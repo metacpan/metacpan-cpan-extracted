@@ -1,0 +1,25 @@
+XML::CompareML
+
+XML::CompareML is a processor for the CompareML XML grammar, which is used
+to maintain multi-system, multi-item comparisons. An example for such
+a comparison is the Better SCM Comparison of version control systems:
+
+http://better-scm.berlios.de/comparison/
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 Shlomi Fish
+
+This library is free software; you can redistribute it and/or modify
+it under the terms of the MIT X11 license.
+

@@ -1,0 +1,19 @@
+# test disallowed facet types and values
+# only 1 test per file, as first test will always fail the whole file when the schema is parsed
+
+--- |
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="bad_length" type="bad_length"/>
+  <xs:simpleType name="bad_length">
+    <xs:restriction base="xs:decimal">
+      <xs:length value="-1"/>
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>
+
+--- |
+  <bad_length>1</bad_length>
+--- >
+FAIL /nonNegativeInteger/
+
+

@@ -1,0 +1,33 @@
+---
+abstract: 'Extensible XML Reader and Writer'
+author:
+  - 'Nils Diewald'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: XML-Loy
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Mojolicious: '6.05'
+  Scalar::Util: '0'
+  Socket: '1.97'
+  Test::More: '0'
+  Test::Warn: '0.24'
+  Time::Local: '1.2'
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/Akron/XML-Loy/issues
+  license: http://www.opensource.org/licenses/artistic-license-2.0
+  repository: https://github.com/Akron/XML-Loy.git
+version: '0.45'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

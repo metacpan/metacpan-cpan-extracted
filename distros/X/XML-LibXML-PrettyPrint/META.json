@@ -1,0 +1,75 @@
+{
+   "abstract" : "add pleasant whitespace to a DOM tree",
+   "author" : [
+      "Toby Inkster <tobyink@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.016, CPAN::Meta::Converter version 2.140640",
+   "keywords" : [],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "XML-LibXML-PrettyPrint",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "optional_features" : {},
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter::Tiny" : "0",
+            "XML::LibXML" : "1.62",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.96",
+            "Test::Warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "XML::LibXML::PrettyPrint" : {
+         "file" : "lib/XML/LibXML/PrettyPrint.pm",
+         "version" : "0.006"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "X_identifier" : "http://purl.org/NET/cpan-uri/dist/XML-LibXML-PrettyPrint/project",
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Dist/Display.html?Queue=XML-LibXML-PrettyPrint"
+      },
+      "homepage" : "https://metacpan.org/release/XML-LibXML-PrettyPrint",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/tobyink/p5-xml-libxml-prettyprint.git",
+         "web" : "https://github.com/tobyink/p5-xml-libxml-prettyprint"
+      }
+   },
+   "version" : "0.006",
+   "x_provides_scripts" : {
+      "xml-pretty" : {
+         "file" : "bin/xml-pretty"
+      }
+   }
+}

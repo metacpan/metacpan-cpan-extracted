@@ -1,0 +1,26 @@
+This directory contains the documentation for the XML::Schema modules.
+
+The 'html' directory contains the documentation in HTML format.
+
+The 'pod' directory contains POD files which are automatically grafted
+onto the appropriate .pm modules in the '../lib' directory during 
+the 'make dist' process (you generally don't need to worry about this).
+
+The other directories contain various XML files, Template Toolkit
+templates, scripts, config files, and so on, which are used to build
+the HTML and POD documentation from source.  Again, this is only 
+something you need to worry about if you want to make any updates 
+to the documentation and rebuild it (patches welcome to the code and/or
+documentation!).
+
+If you want to rebuild the documentation then you'll need to have the 
+Template Toolkit v2.04 or later installed, the XML::DOM module v1.27
+or later, and possibly some other modules that I forget right now...
+All you need to do is run the bin/build script and leave it to take
+care of the rest.  It generates a ttree config file suitable for your
+site, using the etc/ttree.tt2 template as source.  It then invokes
+ttree to build the documentation using this output configuration 
+file, sending the output to the 'html' directory.
+
+Enjoy
+A

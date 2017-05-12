@@ -1,0 +1,138 @@
+Revision history for Perl extension XML::RAI.
+
+1.3031 Aug 14 2009
+    - Added memory leak test
+    - Added Test::Weaken and Task::Weaken modules to support "weakening" of circular references
+    - Dropped class level caching of XML::RSS::Parser that was causing the leaks test to fail
+
+1.303 Aug 13 2009
+    - Applied memory leak patch from Mark Glines (mark@glines.org) Thanks!
+	
+1.3022July 18 2007
+    - Changed XML::RAI::Object's date handler to avoid an apparent bug in 
+      Date::Format::strftime. Thanks to Tim Sweetman.
+
+1.301Nov 20 2005
+    - Fixed Makefile dependencies
+
+1.3  Nov 18 2005
+    - Seperated out XML::RSS::Parser reversing a bad idea.
+    - Introduced add_mapping method to all objects.
+    - Now requires XML::RSS::Parser 4.0.
+    - Various mapping tweaks.
+    - Numerous bug fixes.
+    - Test. A lot of them.
+
+1.21 Jul 16 2005
+    - Replaced use of Style param in XML::RSS::Parser constructor with
+      standard Handlers param. This lowered the prerequisite version of 
+      XML::Parser needed.
+
+1.2  Jan 16 2005
+    - POTENTIAL BREAK: XML::RAI::Object::source has been renamed src. This fixes
+      a boneheaded oversight where XML::RAI::Item had two documented source
+      methods. The source method for retreiving any RSS source attributes
+      was overloading the XML::RAI::Object source method to retreive the 
+      underlying XML::RSS::Parser::Element object. This was completely fouling 
+      up retreival in an ARRAY context for all the RSS methods in the
+      XML::RAI::Item class. This change required numerous modifications 
+      throughout the XML::RAI classes to reflect this naming change.
+
+1.11 Jan 09 2005
+    - Fixed condition that was generating "Use of uninitialized value in 
+      localtime" warning.
+
+1.1  Jan 09 2005
+    - Dropped POSIX dependency in favor of Date::Format. 
+    - Added EPOCH time formatting option
+    - Fixed time_format bug were PASS_THRU could not be set. (Kevin Frost)
+    - Fixed PASS_THRU bug were an XML::RSS::Parser::Element object would be 
+      returned instead of a string. (Kevin Frost)
+    - Fixed bug were date normalization was ignoring timezone and using the 
+      local system timezone instead. (Kevin Frost)
+
+1.04 Nov 22 2004
+    - Added the Technorati API namespace to XML::Parser::Element.
+
+1.03 Nov 06 2004
+    - Fixed RAI->item_count bug that was returning one less then the 
+      actual count. (Jason Swan)
+
+1.02 Oct 16 2004
+    - Added missing Class::XPath dependency to Makefile.PL  
+
+1.01 Sep 30 2004
+    - Corrected XML::RSS::Parser prerequisite version to 3.
+    - Added prerequisite version of Date::Parse to 2.26 in RAI::Object.
+    - Switched use of deprecated value method to text_content in 
+      RAI::Object.
+
+1.00 Sep 29 2004
+    - Integrated XML::RSS::Parser package into RAI.
+    - Refactored XML::RSS::Parser to use XML::Elemental package and
+      true tree structure.
+    - Introduced XML::RSS::Parser::Characters class
+    - Exposed internal methods for use with Class::XPath in Element
+    - Added more graceful handling of unrecognized namespace URIs
+    - Deprecated value and append_value. BREAKAGE: Regretfully value method 
+      will not work the same as version 2x of the RSS Parser in some cases.
+      This is due to the adoption of a tree model and how text is handled.
+    - Added as_xml method for reimplementing the version 2x pass-thru 
+      functionality under the tree structure.
+
+0.52 Aug 14 2004
+    - Removed lastBuildDate from the RAI::Item created and modified mappings. A
+      good idea gone bad if you are trying to merge feeds and list out entries 
+      chronological order.
+    - Added minimum version of 0 to POSIX an Date::Parse in Makefile.PL.
+    - Time handlers (created, modified etc) return UTC rather then local time
+
+0.51 Jun 09 2004
+    - Fixed multiple feed images bug that caused RAI to choke. (Mike Axelrod)
+    - Add rdf:resource to image URL mapping.
+
+0.50 May 03 2004
+    - Added special link handlers to make up for Class::XPath's (1.4)
+      lack of not() function and compound logical statements.
+    - Fixed guid mapping. Added link module to mappings.
+    - Added created_strict, issued_strict, and modified_strict methods
+      to Element and Channel.
+    - Class::XPath not liking 'description[@type="text/html"]'. 
+      Removed from content_strict mapping for now.
+    - Fixed deprecated contentstrict support.
+
+0.41 Apr 28 2004
+    - Fixed bad XPath statement in item/content_strict.
+
+0.4  Apr 27  2004
+    - Added content_strict. Deprecated contentstrict.
+    - Modified mappings of channel/issued, channel/modified, relation,
+      item/content, item/content_strict, item/creator, source.
+    - Switched isPermalink to isPermaLink in link mapping.
+    - Added pinged method to item. 
+    - Folded channel/alt_table into description.
+    - Fixed time_handler bug were no matches were not being caught 
+      and handled.
+    
+0.3  Apr 18 2004
+    - Added ability to instaniate RAI with an existing 
+      XML::RSS::Parser tree.
+    - Promoted @xml:lang in Channel and Item
+    - Added Trackback "RSS 2.0" support in Item
+    - Added identifier rdf:resource support in Item
+    - Added dcterms:identifier to identifier in Item.
+    - Added alt_title method to Channel
+    
+0.2  Apr 06 2004
+    - Added time_format method to RAI and timestamp normalization 
+      to Object.
+    - Added a created method to Item
+    - Added a ping method to Item
+    - Added trackback:about to the related mapping of Item
+    - Added xml:lang to the language mapping of Item
+    - Missing documentation inserted
+    - Dumped shared channel/item mapping. Each have their own
+      separate maps now.
+
+0.1  Mar 12 2004
+	- Initial release into CPAN.

@@ -1,0 +1,204 @@
+#!/usr/bin/perl
+
+use SQL::Translator;
+use SQL::Translator::Schema::Constants;
+use SQL::Translator::Parser::XML::Xmldoom;
+use SQL::Translator::Producer::XML::Xmldoom;
+use Getopt::Long;
+use IO::File;
+use strict;
+
+# for debugging
+use Data::Dumper;
+use Carp;
+
+$SIG{__DIE__} = sub {
+	Carp::confess(@_);
+	#Carp::confess;
+};
+
+sub drop_fkeys
+{
+	my $schema = shift;
+
+	foreach my $table ( $schema->get_tables )
+	{
+		my @constraints = $table->get_constraints;
+		
+		foreach my $cons ( @constraints )
+		{
+			if ( $cons->type eq FOREIGN_KEY )
+			{
+				$table->drop_constraint( $cons );
+			}
+		}
+	}
+}
+
+sub drop_other_tables
+{
+	my $schema = shift;
+
+	my $translator = $schema->translator;
+	my $producer_args  = $translator->producer_args;
+	my $allowed_tables = $producer_args->{allowed_tables};
+
+	my @tables = $schema->get_tables;
+	foreach my $table ( @tables )
+	{
+		my $drop = 1;
+
+		foreach my $name ( @$allowed_tables )
+		{
+			if ( $table->name eq $name )
+			{
+				$drop = 0;
+				last;
+			}
+		}
+
+		if ( $drop )
+		{
+			$schema->drop_table( $table );
+		}
+	}
+}
+
+sub main_convert
+{
+	my $database_xml;
+	my $output;
+	my $producer;
+	my @allowed_tables;
+	my $drop_foreign_keys = 0;
+
+	my $result = GetOptions(
+		'database-xml|D:s'  => \$database_xml,
+		'output|o:s'        => \$output,
+		'producer|P:s'      => \$producer,
+		'only-table|t:s'    => \@allowed_tables,
+		'drop-foreign-keys' => \$drop_foreign_keys,
+	);
+
+	if ( not defined $database_xml )
+	{
+		die "Must specify a file with --database-xml";
+	}
+	if ( not defined $producer )
+	{
+		die "Must specify a producer name with --producer";
+	}
+
+	my $translator = SQL::Translator->new(
+		filename => $database_xml,
+		parser   => 'SQL::Translator::Parser::XML::Xmldoom',
+		producer => $producer,
+	);
+
+	if ( scalar @allowed_tables > 0 )
+	{
+		$translator->producer_args( allowed_tables => \@allowed_tables );
+		$translator->filters( \&drop_other_tables );
+	}
+
+	if ( $drop_foreign_keys )
+	{
+		$translator->filters( \&drop_fkeys );
+	}
+
+	my $result = $translator->translate()
+		or die $translator->error;
+	
+	if ( defined $output )
+	{
+		my $fd = IO::File->new($output, 'w');
+		$fd->write($result);
+		$fd->close();
+	}
+	else
+	{
+		print $result;
+	}
+}
+
+sub main_create
+{
+	my $output;
+	my $parser;
+	my $dsn;
+	my $username;
+	my $password;
+	my @allowed_tables;
+
+	my $result = GetOptions(
+		'output|o:s'     => \$output,
+		'parser|P:s'     => \$parser,
+		'dsn:s'          => \$dsn,
+		'username|u:s'   => \$username,
+		'password|p:s'   => \$password,
+		'only-table|t:s' => \@allowed_tables,
+	);
+
+	my $filename = shift @ARGV;
+	if ( scalar @ARGV )
+	{
+		die "Can specify one and only one file";
+	}
+
+	if ( not defined $parser )
+	{
+		die "Must specify a parser name with --parser";
+	}
+
+	my $translator = SQL::Translator->new(
+		filename => $filename,
+		producer => 'SQL::Translator::Producer::XML::Xmldoom',
+		parser   => $parser,
+		parser_args => {
+			dsn         => $dsn,
+			db_user     => $username,
+			db_password => $password
+		}
+	);
+
+	if ( scalar @allowed_tables > 0 )
+	{
+		$translator->producer_args( allowed_tables => \@allowed_tables );
+		$translator->filters( \&drop_other_tables );
+	}
+
+	my $result = $translator->translate()
+		or die $translator->error;
+	
+	if ( defined $output )
+	{
+		my $fd = IO::File->new($output, 'w');
+		$fd->write($result);
+		$fd->close();
+	}
+	else
+	{
+		print $result;
+	}
+}
+
+sub main
+{
+	my $mode = shift @ARGV;
+
+	if ( $mode eq 'convert' )
+	{
+		main_convert;
+	}
+	elsif ( $mode eq 'create' )
+	{
+		main_create;
+	}
+	else
+	{
+		die "Must specify a valid mode.";
+	}
+}
+
+main;
+

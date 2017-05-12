@@ -1,0 +1,26 @@
+--- #YAML:1.0
+name:               XML-Atom-Ext-Inline
+version:            0.02
+abstract:           In-lining Extensions for Atom
+author:
+    - Dmitri Popov <operator@cv.dp-net.com>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Test::More:  0
+    XML::Atom:   0
+resources:
+    bugtracker:  http://github.com/pin/xml-atom-ext-inline/issues
+    repository:  git://github.com/pin/xml-atom-ext-inline.git
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.55_02
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

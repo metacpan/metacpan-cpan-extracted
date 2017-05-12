@@ -1,0 +1,28 @@
+severity = brutal
+verbose = 8
+exclude = CodeLayout::ProhibitHashBarewords Perl::Critic::Policy::Documentation::RequirePODUseEncodingUTF8 Editor::RequireEmacsFileVariables Modules::RequirePerlVersion Tics::ProhibitLongLines
+
+[CodeLayout::RequireTidyCode]
+perltidyrc = xt/author/perltidy.rc
+
+# using Modern::Perl
+[Compatibility::PerlMinimumVersionAndWhy]
+above_version = 5.010
+[Compatibility::PodMinimumVersion]
+above_version = 5.010
+
+[Documentation::RequirePodSections]
+lib_sections = NAME | VERSION | SYNOPSIS | DESCRIPTION | SUPPORT | AUTHOR | COPYRIGHT AND LICENSE
+script_sections = NAME | USAGE | DESCRIPTION | CONFIGURATION | SUPPORT | AUTHOR | COPYRIGHT AND LICENSE
+
+[Subroutines::ProhibitCallsToUndeclaredSubs]
+exempt_subs = Const::Fast::const Moo::has
+
+[Subroutines::ProhibitUnusedPrivateSubroutines]
+private_name_regex = _(?!build_)\w+
+
+[TestingAndDebugging::RequireUseStrict]
+equivalent_modules = Modern::Perl
+
+[TestingAndDebugging::RequireUseWarnings]
+equivalent_modules = Modern::Perl

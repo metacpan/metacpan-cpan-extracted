@@ -1,0 +1,65 @@
+2.06    2010-12-16    Better error reporting
+
+2.05    2010-08-13    Bugfix: BOMs exist
+
+2.04    2010-04-22    Bugfix: CDATA in attribute may contain quote chars
+
+2.03    2010-01-13    Bugfix: element and attribute names can begin with
+                        an underscore
+
+2.02    2009-03-24    Back out the DOMmish stuff, and move that into a
+                        seperate distribution - XML-Tiny-DOM
+
+2.01    2009-03-23    Remove values() method from DOMmish interface - not
+                        needed because we have ...->element('*')
+
+2.0     2009-03-22    Add parsedommish() constructor, taken from
+                        experimental rsnapshot fork
+
+1.12    2008-01-22    Fixed bug in handling strings of XML with newlines in
+
+1.11    2007-11-01    Fix broken TAP in POD tests
+
+1.10    2007-10-29    POD tests no longer require Test::More (thanks
+                        to Jonathan Stowe for pointing this bug out)
+
+1.09    2007-10-29    Fixed filehandle localisation bug
+
+1.08    2007-10-25    Fixed another bug in self-closing tags, introduced in
+                        1.07 and again reported by Sergio.
+
+1.07    2007-10-24    Fixed bug in self-closing tags, thanks to Sergio
+                        Fanchiotti.
+                      Added POD tests.
+
+1.06    2007-03-04    Fixed bug in open tags with no attributes and a single
+                        whitespace char between the name and the >.  Thanks
+                        to Gary Ansok.
+
+1.05    2007-02-27    Localised warnings;
+                      Better testing of filehandles
+                        (both thanks to SAPER)
+
+1.04    2007-02-11    Optionally reject documents with ENTITY and DOCTYPE
+                        declarations;
+                      Optionally pass entities through without decoding 'em;
+                      Optionally get all bondage-and-discpline about entities;
+                      More careful pruning out of processing instructions;
+                      Reject a few more small well-formedness violations;
+                      Doco updates;
+                      Attributes can now contain the > character;
+                      Numeric entities now supported.
+
+1.03    2007-02-03    Added CDATA support;
+                      Removed some of the more inflammatory comments in the
+                        docs :-)
+
+1.02    2007-01-30    More 5.004 compatibility fixes;
+                      Better support for attributes, again thanks to Matt
+                        Knecht
+
+1.01    2007-01-29    Fixed for 5.004_05, with thanks to David Romano;
+                      Added support for passing a string of XML, also at
+                        David Romano's suggestion;
+                      Added basic support for attributes, thanks to Matt
+                        Knecht

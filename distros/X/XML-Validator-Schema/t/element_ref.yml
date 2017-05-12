@@ -1,0 +1,49 @@
+# test a simple schema that allows multiple root elements and uses refs
+
+--- |
+  <?xml version="1.0" encoding="UTF-8"?>
+  <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:element name="bar" type="xs:string"/>
+    <xs:element name="foo">
+      <xs:complexType>
+        <xs:sequence>
+          <xs:element name="bing" minOccurs="0"/>
+          <xs:element name="bong" minOccurs="0"/>
+        </xs:sequence>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="container">
+      <xs:complexType>
+        <xs:sequence>
+          <xs:element ref="foo"/>
+          <xs:element ref="bar"/>
+        </xs:sequence>
+      </xs:complexType>
+    </xs:element>
+  </xs:schema>
+
+--- |
+  <container>
+    <foo />
+    <bar />
+  </container>
+--- >
+PASS
+
+--- |
+  <container>
+    <foo>
+      <bing />
+      <bong />
+    </foo>
+    <bar />
+  </container>
+--- >
+PASS
+
+--- |
+  <container>
+    <foo />
+  </container>
+--- >
+FAIL

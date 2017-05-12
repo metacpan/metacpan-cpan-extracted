@@ -1,0 +1,43 @@
+---
+abstract: 'Fast and modular implementation for an XML-RPC client and server'
+author:
+  - 'Mons Anderson, C<< <mons@cpan.org> >>'
+  - 'Mons Anderson <mons@cpan.org>'
+build_requires:
+  Encode: 0
+  ExtUtils::MakeMaker: 6.62
+  Test::More: 0
+  Test::NoWarnings: 0
+  lib::abs: 0.90
+configure_requires:
+  ExtUtils::MakeMaker: 6.62
+dynamic_config: 0
+generated_by: 'Module::Install version 1.04, CPAN::Meta::Converter version 2.112150'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: XML-RPC-Fast
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+recommends:
+  AnyEvent: 5.0
+  AnyEvent::HTTP: 0
+  DateTime::Format::ISO8601: 0
+  MIME::Base64: 0
+  Sub::Name: 0
+  WWW::Curl: 0
+requires:
+  HTTP::Headers: 0
+  HTTP::Request: 0
+  HTTP::Response: 0
+  LWP::UserAgent: 0
+  XML::Hash::LX: 0.05
+  XML::LibXML: 1.58
+  perl: 5.008003
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.8

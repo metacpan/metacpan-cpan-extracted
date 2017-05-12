@@ -1,0 +1,33 @@
+Module: XML::Excel
+
+Description:
+    XML::Excel provides functions to easily transform Excel documents into XML.  The module uses 
+    Spreadsheet::ParseExcel to parse Excel files and put into perl data structure.  The perl data 
+    structure is then written into xml data structure.  XML::Excel allows to create your own Spreadsheet::ParseExcel
+    object with defaults that fit your needs or just use defaults.  I will enhance it's functionality as time permits.  
+    Efficiency is very important in parsing and writting large docs so one of the next enhancements will include 
+    an option for creating a data structure or write as you parse.  That will eliminate the need for storing a data 
+    structure before writting xml.  The data structure has it's own benefits, since it allows you to provide your 
+    own structure or modify the existing one before you write to xml.  Any ideas or requests for enhancements or 
+    added functionality are very welcomed, so please feel free to email them to me.
+
+Copying:
+    Copyright (c) 2001 Ilya Sterin. All rights reserved.
+
+    This program is free software; you can redistribute it and/or modify
+    it under the same terms as Perl itself.
+
+Prerequisites:
+    perl 5.002
+    Spreadsheet::ParseExcel 
+    OLE::Storage_Lite (needed by Spreadsheet::ParseExcel module)
+
+Build/Installation:
+    Standard build/installation supported by ExtUtils::MakeMaker(3)...
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+Author:
+    Ilya Sterin <isterin@mail.com>

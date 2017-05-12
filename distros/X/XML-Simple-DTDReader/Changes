@@ -1,0 +1,13 @@
+Revision history for Perl extension XML::Simple::DTDReader.
+
+0.01  Thu Mar  6
+	* Original release
+
+0.02  Thu Feb 18
+	* Bugfix: close filehandles when finished with them
+
+0.03  Fri May  6
+        * Fixed failing test
+
+0.04  Sat Jul 30
+        * Bugfix: failed loading leaves the cwd unchanged

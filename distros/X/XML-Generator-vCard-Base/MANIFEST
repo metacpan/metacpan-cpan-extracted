@@ -1,0 +1,8 @@
+Build.PL
+Changes
+lib/XML/Generator/vCard/Base.pm
+Makefile.PL
+META.yml
+MANIFEST
+README
+t/00-load.t

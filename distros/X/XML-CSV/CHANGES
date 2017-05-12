@@ -1,0 +1,23 @@
+Revision history for Perl extension XML::CSV.
+
+0.10  Wednesday Jan 17 13:11:00 2001
+	-Fixed the failed test
+	
+0.11  Sunday Mar 18 16:54:00 2001
+	-Added sub_char attribute to parse_doc() to
+	allow to specify a character(s) with which
+	illegal chars will be replaced in tags.
+	-Added file_tag, parent_tag, format to print_xml()
+	to allow setting the xml parent file tag and xml
+	parent record tag, also to allow to specify the
+	character to use to indent child nodes.  Space, "\t",
+	or any other character(s) can be used.
+	
+0.14  Monday Apr 16 23:30:00 2001
+	-Added declare_xml() and declare_doctype() functions
+	to allow for xml declaration and doctype declarations.
+	
+0.15  Tuesday May 15 12:51:00 2001
+	-Fixed documentation (pod) bug.
+	-column headings are now default to <tr$loop_num> instead of <$tag> to conform
+	to XML standard of tag names strting with alphabetic chars or '_'.

@@ -1,0 +1,14 @@
+1.1.1  - Fix deep recrusion in perl-5.24
+1.1.0  - String operator overloaded to xml_write
+1.0.11 - Support Soapish element names
+1.0.10 - Use root XML_Decl
+1.0.9  - Explicitly return undef from xml_subnode
+1.0.8  - Fix XML Decl in html example
+1.0.7  - Pod typos 
+1.0.6  - Improve(?) pod, fix xml_nesting bug
+1.0.5  - Add contributors to meta
+1.0.4  - Sync changelog
+1.0.3  - Update description
+1.0.2  - Favor InstanceOf over bare classnames
+1.0.1  - Typos, Dist::Zilla support, README.mkdn
+1.0.0  - Initial release

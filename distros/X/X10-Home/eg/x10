@@ -1,0 +1,95 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use Pod::Usage;
+use X10::Home;
+use Log::Log4perl qw(:easy);
+use Getopt::Std;
+
+getopts("v", \my %opts);
+
+Log::Log4perl->easy_init($opts{v} ? $DEBUG : $ERROR);
+
+my($device, $command) = @ARGV;
+
+if(!defined $device or ! defined $command) {
+    pod2usage("parameter missing");
+}
+
+my $x10 = X10::Home->new();
+
+if(! exists $x10->{receivers}->{$device}) {
+    pod2usage("Unknown receiver '$device'");
+}
+
+if(! $x10->command_valid($command)) {
+    pod2usage("Unknown command '$command'");
+}
+
+if($command eq 'status') {
+    if($x10->db_status($device) eq 'on') {
+        print "on\n";
+    } else {
+        print "off\n";
+    }
+} else {
+    $x10->send($device, $command);
+}
+
+__END__
+
+=head1 NAME
+
+    x10home - Control X10 devices by name
+
+=head1 SYNOPSIS
+
+    $ x10home device_name command
+
+=head1 DESCRIPTION
+
+C<x10home> controls devices configured by C<X10::Home> on the command line.
+If you have a configuration file like
+
+    #x10.conf sample file
+    module: ControlX10::CM11
+    device: "/dev/ttyS0"
+    receivers:  
+      - name: office_lights
+        code: K10
+        desc: Office Back Lights
+      - name: water
+        code: K11
+        desc: Plant Sprinkler
+
+then running
+
+    $ x10 office_lights on
+
+will send an 'on' command to the device with house code 'K' and unit
+code '10'. To query the (assumed) status of the device, run
+
+    $ x10 office_lights status
+    on
+
+afterwards.
+
+=head1 EXAMPLES
+
+  $ x10 office_lights on
+  $ x10 office_lights status
+  on
+
+  $ x10 office_lights off
+  $ x10 office_lights status
+  off
+
+=head1 LEGALESE
+
+Copyright 2007 by Mike Schilli, all rights reserved.
+This program is free software, you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+2007, Mike Schilli <cpan@perlmeister.com>

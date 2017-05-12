@@ -1,0 +1,88 @@
+Revision history for Perl extension XML::Elemental.
+
+2.11  Nov 24 2009
+    - Fixed another circular reference that was causing memeory leaks.
+
+2.1   Jan 06 2008
+    - Dropped Class::Accessor dependency in favor of our own simple 
+      lighter weight accessors. Less is more. ;)
+    - Added in_element and ancestors methods to all nodes. 
+    - Added the root_element method to XML::Elemental::Document.
+    - Added tests for root_element, in_element and ancestors.
+    - Fixed contents and attributes so they absolutely will return an
+      empty ARRAY or HASH reference (respectively) if not set.
+
+2.02  Jan 02 2008
+    - Nothing new. Just the intended version number for the last 
+      release.
+
+2.012 Jan 02 2008
+    - I found a break in 2.01 whereby the root method would 
+      return the object being wrapped and not the proxy object.
+      Small, but significant enough break that I decided to reverse 
+      changes made in 2.01. No more proxy object and
+      Object::Destroyer. Instead I'm using the weaken method in
+      Scalar::Util making it and Task::Weaken new
+      dependencies as of this release. Weak reference was a
+      new feature in Perl 5.6.0 thereby making that the required
+      minimum version.
+
+2.011 Jan 01 2008
+    - Nothing new. Just a distribution sans the %$!*#~@ OS X
+      resource files. (Note to self add 'export
+      COPYFILE_DISABLE=1' in .bash_profile on all Leopard
+      machines.)
+      
+2.01  Dec 31 2007
+    - POTENTIAL BREAK: Rearranged code to address the
+      boneheaded oversight of using a circular reference in
+      the parse tree and failing to breaking up. This caused
+      memory to leak. The change involved making
+      XML::Elemental::Document a subclass of
+      Object::Destroyer that works as a proxy to the real
+      object implementation. This *should* be entirely
+      transparent to existing code; however, there is the
+      possibility that I overlooked some usage scenario that
+      this change will break.
+
+2.0  Nov 16 2005
+    - Convert to SAX-based system. (XML::Elemental::SAXHandler
+      added to the distribution.)
+    - Switched to Clarkian notation
+    - Added parser method to XML::Elemental for convienance.
+    - Added XML::Elemental::Util to the distribution.
+    - Added testing suite finally.
+
+1.1  Apr 02 2005
+    - Removed deprecated dynamic class factory code
+    - Unreleased
+
+1.03 Sep 30 2004
+    - Fixed corrupted distribution file
+
+1.02 Sep 29 2004
+    - Fixed XML::Elemental::Node documentation. No code changes.
+
+1.01 Sep 21 2004
+    - Fixed bad logic in XML::Parser::Style::Elemental::ns_qualify
+
+1.00 Apr 22 2004
+    - Package name changed to XML::Elemental.
+    - Created an abstract class and three generic classes to use 
+      instead of dynamic class generation.
+    - Dynamic class generation is deprecated.
+
+0.50 Apr 17 2004
+    - Added root method to all dynamic objects.
+    - Added text_content method to dynamic Element object.
+
+0.41 Apr 04 2004
+	- Fixed bug were Character objects were not being attached to
+	  their parent if a contents array reference did not already 
+	  exist.
+	- Fixed bug were attributes were not being assigned the 
+	  namespace URI of their parent tag if a prefix was not 
+	  designated.
+
+0.40 Mar 21 2004
+	- Initial release into CPAN as XML::Parser::Style::Elemental

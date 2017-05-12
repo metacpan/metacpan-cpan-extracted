@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Schema definition of a product -->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+   <xsd:include schemaLocation="componentDepList.xsd"/>
+   <xsd:include schemaLocation="productDepList.xsd"/>
+   <xsd:include schemaLocation="platformList.xsd"/>
+   <xsd:include schemaLocation="ownerInfo.xsd"/>
+   <xsd:element name="product" type="product"/>
+   <xsd:complexType name="product">
+      <xsd:sequence>
+         <xsd:annotation>
+            <xsd:documentation>In order to replace the control_file data, we need to include the path to the root mtf file we could call this field "packageRoot".</xsd:documentation>
+         </xsd:annotation>
+         <xsd:element name="owner" type="ownerInfo" minOccurs="0">
+            <xsd:annotation>
+               <xsd:documentation>This field is the development owner of the component.  It identifies a group or person responsible.</xsd:documentation>
+            </xsd:annotation>
+         </xsd:element>
+         <xsd:element name="productName" type="xsd:string">
+            <xsd:annotation>
+               <xsd:documentation>product_list: without lowercasing</xsd:documentation>
+            </xsd:annotation>
+         </xsd:element>
+         <xsd:element name="productVersion" type="xsd:string">
+            <xsd:annotation>
+               <xsd:documentation>Version from the control file</xsd:documentation>
+            </xsd:annotation>
+         </xsd:element>
+         <xsd:element name="licenseName" type="xsd:string">
+            <xsd:annotation>
+               <xsd:documentation>flexlm_name in the control_file</xsd:documentation>
+            </xsd:annotation>
+         </xsd:element>
+         <xsd:element name="externalProductIdentifier" type="xsd:nonNegativeInteger">
+            <xsd:annotation>
+               <xsd:documentation>bit_number in control_file</xsd:documentation>
+            </xsd:annotation>
+         </xsd:element>
+         <xsd:element name="released" type="xsd:boolean" default="true">
+            <xsd:annotation>
+               <xsd:documentation>This is IN/OUT in the control_file</xsd:documentation>
+            </xsd:annotation>
+         </xsd:element>
+         <xsd:element name="releasePlatforms" type="platformList">
+            <xsd:annotation>
+               <xsd:documentation>The value "all" corresponds to the default in the control_file and will be expanded in the releaseData.xml file.</xsd:documentation>
+            </xsd:annotation>
+         </xsd:element>
+         <xsd:element name="dependsOn" type="componentDepList" minOccurs="0"/>
+         <xsd:element name="requiredProducts" type="productDepList" minOccurs="0">
+            <xsd:annotation>
+               <xsd:documentation>required in control_file</xsd:documentation>
+            </xsd:annotation>
+         </xsd:element>
+         <xsd:element name="recommendedProducts" type="productDepList" minOccurs="0">
+            <xsd:annotation>
+               <xsd:documentation>recommend in control_file</xsd:documentation>
+            </xsd:annotation>
+         </xsd:element>
+      </xsd:sequence>
+      <xsd:attribute name="name" type="xsd:string" use="required">
+         <xsd:annotation>
+            <xsd:documentation>lower case product_list from control_file.  This must match the filename and be unique among products.</xsd:documentation>
+         </xsd:annotation>
+      </xsd:attribute>
+   </xsd:complexType>
+</xsd:schema>

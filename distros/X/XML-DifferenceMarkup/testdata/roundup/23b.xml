@@ -1,0 +1,4 @@
+<?xml version="1.0"?>
+<dm:new xmlns:dm="http://www.deadmouse.com/">
+  <dm2:second xmlns:dm2="http://www.deadmouse.com/2"/>
+</dm:new>

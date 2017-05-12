@@ -1,0 +1,194 @@
+0.45 2016-09-09
+        - Fixed Kwalitee measures.
+
+0.44 2016-07-21
+        - Fixed Mojolicious 7 support.
+
+0.43 2016-04-01
+        - Fixed Makefile.PL script to generate
+          resource details in META files (Manwar++).
+        - Added travis support.
+
+0.42 2015-09-22
+        - Fixed attribute parameter in XML::Loy::XRD.
+
+0.41 2015-08-29
+        - Fixed '0'-Text bug (kappa++).
+
+0.40 2015-05-26
+        - Added test counts to Test::More.
+
+0.39 2015-04-26
+        - Fix root selector bug in XRD.
+
+0.38 2015-04-02
+        - Fixed attribute selector bug in XML::Loy::Atom.
+
+0.37 2015-03-22
+        - Updated to recent Mojolicious (6.03).
+
+0.36 2015-02-14
+        - Added more metadata to Makefile.PL (renee++).
+        - Fixed root element handling in XRD (renee++ for reporting).
+
+0.35 2015-02-01
+        - Added Socket dependency (probably for newer
+          versions of Mojolicious).
+
+0.34 2015-01-25
+        - Fixed weird DESTROY warning with Mojolicious 5.73.
+        - Updated year.
+
+0.33 2015-01-16
+        - Fixed namespace handling for 5.71 (renee++ for reporting!).
+        - Fixed root element handling in empty docs for 5.72.
+
+0.32 2015-01-03
+        - Fixed set.t test for wrong attribute name (srezic++ for reporting!).
+        - Fixed type checking in Atom.t for root nodes.
+
+0.31 2014-12-14
+        - Fixed access to root node.
+        - Fixed dependency for fixed root node access.
+
+0.30 2014-11-20
+        - Switched to canonical use of map (sri++).
+
+0.29 2014-11-19
+        - Switched to map from deprecated pluck in Mojo::Collection.
+        - Removed usage of deprecated OO Mojo::JSON access.
+
+0.28 2014-10-29
+        - Made RFC3339 more relaxed (like in Mojo::Date).
+
+0.27 2014-10-15
+        - Fix requirements in Makefile.
+        - Minor optimizations in Atom.
+        - Updated all years.
+        - Less experimental modules.
+
+0.26 2014-06-30
+        - Corrected year in changes file (Thanks, Karjala!).
+
+0.25 2014-02-19
+        - Update year.
+        - Improvements on documentation.
+        - Fix minor problem in value return.
+        - Updated to recent Mojolicious (4.81).
+
+0.24 2014-02-12
+        - Fixed bug in ActivityStreams.
+        - Updated to recent Mojolicious (4.77).
+
+0.23 2013-08-17
+        - Fixed docs.
+
+0.22 2013-08-16
+        - Added OStatus extension.
+        - Fix bug in ActivityStreams.
+
+0.21 2013-08-16
+        - Fix GeoRSS bug.
+
+0.20 2013-08-16
+        - Small optimizations.
+        - Added GeoRSS extension.
+
+0.19 2013-08-01
+        - Fixed compatibility bugs to Mojolicious 4.23.
+        - No backwards compatibility, as now Mojo::DOM::attr
+          is used instead of Mojo::DOM::attrs.
+
+0.18 2013-05-20
+        - Fixed compatibility bug to Mojolicious 4.0.
+
+0.17 2013-04-15
+        - Added experimental on_init hook.
+        - Made -base faster.
+        - Changed return value of extension().
+
+0.16 2013-04-12
+        - Fixed a small bug in extension copying.
+        - Fixed a huge bug in XML treatment of strings.
+        - Added experimental as() method.
+        - Fixed add for fragments.
+        - Fixed sequence bug in XRD.
+        - Added experimental note to extension.
+
+0.15 2013-04-06
+        - Small improvement in filter_rel().
+        - Added default namespace to 'XML::Loy::' via
+          prepended minus symbol.
+        - Changed namespace prefix to 'loy' and
+          namespace to 'http://sojolicio.us/ns/xml-loy'.
+        - Improvements to documentation.
+
+0.14 2013-04-03
+        - Improved test suite.
+        - Added experimental filter_rel() method to
+          XML::Loy::XRD.
+
+0.13 2013-03-29
+        - Fixed bug for XML string on construction.
+        - Some documentation improvements.
+        - Fixed bug in children() reimplementation.
+
+0.12 2013-03-23
+        - Made mime class method.
+        - Fixed bug for invalid element names.
+
+0.11 2013-03-23
+        - Fixed bug in RFC822.
+
+0.10 2013-03-21
+        - Update Dependency (Unicode).
+        - Add Unicode test.
+
+0.09 2013-03-16
+        - Added Date::RFC822.
+        - Improved Date::RFC3339.
+
+0.08 2013-03-11
+        - Fixed time::local test to work with perl-5.10.1.
+        - Fixed undefined type length in children().
+        - Don't use constants.
+
+0.07 2013-03-10
+        - Added Atom::Threading.
+        - Fixed bug in Atom::link().
+        - Improved Warnings.
+        - Improved tests.
+
+0.06 2013-03-08
+        - Fix indexing error on CPAN.
+        - Reintroduced version information to Date::RFC3339.
+
+0.05 2013-03-08
+        - Fix documentation bugs.
+        - Fix small bug in Atom::category.
+        - Improved documentation.
+        - Delete version information from Date::RFC3339.
+
+0.04 2013-03-08
+        - Added Atom and ActivityStreams.
+        - Replaced "children" with own method.
+        - Initial CPAN release.
+
+0.03 2013-03-06
+        - Renamed MojoX::XML to XML::Loy.
+
+0.02 2013-02-17
+        - Added XRD and HostMeta.
+        - Added namespace, mime and extension attributes.
+        - Removed add_namespace and add_extension methods.
+        - Added set method.
+        - Changed add_ and get_ methods from XRD and Hostmeta.
+
+0.01 2013-02-16
+        - Initial submission to GitHub.
+        - Change class variables to use parameters.
+        - Improve test suite
+
+        - This package was before separation part of the
+          Sojolicious project, see
+          https://github.com/Akron/Sojolicious

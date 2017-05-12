@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<root>
+  <node id="1">koko</node>
+  <node id="2">mato</node>
+  <!-- other node types -->
+  text1
+  <![CDATA[<<cdata-text>>]]>
+  text2
+  <?pi pi-content?>
+  <node a1="A" a0="B" a3="C"/>
+</root>
+
+
+
+
+
+
+
+
+
+
+

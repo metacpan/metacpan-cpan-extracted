@@ -1,0 +1,688 @@
+=head1 NAME
+
+XML::CuteQueries - A cute little query language for converting XML to Perl
+
+=head1 SYNOPSIS
+
+This module produces results rather like L<XML::Simple>, but without the
+ambiguity problems inherent in going from XML to Perl.
+
+    use strict;
+    use warnings;
+    use XML::CuteQueries;
+
+    my $CQ = XML::CuteQueries->new;
+       $CQ->parsefile("example.xml");
+
+    my $result = $CQ->cute_query(result=>'');
+    my $data   = $CQ->cute_query(data=>[row=>{'*'=>''}]);
+    my @data   = $CQ->cute_query("/data/row/*" => '');
+    my %fields = $CQ->hash_query("/data/row[1]/*" => '');
+    my @rows   = $CQ->cute_query("/data/row" => {'*'=>''});
+
+L<XML::CuteQueries> L<is an|perltoot/Inheritance> L<XML::Twig>, so when this
+miniature query language isn't enough for your needs, you can just fall back on
+the Twig methods.
+
+This module isn't likely to do a lot more than the above so it can
+I<remain simple>, something L<XML::Simple> forgot to do.
+
+There is only one user method in this module and it just uses L<XML::Twig> to
+return the data you asked for in a predicable perl structure (see
+L</SIMPLE AMBIGUITIES> for
+details on the author's perception of unpredictability using L<XML::Simple>).
+
+Philosophically, this module aims to be really simple, but it does implement a
+query language that must be learned.  It may be easier to skip ahead to the
+L<examples|/EXAMPLES>.  The details of Cute Queries follow.
+
+=head1 CUTE QUERIES
+
+This module uses the Perl parser to implement a miniature query language called
+I<Cute Queries>.  The queries are not proper Perl code in the traditional sense.
+Although, they do parse as perl.
+
+Cute queries are made up of pairs:
+
+    $what_you_are_requesting => $the_target_data_shape
+
+This detailed description here may be easier to follow if you take a look at the
+L</EXAMPLES> section first -- it probably depends on your temperament.
+
+=head2 B<C<$what_you_are_requesting>>
+
+The C<$what_you_are_requesting> is specified with either XPath
+(L<http://www.w3.org/TR/xpath>) as supported by L<XML::Twig> or with regular
+expressions.  Matching starts at the root element, rather than the document.
+This slightly differs from twig.
+
+    $CQ->parse("<r><x><y>7</y></x></r>");
+
+    my $res = $CQ->cute_query("." => ['//y'=>]); # $res is [7]
+    my $res = $CQ->cute_query("x/y" => ''); # $res is 7
+
+In pure twig, C<$twig->get_xpath("x/y")> would return an empty list (since the
+document starts at C</> instead of C<< <r> >>.
+
+=over 4
+
+=item B<XPATH QUERIES>
+
+The recommended interface for most queries is XPath.  The interface is
+L<XML::Twig>'s lighter version of XPath (there is a heavy version, but it is
+unused here).  See L<XML::Twig/CLASSES> for a brief description of this.
+
+This interface will most likely be faster than the L</REGULAR EXPRESSION QUERIES>
+in most cases.  Therefore, most of the examples in this document are XPath
+queries.
+
+=item B<REGULAR EXPRESSION QUERIES>
+
+Regular expression selectors are matched against each direct descendant one at a
+time.
+
+    $CQ->parse("<r><x>7</x><y>8</y></r>");
+
+    my $res = $CQ->cute_query('.' => {'<re>[xy]</re>' => ''});
+    # $res is { x=>7, y=>8 }
+
+Note that the regular expression is rather like an XPath query, except that it
+is surrounded by C<< <re> >> tags.  It might have been preferable to simply use
+pre-compiled regular expressions, rather than requiring string manipulation,
+except for the fact that C<Regexp> references cannot be meaningfully used as
+hash keys!
+
+    # Example of why this doesn't work:
+    my $hashref = { qr(key) => 1 };
+
+    # It turns out like this:
+    my $actual  = { '(?-xism:key)' => 1 };
+
+You can also negatively assert your regular expression queries -- which wouldn't
+be possible with regular old pre-compiled ones.
+
+    my $res = $CQ->cute_query('.' => {'<nre>x</nre>' => ''});
+    # $res is { y=>7 }
+
+One last thing, this query format isn't XML.  You can skip the closing "tags."
+
+=item B<ATTRIBUTE QUERIES>
+
+In addition to regular expressions and XPath, CQ also supports a light version
+of the attribute selector.
+
+    $CQ->parse("<r> <d a='1' b='2'/> <d a='3' b='4'/> </r>");
+
+    my @a = $CQ->cute_query('/r/d/@a'=>'', '/r/d/@b'=>'', 'd/@*'=>'');
+    # @a = (1,2, 1,2,3,4)
+
+Strictly speaking, XPath and XSL can already do this.  For whatever reason,
+L<XML::Twig> doesn't seem to though.
+
+CQ also supports an attribute selector that's completely illegal in XPath
+outside CQ: C<@*>.
+
+    my @a = $CQ->cute_query(d=>{'@*'=>''});
+    # @a = ({a=>1, b=>2}, {a=>3, b=>4})
+
+The attribute matching expressions are limited to those expressions where the
+attributes at the tail end of the path.  (Is there another kind?)
+
+=item B<KAR QUERIES>
+
+There is a need for non-unique keyed queries, which we here call "keyed array"
+queries, or I<KAR>.  Consider this XML:
+
+    $CQ->parse(qq(<r><m>
+        <x>1</x> <x>2</x> <x>3</x>
+        <y>4</y> <y>5</y> <y>6</y>
+    <m></r>));
+
+Ultimately, you want something like this:
+
+    $m = {x=>[1, 2, 3], y=>[4, 5, 6]}
+
+But but the hash query isn't quite doing it right:
+
+    # gives error:
+    $h = $CQ->cute_query(m=>{'*'=>''});
+
+    # gives {x=>3, y=>6}:
+    $h = $CQ->cute_query({nostrict=>1}, m=>{'*'=>''});
+
+If you prefix you're query with C<[]>, you'll get arrayrefs for each key in the
+result.
+
+    $h = $CQ->cute_query( m => {'[]*'=>''} );
+    $h = $CQ->cute_query( m => {'[]x'=>'', '[]y'=>''} );
+
+    # { x => [1, 2, 3], y => [4, 5, 6] }
+    # hooray!!
+
+=back
+
+=head2 B<C<$the_target_data_type>>
+
+There are three basic target shapes.
+
+=over 4
+
+=item B<C<''>>
+
+The simplest target shape is C<''>.  Actually, non-reference scalar will do the
+trick.  You cold use the string C<"data">, a C<0>, or even an
+L<undef|perlfunc/undef>.
+
+This means you'd like for the request to result in the string value of the
+matches.
+
+    my $res = $CQ->cute_query(field_name => '');
+    # just returns the string in the <field_name> element.
+
+This may produce an error if there's more than one C<< <field_name> >> though.
+CQ will notice that the query is in a scalar context and will raise an error if
+there's more than one match.
+
+You can disable this behavior and instead return the I<first> match.  See
+L</OPTIONS> for the full story on options.
+
+    my $first_match = $CQ->cute_query( {nostrict=>1}, field_name=>1 );
+    # return the first match, presuming there may be more than
+    # one <field_name>
+
+At the risk of making something simple into something complicated, there are
+several scalar sub-types.
+
+=over 4
+
+=item B<recurse_text()>
+
+By default, CQ will only return the text from the matched node when requesting
+scalar-type results.  If you'd like to return all the text, use this scalar
+query sub-type instead.
+
+    my $CQ = XML::CuteQueries
+     ->new->parse("<r><p>Slow <em>down</em> there dude.</p></r>");
+
+    my $r1 = $CQ->cute_query(p=>'');
+    # Slow  there dude.
+
+    my $r2 = $CQ->cute_query(p=>'recurse_text()');
+    # Slow down there dude.
+
+There are several synonyms for this:
+
+    # all the same as $r2
+    my $same = $CQ->cute_query(p=>'a');
+    my $same = $CQ->cute_query(p=>'all');
+    my $same = $CQ->cute_query(p=>'all()');
+    my $same = $CQ->cute_query(p=>'all_text()');
+    my $same = $CQ->cute_query(p=>'r');
+    my $same = $CQ->cute_query(p=>'recurse');
+    my $same = $CQ->cute_query(p=>'recurse()');
+    my $same = $CQ->cute_query(p=>'recurse_text()');
+
+=item B<xml()>
+
+You can also choose to slurp out XML or xhtml using the C<'xml()'> scalar-query
+sub-type.
+
+    my $CQ = XML::CuteQueries
+     ->new->parse("<r><p>Slow <em>down</em> there dude.</p></r>");
+
+    my $r1 = $CQ->cute_query(p=>'');
+    # Slow  there dude.
+
+    my $r2 = $CQ->cute_query(p=>'xml()');
+    # Slow <em>down</em> there dude.
+
+There are several synonyms for this:
+
+    # all the same as $r2
+    my $same = $CQ->cute_query(p=>'x');
+    my $same = $CQ->cute_query(p=>'xml');
+    my $same = $CQ->cute_query(p=>'xml()');
+
+=item B<twig()>
+
+Lastly, if you want to do some twigly powerful things, you can ask for the twig
+elements directly:
+
+    my $CQ = XML::CuteQueries
+     ->new->parse("<r><x>1</x><y>2</y></r>");
+
+    # Print x is 1 and y is 2.
+    my ($x, $y) = $CQ->cute_query('*'=>'twig()');
+    print $x->gi, " is ", $x->xml_string, "\n";
+    print $y->gi, " is ", $y->xml_string, "\n";
+
+Another example:
+
+    my @b = $CQ->cute_query('*'=>'t');
+    $_->set_tag('h1') for @b;
+    $CQ->root->set_tag("html");
+    print $CQ->root->sprint, "\n";
+    # prints this: <html><h1>1</h1><h1>2</h1></html>
+
+There are several synonyms for this:
+
+    # all the same as ($x,$y)
+    my @same = $CQ->cute_query('*'=>'t');
+    my @same = $CQ->cute_query('*'=>'twig');
+    my @same = $CQ->cute_query('*'=>'twig()');
+
+=back
+
+=item B<C<[]>>
+
+The result shape of C<[]> indicates that what you're requesting should point to
+an arrayref of items.  Those items are then named in a I<sub-query>.
+
+    my @data = $CQ->cute_query( "data" => [] );
+    # returns one empty arrayref for each <data> element matched
+
+Typically, you would then put a I<sub-query> in the arrayref to indicate how to fill
+it.  In the example below using the XML from L</EXAMPLES>, C<@data> would
+contain one arrayref for each C<< <data> >> element.  There would be one hashref
+for each C<< <row> >> element in the C<< <data> >> element, and that hashref
+would be filled with one key/value pair for each field in the row.
+
+    my @data = $CQ->cute_query( data=>[row=>{'*'=>''}] );
+
+A I<sub-query> inside an arrayref (C<[]>) will have a preference for
+I<not returning> the names of the tags it matches.
+
+=item B<C<{}>>
+
+The result shape of C<{}> indicates that what you're requesting should point to
+a hashref of items.  Those items are then named in a I<sub-query>.
+
+    my @data = $CQ->cute_query( "data/row" => {} );
+    # returns one empty hashref for each row in each data element
+
+Typically, you would then put a I<sub-query> in the hashref to indicate how to
+fill it.  In the example below using the XML from L</EXAMPLES>, C<@data> would
+contain one hashref for each C<< <row> >> element that is a chiled of a
+C<< <data> >> element.  Each hashref is filled with key/value pairs for each
+field in the row.
+
+    my @data = $CQ->cute_query( "data/row" => {'*'=>''} );
+
+A I<sub-query> inside an hashref (C<{}>) will have a preference for I<returning>
+the names of the tags it matches as the keys of the values it finds.
+
+=back
+
+CQ keeps track of your preference for keys internally.  That is, if you want to
+fill a hashref, it will return keys (the tag names) for the matched tags along
+with the values.  Again, using the XML input data from L</EXAMPLES>, the
+C<@ar_data> below will will not have field names, but the C<@hr_data> will.
+
+    my @hr_data = $CQ->cute_query( "data/row" => {'*'=>''} );
+    # ( {f1=>"blah", f2=>...}, {...}, ...)
+
+    my @ar_data = $CQ->cute_query( "data/row" => ['*'=>''] );
+    # ( ["blah", "blah"], [...], ...)
+    # same thing without the key names
+
+=head1 EXAMPLES
+
+This is all a lot easier to explain by example.  For these examples, the
+following XML source is assumed.
+
+    <root>
+        <result>OK</result>
+        <data a="this'll be hard to fetch I think" b="I may need special handlers for @queries">
+            <row> <f1>7</f1><f2>11</f2><f3>13</f3></row>
+            <row><f1>17</f1><f2>19</f2><f3>23</f3></row>
+            <row><f1>29</f1><f2>31</f2><f3>37</f3></row>
+        </data>
+        <atad>
+            <c1><f1>503</f1><f1>509</f1></c1>
+            <c2><f1>521</f1><f1>523</f1></c2>
+        </atad>
+        <keywords>
+            <hot>alpha</hot>
+            <hot>beta</hot>
+            <cool>psychedelic</cool>
+            <cool>funky</cool>
+            <loud>beat</loud>
+        </keywords>
+    </root>
+
+=head2 B<Example 1>
+
+Grab the contents of each C<< <row> >> of each C<< <data> >> as an array ref of
+hashrefs, with each key of each hashref being the name of the field tag and each
+value the contents of the field tag.
+
+    my $arrayref_of_hashrefs = $CQ->cute_query(
+        # the top level query is for the <data> elements
+        # the shape of the only top level query is [],
+        # so it returns one [] -- for the one <data> element
+        "data" => [
+            # the contents of the top level [] is a sub query for row elements.
+            # Each row element should be a hashref, so the data-[] will contain
+            # three row-{} hashrefs
+            row => {
+                # the contents of those hashrefs is a subquery for any tag found
+                # there.  The tag names are preserved as keys because we're
+                # sitting in the context of a hashref.
+                # the shape of each match result is '', so it just returns the
+                # contents of each tag as a string.
+                '*' => '',
+            }
+        ],
+    );
+
+The resulting Perl structure for this query is as follows:
+
+    [ {f1=> 7, f2=>11, f3=>13},
+      {f1=>17, f2=>19, f3=>23},
+      {f1=>29, f2=>31, f3=>37}, ]
+
+=head2 B<Example 2>
+
+Grab the contents of all the C<< <f1> >> tags anywhere in the document.
+
+    my @f1s = $CQ->cute_query( "//f1" => '' );
+    # the result is: (7, 17, 29, 503, 509, 521, 523)
+
+All the contents of C<< <f1> >> tags that are children of tags that are children
+of the C<< <atad> >> tag.  Use the tags found as keys of a hash and return the
+f1-contents as arrayrefs.
+
+    my %C = $CQ->hash_query( # return key-value pairs rather than just values
+        "atad/*" => [ # find all elements that are children of the atad
+            f1=>'' # fill the arrayref for each atad/* with the contents of f1
+                   # elements
+        ]
+    );
+
+    # the result is: (c1 => [503, 509], c2 => [521, 523])
+
+=head2 B<Example 3>
+
+Grab the contents of the C<@a> and C<@b> attributes of the C<< <data> >> tag
+(using the attr names as keys), along with all the values of the C<< <f3> >>
+tags.  Give us the C<< <f3> >>s as an arrayref under the key C<"data"> and
+return the whole mess as a hash.
+
+    my %h = $CQ->hash_query( # preserve keys
+        "data/@*" => '', # grab the attrs
+        data => [ f3 => '' ], # grab the data, subquery to find the f3s
+    );
+
+=head2 B<Example 4>
+
+Grab the keywords as a hash of arrayrefs, one arrayref for each type of keyword
+(see L</KAR QUERIES>).
+
+    my %h = $CQ->hash_query(
+        keywords => {
+
+            '[]*' => ''
+
+            # This works just like the other
+            # '*' => '' queryies, except that
+            # the [] before the * informs the
+            # query engine to expect more than
+            # one of each tag.
+
+        },
+    );
+
+    # The result is like so:
+    # %h = (
+    #      hot  => ['alpha', 'beta'],
+    #      cool => ['psychedelic', 'funky'],
+    #      loud => ['beat'],
+    # )
+
+=head2 B<Example 5>
+
+Get what L<XML::Simple> would get from the document.  Note that you have to be
+about a million times more explicit and there's no way to automate any of the
+query generation.
+
+    my $hashref = $CQ->cute_query(
+        '.' => {
+            result => '',
+            data => [ row => {'*'=>''} ],
+            atad => { '*' => [ '*' => ''] },
+            keywords => { '[]*' => '' }
+        }
+    );
+
+It produces this:
+
+    my $hashref = {
+        result => "OK",
+
+        data => [ {f1=> 7, f2=>11, f3=>13},
+                  {f1=>17, f2=>19, f3=>23},
+                  {f1=>29, f2=>31, f3=>37}, ]
+
+        atad => { c1 => [503, 509], c2 => [521, 523] },
+
+        keywords => {
+            hot  => ['alpha', 'beta'],
+            cool => ['psychedelic', 'funky'],
+            loud => ['beat'],
+        },
+    };
+
+=head1 METHODS
+
+=over 4
+
+=item B<cute_query()>
+
+The only method exposed by L<XML::CuteQueries> that doesn't come from
+L<XML::Twig>.  It is the only real interface into the query language.
+This function can take any number of arguments.
+
+If the first argument is a hash ref, it's assumed to be an
+L<options hashref|/OPTIONS>.  Otherwise, all arguments are assumed to be
+L<query pairs|/CUTE QUERIES>.
+
+The top level query tries to act like a I<sub-query> inside an arrayref L</[]>,
+that is, it throws out the names of the matched tags and just returns the
+values.
+
+=item B<hash_query()> B<klist_query()>
+
+This function is a wrapper for L</cute_query()> which simply adds the L</klist>
+option to the query.
+
+What this does in practice: it makes the query to act like a I<sub-query> inside
+an hashref L</{}>, that is, it uses the matched tag names as keys and returns a
+list of key/value pairs for the matched data.
+
+=item B<parse()>
+
+Choose this method to ask L<XML::Twig> to parse some XML.  See
+L<XML::Twig/parse> for the full story.
+
+=item B<parsefile()>
+
+Choose this method to ask L<XML::Twig> to parse an external XML file.  See
+L<XML::Twig/parsefile> for the full story.
+
+=back
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<nostrict>
+
+CQ crashes in various ways unless your patterns match precisely as you requested
+them.  It may sometimes be desirable to continue matching and return appropriate
+nothings instead.  Use this option to achieve that behavior.
+
+There are actually two flavors of C<nostrict>.  You can turn them both on with
+C<nostrict>, or turn them on individually.
+
+    my $CQ = XML::CuteQueries
+     ->new->parse("<r><x><y>7</y><a>7</a><a>8</a></x></r>");
+
+    my $scalar = $CQ->cute_query("x/y" => ''); # 7
+    my $scalar = $CQ->cute_query("x/z" => ''); # croaks(), match failed
+    my $scalar = $CQ->cute_query("x/a" => ''); # croaks(), too many matches
+
+The first flavor is C<nostrict_match>:
+
+    $CQ->cute_query({nostrict=>1}, "x/z" => ''); # undef
+    $CQ->cute_query({nostrict_match=>1}, "x/z" => ''); # undef
+
+The second flavor is C<nostrict_single>:
+
+    my $scalar = $CQ->cute_query({nostrict=>1}, "x/a" => ''); # 7
+    my $scalar = $CQ->cute_query({nostrict_single=>1}, "x/a" => ''); # 7
+    my @ar     = $CQ->cute_query("x/a" => ''); # (7,8)
+
+B<NOTE>: The loose single match behavior is different than Perl!
+
+    my $single = qw(one two); # $single = "two";
+    my $single = @array = qw(one two); # $single = 2;
+
+    my $single = $CQ->blah() is returning the first match, not the last!
+
+=item B<klist>
+
+By default, the top level L</cute_query()> will try to return a list (without
+the matched tag names as keys).  Using this option will tell the top level to
+preserve the matched field names and return a list of key/value pairs rather
+than just the values.
+
+    my @a = $CQ->cute_query("x"=>''): # match all <x> and return values as list
+    my %h = $CQ->cute_query({ klist => 1 }, "*"=>'');
+    # match all top level tags and return tag-name/value pairs
+
+This can alternately be invoked by calling L</hash_query()>.
+
+=item B<notrim>
+
+By default, CQ will trim the leading and trailing space on each string result
+without this option.  It will skip the trim on results that contain newlines.
+
+    my $CQ = XML::CuteQueries
+     ->new->parse("<r><x> 7</x><x> \n8</x></r>");
+
+    my $r1 = $CQ->cute_query('.'=>[x=>'']);
+    # $r1 is [7, " \n8"]
+
+    my $r2 = $CQ->cute_query({notrim=>1}, '.'=>[x=>'']);
+    # $r2 is [" 7", " \n8"]
+
+=item B<nofilter_nontags>
+
+    my $CQ = XML::CuteQueries
+     ->new->parse("<r> <x>7</x> <x>8</x></r>");
+
+By default, we skip the C<#PCDATA> "node" before the C<< <x> >>.
+
+    my $r1 = $CQ->cute_query('.'=>[x=>'']);
+    # $r1 is [7]
+
+    my $r2 = $CQ->cute_query({nofilter_nontags=>1}, '.'=>[x=>'']);
+    # $r2 is ['', 7, '', 8]
+
+Preserving the text in a C<#PCDATA> requires L</notrim> (obviously), but also
+seems to require L</recurse_text>.
+
+    my $r3 = $CQ->cute_query(
+        {notrim=>1, nofilter_nontags=1, recurse_text=>1},
+        '.'=>[x=>'']);
+    # $r3 is [' ', 7, ' ', 8]
+
+=back
+
+=head1 SIMPLE AMBIGUITIES
+
+Consider the following XML.
+
+    <sql_result>
+        <row><field1>x</field1> <field2>y</field2></row>
+    </sql_result>
+
+L<XML::Simple>'s C<XMLin()> will return this.
+
+    { row => { field1 => "x", field2 => "y" } }
+
+Now how about this?
+
+    <sql_result>
+        <row><field1>x</field1> <field2>y</field2></row>
+        <row><field1>z</field1> <field2>w</field2></row>
+    </sql_result>
+
+Now we get this instead:
+
+    { row => [
+          { field1 => "x", field2 => "y" },
+          { field1 => "z", field2 => "w" },
+    ]}
+
+
+Ahh, is C<row> a hashref or an arrayref of hashrefs?  This is the main Arrrg I
+had with L<XML::Simple>.  I'm sure there's a way to solve this with
+L<XML::Simple>, but I wouldn't want to have to figure it out.  The module is
+just too complicated.
+
+=head1 WHY CQ
+
+L<XML::Twig> is pretty easy to use.  I'm also rather fond of L<XML::XPath>.  But
+I found myself writing a great deal of Perl to get data from XML that I felt
+like I should be able to get in one or two lines.
+
+What I wanted was an explicit way to query data from the XML without
+worrying about the problem listed in L</SIMPLE AMBIGUITIES>.
+
+=head1 THANKS
+
+=over 4
+
+=item Hans Dieter Pearcey C<< <hdp@weftsoar.net> >>
+
+I did not know there wasn't a C<< LE<lt>text|scheme:E<gt> >>.  Why doesn't Test::Pod
+notice this?  (He also fixed an ugly doc bug, implying he actually read the
+docs.  Neat.)
+
+Hans has also begun some refactoring in the (currently) heinously built query
+code.
+
+=item Github L<http://github.com>
+
+Github makes this collaboration a joy.  I didn't have to add Hans to the repo or
+anything, he just started working on it, I could see what he did, and pulled it
+in.
+
+=back
+
+=head1 AUTHOR
+
+Paul Miller C<< <jettero@cpan.org> >>
+
+This module represents an elaborate brainstorming exercise, although I'm pretty
+happy with the result.  If you have ideas to make it better, need help, or just
+plain want to say hi ... shoot me an email.  I love to hear from people.
+
+If there are bugs, or wishlist items, please choose
+L<http://rt.cpan.org/Public/Dist/Display.html?Name=XML-CuteQueries>
+
+=head1 LICENSE
+
+Copyright (C) 2010, Paul Miller,
+
+This module is free software.  You can redistribute it and/or
+modify it under the terms of the Artistic License 2.0.
+
+This program is distributed in the hope that it will be useful,
+but without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=head1 SEE ALSO
+
+perl(1), L<XML::Twig>, L<XML::CuteQueries::Error>

@@ -1,0 +1,8 @@
+root
+//a/y/z	/a/c	/r/x	/r/s/t
+test	test0		
+	test1		
+	test2		
+		testX	TestT1
+		testX	TestT2
+

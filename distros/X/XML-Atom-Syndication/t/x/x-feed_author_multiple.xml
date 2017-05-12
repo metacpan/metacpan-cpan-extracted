@@ -1,0 +1,12 @@
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <author>
+    <name>Author 1</name>
+    <email>me@example.com</email>
+    <uri>http://example.com/</uri>
+  </author>
+  <author>
+    <name>Author 2</name>
+    <email>you@example.com</email>
+    <uri>http://two.example.com/</uri>
+  </author>
+</feed>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Schema definition for owner information -->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+   <xsd:element name="ownerInfo" type="ownerInfo"/>
+   <xsd:complexType name="ownerInfo">
+      <xsd:sequence>
+         <xsd:element name="owningTeam" type="xsd:string"/>
+         <xsd:element name="contactName" type="xsd:string"/>
+      </xsd:sequence>
+   </xsd:complexType>
+</xsd:schema>

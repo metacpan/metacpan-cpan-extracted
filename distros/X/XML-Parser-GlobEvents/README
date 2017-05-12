@@ -1,0 +1,64 @@
+XML-Parse-GlobEvents version 0.100
+==================================
+
+When people ask how to parse XML, they commonly get 2 options as an answer: SAX,
+or DOM. These options are the two extremes, but neither are very practical for
+every day to day use:
+
+ * SAX remembers nothing. You only get a callback for each item (tag, text)
+while the  document is being parsed. It is very memory efficient, but you, as a
+programmer, are solely responsible for keeping track of where in the document
+parsing process you are. It is as primitive as it can get.
+
+ * DOM remembers everything: the whole document is parsed first, and only after
+it finishes, you get a tree data structure back, that represents the whole
+document.
+
+This is a lot easier for the programmer, but if the document is quite
+large, memory consumption will be humongous.
+
+This module attempts to be a compromise between these two extremes: it is still
+event based, but filtered: you get to decide what tags you're interested in, and
+you get a tree representing the element structure, as a parameter.
+
+And when you have finished processing this element tree and you will no longer use it, it is discarded, before the next section is even read in.
+
+The module is intended to be used in a "process as you parse", with parsing
+and processing interleaved.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+or use the CPAN shell.
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  XML::Parser::Expat
+
+If you don't happen have that already (it's petty standard), don't forget to
+get the C library "expat" too.
+
+RELEASE NOTES
+
+This is a historical release. It's pretty much the module as I wrote it
+in 2000-2001. It's one of the modules I have always been the most proud
+of. Whenever I think of parsing XML, this module is still the module I
+think of first...
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2000-2009 by Bart Lateur <bart.lateur@pandora.be>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.6.0 or,
+at your option, any later version of Perl 5 you may have available.
+

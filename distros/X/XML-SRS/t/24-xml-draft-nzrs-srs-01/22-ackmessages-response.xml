@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<NZSRSResponse VerMajor="5" VerMinor="0">
+       <Response Action="AckMessage" FeId="8" FeSeq="4799330" OrigRegistrarId="90" RecipientRegistrarId="90" TransId="2010 0707 1">
+       <FeTimeStamp Day="7" Hour="14" Minute="53" Month="7" Second="10" TimeZoneOffset="+12:00" Year="2010"/>
+       <AckResponse OriginatingRegistrarId="1" Remaining="801" TransId="srsrps-1_376"/>
+       </Response>
+</NZSRSResponse>
+

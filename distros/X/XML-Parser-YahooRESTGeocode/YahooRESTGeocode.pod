@@ -1,0 +1,85 @@
+=head1	NAME
+
+XML::Parser::YahooRESTGeocode - an XML::Parser subclass for parsing results returned from YAHOO REST geocode webservice
+
+
+
+
+=head1	SYNOPPSIS
+
+	use LWP::Simple
+	use XML::Parser;
+	use XML::Parser::YahooRESTGeocode;
+	
+	#connect to yahoo geocode service
+	my $url = 'http://api.local.yahoo.com/MapsService/V1/geocode';
+	my $get = 'appid=YahooDemo&street=701+First+Street&city=Sunnyvale&state=CA';
+	
+	#call yahoo geocode service
+	my $xml = get $url . "?" . $get;
+	
+	#construct use XML::Parser with YahooRESTGeocode subclass
+	my $parser = new XML::Parser(Style	=> 'YahooRESTGeocode');
+	my $data = $parser->parse($xml) || do {
+		die ("parse failed: $XML::Parser::errstr, $!\n");
+	};
+	
+	#use the data for something
+	my $cnt = 0;
+	foreach my $result (@{$data->{'Result'}}){
+		$cnt ++;
+		print "\n---- RESULT #" . $cnt . " ----\n";
+		foreach my $field (keys %{$result}){
+			print "\t[" . $field . "]: " . $result->{$field} . "\n";
+		}
+	}
+
+
+
+
+=head1	NOTES
+
+=over
+
+=item	works for geocode only
+
+this module only knows how to handle Yahoo!'s REST responses from the geocode API
+
+
+=item	known fields
+
+this module will need to be modified if more fields are added to the <Result> node,
+namely, their names will need to be added to the %node_tree hash at the top of the
+module
+
+
+=item	this was a quick hack
+
+hey, maybe there's a better module for parsing REST query responses out there? This module was 
+written as a quick hack, not as a one stop solution. If you want to add improvements or what
+have you, then please feel free to hack away on this 'till you're blue in the face. Send me the
+changes though, so I can put 'em in the distribution.
+
+
+=item	'make test' dosen't really test anything
+
+well ... it's a quick hack. part of writing a quick hack is not writing proper test cases and 
+skimping on documentation, speaking of ... why am I still writing ???
+
+
+=item	thanks to Yahoo!
+
+Hey, Yahoo! Thanks for your geocode API, it's pretty sweet!
+
+=back
+
+
+
+
+=head1	AUTHOR
+
+Andrew N. Hicox		<andrew@hicox.com>
+
+Hicox Information Systems Development
+
+http://hicox.com

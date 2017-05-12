@@ -1,0 +1,28 @@
+Revision history for Perl extension X11-Keyboard.
+
+=============================================================================
+revision 1.4
+date: 2002/12/04 05:16:01;  author: ekkis;  state: Exp;  lines: +10 -8
+- methods now default required args to $_
+----------------------------
+revision 1.3
+date: 2002/12/04 04:36:30;  author: ekkis;  state: Exp;  lines: +29 -16
+- KeysymToKeycode() now returns state
+- added Acknowledgements section
+----------------------------
+revision 1.2
+date: 2002/12/03 23:19:48;  author: ekkis;  state: Exp;  lines: +12 -7
+- first pass.  made sure module compiles and test works
+----------------------------
+revision 1.1
+date: 2002/12/03 23:09:10;  author: ekkis;  state: Exp;
+branches:  1.1.1;
+Initial revision
+----------------------------
+revision 1.1.1.1
+date: 2002/12/03 23:09:10;  author: ekkis;  state: Exp;  lines: +0 -0
+Imported sources
+=============================================================================
+
+0.01  Tue Sep 10 03:44:09 2002
+	- original version; created by h2xs 1.21

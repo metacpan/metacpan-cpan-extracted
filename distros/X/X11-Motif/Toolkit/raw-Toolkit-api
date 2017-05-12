@@ -1,0 +1,982 @@
+void
+XtAddExposureToRegion(event, region)
+	XEvent *		event
+	Region			region
+
+Widget
+priv_XtAppCreateShell(application_name, application_class, widget_class, display, ...)
+	char *			application_name
+	char *			application_class
+	WidgetClass		widget_class
+	Display *		display
+	PREINIT:
+	    ArgList arg_list = 0;
+	    Cardinal arg_list_len = 0;
+	CODE:
+	    arg_list_len = xt_build_input_arg_list(0, widget_class, &arg_list, &ST(4), items - 4);
+	    RETVAL = XtAppCreateShell(application_name, application_class, widget_class, display, arg_list, arg_list_len);
+	    if (arg_list) free(arg_list);
+	OUTPUT:
+	    RETVAL
+
+Boolean
+XtCallConverter(dpy, converter, args, num_args, from, to_in_out, cache_ref_return)
+	Display *		dpy
+	XtTypeConverter		converter
+	XrmValuePtr		args
+	Cardinal		num_args
+	XrmValuePtr		from
+	XrmValue *		to_in_out
+	XtCacheRef *		cache_ref_return
+
+void
+XtCloseDisplay(dpy)
+	Display *		dpy
+
+void
+XtConvertCase(dpy, keysym, lower_return, upper_return)
+	Display *		dpy
+	KeySym			keysym
+	KeySym *		lower_return
+	KeySym *		upper_return
+
+XtAppContext
+XtCreateApplicationContext()
+
+
+Widget
+priv_XtCreateManagedWidget(name, widget_class, parent, ...)
+	char *			name
+	WidgetClass		widget_class
+	Widget			parent
+	PREINIT:
+	    ArgList arg_list = 0;
+	    Cardinal arg_list_len = 0;
+	CODE:
+	    arg_list_len = xt_build_input_arg_list(parent, widget_class, &arg_list, &ST(3), items - 3);
+	    RETVAL = XtCreateManagedWidget(name, widget_class, parent, arg_list, arg_list_len);
+	    if (arg_list) free(arg_list);
+	OUTPUT:
+	    RETVAL
+
+Widget
+priv_XtCreatePopupShell(name, widgetClass, parent, ...)
+	char *			name
+	WidgetClass		widgetClass
+	Widget			parent
+	PREINIT:
+	    ArgList arg_list = 0;
+	    Cardinal arg_list_len = 0;
+	CODE:
+	    arg_list_len = xt_build_input_arg_list(parent, widgetClass, &arg_list, &ST(3), items - 3);
+	    RETVAL = XtCreatePopupShell(name, widgetClass, parent, arg_list, arg_list_len);
+	    if (arg_list) free(arg_list);
+	OUTPUT:
+	    RETVAL
+
+Widget
+priv_XtCreateWidget(name, widget_class, parent, ...)
+	char *			name
+	WidgetClass		widget_class
+	Widget			parent
+	PREINIT:
+	    ArgList arg_list = 0;
+	    Cardinal arg_list_len = 0;
+	CODE:
+	    arg_list_len = xt_build_input_arg_list(parent, widget_class, &arg_list, &ST(3), items - 3);
+	    RETVAL = XtCreateWidget(name, widget_class, parent, arg_list, arg_list_len);
+	    if (arg_list) free(arg_list);
+	OUTPUT:
+	    RETVAL
+
+XrmDatabase
+XtDatabase(dpy)
+	Display *		dpy
+
+Boolean
+XtDispatchEvent(event)
+	XEvent *		event
+
+void
+XtDisplayStringConversionWarning(dpy, from_value, to_type)
+	Display *		dpy
+	char *			from_value
+	char *			to_type
+
+XtAppContext
+XtDisplayToApplicationContext(dpy)
+	Display *		dpy
+
+String
+XtFindFile(path, substitutions, num_substitutions, predicate)
+	char *			path
+	Substitution		substitutions
+	Cardinal		num_substitutions
+	XtFilePredicate		predicate
+
+KeySym
+XtGetActionKeysym(event, modifiers_return)
+	XEvent *		event
+	Modifiers *		modifiers_return
+
+KeySym *
+XtGetKeysymTable(dpy, min_keycode_return, keysyms_per_keycode_return)
+	Display *		dpy
+	KeyCode *		min_keycode_return
+	int  			&keysyms_per_keycode_return
+	OUTPUT:
+	    RETVAL
+	    keysyms_per_keycode_return
+
+int
+XtGetMultiClickTime(dpy)
+	Display *		dpy
+
+void
+XtInitializeWidgetClass(widget_class)
+	WidgetClass		widget_class
+
+void
+XtKeysymToKeycodeList(dpy, keysym, keycodes_return, keycount_return)
+	Display *		dpy
+	KeySym			keysym
+	KeyCode **		keycodes_return
+	Cardinal *		keycount_return
+
+Time
+XtLastTimestampProcessed(dpy)
+	Display *		dpy
+
+void
+XtManageChildren(children, num_children)
+	WidgetList		children
+	Cardinal		num_children
+
+XtAccelerators
+XtParseAcceleratorTable(source)
+	char *			source
+
+XtTranslations
+XtParseTranslationTable(table)
+	char *			table
+
+void
+XtRegisterCaseConverter(dpy, proc, start, stop)
+	Display *		dpy
+	XtCaseProc		proc
+	KeySym			start
+	KeySym			stop
+
+void
+XtRegisterGrabAction(action_proc, owner_events, event_mask, pointer_mode, keyboard_mode)
+	XtActionProc		action_proc
+	int			owner_events
+	unsigned int		event_mask
+	int			pointer_mode
+	int			keyboard_mode
+
+void
+XtRemoveActionHook(id)
+	XtActionHookId		id
+
+void
+XtRemoveInput(id)
+	XtInputId		id
+
+void
+XtRemoveTimeOut(timer)
+	XtIntervalId		timer
+
+void
+XtRemoveWorkProc(id)
+	XtWorkProcId		id
+
+String
+XtResolvePathname(dpy, type, filename, suffix, path, substitutions, num_substitutions, predicate)
+	Display *		dpy
+	char *			type
+	char *			filename
+	char *			suffix
+	char *			path
+	Substitution		substitutions
+	Cardinal		num_substitutions
+	XtFilePredicate		predicate
+
+XrmDatabase
+XtScreenDatabase(screen)
+	Screen *		screen
+
+void
+XtSetKeyTranslator(dpy, proc)
+	Display *		dpy
+	XtKeyProc		proc
+
+void
+XtSetMultiClickTime(dpy, milliseconds)
+	Display *		dpy
+	int			milliseconds
+
+void
+XtSetTypeConverter(from_type, to_type, converter, convert_args, num_args, cache_type, destructor)
+	char *			from_type
+	char *			to_type
+	XtTypeConverter		converter
+	XtConvertArgList	convert_args
+	Cardinal		num_args
+	XtCacheType		cache_type
+	XtDestructor		destructor
+
+void
+XtToolkitInitialize()
+
+
+void
+XtTranslateKey(dpy, keycode, modifiers, modifiers_return, keysym_return)
+	Display *		dpy
+	unsigned int		keycode
+	Modifiers		modifiers
+	Modifiers *		modifiers_return
+	KeySym *		keysym_return
+
+void
+XtTranslateKeycode(dpy, keycode, modifiers, modifiers_return, keysym_return)
+	Display *		dpy
+	unsigned int		keycode
+	Modifiers		modifiers
+	Modifiers *		modifiers_return
+	KeySym *		keysym_return
+
+void
+XtUnmanageChildren(children, num_children)
+	WidgetList		children
+	Cardinal		num_children
+
+Widget
+XtWindowToWidget(display, window)
+	Display *		display
+	Window			window
+
+MODULE = X11::Toolkit	PACKAGE = X::Toolkit::Widget
+
+void
+XtAddEventHandler(widget, event_mask, nonmaskable, proc, closure)
+	Widget			widget
+	EventMask		event_mask
+	int			nonmaskable
+	XtEventHandler		proc
+	XtPointer		closure
+
+void
+XtAddGrab(widget, exclusive, spring_loaded)
+	Widget			widget
+	int			exclusive
+	int			spring_loaded
+
+void
+XtAddRawEventHandler(widget, event_mask, nonmaskable, proc, closure)
+	Widget			widget
+	EventMask		event_mask
+	int			nonmaskable
+	XtEventHandler		proc
+	XtPointer		closure
+
+GC
+XtAllocateGC(widget, depth, valueMask, values, dynamicMask, unusedMask)
+	Widget			widget
+	Cardinal		depth
+	XtGCMask		valueMask
+	XGCValues *		values
+	XtGCMask		dynamicMask
+	XtGCMask		unusedMask
+
+void
+XtAugmentTranslations(widget, translations)
+	Widget			widget
+	XtTranslations		translations
+
+EventMask
+XtBuildEventMask(widget)
+	Widget			widget
+
+Boolean
+XtCallAcceptFocus(widget, time)
+	Widget			widget
+	Time *			time
+
+void
+XtCallActionProc(widget, action, event, params, num_params)
+	Widget			widget
+	char *			action
+	XEvent *		event
+	String *		params
+	Cardinal		num_params
+
+void
+XtCallCallbackList(widget, callbacks, call_data)
+	Widget			widget
+	XtCallbackList		callbacks
+	XtPointer		call_data
+
+void
+XtCallCallbacks(widget, callback_name, call_data)
+	Widget			widget
+	char *			callback_name
+	XtPointer		call_data
+
+void
+XtCallbackExclusive(widget, closure, call_data)
+	Widget			widget
+	XtPointer		closure
+	XtPointer		call_data
+
+void
+XtCallbackNone(widget, closure, call_data)
+	Widget			widget
+	XtPointer		closure
+	XtPointer		call_data
+
+void
+XtCallbackNonexclusive(widget, closure, call_data)
+	Widget			widget
+	XtPointer		closure
+	XtPointer		call_data
+
+void
+XtCallbackPopdown(widget, closure, call_data)
+	Widget			widget
+	XtPointer		closure
+	XtPointer		call_data
+
+void
+XtCallbackReleaseCacheRef(widget, closure, call_data)
+	Widget			widget
+	XtPointer		closure
+	XtPointer		call_data
+
+void
+XtCallbackReleaseCacheRefList(widget, closure, call_data)
+	Widget			widget
+	XtPointer		closure
+	XtPointer		call_data
+
+WidgetClass
+XtClass(object)
+	Widget			object
+
+void
+XtConfigureWidget(widget, x, y, width, height, border_width)
+	Widget			widget
+	int			x
+	int			y
+	unsigned int		width
+	unsigned int		height
+	unsigned int		border_width
+
+Boolean
+XtConvertAndStore(widget, from_type, from, to_type, to_in_out)
+	Widget			widget
+	char *			from_type
+	XrmValue *		from
+	char *			to_type
+	XrmValue *		to_in_out
+
+void
+XtCreateWindow(widget, window_class, visual, value_mask, attributes)
+	Widget			widget
+	unsigned int		window_class
+	Visual *		visual
+	XtValueMask		value_mask
+	XSetWindowAttributes *	attributes
+
+void
+XtDestroyWidget(widget)
+	Widget			widget
+
+void
+XtDisownSelection(widget, selection, time)
+	Widget			widget
+	Atom			selection
+	Time			time
+
+Display *
+XtDisplay(widget)
+	Widget			widget
+
+Display *
+XtDisplayOfObject(object)
+	Widget			object
+
+GC
+XtGetGC(widget, valueMask, values)
+	Widget			widget
+	XtGCMask		valueMask
+	XGCValues *		values
+
+XSelectionRequestEvent *
+XtGetSelectionRequest(widget, selection, request_id)
+	Widget			widget
+	Atom			selection
+	XtRequestId		request_id
+
+void
+XtGetSelectionValue(widget, selection, target, callback, closure, time)
+	Widget			widget
+	Atom			selection
+	Atom			target
+	XtSelectionCallbackProc	callback
+	XtPointer		closure
+	Time			time
+
+void
+XtGetSelectionValueIncremental(widget, selection, target, selection_callback, client_data, time)
+	Widget			widget
+	Atom			selection
+	Atom			target
+	XtSelectionCallbackProc	selection_callback
+	XtPointer		client_data
+	Time			time
+
+void
+XtGetSelectionValues(widget, selection, targets, count, callback, closures, time)
+	Widget			widget
+	Atom			selection
+	Atom *			targets
+	int			count
+	XtSelectionCallbackProc	callback
+	XtPointer *		closures
+	Time			time
+
+void
+XtGetSelectionValuesIncremental(widget, selection, targets, count, callback, client_data, time)
+	Widget			widget
+	Atom			selection
+	Atom *			targets
+	int			count
+	XtSelectionCallbackProc	callback
+	XtPointer *		client_data
+	Time			time
+
+void
+XtGrabButton(widget, button, modifiers, owner_events, event_mask, pointer_mode, keyboard_mode, confine_to, cursor)
+	Widget			widget
+	int			button
+	Modifiers		modifiers
+	int			owner_events
+	unsigned int		event_mask
+	int			pointer_mode
+	int			keyboard_mode
+	Window			confine_to
+	Cursor			cursor
+
+void
+XtGrabKey(widget, keycode, modifiers, owner_events, pointer_mode, keyboard_mode)
+	Widget			widget
+	unsigned int		keycode
+	Modifiers		modifiers
+	int			owner_events
+	int			pointer_mode
+	int			keyboard_mode
+
+int
+XtGrabKeyboard(widget, owner_events, pointer_mode, keyboard_mode, time)
+	Widget			widget
+	int			owner_events
+	int			pointer_mode
+	int			keyboard_mode
+	Time			time
+
+int
+XtGrabPointer(widget, owner_events, event_mask, pointer_mode, keyboard_mode, confine_to, cursor, time)
+	Widget			widget
+	int			owner_events
+	unsigned int		event_mask
+	int			pointer_mode
+	int			keyboard_mode
+	Window			confine_to
+	Cursor			cursor
+	Time			time
+
+XtCallbackStatus
+XtHasCallbacks(widget, callback_name)
+	Widget			widget
+	char *			callback_name
+
+void
+XtInsertEventHandler(widget, event_mask, nonmaskable, proc, closure, position)
+	Widget			widget
+	EventMask		event_mask
+	int			nonmaskable
+	XtEventHandler		proc
+	XtPointer		closure
+	XtListPosition		position
+
+void
+XtInsertRawEventHandler(widget, event_mask, nonmaskable, proc, closure, position)
+	Widget			widget
+	EventMask		event_mask
+	int			nonmaskable
+	XtEventHandler		proc
+	XtPointer		closure
+	XtListPosition		position
+
+void
+XtInstallAccelerators(destination, source)
+	Widget			destination
+	Widget			source
+
+void
+XtInstallAllAccelerators(destination, source)
+	Widget			destination
+	Widget			source
+
+Boolean
+XtIsManaged(rectobj)
+	Widget			rectobj
+
+Boolean
+XtIsObject(object)
+	Widget			object
+
+Boolean
+XtIsRealized(widget)
+	Widget			widget
+
+Boolean
+XtIsSensitive(widget)
+	Widget			widget
+
+Boolean
+XtIsSubclass(widget, widgetClass)
+	Widget			widget
+	WidgetClass		widgetClass
+
+XtGeometryResult
+XtMakeGeometryRequest(widget, request, reply_return)
+	Widget			widget
+	XtWidgetGeometry *	request
+	XtWidgetGeometry *	reply_return
+
+XtGeometryResult
+XtMakeResizeRequest(widget, width, height, width_return, height_return)
+	Widget			widget
+	unsigned int		width
+	unsigned int		height
+	Dimension *		width_return
+	Dimension *		height_return
+
+void
+XtManageChild(child)
+	Widget			child
+
+void
+XtMenuPopupAction(widget, event, params, num_params)
+	Widget			widget
+	XEvent *		event
+	String *		params
+	Cardinal *		num_params
+
+void
+XtMoveWidget(widget, x, y)
+	Widget			widget
+	int			x
+	int			y
+
+String
+XtName(object)
+	Widget			object
+
+Widget
+XtNameToWidget(reference, names)
+	Widget			reference
+	char *			names
+
+void
+XtOverrideTranslations(widget, translations)
+	Widget			widget
+	XtTranslations		translations
+
+Boolean
+XtOwnSelection(widget, selection, time, convert, lose, done)
+	Widget			widget
+	Atom			selection
+	Time			time
+	XtConvertSelectionProc	convert
+	XtLoseSelectionProc	lose
+	XtSelectionDoneProc	done
+
+Boolean
+XtOwnSelectionIncremental(widget, selection, time, convert_callback, lose_callback, done_callback, cancel_callback, client_data)
+	Widget			widget
+	Atom			selection
+	Time			time
+	XtConvertSelectionIncrProc	convert_callback
+	XtLoseSelectionIncrProc	lose_callback
+	XtSelectionDoneIncrProc	done_callback
+	XtCancelConvertSelectionProc	cancel_callback
+	XtPointer		client_data
+
+void
+XtPopdown(popup_shell)
+	Widget			popup_shell
+
+void
+XtPopup(popup_shell, grab_kind)
+	Widget			popup_shell
+	XtGrabKind		grab_kind
+
+void
+XtPopupSpringLoaded(popup_shell)
+	Widget			popup_shell
+
+XtGeometryResult
+XtQueryGeometry(widget, intended, preferred_return)
+	Widget			widget
+	XtWidgetGeometry *	intended
+	XtWidgetGeometry *	preferred_return
+
+void
+XtRealizeWidget(widget)
+	Widget			widget
+
+void
+XtReleaseGC(object, gc)
+	Widget			object
+	GC			gc
+
+void
+XtRemoveAllCallbacks(widget, callback_name)
+	Widget			widget
+	char *			callback_name
+
+void
+XtRemoveCallback(widget, callback_name, callback, closure)
+	Widget			widget
+	char *			callback_name
+	XtCallbackProc		callback
+	XtPointer		closure
+
+void
+XtRemoveCallbacks(widget, callback_name, callbacks)
+	Widget			widget
+	char *			callback_name
+	XtCallbackList		callbacks
+
+void
+XtRemoveEventHandler(widget, event_mask, nonmaskable, proc, closure)
+	Widget			widget
+	EventMask		event_mask
+	int			nonmaskable
+	XtEventHandler		proc
+	XtPointer		closure
+
+void
+XtRemoveGrab(widget)
+	Widget			widget
+
+void
+XtRemoveRawEventHandler(widget, event_mask, nonmaskable, proc, closure)
+	Widget			widget
+	EventMask		event_mask
+	int			nonmaskable
+	XtEventHandler		proc
+	XtPointer		closure
+
+void
+XtResizeWidget(widget, width, height, border_width)
+	Widget			widget
+	unsigned int		width
+	unsigned int		height
+	unsigned int		border_width
+
+void
+XtResizeWindow(widget)
+	Widget			widget
+
+Screen *
+XtScreen(widget)
+	Widget			widget
+
+Screen *
+XtScreenOfObject(object)
+	Widget			object
+
+void
+XtSetKeyboardFocus(subtree, descendent)
+	Widget			subtree
+	Widget			descendent
+
+void
+XtSetMappedWhenManaged(widget, mapped_when_managed)
+	Widget			widget
+	int			mapped_when_managed
+
+void
+XtSetSensitive(widget, sensitive)
+	Widget			widget
+	int			sensitive
+
+void
+priv_XtSetValues(widget, ...)
+	Widget			widget
+	PREINIT:
+	    ArgList arg_list = 0;
+	    Cardinal arg_list_len = 0;
+	CODE:
+	    arg_list_len = xt_build_input_arg_list(widget, XtClass(widget), &arg_list, &ST(1), items - 1);
+	    XtSetValues(widget, arg_list, arg_list_len);
+	    if (arg_list) free(arg_list);
+
+void
+XtSetWMColormapWindows(widget, list, count)
+	Widget			widget
+	Widget *		list
+	Cardinal		count
+
+WidgetClass
+XtSuperclass(object)
+	Widget			object
+
+void
+XtTranslateCoords(widget, x, y, rootx_return, rooty_return)
+	Widget			widget
+	int			x
+	int			y
+	Position *		rootx_return
+	Position *		rooty_return
+
+void
+XtUngrabButton(widget, button, modifiers)
+	Widget			widget
+	unsigned int		button
+	Modifiers		modifiers
+
+void
+XtUngrabKey(widget, keycode, modifiers)
+	Widget			widget
+	unsigned int		keycode
+	Modifiers		modifiers
+
+void
+XtUngrabKeyboard(widget, time)
+	Widget			widget
+	Time			time
+
+void
+XtUngrabPointer(widget, time)
+	Widget			widget
+	Time			time
+
+void
+XtUninstallTranslations(widget)
+	Widget			widget
+
+void
+XtUnmanageChild(child)
+	Widget			child
+
+XtAppContext
+XtWidgetToApplicationContext(widget)
+	Widget			widget
+
+Window
+XtWindow(widget)
+	Widget			widget
+
+Window
+XtWindowOfObject(object)
+	Widget			object
+
+MODULE = X11::Toolkit	PACKAGE = X::Toolkit::Context
+
+XtActionHookId
+XtAppAddActionHook(app_context, proc, client_data)
+	XtAppContext		app_context
+	XtActionHookProc	proc
+	XtPointer		client_data
+
+void
+XtAppAddActions(app_context, actions, num_actions)
+	XtAppContext		app_context
+	XtActionList		actions
+	Cardinal		num_actions
+
+XtInputId
+XtAppAddInput(app_context, source, condition, proc, closure)
+	XtAppContext		app_context
+	int			source
+	XtPointer		condition
+	XtInputCallbackProc	proc
+	XtPointer		closure
+
+XtIntervalId
+XtAppAddTimeOut(app_context, interval, proc, closure)
+	XtAppContext		app_context
+	unsigned long		interval
+	XtTimerCallbackProc	proc
+	XtPointer		closure
+
+XtWorkProcId
+XtAppAddWorkProc(app_context, proc, closure)
+	XtAppContext		app_context
+	XtWorkProc		proc
+	XtPointer		closure
+
+void
+XtAppError(app_context, message)
+	XtAppContext		app_context
+	char *			message
+
+void
+XtAppErrorMsg(app_context, name, type, class, def, params, num_params)
+	XtAppContext		app_context
+	char *			name
+	char *			type
+	char *			class
+	char *			def
+	String *		params
+	Cardinal *		num_params
+
+XrmDatabase *
+XtAppGetErrorDatabase(app_context)
+	XtAppContext		app_context
+
+void
+XtAppGetErrorDatabaseText(app_context, name, type, class, def, buffer_return, nbytes, database)
+	XtAppContext		app_context
+	char *			name
+	char *			type
+	char *			class
+	char *			def
+	String			buffer_return
+	int			nbytes
+	XrmDatabase		database
+
+unsigned long
+XtAppGetSelectionTimeout(app_context)
+	XtAppContext		app_context
+
+Widget
+priv_XtAppInitialize(app_context_return, application_class, options, num_options, argc_in_out, argv_in_out, fallback_resources, ...)
+	XtAppContext *		app_context_return
+	char *			application_class
+	XrmOptionDescList	options
+	Cardinal		num_options
+	int *			argc_in_out
+	String *		argv_in_out
+	String *		fallback_resources
+	PREINIT:
+	    ArgList arg_list = 0;
+	    Cardinal arg_list_len = 0;
+	CODE:
+	    arg_list_len = xt_build_input_arg_list(0, 0, &arg_list, &ST(7), items - 7);
+	    RETVAL = XtAppInitialize(app_context_return, application_class, options, num_options, argc_in_out, argv_in_out, fallback_resources, arg_list, arg_list_len);
+	    if (arg_list) free(arg_list);
+	OUTPUT:
+	    RETVAL
+
+void
+XtAppMainLoop(app_context)
+	XtAppContext		app_context
+
+XtInputMask
+XtAppPending(app_context)
+	XtAppContext		app_context
+
+void
+XtAppProcessEvent(app_context, mask)
+	XtAppContext		app_context
+	XtInputMask		mask
+
+void
+XtAppReleaseCacheRefs(app_context, cache_ref)
+	XtAppContext		app_context
+	XtCacheRef *		cache_ref
+
+XtErrorHandler
+XtAppSetErrorHandler(app_context, handler)
+	XtAppContext		app_context
+	XtErrorHandler		handler
+
+XtErrorMsgHandler
+XtAppSetErrorMsgHandler(app_context, handler)
+	XtAppContext		app_context
+	XtErrorMsgHandler	handler
+
+void
+XtAppSetFallbackResources(app_context, specification_list)
+	XtAppContext		app_context
+	String *		specification_list
+
+void
+XtAppSetSelectionTimeout(app_context, timeout)
+	XtAppContext		app_context
+	unsigned long		timeout
+
+void
+XtAppSetTypeConverter(app_context, from_type, to_type, converter, convert_args, num_args, cache_type, destructor)
+	XtAppContext		app_context
+	char *			from_type
+	char *			to_type
+	XtTypeConverter		converter
+	XtConvertArgList	convert_args
+	Cardinal		num_args
+	XtCacheType		cache_type
+	XtDestructor		destructor
+
+XtErrorHandler
+XtAppSetWarningHandler(app_context, handler)
+	XtAppContext		app_context
+	XtErrorHandler		handler
+
+XtErrorMsgHandler
+XtAppSetWarningMsgHandler(app_context, handler)
+	XtAppContext		app_context
+	XtErrorMsgHandler	handler
+
+void
+XtAppWarning(app_context, message)
+	XtAppContext		app_context
+	char *			message
+
+void
+XtAppWarningMsg(app_context, name, type, class, def, params, num_params)
+	XtAppContext		app_context
+	char *			name
+	char *			type
+	char *			class
+	char *			def
+	String *		params
+	Cardinal *		num_params
+
+void
+XtDestroyApplicationContext(app_context)
+	XtAppContext		app_context
+
+void
+XtDisplayInitialize(app_context, dpy, application_name, application_class, options, num_options, argc, argv)
+	XtAppContext		app_context
+	Display *		dpy
+	char *			application_name
+	char *			application_class
+	XrmOptionDescRec *	options
+	Cardinal		num_options
+	int *			argc
+	char **			argv
+
+Display *
+XtOpenDisplay(app_context, display_string, application_name, application_class, options, num_options, argc, argv)
+	XtAppContext		app_context
+	char *			display_string
+	char *			application_name
+	char *			application_class
+	XrmOptionDescRec *	options
+	Cardinal		num_options
+	int *			argc
+	char **			argv
+
+XtLanguageProc
+XtSetLanguageProc(app_context, proc, client_data)
+	XtAppContext		app_context
+	XtLanguageProc		proc
+	XtPointer		client_data
+

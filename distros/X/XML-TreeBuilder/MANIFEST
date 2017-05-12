@@ -1,0 +1,16 @@
+Build.PL
+Changes
+lib/XML/Element.pm
+lib/XML/TreeBuilder.pm
+Makefile.PL
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
+README
+t/00about.t
+t/10main.t
+t/parse_test.xml
+t/test.ent
+xt/author/zz_perlcritic.t
+xt/author/zz_pod-coverage.t
+xt/author/zz_pod.t
+META.json

@@ -1,0 +1,2 @@
+[% section(item.title) %]
+[% item.content(view) %]

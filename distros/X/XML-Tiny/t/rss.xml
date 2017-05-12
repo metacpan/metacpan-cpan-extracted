@@ -1,0 +1,113 @@
+<?xml version="1.0"?>
+<!-- name="generator" content="bryar" -->
+<rdf:RDF
+  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns:dc="http://purl.org/dc/elements/1.1/"
+  xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+  xmlns:admin="http://webns.net/mvcb/"
+  xmlns:content="http://purl.org/rss/1.0/modules/content/"
+  xmlns="http://purl.org/rss/1.0/">
+
+  <channel rdf:about="http://www.cantrell.org.uk/david/journal/index.pl">
+    <title>Dave's Free Press</title>
+    <link>http://www.cantrell.org.uk/david/journal/index.pl</link>
+    <description>the Slightly Less Bad And Wrong Blog Edition</description>
+    <dc:language>en-us</dc:language>
+    <dc:date>2007-01-20T22:02:42Z</dc:date>
+    <items>
+      <rdf:Seq>      <rdf:li rdf:resource="http://www.cantrell.org.uk/david/journal/index.pl/id_bryar-software-release"/>      <rdf:li rdf:resource="http://www.cantrell.org.uk/david/journal/index.pl/id_big-brother-racism"/>      <rdf:li rdf:resource="http://www.cantrell.org.uk/david/journal/index.pl/id_idiot-recruiters"/>      <rdf:li rdf:resource="http://www.cantrell.org.uk/david/journal/index.pl/id_measurement-in-the-digital-age"/>      <rdf:li rdf:resource="http://www.cantrell.org.uk/david/journal/index.pl/id_dear-amazon"/>      <rdf:li rdf:resource="http://www.cantrell.org.uk/david/journal/index.pl/id_new-weblog"/>      <rdf:li rdf:resource="http://www.cantrell.org.uk/david/journal/index.pl/id_customer-service-BA-style"/>      <rdf:li rdf:resource="http://www.cantrell.org.uk/david/journal/index.pl/id_amazon-recommendations"/>      <rdf:li rdf:resource="http://www.cantrell.org.uk/david/journal/index.pl/id_this-week-in-whisky-news"/>      <rdf:li rdf:resource="http://www.cantrell.org.uk/david/journal/index.pl/id_bastard-fairies"/>      </rdf:Seq>
+    </items>
+  </channel>
+  <item rdf:about="http://www.cantrell.org.uk/david/journal/index.pl/id_bryar-software-release">
+    <title> New Bryar release </title>
+    <link> http://www.cantrell.org.uk/david/journal/index.pl/id_bryar-software-release</link>
+    <description>
+Warning: geeky content ahead&lt;p&gt;As I've been promising to do for ages (it's over a year since Simon said I could take over maintenance of it, and several months since I promised &lt;a href=http://randomness.org.uk/&gt;Bob&lt;/a&gt; that he could have all the &lt;a href=http://search.cpan.org/src/DCANTRELL/Bryar-3.0/Changes&gt;shiny new features&lt;/a&gt; I had planned) I've finally got round to releasing a &lt;a href=http://search.cpan.org/~dcantrell/Bryar-3.0/&gt;new version of Bryar&lt;/a&gt;, the software what provides the brains behind this 'ere august journal.&lt;p&gt;The most important change is that I released the stuff for filtering out comment spam.
+</description>
+    <dc:date> 2007-01-20T22:02:42Z </dc:date>
+    <dc:creator> david </dc:creator>
+  </item>  <item rdf:about="http://www.cantrell.org.uk/david/journal/index.pl/id_big-brother-racism">
+    <title> Racism on the telly </title>
+    <link> http://www.cantrell.org.uk/david/journal/index.pl/id_big-brother-racism</link>
+    <description>
+&lt;table border=1 align=right&gt;&lt;tr&gt;&lt;td align=center&gt;&lt;font size=-2&gt;&lt;img src=/david/journal/images/sherpa-shitty.jpg&gt;&lt;br&gt;Sherpa Shitty, famous for&lt;br&gt;being a piece of plastic&lt;/font&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;Apparently there is a television programme called &quot;Big Brother&quot;, one of the requirements for appearing on which is being exceedingly stupid.  There's a furore because one of the stupid people is supposed to have made some nasty racist comments about another of the stupid people.  Not entirely unexpected, when you consider that the programme has the same requirements as being a racist does.  Anyway, the victim is pictured here.  I hope you don't think I'm racist for pointing out that she looks like a plastic doll.
+</description>
+    <dc:date> 2007-01-19T22:44:38Z </dc:date>
+    <dc:creator> david </dc:creator>
+  </item>  <item rdf:about="http://www.cantrell.org.uk/david/journal/index.pl/id_idiot-recruiters">
+    <title> An Idiot </title>
+    <link> http://www.cantrell.org.uk/david/journal/index.pl/id_idiot-recruiters</link>
+    <description>
+[originally posted on 2006-01-12]&lt;p&gt;I got an email today from a recruiter.  Not to see if I was available for work, but trying to push someone on to me.  The email read:&lt;p&gt;&lt;blockquote&gt;
+Please find attached the CV of an extremely talented web developer who specialises in PHP and front end web development technologies including HTML, CSS and JavaScript.&lt;p&gt;This candidate is actively seeking work in your area at the moment. He does have several other interviews arranged therefore if you are interested in seeing him for a role you are currently recruiting for please give me a call today.&lt;p&gt;If you are not recruiting, please keep my details on record for future reference.
+&lt;/blockquote&gt;&lt;p&gt;and was sent to my personal address, not to work.  Neither I nor my lovely employer have told this girl that we are looking for anyone technical and if we had we'd not have asked for someone who knew PHP.  So yes, I most certainly will &quot;keep her details on record for future reference&quot;.  Being a gentleman, I informed her of this fact and that I was keeping them because I would otherwise not remember that she is clearly far too stupid for me to do business with.&lt;p&gt;&lt;strong&gt;Update 2006-01-19:&lt;/strong&gt; she dunnit again.  This time I phoned her, and she admitted sending unsolicited, untargetted mailshots - that is, spam.  She, of course, thinks it was targetted, but I'm afraid that's just not true as is obvious from what I wrote above.  And, of course, there's the issue that the address she sent her spam to is one that I created only because one person (one!) continually mis-spelt my real one.  I've never sent email from the address in question, nor have I ever given that address to anyone apart from that one person.  Consequently, the idiot spammer Claire O'Keeffe of Huxley Associates obviously either guessed it or acquired it by some other nefarious means.
+</description>
+    <dc:date> 2007-01-19T17:43:46Z </dc:date>
+    <dc:creator> david </dc:creator>
+  </item>  <item rdf:about="http://www.cantrell.org.uk/david/journal/index.pl/id_measurement-in-the-digital-age">
+    <title> Measuring speed in the digital age </title>
+    <link> http://www.cantrell.org.uk/david/journal/index.pl/id_measurement-in-the-digital-age</link>
+    <description>
+Warning: geeky content ahead&lt;p&gt;In the digital age, accuracy and speedy calculations come from using powers of two.  You also want to stick with integers to avoid rounding error.  Therefore I propose that we measure speed in nano-furlongs per mega-fortnight.  The conversion from metres per second is fairly simple - 1&amp;nbsp;m/s is approximately 2&lt;sup&gt;64&lt;/sup&gt;&amp;nbsp;nFurlong/Mfortnight.&lt;p&gt;This means that we can measure incredibly slow speeds with great precision - down to of the order of 10&lt;sup&gt;-19&lt;/sup&gt; m/s without having to enter the dangerous world of floating point.  And of course we can easily measure all the way up to the fastest possible speed, that of light, which is only about 2&lt;sup&gt;92&lt;/sup&gt; nF/MF.  This provides ample room for further expansion of the measuring stick if Mr. Einstein turns out to have been wrong.  A 128-bit value would let us measure speeds up to 10&lt;sup&gt;10&lt;/sup&gt; times that of light, in extremely small increments.
+</description>
+    <dc:date> 2007-01-16T21:10:18Z </dc:date>
+    <dc:creator> david </dc:creator>
+  </item>  <item rdf:about="http://www.cantrell.org.uk/david/journal/index.pl/id_dear-amazon">
+    <title> Dear Amazon </title>
+    <link> http://www.cantrell.org.uk/david/journal/index.pl/id_dear-amazon</link>
+    <description>
+You're a bunch of cunts.  Not only do you provide no way for me to export my wishlist to XML or CSV or anything useful like that, you manage to break all the third-party applications that do it as well.  I hate you and hope you die.&lt;p&gt;&lt;strong&gt;update:&lt;/strong&gt; they had for no apparent reason disabled my account, although they were still sending me information about how to use it.  It would have been nice if they'd told me.  It would have been nice if I got helpful error messages back from the Net::Amazon module too.
+</description>
+    <dc:date> 2007-01-14T17:30:49Z </dc:date>
+    <dc:creator> david </dc:creator>
+  </item>  <item rdf:about="http://www.cantrell.org.uk/david/journal/index.pl/id_new-weblog">
+    <title> New weblog </title>
+    <link> http://www.cantrell.org.uk/david/journal/index.pl/id_new-weblog</link>
+    <description>
+I've got a new weblog &lt;a href=http://www.cantrell.org.uk/david/journal/weblog.tt2&gt;here&lt;/a&gt;.
+</description>
+    <dc:date> 2007-01-05T22:09:45Z </dc:date>
+    <dc:creator> david </dc:creator>
+  </item>  <item rdf:about="http://www.cantrell.org.uk/david/journal/index.pl/id_customer-service-BA-style">
+    <title> Customer Service, BA-style </title>
+    <link> http://www.cantrell.org.uk/david/journal/index.pl/id_customer-service-BA-style</link>
+    <description>
+British Airways' &quot;vision&quot; is to &quot;create the best possible airport experience before you fly&quot;, according to some &lt;a href=/david/journal/images/ba-bumph.txt&gt;bumph&lt;/a&gt; they sent me.  To do this they have a &quot;new simpler checked and excess baggage policy&quot;.  I wonder what that new policy is, so reading on a bit ... &quot;the maximum weight per bag will be reduced&quot;.  The overall effect is that ordinary people will be able to take less luggage.&lt;p&gt;Obviously, that makes flying so much nicer!&lt;p&gt;Now I've known for some time that the government basically doesn't want people to fly, and that the method they've chosen to implement this part of their &lt;strike&gt;giving in to terrorists&lt;/strike&gt; errm, I mean security agenda is to make it as inconvenient as possible.  I'd already stopped flying because I quite literally can't take all my valuable items in hand luggage like I used to and I don't trust the baggage monkeys to not steal them&amp;nbsp;/ use them as footballs&amp;nbsp;/ run them over with trucks&amp;nbsp;/ send them to Ulaan Bator.  I use Eurostar and other trains, which for the vast majority of my journeys is not significantly more time-consuming, as well as being cheaper and a great deal less unpleasant.&lt;p&gt;What I can't understand is why an &lt;em&gt;airline&lt;/em&gt; would want to collaborate with the enemy in this way and drive even more of its customers away.  Although I do note that BA own 10% of the shares in the company that runs Eurostar ...
+</description>
+    <dc:date> 2006-12-29T20:02:44Z </dc:date>
+    <dc:creator> david </dc:creator>
+  </item>  <item rdf:about="http://www.cantrell.org.uk/david/journal/index.pl/id_amazon-recommendations">
+    <title> Amazon recommendations </title>
+    <link> http://www.cantrell.org.uk/david/journal/index.pl/id_amazon-recommendations</link>
+    <description>
+Today I ordered a spoon from Amazon.  This seems to have screwed up its recommendations system so now it seems to be ignoring the zillion bits of sci-fi, the zombie flicks and the metal CDs I've bought and thinks that I want:&lt;p&gt;&lt;ul&gt;&lt;li&gt;a slotted spoon
+&lt;li&gt;a ladle
+&lt;li&gt;a spaghetti server
+&lt;li&gt;an omelette turner
+&lt;li&gt;some tongs
+&lt;/ul&gt;&lt;p&gt;mixed in with:&lt;p&gt;&lt;ul&gt;&lt;li&gt;&quot;selected works&quot; of Cicero (no thanks, I'll select my own)
+&lt;li&gt;&quot;Iron Sunrise&quot; by Charlie Stross
+&lt;li&gt;&quot;Adventures of a bacon curer&quot;
+&lt;li&gt;a DVD of The Da Vinci Code
+&lt;li&gt;Now 65
+&lt;/ul&gt;&lt;p&gt;Well done Amazon, you score two out of ten.&lt;p&gt;And what the FUCK is an omelette turner?
+</description>
+    <dc:date> 2006-12-28T14:07:23Z </dc:date>
+    <dc:creator> david </dc:creator>
+  </item>  <item rdf:about="http://www.cantrell.org.uk/david/journal/index.pl/id_this-week-in-whisky-news">
+    <title> This week in Whisky news </title>
+    <link> http://www.cantrell.org.uk/david/journal/index.pl/id_this-week-in-whisky-news</link>
+    <description>
+Having come back from Edinburgh after the weekend with a splendid bottle of &lt;a href=http://www.smws.com&gt;the society&lt;/a&gt;'s &lt;a href=https://www.smws.co.uk/shop/whisky_details.php?id_bottlings=1837&gt;Laphroaig&lt;/a&gt;, I was pleased to discover a whisky shop in Vinopolis near London Bridge.  At which there was a bottle of &lt;a href=http://www.royalmilewhiskies.com/product.asp?pf_id=0040000007487&gt;50 year old Talisker&lt;/a&gt;, which I persuaded to come home with me.&lt;p&gt;I'm doomed, and not just when the credit card bill arrives.
+</description>
+    <dc:date> 2006-12-19T15:08:04Z </dc:date>
+    <dc:creator> david </dc:creator>
+  </item>  <item rdf:about="http://www.cantrell.org.uk/david/journal/index.pl/id_bastard-fairies">
+    <title> Bastard Fairies </title>
+    <link> http://www.cantrell.org.uk/david/journal/index.pl/id_bastard-fairies</link>
+    <description>
+You! Yes, you behind the bikesheds! Listen to &lt;a href=http://www.thebastardfairies.com/&gt;The Bastard Fairies&lt;/a&gt; now.&lt;p&gt;Even if you don't like the music, the name rules.
+</description>
+    <dc:date> 2006-12-18T00:10:46Z </dc:date>
+    <dc:creator> david </dc:creator>
+  </item></rdf:RDF>

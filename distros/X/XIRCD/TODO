@@ -1,0 +1,8 @@
+- 0.0.1
+-- iCal Component
+-- add requires to Makefile.PL
+-- release
+
+- 0.0.2
+-- multi channel
+-- IRC Proxy Component

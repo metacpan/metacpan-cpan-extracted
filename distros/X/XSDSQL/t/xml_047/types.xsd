@@ -1,0 +1,21 @@
+<?xml version="1.0"?> 
+<xs:schema 
+	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+>
+
+	<xs:attribute name="id" type="xs:integer"/>
+	<xs:element name="isbn" type="xs:string"/>
+	<xs:element name="title" type="xs:string"/>
+	<xs:element name="author" type="xs:string"/>
+	<xs:element name="character" type="xs:string"/>
+	<xs:attribute name="available" type="xs:boolean"/>
+	<xs:element name="name" type="xs:string"/>
+	<xs:element name="born" type="xs:date"/>
+	<xs:element name="dead" type="xs:date"/>
+
+	<xs:complexType name="elementWithID">
+		<xs:attribute ref="id"/>
+	</xs:complexType>
+
+</xs:schema>
+

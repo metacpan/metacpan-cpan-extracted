@@ -1,0 +1,32 @@
+---
+abstract: 'Persistant XML RSS Encapsulation'
+author:
+  - 'Jeff Bisbee <jbisbee@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.7, CPAN::Meta::Converter version 2.131560'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: XML-RSS-Feed
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: 0
+  Clone: 0
+  Digest::MD5: 0
+  Encode: 0
+  HTML::Entities: 0
+  Storable: 0
+  Test::More: 0
+  Time::HiRes: 0
+  URI: 0
+  URI::Escape: 0
+  XML::RSS: 0
+version: 2.4

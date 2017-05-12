@@ -1,0 +1,25 @@
+XML::Handler::AxPoint
+=====================
+
+This module is a port of the original AxKit presentation tool AxPoint.
+
+It allows you to write presentations in a very simple XML format, yet
+create beautiful [1] anti-aliased [2] PDF results with slide transitions,
+bookmarks, images, etc.
+
+It's a sax handler, so you require XML::SAX and XML::SAX::Writer, and it
+uses PDFLib to do the PDF writing, which you can grab from CPAN, but 
+requires pdflib from http://www.pdflib.com/.
+
+Installation is simple:
+
+  $ perl Makefile.PL
+  $ make
+  $ make test
+  $ su
+  $ make install
+
+[1] Looks pretty rubbish on ghostview and xpdf, but lovely on Acrobat Reader.
+[2] Anti Aliasing is part of the Adobe Acrobat reader, not part of this
+module.
+

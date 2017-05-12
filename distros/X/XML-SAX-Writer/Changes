@@ -1,0 +1,91 @@
+Revision history for XML::SAX::Writer
+-------------------------------------
+
+0.54 - 2013-12-13
+     - remove /o modifier on Regexps (RT#91382)
+     - Update to Dist::Zilla for releasing
+        - Clean up POD issues
+        - Simplify Makefile.PL
+        - Add cpanfile 
+
+0.53 - 2010-07-12
+     - Switch from Text::IconV to Encode (David Pinkowitz)
+     - Update package Module::Install metadata discovery
+
+0.52 - 2008-11-19
+     - Fix spelling of QuoteCharacter
+
+0.51 - 2008-11-19
+     - Added QuoteCharecter parameter to new() to control quoting of
+       attributes (perigrin)
+        - Added Tests and Docs
+     
+0.50 - Sep 14, 2006
+     - fixed redundant skipped entity at start_dtd 
+       (RT.cpan.org #18546)
+     - attribute_decl expects Mode instead of ValueDefault property
+       to fit to Perl SAX 2.1 (ValueDefault still supported)
+     - fixed make test failure with Text::Iconv 1.3 or higher
+       (RT.cpan.org #7436 and #9690)
+     - fixed make test failure on VMS
+       (RT.cpan.org #18663)
+     - fixed dropped output on encoding conversion errors
+       (RT.cpan.org #17177)
+
+0.43 - 0.44 fri 20020906 18:27
+    - made the basic tests work again despite the fact we now return
+      a BufferText object
+    - fixed a bug reported by Grant that prevented proper use of 
+      output FH under some conditions.
+
+0.42 - thu 20020801 17:17
+    - fixed a serious bug in StringConsumer, thanks to help from Barrie
+      Slaymaker, Adam Turoff, and Eric Cholet.
+
+0.40 - 0.41 sat 20020706 18:01
+    - implemented the subclassable SAX writing framework
+    - documented the converter API
+    - made comments be escaped differently
+    - fixed doctype writing (Michel Rodriguez)
+    - fixed a warning (Joshua Keroes)
+    - requires correct version of Test::More (Richard Dice)
+    - fixed CDATA escaping
+    - we return a BufferText object now, to make sure that multiple
+      charater escapes work
+    - lots of stuff thanks to Barrie Slaymaker:
+        - Rewrite of all consumers to be smaller and faster.
+        - XML::SAX::Writer::ConsumerInterface::new is now a real
+          constructor which all derived classes should call.
+        - finalize is now not called unless it exists.
+        - A file name of "0" will not cause an exception.
+        - One error message now reports the package name properly if
+          it was subclassed.
+        - base.pm is no longer used.
+        - the test suite runs events through Writer and in to
+          CodeConsumer and a custom consumer.
+        - Custom consumers are better documented (barries).
+
+0.39 wed 20020116 22:15:41
+    - fixed an FH problem (Dave Rolsky)
+    - the null converter was so null that it converted strings to nothing
+    (Graham Barr)
+
+0.38 wed 20020116 21:41:41
+    - several major bugfixes that prevented some consumers (mostly Handle and
+    File) from working at all.
+    - the beginning of a test suite. It doesn't test the correctness of the
+    XML that is created yet, but it does at least go through all the basic
+    functions that are needed for that to work.
+
+0.37 wed 20020116 16:11:15
+    - on Solaris it would seem that iconv has problems converting an encoding
+    to itself (at least, utf-8 to utf-8). Given that this is a useless
+    operation, it is now detected and replaced with a noop (thanks to
+    David N. Blank-Edelman for reporting this).
+
+0.02 - 0.36
+    - many bugfixes thanks to many helpful people, notably Barrie Slaymaker,
+    Dave Rolsky, Sean M. Burke, and others.
+
+0.01  mon 20011126 02:31:58
+	- original version

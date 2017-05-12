@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<xs:schema 
+	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	targetNamespace="http://www.site.org/book"
+	xmlns="http://www.site.org/book"
+>
+
+<xs:include schemaLocation="book.xsd"/>
+
+</xs:schema>
+

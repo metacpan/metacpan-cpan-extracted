@@ -1,0 +1,35 @@
+XML/Writer/String version 0.1
+=============================
+
+
+This module implements a bare-bones class specifically for the purpose
+of capturing data from the XML::Writer module. XML::Writer expects an
+IO::Handle object and writes XML data to the specified object (or
+STDOUT) via it's print() method. This module simulates such an object
+for the specific purpose of providing the required print() method.
+
+It is recommended that $writer->end() is called prior to calling
+$s->value() to check for well-formedness.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  XML::Writer
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2002 Simon Oliver
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

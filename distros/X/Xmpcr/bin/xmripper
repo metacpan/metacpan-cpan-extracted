@@ -1,0 +1,148 @@
+#!/opt/links/perl -w
+
+# -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+#     xmripper - A program to cut live XM into song chunks, in realtime. 
+#                Connect your XM PCR to your sound card's
+#                line input, select the line input for recording (with
+#                aumix), and start recording. Pass in a '-c' at the front
+#                of the command line to automatically compress files
+#                to mp3 or ogg (and set the "compressor" variable).
+#
+#                This program uses 2 directories: it records into $tempdir,
+#                then moves the recording to $tempdir/$station when complete.
+#                To run a command when each file is ready, set the
+#                $postcommand variable to a program to run.
+#
+#                This application is subject to the same copyright as the
+#                Audio::Xmpcr module.
+# -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+#                                configuration
+my $postcommand="";
+my $tempdir="/burn/audio/xmdone";
+my $nethost="localhost";
+my $rate=44101;      # either 44100 or 44101; problem with some soundcards
+#my $compressor="bladeenc -del -192 -quiet -q FILE";   # makes MP3s
+my $compressor="oggenc -q 5 FILE && rm FILE";   			# makes ogg/vorbis
+#$postcommand="echo 'FILE is ready'";       # set this to run shell cmd 
+# -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+use strict;
+use bytes;
+use Audio::DSP;
+use Audio::Wav;
+use Audio::Xmpcr;
+use POSIX;
+use Fcntl;
+die <<"EOF" if scalar(@ARGV)!=2 and scalar(@ARGV)!=3;
+usage: $0 [-c] station duration(mins) 
+where:
+	-c turns on mp3/ogg vorbis compression
+	station is the numeric XM channel
+	duration is the number of minutes to record (0 to record forever)
+EOF
+my($docompress);
+if ($ARGV[0] eq "-c") {
+	$docompress=1;
+	shift @ARGV;
+} else {
+	$docompress=0;
+}
+my($station,$duration)=@ARGV;
+
+# -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+#                        set up the audio dev and output file
+# -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+my $dsp = new Audio::DSP(
+	buffer   => 65536,
+  channels => 2,
+  format   => 16,
+  rate     => $rate,
+  mode 		 => O_RDONLY,
+) or die "Can't create a DSP object: $!";
+$dsp->init(mode => O_RDONLY) || die "failed to init dsp: " . $dsp->errstr();
+my($kid,@compressq)=(0);
+my $spooldir=$tempdir . "/$station";
+chdir($tempdir) || die "$tempdir doesn't exist!";
+mkdir($spooldir) if ! -d $spooldir; 
+my $termtime=time+$duration*60;
+
+my $radio=new Audio::Xmpcr(NETHOST => $nethost,LOCKER => "ripper")
+									or die "Couldn't contact the XMPCR";
+print "Turning radio power on...\n"; 
+$radio->power("on") and die "can't turn power on";
+print "Changing channel to $station\n"; 
+$radio->setchannel($station) and die "Can't change the channel!";
+$radio->events("on");
+print "Ready to record... waiting for next song/title to begin... \n";
+
+# -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+#                            main loop
+# -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+my $wav=new Audio::Wav;
+my $details={ bits_sample => 16, sample_rate => 44100, channels => 2 };
+my($outfh,$outfn,$buf)=(undef,undef); # don't record initial partial song
+while($duration==0 or time<$termtime) {
+	$outfh->write_raw($buf) if defined($buf=$dsp->dread) and $outfh;
+	for my $ch ($radio->processEvents()) {
+		next unless $ch->{NUM}==$station;
+		save($outfn) if $outfh;
+		$outfn=($ch->{ARTIST}||"none") . "_-_" . ($ch->{SONG}||"none");
+		$outfn =~ s/ /_/g;                   # chuck all spaces
+		1 while $outfn =~ s/__/_/g;          # double spaces to single
+		$outfn =~ s/^_+//;                   # toss leading underscores
+		$outfn =~ s/\W/_/g;                  # get rid of funny chars
+		print "> Song change: $outfn\n";
+		$outfh=$wav->write($outfn . ".wav",$details);
+	}
+
+	# should we start a compress process?
+	if ($docompress) {
+		if ($kid and waitpid($kid,WNOHANG)) {
+			$kid=0;
+			printf(">> Compression complete\n");
+		}
+		compress(pop @compressq) if scalar(@compressq) and ! $kid;
+	}
+}
+save($outfn) if $outfh;
+
+sub save {
+	$outfh->finish();
+	my $fn=$outfn . 
+		(dirHasPrefix($outfn) ? ("_" . time()) : "") .
+		".wav";
+	rename("$tempdir/$outfn.wav","$spooldir/$fn")  
+		or warn "Hmm.. had trouble saving $outfn: $!\n";
+	push(@compressq,"$spooldir/$fn") if $docompress;
+  system("$postcommand $spooldir/$fn") if $postcommand and ! $docompress;
+}
+
+sub compress {
+	my($file)=@_;
+	if ($kid=fork()) {
+		printf(">> Started pid $kid compressing $file\n");
+	} else {
+		my $prg=$compressor;
+		$prg =~ s/FILE/$file/g;
+		system($prg);
+		if ($postcommand) {
+			my $shell=$postcommand;
+			$shell =~ s/FILE/$file/g;
+  		system($shell);
+		}
+		exit(0);
+	}
+}
+
+# does a mp3/wav/ogg file exist in the output dir with this prefix?
+sub dirHasPrefix {
+	my($prefix)=@_;
+  my($found,$str)=0;
+  opendir(D,$spooldir) or die "Huh? can't open $spooldir for reading?\n";
+	while($str=readdir D) {
+		next if $str =~ /^\./;
+		next unless -f "$spooldir/$str";
+		$found++ if $str =~ /^$prefix/;
+	}
+	$found;
+}

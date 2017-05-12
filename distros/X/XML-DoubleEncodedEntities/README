@@ -1,0 +1,9 @@
+This module is a tiny shim to unbreak XML files that have had their entities
+doubly-encoded.
+
+To install, do the usual dance:
+
+    perl Makefile.PL
+    make
+    make test
+    make install

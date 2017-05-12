@@ -1,0 +1,53 @@
+---
+abstract: 'Database abstraction layer for the XAS Middleware Suite'
+author:
+  - 'Kevin L. Esteb <kevin@kesteb.us>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4001, CPAN::Meta::Converter version 2.120351'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: XAS-Model
+provides:
+  XAS::Apps::Database::ExtractData:
+    file: lib/XAS/Apps/Database/ExtractData.pm
+    version: 0.02
+  XAS::Apps::Database::ExtractGlobals:
+    file: lib/XAS/Apps/Database/ExtractGlobals.pm
+    version: 0.02
+  XAS::Apps::Database::RemoveData:
+    file: lib/XAS/Apps/Database/RemoveData.pm
+    version: 0.02
+  XAS::Apps::Database::Schema:
+    file: lib/XAS/Apps/Database/Schema.pm
+    version: 0
+  XAS::Docs::Model::Installation:
+    file: lib/XAS/Docs/Model/Installation.pm
+    version: 0.01
+  XAS::Model:
+    file: lib/XAS/Model.pm
+    version: 0.02
+  XAS::Model::DBM:
+    file: lib/XAS/Model/DBM.pm
+    version: 0.01
+  XAS::Model::Database:
+    file: lib/XAS/Model/Database.pm
+    version: 0.01
+  XAS::Model::Schema:
+    file: lib/XAS/Model/Schema.pm
+    version: 0.01
+requires:
+  DBIx::Class: 0.08196
+  DBIx::Class::OptimisticLocking: 0.02
+  DBIx::Class::Schema::Config: 0.001010
+  XAS: 0.08
+  perl: 5.00808
+resources:
+  homepage: http://scm.kesteb.us/trac
+  repository: http://scm.kesteb.us/git/XAS-Model
+version: 0.02

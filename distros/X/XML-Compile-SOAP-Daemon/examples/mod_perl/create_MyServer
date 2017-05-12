@@ -1,0 +1,18 @@
+#!/bin/sh
+perl -sp -e '
+	s/# XXX\s//;
+	$_ = "# $_" if /NPH START/../NPH END/;
+' nph-server.cgi >MyServer.pm 
+chmod a+rx MyServer.pm
+diff nph-server.cgi MyServer.pm 
+perl -sn -e '
+if( /nph-server2.cgi START/../nph-server2.cgi END/ ){
+
+	next if /nph-server2.cgi /;
+	s/^#+\s*//;
+	next if /^$/;
+	print;
+}
+' nph-server.cgi >nph-server2.cgi 
+chmod a+rx nph-server2.cgi
+

@@ -1,0 +1,9 @@
+<team>
+    <name>Chelsea</name>
+    <manager>Chelsea coach</manager>
+    <players>
+        <player name="Drogba"/>
+        <player name="Torres" />
+		<ballBoy name = "Steve" />
+    </players>
+</team>

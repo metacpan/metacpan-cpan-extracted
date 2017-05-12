@@ -1,0 +1,44 @@
+{
+   "abstract" : "Retrieve information from X11 windows",
+   "author" : [
+      "Tom Molesworth <cpan@entitymodel.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300021, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "X11-WindowHierarchy",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "X11::Protocol" : "0.56",
+            "parent" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-x11-windowhierarchy at rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=X11-WindowHierarchy"
+      },
+      "homepage" : "http://search.cpan.org/dist/X11-WindowHierarchy/"
+   },
+   "version" : "0.004"
+}
+

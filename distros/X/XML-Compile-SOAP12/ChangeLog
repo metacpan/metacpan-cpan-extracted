@@ -1,0 +1,65 @@
+
+=== version history of XML::Compile::SOAP12
+
+explain differences in WSDL
+http://schemas.xmlsoap.org/wsdl/soap12/soap12WSDL.html
+
+version 3.04: Wed  9 Dec 12:12:20 CET 2015
+
+	Fixes:
+	- fix content-type of soap12
+	  rt.cpan.org#107586 [Derek Hausauer]
+
+version 3.03: Fri Feb 27 13:14:45 CET 2015
+
+	Fixes:
+	- pass soap object to transporter. [Sean Baker]
+
+version 3.02: Fri Feb  7 09:37:58 CET 2014
+
+	Fixes:
+	- silence complaint about double declared 'our $VERSION'
+	  rt.cpan.org#92796 [Andreas Koenig]
+
+version 3.01: Thu Feb  6 17:07:05 CET 2014
+
+	Fixes:
+	- implementation of the server side
+
+	Improvements:
+	- include reference to sponsor Momac
+	- remove "not usable" warnings
+	- implementation of the server side
+	- change documentation style
+	- remove t/TestTools.pm, not used
+
+version 3.00: Mon Jan  6 01:03:05 CET 2014
+	Implement it for real, thanks to Momac!!  Still work to do on
+	the server side code.
+
+	Changes:
+	- moved WSDL schema to new XML-Compile-WSDL distribution
+
+	Improvements:
+	- use ::Cache::addPrefixes()
+
+version 2.04: Tue Jul  9 18:02:15 CEST 2013
+	- enforce schema's to have elementFromDefault='qualified'
+	- move t/99pod.t to xt/  and drop dependency to Test::Pod
+
+version 2.03: Mon Feb 11 10:48:25 CET 2013
+	- try to get sponsorship to complete this module.
+
+version 2.02: Tue Nov  9 13:07:56 CET 2010
+	- XML::Compile::Operation got renamed to
+	  XML::Compile::SOAP::Operation.
+
+version 2.01: Wed Apr  7 13:20:12 CEST 2010
+	- add ::SOAP12::Operation
+	- make $wsdl->printIndex usable for XML::Compile::WSDL11
+
+version 2.00: Thu Feb 12 10:27:06 CET 2009
+
+	- split-off from XML::Compile::SOAP.
+	  Unusable!
+

@@ -1,0 +1,38 @@
+---
+name: Xcruciate
+version: 0.21
+author:
+  - 'Mark Howe <melonman@cpan.org>'
+abstract: libraries for perl scripts in and around the Xcruciate server project
+license: bsd
+resources:
+  license: http://opensource.org/licenses/bsd-license.php
+build_requires:
+  Test::More: 0
+requires:
+  Carp: 1.0
+  Time::gmtime: 1
+  XML::LibXSLT: 1.58
+  perl: v5.6.1
+recommends:
+  Test::Pod: 1.14
+  Test::Pod::Coverage: 1.04
+configure_requires:
+  Module::Build: 0.34
+provides:
+  Xcruciate:
+    file: lib/Xcruciate.pm
+    version: 0.21
+  Xcruciate::UnitConfig:
+    file: lib/Xcruciate/UnitConfig.pm
+    version: 0.21
+  Xcruciate::Utils:
+    file: lib/Xcruciate/Utils.pm
+    version: 0.21
+  Xcruciate::XcruciateConfig:
+    file: lib/Xcruciate/XcruciateConfig.pm
+    version: 0.21
+generated_by: Module::Build version 0.34
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

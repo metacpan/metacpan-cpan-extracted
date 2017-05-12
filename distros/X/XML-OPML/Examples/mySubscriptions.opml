@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<opml version="1.1">
+<head>
+<title>mySubscriptions</title>
+<dateCreated>Wed, 11 Feb 2004 10:27:00 GMT</dateCreated>
+<dateModified>Mon, 16 Feb 2004 11:36:00 GMT</dateModified>
+<ownerName>michael szul</ownerName>
+<ownerEmail>michael@madghoul.com</ownerEmail>
+</head>
+<body>
+<outline text="madghoul.com | the dark night of the soul" description="Looking for something strange? Religion, philosophy, and occult science intermingle to form an amalgamation ripe for the counterculture - madghoul.com, keep your nightmares in order with the one site that keeps you up to date on the dark night of the soul." title="madghoul.com | the dark night of the soul" type="rss" version="RSS" htmlUrl="http://www.madghoul.com/ghoul/InsaneRapture/lunacy.mhtml" xmlUrl="http://www.madghoul.com/cgi-bin/fearsome/fallout/index.rss10"/>
+<outline text="Disobey Nonsense Network" description="A one sentence description!? Bah! Impossible!" title="Disobey Nonsense Network" type="rss" version="RSS" htmlUrl="http://www.disobey.com/dnn/index.shtml" xmlUrl="http://www.disobey.com/dnn/index.xml"/>
+<outline text="Neil Gaiman&apos;s Journal" description="Neil Gaiman&apos;s Journal" title="Neil Gaiman&apos;s Journal" type="rss" version="RSS" htmlUrl="http://www.neilgaiman.com/journal/journal.asp" xmlUrl="http://www.neilgaiman.com/journal/blogger_rss.xml"/>
+<outline text="die puny humans" description="warren ellis speaks clever" title="die puny humans" type="rss" version="RSS" htmlUrl="http://www.diepunyhumans.com" xmlUrl="http://www.diepunyhumans.com/index.rdf"/>
+<outline text="2012" description="News blog of Survive2012.com" title="2012" type="rss" version="RSS" htmlUrl="http://2012.antville.org" xmlUrl="http://2012.antville.org/rss10"/>
+<outline text="Technoccult" description="" title="Technoccult" type="rss" version="RSS" htmlUrl="http://www.technoccult.net" xmlUrl="http://www.technoccult.net/index.rdf"/>
+<outline text="rushkoff.blog" description="Author and media theorist Douglas Rushkoff&apos;s personal weblog." title="rushkoff.blog" type="rss" version="RSS" htmlUrl="http://www.rushkoff.com/blog.php" xmlUrl="http://www.rushkoff.com/rssfeed.xml"/>
+<outline text="notes from somewhere bizarre" description="" title="notes from somewhere bizarre" type="rss" version="RSS" htmlUrl="http://www.ashleyb.org" xmlUrl="http://www.ashleyb.org/index.rdf"/>
+<outline text="obscurantist" description="" title="obscurantist" type="rss" version="RSS" htmlUrl="http://www.obscurantist.net" xmlUrl="http://www.obscurantist.net/index.rdf"/>
+<outline text="philhine.org.uk News &amp; Updates" description="The latest news and updates from philhine.org.uk" title="philhine.org.uk News &amp; Updates" type="rss" version="RSS" htmlUrl="http://www.philhine.org.uk" xmlUrl="http://www.philhine.org.uk/index.xml"/>
+</body>
+</opml>
+

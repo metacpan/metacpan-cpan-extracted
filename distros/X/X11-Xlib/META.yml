@@ -1,0 +1,34 @@
+---
+abstract: 'Low-level access to the X11 library'
+author:
+  - 'Olivier Thauvin <nanardon@nanardon.zarb.org>'
+  - 'Michael Conrad <mike@nrdvana.net>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
+configure_requires:
+  Devel::CheckLib: '1.03'
+  ExtUtils::Depends: '0.405'
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: X11-Xlib
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  Scalar::Util: '0'
+  Try::Tiny: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/nanardon/X11-Xlib/issues
+  repository: https://github.com/nanardon/X11-Xlib.git
+version: '0.14'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

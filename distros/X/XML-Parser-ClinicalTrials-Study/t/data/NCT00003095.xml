@@ -1,0 +1,1065 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<clinical_study rank="418">
+  <!-- This xml conforms to an XML Schema at:
+    http://clinicaltrials.gov/ct2/html/images/info/public.xsd
+ and an XML DTD at:
+    http://clinicaltrials.gov/ct2/html/images/info/public.dtd -->
+  <required_header>
+    <download_date>ClinicalTrials.gov processed this data on November 07, 2013</download_date>
+    <link_text>Link to the current ClinicalTrials.gov record.</link_text>
+    <url>http://clinicaltrials.gov/show/NCT00003095</url>
+  </required_header>
+  <id_info>
+    <org_study_id>CDR0000065813</org_study_id>
+    <secondary_id>S9719</secondary_id>
+    <secondary_id>U10CA032102</secondary_id>
+    <nct_id>NCT00003095</nct_id>
+  </id_info>
+  <brief_title>S9719 Gene Damage Following Chemotherapy in Women With Stage II or Stage III Breast Cancer</brief_title>
+  <official_title>S9719: Clonal Hematopoiesis as a Marker of Genetic Damage Following Adjuvant Chemotherapy for Breast Cancer: Pilot Study to Evaluate Incidence. Ancillary to S9623</official_title>
+  <sponsors>
+    <lead_sponsor>
+      <agency>Southwest Oncology Group</agency>
+      <agency_class>Other</agency_class>
+    </lead_sponsor>
+    <collaborator>
+      <agency>National Cancer Institute (NCI)</agency>
+      <agency_class>NIH</agency_class>
+    </collaborator>
+  </sponsors>
+  <source>Southwest Oncology Group</source>
+  <oversight_info>
+    <authority>United States: Federal Government</authority>
+    <has_dmc>No</has_dmc>
+  </oversight_info>
+  <brief_summary>
+    <textblock>
+      RATIONALE: Drugs used in chemotherapy for breast cancer may damage the genes of cells. This
+      may lead to the development of secondary cancers.
+
+      PURPOSE: Pilot study to evaluate the degree of gene damage following chemotherapy in women
+      with stage II or stage III breast cancer involving four to nine axillary lymph nodes.
+    </textblock>
+  </brief_summary>
+  <detailed_description>
+    <textblock>
+      OBJECTIVES: I. Estimate the incidence of early genetic damage, defined by the presence of
+      clonal hematopoiesis using the human androgen receptor assay (HUMARA), in pretreatment blood
+      and bone marrow, apheresis, and two sequential post-treatment specimens from women with
+      stage II/III breast cancer enrolled in SWOG-S9623. II. Detect genetic damage following
+      dose-intensive adjuvant regimens for breast cancer by screening for the presence of
+      defective DNA mismatch repair mechanisms and loss of heterozygosity using microsatellite
+      instability assays. III. Estimate the incidence of myeloid lymphoid leukemia gene fusion
+      transcripts in cases where either the HUMARA or microsatellite repeat assays are positive
+      for clonal hematopoiesis. IV. Determine the frequency of RAS gene mutations (H-, K-, and
+      N-RAS) following dose-intensive adjuvant regimens for breast cancer.
+
+      OUTLINE: Prior to beginning treatment on SWOG-9623, blood samples and bone marrow aspirates
+      (when available) are collected from each patient. Patients randomized to autologous
+      peripheral stem cell transplant have specimens collected again at 3 months (apheresis
+      aliquot and blood). At 3 and 12 months after completing chemotherapy, blood samples are
+      collected from all patients. Samples are collected again from any patient presenting with a
+      second malignancy in the future. DNA is collected from blood or bone marrow samples.
+      Clonality at the HUMARA locus is examined. Microsatellite instability is assessed at
+      multiple chromosomal loci: 7q31, 5q31, 17p12, 8p22, 11q23, and the BAT loci. If the HUMARA
+      or microsatellite repeat assays are positive for clonal hematopoiesis, then specimens are
+      examined for myeloid lymphoid leukemia fusion transcripts commonly reported in acute myeloid
+      leukemia with 11q23 abnormalities. Specimens are also examined for RAS mutations (H-, K-,
+      N-RAS). Patients do not receive the results of the genetic testing and the results do not
+      influence the type or duration of treatment.
+
+      PROJECTED ACCRUAL: This study will accrue 100 patients for each arm of SWOG-9623, for a
+      total of 200 patients.
+    </textblock>
+  </detailed_description>
+  <overall_status>Completed</overall_status>
+  <start_date>November 1997</start_date>
+  <completion_date type="Actual">February 2001</completion_date>
+  <primary_completion_date type="Actual">February 2001</primary_completion_date>
+  <phase>N/A</phase>
+  <study_type>Observational</study_type>
+  <study_design>Observational Model: Cohort, Time Perspective: Prospective</study_design>
+  <number_of_groups>2</number_of_groups>
+  <enrollment type="Actual">26</enrollment>
+  <condition>Breast Cancer</condition>
+  <arm_group>
+    <arm_group_label>bone marrow transplant</arm_group_label>
+    <description>bone marrow transplant</description>
+  </arm_group>
+  <arm_group>
+    <arm_group_label>standard chemotherapy</arm_group_label>
+    <description>standard chemotherapy</description>
+  </arm_group>
+  <biospec_retention>Samples With DNA</biospec_retention>
+  <biospec_descr>
+    <textblock>
+      tissue and blood
+    </textblock>
+  </biospec_descr>
+  <eligibility>
+    <study_pop>
+      <textblock>
+        Must be enrolled in SWOG-9623 at time of registration to this study, but must not have
+        started treatment Hormone receptor status: Not specified
+      </textblock>
+    </study_pop>
+    <sampling_method>Non-Probability Sample</sampling_method>
+    <criteria>
+      <textblock>
+        DISEASE CHARACTERISTICS: Must be enrolled in SWOG-9623 at time of registration to this
+        study, but must not have started treatment Hormone receptor status: Not specified
+
+        PATIENT CHARACTERISTICS: Age: Adult Sex: Female Menopausal status: Not specified
+        Performance status: See Disease Characteristics Life expectancy: SWOG 0 or 1
+        Hematopoietic: See Disease Characteristics Hepatic: See Disease Characteristics Renal: See
+        Disease Characteristics
+
+        PRIOR CONCURRENT THERAPY: See Disease Characteristics
+      </textblock>
+    </criteria>
+    <gender>Female</gender>
+    <minimum_age>18 Years</minimum_age>
+    <maximum_age>N/A</maximum_age>
+    <healthy_volunteers>No</healthy_volunteers>
+  </eligibility>
+  <overall_official>
+    <last_name>Marilyn L. Slovak, PhD</last_name>
+    <role>Study Chair</role>
+    <affiliation>Beckman Research Institute</affiliation>
+  </overall_official>
+  <location>
+    <facility>
+      <name>MBCCOP - University of South Alabama</name>
+      <address>
+        <city>Mobile</city>
+        <state>Alabama</state>
+        <zip>36688</zip>
+        <country>United States</country>
+      </address>
+    </facility>
+  </location>
+  <location>
+    <facility>
+      <name>CCOP - Greater Phoenix</name>
+      <address>
+        <city>Phoenix</city>
+        <state>Arizona</state>
+        <zip>85006-2726</zip>
+        <country>United States</country>
+      </address>
+    </facility>
+  </location>
+  <location>
+    <facility>
+      <name>Veterans Affairs Medical Center - Phoenix (Hayden)</name>
+      <address>
+        <city>Phoenix</city>
+        <state>Arizona</state>
+        <zip>85012</zip>
+        <country>United States</country>
+      </address>
+    </facility>
+  </location>
+  <location>
+    <facility>
+      <name>Arizona Cancer Center</name>
+      <address>
+        <city>Tucson</city>
+        <state>Arizona</state>
+        <zip>85724</zip>
+        <country>United States</country>
+      </address>
+    </facility>
+  </location>
+  <location>
+    <facility>
+      <name>Veterans Affairs Medical Center - Tucson</name>
+      <address>
+        <city>Tucson</city>
+        <state>Arizona</state>
+        <zip>85723</zip>
+        <country>United States</country>
+      </address>
+    </facility>
+  </location>
+  <location>
+    <facility>
+      <name>University of Arkansas for Medical Sciences</name>
+      <address>
+        <city>Little Rock</city>
+        <state>Arkansas</state>
+        <zip>72205</zip>
+        <country>United States</country>
+      </address>
+    </facility>
+  </location>
+  <location>
+    <facility>
+      <name>Veterans Affairs Medical Center - Little Rock (McClellan)</name>
+      <address>
+        <city>Little Rock</city>
+        <state>Arkansas</state>
+        <zip>72205</zip>
+        <country>United States</country>
+      </address>
+    </facility>
+  </location>
+  <location>
+    <facility>
+      <name>Veterans Affairs Medical Center - Long Beach</name>
+      <address>
+        <city>Long Beach</city>
+        <state>California</state>
+        <zip>90822</zip>
+        <country>United States</country>
+      </address>
+    </facility>
+  </location>
+  <location>
+    <facility>
+      <name>USC/Norris Comprehensive Cancer Center</name>
+      <address>
+        <city>Los Angeles</city>
+        <state>California</state>
+        <zip>90033-0800</zip>
+        <country>United States</country>
+      </address>
+    </facility>
+  </location>
+  <location>
+    <facility>
+      <name>Beckman Research Institute, City of Hope</name>
+      <address>
+        <city>Los Angeles</city>
+        <state>California</state>
+        <zip>91010</zip>
+        <country>United States</country>
+      </address>
+    </facility>
+  </location>
+  <location>
+    <facility>
+      <name>Jonsson Comprehensive Cancer Center, UCLA</name>
+      <address>
+        <city>Los Angeles</city>
+        <state>California</state>
+        <zip>90095-1781</zip>
+        <country>United States</country>
+      </address>
+    </facility>
+  </location>
+  <location>
+    <facility>
+      <name>Veterans Affairs Outpatient Clinic - Martinez</name>
+      <address>
+        <city>Martinez</city>
+        <state>California</state>
+        <zip>94553</zip>
+        <country>United States</country>
+      </address>
+    </facility>
+  </location>
+  <location>
+    <facility>
+      <name>CCOP - Bay Area Tumor Institute</name>
+      <address>
+        <city>Oakland</city>
+        <state>California</state>
+        <zip>94609-3305</zip>
+        <country>United States</country>
+      </address>
+    </facility>
+  </location>
+  <location>
+    <facility>
+      <name>Chao Family Comprehensive Cancer Center</name>
+      <address>
+        <city>Orange</city>
+        <state>California</state>
+        <zip>92868</zip>
+        <country>United States</country>
+      </address>
+    </facility>
+  </location>
+  <location>
+    <facility>
+      <name>University of California Davis Medical Center</name>
+      <address>
+        <city>Sacramento</city>
+        <state>California</state>
+        <zip>95817</zip>
+        <country>United States</country>
+      </address>
+    </facility>
+  </location>
+  <location>
+    <facility>
+      <name>CCOP - Santa Rosa Memorial Hospital</name>
+      <address>
+        <city>Santa Rosa</city>
+        <state>California</state>
+        <zip>95403</zip>
+        <country>United States</country>
+      </address>
+    </facility>
+  </location>
+  <location>
+    <facility>
+      <name>David Grant Medical Center</name>
+      <address>
+        <city>Travis Air Force Base</city>
+        <state>California</state>
+        <zip>94535</zip>
+        <country>United States</country>
+      </address>
+    </facility>
+  </location>
+  <location>
+    <facility>
+      <name>University of Colorado Cancer Center</name>
+      <address>
+        <city>Denver</city>
+        <state>Colorado</state>
+        <zip>80262</zip>
+        <country>United States</country>
+      </address>
+    </facility>
+  </location>
+  <location>
+    <facility>
+      <name>Veterans Affairs Medical Center - Denver</name>
+      <address>
+        <city>Denver</city>
+        <state>Colorado</state>
+        <zip>80220</zip>
+        <country>United States</country>
+      </address>
+    </facility>
+  </location>
+  <location>
+    <facility>
+      <name>CCOP - Atlanta Regional</name>
+      <address>
+        <city>Atlanta</city>
+        <state>Georgia</state>
+        <zip>30342-1701</zip>
+        <country>United States</country>
+      </address>
+    </facility>
+  </location>
+  <location>
+    <facility>
+      <name>Dwight David Eisenhower Army Medical Center</name>
+      <address>
+        <city>Fort Gordon</city>
+        <state>Georgia</state>
+        <zip>30905-5650</zip>
+        <country>United States</country>
+      </address>
+    </facility>
+  </location>
+  <location>
+    <facility>
+      <name>Cancer Research Center of Hawaii</name>
+      <address>
+        <city>Honolulu</city>
+        <state>Hawaii</state>
+        <zip>96813</zip>
+        <country>United States</country>
+      </address>
+    </facility>
+  </location>
+  <location>
+    <facility>
+      <name>CCOP - Central Illinois</name>
+      <address>
+        <city>Decatur</city>
+        <state>Illinois</state>
+        <zip>62526</zip>
+        <country>United States</country>
+      </address>
+    </facility>
+  </location>
+  <location>
+    <facility>
+      <name>Veterans Affairs Medical Center - Hines (Hines Junior VA Hospital)</name>
+      <address>
+        <city>Hines</city>
+        <state>Illinois</state>
+        <zip>60141</zip>
+        <country>United States</country>
+      </address>
+    </facility>
+  </location>
+  <location>
+    <facility>
+      <name>Loyola University Medical Center</name>
+      <address>
+        <city>Maywood</city>
+        <state>Illinois</state>
+        <zip>60153</zip>
+        <country>United States</country>
+      </address>
+    </facility>
+  </location>
+  <location>
+    <facility>
+      <name>University of Kansas Medical Center</name>
+      <address>
+        <city>Kansas City</city>
+        <state>Kansas</state>
+        <zip>66160-7357</zip>
+        <country>United States</country>
+      </address>
+    </facility>
+  </location>
+  <location>
+    <facility>
+      <name>CCOP - Wichita</name>
+      <address>
+        <city>Wichita</city>
+        <state>Kansas</state>
+        <zip>67214-3882</zip>
+        <country>United States</country>
+      </address>
+    </facility>
+  </location>
+  <location>
+    <facility>
+      <name>Veterans Affairs Medical Center - Wichita</name>
+      <address>
+        <city>Wichita</city>
+        <state>Kansas</state>
+        <zip>67218</zip>
+        <country>United States</country>
+      </address>
+    </facility>
+  </location>
+  <location>
+    <facility>
+      <name>Albert B. Chandler Medical Center, University of Kentucky</name>
+      <address>
+        <city>Lexington</city>
+        <state>Kentucky</state>
+        <zip>40536-0084</zip>
+        <country>United States</country>
+      </address>
+    </facility>
+  </location>
+  <location>
+    <facility>
+      <name>Veterans Affairs Medical Center - Lexington</name>
+      <address>
+        <city>Lexington</city>
+        <state>Kentucky</state>
+        <zip>40511-1093</zip>
+        <country>United States</country>
+      </address>
+    </facility>
+  </location>
+  <location>
+    <facility>
+      <name>MBCCOP - LSU Medical Center</name>
+      <address>
+        <city>New Orleans</city>
+        <state>Louisiana</state>
+        <zip>70112</zip>
+        <country>United States</country>
+      </address>
+    </facility>
+  </location>
+  <location>
+    <facility>
+      <name>Tulane University School of Medicine</name>
+      <address>
+        <city>New Orleans</city>
+        <state>Louisiana</state>
+        <zip>70112</zip>
+        <country>United States</country>
+      </address>
+    </facility>
+  </location>
+  <location>
+    <facility>
+      <name>Veterans Affairs Medical Center - New Orleans</name>
+      <address>
+        <city>New Orleans</city>
+        <state>Louisiana</state>
+        <zip>70112</zip>
+        <country>United States</country>
+      </address>
+    </facility>
+  </location>
+  <location>
+    <facility>
+      <name>Louisiana State University Health Sciences Center - Shreveport</name>
+      <address>
+        <city>Shreveport</city>
+        <state>Louisiana</state>
+        <zip>71130-3932</zip>
+        <country>United States</country>
+      </address>
+    </facility>
+  </location>
+  <location>
+    <facility>
+      <name>Veterans Affairs Medical Center - Shreveport</name>
+      <address>
+        <city>Shreveport</city>
+        <state>Louisiana</state>
+        <zip>71130</zip>
+        <country>United States</country>
+      </address>
+    </facility>
+  </location>
+  <location>
+    <facility>
+      <name>Boston Medical Center</name>
+      <address>
+        <city>Boston</city>
+        <state>Massachusetts</state>
+        <zip>02118</zip>
+        <country>United States</country>
+      </address>
+    </facility>
+  </location>
+  <location>
+    <facility>
+      <name>Veterans Affairs Medical Center - Boston (Jamaica Plain)</name>
+      <address>
+        <city>Jamaica Plain</city>
+        <state>Massachusetts</state>
+        <zip>02130</zip>
+        <country>United States</country>
+      </address>
+    </facility>
+  </location>
+  <location>
+    <facility>
+      <name>University of Michigan Comprehensive Cancer Center</name>
+      <address>
+        <city>Ann Arbor</city>
+        <state>Michigan</state>
+        <zip>48109-0752</zip>
+        <country>United States</country>
+      </address>
+    </facility>
+  </location>
+  <location>
+    <facility>
+      <name>Veterans Affairs Medical Center - Ann Arbor</name>
+      <address>
+        <city>Ann Arbor</city>
+        <state>Michigan</state>
+        <zip>48105</zip>
+        <country>United States</country>
+      </address>
+    </facility>
+  </location>
+  <location>
+    <facility>
+      <name>Henry Ford Hospital</name>
+      <address>
+        <city>Detroit</city>
+        <state>Michigan</state>
+        <zip>48202</zip>
+        <country>United States</country>
+      </address>
+    </facility>
+  </location>
+  <location>
+    <facility>
+      <name>Barbara Ann Karmanos Cancer Institute</name>
+      <address>
+        <city>Detroit</city>
+        <state>Michigan</state>
+        <zip>48201</zip>
+        <country>United States</country>
+      </address>
+    </facility>
+  </location>
+  <location>
+    <facility>
+      <name>Veterans Affairs Medical Center - Detroit</name>
+      <address>
+        <city>Detroit</city>
+        <state>Michigan</state>
+        <zip>48201-1932</zip>
+        <country>United States</country>
+      </address>
+    </facility>
+  </location>
+  <location>
+    <facility>
+      <name>CCOP - Grand Rapids Clinical Oncology Program</name>
+      <address>
+        <city>Grand Rapids</city>
+        <state>Michigan</state>
+        <zip>49503</zip>
+        <country>United States</country>
+      </address>
+    </facility>
+  </location>
+  <location>
+    <facility>
+      <name>Providence Hospital - Southfield</name>
+      <address>
+        <city>Southfield</city>
+        <state>Michigan</state>
+        <zip>48075-9975</zip>
+        <country>United States</country>
+      </address>
+    </facility>
+  </location>
+  <location>
+    <facility>
+      <name>Veterans Affairs Medical Center - Biloxi</name>
+      <address>
+        <city>Biloxi</city>
+        <state>Mississippi</state>
+        <zip>39531-2410</zip>
+        <country>United States</country>
+      </address>
+    </facility>
+  </location>
+  <location>
+    <facility>
+      <name>University of Mississippi Medical Center</name>
+      <address>
+        <city>Jackson</city>
+        <state>Mississippi</state>
+        <zip>39216-4505</zip>
+        <country>United States</country>
+      </address>
+    </facility>
+  </location>
+  <location>
+    <facility>
+      <name>Veterans Affairs Medical Center - Jackson</name>
+      <address>
+        <city>Jackson</city>
+        <state>Mississippi</state>
+        <zip>39216</zip>
+        <country>United States</country>
+      </address>
+    </facility>
+  </location>
+  <location>
+    <facility>
+      <name>Keesler Medical Center - Keesler AFB</name>
+      <address>
+        <city>Keesler AFB</city>
+        <state>Mississippi</state>
+        <zip>39534-2576</zip>
+        <country>United States</country>
+      </address>
+    </facility>
+  </location>
+  <location>
+    <facility>
+      <name>Veterans Affairs Medical Center - Kansas City</name>
+      <address>
+        <city>Kansas City</city>
+        <state>Missouri</state>
+        <zip>64128</zip>
+        <country>United States</country>
+      </address>
+    </facility>
+  </location>
+  <location>
+    <facility>
+      <name>CCOP - Kansas City</name>
+      <address>
+        <city>Kansas City</city>
+        <state>Missouri</state>
+        <zip>64131</zip>
+        <country>United States</country>
+      </address>
+    </facility>
+  </location>
+  <location>
+    <facility>
+      <name>CCOP - St. Louis-Cape Girardeau</name>
+      <address>
+        <city>Saint Louis</city>
+        <state>Missouri</state>
+        <zip>63141</zip>
+        <country>United States</country>
+      </address>
+    </facility>
+  </location>
+  <location>
+    <facility>
+      <name>St. Louis University Health Sciences Center</name>
+      <address>
+        <city>Saint Louis</city>
+        <state>Missouri</state>
+        <zip>63110-0250</zip>
+        <country>United States</country>
+      </address>
+    </facility>
+  </location>
+  <location>
+    <facility>
+      <name>CCOP - Cancer Research for the Ozarks</name>
+      <address>
+        <city>Springfield</city>
+        <state>Missouri</state>
+        <zip>65807</zip>
+        <country>United States</country>
+      </address>
+    </facility>
+  </location>
+  <location>
+    <facility>
+      <name>CCOP - Montana Cancer Consortium</name>
+      <address>
+        <city>Billings</city>
+        <state>Montana</state>
+        <zip>59101</zip>
+        <country>United States</country>
+      </address>
+    </facility>
+  </location>
+  <location>
+    <facility>
+      <name>MBCCOP - University of New Mexico HSC</name>
+      <address>
+        <city>Albuquerque</city>
+        <state>New Mexico</state>
+        <zip>87131</zip>
+        <country>United States</country>
+      </address>
+    </facility>
+  </location>
+  <location>
+    <facility>
+      <name>Veterans Affairs Medical Center - Albuquerque</name>
+      <address>
+        <city>Albuquerque</city>
+        <state>New Mexico</state>
+        <zip>87108-5138</zip>
+        <country>United States</country>
+      </address>
+    </facility>
+  </location>
+  <location>
+    <facility>
+      <name>Herbert Irving Comprehensive Cancer Center</name>
+      <address>
+        <city>New York</city>
+        <state>New York</state>
+        <zip>10032</zip>
+        <country>United States</country>
+      </address>
+    </facility>
+  </location>
+  <location>
+    <facility>
+      <name>Barrett Cancer Center, The University Hospital</name>
+      <address>
+        <city>Cincinnati</city>
+        <state>Ohio</state>
+        <zip>45219</zip>
+        <country>United States</country>
+      </address>
+    </facility>
+  </location>
+  <location>
+    <facility>
+      <name>Veterans Affairs Medical Center - Cincinnati</name>
+      <address>
+        <city>Cincinnati</city>
+        <state>Ohio</state>
+        <zip>45220-2288</zip>
+        <country>United States</country>
+      </address>
+    </facility>
+  </location>
+  <location>
+    <facility>
+      <name>Cleveland Clinic Taussig Cancer Center</name>
+      <address>
+        <city>Cleveland</city>
+        <state>Ohio</state>
+        <zip>44195</zip>
+        <country>United States</country>
+      </address>
+    </facility>
+  </location>
+  <location>
+    <facility>
+      <name>CCOP - Columbus</name>
+      <address>
+        <city>Columbus</city>
+        <state>Ohio</state>
+        <zip>43206</zip>
+        <country>United States</country>
+      </address>
+    </facility>
+  </location>
+  <location>
+    <facility>
+      <name>Veterans Affairs Medical Center - Dayton</name>
+      <address>
+        <city>Dayton</city>
+        <state>Ohio</state>
+        <zip>45428</zip>
+        <country>United States</country>
+      </address>
+    </facility>
+  </location>
+  <location>
+    <facility>
+      <name>CCOP - Dayton</name>
+      <address>
+        <city>Kettering</city>
+        <state>Ohio</state>
+        <zip>45429</zip>
+        <country>United States</country>
+      </address>
+    </facility>
+  </location>
+  <location>
+    <facility>
+      <name>Oklahoma Medical Research Foundation</name>
+      <address>
+        <city>Oklahoma City</city>
+        <state>Oklahoma</state>
+        <zip>73104</zip>
+        <country>United States</country>
+      </address>
+    </facility>
+  </location>
+  <location>
+    <facility>
+      <name>Veterans Affairs Medical Center - Oklahoma City</name>
+      <address>
+        <city>Oklahoma City</city>
+        <state>Oklahoma</state>
+        <zip>73104</zip>
+        <country>United States</country>
+      </address>
+    </facility>
+  </location>
+  <location>
+    <facility>
+      <name>CCOP - Columbia River Program</name>
+      <address>
+        <city>Portland</city>
+        <state>Oregon</state>
+        <zip>97213</zip>
+        <country>United States</country>
+      </address>
+    </facility>
+  </location>
+  <location>
+    <facility>
+      <name>Oregon Cancer Center at Oregon Health Sciences University</name>
+      <address>
+        <city>Portland</city>
+        <state>Oregon</state>
+        <zip>97201-3098</zip>
+        <country>United States</country>
+      </address>
+    </facility>
+  </location>
+  <location>
+    <facility>
+      <name>Veterans Affairs Medical Center - Portland</name>
+      <address>
+        <city>Portland</city>
+        <state>Oregon</state>
+        <zip>97207</zip>
+        <country>United States</country>
+      </address>
+    </facility>
+  </location>
+  <location>
+    <facility>
+      <name>CCOP - Greenville</name>
+      <address>
+        <city>Greenville</city>
+        <state>South Carolina</state>
+        <zip>29615</zip>
+        <country>United States</country>
+      </address>
+    </facility>
+  </location>
+  <location>
+    <facility>
+      <name>CCOP - Upstate Carolina</name>
+      <address>
+        <city>Spartanburg</city>
+        <state>South Carolina</state>
+        <zip>29303</zip>
+        <country>United States</country>
+      </address>
+    </facility>
+  </location>
+  <location>
+    <facility>
+      <name>Brooke Army Medical Center</name>
+      <address>
+        <city>Fort Sam Houston</city>
+        <state>Texas</state>
+        <zip>78234</zip>
+        <country>United States</country>
+      </address>
+    </facility>
+  </location>
+  <location>
+    <facility>
+      <name>University of Texas Medical Branch</name>
+      <address>
+        <city>Galveston</city>
+        <state>Texas</state>
+        <zip>77555-1329</zip>
+        <country>United States</country>
+      </address>
+    </facility>
+  </location>
+  <location>
+    <facility>
+      <name>Texas Tech University Health Science Center</name>
+      <address>
+        <city>Lubbock</city>
+        <state>Texas</state>
+        <zip>79423</zip>
+        <country>United States</country>
+      </address>
+    </facility>
+  </location>
+  <location>
+    <facility>
+      <name>University of Texas Health Science Center at San Antonio</name>
+      <address>
+        <city>San Antonio</city>
+        <state>Texas</state>
+        <zip>78284-7811</zip>
+        <country>United States</country>
+      </address>
+    </facility>
+  </location>
+  <location>
+    <facility>
+      <name>Veterans Affairs Medical Center - San Antonio (Murphy)</name>
+      <address>
+        <city>San Antonio</city>
+        <state>Texas</state>
+        <zip>78284</zip>
+        <country>United States</country>
+      </address>
+    </facility>
+  </location>
+  <location>
+    <facility>
+      <name>CCOP - Scott and White Hospital</name>
+      <address>
+        <city>Temple</city>
+        <state>Texas</state>
+        <zip>76508</zip>
+        <country>United States</country>
+      </address>
+    </facility>
+  </location>
+  <location>
+    <facility>
+      <name>Veterans Affairs Medical Center - Temple</name>
+      <address>
+        <city>Temple</city>
+        <state>Texas</state>
+        <zip>76504</zip>
+        <country>United States</country>
+      </address>
+    </facility>
+  </location>
+  <location>
+    <facility>
+      <name>Huntsman Cancer Institute</name>
+      <address>
+        <city>Salt Lake City</city>
+        <state>Utah</state>
+        <zip>84132</zip>
+        <country>United States</country>
+      </address>
+    </facility>
+  </location>
+  <location>
+    <facility>
+      <name>Veterans Affairs Medical Center - Salt Lake City</name>
+      <address>
+        <city>Salt Lake City</city>
+        <state>Utah</state>
+        <zip>84148</zip>
+        <country>United States</country>
+      </address>
+    </facility>
+  </location>
+  <location>
+    <facility>
+      <name>CCOP - Virginia Mason Research Center</name>
+      <address>
+        <city>Seattle</city>
+        <state>Washington</state>
+        <zip>98101</zip>
+        <country>United States</country>
+      </address>
+    </facility>
+  </location>
+  <location>
+    <facility>
+      <name>Veterans Affairs Medical Center - Seattle</name>
+      <address>
+        <city>Seattle</city>
+        <state>Washington</state>
+        <zip>98108</zip>
+        <country>United States</country>
+      </address>
+    </facility>
+  </location>
+  <location>
+    <facility>
+      <name>Swedish Cancer Institute</name>
+      <address>
+        <city>Seattle</city>
+        <state>Washington</state>
+        <zip>98104</zip>
+        <country>United States</country>
+      </address>
+    </facility>
+  </location>
+  <location>
+    <facility>
+      <name>CCOP - Northwest</name>
+      <address>
+        <city>Tacoma</city>
+        <state>Washington</state>
+        <zip>98405-0986</zip>
+        <country>United States</country>
+      </address>
+    </facility>
+  </location>
+  <location_countries>
+    <country>United States</country>
+  </location_countries>
+  <link>
+    <url>http://cancer.gov/clinicaltrials/SWOG-S9719</url>
+    <description>Clinical trial summary from the National Cancer Institute's PDQ® database</description>
+  </link>
+  <verification_date>November 2013</verification_date>
+  <lastchanged_date>November 7, 2013</lastchanged_date>
+  <firstreceived_date>November 1, 1999</firstreceived_date>
+  <responsible_party>
+    <responsible_party_type>Sponsor</responsible_party_type>
+  </responsible_party>
+  <keyword>stage II breast cancer</keyword>
+  <keyword>stage III breast cancer</keyword>
+  <is_fda_regulated>No</is_fda_regulated>
+  <has_expanded_access>No</has_expanded_access>
+  <condition_browse>
+    <!-- CAUTION:  The following MeSH terms are assigned with an imperfect algorithm  -->
+    <mesh_term>Breast Neoplasms</mesh_term>
+  </condition_browse>
+  <!-- Results have not yet been posted for this study                                -->
+</clinical_study>

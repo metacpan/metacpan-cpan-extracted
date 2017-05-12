@@ -1,0 +1,206 @@
+Changes
+=======
+
+Except where noted, all changes made by Daisuke Maki
+
+0.3105 2014-04-29T22:31:01Z
+  * Fix tests for timestamps displaying [+-]0000 
+    [https://github.com/lestrrat/XML-RSS-LibXML/issues/5] (eserte)
+
+0.3104 2014-03-07T21:24:58Z
+  * Remove stray Makefile
+
+0.3103 2014-02-22T08:31:41Z
+  * Iterate over hash using keys() instead of each() (reported by Dave O'Brien)
+  * Use Minilla for development
+
+0.3102 - 14 Sep 2011
+  * Allow upper uppercase letters as first character of namespace prefix
+    [https://github.com/lestrrat/XML-RSS-LibXML/pull/2] (arc)
+
+0.3101 - 06 Jul 2011
+  * Fix perl 5.14 qw() deprecation warnings (theory)
+  * Fix some edge case errors cause by isa / UNIVERSAL::isa
+  * Fix silly error detecting RSS 1.0
+
+0.3100 - 22 Jun 2010
+  * Bunch of changes by David Wheeler, granting a minor version++ :)
+    Note that changes about stringifying child elements may have affect
+    some users. Drop me a line if you have a problem.
+
+  - Add support for xml:base in RSS 2.0. (theory)
+  - Parse and include items in RSS 2.0 feeds without a title or description. (theory)
+  - The encoding() method now returns the encoding of a parsed feed. (theory)
+  - Parser recognizes elements that should not have children and stringifies 
+    the children of such elements when it finds children. (theory)
+
+0.3005 - 3 Jun 2010
+  - rt #58067 Document create_libxml() (theory)
+  - rt #58068 Add support for RSS 0.92 (theory)
+
+0.3004 - 20 Jan 2009
+  - rt #42536. Some files were removed from the distro for the time being.
+    (I don't have the time to re-create these for now -- patch submissions
+    are most welcome)
+
+0.3003 - 26 Nov 2008
+  - Try not to die if we encountered a Broken <image> tag in RSS 2.0
+  - We won't test RSS 0.9x. This is due to the nature of libxml wanting to
+    validate the DTD, when the namespaces have been changed
+    (see http://blog.netscape.com/2008/01/22/rss-specifications-moving-to-rss-advisory-board/)
+    We could use a hackish fix, but we won't, as it may change the behavior
+    for this widely used format (which is surprisingly large number).
+    So instead, we'll just silence the tests, to stop odd failures from occurring
+  - For practical purposes, we use the old namespace unless asked
+    otherwise via XML_RSS_LIBXML_USE_NEW_RSS09 environment variable
+
+0.3002 - 08 Oct 2007
+  - Apply fix from AAR (rt #29683) to make things work with XML::LibXML >= 1.64
+
+0.3001 - 09 May 2007
+  - Fix Makefile.PL dependency
+  - Remove stray debug output
+
+0.30 - 08 May 2007
+  - Move to Module::Install
+  - Tweak tests.
+
+0.30_02 - 23 Mar 2007
+  - Make things more compatible with t/items-are-0.t
+
+0.30_01 - 14 Mar 2007
+  - BEWARE! MAJOR CHANGE IN CODE!
+  - Compatiblity with XML::RSS-1.29_02's test suite.
+  - Completely redo the internal structure in a saner manner.
+
+0.23 - 05 Jul 2006
+  - Apply multiple enclosure patch from SERGEYCHE (rt #20285)
+    This allows you to *generate* RSS with multiple enclosures
+
+0.22 - 28 Jun 2006
+  - Remove stray files and debug statements (rt #19939)
+
+0.21 - 31 May 2006
+  - Repository blunder messes up the distro. fixed.
+    Reported by Tatsuhiko Miyagawa
+
+0.20 - 14 May 2006
+  - Set $rss->{version} for compatibility.
+  - As a result, we no longer set or depend on $rss->{_internal}{version}.
+    If you saw it and used it, then stop doing that ;)
+
+0.19 - 17 Apr 2006
+  - Fixed bug where $rss->channel('title') and such would give you the
+    non-UTF8 representation when another encoding is specified in the
+    RSS document (reported by Tatsuhiko Miyagawa)
+
+0.18 - 06 Mar 2006
+  - Fixed bug where extra modules were not included in the output string.
+    (reported by Tatsuhiko Miyagawa)
+
+0.17 - 05 Mar 2006
+  - s/getValue/getData/g (reported by Tatsuhiko Miyagawa)
+  - Add caveat: namespaced attributes aren't parsed correctly
+
+0.16 - 28 Feb 2006
+  - Fix namespace support for RSS 2.0. Reported by various people.
+
+0.15 - 06 Jan 2006
+  - Fix cpan #16748, and now we can parse RSS 0.91.
+    Patch provided by aar@cpan.org
+  - Add tests for 0.91
+
+0.14 - 20 Nov 2005
+  - Bah, stupid POD msitakes. No code change
+
+0.13 - 18 Nov 2005
+  - XML::RSS::LibXML wasn't conforming to the XML::RSS interface on
+    channel(), image() and textinput() methods. Reported by
+    Taro Minowa.
+  - Make POD tests run only on disttest
+
+0.12 - 09 Nov 2005
+  - Ugh, need to use Test::Pod::Coverage more carefully.
+    Reported by various people.
+
+0.11 - 19 Oct 2005
+  - Most files were mysteriously not included in the previous release.
+
+0.10 - 18 Oct 2005
+  - Mainly a kwalitee improvement release. Added bunch of POD and tests
+  - Fix: Allow XML::RSS::LibXML constructor to accept encoding. Currently
+    this just controls the output encoding, not the internal representation
+
+0.09 - 17 Aug 2005
+  - Various fixes to make $rss->parse($rss->as_string) work. However,
+    it turns out that since XML::RSS doesn't parse <-> generate RSS
+    in a way that allows 100% of the cases to work, I've decided to
+    stop it at a "good enough" state.
+  - taxo: parses correctly
+  - use exists() to prevent autovivification
+
+0.08 - 17 Aug 2005 ("Insanity" Release)
+  - In a fit of insanity, I've implemented RSS generation code.
+    Currently RSS version 0.9, 1.0, and 2.0 are supported.
+  - You can now parse RSS, serialize it via as_string(), parse it again, and
+    get (almost) the same structure back.
+  - Separated out RSS parsing/generation code from main module. These modules
+    are loaded as necessary, or by demand.
+  - Updated benchmark.
+
+0.07 - 15 Aug 205
+  - Document MagicElements in the main docs.
+  - Create XPathContext at parse time, andd call registerNs() only then.
+  - Update benchmark for fairness. 
+  - Changed code to use eh, cleaner Test::More code
+  - Removed unused code
+
+0.06 - 10 Aug 2005 ("Magic Is In The Air" Release)
+  - Introduce MagicElement.pm. This allows us to parse RSS elements
+    that have attributes without sacrificing the interface (hopefully).
+    Inspired by patch from Taro Minowa.
+
+0.05 - 04 Jul 2005 ("I'm so dumb" Release)
+  - Make $item->{$namespace_uri}->{$tag} work. Patch by Naoya Ito.
+  - Add corresponding tests. Patch by Naoya Ito.
+
+0.04 - 21 Jun 2005
+  - No code change.
+  - Clarify compatibility issues.
+  - Fix typos
+
+0.03 - 21 Jun 2005
+  - channel() fix by Naoya Ito (compatibility with XML::RSS)
+
+0.02 - 21 Jun 2005
+  - Doc tweaks.
+  - This be 0.02. Remember to read the backward incompatible changes
+    below.
+
+0.01_01 - 20 Jun 2005
+  - Typo in Build.PL/Makefile.PL (Tatsuhiko Miyagawa)
+
+  **** Backwards Incompatible Change ****
+  - Make namespace handling the same as XML::RSS - e.g.,
+    <content:encoded> is now parsed as $item->{content}->{encoded}.
+    (thanks to Tatsuhiko Miyagawa for suggestions)
+  - Remove add_parse_context(), as it is no longer necessary.
+  - Parsing is now done only on nodes that are immediately under
+    <channel> and <item>. This is not correct spec-wise, but it does the
+    job for most of the RSS out there.
+
+0.01 - 14 Jun 2005
+  - Seems like some people just think about the same thing. Tatsuhiko
+    Miyagawa caught me doing some of the same thing he was doing in an
+    unrelease module, so merged some features from his :)
+  - Added add_module() (Tatsuhiko Miyagawa)
+  - Added as_string() (Tatsuhiko Miyagawa)
+  - Added add_parse_context().
+  - Added fields to be parsed by default.
+  - Changed internal representation a bit.
+
+0.01_02 - 14 June 2005
+  - Doc screw up
+
+0.01_01 - 14 June 2005
+  - Initial CPAN release

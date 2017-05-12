@@ -1,0 +1,20 @@
+<stx:transform version="1.0" 
+  xmlns:stx="http://stx.sourceforge.net/2002/ns"
+  strip-space="yes">
+
+  <stx:template match="/root">
+    <r>
+      <stx:result-document href="'test/temp~.xml'">
+	<stx:process-children/>
+      </stx:result-document>
+      <stx:value-of select="has-child-nodes()"/>
+    </r>
+  </stx:template>
+
+  <stx:template match="node[1]">
+    <root>
+      <stx:text>this text goes to a parallel result stream</stx:text>
+    </root>
+  </stx:template>
+  
+</stx:transform>

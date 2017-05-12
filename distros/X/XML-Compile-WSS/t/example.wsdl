@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<definitions name="wss-demo"
+   targetNamespace="http://msgsec.wssecfvt.ws.ibm.com"
+   xmlns:tns="http://msgsec.wssecfvt.ws.ibm.com"
+   xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+   xmlns="http://schemas.xmlsoap.org/wsdl/">
+
+  <types>
+    <schema
+       targetNamespace="http://msgsec.wssecfvt.ws.ibm.com"
+       xmlns="http://www.w3.org/2001/XMLSchema"
+       elementFormDefault="qualified">
+
+      <element name="getVersion">
+        <complexType><sequence/></complexType>
+      </element>
+
+      <element name="hasVersion" type="string" />
+
+    </schema>
+  </types>
+
+  <message name="get_version">
+    <part name="body" element="tns:getVersion"/>
+  </message>
+
+  <message name="has_version">
+    <part name="body" element="tns:hasVersion"/>
+  </message>
+
+  <portType name="requestVersion">
+    <operation name="version">
+      <input message="tns:get_version"/>
+      <output message="tns:has_version"/>
+    </operation>
+  </portType>
+
+  <binding name="soap11_interface" type="tns:requestVersion">
+    <soap:binding style="document"
+       transport="http://schemas.xmlsoap.org/soap/http"/>
+    <operation name="version">
+      <soap:operation soapAction="request-version" />
+      <input><soap:body use="literal"/></input>
+      <output><soap:body use="literal"/></output>
+    </operation>
+  </binding>
+
+  <service name="MyService">
+    <port name="interface" binding="tns:soap11_interface">
+      <soap:address location="location-overruled"/>
+    </port>
+  </service>
+</definitions>

@@ -1,0 +1,127 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+<head>
+<title>Modules Index</title>
+</head>
+
+<body bgcolor="#ffffff">
+<table border="0" width="100%">
+<tr>
+<td align="left"><a href="../../../index.html"><img src="../../../images/canon.gif" border="0"></a></td>
+<td align="right"><img src="../../../images/canre.gif"></td>
+</tr>
+</table>
+<div align="right">
+<small><a href="../../../index.html">XML Schema Home</a></small>
+</div>
+
+<h1>XML::Schema::Type</h1>
+
+<ul>
+
+    This module implements a base class for XML Schema datatypes.
+  </ul>
+
+<h2>Table of Contents</h2>
+<ul>
+<table border="0" cellpadding="2" cellspacing="0">
+<tr valign="top">
+<td>
+  <li><b><a href="#section_Synopsis">Synopsis</a></b>
+</td>
+
+<td>
+</td>
+
+<td>
+<td>
+
+</tr>
+<tr valign="top">
+<td>
+  <li><b><a href="#section_Description">Description</a></b>
+</td>
+
+<td>
+</td>
+
+<td>
+<td>
+
+</tr>
+<tr valign="top">
+<td>
+  <li><b><a href="#section_Methods">Methods</a></b>
+</td>
+
+<td>
+<b>:<b>
+</td>
+
+<td>
+<small><a href="#method_base">base()</a>,&nbsp; <a href="#method_name">name()</a>,&nbsp; <a href="#method_namespace">namespace()</a></small>
+<td>
+
+</tr>
+</table>
+</ul>
+
+
+
+
+<hr width="100%" size="1" noshade="1"><a name="section_Synopsis"><h2>Synopsis</h2></a>
+<ul><pre><p>package XML::Schema::Type::MyType;
+use base qw( XML::Schema::Type );
+
+package main;
+my $type = XML::Schema::Type::MyType-&gt;new(
+    name      =&gt; 'MyTypeName',
+    namespace =&gt; 'http://my.namespace.com/xyz',
+);
+
+print $type-&gt;name(), &quot;, &quot;, $type-&gt;namespace(), &quot;\n&quot;;</b></pre></ul>
+
+  
+<hr width="100%" size="1" noshade="1"><a name="section_Description"><h2>Description</h2></a>
+    <p>
+      The XML::Schema::Type module is a base class for objects that
+      represent XML Schema types.  The module also loads the
+      <a href="../../../modules/XML/Schema/Type/Simple.html">XML::Schema::Type::Simple</a> and
+      <a href="../../../modules/XML/Schema/Type/Complex.html">XML::Schema::Type::Complex</a> modules (which may
+      go on to load further modules of their own).  Thus, it should
+      usually be sufficient to <code>use XML::Schema::Type;</code>
+      and expect all relevant datatype related modules to be loaded.
+    </p>
+
+  
+
+<hr width="100%" size="1" noshade="1"><a name="section_Methods"><h2>Methods</h2></a><ul>
+<li><p>
+<a name="method_base"><b>base()</b></a>
+<br>
+
+
+	Returns the value for the internal <code>base</code> item
+	which may be set as a configuration parameter passed to the
+	<a href="../../../modules/XML/Schema/Base.html#method_new"><code><b>new()</b></code></a> constructor
+	method to represent a base class type.
+    </p><li><p>
+<a name="method_name"><b>name()</b></a>
+<br>
+
+
+	Returns the name of the type.
+    </p><li><p>
+<a name="method_namespace"><b>namespace()</b></a>
+<br>
+
+
+	Returns the XML namespace of the type.
+    </p></ul>
+
+
+<div align="center">
+<small><b>Perl XML::Schema Documentation</b></small>
+</div>
+</body>
+</html>

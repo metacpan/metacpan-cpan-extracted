@@ -1,0 +1,101 @@
+# Describing complex ds:SignedInfo
+#     {http://www.w3.org/2000/09/xmldsig#}SignedInfo
+#
+# Produced by XML::Compile::Translate::Template version undef
+#          on Sat Jul 16 01:30:09 2016
+#
+# BE WARNED: in most cases, the example below cannot be used without
+# interpretation.  The comments will guide you.
+#
+# xmlns:ds        http://www.w3.org/2000/09/xmldsig#
+
+# is a ds:SignedInfoType
+{ # is a xsd:ID
+  # becomes an attribute
+  Id => "id_0",
+
+  # sequence of ds_CanonicalizationMethod, ds_SignatureMethod,
+  #   ds_Reference
+
+  # is a ds:CanonicalizationMethodType
+  ds_CanonicalizationMethod =>
+  { # is a xsd:anyURI
+    # attribute Algorithm is required
+    Algorithm => "http://example.com",
+
+    # sequence of ANY
+
+    # any element in any namespace
+    # occurs any number of times
+    ANY => [ "Anything", ], },
+
+  # is a ds:SignatureMethodType
+  ds_SignatureMethod =>
+  { # is a xsd:anyURI
+    # attribute Algorithm is required
+    Algorithm => "http://example.com",
+
+    # sequence of ds_HMACOutputLength, ANY
+
+    # is a xsd:integer
+    # is optional
+    ds_HMACOutputLength => 42,
+
+    # any element not in ds:
+    # occurs any number of times
+    ANY => [ "Anything", ], },
+
+  # is a ds:ReferenceType
+  # occurs 1 <= # <= unbounded times
+  ds_Reference =>
+  [ { # is a xsd:ID
+      # becomes an attribute
+      Id => "id_0",
+
+      # is a xsd:anyURI
+      # becomes an attribute
+      URI => "http://example.com",
+
+      # is a xsd:anyURI
+      # becomes an attribute
+      Type => "http://example.com",
+
+      # sequence of ds_Transforms, ds_DigestMethod, ds_DigestValue
+
+      # is a ds:TransformsType
+      # is optional
+      ds_Transforms =>
+      { # sequence of ds_Transform
+
+        # is a ds:TransformType
+        # occurs 1 <= # <= unbounded times
+        ds_Transform =>
+        [ { # is a xsd:anyURI
+            # attribute Algorithm is required
+            Algorithm => "http://example.com",
+
+            # choice of ANY, ds_XPath
+            # occurs any number of times
+            cho_any => 
+            [ {
+                # any element not in ds:
+                ANY => "Anything",
+
+                # is a xsd:string
+                ds_XPath => "example", },
+            ], }, ], },
+
+      # is a ds:DigestMethodType
+      ds_DigestMethod =>
+      { # is a xsd:anyURI
+        # attribute Algorithm is required
+        Algorithm => "http://example.com",
+
+        # sequence of ANY
+
+        # any element not in ds:
+        # occurs any number of times
+        ANY => [ "Anything", ], },
+
+      # is a xsd:base64Binary
+      ds_DigestValue => "decoded bytes", }, ], }

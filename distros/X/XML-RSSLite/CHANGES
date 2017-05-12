@@ -1,0 +1,43 @@
+Revision history for Perl extension XML::RSSLite.
+
+0.15	Sat Sep  5 23:25:51 EDT 2009
+	Strip bracketing whitespace from links
+
+	Support SSL links
+
+	Fix(?) relative URI munging, broken since at least 0.06
+
+	Fixed HTML anchor in item link munging, broken since at least 0.06
+
+	Fixed title URI to link if latter is missing, broken since at least 0.06
+
+0.11	Mon Feb 24 06:25:54 UTC 2003
+	Vast speed and memory requirement improvements for deep structures.
+
+	Fixed bug where attributes of a tag with no content were dropped.
+
+	Fixed buglet where "empty" (all whitespace) content was added to tree.
+
+0.10	Sun Feb 23 02:26:04 UTC 2003
+	Rewrote the parser, subsequently squashing bugs, and future-proofing.
+
+	THIS VERSION BREAKS BACKWARDS COMPATIBILITY
+	It is very similar and should require only minor changes,
+	but it is not a drop-in upgrade. See the README.
+
+	Fixed a bug resulting from a lack of DWIM;
+	'+', '-', and '9' were being stripped from the RSS feed
+
+0.08	Wed May  1 02:51:51 UTC 2002
+
+	Improved efficiency of parseXML, also allow [ and ]
+
+	Removed Data::Dumper.
+
+0.07	Thu Mar 21 16:38:04 UTC 2002
+
+	If we don't have a title, use the link.
+
+0.06	Thu Oct 19 19:05 2000
+
+	Initial offering.

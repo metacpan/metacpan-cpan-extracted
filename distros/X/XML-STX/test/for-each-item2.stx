@@ -1,0 +1,26 @@
+<stx:transform version="1.0" 
+  xmlns:stx="http://stx.sourceforge.net/2002/ns"
+  strip-space="yes">
+
+  <stx:variable name="var1" select="(1,2,3)"/>
+
+  <stx:template match="/root">
+    <root>
+      <stx:variable name="var2" select="('a','b')"/>
+
+      <stx:for-each-item name="i" select="$var1">
+	<stx:variable name="var3" select="'0'"/>
+	<i>
+	  <stx:for-each-item name="j" select="$var2">
+	    <j>
+	      <stx:value-of select="concat($i,$j,$var3)"/>
+	    </j>
+	  </stx:for-each-item>
+	</i>
+      </stx:for-each-item>
+
+    </root>
+  </stx:template>
+
+
+</stx:transform>

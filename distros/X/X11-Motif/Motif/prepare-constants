@@ -1,0 +1,33 @@
+
+use strict;
+
+open(IN, "< constants.dat") || die("can't open constants.dat file");
+open(OUT, "> constants.c") || die("can't open constants.c file");
+
+my $type = 'integer';
+my $line;
+my $name;
+
+while (defined($line = <IN>)) {
+    next if ($line =~ /^#/);
+
+    if ($line =~ /^(\w+)/) {
+	$name = $1;
+
+	if ($type eq 'string') {
+	    print OUT qq|\tprintf("sub $name () { '%s' }\\n", $name);\n|;
+	}
+	elsif ($type eq 'integer') {
+	    print OUT qq|\tprintf("sub $name () { %d }\\n", $name);\n|;
+	}
+    }
+    elsif ($line =~ /^--\s*(\w+)/) {
+	$type = $1;
+    }
+    elsif ($line =~ /^:(.*)/) {
+	print OUT $1, "\n";
+    }
+}
+
+close OUT;
+close IN;

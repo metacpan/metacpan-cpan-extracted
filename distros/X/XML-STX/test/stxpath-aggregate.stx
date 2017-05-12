@@ -1,0 +1,26 @@
+<stx:transform version="1.0" 
+  xmlns:stx="http://stx.sourceforge.net/2002/ns"
+  strip-space="yes">
+
+  <stx:template match="/root">
+    <node>
+      <stx:variable name="seq1" select="('2', 5, 3.8, -1)"/>
+      <stx:value-of select="sum($seq1)"/>
+      <stx:text>:</stx:text>
+      <stx:value-of select="sum(())"/>
+      <stx:text>/</stx:text>
+      <stx:value-of select="avg($seq1)"/>
+      <stx:text>:</stx:text>
+      <stx:value-of select="avg(())"/>
+      <stx:text>/</stx:text>
+      <stx:value-of select="min($seq1)"/>
+      <stx:text>:</stx:text>
+      <stx:value-of select="min((1,2,3))"/>
+      <stx:text>/</stx:text>
+      <stx:value-of select="max($seq1)"/>
+      <stx:text>:</stx:text>
+      <stx:value-of select="max((10,100,1))"/>
+    </node>
+  </stx:template>
+
+</stx:transform>

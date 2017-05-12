@@ -1,0 +1,10 @@
+To Do
+-----
+
+* Allow embedding of xvcs:id in documents, and use xvcs:id for first match pass
+* Allow option to use xvcs:id instead of XPath as node identifier
+* Add DTD & XML-Schema support to improve Diffs
+* Add Entity Tag Versioning
+* Add atomic patch, allowing individual items from the Diffgram to be applied
+* Add capability to reverse diffgram
+* Do LCS diff on large text nodes to reduce diffgram

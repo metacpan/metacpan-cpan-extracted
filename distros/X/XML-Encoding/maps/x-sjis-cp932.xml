@@ -1,0 +1,21 @@
+<!DOCTYPE encmap [
+<!ENTITY X5C       "<ch byte='x5c' uni='x005c'/>">
+<!ENTITY X7E       "<ch byte='x7e' uni='x007e'/>">
+<!ENTITY X815C     "<ch byte='x5c' uni='x2015'/>">
+<!ENTITY X815F     "<ch byte='x5f' uni='xff3c'/> <!-- Different from 005C -->">
+<!ENTITY X8160     "<ch byte='x60' uni='xff5e'/> <!-- Different from 301C -->">
+<!ENTITY X8161     "<ch byte='x61' uni='x2225'/> <!-- Different from 2016 -->">
+<!ENTITY X817C     "<ch byte='x7c' uni='xff0d'/> <!-- Different from x2212 -->">
+<!ENTITY X8191-2   "<range byte='x91' len='2' uni='xffe0'/>  <!-- Different from uni ='x00a2' -->">
+<!ENTITY X81CA     "<ch byte='xca' uni='xffe2'/> <!-- Different from 00ac -->">
+
+<!ENTITY kana-and-kanji    SYSTEM "kana-and-kanji.ent">
+<!ENTITY oem               SYSTEM "oem.ent">
+]>
+
+<encmap name='x-sjis-cp932' expat='yes'>
+  &X5C;
+  &X7E;
+  &kana-and-kanji;
+  &oem;
+</encmap>

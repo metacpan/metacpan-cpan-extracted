@@ -1,0 +1,51 @@
+Revision history for Perl extension XML::LibXML::jQuery
+
+0.08 2016-07-23T17:52:05Z
+
+    [ PERFORMANCE ]
+    * implemented method '_stuff_to_nodes'
+      - just the "node resolution" part of new()
+    * implemented method '_new_nodes'
+      - for faster blessing new jQuery object from nodes of the same document
+      - traversal methods now calling _new_nodes() instead of new()
+
+0.07 2016-07-22T16:10:17Z
+
+    * Now checking if self->{document} is defined in DESTROY. It gets undefined
+      in some situations, probably wiped by XS code... :/
+
+0.06 2016-07-22T15:24:33Z
+
+    * fixed document refcount decrement
+
+0.05 2016-07-11T23:34:49Z
+
+    [ BUG FIXES ]
+    - Undeclared dependency on Test::Exception (GH#1, reported by andk)
+
+0.04 2016-07-08T13:20:18Z
+
+    [COMPATIBILITY FIX]
+    - each() callback now receives an element instead of jQuery object
+
+    [EXPERIMENT]
+    - basic plugin system: method names AUTOLOADed from global %fn hash
+        - probably bad idea, too javascriptish... probably gonna use roles in the future
+
+0.03 2016-06-26T18:17:44Z
+
+    - fixed before/after(content[, content]) signature
+    - implemented before/after(function) signature
+    - insert_before/insert_after(target) signature fully implemented
+      - target = selector, element, arrayref of elements, HTML string, or jQuery object
+
+0.02 2016-06-26T15:07:06Z
+
+    - implemented all add() signatures
+    - implemented all data() signatures
+    - not using // operator to support perls < 5.10
+
+0.01 2016-06-22T18:46:06Z
+
+    - initial import from cafe's private repo
+    - written basic pod

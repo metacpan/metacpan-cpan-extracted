@@ -1,0 +1,29 @@
+---
+abstract: 'create DOM fragments from SAX events'
+author:
+  - 'Martijn van Beers  <martijn@cpan.org>'
+build_requires:
+  Test::More: 0
+distribution_type: module
+generated_by: 'Module::Install version 0.75'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+name: XML-SAX-IncrementalBuilder-LibXML
+no_index:
+  directory:
+    - inc
+    - t
+provides:
+  XML::SAX::IncrementalBuilder::LibXML:
+    file: lib/XML/SAX/IncrementalBuilder/LibXML.pm
+    version: 0.02
+  XML::SAX::IncrementalBuilder::LibXML::Document:
+    file: lib/XML/SAX/IncrementalBuilder/LibXML.pm
+  XML::SAX::IncrementalBuilder::LibXML::Element:
+    file: lib/XML/SAX/IncrementalBuilder/LibXML.pm
+requires:
+  Class::InsideOut: 0
+  XML::LibXML: 1.66
+version: 0.02

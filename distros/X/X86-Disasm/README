@@ -1,0 +1,30 @@
+X86-Disasm version 0.23.1
+=========================
+
+The code is available at : https://sourceforge.net/projects/x86disasm/
+
+The files in the test directory, t, give some indication of usage.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires libdisasm - a C disassembler available from 
+http://bastard.sourceforge.net/libdisasm.html
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009,2013 by Bob Wilkinson
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+

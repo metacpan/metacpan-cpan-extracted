@@ -1,0 +1,136 @@
+# the first example schema from the O'Reilly XML Schema book, slightly
+# modified to not use date and language types
+
+--- |
+ <?xml version="1.0"?>
+ <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+   <xs:element name="name" type="xs:string"/>
+   <xs:element name="qualification" type="xs:string"/>
+   <xs:element name="born" type="xs:string"/>
+   <xs:element name="dead" type="xs:string"/>
+   <xs:element name="isbn" type="xs:string"/>
+   <xs:attribute name="id" type="xs:ID"/>
+   <xs:attribute name="available" type="xs:boolean"/>
+   <xs:attribute name="lang" type="xs:string"/>
+   <xs:element name="title">
+     <xs:complexType>
+       <xs:simpleContent>
+         <xs:extension base="xs:string">
+           <xs:attribute ref="lang"/>
+         </xs:extension>
+       </xs:simpleContent>
+     </xs:complexType>
+   </xs:element>
+   <xs:element name="library">
+     <xs:complexType>
+       <xs:sequence>
+         <xs:element ref="book" maxOccurs="unbounded"/>
+       </xs:sequence>
+     </xs:complexType>
+   </xs:element>
+   <xs:element name="author">
+     <xs:complexType>
+       <xs:sequence>
+         <xs:element ref="name"/>
+         <xs:element ref="born"/>
+         <xs:element ref="dead" minOccurs="0"/>
+       </xs:sequence>
+       <xs:attribute ref="id"/>
+     </xs:complexType>
+   </xs:element>
+   <xs:element name="book">
+     <xs:complexType>
+       <xs:sequence>
+         <xs:element ref="isbn"/>
+         <xs:element ref="title"/>
+         <xs:element ref="author" minOccurs="0" maxOccurs="unbounded"/> 
+         <xs:element ref="character" minOccurs="0"
+           maxOccurs="unbounded"/>
+       </xs:sequence>
+       <xs:attribute ref="id"/>
+       <xs:attribute ref="available"/>
+     </xs:complexType>
+   </xs:element>
+   <xs:element name="character">
+     <xs:complexType>
+       <xs:sequence>
+         <xs:element ref="name"/>
+         <xs:element ref="born"/>
+         <xs:element ref="qualification"/>
+       </xs:sequence>
+       <xs:attribute ref="id"/>
+     </xs:complexType>
+   </xs:element>
+ </xs:schema>
+
+--- |
+
+ <?xml version="1.0"?> 
+ <library>
+   <book id="b0836217462" available="true">
+     <isbn>
+       0836217462
+     </isbn>
+     <title lang="en">
+       Being a Dog Is a Full-Time Job
+     </title>
+     <author id="CMS">
+       <name>
+         Charles M Schulz
+       </name>
+       <born>
+         1922-11-26
+       </born>
+       <dead>
+         2000-02-12
+       </dead>
+     </author>
+     <character id="PP">
+       <name>
+         Peppermint Patty
+       </name>
+       <born>
+         1966-08-22
+       </born>
+       <qualification>
+         bold, brash and tomboyish
+       </qualification>
+     </character>
+     <character id="Snoopy">
+       <name>
+         Snoopy
+       </name>
+       <born>
+         1950-10-04
+       </born>
+       <qualification>
+         extroverted beagle
+       </qualification>
+     </character>
+     <character id="Schroeder">
+       <name>
+         Schroeder
+       </name>
+       <born>
+         1951-05-30
+       </born>
+       <qualification>
+         brought classical music to the Peanuts strip
+       </qualification>
+     </character>
+     <character id="Lucy">
+       <name>
+         Lucy
+       </name>
+       <born>
+         1952-03-03
+       </born>
+       <qualification>
+         bossy, crabby and selfish
+       </qualification>
+     </character>
+   </book>
+ </library>
+
+--- >
+PASS

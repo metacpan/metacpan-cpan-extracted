@@ -1,0 +1,31 @@
+--- 
+name: XML-RelaxNG-Compact-PXB
+abstract: XML RelaxNG Compact data binding 
+version: 0.15
+distribution_type: module
+license: Fermitools
+installdirs: site
+no_index: 
+  directory: 
+    - t
+    - inc
+requires:
+  Data::Dumper: 0
+  File::Basename: 0
+  File::Path: 0
+  FindBin: 0
+  Log::Log4perl: 0
+  POD::Credentials: 0.03
+  Perl::Critic: 1
+  Test::Perl::Critic: 0
+  Perl::Tidy: 0
+  Readonly: 0
+  Scalar::Util: 0
+  Test::Harness: 0
+  Test::More: 0
+  XML::LibXML: 1.59
+  XML::LibXML::XPathContext: 0.04
+  fields: 0
+  perl: 5.8.4
+  version: 0.15
+

@@ -1,0 +1,27 @@
+Revision history for Perl module XML::Compare
+
+0.05 2015-11-27 NEILB
+    - Switched to Dist::Zilla, in the process ensuring releases have
+      a META.json file and a LICENSE file.
+
+0.04 2010-07-12 CHILTS
+    - Change to example POD to fix up quotes
+
+0.03 2010-06-28 CHILTS
+    - Added XML::Assert::Changes.pod file
+
+0.02 2009-12-15 SAMV
+    - Add namespace support to ignore, document ignore
+    - Add support for ignoring parts of the XML based on XPath expressions
+    - Store the exception in an object property
+    - Add namespace_strict diff option
+    - Møøse
+    - Pass around xpath context, for contextual exceptions
+    - Allow debugging to be enabled via an environment variable
+    - Add link to github repository
+    - [admin] .gitignore debian files
+    - Fix incorrect use of '$@' in synopsis
+
+0.01 2009-12-09 SAMV
+    - Initial version
+

@@ -1,0 +1,5 @@
+I/O, I/O,
+It's off to disk I go.
+
+    -- Shlomi Fish
+    -- Aphorisms List ( http://www.shlomifish.org/humour.html )

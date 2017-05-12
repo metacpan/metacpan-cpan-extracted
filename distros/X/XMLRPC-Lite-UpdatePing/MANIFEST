@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/XMLRPC-Lite-UpdatePing.t
+lib/XMLRPC/Lite/UpdatePing.pm
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,548 @@
+<design>
+    <section id="intro" title="Introduction">
+      This document contains a brief list of some of the features
+      that I'm adding, have added or am thinking about adding to 
+      version 3 of the Template Toolkit.
+    </section>
+
+    <!-- Directives -->
+    <section id="directives" title="Template Directives">
+	<list>
+	<item title="PRINT">
+	    PRINT directives acts like current Template::View::print(),
+	    doing the Right Thing to present the target via the 
+	    appropriate template.
+<template>
+[% PRINT myhash %]
+[% PRINT myobject %]
+</template>
+	</item>
+	<item title="DO">
+	    Like INCLUDE and PROCESS but processes the template in an
+	    isolated environment. The template does not see any
+	    variables currently in scope, only those passed as args,
+	    globals or member data (e.g. obeys the Law of Demeter).
+<template>
+[% DO header title="blah blah" %]
+</template>
+	</item>
+	<item title="TEXT">
+	    Non-parsed text.
+<template>
+[% mytext = TEXT %]
+This is some text.  It can contain [% directives %]
+but they are ignored.  It is always processed as if 
+via INSERT.  However, it may be a requirement 
+that the content is syntactically correct...
+[% END %]
+</template>
+	</item>
+	<item title="XML">
+	    Parses enclosed XML block and generates events via a
+	    view.
+<template>
+[% XML %]
+<menu title="My Menu">
+   <item text="Item 1" link="blahblah.html"/>
+   <item text="Item 2" link="yadayada.html"/>
+   <item text="Item 3" link="yodayoda.html"/>
+</menu>
+[% END %]
+
+same as:
+
+[% WRAPPER menu title="My Menu" %]
+   [% INCLUDE item text="Item 2" link="blahblah.html" %]
+   [% INCLUDE item text="Item 2" link="yadayada.html" %]
+   [% INCLUDE item text="Item 2" link="yodayoda.html" %]
+[% END %]
+</template>
+	</item>
+
+	<item title="FOR">
+	    A fast, low-level, non-iterator version of FOREACH.
+	</item>
+
+	<item title="FOREACH">
+	    Could support multiple target variables?  e.g.
+<template title="Multiple FOREACH targets">
+[% FOREACH (key, value) = myhash %]
+[% FOREACH  key, value  = myhash %]
+[% FOREACH  key  value  = myhash %]
+</template>
+	    Could it also be possible to specify multiple lists
+	    which should be iterated in lockstep, e.g. (not sure
+	    of syntax yet...)
+<template title="Lockstep Iterators">
+[% FOREACH (col, product) = (colours*, products) %]
+[% FOREACH  col, product  =  colours*, products %]
+</template>
+	    <p>
+	    Note how we append <ttcode>*</ttcode> to
+	    <ttcode>colours</ttcode> to indicate that the values
+	    should repeat if they finish short of the
+	    <ttcode>products</ttcode> list (e.g. loop).
+	    </p>
+
+	    <p>
+	    It might also be a good idea to
+	    change the default iterator name from 'loop' to 'each' or
+	    even 'EACH'.  Further still, the parser might also support
+	    directives of the form FOR_NAME or FORNAME to
+	    allow a different iterator name to be specified.
+	    </p>
+<template title="Named FOREACH Loops">
+[% FOREACH user = userlist %]
+   [% IF EACH.last %]
+      ...
+   [% END %]
+[% END %]
+
+[% FORGROUP group = grouplist %]
+   [% FORUSER user = userlist %]
+      [% IF GROUP.size > 5 %]
+         [% LAST GROUP %]
+      [% END %]
+   [% END %]
+[% END %]
+</template>
+	</item>
+	<item title="END???">
+	    It should be possible to specify an <ttcode>END</ttcode>
+	    directive as, for example, <ttcode>END FOR</ttcode>,
+	    <ttcode>END_FOR</ttcode> or <ttcode>ENDFOR</ttcode> and
+	    have the parser accept it and verify that it
+	    correctly terminates the right block type.
+<template>
+[% IF foo == bar %]
+   [% FOREACH item = things %]
+      ...
+   [% END FOREACH %]
+[% END IF %]
+</template>
+	</item>
+	</list>
+    </section>
+
+
+
+    <!-- Variables -->
+    <section id="vars" title="Template Variables">
+	See the <module>Template::Stash</module> and 
+	<module>Template::Parser</module> pages for 
+	recent progress in these areas.
+
+	<list>
+	<item title="Quoted Lists">
+	    The <ttcode>qw[ ]</ttcode> operator should be supported for
+	    creating lists of quoted items.
+<template>
+[% people = [ 'tom', 'dick', 'larry' ] %]
+vs
+[% people = qw[ tom dick larry ] %]
+</template>
+	    Not sure about supporting other parenthesis, e.g. 
+<template>
+[% people = qw( tom dick larry ) %]
+</template>
+(NOTE: parser now supports this with all combinations of parentheses).
+	</item>
+
+	<item title="Slices">
+	    It should be possible to specify list, hash and/or object
+	    method "slices". 
+<template title="Slicing">
+[% (id, name, email) = user.[ 'id', 'name', 'email' ] %]
+[% (id, name, email) = user.qw[ id, name, email ] %]
+</template>
+(NOTE: stash already supports this, thanks to Craig's patch.  Parser
+doesn't yet support [ ] as a varnode, but probably should.  Also want to
+support slices for object methods.
+	</item>
+
+	<item title="Constants">
+	    The CONSTANT directive should be provided to define
+	    compile time constants whose values are inserted into the
+	    desination text at compile time.  Assigning to a constant
+	    variable should raise a compile or runtime error (or simply
+	    ignore it as if the variable doesn't exist at runtime?).
+<template>
+[% CONSTANT
+     title = 'My Title'
+     version = 3.14
+%]
+</template>
+(NOTE: got this working in the parser, but need to think about how
+constants can be shared across template boundaries).
+	</item>
+
+	<item title="STASH Directive">
+	    The <ttcode>STASH</ttcode> should create a localised stash
+	    with a pre-defined set of variables.  These mask any
+	    previously defined variables.
+<template>
+[% STASH 
+    title   = 'My Title'
+    version = 3.14
+%]
+</template>
+	</item>
+	<item title="Specialised Stashes">
+	    It should be possible to specify different stashes.
+<template>
+[% STASH_FAST
+    title = 'My Title'
+    version = 3.14
+%]
+</template>
+	    Thus, <ttcode>CONSTANT</ttcode> is just a special kind of 
+	    stash facility which intercepts all directives at compile
+	    time and returns values.
+<template>
+[% STASH_CONSTANT
+    title = 'My Title'
+    version = 3.14
+%]
+</template>
+	    Same as:
+<template>
+[% CONSTANT
+    title = 'My Title'
+    version = 3.14
+%]
+</template>
+	</item>
+
+	</list>
+    </section>
+
+
+
+    <section id="resources" title="Resources">
+	<list>
+	<item>
+	    Templates, blocks, files, plugins, filters, etc., should
+	    all be represented by Template::Resource objects which are
+	    provided by Template::Provider objects and may be cached
+	    by Template::Cache objects.  A resource prefix can be
+	    specified to bind a template designator to a particular
+	    provider or chain of providers.
+<template>
+[% file = http://www.tt3.org/blahblah.html %]
+[% INCLUDE block:header %]
+[% INCLUDE file:header %]
+</template>
+        </item>
+        <item>
+	    Other resources may be defined by particular libraries
+	    and/or applications.
+<template>
+[% FOREACH item = dbi:query( my.sql.query ) %]
+    ...
+[% END %]
+
+[% xmldom = xml:dom( my.xml.file ) %]
+</template>
+	</item>
+	<item>
+	    Resources could also be used for custom data types.
+<template>
+[% my = user:abw %]
+</template>
+	</item>
+	<item>
+	    This should guarantee that the returned data is of a
+	    particular object derivation which TT3 can handle
+	    natively.  Compare to <ttcode>[% me = user('abw')
+	    %]</ttcode> or <ttcode>[% me = user.abw %]</ttcode> which
+	    could return any kind of data.  Thus you should be able to
+	    <ttcode>[% INCLUDE user:fred %]</ttcode> and have it Do
+	    The Right Thing in presenting the 'fred' user via the
+	    appropriate template.  In contrast, [% INCLUDE $user.fred %],
+	    means a different thing altogether and may not even be 
+	    valid.
+	</item>
+	</list>
+    </section>
+
+
+
+    <section id="facilities" title="Facilities">
+	<list>
+	<item>
+	Core functionality should be moved out of Template::Context into 
+	separate facilities (e.g. view, stash, plugins, filters, etc).
+	</item>
+	<item>
+	A facility may define one or more of: variables, resources,
+	and/or directives.
+	</item>
+	<item>
+	For example, the <ttcode>DBI</ttcode> facility might define 
+	the <ttcode>dbi:xxx</ttcode> resource, the <ttcode>SQL</ttcode>
+	directive and the <ttcode>TT3.dbi</ttcode> context.facility
+	reference.
+	</item>
+	</list>
+    </section>
+
+
+    <!-- Stash -->
+    <section id="stash" title="Stash">
+	<list>
+	<item title="Replaceable stash">
+	    With the stash implemented as Yet Another Facility, it
+	    should be possible to switch in a different stash which
+	    generates faster and less magical code, for example.
+	</item>
+	<item title="virtual methods">
+	    Virtual methods for scalars should be interchangeable
+	    with filters.  e.g.  <ttcode>foo | lower</ttcode> vs
+	    <ttcode>foo.lower</ttcode>
+	</item>
+	</list>
+    </section>
+
+
+
+    <!-- Parser -->
+    <section id="parser" title="Parser">
+	<list>
+	<item>
+	    It would be really nice if the chunker/scanner/directive
+	    seperator of the parser was generic and configurable such
+	    that a hierarchy of different parse "modes" can be
+	    specified.  e.g. scanner looks for directives in <b>[%</b>
+	    ... <b>%]</b>, stuff outside directives is "text" and is
+	    then subject to "interpolate" scan.  Stuff inside
+	    directive is "directive" and may then be subject to other
+	    scans, e.g. double quote interpolate scan, or custom
+	    "debug" token, e.g. <ttcode>[% INCLUDE x #DEBUG y
+	    #END_DEBUG %]</ttcode> when '#DEBUG' and '#END_DEBUG' mark
+	    new start/end tokens.  Could we implement aspect weaving
+	    with such an extensible set of directives like this?  (remember
+	    mrp's pre-processing DEBUG hack?)
+	</item>
+	<item>
+	    The parser should accept configuration parameters in BLOCKS.
+<template>
+[% BLOCK post_chomp=1 %]
+   ...
+[% END %]
+</template>
+	</item>
+	<item>
+	    It should also be possible to change the parser
+	    configuration via variables and/or directives which are
+	    caught and acted upon at compiled time.
+<template>
+[% PARSER
+    start_tag = '[*'
+    end_tag   = '*]'
+%]
+
+[% PARSER.tag_style = 'star' %]
+
+[% mydir = "${PARSER.start_tag} INCLUDE header ${PARSER.end_tag}" %]
+</template>
+	</item>
+	</list>
+    </section>
+
+
+
+    <!-- Block -->
+    <section id="blocks" title="Template Block">
+	<list>
+	<item title="{ BLOCK }">
+	    <p>
+	    The parser should accept <ttcode>{</ttcode>
+	    ... <ttcode>}</ttcode> as an alias for <ttcode>;</ttcode>
+	    ... <ttcode>; END</ttcode>.
+	    </p>
+<template>
+[% IF a == b { 
+      INCLUDE foo
+   }
+   ELSE {
+      INCLUDE bar
+   }
+%]
+</template>
+Same as:
+<template>
+[% IF a == b;
+      INCLUDE foo;
+   ELSE;
+      INCLUDE bar;
+   END
+%]
+</template>
+	    <p>
+	    This should work across directive tags.
+	    </p>
+<template>
+[% IF a == b { %]
+    ...
+[% } 
+   ELSE { %]
+    ...
+[% } %]
+</template>
+	</item>
+	<item title="Defining BLOCKs">
+	    The above syntax can be used to define BLOCKs.
+<template>
+[% BLOCK header { INCLUDE html/header } %]
+</template>
+	    When specified anonymously, a BLOCK is processed 
+	    as per usual and the output returned.
+<template>
+[% text = BLOCK { INCLUDE html/header } %]
+</template>
+	    Same as in TT2:
+<template>
+[% text = BLOCK; INCLUDE html/header; END %]
+</template>
+	</item>
+	<item title="Defining PERL Blocks (subroutines)">
+	    As per BLOCK above, it should be possible to do the same
+	    with the PERL directive.  When used anonymously, the Perl
+	    code is evaluated and output returned.
+<template>
+[% PERL %]
+my $foo = 10;
+print "Output!  foo: $foo\n";
+[% END %]
+</template>
+	    Or
+<template>
+[% PERL { %]
+my $foo = 10;
+print "Output!  foo: $foo\n";
+[% } %]
+</template>
+	    When specified with a name, a Perl subroutine is defined
+	    and assigned to the variable named.
+<template>
+[% PERL title %]
+my $title = shift;
+return "<title>$title</title>\n";
+[% END %]
+
+[% title('Hello World') %]
+</template>
+	</item>
+	</list>
+    </section>
+
+
+
+    <!-- Context -->
+    <section id="context" title="Context">
+	<list>
+	<item title="Context Switching">
+	    It should be possible to switch contexts within a
+	    template.  e.g.
+	    <ttcode>[% CONTEXT splash %] . . . [% END %]</ttcode>
+	</item>
+        </list>
+    </section>
+
+
+
+    <!-- Providers -->
+    <section id="providers" title="Providers">
+	<list>
+	<item title="file">
+	    Template::Provider::File.
+	</item>
+	<item title="http">
+	    Template::Provider::HTTP.
+	</item>
+	<item title="dbi">
+	    Template::Provider::DBI.
+	</item>
+	</list>
+    </section>
+
+
+
+    <!-- Cache -->
+    <section id="cache" title="Cache">
+	<list>
+	<item>
+	    Caching functionality should be moved out of
+	    Template::Provider and implemented in a module of its own,
+	    allowing it to be subclassed and/or replaced by a different
+	    caching mechanism.
+	</item>
+	</list>
+    </section>
+
+
+    <!-- Output -->
+    <section id="output" title="Output">
+	<list>
+	<item>
+	    We require an elegant way to redirect output to a different
+	    file, flush output (e.g. to a request), create multiple output
+	    buffers, and a few other things I can't think of right now.
+	</item>
+	</list>
+    </section>
+
+
+
+    <!-- Contract -->
+    <section id="contract" title="Contract">
+	<list>
+	<item>
+	    The Template::Service module should acquire resources,
+	    prepare variables, mangle the request in various different
+	    ways, handle errors, perform redirection, and so on, according
+	    to a Service::Contract which defined the service level agreement
+	    between client and server.
+	</item>
+	</list>
+    </section>
+
+
+
+    <!-- Scripts -->
+    <section id="scripts" title="Scripts">
+	<list>
+	<item title="ttree">
+	    ttree should become one or more modules: one to
+	    represent conceptual collections of documents, one to 
+	    do directory trawling to determine such collections, 
+	    another to read collection spec from an XML file, and
+	    so on, and another to actually fire up Template and 
+	    process it according to some specific configuration.
+	</item>
+	<item title="tskel">
+	    This should be done properly.  It requires better
+	    programming level hooks (e.g. for prompting).  It would be
+	    nice if we could make a good attempt at "Web Site in a
+	    Box" (i.e. run one command to generate a new web site
+	    project, complete with standard template libraries, dummy
+	    config, source, CGI, XML files, SQL examples, Perl
+	    modules, etc) and even nicer if we could do something
+	    like h2xs but with full customisation via templates.
+	    We can but dream of one day aspiring to implement a
+	    replacement for Configure...
+	</item>
+	<item title="tpage">
+	    Should be left clean and simple as it is, but allowing
+	    configuration files and command line options to be
+	    specified.
+	</item>
+	<item title="Configuration">
+	    There should be a module to represent a particular site
+	    configuration, be it in Perl, XML file, AppConfig file, or
+	    whatever.  All the above scripts, and the Template module
+	    itself should respond to such a configuration.
+	</item>
+	</list>
+    </section>
+</design>

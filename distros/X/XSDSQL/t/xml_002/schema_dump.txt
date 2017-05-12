@@ -1,0 +1,192 @@
+XMLDecl: $VAR1 = [
+          '1.0',
+          undef,
+          undef
+        ];
+
+Default: $VAR1 = [
+          '
+'
+        ];
+
+Start: $VAR1 = [
+          'xs:schema',
+          'xmlns:xs',
+          'http://www.w3.org/2001/XMLSchema'
+        ];
+
+Char: $VAR1 = [
+          '
+'
+        ];
+
+Char: $VAR1 = [
+          '  '
+        ];
+
+Start: $VAR1 = [
+          'xs:element',
+          'name',
+          'simple_schema_with_iteration'
+        ];
+
+Char: $VAR1 = [
+          '
+'
+        ];
+
+Char: $VAR1 = [
+          '	'
+        ];
+
+Start: $VAR1 = [
+          'xs:complexType'
+        ];
+
+Char: $VAR1 = [
+          '
+'
+        ];
+
+Char: $VAR1 = [
+          '    		'
+        ];
+
+Start: $VAR1 = [
+          'xs:sequence',
+          'minOccurs',
+          '0',
+          'maxOccurs',
+          '1'
+        ];
+
+Char: $VAR1 = [
+          '
+'
+        ];
+
+Char: $VAR1 = [
+          '		      '
+        ];
+
+Start: $VAR1 = [
+          'xs:element',
+          'name',
+          'el0',
+          'type',
+          'xs:string',
+          'minOccurs',
+          '0',
+          'maxOccurs',
+          '1'
+        ];
+
+End: $VAR1 = [
+          'xs:element'
+        ];
+
+Char: $VAR1 = [
+          '
+'
+        ];
+
+Char: $VAR1 = [
+          '		      '
+        ];
+
+Start: $VAR1 = [
+          'xs:element',
+          'name',
+          'el1',
+          'type',
+          'xs:string',
+          'minOccurs',
+          '0',
+          'maxOccurs',
+          '1'
+        ];
+
+End: $VAR1 = [
+          'xs:element'
+        ];
+
+Char: $VAR1 = [
+          '
+'
+        ];
+
+Char: $VAR1 = [
+          '		      '
+        ];
+
+Start: $VAR1 = [
+          'xs:element',
+          'name',
+          'el2',
+          'type',
+          'xs:string',
+          'minOccurs',
+          '0',
+          'maxOccurs',
+          'unbounded'
+        ];
+
+End: $VAR1 = [
+          'xs:element'
+        ];
+
+Char: $VAR1 = [
+          '
+'
+        ];
+
+Char: $VAR1 = [
+          '    		'
+        ];
+
+End: $VAR1 = [
+          'xs:sequence'
+        ];
+
+Char: $VAR1 = [
+          '
+'
+        ];
+
+Char: $VAR1 = [
+          '	'
+        ];
+
+End: $VAR1 = [
+          'xs:complexType'
+        ];
+
+Char: $VAR1 = [
+          '
+'
+        ];
+
+Char: $VAR1 = [
+          '  '
+        ];
+
+End: $VAR1 = [
+          'xs:element'
+        ];
+
+Char: $VAR1 = [
+          '
+'
+        ];
+
+End: $VAR1 = [
+          'xs:schema'
+        ];
+
+Default: $VAR1 = [
+          '
+
+ 
+'
+        ];
+

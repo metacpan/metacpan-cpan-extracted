@@ -1,0 +1,66 @@
+# this timestamp can be used on either a single element, like so:
+#		<element><name>test_ts</name><macro>timestamp</macro></element>
+#	(which just records in comma internals that you are using a
+#	 timestamp, only useful for introspection stuff, so far...)
+# OR, at the top level of a def, like one of the below:
+#	<macro>timestamp: [ @stores ], 'created_ts'</macro>
+#	<macro>timestamp: [ @stores ], 'created_ts', 'last_modified_ts'</macro>
+# these means that for each stores, update created_ts whenever a doc is
+# created, and (in the latter usage), update last_modified_ts whenever
+# a doc is modified.
+
+if($self->tag eq 'DocumentDefinition') {
+	#macro used in def context:
+	my ( $stores, $created, $last_modified ) = @macro_args;
+
+	die "timestamp macro needs a list of stores\n" unless ref($stores) eq 'ARRAY';
+	die "timestamp macro needs the name of a 'created' element\n" unless $created;
+
+	if ( $created ) {
+		#add the element
+		my $el = $self->add_element ( 'element' );
+		$el->add_element ( 'name' )->set ( $created );
+		#keep some info in the def about which elements are timestamps
+		push @{$el->{_Def_macro_names}}, 'timestamp';
+		push @{$el->{_Def_macro_names}}, 'timestamp_created';
+
+		foreach my $store_name ( @$stores ) {
+			my $store = $self->get_store($store_name );
+			$store->add_hook ( 'pre_store_hook',
+				sub {
+					my $doc = shift;
+					$doc->element ( $created )->set ( time() )
+					unless $doc->element ( $created )->get();
+				}
+			);
+		}
+	}
+
+	if ( $last_modified ) {
+		#add the element
+		my $el = $self->add_element ( 'element' );
+		$el->add_element ( 'name' )->set ( $last_modified );
+		#keep some info in the def about which elements are timestamps
+		push @{$el->{_Def_macro_names}}, 'timestamp';
+		push @{$el->{_Def_macro_names}}, 'timestamp_last_modified';
+
+		foreach my $store_name ( @$stores ) {
+			my $store = $self->get_store($store_name);
+			$store->add_hook ( 'pre_store_hook',
+				sub {
+					my ( $self, $store, $args ) = @_;
+					return  if  $args->{no_mtime};
+					$self->element ( $last_modified )->set ( time() );
+				}
+			);
+		}
+	}
+} elsif($self->tag eq 'element') {
+	#macro is used in element context:
+	#a no-op. but this call adds to applied_macros();
+} else {
+	#unknown context, error out
+	die "you must use the timestamp macro on a def or a single element";
+}
+
+1;

@@ -1,0 +1,11 @@
+0.1
+	Initial Release 
+
+0.1.2
+	Changed from IPC::SharedMemory to Cache::SharedMemoryCache because its platform independent
+
+0.1.3
+	Fixed caching bug (concerning cache_expire option)
+
+0.1.4
+	Fixed bugs 5221 (reported and patch provided by guest) and 5358 (reported by Robert Roggenbuck)

@@ -1,0 +1,173 @@
+=encoding utf8
+
+=head1 NAME
+
+XML::Compile::SOAP::Trace - help displaying trace details.
+
+=head1 SYNOPSIS
+
+ my ($answer, $trace) = $call->(%params);
+ # now $trace is a XML::Compile::SOAP::Trace
+
+ my $req = $trace->request;   # HTTP message which was sent
+ my $res = $trace->response;  # HTTP message received
+
+ my $start = $trace->date;
+ my $dura  = $trace->elapse;
+
+ $trace->printTimings;
+ $trace->printErrors;
+ $trace->printTimings(\*STDERR);
+ $trace->printRequest(pretty_print => 1);
+ $trace->printResponse;
+
+=head1 DESCRIPTION
+
+This help module simplifies user access to the trace data,
+as produced by a SOAP call (client side).
+
+=head1 METHODS
+
+=head2 Constructors
+
+=over 4
+
+=item XML::Compile::SOAP::Trace-E<gt>B<new>(%options)
+
+Called by the SOAP call implementation; not for normal users.
+
+=back
+
+=head2 Accessors
+
+=over 4
+
+=item $obj-E<gt>B<date>()
+
+Returns the date string which represent the moment that the call
+was initiated.
+
+=item $obj-E<gt>B<elapse>( [$kind] )
+
+Returns the time in seconds (with hires, sub-second detail) of a part of
+the SOAP communication. Some values may be C<undef>.  Elapse without
+argument will return the total time elapsed.
+
+As KINDs are defined C<encode> (the time required by the translator
+build by XML::Compile::Schema to translate Perl into an XML::LibXML
+tree), C<transport>, and C<decode> (from XML::LibXML tree into Perl)>.
+The transport components are also provided separately, as C<stringify>
+(by XML::LibXML to convert a tree into text), C<connect> (for the network
+message exchange by HTTP::Daemon), and C<parse> (parsing answer string
+into XML)
+
+See L<printTimings()|XML::Compile::SOAP::Trace/"Printing">.
+
+example: 
+
+ print $trace->elapse('decode');
+
+=item $obj-E<gt>B<error>( [$error] )
+
+Often contains an error message, when something went wrong.  The message
+is returned as Log::Report::Exception.  Only the first error is returned,
+use L<errors()|XML::Compile::SOAP::Trace/"Accessors"> to get all.
+
+[2.31] When an $error is provided, it is added to the internal list of errors.
+The $error parameter may be a Log::Report::Exception, a
+Log::Report::Message or a simple string.
+
+=item $obj-E<gt>B<errors>()
+
+[2.31] Return all errors, which are Log::Report::Exception objects.
+See also L<error()|XML::Compile::SOAP::Trace/"Accessors">.
+
+=item $obj-E<gt>B<request>()
+
+Returns the HTTP::Request object used for this SOAP call.  This might
+be quite useful during debugging, because a lot of the processing is
+hidden for the user... but you may want to see or log what is actually
+begin send.
+
+=item $obj-E<gt>B<response>()
+
+Returns the HTTP::Response object, returned by the remote server.  In
+some erroneous cases, the client library will create an error response
+without any message was exchanged.
+
+=item $obj-E<gt>B<responseDOM>()
+
+Returns the XML::LibXML::Document top node of the response: the parsed
+text of the content of the received HTTP message.
+
+=item $obj-E<gt>B<start>()
+
+Returns the (platform dependent) time value which represent the moment
+that the call was initiated.  See Time::HiRes method C<time>.
+
+=back
+
+=head2 Printing
+
+=over 4
+
+=item $obj-E<gt>B<printErrors>( [$fh] )
+
+The filehandle defaults to STDERR.
+
+If you want to see more output, try adding C<<use Log::Report mode => 3;>>
+
+=item $obj-E<gt>B<printRequest>( [$fh], %options )
+
+ -Option      --Default
+  pretty_print  0
+
+=over 2
+
+=item pretty_print => 0|1|2
+
+Use L<XML::Compile::Transport::compileClient(xml_format)|XML::Compile::Transport/"Handlers"> if you want
+the messages to be shown readible.  The digits reflect XML::LibXML
+format settings: '0' is unchanged, '1' will show indented formatting,
+and '2' has even more whitespace in it.
+
+=back
+
+=item $obj-E<gt>B<printResponse>( [$fh], %options )
+
+ -Option      --Default
+  pretty_print  0
+
+=over 2
+
+=item pretty_print => 0|1|2
+
+Use L<XML::Compile::Transport::compileClient(xml_format)|XML::Compile::Transport/"Handlers"> if you want
+the messages to be shown readible.
+
+=back
+
+=item $obj-E<gt>B<printTimings>( [$fh] )
+
+Print an overview on various timings to the selected filehandle.
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of XML-Compile-SOAP distribution version 3.21,
+built on January 11, 2017. Website: F<http://perl.overmeer.net/xml-compile/>
+
+Please post questions or ideas to the mailinglist at
+F<http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/xml-compile> .
+For live contact with other developers, visit the C<#xml-compile> channel
+on C<irc.perl.org>.
+
+=head1 LICENSE
+
+Copyrights 2007-2017 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

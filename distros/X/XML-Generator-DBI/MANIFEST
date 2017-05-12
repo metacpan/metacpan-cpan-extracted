@@ -1,0 +1,11 @@
+Changes
+DBI.pm
+Makefile.PL
+MANIFEST
+README
+t/00basic.t
+t/01xmlgen.t
+t/02execute.t
+t/03execute_one.t
+t/04groupby.t
+t/05bycol.t

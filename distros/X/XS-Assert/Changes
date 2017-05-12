@@ -1,0 +1,7 @@
+Revision history for Perl extension XS::Assert
+
+0.002 Mon Sep 14 17:21:37 2009
+	- forgot "install_headers 'assert.h'"
+
+0.001 Mon Sep 14 10:43:35 2009
+	- original version; created by Module::Setup

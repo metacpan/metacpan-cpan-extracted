@@ -1,0 +1,14 @@
+<%
+
+$template->set( 'foo' => {
+                   ( map { $_ => "$_\n" } qw/ pre post intro extro 
+                                            prechild postchild
+                                            prechildren postchildren / ),
+                   showtag => 1,
+                   action => DO_SELF_ONLY,
+                   testcode => sub { DO_SELF_AND_KIDS },
+                 });
+
+$template->set( 'text()' => { showtag => 0 } );
+%>
+<%= apply_templates() %>

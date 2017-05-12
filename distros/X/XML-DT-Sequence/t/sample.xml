@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<main>
+  <head>
+    <something>a</something>
+    <something>b</something>
+    <something>c</something>
+    <something>d</something>
+  </head>
+  <body>
+    <item n="1">
+      <foo>foo</foo>
+      <bar>bar</bar>
+    </item>
+    <item>
+      <foo>foo</foo>
+      <bar>bar</bar>
+    </item>
+    <item a="b" c="d">
+      <foo>foo</foo>
+      <bar>bar</bar>
+    </item>
+    <item>
+      <foo>foo</foo>
+      <bar>bar</bar>
+    </item>
+    <item>
+      <foo>last</foo>
+      <bar>chunk</bar>
+    </item>
+  </body>
+  <footer>
+    <something>weird</something>
+  </footer>
+</main>

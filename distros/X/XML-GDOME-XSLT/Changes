@@ -1,0 +1,70 @@
+Revision history for Perl extension XML::LibXSLT.
+
+1.31
+    - removed global callbacks
+    - changed callbacks to using LibXML globals
+
+1.30
+    - Compatibility with XML::LibXML 1.30 (esp callbacks)
+    - EXSLT support
+    - Better test files
+
+1.09
+    - Some fixes and tests for document('')
+    - Better have_library implementation in Makefile.PL
+
+1.08
+    - Fixed Makefile.PL check for libxslt > 0.7.0 to work with 1.0.0
+
+1.07
+    - Fixes to work with XML::LibXML 0.94
+
+1.06
+    - Support text/html defaulting for media_type when document element
+      is <html>.
+    - Support building on Win32
+
+1.05
+    - More tests and fixes for media_type
+
+1.04
+    - Fixed media_type method
+
+1.03
+    - Added output_encoding and media_type methods
+
+1.02
+    - Fixed Makefile.PL to work with libxslt 0.10
+
+1.01
+    - Removed hack where we set dom->standalone = 42 to prevent
+      XML::LibXML from garbage collecting
+    - Removed XML::LibXML from the distribution. Now separate.
+
+1.00
+    - More segfault fixes
+    - Benchmark updates    
+
+0.99_01
+    - More segfault fixes
+
+0.99
+    - Fixed segfaults on 5.00503
+
+0.98
+    - Fixed output encoding problems
+
+0.97
+    - Now needs libxslt 0.7.0
+    - Removed add_param() (now passed to transform())
+    - Makefile.PL works without gnome-config now
+
+0.95 & 0.96
+    - Various cleanups and code additions to make stable.
+
+0.94  Tue Mar 13 2001
+    - First release to CPAN
+
+0.01  Sat Mar  3 17:08:00 2001
+	- original version; created by h2xs 1.19
+

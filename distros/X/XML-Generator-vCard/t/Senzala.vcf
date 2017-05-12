@@ -1,0 +1,12 @@
+BEGIN:VCARD
+VERSION:3.0
+N:;;;;
+FN:Senzala
+ORG:Senzala;
+TEL;type=WORK;type=pref:514/274-1464
+item1.ADR;type=WORK;type=pref:;;177 Bernard o.;Montreal;Quebec;;Canada
+item1.X-ABADR:ca
+NOTE:I had breakfast here with Maciej - the food is good, the coffee not so
+X-ABShowAs:COMPANY
+CATEGORY:montreal
+END:VCARD

@@ -1,0 +1,7 @@
+# XML::FeedPP::Plugin::DumpJSON Changes
+
+2008/01/05 (0.33)
+    * XML::FeedPP::Plugin::DumpJSON module branched out from XML::FeedPP
+      http://search.cpan.org/dist/XML-FeedPP-Plugin-DumpJSON/
+    * JSON::Syck is only supported at the moment.
+      JSON::PP module version 2.0x seems to have problems with utf8 handling.

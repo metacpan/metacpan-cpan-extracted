@@ -1,0 +1,176 @@
+Revision history for Perl extension XML::SAX::ExpatXS
+=====================================================
+ 
+1.33 Oct 26, 2012 
+    - LICENSE field added to ExpatXS.pm
+    - [rt.cpan.org #69253] t/f08noexpand.t is missing in distro ()
+
+1.32 Apr 12, 2011
+    - NoExpand option test added
+    - type warnings fixed (gcc 4.4)
+
+1.31 July 3, 2007
+    - Security fix: namespace separator in XML_ParserCreate_MM
+      changed from '}' to -1, related to SF.net bug 1742315 
+      [suggested by Bjoern Hoehrmann]
+
+1.30 July 2, 2007
+    - speed optimizations - main callback functions (start_element,
+      end_element, characters, comment) resolved in advance using 
+      XML::SAX::ExpatXS::Preload module
+    - feature 'http://xmlns.perl.org/sax/recstring' controls whether
+      a recognized string is available as {RecognizedString} among 
+      {ParseOptions} (not by default as this is rather expensive).
+    - added {ExpatVersion} property
+
+1.20 April 7, 2006
+    - speed optimizations - data structures reused: start_element() 
+      hash reused by end_element() call when free, characters() hash 
+      recycled when free
+    - better error message when parse_uri fails
+
+1.10 November 10, 2005
+    - fixed start_entity() called for an external DTD subset if 
+      parameter entity parsing is in effect (ParseParamEnt option
+      setting XML_PARAM_ENTITY_PARSING_UNLESS_STANDALONE in Expat)
+      [using patches by Axel Eckenberger]
+    - resolve_entity() can return source with {String} now
+    - feature 'http://xml.org/sax/features/external-general-entities'
+      controls processing of external general entities
+    - feature 'http://xml.org/sax/features/external-parameter-entities'
+      controls processing of external parameter entities (the same as 
+      ParseParamEnt option)
+    - skipped_entity() implemented
+      [based on patch and tests by Axel Eckenberger]
+    - fixed segfault for unparsed entities without PublicId
+      [using patches by Axel Eckenberger]
+    - fixed leaks in entity callbacks
+
+1.09 October 14, 2005
+    - {Source}{Encoding} is used (with higher priority 
+      than encoding specified in the XML declaration)
+    - fixed segfaults for undefined {Source} properties
+    - Expat localization improved in Makefile.PL
+    - localized setting of $/ in _get_external_entity
+
+1.08 April 22, 2005
+    - feature 'http://xmlns.perl.org/sax/xmlns-uris'
+      puts xmlns:* attributes into 
+      the 'http://www.w3.org/2000/xmlns/' namespace
+      and xmlns attributes into no namespace.
+      The 'http://xml.org/sax/features/xmlns-uris'
+      applies only if the new one is off.
+      The default behavior is the same as for other 
+      Perl SAX parsers now.
+    - fixed repeated parsing with Perl 5.6
+
+1.07 March 16, 2005
+    - feature  'http://xml.org/sax/features/xmlns-uris'
+      puts xmlns and xmlns:* attributes into no or
+      the 'http://www.w3.org/2000/xmlns/' namespace.
+      Default is no namespace (feature not set) which
+      is a behavior different from previous versions!
+    - feature 'http://xmlns.perl.org/sax/version-2.1'
+      is set (and can't be turned off)  
+    - minor fix in memory management
+      [reported by Rob Bloodgood] 
+
+1.06 March 7, 2005
+    - more changes in memory management; 
+      parse_* run in loops without leaks
+      [reported by Rob Bloodgood]
+
+1.05 February 18, 2005
+    - fixed segfault after deleting a key of Features
+      [patch by Pavel Hlavnicka]
+
+1.04 December 15, 2004
+    - fixed the bug of SystemId/PublicId of external DTD 
+      subset provided instead of identifiers of the current 
+      entity in Locator and Exception
+      [reported by Bjoern Hoehrmann]
+    - recognized string made available
+      as $p->{ParseOptions}{RecognizedString}
+    - ParserOptions renamed to ParseOptions to match 
+      XML::SAX::Base
+    - minor fixes for make test
+    - test suite extended
+
+1.03 November 23, 2004
+    - minor fixes for make test
+
+1.02 November 22, 2004
+    - document locator redesigned to fit
+      Perl SAX 2.1 specs
+    - feature 'http://xmlns.perl.org/sax/locator' can turn
+      the document locator off
+    - test suite extended
+
+1.01 September 24, 2004
+    - memory management check completed, 
+      no more leaks detected
+
+1.00 July 16, 2004
+    - relevant memory leaks fixed
+    - some more XS code cleanup 
+
+0.99 June 7, 2004
+    - element_decl (Name, Model) completed
+    - attribute_decl (eName, aName, Type, Mode, Value) completed
+    - ns declaration attributes are treated as common attributes
+      when the 'http://xmlns.perl.org/sax/ns-attributes' feature
+      is set to 1 (default)
+    - fixed the bug of "0" translated into ""
+      [patch by Sam Tregar]
+    - fixed a reference counting bug in startElement
+      [reported by Sam Tregar]
+    - test suite extended
+
+0.98 April 9, 2004
+    - added support for more encodings. In addition to
+      built-in Expat encodings (UTF-8, UTF-16, ISO-8859-1, 
+      US-ASCII) we now support ISO-8859-2,3,4,5,7,8,9,
+      WIN-1250,1252, BIG5, EUC-KR, EUC-JP and Shift JIS.
+      (adapted from XML::Parser)
+    - cleaning the code to satisfy gcc2 and ANSI C
+      [suggested by Sergey Skvortsov]
+    - minor bug fixes (locator, test suite)
+
+0.97 March 29, 2004
+    - external parsed entities parsed
+    - external_entity_decl (Name, PublicId, SystemId) called 
+      for external entity declarations
+    - internal_entity_decl (Name, Value) called for external 
+      entity declarations
+    - start_entity (Name), end_entity (Name) called for 
+      external entity references
+    - resolve_entity callback implemented
+    - get_feature(), set_feature(), get_features() API functions 
+      implemented 
+    - feature 'http://xmlns.perl.org/sax/join-character-data' controls 
+      character data fragmentation, 0/1 (1 being default)
+    - performance optimizations
+    - fixed the xmlns="" segmentation fault
+    - test suite extended
+
+0.96 February 19, 2004
+    - exceptions (Message, Exception, LineNumber, 
+      ColumnNumber, PublicId, SystemId) sent to ErrorHandler
+    - document locator (LineNumber, ColumnNumber, PublicId, 
+      SystemId, Encoding, XMLVersion) implemented (updated on 
+      start_element, end_element, characters, start_prefix_mapping, 
+      end_prefix_mapping, processing-instruction)
+    - test suite extended
+
+0.95 February 5, 2004
+    - renamed to XML::SAX::ExpatXS
+    - completed parsing of xml declarations
+    - completed start_dtd, end_dtd
+    - fixed a bug of Attributes hash keys
+    - fixed an "Attempt to free unreferenced scalar during 
+      global destruction" bug when parsing repeatedly
+    - test suite extended      
+
+0.90_01 May 13, 2002
+    - initial release by Matt Sergeant 
+      (a working parser).

@@ -1,0 +1,57 @@
+README for XML::Dumper 
+======================
+
+XML::Dumper dumps Perl data to a structured XML format.
+XML::Dumper can also read XML data that was previously dumped
+by the module and convert it back to Perl.
+
+This might be useful for dumping Perl objects to files
+using an XML format that can be reloaded or accessed by
+other programs. Maybe even by other languages.
+
+For more information, read the perldoc for this module.
+
+I (Mike Wong) am the current maintainer; I welcome bug reports,
+comments and suggestions to make this a better module for helping
+you to do what you need. Contact me via e-mail at 
+<mike_w3@pacbell.net>. 
+
+Better yet, if you're in Sonoma County of California, USA, join the 
+Sonoma Perl Mongers and we can talk there. For more information on
+Sonoma Perl Mongers, see
+
+  http://sonoma.pm.org
+
+INSTALLATION
+
+To install this module, type the following: 
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+DEPENDENCIES
+
+This module requires version 2.16 or greater of the XML::Parser module.
+The latest version is available at any CPAN archive.
+
+This module also optionally depends on Compress::Zlib. If you install
+Compress::Zlib, you may read and write zlib-compressed XML files.
+Zlib is the compression library that gzip and gunzip use for their
+compression/decompression scheme. The XML files that are zlib-
+compressed are compatible with gzip and gunzip. XML is an extremely
+regular file format and benefits greatly from compression; installing
+Compress::Zlib is highly recommended.
+
+CURRENT MAINTAINER
+
+Mike Wong <mike_w3@pacbell.net>
+
+COPYRIGHT AND LICENSE
+
+  Copyright © 2002 Mike Wong. All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

@@ -1,0 +1,25 @@
+0.06 Jun 29 2015
+
+	* bin/timeseries: Donnot attach values for items of textBlockItemType
+
+0.05 Mar 28 2015
+
+	* README: Changed the URL of TSE.
+	* README.ja.txt
+
+0.04 Mar 1 2015
+
+	* bin/timeseries: Changed output format from bare values to double-quoted values.
+	* bin/ts2xlsx: Fixed a bug(a label of accounts may have comma.)
+
+0.03 Feb 24 2015
+
+	* README
+	* README.ja.txt
+	* bin/timeseries: Fixed a bug(add q4r, q5r)
+
+0.02 Feb 15 2015
+
+	* README
+	* README.ja.txt
+	* bin/ts2xlsx: Fixed a bug(add clear_formats)

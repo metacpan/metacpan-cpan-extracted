@@ -1,0 +1,15 @@
+<?xml version='1.0' encoding='utf-8'?>
+<?xml-stylesheet type="text/xml" href="product-syndication.xsl"?>
+<!DOCTYPE comparison SYSTEM "product-syndication.dtd">
+<product-syndication>
+    <data>
+        <cat id="books">
+            <title>Books</title>
+            <desc>
+                <p>
+                    These are my books.
+                </p>
+            </desc>
+        </cat>
+    </data>
+</product-syndication>

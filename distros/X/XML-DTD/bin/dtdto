@@ -1,0 +1,297 @@
+#!perl
+
+# This script parses a DTD and writes it out in a simple XML format
+# Copyright (C) 2006-2013 Brendt Wohlberg <wohl@cpan.org>
+# Most recent modification: 9 August 2013
+
+use strict;
+use Getopt::Long;
+use File::Temp;
+use File::ShareDir ':ALL';
+
+use XML::DTD;
+
+my $share = dist_dir('XML-DTD');
+my $xslvld = "$share/dtdto/valid.xsl";
+my $xsldtd = "$share/dtdto/dtd.xsl";
+my $xslhtml = "$share/dtdto/html.xsl";
+my $xsldbk = "$share/dtdto/docbook.xsl";
+
+my ($usagetext, $help, $dbglvl, $format, $validflag, $dtdflag, $htmlflag,
+    $docbookflag, $topelement, $topid, $title, $anchorprefix);
+
+$usagetext = <<EOF;
+usage: dtdto [ --help ] [--debug level] [ --valid | --dtd |
+             [ ( --html | ( --docbook [ --top-element element-name ]
+             [ --top-id id-string ] ) ) [ --title title-string ]
+             [ --anchor-prefix prefix-string ] ] ]
+             [ input-file [ output-file ] ]
+
+       --valid         Construct an XSLT script for DTD validation
+
+       --dtd           Use xsltproc to convert XML representation back to a DTD
+
+       --html          Use xsltproc to convert to HTML documentation
+
+       --docbook       Use xsltproc to convert to Docbook documentation
+
+       --top-element   Set the Docbook top level element
+
+       --top-id        Set the id attribute of the Docbook top level element
+
+       --title         Set the output document title
+
+       --anchor-prefix Define a prefix for internal link anchors
+
+       --help          Display usage information
+
+       --debug         Set debugging level
+
+       If a --valid, --dtd, --html, or --docbook flag is not provided,
+       dtdto emits the intermediate XML representation used to
+       construct the DTD, HTML, and Docbook outputs.  Note that the
+       Docbook output is intended for inclusion within a Docbook
+       document, and is not itself a valid Docbook document.
+
+EOF
+
+# Parse command line options
+GetOptions("help!" => \$help,
+	   "debug=i" => \$dbglvl,
+	   "valid!" => \$validflag,
+	   "dtd!" => \$dtdflag,
+	   "html!" => \$htmlflag,
+	   "docbook!" => \$docbookflag,
+           "top-element=s" => \$topelement,
+	   "top-id=s" => \$topid,
+	   "title=s" => \$title,
+	   "anchor-prefix=s" => \$anchorprefix) or
+  die  $usagetext;
+
+if ($help) {
+  print $usagetext;
+  exit(0);
+}
+
+# Open input and output files if necessary
+my ($dtdfile, $xmlfile, $dtdfh, $xmlfh);
+$dtdfile = $ARGV[0];
+if (defined $dtdfile) {
+  open(DTDFH, "<$dtdfile") or die "Couldn't open file $dtdfile\n";
+  $dtdfh = *DTDFH;
+} else {
+  $dtdfh = *STDIN;
+}
+$xmlfile = $ARGV[1];
+if (defined $xmlfile) {
+  open(XMLFH, ">$xmlfile") or die "Couldn't open file $xmlfile\n";
+  $xmlfh = *XMLFH;
+} else {
+  $xmlfh = *STDOUT;
+}
+
+# Set debugging level for exceptions in XML::DTD modules
+$XML::DTD::Error::Debug = $dbglvl if (defined $dbglvl and $dbglvl > 0);
+
+my $dtd = new XML::DTD;
+$dtd->parse($dtdfh);
+
+# Set up temporary files if output postprocessing requested
+my ($cnvfh, $tmpfh1, $tmpfn1, $tmpfh2, $tmpfn2, $cmd, $line);
+if ($validflag or $dtdflag or $htmlflag or $docbookflag) {
+  ($tmpfh1, $tmpfn1) = File::Temp::tempfile();
+  ($tmpfh2, $tmpfn2) = File::Temp::tempfile();
+  $cnvfh = $tmpfh1;
+} else {
+  $cnvfh = $xmlfh;
+}
+# Perform conversion to XML
+
+if ($validflag) {
+  fwritevld($dtd, $cnvfh);
+} else {
+  $dtd->fwritexml($cnvfh);
+}
+
+# Perform output postprocessing if requested
+if ($validflag or $dtdflag or $htmlflag or $docbookflag) {
+  my $params;
+  $params = " --stringparam document-title \'$title\' " if ($title);
+  $params .= "--stringparam anchor-prefix \'$anchorprefix\' "
+         if ($anchorprefix);
+  if ($validflag) {
+    $cmd = "xsltproc $xslvld $tmpfn1 > $tmpfn2";
+    !system($cmd) or die "Error running xsltproc\n";
+  } elsif ($dtdflag) {
+    $cmd = "xsltproc $xsldtd $tmpfn1 > $tmpfn2";
+    !system($cmd) or die "Error running xsltproc\n";
+  } elsif ($htmlflag) {
+    $cmd = "xsltproc $params $xslhtml $tmpfn1 > $tmpfn2";
+    !system($cmd) or die "Error running xsltproc\n";
+  } elsif ($docbookflag) {
+    $params .= "--stringparam enclosing-element \'$topelement\' "
+         if ($topelement);
+    $params .= "--stringparam enclosing-element-id \'$topid\' "
+         if ($topid);
+    $cmd = "xsltproc $params $xsldbk $tmpfn1 > $tmpfn2";
+    !system($cmd) or die "Error running xsltproc\n";
+  }
+  while ($line = <$tmpfh2>) {
+    print $xmlfh $line;
+  }
+  close($tmpfh1);
+  close($tmpfh2);
+  unlink($tmpfn1);
+  unlink($tmpfn2);
+}
+
+
+# Close files if appropriate
+close($dtdfh) if defined ($dtdfile);
+close($xmlfh) if defined ($xmlfile);
+
+exit(0);
+
+
+sub fwritevld {
+  my $dtd = shift;
+  my $cnvfh = shift;
+
+  my $xmlw = new XML::Output({'fh' => $cnvfh});
+  $xmlw->open('dtdvalidate');
+
+  my $eltnmlst = $dtd->elementnames;
+  my ($eltnm, $cm, $tp, $cnm, $c, $dfa);
+  foreach $eltnm (@$eltnmlst) {
+    $cm = $dtd->element($eltnm)->contentmodel;
+    $tp = $cm->type;
+    $xmlw->open('element', {'name' => $eltnm, 'type' => $tp});
+    if ($tp eq 'mixed') {
+      $cnm = $cm->childnames;
+      if (scalar @$cnm > 0) {
+      $xmlw->open('mixed');
+      foreach $c (@$cnm) {
+	$xmlw->empty('child', {'name' => $c});
+      }
+      $xmlw->close;
+    }
+    } elsif ($tp eq 'element') {
+      $dfa = $cm->dfa;
+      $dfa->writexml($xmlw);
+    }
+    $xmlw->close;
+  }
+  $xmlw->close;
+}
+
+
+__END__
+
+=pod
+
+=head1 NAME
+
+dtdto - Convert an XML DTD to a variety of XML representations.
+
+=head1 SYNOPSIS
+
+B<dtdto> [ B<--help> ] [ B<--debug> I<level> ] [ B<--valid> | B<--dtd> | [ ( B<--html> | ( B<--docbook> [ B<--top-element> I<element-name> ] [ B<--top-id> I<id-string> ] ) ) [ B<--title> I<title-string> ] [ B<--anchor-prefix> I<prefix-string> ] ] ] [ I<input-file> [ I<output-file> ] ]
+
+=head1 DESCRIPTION
+
+B<dtdto> constructs an XML representation of an XML DTD if one of the
+B<--valid>, B<--dtd>, B<--html>, or B<--docbook> arguments is not
+specified. If the B<--html> or B<--docbook> argument is specified,
+this intermediate XML representation is converted into documentation
+in HTML or Docbook format respectively. Within the DTD, any comment
+directly followed by a line break and an element declaration is
+considered to be applicable to that element, and will be included as
+such in the documentation. A similar convention is applied for entity
+declarations, except that a comment directly following an entity
+declaration, with no separating line break, is also considered to be
+applicable to that entity. If the B<--valid> argument is specified,
+B<dtdto> constructs an XSLT stylesheet for validating an XML document
+with respect to the DTD.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--help>
+
+Display usage information.
+
+=item B<--debug> I<level>
+
+Set debugging level. Default value is 0, with larger integers
+signifying more detailed debugging information.
+
+=item B<--valid>
+
+Generate an XSLT stylesheet for validating an XML document with
+respect to the DTD.
+
+=item B<--dtd>
+
+Convert the intermediate XML representation back to a DTD. Mainly
+useful for debugging.
+
+=item B<--html>
+
+Convert the intermediate XML representation to DTD documentation in
+HTML format.
+
+=item B<--docbook>
+
+Convert the intermediate XML representation to DTD documentation in
+Docbook format. Note that this output is intended for inclusion within
+a Docbook document, and is not itself a valid Docbook document.
+
+=item B<--top-element> I<element-name>
+
+Set the Docbook top level element.
+
+=item B<--top-id> I<id-string>
+
+Set the id attribute of the Docbook top level element.
+
+=item B<--title> I<title-string>
+
+Set the output document title.
+
+=item B<--anchor-prefix> I<prefix-string>
+
+Define a prefix for internal link anchors.
+
+=back
+
+=head1 LIMITATIONS
+
+The XML::DTD library has not yet been rigorously tested, and may fail
+to correctly parse some DTDs. External entities are not yet resolved,
+so DTDs consisting of multiple included sections will not be properly
+handled.
+
+The XSLT validation (generated when the B<--valid> argument is
+specified) is currently only partial: child elements are confirmed to
+conform to the content model of their parent, but there is no checking
+for spurious text nodes in a non-mixed content model, and attributes
+are not checked at all.
+
+=head1 LICENSE
+
+This software is made available under the terms of the GNU General
+Public License (version 2 or later).
+
+
+=head1 AVAILABILITY
+
+This utility is part of the XML::DTD Perl module, available from
+L<http://search.cpan.org/~wohl/XML-DTD/>.
+
+
+=head1 AUTHOR
+
+Brendt Wohlberg <wohl@cpan.org>
+
+=cut

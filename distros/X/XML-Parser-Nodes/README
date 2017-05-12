@@ -1,0 +1,81 @@
+XML-Parser-Nodes version 0.01
+=============================
+
+The Tree object is one of the possible outputs when XML::Parser is used
+to parse an XML document.  This unblessed object is an ARRAY reference 
+with container and scalar elements and whose depth represents the
+recursions into the XML document.  Each recursion has essentially the
+same structure as its parent.  XML::Parser::Nodes simply blesses this 
+object and its constituent recursion elements so that a common set of 
+methods can be used to access the internal data.
+
+XML::Parser's Tree object has one fewer elements than its children 
+objects.  XML::Parser::Nodes inserts an empty value so that the Tree
+object merely represents the top node.  With this approach, any internal 
+node is independent and unaware of its context, as though it were the top 
+node.  As an advantage, any portion of a larger document can be accessed 
+as though it were a self-contained document.
+
+The basic access methods are as follows:
+
+	gettext()	  Retrieve the scalar data.
+	getattributes()	  Retrieve the node properties as a HASH ref.
+	childlist()	  List the child nodes by name.
+	childnode()	  Access a child node by name.
+	childnodes()	  Return child nodes as elements.
+	dump()		  Export the node as a stand-alone document.
+
+A few additional methods are included for convenience:
+
+	wrapper()	  Creates a new node as a parent.
+	tree()		  Runs childlist() recursively.  The returned list 
+			  of names includes '/' slashes to indicate 
+			  parent->child similar to a file path.
+	nodebykey()	  Access a node from tree() output.
+	pl2xml()	  Creates a Nodes object directly from a Perl object.
+	nvpdump()	  Transforms pl2xml() generated object into a
+			  document that has no reference to the underlying
+			  Perl object.
+
+Because each node is unaware of its context, it doesn't know its name (which
+is actually a property of the parent).  Most operations need to operate on an
+NVP (more precisely, a Name-Node Pair), which is represented by two elements 
+in an unblessed array.  To establish a convenenient nomenclature, this NVP 
+array is referred to as an element.  The set returned by the childnodes()
+methods consists of these NVP arrays.
+
+For script writers, and other procedural programmers looking for a single
+purpose API, this module will be of little use.  Its one useful function,
+nvpdump(), is duplicated in other modules.  But the methods defined in
+XML::Parser::Nodes provide enough framework that nvpdump() can be implemented
+with just a few lines of code.  Programmers who need to perform similar
+transformations should find these methods and the built-in recursion
+capabilities quite valuable.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+   XML::Parser
+
+   The pl2xml function requires XML::Dumper
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2012 by Jim Schueler
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.9 or,
+at your option, any later version of Perl 5 you may have available.
+
+

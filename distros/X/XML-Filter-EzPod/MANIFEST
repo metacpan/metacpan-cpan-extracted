@@ -1,0 +1,12 @@
+Changes
+EzPod.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/00basic.t
+t/01bullets.t
+t/01ordered.t
+t/02indent.t
+t/10mixed.t
+META.yml                                 Module meta-data (added by MakeMaker)

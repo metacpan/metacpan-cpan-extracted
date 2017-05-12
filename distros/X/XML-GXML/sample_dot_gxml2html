@@ -1,0 +1,10 @@
+# Some remappings
+<para>			<p>
+<semiblob>		<blob>
+<heading1>		<h2>
+
+# You can also leave a remapping blank, thereby disabling the tag. Any
+# entity remapped to nil will *not* get transferred into the final
+# document.
+<nothing>
+

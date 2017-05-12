@@ -1,0 +1,16 @@
+TYPEMAP
+xmlNodePtr                  O_NODE_OBJECT
+
+INPUT
+O_NODE_OBJECT
+    if( sv_isobject($arg) && (SvTYPE(SvRV($arg)) == SVt_PVMG) ) {
+            $var = INT2PTR($type,PmmSvNode($arg));
+            if ( $var == NULL ) {
+               croak( \"${Package}::$func_name() -- $var contains no data\" );
+               XSRETURN_UNDEF;
+            }
+    }
+    else {
+            croak( \"${Package}::$func_name() -- $var is not a blessed SV reference\" );
+            XSRETURN_UNDEF;
+    }

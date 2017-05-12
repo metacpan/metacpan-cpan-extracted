@@ -1,0 +1,311 @@
+Revision history for Perl module XML::RSS
+
+1.59    2016-03-01
+    - Merge a pull request to add subcategory support.
+        - https://github.com/shlomif/perl-XML-RSS/pull/4
+        - https://rt.cpan.org/Public/Bug/Display.html?id=48426
+        - Thanks to @ozcoder for the changes.
+
+1.58    2016-02-08
+    - Merge a pull-request regarding the handling of isPermaLink:
+        - https://github.com/shlomif/perl-XML-RSS/pull/2
+        - Thanks to @dwmc15873 for the changes.
+
+1.57    2015-12-13
+    - Update an old E-mail address for Shlomi Fish.
+
+1.56    2014-12-04
+    - Fix https://rt.cpan.org/Ticket/Display.html?id=100660
+        - XML External Entities Exploit, as reported here:
+            - http://mikeknoop.com/lxml-xxe-exploit/
+        - Security.
+
+1.55    2014-04-15
+    - Fix the tests for DateTime-Format-Mail-0.400.
+
+1.54    2013-06-05
+    - Apply a patch from Debian for correcting a typo.
+        - https://rt.cpan.org/Public/Bug/Display.html?id=85962
+        - Thanks to Gregor Herrmann
+
+1.53    2013-06-04
+    - Implement a more user-friendly error with XML::RSS->new(version=>1.0)
+    and a missing "link" and/or "title" field.
+        - Thanks to Gabor Szabo for reporting it.
+
+1.52    2013-05-21
+    - Add t/style-trailing-space.t.
+        - Got rid of trailing space.
+    - Convert to t/cpan-changes.t .
+
+1.51    2013-05-11
+    - Sort the XML namespaces before outputting.
+        - became broken in perl-5.18.0-RC1.
+
+1.50    2013-04-07
+    - Update the repository URL to its new location on GitHub.
+
+1.49    2011-04-07
+    - Some correctness and Modern Perl changes to the rss2html.pl
+    script (it still appears to be very hairy.)
+    - Add support for parsing rssCloud:
+        - https://rt.cpan.org/Ticket/Display.html?id=67241
+        - Thanks to STUIFZAND for the patch.
+
+1.48    2010-04-23
+    - Fix the $rss->parse($string)->other_method() display (had to add
+    spaces between the << and >>). See:
+        - https://rt.cpan.org/Public/Bug/Display.html?id=56848
+        - Thanks to Slaven_Rezic for the report.
+
+1.47    2009-12-08
+    - Made sure XML::RSS::save() can do its thing when in taint mode:
+        - http://rt.cpan.org/Public/Bug/Display.html?id=52334
+
+1.46    2009-10-08
+    - Updated the E-mail address of Adam Trickett.
+    - Removed the perl-5.6.x-specific workarounds and made perl-5.8.x as
+    a requirement. This was done in order to:
+        - avoid a workaround that also caused an incomplete test coverage.
+        - avoid various test failures due to a problem with XML-Parser
+        on 5.6.x .
+        - encourage people using ancient versions of perl in production.
+    - Convert all occurences of "new XML::RSS" to "XML::RSS->new()" everywhere.
+        - a best practice.
+
+1.45    2009-08-05
+    - Removed some unused module requirements statements from lib/**.pm.
+    - Added a note about date parsing/generation (thanks to an email
+    correspondent).
+    - Applied a patch by "David White" to have uppercase letter in
+    namespace/module identifiers.
+        - https://rt.cpan.org/Ticket/Display.html?id=48405
+    - Added "resources" and "keywords" to the Build.PL.
+
+1.44    2009-04-01
+    - Applied a patch from Simon Wistow (after some modifications) to
+    add support for multiple enclosures.
+    - Added the t/xml-base.t test file from Simon Wistow to test for
+    xml:base. Corrected for style.
+
+1.43    2009-01-12
+    - Fixed the date on the last entry on this changelog, to say "2009"
+    instead of "2008".
+        - http://rt.cpan.org/Ticket/Display.html?id=42304
+
+1.42    2009-01-03
+    - When transforming elements with attributes into hash-refs - make
+    sure they are placed in the correct namespace. Previously
+    <media:description> over-rided the plain <description>. (as in Flickr).
+
+1.41    2008-12-04
+    - Made the default keys for the channel link, description and title undef
+    instead of ''. They become '' once they are opened.
+        - http://rt.cpan.org/Public/Bug/Display.html?id=40686
+    - Now keeping track of rdf:resource of <image> in RSS 1.0:
+        - http://rt.cpan.org/Ticket/Display.html?id=3978
+    - Made sure that channel/{link,description,title} are localized to
+    the empty string before rendering, to allow for better backwards
+    compatibility.
+        - http://rt.cpan.org/Public/Bug/Display.html?id=40686
+
+1.40    2008-12-01
+    - Now outputting an arrayref of <skipDays>/<day>'s and <skipHours>/<hours>
+    properly.
+        - http://rt.cpan.org/Public/Bug/Display.html?id=40978
+    - Now parsing multiple <category>'ies inside an <item> into an
+    array-reference.
+        - http://rt.cpan.org/Ticket/Display.html?id=38296
+    - Now outputting an arayref of <item>/<category> prpoerly.
+        - http://rt.cpan.org/Ticket/Display.html?id=38296
+    - Parsing multiple <channel>/<category> into arrays.
+        - http://rt.cpan.org/Public/Bug/Display.html?id=9729
+    - Rendering multiple <channel>/<category> elements from array refs.
+        - http://rt.cpan.org/Public/Bug/Display.html?id=9729
+    - Now parsing multiple dc:items into an array
+    reference (at least inside an <item>):
+        - http://rt.cpan.org/Public/Bug/Display.html?id=6000
+    - Added the modules_as_arrays option to parse repeatable module elements
+    into an array ref.
+
+
+1.38    2008-11-27
+    - Added support for duplicate items of RSS modules.
+        - http://rt.cpan.org/Public/Bug/Display.html?id=4495
+    - Added support for multiple Dublin Core elements. One can point
+    the field to an array and it will create multiple elements:
+        - http://rt.cpan.org/Public/Bug/Display.html?id=6000
+    - Now parsing several <skipDays>/<day>s and <skipHours>/<hour>s into
+    an array reference instead of concatenating them together.
+        - http://rt.cpan.org/Public/Bug/Display.html?id=40978
+
+1.37    2008-11-18
+    - Extracted the common parts of parse() and parsefile() into one
+    method (Refactoring - Shlomi Fish)
+    - Incorporated a modified version of a patch from Simon Wistow to
+    add support for the "xml:base" attribute.
+    - Renamed t/items-are-0.t into the more descriptive
+    t/test-generated-items.t , to highlight its significance and make
+    it easier to notice.
+    - Enabled backwards-compatibility mode for the "description" item
+    to not become a hash-ref by default if xml:base is specified.
+
+1.36    2008-10-07
+    - ->parse() now explicitly returns $self.
+        - http://rt.cpan.org/Public/Bug/Display.html?id=34914
+    - ->parsefile() now explicitly returns $self.
+        - http://rt.cpan.org/Public/Bug/Display.html?id=34914
+    - Applied a patch to change the RSS-0.91 DTD URL from my.netscape.com
+    to rssboard.org:
+        - http://rt.cpan.org/Ticket/Display.html?id=39780
+    - Reformatted the Changes file to standardize on 4-space-indents.
+    - Small documentation patch: (add_item with dc:date)
+        - http://rt.cpan.org/Ticket/Display.html?id=39780
+
+1.35    2008-09-13
+    - Added a Module::Build-based Build.PL so we'll have an easier time
+    with the META.yml and the Kwalitee.
+    - Kwalitee - added "use warnings" to all Perl files.
+        - now depending on at least perl-5.6.0.
+    - Kwalitee - fixed the "use" statement of
+    "Test::Run::CmdLine::Iface" to a runtime require.
+
+1.34    2008-09-12
+    - fixed a typo in the documentation of lib/XML/RSS.pm -
+    "regardless" instead of "regarless".
+        - http://rt.cpan.org/Public/Bug/Display.html?id=37916
+        - (Reported by Reuben Thomas, Fixed by Shlomif).
+    - fixed a code fragment - pop() instead of shift() for older
+    items, and while() instead of if():
+        - http://rt.cpan.org/Public/Bug/Display.html?id=39231
+        - (Reported by Dave, Fixed by Shlomif).
+
+1.33    2008-06-08
+    - Allowed the end-user to customise the _encode() routine in
+    XML::RSS::Private::Output::Base from XML::RSS using the
+    encode_cb key.
+
+1.32    2008-02-08
+    - Fixed http://rt.cpan.org/Public/Bug/Display.html?id=25336 :
+        - made sure the namespace specified elements can have a hash
+        as a value in which case they'll be outputted as a standalone tag
+        with attributes.
+    - Fixed http://rt.cpan.org/Ticket/Display.html?id=25368 :
+        - changed pop() to shift() to remove the oldest item in the
+        example in lib/XML/RSS.pm, per the comments in the bug report.
+    - Fixed http://rt.cpan.org/Ticket/Display.html?id=24329#txn-296761 :
+        - updated the URLs for information about RSS mentioned under
+        "=head1 DESCRIPTION", based on a Google search.
+        - (Shlomi Fish)
+    - Fixed http://rt.cpan.org/Ticket/Display.html?id=33001 :
+        - made sure that isPermalink is true if and only if the isPermalink
+        attribute is "true". Not if it is non-existent, etc.
+        - this modified the behaviour of the module.
+
+1.31    2007-06-29
+    - Fixed the save() function to handle perl-5.6.x (and possibly below)
+    where the ":encoding(...)" filehandle are not available (Shlomi Fish)
+
+1.30    2007-06-18
+    - Same as 1.29_02 (from February 23, 2007)
+    - Removed some methods that were not used.
+    - Added more tests to increase the test coverage.
+    - Fixed a bug where prefixes could be specified with invalid characters
+      because there was a range (.-_) instead of three individual
+      characters (.\-_).
+    - Many files were left in the distribution or Subversion repository
+      that were executable but need not be. Made them non-executable.
+    - Clean up examples/ directory and move generated files out of t/
+    - isPerCould not parse Line '1.04 - Web Mar 03 20:49:43 2004' at /home/shlomif/bin/upgrade-to-CPAN-Changes line 40, <STDIN> line 271.
+maLink / guid fixes (RT#23983, Shlomi)
+    - increased the test coverage of XML::RSS up to 100%. (Shlomif)
+    - SECURITY BUG FIX: eliminated a markup injection vulnerability in the
+      taxo:topics output of RSS 1.0. (Shlomif)
+    - Moved the append function, which is unused and cannot be effectively
+      used, out of the main module and into the rejects directory inside
+      the repository (but outside the module). (Shlomif)
+    - Added POD for full POD coverage. (Shlomif)
+    - Several other bug fixes. (Shlomif)
+    - Heavy refactoring of the code. (Shlomif)
+    - perltidy configuration file; run perltidy on XML::RSS (and
+      intentionally not on the tests) (ABH).
+    - Removed the remaining tab characters. (Shlomif)
+    - Fixed a bug in one of the tests. (Shlomif)
+    - Converted the rendering processes of the various RSS versions to
+      one class per RSS version and applied the "Convert Conditionals
+      to Polymorphism" refactoring. (Shlomif)
+    - Removed the languages hash which was completely unused. (Shlomif)
+    - Converted the parsing routines to be methods of XML::RSS to increase
+      modularity. XML::RSS no longer inherits from XML::Parser. (Shlomif)
+    - Extracted several methods from the parsing stage. (Shlomif)
+    - Added a regression test to
+      https://rt.cpan.org/Ticket/Display.html?id=24742   (Shlomif)
+    - Tweaked the Makefile.PL Test::Run integration according to:
+      http://www.nntp.perl.org/group/perl.qa/2006/11/msg7400.html
+      (Shlomif)
+
+1.22    2006-12-17
+    - Fix XML::Feed compatability. Make sure $item->{content} is always setup
+      (broke in 1.20, RT#23822, Shlomi, Andreas J. Koenig)
+    - Fix the tests to work on Win32 (RT#23752, Shlomi, Kenichi Ishigaki)
+    - make add_module work for both RSS 1.0 and 2.0 (RT#16191,
+      RT#18907, RT#13209, Ben Trott, Ivan Willis)
+    - Fixed the problem with a version => "2.0" RSS not parsing correctly
+      the namespaced elements in a RSS 1.0 feed (in RT#23822, Shlomi)
+    - Channel->{link | textInput} (sic) property mapping in RSS 2.0
+      (RT#9862, Shlomi / chatiman)
+    - Don't fail the tests if Test::Pod::Coverage is missing
+      (reported by Andreas J. Koenig)
+
+1.21    2006-12-05
+    - Support inserting a XSL stylesheet URL into the XML output
+      (RT#11569, Jason A. Smith, Shlomi Fish)
+    - Remove empty lines in the test_manifest - some versions of
+      Test::Manifest doesn't do the right thing with
+      those. (RT#23678, Hugo van der Sanden)
+    - Add Pod::Coverage tests
+    - More Date Conversion (Shlomi)
+    - Fix for a Markup Injection Vulnerability (RT#23435, Shlomi)
+
+1.20    2006-11-10
+    - Value for $XML::RSS::modules gets destroyed (RT#18755, Shlomi)
+      - Note that YOU CAN NO LONGER USE $XML::RSS::modules, you
+           have to use the add_modules call as documented!
+    - encode generates warnings for undefined text (RT#13523, Mark Stosberg)
+    - Missing last build date value in RSS 2.0 (RT#19417)
+    - renamed the internal encode method to _encode
+    - RSS 2.0 spec allows omission of title from entry (RT#18817,
+      test from Shlomi)
+    - Can't create "0" values in optional items (RT#11415, based on
+      patch from Shlomi - thanks!)
+    - Remove the executable bit from Makefile.PL
+    - Add test to test regression of CPAN RT#5438 (Shlomi)
+    - More tests...
+
+1.12    2006-10-25
+    - Add more tests
+    - make sure META.yml is correctly generated
+    - Fix enclosure parsing (RT#7920, Tatsuhiko Miyagawa)
+    - Incorrect entity encoding in XML output (RT#22467, reported by Stephen Hall)
+
+1.11    2006-10-19
+    - use HTML::Entities instead of the "homegrown" entity encoding code
+    - Minor doc fix (David Steinbrunner)
+    - Fix encoding of the > char, added tests (RT#19420, Shlomi Fish)
+    - XML::RSS ignores output encoding (RT#11124, RT#7343, test
+      failures on win32, Vaclav Haisman, Steve Peters)
+    - encoding of source element (RT#2285)
+    - use base instead of @ISA
+    - Thanks to Shlomi Fish for helping sorting through the RT queue!
+
+1.10    2006-03-11
+    - Module (for now) maintained by Ask Bjoern Hansen
+    - Fixed category output in RSS 2.0 (RT#17303, Yasuhiro Onishi)
+    - Update documentation with new Subversion server and bug tracking
+    - Clean up distribution (tests, Makefile.PL, file locations, ...)
+
+1.05    2004-08-12
+    - fixed version number
+    - improved RSS 2.0 generation support
+    - typo and documentation fixes
+

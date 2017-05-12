@@ -1,0 +1,103 @@
+NAME
+    XAO::DO::FS::Collection - Collection class for XAO::FS
+
+SYNOPSIS
+     my $orders=$odb->collection(class => 'Data::Order');
+
+     my $sr=$orders->search('placed_by', 'eq', 'user@host.name');
+
+DESCRIPTION
+    Collection class is similar to List object in the sense that it contains
+    Hash objects joined by some criteria.
+
+    All Collection objects are read-only, you can use them to search for
+    data and to get data objects from them but not to store.
+
+    Methods are (alphabetically):
+
+    container_key ()
+        Makes no sense for Collection, will throw an error.
+
+    delete ($)
+        Makes no sense for Collection, will throw an error.
+
+    describe () {
+        Describes itself, returns a hash reference with at least the
+        following elements:
+
+         type       => 'collection'
+         class      => class name
+         key        => key name
+
+    detach ()
+        Not implemented, but safe to use.
+
+    exists ($)
+        Checks if an object with the given name exists in the collection and
+        returns boolean value.
+
+    get (@)
+        Retrieves a Hash object from the Collection using the given name.
+
+        As a convenience you can pass more then one object name to the get()
+        method to retrieve multiple Hash references at once.
+
+        If an object does not exist an error will be thrown, use exists()
+        method to check if you really need to.
+
+        Note: It does not check if the object still exists in the database!
+        If you need to be sure that the object does exist use
+
+    get_new ()
+        Convenience method that returns new empty detached object of the
+        type that collection operates on.
+
+    glue ()
+        Returns the Glue object which was used to retrieve the current
+        object from.
+
+    keys ()
+        Returns unsorted list of all keys for all objects stored in that
+        list.
+
+    new (%)
+        You cannot use this method directly. Use collection() method on Glue
+        to get a collection reference. Example:
+
+         my $orders=$odb->collection(class => 'Data::Order');
+
+        Currently the only supported type of collection is by class name, a
+        collection that joins together all Hashes of the same class.
+
+    objtype ()
+        For all Collection objects always return a string 'Collection'.
+
+    put ($;$)
+        Makes no sense on collections. Will throw an error.
+
+    search (@)
+        Supports the same syntax as List's search() method. See
+        XAO::DO::FS::List for reference.
+
+    values ()
+        Returns a list of all Hash objects in the list.
+
+        Note: the order of values is the same as the order of keys returned
+        by keys() method. At least until you modify the object directly on
+        indirectly. It is not recommended to use values() method for the
+        reason of pure predictability.
+
+    uri ($)
+        Makes no sense on collections, will throw an error.
+
+AUTHORS
+    Copyright (c) 2005 Andrew Maltsev
+
+    Copyright (c) 2001 Andrew Maltsev, XAO Inc.
+
+    <am@ejelta.com> -- http://ejelta.com/xao/
+
+SEE ALSO
+    Further reading: XAO::FS, XAO::DO::FS::Hash (aka FS::Hash),
+    XAO::DO::FS::List (aka FS::List). XAO::DO::FS::Glue (aka FS::Glue).
+

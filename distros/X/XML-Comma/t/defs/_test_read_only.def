@@ -1,0 +1,30 @@
+<DocumentDefinition>
+  <name>_test_read_only</name>
+
+  <element><name>a</name></element>  
+
+  <nested_element>
+    <name>b</name>
+    <element><name>b_1</name></element>
+    <nested_element>
+      <name>b_2</name>
+      <element><name>b_2_1</name></element>
+      <plural>'b_2_1'</plural>
+    </nested_element>
+    <plural>'b_1'</plural>
+  </nested_element>
+
+  <blob_element>
+    <name>c</name>
+    <extension>'.c'</extension>
+  </blob_element>    
+
+  <plural>'a'</plural>
+
+  <store>
+  <name>main</name>
+  <base>test/ro</base>
+  <location>Sequential_file:'max',10,'extension','.ro'</location>
+  </store>
+
+</DocumentDefinition>

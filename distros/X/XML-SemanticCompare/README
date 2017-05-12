@@ -1,0 +1,43 @@
+XML-SemanticCompare version 0.91
+
+======================
+
+This directory contains the implementation of the XML-SemanticCompare
+codebase.
+
+INSTALLATION
+
+Installtion is very straight forward. During the make process, you will
+be prompted to install any missing dependencies.
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+There are only a few dependencies used by the XML::SemanticCompare 
+codebase that may not be cleanly installed during the make install phase 
+of installation. 
+
+If you are having any problems automatically getting the dependencies 
+to install properly, please either try command line cpan or download
+each dependency independently and install them as per their installation
+instructions.
+
+DEPENDENCIES on WINDOWS
+
+For those of you on WINDOWS, XML::LibXML can be obtained from the following
+active state repository: http://theory.uwinnipeg.ca/ppms/
+
+Please go to that site and choose the appropriate ppm repo that corresponds
+to your Perl version.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 Edward Kawas (edward.kawas+xml-semantic-compare@gmail.com)
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

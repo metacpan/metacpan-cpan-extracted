@@ -1,0 +1,205 @@
+<HTML>
+<HEAD>
+<TITLE>XML::DocStats</TITLE>
+</HEAD>
+<BODY BGCOLOR="#fffff8" TEXT="#000000">
+<UL>
+<LI><A HREF="#NAME">NAME
+
+</A></LI>
+<LI><A HREF="#SYNOPSIS">SYNOPSIS
+
+</A></LI>
+<LI><A HREF="#DESCRIPTION">DESCRIPTION
+
+</A></LI>
+<LI><A HREF="#METHODS">METHODS
+
+</A></LI>
+<UL>
+<LI><A HREF="#new">new
+
+</A></LI>
+<LI><A HREF="#analyze">analyze
+
+</A></LI>
+<LI><A HREF="#parameter%20methods">parameter methods
+
+</A></LI>
+</UL>
+<LI><A HREF="#EXAMPLES">EXAMPLES
+
+</A></LI>
+<LI><A HREF="#AUTHOR">AUTHOR
+
+</A></LI>
+<LI><A HREF="#WEB%20SITE">WEB SITE
+
+</A></LI>
+<LI><A HREF="#SEE%20ALSO">SEE ALSO
+
+</A></LI>
+</UL>
+<HR>
+<H1><A NAME="NAME">NAME
+
+</A></H1>
+
+<P>XML::DocStats - produce a simple analysis of an XML document
+
+</P><H1><A NAME="SYNOPSIS">SYNOPSIS
+
+</A></H1>
+
+<P>Analyze the xml document on STDIN, the STDOUT output format is html:
+
+</P>
+<PRE>    use XML::DocStats;
+    my $parse = XML::DocStats-&gt;new;
+    $parse-&gt;analyze;</PRE>
+
+<P>Analyze in-memory xml document:
+
+</P>
+<PRE>    use XML::DocStats;
+    my ($xmldata) = @_;
+    my $parse = XML::DocStats-&gt;new(xmlsource=&gt;{String =&gt; $xmldata},
+                                           BYTES =&gt; length($xmldata));
+    $parse-&gt;analyze;</PRE>
+
+<P>Analyze xml document IO stream, the output format is plain text:
+
+</P>
+<PRE>    use XML::DocStats;
+    use IO::File;
+    my $xmlsource = IO::File-&gt;new(&quot;&lt; document.xml&quot;);
+    my $parse = XML::DocStats-&gt;new(xmlsource=&gt;{ByteStream =&gt; $xmlsource});
+    $parse-&gt;format('text');
+    $parse-&gt;analyze;</PRE>
+<H1><A NAME="DESCRIPTION">DESCRIPTION
+
+</A></H1>
+
+<P>XML::DocStats parses an xml document using a SAX handler built using Ken MacLeod's XML::Parser::PerlSAX. It produces a listing indented to show the element heirarchy, and collects counts of various xml components along the way. A summary of the counts is produced following the conclusion of the parse. This is useful to visualize the structure and content of an XML document. 
+
+</P>
+<P>The output listing is either in plain text or html.
+
+</P>
+<P>Each xml thingy is color-coded in the html output for easy reading:
+
+</P>
+<P><ul>
+<li><font color="purple"><b>purple</b></font> denotes elements.</li>
+<li><font color="blue"><b>blue</b></font> denotes text (character data). The text itself is black.</li>
+<li><font color="olive"><b>olive</b></font> denotes attributes and attribute valuesin elements, XML-DCL, DOCTYPE, and PIs.</li>
+<li><font color="fuchsia"><b>fuchsia</b></font> denotes entity references. The name of the entity is in black. <font color="fuchsia"><b>fuchsia</b></font> is also used to denote the root element, and to mark the start and finish of the parse, as well as to label the statistices at the end.</li>
+<li><font color="teal"><b>teal</b></font> denotes the XML declaration.</li>
+<li><font color="navy"><b>navy</b></font> denotes the DOCTYPE declaration.</li>
+<li><font color="maroon"><b>maroon</b></font> denotes PIs (processing instructions).</li>
+<li><font color="green"><b>green</b></font> denotes comments. The text of the comment is black.</li>
+<li><font color="red"><b>red</b></font> denotes error messages should the xml fail to be well-formed.</li>
+</ul>
+
+</P><H1><A NAME="METHODS">METHODS
+
+</A></H1>
+<H2><A NAME="new">new
+
+</A></H2>
+
+<P>Create a XML::DocStats. Parameters to control the input, output, and analysis format can
+be passed to <B>new</B>, to <B>analyse</B>, or by invoking parameter methods. See below.
+
+</P><H2><A NAME="analyze">analyze
+
+</A></H2>
+
+<P>Parse the xml document and produce the analysis listing.
+
+</P><H2><A NAME="parameter%20methods">parameter methods
+
+</A></H2>
+
+<P>Parameters to control the input, output, and analysis format can
+be passed to <B>new</B>, to <B>analyse</B>, or by invoking the parameter methods listed below, e.g. <B>$parse-&gt;param('value')</B>.
+When passing parameters to <B>new</B> or <B>analyse</B>, the form <B>$parse-&gt;analyze(param=&gt;'value')</B> is used.
+
+</P>
+<P><B>xmlsource</B> - values: the <B>XML::Parser::PerlSAX Source</B>, default: {ByteStream =&gt; \*STDIN}. See <A HREF="XML/Parser/PerlSAX.html">XML::Parser::PerlSAX</A>.
+
+</P>
+<P><B>format</B> - values: html/text, default: html. When <B>format</B> is <B>html</B>, the analysis listing is formatted in HTML; otherwise, plain text is produced.
+
+</P>
+<P><B>output</B> - values: print/return, default: print. When <B>outout</B> is <B>print</B>, the analysis listing is printed to STDOUT incrementally as the parse progresses; otherwise, the listing is retured as a text string by <B>analyze</B>.
+
+</P>
+<P><B>print_htmlpage</B> - values: yes/no, default: yes. When <B>print_htmlpage</B> is <B>yes</B> and <B>format</B> is <B>html</B>, the analysis listing is formatted as a complete XHTML document. Otherwise, if <B>format</B> is <B>html</B>, only the HTML tags necessary to format the listing are included. 
+
+</P>
+<P>The following parameters control whether the corresponding xml thingy is included in the analysis listing. Setting all <B>print_&lt;item&gt;</B>s to <B>no</B> will produce just the summary statistics.
+
+</P>
+<P><B>print_element</B> - values: yes/no, default: yes.
+
+</P>
+<P><B>print_text</B> - values: yes/no, default: yes.
+
+</P>
+<P><B>print_entity</B> - values: yes/no, default: yes.
+
+</P>
+<P><B>print_doctype</B> - values: yes/no, default: yes.
+
+</P>
+<P><B>print_xmldcl</B> - values: yes/no, default: yes.
+
+</P>
+<P><B>print_comment</B> - values: yes/no, default: yes.
+
+</P>
+<P><B>print_pi</B> - values: yes/no, default: yes.
+
+</P><H1><A NAME="EXAMPLES">EXAMPLES
+
+</A></H1>
+
+<P>An example command line script, <B>xmldocstats.pl</B> is included in
+the <B>eg</B> directory of the distribution. After installation, you
+can put this script in your PATH and use it to analyze an xml document:
+
+</P>
+<PRE>    xmldocstats.pl mydoc.xml</PRE>
+
+<P>or
+
+</P>
+<PRE>    xmldocstats.pl &lt; mydoc.xml | less</PRE>
+
+<P>My web site has an online example, see: <A HREF="#WEB%20SITE">&quot;WEB SITE&quot;</A>
+
+</P><H1><A NAME="AUTHOR">AUTHOR
+
+</A></H1>
+
+<P><a href="mailto:afdickey@intac.com">Alan Dickey &lt;afdickey@intac.com&gt;</a>
+
+</P><H1><A NAME="WEB%20SITE">WEB SITE
+
+</A></H1>
+
+<P>A working example of <B>XML::DocStats</B> can be found online at:
+
+</P>
+<P><a href="http://adickey.addr.com/xmldocstats">adickey.addr.com/xmldocstats</a>
+
+</P><H1><A NAME="SEE%20ALSO">SEE ALSO
+
+</A></H1>
+
+<P><A HREF="XML/Parser/PerlSAX.html">XML::Parser::PerlSAX</A>, <A HREF="XML/Parser.html">XML::Parser</A>, <A HREF="Object/_Initializer.html">Object::_Initializer</A>.
+
+</P>
+</BODY>
+</HTML>

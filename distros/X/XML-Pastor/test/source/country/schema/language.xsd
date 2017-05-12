@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2005 sp2 U (http://www.altova.com) by any (Ru-Board) -->
+<xs:schema xmlns="http://www.example.com/language" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.example.com/language" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:simpleType name="LanguageCode_ISO639_3">
+		<xs:restriction base="xs:string">
+			<xs:length value="3"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="LanguageCode_ISO639_1">
+		<xs:restriction base="xs:string">
+			<xs:length value="2"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="Language">
+		<xs:attribute name="code3" type="LanguageCode_ISO639_3" use="optional"/>
+		<xs:attribute name="code2" type="LanguageCode_ISO639_1" use="optional"/>
+		<xs:attribute name="name" type="xs:string" use="optional"/>
+	</xs:complexType>
+	<xs:element name="language" type="Language">
+		<xs:annotation>
+			<xs:documentation>language</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+</xs:schema>

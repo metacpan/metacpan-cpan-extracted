@@ -1,0 +1,52 @@
+<?xml version="1.0"?> 
+<rdf:RDF 
+  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" 
+  xmlns:rss091="http://purl.org/rss/1.0/modules/rss091#"
+  xmlns="http://purl.org/rss/1.0/"
+> 
+
+<!-- Can we throw off RAI? -->
+
+  <textinput rdf:about="http://search.xml.com">
+    <title>Search example.com</title>
+    <description>Search example.com's collection</description>
+    <name>s</name>
+    <link>http://search.example.com</link>
+  </textinput>
+
+  <image rdf:about="http://example.com/IMAGE/LINK">
+    <title>example.com</title>
+    <link>http://www.example.com</link>
+    <url>http://example.com/IMAGE/LINK</url>
+    <rss091:width>42</rss091:width>
+    <rss091:height>42</rss091:height>
+    <rss091:description>IMAGE LINK DESCRIPTION</rss091:description>
+  </image>
+
+  <channel rdf:about="http://www.example.com/xml/news.rss">
+    <title>example.com</title>
+    <description>tagline</description>
+    <rss091:language>en-us</rss091:language>
+    <rss091:rating>FEED PICS</rss091:rating>
+    <rss091:managingEditor>EDITOR</rss091:managingEditor>
+    <rss091:webmaster>WEBMASTER</rss091:webmaster>
+    <rss091:pubDate>Sat, 01 Jan 2000 12:00:00 GMT</rss091:pubDate>
+    <rss091:lastBuildDate>Sat, 01 Jan 2000 12:00:00 GMT</rss091:lastBuildDate>
+    <rss091:skipHours rdf:parseType="Literal">
+      <rss091:hour>12</rss091:hour>
+    </rss091:skipHours>
+    <rss091:skipDays rdf:parseType="Literal">
+      <rss091:day>Thursday</rss091:day>
+    </rss091:skipDays>
+    <rss091:copyright>FEED RIGHTS</rss091:copyright>
+  </channel>
+
+  <item rdf:about="http://www.example.com/ENTRY/ALTERNATE/LINK">
+    <title>ENTRY TITLE</title>
+    <link>http://www.example.com/ENTRY/ALTERNATE/LINK</link>
+    <rss091:description>PLAINTEXT ENTRY SUMMARY</rss091:description>
+    <rss091:pubDate>Sat, 01 Jan 2000 12:00:00 GMT</rss091:pubDate>
+    <rss091:author>ENTRY AUTHOR</rss091:author>
+  </item>
+  
+</rdf:RDF>

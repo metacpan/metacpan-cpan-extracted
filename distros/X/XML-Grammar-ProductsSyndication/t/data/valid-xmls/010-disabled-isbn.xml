@@ -1,0 +1,30 @@
+<?xml version='1.0' encoding='utf-8'?>
+<?xml-stylesheet type="text/xml" href="product-syndication.xsl"?>
+<!DOCTYPE comparison SYSTEM "product-syndication.dtd">
+<product-syndication>
+    <data>
+        <cat id="books">
+            <title>Books</title>
+            <desc>
+                <p>
+                    These are my books.
+                </p>
+            </desc>
+            <cat id="fiction_books">
+                <title>Fiction books</title>
+                <prod id="little_women">
+                    <title>Little Women</title>
+                    <isbn disable="1" />
+                    <desc>
+                        <p>
+                            Little Women by Louisa May Alcott.
+                        </p>
+                    </desc>
+                </prod>
+            </cat>
+            <cat id="computer_books">
+                <title>Computer books</title>
+            </cat>
+        </cat>
+    </data>
+</product-syndication>

@@ -1,0 +1,78 @@
+---
+abstract: 'A set of procedures and modules to retrieve messages and store the results'
+author:
+  - 'Kevin L. Esteb <kevin@kesteb.us>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4001, CPAN::Meta::Converter version 2.120351'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: XAS-Collector
+provides:
+  XAS::Apps::Collector::Process:
+    file: lib/XAS/Apps/Collector/Process.pm
+    version: 0.01
+  XAS::Collector:
+    file: lib/XAS/Collector.pm
+    version: 0.03
+  XAS::Collector::Format::Alerts:
+    file: lib/XAS/Collector/Format/Alerts.pm
+    version: 0.01
+  XAS::Collector::Format::Base:
+    file: lib/XAS/Collector/Format/Base.pm
+    version: 0.01
+  XAS::Collector::Format::Logs:
+    file: lib/XAS/Collector/Format/Logs.pm
+    version: 0.01
+  XAS::Collector::Input::Stomp:
+    file: lib/XAS/Collector/Input/Stomp.pm
+    version: 0.03
+  XAS::Collector::Output::Console::Alerts:
+    file: lib/XAS/Collector/Output/Console/Alerts.pm
+    version: 0.01
+  XAS::Collector::Output::Console::Base:
+    file: lib/XAS/Collector/Output/Console/Base.pm
+    version: 0.01
+  XAS::Collector::Output::Console::Logs:
+    file: lib/XAS/Collector/Output/Console/Logs.pm
+    version: 0.01
+  XAS::Collector::Output::Database::Alerts:
+    file: lib/XAS/Collector/Output/Database/Alerts.pm
+    version: 0.01
+  XAS::Collector::Output::Database::Base:
+    file: lib/XAS/Collector/Output/Database/Base.pm
+    version: 0.01
+  XAS::Collector::Output::Database::Logs:
+    file: lib/XAS/Collector/Output/Database/Logs.pm
+    version: 0.01
+  XAS::Collector::Output::Socket::Base:
+    file: lib/XAS/Collector/Output/Socket/Base.pm
+    version: 0.01
+  XAS::Collector::Output::Socket::Logstash:
+    file: lib/XAS/Collector/Output/Socket/Logstash.pm
+    version: 0.01
+  XAS::Collector::Output::Socket::OpenTSDB:
+    file: lib/XAS/Collector/Output/Socket/OpenTSDB.pm
+    version: 0.01
+  XAS::Docs::Collector::Installation:
+    file: lib/XAS/Docs/Collector/Installation.pm
+    version: 0.01
+  XAS::Model::Database::Messaging::Result::Alert:
+    file: lib/XAS/Model/Database/Messaging/Result/Alert.pm
+    version: 0.01
+  XAS::Model::Database::Messaging::Result::Log:
+    file: lib/XAS/Model/Database/Messaging/Result/Log.pm
+    version: 0.01
+requires:
+  XAS: 0.08
+  XAS::Model: 0.01
+  perl: 5.00808
+resources:
+  homepage: http://scm.kesteb.us/trac
+  repository: http://scm.kesteb.us/git/XAS-Collector
+version: 0.03

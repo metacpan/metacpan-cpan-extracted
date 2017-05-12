@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+
+	<xs:complexType name="ct0">
+		<xs:sequence minOccurs="1" maxOccurs="1">
+			<xs:element name="el0" type="xs:string" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="el1" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="c1" type="ct1" minOccurs="0" maxOccurs="1"/>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:element name="nestedTypes">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="c0" type="ct0" minOccurs="0" maxOccurs="unbounded"/>
+<!--				<xs:element name="d" type="ct0" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element name="e" type="ct1" minOccurs="0" maxOccurs="unbounded"/>
+-->
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:complexType name="ct1">
+		<xs:sequence minOccurs="1" maxOccurs="1">
+			<xs:element name="el0" type="xs:string" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="el1" type="xs:string" minOccurs="0" maxOccurs="1"/>
+		</xs:sequence>
+	</xs:complexType>
+
+</xs:schema>
+

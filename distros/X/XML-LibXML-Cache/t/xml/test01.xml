@@ -1,0 +1,9 @@
+<!DOCTYPE document SYSTEM "test01.dtd">
+
+<document xmlns:xi="http://www.w3.org/2001/XInclude">
+    &title;
+    <xi:include href="test01-include.xml"/>
+    <xi:include href="test01-missing.xml">
+        <xi:fallback/>
+    </xi:include>
+</document>

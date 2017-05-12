@@ -1,0 +1,42 @@
+Revision history for Perl extension X11::Xlib.
+
+0.14 - 2017-04-15
+    - Fix bug in XEvent->window that was using the incorrect field for
+       any struct that renames 'xany.window' to i.e. 'parent' or 'event'
+    - New Xcomposite test attempts to use Xephyr if it is installed
+    - Fix API of XCompositeQueryVersion, which takes in/out arguments
+    - Only run X11-connected test cases when DISPLAY is set
+    - Add configuration for Travis-CI
+    - Doc updates
+
+0.13 - 2017-04-13
+    - Many new window attribute and window placement functions/constants
+    - Several new Input and Event functions
+    - New structs XRectangle, XWindowAttributes, XWindowChanges
+    - Xcomposite API, conditionally detected by makefile
+    - A little bit of undocumented Xfixes API
+    - Changed API for XGetGeometry, but still backward compatible
+    - Fix prereq lists in Makefile.PL and META files.
+
+0.12 - 2017-04-07
+    - Unicode handling compatibility for perl 5.8
+
+0.11 - 2017-04-06
+    - Include ppport.h in MANIFEST
+
+0.10 - 2017-04-06
+    - implement Xlib API for screens, events, windows, pixmaps, colormaps,
+      visual/visualinfo, keymaps, keysyms, input, and error handling.
+    - more distinct separation between C-style API and object layer.
+    - caching support for objects wrapping connections or XIDs
+    - typemap handling for all the new supported objects
+    - use ExtUtils::Depends to share C API and typemap with derived modules
+
+0.03 - 2015-01-20
+    - removed distro included Devel::CheckLib, and added it to CONFIGURE_REQUIRES
+
+0.02  Sat Aug 21 13:48:00 2009
+    - formating and doc improvement (by chocolateboy)
+
+0.01  Wed Jul  1 00:25:01 2009
+    - original version; created by h2xs 1.23 with options X11::Xlib

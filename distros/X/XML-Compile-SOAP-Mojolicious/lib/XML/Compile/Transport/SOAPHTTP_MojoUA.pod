@@ -1,0 +1,298 @@
+=encoding utf8
+
+=head1 NAME
+
+XML::Compile::Transport::SOAPHTTP_MojoUA - exchange XML via Mojo::UserAgent
+
+=head1 INHERITANCE
+
+ XML::Compile::Transport::SOAPHTTP_MojoUA
+   is a XML::Compile::Transport
+   is a XML::Compile::SOAP::Extension
+
+=head1 SYNOPSIS
+
+ use XML::Compile::Transport::SOAPHTTP_MojoUA;
+
+ my $http = XML::Compile::Transport::SOAPHTTP_MojoUA->new(@options);
+ my $send = $http->compileClient(@options2);
+
+ my $call = $wsdl->compileClient
+   ( operation => 'some-port-name'
+   , transport => $send
+   , async     => 1      # required!
+   );
+
+ sub handler
+   { my ($xmlout, $trace) = @_;
+     # so something
+   };
+
+ $call->($xmlin, _callback => \&handler);
+
+=head1 DESCRIPTION
+
+This module handles the exchange of (XML) messages, according to the
+rules of SOAP (any version).  The module does not known how to parse
+or compose XML, but only worries about the HTTP aspects.
+
+Contrary to L<XML::Compile::Transport::SOAPHTTP|XML::Compile::Transport::SOAPHTTP>, this implementation
+can be used in a non-blocking Mojolicious context, via Mojo::UserAgent.
+
+Just C<use>ing this module will make your WSDL object use it as transport
+handler for async connections (i.e., when the C<async> param show above is
+set to a true value).
+
+Be aware that, if you explicitly pass in an object for the transport param
+as shown above you take full responsibility for the connection.
+That means that, e.g, you have to set server address yourself: it is no
+longer automatically taken from the WSDL and passed to the internally
+created (implicit / hidden) transporter.
+
+This module was contributed by Heiko Jansen F<hjansen@cpan.org>
+
+Extends L<"DESCRIPTION" in XML::Compile::Transport|XML::Compile::Transport/"DESCRIPTION">.
+ 
+=head1 METHODS
+
+Extends L<"METHODS" in XML::Compile::Transport|XML::Compile::Transport/"METHODS">.
+ 
+=head2 Constructors
+
+Extends L<"Constructors" in XML::Compile::Transport|XML::Compile::Transport/"Constructors">.
+ 
+=over 4
+
+=item XML::Compile::Transport::SOAPHTTP_MojoUA-E<gt>B<new>(%options)
+
+ -Option           --Defined in             --Default
+  address            XML::Compile::Transport  'http://localhost'
+  charset            XML::Compile::Transport  'utf-8'
+  ua_start_callback                           undef
+
+=over 2
+
+=item address => URI|ARRAY-of-URI
+
+=item charset => STRING
+
+=item ua_start_callback => CODEREF
+
+A subroutine ref passed to the C<start> event of the user agent object.
+The ARRAY is a list of PAIRS.
+
+=back
+
+=back
+
+=head2 WSDL11
+
+Extends L<"WSDL11" in XML::Compile::Transport|XML::Compile::Transport/"WSDL11">.
+ 
+=over 4
+
+=item $obj-E<gt>B<wsdl11Init>($wsdl, $args)
+
+=item XML::Compile::Transport::SOAPHTTP_MojoUA-E<gt>B<wsdl11Init>($wsdl, $args)
+
+Inherited, see L<XML::Compile::SOAP::Extension/"WSDL11">
+
+=back
+
+=head2 SOAP11
+
+Extends L<"SOAP11" in XML::Compile::Transport|XML::Compile::Transport/"SOAP11">.
+ 
+=over 4
+
+=item $obj-E<gt>B<soap11ClientWrapper>($operation, $call, $args)
+
+Inherited, see L<XML::Compile::SOAP::Extension/"SOAP11">
+
+=item $obj-E<gt>B<soap11HandlerWrapper>($operation, $callback, $args)
+
+Inherited, see L<XML::Compile::SOAP::Extension/"SOAP11">
+
+=item $obj-E<gt>B<soap11OperationInit>($operation, $args)
+
+=item XML::Compile::Transport::SOAPHTTP_MojoUA-E<gt>B<soap11OperationInit>($operation, $args)
+
+Inherited, see L<XML::Compile::SOAP::Extension/"SOAP11">
+
+=back
+
+=head2 SOAP12
+
+Extends L<"SOAP12" in XML::Compile::Transport|XML::Compile::Transport/"SOAP12">.
+ 
+=over 4
+
+=item $obj-E<gt>B<soap12ClientWrapper>($operation, $call, $args)
+
+Inherited, see L<XML::Compile::SOAP::Extension/"SOAP12">
+
+=item $obj-E<gt>B<soap12HandlerWrapper>($operation, $callback, $args)
+
+Inherited, see L<XML::Compile::SOAP::Extension/"SOAP12">
+
+=item $obj-E<gt>B<soap12OperationInit>($operation, $args)
+
+=item XML::Compile::Transport::SOAPHTTP_MojoUA-E<gt>B<soap12OperationInit>($operation, $args)
+
+Inherited, see L<XML::Compile::SOAP::Extension/"SOAP12">
+
+=back
+
+=head2 Accessors
+
+Extends L<"Accessors" in XML::Compile::Transport|XML::Compile::Transport/"Accessors">.
+ 
+=over 4
+
+=item $obj-E<gt>B<address>()
+
+Inherited, see L<XML::Compile::Transport/"Accessors">
+
+=item $obj-E<gt>B<addresses>()
+
+Inherited, see L<XML::Compile::Transport/"Accessors">
+
+=item $obj-E<gt>B<charset>()
+
+Inherited, see L<XML::Compile::Transport/"Accessors">
+
+=item $obj-E<gt>B<uaStartCallback>()
+
+Read-only accessing the C<start> event callback.
+
+=back
+
+=head2 Handlers
+
+Extends L<"Handlers" in XML::Compile::Transport|XML::Compile::Transport/"Handlers">.
+ 
+=over 4
+
+=item $obj-E<gt>B<compileClient>(%options)
+
+Compile an HTTP client handler.  Returned is a subroutine which is called
+with a text represenation of the XML request, or an XML::LibXML tree.
+In SCALAR context, an XML::LibXML parsed tree of the answer message
+is returned.  In LIST context, that answer is followed by a HASH which
+contains trace information.
+
+ -Option    --Defined in             --Default
+  action                               ''
+  header                               <created>
+  hook        XML::Compile::Transport  <undef>
+  kind                                 'request-response'
+  method                               'POST'
+  mime_type                            <depends on soap version>
+  mpost_id                             42
+  soap                                 'SOAP11'
+  xml_format  XML::Compile::Transport  0
+
+=over 2
+
+=item action => URI
+
+=item header => HTTP::Headers object
+
+Versions of L<XML::Compile|XML::Compile>, L<XML::Compile::SOAP|XML::Compile::SOAP>, and LWP will be
+added to simplify bug reports.
+
+=item hook => CODE
+
+=item kind => DIRECTION
+
+What kind of interactie, based on the four types defined by WSDL(1):
+C<notification-operation> (server initiated, no answer required),
+C<one-way> (client initiated, no answer required), C<request-response>
+(client initiated, the usual in both directions), C<solicit-response> (server
+initiated "challenge").
+
+=item method => 'POST'|'M-POST'
+
+With C<POST>, you get the standard HTTP exchange.  The C<M-POST> is
+implements the (Microsoft) HTTP Extension Framework.  Some servers
+accept both, other require a specific request.
+
+=item mime_type => STRING
+
+=item mpost_id => INTEGER
+
+With method C<M-POST>, the header extension fields require (any) number
+to be grouped.
+
+=item soap => 'SOAP11'|'SOAP12'|OBJECT
+
+=item xml_format => 0|1|2
+
+=back
+
+=item $obj-E<gt>B<headerAddVersions>($header)
+
+=item XML::Compile::Transport::SOAPHTTP_MojoUA-E<gt>B<headerAddVersions>($header)
+
+Adds some lines about module versions, which may help debugging
+or error reports.  This is called when a new client or server
+is being created.
+
+=back
+
+=head1 DETAILS
+
+Extends L<"DETAILS" in XML::Compile::Transport|XML::Compile::Transport/"DETAILS">.
+ 
+=head1 SYNOPSYS
+
+Extends L<"SYNOPSYS" in XML::Compile::Transport|XML::Compile::Transport/"SYNOPSYS">.
+ 
+=head1 Helpers
+
+Extends L<"Helpers" in XML::Compile::Transport|XML::Compile::Transport/"Helpers">.
+ 
+=over 4
+
+=item XML::Compile::Transport::SOAPHTTP_MojoUA-E<gt>B<register>($uri)
+
+Inherited, see L<XML::Compile::Transport/"Helpers">
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of XML-Compile-SOAP-Mojolicious distribution version 0.02,
+built on March 17, 2016. Website: F<http://perl.overmeer.net/xml-compile/>
+
+Other distributions in this suite:
+L<XML::Compile>,
+L<XML::Compile::SOAP>,
+L<XML::Compile::WSDL11>,
+L<XML::Compile::SOAP12>,
+L<XML::Compile::SOAP::Daemon>,
+L<XML::Compile::SOAP::WSA>,
+L<XML::Compile::C14N>,
+L<XML::Compile::WSS>,
+L<XML::Compile::WSS::Signature>,
+L<XML::Compile::Tester>,
+L<XML::Compile::Cache>,
+L<XML::Compile::Dumper>,
+L<XML::Compile::RPC>,
+L<XML::Rewrite>
+and
+L<XML::LibXML::Simple>.
+
+Please post questions or ideas to the mailinglist at
+F<http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/xml-compile> .
+For live contact with other developers, visit the C<#xml-compile> channel
+on C<irc.perl.org>.
+
+=head1 LICENSE
+
+Copyrights 2016 by [Heiko Jansen/Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

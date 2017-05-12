@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE data [
+  <!ELEMENT data (stuff+)>
+  <!ELEMENT stuff (name)>
+  <!ELEMENT name  (#PCDATA)>
+  <!ATTLIST stuff attrib CDATA "first">
+]>
+<data>
+  <stuff>
+    <name>Moose</name>
+  </stuff>
+  <stuff attrib="second">
+    <name>Thingy</name>
+  </stuff>
+</data>

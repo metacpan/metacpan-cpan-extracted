@@ -1,0 +1,39 @@
+% layout 'default';
+% title 'Site Products';
+
+<ol class="breadcrumb">
+  <li><a href="/user/">User Main</a></li>
+  <li class="active">Site Products</li>
+</ol>
+
+% if ( flash 'users_update_ok' ) {
+  <p class="alert alert-success">User update was successfully saved.</p>
+% }
+% if ( flash 'users_delete_ok' ) {
+  <p class="alert alert-success">Provided users were
+      successfully deleted.</p>
+% }
+
+<div class="panel panel-primary">
+  <div class="panel-body">
+      %= form_for '/user/site-products' => (method => 'POST') => begin
+        %= hidden_field save => 1
+
+        <div class="form-group">
+          %= submit_button 'Save changes', name => 'save', class => 'btn btn-primary';
+        </div>
+        <p class="alert alert-info">
+          <i class="glyphicon glyphicon-info-sign"></i>
+          Enter product numbers and prices to display on site
+            <b><%= config 'site' %></b>.
+          One entry per line.
+        </p>
+        <div class="form-group">
+          <%= text_area 'products' =>
+            class => 'form-control' => rows => 20
+          %>
+        </div>
+        %= submit_button 'Save changes', class => 'btn btn-primary'
+      %= end
+  </div>
+</div>

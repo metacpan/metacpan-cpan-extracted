@@ -1,0 +1,53 @@
+XML/EasyOBJ version 1.12
+========================
+
+This module is designed to make accessing accessing an XML document
+rather trivial.  You don't need to understand the DOM, you don't need to
+even know what SAX is, all you need to know is how an XML document
+is structured and how to program with objects (OOP).
+
+XML::EasyOBJ takes each tag in your XML file and magically converts it
+to a method name.  So if you wanted to access the 3rd <p> tag inside
+the <body> tag of an XHTML file you might use this:
+
+    $obj->body->p(2)
+
+XML::EasyOBJ gives you several methods to extract data from elements:
+
+    $obj->body->p(2)->getString;
+    $obj->body->getAttr('bgcolor');
+
+XML::EasyOBJ gives you several methods to set data in elements:
+
+    $obj->body->p(2)->setString("Testing");
+    $obj->body->setAttr('bgcolor', 'red');
+
+Obviously these "helper" methods provided won't work in every situatiuon,
+so you can also access the underlying DOM model if you really really need
+to:
+
+    my $element = $obj->body->p(2)->getDomObj;
+    
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    XML::DOM
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2002 Robert Hanson <rhanson@blast.net>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

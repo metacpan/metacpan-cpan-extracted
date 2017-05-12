@@ -1,0 +1,5 @@
+root
+/a/#id	/a	/a/@x	/a/@y
+1	testA	test1	testy
+2		test2	testy
+

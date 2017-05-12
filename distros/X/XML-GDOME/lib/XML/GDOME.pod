@@ -1,0 +1,104 @@
+=head1 NAME
+
+  XML::GDOME - Interface to Level 2 DOM gdome2 library
+
+=head1 SYNOPSIS
+
+  use XML::GDOME;
+
+  my $doc = XML::GDOME->createDocFromURI("foo.xml", GDOME_LOAD_VALIDATING | GDOME_LOAD_SUBSTITUTE_ENTITIES);
+  my $root = $doc->documentElement;
+  my $el = $doc->createElement("RELEASE");
+  my $txtnode = $doc->createTextNode("0.6.x");
+  my @nodes = $doc->findnodes("//*");
+  $el->appendChild($txtnode);
+  $root->appendChild($el);
+  my $str = $doc->toString;
+
+=head1 DESCRIPTION
+
+XML::GDOME is a perl module that provides the DOM Level 2 Core API
+for accessing XML documents.
+
+It uses a XS wrapper around the gdome2 library, located
+at http://phd.cs.unibo.it/gdome2/
+
+=head1 CLASS METHODS
+
+=over 4
+
+=item $doc = XML::GDOME->createDocFromString( $str, $mode );
+
+Loads document from a string.
+
+$mode is the bitwise or of GDOME_LOAD_PARSING, GDOME_LOAD_VALIDATING,
+GDOME_LOAD_RECOVERING, and GDOME_LOAD_SUBSTITUTE_ENTITIES.
+
+=item $doc = XML::GDOME->createDocFromURI( $uri, $mode );
+
+Loads document from an xml file on the local filename or from
+a remote URL.
+
+=item $doc = XML::GDOME->createDocument( $nsURI, $name, $dtd );
+
+Creates a new xml document.  It will be in the $nsURI namespace, if
+$nsURI is defined, and its document element will have the name $name.
+
+$dtd is optional, and should be a XML::GDOME::DocumentType object, or
+C<undef>.
+
+=item $dtd = XML::GDOME->createDocumentType( $name, $publicId, $systemId );
+
+Creates a XML::GDOME::DocumentType object.
+
+=item $bool = XML::GDOME->hasFeature($feature, $version);
+
+Tests whether the DOM implementation implements a specific feature.
+
+=back
+
+=head1 AUTHOR
+
+T.J. Mather, E<lt>tjmather@tjmather.comE<gt>
+
+XML::GDOME is based on XML::LibXML.
+Matt Sergeant and Christian Glahn were the authors of XML::LibXML.
+
+=head1 CREDITS
+
+Bug fixes and feature enhancements generously provided by:
+
+  Richard Titmuss
+  Martin Oldfield
+
+Thanks!
+
+=head1 COPYRIGHT
+
+Copyright (c) 2001, 2002 T.J. Mather.
+Copyright 2001, AxKit.com Ltd. All rights reserved. 
+XML::GDOME is free software;
+you may redistribute it and/or modify it under the same terms as Perl itself. 
+
+=head1 SEE ALSO
+
+L<XML::GDOME::Attr>, L<XML::GDOME::CDATASection>, L<XML::GDOME::CharacterData>,
+L<XML::GDOME::Comment>, L<XML::GDOME::DocumentFragment>,
+L<XML::GDOME::Document>, L<XML::GDOME::DocumentType>, L<XML::GDOME::Element>,
+L<XML::GDOME::Entity>, L<XML::GDOME::EntityReference>,
+L<XML::GDOME::NamedNodeMap>, L<XML::GDOME::NodeList>, L<XML::GDOME::Node>,
+L<XML::GDOME::Notation>, L<XML::GDOME::ProcessingInstruction>,
+L<XML::GDOME::Text>
+
+L<XML::GDOME::XPath::Evaluator>, L<XML::GDOME::XPath::Namespace>,
+L<XML::GDOME::XPath::NSResolver>, L<XML::GDOME::XPath::Result>,
+L<XML::GDOME::XPath::SetIterator>
+
+L<XML::GDOME::SAX::Builder>, L<XML::GDOME::SAX::Generator>,
+L<XML::GDOME::SAX::Parser>
+
+L<XML::GDOME::XSLT>
+
+L<XML::DOM>, L<XML::LibXML>
+
+=cut

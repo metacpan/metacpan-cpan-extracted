@@ -1,0 +1,28 @@
+
+XML::DT examples
+
+A simple example using xml::dt
+
+ex.xml        - a simple xml file     (use ex1.pl ex.xml)
+ex1.pl        - perl program to process it
+
+Generation of a html page with an index for a image archive
+  see also http://alfarrabio.um.geira.pt/~jj/img_arq
+
+arq.pl        - perl program          (use make)
+arq.xml       - xml arquive file
+makefile      - 
+
+example using recursive use of XML::DT
+
+ex2.pl        - a more complex example (use ex2.pl ex.xml)
+
+example using SGML, sx and XML::DT
+
+10nov.sgm     - SGML file
+publico.dtd   - DTD 
+_10nov.sgm    - xml translation (sx 10nov.sgm > ...)
+_titulos      - make _titulos
+pub.pl        - 
+
+

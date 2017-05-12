@@ -1,0 +1,19 @@
+<stx:transform version="1.0" 
+  xmlns:stx="http://stx.sourceforge.net/2002/ns"
+  xmlns:pre="http://test_ns"
+  stxpath-default-namespace="http://koko"
+  strip-space="yes">
+
+  <stx:template match="/root">
+    <stx:copy>
+      <stx:process-children/>
+    </stx:copy>
+  </stx:template>
+
+  <stx:template match="pre:node">
+    <stx:copy>
+      <stx:value-of select="/root/pre:node/@id"/>
+    </stx:copy>
+  </stx:template>
+
+</stx:transform>

@@ -1,0 +1,31 @@
+xfce4-perl: Perl bindings for Xfce 4.
+
+NB: The bindings are currently far from complete.  Please keep that in mind.
+However, the stuff that currently works should continue to work, so there
+should be little risk in depending on functionality being there later.
+
+I do *not* intend do bind libxfce4mcs.  "Normal" applications shouldn't be
+using MCS, and MCS will likely be retired for Xfce 4.6.
+
+There are currently no releases of xfce4-perl.  You can fetch the lastest
+development version from the Xfce Subversion repository:
+
+svn checkout http://svn.foo-projects.org/svn/xfce/xfce4-perl/trunk xfce4-perl
+
+To build and install from SVN, execute the following:
+
+perl Makefile.PL
+make
+make install
+
+Since the modules install to a system location, 'make install' should be run
+as root.
+
+Documentation is provided for all modules, though most do not have any extra
+information provided beyond giving call signatures.  Type 'man Xfce4' to
+see the toplevel documentaion, or 'man Xfce4::index' to see a list of all
+submodules.
+
+xfce4-perl is written and maintained by Brian Tarricone <bjt23@cornell.edu>.
+Further information can be found at:
+http://spuriousinterrupt.org/projects/xfce4-perl/

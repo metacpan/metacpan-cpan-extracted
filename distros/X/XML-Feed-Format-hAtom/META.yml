@@ -1,0 +1,23 @@
+---
+name: XML-Feed-Format-hAtom
+version: 0.5
+author: []
+abstract: hAtom Syndication Feed Support
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Data::Microformat: 0.04
+  HTML::Entities: 0
+  Test::More: 0
+  XML::Feed: 0.3
+provides:
+  XML::Feed::Entry::Format::hAtom:
+    file: lib/XML/Feed/Format/hAtom.pm
+  XML::Feed::Format::hAtom:
+    file: lib/XML/Feed/Format/hAtom.pm
+    version: 0.5
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

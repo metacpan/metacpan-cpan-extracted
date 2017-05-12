@@ -1,0 +1,8 @@
+Makefile.PL
+MANIFEST
+lib/X11/Protocol/Ext/SYNC.pm
+lib/X11/Protocol/Ext/RANDR.pm
+lib/X11/Protocol/Ext/XKEYBOARD.pm
+lib/X11/Protocol/Enhanced.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,11 @@
+root
+/common	/f/commonF	/f/a/b/@att	/f/a/b/c	/f/a/d/e	/r/commonR	/r/commonR/@att	/r/s	/r/s/@att2
+root	hehe		test0					
+root	hehe			testB				
+root	hehe	dsd	test1					
+root	hehe			testA				
+root	hehe		test2					
+root	hehe			testB				
+root					hehe	fef	tetst	
+root					hehe	fef	tesr	wer
+

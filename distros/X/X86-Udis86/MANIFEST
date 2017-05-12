@@ -1,0 +1,23 @@
+Changes
+Makefile.PL
+MANIFEST
+ppport.h
+README
+typemap
+Udis86.xs
+t/X86-Udis86.t
+fallback/const-c.inc
+fallback/const-xs.inc
+lib/X86/Udis86.pm
+lib/X86/Udis86/Operand.pm
+src/udis86.h
+src/libudis86/decode.h
+src/libudis86/extern.h
+src/libudis86/itab.h
+src/libudis86/syn.h
+src/libudis86/types.h
+src/libudis86/udint.h
+const-c.inc
+const-xs.inc
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

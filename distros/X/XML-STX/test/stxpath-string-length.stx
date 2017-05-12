@@ -1,0 +1,25 @@
+<stx:transform version="1.0" 
+  xmlns:stx="http://stx.sourceforge.net/2002/ns"
+  strip-space="yes">
+
+  <stx:template match="/*">
+    <root>
+      <stx:value-of select="string-length('koko')"/>
+      <stx:text>:</stx:text>
+      <stx:value-of select="string-length('kokomato')"/>
+      <stx:text>:</stx:text>
+      <stx:value-of select="string-length(not(true()))"/>
+      <stx:text>:</stx:text>
+      <stx:value-of select="string-length(/noex)"/>
+      <stx:text>:</stx:text>
+      <stx:value-of select="string-length(3 + 8)"/>
+      <stx:process-children/>
+    </root>
+  </stx:template>
+
+  <stx:template match="node[1]">
+    <stx:text>:</stx:text>
+    <stx:value-of select="string-length()"/>
+  </stx:template>
+  
+</stx:transform>

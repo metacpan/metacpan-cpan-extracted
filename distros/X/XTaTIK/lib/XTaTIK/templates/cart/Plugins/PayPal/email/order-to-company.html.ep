@@ -1,0 +1,112 @@
+% layout 'email';
+
+<h3>Customer Data</h3>
+
+<div class="unsemantic-list">
+  <p><strong>First name:</strong> <%= stash 'cust_name' %></p>
+  <p><strong>Last name:</strong> <%= stash 'cust_lname' %></p>
+  <p><strong>Email:</strong> <a href="mailto:<%= stash 'cust_email' %>"
+    ><%= stash 'cust_email' %></a></p>
+  <p><strong>Address:</strong>
+    <br> <%= stash 'cust_address1' %>
+    <br> <%= stash 'cust_address2' %>
+  </p>
+  <p><strong>City:</strong> <%= stash 'cust_city' %></p>
+  <p><strong>Phone:</strong> <%= stash 'cust_phone' %></p>
+  <p><strong>Province:</strong> <%= stash 'cust_province' %></p>
+  <p><strong>Postal code:</strong> <%= stash 'cust_zip' %></p>
+</div>
+
+% if ( items_in 'cart' ) {
+  <h3>Order Summary</h3>
+
+  <div class="unsemantic-list">
+    % for ( items_in xtext 'paypal_custom_fields' ) {
+      % next unless $_->{email};
+      <p><b><%= $_->{email} %>:</b> <%= stash 'cust_' . $_->{email} %></p>
+    % }
+    <p><b>Promo code used:</b> <%= stash 'promo_code' %> </p>
+    <p><b>Cost of products:</b> $<%= cart->total %></p>
+
+    % if ( 0 + stash 'hst' ) {
+      <p><b><abbr title="Harmonized Sales Tax">HST</abbr></b>:
+          $<%= stash 'hst' %></p>
+    % }
+
+    % if ( 0 + stash 'gst' ) {
+      <p><b><abbr title="Goods and Services Tax">GST</abbr></b>:
+          $<%= stash 'gst' %></p>
+    % }
+
+    % if ( 0 + stash 'pst' ) {
+      <p><b><abbr title="Provincial Sales Tax">PST</abbr></b>:
+        $<%= stash 'pst' %></p>
+    % }
+
+    <p><b>Shipping:</b>
+      % if ( defined( xtext('shipping_free') ) &&  xtext('shipping_free') < cart->total ) {
+          FREE
+      % } else {
+        $<%= stash 'shipping' %>
+          <small>(includes applicable taxes)</small>
+      % }
+    </p>
+    <p style="font-size: 130%; color: blue">
+      <b>Total:</b>
+        <strong>$<%= stash 'total_dollars' %><sup>.<%= stash 'total_cents'
+          %></sup></strong>
+    </p>
+  </div>
+
+  <h3>Products on Order</h3>
+
+  <table>
+  <thead>
+    <tr>
+      <th>Number</th>
+      <th>Name</th>
+      <th>Quantity</th>
+      <th>Price per unit</th>
+      <th><abbr title="Unit of Measure">UoM</abbr></th>
+    </tr>
+  </thead>
+  <tbody>
+    % for ( 1 .. items_in 'cart' ) {
+      % my $p = stash('cart')->[$_-1];
+      <tr>
+        <td><%= $p->{number} %></td>
+        <td><%= $p->{title} %></td>
+        <td><%= $p->{quantity} %></td>
+        <td><%= $p->{price} == 0 ? 'FREE' : '$' . $p->{price} %></td>
+        <td><%= $p->{unit} %></td>
+      </tr>
+    % }
+  </tbody>
+  </table>
+% }
+
+% if ( items_in 'quote' ) {
+  <h3>Quote Request</h3>
+
+  <table>
+  <thead>
+    <tr>
+      <th>Number</th>
+      <th>Name</th>
+      <th>Quantity</th>
+      <th><abbr title="Unit of Measure">UoM</abbr></th>
+    </tr>
+  </thead>
+  <tbody>
+    % for ( 1 .. items_in 'quote' ) {
+      % my $p = stash('quote')->[$_-1];
+      <tr>
+        <td><%= $p->{number} %></td>
+        <td><%= $p->{title} %></td>
+        <td><%= $p->{quantity} %></td>
+        <td><%= $p->{unit} %></td>
+      </tr>
+    % }
+  </tbody>
+  </table>
+% }

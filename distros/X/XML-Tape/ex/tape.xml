@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tape xmlns="http://library.lanl.gov/2005-01/STB-RL/tape/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://library.lanl.gov/2005-01/STB-RL/tape/ http://purl.lanl.gov/STB-RL/schemas/2005-01/tape.xsd"><tape-record><tape-record-admin><identifier>oai:arXiv.org:hep-th:0208181</identifier><date>2005-06-01T14:36:10Z</date><record-admin></record-admin></tape-record-admin><record>
+ <oai_dc:dc xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+ <dc:title>Complex singularities of the critical potential in the large-N limit</dc:title>
+ <dc:creator>Meurice, Y.</dc:creator>
+ <dc:description>  We show with two numerical examples that the conventional expansion in powers
+of the field for the critical potential of 3-dimensional O(N) models in the
+large-N limit, does not converge for values of phi^2 larger than some critical
+value. This can be explained by the existence of conjugated branch points in
+the complex phi^2 plane. Pade approximants [L+3/L] for the critical potential
+apparently converge at large phi^2. This allows high-precision calculation of
+the fixed point in a more suitable set of coordinates. We argue that the
+singularities are generic and not an artifact of the large-N limit. We show
+that ignoring these singularities may lead to inaccurate approximations.
+</dc:description>
+ <dc:description>Comment: 9 pages, 9 figures, uses revtex</dc:description>
+ <dc:date>2002-08-25</dc:date>
+ <dc:type>text</dc:type>
+ <dc:identifier>http://arXiv.org/abs/hep-th/0208181</dc:identifier>
+ </oai_dc:dc>
+</record></tape-record><tape-record><tape-record-admin><identifier>oai:arXiv.org:hep-th:0208182</identifier><date>2005-06-01T14:40:35Z</date><record-admin></record-admin></tape-record-admin><record>
+ <oai_dc:dc xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+ <dc:title>Virasoro Algebra for Particles with Higher Derivative Interactions</dc:title>
+ <dc:creator>Ho, Pei-Ming</dc:creator>
+ <dc:description>  In this paper we show that the worldline reparametrization for particles with
+higher derivative interactions appears as a higher dimensional symmetry on the
+phase space. In the limit of infinite order time dervatives, the fields on the
+worldline get naturally promoted to those living on a two dimensional space,
+and the reparametrization symmetry is locally the same as the conformal
+symmetry.
+</dc:description>
+ <dc:description>Comment: 11 pages</dc:description>
+ <dc:date>2002-08-25</dc:date>
+ <dc:type>text</dc:type>
+ <dc:identifier>http://arXiv.org/abs/hep-th/0208182</dc:identifier>
+ </oai_dc:dc>
+</record></tape-record><tape-record><tape-record-admin><identifier>oai:arXiv.org:hep-th:0208183</identifier><date>2005-06-01T14:36:10Z</date><record-admin></record-admin></tape-record-admin><record>
+ <oai_dc:dc xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+ <dc:title>Generalized Bogoliubov Transformation for Confined Fields: Applications
+ in Casimir Effect</dc:title>
+ <dc:creator>Silva, J. C. da</dc:creator>
+ <dc:creator>Khanna, F. C.</dc:creator>
+ <dc:creator>Neto, A. Matos</dc:creator>
+ <dc:creator>Santana, A. E.</dc:creator>
+ <dc:description>  The Bogoliubov transformation in thermofield dynamics, an operator formalism
+for the finite-temperature quantum-field theory, is generalized to describe a
+field in arbitrary confined regions of space and time. Starting with the scalar
+field, the approach is extended to the electromagnetic field and the
+energy-momentum tensor is written via the Bogoliubov transformation. In this
+context, the Casimir effect is calculated for zero and non-zero temperature,
+and therefore it can be considered as a vacuum condensation effect of the
+electromagnetic field. This aspect opens an interesting perspective for using
+this procedure as an effective scheme for calculations in the studies of
+confined fields, including the interacting fields.
+</dc:description>
+ <dc:description>Comment: 20 pages, latex(article)</dc:description>
+ <dc:date>2002-08-25</dc:date>
+ <dc:type>text</dc:type>
+ <dc:identifier>http://arXiv.org/abs/hep-th/0208183</dc:identifier>
+ </oai_dc:dc>
+</record></tape-record><tape-record><tape-record-admin><identifier>oai:arXiv.org:hep-th:0208187</identifier><date>2005-06-03T13:23:30Z</date><record-admin></record-admin></tape-record-admin><record>
+ <oai_dc:dc xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+ <dc:title>Branes in Time-Dependent Backgrounds and AdS/CFT Correspondence</dc:title>
+ <dc:creator>Alishahiha, Mohsen</dc:creator>
+ <dc:creator>Parvizi, Shahrokh</dc:creator>
+ <dc:description>  We study supergravity solutions of Dp-branes in the time-dependent orbifold
+background. We show that worldvolume theories decouple from the bulk gravity
+for p less than six. Along AdS/CFT correspondence, these solutions could
+provide the gravity description of noncommutative field theory with
+time-dependent noncommutative parameter. Type II NS5-brane (M5-brane) in the
+presence of RR n-form for n=0,..., 4 (C field) in this time-dependent
+background have also been studied.
+</dc:description>
+ <dc:description>Comment: 15 pages, latex file, v2: typos corrected, ref added</dc:description>
+ <dc:date>2002-08-26</dc:date>
+ <dc:date>2002-08-27</dc:date>
+ <dc:type>text</dc:type>
+ <dc:identifier>http://arXiv.org/abs/hep-th/0208187</dc:identifier>
+ </oai_dc:dc>
+</record></tape-record><tape-record><tape-record-admin><identifier>oai:arXiv.org:hep-th:0208188</identifier><date>2005-06-03T13:23:30Z</date><record-admin></record-admin></tape-record-admin><record>
+ <oai_dc:dc xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+ <dc:title>On T-Duality in Brane Gas Cosmology</dc:title>
+ <dc:creator>Boehm, Timon</dc:creator>
+ <dc:creator>Brandenberger, Robert</dc:creator>
+ <dc:description>  In the context of homogeneous and isotropic superstring cosmology, the
+T-duality symmetry of string theory has been used to argue that for a
+background space-time described by dilaton gravity with strings as matter
+sources, the cosmological evolution of the Universe will be nonsingular. In
+this Letter we discuss how T-duality extends to brane gas cosmology, an
+approximation in which the background space-time is again described by dilaton
+gravity with a gas of branes as a matter source. We conclude that the arguments
+for nonsingular cosmological evolution remain valid.
+</dc:description>
+ <dc:description>Comment: 7 pages, no figures</dc:description>
+ <dc:date>2002-08-26</dc:date>
+ <dc:type>text</dc:type>
+ <dc:identifier>http://arXiv.org/abs/hep-th/0208188</dc:identifier>
+ </oai_dc:dc>
+</record></tape-record></tape>

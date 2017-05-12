@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<!-- $Id: test-0.91.rdf 56 2008-06-23 16:54:31Z adam $ -->
+<!DOCTYPE rss SYSTEM "http://my.netscape.com/publish/formats/rss-0.91.dtd">
+<rss version="0.91">
+  <channel>
+    <title>Guardian Unlimited</title>
+    <link>http://www.guardian.co.uk</link>
+    <description>Intelligent news and comment throughout the day from The Guardian newspaper</description>
+    <language>en-us</language>
+    <copyright>Guardian Unlimited, Guardian Newspapers Limited 2002</copyright>
+    <image>
+      <title>Guardian Unlimited</title>
+      <url>http://image.guardian.co.uk/news/site/global/guardian_crumb.gif</url>
+      <link>http://www.guardian.co.uk</link>
+      <width>133</width>
+      <height>22</height>
+      <description>Intelligent news and comment throughout the day from The Guardian newspaper. &pound; </description>
+    </image>
+    <item>
+      <title> 
+		Blair losing control, say top unions  </title>
+      <link>http://www.guardian.co.uk/Observer/politics/story/0,6903,846587,00.html?=rss</link>
+      <description>&pound; Tony Blair was accused last night of &apos;completely losing control&apos; as the firefighters' strike entered its third day - and a wave of new industrial unrest was set to hit airports and schools. </description>
+    </item>
+    <item>
+      <title> 
+		Osama issues new call to arms  </title>
+      <link>http://www.guardian.co.uk/Observer/worldview/story/0,11581,846511,00.html?=rss</link>
+      <description>&eacute; A chilling new message from Osama bin Laden provides a fascinating insight into the mindset of the world's most wanted man.</description>
+    </item>
+    <textinput>
+      <title>Search</title>
+      <link>http://www.guardianunlimited.co.uk/rss/search/1,,,00.html</link>
+      <description>Search all articles from the last 7 days</description>
+      <name>query</name>
+    </textinput>
+  </channel>
+</rss>

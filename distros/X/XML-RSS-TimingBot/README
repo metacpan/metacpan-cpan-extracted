@@ -1,0 +1,80 @@
+README for XML-RSS-TimingBot
+                                        Time-stamp: "2004-04-24 01:22:57 ADT"
+
+NAME
+    XML::RSS::TimingBot -- for efficiently fetching RSS feeds
+
+SYNOPSIS
+      use XML::RSS::TimingBot;
+      $browser = XML::RSS::TimingBot->new;
+
+      my $response = $browser->get(
+        'http://interglacial.com/rss/cairo_times.rss'
+         # or whatever feed
+      );
+
+      ... And process $response just as if it came from
+         a plain old LWP::UserAgent object, for example: ...
+  
+      if($response->code == 200) {  # 200 = "okay, here it is"
+        ...process it...
+      } elsif($response->code == 304) { # 304 = "Not Changed"
+        # do nothing
+      } else {
+        print "Hm, couldn't access it: ", $response->status_line, "\n";
+      }
+  
+      $browser->commit;   # Save our history.  Don't forget!!
+
+DESCRIPTION
+    If you use LWP::UserAgent for fetching RSS/RDF feeds, use
+    XML::RSS::TimingBot instead! XML::RSS::TimingBot has the same interface,
+    but knows when to more efficiently request the data.
+
+  DETAILED DESCRIPTION
+    XML::RSS::TimingBot is for requesting RSS feeds only as often as needed.
+    This class does this in two ways:
+
+    * When you request a feed the first time, this class remembers what
+    Last-Modified and ETag headers it has; that the next time you request
+    that feed, this class can specify that the feed's server should return
+    data only if that feed has changed since last time, or has a different
+    ETag value. If the feed *has* changed, you'll get the HTTP response back
+    with full content and with a normal "200" status code. If the feed
+    *hasn't* changed, you'll get a contentless "304" response (meaning "I'm
+    not giving you any content, because it hasn't changed").
+
+    * When you request a feed, this class remembers any data that might be
+    in the RSS that says how often this feed updates. See XML::RSS::Timing
+    for the full story; but as a common example if there's a
+    "<ttl>180</ttl>" in the feed, that means that the feed will rebuild only
+    once every three hours (180 minutes). When this class sees that in the
+    received RSS data, it remembers this so that if you go to get the feed
+    more often than that, it will stop you and give a "304" (Not Modified)
+    error response.
+
+[continued in the documentation for this module, which you can read
+with perldoc]
+
+
+INSTALLATION
+
+You install this Perl module, as you would install any Perl module
+library, by running these commands:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+If you want to install a private copy of this module in your home
+directory, then you should try to produce the initial Makefile with
+something like this command:
+
+  perl Makefile.PL PREFIX=~/perl
+
+See "perldoc perlmodinstall" for more information and advice.
+
+
+This module doesn't depend on XML::RSS, nor in fact have any
+particular relationship with it.

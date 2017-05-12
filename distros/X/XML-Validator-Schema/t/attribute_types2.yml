@@ -1,0 +1,32 @@
+# test attribute types bug report
+
+--- |
+ <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+   <xs:element name="foo">
+     <xs:complexType mixed="true">
+       <xs:attribute name="bar" use="optional" default="asdf">
+         <xs:simpleType>
+           <xs:restriction base="xs:string">
+             <xs:enumeration value="asdf" />
+             <xs:enumeration value="fdsa" />
+           </xs:restriction>
+         </xs:simpleType>
+       </xs:attribute>
+     </xs:complexType>
+   </xs:element>
+ </xs:schema>
+
+--- |
+ <foo bar="asdf"></foo>
+--- >
+PASS
+
+--- |
+ <foo bar="zzzz"></foo>
+--- >
+FAIL
+
+--- |
+ <foo />
+--- >
+PASS

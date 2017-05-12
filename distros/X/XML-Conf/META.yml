@@ -1,0 +1,40 @@
+---
+abstract: 'a simple configuration module based on XML'
+author:
+  - 'Jonas B. Nielsen <jonasbn@cpan.org>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Module::Build: '0.30'
+  Pod::Coverage::TrustPod: '0'
+  Test::Kwalitee: '1.21'
+  Test::More: '0.88'
+  Test::Pod: '1.41'
+  Test::Pod::Coverage: '1.08'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  Module::Build: '0.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005'
+license: artistic
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: XML-Conf
+provides:
+  XML::Conf:
+    file: lib/XML/Conf.pm
+    version: '0.07'
+requires:
+  Carp: '0'
+  Data::Dumper: '0'
+  Tie::DeepTied: '0'
+  Tie::Hash: '0'
+  Tie::Tools: '1.05'
+  XML::Simple: '2.20'
+  perl: '5.008'
+resources:
+  homepage: http://search.cpan.org/dist/XML-Conf/
+  repository: git://github.com/jonasbn/XML-Conf.git
+version: '0.07'

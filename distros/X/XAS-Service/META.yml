@@ -1,0 +1,57 @@
+---
+abstract: 'A set of modules and utilities to implement Micro Services'
+author:
+  - 'Kevin L. Esteb <kevin@kesteb.us>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4001, CPAN::Meta::Converter version 2.120351'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: XAS-Service
+provides:
+  XAS::Apps::Service::Testd:
+    file: lib/XAS/Apps/Service/Testd.pm
+    version: 0
+  XAS::Docs::Service::Installation:
+    file: lib/XAS/Docs/Service/Installation.pm
+    version: 0.01
+  XAS::Service:
+    file: lib/XAS/Service.pm
+    version: 0.01
+  XAS::Service::CheckParameters:
+    file: lib/XAS/Service/CheckParameters.pm
+    version: 0.01
+  XAS::Service::Profiles:
+    file: lib/XAS/Service/Profiles.pm
+    version: 0.01
+  XAS::Service::Profiles::Search:
+    file: lib/XAS/Service/Profiles/Search.pm
+    version: 0.01
+  XAS::Service::Resource:
+    file: lib/XAS/Service/Resource.pm
+    version: 0
+  XAS::Service::Search:
+    file: lib/XAS/Service/Search.pm
+    version: 0.01
+  XAS::Service::Server:
+    file: lib/XAS/Service/Server.pm
+    version: 0.01
+requires:
+  Data::FormValidator: 4.7
+  Data::FormValidator::Constraints::MethodsFactory: 0.02
+  JSON::XS: 2.32
+  POE::Filter::HTTP::Parser: 1.06
+  Plack: 0.9989
+  Template: 2.18
+  Web::Machine: 0.17
+  XAS: 0.12
+  perl: 5.00808
+resources:
+  homepage: http://scm.kesteb.us/trac
+  repository: http://scm.kesteb.us/git/XAS-Service
+version: 0.01

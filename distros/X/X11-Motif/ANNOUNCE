@@ -1,0 +1,101 @@
+
+The third beta release of the X11::Motif module has been added
+to CPAN.  It is available as:
+
+  file: $CPAN/authors/id/KENFOX/X11-Motif-1.1b3.tar.gz
+  size: 
+   md5: 
+
+The X11::Motif distribution includes X11::Lib, X11::Toolkit,
+X11::Xpm, X11::Xbae and X11::XRT.  An X11::Athena (including
+the 3d, Win95 and NeXTSTEP variants) is in the works.  I'll
+probably have to split the distribution at that point because
+it is just getting too large.
+
+Taken together, these modules provide a nearly complete
+interface to the standard X libraries.  The modules have both
+object oriented and function call style interfaces.  The object
+interface is similar to the Tk module.  The function call
+interface is strongly modeled after the standard X library
+documentation and will be familiar to someone with X Toolkit or
+Motif experience.
+
+The modules work well in both stand-alone scripts and when embedded
+in a larger C (or C++) Motif application.  Embedded Perl combined
+with this module is an ideal way to add scripting capability to an
+existing Motif application.
+
+This release is very stable and works well.  Production programs
+are being built on top of it.  (The only reason that this version
+is not labeled production is because it is missing complete
+documentation.)
+
+I've included two versions of the classic "hello world" example
+at the end of this announcement.  Even if you don't grab the module,
+I'd appreciate feedback on whether the examples are understandable.
+
+To build the modules, you will need:
+
+  * Perl version 5.004 or higher (5.005 hasn't been tested yet)
+  * X11R5 or higher (X11R4 should work but hasn't been tested)
+  * Motif 1.2.4 or higher (CDE Motif works.  Motif 2.0 is reported
+    to work.  LessTif is also reported to work, but with reduced
+    functionality.)
+  * An ANSI C compiler
+
+I would appreciate being notified of any changes necessary to
+support other environments and/or widget sets.
+
+Any questions or comments?  Please send them to <fox@vulpes.com>.
+
+- Ken
+
+# ----------------------------------------------------------------------
+# -- Example #1: The object style
+
+use X11::Motif;
+
+my $toplevel = X::Toolkit::initialize("Example");
+
+my $form = give $toplevel -Form;
+my $hello = give $form -Label, -text => 'Hello, world!';
+my $ok = give $form -Button, -text => 'OK', -command => sub { exit };
+
+arrange $form -fill => 'xy', -bottom => [ $ok, $hello ];
+
+handle $toplevel;
+
+# ----------------------------------------------------------------------
+# -- Example #2: The function call style (i.e. "traditional" Motif)
+
+use X11::Motif qw(:Xt :Xm);
+
+my $toplevel = X::Toolkit::initialize("Example");
+
+my $form = XtCreateManagedWidget("form", xmFormWidgetClass, $toplevel);
+
+my $hello = XtCreateManagedWidget("hello", xmLabelWidgetClass, $form,
+				    XmNlabelString, "Hello, world!",
+				    XmNlabelType, XmSTRING);
+
+my $ok = XtCreateManagedWidget("ok", xmPushButtonWidgetClass, $form,
+				    XmNlabelString, "OK",
+				    XmNlabelType, XmSTRING);
+
+XtAddCallback($ok, XmNactivateCallback, sub { exit }, 0);
+
+XtSetValues($hello,
+		XmNrightAttachment, XmATTACH_FORM,
+		XmNleftAttachment, XmATTACH_FORM,
+		XmNtopAttachment, XmATTACH_FORM,
+		XmNbottomAttachment, XmATTACH_WIDGET,
+		XmNbottomWidget, $ok);
+
+XtSetValues($ok,
+		XmNrightAttachment, XmATTACH_FORM,
+		XmNleftAttachment, XmATTACH_FORM,
+		XmNtopAttachment, XmATTACH_NONE,
+		XmNbottomAttachment, XmATTACH_FORM);
+
+XtRealizeWidget($toplevel);
+XtAppMainLoop(XtWidgetToApplicationContext($toplevel));

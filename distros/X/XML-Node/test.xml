@@ -1,0 +1,67 @@
+<TestTalk>
+  <TestSuite>
+<!--  This test suite has all the test case that work -->
+   <Name>ClientTestSuite1</Name>
+   <TestCase>
+      <Name>SimpleText</Name>
+      <Properties>SanityCheck</Properties>
+      <!--Properies can used to select test cases or to analyze test coverage.-->
+      <Action-GetPage>
+         <Url>http://localhost:8082</Url>
+         <Oracle-Text>
+            <Text>It Worked!</Text>
+         </Oracle-Text>
+	 <!-- This oracle is closely related to the action, meaning there is data dependency here, so it's put here as an element. -->
+      </Action-GetPage>
+   </TestCase>
+   <TestCase>
+      <Name>ServerLog</Name>
+      <Action-GetPage>
+         <Url>http://localhost</Url>
+      </Action-GetPage>
+         <Oracle-MatchServerLog>
+            <ServerLogName>access_log</ServerLogName>
+            <Match>127.0.0.1 - - \[22/Oct/1999:.*GET / HTTP/1\.0</Match>
+	    <!-- change this to your test time -->
+         </Oracle-MatchServerLog>
+	 <!-- This oracle is independent. So it's placed here as a top-level oracle. -->
+   </TestCase>
+   <TestCase>
+      <Name>OracleCombo</Name>
+      <Properties>SanityCheck</Properties>
+      <!--Properies can used to select test cases or to analyze test coverage.-->
+      <Action-GetPage>
+         <Url>http://localhost:8082</Url>
+         <Oracle-Combo>
+           <Code>200</Code>
+           <Title>1:Test Page for Apache Installation on Web Site</Title>
+           <Lines>51</Lines>
+           <Bytes>1626</Bytes>
+         </Oracle-Combo>   
+      </Action-GetPage>
+   </TestCase>
+   <TestCase>
+      <Name>ChangeDocumentRoot</Name>
+      <Properties>RocumentRoot</Properties>
+      <!--The test case tests for the DocumentRoot directive in the Apache configuration files.-->
+      <Action-RestartServer>
+         <ServerTestCaseName>DocumentRoot22</ServerTestCaseName>
+      </Action-RestartServer>
+      <Action-GetPage>
+         <Url>http://localhost:8082</Url>
+         <Oracle-Text>
+            <Text>2:It Worked!</Text>
+         </Oracle-Text>
+      </Action-GetPage>
+      <Action-RestartServer>
+         <ServerTestCaseName>DocumentRoot21</ServerTestCaseName>
+      </Action-RestartServer>
+      <Action-GetPage>
+         <Url>http://localhost:8082</Url>
+         <Oracle-Text>
+            <Text>1:It Worked!</Text>
+         </Oracle-Text>
+      </Action-GetPage>
+   </TestCase>
+</TestSuite>
+</TestTalk>

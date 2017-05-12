@@ -1,0 +1,18 @@
+<stx:transform version="1.0" 
+  xmlns:stx="http://stx.sourceforge.net/2002/ns"
+  pass-through="all"
+  strip-space="yes">
+
+  <stx:group pass-through="none">
+
+    <stx:template match="/root" public="yes">
+      <stx:process-children/>
+    </stx:template>
+    
+    <stx:template match="node">
+      [<node/>]
+    </stx:template>
+
+  </stx:group>
+
+</stx:transform>

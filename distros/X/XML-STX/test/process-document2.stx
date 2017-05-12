@@ -1,0 +1,43 @@
+<stx:transform version="1.0" 
+  xmlns:stx="http://stx.sourceforge.net/2002/ns"
+  strip-space="yes">
+
+  <stx:variable name="order" select="0"/>
+
+  <stx:template match="/root">
+    <stx:assign name="order" select="$order + 1"/>
+    <r>
+      <stx:process-children/>
+      <stx:if test="$order=1">
+	<stx:process-document href="'_data01.xml'" group="G1"/>
+      </stx:if>
+    </r>
+  </stx:template>
+
+  <stx:template match="node">
+    <n>
+      <stx:value-of select="position()"/>
+    </n>
+  </stx:template>
+
+  <stx:group name="G1">
+
+    <stx:template match="/">
+      <stx:process-children/>
+    </stx:template>
+
+    <stx:template match="root">
+      <er>
+	<stx:process-children/>
+      </er>
+    </stx:template>
+
+    <stx:template match="node">
+      <en>
+	<stx:value-of select="position()"/>
+      </en>
+    </stx:template>
+
+  </stx:group>
+  
+</stx:transform>

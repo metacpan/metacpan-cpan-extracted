@@ -1,0 +1,11 @@
+Benchmark: timing 10000 iterations of date, path, pdate, pdd, sim, sim4, var, var2, var3, var4...
+  sim:  1 wallclock secs ( 0.48 usr +  0.00 sys =  0.48 CPU) @ 20833.33/s (n=10000)
+ sim4:  1 wallclock secs ( 0.92 usr +  0.00 sys =  0.92 CPU) @ 10869.57/s (n=10000)
+  var:  0 wallclock secs ( 0.55 usr +  0.00 sys =  0.55 CPU) @ 18181.82/s (n=10000)
+ var2:  1 wallclock secs ( 0.86 usr +  0.01 sys =  0.87 CPU) @ 11494.25/s (n=10000)
+ var3:  1 wallclock secs ( 1.28 usr +  0.00 sys =  1.28 CPU) @ 7812.50/s (n=10000)
+ var4:  2 wallclock secs ( 1.56 usr +  0.00 sys =  1.56 CPU) @ 6410.26/s (n=10000)
+ date:  1 wallclock secs ( 1.83 usr +  0.00 sys =  1.83 CPU) @ 5464.48/s (n=10000)
+ path:  2 wallclock secs ( 1.45 usr +  0.00 sys =  1.45 CPU) @ 6896.55/s (n=10000)
+pdate:  3 wallclock secs ( 3.10 usr +  0.02 sys =  3.12 CPU) @ 3205.13/s (n=10000)
+  pdd:  7 wallclock secs ( 7.24 usr +  0.00 sys =  7.24 CPU) @ 1381.22/s (n=10000)

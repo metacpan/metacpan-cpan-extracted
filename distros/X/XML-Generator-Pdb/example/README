@@ -1,0 +1,6 @@
+Please try the example PDB ...
+
+>pdbtoxml --format=int,date,time,byte,float,double,short,text --source=example.pdb 
+
+The example pdb has been generated with the example included in the 
+XML::Handler::Pdb distribution.

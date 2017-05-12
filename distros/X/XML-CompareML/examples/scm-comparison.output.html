@@ -1,0 +1,3420 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>Version Control System Comparison</title>
+<style type="text/css">
+h2 { background-color : #98FB98; /* PaleGreen */ }
+h3 { background-color : #FFA500; /* Orange */ }
+table.compare
+{
+    margin-left : 1em;
+    margin-right : 1em;
+    width: 90%;
+    max-width : 40em;
+}
+.compare td
+{
+    border-color : black; border-style : solid ; border-width : thin;
+    vertical-align : top;
+    padding : 0.2em;
+}
+ul.toc
+{
+    list-style-type : none ; padding-left : 0em;
+}
+.toc ul
+{
+    list-style-type : none ;
+    padding-left : 0em;
+    margin-left : 2em;
+}
+.expl
+{
+    border-style : solid ; border-width : thin;
+    background-color : #E6E6FA; /* Lavender */
+    border-color : black;
+    padding : 0.3em;
+}
+a:hover { background-color : yellow }
+tt { color : #8A2BE2 /* The BlueViolet Color */ }
+</style>
+</head>
+<body>
+<h1 id="main">Version Control System Comparison</h1>
+<p class="expl">
+        This is a comparison of version-control systems. It is split
+        into several categories and sub-categories under which the
+        systems are checked.
+    </p>
+<p>
+<b>Timestamp:</b>
+<tt>
+            $Id: scm-comparison.xml 313 2008-07-12 07:25:40Z shlomif $
+        </tt>
+</p>
+<ul class="toc">
+<li>
+<a href="#repos_operations">Repository Operations</a>
+<ul>
+<li>
+<a href="#atomic_commits">Atomic Commits</a>
+</li>
+<li>
+<a href="#move">Files and Directories Moves or Renames</a>
+</li>
+<li>
+<a href="#intelligent_renames">Intelligent Merging after Moves or Renames</a>
+</li>
+<li>
+<a href="#copy">File and Directories Copies</a>
+</li>
+<li>
+<a href="#repos_clone">Remote Repository Replication</a>
+</li>
+<li>
+<a href="#push">Propagating Changes to Parent Repositories</a>
+</li>
+<li>
+<a href="#permissions">Repository Permissions</a>
+</li>
+<li>
+<a href="#changesets">Changesets' Support</a>
+</li>
+<li>
+<a href="#annotate">Tracking Line-wise File History</a>
+</li>
+</ul>
+</li>
+<li>
+<a href="#features">Features</a>
+<ul>
+<li>
+<a href="#work_on_dir">Ability to Work only on One Directory of the Repository</a>
+</li>
+<li>
+<a href="#tracking_uncommited_changes">Tracking Uncommited Changes</a>
+</li>
+<li>
+<a href="#per_file_commit_messages">Per-File Commit Messages</a>
+</li>
+</ul>
+</li>
+<li>
+<a href="#technical_status">Technical Status</a>
+<ul>
+<li>
+<a href="#documentation">Documentation</a>
+</li>
+<li>
+<a href="#ease_of_deployment">Ease of Deployment</a>
+</li>
+<li>
+<a href="#command_set">Command Set</a>
+</li>
+<li>
+<a href="#networking">Networking Support</a>
+</li>
+<li>
+<a href="#portability">Portability</a>
+</li>
+</ul>
+</li>
+<li>
+<a href="#user_interaces">User Interfaces</a>
+<ul>
+<li>
+<a href="#web_interface">Web Interface</a>
+</li>
+<li>
+<a href="#availability_of_guis">Availability of Graphical User-Interfaces.</a>
+</li>
+</ul>
+</li>
+<li>
+<a href="#license">License</a>
+</li>
+</ul>
+<h2 id="repos_operations">Repository Operations</h2>
+<h3 id="atomic_commits">Atomic Commits</h3>
+<p class="expl">
+                Support for atomic commits means that if an
+                operation on the repository is interrupted
+                in the middle, the repository will not be
+                left in an inconsistent state. Are the
+                check-in operations atomic, or can
+                interrupting an operation leave the
+                repository in an intermediate state?
+            </p>
+<table class="compare">
+<tr>
+<td class="sys">CVS</td>
+<td class="desc">No. CVS commits are not atomic.</td>
+</tr>
+<tr>
+<td class="sys">AccuRev</td>
+<td class="desc">Yes. Commits are atomic</td>
+</tr>
+<tr>
+<td class="sys">Aegis</td>
+<td class="desc">Commits are atomic.</td>
+</tr>
+<tr>
+<td class="sys">Arch</td>
+<td class="desc">Yes. Commits are atomic.</td>
+</tr>
+<tr>
+<td class="sys">Bazaar</td>
+<td class="desc">Yes. Commits are atomic.</td>
+</tr>
+<tr>
+<td class="sys">BitKeeper</td>
+<td class="desc">Yes (but need to verify)</td>
+</tr>
+<tr>
+<td class="sys">ClearCase</td>
+<td class="desc">Yes. Commits (checkins) are atomic.</td>
+</tr>
+<tr>
+<td class="sys">CM+</td>
+<td class="desc">Yes. Commits are atomic.</td>
+</tr>
+<tr>
+<td class="sys">CMSynergy</td>
+<td class="desc">Yes. Commits are atomic.</td>
+</tr>
+<tr>
+<td class="sys">Co-Op</td>
+<td class="desc">Yes. Commits are atomic.</td>
+</tr>
+<tr>
+<td class="sys">Darcs</td>
+<td class="desc">Yes. Commits are atomic.</td>
+</tr>
+<tr>
+<td class="sys">Git</td>
+<td class="desc">Yes. Commits are atomic.</td>
+</tr>
+<tr>
+<td class="sys">LibreSource Synchronizer</td>
+<td class="desc">Yes. Commits and updates are atomic.</td>
+</tr>
+<tr>
+<td class="sys">Mercurial</td>
+<td class="desc">Yes.</td>
+</tr>
+<tr>
+<td class="sys">Monotone</td>
+<td class="desc">Yes.</td>
+</tr>
+<tr>
+<td class="sys">OpenCM</td>
+<td class="desc">Yes. Commits are atomic.</td>
+</tr>
+<tr>
+<td class="sys">Perforce</td>
+<td class="desc">Yes. Commits are atomic.</td>
+</tr>
+<tr>
+<td class="sys">PureCM</td>
+<td class="desc">Yes. Commits are atomic.</td>
+</tr>
+<tr>
+<td class="sys">SourceAnywhere</td>
+<td class="desc">Yes. Commits are atomic.</td>
+</tr>
+<tr>
+<td class="sys">Subversion</td>
+<td class="desc">Commits are atomic.</td>
+</tr>
+<tr>
+<td class="sys">Superversion</td>
+<td class="desc">Commits are atomic.</td>
+</tr>
+<tr>
+<td class="sys">svk</td>
+<td class="desc">Commits are atomic.</td>
+</tr>
+<tr>
+<td class="sys">Team Foundation Server</td>
+<td class="desc">Yes. Commits are atomic.</td>
+</tr>
+<tr>
+<td class="sys">Vesta</td>
+<td class="desc">Yes. Commits are atomic.</td>
+</tr>
+<tr>
+<td class="sys">Visual SourceSafe</td>
+<td class="desc">No. VSS commits are not atomic.</td>
+</tr>
+</table>
+<h3 id="move">Files and Directories Moves or Renames</h3>
+<p class="expl">
+                Does the system support moving a file or directory to
+                a different location while still retaining the history
+                of the file? <b>Note:</b> also see the next section
+                about intelligent merging of renamed paths.
+            </p>
+<table class="compare">
+<tr>
+<td class="sys">CVS</td>
+<td class="desc">
+                    No. Renames are not supported and a manual one
+                    may break history in two.
+                </td>
+</tr>
+<tr>
+<td class="sys">AccuRev</td>
+<td class="desc">
+                    Yes. Renames of both files and directories are supported.
+                    Supports controlling of symbolic links as well.
+                </td>
+</tr>
+<tr>
+<td class="sys">Aegis</td>
+<td class="desc">Yes. Renames are supported.</td>
+</tr>
+<tr>
+<td class="sys">Arch</td>
+<td class="desc">Yes. Renames are supported.</td>
+</tr>
+<tr>
+<td class="sys">Bazaar</td>
+<td class="desc">Yes. Renames are supported for files and directories.</td>
+</tr>
+<tr>
+<td class="sys">BitKeeper</td>
+<td class="desc">Yes. Renames are supported.</td>
+</tr>
+<tr>
+<td class="sys">ClearCase</td>
+<td class="desc">
+                  Yes. Directories are first-class controlled entities
+                  in Clearcase. Even supports controlling of
+                  symbolic/hard links.
+                </td>
+</tr>
+<tr>
+<td class="sys">CM+</td>
+<td class="desc">Yes. Both moves and renames are supported, while maintaining history.</td>
+</tr>
+<tr>
+<td class="sys">CMSynergy</td>
+<td class="desc">Yes. Renames are supported.</td>
+</tr>
+<tr>
+<td class="sys">Co-Op</td>
+<td class="desc">Renames of files are supported.
+                    Renaming a directory requires creating a new one,
+                    moving the files and deleting the old one.
+                    Moved file histories are preserved.
+                </td>
+</tr>
+<tr>
+<td class="sys">Darcs</td>
+<td class="desc">Yes. Renames are supported.</td>
+</tr>
+<tr>
+<td class="sys">Git</td>
+<td class="desc">
+                    Renames are supported for most practical
+                    purposes.  Git even detects renames when a file has been
+                    changed afterward the rename.  However, due to a peculiar
+                    repository structure, renames are not recorded
+                    explicitly, and Git has to deduce them (which works well
+                    in practice).
+                </td>
+</tr>
+<tr>
+<td class="sys">LibreSource Synchronizer</td>
+<td class="desc">
+                    Yes. Renames and move are supported but the working copy
+                    needs to be up-to-date before doing a rename/move operation.
+                    This operation will be committed directly.
+                </td>
+</tr>
+<tr>
+<td class="sys">Mercurial</td>
+<td class="desc">Yes. Renames are supported.</td>
+</tr>
+<tr>
+<td class="sys">Monotone</td>
+<td class="desc">Yes. Renames are supported.</td>
+</tr>
+<tr>
+<td class="sys">OpenCM</td>
+<td class="desc">Yes. Renames are supported</td>
+</tr>
+<tr>
+<td class="sys">Perforce</td>
+<td class="desc">
+                    Not directly (you copy and then delete but it manages to
+                    keep track of the branch)
+                </td>
+</tr>
+<tr>
+<td class="sys">PureCM</td>
+<td class="desc">
+                    Yes. File renames are directly supported. File and folder
+                    moves require creating a new one and deleting the old one.
+                    Moved file histories are preserved.
+                </td>
+</tr>
+<tr>
+<td class="sys">SourceAnywhere</td>
+<td class="desc">Yes. Both moves and renames are supported, while maintaining history.</td>
+</tr>
+<tr>
+<td class="sys">Subversion</td>
+<td class="desc">Yes. Renames are supported.</td>
+</tr>
+<tr>
+<td class="sys">Superversion</td>
+<td class="desc">No. Renames are not supported.</td>
+</tr>
+<tr>
+<td class="sys">svk</td>
+<td class="desc">Yes. Renames are supported.</td>
+</tr>
+<tr>
+<td class="sys">Team Foundation Server</td>
+<td class="desc">
+                  Yes. Both moves and renames are supported,
+                  while maintaining history.
+                </td>
+</tr>
+<tr>
+<td class="sys">Vesta</td>
+<td class="desc">
+                    Yes.  The unit of checkout/checkin is a directory
+                    tree.  Files and directories can be added,
+                    deleted, and renamed between versions.
+                </td>
+</tr>
+<tr>
+<td class="sys">Visual SourceSafe</td>
+<td class="desc">
+                    Affects the whole history, it's like renaming a
+                    file in the CVS repository. There is a kludgy workaround
+                    using "share-rename,move,delete" that gets what you
+                    want.
+                </td>
+</tr>
+</table>
+<h3 id="intelligent_renames">Intelligent Merging after Moves or Renames</h3>
+<p class="expl">
+                If the system keeps tracks of renames, does it support
+                intelligent merging of the files in the history after
+                the rename? (For example, changing a file in a renamed
+                directory, and trying to merge it).
+            </p>
+<table class="compare">
+<tr>
+<td class="sys">CVS</td>
+<td class="desc">
+                    Renames are not supported at all, much less intelligent
+                    ones.
+                </td>
+</tr>
+<tr>
+<td class="sys">AccuRev</td>
+<td class="desc">
+                    Unknown. FILL IN.
+                </td>
+</tr>
+<tr>
+<td class="sys">Aegis</td>
+<td class="desc">Unknown. FILL IN.</td>
+</tr>
+<tr>
+<td class="sys">Arch</td>
+<td class="desc">Yes. Renames can be merged intelligently.</td>
+</tr>
+<tr>
+<td class="sys">Bazaar</td>
+<td class="desc">Yes. Renames are intelligent.</td>
+</tr>
+<tr>
+<td class="sys">BitKeeper</td>
+<td class="desc">Probably Yes.</td>
+</tr>
+<tr>
+<td class="sys">ClearCase</td>
+<td class="desc">
+                    Unknown. FILL IN.
+                </td>
+</tr>
+<tr>
+<td class="sys">CM+</td>
+<td class="desc">Unknown. FILL IN.</td>
+</tr>
+<tr>
+<td class="sys">CMSynergy</td>
+<td class="desc">
+                    Unknown. FILL IN.
+                </td>
+</tr>
+<tr>
+<td class="sys">Co-Op</td>
+<td class="desc">
+                    Unkown. FILL IN.
+                </td>
+</tr>
+<tr>
+<td class="sys">Darcs</td>
+<td class="desc">Unknown.</td>
+</tr>
+<tr>
+<td class="sys">Git</td>
+<td class="desc">
+                    As detailed in the <a href="http://git.or.cz/gitwiki/GitFaq#rename-tracking">Git
+                        FAQ</a>:
+                    "Git has a rename command git mv, but that is just a
+                    convenience. The effect is indistinguishable from removing
+                    the file and adding another with different name and the
+                    same content."
+                </td>
+</tr>
+<tr>
+<td class="sys">LibreSource Synchronizer</td>
+<td class="desc">
+                    Unknown. FILL IN.
+                </td>
+</tr>
+<tr>
+<td class="sys">Mercurial</td>
+<td class="desc">
+                    No. <a href="http://hgbook.red-bean.com/hgbookch5.html#x9-1030005.4">the
+                        Mercurial book says:</a>
+                    "When you use the 'hg rename' command, Mercurial makes a
+                    copy of each source file, then deletes it and marks the
+                    file as removed. "
+                </td>
+</tr>
+<tr>
+<td class="sys">Monotone</td>
+<td class="desc">Unknown. FILL IN.</td>
+</tr>
+<tr>
+<td class="sys">OpenCM</td>
+<td class="desc">Unknown.</td>
+</tr>
+<tr>
+<td class="sys">Perforce</td>
+<td class="desc">
+                    No, renames are not intelligent.
+                </td>
+</tr>
+<tr>
+<td class="sys">PureCM</td>
+<td class="desc">
+                    Unknown. FILL IN.
+                </td>
+</tr>
+<tr>
+<td class="sys">SourceAnywhere</td>
+<td class="desc">
+                    Unknown. FILL IN.
+                </td>
+</tr>
+<tr>
+<td class="sys">Subversion</td>
+<td class="desc">
+                    "svn help me" says "Note: this subcommand is equivalent to
+                    a 'copy' and 'delete'." There's <a href="http://subversion.tigris.org/issues/show_bug.cgi?id=898">a
+                        bug report about it</a>.
+                </td>
+</tr>
+<tr>
+<td class="sys">Superversion</td>
+<td class="desc">No. Renames are not supported.</td>
+</tr>
+<tr>
+<td class="sys">svk</td>
+<td class="desc">Same as Subversion.</td>
+</tr>
+<tr>
+<td class="sys">Team Foundation Server</td>
+<td class="desc">
+                    Unknown. FILL IN.
+                </td>
+</tr>
+<tr>
+<td class="sys">Vesta</td>
+<td class="desc">
+                    Unknown. FILL IN.
+                </td>
+</tr>
+<tr>
+<td class="sys">Visual SourceSafe</td>
+<td class="desc">
+                    No, renames are not intelligent.
+                </td>
+</tr>
+</table>
+<h3 id="copy">File and Directories Copies</h3>
+<p class="expl">
+                Does the version control system support copying
+                files or directories to a different location at the
+                repository level, while retaining the history?
+            </p>
+<table class="compare">
+<tr>
+<td class="sys">CVS</td>
+<td class="desc">No. Copies are not supported.</td>
+</tr>
+<tr>
+<td class="sys">AccuRev</td>
+<td class="desc">
+                    Copying is supported through symbolic links
+                    (but all linked files are treated as the same file
+                    version).  Moves are fully supported with the history
+                    retained.
+                </td>
+</tr>
+<tr>
+<td class="sys">Aegis</td>
+<td class="desc">No. Copies are not supported.</td>
+</tr>
+<tr>
+<td class="sys">Arch</td>
+<td class="desc">No. Copies of files and directory structures are
+                    not supported.
+                </td>
+</tr>
+<tr>
+<td class="sys">Bazaar</td>
+<td class="desc">No. Copies are not supported.</td>
+</tr>
+<tr>
+<td class="sys">BitKeeper</td>
+<td class="desc">
+                    Yes. Copies are supported.
+                </td>
+</tr>
+<tr>
+<td class="sys">ClearCase</td>
+<td class="desc">
+                  Yes, through use of hard links. (But some
+                  limitations in Windows environments)
+                </td>
+</tr>
+<tr>
+<td class="sys">CM+</td>
+<td class="desc">Yes. An inexpensive operation that can be used for
+                    sharing files in multiple places.  On deploy, you have the
+                    option of deploying only one of the shared files or all of them.
+                </td>
+</tr>
+<tr>
+<td class="sys">CMSynergy</td>
+<td class="desc">Yes, and it's a very cheap operation (update the target
+					directory to include the new file/directory).
+				</td>
+</tr>
+<tr>
+<td class="sys">Co-Op</td>
+<td class="desc">Copying doesn't retain history, moving does.</td>
+</tr>
+<tr>
+<td class="sys">Darcs</td>
+<td class="desc">No. Copies of files and directory structures are
+                    not supported.
+                </td>
+</tr>
+<tr>
+<td class="sys">Git</td>
+<td class="desc">No.  Copies are not supported.</td>
+</tr>
+<tr>
+<td class="sys">LibreSource Synchronizer</td>
+<td class="desc">No, copies will start their own history.</td>
+</tr>
+<tr>
+<td class="sys">Mercurial</td>
+<td class="desc">Yes. Copies are supported</td>
+</tr>
+<tr>
+<td class="sys">Monotone</td>
+<td class="desc">Yes. Copies are supported</td>
+</tr>
+<tr>
+<td class="sys">OpenCM</td>
+<td class="desc">No. Copies are not supported.</td>
+</tr>
+<tr>
+<td class="sys">Perforce</td>
+<td class="desc">Copies are supported (though, because
+                    of its architecture, I don't know how well)
+                </td>
+</tr>
+<tr>
+<td class="sys">PureCM</td>
+<td class="desc">Yes. Copies are supported.</td>
+</tr>
+<tr>
+<td class="sys">SourceAnywhere</td>
+<td class="desc">Copying doesn't retain history, moving does.</td>
+</tr>
+<tr>
+<td class="sys">Subversion</td>
+<td class="desc">Yes. And it's a very cheap operation (O(1)) that
+                    is also utilized for branching.
+                </td>
+</tr>
+<tr>
+<td class="sys">Superversion</td>
+<td class="desc">No. Copies are not supported.</td>
+</tr>
+<tr>
+<td class="sys">svk</td>
+<td class="desc">Yes. Same as subversion.</td>
+</tr>
+<tr>
+<td class="sys">Team Foundation Server</td>
+<td class="desc">
+                  Yes - you can create a branch. But the GUI has no option to
+                  view the old history. The <a href="http://msdn.microsoft.com/en-us/tfs2008/bb980963.aspx">
+                  Power-Tool tfpt</a> has the option /followbranches to show
+                  the history of the file branch's ancestors
+                </td>
+</tr>
+<tr>
+<td class="sys">Vesta</td>
+<td class="desc">
+                    Yes.  A new package/branch can be based on any
+                    existing version without affecting the past
+                    history.  (This is also an O(1) operation.)
+                </td>
+</tr>
+<tr>
+<td class="sys">Visual SourceSafe</td>
+<td class="desc">Yes. Copies are supported up to a point.</td>
+</tr>
+</table>
+<h3 id="repos_clone">Remote Repository Replication</h3>
+<p class="expl">
+                Does the system support cloning a remote repository to get
+                a functionally equivalent copy in the local system? That
+                should be done without any special access to the remote
+                server except for normal repository access.
+            </p>
+<table class="compare">
+<tr>
+<td class="sys">CVS</td>
+<td class="desc">
+                    Indirectly, by using
+                    <a href="http://www.cvsup.org/">CVSup</a>
+                    by John Polstra (which requires running the cvsupd
+                    daemon on the server)
+                </td>
+</tr>
+<tr>
+<td class="sys">AccuRev</td>
+<td class="desc">Yes.</td>
+</tr>
+<tr>
+<td class="sys">Aegis</td>
+<td class="desc">Yes.</td>
+</tr>
+<tr>
+<td class="sys">Arch</td>
+<td class="desc">Yes.</td>
+</tr>
+<tr>
+<td class="sys">Bazaar</td>
+<td class="desc">Yes.</td>
+</tr>
+<tr>
+<td class="sys">BitKeeper</td>
+<td class="desc">Yes.</td>
+</tr>
+<tr>
+<td class="sys">ClearCase</td>
+<td class="desc">
+                  Not really applicable for clearcase, but see next point.
+                </td>
+</tr>
+<tr>
+<td class="sys">CM+</td>
+<td class="desc">Yes. CM+MultiSite can be configured to clone a repository
+                    so that it continues to act as a single repository. Options include
+                    cloning only from the main site (i.e. not allowing updates from the
+                    clone) and restricting the set of files transferred to a cloned site.
+                </td>
+</tr>
+<tr>
+<td class="sys">CMSynergy</td>
+<td class="desc">Yes, as long as you have the (more expensive) Distributed package.</td>
+</tr>
+<tr>
+<td class="sys">Co-Op</td>
+<td class="desc">Repositories are always replicated on local machines.
+                    There is no central server.
+                </td>
+</tr>
+<tr>
+<td class="sys">Darcs</td>
+<td class="desc">Yes.</td>
+</tr>
+<tr>
+<td class="sys">Git</td>
+<td class="desc">Yes.  This is very intrinsic feature of Git.</td>
+</tr>
+<tr>
+<td class="sys">LibreSource Synchronizer</td>
+<td class="desc">
+                  Yes, but is not documented and its based on the dataflow feature of the
+                  LibreSource Synchronizer.
+                </td>
+</tr>
+<tr>
+<td class="sys">Mercurial</td>
+<td class="desc">Yes.</td>
+</tr>
+<tr>
+<td class="sys">Monotone</td>
+<td class="desc">Yes.</td>
+</tr>
+<tr>
+<td class="sys">OpenCM</td>
+<td class="desc">No.</td>
+</tr>
+<tr>
+<td class="sys">Perforce</td>
+<td class="desc">Yes. Via the Perforce Proxy (P4P) tool.</td>
+</tr>
+<tr>
+<td class="sys">PureCM</td>
+<td class="desc">
+                    No. (But a proxy feature is planned for
+                    inclusion in the next releases.)
+                </td>
+</tr>
+<tr>
+<td class="sys">SourceAnywhere</td>
+<td class="desc">Not directly possible with the included GUI or command line tools; Some SQL Server tool might be useable.</td>
+</tr>
+<tr>
+<td class="sys">Subversion</td>
+<td class="desc">
+                    Indirectly, by using Chia-liang Kao's
+                    <a href="http://search.cpan.org/dist/SVN-Mirror/">SVN::Mirror</a>
+                    add-on or Shlomi Fish'
+                    <a href="http://search.cpan.org/dist/SVN-Pusher/">SVN-Pusher</a>
+                    utility.
+                </td>
+</tr>
+<tr>
+<td class="sys">Superversion</td>
+<td class="desc">Yes.</td>
+</tr>
+<tr>
+<td class="sys">svk</td>
+<td class="desc">Yes.</td>
+</tr>
+<tr>
+<td class="sys">Team Foundation Server</td>
+<td class="desc">
+                  TFS Proxy is available but the replica isn't an
+                  equivalent copy.
+                </td>
+</tr>
+<tr>
+<td class="sys">Vesta</td>
+<td class="desc">Yes.  Replication is a fundamental part of the design.</td>
+</tr>
+<tr>
+<td class="sys">Visual SourceSafe</td>
+<td class="desc">
+                    Not directly possible with the included GUI or
+                    command line tools; ssarc and ssrestor might be useable
+                </td>
+</tr>
+</table>
+<h3 id="push">Propagating Changes to Parent Repositories</h3>
+<p class="expl">
+                Can the system propagate changes from one repository to
+                another?
+            </p>
+<table class="compare">
+<tr>
+<td class="sys">CVS</td>
+<td class="desc">No.</td>
+</tr>
+<tr>
+<td class="sys">AccuRev</td>
+<td class="desc">
+                    With AccuReplica, the replica server has all the meta-data
+                    and  fetches file data as needed by replica users; all
+                    write operations pass automatically from the replica to
+                    the master server.
+                </td>
+</tr>
+<tr>
+<td class="sys">Aegis</td>
+<td class="desc">Yes.</td>
+</tr>
+<tr>
+<td class="sys">Arch</td>
+<td class="desc">Yes.</td>
+</tr>
+<tr>
+<td class="sys">Bazaar</td>
+<td class="desc">Yes.</td>
+</tr>
+<tr>
+<td class="sys">BitKeeper</td>
+<td class="desc">Yes.</td>
+</tr>
+<tr>
+<td class="sys">ClearCase</td>
+<td class="desc">Yes, using Clearcase Multisite.</td>
+</tr>
+<tr>
+<td class="sys">CM+</td>
+<td class="desc">
+                    Yes.  In CM+MultiSite, changes made at the slave are,
+                    by default, propagated to the Main(master) library, as well as
+                    to all other Clones (slaves).  You may also propagate changes
+                    between unrelated repositories containing some of the same source.
+                </td>
+</tr>
+<tr>
+<td class="sys">CMSynergy</td>
+<td class="desc">Yes, as long as you have the (more expensive) Distributed package.</td>
+</tr>
+<tr>
+<td class="sys">Co-Op</td>
+<td class="desc">It's a peer-to-peer system,
+                    which keeps all replicas of the repository in sync.
+                </td>
+</tr>
+<tr>
+<td class="sys">Darcs</td>
+<td class="desc">Yes.</td>
+</tr>
+<tr>
+<td class="sys">Git</td>
+<td class="desc">Yes.  (The Linux kernel development process uses this extremely often).</td>
+</tr>
+<tr>
+<td class="sys">LibreSource Synchronizer</td>
+<td class="desc">Yes, it's what we call a dataflow.</td>
+</tr>
+<tr>
+<td class="sys">Mercurial</td>
+<td class="desc">Yes.</td>
+</tr>
+<tr>
+<td class="sys">Monotone</td>
+<td class="desc">Yes.</td>
+</tr>
+<tr>
+<td class="sys">OpenCM</td>
+<td class="desc">No.</td>
+</tr>
+<tr>
+<td class="sys">Perforce</td>
+<td class="desc">Unknown. Probably Not.</td>
+</tr>
+<tr>
+<td class="sys">PureCM</td>
+<td class="desc">No.</td>
+</tr>
+<tr>
+<td class="sys">SourceAnywhere</td>
+<td class="desc">Not directly possible with the included GUI or command line tools; Some SQL Server tool might be useable.</td>
+</tr>
+<tr>
+<td class="sys">Subversion</td>
+<td class="desc">Yes, using either Chia-Ling Kao's SVN::Mirror
+                    script or the svn-push utility by Shlomi Fish.
+                </td>
+</tr>
+<tr>
+<td class="sys">Superversion</td>
+<td class="desc">No.</td>
+</tr>
+<tr>
+<td class="sys">svk</td>
+<td class="desc">Yes.</td>
+</tr>
+<tr>
+<td class="sys">Team Foundation Server</td>
+<td class="desc">No.</td>
+</tr>
+<tr>
+<td class="sys">Vesta</td>
+<td class="desc">
+                    Yes.
+                </td>
+</tr>
+<tr>
+<td class="sys">Visual SourceSafe</td>
+<td class="desc">
+                    Not directly possible with the included GUI or
+                    command line tools; ssarc and ssrestor might be useable
+                </td>
+</tr>
+</table>
+<h3 id="permissions">Repository Permissions</h3>
+<p class="expl">
+                Is it possible to define permissions on access to different
+                parts of a remote repository? Or is access open for all?
+            </p>
+<table class="compare">
+<tr>
+<td class="sys">CVS</td>
+<td class="desc">
+                    Limited. "pre-commit hook scripts" can be used to
+                    implement various permissions systems.
+                </td>
+</tr>
+<tr>
+<td class="sys">AccuRev</td>
+<td class="desc">
+                    Yes. Access can be defined per stream (branch) using
+                    access control lists.
+                </td>
+</tr>
+<tr>
+<td class="sys">Aegis</td>
+<td class="desc">
+                    Yes. Aegis relies on the UNIX permissions system to
+                    implement permissions for files in the repository.
+                </td>
+</tr>
+<tr>
+<td class="sys">Arch</td>
+<td class="desc">
+                    Yes. It is possible to define permissions on access to
+                    different parts of a remote repository based on the
+                    permission systems of the underlying protocol.
+                </td>
+</tr>
+<tr>
+<td class="sys">Bazaar</td>
+<td class="desc">
+                    Basic access control can be implemented through a
+                    contributed hook script.  ACL support for the
+                    Bazaar server is planned.
+                </td>
+</tr>
+<tr>
+<td class="sys">BitKeeper</td>
+<td class="desc">
+                    FILL IN
+                </td>
+</tr>
+<tr>
+<td class="sys">ClearCase</td>
+<td class="desc">
+                  Yes, a unix-like permissions model is used, which maps
+                  onto Windows domain-based authentication in
+                  multi-platform environments.
+                </td>
+</tr>
+<tr>
+<td class="sys">CM+</td>
+<td class="desc">
+                    Yes.  Permissions are defined by data, primarily,
+                    not by location.  If location is a part of the data, it may
+                    be used to define permissions by location.  Permissions may
+                    apply to a branch, file, problem report, test case, etc.
+                    Access may be extended based on peer group, manager, and
+                    access lists.
+                </td>
+</tr>
+<tr>
+<td class="sys">CMSynergy</td>
+<td class="desc">No, though a single server can serve many repositories.</td>
+</tr>
+<tr>
+<td class="sys">Co-Op</td>
+<td class="desc">First access (joining the project)
+                    requires administrator's approval.
+                    Subsequent access to that project is not controlled.
+                </td>
+</tr>
+<tr>
+<td class="sys">Darcs</td>
+<td class="desc">
+                    No.
+                </td>
+</tr>
+<tr>
+<td class="sys">Git</td>
+<td class="desc">No, but a single server can serve many repositories.  Also, UNIX permissions can be used to some extent.</td>
+</tr>
+<tr>
+<td class="sys">LibreSource Synchronizer</td>
+<td class="desc">Permissions are set for the whole repository or branch.</td>
+</tr>
+<tr>
+<td class="sys">Mercurial</td>
+<td class="desc">
+                    Yes. It is possible to lock down repositories,
+                    subdirectories, or files using hooks.
+                </td>
+</tr>
+<tr>
+<td class="sys">Monotone</td>
+<td class="desc">
+                    Yes. It is possible to restrict incoming changes
+                    from certain sources to be performed only in certain
+                    parts of the repository.
+                </td>
+</tr>
+<tr>
+<td class="sys">OpenCM</td>
+<td class="desc">
+                    Permissions are defined on a per-branch
+                    basis.
+                </td>
+</tr>
+<tr>
+<td class="sys">Perforce</td>
+<td class="desc">
+                    Yes. (more than half a dozen of permission levels that can
+                    be set in a file by file basis)
+                </td>
+</tr>
+<tr>
+<td class="sys">PureCM</td>
+<td class="desc">
+                    Yes. (more than half a dozen of permission levels that can
+                    be set in a file by file basis)
+                </td>
+</tr>
+<tr>
+<td class="sys">SourceAnywhere</td>
+<td class="desc">Yes. SourceAnywhere Server Manager can define access to a repository per user or group and user access rights to a project.</td>
+</tr>
+<tr>
+<td class="sys">Subversion</td>
+<td class="desc">
+                    Yes. The WebDAV-based service supports defining HTTP
+                    permissions for various directories of the repository.
+                </td>
+</tr>
+<tr>
+<td class="sys">Superversion</td>
+<td class="desc">
+                    No.
+                </td>
+</tr>
+<tr>
+<td class="sys">svk</td>
+<td class="desc">
+                    Same as subversion.
+                </td>
+</tr>
+<tr>
+<td class="sys">Team Foundation Server</td>
+<td class="desc">
+                  Yes. You get set permissions for each team project, folder,
+                  file.
+                </td>
+</tr>
+<tr>
+<td class="sys">Vesta</td>
+<td class="desc">
+                    Yes.  Access permissions for each package (the
+                    unit of checkout/checkin) can be different.
+                    Access permissions for a branch can be different
+                    from the basis package.
+                </td>
+</tr>
+<tr>
+<td class="sys">Visual SourceSafe</td>
+<td class="desc">
+                    Project specific permissions (read, write, delete, destroy)
+                    can be set per user; but see "Networking Support":
+                    this makes "Repository Permissions" a hindrance to
+                    accidental damage but cannot prevent intentional damage.
+                </td>
+</tr>
+</table>
+<h3 id="changesets">Changesets' Support</h3>
+<p class="expl">
+                Does the repository support changesets? Changesets are a way
+                to group a number of modifications that are relevant to each
+                other in one atomic package, that can be cancelled or
+                propagated as needed.
+            </p>
+<table class="compare">
+<tr>
+<td class="sys">CVS</td>
+<td class="desc">No. Changes are file-specific.</td>
+</tr>
+<tr>
+<td class="sys">AccuRev</td>
+<td class="desc">
+                    Yes, AccuRev provides robust functionality for change
+                    sets (called change packages in AccuRev) including viewing
+                    differences by change packages and merging changes from
+                    stream to stream by change package.
+                </td>
+</tr>
+<tr>
+<td class="sys">Aegis</td>
+<td class="desc">
+                    Yes. Changesets are supported.
+                </td>
+</tr>
+<tr>
+<td class="sys">Arch</td>
+<td class="desc">
+                    Yes. Changesets are supported.
+                </td>
+</tr>
+<tr>
+<td class="sys">Bazaar</td>
+<td class="desc">
+                    Yes. Changesets are supported.
+                </td>
+</tr>
+<tr>
+<td class="sys">BitKeeper</td>
+<td class="desc">
+                    Yes. Changesets are supported.
+                </td>
+</tr>
+<tr>
+<td class="sys">ClearCase</td>
+<td class="desc">
+                  Not supported in this way. Extensive branching
+                  support gives similar benefits. (eg each changeset
+                  can be given a branch). Also optional UCM feature
+                  gives something like this (each changeset is a
+                  "stream").
+                </td>
+</tr>
+<tr>
+<td class="sys">CM+</td>
+<td class="desc">
+                    Yes. Change packages are known as updates.  By
+                    default, an update is required to make any change.  The
+                    update may be checked-in, differenced, promoted, retrieved,
+                    propagated, yanked (i.e. removed from history), etc. each in
+                    a single operation.  Baseline alignment is performed
+                    based on the status (i.e. promotion level) of the update.
+                    Updates also record changes to directory structure: move,
+                    add, remove.
+                </td>
+</tr>
+<tr>
+<td class="sys">CMSynergy</td>
+<td class="desc">Yes.  Changesets (or tasks) are fundamental
+                	to the way Synergy works.</td>
+</tr>
+<tr>
+<td class="sys">Co-Op</td>
+<td class="desc">Yes. Changesets are the default.</td>
+</tr>
+<tr>
+<td class="sys">Darcs</td>
+<td class="desc">
+                    Yes. Changesets are supported.
+                </td>
+</tr>
+<tr>
+<td class="sys">Git</td>
+<td class="desc">Yes, Changesets are supported, and there's some flexibility in creating them.</td>
+</tr>
+<tr>
+<td class="sys">LibreSource Synchronizer</td>
+<td class="desc">
+                  Partial support. There are implicit changeset that are generated on
+                  each commit.
+                </td>
+</tr>
+<tr>
+<td class="sys">Mercurial</td>
+<td class="desc">
+                    Yes. Changesets are supported.
+                </td>
+</tr>
+<tr>
+<td class="sys">Monotone</td>
+<td class="desc">
+                    Yes. Changesets are supported.
+                </td>
+</tr>
+<tr>
+<td class="sys">OpenCM</td>
+<td class="desc">
+                    Yes. Changesets are supported.
+                </td>
+</tr>
+<tr>
+<td class="sys">Perforce</td>
+<td class="desc">
+                    Yes. Changesets are supported.
+                </td>
+</tr>
+<tr>
+<td class="sys">PureCM</td>
+<td class="desc">
+                    Yes. Changesets are supported.
+                </td>
+</tr>
+<tr>
+<td class="sys">SourceAnywhere</td>
+<td class="desc">Not exactly. SourceAnywhere uses a related concept of configurations instead, which some has similar properties.</td>
+</tr>
+<tr>
+<td class="sys">Subversion</td>
+<td class="desc">Partial support. There are implicit
+                    changeset that are generated on each commit.
+                </td>
+</tr>
+<tr>
+<td class="sys">Superversion</td>
+<td class="desc">Partial support. Changes are grouped into changesets,
+                    but cannot be cancelled invididually yet.
+                </td>
+</tr>
+<tr>
+<td class="sys">svk</td>
+<td class="desc">Same as subversion.
+                </td>
+</tr>
+<tr>
+<td class="sys">Team Foundation Server</td>
+<td class="desc">Yes. Changesets are only possibility.</td>
+</tr>
+<tr>
+<td class="sys">Vesta</td>
+<td class="desc">
+                    Not exactly.  Vesta uses a related concept of
+                    configurations instead, which some has similar
+                    properties.
+                </td>
+</tr>
+<tr>
+<td class="sys">Visual SourceSafe</td>
+<td class="desc">No.  Changes are file-specific.</td>
+</tr>
+</table>
+<h3 id="annotate">Tracking Line-wise File History</h3>
+<p class="expl">
+                Does the version control system have an option to track the
+                history of the file line-by-line? I.e., can it show for each line
+                at which revision it was most recently changed, and by whom?
+            </p>
+<table class="compare">
+<tr>
+<td class="sys">CVS</td>
+<td class="desc">Yes. cvs annotate</td>
+</tr>
+<tr>
+<td class="sys">AccuRev</td>
+<td class="desc">Yes. Available from both the gui and cli.</td>
+</tr>
+<tr>
+<td class="sys">Aegis</td>
+<td class="desc">Yes. aeannotate</td>
+</tr>
+<tr>
+<td class="sys">Arch</td>
+<td class="desc">Not in the command line client, but ViewARCH,
+                a web-interface for Arch, has it.</td>
+</tr>
+<tr>
+<td class="sys">Bazaar</td>
+<td class="desc">Yes. (bzr annotate).</td>
+</tr>
+<tr>
+<td class="sys">BitKeeper</td>
+<td class="desc">Yes. (bk annotate)</td>
+</tr>
+<tr>
+<td class="sys">ClearCase</td>
+<td class="desc">Yes, "cleartool annotate"</td>
+</tr>
+<tr>
+<td class="sys">CM+</td>
+<td class="desc">Yes.  View revision tags. </td>
+</tr>
+<tr>
+<td class="sys">CMSynergy</td>
+<td class="desc">Probably, if you're a sufficiently proficient hacker with
+					their scripting language.
+                </td>
+</tr>
+<tr>
+<td class="sys">Co-Op</td>
+<td class="desc">Not directly, but it's possible to compare
+                    any two versions using a visual differ.
+                </td>
+</tr>
+<tr>
+<td class="sys">Darcs</td>
+<td class="desc">Yes. (darcs annotate)</td>
+</tr>
+<tr>
+<td class="sys">Git</td>
+<td class="desc">Yes. (git blame).</td>
+</tr>
+<tr>
+<td class="sys">LibreSource Synchronizer</td>
+<td class="desc">
+                    Yes, locally without any server connection with the standard graphical
+                    Java client.
+                </td>
+</tr>
+<tr>
+<td class="sys">Mercurial</td>
+<td class="desc">Yes. (hg annotate)</td>
+</tr>
+<tr>
+<td class="sys">Monotone</td>
+<td class="desc">Yes, as of version 0.19.</td>
+</tr>
+<tr>
+<td class="sys">OpenCM</td>
+<td class="desc">Unknown. Probably not.</td>
+</tr>
+<tr>
+<td class="sys">Perforce</td>
+<td class="desc">Yes, an annotation feature is present.</td>
+</tr>
+<tr>
+<td class="sys">PureCM</td>
+<td class="desc">Yes, annotation is available through the GUI.</td>
+</tr>
+<tr>
+<td class="sys">SourceAnywhere</td>
+<td class="desc">Yes. (SAW annotate)</td>
+</tr>
+<tr>
+<td class="sys">Subversion</td>
+<td class="desc">Yes. (svn blame)</td>
+</tr>
+<tr>
+<td class="sys">Superversion</td>
+<td class="desc">No.</td>
+</tr>
+<tr>
+<td class="sys">svk</td>
+<td class="desc">Yes. (svk blame)</td>
+</tr>
+<tr>
+<td class="sys">Team Foundation Server</td>
+<td class="desc">Yes. (tf annotate).</td>
+</tr>
+<tr>
+<td class="sys">Vesta</td>
+<td class="desc">
+                    No, but it would be easy to implement a tool that
+                    did this, as the Vesta repository provides direct
+                    filesystem access to all versions.
+                </td>
+</tr>
+<tr>
+<td class="sys">Visual SourceSafe</td>
+<td class="desc">Not directly, but it's possible to compare
+                    any two versions using a visual differ.
+                </td>
+</tr>
+</table>
+<h2 id="features">Features</h2>
+<h3 id="work_on_dir">Ability to Work only on One Directory of the Repository</h3>
+<p class="expl">
+                Can the version control system checkout only one directory of
+                the repository? Or restrict the check-ins to only one
+                directory?
+            </p>
+<table class="compare">
+<tr>
+<td class="sys">CVS</td>
+<td class="desc">Yes.</td>
+</tr>
+<tr>
+<td class="sys">AccuRev</td>
+<td class="desc">
+                    Yes. AccuRev provides functionality to define
+                    feature streams in which only the subset of code is seen.
+                    A group of developers can then be retricted to work only
+                    from that stream so they are only allowed to check in
+                    changes to that subset of code.
+                </td>
+</tr>
+<tr>
+<td class="sys">Aegis</td>
+<td class="desc">No. All changes are made repository-wide.</td>
+</tr>
+<tr>
+<td class="sys">Arch</td>
+<td class="desc">
+                    It is possible to commit only a certain directory.
+                    However, one must check out the entire repository as a
+                    whole.
+                </td>
+</tr>
+<tr>
+<td class="sys">Bazaar</td>
+<td class="desc">For checkouts: No. For checkins: Yes.</td>
+</tr>
+<tr>
+<td class="sys">BitKeeper</td>
+<td class="desc">No. All changes are made repository-wide.</td>
+</tr>
+<tr>
+<td class="sys">ClearCase</td>
+<td class="desc">Yes, using snapshot view load rules.</td>
+</tr>
+<tr>
+<td class="sys">CM+</td>
+<td class="desc">
+                    Yes.  Any arbitrary set can be checked out
+                    and worked on.  Similarly, arbitrary restrictions may be
+                    applied for check-in, including file ownership.
+                </td>
+</tr>
+<tr>
+<td class="sys">CMSynergy</td>
+<td class="desc">
+                    Yes and no.  Files and directories are checked out and in
+                    individually, however you have to work in the context of a
+                    project, which consists of one or more directories.
+                </td>
+</tr>
+<tr>
+<td class="sys">Co-Op</td>
+<td class="desc">No. All changes are made to a project as
+                    a unit, but it's possible to access each file's
+                    history separately.
+                </td>
+</tr>
+<tr>
+<td class="sys">Darcs</td>
+<td class="desc">
+                    It is possible to commit only a certain directory.
+                    However, one must check out the entire repository as a
+                    whole.
+                </td>
+</tr>
+<tr>
+<td class="sys">Git</td>
+<td class="desc">No.  However, commits could be restricted somewhat, see the "Repository Permissions".</td>
+</tr>
+<tr>
+<td class="sys">LibreSource Synchronizer</td>
+<td class="desc">
+                   It is possible to commit only a certain directory. However, one must
+                   check out the entire repository as a whole.
+                </td>
+</tr>
+<tr>
+<td class="sys">Mercurial</td>
+<td class="desc">
+                    It is possible to commit changes only in a subset of the
+                    tree. There are plans for partial checkouts.
+                </td>
+</tr>
+<tr>
+<td class="sys">Monotone</td>
+<td class="desc">
+                    It is possible to commit changes only in a subset of the
+                    tree. However, one must extract the entire tree to work
+                    on it.
+                </td>
+</tr>
+<tr>
+<td class="sys">OpenCM</td>
+<td class="desc">No. All changes are made to a project as
+                    a unit
+                </td>
+</tr>
+<tr>
+<td class="sys">Perforce</td>
+<td class="desc">
+                    Yes. Changes to a sub-directory of the repository
+                    are supported.
+                </td>
+</tr>
+<tr>
+<td class="sys">PureCM</td>
+<td class="desc">
+                    Yes.
+                </td>
+</tr>
+<tr>
+<td class="sys">SourceAnywhere</td>
+<td class="desc">Yes. SourceAnywhere can define the user access right to each project
+                 and users can be restricted to work only on the projects they have check out/in right.</td>
+</tr>
+<tr>
+<td class="sys">Subversion</td>
+<td class="desc">Yes.</td>
+</tr>
+<tr>
+<td class="sys">Superversion</td>
+<td class="desc">No.</td>
+</tr>
+<tr>
+<td class="sys">svk</td>
+<td class="desc">Yes.</td>
+</tr>
+<tr>
+<td class="sys">Team Foundation Server</td>
+<td class="desc">Yes.</td>
+</tr>
+<tr>
+<td class="sys">Vesta</td>
+<td class="desc">
+                    Yes and no. The unit of checkout/checkin (called a
+                    package) is a directory tree.  Most projects use
+                    more than one.  Once created, a package must be
+                    checked out/in as a unit.
+                </td>
+</tr>
+<tr>
+<td class="sys">Visual SourceSafe</td>
+<td class="desc">Yes.</td>
+</tr>
+</table>
+<h3 id="tracking_uncommited_changes">Tracking Uncommited Changes</h3>
+<p class="expl">
+                Does the software have an ability to track the changes in the
+                working copy that were not yet committed to the repository?
+            </p>
+<table class="compare">
+<tr>
+<td class="sys">CVS</td>
+<td class="desc">Yes. Using cvs diff</td>
+</tr>
+<tr>
+<td class="sys">AccuRev</td>
+<td class="desc">
+                    Yes. The functionality is available through both the GUI
+                    and the command line interface.
+                </td>
+</tr>
+<tr>
+<td class="sys">Aegis</td>
+<td class="desc">Yes. Using aediff</td>
+</tr>
+<tr>
+<td class="sys">Aegis</td>
+<td class="desc">Yes. Using aediff.</td>
+</tr>
+<tr>
+<td class="sys">Arch</td>
+<td class="desc">
+                    Yes, using "tla changes".
+                </td>
+</tr>
+<tr>
+<td class="sys">Bazaar</td>
+<td class="desc">Yes, using "bzr diff".</td>
+</tr>
+<tr>
+<td class="sys">BitKeeper</td>
+<td class="desc">Yes. Using bk diff.</td>
+</tr>
+<tr>
+<td class="sys">ClearCase</td>
+<td class="desc">Yes, "cleartool diff"</td>
+</tr>
+<tr>
+<td class="sys">CM+</td>
+<td class="desc">
+                    Yes. Use Updates | Delta | Delta Update. Or
+                    right click a file or directory and do a compare to workspace.
+                </td>
+</tr>
+<tr>
+<td class="sys">CMSynergy</td>
+<td class="desc">Yes, either using integrated diff tool or user-configured
+					external diff tool</td>
+</tr>
+<tr>
+<td class="sys">Co-Op</td>
+<td class="desc">Yes, using built-in visual differ/editor.</td>
+</tr>
+<tr>
+<td class="sys">Darcs</td>
+<td class="desc">
+                    Yes, using "darcs whatsnew".
+                </td>
+</tr>
+<tr>
+<td class="sys">Git</td>
+<td class="desc">Yes.
+                Also, branches are very lightweight in Git, and
+                could be considered a kind of storage for "uncommitted" code in some workflows.
+                </td>
+</tr>
+<tr>
+<td class="sys">LibreSource Synchronizer</td>
+<td class="desc">
+                  Yes, with the Synchronizer Studio (default Java client) or with the
+                  standard diff command (diff -r . .so6/xxx/REFCOPY/)
+                </td>
+</tr>
+<tr>
+<td class="sys">Mercurial</td>
+<td class="desc">Yes. Using hg diff.</td>
+</tr>
+<tr>
+<td class="sys">Monotone</td>
+<td class="desc">Yes. In a similar fashion to CVS.</td>
+</tr>
+<tr>
+<td class="sys">OpenCM</td>
+<td class="desc">Yes. Using cm diff</td>
+</tr>
+<tr>
+<td class="sys">Perforce</td>
+<td class="desc">Yes.</td>
+</tr>
+<tr>
+<td class="sys">PureCM</td>
+<td class="desc">Yes.</td>
+</tr>
+<tr>
+<td class="sys">SourceAnywhere</td>
+<td class="desc">Yes. Using saw diff.</td>
+</tr>
+<tr>
+<td class="sys">Subversion</td>
+<td class="desc">Yes. Using svn diff</td>
+</tr>
+<tr>
+<td class="sys">Superversion</td>
+<td class="desc">Yes. Local changes are detected and shown immediately. Changes can be
+                  collected in a local buffer before being committed to the repository.</td>
+</tr>
+<tr>
+<td class="sys">svk</td>
+<td class="desc">Yes. Using svk diff</td>
+</tr>
+<tr>
+<td class="sys">Team Foundation Server</td>
+<td class="desc">
+                  Yes. Using tf diff or "Pending Changes" in Visual Studio.
+                </td>
+</tr>
+<tr>
+<td class="sys">Vesta</td>
+<td class="desc">
+                    Yes.  Intermediate immutable snapshots can be
+                    taken during an active checkout (with vadvance).
+                    These intermediate versions can be treated just
+                    like checked in versions: they can be replicated
+                    to other repositories and used as the basis for
+                    branches.
+                </td>
+</tr>
+<tr>
+<td class="sys">Visual SourceSafe</td>
+<td class="desc">Yes, using integrated diff tool.</td>
+</tr>
+</table>
+<h3 id="per_file_commit_messages">Per-File Commit Messages</h3>
+<p class="expl">
+                Does the system have a way to assign a per-file commit message
+                to the changeset, as well as a per-changeset message?
+            </p>
+<table class="compare">
+<tr>
+<td class="sys">CVS</td>
+<td class="desc">No. Commit messages are per change.</td>
+</tr>
+<tr>
+<td class="sys">AccuRev</td>
+<td class="desc">No. Commit messages are per change.</td>
+</tr>
+<tr>
+<td class="sys">Arch</td>
+<td class="desc">
+                    No.
+                </td>
+</tr>
+<tr>
+<td class="sys">Bazaar</td>
+<td class="desc">
+                    With respect to pure Bazaar: No.  At least one
+                    plugin (bzr-gtk) supports it though.
+                </td>
+</tr>
+<tr>
+<td class="sys">BitKeeper</td>
+<td class="desc">Yes. It is possible to have a per-file
+                    commit message</td>
+</tr>
+<tr>
+<td class="sys">ClearCase</td>
+<td class="desc">
+                  Yes, assuming a comment on the branch is sufficient
+                  for a per-changeset message.
+                </td>
+</tr>
+<tr>
+<td class="sys">CM+</td>
+<td class="desc">
+                    Yes.  Out of the box CM+ is configured to
+                    prompt for messages (i.e. comments) only per change.
+                    However, the schema is pre-configured so that you may
+                    prompt on a per file basis as well (typically done at
+                    checkout time as the entire change is normally checked
+                    in with a single operation.
+                </td>
+</tr>
+<tr>
+<td class="sys">CMSynergy</td>
+<td class="desc">Yes.</td>
+</tr>
+<tr>
+<td class="sys">Co-Op</td>
+<td class="desc">No. Commit messages are per change.
+                    They go to all project members and update
+                    their repositories.
+                </td>
+</tr>
+<tr>
+<td class="sys">Darcs</td>
+<td class="desc">
+                    No.
+                </td>
+</tr>
+<tr>
+<td class="sys">Git</td>
+<td class="desc">No. Commit messages are per changeset.</td>
+</tr>
+<tr>
+<td class="sys">LibreSource Synchronizer</td>
+<td class="desc">No. Commit messages are per changeset.</td>
+</tr>
+<tr>
+<td class="sys">Mercurial</td>
+<td class="desc">
+                    No.
+                </td>
+</tr>
+<tr>
+<td class="sys">Monotone</td>
+<td class="desc">
+                    Yes. It is possible to attach a comment to a certain
+                    file at a certain revision.
+                </td>
+</tr>
+<tr>
+<td class="sys">OpenCM</td>
+<td class="desc">
+                    Unknown.
+                </td>
+</tr>
+<tr>
+<td class="sys">Perforce</td>
+<td class="desc">
+                    No. Commit messages are per change.
+                </td>
+</tr>
+<tr>
+<td class="sys">PureCM</td>
+<td class="desc">
+                    No. Commit messages are per change.
+                </td>
+</tr>
+<tr>
+<td class="sys">SourceAnywhere</td>
+<td class="desc">No. There is no such feature.</td>
+</tr>
+<tr>
+<td class="sys">Subversion</td>
+<td class="desc">No. There is no such feature.</td>
+</tr>
+<tr>
+<td class="sys">Superversion</td>
+<td class="desc">Yes.</td>
+</tr>
+<tr>
+<td class="sys">svk</td>
+<td class="desc">No. There is no such feature.</td>
+</tr>
+<tr>
+<td class="sys">Team Foundation Server</td>
+<td class="desc">No. Commit messages are per changeset.</td>
+</tr>
+<tr>
+<td class="sys">Vesta</td>
+<td class="desc">
+                    Not exactly.  The unit of checkin is a directory,
+                    and commit messages are assigned at that level,
+                    not to individual files.  Since configurations are
+                    also versioned, they also have commit messages.
+                </td>
+</tr>
+<tr>
+<td class="sys">Visual SourceSafe</td>
+<td class="desc">Since changesets are not supported, yes.</td>
+</tr>
+</table>
+<h2 id="technical_status">Technical Status</h2>
+<h3 id="documentation">Documentation</h3>
+<p class="expl">
+                How well is the system documented? How easy is it to
+                get started using it?
+            </p>
+<table class="compare">
+<tr>
+<td class="sys">CVS</td>
+<td class="desc">Excellent. There are many online tutorials and
+                    resources and an online book. The command line client
+                    also provides an online comprehensive help system.
+                </td>
+</tr>
+<tr>
+<td class="sys">AccuRev</td>
+<td class="desc">
+                    Excellent.  There is a full set of documentation available
+                    in pdf format available at
+                    <a href="http://www.accurev.com/documentation.html">AccuRev
+                        Documentation</a> as well as context-sensitive help
+                    in the GUI.
+                </td>
+</tr>
+<tr>
+<td class="sys">Aegis</td>
+<td class="desc">
+                    Medium. The documentation is given in several large scope
+                    troff documents, that are only usable as not-so-PDFish
+                    PDF documents, and as text documents that lack any
+                    formatting. It is very hard to get started using
+                    it with the online resources. The content is of good
+                    quality, but otherwise not made very accessible.
+                </td>
+</tr>
+<tr>
+<td class="sys">Arch</td>
+<td class="desc">
+                    Medium. There are two online tutorials and a
+                    comprehensive online documentation. The command line
+                    client also supplies a reference page. However, some of
+                    the documentation is out of date or incomplete.
+                </td>
+</tr>
+<tr>
+<td class="sys">Bazaar</td>
+<td class="desc">
+                    Excellent.  Apart from online help in the command
+                    line client there exist tutorials, a reference
+                    card ("Quick Start Guide"), several full fledged
+                    guides and references, and documents on
+                    specialized topics, such as migration from other
+                    VCS systems and different workflows.  The
+                    documentation comes in html and plain-text formats.  The
+                    API of the underlying library is fully documented.
+                    In the UI design of the command line client
+                    special attention was paid to make it easy to get
+                    started with Bazaar.
+                </td>
+</tr>
+<tr>
+<td class="sys">BitKeeper</td>
+<td class="desc">
+                    Very good. There is a comprehensive help at the BitKeeper
+                    site. Each command is documented in its own man page,
+                    and the client contains a help tool that offers
+                    an integrated help system.
+                </td>
+</tr>
+<tr>
+<td class="sys">ClearCase</td>
+<td class="desc">
+                  Extensive online help in Windows Help / UNIX manpage
+                  format, also PDF-based documentation. However the
+                  complexity of the tool can mean a lengthy ramp-up
+                  time.
+                </td>
+</tr>
+<tr>
+<td class="sys">CM+</td>
+<td class="desc">
+                    Very good.  There is a self-demo/tutorial
+                    to get you started quickly.  Administration is minimal.
+                    So normal developer use requires only a 1 to 2 hour
+                    training session (or equivalent guide) to introduce you
+                    to concepts and capabilities (e.g. like updates, options).
+                    Customization documentation is also extensive but should
+                    normally be accompanied by a 2-day to 4-day course for
+                    GUI, Process, Data and Application set customization.
+                </td>
+</tr>
+<tr>
+<td class="sys">CMSynergy</td>
+<td class="desc">Medium.  Lots of books, plus somewhat
+                	clunky set of HTML pages, but has some radical concepts
+                	which can cause real problems really quickly.  They recommend
+                	a day's training for basic users, more for more advanced users.
+                	Took a while to become fluent.
+                </td>
+</tr>
+<tr>
+<td class="sys">Co-Op</td>
+<td class="desc">Very good. Step-by-step tutorial and HTML help
+                    is included.
+                </td>
+</tr>
+<tr>
+<td class="sys">Darcs</td>
+<td class="desc">
+                    Good. The manual contains a brief tutorial and a solid
+                    reference.  Every sub-command can print its usage.
+                    Because the command-set is small and the model is
+                    simple, many users find it easy to get started.
+                </td>
+</tr>
+<tr>
+<td class="sys">Git</td>
+<td class="desc">
+                 Medium. The short help is too terse and obscure. The man pages are extensive,
+                 but tend to be confusing. The are many tutorials.
+             </td>
+</tr>
+<tr>
+<td class="sys">LibreSource Synchronizer</td>
+<td class="desc">
+                  Medium. There are an online tutorial and some comprehensive online
+                  documentation. Installing and getting started with the GUI is very easy
+                  though. (update/commit-next-next-next-finished)
+                </td>
+</tr>
+<tr>
+<td class="sys">Mercurial</td>
+<td class="desc">
+                    Very good.  There is a
+                    <a href="http://hgbook.red-bean.com/">companion
+                        book</a> and a wiki. Every command has integrated help.
+                </td>
+</tr>
+<tr>
+<td class="sys">Monotone</td>
+<td class="desc">
+                    Good. There's an overview and tutorial written in Texi,
+                    and a man page. The client supplies documentation for
+                    every command.
+                </td>
+</tr>
+<tr>
+<td class="sys">OpenCM</td>
+<td class="desc">
+                    Well documented.
+                </td>
+</tr>
+<tr>
+<td class="sys">Perforce</td>
+<td class="desc">
+                    Very Good (html and command line help)
+                </td>
+</tr>
+<tr>
+<td class="sys">PureCM</td>
+<td class="desc">
+                    Very Good (html and command line help)
+                </td>
+</tr>
+<tr>
+<td class="sys">SourceAnywhere</td>
+<td class="desc">Good. There's an overview and tutorial on the web site,
+                 and integrated help for every command.</td>
+</tr>
+<tr>
+<td class="sys">Subversion</td>
+<td class="desc">
+                    Very good. There is a free online book and some online
+                    tutorials and resources. The book is written in
+                    DocBook/XML and so is convertible to many different
+                    formats. The command-line client also provides a good
+                    online help system that can be used as a reference.
+                </td>
+</tr>
+<tr>
+<td class="sys">Superversion</td>
+<td class="desc">
+                    Fairly poor. There are two tutorials, but there is no
+                    reference. Installing and getting started with the GUI
+                    is very easy though.
+                </td>
+</tr>
+<tr>
+<td class="sys">svk</td>
+<td class="desc">
+                    Relatively poor, but improving. There's
+                    <a href="http://svkbook.elixus.org/">a work-in-progress
+                        book</a> as well as
+                    <a href="http://svk.elixus.org/">the Wiki</a> and some
+                    external Articles and Tutorials.
+                </td>
+</tr>
+<tr>
+<td class="sys">Team Foundation Server</td>
+<td class="desc">
+                  Good. A comprehensive documentation in the MSDN Library.
+                  Many Step-by-Step tutorial videos online.
+                </td>
+</tr>
+<tr>
+<td class="sys">Vesta</td>
+<td class="desc">
+                    Quite thoroughly (HTML, man pages, published
+                    papers, a book-length research report).
+                </td>
+</tr>
+<tr>
+<td class="sys">Visual SourceSafe</td>
+<td class="desc">Medium.  Help file which is sometimes useful.
+                	However, the interface is reasonably intuitive so
+                	documentation isn't needed as much.
+                </td>
+</tr>
+</table>
+<h3 id="ease_of_deployment">Ease of Deployment</h3>
+<p class="expl">
+                How easy is it to deploy the software? What are
+                the dependencies and how can they be satisfied?
+            </p>
+<table class="compare">
+<tr>
+<td class="sys">CVS</td>
+<td class="desc">
+                    Good. Out of being the de-facto standard,
+                    CVS is available on most systems and is easy
+                    to deploy.
+                </td>
+</tr>
+<tr>
+<td class="sys">AccuRev</td>
+<td class="desc">
+                    Excellent.  All that is required is to download the
+                    binaries for the appropriate platform and run the
+                    installer.  The installation package is self-contained.  No
+                    additional software is needed.  AccuRev supports most UNIX,
+                    Linux, and Windows platforms and deploying AccuRev to a
+                    multi-platform environment is straight-forward.
+                </td>
+</tr>
+<tr>
+<td class="sys">Aegis</td>
+<td class="desc">
+                    The Aegis binary should be installed as SUID-root, and
+                    so requires root privileges to install. It also not very
+                    portable to Win32 systems. Other than that, Aegis supports
+                    an easy autoconf or RPM/apt-based installation process.
+                </td>
+</tr>
+<tr>
+<td class="sys">Arch</td>
+<td class="desc">
+                    Excellent. An arch service is nothing but a
+                    filesystem-space hosted by any of its supported
+                    protocols (FTP, SFTP, WebDAV, etc.). The arch client
+                    is written in C, and is portable across UNIX systems
+                    (and on Win32 only with a UNIX emulation layer).
+                </td>
+</tr>
+<tr>
+<td class="sys">Bazaar</td>
+<td class="desc">
+                    Very easy.  Bazaar has an installer for MS Windows
+                    and packages for some major Linux distributions,
+                    FreeBSD, and Mac OS X.  The dependencies for
+                    manual installation are listed on the Bazaar
+                    website.
+                </td>
+</tr>
+<tr>
+<td class="sys">BitKeeper</td>
+<td class="desc">
+                    Good. All that is required is downloading a binary
+                    for the system and installing it using the installation
+                    script. The package is self-contained and is easy to
+                    set up.
+                </td>
+</tr>
+<tr>
+<td class="sys">ClearCase</td>
+<td class="desc">
+                  Poor. Clearcase is very difficult to install in
+                  general. At least, setup for a new site is quite
+                  complex. Installing additional servers (eg
+                  repository servers) is less so.
+                </td>
+</tr>
+<tr>
+<td class="sys">CM+</td>
+<td class="desc">
+                    Yes. Typical installation need only be done
+                    on the server (with a single shortcut established on the
+                    client).  This assumes file system connectivity. For IP
+                    only connectivity, installation is also required on
+                    remote clients.  Installation is typically a couple of
+                    minutes. No dependencies unless web interface is used,
+                    in which case an Apache server is required. A download
+                    is available from Neuma's web site and takes you right
+                    into a self-guided fully working demo version.
+                </td>
+</tr>
+<tr>
+<td class="sys">CMSynergy</td>
+<td class="desc">
+                    Medium. There is a detailed install guide for setting it
+                    up using a binary kit and a set of scripts.  However
+                    it still took several tries to get it properly installed
+                    and configured.  The Windows client has a slightly clunky
+                    Windows installer.
+                </td>
+</tr>
+<tr>
+<td class="sys">Co-Op</td>
+<td class="desc">Very easy to deploy, since there is no central
+                    server. Can be configured to use e-mail or LAN (or both) for
+                    synchronization. For e-mail, requires MAPI-compliant
+                    e-mail client.
+                </td>
+</tr>
+<tr>
+<td class="sys">Darcs</td>
+<td class="desc">
+                    Very good. darcs requires few external libraries,
+                    however you need the Glasgow Haskell Compiler if you
+                    cannot find a binary. To start working, just "darcs
+                    init".
+                </td>
+</tr>
+<tr>
+<td class="sys">Git</td>
+<td class="desc">
+                   Good.  Binary packages are available
+                   for modern platforms.  C compiler and Perl are
+                   required. Requires cygwin on Windows, and has some
+                   UNIXisms.
+               </td>
+</tr>
+<tr>
+<td class="sys">LibreSource Synchronizer</td>
+<td class="desc">
+                  Excellent. It is managed by JavaWebStart with links on any
+                  LibreSource repository web page.
+                  (links: create workspace, update, commit, studio...)
+                </td>
+</tr>
+<tr>
+<td class="sys">Mercurial</td>
+<td class="desc">
+                    Excellent.  Binary packages are available for all
+                    popular platforms.  Building from source requires
+                    only Python 2.3 (or later) and a C compiler.
+                </td>
+</tr>
+<tr>
+<td class="sys">Monotone</td>
+<td class="desc">
+                    Excellent. It is possible to copy or compile the executable
+                    to the user's machine, without any configuration or
+                    external dependencies.
+                </td>
+</tr>
+<tr>
+<td class="sys">OpenCM</td>
+<td class="desc">
+                    Very good. Install the RPM, or build from tarball and
+                    install the init script.
+                </td>
+</tr>
+<tr>
+<td class="sys">Perforce</td>
+<td class="desc">
+                    Very good. Perforce is very easy to deploy.
+                </td>
+</tr>
+<tr>
+<td class="sys">PureCM</td>
+<td class="desc">
+                    Very good. PureCM is very easy to deploy.
+                </td>
+</tr>
+<tr>
+<td class="sys">SourceAnywhere</td>
+<td class="desc">Excellent. Dynamsoft SourceAnywhere is extremely easy to install.
+                 It is totally written in C++ from scratch,
+                  which means that you don't need any additional components
+                   and frameworks to support the installation.</td>
+</tr>
+<tr>
+<td class="sys">Subversion</td>
+<td class="desc">
+                    A Subversion service requires installing an Apache 2
+                    module (if one wishes to use HTTP as the underlying
+                    protocol) or its own proprietary server. The client
+                    requires only the Subversion-specific logic and the
+                    Neon WebDAV library (for HTTP). Installation of the
+                    components is quite straightforward, but will require
+                    some work, assuming Subversion does not come prepackaged
+                    for one's system.
+                </td>
+</tr>
+<tr>
+<td class="sys">Superversion</td>
+<td class="desc">
+                    If Java 1.4 is installed, deployment of Superversion
+                    usually takes two clicks.
+                </td>
+</tr>
+<tr>
+<td class="sys">svk</td>
+<td class="desc">
+                    In addition to installing subversion, users are required
+                    to install the subversion perl bindings and a few modules
+                    from CPAN.
+                </td>
+</tr>
+<tr>
+<td class="sys">Team Foundation Server</td>
+<td class="desc">
+                  Installation is quite complex. Needs IIS, MS-SQL Server and
+                  Reporting Services. A own installation guide with
+                  step-by-step guide is available.
+                  Allows separating in data and app tier.
+                </td>
+</tr>
+<tr>
+<td class="sys">Vesta</td>
+<td class="desc">
+                    Medium to Good.  There is a detailed installation guide
+                    for setting it up using a binary kit.  RPMs and
+                    Debian packages have been recently released.
+                    There are no dependencies on other software. There is a
+                    bootstrap package available to build Vesta from using
+                    "make".
+                </td>
+</tr>
+<tr>
+<td class="sys">Visual SourceSafe</td>
+<td class="desc">
+                    Very good - an installation package which does the work.
+                    When you create a repository it installs the exe's in a
+                    directory and you can run them from there if you need to.
+                </td>
+</tr>
+</table>
+<h3 id="command_set">Command Set</h3>
+<p class="expl">
+                What is the command set? How compatible is it with
+                the commands of CVS (the current open-source defacto
+                standard)?
+            </p>
+<table class="compare">
+<tr>
+<td class="sys">CVS</td>
+<td class="desc">
+                    A simple command set that includes three most commonly
+                    used commands (cvs commit, cvs update and cvs checkout)
+                    and several others.
+                </td>
+</tr>
+<tr>
+<td class="sys">AccuRev</td>
+<td class="desc">
+                    Very extensive but not compatible with cvs.
+                </td>
+</tr>
+<tr>
+<td class="sys">Aegis</td>
+<td class="desc">
+                    A complex command set that involves many operations
+                    just to get started. Not CVS-compatible. (albeit
+                    support for such basic operations was contemplated)
+                    Note that Aegis is a Software Configuration Management
+                    system and not just a simple version control system,
+                    which may justify this extra complexity.
+                </td>
+</tr>
+<tr>
+<td class="sys">Arch</td>
+<td class="desc">
+                    Many commands are compatible with CVS or BitKeeper. However,
+                    there are many other commands for it for different uses.
+                    Aliasing of commands is possible so it it may be possible
+                    to make it more compatible.
+                </td>
+</tr>
+<tr>
+<td class="sys">Bazaar</td>
+<td class="desc">
+                    Tries to follow CVS conventions, but deviates
+                    where there is a different design.
+                </td>
+</tr>
+<tr>
+<td class="sys">BitKeeper</td>
+<td class="desc">
+                    A CVS-like command set with some easy-to-get-used-to
+                    complications due to its different way of work and
+                    philosophy.
+                </td>
+</tr>
+<tr>
+<td class="sys">ClearCase</td>
+<td class="desc">
+                  Excellent. All tools are available through the
+                  command-line. Not very compatible with CVS though.
+                </td>
+</tr>
+<tr>
+<td class="sys">CM+</td>
+<td class="desc">
+                        CM+ has several dozen commands that can
+                    be used both for operation and configuration of the product.
+                    As CM+ is change-based, commands are substantially
+                    different than CVS.  The GUI is used primarily and implemented
+                    on top of the command set.  As well, CM+ covers a full ALM
+                    suite and can be extended beyond, so there are many more
+                    generic commands for browsing, reporting, etc.
+                </td>
+</tr>
+<tr>
+<td class="sys">CMSynergy</td>
+<td class="desc">An extensive and powerful command set,
+                	which has some CVS similarity, though the architecture
+                	is so different that it quickly moves away for anything
+                	but the basics.
+                </td>
+</tr>
+<tr>
+<td class="sys">Co-Op</td>
+<td class="desc">Basic commands are compatible with CVS.</td>
+</tr>
+<tr>
+<td class="sys">Darcs</td>
+<td class="desc">
+                    The command set is fairly compact and the core commands
+                    are easy to understand.  Follows CVS in a few places,
+                    but since the model is different most commands are
+                    unique.
+                </td>
+</tr>
+<tr>
+<td class="sys">Git</td>
+<td class="desc">Command set is very feature-rich, and not compatible with CVS.</td>
+</tr>
+<tr>
+<td class="sys">LibreSource Synchronizer</td>
+<td class="desc">
+                  Basic commands available (commit/update), but it's really simple to
+                  use the GUI. Ant task are also available.
+                </td>
+</tr>
+<tr>
+<td class="sys">Mercurial</td>
+<td class="desc">
+                    Tries to follow CVS conventions, but deviates where there
+                    is a different design.
+                </td>
+</tr>
+<tr>
+<td class="sys">Monotone</td>
+<td class="desc">
+                    Tries to follow CVS conventions, but deviates where there
+                    is a different design.
+                </td>
+</tr>
+<tr>
+<td class="sys">OpenCM</td>
+<td class="desc">
+                    A CVS-like command set that is familiar to existing CVS
+                    users.
+                </td>
+</tr>
+<tr>
+<td class="sys">Perforce</td>
+<td class="desc">
+                    Very extensive but not compatible with CVS.
+                </td>
+</tr>
+<tr>
+<td class="sys">PureCM</td>
+<td class="desc">
+                    A CVS-like command set which is easy to get used to
+                    for CVS-users.
+                </td>
+</tr>
+<tr>
+<td class="sys">SourceAnywhere</td>
+<td class="desc">Very extensive but not compatible with CVS.</td>
+</tr>
+<tr>
+<td class="sys">Subversion</td>
+<td class="desc">
+                    A CVS-like command set which is easy to get used to
+                    for CVS-users.
+                </td>
+</tr>
+<tr>
+<td class="sys">Superversion</td>
+<td class="desc">
+                    There is little need to memorize a command set because
+                    all actions take place in a GUI. A part of the terminology
+                    used in the application is borrowed from CVS.
+                </td>
+</tr>
+<tr>
+<td class="sys">svk</td>
+<td class="desc">
+                    A CVS-like command set which is easy to get used to
+                    for CVS-users.
+                </td>
+</tr>
+<tr>
+<td class="sys">Team Foundation Server</td>
+<td class="desc">
+                  The command set allows more operations than the GUI
+                  but isn't compatible with CVS.
+                </td>
+</tr>
+<tr>
+<td class="sys">Vesta</td>
+<td class="desc">
+                    The command set is unrelated to CVS.  Most of the
+                    time, users use about 5 commands.  Few ever need
+                    to know more than about 20 commands.
+                </td>
+</tr>
+<tr>
+<td class="sys">Visual SourceSafe</td>
+<td class="desc">
+                    A bit of an afterthought.  It's possible to do basic
+                	things, but it's really geared up for using the GUI.
+                </td>
+</tr>
+</table>
+<h3 id="networking">Networking Support</h3>
+<p class="expl">
+                How good is the networking integration of the system?
+                How compliant is it with existing protocols and infra-structure?
+            </p>
+<table class="compare">
+<tr>
+<td class="sys">CVS</td>
+<td class="desc">
+                    Good. CVS uses a proprietary protocol with various
+                    variations for its client/server protocol. This protocol
+                    can be tunneled over an SSH-connection to support
+                    encryption.
+                </td>
+</tr>
+<tr>
+<td class="sys">AccuRev</td>
+<td class="desc">
+                    Good. (proprietary protocol using TCP/IP)
+                </td>
+</tr>
+<tr>
+<td class="sys">Aegis</td>
+<td class="desc">
+                    Poor. Aegis is filesystem-oriented and so can be networked
+                    only via NFS (network file-system) or a similar protocol.
+                    There exists some HTTP-functionality, but it is quite
+                    limited.
+                </td>
+</tr>
+<tr>
+<td class="sys">Arch</td>
+<td class="desc">
+                    Excellent. Arch can utilize a multitude of protocols
+                    for its service, which is nothing but a dumb remote
+                    filesystem server. Currently supported protocols include
+                    FTP, SFTP, WebDAV (remote file access over HTTP),
+                    as well as any remote filesystem protocol (NFS, SMB).
+                </td>
+</tr>
+<tr>
+<td class="sys">Bazaar</td>
+<td class="desc">
+                    Excellent. Works natively over HTTP (read-only),
+                    FTP and SFTP without having Bazaar installed at
+                    the remote end.  Works over HTTP, SSH and a custom
+                    protocol when talking to a remote Bazaar
+                    server. Supports RSYNC and WebDAV (experimental)
+                    through plugins.
+                </td>
+</tr>
+<tr>
+<td class="sys">BitKeeper</td>
+<td class="desc">
+                    Good. Repositories can be checked out from remote
+                    over HTTP, and BitKeeper also sports its own proprietary
+                    protocol for communicating between one repository and
+                    the other.
+                </td>
+</tr>
+<tr>
+<td class="sys">ClearCase</td>
+<td class="desc">
+                  Poor. Uses an *extremely* chatty RPC protocol for
+                  most clearcase operations, plus NFS or SMB for
+                  accessing the files themselves. Typically servers
+                  should be deployed locally (ie on the same LAN) as
+                  the client workstations for acceptable performance.
+                </td>
+</tr>
+<tr>
+<td class="sys">CM+</td>
+<td class="desc">
+                    Very good.  File system connectivity,
+                    TCP/IP connectivity and Web connectivity may be
+                    intermixed. MultiSite connectivity is over TCP/IP,
+                    as is License server. Works well with SSH, NFS, SMB, etc.
+                </td>
+</tr>
+<tr>
+<td class="sys">CMSynergy</td>
+<td class="desc">Good (single TCP/IP socket)</td>
+</tr>
+<tr>
+<td class="sys">Co-Op</td>
+<td class="desc">Uses the simplest LAN interface:
+                    copying files between shared directories.
+                </td>
+</tr>
+<tr>
+<td class="sys">Darcs</td>
+<td class="desc">
+                    Good. Darcs supports getting patches over HTTP, and
+                    getting and sending patches over SSH and email.
+                </td>
+</tr>
+<tr>
+<td class="sys">Git</td>
+<td class="desc">Excellent.  Can use native Git protocol,
+                but works over rsync, ssh, HTTP and HTTPS also.</td>
+</tr>
+<tr>
+<td class="sys">LibreSource Synchronizer</td>
+<td class="desc">
+                  Good. Use of HTTP to get through firwalls.
+                </td>
+</tr>
+<tr>
+<td class="sys">Mercurial</td>
+<td class="desc">
+                    Excellent.  Uses HTTP or ssh.  Remote access also
+                    works safely without locks over read-only network
+                    filesystems.
+                </td>
+</tr>
+<tr>
+<td class="sys">Monotone</td>
+<td class="desc">
+                    Good. Uses a custom protocol called "netsync".
+                </td>
+</tr>
+<tr>
+<td class="sys">OpenCM</td>
+<td class="desc">
+                    Good. Uses its own proprietary client/server protocol.
+                </td>
+</tr>
+<tr>
+<td class="sys">Perforce</td>
+<td class="desc">
+                    Good. (single TCP/IP socket)
+                </td>
+</tr>
+<tr>
+<td class="sys">PureCM</td>
+<td class="desc">
+                    Good. (single TCP/IP socket)
+                </td>
+</tr>
+<tr>
+<td class="sys">SourceAnywhere</td>
+<td class="desc">Good. (single TCP/IP socket)</td>
+</tr>
+<tr>
+<td class="sys">Subversion</td>
+<td class="desc">
+                    Very good. The Subversion service can use either
+                    WebDAV+DeltaV (which is HTTP or HTTPS based) as its
+                    underylying protocol, or its own proprietary protocol
+                    that can be channeled over an SSH connection.
+                </td>
+</tr>
+<tr>
+<td class="sys">Superversion</td>
+<td class="desc">
+                    Good. Network support based on RMI is integrated
+                    seamlessly. Encryption and HTTP tunnelling are planned
+                    for the near future.
+                </td>
+</tr>
+<tr>
+<td class="sys">svk</td>
+<td class="desc">
+                    Very good. svk uses SVN::Mirror to retrieve remote
+                    repository. There has been plans to add VCP support
+                    to SVN::Mirror so it will be able to mirror from arbitary
+                    remote version control systems.
+                </td>
+</tr>
+<tr>
+<td class="sys">Team Foundation Server</td>
+<td class="desc">Good. Use of HTTP(S).</td>
+</tr>
+<tr>
+<td class="sys">Vesta</td>
+<td class="desc">
+                    Networking is inherent to the system.  The
+                    repository exports both an NFS interface and an
+                    RPC interface.  The checkout and checkin tools
+                    automatically contact a remote repository when
+                    required to perform an operation.
+                </td>
+</tr>
+<tr>
+<td class="sys">Visual SourceSafe</td>
+<td class="desc">
+                    VSS uses a Windows network share which has to be writable
+                    for the VSS users (since this means doubling maintenance
+                    for new users). Add user in VSS and to share permissions.
+                    the share is most often world-writable, as is the default
+                    when creating a share) It does not perform well over a
+                    slow network connection.
+                </td>
+</tr>
+</table>
+<h3 id="portability">Portability</h3>
+<p class="expl">
+                How portable is the version-control system to various
+                operating systems, computer architectures, and other
+                types of systems?
+            </p>
+<table class="compare">
+<tr>
+<td class="sys">CVS</td>
+<td class="desc">
+                    Good. Client works on UNIX, Windows and Mac OS.
+                    Server works on UNIXes and on Windows with a UNIX
+                    emulation layer.
+                </td>
+</tr>
+<tr>
+<td class="sys">AccuRev</td>
+<td class="desc">
+                    Excellent. The server runs on most UNIX, Linux
+                    and Windows platforms. The client runs on all of these
+                    platforms and on Mac OS X.
+                </td>
+</tr>
+<tr>
+<td class="sys">Aegis</td>
+<td class="desc">
+                    Medium. The source is portable across all UNIXes,
+                    but the Windows version work only using cygwin, and even
+                    then not entirely natively.
+                </td>
+</tr>
+<tr>
+<td class="sys">Arch</td>
+<td class="desc">
+                    Good. The source is portable across all UNIXes,
+                    but requires a UNIX emulation layer on Windows. (need to
+                    verify). A service can be hosted on any platform
+                    that sports a suitable Internet service.
+                </td>
+</tr>
+<tr>
+<td class="sys">Bazaar</td>
+<td class="desc">
+                    Works on MS Windows, Linux, Mac OS X, FreeBSD,
+                    UNIX, and basically on any system that has a
+                    recent Python port.  With case-insensitive file
+                    systems there are some issues that can be avoided
+                    by using a graphical frontend.  On MS Windows
+                    there is a plugin to support tracking of symlinks
+                    even if they are not supported natively by the
+                    file system.
+                </td>
+</tr>
+<tr>
+<td class="sys">BitKeeper</td>
+<td class="desc">
+                    Very good. Binaries are available for most common UNIX
+                    systems and for Windows 98 and above.
+                </td>
+</tr>
+<tr>
+<td class="sys">ClearCase</td>
+<td class="desc">
+                  Medium. Available on Windows, and several selected
+                  flavours of UNIX (not including MacOS X, or any
+                  other Linux other than Red Hat).
+                </td>
+</tr>
+<tr>
+<td class="sys">CM+</td>
+<td class="desc">
+                    Good.  Clients and Servers work on Unix,
+                    Linux, and Windows.  MAC OS X port pending.  Moving server
+                    from one platform to another is a copy operation only. Can
+                    have different platforms for different servers in a MultiSite
+                    configuration. Easily configurable Web client also supported.
+                    No CR/LF issues. Scripts are all portable as well.
+                </td>
+</tr>
+<tr>
+<td class="sys">CMSynergy</td>
+<td class="desc">
+                    Very good - various flavours of Unix,
+                    Windows (only NT family for the server), VMS, and
+                    possibly other systems.
+                </td>
+</tr>
+<tr>
+<td class="sys">Co-Op</td>
+<td class="desc">Windows only: starting with Win95.</td>
+</tr>
+<tr>
+<td class="sys">Darcs</td>
+<td class="desc">
+                    Very good. Supports many UNIXes, Mac OS X, and Windows,
+                    and is written in a portable language.
+                </td>
+</tr>
+<tr>
+<td class="sys">Git</td>
+<td class="desc">
+                  The client works on most UNIXes, but not on native MS-Windows. The cygwin build
+                  seems to be workable, though.
+              </td>
+</tr>
+<tr>
+<td class="sys">LibreSource Synchronizer</td>
+<td class="desc">
+                  Excellent. Clients and servers work on any Java 1.5-compatible
+                  platform. (Windows, Linux and Mac OS X )
+                </td>
+</tr>
+<tr>
+<td class="sys">Mercurial</td>
+<td class="desc">
+                    Excellent. Runs on all platforms supported by
+                    Python.  Repositories are portable across CPU
+                    architectures and endian conventions.
+                </td>
+</tr>
+<tr>
+<td class="sys">Monotone</td>
+<td class="desc">
+                    Excellent. Executable is portable across all UNIXes and
+                    Win32.
+                </td>
+</tr>
+<tr>
+<td class="sys">OpenCM</td>
+<td class="desc">
+                    Good. Portable across all UNIX systems.
+                </td>
+</tr>
+<tr>
+<td class="sys">Perforce</td>
+<td class="desc">
+                    Excellent. Runs on UNIX, Mac OS, BeOS and Windows.
+                </td>
+</tr>
+<tr>
+<td class="sys">PureCM</td>
+<td class="desc">
+                    Excellent. Client and Server run on Windows, Linux,
+                    Solaris and other UNIXes. The client also runs on Mac
+                    OS X.
+                </td>
+</tr>
+<tr>
+<td class="sys">SourceAnywhere</td>
+<td class="desc">Good. The server runs on Windows only.
+                 Clients can work on any platform that SWT (Standard Widget Toolkit) supports,
+                  including Windows, Linux, Mac, Solaris, AIX, HP-UX, SCO Unix, FreeBSD and so on.</td>
+</tr>
+<tr>
+<td class="sys">Subversion</td>
+<td class="desc">
+                    Excellent. Clients and Servers work on UNIX,
+                    Windows and Mac OS X.
+                </td>
+</tr>
+<tr>
+<td class="sys">Superversion</td>
+<td class="desc">
+                    Excellent. Clients and servers work on any Java
+                    1.4-compatible platform. There is official support
+                    for Windows, Linux and OS/2.
+                </td>
+</tr>
+<tr>
+<td class="sys">svk</td>
+<td class="desc">
+                    Good. Clients requires subversion and its perl bindings.
+                </td>
+</tr>
+<tr>
+<td class="sys">Team Foundation Server</td>
+<td class="desc">
+                The Server and Client needs Windows. A thirdparty company,
+                Teamprise, has developed a client for Eclipse, which means
+                Linux, Mac and other UNIXes support. The Project SvnBridge
+                allows access using SVN clients but needs to run on Windows.
+              </td>
+</tr>
+<tr>
+<td class="sys">Vesta</td>
+<td class="desc">
+                    Good.  It should be portable to any UNIX system.
+                    Currently it runs on Digital/Compaq/HP Tru64 UNIX
+                    and Linux on several different CPU architectures.
+                    Ports to Solaris and FreeBSD are planned but
+                    haven't begun yet.
+                </td>
+</tr>
+<tr>
+<td class="sys">Visual SourceSafe</td>
+<td class="desc">
+                    The Microsoft Product is Windows only.
+                    <a href="http://www.mainsoft.com/">MainSoft</a>
+                    ships a version of it for some UNIX platforms.
+                </td>
+</tr>
+</table>
+<h2 id="user_interaces">User Interfaces</h2>
+<h3 id="web_interface">Web Interface</h3>
+<p class="expl">
+                Does the system have a WWW-based interface that can be
+                used to browse the tree and the various revisions of the
+                files, perform arbitrary diffs, etc?
+            </p>
+<table class="compare">
+<tr>
+<td class="sys">CVS</td>
+<td class="desc">Yes.
+                    <a href="http://www.freebsd.org/projects/cvsweb.html">CVSweb</a>,
+                    <a href="http://www.viewvc.org/">ViewVC</a>,
+                    <a href="http://www.horde.org/chora/">Chora</a>,
+                    and <a href="http://wwcvs.republika.pl/">wwCVS</a>.
+                </td>
+</tr>
+<tr>
+<td class="sys">AccuRev</td>
+<td class="desc">No.</td>
+</tr>
+<tr>
+<td class="sys">Aegis</td>
+<td class="desc">Yes.</td>
+</tr>
+<tr>
+<td class="sys">Arch</td>
+<td class="desc">
+                    There's <a href="http://arch.bluegate.org/viewarch.html">ViewARCH</a>, and
+                    <a href="http://migo.sixbit.org/software/archzoom/">ArchZoom</a>
+                    which are
+                    works in progress.
+                </td>
+</tr>
+<tr>
+<td class="sys">Bazaar</td>
+<td class="desc">
+                    Yes, several:
+                    <a href="http://www.lag.net/loggerhead/">Loggerhead</a>,
+                    <a href="http://goffredo-baroncelli.homelinux.net/bazaar/">Webserve</a>,
+                    <a href="http://mccormick.cx/dev/bzrweb/index.py/log/bzrweb/head">Bzrweb</a>,
+                    and
+                    <a href="http://bazaar-vcs.org/TracBzr">Trac</a>.
+                </td>
+</tr>
+<tr>
+<td class="sys">BitKeeper</td>
+<td class="desc">Yes. Its own built-in web-interface.</td>
+</tr>
+<tr>
+<td class="sys">ClearCase</td>
+<td class="desc">
+                  Yes. Web views are supported.
+                </td>
+</tr>
+<tr>
+<td class="sys">CM+</td>
+<td class="desc">
+                    Yes.  Can be configured to restrict which operations
+                    are allowed by which users, so that customers may access their
+                    requests without seeing development team data.
+                </td>
+</tr>
+<tr>
+<td class="sys">CMSynergy</td>
+<td class="desc">Possibly.</td>
+</tr>
+<tr>
+<td class="sys">Co-Op</td>
+<td class="desc">Since this functionality is always
+                    available locally, there is no need for web interface.
+                </td>
+</tr>
+<tr>
+<td class="sys">Darcs</td>
+<td class="desc">
+                    <a href="http://abridgegame.org/cgi-bin/darcs.cgi/darcs/">darcs.cgi</a>
+                    is included in the distribution.
+                </td>
+</tr>
+<tr>
+<td class="sys">Git</td>
+<td class="desc">
+                    Yes.  Gitweb is included in distribution.
+                </td>
+</tr>
+<tr>
+<td class="sys">LibreSource Synchronizer</td>
+<td class="desc">
+                  Yes, without diff features but with a better awareness support.
+                  (allow to know at any time on each version each one is working on)
+                </td>
+</tr>
+<tr>
+<td class="sys">Mercurial</td>
+<td class="desc">Yes.  The web interface is a bundled component.</td>
+</tr>
+<tr>
+<td class="sys">Monotone</td>
+<td class="desc">No.</td>
+</tr>
+<tr>
+<td class="sys">OpenCM</td>
+<td class="desc">No.</td>
+</tr>
+<tr>
+<td class="sys">Perforce</td>
+<td class="desc">Yes, P4Web.</td>
+</tr>
+<tr>
+<td class="sys">PureCM</td>
+<td class="desc">Yes.</td>
+</tr>
+<tr>
+<td class="sys">SourceAnywhere</td>
+<td class="desc">Currently not.</td>
+</tr>
+<tr>
+<td class="sys">Subversion</td>
+<td class="desc">Yes.
+                    <a href="http://www.viewvc.org/">ViewVC</a>,
+                    <a href="http://freshmeat.net/projects/svnweb/">SVN::Web</a>,
+                    <a href="http://websvn.tigris.org/">WebSVN</a>,
+                    <a href="http://viewsvn.berlios.de/">ViewSVN</a>,
+                    <a href="http://www.outoforder.cc/projects/apache/mod_svn_view/">mod_svn_view</a>,
+                    <a href="http://www.horde.org/chora/">Chora</a>,
+                    <a href="http://www.edgewall.com/trac/">Trac</a>,
+                    <a href="http://web-cpan.berlios.de/modules/SVN-RaWeb-Light/">SVN::RaWeb::Light</a>,
+                    <a href="http://www.polarion.org/svnbrowser.php">SVN
+                        Browser</a>,
+                    <a href="http://insurrection.tigris.org/">Insurrection</a>
+                    and <a href="http://www.osdevel.org/projects/show/16?lang=en">perl_svn</a>.
+                    Aside
+                    from that, the Subversion Apache service provides a
+                    rudimentary web-interface.
+                    </td>
+</tr>
+<tr>
+<td class="sys">Superversion</td>
+<td class="desc">No.</td>
+</tr>
+<tr>
+<td class="sys">svk</td>
+<td class="desc">Yes. Same as Subversion.</td>
+</tr>
+<tr>
+<td class="sys">Team Foundation Server</td>
+<td class="desc">Web Access is available as download for free.</td>
+</tr>
+<tr>
+<td class="sys">Vesta</td>
+<td class="desc">
+                    Yes: <a href="http://www.scooter.cx/vestaweb/">Vestaweb</a>.
+                </td>
+</tr>
+<tr>
+<td class="sys">Visual SourceSafe</td>
+<td class="desc">
+                    It is possible to code one using the API, but no official
+                    or third-party one exists.
+                </td>
+</tr>
+</table>
+<h3 id="availability_of_guis">Availability of Graphical User-Interfaces.</h3>
+<p class="expl">
+                What is the availability of graphical user-interfaces for
+                the system? How many GUI clients are present for it?
+            </p>
+<table class="compare">
+<tr>
+<td class="sys">CVS</td>
+<td class="desc">Very good. There are many available GUIs:
+                    WinCVS, Cervisia (for KDE),
+                    TortoiseCVS (Windows Explorer plug-in).
+                </td>
+</tr>
+<tr>
+<td class="sys">AccuRev</td>
+<td class="desc">
+                    A single, comprehensive,
+                    java-based GUI is provided.  The GUI has the same
+                    look-and-feel on all platforms.
+                </td>
+</tr>
+<tr>
+<td class="sys">Aegis</td>
+<td class="desc">
+                    There is tkaegis.
+                </td>
+</tr>
+<tr>
+<td class="sys">Arch</td>
+<td class="desc">
+                    There are
+                    <a href="http://www.ibe.miee.ru/tlator/">tlator</a>,
+                    <a href="http://www.hpl.hp.com/personal/Yasushi_Saito/octopy/">Octopy</a>,
+                    and <a href="http://www.nongnu.org/archway/">ArchWay</a>
+                    and possibly others under development.
+                </td>
+</tr>
+<tr>
+<td class="sys">Bazaar</td>
+<td class="desc">
+                    There are several graphical frontends in
+                    development,
+                    see <a href="http://bazaar-vcs.org/BzrPlugins">the Bazaar Plugins page</a>
+                    and <a href="http://bazaar-vcs.org/3rdPartyTools">the Third-party Tools page</a>.
+                    Notable
+                    are <a href="http://bazaar-vcs.org/QBzr">QBzr
+                    (Qt)</a> and
+                    <a href="http://bazaar-vcs.org/bzr-gtk">bzr-gtk (GTK+)</a>, which
+                    can be considered beta quality.  Work is also
+                    being done on integrating Bazaar with Windows
+                    Explorer, Eclipse, Nautilus, and Meld.
+                </td>
+</tr>
+<tr>
+<td class="sys">BitKeeper</td>
+<td class="desc">
+                    Good. BitKeeper ships with several
+                    GUIs for performing common tasks. I'm not aware
+                    of any third-part GUIs.
+                </td>
+</tr>
+<tr>
+<td class="sys">ClearCase</td>
+<td class="desc">
+                  Supplied for both Windows and UNIX. GUI tools are
+                  typically not as solid as the command-line tools
+                  though.
+                </td>
+</tr>
+<tr>
+<td class="sys">CM+</td>
+<td class="desc">
+                    Excellent.  Windows and Unix/Linux GUI as well
+                    as web GUI.  Extensively configurable via simple menu files,
+                    browser files, etc.  Can customize the set of to-do lists by
+                    user/role, same for menus, pop-up menus, default visible tabbed
+                    reports, etc.  GUI also used for all admin and for process
+                    and data schema customization.  Also plug-in for Visual Studio,
+                    Eclipse, etc. and File Browser (Windows).
+                </td>
+</tr>
+<tr>
+<td class="sys">CMSynergy</td>
+<td class="desc">
+                    A couple of GUIs.  A motif-based one
+                    (even on Windows) allows most functionality but is clunky.
+                    A nicer Java one allows developer work but not much
+                    administrative stuff. Has an SCCI plug-in, though it
+                    doesn't handle network problems well.
+                </td>
+</tr>
+<tr>
+<td class="sys">Co-Op</td>
+<td class="desc">The system is GUI-based by design.</td>
+</tr>
+<tr>
+<td class="sys">Darcs</td>
+<td class="desc">
+                    None to speak of.  (There is a modest graphical
+                    interface to a few commands in the distribution, but it
+                    is not being developed currently.)
+                </td>
+</tr>
+<tr>
+<td class="sys">Git</td>
+<td class="desc">
+                    Gitk is included in distribution.  Qgit and Git-gui tools are also available.
+                </td>
+</tr>
+<tr>
+<td class="sys">LibreSource Synchronizer</td>
+<td class="desc">
+                  One written in Java/SWING and available on any OS that
+                  is automatically launched from the repository web page and
+                  another one which is an Eclipse plugin.
+                </td>
+</tr>
+<tr>
+<td class="sys">Mercurial</td>
+<td class="desc">
+                    History viewing available with hgit extension;
+                    check-in extension (hgct) makes committing easier.
+                    Some third-party IDEs and GUI tools (e.g. eric3,
+                    meld) have integrated Mercurial support.
+                </td>
+</tr>
+<tr>
+<td class="sys">Monotone</td>
+<td class="desc">
+                    No GUIs are available.
+                </td>
+</tr>
+<tr>
+<td class="sys">OpenCM</td>
+<td class="desc">
+                    No GUIs are available.
+                </td>
+</tr>
+<tr>
+<td class="sys">Perforce</td>
+<td class="desc">
+                    Yes, P4Win and others based on the available libp4
+                    library.
+                </td>
+</tr>
+<tr>
+<td class="sys">PureCM</td>
+<td class="desc">
+                    Cross-platform GUI for Windows, Linux, Mac OS X
+                    and other UNIXes.
+                </td>
+</tr>
+<tr>
+<td class="sys">SourceAnywhere</td>
+<td class="desc">The system is GUI-based by design.</td>
+</tr>
+<tr>
+<td class="sys">Subversion</td>
+<td class="desc">
+                    Very good. There are many available
+                    GUIs: RapidSVN (cross-platform),
+                    TortoiseSVN (Windows Explorer plug-in), Jsvn (Java), etc.
+                    Most of them are still under development.
+                </td>
+</tr>
+<tr>
+<td class="sys">Superversion</td>
+<td class="desc">
+                    A GUI is integrated.
+                </td>
+</tr>
+<tr>
+<td class="sys">svk</td>
+<td class="desc">
+                    No GUIs are available.
+                </td>
+</tr>
+<tr>
+<td class="sys">Team Foundation Server</td>
+<td class="desc">TFS client integrates into Visual Studio.</td>
+</tr>
+<tr>
+<td class="sys">Vesta</td>
+<td class="desc">
+                    No GUIs are available, but the repository has a
+                    C++ API, and it is not hard to write one.  (At
+                    least three different project-specific ones have
+                    been written by users at Compaq and Intel.)
+                </td>
+</tr>
+<tr>
+<td class="sys">Visual SourceSafe</td>
+<td class="desc">
+                    Standalone GUI comes with it, plus SCCI plug-in for
+                    MS Visual Developer Studio. There is an Eclipse
+                    plug-in.
+                </td>
+</tr>
+</table>
+<h2 id="license">License</h2>
+<p class="expl">
+            What are the licensing terms for the software?
+        </p>
+<table class="compare">
+<tr>
+<td class="sys">CVS</td>
+<td class="desc">GNU GPL (open source)</td>
+</tr>
+<tr>
+<td class="sys">AccuRev</td>
+<td class="desc">Proprietary, named-user licensing.</td>
+</tr>
+<tr>
+<td class="sys">Aegis</td>
+<td class="desc">
+                GNU GPL (open source)
+            </td>
+</tr>
+<tr>
+<td class="sys">Arch</td>
+<td class="desc">GNU GPL (open source)</td>
+</tr>
+<tr>
+<td class="sys">Bazaar</td>
+<td class="desc">GNU GPL (open source)</td>
+</tr>
+<tr>
+<td class="sys">BitKeeper</td>
+<td class="desc">
+                Proprietary, binary only license. Pay per use license,
+                with an option for a costless license for developers of
+                open-source software. Used to have a gratis, downloadable
+                license, which was intended for the develpoment of open
+                source software. It had <a href="bk-license.html">a
+                    problematic license</a>,
+                and was discontinued starting at April 2005.
+            </td>
+</tr>
+<tr>
+<td class="sys">ClearCase</td>
+<td class="desc">
+              Proprietary, with floating license supported. License
+              server contacted for each clearcase operation, which
+              obtains a license to be used for the next 30-60
+              mins. Prices are several $k per license plus yearly
+              maintenance fee. Typically 1-3 users per license
+              required, depending on activity. Multisite requires
+              additional licensing.
+            </td>
+</tr>
+<tr>
+<td class="sys">CM+</td>
+<td class="desc"> Network licenses and user licenses. No minimum
+                checkout time, and automatic license checkin on idle. License
+                server included in product. Professional and Enterprise editions.
+                Enterprise includes customizations, additional applications, and
+                full multiple site capability.  One Server license per site. Total
+                license cost per user typically less than $1000 + 18% annual mtce.
+            </td>
+</tr>
+<tr>
+<td class="sys">CMSynergy</td>
+<td class="desc">
+                Prices negotiable with salesman.
+                Server is typically roughly 20,000 British Pounds.
+                Clients are 4,000 British Pounds.  Per-year costs of 18%
+                of original.
+            </td>
+</tr>
+<tr>
+<td class="sys">Co-Op</td>
+<td class="desc">Proprietary, short text key. 30-day
+                full-featured trial. Free to "observers"
+                (members who don't make changes).
+                $159 per workstation.
+            </td>
+</tr>
+<tr>
+<td class="sys">Darcs</td>
+<td class="desc">GNU GPL (open source)</td>
+</tr>
+<tr>
+<td class="sys">Git</td>
+<td class="desc">GNU GPL v2 (open source).</td>
+</tr>
+<tr>
+<td class="sys">LibreSource Synchronizer</td>
+<td class="desc">QPL - The Qt Public License (OpenSource)</td>
+</tr>
+<tr>
+<td class="sys">Mercurial</td>
+<td class="desc">GNU GPL (open source)</td>
+</tr>
+<tr>
+<td class="sys">Monotone</td>
+<td class="desc">GNU GPL (open source)</td>
+</tr>
+<tr>
+<td class="sys">OpenCM</td>
+<td class="desc">
+                GNU GPL (open source), but moving soon to
+                BSD or CPL (also open source).
+            </td>
+</tr>
+<tr>
+<td class="sys">Perforce</td>
+<td class="desc">
+                A proprietary, binary only, commercial license.
+                <a href="http://perforce.com/perforce/price.html">Price
+                    starting at $800 per seat for the first year</a> and then
+                a $160 for continuing support for the subsequent years. The
+                latter payment is optional and required only for support,
+                as the product can be used without it. Free for
+                Open Source projects (no support in this case).
+            </td>
+</tr>
+<tr>
+<td class="sys">PureCM</td>
+<td class="desc">
+                A proprietary, binary only, commercial license.
+                <a href="http://www.purecm.com/purchase">Price
+                    starting at $1000 for 5 users</a>
+            </td>
+</tr>
+<tr>
+<td class="sys">SourceAnywhere</td>
+<td class="desc">Proprietary, named-user licensing.</td>
+</tr>
+<tr>
+<td class="sys">Subversion</td>
+<td class="desc">
+                Apache/BSD-style license. (open-source)
+            </td>
+</tr>
+<tr>
+<td class="sys">Superversion</td>
+<td class="desc">
+                GNU GPL (open-source)
+            </td>
+</tr>
+<tr>
+<td class="sys">svk</td>
+<td class="desc">Perl License. (open source)</td>
+</tr>
+<tr>
+<td class="sys">Team Foundation Server</td>
+<td class="desc">Commercial license.</td>
+</tr>
+<tr>
+<td class="sys">Vesta</td>
+<td class="desc">
+                GNU LGPL (open source)
+            </td>
+</tr>
+<tr>
+<td class="sys">Visual SourceSafe</td>
+<td class="desc">
+                VSS Ships with MSDN, and can also be purchased
+                standalone or with other tools.
+            </td>
+</tr>
+</table>
+</body>
+</html>

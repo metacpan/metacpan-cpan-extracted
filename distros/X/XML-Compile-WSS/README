@@ -1,0 +1,25 @@
+=== README for XML-Compile-WSS version 1.14
+=   Generated on Mon May  8 09:15:41 2017 by OODoc 2.02
+
+There are various ways to install this module:
+
+ (1) if you have a command-line, you can do:
+       perl -MCPAN -e 'install <any package from this distribution>'
+
+ (2) if you use Windows, have a look at http://ppm.activestate.com/
+
+ (3) if you have downloaded this module manually (as root/administrator)
+       gzip -d XML-Compile-WSS-1.14.tar.gz
+       tar -xf XML-Compile-WSS-1.14.tar
+       cd XML-Compile-WSS-1.14
+       perl Makefile.PL
+       make          # optional
+       make test     # optional
+       make install
+
+For usage, see the included manual-pages or
+    http://search.cpan.org/dist/XML-Compile-WSS-1.14/
+
+Please report problems to
+    http://rt.cpan.org/Dist/Display.html?Queue=XML-Compile-WSS
+

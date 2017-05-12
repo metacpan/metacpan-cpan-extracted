@@ -1,0 +1,7 @@
+MANIFEST                This list of files
+README                  The README file
+Makefile.PL             Perl script to generate Makefile
+lib/XML/Namespace.pm    The XML::Namespace module itself
+t/namespace.t           A test script for the XML::Namespace module
+META.yml                Module meta-data (added by MakeMaker)
+

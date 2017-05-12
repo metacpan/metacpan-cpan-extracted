@@ -1,0 +1,133 @@
+% title 'Your Cart';
+% layout 'default';
+
+% if ( items_in 'cart' or items_in 'quote' ) {
+<!--
+  % if ( items_in 'cart' ) {
+    <ul class="checkout_crumbs text-center">
+       <li class="col-md-15 label-primary">Review products</li>
+       <li class="col-md-15 label-default">Enter contact information</li>
+       <li class="col-md-15 label-default">Review Pricing</li>
+       <li class="col-md-15 label-default">Pay for the order</li>
+       <li class="col-md-15 label-default">Receive confirmation</li>
+    </ul>
+  % } else {
+    <ul class="checkout_crumbs text-center">
+       <li class="col-md-4 label-primary">Review products</li>
+       <li class="col-md-4 label-default">Enter contact information</li>
+       <li class="col-md-4 label-default">Receive confirmation</li>
+    </ul>
+  % }
+-->
+  %= form_for '/cart/checkout' => (method => 'POST') => id => 'checkout_form' => begin
+    %= csrf_field
+
+    <div class="row">
+      % if ( items_in 'cart' ) {
+        <div class="cart col-md-<%= scalar(items_in 'quote') ? 6 : 12 %>">
+          <div class="table-responsive panel panel-primary">
+            <div class="panel-heading">
+              <h3 class="panel-title"><i class="glyphicon glyphicon-shopping-cart"></i> Purchase</h3>
+            </div>
+            <div class="panel-body">
+              <p>Here are the items you're purchasing.</p>
+            </div>
+            <table class="table table-striped">
+            <thead>
+              <tr>
+                <th></th>
+                <th>Product</th>
+                <th>Price</th>
+                <th>Quantity</th>
+                <th>Unit</th>
+              </tr>
+            </thead>
+            <tbody>
+              % for ( items_in 'cart' ) {
+                <tr>
+                  <td><span><img src="/product-pics/<%=
+                    $_->{image} %>" alt=""></span></td>
+                  <td><a href="/product/<%= $_->{url} %>"
+                    ><%= $_->{title} %>
+                      % if ( length $_->{group_desc} ) {
+                        <small>(<%= $_->{group_desc} %>)</small>
+                      % }
+                    </a></td>
+                  <td>
+                    % if ( $_->{price} == 0 ) {
+                      FREE
+                    % } else {
+                      $<%= $_->{price_dollars}
+                      %><sup>.<%= $_->{price_cents} %></sup>
+                    % }
+                  </td>
+                  <td>
+                    <%= hidden_field 'id_' . $_->{id} => $_->{id} %>
+                    <%= hidden_field 'number_' . $_->{id}
+                      => $_->{number} %>
+                    <%= text_field 'quantity_' . $_->{id}
+                      => value => $_->{quantity},
+                      class => 'qty-input form-control'
+                    %>
+                  </td>
+                  <td><%= $_->{quantity} > 1
+                      ? $_->{unit_multi} : $_->{unit} %></td>
+                </tr>
+              % }
+            </tbody>
+            </table>
+          </div>
+        </div>
+      % }
+      % if ( items_in 'quote' ) {
+        <div class="quote col-md-<%= scalar(items_in 'cart') ? 6 : 12 %>">
+          <div class="table-responsive panel panel-primary">
+            <div class="panel-heading">
+              <h3 class="panel-title"><i class="glyphicon glyphicon-comment"></i> Quote Request</h3>
+            </div>
+            <div class="panel-body">
+              <p>A Sales Representative will respond to you with a quote.</p>
+            </div>
+              <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th></th>
+                  <th>Product</th>
+                  <th>Quantity</th>
+                  <th>Unit</th>
+                </tr>
+              </thead>
+              <tbody>
+                % for ( items_in 'quote' ) {
+                  <tr>
+                    <td><img src="/product-pics/<%=
+                    $_->{image} %>" alt=""></td>
+                    <td><a href="/product/<%= $_->{url} %>"
+                      ><%= $_->{title} %></a></td>
+                    <td>
+                      <%= hidden_field 'id_' . $_->{id} => $_->{id} %>
+                      <%= hidden_field 'number_' . $_->{id}
+                        => $_->{number} %>
+                      <%= text_field 'quantity_' . $_->{id}
+                        => value => $_->{quantity},
+                        class => 'qty-input form-control'
+                      %>
+                    </td>
+                    <td><%= $_->{quantity} > 1
+                      ? $_->{unit_multi} : $_->{unit} %></td>
+                  </tr>
+                % }
+              </tbody>
+              </table>
+          </div>
+        </div>
+      % }
+    </div>
+    %= submit_button 'Proceed to the next step', class => 'btn btn-lg btn-primary'
+  %= end
+
+% } else {
+  <p class="alert alert-extra-danger"><i
+    class="glyphicon glyphicon-exclamation-sign"></i> There are no
+      products in your cart.</p>
+% }

@@ -1,0 +1,94 @@
+NAME
+    XML::Atom::FromOWL - export RDF data to Atom
+
+SYNOPSIS
+     use LWP::UserAgent;
+     use XML::Atom::OWL;
+     use XML::Atom::FromOWL;
+ 
+     my $ua       = LWP::UserAgent->new;
+     my $r        = $ua->get('http://intertwingly.net/blog/index.atom');
+     my $atomowl  = XML::Atom::OWL->new($r->decoded_content, $r->base);
+     my $model    = $atomowl->consume->graph;  ## an RDF::Trine::Model
+ 
+     my $exporter = XML::Atom::FromOWL->new;
+     print $_->as_xml
+            foreach $exporter->export_feeds($model);
+
+DESCRIPTION
+    This module reads RDF and writes Atom feeds. It does the reverse of
+    XML::Atom::OWL.
+
+  Constructor
+    *   `new(%options)`
+
+        Returns a new XML::Atom::FromOWL object.
+
+        There are no valid options at the moment - the hash is reserved for
+        future use.
+
+  Methods
+    *   `export_feeds($input, %options)`
+
+        Returns a list of feeds found in the input, in no particular order.
+
+        The input may be a URI, file name, RDF::Trine::Model or anything else
+        that can be handled by the `parse` function of RDF::TrineX::Functions.
+
+        Each item in the list returned is an XML::Atom::Feed.
+
+    *   `export_feed($input, $subject, %options)`
+
+        As per `export_feeds` but exports just a single feed.
+
+        The subject provided must be an RDF::Trine::Node::Blank or
+        RDF::Trine::Node::Resource of type awol:Feed.
+
+    *   `export_entries($input, %options)`
+
+        Returns a list of entries found in the input, in no particular order.
+
+        The input may be a URI, file name, RDF::Trine::Model or anything else
+        that can be handled by the `parse` function of RDF::TrineX::Functions.
+
+        Each item in the list returned is an XML::Atom::Entry.
+
+    *   `export_entry($input, $subject, %options)`
+
+        As per `export_entry` but exports just a single entry.
+
+        The subject provided must be an RDF::Trine::Node::Blank or
+        RDF::Trine::Node::Resource of type awol:Entry.
+
+  RDF Input
+    Input is expected to use AtomOwl
+    <http://bblfish.net/work/atom-owl/2006-06-06/#>.
+
+  Feed Output
+    This module doesn't attempt to enforce many of OWL's semantic constraints
+    (e.g. it doesn't enforce that an entry has only one title). It relies on
+    XML::Atom::Feed and XML::Atom::Entry for that sort of thing, but if your
+    input is sensible that shouldn't be a problem.
+
+SEE ALSO
+    XML::Atom::OWL, HTML::Microformats, RDF::TrineX::Functions,
+    XML::Atom::Feed, XML::Atom::Entry.
+
+    <http://bblfish.net/work/atom-owl/2006-06-06/>.
+
+    <http://www.perlrdf.org/>.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2011-2012 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

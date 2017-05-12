@@ -1,0 +1,31 @@
+<script src="/yui/yahoo/yahoo.js"></script> 
+<script src="/yui/connection/connection.js"></script> 
+<script src="/yui/dom/dom.js"></script> 
+
+<HTML>
+  <HEAD>
+    <style> body {font-family: Tahoma, Arial, Helvetica;} 
+            td   {background-color: beige;}
+    </style>
+  </HEAD>
+  <BODY onload="update_buttons()">
+    <H2>X10 Control Console</H2>
+    <P>
+    <FORM>
+      <TABLE CELLSPACING=2 CELLPADDING=6>
+        [% FOREACH device IN devices %]
+          <TR>
+            <TD> [% device.desc %] </TD>
+            <TD> <input class="clicker" type="button" 
+                   id="[% device.name %]"
+                   onClick="toggle('[% device.name %]');">
+            </TD>
+          </TR>
+        [% END %]
+      </TABLE>
+    </FORM>
+    <div id="message"></div>
+  </BODY>
+</HTML>
+
+<script src="/x10.js"></script> 

@@ -1,0 +1,12 @@
+Build.PL
+Changes
+lib/XML/Filter/Normalize.pm
+Makefile.PL
+MANIFEST
+META.yml			# Will be created by "make dist"
+README
+t/00-load.t
+t/pod-coverage.t
+t/pod.t
+t/Recorder.pm
+t/xml-filter-normalize.t

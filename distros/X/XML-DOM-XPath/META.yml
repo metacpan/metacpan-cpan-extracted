@@ -1,0 +1,15 @@
+--- #YAML:1.0
+name:                XML-DOM-XPath
+version:             0.14
+abstract:            Perl extension to add XPath support to XML::DOM, using XML::XPath engine
+license:             ~
+author:              
+    - Michel Rodriguez <mirod@cpan.org>
+generated_by:        ExtUtils::MakeMaker version 6.44
+distribution_type:   module
+requires:     
+    XML::DOM:                      0
+    XML::XPathEngine:              0.1
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

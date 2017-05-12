@@ -1,0 +1,19 @@
+<html>
+<head>
+  <meta http-equiv="Set-Cookie" content="foo; value=bar"/>
+</head>
+<body>
+  <area/>
+  <base href="foo"/>
+  <basefont/>
+  <br class="short"/>
+  <col/>
+  <frame src="here"/>
+  <hr class="long"/>
+  <img src="there"/>
+  <input type="text"/>
+  <isindex/>
+  <link type="text/css"/>
+  <param/>
+</body>
+</html>

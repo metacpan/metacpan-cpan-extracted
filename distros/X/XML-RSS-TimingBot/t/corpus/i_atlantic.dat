@@ -1,0 +1,200 @@
+<?xml version="1.0"?>
+<?xml-stylesheet title="CSS_formatting" type="text/css" href="rss.css"?>
+<rss version="2.0"
+  xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+><channel>
+<!-- Generated with Perl's XML::RSS::SimpleGen v11.11 -->
+
+<link>http://www.theatlantic.com</link>
+<title>The Atlantic</title>
+<description>The Atlantic Monthly plus exclusive online features</description>
+<language>en-US</language>
+<lastBuildDate>Tue, 09 Mar 2004 04:57:13 GMT</lastBuildDate>
+<skipHours><hour>0</hour><hour>1</hour><hour>2</hour><hour>3</hour><hour>4</hour><hour>6</hour><hour>7</hour><hour>8</hour><hour>9</hour><hour>10</hour><hour>11</hour><hour>12</hour><hour>13</hour><hour>14</hour><hour>15</hour><hour>16</hour><hour>18</hour><hour>19</hour><hour>20</hour><hour>21</hour><hour>22</hour><hour>23</hour></skipHours>
+<sy:updateFrequency>2</sy:updateFrequency>
+<sy:updatePeriod>daily</sy:updatePeriod>
+<sy:updateBase>1970-01-01T05:00+00:00</sy:updateBase>
+<ttl>720</ttl>
+<webMaster>sburke@cpan.org</webMaster>
+<docs>http://www.interglacial.com/rss/about.html</docs>
+
+<item>
+  <title>Putting ECOSOC Back in the Loop</title>
+  <link>http://www.theatlantic.com/foreign/unwire/crossette2004-03-08.htm</link>
+  <description>&quot;The UN's Economic and Social Council sank into obscurity over the decades, upstaged by the Security Council, the General Assembly, and a host of agencies working on what should have been primarily ECOSOC's issues: development, health, and human rights.&quot; By Barbara Crossette.</description>
+</item>
+
+<item>
+  <title>Eisner Gets the Axe</title>
+  <link>http://www.theatlantic.com/unbound/sage/ss2004-03-04.htm</link>
+</item>
+
+<item>
+  <title>Money Into the Void</title>
+  <link>http://www.theatlantic.com/unbound/flashbks/spacecosts.htm</link>
+  <description>Is the exorbitant expense of space exploration worth it? Articles from 1895 to the present consider the merits.</description>
+</item>
+
+<item>
+  <title>Newspaper Morals (March 1914)</title>
+  <link>http://www.theatlantic.com/issues/14mar/mencken.htm</link>
+  <description>"The chief appeal of a newspaper is not at all to the educated and reflective minority of citizens, but to the ignorant and unreflective majority." In 1914, H.L. Mencken argued that successful journalism must inflame the sensibilities of the everyman.</description>
+</item>
+
+<item>
+  <title>Wealth of Nations: George Bush and the Labor Market: Like Father, Like Son?</title>
+  <link>http://www.theatlantic.com/politics/nj/crook2004-03-03.htm</link>
+  <description>If the flight of jobs overseas is not the cause of the current labor-market malaise, what is? And at what point will job growth start to match the economy's growth in output? By Clive Crook.</description>
+</item>
+
+<item>
+  <title>Legal Affairs: 'Enemy Combatants': Inching Toward Due Process</title>
+  <link>http://www.theatlantic.com/politics/nj/taylor2004-03-03.htm</link>
+  <description>The Bush administration's handling of alleged "enemy combatants" at Guantanamo Bay shows signs of paying more heed to the rule of law. By Stuart Taylor Jr.</description>
+</item>
+
+<item>
+  <title>Political Pulse: Positively Negative?</title>
+  <link>http://www.theatlantic.com/politics/nj/schneider2004-03-03.htm</link>
+  <description>John Edwards needs to prove two things to Democrats on Super Tuesday. First, that he is electable. And second, that John Kerry isn't. Otherwise, he faces a long, difficult day. By William Schneider.</description>
+</item>
+
+<item>
+  <title>Media: Cold Feet</title>
+  <link>http://www.theatlantic.com/politics/nj/powers2004-03-03.htm</link>
+  <description>We may look back one day and wonder why media coverage of the gay-marriage issue never kicked in to the old, familiar fight-for-justice story line evident in the civil-rights struggles of the 1960s. By William Powers.</description>
+</item>
+
+<item>
+  <title>Haiti's "Devil"</title>
+  <link>http://www.theatlantic.com/issues/2001/06/grann.htm</link>
+  <description>"Faceless bodies began to appear in the streets.... By the middle of 1994 thousands of Haitians had been slaughtered." In 2001 David Grann profiled "Toto" Constant, the CIA-affiliated leader of a paramilitary group that terrorized Haiti after the 1991 overthrow of Jean-Bertrand Aristide.</description>
+</item>
+
+<item>
+  <title>America's Most Wanted</title>
+  <link>http://pqasb.pqarchiver.com/theatlantic/docsearch?1612547606981</link>
+  <description>by Christopher Shea</description>
+</item>
+
+<item>
+  <title>The Unfree World</title>
+  <link>http://pqasb.pqarchiver.com/theatlantic/docsearch?bf6f547606021</link>
+  <description>Democracy's faltering progress by Jen Joynt and Marshall Poe</description>
+</item>
+
+<item>
+  <title>The Armageddon Plan</title>
+  <link>http://pqasb.pqarchiver.com/theatlantic/docsearch?037b547606101</link>
+  <description>During the Reagan era Dick Cheney and Donald Rumsfeld were key players in a clandestine program designed to install a new "President" in the event of a nuclear attack by James Mann</description>
+</item>
+
+<item>
+  <title>We Will Bury You</title>
+  <link>http://pqasb.pqarchiver.com/theatlantic/docsearch?068f547606651</link>
+  <description>The caretakers of Lenin's corpse have made a killing in post-Soviet Russia by Keith Gessen</description>
+</item>
+
+<item>
+  <title>How Jefferson Counted Himself In</title>
+  <link>http://pqasb.pqarchiver.com/theatlantic/docsearch?e89e547605971</link>
+  <description>Something was funny about the Georgia ballot. Did Thomas Jefferson act properly in making himself President in 1801? by Bruce Ackerman and David Fontana</description>
+</item>
+
+<item>
+  <title>God's Lonely Man</title>
+  <link>http://pqasb.pqarchiver.com/theatlantic/docsearch?e0b7547605421</link>
+  <description>Johnny Cash was a Christian who didn't cast stones, a patriot who wasn't a bully by Francis Davis</description>
+</item>
+
+<item>
+  <title>When the Front Page Meets the Big Screen</title>
+  <link>http://pqasb.pqarchiver.com/theatlantic/docsearch?106d547605511</link>
+  <description>Hollywood is not a reliable moral arbiter of anything, so it's not surprising that when it holds a mirror up to journalism, Shattered Glass is the result by Mark Bowden</description>
+</item>
+
+<item>
+  <title>Getting Over Race</title>
+  <link>http://www.theatlantic.com/unbound/interviews/int2004-02-27.htm</link>
+  <description>Debra Dickerson, the author of The End of Blackness, on why she thinks the African-American community needs to &quot;grow up.&quot;</description>
+</item>
+
+<item>
+  <title>Is There a New Germany? (February 1964)</title>
+  <link>http://www.theatlantic.com/issues/64feb/germany.htm</link>
+  <description>"Until Germans really believe that each man is responsible for his acts and his conscience, and that orders are not their own justification, Germany merely changes its leaders, not its character." In 1964, Martha Gellhorn inveighed against Germany's post-war generation.</description>
+</item>
+
+<item>
+  <title>The Southern Cross</title>
+  <link>http://www.theatlantic.com/issues/2004/03/green-flag.htm</link>
+  <description>What defenders of the Confederate flag should know: the man who created it would have been the first to get rid of it by Joshua Green</description>
+</item>
+
+<item>
+  <title>Free Trade vs. Good Jobs</title>
+  <link>http://www.theatlantic.com/unbound/polipro/pp2004-02-25.htm</link>
+  <description>What led America's early leaders to break the law of free trade? Should we break it again? By Jack Beatty.</description>
+</item>
+
+<item>
+  <title>Social Studies: Israel's Sharon Is Up to Something in Gaza. But What?</title>
+  <link>http://www.theatlantic.com/politics/nj/rauch2004-02-25.htm</link>
+  <description>What's up with Israeli Prime Minister Ariel Sharon's recent announcement that Israel intends to withdraw from its settlements in Gaza? By Jonathan Rauch.</description>
+</item>
+
+<item>
+  <title>Legal Affairs: John Edwards: The Lawsuit Industry Puts Its Best Face Forward</title>
+  <link>http://www.theatlantic.com/politics/nj/taylor2004-02-25.htm</link>
+  <description>A look at John Edwards's legal career provides a window into the flaws of the legal system that made this mill worker's son a multimillionaire. By Stuart Taylor Jr.</description>
+</item>
+
+<item>
+  <title>Political Pulse: Bush's Vanished Capital</title>
+  <link>http://www.theatlantic.com/politics/nj/schneider2004-02-25.htm</link>
+  <description>John Kerry was on both sides of the issue that split the Vietnam generation. He was a war hero and an anti-war hero. With Kerry as their leading candidate, Democrats have the standing to play the military card. By William Schneider.</description>
+</item>
+
+<item>
+  <title>The Kiss of Death</title>
+  <link>http://www.theatlantic.com/unbound/sage/ss2004-02-24.htm</link>
+  <description>Cartoons by Sage Stossel.</description>
+</item>
+
+<item>
+  <title>Blind Into Baghdad</title>
+  <link>http://www.theatlantic.com/issues/2004/01/fallows.htm</link>
+  <description>by James Fallows The U.S. occupation of Iraq is a debacle because a vast amount of expert planning was willfully ignored.</description>
+</item>
+
+<item>
+  <title>Robert Moses: An Atlantic Portrait (February 1939)</title>
+  <link>http://www.theatlantic.com/issues/39feb/0239rodgers.htm</link>
+  <description>Cleveland Rodgers draws an early sketch of New York's urban czar, "the man who, in less than five years, has remade or refurbished a considerable portion of the metropolis."</description>
+</item>
+
+<item>
+  <title>How Serfdom Saved the Women's Movement</title>
+  <link>http://www.theatlantic.com/issues/2004/03/flanagan.htm</link>
+  <description>Because of "the unmade beds, the children with their endless questions, the tendency of a good fight over housework to stop the talking and the kissing," the author writes, "one of the most profound cultural revolutions in American history came perilously close to running aground." But then the forces of global capitalism solved the problem: America's newly liberated class of educated professional women found itself presented with an army of poor, easily exploited women from other countries who could take care of their children and clean their houses by Caitlin Flanagan</description>
+</item>
+
+<item>
+  <title>Letters to the Editor</title>
+  <link>http://www.theatlantic.com/issues/2004/03/letters.htm</link>
+</item>
+
+<item>
+  <title>The Hollow Army</title>
+  <link>http://www.theatlantic.com/issues/2004/03/fallows.htm</link>
+  <description>It's only a slight exaggeration to say that the entire U.S. military is either in Iraq, returning from Iraq, or getting ready to go by James Fallows</description>
+</item>
+
+<item>
+  <title>Madonna Wants Me</title>
+  <link>http://www.theatlantic.com/issues/2004/03/green-celebrity.htm</link>
+  <description>Every political candidate now needs a "celebrity wrangler" by Joshua Green</description>
+</item>
+
+
+</channel></rss>

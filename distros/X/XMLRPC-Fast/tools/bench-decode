@@ -1,0 +1,165 @@
+#!/usr/bin/perl
+use v5.14;
+use strict;
+use warnings;
+
+use Benchmark   qw< timethese cmpthese >;
+use Dumbbench;
+use Frontier::RPC2;
+use RPC::XML;
+use RPC::XML::ParserFactory;
+use XML::RPC;
+use XMLRPC::Lite;
+
+use lib "lib", "alt";
+use XMLRPC::Fast;
+use XMLRPC::Fast::DecodeWith::XMLLibXML;
+use XMLRPC::Fast::DecodeWith::XMLTreePP;
+
+use lib "/home/voice/current/agi-bin";
+use constant
+    HAVE_DIABOLO_XMLRPC_LITE => eval "use Diabolo::XMLRPC_Lite; 1" // 0;
+
+
+my $ping = [ "client.ping" ];
+my $login = [ "auth.login", { login => "someone", password => "secret" } ];
+my $set_status = [ "user.set_next_status", { agent_status => 'available' } ];
+my $update_infos = [
+    "client.update_interface", {
+        agent_id => 12345,
+        availability_code => "",
+        hostname => "dev01.dev.company.com",
+        in_conference => "N",
+        in_listen => "N",
+        in_whisper => "N",
+        line_status => "incoming_call_in_conversation",
+        logon_time => "2015-08-13T10:00:00 CEST",
+        logout_cause => "",
+        logout_time => "",
+        logout_who => "",
+        next_status => "available",
+        next_status_availability_code => "",
+        phone_number => "+33123456789",
+        queue_status => "",
+        queue_status_update_time => "",
+        status => "incoming_call_in_conversation",
+        status_updated_time => "2015-08-13T10:04:32 CEST",
+        transferAgent_id => "",
+        transferAgent_status => "",
+        user_role => "Agent",
+        version => 3,
+
+        call_info => {
+            destination_origin => "3312345678",
+            diaboloCallid => "240306495400301",
+            duration => "",
+            hangup_cause => "",
+            hangup_who => "",
+            hybrid_campaign_contact_id => 0,
+            id => "",
+            inqueue_duration => "",
+            on_conference => "N",
+            on_hold => "N",
+            on_listen => "N",
+            on_recording => "N",
+            on_whisper => "N",
+            owner_agent_id => 12345,
+            peer_number => 3312345678,
+            pickup_agent_id => 12345,
+            pickup_delay => 2,
+            pickup_when => "2015-08-13T10:04:31 CEST",
+            queue_name => "service apres-vente des emissions",
+            real_service => "service apres-vente des emissions",
+            service => 123,
+            skills => [ { id => 1, name => "can speak"} ],
+            source => "33123456789",
+            status => "incoming_call_in_conversation",
+            status_update_time => "2015-08-13T10:04:32 CEST",
+            svi_start => "2015-08-13T10:04:30 CEST",
+            type => "entrant",
+            user_message => "",
+            version => 2,
+            webcallback_id => 0,
+            when_in_queue => "2015-08-13T10:04:32 CEST",
+            wrapup_id => 0,
+        },
+    }
+];
+
+my $msg = $update_infos;
+my $xml = XMLRPC::Serializer->envelope(method => @$msg);
+
+my $frpc2 = Frontier::RPC2->new;
+my $xrpc = XML::RPC->new("");
+my $rxp = RPC::XML::ParserFactory->new;
+
+
+my @tests = (
+    {
+        name => "XMLRPC::Fast (XML::LibXML)",
+        code => sub {
+            my $rpc = XMLRPC::Fast::DecodeWith::XMLLibXML::decode_xmlrpc($xml);
+        }
+    },
+    {
+        name => "XMLRPC::Fast (XML::Parser)",
+        code => sub {
+            my $rpc = decode_xmlrpc($xml);
+        }
+    },
+    {
+        name => "XMLRPC::Fast (XML::TreePP)",
+        code => sub {
+            my $rpc = XMLRPC::Fast::DecodeWith::XMLTreePP::decode_xmlrpc($xml);
+        }
+    },
+    {
+        name => "XMLRPC::Lite",
+        code => sub {
+            my $rpc = XMLRPC::Deserializer->deserialize($xml)->root
+        },
+    },
+  ( {
+        name => "Diabolo::XMLRPC_Lite",
+        code => sub {
+            my $rpc = Diabolo::XMLRPC_Deserializer->deserialize($xml)->root
+        },
+    } ) x!! HAVE_DIABOLO_XMLRPC_LITE,
+    {
+        name => "XML::RPC",
+        code => sub {
+            my ($method, @params)
+                = $xrpc->unparse_call($xrpc->{tpp}->parse($xml));
+        },
+    },
+    {
+        name => "RPC::XML",
+        code => sub {
+            my $rpc = $rxp->parse($xml);
+        },
+    },
+    {
+        name => "Frontier::RPC2",
+        code => sub {
+            my $call = $frpc2->decode($xml);
+        },
+    },
+);
+
+
+my $r = timethese(50_000, { map { $_->{name} => $_->{code} } @tests });
+say "";
+cmpthese($r);
+
+exit;
+say "";
+
+my $bench = Dumbbench->new(
+    target_rel_precision    =>       0.005, # seek ~0.5%
+    initial_runs            =>  30_000,
+    max_iterations          => 200_000,
+);
+$bench->add_instances( map Dumbbench::Instance::PerlSub->new(%$_), @tests );
+$bench->run;
+$bench->report;
+

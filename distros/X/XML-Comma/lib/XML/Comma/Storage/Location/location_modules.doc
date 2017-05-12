@@ -1,0 +1,186 @@
+how to write location modules
+--
+
+There are two types, we'll call them _files and _dirs, by analogy to
+file and directory parts of a path. (The calls from Store should be
+abstracted enough that we can craft _file and _dir components that
+don't actually have anything to do with the filesystem, but the ones
+we're using now actually all do.)
+
+----
+
+_file modules must implement the following methods:
+
+MAJOR_NUMBER()
+ should return '1'; each _file has a major number of 1, that's what
+identifies it unambiguously as a _file module (as opposed to a _dir)
+to the Store setup code.
+
+decl_pos()
+ return undef, or whatever. only needed out of parallelism with _dir
+sections. (without this, there would be an unintuitive, rather than
+intuitive, error if two _file sections are specified)
+
+new ( $class, $store, $decl_pos, parsed %args )
+ three responsibilities: 1) create a blessed object, 2) setup whatever
+fields are needed to keep track of this particular configuration --
+presumably using parsed args from def section, and 3) return a list of
+the form ($self, 'string name of exported special method'...).
+
+make_id ( $self, $struct )
+ this is called to create a new id (presumably as part of an initial
+store or a copy). make_id routines are called in "left to right"
+order, so this is called last after all of the _dir make_id's are
+called. the $struct argument has the following fields:
+
+store - the Store object that is doing the calling.
+doc - the Doc that the id is being made on behalf of
+locs - a reference to a list of "pieces" of the being-constructed location
+ids - a reference to a list of "pieces" of the being-constructed id
+overflow - a flag indicating whether we are being called in the context of an 
+           "overflow" from a further-right compatriot (this will never
+           be true for _file sections)
+
+ the job of this method is to put the pieces of the location and id
+together in a appropriate ways, adding to them to create new
+(presumably unique) location and id strings, and to return those
+complete strings.
+
+ make_id may return a special value -- the string
+'COMMA_DB_SEQUENCE_SET' -- if this location module is actually going
+to depend on the database/indexing code to generate a unique
+doc_id. ugly hacks in the SQL layers handle id generation, in this
+case. and the write() method is responsibly for doing some cleanup and
+setting the doc's storage_info fields. see the source of the
+Index_Only module.
+
+write ( $self, $store, $location, $id, $output_text_block, $doc )
+ write out to permanent store - given both location and id for
+ convenience, also given a reference to the doc object itself, for
+ unusual cases. normally a locattion module woul just write out the
+ text block that has been produced by the filter stages.
+
+read ( $self, $store, $location, $id )
+ read from permanent store
+
+erase ( $self, $location, $doc )
+ erase from permanent store
+
+location_from_id ( $self, $store, $id, $location )
+ as with make_id, this is called at the tail end of a chain. the $id
+argument should be just the final piece of the id string, the "lefter"
+parts of the string having been consumed by preceding
+_dir->location_from_id() calls. the $location argument should be the
+location string constructed thus far. this method should turn the
+piece of the id that it is given into a final location piece and
+return ('', $full_location_string), or die with an error.
+
+id_from_location ( $self, $store, $id, $location ) 
+ just like location_from_id, only does the transform in the opposite
+direction
+
+next_location ( $self, $store, $location, $direction )
+ called with a full location string, must return either the "next"
+location of a stored Doc, or undef if there is no next Doc. the
+$direction arg should be >=0 for 'up', or <=0 for 'down'.
+
+first_location ( $self, $store )
+ get the first location of a stored Doc. "first" means that
+next_location() returns undef when called with this location and
+a negative direction.
+
+last_location ( $self, $store ) 
+ get the last location of a stored Doc. "last" means that
+next_location() returns undef when called with this location and a
+positive direction.
+
+write_blob ( $self, $store, $store_location, $store_id, $blob, 
+             $content, $new_location )
+ write the given blob/content in the permanent store. last argument is
+a boolean: if true, create a new blob_location. if false, use the
+blob's current location if possible, or create a new location if
+not. return the blob_location used.
+
+read_blob ( $self, $store, $blob )
+ read and return the content from the given blob.
+
+copy_to_blob ( $self, $store, $store_location, $store_id, $blob, 
+               $from_filename, $to_location )
+ almost the same as write_blob: write the content contained in the
+given $filename to the permanent store. return the blob_location to
+which the blob was written. the last argument is optional. if given a
+to_location, this method must use that as the place to copy the blob
+to, otherwise this method must make its own decision (presumably make
+a new) location.
+
+erase_blob ( $self, $store, $blob, $blob_location )
+ remove the blob from the permanent store. the last argument is
+optional, the routine should use $blob->get_location() if one isn't
+given, and should use the passed blob_location if its available.
+
+touch ( $self, $store, $location )
+ update the mod time of the given $location. return the updated mod
+time.
+
+last_modified ( $self, $store, $location )
+ return the mod time of the give $location.
+
+----
+
+_dir modules are considerably simpler, having only six required
+methods, all of which are similar to methods described above.
+
+MAJOR_NUMBER ()
+ this is used as the primary sort criterion for ordering _dir modules
+in relation to one another. (having an explicit sort order could be a
+good idea for some sets of directory pairings, rather than relying on
+config files to make sure that orders are compatible. However, modules
+that are careful about making sure that their lengths are always
+specified probably don't need to sort differently, so it's nice for
+operators to be able to specify the order in which ids/locations are
+structured. So the *standard* MAJOR_NUMBER is '400', by
+convention. NOTE: '1' is reserved for _file modules.
+
+decl_pos ()
+ the secondary sort criterion for ordering these modules is the
+declaration order. so this method should return the position of this
+location field (relative to other location fields) in the storage
+def. (see new(), for where to get the information used to determine
+the declaration position.)
+
+new ( $class, parsed %args )
+ almost exactly like _file->new(). additionally, a 'decl_pos' arg is
+passed, whihc should be squirreled away in a field so that decl_pos()
+can return it, later.
+
+make_id ( $self, $struct )
+ very similar to _file->make_id(). unlike _file->make_id(), this
+method only returns the new *pieces* that it creates for the id and
+location strings: return ( $id_piece, $location_piece). things are
+specified this way in order for the Store code that controls the
+calling chain to be able to handle overflow situations as easily as
+possible. which brings us to an additional responsibility that the
+_dir modules have here -- to check and handle the "overflow" case as
+indicated by the $struct->{overflow} flag. if this location is able to
+create additional capacity in response to an overflow down the chain,
+it should do so. if not, it should return undef (or die??? FIX this
+note).
+
+location_from_id ( $self, $store, $id, $location )
+ handles a part of the id->location transformation. should consume the
+part of the id string that it uses, returning ( $shortened_id,
+$lengthened_location). this method is called in a left-to-right chain,
+and should feel free to die with an error if it encounters any
+mal-formedness in its piece of id. it should not check for existence
+or validity beyond well-formedness -- that's not its job.
+
+id_from_location ( $self, $store, $id, $location )
+ just like location_from_id, but does the transform in the opposite
+direction.
+
+--
+
+NOTE: File-based storages *really* need to include an extension, so
+that it is easy to pull doc files out of directories. The suggested
+default extension is '.comma'. This isn't enforced, even by the
+Abstract_file template, but it's worth remembering.

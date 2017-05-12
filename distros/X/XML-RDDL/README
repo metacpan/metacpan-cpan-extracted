@@ -1,0 +1,13 @@
+
+XML::RDDL - Interface to RDDL (http://www.rddl.org/)
+
+
+RDDL (Resource Directory Description Language) is an XML vocabulary
+used to described resources associated with a namespace. It can be
+embedded inside other XML vocabularies (most frequently XHTML).
+
+This module is meant to be used as a SAX2 handler that will return a
+Directory instance containing all resource descriptions at the end of
+the parse. It also features a SAX2 Driver to generate XML from an RDDL
+object.
+

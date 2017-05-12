@@ -1,0 +1,19 @@
+<stx:transform version="1.0" 
+  xmlns:stx="http://stx.sourceforge.net/2002/ns"
+  strip-space="yes">
+
+  <stx:template match="node">
+    <n>
+      <stx:process-children/>
+      <stx:process-attributes/>
+    </n>
+  </stx:template>
+  
+  <stx:template match="@*">
+    <stx:element name="{name()}">
+      <stx:value-of select="."/>
+      <stx:process-children/>
+    </stx:element>
+  </stx:template>
+
+</stx:transform>

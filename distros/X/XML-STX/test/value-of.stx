@@ -1,0 +1,23 @@
+<stx:transform version="1.0" 
+  xmlns:stx="http://stx.sourceforge.net/2002/ns"
+  strip-space="yes">
+
+  <stx:template match="node[@id=2]">
+    <root>
+      <stx:value-of select="'text'"/>
+      <stx:text>:</stx:text>
+      <stx:value-of select="(52,2)"/>
+      <stx:text>:</stx:text>
+      <stx:value-of select="1+2*2"/>
+      <stx:text>:</stx:text>
+      <stx:value-of select="boolean(5)"/>
+      <stx:text>:</stx:text>
+      <stx:value-of select="('Hi', 'there')"/>
+      <stx:text>:</stx:text>
+      <stx:value-of select="('a', 2, 'b')" separator="-"/>
+      <stx:text>:</stx:text>
+      <stx:value-of select="('a', 2, 'b')" separator=""/>
+    </root>
+  </stx:template>
+  
+</stx:transform>

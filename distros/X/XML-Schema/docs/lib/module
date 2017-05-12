@@ -1,0 +1,31 @@
+[%  USE domparser = XML.DOM( ErrorContext => 4 );
+    dom  = domparser.parse( module.xml );
+    node = dom.getElementsByTagName('module', 0);
+    toc = [ ];
+    content = site.view.module.print( node );
+-%]
+<h1>[% node.id or node.name %]</h1>
+
+<ul>
+[% node.getElementsByTagName('about', 0).content(site.view.default) %]
+</ul>
+
+[% INCLUDE toc/wide %]
+
+[% IF (notes = node.getElementsByTagName('note', 0));
+       ntext = [];
+       FOREACH n = notes;
+           nt = n.content(site.view.text);
+           ntext.push(nt);
+       END
+-%]
+<b>NOTES: </b>
+<ul>
+[% FOREACH note = ntext -%]
+<li>[% note %]
+[% END %]
+</ul>
+[% END %]
+
+
+[% content %]

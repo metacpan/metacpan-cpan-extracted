@@ -1,0 +1,17 @@
+--- #YAML:1.0
+name:                XML-CompileX-Tranport-SOAPXMPP
+version:             1.0
+abstract:            Send SOAP messages through XMPP
+license:             ~
+author:              
+    - Daniel Ruoso <daniel@ruoso.com>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    AnyEvent:                      0
+    Event:                         0
+    Net::XMPP2:                    0
+    XML::Compile::SOAP:            0.73
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

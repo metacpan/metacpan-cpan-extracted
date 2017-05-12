@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="windows-1252"?>
+<doc boo="789">
+ <person active="1"> this &lt; is it
+  <fname>Jane •</fname>
+  <lname>•Luser</lname>
+  <email>JLuser@bogus.com</email>
+  <address>
+   <street>Washington st.</street>
+   <city>Old Creek</city>
+   <country>The US</country>
+   <bogus>bleargh</bogus>
+  </address>
+ </person>
+ <person active="1">
+  <fname>Jañé šø</fname>
+  <lname>Luser</lname>
+  <email>JLuser@bogus.com</email>
+  <address>
+   <street>Washington st.</street>
+   <city>Old Creek</city>
+   <country>The US</country>
+   <bogus>bleargh</bogus>
+  </address>
+ </person>
+ <person active="0">
+  <fname>John</fname>
+  <lname>Other</lname>
+  <email>JOther@silly.com</email>
+  <address>
+   <street>Grant's st.</street>
+   <city>New Creek</city>
+   <country>Canada</country>
+   <bogus>sdrysdfgtyh <foo>degtrhy werthy</foo> drthyu</bogus>
+  </address>
+ </person>
+</doc>

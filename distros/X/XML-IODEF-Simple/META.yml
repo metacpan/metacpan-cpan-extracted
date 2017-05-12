@@ -1,0 +1,29 @@
+---
+abstract: 'Perl extension for easier IODEF message generation'
+author:
+  - 'Wes Young, <wes@barely3am.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: XML-IODEF-Simple
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Digest::MD5: 2.36
+  Digest::SHA1: 2.11
+  Module::Pluggable: 3.6
+  Regexp::Common::net: 2.108
+  XML::IODEF: 0.11
+  perl: 5.8.8
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.02

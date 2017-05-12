@@ -1,0 +1,32 @@
+DESCRIPTION
+
+  XML::Filter::Sort - SAX filter for sorting elements in XML
+
+  This module is a SAX filter for sorting 'records' in XML documents
+  (including documents larger than available memory).  The `xmlsort'
+  utility which is included with this distribution can be used to sort
+  an XML file from the command line without writing Perl code (see:
+  `perldoc xmlsort').
+
+PREREQUISITES
+
+  Requires XML::SAX
+
+
+BUILDING/INSTALLING
+
+  Once the archive is unpacked, use these commands:
+
+      perl Makefile.PL
+      make
+      make test
+      make install
+
+
+COPYRIGHT
+
+  Copyright 2002-2005 Grant McLean <grantm@cpan.org>
+
+  This library is free software; you can redistribute it and/or modify
+  it under the same terms as Perl itself.
+

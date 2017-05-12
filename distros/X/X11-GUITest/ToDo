@@ -1,0 +1,18 @@
+X11::GUITest ($Id: ToDo 226 2013-02-05 23:57:21Z pecastro $)
+
+This is a list of Todo items. 
+--------------------------------------------------------------------
+
+- Be able to obtain a widget's text.  For example, if we could
+  obtain the label text of a button, we could then locate its
+  position and use ClickWindow to click on it rather then using
+  ClickWindow with pre-known offsets or even SendKeys.  I've
+  looked at such things as XtWindowToWidget, XFetchName,
+  XtGetValues.  The EditRes protocol is not generic enough and
+  requires the support of the client application.  Could look
+  at spying on the X server to find this information or use AT-SPI.
+
+- Ensure alternatively mapped mouse buttons are handled
+  appropriately.
+
+--------------------------------------------------------------------

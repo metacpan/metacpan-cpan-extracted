@@ -1,0 +1,16 @@
+ChangeLog
+MANIFEST
+Makefile.PL
+README
+lib/XML/Compile/C14N.pm
+lib/XML/Compile/C14N.pod
+lib/XML/Compile/C14N/Util.pm
+lib/XML/Compile/C14N/Util.pod
+lib/XML/Compile/C14N/exc-c14n.xsd
+t/01use.t
+t/10strip.t
+t/20util.t
+world.txt
+xt/99pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,26 @@
+<SOFTPKG NAME="DBI" VERSION="1,604,0,0">
+  <TITLE>DBI</TITLE>
+  <ABSTRACT>Database independent interface for Perl</ABSTRACT>
+  <AUTHOR>Tim Bunce (dbi-users@perl.org)</AUTHOR>
+  <IMPLEMENTATION>
+    <DEPENDENCY NAME="Scalar-List-Utils" VERSION="0,0,0,0" />
+    <DEPENDENCY NAME="Storable" VERSION="1,0,0,0" />
+    <OS NAME="MSWin32" />
+		<ARCHITECTURE NAME="MSWin32-x86-multi-thread" />
+		<CODEBASE HREF="DBI-1.604-PPM56.tar.gz" />
+	</IMPLEMENTATION>
+  <IMPLEMENTATION>
+    <DEPENDENCY NAME="Scalar-List-Utils" VERSION="0,0,0,0" />
+    <DEPENDENCY NAME="Storable" VERSION="1,0,0,0" />
+    <OS NAME="MSWin32" />
+    <ARCHITECTURE NAME="MSWin32-x86-multi-thread-5.8" />
+    <CODEBASE HREF="DBI-1.604-PPM58.tar.gz" />
+  </IMPLEMENTATION>
+  <IMPLEMENTATION>
+    <DEPENDENCY NAME="Scalar-List-Utils" VERSION="0,0,0,0" />
+    <DEPENDENCY NAME="Storable" VERSION="1,0,0,0" />
+    <OS NAME="MSWin32" />
+    <ARCHITECTURE NAME="MSWin32-x86-multi-thread-5.10" />
+    <CODEBASE HREF="DBI-1.604-PPM510.tar.gz" />
+  </IMPLEMENTATION>
+</SOFTPKG>

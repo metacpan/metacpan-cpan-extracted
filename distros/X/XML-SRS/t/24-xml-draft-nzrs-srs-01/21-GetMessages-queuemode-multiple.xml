@@ -1,0 +1,335 @@
+<?xml version="1.0" encoding="utf-8"?>
+<NZSRSResponse VerMajor="5" VerMinor="0" RegistrarId="140">
+  <Response Action="GetMessages" FeId="8" FeSeq="4779468" MoreRowsAvailable="1" OrigRegistrarId="1" RecipientRegistrarId="140" Rows="1">
+    <FeTimeStamp Day="2" Hour="10" Minute="24" Month="7" Second="00" TimeZoneOffset="+12:00" Year="2010" />
+    <Response Action="DomainUpdate" FeId="5" FeSeq="103433490029" OrigRegistrarId="50" RecipientRegistrarId="100" Rows="11" TransId="1034394336128521553">
+      <FeTimeStamp Day="12" Hour="00" Minute="15" Month="10" Second="00" TimeZoneOffset="+1300" Year="2002" />
+      <Domain Delegate="1" DomainName="number1.net.te" RegistrantRef="1178175" RegistrarId="100" Status="Active" Term="1">
+        <NameServers>
+          <Server FQDN="idns1.netsol.gen.te" IP4Addr="216.168.224.88" />
+          <Server FQDN="idns2.netsol.gen.te" IP4Addr="216.168.228.201" />
+        </NameServers>
+        <RegistrantContact Name="bob a fet">
+          <PostalAddress Address1="This is where i live" />
+          <Phone AreaCode="1" CountryCode="33" LocalNumber="1234567" />
+          <Fax AreaCode="1" CountryCode="33" LocalNumber="1234567" />
+        </RegistrantContact>
+        <AdminContact Name="bob a fet">
+          <PostalAddress Address1="This is where i live" />
+          <Phone AreaCode="1" CountryCode="33" LocalNumber="1234567" />
+          <Fax AreaCode="1" CountryCode="33" LocalNumber="1234567" />
+        </AdminContact>
+        <TechnicalContact Name="bob a fet">
+          <PostalAddress Address1="This is where i live" />
+          <Phone AreaCode="1" CountryCode="33" LocalNumber="1234567" />
+          <Fax AreaCode="1" CountryCode="33" LocalNumber="1234567" />
+        </TechnicalContact>
+        <BilledUntil Day="28" Hour="00" Minute="00" Month="3" Second="00" TimeZoneOffset="+1300" Year="2003" />
+        <RegisteredDate Day="28" Hour="00" Minute="00" Month="3" Second="00" TimeZoneOffset="+1200" Year="2001" />
+        <CancelledDate Day="17" Hour="14" Minute="10" Month="9" Second="31" TimeZoneOffset="+1200" Year="2002" />
+        <AuditDetails ActionId="1034394336128521553" RegistrarId="50">
+          <AuditTime>
+            <From Day="12" Hour="00" Minute="15" Month="10" Second="00" TimeZoneOffset="+1300" Year="2002" />
+          </AuditTime>
+          <AuditText>
+      RenewDomains
+      </AuditText>
+        </AuditDetails>
+      </Domain>
+      <Domain Delegate="1" DomainName="number1.net.te" RegistrantRef="1225807" RegistrarId="100" Status="Active" Term="1">
+        <NameServers>
+          <Server FQDN="ns2.iprolink.net.te" IP4Addr="203.96.0.23" />
+          <Server FQDN="ns3.iprolink.net.te" IP4Addr="203.96.47.253" />
+        </NameServers>
+        <RegistrantContact Name="bob a fet">
+          <PostalAddress Address1="This is where i live" />
+          <Phone AreaCode="3" CountryCode="64" LocalNumber="1234567" />
+          <Fax AreaCode="3" CountryCode="64" LocalNumber="1234567" />
+        </RegistrantContact>
+        <AdminContact Name="bob a fet">
+          <PostalAddress Address1="This is where i live" />
+          <Phone AreaCode="3" CountryCode="64" LocalNumber="1234567" />
+          <Fax AreaCode="3" CountryCode="64" LocalNumber="1234567" />
+        </AdminContact>
+        <TechnicalContact Name="bob a fet">
+          <Phone AreaCode="9" CountryCode="64" LocalNumber="1234567" />
+          <Fax AreaCode="9" CountryCode="64" LocalNumber="1234567" />
+        </TechnicalContact>
+        <BilledUntil Day="2" Hour="15" Minute="51" Month="6" Second="09" TimeZoneOffset="+1300" Year="2003" />
+        <RegisteredDate Day="05" Hour="15" Minute="52" Month="6" Second="59" TimeZoneOffset="+1200" Year="2002" />
+        <AuditDetails ActionId="1034394336128521553" RegistrarId="50">
+          <AuditTime>
+            <From Day="12" Hour="00" Minute="15" Month="10" Second="00" TimeZoneOffset="+1300" Year="2002" />
+          </AuditTime>
+          <AuditText>
+      RenewDomains
+      </AuditText>
+        </AuditDetails>
+      </Domain>
+      <Domain Delegate="1" DomainName="number1.net.te" RegistrantRef="1199609" RegistrarId="100" Status="Active" Term="1">
+        <NameServers>
+          <Server FQDN="ns1.digiweb.org.te" IP4Addr="203.167.250.2" />
+          <Server FQDN="ns2.digiweb.org.te" IP4Addr="203.167.250.3" />
+        </NameServers>
+        <RegistrantContact Name="bob a fet">
+          <PostalAddress Address1="This is where i live" />
+          <Phone AreaCode="3" CountryCode="64" LocalNumber="1234567" />
+          <Fax AreaCode="3" CountryCode="64" LocalNumber="1234567" />
+        </RegistrantContact>
+        <AdminContact Name="bob a fet">
+          <PostalAddress Address1="This is where i live" />
+          <Phone AreaCode="3" CountryCode="64" LocalNumber="1234567" />
+          <Fax AreaCode="3" CountryCode="64" LocalNumber="1234567" />
+        </AdminContact>
+        <TechnicalContact Name="bob a fet">
+          <PostalAddress Address1="This is where i live" />
+          <Phone AreaCode="3" CountryCode="64" LocalNumber="1234567" />
+          <Fax AreaCode="3" CountryCode="64" LocalNumber="1234567" />
+        </TechnicalContact>
+        <BilledUntil Day="13" Hour="17" Minute="51" Month="9" Second="00" TimeZoneOffset="+1300" Year="2003" />
+        <RegisteredDate Day="13" Hour="17" Minute="51" Month="9" Second="00" TimeZoneOffset="+1200" Year="2001" />
+        <CancelledDate Day="26" Hour="00" Minute="00" Month="8" Second="00" TimeZoneOffset="+1200" Year="2002" />
+        <AuditDetails ActionId="1034394336128521553" RegistrarId="50">
+          <AuditTime>
+            <From Day="12" Hour="00" Minute="15" Month="10" Second="00" TimeZoneOffset="+1300" Year="2002" />
+          </AuditTime>
+          <AuditText>
+      RenewDomains
+      </AuditText>
+        </AuditDetails>
+      </Domain>
+      <Domain Delegate="0" DomainName="number1.net.te" RegistrantRef="1196568" RegistrarId="100" Status="Active" Term="1">
+        <NameServers>
+          <Server FQDN="ns1.alldomains.gen.te" IP4Addr="209.25.140.101" />
+          <Server FQDN="ns2.alldomains.gen.te" IP4Addr="209.25.143.102" />
+        </NameServers>
+        <RegistrantContact Name="bob a fet">
+          <PostalAddress Address1="This is where i live" />
+          <Phone AreaCode="925" CountryCode="1" LocalNumber="1234567" />
+        </RegistrantContact>
+        <AdminContact Name="bob a fet">
+          <PostalAddress Address1="This is where i live" />
+          <Phone AreaCode="925" CountryCode="1" LocalNumber="1234567" />
+        </AdminContact>
+        <TechnicalContact Name="bob a fet">
+          <PostalAddress Address1="This is where i live" />
+        </TechnicalContact>
+        <BilledUntil Day="17" Hour="00" Minute="00" Month="8" Second="00" TimeZoneOffset="+1300" Year="2003" />
+        <RegisteredDate Day="17" Hour="00" Minute="00" Month="8" Second="00" TimeZoneOffset="+1200" Year="2001" />
+        <AuditDetails ActionId="1034394336128521553" RegistrarId="50">
+          <AuditTime>
+            <From Day="12" Hour="00" Minute="15" Month="10" Second="00" TimeZoneOffset="+1300" Year="2002" />
+          </AuditTime>
+          <AuditText>
+      RenewDomains
+      </AuditText>
+        </AuditDetails>
+      </Domain>
+      <Domain Delegate="1" DomainName="number1.net.te" RegistrantRef="1237786" RegistrarId="100" Status="Active" Term="1">
+        <NameServers>
+          <Server FQDN="sage.ts.net.te" IP4Addr="202.49.92.1" />
+          <Server FQDN="garlic.ts.net.te" IP4Addr="202.49.92.8" />
+        </NameServers>
+        <RegistrantContact Name="bob a fet">
+          <PostalAddress Address1="This is where i live" />
+          <Phone AreaCode="4" CountryCode="64" LocalNumber="1234567" />
+          <Fax AreaCode="4" CountryCode="64" LocalNumber="1234567" />
+        </RegistrantContact>
+        <AdminContact Name="bob a fet">
+          <PostalAddress Address1="This is where i live" />
+          <Phone AreaCode="4" CountryCode="64" LocalNumber="1234567" />
+          <Fax AreaCode="4" CountryCode="64" LocalNumber="1234567" />
+        </AdminContact>
+        <TechnicalContact Name="bob a fet">
+          <Phone AreaCode="3" CountryCode="64" LocalNumber="1234567" />
+          <Fax AreaCode="3" CountryCode="64" LocalNumber="1234567" />
+        </TechnicalContact>
+        <BilledUntil Day="5" Hour="00" Minute="00" Month="9" Second="00" TimeZoneOffset="+1300" Year="2003" />
+        <RegisteredDate Day="05" Hour="10" Minute="39" Month="9" Second="59" TimeZoneOffset="+1200" Year="2002" />
+        <AuditDetails ActionId="1034394336128521553" RegistrarId="50">
+          <AuditTime>
+            <From Day="12" Hour="00" Minute="15" Month="10" Second="00" TimeZoneOffset="+1300" Year="2002" />
+          </AuditTime>
+          <AuditText>
+      RenewDomains
+      </AuditText>
+        </AuditDetails>
+      </Domain>
+      <Domain Delegate="1" DomainName="number1.net.te" RegistrantRef="1194172" RegistrarId="100" Status="Active" Term="1">
+        <RegistrantContact Name="bob a fet">
+          <PostalAddress Address1="This is where i live" />
+          <Phone AreaCode="21" CountryCode="64" LocalNumber="1234567" />
+        </RegistrantContact>
+        <AdminContact Name="bob a fet">
+          <PostalAddress Address1="This is where i live" />
+          <Phone AreaCode="21" CountryCode="64" LocalNumber="1234567" />
+        </AdminContact>
+        <TechnicalContact Name="bob a fet">
+          <PostalAddress Address1="This is where i live" />
+          <Phone AreaCode="9" CountryCode="64" LocalNumber="1234567" />
+          <Fax AreaCode="9" CountryCode="64" LocalNumber="1234567" />
+        </TechnicalContact>
+        <BilledUntil Day="27" Hour="00" Minute="00" Month="7" Second="00" TimeZoneOffset="+1300" Year="2003" />
+        <RegisteredDate Day="27" Hour="00" Minute="00" Month="7" Second="00" TimeZoneOffset="+1200" Year="2001" />
+        <AuditDetails ActionId="1034394336128521553" RegistrarId="50">
+          <AuditTime>
+            <From Day="12" Hour="00" Minute="15" Month="10" Second="00" TimeZoneOffset="+1300" Year="2002" />
+          </AuditTime>
+          <AuditText>
+      RenewDomains
+      </AuditText>
+        </AuditDetails>
+      </Domain>
+      <Domain Delegate="1" DomainName="number1.net.te" RegistrantRef="1180256" RegistrarId="100" Status="Active" Term="1">
+        <NameServers>
+          <Server FQDN="ns1.2day.gen.te" IP4Addr="202.37.240.3" />
+          <Server FQDN="ns2.2day.gen.te" IP4Addr="198.32.66.4" />
+          <Server FQDN="ns3.2day.gen.te" IP4Addr="198.32.66.42" />
+        </NameServers>
+        <RegistrantContact Name="bob a fet">
+          <PostalAddress Address1="This is where i live" />
+          <Phone AreaCode="27" CountryCode="64" LocalNumber="1234567" />
+        </RegistrantContact>
+        <AdminContact Name="bob a fet">
+          <PostalAddress Address1="This is where i live" />
+          <Phone AreaCode="27" CountryCode="64" LocalNumber="1234567" />
+        </AdminContact>
+        <TechnicalContact Name="bob a fet">
+          <PostalAddress Address1="This is where i live" />
+          <Phone AreaCode="9" CountryCode="64" LocalNumber="1234567" />
+        </TechnicalContact>
+        <BilledUntil Day="16" Hour="00" Minute="00" Month="4" Second="00" TimeZoneOffset="+1300" Year="2003" />
+        <RegisteredDate Day="16" Hour="00" Minute="00" Month="4" Second="00" TimeZoneOffset="+1200" Year="2001" />
+        <AuditDetails ActionId="1034394336128521553" RegistrarId="50">
+          <AuditTime>
+            <From Day="12" Hour="00" Minute="15" Month="10" Second="00" TimeZoneOffset="+1300" Year="2002" />
+          </AuditTime>
+          <AuditText>
+      RenewDomains
+      </AuditText>
+        </AuditDetails>
+      </Domain>
+      <Domain Delegate="1" DomainName="number9.net.te" RegistrantRef="1194247" RegistrarId="100" Status="Active" Term="1">
+        <NameServers>
+          <Server FQDN="ns.freeparking.net.te" IP4Addr="210.54.242.9" />
+          <Server FQDN="ns2.freeparking.net.te" IP4Addr="64.27.98.200" />
+        </NameServers>
+        <RegistrantContact Name="bob a fet">
+          <PostalAddress Address1="This is where i live" />
+          <Phone AreaCode="25" CountryCode="64" LocalNumber="1234567" />
+        </RegistrantContact>
+        <AdminContact Name="bob a fet">
+          <PostalAddress Address1="This is where i live" />
+          <Phone AreaCode="25" CountryCode="64" LocalNumber="1234567" />
+        </AdminContact>
+        <TechnicalContact Name="bob a fet">
+          <PostalAddress Address1="This is where i live" />
+          <Phone AreaCode="6" CountryCode="64" LocalNumber="1234567" />
+          <Fax AreaCode="6" CountryCode="64" LocalNumber="1234567" />
+        </TechnicalContact>
+        <BilledUntil Day="27" Hour="22" Minute="15" Month="7" Second="00" TimeZoneOffset="+1300" Year="2003" />
+        <RegisteredDate Day="27" Hour="22" Minute="15" Month="7" Second="00" TimeZoneOffset="+1200" Year="2001" />
+        <CancelledDate Day="12" Hour="00" Minute="00" Month="8" Second="00" TimeZoneOffset="+1200" Year="2002" />
+        <AuditDetails ActionId="1034394336128521553" RegistrarId="50">
+          <AuditTime>
+            <From Day="12" Hour="00" Minute="15" Month="10" Second="00" TimeZoneOffset="+1300" Year="2002" />
+          </AuditTime>
+          <AuditText>
+      RenewDomains
+      </AuditText>
+        </AuditDetails>
+      </Domain>
+      <Domain Delegate="1" DomainName="number9.net.te" RegistrantRef="1194139" RegistrarId="100" Status="Active" Term="1">
+        <NameServers>
+          <Server FQDN="planet.ak.planet.gen.te" />
+          <Server FQDN="ns2.kc.org.te" />
+        </NameServers>
+        <RegistrantContact Name="bob a fet">
+          <PostalAddress Address1="This is where i live" />
+          <Phone AreaCode="9" CountryCode="64" LocalNumber="1234567" />
+          <Fax AreaCode="9" CountryCode="64" LocalNumber="1234567" />
+        </RegistrantContact>
+        <AdminContact Name="bob a fet">
+          <PostalAddress Address1="This is where i live" />
+          <Phone AreaCode="9" CountryCode="64" LocalNumber="1234567" />
+          <Fax AreaCode="9" CountryCode="64" LocalNumber="1234567" />
+        </AdminContact>
+        <TechnicalContact Name="bob a fet">
+          <PostalAddress Address1="This is where i live" />
+        </TechnicalContact>
+        <BilledUntil Day="27" Hour="00" Minute="00" Month="7" Second="00" TimeZoneOffset="+1300" Year="2003" />
+        <RegisteredDate Day="27" Hour="00" Minute="00" Month="7" Second="00" TimeZoneOffset="+1200" Year="2001" />
+        <AuditDetails ActionId="1034394336128521553" RegistrarId="50">
+          <AuditTime>
+            <From Day="12" Hour="00" Minute="15" Month="10" Second="00" TimeZoneOffset="+1300" Year="2002" />
+          </AuditTime>
+          <AuditText>
+      RenewDomains
+      </AuditText>
+        </AuditDetails>
+      </Domain>
+      <Domain Delegate="1" DomainName="number9.co.te" RegistrantRef="1237789" RegistrarId="100" Status="Active" Term="1">
+        <NameServers>
+          <Server FQDN="sage.ts.net.te" IP4Addr="202.49.92.1" />
+          <Server FQDN="garlic.ts.net.te" IP4Addr="202.49.92.8" />
+        </NameServers>
+        <RegistrantContact Name="bob a fet">
+          <PostalAddress Address1="This is where i live" />
+          <Phone AreaCode="4" CountryCode="64" LocalNumber="1234567" />
+          <Fax AreaCode="4" CountryCode="64" LocalNumber="1234567" />
+        </RegistrantContact>
+        <AdminContact Name="bob a fet">
+          <PostalAddress Address1="This is where i live" />
+          <Phone AreaCode="4" CountryCode="64" LocalNumber="1234567" />
+          <Fax AreaCode="4" CountryCode="64" LocalNumber="1234567" />
+        </AdminContact>
+        <TechnicalContact Name="bob a fet">
+          <Phone AreaCode="3" CountryCode="64" LocalNumber="1234567" />
+          <Fax AreaCode="3" CountryCode="64" LocalNumber="1234567" />
+        </TechnicalContact>
+        <BilledUntil Day="6" Hour="00" Minute="00" Month="9" Second="00" TimeZoneOffset="+1300" Year="2003" />
+        <RegisteredDate Day="05" Hour="10" Minute="53" Month="9" Second="55" TimeZoneOffset="+1200" Year="2002" />
+        <AuditDetails ActionId="1034394336128521553" RegistrarId="50">
+          <AuditTime>
+            <From Day="12" Hour="00" Minute="15" Month="10" Second="00" TimeZoneOffset="+1300" Year="2002" />
+          </AuditTime>
+          <AuditText>
+      RenewDomains
+      </AuditText>
+        </AuditDetails>
+      </Domain>
+      <Domain Delegate="0" DomainName="domain.co.te" RegistrantRef="1182410" RegistrarId="100" Status="Active" Term="1">
+        <NameServers>
+          <Server FQDN="ns1.2day.gen.te" IP4Addr="202.37.240.3" />
+          <Server FQDN="ns2.2day.gen.te" IP4Addr="198.32.66.4" />
+          <Server FQDN="ns3.2day.gen.te" IP4Addr="198.32.66.42" />
+        </NameServers>
+        <RegistrantContact Name="bob a fet">
+          <PostalAddress Address1="This is where i live" />
+          <Phone AreaCode="25" CountryCode="64" LocalNumber="1234567" />
+          <Fax AreaCode="7" CountryCode="64" LocalNumber="1234567" />
+        </RegistrantContact>
+        <AdminContact Name="bob a fet">
+          <PostalAddress Address1="This is where i live" />
+          <Phone AreaCode="25" CountryCode="64" LocalNumber="1234567" />
+          <Fax AreaCode="7" CountryCode="64" LocalNumber="1234567" />
+        </AdminContact>
+        <TechnicalContact Name="bob a fet">
+          <PostalAddress Address1="This is where i live" />
+          <Phone AreaCode="9" CountryCode="64" LocalNumber="1234567" />
+          <Fax AreaCode="9" CountryCode="64" LocalNumber="1234567" />
+        </TechnicalContact>
+        <BilledUntil Day="4" Hour="00" Minute="00" Month="5" Second="00" TimeZoneOffset="+1300" Year="2003" />
+        <RegisteredDate Day="04" Hour="00" Minute="00" Month="5" Second="00" TimeZoneOffset="+1200" Year="2001" />
+        <AuditDetails ActionId="1034394336128521553" RegistrarId="50">
+          <AuditTime>
+            <From Day="12" Hour="00" Minute="15" Month="10" Second="00" TimeZoneOffset="+1300" Year="2002" />
+          </AuditTime>
+          <AuditText>
+      RenewDomains
+      </AuditText>
+        </AuditDetails>
+      </Domain>
+    </Response>
+  </Response>
+</NZSRSResponse>

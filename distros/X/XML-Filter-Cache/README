@@ -1,0 +1,8 @@
+XML::Filter::Cache
+==================
+
+A record/playback module for SAX events, implemented as a filter.
+
+Features a pluggable cache layer.
+
+

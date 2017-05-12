@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:rss091="http://purl.org/rss/1.0/modules/rss091#">
+  <channel>
+    <title>my little example feed</title>
+    <link>http://www.example.com/</link>
+    <description>example tagline</description>
+    <language>en</language>
+  <item>
+    <title>First post</title>
+    <link>http://www.example.com/archives/1</link>
+    <rss091:description>ENTRY CONTENT WITH &lt;b&gt;EMBEDDED MARKUP&lt;/b&gt;</rss091:description>
+  </item>
+  </channel>
+</rss>

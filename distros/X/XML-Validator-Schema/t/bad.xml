@@ -1,0 +1,9 @@
+<foo>
+     <int>1</int>
+     <integer>1</integer>
+     <name>foo</name>
+     <string>...</string>
+     <bool>zool</bool>
+     <date>1977-08-02T20:02:00</date>
+</foo>
+

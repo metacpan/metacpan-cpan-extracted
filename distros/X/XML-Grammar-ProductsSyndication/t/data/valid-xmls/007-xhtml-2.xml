@@ -1,0 +1,75 @@
+<?xml version='1.0' encoding='utf-8'?>
+<?xml-stylesheet type="text/xml" href="product-syndication.xsl"?>
+<!DOCTYPE comparison SYSTEM "product-syndication.dtd">
+<product-syndication>
+    <data>
+        <cat id="books">
+            <title>Books</title>
+            <desc>
+                <p>
+                    These are my books.
+                </p>
+            </desc>
+            <cat id="fiction_books">
+                <title>Fiction books</title>
+                <prod id="little_women">
+                    <title>Little Women</title>
+                    <isbn>06903459409</isbn>
+                    <creator type="author">Louisa May Alcott</creator>
+                    <desc>
+                        <p>
+                            Little Women by <a href="http://en.wikipedia.org/wiki/Louisa_May_Alcott" rel="author">Louisa May Alcott</a> is an 
+                            <b>early</b> and <strong>intriguing</strong>
+                            book.
+                        </p>
+                    </desc>
+                </prod>
+                <prod id="around_the_world_in_80_days">
+                    <title>Around the World in 80 Days</title>
+                    <isbn>12340987</isbn>
+                    <ref 
+                        href="http://www.amazon.com/exec/obidos/ASIN/1577656806/ref=nosim/shlomifishhom-20" 
+                        affil="amazon" 
+                        />
+                    <ref
+                        href="http://search.barnesandnoble.com/booksearch/isbnInquiry.asp?z=y&amp;EAN=9780140367119&amp;itm=1"
+                        affil="bn"
+                        />
+                    <desc>
+                        <p>
+                            Around the world by <a href="http://jules.tld/" 
+                                rel="myover">Jules 
+                                <strong>Verne</strong></a>. About <i>Fog</i> and
+                            Passpartu.
+                        </p>
+                        <p>
+                            <q>I wish I was taller, I wish I was a baller</q>
+                        </p>
+                    </desc>
+                </prod>
+            </cat>
+            <prod id="not_a_book">
+                <title>This is a book that's not a book</title>
+                <isbn>06454545</isbn>
+                <desc>
+                    <p>
+                        I came. I saw. I conquered.
+                    </p>
+                </desc>
+            </prod>
+            <cat id="non_books">
+                <title>Non books</title>
+                <prod id="beatles_blue_album">
+                    <title>The Beatles - The Blue Album</title>
+                    <isbn>56565656</isbn>
+                    <creator type="artist">The Beatles</creator>
+                    <desc>
+                        <p>
+                            I became addicted to "Come Togethere".
+                        </p>
+                    </desc>
+                </prod>
+            </cat>
+        </cat>
+    </data>
+</product-syndication>

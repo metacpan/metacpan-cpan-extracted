@@ -1,0 +1,46 @@
+# Produced by XML::Compile::Translate::Template version 1.08
+#          on Wed Oct 21 10:21:09 2009
+#          Then editted manually.
+# xmlns    http://exist-db.org/collection-config/1.0
+
+# my $config = { ...see below };
+# my $db     = XML::eXistDB::RPC->new(...);
+# my ($rc, $success) = $db->configureCollection($collname, $config, %options);
+
+{ 
+  # 'index' is optional
+  index =>
+  { 
+    fulltext =>
+    { 
+      # the 'path' HASHes occur any number of times
+      include    => [ { path => "example", }, ],
+      exclude    => [ { path => "example", }, ],
+      default    => "none",     # Enum: all none
+      attributes => "true",     # Boolean: true|false|1|0
+      alphanum   => "true",     # Boolean: true|false|1|0
+    },
+
+    # HASH occurs any number of times
+    create =>
+    [ { path     => "example",  # string
+        qname    => "example",  # string
+        type     => "anything", # anySimpleType
+       }, ],
+  },
+
+  # is optional
+  triggers =>
+  { 
+    # HASH occurs at least once
+    trigger =>
+    [ { 
+        # HASH occurs any number of times
+        parameter => [ { name  => "example", value => "example", }, ],
+        class     => "example",
+       }, ], },
+
+  # is optional
+  validation => { mode => "yes", },  # Enum: auto no yes
+}
+

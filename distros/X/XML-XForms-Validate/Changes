@@ -1,0 +1,6 @@
+Revision history for Perl extension XML::XForms::Validate.
+
+0.01  Wed Sep  3 23:03:11 2008
+	- original version; created by h2xs 1.23 with options
+		-b 5.8.0 -n XML::XForms::Validate
+

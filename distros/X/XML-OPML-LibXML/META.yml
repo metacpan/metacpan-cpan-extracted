@@ -1,0 +1,15 @@
+abstract: Parse OPML document with LibXML parser
+author: Tatsuhiko Miyagawa <miyagawa@bulknews.net>
+build_requires: 
+  Test::More: 0
+distribution_type: module
+generated_by: Module::Install version 0.64
+license: perl
+name: XML-OPML-LibXML
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  XML::LibXML: 1.6
+version: 0.03

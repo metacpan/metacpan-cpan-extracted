@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<linkbase xmlns="http://www.xbrl.org/2003/linkbase" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xbrli="http://www.xbrl.org/2003/instance">
+  <roleRef roleURI="http://www.xbrl.tdnet.info/jp/br/tdnet/role/ConsolidatedQuarterly" xlink:type="simple" xlink:href="http://www.xbrl.tdnet.info/jp/br/tdnet/o/ed/rt/2007-06-30/tse-rt-ed-2007-06-30.xsd#RoleConsolidatedInterim"/>
+  <presentationLink xlink:type="extended" xlink:role="http://www.xbrl.tdnet.info/jp/br/tdnet/role/ConsolidatedQuarterly">
+    <loc xlink:type="locator" xlink:href="http://www.xbrl.tdnet.info/jp/br/tdnet/t/hi/2007-06-30/tse-t-hi-2007-06-30.xsd#tse-t-hi_CorrectionOfConsolidatedFinancialForecastInThisQuarter" xlink:label="CorrectionOfConsolidatedFinancialForecastInThisQuarter"/>
+    <loc xlink:type="locator" xlink:href="http://www.xbrl.tdnet.info/jp/br/tdnet/t/ed/2007-06-30/tse-t-ed-2007-06-30.xsd#tse-t-ed_NoteToConsolidatedForecastsAbstract" xlink:label="NoteToConsolidatedForecastsAbstract"/>
+    <presentationArc xlink:type="arc" xlink:arcrole="http://www.xbrl.org/2003/arcrole/parent-child" xlink:from="CorrectionOfConsolidatedFinancialForecastInThisQuarter" xlink:to="NoteToConsolidatedForecastsAbstract" use="prohibited" priority="1" order="1.0"/>
+    <loc xlink:type="locator" xlink:href="http://www.xbrl.tdnet.info/jp/br/tdnet/t/ed/2007-06-30/tse-t-ed-2007-06-30.xsd#tse-t-ed_OthersAbstract" xlink:label="OthersAbstract"/>
+    <presentationArc xlink:type="arc" xlink:arcrole="http://www.xbrl.org/2003/arcrole/parent-child" xlink:from="CorrectionOfConsolidatedFinancialForecastInThisQuarter" xlink:to="OthersAbstract" use="prohibited" priority="1" order="2.0"/>
+    <loc xlink:type="locator" xlink:href="http://www.xbrl.tdnet.info/jp/br/tdnet/t/ed/2007-06-30/tse-t-ed-2007-06-30.xsd#tse-t-ed_NoteToOthersAbstract" xlink:label="NoteToOthersAbstract"/>
+    <presentationArc xlink:type="arc" xlink:arcrole="http://www.xbrl.org/2003/arcrole/parent-child" xlink:from="CorrectionOfConsolidatedFinancialForecastInThisQuarter" xlink:to="NoteToOthersAbstract" use="prohibited" priority="1" order="3.0"/>
+    <loc xlink:type="locator" xlink:href="http://www.xbrl.tdnet.info/jp/br/tdnet/t/ed/2007-06-30/tse-t-ed-2007-06-30.xsd#tse-t-ed_ConsolidatedInformationAbstract" xlink:label="ConsolidatedInformationAbstract"/>
+    <presentationArc xlink:type="arc" xlink:arcrole="http://www.xbrl.org/2003/arcrole/parent-child" xlink:from="ConsolidatedInformationAbstract" xlink:to="CorrectionOfConsolidatedFinancialForecastInThisQuarterAbstract" order="23.0"/>
+    <loc xlink:type="locator" xlink:href="http://www.xbrl.tdnet.info/jp/br/tdnet/t/hi/2007-06-30/tse-t-hi-2007-06-30.xsd#tse-t-hi_CorrectionOfConsolidatedFinancialForecastInThisQuarterAbstract" xlink:label="CorrectionOfConsolidatedFinancialForecastInThisQuarterAbstract"/>
+    <presentationArc xlink:type="arc" xlink:arcrole="http://www.xbrl.org/2003/arcrole/parent-child" xlink:from="CorrectionOfConsolidatedFinancialForecastInThisQuarterAbstract" xlink:to="CorrectionOfConsolidatedFinancialForecastInThisQuarter" order="2.0"/>
+    <presentationArc xlink:type="arc" xlink:arcrole="http://www.xbrl.org/2003/arcrole/parent-child" xlink:from="ConsolidatedInformationAbstract" xlink:to="NoteToConsolidatedForecastsAbstract" order="24.0"/>
+    <presentationArc xlink:type="arc" xlink:arcrole="http://www.xbrl.org/2003/arcrole/parent-child" xlink:from="ConsolidatedInformationAbstract" xlink:to="OthersAbstract" order="25.0"/>
+    <presentationArc xlink:type="arc" xlink:arcrole="http://www.xbrl.org/2003/arcrole/parent-child" xlink:from="ConsolidatedInformationAbstract" xlink:to="NoteToOthersAbstract" order="26.0"/>
+  </presentationLink>
+</linkbase>

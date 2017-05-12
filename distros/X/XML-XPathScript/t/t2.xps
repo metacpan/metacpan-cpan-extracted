@@ -1,0 +1,7 @@
+<%  
+    use XML::XPathScript;
+	$t->{turkey}{pre} =  'llama';
+	$t->{chicken}{showtag} = 1;
+	$t->{chicken}{testcode} = sub { return DO_SELF_ONLY() };
+	$t->{'text()'}{testcode} = sub { $_[1]->{pre} = uc $_[0]->string_value; -1  };
+%><%= apply_templates( '//chicken' ) %>

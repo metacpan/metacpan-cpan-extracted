@@ -1,0 +1,28 @@
+<product name="myProduct">
+   <owner>
+      <owningTeam>IAT</owningTeam>
+      <contactName>Robert Schweikert</contactName>
+   </owner>
+   <productName>Test Special Edition</productName>
+   <productVersion>0.1.3</productVersion>
+   <licenseName>tse</licenseName>
+   <externalProductIdentifier>88</externalProductIdentifier>
+   <released>false</released>
+   <releasePlatforms>
+      <platform>glnx86</platform>
+      <platform>glnxa64</platform>
+      <platform>maci</platform>
+   </releasePlatforms>
+   <dependsOn>
+      <componentDep name="ola"></componentDep>
+      <componentDep name="bola"></componentDep>
+      <componentDep name="pablo"></componentDep>
+   </dependsOn>
+   <requiredProducts>
+      <productDep name="tester"></productDep>
+   </requiredProducts>
+   <recommendedProducts>
+      <productDep name="testerExtension"></productDep>
+   </recommendedProducts>
+</product>
+   

@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<diff xmlns="http://www.locus.cz/diffmark">
+  <a>
+    <dm:copy xmlns:dm="http://www.locus.cz/diffmark" count="2"/>
+    <dm:delete xmlns:dm="http://www.locus.cz/diffmark">
+      <c/>
+    </dm:delete>
+    <dm:insert xmlns:dm="http://www.locus.cz/diffmark">
+      <c2>
+        <d/>
+        <e/>
+        <f/>
+      </c2>
+    </dm:insert>
+  </a>
+</diff>

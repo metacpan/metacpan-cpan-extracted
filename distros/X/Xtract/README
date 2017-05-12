@@ -1,0 +1,34 @@
+NAME
+    Xtract - Take any data source and deliver it to the world
+
+DESCRIPTION
+    THIS APPLICATION IS HIGHLY EXPERIMENTAL
+
+    Xtract is an command line application for extracting data out of many
+    different types of databases (or other things that are able to look like
+    a database via DBI).
+
+    More information to follow...
+
+SUPPORT
+    Bugs should be reported via the CPAN bug tracker at
+
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Xtract>
+
+    For other issues, contact the author.
+
+AUTHOR
+    Adam Kennedy <adamk@cpan.org>
+
+SEE ALSO
+    DBI
+
+COPYRIGHT
+    Copyright 2009 - 2011 Adam Kennedy.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

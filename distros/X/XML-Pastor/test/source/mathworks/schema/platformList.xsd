@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Schema definition for the platformList element specification -->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+   <xsd:element name="platformList" type="platformList"/>
+   <xsd:complexType name="platformList">
+      <xsd:sequence>
+         <xsd:element name="platform" type="xsd:string" maxOccurs="unbounded"/>
+      </xsd:sequence>
+   </xsd:complexType>
+</xsd:schema>

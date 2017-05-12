@@ -1,0 +1,74 @@
+=head1 NAME
+
+X500::RDN - handle X.500 RDNs (Relative Distinguished Names), parse and format them
+
+=head1 SYNOPSIS
+
+  use X500::RDN;
+
+  my $rdn = new X500::RDN ('c'=>'DE');
+  my $c = $rdn->getAttributeValue ('c');
+
+=head1 DESCRIPTION
+
+This module handles X.500 RDNs (Relative Distinguished Names).
+This is a supporting module for X500::DN.
+
+=head2 Methods
+
+=over 4
+
+=item * $object = new X500::RDN ('type'=>'value', 'type'=>'value', ...);
+
+Creates an RDN object from argument pairs, each pair an attribute type and value.
+With more than one pair as arguments, you will get a multi-valued RDN.
+
+=item * $object->isMultivalued();
+
+Returns whether the RDN is multi-valued.
+
+=item * $object->getAttributeTypes();
+
+Returns the RDN's attribute types, a list of strings.
+
+=item * $object->getAttributeValue (type);
+
+Returns the RDN attribute's value.
+
+=item * $object->getRFC2253String();
+
+Returns the RDN as a string formatted according to RFC 2253 syntax.
+
+=item * $object->getX500String();
+
+Returns the RDN as a string formatted according to X.500 syntax.
+NOTE: This is a hack, there is no definition for a X.500 string syntax!?
+
+=item * $object->getOpenSSLString();
+
+Returns the RDN as a string formatted according to one of openssl's syntaxes.
+Croaks on multi-valued RDNs.
+
+=back
+
+=head2 EXPORT
+
+None.
+
+=head1 BUGS
+
+=head1 AUTHOR
+
+Robert Joop E<lt>yaph-070708@timesink.deE<gt>
+
+=head1 COPYRIGHT
+
+Copyright 2002 Robert Joop.  All Rights reserved.
+This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+L<X500::DN>,
+L<perl>.
+
+=cut

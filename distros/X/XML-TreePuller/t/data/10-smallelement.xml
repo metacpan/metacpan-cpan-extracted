@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<element one="1" two="2">
+	<foo>bar</foo>
+	<baz>biddle</baz>
+	<baz>more biddle</baz></element>

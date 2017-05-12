@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:tns1="http://schemas.microsoft.com/sharepoint/soap/" elementFormDefault="qualified" targetNamespace="http://schemas.microsoft.com/sharepoint/soap/" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="GetAppManagementDatabaseMap">
+    <xs:complexType>
+      <xs:sequence/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetAppManagementDatabaseMapResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="GetAppManagementDatabaseMapResult" nillable="true" type="tns1:ArrayOfAppMngMapEntryData"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="ArrayOfAppMngMapEntryData">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="AppMngMapEntryData" nillable="true" type="tns1:AppMngMapEntryData"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfAppMngMapEntryData" nillable="true" type="tns1:ArrayOfAppMngMapEntryData"/>
+  <xs:complexType name="AppMngMapEntryData">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="CompositeKeyEnd" nillable="true" type="xs:base64Binary"/>
+      <xs:element minOccurs="0" name="CompositeKeyStart" nillable="true" type="xs:base64Binary"/>
+      <xs:element minOccurs="0" name="ConnectionString" nillable="true" type="xs:string"/>
+      <xs:element minOccurs="0" name="IsSqlAzure" type="xs:boolean"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="AppMngMapEntryData" nillable="true" type="tns1:AppMngMapEntryData"/>
+  <xs:complexType name="AppManagementServiceFault">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Message" nillable="true" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="AppManagementServiceFault" nillable="true" type="tns1:AppManagementServiceFault"/>
+</xs:schema>

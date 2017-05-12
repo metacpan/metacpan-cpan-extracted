@@ -1,0 +1,22 @@
+XML::CommonNS
+=============
+
+A list of commonly used namespaces, with XML::NamespaceFactory 
+intergration.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 Robin Berjon
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

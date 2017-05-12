@@ -1,0 +1,15 @@
+ChangeLog
+MANIFEST
+Makefile.PL
+README
+bin/xmlrewrite
+example/dimap/README
+example/dimap/horrible.zip
+example/dimap/norm
+lib/XML/Rewrite.pm
+lib/XML/Rewrite.pod
+lib/XML/Rewrite/Schema.pm
+lib/XML/Rewrite/Schema.pod
+t/01use.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

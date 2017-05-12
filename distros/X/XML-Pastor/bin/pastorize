@@ -1,0 +1,271 @@
+#!/usr/bin/perl -w
+
+require 5.008;
+
+use utf8;
+use lib './lib';
+use XML::Pastor::Pastorize;
+
+XML::Pastor::Pastorize->run();
+
+1;
+
+__END__
+
+
+=head1 NAME
+
+pastorize - Generate Perl classes with XML bindings starting from a W3C XSD Schema
+
+=head1 SYNOPSIS 
+
+  pastorize [options] schema1 schema2 ...
+  
+  Options:  --help, --man, --verbose, --debug, --mode, --style, --module, --destination, --class_prefix, --complex_isa, --simple_isa
+  
+=head1 OPTIONS
+
+=item ARGUMENTS
+
+Argument is a file name or the URL to the B<W3C XSD schema> file to be processed. 
+
+Be careful about the paths that are mentioned for any included schemas though. If these are relative, they
+will be taken relative to the current schema being processed. In the case of a schema string, the resolution
+of relative paths for the included schemas is undefined.
+
+Currently, it is also possible to pass multiple schemas, in which case the schemas will be processed in order
+and merged to the same model for code generation. Just make sure you don't have name collisions in the schemas though.
+
+=item THE OPTIONS
+
+=over
+
+=item mode
+
+This parameter effects what actually will be done by the method. Either offline code generation, or run-time
+code evaluation, or just returning the generated code.
+
+=over
+
+=item offline
+
+B<Default>.
+
+In this mode, the code generation is done 'offline', that is, similar to Java's Castor way of doing things, the generated code 
+will be written to disk on module files under the path given by the L</destination> parameter.
+
+In 'offline'  mode, it is possible to generate a single module with all the generated clasess or multiple modules
+one for each class, depending on the value of the L</style> parameter. 
+
+The typical use of the offline mode is during a 'make' process, where you have a set of XSD schemas and you
+generate your modules to be later installed by 'make install'. This is very similar to Java Castor's behaviour. 
+This way your XSD schemas don't have to be accessible during run-time and you don't have a performance penalty.
+
+  # Generate MULTIPLE modules, one module for each class, and put them under destination.
+  pastorize --mode offline --style multiple --destination /tmp/lib/perl --class_prefix MyApp::Data /some/path/to/schema.xsd 
+    
+=item eval 
+
+In 'I<eval>' (run-time) mode, the XSD schema is processed at 
+run-time giving much more flexibility to the user. In this mode, no code will be written to disk. Instead, the generated code 
+(which is necessarily a L</single> block) will be evaluated before returning to the caller. 
+
+The added flexibility has a price on the other hand, namely a performance penalty and 
+the fact that the XSD schema needs to be accessible at run-time. Note that the performance penalty applies only to the code genereration (pastorize) phase; 
+the generated classes perform the same as if they were generated offline.
+
+Note that 'eval' mode forces the L</style> parameter to have a value of 'single';
+
+  # Generate classes in MEMORY, and EVALUATE the generated code on the fly.
+  pastorize --mode eval --class_prefix MyApp::Data /some/path/to/schema.xsd 
+    
+
+=item return 
+
+In 'return'  mode, the XSD schema is processed but no code is written to disk or evaluated. In this mode, the method
+just returns the generated block of code as a string, so that you may use it to your liking. You would typically be evaluating 
+it though.
+
+Note that 'return' mode forces the L</style> parameter to have a value of 'single';
+
+
+=item print 
+
+Like 'return' mode, but also prints the resulting string on STDOUT. 
+
+=back
+
+=item style
+
+This parameter determines if XML::Pastor will generate a single module where all classes reside (L</single>), or 
+multiple modules one for each class (L</multiple>).
+
+Some modes (such as L</eval> and L</return>)force the style argument to be 'single'.
+
+Possible values are :
+
+=over 
+
+=item single 
+
+One block of code containg all the generated classes will be produced. This will be put in the module given by the
+'module' argument (or otherwise the class_prefix).
+
+=item multiple 
+
+A separate piece of code for each class will be produced. In addition, a module that 'uses' each of the 
+individual generated modules will be created whose name is given by the 'module' argument (or otherwise it's 
+given by 'class_prefix').
+
+=back
+
+=item class_prefix
+
+If present, the names of the generated classes will be prefixed by this value. 
+You may end the value with '::' or not, it's up to you. It will be autocompleted. 
+In other words both 'MyApp::Data' and 'MyApp::Data::' are valid. 
+
+=item destination
+
+This is the directory prefix where the produced modules will be written in I<offline> mode. In other modes (I<eval> and I<return>), it is ignored.
+
+Note that the trailing slash ('/') is optional. The default value for this parameter is '/tmp/lib/perl/'.
+
+=item module
+
+This parameter has sense only when generating one big chunk of code (L</style> => L</single>) in offline L</mode>. 
+
+It denotes the name of the module (without the .pm extension) that will be written to disk in this case. 
+
+=item complex_isa
+
+Via this parameter, it is possible to indicate a common ancestor (or ancestors) of all complex types that are generated by XML::Pastor.
+The generated complex types will still have XML::Pastor::ComplexType as their last ancestor in their @ISA, but they will also have the class whose  
+name is given by this parameter as their first ancestor. Handy if you would like to add common behaviour to all your generated classes. 
+
+This parameter can have a string value (the usual case) or an array reference to strings. In the array case, each item is added to the @ISA array (in that order) 
+of the generated classes.
+
+=item simple_isa
+
+Via this parameter, it is possible to indicate a common ancestor (or ancestors) of all simple types that are generated by XML::Pastor.
+The generated simple types will still have XML::Pastor::SimpleType as their last ancestor in their @ISA, but they will also have the class whose  
+name is given by this parameter as their first ancestor. Handy if you would like to add common behaviour to all your generated classes. 
+
+This parameter can have a string value (the usual case) or an array reference to strings. In the array case, each item is added to the @ISA array (in that order) 
+of the generated classes.
+
+=item verbose
+
+This parameter indicates the desired level of verbosity of the output. A value of zero (0), which is the default, indicates 'silent' operation where only a fatal
+error will result in a 'die' which will in turn write on STDERR. A higher value of 'verbose' indicates more and more chatter on STDERR.
+Setting 'debug' will currently put 'verbose' to level 9.
+
+=item debug
+
+Currently all that this option does is to put the verbose level to 9. 
+
+=back
+
+=head1 BUGS & CAVEATS
+
+There no known bugs at this time, but this doesn't mean there are aren't any. 
+Note that, although some testing was done prior to releasing the module, this should still be considered alpha code. 
+So use it at your own risk.
+
+There are known limitations however:
+
+=over 
+
+=item * Namespaces
+
+The namespace support is somewhat shaky. Currently at most one I<targetNamspace> is supported. 
+Multiple target namespaces are not supported. That's why schema 'import' facility does not work. 
+
+=item * Schema import
+
+The 'import' element of W3C XSD schema is not supported at this time. This is basically because of namespace complexities. If you think of a 
+way to support the 'import' feature, please let me know. 
+
+=item * 'mixed' elements
+
+Elements with 'mixed' content (text and child elements) are not supported at this time.
+
+=item * substitution groups
+
+Substitution groups are not supported at this time.
+
+=item * Encoding
+
+Only the UTF-8 encoding is supported. You should make sure that your data is in UTF-8 format. It may be possible to read (but not write) XML from other encodings. 
+But this feature is not tested at this time. 
+
+=item * Default values for attributes
+
+Default values for attributes are not supported at this time. If you can think of a simple way to support this, please let me know.
+
+=back
+
+Note that there may be other bugs or limitations that the author is not aware of.
+
+=head1 AUTHOR
+
+Ayhan Ulusoy <dev@ulusoy.name>
+
+
+=head1 COPYRIGHT
+
+  Copyright (C) 2006-2008 Ayhan Ulusoy. All Rights Reserved.
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=head1 DISCLAIMER
+
+BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, 
+THERE IS NO WARRANTY FOR THE SOFTWARE, 
+TO THE EXTENT PERMITTED BY APPLICABLE LAW. 
+EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES PROVIDE 
+THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, 
+EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, 
+THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. 
+THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH YOU. 
+SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING 
+WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR REDISTRIBUTE THE SOFTWARE 
+AS PERMITTED BY THE ABOVE LICENCE, BE LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, 
+SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE SOFTWARE 
+(INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING RENDERED INACCURATE OR LOSSES SUSTAINED BY 
+YOU OR THIRD PARTIES OR A FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), 
+EVEN IF SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+
+
+=head1 SEE ALSO
+
+See also L<XML::Pastor>, L<XML::Pastor::Pastorize>
+
+If you are curious about the implementation, see also L<XML::Pastor::Schema::Parser>, L<XML::Pastor::Schema::Model>, L<XML::Pastor::Generator>.
+
+=cut
+
+1;
+
+
+
+
+
+
+
+
+	
+
+
+
+
+
+
+
+
+
+

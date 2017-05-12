@@ -1,0 +1,109 @@
+#!/usr/bin/perl -w
+#
+# Strip a namespace out of an XML file.
+#
+# @(#) $Id: filtns,v 1.3 2002/12/04 14:30:46 dom Exp $
+#
+
+use strict;
+use warnings;
+
+use File::Basename 'basename';
+use Getopt::Std;
+use XML::Filter::Namespace;
+use XML::SAX::ParserFactory;
+use XML::SAX::Writer;
+
+my $me = basename $0;
+
+sub usage {
+    die "usage: $me -n NamespaceURI [-p PublicID ] [-s SystemId] [-t tags] [file]\n";
+}
+
+my %opt;
+getopts( "n:p:s:t:", \%opt )
+    or usage;
+$opt{ n } ||= $ENV{ XMLNS };
+$opt{ t } ||= join( " ", qw( p ) );
+
+die "$me: must specify system identifier as well when using public identifier\n"
+    if $opt{ p } && !$opt{ s };
+
+usage unless $opt{ n };
+
+binmode( STDOUT, ':utf8' )
+    if $] >= 5.007;
+
+my $w = XML::SAX::Writer->new( Output => \*STDOUT );
+my $xfn = XML::Filter::Namespace->new( Handler => $w );
+$xfn->ns( $opt{ n } );
+$xfn->systemid( $opt{ s } )
+    if $opt{ s };
+$xfn->publicid( $opt{ p } )
+    if $opt{ p };
+$xfn->nl_after_tag( { map { $_ => 1 } split " ", $opt{ t } } );
+my $p = XML::SAX::ParserFactory->parser( Handler => $xfn );
+
+$p->parse_uri( shift || '-' );
+
+exit 0;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+filtns - strip all but tags in a certain namespace from a file
+
+=head1 SYNOPSIS
+
+  filtns -n NamespaceURI [-s SystemId_DTD] [-p PublicID] [-t tags] [file.xml]
+
+=head1 DESCRIPTION
+
+This program strips all tags from a file which do not belong to the namespace
+specified with B<-n>.  The NamespaceURI argument is mandatory (alternately it
+can be supplied using the XMLNS environment variable).
+
+If a B<-s> flag is specified, a DOCTYPE declaration will be added to the
+output with the specified SystemID.
+
+If a B<-p> flag is specified, a DOCTYPE declaration will be added with the
+specified PublicID.  A SystemID must also be specified in this case.
+
+If a B<-t> flag is specified, it is a list (quoted to protect from the
+shell) of tags that should have newlines output after their closing
+tags.  The default list is:
+
+=over 4
+
+=item I<p>
+
+=back
+
+If a file is not specified, input is taken from stdin.
+
+Generated output is sent to stdout, in UTF8.
+
+=head1 SEE ALSO
+
+L<XML::Filter::Namespace>(3).
+
+=head1 AUTHOR
+
+Dominic Mitchell E<lt>cpan@semantico.comE<gt>
+
+=head1 VERSION
+
+@(#) $Id: filtns,v 1.3 2002/12/04 14:30:46 dom Exp $
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+
+=cut
+
+# vim: set ai et sw=4 :
+

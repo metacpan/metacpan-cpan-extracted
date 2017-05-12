@@ -1,0 +1,35 @@
+#!/usr/bin/perl
+
+use X11::Wcl;
+
+X11::Wcl::mainloop(
+	ARGV => ["XtAppAddInput"],
+	NO_INITIAL_RESOURCES => 1,
+	NO_REALIZE => 1,
+	STARTUP => \&startup,
+);
+
+# called when INPUT filehandle is readable
+sub file_io
+{
+	my $x = <INPUT>;
+	chomp $x;
+	print "input is ($x)\n";
+}
+
+# for application-specific startup actions
+sub startup
+{
+	my($toplevel, $app_context) = @_;
+
+	open(INPUT, q{
+		while true; do
+			date
+			sleep 15
+		done
+	|});
+
+	my $file_io = X11::Wcl::MakeXtInputCallbackProc("::file_io");
+	my $x = X11::Wcl::ptrcast(eval $X11::Wcl::XtInputReadMask, "XtPointer");
+	X11::Wcl::XtAppAddInput($app_context, fileno(INPUT), $x, $file_io, undef);
+}

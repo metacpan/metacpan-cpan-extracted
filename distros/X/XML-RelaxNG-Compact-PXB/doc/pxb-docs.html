@@ -1,0 +1,348 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>NAME</title>
+<link rev="made" href="mailto:netadmin@nws-cms2.fnal.gov" />
+</head>
+
+<body style="background-color: white">
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#introduction">INTRODUCTION</a></li>
+	<li><a href="#pxb_framework">PXB FRAMEWORK</a></li>
+	<ul>
+
+		<li><a href="#or_why_yet_another_xml_framework">or Why Yet Another XML framework</a></li>
+		<li><a href="#data_model">DATA MODEL</a></li>
+		<li><a href="#api_class_introspection">API CLASS INTROSPECTION</a></li>
+	</ul>
+
+	<li><a href="#case_study">CASE STUDY</a></li>
+	<ul>
+
+		<li><a href="#utilizing_pxb_for_perfsonarps_web_services">Utilizing PXB for perfSONAR-PS web services</a></li>
+		<li><a href="#perfsonarps_data_model_for_pinger_service">perfSONAR-PS data model for PingER service</a></li>
+		<li><a href="#sql_mapping">SQL MAPPING</a></li>
+	</ul>
+
+	<li><a href="#references">REFERENCES</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>PXB: Perl XML data Binding</p>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>Maxim Grigoriev</p>
+<dl>
+<dt><strong><a name="item__2f_22introduction_22"><a href="#introduction">INTRODUCTION</a></a></strong><br />
+</dt>
+<dt><strong><a name="item__2f_22pxb_framework_22"><a href="#pxb_framework">PXB FRAMEWORK</a></a></strong><br />
+</dt>
+<dt><strong><a name="item__2f_22data_model_22"><a href="#data_model">DATA MODEL</a></a></strong><br />
+</dt>
+<dt><strong><a name="item__2f_22api_class_introspection_22"><a href="#api_class_introspection">API CLASS INTROSPECTION</a></a></strong><br />
+</dt>
+<dt><strong><a name="item__2f_22case_study_22"><a href="#case_study">CASE STUDY</a></a></strong><br />
+</dt>
+<dl>
+<dt><strong><a name="item__2f_22utilizing_pxb_for_perfsonar_2dps_web_service"><a href="#utilizing_pxb_for_perfsonarps_web_services">Utilizing PXB for perfSONAR-PS web services</a></a></strong><br />
+</dt>
+<dt><strong><a name="item__2f_22perfsonar_2dps_data_model_for_pinger_service"><a href="#perfsonarps_data_model_for_pinger_service">perfSONAR-PS data model for PingER service</a></a></strong><br />
+</dt>
+<dt><strong><a name="item__2f_22sql_mapping_22"><a href="#sql_mapping">SQL MAPPING</a></a></strong><br />
+</dt>
+</dl>
+<dt><strong><a name="item__2f_22references_22"><a href="#references">REFERENCES</a></a></strong><br />
+</dt>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="introduction">INTRODUCTION</a></h1>
+<p>This document presents and describes API designed for binding  RelaxNG (Compact) 
+or XML schema, represented by RelaxNG Compact notation into the perl class library. 
+The main idea behind such binding is to provide flexible and scalable API which
+will allow developers  of the document literal based web services easily describe 
+any service messaging profile by writing simple  perl data structures. This approach  
+allows you to work with data from any  XML message using your own class structures, 
+so your XML elements are binded into the perl objects, therefore it called Perl 
+XML data Binding (or PXB). The PXB framework will handle all the details of converting  data to and from 
+XML or DOM objects based on your instructions. The DOM objects tree is created by 
+utilizing very fast LibXML library. PXB was designed to allow you a high degree of control over the
+translation process with custom callbacks and SQL mapping of the hierarchical
+XML entities into the  flat  SQL database schema. Even more importantly to note that
+PXB creates heavily documented, highly supportable and maintainable perl class hierarchies. 
+It also automatically creates test  suit for every created class.
+The <a href="/Perl/Tidy.html">the Perl::Tidy manpage</a> and <a href="/Perl/Critic.html">the Perl::Critic manpage</a> profile files are included into the standard test suit
+in order to comply with the Best Perl Practices. If you familiar with java XML data 
+binding packages such <a href="#2__xmlbeans">xmlbeans</a>, <a href="#4__castor">CASTOR</a>, <a href="#3__metro">METRO</a> or older <a href="#5__jaxb">JAXB</a> 
+then idea of unmarshalling XML into the simple objects should be  known to you.</p>
+<p>
+</p>
+<hr />
+<h1><a name="pxb_framework">PXB FRAMEWORK</a></h1>
+<p>
+</p>
+<h2><a name="or_why_yet_another_xml_framework">or Why Yet Another XML framework</a></h2>
+<p>PXB uses the power of perl data structures to define the rules of how perl
+objects are converted to or from XML (the binding).  Or more explicitly to and
+from the DOM tree objects. Why not to use  DOM instead?  DOM is just a
+representation of the XML tree data structure. It does not provide any facility  to
+hook up easily some custom callback aligned with some external data schema to
+the particular element in the tree.  The current spectrum of available XML APIs
+for perl is limited to tree walking and XPath based search. Also, the process of refactoring heavy XML driven perl code based on
+XML/XPath approach was found to be very tedious and  error prone. 
+Especially when schemas are constantly adapting to the ever changing customer's requirements.
+The PXB framework is an attempt to bring configurable callbacks into the DOM 
+and add some functional validation inside of such binding as well as provide
+mechanism to map  SQL database schema to the hierarchical structure of the DOM tree.
+Importance of such mapping technique was exposed by the lack of robust support for native  XML data
+type among the current  list of “freeware” storage engines where the  SQL RDBM
+is more or less a standard and performance of the native XML databases are still far 
+from the optimal. Also, PXB uses perl as meta-language and it uses
+perl to create perl OO API which makes schema's code significantly smaller.  
+Any developer can concentrate on implementing semantic rules, protocols and actual 
+functionality instead of wasting any time on reimplementing once again  XML tree walking API.  
+Moreover, there is an automated test suite for the each class of the generated API   and
+every method call is documented. The internal structure of  every class was designed  
+to be  clean, readable and easily understandable by any other perl developer. 
+It utilizes <a href="#6__perl_best_practices__by_damian_conway">perl’ best practices</a>  and uses  <code>fields</code> packages to provide tighter
+encapsulation and creates explicitly named lists of accessors and
+mutators. Behavioral semantic of the each class in the class tree is the same
+and implements absolutely the same methods to allow transparency and 
+propagation of the implemented callbacks across the API.</p>
+<p>
+</p>
+<h2><a name="data_model">DATA MODEL</a></h2>
+<p>The basic XML element definition is represented as perl hash reference:</p>
+<pre>
+        &lt;element-variable&gt; =  '{   attrs  =&gt;  { ' &lt;attributes-definition&gt; ','  ‘ 'xmlns’ ‘ =&gt; ‘ ' &lt;namespace prefix&gt; '},'
+                                'elements =&gt; [' &lt;elements-definition&gt; '],'
+                                '‘text ’  =&gt; ' &lt;text-content&gt; ','
+                                '‘sql =&gt;  {' &lt;sql-mapping-definition&gt; '}'
+                             '}'</pre>
+<p>Where each &lt;xxxx-definition&gt; can be expressed in <a href="#7__ebnf">EBNF</a> as:</p>
+<pre>
+  &lt;attributes-definition&gt; = (attribute-name  '‘=&gt;’'  attribute-value) (',’'  &lt;attributes-definition&gt;)*
+ 
+  attribute-name          = string
+ 
+  namespace-id            = string
+ 
+  attribute-value         = ‘scalar’| ('’enum:’'(attribute-name ( '‘,’'  attribute-name)*))</pre>
+<pre>
+  &lt;elements-definition&gt; =   ( '‘[‘' element-name  '’=&gt;'’  (
+                                                            &lt;element-variable&gt;  |
+                                                   ’'['   ‘   &lt;element-variable&gt; '’]’' | 
+                                                   ’'[‘' (    &lt;element-variable&gt; '’,'’)+’ ']’' |
+                                                   '’[‘' ('['‘ &lt;element-variable&gt; '’]’,'’?)+ ’']'’ ) 
+                                                  ',' conditional-statement? ']’')*</pre>
+<pre>
+  conditional-statement =  ('‘unless’'|’'if'’)’':'’(registered-name ('‘,'’ registered-name)*)</pre>
+<pre>
+  registered-name = attribute-name|element-name</pre>
+<pre>
+  element-name  = string</pre>
+<pre>
+  &lt;text-content&gt; = ‘scalar’|conditional-statement</pre>
+<pre>
+  &lt;sql-mapping-definition&gt; = (sql-table-name ‘'=&gt;’ ‘{'‘ sql-table-entry '‘}’' ) ( '‘,'’ &lt;sql-mapping-definition&gt;)*</pre>
+<pre>
+  sql-table-entry =  (sql-entry-name '‘=&gt;’ ’{'‘ entry-mapping ‘'}’' ) ( '‘,’ '  sql-table-entry )*
+ 
+  sql-table-name = string
+ 
+  sql-entry-name = string</pre>
+<pre>
+  entry-mapping = '‘value’ ‘=&gt;' ’( element-name|( '‘['‘ element-name ('‘,'’ element-name)+ ’']’')) ( ‘','’ if-condition)?  
+ 
+  if-condition = '‘if’ ‘=&gt;’( ' attribute-name '‘:’' attribute-value | '[' ( ' attribute-name ':' attribute-value ',' )+ ']'  )</pre>
+<p>Where:</p>
+<dl>
+<dt></dt>
+<dd>
+<pre>
+  elements =&gt;  [parameter =&gt; [$parameter]]  - defines list of  'parameter' sub-elements</pre>
+</dd>
+<dt></dt>
+<dd>
+<pre>
+  elements =&gt; [parameter =&gt; $parameter]  - defines single 'parameter'’ sub-element</pre>
+</dd>
+<dt></dt>
+<dd>
+<pre>
+  elements =&gt;  [parameters  =&gt; [$parameters,$select_parameters]]  - defines the choice between  two single 
+                    ‘'parameters' sub-elements of different type</pre>
+</dd>
+<dt></dt>
+<dd>
+<pre>
+  elements =&gt;  [datum  =&gt; [[$pinger_datum], [$result_datum]] ]  - defines choice between  two lists of  
+                    'datum' sub-elements of different type</pre>
+</dd>
+</dl>
+<p>In <code>elements-definition</code> the third member  is an optional conditional statement which represents validation rule. 
+For example <em>‘unless:value</em>’ conditional statement  will be translated  into the  perl’  conditional statement  
+<code>&amp;&amp; !($self-&gt;get_value)</code>  where ‘value’ must be registered attribute or sub-element name and this condition  
+will be placed in every piece of code where perl  object is serialized into the XML DOM  object or unmarshalled from it.</p>
+<p>
+</p>
+<h2><a name="api_class_introspection">API CLASS INTROSPECTION</a></h2>
+<p>In order to provide the same class interface throughout the API, the same universal constructors and same set 
+of method calls were implemented. Currently the constructor body includes initialization part as well and this 
+part is slightly different for different modules, but it might be reduced to generic constructor and some custom 
+initialization part in the future where generic constructor might be inherited from some sort of the base Object class. 
+Currently every constructor “knows” how to initialize the whole class from the DOM object, XML string fragment 
+or from the reference to the perl hash structure of the named class  fields. Also, it “knows” how to handle arrays 
+of the class fields with support for elements identified by <em>id</em>. It supports special field, 
+named idmap  for that purpose. It “knows” how to serialize object of the class into the DOM or XML 
+text string and how to map contents of the object on some SQL schema. By issuing <em>registerNamespaces</em> call to 
+the root object one can obtain the reference to the hash with all namespaces utilized by every sub-element in the object. 
+It utilizes another special field, called <code>nsmap</code> for that. This field is an object of the  generated helper 
+class and serves as container for  map between local names and namespace prefixes. Every namespace is identified by
+namespace prefix and the version of the schema is getting built into the generated API package pathname.</p>
+<p>
+</p>
+<hr />
+<h1><a name="case_study">CASE STUDY</a></h1>
+<p>Our case is based on building interoperable SOAP document/literal based webservice for <a href="#8__perfsonarps">perfSONAR-PS</a> project.
+Webservices are indeed wrappers around network performance monitoring tools. Where there are two types of services
+- Measuremnt Archive (MA) with ability to publish historical data and Measurement Point (MP) providing on-demand
+measurements.</p>
+<p>
+</p>
+<h2><a name="utilizing_pxb_for_perfsonarps_web_services">Utilizing PXB for perfSONAR-PS web services</a></h2>
+<p>The major utilization scenario of the PXB framework comes when there is a need to build  MA  service with SQL database based storage engine. 
+In any case PXB framework will provide the complete solution and actual development for MP will be contained in
+writing real time measurements facility class  and then utilizing PXB to inject 
+measured data into the published XML message. For MA the whole SD process  will be dedicated to writing 
+the actual message handler and implementing actual protocol specifications. For example, for PingER MA it is
+<a href="/perfSONAR_PS/Datatypes/PingER.html">the perfSONAR_PS::Datatypes::PingER manpage</a> class, inherited from <a href="/perfSONAR_PS/Datatypes/Message.html">the perfSONAR_PS::Datatypes::Message manpage</a> class with actual
+implementation of SetupData request and MetaDataKey request handlers. The <a href="/perfSONAR_PS/Datatypes/Message.html">the perfSONAR_PS::Datatypes::Message manpage</a> 
+is an abstract class, extending <a href="/perfSONAR_PS/Datatypes/v2_0/nmwg/Message.html">the perfSONAR_PS::Datatypes::v2_0::nmwg::Message manpage</a> class. This extra class exists because
+the root   <strong>Message</strong> class from the PXB is message type agnostic.</p>
+<p>
+</p>
+<h2><a name="perfsonarps_data_model_for_pinger_service">perfSONAR-PS data model for PingER service</a></h2>
+<p>The root of the perfSONAR-PS schema and the root of the OO API built by PXB  is the  <strong>Message</strong>  object. 
+It exists in the perfSONAR base namespace identified by <code>nmwg</code> id. The schema is versioned.
+The most current root package name for <strong>Message</strong> class is <a href="/perfSONAR_PS/Datatypes/v2_0/nmwg/Message.html">the perfSONAR_PS::Datatypes::v2_0::nmwg::Message manpage</a>.
+The base schema is completely defined by <a href="/perfSONAR_PS/DataModels/DataModel.html">the perfSONAR_PS::DataModels::DataModel manpage</a> module. 
+This is a simple perl package and not the class, because it  has only data definitions.
+The current <strong>DataModel</strong>  has implemented definitions from several <strong>OGF</strong> schemas, namely:
+ <code>filter.rnc, nmtopo.rnc, nmbase.rnc, nmtm.rnc, nmtl3.rnc, nmtl4.rnc</code>.  
+There is no SQL mapping definitions in the base data model allowed, because SQL mapping  is a service specific. 
+Any service specific extension of this  base schema must be extended in the separate data model  package 
+as it was done for PingER service. The PingER data model can be viewed as an example and it is contained 
+in the  <a href="/perfSONAR_PS/DataModels/PingER_Model.html">the perfSONAR_PS::DataModels::PingER_Model manpage</a>. Any other extension data model package can be created for any other service. 
+Let’s look on example of  the parameter element. It is described in the base model as:</p>
+<pre>
+     $parameter      =  {attrs  =&gt; {name =&gt; 'scalar',  value =&gt; 'scalar', xmlns =&gt; 'nmwg'},
+                         elements =&gt; [],
+                         text =&gt; 'unless:value',
+                       };</pre>
+<p>That means the parameter element has name and value attributes, does not have any sub-elements and might have 
+optional (only when value attribute is undefined) text content. For PingER  service it was extended as:</p>
+<pre>
+ $parameter-&gt;{'attrs'} = {name =&gt;      'enum:count,packetInterval,packetSize,ttl,valueUnits,startTime,endTime,deadline,transport,setLimit', 
+                               value =&gt; 'scalar', xmlns =&gt; 'nmwg'};</pre>
+<p>Where explicit enumeration was  added for the list of allowed values of the name attribute and SQL mapping was defined as:</p>
+<pre>
+  $parameter-&gt;{sql} = {metaData =&gt; {count =&gt; {value =&gt;  ['value' , 'text'],
+                                                                                  if =&gt; 'name:count'},
+                                               packetInterval=&gt; {value =&gt;  ['value' , 'text'],  
+                                                                                 if =&gt; 'name:packetInterval'},
+                                               packetSize=&gt; {value =&gt; ['value' , 'text'] ,
+                                                                                 if =&gt; 'name:packetSize'},
+                                               ttl=&gt; {value =&gt;  ['value' , 'text'],
+                                                                                 if =&gt; 'name:ttl'},
+                                               deadline =&gt; {value =&gt;  ['value' , 'text'] , 
+                                                                                 if =&gt; 'name:deadline'},
+                                               transport =&gt; { value =&gt;   ['value' , 'text'],
+                                                                                if =&gt; 'name:transport'},
+                                                         },
+                      time    =&gt;      {      start =&gt; {value =&gt; ['value' , 'text'], 
+                                                                                if =&gt; 'name:startTime'},
+                                                                  end  =&gt;   { value =&gt;  ['value' , 'text'],
+                                                                             if =&gt; 'name:endTime'},
+                                                          },
+                      limit    =&gt;   {      setLimit =&gt; { value =&gt;  ['value' , 'text'], 
+                                                                               if =&gt; 'name:setLimit'},               
+                                         },
+                                    };</pre>
+<p>Please note that <code>time</code> table name was made up to allow mapping of the time range related entities. 
+Also, <code>tlimit</code> table name was made up to provide non-existed paging mechanism in order to limit the 
+size of the requested dataset in the response message. As it clear from the example above, the schema can be
+modified in any time without affecting the rest of the service API. For example extra attribute ‘named <code>type</code>’ can be 
+added and the whole API framework rebuild in the matter of seconds. Then developer can utilize this extra 
+attribute type by calling <code>-&gt;get_type</code>  on the <code>parameter</code> object in the message handling class and 
+new functionality will be immediately supported.</p>
+<p>
+</p>
+<h2><a name="sql_mapping">SQL MAPPING</a></h2>
+<p>Lets look again on  the example of the SQL mapping definitions for PingER service from previous chapter. Every object of 
+the API class tree implements  <code>querySQL</code> call. It accepts reference to the empty hash and  passes this reference 
+through the whole objects tree while filling contents of the hash with initialized  contents of the “objects of interest”.
+The “object of interest” is defined by the SQL  mapping definition.</p>
+<p>For example, for definition:</p>
+<p><code>{metaData =&gt; {count =&gt; {value =&gt;  ['value' , 'text'],   if =&gt; 'name:count'}</code></p>
+<p>for  <code>Parameter</code> object with <code>name</code> attribute  set to ‘<code>count</code>’ and <code>‘value</code> attribute’  or <code>text</code> content  
+set to ‘100’ it will add:</p>
+<p><code>metaData =&gt; {‘count’ =&gt; { ‘eq’ =&gt; ‘100’}}</code></p>
+<p>into the SQL query hash. 
+The resulted hash for <code>metaData</code> table will be returned and will look as:</p>
+<p><code>{ metaData =&gt; {count =&gt;  '100'}}</code></p>
+<p>where it can be easily passed to any of SQL ORM frameworks in order to build proper <code>WHERE</code> clause.
+For example <a href="/Class/DBI.html">the Class::DBI manpage</a> or with minor refactoring to the <a href="/Rose/DB.html">the Rose::DB manpage</a></p>
+<p>
+</p>
+<hr />
+<h1><a name="references">REFERENCES</a></h1>
+<ol>
+<li><strong><a name="item_relaxng_compact">RelaxNG Compact</a></strong><br />
+</li>
+<a href="http://relaxng.org/compact-tutorial-20030326.html">http://relaxng.org/compact-tutorial-20030326.html</a>
+<p></p>
+<li><strong><a name="item_xmlbeans">xmlbeans</a></strong><br />
+</li>
+<a href="http://xmlbeans.apache.org">http://xmlbeans.apache.org</a>
+<p></p>
+<li><strong><a name="item_metro">METRO</a></strong><br />
+</li>
+<a href="http://java.sun.com/webservices/index.jsp">http://java.sun.com/webservices/index.jsp</a>
+<p></p>
+<li><strong><a name="item_castor">CASTOR</a></strong><br />
+</li>
+<a href="http://www.castor.org/">http://www.castor.org/</a>
+<p></p>
+<li><strong><a name="item_jaxb">JAXB</a></strong><br />
+</li>
+<a href="http://java.sun.com/developer/technicalArticles/WebServices/jaxb/">http://java.sun.com/developer/technicalArticles/WebServices/jaxb/</a>
+<p></p>
+<li><strong><a name="item_perl_best_practices_2c_by_damian_conway">Perl Best Practices, by Damian Conway</a></strong><br />
+</li>
+<li><strong><a name="item_ebnf">EBNF</a></strong><br />
+</li>
+<a href="http://en.wikipedia.org/wiki/Extended_Backus%E2%80%93Naur_form">http://en.wikipedia.org/wiki/Extended_Backus%E2%80%93Naur_form</a>
+<p></p>
+<li><strong><a name="item_perfsonar_2dps">perfSONAR-PS</a></strong><br />
+</li>
+<a href="https://wiki.internet2.edu/confluence/display/PSPS">https://wiki.internet2.edu/confluence/display/PSPS</a>
+<p></p></ol>
+
+</body>
+
+</html>

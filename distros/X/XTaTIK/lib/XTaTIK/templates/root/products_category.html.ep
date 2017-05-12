@@ -1,0 +1,49 @@
+% layout 'default';
+% title stash 'page_title';
+% stash active_page => 'products';
+
+% if ( defined(stash 'return_path') ) {
+  <p id="back_up_category">
+    % if ( defined(stash 'return_name') ) {
+      <a href="/products/<%= stash 'return_path' %>"
+        class="btn btn-default">
+        <i class="glyphicon glyphicon-chevron-left"></i> Back to <%= stash 'return_name' %>
+      </a>
+    % } else {
+      <a href="/products" class="btn btn-default"
+        ><i class="glyphicon glyphicon-chevron-left"></i> Back to category list</a>
+    % }
+  </p>
+% }
+
+<ul id="product_list">
+% for ( items_in 'products' ) {
+  <li class="cat">
+    % unless ( $_->{no_cat} ) {
+      <h3><a href="/products/<%= $_->{cat_url} %>"
+        ><i class="glyphicon glyphicon-chevron-right"></i> <%= $_->{title} %></a></h3>
+    % }
+    <ul class="row">
+      % for ( items_in $_->{contents} ) {
+        <li class="col-md-4 col-sm-6 <%= $_->{is_subsub_cat}
+                                        ? 'subcat' : 'prod' %>">
+          % if ( $_->{is_subsub_cat} ) {
+            <h4><a href="/products/<%= $_->{cat_url} %>"><i class="glyphicon glyphicon-chevron-right"></i>
+              <%= $_->{title} %>
+            </a></h4>
+          % } else {
+            <div class="well">
+              <a href="/product/<%= $_->{url} %>" class="h4">
+                <%= $_->{title} %>
+              </a>
+
+              <a href="/product/<%= $_->{url} %>"
+                  class="thumbnail"><img src="/product-pics/<%= $_->{image} %>" alt=""></a>
+            </div>
+          % }
+        </li>
+      % }
+    </ul>
+  </li>
+% }
+</ul>

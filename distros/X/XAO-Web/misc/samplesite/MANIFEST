@@ -1,0 +1,12 @@
+MANIFEST
+MANIFEST.MODES
+MANIFEST.SKIP
+Makefile
+README
+TODO
+bin/build-structure.proto
+configure.pl
+objects/Config.pm.proto
+requires.pl
+testcases/base.pm
+testcases/requires.pm

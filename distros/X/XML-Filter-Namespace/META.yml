@@ -1,0 +1,19 @@
+--- #YAML:1.0
+name: XML-Filter-Namespace
+version: 1.03
+license: perl
+distribution_type: module
+requires:
+  Class::Accessor: 0.17
+  XML::SAX::Base: 0
+  XML::SAX::Writer: 0.44
+  perl: 5.6.1
+recommends: {}
+build_requires:
+  Test::More: 0
+conflicts: {}
+provides:
+  XML::Filter::Namespace:
+    file: lib/XML/Filter/Namespace.pm
+    version: 1.03
+generated_by: Module::Build version 0.18

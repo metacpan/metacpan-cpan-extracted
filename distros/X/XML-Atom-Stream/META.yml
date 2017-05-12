@@ -1,0 +1,16 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         XML-Atom-Stream
+version:      0.11
+version_from: lib/XML/Atom/Stream.pm
+installdirs:  site
+requires:
+    LWP:                           5
+    Test::More:                    0.32
+    XML::Atom:                     0.2
+    XML::Handler::Trees:           0.02
+    XML::LibXML::SAX:              1.00
+    XML::SAX:                      0.12
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

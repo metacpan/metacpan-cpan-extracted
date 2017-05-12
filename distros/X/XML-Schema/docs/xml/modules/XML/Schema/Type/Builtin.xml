@@ -1,0 +1,18 @@
+<module name="XML::Schema::Type::Builtin">
+
+  <about>
+    This module implements the 30-something builtin simple types.
+  </about>
+
+  <synopsis>
+<perl>
+use XML::Schema::Type::Builtin;
+</perl>
+  </synopsis>
+</module>
+
+
+
+
+
+

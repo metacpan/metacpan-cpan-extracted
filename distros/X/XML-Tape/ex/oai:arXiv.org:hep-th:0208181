@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <oai_dc:dc xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+ <dc:title>Complex singularities of the critical potential in the large-N limit</dc:title>
+ <dc:creator>Meurice, Y.</dc:creator>
+ <dc:description>  We show with two numerical examples that the conventional expansion in powers
+of the field for the critical potential of 3-dimensional O(N) models in the
+large-N limit, does not converge for values of phi^2 larger than some critical
+value. This can be explained by the existence of conjugated branch points in
+the complex phi^2 plane. Pade approximants [L+3/L] for the critical potential
+apparently converge at large phi^2. This allows high-precision calculation of
+the fixed point in a more suitable set of coordinates. We argue that the
+singularities are generic and not an artifact of the large-N limit. We show
+that ignoring these singularities may lead to inaccurate approximations.
+</dc:description>
+ <dc:description>Comment: 9 pages, 9 figures, uses revtex</dc:description>
+ <dc:date>2002-08-25</dc:date>
+ <dc:type>text</dc:type>
+ <dc:identifier>http://arXiv.org/abs/hep-th/0208181</dc:identifier>
+ </oai_dc:dc>

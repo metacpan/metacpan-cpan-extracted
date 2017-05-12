@@ -1,0 +1,48 @@
+Revision history for Perl extension XML::ExtOn.
+#$Id: Changes 966 2011-08-07 18:07:19Z zag $
+
+0.17
+    - fix namespaces
+0.16
+    - fix distr
+0.15
+    - disallow escape entity in out XML
+0.14 
+    - add function split_pipe
+0.13
+    -fix depends
+0.12
+    - add wrap_around 
+    - fix syntax
+0.11
+    - fix filenames for tests [https://rt.cpan.org/Public/Bug/Display.html?id=49512]
+0.10
+    - fix context for namespaces
+    - do create_pipe reentable
+0.09
+    - fix docs
+    - fix context in XML::ExtOn::IncXML
+0.08 
+    - fix perl version ( https://rt.cpan.org/Ticket/Display.html?id=42547 )
+
+0.07
+    - Change NS: XML::Handler::ExtOn -> XML::ExtOn
+    - add mk_start_element,  mk_end_element to XML::ExtOn
+    - add insert_to method XML::ExtOn::Element
+    - add change local_name for element
+
+0.06 
+    - create_pipe() use already created filter
+0.05 
+    - add_namespace to ExtOn
+    - add delete alias
+    
+0.04
+    - add SAX1 to ExtOn converter 
+0.03
+    - add tests
+    - documenting
+    - get attrs by name ( by_name )
+0.02 
+    - add mk_characters and mk_cdata
+    - add on_cdata

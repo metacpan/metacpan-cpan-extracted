@@ -1,0 +1,57 @@
+#!/usr/bin/perl /usr/bin/hekeln
+#	its important to continue as a comment
+
+start_element:repository
+!	$self->handle('start_document',{});
+<	html	>
+<	body	>
+<	h1	>
+	XML-Edifact Repository
+</	h1	>
+<	h2	>
+	~name~
+</	h2	>
+<	p	>
+	Agency: ~agency~
+<	br	>
+	Code: ~code~
+<	br	>
+	Version: ~version~
+<	br	>
+	Description: ~desc~
+</	p	>
+<	hr	>
+
+end_element:repository
+</	body	>
+</	html	>
+!	$self->handle('end_document',{});
+
+start_element:segment
+<	h2	>
+	Segment: ~code~ - ~name~
+</	h2	>
+<	p	>
+	Description: ~desc~
+</	p	>
+<	ul	>
+
+end_element:segment
+</	ul	>
+<	hr	>
+
+start_element:composite
+<	li	>
+	~code~ - ~name~ - ~flag~
+<	ul	>
+
+end_element:composite
+</	ul	>
+</	li	>
+
+start_element:element
+<	li	>
+	~code~ - ~name~ - ~flag~ ~repr~
+
+end_element:element
+</	li	>

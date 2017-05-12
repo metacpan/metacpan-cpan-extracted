@@ -1,0 +1,253 @@
+XML::Bare Changelog
+
+0.53 ( 7-12-13 )
+  - Remove executable permissions from files that shouldn't have them.
+  - Added shebang to main Bare.pm file ( apparently some people want this )
+  - Correct line endings to unix style on parser.c
+  - Improved simplify function that works properly with trees instead of just a single level
+  - Added hash2xml to quickly convert recursing hashes into XML
+
+0.52 ( 4-29-13 )
+  - Added proper binmode setting when outputting XML to address deficiences on Win32 ( such as failing Strawberry perl due to line endings )
+  - Added evil OS check in file writing code to address differences in how files must be opened to write utf8 on win32 versus linux/cygwin.
+  - Added note regarding using utf8 flag instead of using encoding(utf8)
+  - Altered UTF8 test to also write XML containing UTF8 to a file.
+  
+0.51 ( 4-28-13 )
+  - New 'unsafe' parsing mode, giving a 30% speed increase with some downfalls
+  - New 'read_more' function, allowing more data to be read in before parsing into a tree
+  - Fixed some memory leaks
+  - Added 'Controversy' section to documentation
+  - Updated speed comparisons for feed2.xml, adding a comparison against XML::Fast as well
+    as a comparison of running in 'unsafe' mode.
+  - Spelling correction
+  - "Modernized" file handling using my variables
+  
+0.50 ( 4-24-13 )
+  - Remove debugging print statements that were left in
+  - Include the new test cases in the distribution
+  
+0.49 ( 4-23-13 )
+  - Fixes to find_by_perl
+    Can now be accessed in an object or namespace flexibly.
+    Now ignores case of keys.
+    Keys with underscores can be used.
+    Will work properly when passed a single node instead of an array reference of nodes.
+  - Fixes to xget
+    Method of deferencing has been changed to be compatible with newer versions of perl ( 5.10.2+ )
+  - Fixed handling of nodes named 'value'; they will no longer crash the XS code
+  - Added a new function similar to new called 'simple', that works in the same way but automatically uses the 'simple' parser
+  - Altered handling of node values in simple mode, so that it stores values when mixed with nodes or atttributes under 'content' ( like XML::Simple )
+    This feature was requested by users so it has been added. Note that it only does this when the value is not composed of just spaces and carriage returns.
+
+0.48 ( 4-22-13 )
+  - Revert code back to 0.45 version
+    Changes lost in the process:
+      Content is not stored in the 'content' key any more; it is stored as the node itself when the node contains nothing else. As God intended.
+      Memory leak fixes
+      Quote handling
+  - Code copyright returned fully to David Helkowski; any changes by other parties have been discarded. Any code ported in from other open source projects removed.
+    This has been done intentionally so as to make it possible to relicense the software commerically.
+  - XS code modofied to work in a multi-threaded environment
+  - Reverting Makefile.PL back to original wierd hackish fixes. They are there for specific reasons.
+  
+0.47 ( 2-8-12 )
+  - Preping release unchanged from trial release.
+    The 0.45 release and previous set particular compile options for several different
+    platforms.  My release refactoring stripped the Makefile.PL customisations, however
+    it appears these are not needed by any of the smoker CPANTS systems, so am releasing
+    with really basic compilation driver - see how it goes...
+
+0.46_03 ( 1-28-12 )
+  - Bug #49906 Simple mode reports content of empty node as integer 1
+  - Bug #52762 XML::Simple compatibility mode doesn't support CDATA with attributes
+  - Bug #52832 Several memory leaks
+  - XML quote decoding on XML read
+
+0.45
+  - Missing UTF8 test files now included
+  - XML Saving functionality now does size checks to ensure concurrency
+    issues do not corrupt XML.
+  - Linking under Solaris should now be fixed
+  - Line number defines removed from XS compilation to attempt to
+    fix some strange compilation problems.
+
+0.44
+  - Self closing nodes now printed by xml function
+  - UTF8 Handling fixed; thanks go to Nigel Metheringham for the fix
+    recommendation as well as the test files
+  - Static linking has been fixed
+  - 'cc' now used properly in cases where 'gcc' is absent
+
+0.43 ( 3-17-09 )
+  - Fixed newly broken add_node problem from 0.42
+  - Added a new test to detect fixed problem
+
+0.42 ( 3-16-09 )
+  - A number of memory leaks have been fixed
+  - XML files included for benchmarking have been replaced with dummy test
+    data to avoid licensing problems.
+
+0.41 ( internal )
+  - Perl code has been optimized
+  - Fixed problem with merge function
+  - Added tohtml output
+  - Added flag to indicate node read in as CDATA
+
+0.40 ( 12-14-08 )
+  - Added schema checking functionality
+  - Fixed parsing of nodes with more than one comment block
+  - Added error checking to ensure properly closed tags
+  - Fixed parsing of attributes without values
+
+0.30 ( 7-02-08 )
+  - Add new parsing mode, simple, which simulates XML::Simple.
+
+0.29 ( internal )
+  - New function add_node_after
+  - Fixed node ordering such that node order is preserved
+
+0.28 ( internal )
+  - Altered xml output so that it cleans extraneous input spacing
+    and indents mixed values properly.
+  - Added prereqs to Makefile.pl
+  - Added Test::POD and Test::POD::Coverage tests
+  - Fixed incorrect pointer type cast in parser.c
+  - Rewrote benchmark system to use templated benchmarking
+
+0.27 ( 11-21-07 )
+  - makefile.pl modified to be compatible with Darwin and
+    to error out if XCode ( gcc specifically ) is not installed
+  - makefile.pl modified to support Perl 5.6+ on Win32 MSVC
+    ( previously only Perl 5.8 was supported )
+  - parser.c modified to include stdlib.h for malloc in Darwin.
+  - Cyclic equality test weakened to allow for differences in
+    default sorting of hash keys per perl version.
+
+0.26 ( 11-09-07 )
+  - Compatibility with versions before Perl 5.6 is not fruitful.
+    Perl 5.6 now required and will likely remain as a requirement.
+    It broke too many things.
+
+0.25 ( 11-09-07 )
+  - makefile.pl modified to pass -shared option correctly
+    to gcc and not the linker. This caused compilation failure
+    on certain Solaris systems.
+
+0.24 ( 11-09-07 )
+  - Continued makefile.pl changes to recognize some platforms
+    use executable extensions for gcc.
+  - Remove blank require line from meta.yml. It seemed to break
+    the kwalitee rating.
+
+0.23 ( 11-08-07 )
+  - Minor change to XS code for potential future Perl 5.005 support
+
+0.22 ( 11-07-07 )
+  - Altered makefile.pl to be compatible with more platforms.
+  - Removed dependency upon string.h for msvc because it
+    was breaking activestate builds.
+  - Perl 5.005 allowed, but it fails
+  - Comment parsing had an issue when the node containing
+    the comment had no direct value. This has now been resolved.
+  - Using comments caused ever increasing blank spaces to be added.
+    This has now been resolved.
+  - A test for comment reading has been added.
+  - A test for cyclic equality ( repeated loading and saving ) has
+    now been added.
+
+0.21 ( 11-04-07 )
+  - Comments are no longer completely ignored. One comment
+    node is recognized and stored per non immediate node.
+
+0.20 ( internal )
+  - forcearray function has been added
+  - simplify function has been added
+  - croak now used to error out of an improper call to find_node
+  - obj2xml has been corrected; previously newlines would stack
+    up at the end of the xml file
+    
+0.17 ( internal - unstable )
+  - Merge updated to handle array and overlap properly
+  - del_by_perl function has been added
+  - add_node modified to return the added node
+  - find_node modified to skip blank values
+  - Previously a set of nodes could not be printed out using
+    the 'xml' function. This can now be done. ( see perldoc )
+
+0.16 ( internal )
+  - Mixed XML is now supported.
+  - UTF8 is now parsed properly.
+
+0.15 ( internal )
+  - C Parser has been revised greatly in order to make it faster. Internal
+    state engine has been rewritten using gotos instead of a switch in order
+    make each state more independent and easily optimized by the compiler.
+
+0.14 ( internal )
+  - Code that creates Perl hash from parsed XML structure has been
+    rewritten in XS instead of Perl. As a result overall speed has been
+    increased by 40% or so.
+
+0.13 ( internal )
+  - Code that creates Perl hash from parsed XML structure has been
+    cleaned up in order to avoid use of a temporary Perl hash.
+
+0.12 ( internal )
+  - 'find_node' and 'del_node' functions are now exportable.
+  - 'find_node' function will now work properly if called on a single item
+    instead of a list of items.
+  - Added 'find_by_perl' function to select nodes from a list that match
+    a specific perl expression.
+  - A performance test script and some xml files are now included and example runs of 
+    the test script are in the documentation. XML::Bare is ~14-80 times
+    faster than the alternatives.
+
+0.11 ( 6-25-07 )
+  - Changed XS code so that it is backwards compatible with older versions of Perl.
+  - Changed XS code to use 'blind' pointers, a custom created Perl Scalar. Speed
+    is increased as a result for XML with large contiguous values.
+
+0.10 ( 6-21-07 )
+  - Made XS routines 30% more efficient. Speed of parsing and perl hash creation
+    is now very good in comparison to all currently available alternatives in perl.
+
+0.09 ( 6-20-07 )
+  - Rewrote library using XS instead of swig.
+
+0.08 ( 6-20-07 )
+  - Parser has been rewritten in C to avoid dependency on g++.
+  - After node parsing C tree structure memory is now freed.
+
+0.07 ( 6-19-07 )
+  - Modified custom script because it was incorrect in its use of redirection, causing
+    some platforms to fail to compile.
+
+0.06 ( 6-17-07 )
+  - Modified Makefile to use custom script to switch between g++ and gcc for
+    compilation. Even as c, swig interface still did not compile properly with
+    g++ on some systems.
+
+0.05 ( 6-16-07 )
+  - Ceased using c++ for swig interface; it caused compilation issues on some platforms
+  - Fix further output indentation issues due to {value} always being displayed.
+    {value} is now displayed as documented.
+  - First line of changes was incorrect previously
+
+0.04 ( 06-15-07 )
+  - Added clean function
+  - Added merge function
+  - Bugfix: xml output indentation was off due to parser changes in 0.03
+  - Updated documentation
+
+0.03 ( 06-14-07 )
+  - Modified makefile to work under windows with Activestate and MSVC
+  - Cleaned up parser some and fixed basic mixed xml
+  - Added changelog to dist
+  - Dist now created from MakeMaker 6.32 ( license and abstract add to Meta.yml )
+
+0.02 ( 06-13-07 )
+  - Changed version line in perl module from my to global to allow proper cpan indexing
+
+0.01 ( 06-13-07 )
+  - First release

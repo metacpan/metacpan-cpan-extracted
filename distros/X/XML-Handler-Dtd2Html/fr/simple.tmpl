@@ -1,0 +1,38 @@
+<?xml version='1.0' encoding='ISO-8859-1'?>
+<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3.org/1999/xhtml'>
+
+  <head>
+    <meta http-equiv='Content-Type' content='text/html; charset=ISO-8859-1' />
+    <meta name='generator' content='<TMPL_VAR NAME=generator>' />
+    <!-- TMPL_IF NAME="date" --><meta name='date' content='<TMPL_VAR NAME=date>' /><!-- /TMPL_IF -->
+    <title><!-- TMPL_VAR NAME="title" --></title>
+    <!-- TMPL_IF NAME="css" -->
+    <link href='<TMPL_VAR NAME=css>.css' rel='stylesheet' type='text/css'/>
+    <!-- TMPL_ELSE -->
+    <style type='text/css'>
+      a.index {font-weight: bold}
+      hr {text-align: center}
+      h2 {color: red}
+      p.comment {color: green}
+      span.comment {color: green}
+      span.keyword1 {color: teal}
+      span.keyword2 {color: maroon}
+    </style>
+    <!-- /TMPL_IF -->
+  </head>
+
+  <body>
+    <h1><!-- TMPL_VAR NAME="title" --></h1>
+    <hr />
+    <!-- TMPL_INCLUDE NAME='_index.tmpl' -->
+    <hr />
+    <!-- TMPL_IF NAME="tree" -->
+    <h2>Arborescence des &eacute;l&eacute;ments.</h2>
+      <!-- TMPL_VAR NAME="tree" -->
+    <hr />
+    <!-- /TMPL_IF -->
+  <!-- TMPL_INCLUDE NAME='_main.tmpl' -->
+  </body>
+
+</html>

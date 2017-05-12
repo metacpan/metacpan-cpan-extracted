@@ -1,0 +1,24 @@
+ChangeLog		Package history
+MANIFEST		This file
+MANIFEST.SKIP
+Makefile.PL		Makefile generator
+README
+examples/hello.xep
+examples/hello.xsl
+lib/XML/EP.pm
+lib/XML/EP/Control.pm
+lib/XML/EP/Error.pm
+lib/XML/EP/Install.pm
+lib/XML/EP/Formatter/HTML.pm
+lib/XML/EP/Processor/EmbPerl.pm
+lib/XML/EP/Processor/XSLT.pm
+lib/XML/EP/Processor/XSLTParser.pm
+lib/XML/EP/Producer/File.pm
+lib/XML/EP/Request/CGI.pm
+lib/XML/EP/Response.pm
+lib/XML/EP/Test.pm
+t/base.t
+t/cgi.t
+t/embperl.t
+t/xslt.t
+xmlep.PL

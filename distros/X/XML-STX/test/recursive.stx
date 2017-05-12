@@ -1,0 +1,36 @@
+<stx:transform version="1.0" 
+  xmlns:stx="http://stx.sourceforge.net/2002/ns"
+  strip-space="yes">
+
+  <stx:variable name="list" select="0"/>
+  <stx:variable name="li" select="0"/>
+
+  <stx:template match="/root">
+    <stx:copy>
+      <stx:process-children/>
+      <list-total count="{$list}"/>
+      <li-total count="{$li}"/>
+    </stx:copy>
+  </stx:template>
+
+  <stx:group>
+
+  <stx:variable name="li-in-list" select="0"/>
+  <stx:variable name="level" select="0" keep-value="yes"/>
+
+    <stx:template match="list" public="yes" new-scope="yes">
+      <stx:assign name="list" select="$list + 1"/>
+      <stx:assign name="level" select="$level + 1"/>
+      <stx:variable name="list-no" select="$list"/>
+      <stx:process-children/>
+      <list no="{$list-no}" count="{$li-in-list}" level="{$level}"/>
+    </stx:template>
+
+    <stx:template match="li">
+      <stx:assign name="li" select="$li + 1"/>
+      <stx:assign name="li-in-list" select="$li-in-list + 1"/>
+    </stx:template>
+    
+  </stx:group>
+  
+</stx:transform>

@@ -1,0 +1,56 @@
+=head1 NAME
+
+  XML::GDOME::XPath::Evaluator - Interface XPathEvaluator implementation.
+
+=head1 SYNOPSIS
+
+  $xpeval     = XML::GDOME::XPathEvaluator::mkref();
+  $xpnsresolv = $xpeval->createNSResolver($nodeResolver);
+  $xpresult   = $xpeval->createResult();
+  $xpresult   = $xpeval->evaluate($expression,$contextNode,$resolver,$type,$result);
+
+=head1 METHODS
+
+=over 4
+
+
+=item $xpeval = XML::GDOME::XPathEvaluator::mkref();
+
+Constructor of the XPathEvaluator interface.
+
+I<Returns>: the reference to the XPathEvaluator structure.
+
+
+=item $xpnsresolv = $xpeval->createNSResolver($nodeResolver);
+
+Adapts any DOM node to resolve namespaces so that an XPath expression can be easily evaluated relative to the context of the node where it appeared within the document.
+
+I<Returns>: GdomeXPathNSResolver object.
+
+
+=item $xpresult = $xpeval->createResult();
+
+
+
+I<Returns>: an GdomeXPathResult object which may be passed as a parameter to the          evaluation methods of this GdomeXPathEvaluator so that a new one is not          created on each call to an evaluation method.
+
+
+=item $xpresult = $xpeval->evaluate($expression,$contextNode,$resolver,$type,$result);
+
+Evaluates an XPath expression string
+
+I<C<expression>>: The XPath expression string to be parsed and evaluated.
+
+I<C<contextNode>>: Context node for the evaluation of this XPath expression.
+
+I<C<resolver>>: The resolver permits translation of prefixes within the XPath           expression into appropriate namespace URIs.
+
+I<C<type>>: If specified, result will be coerced to return the specified type.
+
+I<C<result>>: Specifies a GdomeXPathResult object to be re-used.
+
+I<Returns>: a result of the specified type if possible. 
+
+
+=back
+

@@ -1,0 +1,21 @@
+--- #YAML:1.0
+name:               XML-Atom-Filter
+version:            0.07
+abstract:           easy creation of command line Atom processing tools
+author:
+    - Mark Paschal <markpasc@markpasc.org>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Test::More:  0
+    XML::Atom:   0.20
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.48
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

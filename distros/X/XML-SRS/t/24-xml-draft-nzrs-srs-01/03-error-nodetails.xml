@@ -1,0 +1,10 @@
+<NZSRSResponse VerMajor="5" VerMinor="0">
+    <Response Action="DomainUpdate" FeId="8" FeSeq="4775126" OrigRegistrarId="1" RecipientRegistrarId="1" TransId="20100701 1">
+        <FeTimeStamp Day="1" Hour="08" Minute="50" Month="7" Second="34" TimeZoneOffset="+12:00" Year="2010"/>
+        <Error Hint="UNKNOWN_ERROR_HINT" ErrorId="DOMAIN_ASSIGNED_TO_NON_REGISTRAR" Severity="err">
+            <Description>
+            <![CDATA[A domain may only be administered by a registry with the  REGISTRAR role]]>
+        </Description>
+        </Error>
+    </Response>
+</NZSRSResponse>

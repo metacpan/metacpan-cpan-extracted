@@ -1,0 +1,78 @@
+#!/usr/bin/perl
+#
+# This is a simple demo of a Motif PushButton widget.
+# It does not require Motif 2.0.
+#
+
+use X11::Wcl;
+
+X11::Wcl::mainloop(
+	ARGV => ["XmPushButton", "-trrf"],
+	DELETE => \&delete_window,
+	EDITRES_SUPPORT => 1,
+	INITIAL_RESOURCES => \*DATA,
+	CALLBACKS => [
+		["buttonCB", \&buttonCB, "argument object"],
+	],
+	STARTUP => \&startup,
+	NEED_MOTIF => 1,
+);
+
+# called when window manager is used to close application
+sub delete_window
+{
+	print "closed by window manager\n";
+}
+
+# exit button was pressed
+#
+# $widget is the invoking widget, of type Widget
+# $arg1 is the argument string appearing in the resource that caused
+#     this callback to be invoked
+# $arg2 is the callback struct; it must be cast into the proper type
+#     using the proper constructor
+# $arg3 is the argument from callback registration time; it is
+#     whatever PERL object was passed to X11::Wcl::WcRegisterCallback()
+sub buttonCB
+{
+	my($widget, $arg1, $arg2, $arg3) = @_;
+
+	print "exit button pressed\n";
+	exit(0);
+}
+
+# for application-specific startup actions
+sub startup
+{
+	my($toplevel, $app_context) = @_;
+
+	print "startup($toplevel, $app_context)\n";
+}
+
+__END__
+
+MAIN
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+XmPushButton.wcChildren: form
+
+! constants
+*wclVerboseWarnings:			True
+!*wcPostCreateDumpResources:	True
+!*wcPreCreateDumpResources:		True
+!*wcTrace:						True
+*background:					light gray
+*foreground:					black
+*FontList:						-*-courier-bold-r-*-*-*-140-100-100-*-*-*-*
+
+*form.WcCreate:					XmForm
+*form.WcChildren:				button
+!*form.width:					500
+!*form.height:					500
+*form.fractionBase:				1000
+!*form.wcAfterChildren:			WcPrintTree(*form)
+
+*button.WcCreate: XmPushButton
+*button.labelString: EXIT
+*button.activateCallback: 	buttonCB()
+*button.topAttachment:		ATTACH_FORM
+*button.leftAttachment:		ATTACH_FORM

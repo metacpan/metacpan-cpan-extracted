@@ -1,0 +1,16 @@
+			Perl module: XML-Checker
+
+Copyright (c) 1999,2000 Enno Derksen
+All rights reserved.
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+For bug reports or suggestions send email to tjmather@tjmather.com
+
+============= XML::Checker =====================================================
+
+The XML::Checker Perl module contains several classes:
+
+XML::Checker         - contains the XML::Checker class that is used by the others
+XML::Checker::Parser - an XML::Parser that validates at parse time
+XML::DOM::ValParser  - an XML::DOM::Parser that validates at parse time

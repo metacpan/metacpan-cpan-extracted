@@ -1,0 +1,1280 @@
+
+=== version history of XML::Compile::SOAP
+
+version 3.21: Wed 11 Jan 10:02:19 CET 2017
+
+	Fixes:
+	- XOP hooks were instated, even though XML::Compile::XOP was not.
+	  Schema/WSDL compilation will be a little faster now.
+	  https://github.com/mjgardner/xml-compilex-schema-loader/issues/1
+	  [Slaven Rezić]
+	- constant name: XS_DAEMON_NS -> XC_DAEMON_NS
+	  rt.cpan.org#119800 [Pavel Trushkin]
+
+	Improvements:
+	- spell fix Debian rt.cpan.org#118577 [Gregor Herrmann, Debian]
+
+version 3.20: Wed 19 Oct 15:43:19 CEST 2016
+
+	Fixes:
+	- XOP writing, where object type not equal but extending base64Binary
+	  [Kit Peters]
+
+version 3.19: Mon Sep 19 23:02:10 CEST 2016
+
+	Fixes:
+	- typo rt.cpan.org#113270 [Debian]
+	- include examples in the manual page.
+
+	Improvements:
+	- XOP charset [Kit Peters]
+
+version 3.18: Tue 22 Mar 09:04:22 CET 2016
+
+	Fixes:
+	- 3.17 had an unclean release [Nick Morrott]
+
+version 3.17: Mon 21 Mar 15:00:39 CET 2016
+
+	Changes:
+	- moved BEA and Sharepoint schemas to a new XML::Compile::Licensed
+	  distribution, to avoid license related complications on Debian.
+	  Discovered by [Nick Morrott]
+	- remove examples/temperature/convert.xsd from the distribution:
+	  license not clear.
+
+version 3.16: Tue 15 Mar 08:31:43 CET 2016
+
+	Fixes:
+	- document style can have fault parts with "type" [Heiko Jansen]
+	- apache's Coyote requires encodingStyle in rpc messange [Heiko Jansen]
+	- typos rt.cpan.org#112910 [Nick Morrott]
+
+	Improvements:
+	- refer to the new ::SOAPHTTP_MojoUA module.
+
+version 3.15: Wed  6 Jan 17:13:07 CET 2016
+
+	Fixes:
+	- regression test charset
+	  rt.cpan.org#110950 [Mark Gardner]
+	- version in README
+	  rt.cpan.org#110951 [Mark Gardner]
+
+version 3.14: Wed  6 Jan 14:56:04 CET 2016
+
+	Fixes:
+	- remove enforcement of ::Daemon upgrade, added in the
+	  previous release: cyclic redundancy.
+	  rt.cpan.org#110233 [Alan Mizrahi]
+	- Apache XCF does not understand quotes around charset in XOP
+	  rt.cpan.org #107586 [Derek Hausauer]
+
+	Improvements:
+	- compile{Client|Calls|All} option transporter can now also
+	  be a XML::SOAP::Transport-object (so, you do not need to
+	  call compileClient() on it explicitly.
+
+version 3.13: Fri  6 Nov 09:39:09 CET 2015
+
+	Fixes:
+	- mime-type of XOP part got broken.
+	  rt.cpan.org #107586 [Derek Hausauer]
+
+	Improvements:
+	- detect need for upgrade of XML::Compile::SOAP::Daemon
+	- fix some encoding related regression tests
+
+version 3.12: Tue 22 Sep 12:09:36 CEST 2015
+
+	Fixes:
+	- oops, remove debug statements
+
+version 3.11: Tue 22 Sep 12:03:34 CEST 2015
+
+	Fixes:
+	- rpc: performance issue reading xsi:type's
+
+version 3.10: Tue 11 Aug 11:37:49 CEST 2015
+
+	Changes:
+	- when the response is a Fault, we do not return Bad Request,
+	  but OK.  WCF (Microsoft .NET) apparently interprets headers
+	  of SOAP1.1 messages as SOAP1.2 (only with some settings?)
+
+	Fixes:
+	- XOP: escape double-quote in start-info [Grégory Bougourd]
+
+version 3.09: Tue Jul 21 14:11:55 CEST 2015
+
+	Fixes:
+	- SOAP11::Encoding should use compileType()
+	  rt.cpan.org#105170 [Nick Wellnhofer]
+
+	Improvements:
+	- FAQ on use of SSL.
+
+version 3.08: Fri Feb 27 13:16:45 CET 2015
+
+	Fixes:
+	- pass soap object to ::Transporter::compileClient [Sean Baker]
+
+version 3.07: Thu Jan 15 14:36:54 CET 2015
+
+	Fixes:
+	- FAQ: how to set the HTTP timeout.
+	- silence rpc-encoded without namespace.
+	  rt.cpan.org#101383 [Breno G. de Oliveira]
+
+	Improvements:
+	- lower http "received status" messages from 'info' to 'trace'
+	- ::SOAPHTTP new method defaultUserAgent()
+	- force people to upgrade LWP
+
+version 3.06: Mon Dec 22 08:43:11 CET 2014
+
+	Fixes:
+	- accept multiple rpc name-spaces.
+
+	Improvements:
+	- typo in generated daemon example [Cs Metsys]
+	- new method ::SOAP::Operation::longName()
+	- remove soap-env-patch: not needed anymore
+	- remove overrule of *form_default on standard schemas: not needed
+	  anymore.
+	- rpc-encoding partially supported
+
+version 3.05: Wed May 28 09:29:16 CEST 2014
+
+	Fixes:
+	- support rpc-literal fault parts based on type, not only element.
+	  reported by [Rob De Langhe]
+	- handle returned XOP objects.  Patch by [Christopher Taranto]
+
+	Improvements:
+	- use File::Slurp::Tiny to replace File::Slurp
+	  rt.cpan.org#92920 [Karen Etheridge]
+	- do not include ::Daemon in META.yml
+	  rt.cpan.org#95507 [Nikolay Martynov]
+
+version 3.04: Thu Feb  6 17:05:32 CET 2014
+
+	Improvements:
+	- change documentation style.
+	- move ::SOAP11::Operation::parsedWSDL() to base-class
+
+version 3.03: Fri Jan 10 15:42:22 CET 2014
+
+	Fixes:
+	- remove dependency to WSDL again, because CPAN.pm cannot
+	  handle cyclic dependencies.
+	- revert unintended change in 2.36 which croaks when the
+	  Fault/details contains elements which are not understood.
+	  Detected by [Steffen Winkler]
+
+	Improvements:
+	- add server schemas, currently for BEA, SharePoint, and
+	  XML::Compile::Daemon servers.
+
+version 3.02: Wed Jan  8 01:04:45 CET 2014
+
+	Fixes:
+	- auto check whether WSDL11 must be upgraded. [Caleb Cushing]
+
+version 3.01: Mon Jan  6 23:19:14 CET 2014
+
+	Improvements:
+	- upgrade daemon if installed.
+	- drop support for very old Perl's
+
+version 3.00: Mon Jan  6 00:55:08 CET 2014
+	Changes:
+	- split-off WSDL11 into own distribution.
+	- default mime-type for SOAP 1.1 is text/xml
+	- removed SOAP10
+
+	Fixes:
+	- headers and body elements which appear more than once will
+	  be put in an ARRAY.
+
+	Improvements:
+	- check that all XML::Compile::SOAP* modules are loaded
+	  [Chase Whitener]
+	- and one more check [Reiber Christian]
+	- example how to add BasicAuthentication headers
+	- added examples/temperature, based on answer to request of [fort_d]
+	- moved WSDL11 initialization from ::Operation to ::SOAP11
+	- moved module registration from ::Operation to ::SOAP
+	- ::Extensions can now register soap12 routines.
+	- add examples/salesforce/, contribute by [Ciaran Deignan]
+	- ::Operation:addHeader() now also accepts ELEMENTs in prefixed form
+
+version 2.38: Thu Aug 22 16:20:29 CEST 2013
+
+	Fixes:
+	- soaphttp: do not reuse HTTP::Request object; we need fresh
+	  headers. rt.cpan.org#88019 [Bret Lambert]
+
+	Improvements:
+	- use ::Cache::addPrefixes()
+	- one set of operations should not include ops with the same name:
+	  tell user to be more specific when sets overlap.
+	- clean error when ::WSDL11::compileCalls() would select overlapping
+	  operation names
+	- remove trick to first generate body and the headers.
+	- example of changing ::WSDL::endPoint, with help of [Bret]
+	- ::WSDL::compileCall() now also works with an operation by name,
+	  not only as object.
+
+version 2.37: Tue Jul  9 17:53:13 CEST 2013
+
+	Fixes:
+	- wsdl: compileClient now also respects declare(OPERATION)
+	- wsdl: SOAP12 operations became SOAP11 ports
+
+	Improvements:
+	- wsdl: new compileCall($operation), helping [Caleb Cushing]
+	- soaphttp: docs improvement about own user_agent. [Edward Savage]
+
+version 2.36: Fri May  3 10:04:52 CEST 2013
+
+	Changes:
+	- error when Fault/details contains elements which are not
+	  understood.
+
+	Fixes:
+	- writer rpc: do not ignore empty message parts [Henrik Tougaard]
+
+	Improvements:
+	- spell fixes. rt.cpan.org#83835 [Joenio Marques de Costa]
+	- remove dependency for Test::Deep
+	- moved ::WSDL11::_learn_prefixes to ::Cache
+	- doc: OODoc improvements produce nices DETAILS sections
+
+version 2.35: Mon Jan 14 11:45:07 CET 2013
+
+	Fixes:
+	- fix collection of errors, even better. [Lars Thegler]
+
+version 2.34: Fri Dec 21 12:21:00 CET 2012
+
+	Fixes:
+
+	- correct collection of errors in ::Client
+	  [Roman Daniel]
+
+version 2.33: Fri Nov 30 19:18:22 CET 2012
+
+	Improvements:
+
+	- ::SOAP11::Operation::addHeader() now supports mustUnderstand
+	  and destination.
+
+version 2.32: Mon Oct 22 21:38:04 CEST 2012
+
+	Fixes:
+
+	- ::Trace errors is ARRAY, not HASH.
+
+version 2.31: Tue Oct 16 16:28:52 CEST 2012
+
+	Changes:
+
+	- writer: first create the Body, then the Header, so fields in the
+	  header (for instance Security) do know what the body will be.
+
+	- writer: rpc operation will have xmlns, not Envelope
+
+	Fixes:
+
+	- transport: capture XML and protocol errors in exceptions.
+
+	- ::Operation::addHeader() will silently ignore adding the same
+	  header again.
+
+	Improvements:
+
+	- trace object may capture multiple errors.  New method: errors()
+
+version 2.30: Sat Oct  6 13:35:21 CEST 2012
+
+	Fixes:
+
+	- handle XOP decoding where there is no start-id is mentioned.
+	  Reported by [Ciaran Deignan]
+
+	- explain of operation sometimes missed a name-space declaration.
+	  rt.cpan.org#79786 [David Tindall Mcmath]
+
+	- ::WSDL::new(wsdl) was documented to accept multiple WSDLs,
+	  but only the first was taken.
+	  [Karen Etheridge]
+
+	Improvements:
+
+	- more reuse of the default LWP::UserAgent.
+
+	- explain show prefixed type for faults.
+
+version 2.29: Thu Aug 16 00:17:22 CEST 2012
+
+	Fixes:
+
+	- deprecated XML::LibXML::parse_string() must be replaced
+	  by XML::LibXML::load_xml(string).
+	  rt.cpan.org#78946 [chernomyrdin]
+
+	- treat XOP mime-type multipart/related case-insensitive
+	  [Ciaran Deignan]
+
+	Improvements:
+
+	- add ::SOAP11::Operation::parsedWSDL()
+
+version 2.28: Fri Jun 22 20:19:53 CEST 2012
+
+	Fixes:
+
+	- handling single string fault details. [ZP Gu]
+
+version 2.27: Fri Jun 22 08:54:08 CEST 2012
+
+	Fixes:
+
+	- disable attempts of the XML::LibXML parser to dynamically load
+	  DTDs for ::Trace::*(pretty_print)  [Michael Ludwig]
+
+	Improvements:
+
+	- take hint by [Boris Jakubaschk] about how simpel it is to get
+	  basic authentication included in the HTTP headers.
+
+	- add parsed response DOM-tree to the ::Trace.
+	  On request by [Michael Ludwig]
+
+version 2.26: Wed Feb  8 20:19:15 CET 2012
+
+	Fixes:
+
+	- fix and improve ::Trace::pretty_print() [Michael Ludwig]
+
+	Improvements:
+
+	- avoid warnings in ::Trace::printTimings() when the
+	  message exchange was incomplete.
+
+	- added example how to get low-level control over the HTTP
+	  messages to the ::FAQ.  Based on an example from
+	  [Michael Ludwig]
+
+	- added a way to load all imported xsd files to your local
+	  disk via wget, after a question from [Gary Kennedy]
+
+	- documentation generation problems.
+
+	- add transporter object as parameter to the hook call.
+
+	- ::Tansport::compileClient() gets xml_format options to
+	  improve readability.
+
+version 2.25: Thu Sep 22 10:56:11 CEST 2011
+
+	Fixes:
+
+	- do not silently continue when there are decoding errors.
+
+	- two missing __x() in ::SOAP::Server errors. [Patrick Powell]
+
+	- one-way message error-handling and explain [Patrick Powell]
+
+	- examples/rpc-literal/element.pl failed.  Reported by
+	  rt.cpan.org#70349 [Caleb Cushing]
+
+	Improvements:
+
+	- new method XML::Compile::SOAP::Trace::printErrors()
+
+	- explain how to use transport_hook to implement transporter
+	  tricks without fully extending ::Transport [Patrick Powell]
+
+	- handler callbacks pass additional session object around.
+	  [Patrick Powell]
+
+	- extended ::Trace::printResponse() with 'pretty_print' options,
+	  as suggested by [Caleb Cushin]
+
+	- remove example/wssecurity from the distribution: we now have
+	  XML::Compile:WSS.
+
+version 2.24: Mon Jun 20 14:27:15 CEST 2011
+
+	Fixes:
+
+	- cleanly catch more errors in trace object.
+
+	Improvements:
+
+	- allow instantiation of WSDL11 object with ARRAY of wsdl
+	  filenames.
+
+	- template: also show headers in explain()  Hinted by [Patrick
+	  Powell]
+
+version 2.23: Tue Feb 15 08:56:35 CET 2011
+
+	Fixes:
+
+	- check whether reading from XOP file succeeds.
+
+	- ahhh... debug warning was left-in.
+	  rt.cpan.org #65720 [Boris Zentner]
+
+version 2.22: Sat Feb  5 20:41:13 CET 2011
+
+	Fixes:
+
+	- endpoint parameter got broken in 2.20 [Daniel Stini]
+
+	Improvements:
+
+	- make explain() output well-formed, syntax correct.
+	  [Patrick Powell]
+
+	- $op->compileClient now also accepts parameters for the
+	  transporter which is created internally [Robin V.]
+
+version 2.21: Sat Dec 25 12:01:30 CET 2010
+
+	Fixes:
+
+	- various tests fail with newer Test::More
+
+version 2.20: Wed Dec 22 16:40:56 CET 2010
+
+	Fixes:
+
+	- load soap11 schemas, even when WSDL defines a SOAP-ENV.
+	  rt.cpan.org#63439
+
+	- fix server faults even further :(
+	  Good test-env by [Patrick Powell] is half the work
+
+	Improvements:
+
+	- call caching, with new methods compileCalls() and call().
+	  Simplifies application, as shown by [Bernd Web]
+
+	- new ::endPoint()
+
+	- add fault structures to ::Operation::explain() on request
+	  by [Patrick Powell]
+
+version 2.19: Tue Nov  9 13:23:05 CET 2010
+
+	Fixes:
+
+	- pass async flag of ::Operation::compileClient [Aleksey Mashanov]
+
+	Improvements:
+
+	- documentation fixes by [Patrick Powell]
+
+version 2.18: Mon Nov  1 17:10:17 CET 2010
+
+	Changes:
+
+	- extra "action" parameter for faultMessageNotRecognized().
+	  [Patrick Powell]
+
+	- renamed XML::Compile::Operation to XML::Compile::SOAP::Operation
+
+	Improvements:
+
+	- also Faults which do not contain additional details will
+	  get decoded for convenience. Found by [Patrick Powell]
+
+	- promote soapAction() from ::SOAP11::Operation into ::Operation
+
+	- document availability of ::Operation::wsaAction() for ::WSA
+
+	- produce error when binding of operation is missing.
+
+	- XML::Compile::Transport becomes an ::Extension
+
+	- added ::Extension::soap11ServerWrapper()
+
+	- explain how to use ANY elements in SOAP messages.
+
+	- ::SOAP::compileClient() can now be used with async transfer
+	  protocols. [Aleksey Mashanov]
+
+	- document existence of ::Transfer::SOAPHTTP_AnyEvent
+
+	- ::SOAP::messageStructure() also shows wsa_action.
+
+	- remove dependency on Test::Pod
+
+	- started with XML::Compile::SOAP::FAQ
+
+version 2.17: Thu Sep 30 17:05:42 CEST 2010
+
+	Fixes:
+
+	- when the WSDL does not contain a soapAction, there will
+	  not be such field in the mime-header (because SharePoint
+	  gets confused) [Pete Groff]
+
+	- when no namespace is defined in RPC, it should be
+	  interpreted as undefined, not produce an error. [Tapio Niva]
+
+	- repaired WSDL interpretation problem with faults.
+
+	Improvements:
+
+	- received header and body elements which are not understood
+	  (hence cannot be decoded) will be included as XML::LibXML node
+	  in the result. Question by [Lars Thegler]
+
+	- WSDL elements like service-name do now also accept prefixed
+	  names, not only qnames and local names.
+
+	- explain will prefer to show types in prefixed form, which
+	  is shorter than the qname version.
+
+	- do also cleanup server generated (out-of WSDL) faults and
+	  describe how to use them.
+
+version 2.16: Wed Aug 11 16:13:14 CEST 2010
+
+	Fixes:
+
+	- rpc without parameters should create empty procedure element
+	  [Oliver Gorwit]
+
+	- do not crash with http-get and http-post bindings in the WSDL.
+	  [Morad Igmir]  A real-life server and examples are needed to
+	  be able to implement these protocols.
+
+	Improvements:
+
+	- accept FILEHANDLE argument in XML::Compile::SOAP::print*()
+	  Requested by [Max Cohan]
+
+	- add XML::Compile::Cache version to the HTTP headers.
+
+	- add 'Accept' HTTP line to request for SOAP answer (SOAP1.2)
+
+	- $wsdl->printIndex() shows SOAP version with port name.
+
+	- load wsdl-http.xsd in SOAP10, not WSDL11
+
+version 2.15: Tue Jun 15 15:22:30 CEST 2010
+
+	Improvements:
+
+	- add ways to extend SOAP11 operation definitions, to support
+	  extensions which are not in the WSDL.
+
+	- add XML::Compile::SOAP::Extension for XML::Compile::SOAP::WSA
+
+version 2.14: Mon May 17 13:12:39 CEST 2010
+
+	Changes:
+
+	- using WSDL with RPC/type, the values must not be labeled
+	  with the type, but the part name.
+
+	Fixes:
+
+	- ::WSDL11::explain() should pass options to operation search.
+
+version 2.13: Mon Apr 26 10:07:11 CEST 2010
+
+	Fixes:
+
+	- crash when the data structure returned in a server handler
+	  does not match the expected structure. [Robin V.]
+
+	- role keywords were not translated into URIs.
+
+	Improvements:
+
+	- SOAP11::Operation::compileHandler() new option "selector"
+
+	- test the server side production of wsdl defined faults.
+
+version 2.12: Tue Mar  2 15:58:48 CET 2010
+
+	Fixes:
+
+	- rpc return decoding.
+
+version 2.11: Tue Mar  2 09:27:40 CET 2010
+
+	Fixes:
+
+	- syntax error caused by change in Log::Report.
+	  rt.cpan.org#55095 [Leandro Hermida]
+
+	- rpc with part types was not processed correctly
+	  [Tapio.Niva]
+
+version 2.10: Mon Feb  8 19:43:42 CET 2010
+
+	Fixes:
+
+	- action parameter of XML::Compile::Transport::SOAPHTTP::new()
+	  was ignored. [Titi Ala'ilima]
+
+	- ::SOAP11::Server::faultNotImplemented() should only produce
+	  a fault structure, not a message.
+
+	Improvements:
+
+	- ::SOAP11::Server::compileHandler()  _RETURN_CODE and
+	   _RETURN_TEXT in produced answer will be used in the HTTP
+	   header.
+
+	- ::SOAP11::Server shows some client error messages in the
+	  server logs.
+
+version 2.09: Thu Jan 28 14:24:40 CET 2010
+
+	Fixes:
+
+	- explicitly require XML::Compile in ::SOAPHTTP [Joel B]
+
+	- good error handling when 'use XML::Compile::SOAP11' is missing.
+
+	Improvements:
+
+	- re-added /examples/wssecurity/security.pm to distribution.
+
+version 2.08: Thu Jun 18 10:29:13 CEST 2009
+
+	Fixes:
+
+	- Fault's did not decoded since v2.05, reported by [Gert Doering]
+
+	Improvements:
+
+	- new method XML::Compile::SOAP::Trace::error()
+
+version 2.07: Tue Jun  2 15:52:20 CEST 2009
+
+	Fixes:
+
+	- remove debug print statement
+
+version 2.06: Tue Jun  2 11:11:27 CEST 2009
+
+	Fixes:
+
+	- removed  XML::Compile::SOAP::Tester from t/01use.t
+	  [cpantesters] and rt.cpan.org#46588 [Dagfinn Ilmari Mannsaker]
+
+	- repair call structure when not running with test server.
+	  Reported by [Luong Truong]
+
+	- require 'namespace' attribute when SOAP  RPC.  Decided together
+	  with [Daniel Ruoso]
+
+	- removed more references to the "fakeServer" implementation which
+	  never got around.  There is a nice way to create "server stubs"
+	  to be able to test the clients without the need for a remote server.
+	  See the docs in XML::Compile::Transport
+
+version 2.05: Thu May 28 12:31:46 CEST 2009
+
+	Fixes:
+
+	- remove XML::Compile::SOAP::Tester, because it was not completely
+	  developed.  Signaled by [Georg Oechsler]
+
+	- use 'namespace' parameter (if available) in SOAP RPC
+	  Reported by [Daniel Ruoso]
+
+	- rpc-literal one-way fix (hopefully).  Reported by [Daniel Ruoso]
+
+	Improvements:
+
+	- support MTOM and XOP in new modules XML::Compile::XOP(::Include)
+	  tests in t/60xop.t   Needed by [Luong Truong]
+
+	- trace which message top-nodes are being skipped.
+
+version 2.04: Mon Apr 13 19:01:15 CEST 2009
+
+	Fixes:
+
+	- RPC/literal was seriously broken.
+	  Extended example by [Daniel Ruoso].
+
+	- address operation by port-name [Georg Oechsler]
+
+	Improvements:
+
+	- add filters on operations(), proposed by [Georg Oechsler]
+
+	- added to ::Operation the accessors serviceName(), portName()
+	  bindingName(), portTypeName().
+
+	- added ::WSDL11::printIndex()
+
+	- require LWP to be at least 5.825, because Perl 5.10 comes with a
+	  version which breaks on unicode [Anton Berezin]
+
+version 2.03: Wed Mar 25 15:44:10 CET 2009
+
+	Fixes:
+
+	- auto-generate service block when missing and only one portType
+	  and binding defined. Used by Exchange. Reported by [Anton Berezin]
+
+	- fix wsdl11 when "parts" is used.  [Anton Berezin]
+
+	- do not enforce an endpoint parameter.
+
+	- do not let HTTP error codes confuse the transporter: sometimes
+	  they are produced by the SOAP handler. [Gert Doering]
+
+	Improvements:
+
+	- namespace work-around for unqualified Fault structure in SOAP11
+	  envelope was implemented twice.  Removed one.
+
+	- accept 'server' option to compileClient, which does only replace
+	  the server name in the WSDL service location string, not the
+	  whole endpoint.
+
+version 2.02: Sun Feb 15 23:24:14 CET 2009
+
+	Changes:
+
+	- ::Server::compileHandler() now returns a pair: contains
+	  a status code as well.
+
+	Fixes:
+
+	- restore accidentally removed ::Server::faultValidationFailed()
+
+	- repair handling of server processing errors.
+
+	- add clean handling of ::Server::faultResponseInvalid()
+
+	- reuse created Server::faultWriter()
+
+	- required XML::Compile::Cache 0.91 [cpantesters]
+
+	Improvements:
+
+	- trace the returned faults
+
+version 2.01: Thu Feb 12 09:48:17 CET 2009
+
+	Changes:
+
+	- require XML::Compile v1.00 for element_form_default parameter
+	  rename.
+
+	- SOAP::version not configurable, but class constant.
+
+	Fixes:
+
+	- crash on server errors, when throw() is called.
+	  rt.cpan.org#42528 [Piotr Roszatycki]
+
+	- do not use /bin/pwd in t/99pod.t
+
+	- do not prefix the user's keys without explicit user request
+	  via key_rewrite => 'PREFIXED'.  Requires XML::Compile 1.01
+
+	Improvements:
+
+	- lookup SOAP protocol via envelope namespace as well.
+
+        - also *::Operation now shows protocol version().
+
+	- added serverClass() and clientClass() for ::Operation.
+
+version 2.00_01: Mon Dec 29 11:13:05 CET 2008
+
+	************** MAJOR REWRITE!!! *******************
+	. WSDL11 based on XML::Compile::Cache, with much simpler code
+	  as result.
+	. many classes and methods have been renamed or removed.
+	. split-off SOAP12 into distribution XML::Compile::SOAP12
+	. the "document" style soap interface unchanged.
+	. rpc-literal is much better now, like document style
+	. rpc-encoded not yet supported.
+	. pluggable back-ends for message structures (SOAP1.1, SOAP1.2,..)
+	  and transporters (SOAPHTTP, XMPP, ...)
+
+	Changes:
+
+	- Too many changes in internals to detail.
+
+	- you have to explicitly load XML::Compile::SOAP11 yourself, to
+	  have those definitions understood by the WSDL.
+
+	Fixes:
+
+	- fixed t/30charset.t, with double encode of utf-8.
+
+	Improvements:
+
+	- port to Perl pre-5.8.3, working around broken or non-existing
+	  encode() [Toby Corkindale]
+
+	- report cause on client error which is produced in LWP [Tom]
+
+	- removed the [new in 0.78] added elementFormDefault="qualified"
+	  in favor of the new XML::Compile::Schema::importDefinitions()
+	  options which do the same.
+
+	- more trace messages.
+
+	- new examples for rpc-literal, based on Daniel Ruoso's example.
+
+version 0.78: Fri Oct 10 15:55:39 CEST 2008
+
+	Fixes:
+
+	- improved understanding of top-level elements in XML::Compile 0.95
+	  broke this module:
+	  . some schema lack    elementFormDefault="qualified"
+	    changed in soap-encoding.xsd, wsdl-soap.xsd
+	  . some problems in the RPC encoder/decoder
+	  . disable t/51wsdl11enc.t
+
+	Improvements:
+
+	- do not use (big)float in test of t/15rpclit11.t
+
+version 0.77: Fri Aug 15 07:48:22 CEST 2008
+
+	Fixes:
+
+	- Changes in XML::Compile 0.93 broke group processing in WSDL
+	  rt.cpan.org#38483 [John LoVerso]
+
+version 0.76: Fri Aug  1 13:18:21 CEST 2008
+
+	Fixes:
+
+	- Correcting fault handling. Code and tests(!) contributed
+	  by [Jamie Lentin]
+
+	- Requires XML::Compile 0.91, just because it is much better.
+
+version 0.75: Mon Jul 21 09:17:10 CEST 2008
+
+	Fixes:
+
+	- Requires XML::Compile 0.90. Cpantesters [Martin Kutter]
+
+version 0.74: Fri Jul 18 22:01:24 CEST 2008
+
+	Fixes:
+
+	- Reading SOAP failed, because improved strictness of XML::Compile
+	  [Jason Tang]
+
+	Changes:
+
+	- require XML::Compile 0.87, which renames option output_namespaces
+	  into prefixes.
+
+	Improvements:
+
+	- rename encoder option namespaces into prefixes.  Old name still
+	  available.
+
+version 0.73: Tue Apr 29 18:59:42 CEST 2008
+
+	Changes:
+
+	- require Log::Report 0.17, to fulfil promisses of the doc (was 0.11)
+
+	- require XML::Compile::Tester
+
+	- require XML::Compile 0.78 -> 0.81
+
+	Improvements:
+
+	- example how to use WS-Security, contributed by [Alan Wind]
+
+	- refer to mailinglist and IRC, set-up by [Matt S Trout]
+
+	- Test scripts converted to use XML::Compile::Tester.  Cleaned-out
+	  t/TestTools.t
+
+version 0.72: Wed Apr 16 13:03:26 CEST 2008
+
+	Fixes:
+
+	- WSDL schemata passed to new() got parsed twice.
+
+	- schema sources were offered for compilation twice, but ignored
+	  the last time.
+
+	- schema mix-up with more than one WSDL object. [Kaare Rasmussen]
+
+	- WSDL11->compileClient did not pass parameters to ::Schema::compile()
+	  as was documented [Allan Wind]
+
+	Changes:
+
+	- requires XML::Compile 0.73 -> 0.78
+
+	Improvements:
+
+	- new option WSDL11(schemas).
+
+	- only complain about limitation to SOAPHTTP protocol if no
+	  explicit transporter was defined. [Daniel Ruoso]
+
+version 0.71: Sat Apr 12 09:58:05 CEST 2008
+
+	Fixes:
+
+	- Support XML which uses a non-utf8 encoding. Patch by [Gert Doering]
+	  The related test needs to be updated (print cannot handle byte-
+	  streams)
+
+	- Client does not add Content-Length field. Patch [Drew Taylor]
+
+	- headers were missing, since XML::Compile "reader in list-context"
+	  fix.  Reported by [Gert Doering]
+
+version 0.70: Wed Apr  9 15:09:43 CEST 2008
+
+	Fixes:
+
+	- Math::BigInt with GMP caused t/14dec11.t to fail
+	  [CPANTesters, Slaven Rezic]
+
+version 0.69: Tue Apr  8 23:48:31 CEST 2008
+
+	Fixes:
+
+	- Trace returned on error was not transformed into an object, and
+	  resulted in unwanted undefs.
+
+	- ::Trace->printTimings() did not handle undefs well.
+
+	- Document that SOAPHTTP::compileClient(action) is optional, not
+	  required
+
+	- ::SOAPHTTP will use LWP::UserAgent with Keep-Alive on.
+
+	Changes:
+
+	- require XML::Compile 0.69 -> 0.73
+
+	- ::WSDL11::Operation canTransport() implementation was broken,
+	  and therefore needed a change of behavior.  Probably invisible
+	  for end-users.
+
+	Improvements:
+
+	- Automatic reuse of transport connections for all WSDL operations
+	  with the same endpoint(s).
+
+	- New method ::SOAP::messageStructure()
+
+	- New facility method ::SOAP::importDefinitions()
+
+	- Added ::Util::MSEXT constant (MicroSoft Extension Framework)
+
+	- Make XML::Compile::SOAP::Daemon work by extending ::SOAP::Server
+	  and ::SOAP11::Server implementations.  Implementation completed.
+
+	- Added TODO file.
+
+version 0.68: Fri Mar 14 17:56:37 CET 2008
+
+	Fixes:
+
+	- sender/receiver compile options where not passed to
+	  ::Schema::compile()
+
+	- use of ::Transport::SOAPHTTP was not correctly described
+	  in its SYNOPSIS [Marc Sebastian Pelzer]
+
+	- SOAP.pm did not use hires-timings
+
+	Improvements:
+
+	- XML::Compile::SOAP::Trace added for simplified debugging.
+	  This also simplifies example/namesservice/has_wsdl.pl
+
+version 0.67: Fri Feb  8 09:16:15 CET 2008
+
+	Fixes:
+
+	- WSDL types were compiled twice.
+
+	- problems with specifying your own transporter when creating SOAP
+	  calls based on a WSDL.
+
+	- upgrade requirement XML::Compile to 0.68
+
+	- ::Encoding::dec()  [decode RPC] tries harder.
+	  with help of [Philippe B.]
+
+	Improvements:
+
+	- Pass information about location of type definitions to
+	  XML::Compile, for debugging and tracing.
+
+	- ::Encoding::array new option array_type
+
+version 0.66: Thu Jan 31 09:30:18 CET 2008
+
+	Fixes:
+
+	- the SOAP message is a document, not an element.  This way,
+	  we get the right output encoding for free.  Problem spotted
+	  by [Gert Doering]
+
+	- more encoding/decoding character-set issues.  Test script
+	  in t/30charset.t
+
+	Improvements:
+
+	- details about client-side soap moved from ::SOAP into
+	  ::SOAP::Client
+
+	- ::SOAP::compileClient() moved to ::SOAP::Client::
+
+	- example for $wsdl->compileClient() by [Allen Wind]
+
+	- updated the docs, wrt non-existing SOAP1.2 support, triggered
+	  by [Allen Wind]
+
+	- initial implementation of XML::Compile::SOAP::Server
+
+	- return multiple elements in RPC-encoded constructor.
+	  Needed by [Philippe B.]
+
+version 0.65: Mon Jan  7 11:58:52 CET 2008
+
+	Improvements:
+
+	- do not fail in ::Operation::collectMessageParts() if the
+	  input or output part description is missing. [Kaare Rasmussen]
+
+	- support for one-way (WSDL) messages, pushed by [Kaare Rasmussen]
+	
+version 0.64: Tue Nov 27 11:42:45 CET 2007
+
+	Changes:
+
+	- various improvements in the output of Encode::decSimplify(),
+	  the automatic decoded rpc-encoded messages.
+
+	- depends on XML::Compile 0.61
+
+	Fixes:
+
+	- ::Encoding::_dec_typed() confused URI and prefix.
+
+	- rpc-encoded now tests that user's constructed question has
+	  a name-space.
+
+	Improvements:
+
+	- updated examples in example/namesservice/
+	  WSDL example is now called: has_wsdl.pl
+
+	- added new example/namesservices examples:
+	  New pure Schema example: has_schema.pl
+	  RPC-literal example: rpc-literal.pl
+	  RPC-Encoded example: rpc-encoded.pl
+	  and 4 related simplifications, named xxxx2.pl
+
+	- added for convenience: Encoding::encAddNamespace() [without s]
+
+version 0.63: Sat Nov 24 00:14:07 CET 2007
+
+	Changes:
+
+	- requires XML::Compile 0.60
+
+	- ::Encode::typed() now uses selected schemaNS as default, so
+	  simplifies the type parameter.
+
+	- ::Encode::element() now also has the 'type' as first parameter,
+	  like ::typed().
+
+	Fixes:
+
+	- detection of operation type, where WSDL used prefixes.
+
+	- some improvements and changes where not listed in the changelog
+	  for version 0.62
+
+	- fixed ::Encode::typed() when value is already an element
+
+	- WSDL11 headers parsed wrongly. [Gert Doering]
+
+	Improvements:
+
+	- added t/51wsdl11enc.t
+
+	- added ::Encoding::nil()
+
+	- test for ::Encoding::struct();
+
+version 0.62: Mon Nov 19 12:55:42 CET 2007
+
+	Changes:
+
+	- XML::Compile::SOAP::HTTPClient renamed into
+	  XML::Compile::Transport::SOAPHTTP.
+	  It is reworked to extend the new XML::Compile::Transport.
+	  Change invisible to WSDL users, but very visible to people
+	  who create their own messages.  Some of the trace records
+	  changed name as well.
+
+	- swapped arguments of ::Encoding::typed() from
+	   (name, type, value) to (type, name, value);
+
+	- WSDL11(::Operation)::prepareClient() renamed into
+	  ::compileClient()
+
+	Improvements:
+
+	- moved README.todo text to XML::Compile::SOAP man-page,
+	  because people often use pre-packaged modules and therefore
+	  may not see the README files.
+
+	- extended the documentation a lot.
+
+	- implemented XML::Compile::SOAP::compileClient(), which was
+	  documented but not present.
+
+	- added transport base class XML::Compile::Transport.
+
+	- compileMessage() accepts pre-compiled READER and WRITERs,
+	  not only element types.
+
+	- implemented (and documented/tested) literal and encoded RPC.
+
+	- added Encoding::encAddNamespaces()
+
+	- added Encoding::struct()
+
+	- use fake_server to t/wsdl11.t
+
+version 0.61: Tue Nov  6 13:56:54 CET 2007
+
+	Fixes:
+
+	- expected installation problmes due to version number.
+
+version 0.60: Tue Nov  6 13:52:45 CET 2007
+
+	Changes:
+
+	- requires XML::Compile 0.58
+
+	- Empty parameter list at operation will be passed to a
+	  single body element.
+
+	Improvements:
+
+	- XML::Compile::SOAP::Encoding::decSimplify()
+
+	- Working(!) example included.
+
+version 0.59: Mon Nov  5 15:57:30 CET 2007
+
+	Changes:
+
+	- requires XML::Compile 0.57
+
+	Improvements:
+
+	- added XML::Compile::SOAP::Util, where all often-used URIs
+	  are now defined.
+
+	- added XML::Compile::SOAP::Encoding, for XML-RPC.
+	  tests in t/13enc11.t and t/14dec11.t
+
+version 0.58: Mon Oct 22 10:53:30 CEST 2007
+
+	Fixes:
+
+	- XML::Compile::SOAP::Server was missing from the MANIFEST.
+	  Cpan-testers, [Slaven Rezic]
+
+version 0.57: Thu Oct 18 09:33:10 CEST 2007
+
+	SOAP11 might be working, partially.  No tests with real HTTP
+	connection yet.
+
+	Fixes:
+
+	- XML::Compile::SOAP1[12]::Client's were missing from the
+	  MANIFEST
+
+	Changes:
+
+	- roleAbbreviations() became roleURI(), and new roleAbbrevations()
+	  which does the reverse of the old one.
+
+	Improvements:
+
+	- producing and decoding faults, with tests in t/11fault11.t
+
+	- implemented XML::Compile::SOAP::compileCall()
+
+	- moved description of missing implementation features from
+	  XML::Compile::SOAP manual page to README.todo
+
+version 0.56: Fri Oct 12 14:54:25 CEST 2007
+
+	Massive changes and extensions, but still not functioning.
+
+	- split-off XML::Compile::SOAP::Daemon and all its needs into
+	  a seperate distribution.
+
+	- implements XML::Compile::SOAP::Tester
+	- implements XML::Compile::SOAP11::Server
+	- implements XML::Compile::SOAP12::Server
+
+	- moved parts of XML::Compile::SOAP1[12]
+	  into XML::Compile::SOAP1[12]::Client, and reworked examples.
+
+	- translated some die's and warn's into Log::Report
+
+	- use "5.008" in Makefile.PL, to replace "use 5.8" which is
+	  not understood by Perl 5.5 [Slaven Rezic]
+
+version 0.55: Wed Oct  3 22:57:24 CEST 2007
+
+	- first attempt on a full implementation.  Quite some
+	  interface changes were made; old docs are useless.
+
+	- fork from XML::Compile
+
+	- renamed XML::Compile::WSDL         into XML::Compile::WSDL11
+	- renamed XML::Compile::SOAP::SOAP11 into XML::Compile::SOAP11
+	- renamed XML::Compile::SOAP::SOAP12 into XML::Compile::SOAP12
+
+	- install xsd's automatically, grouped in directories
+	  XML/Compile/{SOAP11,SOAP12,WSDL11}/xsd/
+
+	- added wsdl11soap12.xsd
+
+	- Log::Report (translation) namespace xml-compile-soap
+
+	- depend on LWP
+
+	- renamed XML::Compile::SOAP::Operation into
+	  XML::Compile::WSDL11::Operation.
+
+	- Added XML::Compile::SOAP::Client and ::Server
+	- Added XML::Compile::SOAP::HTTPClient and ::Server

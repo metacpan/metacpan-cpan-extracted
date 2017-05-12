@@ -1,0 +1,12 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         XML-LibXML-Iterator
+version:      1.04
+version_from: lib/XML/LibXML/Iterator.pm
+installdirs:  site
+requires:
+    XML::LibXML:                   1.52
+    XML::NodeFilter:               0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30_01

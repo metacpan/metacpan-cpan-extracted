@@ -1,0 +1,178 @@
+=encoding utf8
+
+=head1 NAME
+
+XML::Compile::SOAP::Server - server-side SOAP message processing
+
+=head1 INHERITANCE
+
+ XML::Compile::SOAP::Server is extended by
+   XML::Compile::SOAP11::Server
+   XML::Compile::SOAP12::Server
+
+=head1 SYNOPSIS
+
+  # used by distribution XML::Compile::SOAP::Daemon
+
+  my $soap   = XML::Compile::SOAP11::Server->new;
+  my $input  = $soap->compileMessage('RECEIVER', ...);
+  my $output = $soap->compileMessage('SENDER', ...);
+
+  $soap->compileHandler
+    ( name => $name, input => $input, output => $output
+    , callback => \$my_handler
+    );
+
+  my $daemon = XML::Compile::SOAP::HTTPDaemon->new(...);
+  $daemon->addHandler($type => $daemon);
+
+=head1 DESCRIPTION
+
+This class defines methods that each server for the SOAP
+message exchange protocols must implement.
+
+=head1 METHODS
+
+=head2 Instantiation
+
+This object can not be instantiated, but is only used as secundary
+base class.  The primary must contain the C<new>.
+
+=over 4
+
+=item XML::Compile::SOAP::Server-E<gt>B<new>(%options)
+
+ -Option--Default
+  role    'NEXT'
+
+=over 2
+
+=item role => URI
+
+In SOAP1.1, the term is 'actor', but SOAP1.2 has renamed this into
+'role': the role [this daemon] plays in the transport protocol.
+
+Please use the role abbreviations as provided by the protocol
+implementations when possible: they will be translated into the
+right URI on time.  See L<XML::Compile::SOAP::roleAbbreviation()|XML::Compile::SOAP/"Transcoding">
+and the constants defined in L<XML::Compile::SOAP::Util|XML::Compile::SOAP::Util>
+
+=back
+
+=back
+
+=head2 Accessors
+
+=over 4
+
+=item $obj-E<gt>B<role>()
+
+Returns the URI of the role (actor) of this server.
+
+=back
+
+=head2 Actions
+
+=over 4
+
+=item $obj-E<gt>B<compileFilter>(%options)
+
+This routine returns a CODE reference which can be used for
+L<compileHandler(selector)|XML::Compile::SOAP::Server/"Actions">; so see whether a certain message has arrived.
+On the moment, only the first C<body> element is used to determine that.
+
+ -Option--Default
+  body    []
+  fault   <undef>
+  header  <undef>
+
+=over 2
+
+=item body => ARRAY-of-TYPES
+
+=item fault => ARRAY-of-TYPES
+
+=item header => ARRAY-of-TYPES
+
+=back
+
+=item $obj-E<gt>B<compileHandler>(%options)
+
+Returns an HTTP status code and an XML::LibXML::Document pair.
+
+ -Option  --Default
+  callback  <fault: not implemented>
+  decode    <undef>
+  encode    <undef>
+  name      <required>
+  selector  sub {0}
+
+=over 2
+
+=item callback => CODE
+
+As input, the SERVER object and the translated input message (Perl version)
+are passed in.  As output, a suitable output structure must be produced.
+If the callback is not set, then a fault message will be returned to the
+user.
+
+=item decode => CODE
+
+The CODE reference is used to decode the (parsed) XML input message
+into the pure Perl request.  The reference is a READER, created with
+L<XML::Compile::Schema::compile()|XML::Compile::Schema/"Compilers">.  If no input decoder is specified,
+then the callback handler will be called with the un-decoded
+XML::LibXML::Document node.
+
+=item encode => CODE
+
+The CODE reference is used to encode the Perl answer structure into the
+output message.  The reference is a WRITER.  created with
+L<XML::Compile::Schema::compile()|XML::Compile::Schema/"Compilers">.  If no output encoder is specified,
+then the callback must return an XML::LibXML::Document, or only
+produce error messages.
+
+=item name => STRING
+
+The identification for this action, for instance used for logging.  When
+the action is created via a WSDL, the portname will be used here.
+
+It is a pity that the portname is not passed in the SOAP message,
+because it is not so easy to detect which handler must be called.
+
+=item selector => CODE
+
+One way or the other, you have to figure-out whether a message addresses
+a certain process. The callback will only be used if the CODE reference
+specified here returns a true value.
+
+The CODE reference will be called with the XML version of the message,
+and a HASH which contains the information about the XML collected with
+L<XML::Compile::SOAP::messageStructure()|XML::Compile::SOAP/"Single message"> plus the C<soap_version> entry.
+
+=back
+
+=item XML::Compile::SOAP::Server-E<gt>B<faultWriter>()
+
+Returns a CODE reference which can be used to produce faults.
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of XML-Compile-SOAP distribution version 3.21,
+built on January 11, 2017. Website: F<http://perl.overmeer.net/xml-compile/>
+
+Please post questions or ideas to the mailinglist at
+F<http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/xml-compile> .
+For live contact with other developers, visit the C<#xml-compile> channel
+on C<irc.perl.org>.
+
+=head1 LICENSE
+
+Copyrights 2007-2017 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

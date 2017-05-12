@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<nestedTypes>
+  <c0>
+  	<c1>
+		<el0>EL0</el0>
+		<el1>EL1</el1>
+ 	</c1>
+  </c0>
+  <c0>
+	<el0>el0</el0>
+	<el1>el1_0</el1>
+	<el1>el1_1</el1>
+	<el1>el1_2</el1>
+  	<c1>
+		<el0>EL2</el0>
+ 	</c1>
+  </c0>
+</nestedTypes>

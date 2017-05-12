@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<playlist version="0" xmlns="http://xspf.org/ns/0/">
+    <title>A Sample Playlist</title>
+    <annotation>An example of the default format playlist expressed in XML.</annotation>
+    <creator>The Portable Playlist Working Group</creator>
+    <info>http://playlist.musicbrainz.org/playlist/moin.cgi/FrontPage</info>
+    <location>http://playlist.musicbrainz.org/playlist/moin.cgi/DefaultFormatInXmlVersionThree</location>
+    <identifier>urn:experimental:foo</identifier>
+    <image>http://example.org/foo.jpg</image>
+    <link rel="http://whatever.org/sponsor">http://chewco.com</link> 
+    <meta rel="http://example.org/key">value</meta>
+    <date>2004-03-21</date>
+    <attribution>
+       <location>http://playlist.musicbrainz.org/playlist/moin.cgi/DefaultFormatInXmlVersionTwo</location>
+       <location>http://playlist.musicbrainz.org/playlist/moin.cgi/DefaultFormatInRdfVersionFour</location>
+       <location>http://playlist.musicbrainz.org/playlist/moin.cgi/DefaultFormatInRdfVersionTwoB</location>
+       <location>http://playlist.musicbrainz.org/playlist/moin.cgi/DefaultFormatInRdf</location>
+       <location>http://www.stud.uni-karlsruhe.de/~uy7l/playlist/example3.xml</location>
+    </attribution>
+
+    <license>http://creativecommons.org/licenses/by-sa/1.0/</license>
+
+    <trackList>
+      <track>
+        <location>file:///mp3s/tori/space_dog.mp3</location>
+        <image>http://example.org/bar.gif</image>
+        <annotation>My mom loves this song.  This is weird.</annotation>
+        <creator>Tori Amos</creator>
+        <title>Space Dog</title>
+        <album>Under the Pink</album>
+        <trackNum>11</trackNum>
+        <duration>31300</duration>
+        <link rel="http://whatever.org/sponsor">http://chewco.com</link> 
+        <meta rel="http://example.org/key">value</meta>
+      </track>
+      <track>
+        <identifier>http://musicbrainz.org/track/28af4859-5f9e-483f-8ff3-3dc1e5a6f19d</identifier>
+        <info>http://some.webshop.invalid/songs?id=xyz</info>
+      </track>
+      <track>
+        <location>http://www.mafr.de/not_there/find_the_river.mp3</location>
+        <identifier>http://musicbrainz.org/track/c6b633b9-5d94-426a-aad1-1b394e2be75</identifier>
+      </track>
+      <track>
+        <identifier>urn:sha1:01c2f6b84888970732259dad9faa8b42e2e31f6b</identifier>
+      </track>
+      <track>
+         <location>file:///mp3s/Bob_Dylan/Visions_Of_Johanna.mp3</location>
+         <meta rel="http://some.domain.invalid/tempo">lento</meta>
+      </track>
+    </trackList>
+
+</playlist>    

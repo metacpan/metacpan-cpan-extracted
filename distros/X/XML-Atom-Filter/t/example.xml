@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed version="0.3" xmlns="http://purl.org/atom/ns#">
+	<title>example Atom 0.3 document</title>
+	<link rel="alternate" type="text/html" href="http://www.example.com/" />
+	<modified>2005-04-07T00:34:00Z</modified>
+	<author>
+		<name>Mark Paschal</name>
+	</author>
+
+	<entry>
+		<title>example Atom 0.3 entry</title>
+		<link rel="alternate" type="text/html" href="http://www.example.com/2005/04/07/example" />
+		<id>http://www.example.com/2005/04/07/example</id>
+		<issued>2005-04-07T00:34:00Z</issued>
+		<modified>2005-04-07T00:34:00Z</modified>
+	</entry>
+</feed>
+

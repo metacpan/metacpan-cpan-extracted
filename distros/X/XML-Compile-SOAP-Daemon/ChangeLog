@@ -1,0 +1,273 @@
+
+=== version history of XML::Compile::SOAP::Daemon
+
+TODO:
+  . trace incoming and outgoing messages server-side
+
+version 3.12: Fri 13 May 21:21:11 CEST 2016
+
+	Fixes:
+	- test for availability of CGI.pm [cpantesters]
+
+	Improvements:
+	- add example of basic-auth in Plack to ::PSGI
+	  [Emeline Thibault]
+
+version 3.11: Wed Jan 14 10:22:53 CET 2015
+
+	Fixes:
+	- ::Daemon::AnyDaemon calculation of request timeout
+
+version 3.10: Wed Nov 26 08:45:03 CET 2014
+
+	Fixes:
+	- please Perl 5.20.1 change of import score in regression test
+	  [cpantesters]
+
+version 3.09: Wed May 28 09:26:56 CEST 2014
+
+	Fixes:
+	- ::AnyDaemon warning on use of connection timout (expires)
+	- t/wsa.t use of constants with perl 5.18.2 [cpantesters]
+
+	Improvements:
+	- faultNotImplemented called as instance method.
+	- change documentation style.
+	- ::Daemon::CGI support for fcgi, only needs run(nph => 0) [Immo]
+	- request for ?wsdl now case insensitive
+	- improve example/any-daemon script
+
+version 3.08: Wed Jan  8 00:56:28 CET 2014
+
+	Fixes:
+	- depend on new XML::Compile::WSDL11 [cpantesters]
+
+version 3.07: Mon Jan  6 23:19:49 CET 2014
+
+	Fixes:
+	- ::AnyDaemon fix parameters [Theo Bot]
+	- adapt to changes in XML::Compile::SOAP.
+	  rt.cpan.org#91900 [Raffeallo Galli]
+
+	Improvements:
+	- use parent, to replace use base.
+	- ::setWsdlResponse() now can have mime-type parameter
+
+version 3.06: Fri May  3 10:07:33 CEST 2013
+
+	Improvements:
+	- ::CGI configuration example for Apache VirtualHost
+	  [Dan Lyke]
+
+version 3.05: Thu Aug 16 00:22:31 CEST 2012
+
+	Fixes:
+	- various minor improvements to the new ::PSGI backend.
+	  [Piotr Roszatycki]
+
+	Improvements:
+	- additional regression test for psgi.
+	  [Piotr Roszatycki].
+
+version 3.04: Wed Mar 14 00:11:11 CET 2012
+
+	Improvement:
+
+	- new back-end XML::Compile::SOAP::Daemon::PSGI, contributed
+	  by [Piotr Roszatycki].
+
+version 3.03: Mon Mar  5 11:21:30 CET 2012
+
+	Fixes:
+
+	- syntax errors in namesservices/server.pl
+	  rt.cpan.org #75518 [Caleb Cushing]
+
+	- ::NetServer got broken.  Discovered by
+	  rt.cpan.org #75516 [Caleb Cushing]
+
+version 3.02: Thu Mar  1 11:47:03 CET 2012
+
+	Improvements:
+
+	- ::Daemon::AnyDaemon::run() got a 'child_init' option.
+
+	- add SSL support to ::Daemon::NetServer and ::Daemon::AnyDaemon.  The
+	  latter man-page contains an example.
+
+version 3.01: Mon Feb 13 10:30:20 CET 2012
+
+	Improvements:
+
+	- add new server type ::Daemon::AnyDaemon, with example
+
+	- implement error handling in ::CGI, lack discovered by [Bill Moseley]
+
+	- ::CGI does return a WSDL as well.
+
+	- regression tests for ::CGI
+
+	- called handlers get the $request as additional fourth parameter
+	  [Patrick Powell]
+
+	- examples/namesservice/client.pl, demonstrate send-hook
+	  based on example by [Patrick Powell]
+
+	- examples/namesservice/server.pl, added server restart protection
+	  by [Patrick Powell]
+
+	- add $request parameter to postprocess [Patrick Powell]
+
+	- ability to sub-set the operations in ::Daemon::operationsFromWSDL()
+	  based on service, port, or binding.
+
+version 3.00: Fri Apr 15 11:22:41 CEST 2011
+
+	Changes:
+
+	- major reorganisation. ::HTTPDaemon split into ::Daemon::LWPutil
+	  and ::Daemon::NetServer.
+
+	Improvements:
+
+	- added ::Daemon::CGI, rewrite from contribution by [Patrick Powell]
+
+	- add setWsdlResponse() to answer ?WSDL "GET" requests.
+	  Feature request by [Mark Wood-Patrick]
+
+version 2.06: Wed Dec 22 16:42:04 CET 2010
+
+	Fixes:
+
+	- correct use of soapAction selector again [Kaare Rasmussen]
+
+	- silence warnings when ::WSA is loaded, but not in the WSDL.
+	  reported by [Patrick Powell]
+
+	- produce notice when WSA is loaded but not used.
+
+version 2.05: Mon Dec 13 15:37:11 CET 2010
+
+	Fixes:
+
+	- correct use of soapAction selector [Patrick Powell]
+
+	Improvements:
+
+	- HTTPDaemon::runRequest does not require a 'connection'
+	  anymore [Patrick Powell]
+
+	- update ::WSA to at least version 0.12 if it is installed.
+
+	- textual improvements by [Patrick Powell]
+
+version 2.04; Mon Nov  1 17:21:38 CET 2010
+
+	Improvements:
+
+	- remove dependency for Test::Pod
+
+	- implement operation selection based on wsa:action headers.
+
+	- implement operation selection based on SOAPAction HTTP header.
+
+	- add option for new(accept_slow_select) to be able to
+	  disable tranditional SOAP operation selection
+
+	- add wsa:Action values to the output, when ::WSA is loaded.
+
+version 2.03: Thu Sep 30 17:30:04 CEST 2010
+
+	Fixes:
+
+	- repair ::Daemon::printIndex(). Spotted by [Robin V.]
+
+	- not not complain about missing soapAction field: apparently
+	  there are servers which can live without them.
+
+	- fix return of answer construction errors.
+
+	Improvements:
+
+	- describe how to produce private error messages in the
+	  handler.
+
+version 2.02: Mon Feb  8 19:48:31 CET 2010
+
+	Fixed:
+
+	- alarm in SOAPHTTP was not un-set in all cases. [Anton Berezin]
+
+	- the "not implemented" message was not converted to 2.00
+	  calling structure. [Anton Berezin]
+
+	Improvements:
+
+	- added example how to return errors from a handler. Contributed
+	  Jeroen Koekkoek.
+
+	- extended examples/namesservices with an error and a stub.
+
+	- _RETURN_CODE and _RETURN_TEXT in produced answer will be used
+	  in the HTTP header
+
+version 2.01: Sun Feb 15 23:28:52 CET 2009
+
+	Fixes:
+
+	- perl syntax error when WSDL does not define any operations.
+
+	- require XML::Compile::Cache 0.91
+	          XML::Compile::SOAP  2.02
+
+version 2.00: Thu Feb 12 10:18:11 CET 2009
+
+	Changes:
+
+	- Be compatible with XML::Compile::SOAP 2.01
+
+	- adapted examples to new interface.  Minor changes.
+
+	- removed new(support_versions) and isSupportedVersion().
+	  Simply only load the implementations you daemon will to support.
+
+	- used HTTP error codes have changed.
+
+	Fixes:
+
+	- do not require SOAP12, which got stripped from XML::Compile::SOAP
+
+	- do not use /bin/pwd in t/pod.t
+
+	- do not attempt to use SOAP11 for protocol errors.
+
+	Improvements:
+
+	- test faults in t/10faults.t
+
+version 0.12: Sun Dec 14 21:48:28 CET 2008
+
+	Fixes:
+
+	- Content-Length was handled uncorrectly [Bruno Santos]
+	  and rt.cpan.org#41695 [Frank Rothhaupt]
+
+version 0.11: Fri Jun  6 16:19:06 CEST 2008
+
+	Fixes:
+
+	- add Content-Length to the HTTP answer.
+
+	Changes:
+
+	- requires XML::Compile::Tester.
+
+	- depends on XML::Compile::SOAP 0.73
+
+	Improvements:
+
+	- convert tests to use XML::Compile::Tester
+
+version 0.10: Tue Apr  8 23:50:35 CEST 2008
+
+	- initial version, forked from XML::Compile::SOAP development

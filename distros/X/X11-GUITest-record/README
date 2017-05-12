@@ -1,0 +1,36 @@
+X11-GUITest-record version 0.15
+===============================
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  - X11::GUITest (optional)
+  - Xlib-devel
+
+To use this module please activate the record extension in the config of the X-Server:
+
+  - under selection "Module"
+     Load           "record"
+
+If you want to test this module please activate the record extension first and then try "make test". Otherwise
+the test will be disabled.
+
+  
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 by Marc Koderer/ecos GmbH
+Copyright (C) 2009 by Marc Koderer
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License.
+

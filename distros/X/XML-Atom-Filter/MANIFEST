@@ -1,0 +1,14 @@
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+lib/XML/Atom/Filter.pm
+t/00-load.t
+t/01-filter.t
+t/02-xpath.t
+t/example.xml
+t/pod-coverage.t
+t/pod.t
+examples/atompost.pl
+examples/atom2linkTL.pl

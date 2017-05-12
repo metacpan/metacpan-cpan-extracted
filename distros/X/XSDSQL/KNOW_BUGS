@@ -1,0 +1,77 @@
+
+Element             - yes: implemented - no: non implemented - ignored: conversion ignored 
+
+
+all                 - no
+alternative         - no (actually at 20130216 xmllint version 20900 and the w3c online validator not recognized this tag)
+annotation          - ignored  (possible conversion into sql comment)
+anyAttribute        - no     
+any                 - no 
+appinfo             - ignored 
+assert              - ignored
+attributeGroup      - yes 
+attribute           - yes 
+choice              - yes 
+complexContent      - yes
+complexType         - yes 
+defaultOpenContent  - no (actually at 20130216 xmllint version 20900 and the w3c online validator not recognized this tag) 
+documentation       - ignored  (possible conversion into sql comment)
+element             - yes 
+entity              - yes
+enumeration         - yes 
+extension           - yes 
+field               - ignored   
+fractionDigits      - yes 
+group               - yes  
+import              - yes 
+include             - yes 
+key                 - ignored (possible conversion into sql unique constraint)
+keyref              - ignored (possible conversion into sql foreign constraint)
+length              - yes 
+list                - yes
+maxExclusive        - ignored (possible conversion into sql check constraint) 
+maxInclusive        - ignored (possible conversion into sql check constraint) 
+maxLength           - yes 
+minExclusive        - ignored (possible conversion into sql check constraint)  
+minInclusive        - ignored (possible conversion into sql check constraint) 
+minLength           - ignored (possible conversion into sql check constraint) 
+mixed               - yes
+notation            - yes (ignored)
+openContent         - no (actually at 20130216 xmllint version 20900 and the w3c online validator not recognized this tag) 
+override            - no (actually at 20130216 xmllint version 20900 and the w3c online validator not recognized this tag)  
+pattern             - ignored (possible conversion into sql check constraint)  
+redefine            - yes (note: redefine is deprecated (see http://www.w3.org/TR/xmlschema11-1/#modify-schema))
+restriction         - yes 
+schema              - yes 
+selector            - ignored
+sequence            - yes 
+simpleContent       - yes 
+simpleType          - yes 
+totalDigits         - yes 
+union               - yes 
+unique              - ignored (possible conversion into sql unique constraint) 
+whiteSpace          - ignored 
+ 
+in this xsd code:
+	<xs:group name="e1-e2">
+		<xs:sequence>
+			<xs:element name="e1" type="xs:string" minOccurs="0"/>
+			<xs:element name="e2" type="xs:string"/>
+		</xs:sequence>
+	</xs:group>
+..
+	<xs:choice>
+		<xs:element name="e1" type="xs:string"/>
+		<xs:group ref="e1-e2"/>
+	</xs:choice>
+
+the element 'e1' and 'e1-e2.e1' share the same xpath
+the parser takes the element of the group 'e1-e2'
+
+
+
+the classes have the first character of the names in lower case; is not a recommended perl for the user classes
+
+
+
+

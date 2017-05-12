@@ -1,0 +1,38 @@
+XML::Filter::Namespace version 1.00
+===================================
+
+This module is a simple SAX filter to get rid of all but a single namespace
+from a piece of XML.  It is useful when you have multiple namespaces inside a
+file and want a clearer view of one of them.
+
+It includes a command line tool (filtns) to perform this task easily.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    Class::Accessor
+    Test::More
+    XML::SAX
+    XML::SAX::Writer
+
+Two of those are only for running the test suite, but they're probably useful
+anyway.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2002 Semantico
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+
+# @(#) $Id: README,v 1.3 2002/12/04 14:31:36 dom Exp $

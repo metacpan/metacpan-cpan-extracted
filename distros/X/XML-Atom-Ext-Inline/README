@@ -1,0 +1,32 @@
+XML::Atom::Ext::Inline
+
+This module implements In-lining extesions for Atom. You can see the RFC draft
+here: http://tools.ietf.org/html/draft-mehta-atom-inline-01
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc XML::Atom::Ext::Inline
+
+You can also look for information at:
+
+    http://github.com/pin/xml-atom-ext-inline
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 Dmitri Popov
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

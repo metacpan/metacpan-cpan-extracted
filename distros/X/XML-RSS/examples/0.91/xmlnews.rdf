@@ -1,0 +1,122 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE rss PUBLIC "-//Netscape Communications//DTD RSS 0.91//EN" "http://www.rssboard.org/rss-0.91.dtd">
+
+<rss version="0.91">
+
+  <channel>
+    <title>XML News and Features from XML.com</title>
+    <description>XML.com features a rich mix of information and services for the XML community.</description>
+    <language>en-us</language>
+    <link>http://xml.com/pub</link>
+    <copyright>Copyright 1999, O'Reilly and Associates and Seybold Publications</copyright>
+    <managingEditor>dale@xml.com (Dale Dougherty)</managingEditor>
+    <webMaster>peter@xml.com (Peter Wiggin)</webMaster>
+
+  <image>
+    <title>XML News and Features from XML.com</title>
+    <url>http://xml.com/universal/images/xml_tiny.gif</url>
+    <link>http://xml.com/pub</link>
+    <width>88</width>
+    <height>31</height>
+  </image>
+
+  <item>
+    <title>Issue: XML Data Servers</title>
+    <link>http://xml.com/pub?wwwrrr_rss</link>
+    <description>Although not everyone agrees that XML should become a full-fledged data-management discipline, object-database vendors are busy repositioning their object-database products as XML data servers. Jon Udell looks at one of these, Object Design's eXcelon and finds it a solid product.</description>
+  </item>
+
+  <item>
+    <title>O'Reilly Labs Review: Object Design's eXcelon 1.1</title>
+    <link>http://xml.com/pub/1999/08/excelon/index.html?wwwrrr_rss</link>
+    <description>Jon Udell takes a look at eXcelon, Object Design's XML data servers, and explains its user interface and general approach to XML.   </description>
+  </item>
+
+  <item>
+    <title>Report from Montreal</title>
+    <link>http://xml.com/pub/1999/08/excelon/montreal.html?wwwrrr_rss</link>
+    <description>Lisa Rein reports from MetaStructures 99 and XML Developers' Day.</description>
+  </item>
+
+  <item>
+    <title>Reviews: Bluestone Software's XML Suite: Promising App, Rough Around the Edges</title>
+    <link>http://xml.com/pub/1999/08/bluestone/index.html?wwwrrr_rss</link>
+    <description>Our reviewer tested Bluestone's XML Suite   (XML Server and Visual XML) on the   Windows NT platform, simulating a two-way exchange of   business information between a book publisher and   book stores. The results were encouraging (with a   few caveats).</description>
+  </item>
+
+  <item>
+    <title>Interviews: CBL: Ecommerce Componentry</title>
+    <link>http://xml.com/pub/1999/08/glushko/glushko.html?wwwrrr_rss</link>
+    <description>In this audio interview, Bob Glushko of Commerce One talks about the Common Business Library (CBL) as a set of building blocks for XML document types and schemas used in ecommerce.</description>
+  </item>
+
+  <item>
+    <title>Backends Sharing Data</title>
+    <link>http://xml.com/pub/1999/08/rpc/index.html?wwwrrr_rss</link>
+    <description>What if you could script remote procedure calls between web sites as easily as you can between programs? Edd Dumbill shows how it can be done in PHP.</description>
+  </item>
+
+  <item>
+    <title>Back Issue: XML Suite</title>
+    <link>http://xml.com/pub/1999/08/18/index.html?wwwrrr_rss</link>
+    <description> Barry Nance runs Bluestone's   XML Suite through the paces. The tools show promise   for passing data between databases and XML. But there are still a   few kinks to be worked out.</description>
+  </item>
+
+  <item>
+    <title>Back Issue: XML-RPC</title>
+    <link>http://xml.com/pub/1999/08/11/index.html?wwwrrr_rss</link>
+    <description>A major promise of XML is its ability to pass data simply from one place to another, regardless of platform. In this issue, Edd Dumbill shows how to use XML-RPC in PHP to pass data from a web site to a PDA.</description>
+  </item>
+
+  <item>
+    <title>News: InDelv XML/XSL Client Version 0.4.</title>
+    <link>http://xml.com/pub/coverpage/newspage.html#ni1999-08-27-a?wwwrrr_rss</link>
+    <description>      A posting from Rob Brown reports on the public availability of the new InDelv XML Client version 0.4.  This version represent an upgrade to InDelv's previously released XML Browser, but "it has been renamed as a 'Client' to reflect the fact that it now contains both an XML/XSL browser and an XML/XSL editor.  The browser is available free for all uses. The editor comes packaged with the browser as a demo, which can later be upgraded to a full commercial version. This is a 100% Java appl...
+</description>
+  </item>
+
+  <item>
+    <title>News: OpenJade Development Team Releases OpenJade 1.3pre1 (Beta).</title>
+    <link>http://xml.com/pub/coverpage/newspage.html#ni1999-08-27-g?wwwrrr_rss</link>
+    <description>      A recent posting from Avi Kivity and the OpenJade Development Team announced the release of OpenJade 1.3pre1 (Beta).  "OpenJade is the DSSSL user community's open source implementation of DSSSL, Document Style Semantics and Specification Language, an ISO standard for rendering SGML and XML documents.  OpenJade is based on James Clark's widely used Jade.  OpenJade 1.3pre1 is a more complete implementation of the DSSSL standard, and introduces many new features, including (1) Implementat...
+</description>
+  </item>
+
+  <item>
+    <title>News: IBM XML Parser Update: XML4C2 Version 2.3.1 Released.</title>
+    <link>http://xml.com/pub/coverpage/newspage.html#ni1999-08-27-b?wwwrrr_rss</link>
+    <description>      Dean Roddey posted an announcement for the update of XML4C.  IBM's XML for C++ parser (XML4C) "is a validating XML parser written in a portable subset of C++.  XML4C makes it easy to give an application the ability to read and write XML data. Its two shared libraries provide classes for parsing, generating, manipulating, and validating XML documents.  XML4C is faithful to the XML 1.0 Recommendation and associated standards (DOM 1.0, SAX 1.0). Source code, samples and API documentation ...
+</description>
+  </item>
+
+  <item>
+    <title>News: Platform for Privacy Preferences (P3P) Specification Working Draft.</title>
+    <link>http://xml.com/pub/coverpage/newspage.html#ni1999-08-27-h?wwwrrr_rss</link>
+    <description>     As part of the W3C P3P Activity, a fifth public working draft of the Platform for Privacy Preferences (P3P) Specification has been published for review by W3C members.  The working draft "describes the Platform for Privacy Preferences (P3P).  P3P enables Web sites to express their privacy practices and enables users to exercise preferences over those practices. P3P compliant products will allow users to be informed of site practices (in both machine and human readable formats), to deleg...
+</description>
+  </item>
+
+  <item>
+    <title>News: Extended XLink with XSLT.</title>
+    <link>http://xml.com/pub/coverpage/newspage.html#ni1999-08-27-c?wwwrrr_rss</link>
+    <description>      Nikita Ogievetsky (President, Cogitech, Inc.) posted an announcement for the availability of slides from the Metastructures '99 presentation "HTML Form Templates with XML.  All in One and One for All.  XSLT template library for WEB applications."  The paper describes building XSLT template library for web applications.  The goal was to "demonstrate data processing on the web made easy with XSL transformations: Generate a data maintenance web with data-structure controlled by XML, scree...
+</description>
+  </item>
+
+  <item>
+    <title>News: HyBrick Web Site Reopens.</title>
+    <link>http://xml.com/pub/coverpage/newspage.html#ni1999-08-27-d?wwwrrr_rss</link>
+    <description>      A posting from Toshimitsu Suzuki (Fujitsu Laboratories Ltd.) to the XLXP-DEV mailing list recently announced the reopening of the HyBrick Web site.   'HyBrick' is "an advanced SGML/XML browser developed by Fujitsu Laboratories, the research arm of Fujitsu.  HyBrick is based on an architecture that supports advanced linking and formatting capabilities.  HyBrick includes a DSSSL renderer and XLink/XPointer engine running on top of James Clark's SP and Jade.   HyBrick supports: (1) Both v...
+</description>
+  </item>
+
+  <item>
+    <title>News: Extended DocBook Synopses Version 1.0.</title>
+    <link>http://xml.com/pub/coverpage/newspage.html#ni1999-08-27-e?wwwrrr_rss</link>
+    <description>      Norman Walsh has posted an announcement for a preliminary release of 'Extended DocBook Synopses'.  Extended DocBook Synopses is a customization layer that extends DocBook, "adding a function synopsis element, ClassSynopsis for modern, mostly object-oriented, programming languages such as Java, C++, Perl, and IDL."  DocBook is an SGML [and XML] DTD maintained by the DocBook Technical Committee of OASIS that particularly well suited to books and papers about computer hardware and softwar...
+</description>
+  </item>
+
+  </channel>
+</rss>

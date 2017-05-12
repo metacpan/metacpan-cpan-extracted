@@ -1,0 +1,20 @@
+TODO:
+----
+
+XSD is mentioned in the XML::RDB perldoc. Spent some time on it, however
+not sure to fix it or convert this mod to DOM 2 standard libXML etc. Anyway
+RDB/UnpopulateSchema.pm holds that code.
+
+API needs re-tooling, some generic beautification has been done.
+Need to address specific routines now.
+
+Perldoc needs re-writing. !
+
+The parsing routines are largely recursive, and could be further optimized.
+Calls to DBIx should be targeted for replacement to bulk calls where applicable.
+
+Would like this to generate XSL as well.
+
+Generate DDL best guess column definitions.
+
+Combine work tables, add summary information for extraction.

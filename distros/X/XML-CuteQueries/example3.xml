@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+
+<root>
+
+    <story title="blarg1">
+        <date>Sat Jul 25 10:35:32 EDT 2009</date>
+        <text>
+            <p> This is a story mang. </p>
+            <p> It has things like <em>emphasis</em> and <strong>bolded</strong> text. </p>
+            <p> (Er, and paragraphs.) </p>
+        </text>
+    </story>
+
+    <story title="blarg2">
+        <date>Sat Jul 25 10:35:51 EDT 2009</date>
+        <text>
+            <p> This is a story mang. </p>
+            <p> It has things like <em>emphasis</em> and <strong>bolded</strong> text. </p>
+            <p> (Er, and paragraphs.) </p>
+        </text>
+    </story>
+
+</root>

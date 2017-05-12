@@ -1,0 +1,4059 @@
+=for comment
+  This file was automatically generated from src/xsh_grammar.xml
+  on Wed Sep 10 17:53:04 2003
+
+=head1 NAME
+
+XSH (DEPRECATED) scripting language for XPath-based editing of XML
+
+=head1 DEPRECATED
+
+This module is deprecated, use XML::XSH2 instead.
+
+=head1 FILES/DOCUMENTS
+
+XSH is intended to query and manipulate XML and HTML documents. Use one of the B<openE<sol>open-*E<sol>create> commands to load an XML or HTML document from a local file, external URL (such as http:E<sol>E<sol> or ftp:E<sol>E<sol>), string or pipe. While loading, XSH parses and optionally validates (see B<validation> and B<load-ext-dtd>) the document. Parsed documents are stored in memory as DOM trees, that can be B<navigated> and B<manipulated> quite similarly to a local filesystem.
+
+Every opened document is associated with an identifier (B<id>), that is a symbolic name for the document in XSH and can be used for example as a prefix of B<xpath>.
+
+In the current version, XSH is only able to save documents locally. To store a document on any other location, use B<ls> command and pipe redirection to feed the XML representation of the document to any external program that is able to store it on a remote location.
+
+Example: Store XSH document DOC on a remote machine using Secure Shell
+
+  xsh> ls DOC:/ | ssh my.remote.org 'cat > test.xml'
+
+
+
+=head2 RELATED COMMANDS
+
+backups, catalog, clone, close, create, documents, nobackups, open, process-xinclude, save, select, stream, switch-to-new-documents
+
+
+=head1 TREE NAVIGATION
+
+With XSH, it is possible to browse B<document trees> as if they were a local filesystem, except that B<XPath> expressions are used instead of ordinary UNIX paths.
+
+Current position in the document tree is called the current node. Current node's XPath may be queried with B<pwd> command. In the interactive shell, current node is also displayed in the command line prompt. Remember, that beside B<cd> command, current node (and document) is silently changed by all variant of B<open> command, B<create> command and temporarily also by the node-list variant of the B<foreach> statement.
+
+Documents are specified in a similar way as harddrives on DOSE<sol>Windows(TM) systems (except that their names are not limitted to one letter in XSH), i.e. by a prefix of the form doc: where doc is the B<id> associated with the document.
+
+To mimic the filesystem navigation as closely as possible, XSH contains several commands named by analogy of UNIX filesystem commands, such as B<cd>, B<ls> and B<pwd>.
+
+Example:
+
+  xsh scratch:/> open docA="testA.xml"
+  xsh docB:/> open docB="testB.xml"
+  xsh> pwd
+  docB:/
+  xsh docB:/> cd docA:/article/chapter[title='Conclusion']
+  xsh docA:/article/chapter[5]> pwd
+  docA:/article/chapter[5]
+  xsh docA:/article/chapter[5]> cd previous-sibling::chapter
+  xsh docA:/article/chapter[4]> cd ..
+  xsh docA:/article> select docB
+  xsh docB:/>
+  
+
+
+
+=head2 RELATED COMMANDS
+
+cd, fold, locate, ls, pwd, register-function, register-namespace, register-xhtml-namespace, register-xsh-namespace, select, unfold, unregister-function, unregister-namespace
+
+
+=head1 TREE MODIFICATION
+
+XSH provides mechanisms not only to browse and inspect the DOM tree but also to modify its content by providing commands for copying, moving, and deleting its nodes as well as adding completely new nodes or XML fragments to it. It is quite easy to learn these commands since their names or aliases mimic their well-known filesystem analogies. On the other hand, many of these commands have two versions one of which is prefixed with a letter "x". This "x" stands for "cross", thus e.g. B<xcopy> should be read as "cross copy". Let's explain the difference on the example of B<xcopy>.
+
+When you copy, you have to specify what are you copying and where are you copying to, so you have to specify the source and the target. XSH is very much XPath-based so, XPath is used here to specify both of them. However, there might be more than one node that satisfies an XPath expression. So, the rule of thumb is that the "cross" variant of a command places one and every of the source nodes to the location of one and every destination node, while the plain variant works one-by-one, placing the first source node to the first destination, the second source node to the second destination, and so on (as long as there are both source nodes and destinations left).
+
+Example:
+
+  xsh> create a "<X><A/><Y/><A/></X>";
+  xsh> create b "<X><B/><C/><B/><C/><B/></X>";
+  xsh> xcopy a://A replace b://B;
+  xsh> copy b://C before a://A;
+  xsh> ls a:/;
+  <?xml version="1.0" encoding="utf-8"?>
+  <X><C/><A/><Y/><C/><A/></X>
+  
+  xsh> ls b:/;
+  <?xml version="1.0" encoding="utf-8"?>
+  <X><A/><A/><C/><A/><A/><C/><A/><A/></X>
+  
+
+As already indicated by the example, another issue of tree modification is the way in which the destination node determines the target location. Should the source node be placed before, after, or into the resulting node? Should it replace it completely? This information has to be given in the B<location> argument that usually precedes the destination XPath.
+
+Now, what happens if source and destination nodes are of incompatible types? XSH tries to avoid this by implicitly converting between node types when necessary. For example, if a text, comment, and attribute node is copied into, before or after an attribute node, the original value of the attribute is replaced, prepended or appended respectively with the textual content of the source node. Note however, that element nodes are never converted into text, attribute or any other textual node. There are many combinations here, so try yourself and see the results.
+
+You may even use some more sofisticated way to convert between node types, as shown in the following example, where an element is first commented out and than again uncommented. Note, that the particular approach used for resurrecting the commented XML material works only for well-balanced chunks of XML.
+
+Example: Using string variables to convert between different types of nodes
+
+  
+  create doc <<EOF;
+  <?xml version='1.0'?>
+  <book>
+    <chapter>
+      <title>Intro</title>
+    </chapter>
+    <chapter>
+      <title>Rest</title>
+    </chapter>
+  </book>
+  EOF
+  
+  
+  # comment out the first chapter
+  ls //chapter[1] |> $chapter_xml;
+  add comment $chapter_xml replace //chapter[1];
+  ls / 0;
+  # OUTPUT:
+  <?xml version="1.0"?>
+  <book>
+  <!--  <chapter>
+      <title>Intro</title>
+    </chapter>
+  -->
+    <chapter>
+      <title>Rest</title>
+    </chapter>
+  </book>
+  
+  
+  # un-comment the chapter
+  $comment = string(//comment()[1]);
+  add chunk $comment replace //comment()[1];
+  ls / 0;
+  # OUTPUT:
+  <?xml version="1.0"?>
+  <book>
+    <chapter>
+      <title>Intro</title>
+    </chapter>
+  
+    <chapter>
+      <title>Rest</title>
+    </chapter>
+  </book>
+  
+
+
+
+=head2 RELATED COMMANDS
+
+clone, copy, insert, map, move, normalize, process-xinclude, remove, rename, set-enc, set-standalone, strip-whitespace, xcopy, xinsert, xmove, xslt, xupdate
+
+
+=head1 FLOW CONTROL
+
+What a scripting language XSH would be had it not some kind of conditional statements, loops and other stuff that influences the way in which XSH commands are processed.
+
+Most notable XSH's feature in this area is that some of the basic flow control statements, namely B<if>, B<unless>, B<while> and B<foreach> have two variants, an XPath-based one and a Perl-based one. The XPath-based variant uses B<xpath> expressions to specify the condition or node-lists to iterate, while the other one utilizes B<perl-code> for this purpose. See descriptions of the individual statements for more detail.
+
+
+
+=head2 RELATED COMMANDS
+
+call, def, exit, foreach, if, ifinclude, include, iterate, last, next, prev, redo, return, run-mode, stream, test-mode, throw, try, undef, unless, while
+
+
+=head1 RETRIEVING MORE INFORMATION
+
+Beside the possibility to browse the DOM tree and list some parts of it (as described in B<Navigation>), XSH provides commands to obtain other information related to open documents as well as the XSH interpreter itself. These commands are listed bellow.
+
+
+
+=head2 RELATED COMMANDS
+
+count, defs, doc-info, documents, dtd, enc, help, locate, ls, namespaces, options, print, pwd, valid, validate, variables, version
+
+
+=head1 ARGUMENT TYPES
+
+XSH commands accept different types of arguments, such as usual strings (B<expression>) or B<XPath expressions>. Notably, these two types and types based on them support string variable interpolation. See documentation of the individual types for more information.
+
+
+=head1 VARIABLES
+
+In the current version, XSH supports two types of variables: string (scalar) variables and node-list variables. Perl programmers that might miss some other kinds of variables (arrays or hashes) may use the support for B<interacting with Perl> to access these types (see some examples below).
+
+These two kinds of variables differ syntactically in the prefix: string variables are prefixed with a dollar sign (B<$>) while node-list variables are prefixed with a percent sign (B<%>).
+
+
+
+=head2 String Variables
+
+Every string variable name consists of a dollar sign (B<$>) prefix and an B<id>, that has to be unique among other scalar variables, e.g. B<$variable>. Values are assigned to variables either by simple B<assignments> of the form B<$variable = B<xpath>> or by capturing the output of some command with a variable redirection of the form B<command E<verbar>E<gt> $variable>.
+
+String variables may be used in B<string expressions>, B<XPath expressions>, or even in perl-code as $B<id> or ${B<id>}. In the first two cases, variables act as macros in the sense that all variables occurences are replaced by the corresponding values before the expression itself is evaluated.
+
+To display current value of a variable, use the B<print> command, B<variables> command or simply the variable name:
+
+Example:
+
+  xsh> $b="chapter";
+  xsh> $file="${b}s.xml";
+  xsh> open f=$file;
+  xsh> ls //$b[count(descendant::para)>10]
+  xsh> print $b
+  chapter
+  xsh> $b
+  $b='chapter';
+  xsh> variables
+  $a='chapters.xml';
+  $b='chapter';
+  
+
+
+
+=head2 Node-list Variables
+
+Every string variable name consists of a percent sign (B<%>) prefix and an B<id>, that has to be unique among other node-list variables, e.g. B<%variable>.
+
+Node-list variables can be used to store lists of nodes that result from evaluating an XPath. This is especially useful when several changes are performed on some set of nodes and evaluating the XPath expression repeatedly would take too long. Other important use is to remember a node that would otherwise be extremely hard or even impossible to locate by XPath expressions after some changes to the tree structure are made, since such an XPath cannot be predicted in advance.
+
+Although node-list variables act just like XPath expressions that would result in the same node-list, for implementation reasons it is not possible to use node-list variables as parts of complex XPath expressions except for one case. They may be only used at the very beginning of an XPath expression. So while constructions such as B<%creatures[4]>, B<%creatures[@race='elf']>, or B<%creaturesE<sol>parentsE<sol>father> do work as expected, B<string(%creatures[2]E<sol>@name)> B<E<sol>E<sol>creature[%creatures[2]E<sol>@name=@name]>, or B<%creatures[@race='elf'][2]> do not. In the first two cases it is because node-list variables cannot be evaluated in the middle of an XPath expression. The third case fails because this construction actually translates into a sequence of evaluations of B<self::*[@race='elf'][2]> for each node in the B<%creatures> node-list, which is not equivallent to the intended expression as the B<[2]> filter does not apply to the whole result of B<%creatures[@race='elf']> at once but rather to the partial results.
+
+Fortunatelly, it is usually possible to work around these unsupported constructions quite easily. This is typically done by introducing some more variables as well as using the B<foreach> statement. The following example should provide some idea on how to do this:
+
+Example:
+
+  # work around for $name=string(%creatures[2]/@name)
+  xsh> foreach %creatures[2] $name=string(@name)
+  # work around for ls //creature[%creatures[2]/@name=@name]
+  xsh> ls //creature[$name=@name]
+  # work around for ls %creatures[@race='elf'][2]
+  xsh> %elves = %creatures[@race='elf']
+  xsh> ls %elves[2]
+  
+
+Remember, that when a node is deleted from a tree it is at the same time removed from all node-lists it occurs in. Note also, that unlike string variables, node-list variables can not be (and are not intended to be) directly accessed from Perl code.
+
+
+
+=head2 Accessing Perl Variables
+
+All XSH string variables are usual Perl scalar variables from the B<XML::XSH::Map> namespace, which is the default namespace for any Perl code evaluated from XSH. Thus it is possible to arbitrarily intermix XSH and Perl assignments:
+
+Example:
+
+  
+  xsh> ls //chapter[1]/title
+  <title>Introduction</title>
+  xsh> $a=string(//chapter[1]/title)
+  xsh> eval { $b="CHAPTER 1: ".uc($a); }
+  xsh> print $b
+  CHAPTER 1: INTRODUCTION
+  
+
+If needed, it is, however, possible to use any other type of Perl variables by means of evaluating a corresponding perl code. The following example demonstrates using Perl hashes to collect and print some simple racial statistics about the population of Middle-Earth:
+
+Example:
+
+  
+  foreach a:/middle-earth/creature { 
+    $race=string(@race);
+    eval { $races{$race}++ };
+  }
+  print "Middle-Earth Population (race/number of creatures)"
+  eval { 
+    echo map "$_/$races{$_}\n",
+      sort ($a cmp $b), keys(%races); 
+  };
+  
+
+
+
+=head2 RELATED COMMANDS
+
+assign, local
+
+
+=head1 OPTIONS
+
+The following commands are used to modify the default behaviour of the XML parser or XSH itself. Some of the commands are switch between two different modes according to a given expression (which is expected to result either in zero or non-zero value). Other commands also working as a flip-flop have their own explicit counterpart (e.g. B<verbose> and B<quiet> or B<debug> and B<nodebug>). This misconsistency is due to historical reasons.
+
+The B<encoding> and B<query-encoding> options allow to specify character encoding that should be expected from user as well as the encoding to be used by XSH on output. This is particularly useful when you work with UTF-8 encoded documents on a console which supports only 8-bit characters.
+
+The B<options> command displays current settings by means of XSH commands. Thus it can not only be used to review current values, but also to store them future use, e.g. in ~E<sol>.xshrc file.
+
+Example:
+
+  xsh> options | cat > ~/.xshrc
+
+
+
+=head2 RELATED COMMANDS
+
+backups, debug, empty-tags, encoding, indent, keep-blanks, load-ext-dtd, nobackups, nodebug, options, parser-completes-attributes, parser-expands-entities, parser-expands-xinclude, pedantic-parser, query-encoding, quiet, recovering, register-function, register-namespace, register-xhtml-namespace, register-xsh-namespace, run-mode, skip-dtd, switch-to-new-documents, test-mode, unregister-function, unregister-namespace, validation, verbose, xpath-axis-completion, xpath-completion
+
+
+=head1 INTERACTING WITH PERL AND SHELL
+
+To allow more complex tasks to be achieved, XSH provides ways for interaction with the Perl programming language and the system shell.
+
+
+
+=head2 Calling Perl
+
+Perl is a language optimized for scanning arbitrary text files, extracting information from those text files, and printing reports based on that information. It's also a good language for many system management tasks. The language is intended to be practical (easy to use, efficient, and complete). XSH itself is written in Perl, so it is extremely easy to support this language as an extension to XSH.
+
+Perl B<expressions or blocks of code> can either be simply evaluated with the B<perl> command, used to do quick changes to nodes of the DOM tree (see B<map> command), used to provide list of strings to iterate over in a B<foreach> loop, or to specify more complex conditions for B<if>, B<unless>, and B<while> statements.
+
+To prevent conflict between XSH internals and the evaluated perl code, XSH runs such code in the context of a special namespace B<XML::XSH::Map>. As described in the section B<Variables>, XSH string variables may be accessed and possibly assigned from Perl code in the most obvious way, since they actually are Perl variables defined in the B<XML::XSH::Map> namespace.
+
+The interaction between XSH and Perl actually works also the other way round, so that you may call back XSH from the evaluated Perl code. For this, Perl function B<xsh> is defined in the B<XML::XSH::Map> namespace. All parameters passed to this function are interpreted as XSH commands. To simplify evaluation of XPath expressions, another three functions: The first one, named B<count>, returns the same value as would be printed by B<count> command in XSH on the same XPath expression. The second function, named B<literal>, returns the result of XPath evaluation as if the whole expression was wrapped with the XPath B<string()> function. In other words, B<literal('doc:expression')> returns the same value as B<count('doc:string(expression)')>. The third function, named B<xml_list>, returns the result of the XPath search as a XML string which is equivallent to the output of a B<ls> on the same XPath expression (without indentation and without folding or any other limitation on the depth of the listing).
+
+In the following examples we use Perl to populate the Middle-Earth with Hobbits whose names are read from a text file called B<hobbits.txt>, unless there are some Hobbits in Middle-Earth already.
+
+Example: Use Perl to read text files
+
+  
+  unless (//creature[@race='hobbit']) {
+    perl 'open $file, "hobbits.txt"';
+    perl '@hobbits=<$file>';
+    perl 'close $file';
+    foreach { @hobbits } {
+      insert element "<creature name='$__' race='hobbit'>"
+        into m:/middle-earth/creatures;
+    }
+  }
+  
+
+Example: The same code as a single Perl block
+
+  perl {
+    unless (count(//creature[@race='hobbit'])) {
+      open my $file, "hobbits.txt";
+      foreach (<$file>) {
+        xsh(qq{insert element "<creature name='$_' race='hobbit'>"
+          into m:/middle-earth/creatures});
+      }
+      close $file;
+    }
+  };
+
+
+
+=head2 Writing your own XPath extension functions in Perl
+
+XSH allows the user to extend the set of XPath functions by providing an extension function written in Perl. This can be achieved using the B<register-function> command. The perl code implementing an extension function works as a usual perl routine accepting its arguments in B<@_> and returning the result. The following conventions are used:
+
+The arguments passed to the perl implementation by the XPath engine are either simple scalars or B<XML::LibXML::NodeList> objects, depending on the types of the XPath arguments. The implementation is responsible for checking the argument number and types. The implementation may use arbitrary B<XML::LibXML> methods to process the arguments and return the result. (B<XML::LibXML> perl module documentation can be found for example at http:E<sol>E<sol>search.cpan.orgE<sol>authorE<sol>PHISHE<sol>XML-LibXML-1.54E<sol>LibXML.pm).
+
+The implementation SHOULD NOT, however, MODIFY the document. Doing so could not only confuse the XPath engine but result in an critical error (such as segmentation fault).
+
+Calling XSH commands from extension function implementations is not currently allowed.
+
+The perl code must return a single value, which can be of one of the following types: a simple scalar (a number or string), B<XML::LibXML::Boolean> object reference (result is a boolean value), B<XML::LibXML::Literal> object reference (result is a string), B<XML::LibXML::Number> object reference (resulat is a float), B<XML::LibXML::Node> (or derived) object reference (result is a nodeset consisting of a single node), or B<XML::LibXML::NodeList> (result is a nodeset). For convenience, simple (non-blessed) array references consisting of B<XML::LibXML::Node> objects can also be used for a nodeset result instead of a B<XML::LibXML::NodeList>.
+
+
+
+=head2 Calling the System Shell
+
+In the interactive mode, XSH interprets all lines starting with a exclamation mark (B<!>) as shell commands and invokes the system shell to interpret them (this is to mimic FTP command-line interpreters).
+
+Example:
+
+  xsh> !ls -l
+  -rw-rw-r--    1 pajas    pajas        6355 Mar 14 17:08 Artistic
+  drwxrwxr-x    2 pajas    users         128 Sep  1 10:09 CVS
+  -rw-r--r--    1 pajas    pajas       14859 Aug 26 15:19 ChangeLog
+  -rw-r--r--    1 pajas    pajas        2220 Mar 14 17:03 INSTALL
+  -rw-r--r--    1 pajas    pajas       18009 Jul 15 17:35 LICENSE
+  -rw-rw-r--    1 pajas    pajas         417 May  9 15:16 MANIFEST
+  -rw-rw-r--    1 pajas    pajas         126 May  9 15:16 MANIFEST.SKIP
+  -rw-r--r--    1 pajas    pajas       20424 Sep  1 11:04 Makefile
+  -rw-r--r--    1 pajas    pajas         914 Aug 26 14:32 Makefile.PL
+  -rw-r--r--    1 pajas    pajas        1910 Mar 14 17:17 README
+  -rw-r--r--    1 pajas    pajas         438 Aug 27 13:51 TODO
+  drwxrwxr-x    5 pajas    users         120 Jun 15 10:35 blib
+  drwxrwxr-x    3 pajas    users        1160 Sep  1 10:09 examples
+  drwxrwxr-x    4 pajas    users          96 Jun 15 10:35 lib
+  -rw-rw-r--    1 pajas    pajas           0 Sep  1 16:23 pm_to_blib
+  drwxrwxr-x    4 pajas    users         584 Sep  1 21:18 src
+  drwxrwxr-x    3 pajas    users         136 Sep  1 10:09 t
+  -rw-rw-r--    1 pajas    pajas          50 Jun 16 00:06 test
+  drwxrwxr-x    3 pajas    users         496 Sep  1 20:18 tools
+  -rwxr-xr-x    1 pajas    pajas        5104 Aug 30 17:08 xsh
+
+To invoke a system shell command or program from the non-interactive mode or from a complex XSH construction, use the B<exec> command.
+
+Since UNIX shell commands are very powerful tool for processing textual data, XSH supports direct redirection of XSH commands output to system shell command. This is very similarly to the redirection known from UNIX shells, except that here, of course, the first command in the pipe-line colone is an XSH command. Since semicolon (B<;>) is used in XSH to separate commands, it has to be prefixed with a backslash if it should be used for other purposes.
+
+Example: Use grep and less to display context of `funny'
+
+  xsh> ls //chapter[5]/para | grep funny | less
+
+Example: The same on Windows 2000E<sol>XP systems
+
+  xsh> ls //chapter[5]/para | find "funny" | more
+
+
+
+=head2 RELATED COMMANDS
+
+exec, lcd, map, perl, rename
+
+
+=head1 COMMAND REFERENCE
+
+
+
+=head2 assign
+
+
+
+=over 4
+
+
+
+=item Usage:
+
+assign $B<id>=B<xpath>
+             $B<id>=B<xpath>
+             assign %B<id>=B<xpath>
+             %B<id>=B<xpath>
+             
+
+
+=item Description:
+
+In the first two cases (where dollar sign appears) store the result of evaluation of the B<xpath> in a variable named $B<id>. In this case, B<xpath> is evaluated in a simmilar way as in the case of the B<count>: if it results in a literal value this value is used. If it results in a node-list, number of nodes occuring in that node-list is used. Use the B<string()> XPath function to obtain a literal values in these cases.
+
+Example: String expressions
+
+  xsh> $a=string(chapter/title)
+  xsh> $b="hallo world"
+  
+
+Example: Arithmetic expressions
+
+  xsh> $a=5*100
+  xsh> $a
+  $a=500
+  xsh> $a=(($a+5) div 10)
+  xsh> $a
+  $a=50.5
+  
+
+Example: Counting nodes
+
+  xsh> $a=//chapter
+  xsh> $a
+  $a=10
+  xsh> %chapters=//chapter
+  xsh> $a=%chapters
+  xsh> $a
+  $a=10
+  
+
+Example: Some caveats of counting node-lists
+
+  xsh> ls ./creature
+  <creature race='hobbit' name="Bilbo"/>
+  
+  ## WRONG (@name results in a singleton node-list) !!!
+  xsh> $name=@name
+  xsh> $name
+  $name=1
+  
+  ## CORRECT (use string() function)
+  xsh> $name=string(@name)
+  xsh> $name
+  $name=Bilbo
+  
+
+In the other two cases (where percent sign appears) find all nodes matching a given B<xpath> and store the resulting node-list in the variable named %B<id>. The variable may be later used instead of an XPath expression.
+
+
+
+=item See also:
+
+var_command
+
+
+
+=back
+
+
+
+=head2 backups
+
+
+
+=over 4
+
+
+
+=item Usage:
+
+backups
+             
+
+
+=item Description:
+
+Enable creating backup files on save (default).
+
+This command is equivalent to setting the B<$BACKUPS> variable to 1.
+
+
+
+=item See also:
+
+nobackups
+
+
+
+=back
+
+
+
+=head2 call
+
+
+
+=over 4
+
+
+
+=item Usage:
+
+call B<id> [B<xpath> E<verbar> B<expression>]*
+             
+
+
+=item Description:
+
+Call an XSH subroutine named B<id> previously created using def. If the subroutine requires some paramters, these have to be specified after the B<id>. Node-list parameters are given by means of B<xpath> expressions. String parameters have to be string B<expression>s.
+
+
+
+=item See also:
+
+def return_command
+
+
+
+=back
+
+
+
+=head2 catalog
+
+
+
+=over 4
+
+
+
+=item Usage:
+
+catalog B<expression>
+             
+
+
+=item Description:
+
+Will use a given catalog file as a catalog during all parsing processes. Using a catalog will significantly speed up parsing processes if many external ressources are loaded into the parsed documents (such as DTDs or XIncludes)
+
+
+
+=back
+
+
+
+=head2 cd
+
+
+
+=over 4
+
+
+
+=item Usage:
+
+cd [B<xpath>]
+             
+
+
+=item Aliases:
+
+chxpath
+
+
+
+=item Description:
+
+Change current context node (and current document) to the first node matching a given B<xpath> argument.
+
+
+
+=back
+
+
+
+=head2 clone
+
+
+
+=over 4
+
+
+
+=item Usage:
+
+clone B<id>=B<id>
+             
+
+
+=item Aliases:
+
+dup
+
+
+
+=item Description:
+
+Make a copy of the document identified by the B<id> following the equal sign assigning it the identifier of the first B<id>.
+
+
+
+=item See also:
+
+open_command close_command print_enc_command files_command
+
+
+
+=back
+
+
+
+=head2 close
+
+
+
+=over 4
+
+
+
+=item Usage:
+
+close [B<id>]
+             
+
+
+=item Description:
+
+Close the document identified by B<id>, removing its parse-tree from memory (note also that all nodes belonging to the document are removed from all nodelists they appear in). If B<id> is omitted, the command closes the current document.
+
+
+
+=back
+
+
+
+=head2 copy
+
+
+
+=over 4
+
+
+
+=item Usage:
+
+copy B<xpath> B<location> B<xpath>
+             
+
+
+=item Aliases:
+
+cp
+
+
+
+=item Description:
+
+Copies nodes matching the first B<xpath> to the destinations determined by the B<location> directive relative to the second B<xpath>. If more than one node matches the first B<xpath> than it is copied to the position relative to the corresponding node matched by the second B<xpath> according to the order in which are nodes matched. Thus, the n'th node matching the first B<xpath> is copied to the location relative to the n'th node matching the second B<xpath>.
+
+The possible values for B<location> are: after, before, into, replace and cause copying the source nodes after, before, into (as the last child-node). the destination nodes. If replace B<location> is used, the source node is copied before the destination node and the destination node is removed.
+
+Some kind of type conversion is used when the types of the source and destination nodes are not equal. Thus, text, cdata, comment or processing instruction node data prepend, append or replace value of a destination attribute when copied before,afterE<sol>into or instead (replace) an attribute, and vice versa.
+
+Attributes may be copied after, before or into some other attribute to append, prepend or replace the destination attribute value. They may also replace the destination attribute completely (both its name and value). To copy an attribute from one element to another, simply copy the attribute node into the destination element.
+
+Elements may be copied into other elements (which results in appending the child-list of the destination element), or before, after or instead (replace) other nodes of any type except attributes.
+
+Example: Replace living-thing elements in the document b with the coresponding creature elements of the document a.
+
+  xsh> copy a://creature replace b://living-thing
+
+
+
+=back
+
+
+
+=head2 count
+
+
+
+=over 4
+
+
+
+=item Usage:
+
+count B<xpath>
+             
+
+
+=item Aliases:
+
+print_value get
+
+
+
+=item Description:
+
+Calculate a given B<xpath> expression. If the result is a node-list, return number of nodes in the node-list. If the B<xpath> results in a boolean, numeric or literal value, return the value.
+
+
+
+=back
+
+
+
+=head2 create
+
+
+
+=over 4
+
+
+
+=item Usage:
+
+create B<id> B<expression>
+             
+
+
+=item Aliases:
+
+new
+
+
+
+=item Description:
+
+Create a new document using B<expression> to form the root element and associate it with a given identifier.
+
+Example:
+
+  
+  xsh> create t1 root
+  xsh> ls /
+  <?xml version="1.0" encoding="utf-8"?>
+  <root/>
+  
+  xsh> create t2 "<root id='r0'>Just a <b>test</b></root>"
+  xsh> ls /
+  <?xml version="1.0" encoding="utf-8"?>
+  <root id='r0'>Just a <b>test</b></root>
+  xsh> files
+  scratch = new_document.xml
+  t1 = new_document1.xml
+  t2 = new_document2.xml
+  
+
+
+
+=item See also:
+
+open_command clone_command
+
+
+
+=back
+
+
+
+=head2 debug
+
+
+
+=over 4
+
+
+
+=item Usage:
+
+debug
+             
+
+
+=item Description:
+
+Turn on debugging messages.
+
+This is equivalent to setting B<$DEBUG> variable to 1.
+
+
+
+=item See also:
+
+nodebug
+
+
+
+=back
+
+
+
+=head2 def
+
+
+
+=over 4
+
+
+
+=item Usage:
+
+def B<id> [$B<id> E<verbar> %B<id>]* B<command-block>
+         or
+  def B<id> [$B<id> E<verbar> %B<id>]*;
+             
+
+
+=item Aliases:
+
+define
+
+
+
+=item Description:
+
+Define a new XSH subroutine named B<id>. The subroutine may require zero or more parameters of nodelist or string type. These are declared as a whitespace-separated list of (so called) parametric variables (of nodelist or string type). The body of the subroutine is specified as a B<command-block>. Note, that all subroutine declarations are processed during the parsing and not at run-time, so it does not matter where the subroutine is defined.
+
+The routine can be later invoked using the B<call> command followed by the routine name and parameters. Nodelist parameters must be given as an XPath expressions, and are evaluated just before the subroutine's body is executed. String parameters must be given as (string) B<expression>s. Resulting node-listsE<sol>strings are stored into the parametric variables before the body is executed. These variables are local to the subroutine's call tree (see also the B<local> command). If there is a global variable using the same name as some parametric variable, the original value of the global variable is replaced with the value of the parametric variable for the time of the subroutine's run-time.
+
+Note that subroutine has to be declared before it is called with B<call>. If you cannot do so, e.g. if you want to call a subroutine recursively, you have to pre-declare the subroutine using a B<def> with no B<command-block>. There may be only one full declaration (and possibly one pre-declaration) of a subroutine for one B<id> and the declaration and pre-declaration has to define the same number of arguments and their types must match.
+
+Example:
+
+  def l3 %v {
+    ls %v 3; # list given nodes upto depth 3
+  }
+  call l3 //chapter;
+  
+
+Example: Commenting and un-commenting pieces of document
+
+  
+  def comment
+      %n      # nodes to move to comments
+      $mark   # maybe some handy mark to recognize such comments
+  {
+    foreach %n {
+      if ( . = ../@* ) {
+        echo "Warning: attribute nodes are not supported!";
+      } else {
+        echo "Commenting out:";
+        ls .;
+        local $node = "";
+        ls . |> $node;
+        add comment "$mark$node" replace .;
+      }
+    }
+  }
+  
+  def uncomment %n $mark {
+    foreach %n {
+      if (. = ../comment()) { # is this node a comment node
+        local $string = substring-after(.,"$mark");
+        add chunk $string replace .;
+      } else {
+        echo "Warning: Ignoring non-comment node:";
+        ls . 0;
+      }
+    }
+  }
+  
+  
+  # comment out all chapters with no paragraphs
+  call comment //chapter[not(para)] "COMMENT-NOPARA";
+  
+  # uncomment all comments (may not always be valid!)
+  $mark="COMMENT-NOPARA";
+  call uncomment //comment()[starts-with(.,"$mark")] $mark;
+  
+
+
+
+=item See also:
+
+call_command return_command local_command
+
+
+
+=back
+
+
+
+=head2 defs
+
+
+
+=over 4
+
+
+
+=item Usage:
+
+defs
+             
+
+
+=item Description:
+
+List names and parametric variables for all defined XSH routines.
+
+
+
+=item See also:
+
+def var_command
+
+
+
+=back
+
+
+
+=head2 doc-info
+
+
+
+=over 4
+
+
+
+=item Usage:
+
+doc-info [B<expression>]
+             
+
+
+=item Aliases:
+
+doc_info
+
+
+
+=item Description:
+
+In the present implementation, this command displays information provided in the B<E<lt>?xml ...?E<gt>> declaration of a document: B<version>, B<encoding>, B<standalone>, plus information about level of B<gzip> compression of the original XML file.
+
+
+
+=item See also:
+
+set_enc_command set_standalone_command
+
+
+
+=back
+
+
+
+=head2 documents
+
+
+
+=over 4
+
+
+
+=item Usage:
+
+files
+             
+
+
+=item Aliases:
+
+files docs
+
+
+
+=item Description:
+
+List open files and their identifiers.
+
+
+
+=item See also:
+
+open_command close_command
+
+
+
+=back
+
+
+
+=head2 dtd
+
+
+
+=over 4
+
+
+
+=item Usage:
+
+dtd [B<id>]
+             
+
+
+=item Description:
+
+Print external or internal DTD for a given document. If no document identifier is given, the current document is used.
+
+
+
+=item See also:
+
+valid_command validate_command
+
+
+
+=back
+
+
+
+=head2 empty-tags
+
+
+
+=over 4
+
+
+
+=item Usage:
+
+empty-tags B<expression>
+             
+
+
+=item Aliases:
+
+empty_tags
+
+
+
+=item Description:
+
+If the value of B<expression> is 1 (non-zero), empty tags are serialized as a start-tagE<sol>end-tag pair (B<E<lt>fooE<gt>E<lt>E<sol>fooE<gt>>). This option affects both B<ls> and B<save> and possibly other commands. Otherwise, they are compacted into a short-tag form (B<E<lt>fooE<sol>E<gt>>). Default value is B<0>.
+
+This command is equivalent to setting the B<$EMPTY_TAGS> variable.
+
+
+
+=back
+
+
+
+=head2 enc
+
+
+
+=over 4
+
+
+
+=item Usage:
+
+enc [B<id>]
+             
+
+
+=item Description:
+
+Print the original document encoding string. If no document identifier is given, the current document is used.
+
+
+
+=item See also:
+
+set_enc_command
+
+
+
+=back
+
+
+
+=head2 encoding
+
+
+
+=over 4
+
+
+
+=item Usage:
+
+encoding B<enc-string>
+             
+
+
+=item Description:
+
+Set the default output character encoding.
+
+This command is equivalent to setting the B<$ENCODING> variable.
+
+
+
+=back
+
+
+
+=head2 exec
+
+
+
+=over 4
+
+
+
+=item Usage:
+
+exec B<expression> [B<expression> ...]
+             
+
+
+=item Aliases:
+
+system
+
+
+
+=item Description:
+
+execute the system command(s) in B<expression>s.
+
+Example: Count words in "hallo wold" string, then print name of your machine's operating system.
+
+  
+  exec echo hallo world;                 # prints hallo world
+  exec "echo hallo word" | wc; # counts words in hallo world
+  exec uname;                            # prints operating system name
+  
+
+
+
+=back
+
+
+
+=head2 exit
+
+
+
+=over 4
+
+
+
+=item Usage:
+
+exit [B<expression>]
+             
+
+
+=item Aliases:
+
+quit
+
+
+
+=item Description:
+
+Exit xsh immediately, optionally with the exit-code resulting from a given expression.
+
+WARNING: No files are saved on exit.
+
+
+
+=back
+
+
+
+=head2 fold
+
+
+
+=over 4
+
+
+
+=item Usage:
+
+fold B<xpath> [B<expression>]
+             
+
+
+=item Description:
+
+This feature is still EXPERIMENTAL! Fold command may be used to mark elements matching the B<xpath> with a B<xsh:fold> attribute from the B<http:E<sol>E<sol>xsh.sourceforge.netE<sol>xshE<sol>> namespace. When listing the DOM tree using B<B<ls> B<xpath> fold>, elements marked in this way are folded to the depth given by the B<expression> (default depth is 0 = fold immediately).
+
+Example:
+
+  xsh> fold //chapter 1
+  xsh> ls //chapter[1] fold
+  <chapter id="intro" xsh:fold="1">
+    <title>...</title>
+    <para>...</para>
+    <para>...</para>
+  </chapter>
+  
+
+
+
+=item See also:
+
+unfold_command list_command
+
+
+
+=back
+
+
+
+=head2 foreach
+
+
+
+=over 4
+
+
+
+=item Usage:
+
+foreach B<xpath>E<verbar>B<perl-code> 
+    B<command>E<verbar>B<command-block>
+             
+
+
+=item Aliases:
+
+for
+
+
+
+=item Description:
+
+If the first argument is an B<xpath> expression, execute the command-block for each node matching the expression making it temporarily the current node, so that all relative XPath expressions are evaluated in its context.
+
+If the first argument is a B<perl-code>, it is evaluated and the resulting perl-list is iterated setting the variable $__ (note that there are two underscores!) to be each element of the list in turn. It works much like perl's foreach, except that the variable used consists of two underscores.
+
+Example: Move all employee elements in a company element into a staff subelement of the same company
+
+  xsh> foreach //company xmove ./employee into ./staff;
+
+Example: List content of all XML files in current directory
+
+  
+  xsh> foreach { glob('*.xml') } { open f=$__; list f:/; }
+  
+
+
+
+=back
+
+
+
+=head2 help
+
+
+
+=over 4
+
+
+
+=item Usage:
+
+help B<command>E<verbar>argument-type
+             
+
+
+=item Aliases:
+
+?
+
+
+
+=item Description:
+
+Print help on a given command or argument type.
+
+
+
+=back
+
+
+
+=head2 if
+
+
+
+=over 4
+
+
+
+=item Usage:
+
+if B<xpath>E<verbar>B<perl-code> B<command>
+             if B<xpath>E<verbar>B<perl-code>
+    B<command-block> [ elsif B<command-block> ]* [ else B<command-block> ]
+             
+
+
+=item Description:
+
+Execute B<command-block> if a given B<xpath> or B<perl-code> expression evaluates to a non-emtpty node-list, true boolean-value, non-zero number or non-empty literal. If the first test fails, check all possibly following B<elsif> conditions and execute the corresponding B<command-block> for the first one of them which is true. If none of them succeeds, execute the B<else> B<command-block> (if any).
+
+Example: Display node type
+
+  def node_type %n {
+    foreach (%n) {
+      if ( . = self::* ) { # XPath trick to check if . is an element
+        echo 'element';
+      } elsif ( . = ../@* ) { # XPath trick to check if . is an attribute
+        echo 'attribute';
+      } elsif ( . = ../processing-instruction() ) {
+        echo 'pi';
+      } elsif ( . = ../text() ) {
+        echo 'text';
+      } elsif ( . = ../comment() ) {
+        echo 'comment'
+      } else { # well, this should not happen, but anyway, ...
+        echo 'unknown-type';
+      }
+    }
+  }
+  
+
+
+
+=back
+
+
+
+=head2 ifinclude
+
+
+
+=over 4
+
+
+
+=item Usage:
+
+ifinclude B<filename>
+             
+
+
+=item Description:
+
+Include a file named B<filename> and execute all XSH commands therein unless the file was already included using either B<include> of B<ifinclude>.
+
+
+
+=item See also:
+
+include_command
+
+
+
+=back
+
+
+
+=head2 include
+
+
+
+=over 4
+
+
+
+=item Usage:
+
+include B<filename>
+             
+
+
+=item Aliases:
+
+.
+
+
+
+=item Description:
+
+Include a file named B<filename> and execute all XSH commands therein.
+
+
+
+=item See also:
+
+ifinclude_command
+
+
+
+=back
+
+
+
+=head2 indent
+
+
+
+=over 4
+
+
+
+=item Usage:
+
+indent B<expression>
+             
+
+
+=item Description:
+
+If the value of B<expression> is 1, format the XML output while saving a document by adding some nice ignorable whitespace. If the value is 2 (or higher), XSH will act as in case of 1, plus it will add a leading and a trailing linebreak to each text node.
+
+Note, that since the underlying C library (libxml2) uses a hardcoded indentation of 2 space characters per indentation level, the amount of whitespace used for indentation can not be altered on runtime.
+
+This command is equivalent to setting the B<$INDENT> variable.
+
+
+
+=back
+
+
+
+=head2 insert
+
+
+
+=over 4
+
+
+
+=item Usage:
+
+insert B<node-type> B<expression> [namespace B<expression>] B<location> B<xpath>
+             
+
+
+=item Aliases:
+
+add
+
+
+
+=item Description:
+
+Works just like xadd, except that the new node is attached only the first node matched.
+
+
+
+=item See also:
+
+xinsert_command move_command xmove_command
+
+
+
+=back
+
+
+
+=head2 iterate
+
+
+
+=over 4
+
+
+
+=item Usage:
+
+iterate B<xpath> B<command-block>
+             
+
+
+=item Description:
+
+Iterate works very much like the XPath variant of B<foreach>, except that B<iterate> evaluates the B<command-block> as soon as a new node matching a given B<xpath> is found. As a limitation, the B<xpath> expresion used with B<iterate> may only consist of one XPath step, i.e. it cannot contain an XPath step separator B<E<sol>>.
+
+What are the benefits of B<iterate> over a B<foreach> loop, then? Well, under some circumstances it is efficiency, under other there are none. To clarify this, we have to dive a bit deeper into the details of XPath implementation. By definition, the node-list resulting from evaluation of an XPath has to be ordered in the canonical document order. That means that an XPath implementation must contain some kind of a sorting algorithm. This would not itself be much trouble if a relative document order of two nodes of a DOM tree could be determined in a constant time. Unfortunately, the libxml2 library, used behind XSH, does not implement mechanisms that would allow this complexity restriction (which is, however, quite natural and reasonable approach if all the consequences are considered). Thus, when comparing two nodes, libxml2 traverses the tree to find their nearest common ancestor and at that point determines the relative order of the two subtrees by trying to seek one of them in a list of right siblings of the other. This of course cannot be handled in a constant time. As a result, the sorting algorithm, reasonably efficient for a constant time comparison (polynomial of a degree E<lt> 1.5) or small node-lists, becomes rather unusable for huge node-lists with linear time comparison (still polynomial but of a degree E<gt> 2).
+
+The B<iterate> command provides a way to avoid sorting the resulting nodelist by limiting allowed XPath expression to one step (and thus one axis) at a time. On the other hand, since B<iterate> is implemented in Perl, a proxy object glueing the C and Perl layers has to be created for every node the iterator passes by. This (plus some extra subroutine calls) makes it about two to three times slower compared to a similar tree-traversing algorithm used by libxml2 itself during XPath evaluation.
+
+Our experience shows that B<iterate> beats B<foreach> in performance on large node-lists (E<gt>=1500 nodes, but your milage may vary) while B<foreach> wins on smaller node-lists.
+
+The following two examples give equivallent results. However, the one using iterate may be faster esp. if the number of nodes being counted is very large.
+
+Example: Count inhabitants of the kingdom of Rohan in productive age
+
+  cd rohan/inhabitants;
+  iterate child::*[@age>=18 and @age<60] { perl $productive++ };
+  echo "$productive inhabitants in productive age";
+
+Example: Using XPath
+
+  $productive=count(rohan/inhabitants/*[@age>=18 and @age<60]);
+  echo "$productive inhabitants in productive age";
+
+Use e.g. B<E<verbar> time cut> pipe-line redirection to benchmark a XSH command on a UNIX system.
+
+
+
+=item See also:
+
+foreach next_command prev_command last_command
+
+
+
+=back
+
+
+
+=head2 keep-blanks
+
+
+
+=over 4
+
+
+
+=item Usage:
+
+keep_blanks B<expression>
+             
+
+
+=item Aliases:
+
+keep_blanks
+
+
+
+=item Description:
+
+Allows you to turn off XML::LibXML's default behaviour of maintaining whitespace in the document. Non-zero expression forces the XML parser to preserve all whitespace.
+
+This command is equivalent to setting the B<$KEEP_BLANKS> variable.
+
+
+
+=back
+
+
+
+=head2 last
+
+
+
+=over 4
+
+
+
+=item Usage:
+
+last [B<expression>]
+             
+
+
+=item Description:
+
+The last command is like the break statement in C (as used in loops); it immediately exits an enclosing loop. The optional B<expression> argument may evaluate to a positive integer number that indicates which level of the nested loops to quit. If this argument is omitted, it defaults to 1, i.e. the innermost loop.
+
+Using this command outside a subroutine causes an immediate run-time error.
+
+
+
+=item See also:
+
+foreach while iterate next_command last_command
+
+
+
+=back
+
+
+
+=head2 lcd
+
+
+
+=over 4
+
+
+
+=item Usage:
+
+lcd B<expression>
+             
+
+
+=item Aliases:
+
+chdir
+
+
+
+=item Description:
+
+Changes the filesystem working directory to B<expression>, if possible. If B<expression> is omitted, changes to the directory specified in HOME environment variable, if set; if not, changes to the directory specified by LOGDIR environment variable.
+
+
+
+=back
+
+
+
+=head2 load-ext-dtd
+
+
+
+=over 4
+
+
+
+=item Usage:
+
+load_ext_dtd B<expression>
+             
+
+
+=item Aliases:
+
+load_ext_dtd
+
+
+
+=item Description:
+
+If the expression is non-zero, XML parser loads external DTD subsets while parsing. By default, this option is enabled.
+
+This command is equivalent to setting the B<$LOAD_EXT_DTD> variable.
+
+
+
+=back
+
+
+
+=head2 local
+
+
+
+=over 4
+
+
+
+=item Usage:
+
+local $B<id> = B<xpath>
+             local %B<id> = B<xpath>
+             local $B<id>E<verbar>%B<id> [ $B<id>E<verbar>%B<id> ... ]
+             
+
+
+=item Description:
+
+This command acts in a very similar way as B<assign> does, except that the variable assignment is done temporarily and lasts only for the rest of the nearest enclosing B<command-block>. At the end of the enclosing block or subroutine the original value is restored. This command may also be used without the assignment part and assignments may be done later using the usual B<assign> command.
+
+Note, that the variable itself is not lexically is still global in the sense that it is still visible to any subroutine called subsequently from within the same block. A local just gives temporary values to global (meaning package) variables. Unlike Perl's B<my> declarations it does not create a local variable. This is known as dynamic scoping. Lexical scoping is not implemented in XSH.
+
+To sum up for Perl programmers: B<local> in XSH works exactly the same as B<local> in Perl.
+
+
+
+=item See also:
+
+assign_command def
+
+
+
+=back
+
+
+
+=head2 locate
+
+
+
+=over 4
+
+
+
+=item Usage:
+
+locate B<xpath>
+             
+
+
+=item Description:
+
+Print canonical XPaths leading to nodes matched by a given B<xpath>.
+
+
+
+=item See also:
+
+pwd_command
+
+
+
+=back
+
+
+
+=head2 ls
+
+
+
+=over 4
+
+
+
+=item Usage:
+
+ls B<xpath> [B<expression>]
+             
+
+
+=item Aliases:
+
+list
+
+
+
+=item Description:
+
+List the XML representation of all nodes matching B<xpath>. The optional B<expression> argument may be provided to specify the depth of XML tree listing. If negative, the tree will be listed to unlimited depth. If the B<expression> results in the word B<fold>, elements marked with the B<fold> command are folded, i.e. listed only to a certain depth (this feature is still EXPERIMENTAL!).
+
+Unless in quiet mode, this command prints also number of nodes matched on stderr.
+
+If the B<xpath> parameter is omitted, current context node is listed to the depth of 1.
+
+
+
+=item See also:
+
+count_command fold_command unfold_command
+
+
+
+=back
+
+
+
+=head2 map
+
+
+
+=over 4
+
+
+
+=item Usage:
+
+map B<perl-code> B<xpath>
+             
+
+
+=item Aliases:
+
+sed
+
+
+
+=item Description:
+
+This command provides an easy way to modify node's data (content) using arbitrary Perl code.
+
+Each of the nodes matching B<xpath> is passes its data to the B<perl-code> via the B<$_> variable and receives the (possibly) modified data using the same variable.
+
+Since element nodes do not really have any proper content (they are only a storage for other nodes), node's name (tag) is used in case of elements. Note, however, that recent versions of XSH provide a special command B<rename> with a very similar syntax to B<map>, that should be used for renaming element, attribute, and processing instruction nodes.
+
+Example: Capitalises all hobbit names
+
+  xsh> map { $_=ucfirst($_) } //hobbit/@name
+
+Example: Changes goblins to orcs in all hobbit tales.
+
+  xsh> map { s/goblin/orc/gi } //hobbit/tale/text()
+
+
+
+=back
+
+
+
+=head2 move
+
+
+
+=over 4
+
+
+
+=item Usage:
+
+move B<xpath> B<location> B<xpath>
+             
+
+
+=item Aliases:
+
+mv
+
+
+
+=item Description:
+
+B<move> command acts exactly like B<copy>, except that it removes the source nodes after a succesfull copy. Remember that the moved nodes are actually different nodes from the original ones (which may not be obvious when moving nodes within a single document into locations that do not require type conversion). So, after the move, the original nodes do not exist neither in the document itself nor any nodelist variable.
+
+See B<copy> for more details on how the copies of the moved nodes are created.
+
+
+
+=item See also:
+
+copy_command xmove_command insert_command xinsert_command
+
+
+
+=back
+
+
+
+=head2 namespaces
+
+
+
+=over 4
+
+
+
+=item Usage:
+
+namespaces [B<xpath>]
+             
+
+
+=item Description:
+
+For each node matching given B<xpath> lists all namespaces that are valid in its scope in the form of B<xmlns:prefix="uri"> declarations. If no B<xpath> is given, lists namespaces in the scope of the current node.
+
+
+
+=back
+
+
+
+=head2 next
+
+
+
+=over 4
+
+
+
+=item Usage:
+
+next [B<expression>]
+             
+
+
+=item Description:
+
+The next command is like the continue statement in C; it starts the next iteration of an enclosing loop. The optional B<expression> argument may evaluate to a positive integer number that indicates which level of the nested loops should be restarted. If omitted, it defaults to 1, i.e. the innermost loop.
+
+Using this command outside a loop causes an immediate run-time error.
+
+
+
+=item See also:
+
+foreach while iterate redo_command last_command prev_command
+
+
+
+=back
+
+
+
+=head2 nobackups
+
+
+
+=over 4
+
+
+
+=item Usage:
+
+nobackups
+             
+
+
+=item Description:
+
+Disable creating backup files on save.
+
+This command is equivalent to setting the B<$BACKUPS> variable to 0.
+
+
+
+=item See also:
+
+nobackups
+
+
+
+=back
+
+
+
+=head2 nodebug
+
+
+
+=over 4
+
+
+
+=item Usage:
+
+nodebug
+             
+
+
+=item Description:
+
+Turn off debugging messages.
+
+This is equivalent to setting B<$DEBUG> variable to 0.
+
+
+
+=item See also:
+
+debug
+
+
+
+=back
+
+
+
+=head2 normalize
+
+
+
+=over 4
+
+
+
+=item Usage:
+
+normalize B<xpath>
+             
+
+
+=item Description:
+
+B<normalize> puts all text nodes in the full depth of the sub-tree underneath each node selected by a given B<xpath>, into a "normal" form where only structure (e.g., elements, comments, processing instructions, CDATA sections, and entity references) separates text nodes, i.e., there are neither adjacent Text nodes nor empty Text nodes.
+
+
+
+=back
+
+
+
+=head2 open
+
+
+
+=over 4
+
+
+
+=item Usage:
+
+[open [HTMLE<verbar>XMLE<verbar>DOCBOOK] [FILEE<verbar>PIPEE<verbar>STRING]] B<id>=B<expression>
+             
+
+
+=item Description:
+
+Load a new XML, HTML or SGML DOCBOOK document from the file (actually arbitrary URL), command output or string provided by the B<expression>. In XSH the document is given a symbolic name B<id>. To identify the documentin commands like close, save, validate, dtd or enc simply use B<id>. In commands which work on document nodes, give B<id>: prefix to XPath expressions to point the XPath to the document.
+
+Example:
+
+  
+  xsh> open x=mydoc.xml # open a document
+  
+  # open a HTML document from the Internet
+  xsh> open HTML h="http://www.google.com/?q=xsh"
+  # quote file name if it contains whitespace
+  xsh> open y="document with a long name with spaces.xml"
+  
+  # you may omit the word open when loading an XML file/URI.
+  xsh> z=mybook.xml
+  
+  # use HTML or DOCBOOK keywords to load these types
+  xsh> open HTML z=index.htm
+  
+  # use PIPE keyword to read output of a command
+  xsh> open HTML PIPE z='wget -O - xsh.sourceforge.net/index.html'
+  
+  # use z: prefix to identify the document opened with the
+  # previous comand in an XPath expression.
+  xsh> ls z://chapter/title      
+  
+
+
+
+=back
+
+
+
+=head2 options
+
+
+
+=over 4
+
+
+
+=item Usage:
+
+options
+             
+
+
+=item Aliases:
+
+flags
+
+
+
+=item Description:
+
+List current values of all XSH flags and options (such as validation flag or query-encoding).
+
+Example: Store current settings in your .xshrc
+
+  xsh> options | cat > ~/.xshrc
+
+
+
+=back
+
+
+
+=head2 parser-completes-attributes
+
+
+
+=over 4
+
+
+
+=item Usage:
+
+parser-completes-attributes B<expression>
+             
+
+
+=item Aliases:
+
+complete_attributes complete-attributes parser_completes_attributes
+
+
+
+=item Description:
+
+If the expression is non-zero, this command allows XML parser to complete the elements attributes lists with the ones defaulted from the DTDs. By default, this option is enabled.
+
+This command is equivalent to setting the B<$PARSER_COMPLETES_ATTRIBUTES> variable.
+
+
+
+=back
+
+
+
+=head2 parser-expands-entities
+
+
+
+=over 4
+
+
+
+=item Usage:
+
+parser_expands_entities B<expression>
+             
+
+
+=item Aliases:
+
+parser_expands_entities
+
+
+
+=item Description:
+
+Enable the entity expansion during the parse process if the B<expression> is non-zero, disable it otherwise. If entity expansion is off, any external parsed entities in the document are left as entities. Defaults to on.
+
+This command is equivalent to setting the B<$PARSER_EXPANDS_ENTITIES> variable.
+
+
+
+=back
+
+
+
+=head2 parser-expands-xinclude
+
+
+
+=over 4
+
+
+
+=item Usage:
+
+parser_expands_xinclude B<expression>
+             
+
+
+=item Aliases:
+
+parser_expands_xinclude
+
+
+
+=item Description:
+
+If the B<expression> is non-zero, the parser is allowed to expand XIinclude tags imidiatly while parsing the document.
+
+This command is equivalent to setting the B<$PARSER_EXPANDS_XINCLUDE> variable.
+
+
+
+=item See also:
+
+process_xinclude_command
+
+
+
+=back
+
+
+
+=head2 pedantic-parser
+
+
+
+=over 4
+
+
+
+=item Usage:
+
+pedantic_parser B<expression>
+             
+
+
+=item Aliases:
+
+pedantic_parser
+
+
+
+=item Description:
+
+If you wish, you can make XML::LibXML more pedantic by passing a non-zero B<expression> to this command.
+
+This command is equivalent to setting the B<$PEDANTIC_PARSER> variable.
+
+
+
+=back
+
+
+
+=head2 perl
+
+
+
+=over 4
+
+
+
+=item Usage:
+
+eval B<perl-code>
+             
+
+
+=item Aliases:
+
+eval
+
+
+
+=item Description:
+
+Evaluate a given perl expression.
+
+
+
+=item See also:
+
+count_command
+
+
+
+=back
+
+
+
+=head2 prev
+
+
+
+=over 4
+
+
+
+=item Usage:
+
+prev [B<expression>]
+             
+
+
+=item Description:
+
+This command is only allowed inside an B<iterate> loop. It returns the iteration one step back, to the previous node on the iterated axis. The optional B<expression> argument may be used to indicate to which level of nested loops the command applies to.
+
+
+
+=item See also:
+
+iterate redo_command last_command next_command
+
+
+
+=back
+
+
+
+=head2 print
+
+
+
+=over 4
+
+
+
+=item Usage:
+
+print B<expression> [B<expression> ...]
+             
+
+
+=item Aliases:
+
+echo
+
+
+
+=item Description:
+
+Interpolate and print a given expression(s).
+
+
+
+=back
+
+
+
+=head2 process-xinclude
+
+
+
+=over 4
+
+
+
+=item Usage:
+
+process_xinclude [B<id>]
+             
+
+
+=item Aliases:
+
+process_xinclude process-xincludes process_xincludes xinclude xincludes load_xincludes load-xincludes load_xinclude load-xinclude
+
+
+
+=item Description:
+
+Process any xinclude tags in the document B<id>.
+
+
+
+=item See also:
+
+parser_expands_xinclude
+
+
+
+=back
+
+
+
+=head2 pwd
+
+
+
+=over 4
+
+
+
+=item Usage:
+
+pwd
+             
+
+
+=item Description:
+
+Print XPath leading to the current context node. This is equivalent to B<locate .>.
+
+
+
+=item See also:
+
+locate_command
+
+
+
+=back
+
+
+
+=head2 query-encoding
+
+
+
+=over 4
+
+
+
+=item Usage:
+
+query-encoding B<enc-string>
+             
+
+
+=item Aliases:
+
+query_encoding
+
+
+
+=item Description:
+
+Set the default query character encoding.
+
+This command is equivalent to setting the B<$QUERY_ENCODING> variable.
+
+
+
+=back
+
+
+
+=head2 quiet
+
+
+
+=over 4
+
+
+
+=item Usage:
+
+quiet
+             
+
+
+=item Description:
+
+Turn off verbose messages.
+
+This command is equivalent to setting the B<$QUIET> variable.
+
+
+
+=item See also:
+
+verbose
+
+
+
+=back
+
+
+
+=head2 recovering
+
+
+
+=over 4
+
+
+
+=item Usage:
+
+recovering B<expression>
+             
+
+
+=item Description:
+
+Turn on recovering parser mode if the B<expression> is non-zero or off otherwise. Defaults to off. Note, that the in the recovering mode, validation is not performed by the parser even if the validation flag is on and that recovering mode flag only influences parsing of XML documents (not HTML).
+
+The recover mode helps to efficiently recover documents that are almost well-formed. This for example includes documents without a close tag for the document element (or any other element inside the document).
+
+This command is equivalent to setting the B<$RECOVERING> variable.
+
+
+
+=back
+
+
+
+=head2 redo
+
+
+
+=over 4
+
+
+
+=item Usage:
+
+redo [B<expression>]
+             
+
+
+=item Description:
+
+The redo command restarts a loop block without evaluating the conditional again. The optional B<expression> argument may evaluate to a positive integer number that indicates which level of the nested loops should be restarted. If omitted, it defaults to 1, i.e. the innermost loop.
+
+Using this command outside a loop causes an immediate run-time error.
+
+Example: Restart a higher level loop from an inner one
+
+  while ($i<100) { 
+    # ...
+    foreach //para {
+      # some code
+      if $param { 
+        redo; # redo foreach loop
+      } else {
+        redo 2; # redo while loop
+      }
+    }
+  }
+  
+
+
+
+=item See also:
+
+foreach while iterate next_command last_command
+
+
+
+=back
+
+
+
+=head2 register-function
+
+
+
+=over 4
+
+
+
+=item Usage:
+
+register-function B<expression> B<perl-code>
+             
+
+
+=item Aliases:
+
+regfunc
+
+
+
+=item Description:
+
+EXPERIMENTAL! Register given perl code as a new XPath extension function under a name provided in the first argument (B<expression>). XML::LibXML DOM API may be used in the perl code for object processing. If the name contains a colon, then the first part before the colon must be a registered namespace prefix (see B<register-namespace>) and the function is registered within the corresponding namespace.
+
+
+
+=back
+
+
+
+=head2 register-namespace
+
+
+
+=over 4
+
+
+
+=item Usage:
+
+register-namespace B<expression> B<expression>
+             
+
+
+=item Aliases:
+
+regns
+
+
+
+=item Description:
+
+Registers the first argument as a prefix for the namespace given in the second argument. The prefix can later be used in XPath expressions.
+
+
+
+=back
+
+
+
+=head2 register-xhtml-namespace
+
+
+
+=over 4
+
+
+
+=item Usage:
+
+register-xhtml-namespace B<expression>
+             
+
+
+=item Aliases:
+
+regns-xhtml
+
+
+
+=item Description:
+
+Registers a prefix for the XHTML namespace. The prefix can later be used in XPath expressions.
+
+
+
+=back
+
+
+
+=head2 register-xsh-namespace
+
+
+
+=over 4
+
+
+
+=item Usage:
+
+register-xsh-namespace B<expression>
+             
+
+
+=item Aliases:
+
+regns-xsh
+
+
+
+=item Description:
+
+Registers a new prefix for the XSH namespace. The prefix can later be used in XPath expressions. Note, that XSH namespace is by default registered with B<xsh> prefix. This command is thus, in general, useful only when some document uses B<xsh> prefix for a different namespace.
+
+
+
+=back
+
+
+
+=head2 remove
+
+
+
+=over 4
+
+
+
+=item Usage:
+
+remove B<xpath>
+             
+
+
+=item Aliases:
+
+rm prune delete del
+
+
+
+=item Description:
+
+Remove all nodes matching B<xpath>.
+
+Example: Get rid of all evil creatures.
+
+  xsh> del //creature[@manner='evil']
+
+
+
+=back
+
+
+
+=head2 rename
+
+
+
+=over 4
+
+
+
+=item Usage:
+
+rename B<perl-code> B<xpath>
+             
+
+
+=item Description:
+
+This command is very similar to the B<map> command, except that it operates on nodes' names rather than their dataE<sol>values. For every element, attribute or processing-instruction matched by the B<xpath> expression the following procedure is used: 1) the name of the node is stored into Perl's B<$_> variable, 2) the B<perl-code> is evaluated, and 3) the (posibly changed) content of the B<$_> variable is used as a new name for the node.
+
+Example: Renames all hobbits to halflings
+
+  xsh> map $_='halfling' //hobbit
+
+Example: Make all elements and attributes uppercase
+
+  xsh> map { $_=uc($_) } (//*|//@*)
+
+
+
+=item See also:
+
+map_command
+
+
+
+=back
+
+
+
+=head2 return
+
+
+
+=over 4
+
+
+
+=item Usage:
+
+return
+             
+
+
+=item Description:
+
+This command immediatelly stops the execution of a procedure it occurs in and returns the execution to the place of the script from which the subroutine was called.
+
+Using this command outside a subroutine causes an immediate run-time error.
+
+
+
+=item See also:
+
+def call_command
+
+
+
+=back
+
+
+
+=head2 run-mode
+
+
+
+=over 4
+
+
+
+=item Usage:
+
+run-mode
+             
+
+
+=item Aliases:
+
+run_mode
+
+
+
+=item Description:
+
+Switch into normal XSH mode in which all commands are executed.
+
+This is equivalent to setting B<$TEST_MODE> variable to 0.
+
+
+
+=item See also:
+
+test_mode
+
+
+
+=back
+
+
+
+=head2 save
+
+
+
+=over 4
+
+
+
+=item Usage:
+
+save [HTMLE<verbar>XMLE<verbar>XInclude] [FILEE<verbar>PIPEE<verbar>STRING] B<id> B<expression> [encoding B<enc-string>]
+or
+    save B<id>
+or
+    save
+             
+
+
+=item Description:
+
+Save the document identified by B<id>. Using one of the B<FILE>, B<PIPE>, B<STRING> keywords the user may choose to save the document to a file send it to a given command's input via a pipe or simply return its content as a string. If none of the keywords is used, it defaults to FILE. If saving to a PIPE, the B<expression> argument must provide the coresponding command and all its parameters. If saving to a FILE, the B<expression> argument may provide a filename; if omitted, it defaults to the original filename of the document. If saving to a STRING, the B<expression> argument is ignored and may freely be omitted.
+
+The output format is controlled using one of the XML, HTML, XInclude keywords (see below). If the format keyword is ommited, save it defaults to XML.
+
+Note, that a document should be saved as HTML only if it actually is a HTML document. Note also, that the optional encoding parameter forces character conversion only; it is up to the user to declare the document encoding in the appropriate HTML E<lt>METAE<gt> tag.
+
+The XInclude keyword automatically implies XML format and can be used to force XSH to save all already expanded XInclude sections back to their original files while replacing them with E<lt>xi:includeE<gt> tags in the main XML file. Moreover, all material included within E<lt>includeE<gt> elements from the http:E<sol>E<sol>www.w3.orgE<sol>2001E<sol>XInclude namespace is saved to separate files too according to the B<href> attribute, leaving only empty E<lt>includeE<gt> element in the root file. This feature may be used to split the document to new XInclude fragments.
+
+The encoding keyword followed by a B<enc-string> can be used to convert the document from its original encoding to a different encoding. In case of XML output, the E<lt>?xml?E<gt> declaration is changed accordingly. The new encoding is also set as the document encoding for the particular document.
+
+Example: Use save to preview a HTML document in Lynx
+
+  save HTML PIPE mydoc 'lynx -stdin'
+
+
+
+=item See also:
+
+open_command close_command print_enc_command files_command
+
+
+
+=back
+
+
+
+=head2 select
+
+
+
+=over 4
+
+
+
+=item Usage:
+
+select B<id>
+             
+
+
+=item Description:
+
+Make B<id> the document identifier to be used in the next xpath evaluation without identifier prefix.
+
+Example:
+
+  
+  xsh> a=mydoc1.xml       # opens and selects a
+  xsh> ls /               # lists a
+  xsh> b=mydoc2.xml       # opens and selects b
+  xsh> ls /               # lists b
+  xsh> ls a:/             # lists and selects a
+  xsh> select b           # does nothing except selecting b
+  xsh> ls /               # lists b
+  
+
+
+
+=back
+
+
+
+=head2 set-enc
+
+
+
+=over 4
+
+
+
+=item Usage:
+
+set-enc B<enc-string> [B<id>]
+             
+
+
+=item Description:
+
+Changes character encoding of a given document. If no document B<id> is given, the command applies to the current document. This has two effects: changing the XMLDecl encoding declaration in the document prolog to display the new encoding and making all future B<save> operations on the document default to the given charset.
+
+Example:
+
+  xsh> ls
+  <?xml version="1.0" encoding="iso-8859-1"?>
+  <foo>...</foo>
+  xsh> set-enc "utf-8"
+  xsh> ls
+  <?xml version="1.0" encoding="utf-8"?>
+  <foo>...</foo>
+  xsh> save # saves the file in UTF-8 encoding
+  
+
+
+
+=item See also:
+
+print_enc_command doc_info_command
+
+
+
+=back
+
+
+
+=head2 set-standalone
+
+
+
+=over 4
+
+
+
+=item Usage:
+
+set-standalone B<expression> [B<id>]
+             
+
+
+=item Description:
+
+Changes the value of B<standalone> declaration in the XMLDecl prolog of a document. The B<expression> should evaluate to either 1 or 0 or B<'yes'> or B<'no'>. The result of applying the command on other values is not specified. If no document B<id> is given, the command applies to the current document.
+
+
+
+=item See also:
+
+doc_info_command
+
+
+
+=back
+
+
+
+=head2 skip-dtd
+
+
+
+=over 4
+
+
+
+=item Usage:
+
+skip-dtd B<expression>
+             
+
+
+=item Aliases:
+
+skip_dtd
+
+
+
+=item Description:
+
+If the value of B<expression> is 1 (non-zero), DTD DOCTYPE declaration is omitted from any serialization of XML documents (including B<ls> and B<save>). Default value is B<0>.
+
+This command is equivalent to setting the B<$SKIP_DTD> variable.
+
+
+
+=back
+
+
+
+=head2 sort
+
+
+
+=over 4
+
+
+
+=item Usage:
+
+sort B<xpath>E<verbar>B<perl-code> B<perl-code> %B<id>
+             
+
+
+=item Description:
+
+EXPERIMENTAL! This command is not yet guaranteed to remain in the future releases.
+
+DOCUMENTATION OBSOLETE! Syntax changed!
+
+This command may be used to sort the node-list stored in the node-list variable B<id>. First, for each node in the node-list %B<id>, the first argument (either a B<xpath> or B<perl-code> expression), which serves as a sorting criterion, is evaluated in the context of the node and the obtained value is stored together with the node. (In case of B<xpath> the result of whatever type is cast to a string). Then perl's sorting algorithm is used to sort the nodelist, consulting the second, B<perl-code>, argument to compare nodes. Before the B<perl-code> is evaluated, the values obtained from the previous evaluation of the sorting crierion argument on the two nodes being compared are stored into B<$a> and B<$b> variables in the respective order. The B<perl-code> being consulted is supposed to return either -1 (the first node should come first), 0 (no order precedence), or 1 (the second node should come first). Note that Perl provides very convenient operators B<cmp> and B<E<lt>=E<gt>> for string and numeric comparison of this kind as shown in the examples below.
+
+Remember that B<sort> (unlike B<assign>, B<if>, or B<while>) evaluates the first B<xpath> argument (the sorting criterion) in a way to obtain a string. Thus you need not to bother with wrapping node-queries with a B<string()> function but you must remember to explicitly wrap the expression in B<count()> if the number of the nodes is to be the sorting criterion.
+
+Example: Sort creatures by name (XPath-based sort) in ascending order using current locale settings
+
+  
+  xsh> local %c=/middle-earth[1]/creatures
+  xsh> sort @name { use locale; lc($a) cmp lc($b) } %c
+  xsh> xmove %c into /middle-earth[1]# replaces the creatures
+
+Example: Sort (descending order) a node-list by score (Perl-based sort)
+
+  
+  xsh> sort { $scores{ literal('@name') } } { $b <=> $a } %players
+  
+
+
+
+=back
+
+
+
+=head2 stream
+
+
+
+=over 4
+
+
+
+=item Usage:
+
+stream input [FILEE<verbar>PIPEE<verbar>STRING] B<expression>
+                      output [FILEE<verbar>PIPEE<verbar>STRING] B<expression>
+                      select B<xpath> B<command-block>
+                    [ select B<xpath> B<command-block> ... ]
+             
+
+
+=item Description:
+
+EXPERIMENTAL! This command provides a memory efficient (though slower) way to process selected parts of an XML document with XSH. A streaming XML parser (SAX parser) is used to parse the input. The parser has two states which will be refered to as A and B below. The initial state of the parser is A.
+
+In the state A, only a limited vertical portion of the DOM tree is built. All XML data comming from the input stream other than start-tags are immediatelly copied to the output stream. If a new start-tag of an element arrives, a new node is created in the tree. All siblings of the newly created node are removed. Thus, in the state A, there is exactly one node on every level of the tree. After a node is added to the tree, all the B<xpath> expressions following the B<select> keyword are checked. If none matches, the parser remains in state A and copies the start-tag to the output stream. Otherwise, the first expression that matches is remembered and the parser changes its state to B.
+
+In state B the parser builds a complete DOM subtree of the element that was last added to the tree before the parser changed its state from A to B. No data are sent to the output at this stage. When the subtree is complete (i.e. the corresponding end-tag for its topmost element is encountered), the B<command-block> of instructions following the B<xpath> expression that matched is invoked with the root element of the subtree as the current context node. The commands in B<command-block> are allowed to transform the whole element subtree or even to replace it with a different DOM subtree or subtrees. They must, however, preserve the element's parent as well as all its ancestor nodes intact. Failing to do so can result in an error or unpredictable results.
+
+After the subtree processing B<command-block> returns, all subtrees that now appear in the DOM tree in the place of the original subtree are serialized to the output stream. After that, they are deleted and the parser returns to state A.
+
+Note that this type of processing highly limits the amount of information the XPath expressions can use. First notable fact is that elements can not be selected by their content. The only information present in the tree at the time of the XPath evaluation is the element's name and attributes plus the same information for all its ancestors. There is nothing known yet about possible child nodes of the element as well as of the node's position within its siblings.
+
+
+
+=back
+
+
+
+=head2 strip-whitespace
+
+
+
+=over 4
+
+
+
+=item Usage:
+
+strip B<xpath>
+             
+
+
+=item Aliases:
+
+strip_whitespace
+
+
+
+=item Description:
+
+B<strip-whitespace> removes all leading and trailing whitespace from given nodes. If applied to an element node, it removes all leading and trailing child text nodes and CDATA sections that consist entirely of whitespace.
+
+
+
+=back
+
+
+
+=head2 switch-to-new-documents
+
+
+
+=over 4
+
+
+
+=item Usage:
+
+switch-to-new-documents B<expression>
+             
+
+
+=item Aliases:
+
+switch_to_new_documents
+
+
+
+=item Description:
+
+If non-zero, XSH changes current node to the document node of a newly openE<sol>created files every time a new document is opened or created with B<open> or B<create>. Default value for this option is 1.
+
+This command is equivalent to setting the B<$SWITCH_TO_NEW_DOCUMENTS> variable.
+
+
+
+=back
+
+
+
+=head2 test-mode
+
+
+
+=over 4
+
+
+
+=item Usage:
+
+test-mode
+             
+
+
+=item Aliases:
+
+test_mode
+
+
+
+=item Description:
+
+Switch into test mode in which no commands are actually executed and only command syntax is checked.
+
+This is equivalent to setting B<$TEST_MODE> variable to 1.
+
+
+
+=item See also:
+
+run_mode
+
+
+
+=back
+
+
+
+=head2 throw
+
+
+
+=over 4
+
+
+
+=item Usage:
+
+throw B<expression>
+             
+
+
+=item Description:
+
+This command throws and exception containing error message given by the obligatory B<expression> argument. If the exception is not handled by some surrounding B<try> block, the execution is stopped immediatelly and the error message is printed.
+
+Note: There is a special class of internal exceptions with error message starting with a word 'UNCATCHABLE'. Such exceptions are not trapped by B<try> constructions and should be avoided in ordinary XSH scripts.
+
+
+
+=item See also:
+
+try_catch
+
+
+
+=back
+
+
+
+=head2 try
+
+
+
+=over 4
+
+
+
+=item Usage:
+
+try B<command-block> catch [[local] $B<id>] B<command-block>
+             
+
+
+=item Description:
+
+Execute B<command-block> following the B<try> keyword. If an error or exception occures during the evaluation, execute the B<catch> B<command-block>. If a variable follows B<catch> and the B<try> block fails, an error message of the exception occured is stored to the variable before the B<catch> block is executed. Optionally, the variable name may be preceded with the keyword B<local> in order to make the assignment local to the B<catch> block (see B<local>).
+
+The B<throw> command and the equivalent perl construction B<perl { die "error message" }> allow user to throw custom exceptions.
+
+Example: Handle parse errors
+
+  try {
+    open XML doc=$input;
+  } catch {
+    try {
+      echo "XML parser failed, trying HTML";
+      open HTML doc=$input;
+    } catch local $error {
+      echo "Stopping due to errors: $error";
+      exit 1;
+    }
+  }
+  
+
+
+
+=item See also:
+
+throw_command
+
+
+
+=back
+
+
+
+=head2 undef
+
+
+
+=over 4
+
+
+
+=item Usage:
+
+undef B<expression>
+             
+
+
+=item Aliases:
+
+undefine
+
+
+
+=item Description:
+
+This command can be used to undefine previously defined XSH subroutines. The B<expression> is evaluated as a Perl regular expression. All subroutines whose names match are undefined. Note, that like B<def>, all B<undef> commands are processed during the compilation of the source code, not at run-time, so it doesn't matter how deep in the code is a B<undef> command nested.
+
+Example:
+
+  xsh> include my_defs.xsh
+  xsh> call my_sub1 //foo;
+  xsh> call my_sub2 //bar;
+  xsh> undefine 'my_sub.*'
+  xsh> # change/edit the definitions in my_defs.xsh and reload
+  xsh> include my_defs.xsh
+
+
+
+=back
+
+
+
+=head2 unfold
+
+
+
+=over 4
+
+
+
+=item Usage:
+
+unfold B<xpath>
+             
+
+
+=item Description:
+
+This feature is still EXPERIMENTAL! Unfold command removes B<xsh:fold> attributes from all elements matching a given B<xpath> created by previous usage of B<fold>. Be aware, that B<xmlns:xsh> namespace declaration may still be present in the document even when all elements are unfolded.
+
+
+
+=item See also:
+
+fold_command list_command
+
+
+
+=back
+
+
+
+=head2 unless
+
+
+
+=over 4
+
+
+
+=item Usage:
+
+unless B<xpath>E<verbar>B<perl-code>
+    B<command>
+             unless B<xpath>E<verbar>B<perl-code>
+    B<command-block> [ else B<command-block> ]
+             
+
+
+=item Description:
+
+Like if but negating the result of the expression.
+
+
+
+=item See also:
+
+if
+
+
+
+=back
+
+
+
+=head2 unregister-function
+
+
+
+=over 4
+
+
+
+=item Usage:
+
+unregister-function B<expression>
+             
+
+
+=item Aliases:
+
+unregfunc
+
+
+
+=item Description:
+
+EXPERIMENTAL! Unregiseter XPath extension function of a given name previously registered using B<register-function>.
+
+
+
+=back
+
+
+
+=head2 unregister-namespace
+
+
+
+=over 4
+
+
+
+=item Usage:
+
+unregister-namespace B<expression>
+             
+
+
+=item Aliases:
+
+unregns
+
+
+
+=item Description:
+
+Unregisters given namespace prefix previously registered using B<register-namespace>. The prefix can no longer be used in XPath expressions unless declared within the current scope of the queried document.
+
+
+
+=back
+
+
+
+=head2 valid
+
+
+
+=over 4
+
+
+
+=item Usage:
+
+valid [validation-scheme] [B<id>]
+             
+
+
+=item Description:
+
+Check and report the validity of the document B<id> with respect to a DTD, RelaxNG, or XSD schemas specified in B<validation-scheme> (see B<validate> for information, on how B<validation-scheme> may be specified). Prints "yes" if the document is valid and "no" otherwise. If no document identifier is given, the current document is used. If no B<validation-scheme> is specified, the validity against the DTD subset is checked.
+
+
+
+=item See also:
+
+validate_command list_dtd_command
+
+
+
+=back
+
+
+
+=head2 validate
+
+
+
+=over 4
+
+
+
+=item Usage:
+
+validate [B<id>]
+or
+validate DTD PUBLIC B<expression> [SYSTEM B<filename>] B<id>
+or
+validate (DTDE<verbar>RelaxNGE<verbar>XSD) FILE B<filename> [B<id>]
+or
+validate (DTDE<verbar>RelaxNGE<verbar>XSD) STRING B<filename> [B<id>]
+or
+validate (RelaxNGE<verbar>XSD) DOC B<id> [B<id>]
+             
+
+
+=item Description:
+
+This command validates the document identified with B<id> against a DTD, RelaxNG or XSD schema and report all validity errors. If no document identifier is given, the current document is used. A DTD can be specified either by its PUBLIC or SYSTEM identifier (or both), or as a STRING. RelaxNG and XSD schemas can be specified either as a filename or url (FILE B<filename>), as a string (STRING B<expression>), or as a XSH document (DOC B<id>). If no schema is specified, validation is performed against the internal or external DTD subset of the document being validated.
+
+Example:
+
+  open mydoc="test.xml"
+  # in all examples below, mydoc can be ommited
+  validate mydoc; # validate against the documet's DOCTYPE
+  validate DTD PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN" mydoc
+  validate DTD SYSTEM "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd" mydoc
+  validate DTD FILE "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd" mydoc
+
+Example:
+
+  validate RelaxNG FILE "test.rng" mydoc
+  validate RelaxNG STRING $relaxschema mydoc
+  open rng="test.rng"
+  validate RelaxNG DOC rng mydoc
+
+Example:
+
+  validate XSD FILE "test.xsd" mydoc
+  validate XSD STRING $xsdschema mydoc
+  open xsd="test.xsd"
+  validate XSD DOC xsd mydoc
+
+
+
+=item See also:
+
+valid_command list_dtd_command
+
+
+
+=back
+
+
+
+=head2 validation
+
+
+
+=over 4
+
+
+
+=item Usage:
+
+validation B<expression>
+             
+
+
+=item Description:
+
+Turn on validation during the parse process if the B<expression> is non-zero or off otherwise. In XSH version 1.6 and later, defaults to off.
+
+This command is equivalent to setting the B<$VALIDATION> variable.
+
+
+
+=back
+
+
+
+=head2 variables
+
+
+
+=over 4
+
+
+
+=item Usage:
+
+variables
+             
+
+
+=item Aliases:
+
+vars var
+
+
+
+=item Description:
+
+List all defined variables and their values.
+
+
+
+=item See also:
+
+files_command list_defs_command
+
+
+
+=back
+
+
+
+=head2 verbose
+
+
+
+=over 4
+
+
+
+=item Usage:
+
+verbose
+             
+
+
+=item Description:
+
+Turn on verbose messages (default).
+
+This is equivalent to setting B<$QUIET> variable to 0.
+
+
+
+=item See also:
+
+quiet
+
+
+
+=back
+
+
+
+=head2 version
+
+
+
+=over 4
+
+
+
+=item Usage:
+
+version
+             
+
+
+=item Description:
+
+Prints program version plus version numbers of the most important libraries used.
+
+
+
+=back
+
+
+
+=head2 while
+
+
+
+=over 4
+
+
+
+=item Usage:
+
+while B<xpath>E<verbar>B<perl-code> B<command-block>
+             
+
+
+=item Description:
+
+Execute B<command-block> as long as the given B<xpath> or B<perl-code> expression evaluates to a non-emtpty node-list, true boolean-value, non-zero number or non-empty literal.
+
+Example: The commands have the same results
+
+  
+  xsh> while /table/row remove /table/row[1];
+  xsh> remove /table/row;
+  
+
+
+
+=back
+
+
+
+=head2 xcopy
+
+
+
+=over 4
+
+
+
+=item Usage:
+
+xcopy B<xpath> B<location> B<xpath>
+             
+
+
+=item Aliases:
+
+xcp
+
+
+
+=item Description:
+
+xcopy is similar to B<copy>, but copies *all* nodes matching the first B<xpath> to *all* destinations determined by the B<location> directive relative to the second B<xpath>. See B<copy> for detailed description of B<xcopy> arguments.
+
+Example: Copy all middle-earth creatures within the document a into every world of the document b.
+
+  xsh> xcopy a:/middle-earth/creature into b://world
+
+
+
+=back
+
+
+
+=head2 xinsert
+
+
+
+=over 4
+
+
+
+=item Usage:
+
+xinsert B<node-type> B<expression> [namespace B<expression>] B<location> B<xpath>
+             
+
+
+=item Aliases:
+
+xadd
+
+
+
+=item Description:
+
+Use the B<expression> to create a new node of a given B<node-type> in the B<location> relative to the given B<xpath>.
+
+For element nodes, the format of the B<expression> should look like "E<lt>element-name att-name='attvalue' ...E<gt>". The B<E<lt>> and B<E<gt>> characters are optional. If no attributes are used, the expression may simply consist the element name. Note, that in the first case, the quotes are required since the expression contains spaces.
+
+Attribute nodes use the following syntax: "att-name='attvalue' [...]".
+
+For the other types of nodes (text, cdata, comments) the expression should contain the node's literal content. Again, it is necessary to quote all whitespace and special characters as in any expression argument.
+
+The B<location> argument should be one of: B<after>, B<before>, B<into>, B<replace>, B<append> or B<prepend>. See documentation of the B<location> argument type for more detail.
+
+The namespace B<expression> is only valid for elements and attributes and must evaluate to the namespace URI. In that case, the element or attribute name must have a prefix. The created node is associated with a given namespace.
+
+Example: Append a new Hobbit element to the list of middle-earth creatures and name him Bilbo.
+
+  
+  xsh> xadd element "<creature race='hobbit' manner='good'>" \
+        into /middle-earth/creatures
+  xsh> xadd attribute "name='Bilbo'" \
+        into /middle-earth/creatures/creature[@race='hobbit'][last()]
+  
+
+
+
+=item See also:
+
+insert_command move_command xmove_command
+
+
+
+=back
+
+
+
+=head2 xmove
+
+
+
+=over 4
+
+
+
+=item Usage:
+
+xmove B<xpath> B<location> B<xpath>
+             
+
+
+=item Aliases:
+
+xmv
+
+
+
+=item Description:
+
+Like B<xcopy>, except that B<xmove> removes the source nodes after a succesfull copy. Remember that the moved nodes are actually different nodes from the original ones (which may not be obvious when moving nodes within a single document into locations that do not require type conversion). So, after the move, the original nodes do not exist neither in the document itself nor any nodelist variable.
+
+See B<xcopy> for more details on how the copies of the moved nodes are created.
+
+The following example demonstrates how B<xcopy> can be used to get rid of HTML B<E<lt>fontE<gt>> elements while preserving their content. As an exercise, try to find out why simple B<foreach E<sol>E<sol>font { xmove node() replace . }> would not work here.
+
+Example: Get rid of all E<lt>fontE<gt> tags
+
+  
+  while //font[1] {
+    foreach //font[1] {
+      xmove ./node() replace .;
+    }
+  }
+  
+
+
+
+=item See also:
+
+xcopy_command move_command insert_command xinsert_command
+
+
+
+=back
+
+
+
+=head2 xpath-axis-completion
+
+
+
+=over 4
+
+
+
+=item Usage:
+
+xpath-axis-completion B<expression>
+             
+
+
+=item Aliases:
+
+xpath_axis_completion
+
+
+
+=item Description:
+
+The following values are allowed: B<always>, B<never>, B<when-empty>. Note, that all other values (including 1) work as B<never>!
+
+If the B<expression> evaluates to B<always>, TAB completion for XPath expressions always includes axis names.
+
+If the B<expression> evaluates to B<when-empty>, the TAB completion list for XPath expressions includes axis names only if no element name matches the completion.
+
+If the B<expression> evaluates to B<never>, the TAB completion list for XPath expressions never includes axis names.
+
+The default value for this optio is B<always>.
+
+This command is equivalent to setting the B<$XPATH_AXIS_COMPLETION> variable.
+
+
+
+=back
+
+
+
+=head2 xpath-completion
+
+
+
+=over 4
+
+
+
+=item Usage:
+
+xpath_completion B<expression>
+             
+
+
+=item Aliases:
+
+xpath_completion
+
+
+
+=item Description:
+
+If the B<expression> is non-zero, enable the TAB completion for B<xpath> expansions in the interactive shell mode, disable it otherwise. Defaults to on.
+
+This command is equivalent to setting the B<$XPATH_COMPLETION> variable.
+
+
+
+=back
+
+
+
+=head2 xslt
+
+
+
+=over 4
+
+
+
+=item Usage:
+
+xslt B<id> B<filename> B<id> [(paramsE<verbar>parameters) name=B<expression> [name=B<expression> ...]]
+             
+
+
+=item Aliases:
+
+transform xsl xsltproc process
+
+
+
+=item Description:
+
+Load an XSLT stylesheet from a file and use it to transform the document of the first B<id> into a new document named B<id>. Parameters may be passed to a stylesheet after params keyword in the form of a list of name=value pairs where name is the parameter name and value is an B<expression> interpolating to its value. The resulting value is interpretted by XSLT processor as an XPath expression so e.g. quotes surrounding a XPath string have to be quoted themselves to preveserve them during the XSH expression interpolation.
+
+Example:
+
+  xslt src stylesheet.xsl rslt params font="'14pt'" color="'red'"
+
+
+
+=back
+
+
+
+=head2 xupdate
+
+
+
+=over 4
+
+
+
+=item Usage:
+
+xupdate B<id> [B<id>]
+             
+
+
+=item Description:
+
+Modify the current document or the document specified by the second B<id> argument according to XUpdate commands of the first B<id> document. XUpdate is a XML Update Language which aims to be a language for updating XML documents.
+
+XUpdate langauge is described in XUpdate Working Draft at http:E<sol>E<sol>www.xmldb.orgE<sol>xupdateE<sol>xupdate-wd.html.
+
+XUpdate output can be generated for example by Python xmldiff utility from http:E<sol>E<sol>www.logilab.orgE<sol>xmldiffE<sol>. Unfortunatelly, there are few bugs (or, as I tend to say In case of Python, white-space problems) in their code, so its XUpdate output is not always correct.
+
+
+
+=back
+
+
+=head1 ARGUMENT TYPE REFERENCE
+
+=over 4
+
+
+
+=item B<command-block>
+
+XSH command or a block of semicolon-separated commands enclosed within curly brackets.
+
+Example: Count paragraphs in each chapter
+
+  
+  $i=0;
+  foreach //chapter {
+    $c=count(./para);
+    $i=$i+1;
+    print "$c paragraphs in chapter no.$i";
+  }
+  
+
+
+
+=item B<enc-string>
+
+An B<expression> which interpolates to a valid encoding string, e.g. to utf-8, utf-16, iso-8859-1, iso-8859-2, windows-1250 etc.
+
+
+
+=item B<expression>
+
+Expression is a string consisting of unquoted characters other than whitespace or semicolon, single quote or double quote characters or quoted characters of any kind (but see also special case of expression - so called here-documents - described below). Quoting means either preceding a single character with a backslash or enclosing a part of the string into single quotes '...' or double quotes "...". Quoting characters are removed from the string so they must be quoted themselves if they are a part of the expression: \\, \' or " ' ", \" or ' " '. Unquoted (sub)expressons and (sub)expressions quoted with double-quotes are subject to variable, Perl, and XPath expansions.
+
+Variable expansion replaces substrings of the form $id or ${id} with the value of the variable named $id, unless the '$' sign is quoted.
+
+Perl expansion evaluates every substring enclosed in between B<${{{> and B<}}}> as a Perl expresson (in very much the same way as the B<perl> command) and replaces the whole thing with the resulting value.
+
+XPath interpolation evaluates every substring enclosed in between B<${{> and B<}}> as an XPath expression (in very much the same way as the B<count> command) and substitutes the whole thing with the resul.
+
+For convenience, another kind XPath interpolation is performed on expressions. It replaces any substring occuring between B<${(> and B<)}> with a literal result of XPath evaluation of the string. This means, that if the evaluation results in a node-list, the textual content of its first node is substituted rather than the number of nodes in the node-list (as with B<${{ ... }}>).
+
+Example:
+
+  echo foo "bar"                        # prints: foo bar
+  echo foo"bar"                         # prints: foobar
+  echo foo'"bar"'                       # prints: foo"bar"
+  echo foo"'b\\a\"r'"                   # prints: foo'b\a"r'
+  $a="bar"
+  echo foo$a                            # prints: foobar
+  echo foo\$a                           # prints: foo$a
+  echo '$a'                             # prints: '$a'
+  echo "'$a'"                           # prints: 'bar'
+  echo "${{//middle-earth/creatures}}"  # prints: 10
+  echo '${{//middle-earth/creatures}}'  # prints: ${{//middle-earth/creatures}}
+  echo ${{//creature[1]/@name}}         # !!! prints: 1
+  echo ${(//creature[1]/@name)}         # prints: Bilbo
+  echo ${{{ join(",",split(//,$a)) }}}  # prints: b,a,r
+
+There is one more special type of expressions, so called ``here-documents'' following syntax of similar constructs in Bash and Perl. Following a B<E<lt>E<lt>> you specify a string to terminate the quoted material, and all lines following the current line down to the terminating string are the value of the expression. The terminating string is either quoted or unquoted identifier (a word). If quoted, the type of quotes you use determines the treatment of the text, just as in regular quoting, i.e. in case of double quotes, the material contained in the here-document is subject to variable, Perl, and XPath expansions. An unquoted identifier works just like double quotes. There must be no space between the B<E<lt>E<lt>> and the identifier. The terminating string must appear by itself (unquoted and with no surrounding whitespace) on the terminating line.
+
+Example:
+
+  $a="bar"
+  echo foo <<END baz;
+  xx $a yy
+  END
+  # prints foo xx bar yy baz
+  echo foo <<"END" baz;
+  xx $a yy
+  END
+  # same as above
+  echo foo <<'END' baz;
+  xx $a yy
+  END
+  # prints foo xx $a yy baz
+
+
+
+=item B<filename>
+
+An B<expression> which interpolates to a valid file name or URL.
+
+
+
+=item B<id>
+
+An identifier, that is, a string beginning with a letter or underscore, and containing letters, underscores, and digits.
+
+
+
+=item B<location>
+
+One of: B<after>, B<before>, B<into>, B<append>, B<prepend>, B<replace>.
+
+NOTE: XSH 1.6 introduces two new values for location argument: B<append> and B<prepend> and slighlty changes behavior of B<after> and B<before>!
+
+This argument is required by all commands that insert nodes to a document in some way to a destination described by an XPath expression. The meaning of the values listed above is supposed be obvious in most cases, however the exact semantics for location argument values depends on types of both the source node and the target node.
+
+B<afterE<sol>before> place the node right afterE<sol>before the destination node, except for when the destination node is a document node or one of the source nodes is an attribute: If the destination node is a document node, the source node is attached to the endE<sol>beginning of the document (remember: there is no "afterE<sol>before a document"). If both the source and destination nodes are attributes, then the source node is simply attached to the element containing the destination node (remember: there is no order on attribute nodes). If the destination node is an attribute but the source node is of a different type, then the textual content of the source node is appended to the value of the destination attribute (i.e. in this case afterE<sol>before act just as appendE<sol>prepend).
+
+B<appendE<sol>prepend> appendsE<sol>prepends the source node to the destination node. If the destination node can contain other nodes (i.e. it is an element or a document node) then the entire source node is attached to it. In case of other destination node types, the textual content of the source node is appendedE<sol>prepended to the content of the destination node.
+
+B<into> can also be used to place the source node to the end of an element (in the same way as B<append>), to attach an attribute to an element, or, if the destination node is a text node, cdata section, processing-instruction, attribute or comment, to replace its textual content with the textual content of the source node.
+
+B<replace> replaces the entire destination node with the source node except for the case when the destination node is an attribute and the source node is not. In such a case only the value of the destination attribute is replaced with the textual content of the source node. Note also that document node can never be replaced.
+
+
+
+=item B<node-type>
+
+One of: element, attribute, text, cdata, comment, chunk and (EXPERIMENTALLY!) entity_reference. A chunk is a character string which forms a well-balanced peace of XML.
+
+Example:
+
+  
+  add element hobbit into //middle-earth/creatures;
+  add attribute 'name="Bilbo"' into //middle-earth/creatures/hobbit[last()];
+  add chunk '<hobbit name="Frodo">A small guy from <place>Shire</place>.</hobbit>' 
+    into //middle-earth/creatures;
+  
+
+
+
+=item B<perl-code>
+
+A block of perl code enclosed in curly brackets or an expression which interpolates to a perl expression. Variables defined in XSH are visible in perl code as well. Since, in the interactive mode, XSH redirects output to the terminal, you cannot simply use perl print function for output if you want to filter the result with a shell command. Instead use the predefined perl routine B<echo(...)> which is equivalent to Perl's B<print $::OUT ...>. The B<$::OUT> perl-variable stores the reference to the terminal file handle.
+
+For more information about embedded Perl code in XSH, predefined functions etc. see B<Perl_shell>.
+
+Example:
+
+  
+  xsh> $i="foo";
+  xsh> eval { echo "$i-bar\n"; } # prints foo-bar
+  xsh> eval 'echo "\$i-bar\n";'  # exactly the same as above
+  xsh> eval 'echo "$i-bar\n";'   # prints foo-bar too, but $i is
+      # interpolated by XSH. Perl actually evaluates echo "foo-bar\n";
+  
+
+
+
+=item B<xpath>
+
+XSH supports arbitrary XPath expression as defined in W3C recommendation at http:E<sol>E<sol>www.w3.orgE<sol>TRE<sol>xpath. (Nice interactive XPath tutorials and references can be found at http:E<sol>E<sol>www.zvon.org.) In XSH, XPath expressoin may be optionally preceded with a document identifier followed by colon (B<id>:xpath). If no document identifier is given, the current document is used.
+
+As an extension, the following XPath extension functions are defined in the XSH namespace:
+
+B<xsh:doc(id-string)> - returns a nodelist consisting of the document node associated in XSH with an identifier given in B<id-string>.
+
+B<xsh:matches(match-string,regexp-string)> - returns B<true> if B<match-string> matches the regular expression given in B<regexp-string>. Otherwise returns B<false>.
+
+B<xsh:grep(node-set, regexp-string)> - returns a node set consisting of nodes of the given B<node-set> whose content (as returned by the built-in XPath function B<string()>) matches the regular expression given in B<regexp-string>.
+
+B<xsh:same(node-set1, node-set2)> - returns B<true> if the given node sets both contain the same node (in XPath, this can also be expressed as B<count(node-set1E<verbar>node-set2)+count(node-set1)+count(node-set2)=1>).
+
+Example: Open a document and count all sections containing a subsection
+
+  
+  xsh scratch:/> open v = mydocument1.xml;
+  xsh v:/> open k = mydocument2.xml;
+  xsh k:/> count //section[subsection]; # searches k
+  xsh k:/> count v://section[subsection]; # searches v
+  
+
+
+
+=back
+
+

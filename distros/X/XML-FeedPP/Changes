@@ -1,0 +1,145 @@
+# XML::FeedPP Changes
+
+2011/05/08 (0.43)
+    * fixed #67268: Wrong return value of description() with xhtml content in atom feeds
+      https://rt.cpan.org/Ticket/Display.html?id=67268
+      (thanks to MDOM)
+
+2010/10/31 (0.42)
+    * fixed #55197: Not a HASH reference at XML/FeedPP.pm line 2260
+      https://rt.cpan.org/Ticket/Display.html?id=55197
+      (thanks to MDOM)
+
+2009/11/21 (0.41)
+    * supports generating CDATA section by setting SCALAR ref value like XML::TreePP.
+      (thanks to Mario Domgoergen)
+    * pod added to create an empty Atom 1.0 instance intended:
+      XML::FeedPP::Atom::Atom10->new() 
+      (thanks to Andy Piper)
+
+2009/04/07 (0.40)
+    * fixed #44082: parse method refuses feeds with UTF-8 BOM
+      http://rt.cpan.org/Public/Bug/Display.html?id=44082
+      (thanks to haarg)
+    * supports to get attributes in multiple elements determinably.
+      See 36_get_multiple.t
+    * new() and load() methods accept -type argument to specify source type.
+      http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=504143
+      (thanks to Anthony DeRobertis)
+    * to_string() and to_file() methods accept options for XML::TreePP.
+
+2009/03/12 (0.38)
+    * fixed #36270: supports no XMLDecl on load() method
+      https://rt.cpan.org/Ticket/Display.html?id=36270
+      (thanks to hirsch)
+    * supports category element which has type="" or domain="" attribute
+      ex. http://thesteampunkhome.blogspot.com/feeds/posts/default
+      http://weather.livedoor.com/forecast/rss/index.xml
+      http://picasaweb.google.com/data/feed/base/user/www.kawa.net/?alt=rss
+      (thanks to greg, tsubok and t-saitoh)
+
+2009/01/18 (0.37)
+    * fixed #42472: items with 2 titles break the parser
+      (thanks to thaabit)
+      http://rt.cpan.org/Public/Bug/Display.html?id=42472
+    * fixed #41771: possible bug in $item->guid
+      (thanks to PriggeScottM)
+      http://rt.cpan.org/Public/Bug/Display.html?id=41771
+
+2008/10/26 (0.36)
+    * RFC1123 and RSS spec allow two-digit date format
+      http://rt.cpan.org/Public/Bug/Display.html?id=36890
+      http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=503260
+      (thanks to Illtud Daniel and Anthony DeRobertis)
+
+2008/05/18 (0.35)
+    * supports multiple <rdf:Seq> which is invalid though
+      http://www.kawa.net/works/perl/feedpp/feedpp.html#com-2008-05-17T13:13:33Z
+      "Pseudo-hashes are deprecated at FeedPP.pm line 1085."
+      (thanks to nasano)
+    * accepts some invalid W3CDTF format
+    * merge() returns $self
+
+2008/01/14 (0.34)
+    * add time zones supported: UT EST EDT CST CDT MST MDT PST PDT
+      http://www.rfc-editor.org/rfc/rfc2822.txt
+      (thanks to Matti)
+
+2008/01/05 (0.33)
+    * Subversion on Google Code
+      http://xml-treepp.googlecode.com/svn/trunk/XML-FeedPP/
+    * XML::FeedPP::Plugin::DumpJSON module branched
+      http://search.cpan.org/dist/XML-FeedPP-Plugin-DumpJSON/
+
+2007/11/16 (0.31) not released
+    * getting from multiple nodes is supported for <media:thumbnail url="">
+
+2007/08/20 (0.30)
+    * Atom 1.0 supported. Atom 0.3 is still default. (thanks to takemaru)
+      Note that future version of this would change its default as Atom 1.0.
+      http://teahut.sakura.ne.jp/b/2007-06-24-1.html
+
+2007/07/27 (0.22)
+    * bugfix: Daylight saving time accepted.
+      http://cpantesters.perl.org/show/XML-FeedPP.html#XML-FeedPP-0.21
+
+2007/01/21 (0.21)
+    * update new() method to allow key/value pairs to set elements.
+    * update add_item() method to allow key/value pairs to set elements.
+    * add elements() undocumented method which sets elements by key/value pairs.
+    * add match_item() method which finds items by regular expressions.
+    * update sort_item() method to recognizes time zone of items.
+    * add get_pubDate_epoch() undocumented method which returns time as second.
+
+2006/12/29 (0.20) beta
+    * allow a date time format which comes without second.
+
+2006/12/16 (0.19)
+    * negative index supported: get_item() remove_item() limit_item()
+    * POD updated (thanks to sierra and silver)
+
+2006/12/15 (0.17)
+    * $item->get('@attr') supported (thanks to javiermm)
+
+2006/09/05 (0.16)
+    * some of valid/invalid W3CDTF formats supported (thanks to Yamamoto)
+
+2006/08/27 (0.15)
+    * Atom 1.0 support got forward (thanks to Ole Kasper Olsen)
+
+2006/05/07 (0.13)
+    * buf fix: get_pubDate_rfc1123() for RDF/Atom
+    * buf fix: image() for RDF, rdf:about attribute
+    * image() for Atom supports additional content types: image/x-icon, etc.
+
+2006/05/05 (0.12)
+    * new method: clear_item()
+    * image() method now supports XML::FeedPP::Atom as well.
+
+2006/05/03 (0.11)
+    * new method: remove_item() (thanks to JUNDU)
+    * add_item() method now allows clone another item/entry instance.
+
+2006/04/30 (0.10)
+    * category() method fixed for more then one category. (thanks to vlajbert)
+    * normalize() method normalizes pubDate element as well. (thanks to junichi)
+    * load() method has additional arguments for XML::TreePP. (thanks to kisa)
+    * source code passed perltidy.
+
+2006/03/18 (0.08)
+    * new methods: sort_item() uniq_item() limit_item() normalize()
+
+2006/03/09 (0.07)
+    * correct RSS/RDF/Atom file's format
+
+2006/02/27 (0.05)
+    * new methods: set() get()
+
+2006/02/24 (0.03)
+    * first release
+
+# http://groups.yahoo.com/group/xml-feedpp/
+# http://annocpan.org/dist/XML-FeedPP/
+# http://rt.cpan.org/Public/Dist/Display.html?Name=XML-FeedPP
+# http://www.kawa.net/works/perl/feedpp/feedpp-e.html       (English)
+# http://www.kawa.net/works/perl/feedpp/feedpp.html#changes (Japanese)

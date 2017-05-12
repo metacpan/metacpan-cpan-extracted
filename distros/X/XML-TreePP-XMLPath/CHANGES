@@ -1,0 +1,133 @@
+Revision history for Perl module XML::TreePP::XMLPath.
+
+0.72    2013-05-31 reg
+        - Fixed documentation that discusses the internal loading and use of
+          an XML::TreePP object. This helps to bring documentation in line
+          with the POD documentation of XML::TreePP::Editor.
+        - The new() method can now accept an argument that allows the caller
+          to provide an XML::TreePP object. This allows one call
+          $tppx = new XML::TreePP::XMLPath( tpp => $tpp_obj );
+          instead of requiring two calls
+          $tppx = new XML::TreePP::XMLPath; $tppx->tpp( $tpp_obj );
+
+0.71    2013-05-30 reg
+        - Getter and setter methods were not properly accessing the properties
+          of XML::TreePP. XML::TreePP::XMLPath was only accessing them directly
+          through the internally referenced XML::TreePP object's getter and
+          setter. As a result. this feature was removed, and documentation was
+          updated to reflect that the XML::TreePP properties must be set and
+          retrieved through the object's internally referenced XML::TreePP
+          object via XML::TreePP::XMLPath->tpp()->set|get(...) in OO mode.
+
+0.70    2013-04-16 reg
+        - Bug fix for the issue where $tpp->parse($x) dies when $x is not
+          defined, whereas the code was instead expecting undef to be returned
+          in this case. This bug caused calls to filterXMLDoc() or getValues()
+          to fail when the XMLPath referenced a non-existing XML leaf. 
+        - Bug fix to an issue in the charlexslit method of recognizing strings
+          with an escape character. Previously no escape character was used, and
+          strings escaping a character that was also the stop or start token
+          would fail to be recognized properly. Example as in 'The Cat\'s Meow'
+          would attempt to extract the string q{The Cat\} and would fail because
+          the it does cannot handle the remaining dangling string q{s Meow}.
+        - No longer has dependency on Data::Dump, and all use has been changed
+          to the Data::Dumper module. This change includes use of the method in
+          the examples of the documentation.
+        - New function assembleXMLPath() for assembling an XMLPath from a
+          provided representative array or hash ref structure.
+        - The deprecated methods validateAttrValue and getSubtree are now only
+          wrappers around the filterXMLDoc method. If they are called, a carp
+          message is given stating their deprecation. Also, their related
+          documentation has been removed. This allows for backwards
+          compatibility without encouraging new use.
+
+0.63    2011-01-17 reg
+        - This fixes a bug in getValues() method exposed in PERL 5.13.1 and
+          higher, where a local variable is not shared with a sub reference.
+        - Replaced the use of the Data::Dump module with Data::Dumper.
+          In the latest version of PERL (5.12.2 tested) the eval function does
+          not like unquoted HASH keys which begin with the dash "-". Data::Dump
+          does not quote the hash key, so its use was replaced with
+          Data::Dumper which does quote the hash key. It is used to clone XML
+          structures.
+          The XML::TreePP module uses the dash "-" as default (configurable to
+          optionally use "@" instead of "-") to indicate attributes of XML
+          elements. So the XML string "<element attribute="value"/>" is
+          represented in PERL structure as
+                 "{ element => { -attribute => 'value' } }" with Data::Dump
+          and as "{ element => { '-attribute' => 'value' } }" with Data::Dumper
+
+0.62    2010-02-04 reg
+        - This fixes a bug for getValues() method. This method would not return
+          the value of an attribute if the values was "0" (zero).
+        - The getValues() test case was modified to test for this.
+
+0.61    2009-11-04 reg
+        - Bug fix for issue when filtering for the root element (i.e. '/root')
+          filterXMLDoc returned a hash as a result rather than an ARRAY ref.
+
+0.60    2009-10-07 reg
+        - Major changes to internal functionality of the filterXMLDoc() method,
+          which includes a new mapping option (structure => type) to define the
+          the format of the returned results.
+        - The filterXMLDoc() method now has good support for use of the special
+          parent (..) indication in an XMLPath.
+        - Updated POD documentation.
+        - Some code cleanup.
+
+0.56    2009-09-08 reg
+        - This fixes a bug for getElements and getAttributes methods. These
+          methods were only returning values for the first found node instead of
+          all found nodes. The fix was to change these methods to use the
+          filterXMLDoc method, instead of the deprecated getSubtree method.
+        - New test cases added to test the aformentioned scenario.
+        - The helper script 'runtests.pl' was added to allow for manually
+          executing all test cases at once.
+        - Documentation added to README and POD to describe how to use this
+          module with a generic (non-XML) PERL code reference tree.
+
+0.55    2009-08-10 reg
+        - This is a rerelease of 0.54 for CPAN. There are no modifications.
+
+0.54    2009-08-10 reg
+        - There was a conflict in the documentation as to the true name of the
+          getValue() method. However, I like getValues() better as the method
+          name. So the function getValue() changed names to getValues().
+        - This update was released on the same day as 0.53
+
+0.53    2009-08-10 reg
+        - The author has decided to attempt some level of XPath compatibility.
+        - Added new method getValue() to retrieve values from an XML Document
+          as derived from the given XMLPath.
+        - Changed warning implementation to carp
+        - Added Data::Dump dependency in Makefile.PL. This dependency was
+          introduced in version 0.52, but failed to be added as a dependency
+          in the Makefile.PL. This resulted in test and runtime errors if that
+          module did not exist on the system.
+
+0.52    2009-05-12 reg
+        - Removed dependency on Params::Validate
+        - Updated documentation with corrections
+        - Expanded the fundamental filter support recognized by XMLPath
+          philosophy. Additional filtering now includes:
+          + attribute/element existence testing : /books/book[@author]
+          + accessing items with positional a argument : /books/book[3]
+          + access the current context with '.' : 
+            /path/node[.="CDATAvalue"] -sameas-> /path[node="CDATAvalue"]/node
+            or /path/node/.[@attr="val"] -sameas-> /path/node[@attr="val"]
+        - Expanded parseXMLPath() to support the new XMLPath filter options
+        - Added filterXMLDoc() method
+          + replaces getSubtree() and validateAttrValue() methods
+          + implements the new XMLPath filter options
+        - Deprecated getSubtree() and validateAttrValue() methods
+        - Added get() and set() methods to support passing in properties that
+          should be used when this module loads XML::TreePP (ie 'attr_prefix')
+        - Added tpp() accessor method to access the loaded instance of
+          XML::TreePP, or to load an instance for this module to use.
+
+0.51    2008-11-10 reg
+        - Added Params::Validate dependency to Makefile to allow for
+          successful building
+
+0.50	2008-11-03 reg
+	- original version

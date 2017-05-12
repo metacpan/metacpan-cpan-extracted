@@ -1,0 +1,14 @@
+
+READER for rpc-literal examples
+=============================== 2008-12-26
+
+These examples are rewrites from an RPC-Literal detailed description
+kindly contributed by Daniel Ruoso.  They are also used in a test-script
+to guarantee that they will continue to work in future releases.
+
+One pair of files show how rpc-literal via 'element' works, and
+one how rpc-literal via 'type' is working.  Exactly the same for
+the end-user's point of view, while the messages do slightly differ.
+
+This example is provided under the same license as the XML::Compile::SOAP
+distribution itself.

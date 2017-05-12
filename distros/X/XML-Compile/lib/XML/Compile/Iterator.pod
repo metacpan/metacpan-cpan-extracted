@@ -1,0 +1,150 @@
+=encoding utf8
+
+=head1 NAME
+
+XML::Compile::Iterator - reduce view on a node tree
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
+It would have been nice to be able to use XML::LibXML::Iterator, but
+on the moment of this writing, that module is not maintained.  Besides,
+this implementation of the iterator is more specific for our purpose.
+The main user for this object currently is L<XML::Compile::Translate|XML::Compile::Translate>.
+
+=head1 METHODS
+
+=head2 Constructors
+
+=over 4
+
+=item $obj-E<gt>B<descend>( [$node, [$path, [$filter]]] )
+
+The $node is a child of the node handled by the iterator where this
+method is called upon.  Without explicit $node, the current node is used.
+Returned is a new L<XML::Compile::Iterator|XML::Compile::Iterator> object.  The new iterator
+will use the same $filter as the parent iterator by default.  The internal
+administered path with be extended with the $path.
+
+=item XML::Compile::Iterator-E<gt>B<new>($node, $path, $filter,)
+
+The $node is a XML::LibXML::Node object, of which the direct children
+are inspected.
+
+The $filter a CODE reference which is called for each child node.
+The only parameter is the parent $node, and then it must return
+either true or false.  In case of true, the node is selected.
+The FILTERS is applied to all children of the $node once, when the
+first child is requested by the program.
+
+=back
+
+=head2 Attributes
+
+=over 4
+
+=item $obj-E<gt>B<filter>()
+
+Returns the CODE reference which is used to select the nodes.
+
+=item $obj-E<gt>B<node>()
+
+Returns the XML::LibXML::Node node of which the children are walked
+through.
+
+=item $obj-E<gt>B<path>()
+
+The path represents the location where the node is, like a symbolic
+link, how you got there.
+
+=back
+
+=head2 Scanning
+
+=over 4
+
+=item $obj-E<gt>B<childs>()
+
+Returns the child nodes which fulfil the filter requirements.  In LIST
+context as list, in SCALAR context as reference to an ARRAY.
+
+=item $obj-E<gt>B<currentChild>()
+
+Returns the current child node.
+
+=item $obj-E<gt>B<firstChild>()
+
+Returns the first child node.  Does not change the current position.
+
+=item $obj-E<gt>B<lastChild>()
+
+Returns the last child node which fulfills the requirements.
+Does not change the current position.
+
+=item $obj-E<gt>B<nextChild>()
+
+Returns the next child when available, otherwise C<undef>.
+
+=item $obj-E<gt>B<nrChildren>()
+
+Returns the number of childnodes which fulfill the restriction.
+
+=item $obj-E<gt>B<previousChild>()
+
+Returns the previous child when available, otherwise C<undef>.
+
+=back
+
+=head2 simplify XML node access
+
+=over 4
+
+=item $obj-E<gt>B<currentContent>()
+
+Returns the textContent of the L<currentChild()|XML::Compile::Iterator/"Scanning"> node, or undef.
+
+=item $obj-E<gt>B<currentLocal>()
+
+Returns the local name of the L<currentChild()|XML::Compile::Iterator/"Scanning">, or the empty string.
+
+=item $obj-E<gt>B<currentType>()
+
+Returns the type of the L<currentChild()|XML::Compile::Iterator/"Scanning">, or the empty string.
+
+=item $obj-E<gt>B<nodeLocal>()
+
+Returns the local name of the L<node()|XML::Compile::Iterator/"Attributes">, or the empty string.
+
+=item $obj-E<gt>B<nodeNil>()
+
+Returns true if the current node has C<xsi:type="true">.
+
+=item $obj-E<gt>B<nodeType>()
+
+Returns the type of the L<node()|XML::Compile::Iterator/"Attributes">, or the empty string.
+
+=item $obj-E<gt>B<textContent>()
+
+Returns the textContent of the L<node()|XML::Compile::Iterator/"Attributes">, or undef.
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of XML-Compile distribution version 1.56,
+built on March 30, 2017. Website: F<http://perl.overmeer.net/xml-compile/>
+
+Please post questions or ideas to the mailinglist at
+F<http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/xml-compile> .
+For live contact with other developers, visit the C<#xml-compile> channel
+on C<irc.perl.org>.
+
+=head1 LICENSE
+
+Copyrights 2006-2017 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the Artistic license.
+See F<http://dev.perl.org/licenses/artistic.html>
+

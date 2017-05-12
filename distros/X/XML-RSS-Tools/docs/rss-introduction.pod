@@ -1,0 +1,195 @@
+#   $Id: rss-introduction.pod 56 2008-06-23 16:54:31Z adam $
+
+=head1 NAME
+
+Introduction - A Simple Introduction To RSS
+
+=head2 RSS/RDF
+
+Rich Site Summary/Resource Description Framework technology is a
+simple method of a site describing what it has, so that another
+site can summarise the content, and provide links back to the
+original content.
+
+RSS was pioneered by Netscape Communications
+http://my.netscape.com/publish/formats/rss-spec-0.91.html
+for their I<my.netscape> portal, and adopted quickly by many
+others, notably userland http://backend.userland.com/rss092 .
+
+=head2 XML
+
+A simple XML http://www.w3.org/XML/ file is produced by the site
+originating the articles. This file, easily obtainable by HTTP,
+is downloaded and parsed by the client, allowing the client to
+present the site summary in a way that suits the client. XML
+provides a simple human readable format that is easy to generate
+and read, using typical web tools.
+
+=head2 Principle
+
+The module came from a simple idea, gather RSS feeds, convert them into
+HTML fragments and then template them into a web page on a local web
+server.
+
+=head2 Downloading RSS files
+
+Originally I used wget http://www.gnu.org/software/wget/wget.html ,
+to pull files down from their server. Other tools to do this include
+cURL http://curl.haxx.se/ and any web browser. I cached the RSS feeds 
+on my web server's disk space to reduce unnecessary downloading.
+
+=head2 RSS Normalisation
+
+RSS feeds come in several incompatible families. To make conversion to HTML
+simple I opted to convert all RSS feeds to RSS version 0.91 as this is very
+simple to convert to HTML via XSLT http://www.w3.org/Style/XSL/ . You can
+turn off normalisation if you plan to use just one XSLT stylesheet.
+
+The underlying XML::RSS http://perl-rss.sourceforge.net/ (up to version 0.97) core can
+parse and interconvert RSS Versions 0.9, 0.91 and 1.0, versions of XML::RSS 0.98 and beyond can
+additionally process RSS version 2.0, though it is unlikely to ever be able to process the largely
+unused versions 0.92, 0.93, and 0.94, which are the evolutionary steps from 0.91 to 2.0.
+
+=head2 RSS Conversion
+
+Most online examples of RSS use the XML::RSS module to programmatically convert the feed into
+HTML, either directly or via using one of the many quality HTML templating tools. This I felt
+was inefficient and so I opted to use "XML Stylesheet Language Transformation", which is
+industry standard and does not require programming. There are several XSLT processors available:
+Saxon http://saxon.sourceforge.net/ , Xalan http://xml.apache.org/ ,
+MSXML, and Sablotron http://www.gingerall.com/charlie/ga/xml/p_sab.xml , however
+the fastest and easiest one for Perl is Matt Sergeant's XML C Library for Gnome http://xmlsoft.org/
+based a XML::LibXSL.
+
+=head2 Script to Module
+
+After developing the script to do this I realised that much of the code could be
+converted into a module and distributed to the world. After a popular post to
+Perlmonks, I have moved the module up to CPAN. The code should be considered as
+B<pre-release> code, and the API may be extended in the future.
+
+=head2 Examples
+
+Some basic examples of how to use this module are provided in the examples folder.
+
+=head2 Resources
+
+=over
+
+=item *
+
+http://backend.userland.com/rss092
+- the home of key RSS developments
+
+=item *
+
+http://soapclient.com/rss/rss.html
+- a RSS to HTML online tool
+
+=item *
+
+Netscape Communications, home of the original specifications
+- http://my.netscape.com/publish/formats/rss-spec-0.91.html
+
+=item *
+
+W3C Standards body: RDF http://www.w3.org/RDF/ and
+RDF Validator http://www.w3.org/RDF/Validator/
+
+=item *
+
+http://blogspace.com/rss/ - Blogspace RSS FAQ
+
+=item *
+
+http://www.webreference.com/authoring/languages/xml/rss/1/8.html
+Webreference.com RSS Versions
+
+=item *
+
+http://rss.benhammersley.com/ Ben Hammersley's Webloggery and
+recent book Content Syndication with RSS
+- http://www.oreilly.com/catalog/consynrss/
+
+=item *
+
+Dave Beckett's Resource Description Framework Resource Guide
+- http://www.ilrt.bristol.ac.uk/discovery/rdf/resources/
+
+=item *
+
+Mark Pilgrim and Sam Ruby's RSS Validator
+http://feeds.archive.org/validator/
+
+=item *
+
+C<brian d foy> has an interesting, article in The Perl Review
+- http://www.theperlreview.com/Issues/v0i6.shtml
+
+=item *
+
+Mark Pilgrim has some nice RSS articles on XML.com (in Python):
+http://www.xml.com/lpt/a/2002/12/18/dive-into-xml.html
+http://www.xml.com/lpt/a/2003/01/22/dive-into-xml.html 
+http://www.xml.com/lpt/a/2003/02/26/dive-into-xml.html and
+http://www.xml.com/lpt/a/2004/04/07/dive.html
+
+=item *
+
+Bob DuCharme wrote a simple introduction to using XSLT with
+RSS on XML.com: http://www.xml.com/lpt/a/2003/01/02/tr.html
+
+=item *
+
+The Perl-RSS Group has a nice selection of articles on
+http://perl-rss.sourceforge.net/bibliography.html
+
+=item *
+
+O'Reilly has a dedicated RSS section in O'Reilly Network:
+RSS DevCenter http://www.oreillynet.com/rss/
+
+=item *
+
+See my RSS Article removed from this module: 
+http://www.iredale.net/articles/rss-xslt.html
+
+=back
+
+=head2 Some Example RSS Feeds
+
+=over
+
+=item *
+
+http://www.bbc.co.uk/syndication/feeds/news/ukfs_news/front_page/rss091.xml
+
+=item *
+
+http://freshmeat.net/backend/fm.rdf
+
+=item *
+
+http://slashdot.org/slashdot.rdf
+
+=item *
+
+http://www.oreillynet.com/meerkat/?_fl=rss10
+
+=item *
+
+http://www.theregister.co.uk/headlines.rss
+
+=item *
+
+http://www.sophos.com/virusinfo/infofeed/tenalerts.xml
+
+=item *
+
+http://www.perl.com/pace/perlnews.rdf
+
+=back
+
+=head1 See Also
+
+L<XML::RSS>, (L<XML::RSS::Parser>), L<XML::LibXML>, L<XML::LibXSLT>

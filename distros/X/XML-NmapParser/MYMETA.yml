@@ -1,0 +1,30 @@
+---
+abstract: 'The great new XML::NmapParser!'
+author:
+  - 'P Johnson [littleurl] <pjohnson21211@gmail.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0'
+dynamic_config: 0
+generated_by: 'Module::Build version 0.4214, CPAN::Meta::Converter version 2.143240'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: XML-NmapParser
+provides:
+  NmapParser::Host:
+    file: lib/XML/Host/Host.pm
+  NmapParser::Host::Script:
+    file: lib/XML/Host/OS.pm
+  NmapParser::Host::Service:
+    file: lib/XML/Host/Service.pm
+  NmapParser::Host::TraceHop:
+    file: lib/XML/Host/TraceHop.pm
+  XML::NmapParser:
+    file: lib/XML/NmapParser.pm
+    version: '0.01'
+resources:
+  license: http://opensource.org/licenses/artistic-license-2.0.php
+version: '0.01'

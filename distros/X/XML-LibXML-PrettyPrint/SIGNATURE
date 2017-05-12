@@ -1,0 +1,43 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 33317486c4fa2cf7fec85bf92ed38ac0f64233a0 CONTRIBUTING
+SHA1 cfd2a63debf776c6c12d3c6f492b570c0851ffcb COPYRIGHT
+SHA1 4a475a6a4c60c03a6352ec84ae84ca3d03280f81 CREDITS
+SHA1 b38deb1fee434e85aafd225f659a355964b0e01c Changes
+SHA1 c35bc58591abe06e0ed00d7a74bb9b9a080e020a INSTALL
+SHA1 34f5e12514b91055de4b164a1f2327ef5c30ba53 LICENSE
+SHA1 484a05fb124a21eb35290779e58235d2483bf88d MANIFEST
+SHA1 ecc828dee0f783f9cf22f9299cd32dc16edbc713 META.json
+SHA1 900af37cf6aef8c8658540add82df496acc22ad3 META.yml
+SHA1 6b4b5ce140b37e3b2e5686b3e71e2b27bed7eabd Makefile.PL
+SHA1 d4a45b1e73bdd357c916ef65fa0e95787e8fb65b README
+SHA1 dd9cfd0f38b1d1298314067b60ab0271f473c142 bin/xml-pretty
+SHA1 00647e67b80290beb5bd443600e2ffbf78a2f5ad dist.ini
+SHA1 89c9e1f101fbc79f0f9239524f8c353cc2523d3a doap.ttl
+SHA1 b1c8692f77c7733f3ca33ae5e65d3b7c576d40e6 lib/XML/LibXML/PrettyPrint.pm
+SHA1 c82ab8fae485e1a9e001396df6704cc6f8c7c8bb t/01basic.t
+SHA1 c550c210305138773f131e8c3f1c3a913ba39044 t/02stripws.t
+SHA1 8a62b327296101e3fb42a63838f7a84cc61c0ddf t/03indent.t
+SHA1 ca9f29693ddaa38c18b7c75409559f50a349871e t/04print.t
+SHA1 6046af4b34a46a2c0b2308ca2467b855ed7eaecd t/61cdata.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlQMLgQACgkQzr+BKGoqfTlP8QCgp/hBVqESXpUWVK/L8zP84kVm
+Ye0An0yDI290XyYM/1ust9Qcp+dpnjIq
+=Ht8E
+-----END PGP SIGNATURE-----

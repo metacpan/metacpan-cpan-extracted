@@ -1,0 +1,5 @@
+Revision history for Perl extension XML::Filter::DetectWS.
+
+0.01  Sun Aug 26 10:42:39 2001
+	- Moved from XML-DOM to separate package
+

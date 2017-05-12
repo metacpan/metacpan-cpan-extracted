@@ -1,0 +1,19 @@
+<stx:transform version="1.0" 
+  xmlns:stx="http://stx.sourceforge.net/2002/ns"
+  strip-space="yes">
+
+  <stx:template match="/root">
+    <node>
+      <stx:variable name="seq1" select="('a', 'b', 'cde')"/>
+      <stx:value-of select="item-at($seq1,2)"/>
+      <stx:text>:</stx:text>
+      <stx:value-of select="item-at(('a', 'b', 'cde'),2)"/>
+      <stx:text>-</stx:text>
+      <stx:variable name="seq2" select="($seq1,$seq1,'mato')"/>
+      <stx:value-of select="item-at($seq2,7)"/>
+      <stx:text>:</stx:text>
+      <!-- stx:value-of select="item-at($seq2,10)"/ -->
+    </node>
+  </stx:template>
+
+</stx:transform>

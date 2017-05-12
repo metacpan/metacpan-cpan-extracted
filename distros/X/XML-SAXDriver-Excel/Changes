@@ -1,0 +1,11 @@
+Revision history for Perl extension XML::SAXDriver::Excel.
+
+0.01  Thur June 7 15:17:32 2001
+	- Version 0.01 released
+	
+0.03  Tue Jul 17 11:08:00 2001
+  - Added Headings_Handler attribute for non-ASCII custom handlers as well as 
+    a default handler that only works on ASCII char set.
+  - Added SubChar to allow to specify a character(s) to substitute illegal chars in XML tag names.
+
+

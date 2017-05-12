@@ -1,0 +1,39 @@
+---
+abstract: 'Perl module to display wallpaper on your desktop.'
+author:
+  - 'Kathryn Andersen <perlkat@katspace.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Module::Build: '0.28'
+  Test::Distribution: '0'
+  Test::More: '0'
+  blib: '1.01'
+configure_requires:
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: X11-Muralis
+requires:
+  File::Basename: '0'
+  File::Find::Rule: '0'
+  File::Spec: '0'
+  Getopt::ArgvFile: '0'
+  Getopt::Long: '2.34'
+  Image::Info: '0'
+  Module::Pluggable: '0'
+  Pod::Usage: '0'
+  perl: v5.8.3
+  strict: '0'
+  warnings: '0'
+resources:
+  homepage: https://github.com/rubykat/X11-Muralis
+  repository: https://github.com/rubykat/X11-Muralis.git
+version: '0.1003'
+x_serialization_backend: 'YAML::Tiny version 1.69'

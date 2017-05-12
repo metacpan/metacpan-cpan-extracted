@@ -1,0 +1,1537 @@
+=head1 NAME
+
+XML::Reader_fr - Lire du XML avec des informations du chemin, conduit par un parseur d'extraction.
+
+=head1 TRADUCTION
+
+This document is the French translation from English of the module XML::Reader. In order to
+get the Perl source code of the module, please see file XML/Reader.pm
+
+Ce document est une traduction FranE<ccedil>aise de l'Anglais du module XML::Reader. Pour
+obtenir la source Perl du module, consultez le fichier XML/Reader.pm
+
+=head1 SYNOPSIS
+
+  use XML::Reader qw(XML::Parser);
+
+  my $text = q{<init>n <?test pi?> t<page node="400">m <!-- remark --> r</page></init>};
+
+  my $rdr = XML::Reader->new(\$text);
+  while ($rdr->iterate) {
+      printf "Path: %-19s, Value: %s\n", $rdr->path, $rdr->value;
+  }
+
+Ce programme crE<eacute>e le rE<eacute>sultat suivant:
+
+  Path: /init              , Value: n t
+  Path: /init/page/@node   , Value: 400
+  Path: /init/page         , Value: m r
+  Path: /init              , Value:
+
+On peut toujours rajouter un eval {...} autours d'un appel XML::Reader->new(...) afin de vE<eacute>rifier
+que l'appel a rE<eacute>ussi:
+
+  my $rdr = eval{ XML::Reader->new('test.xml') }
+    or warn "Can't XML::Reader->new() because $@";
+
+  if ($rdr) {
+      # ... do something with $rdr ...
+  }
+  else {
+      # ... do some error handling ...
+  }
+
+=head1 UTILISATION
+
+Normalement, on n'utilise pas XML::Reader tout seul, on utilise plutE<ocirc>t XML::Reader::RS (qui utilise XML::Parser) ou
+on utilise XML::Reader::PP (qui utilise XML::Parsepp).
+
+Par contre, si on veut utiliser XML::Reader directement, voici la procE<eacute>dure pour choisir entre XML::Parser et XML::Parsepp:
+
+XML::Reader utilise XML::Parser comme sous-module. Cette configuration marche trE<egrave>s bien, sauf dans le cas oE<ugrave>
+il n'y a pas de compilateur C disponible pour installer XML::Parser. Dans ce cas, XML::Parsepp peut remplacer XML::Parser.
+Voici un exemple:
+
+  use XML::Reader qw(XML::Parser);
+
+  my $text = q{<init>n <?test pi?> t<page node="400">m <!-- remark --> r</page></init>};
+
+  my $rdr = XML::Reader->new(\$text);
+  while ($rdr->iterate) {
+      printf "Path: %-19s, Value: %s\n", $rdr->path, $rdr->value;
+  }
+
+La seule chose est que XML::Reader dE<eacute>pend des deux modules XML::Parser et XML::Parsepp. En consE<eacute>quence,
+si vous ne pouvez pas installer XML::Parser, vous pouvez quand mE<ecirc>me installer XML::Reader, mais vous ne lancez pas les tests.
+
+=head1 DESCRIPTION
+
+XML::Reader est un module simple et facile E<agrave> utiliser pour parser des fichiers XML de maniE<egrave>re sE<eacute>quentielle
+(aussi appellE<eacute> parseur guidE<eacute> par l'extraction) et, en mE<ecirc>me temps, il enregistre le chemin complet du XML.
+
+Il a E<eacute>tE<eacute> dE<eacute>veloppE<eacute> comme une couche sur XML::Parser/XML::Parsepp (quelques fonctionalitE<eacute>s basiques ont E<eacute>tE<eacute> copiE<eacute> de
+XML::TokeParser). XML::Parser, XML::Parsepp et XML::TokeParser utilisent chacun une mE<eacute>thode d'extraction sE<eacute>quentielle,
+mais ils n'enregistrent pas le chemin du XML.
+
+De plus, avec les interfaces de XML::Parser, XML::Parsepp et XML::TokeParser, on est obligE<eacute> de sE<eacute>parer les balises de dE<eacute>but,
+les balises de fin et du texte, ce qui, E<agrave> mon avis, rend l'utilisation assez compliquE<eacute>. (par contre, si on le
+souhaite, XML::Reader peut agir d'une maniE<egrave>re E<agrave> ce que les balises de dE<eacute>but, les balises de fin et du texte
+sont sE<eacute>parE<eacute>s, par l'option {filter => 4, mode => 'pyx'}).
+
+Il y a aussi XML::TiePYX, qui permet de parser des fichiers XML de maniE<egrave>re sE<eacute>quentielle (voir
+L<http://www.xml.com/pub/a/2000/03/15/feature/index.html> pour consulter une introduction E<agrave> PYX).
+Mais mE<ecirc>me avec XML::TiePYX, il faut sE<eacute>parer les balises de dE<eacute>but, les balises de fin et le texte, et il n'y a
+pas de chemin disponible.
+
+Par contre, avec XML::Reader, les les balises de dE<eacute>but, les balises de fin et le texte sont traduits en
+expressions similaires E<agrave> XPath. En consE<eacute>quence, il est inutile de compter des balises individuelles, on a
+un chemin et une valeur, et E<ccedil>a suffit. (par contre, au cas oE<ugrave> on veut opE<eacute>rer XML::Reader en fonctionnement
+compatible E<agrave> PYX, il y a toujours l'option {filter => 4, mode => 'pyx'}, comme dE<eacute>jE<agrave> mentionnE<eacute> ci-dessus).
+
+Mais revenons-nous au fonctionnement normal de XML::Reader, voici un exemple XML dans la variable '$line1':
+
+  my $line1 = 
+  q{<?xml version="1.0" encoding="iso-8859-1"?>
+    <data>
+      <item>abc</item>
+      <item><!-- c1 -->
+        <dummy/>
+        fgh
+        <inner name="ttt" id="fff">
+          ooo <!-- c2 --> ppp
+        </inner>
+      </item>
+    </data>
+  };
+
+Cet exemple peut E<ecirc>tre parsE<eacute> avec XML::Reader en utilisant les mE<eacute>thodes C<iterate> pour lire sE<eacute>quentiellement
+les donnE<eacute>es XML, et en utilisant les mE<eacute>thodes C<path> et C<value> pour extraire le chemin et la valeur E<agrave> un
+endroit prE<eacute>cis dans le fichier XML.
+
+Si nE<eacute>cessaire, on peut E<eacute>galement identifier les balises individuelles de dE<eacute>but et de fin: Il y a une mE<eacute>thode
+C<is_start>, qui donne 1 ou 0 (c'est E<agrave> dire: 1, s'il y a une balise de dE<eacute>but E<agrave> la position actuelle, sinon 0).
+Il y a E<eacute>galement la mE<eacute>thode E<eacute>quivalente C<is_end>.
+
+En plus, il y a les mE<eacute>thodes C<tag>, C<attr>, C<type> and C<level>. C<tag> retourne le nom de la balise
+en cours, C<attr> retourne l'identifiant d'un attribut, C<type> retourne 'T' s'il y a du texte, ou '@' s'il y
+a des attributs et C<level> indique le niveau de cascadage (un nombre >= 0)
+
+Voici un programme qui lit le XML dans la variable '$line1' (voir ci-dessus) pour montrer le principe...
+
+  use XML::Reader qw(XML::Parser);
+
+  my $rdr = XML::Reader->new(\$line1);
+  my $i = 0;
+  while ($rdr->iterate) { $i++;
+      printf "%3d. pat=%-22s, val=%-9s, s=%-1s, e=%-1s, tag=%-6s, atr=%-6s, t=%-1s, lvl=%2d\n", $i,
+        $rdr->path, $rdr->value, $rdr->is_start, $rdr->is_end, $rdr->tag, $rdr->attr, $rdr->type, $rdr->level;
+  }
+
+...et voici le rE<eacute>sultat:
+
+   1. pat=/data                 , val=         , s=1, e=0, tag=data  , atr=      , t=T, lvl= 1
+   2. pat=/data/item            , val=abc      , s=1, e=1, tag=item  , atr=      , t=T, lvl= 2
+   3. pat=/data                 , val=         , s=0, e=0, tag=data  , atr=      , t=T, lvl= 1
+   4. pat=/data/item            , val=         , s=1, e=0, tag=item  , atr=      , t=T, lvl= 2
+   5. pat=/data/item/dummy      , val=         , s=1, e=1, tag=dummy , atr=      , t=T, lvl= 3
+   6. pat=/data/item            , val=fgh      , s=0, e=0, tag=item  , atr=      , t=T, lvl= 2
+   7. pat=/data/item/inner/@id  , val=fff      , s=0, e=0, tag=@id   , atr=id    , t=@, lvl= 4
+   8. pat=/data/item/inner/@name, val=ttt      , s=0, e=0, tag=@name , atr=name  , t=@, lvl= 4
+   9. pat=/data/item/inner      , val=ooo ppp  , s=1, e=1, tag=inner , atr=      , t=T, lvl= 3
+  10. pat=/data/item            , val=         , s=0, e=1, tag=item  , atr=      , t=T, lvl= 2
+  11. pat=/data                 , val=         , s=0, e=1, tag=data  , atr=      , t=T, lvl= 1
+
+=head1 INTERFACE
+
+=head2 CrE<eacute>ation objet
+
+Pour crE<eacute>er un objet, on utilise la syntaxe suivante:
+
+  my $rdr = XML::Reader->new($data,
+    {strip => 1, filter => 2, using => ['/path1', '/path2']});
+
+L'E<eacute>lE<eacute>ment $data est obligatoire, il est le nom d'un fichier XML, ou une URL qui commence par 'http://...', ou
+la rE<eacute>fE<eacute>rence E<agrave> une chaE<icirc>ne de caractE<egrave>res, dans ce cas le contenu de cette chaE<icirc>ne
+de caractE<egrave>res est acceptE<eacute> comme XML.
+
+Sinon, $data peut E<eacute>galement E<ecirc>tre une rE<eacute>fE<eacute>rence E<agrave> un fichier, comme par exemple \*STDIN. Dans ce cas,
+la rE<eacute>fE<eacute>rence de fichier est utiliser pour lire le XML.
+
+Voici un exemple pour crE<eacute>er un objet XML::Reader avec un fichier:
+
+  my $rdr = XML::Reader->new('input.xml');
+
+Voici un autre exemple pour crE<eacute>er un objet XML::Reader avec une rE<eacute>fE<eacute>rence E<agrave> une chaE<icirc>ne de caractE<egrave>res:
+
+  my $rdr = XML::Reader->new(\'<data>abc</data>');
+
+Voici un exemple pour crE<eacute>er un objet XML::Reader avec une rE<eacute>fE<eacute>rence E<agrave> un fichier:
+
+  open my $fh, '<', 'input.xml' or die "Error: $!";
+  my $rdr = XML::Reader->new($fh);
+
+Voici un exemple pour crE<eacute>er un objet XML::Reader avec \*STDIN:
+
+  my $rdr = XML::Reader->new(\*STDIN);
+
+On peut ajouter une ou plusieurs options dans une rE<eacute>fE<eacute>rence E<agrave> un hashage:
+
+=over
+
+=item option {parse_ct => }
+
+Option {parse_ct => 1} permet de lire les commentaires, le defaut est {parse_ct => 0}
+
+=item option {parse_pi => }
+
+Option {parse_pi => 1} permet de lire les processing-instructions et les XML-declarations,
+le dE<eacute>faut est {parse_pi => 0}
+
+=item option {using => }
+
+Option {using => } permet de sE<eacute>lectionner un arbre prE<eacute>cis dans le XML.
+
+La syntaxe est {using => ['/path1/path2/path3', '/path4/path5/path6']}
+
+=item option {filter => } et {mode => }
+
+Option {filter => 2} ou {mode => 'attr-bef-start'} affiche tous les E<eacute>lE<eacute>ments, y compris les attributs.
+
+Option {filter => 3} ou {mode => 'attr-in-hash'} supprime les attributs (c'est E<agrave> dire il supprime toutes les lignes qui
+sont $rdr->type eq '@'). En revanche, le contenu des attributs sont retournE<eacute> dans le hashage
+$rdr->att_hash.
+
+Option {filter => 4} ou {mode => 'pyx'} crE<eacute>e une ligne individuel pour chaque balise de dE<eacute>but, de fin,
+pour chaque attribut, pour chaque commentaire et pour chaque processing-instruction. Ce fonctionnement
+permet, en effet, de gE<eacute>nE<eacute>rer un format PYX.
+
+Option {filter => 5} ou {mode => 'branches'} selectionne uniquement les donnE<eacute>es pour les racines ("root"). Les
+E<eacute>lE<eacute>ments pour chaque "root" sont accumulE<eacute> dans une rE<eacute>fE<eacute>rence E<agrave>
+un array (comme specifiE<eacute> dans la partie "branch") et quand le "branch" est complet, les donnE<eacute>es
+sont retournE<eacute>. Cette procE<eacute>dure se trouve au milieu entre l'option "using" (qui retourne les
+E<eacute>lE<eacute>ments un par un) et la fonction "slurp_xml" (qui accumule les donnE<eacute>es dans un "branch",
+et tous les "branches" sont accumulE<eacute>s dans une seule structure en mE<eacute>moire).
+
+La syntaxe est {filter => 2|3|4|5, mode => 'attr-bef-start'|'attr-in-hash'|'pyx'|'branches'}, le dE<eacute>faut est {filter => 2,
+mode => 'attr-bef-start'}
+
+=item option {strip => }
+
+Option {strip => 1} supprime les caractE<egrave>res blancs au dE<eacute>but et E<agrave> la fin d'un texte ou d'un commentaire.
+(les caractE<egrave>res blancs d'un attribut ne sont jamais supprimE<eacute>). L'option {strip => 0} laisse le texte ou
+commentaire intacte.
+
+La syntaxe est {strip => 0|1}, le dE<eacute>faut est {strip => 1}
+
+=item option {dupatt => }
+
+L'option {dupatt => '*'} permet de lire plusieurs attributs avec le mE<ecirc>me nom. Les diffE<eacute>rentes valeurs sont
+donc concatenE<eacute>es par '*'.
+
+=back
+
+=head2 ME<eacute>thodes
+
+Un objet du type XML::Reader a des mE<eacute>thodes suivantes:
+
+=over
+
+=item iterate
+
+La mE<eacute>thode C<iterate> lit un E<eacute>lE<eacute>ment XML. Elle retourne 1, si la lecture a E<eacute>tE<eacute> un succE<egrave>s, ou undef E<agrave> la fin
+du fichier XML.
+
+=item path
+
+La mE<eacute>thode C<path> retourne le chemin complet de la ligne en cours, les attributs sont rE<eacute>prE<eacute>sentE<eacute>s avec des
+caractE<egrave>res '@'.
+
+=item value
+
+La mE<eacute>thode C<value> retourne la valeur de la ligne en cours (c'est E<agrave> dire le texte ou l'attribut).
+
+Conseil: en cas de {filter => 2 ou 3} avec une dE<eacute>claration-XML (c'est E<agrave> dire $rdr->is_decl == 1),
+il vaut mieux ne pas prendre compte de la valeur (elle sera vide, de toute faE<ccedil>on). Un bout de programme:
+
+  print $rdr->value, "\n" unless $rdr->is_decl;
+
+Le programme ci-dessus ne s'applique *pas* E<agrave> {filter => 4}, dans ce cas un simple "print $rdr->value;"
+est suffisant:
+
+  print $rdr->value, "\n";
+
+=item comment
+
+La mE<eacute>thode C<comment> retourne le commentaire d'un fichier XML. Il est conseillE<eacute> de tester $rdr->is_comment
+avant d'accE<eacute>der E<agrave> la mE<eacute>thode C<comment>.
+
+=item type
+
+La mE<eacute>thode C<type> retourne 'T' quand il y a du texte dans le XML, et '@' quand il y a un attribut.
+
+Si l'option {filter => 4} est active, les possibilitE<eacute>s sont: 'T' pour du texte, '@' poir un attribut,
+'S' pour une balise de dE<eacute>but, 'E' pour une balise de fin, '#' pour un commentaire, 'D' pour une
+dE<eacute>claration-XML, '?' pour une processing-instruction.
+
+=item tag
+
+La mE<eacute>thode C<tag> retourne le nom de la balise en cours.
+
+=item attr
+
+La mE<eacute>thode C<attr> retourne le nom de l'attribut en cours (elle retourne une chaE<icirc>ne de caractE<egrave>res
+vide si l'E<eacute>lE<eacute>ment en cours n'est pas un attribut)
+
+=item level
+
+La mE<eacute>thode C<level> retourne le niveau de cascadage (un nombre > 0)
+
+=item prefix
+
+La mE<eacute>thode C<prefix> retourne le prE<eacute>fixe du chemin (c'est la partie du chemin qui a E<eacute>tE<eacute> supprimE<eacute> dans
+l'option {using => ...}). Elle retourne une chaE<icirc>ne de caractE<egrave>res vide au cas oE<ugrave> l'option {using => ...}
+n'a pas E<eacute>tE<eacute> specifiE<eacute>e.
+
+=item att_hash
+
+La mE<eacute>thode C<att_hash> retourne une rE<eacute>fE<eacute>rence E<agrave> l'hachage des attributs de la balise de dE<eacute>but en cours
+(au cas oE<ugrave> l'E<eacute>lE<eacute>ment en cours n'est pas une balise de dE<eacute>but, un hachage vide est retournE<eacute>)
+
+=item dec_hash
+
+La mE<eacute>thode C<dec_hash> retourne une rE<eacute>fE<eacute>rence E<agrave> l'hachage des attributs de la XML-declaration en cours
+(au cas oE<ugrave> l'E<eacute>lE<eacute>ment en cours n'est pas une XML-declaration, un hachage vide est retournE<eacute>)
+
+=item proc_tgt
+
+La mE<eacute>thode C<proc_tgt> retourne la partie cible (c'est E<agrave> dire la premiE<egrave>re partie) de la processing-instruction
+(au cas oE<ugrave> l'E<eacute>lE<eacute>ment en cours n'est pas une processing-instruction, une chaE<icirc>ne de caractE<egrave>res vide est retournE<eacute>)
+
+=item proc_data
+
+La mE<eacute>thode C<proc_data> retourne la partie donnE<eacute>e (c'est E<agrave> dire la deuxiE<egrave>me partie) de la processing-instruction
+(au cas oE<ugrave> l'E<eacute>lE<eacute>ment en cours n'est pas une processing-instruction, une chaE<icirc>ne de caractE<egrave>res vide est retournE<eacute>)
+
+=item pyx
+
+La mE<eacute>thode C<pyx> retourne la chaE<icirc>ne de caractE<egrave>res format "PYX" de l'E<eacute>lE<eacute>ment XML en cours.
+
+La chaE<icirc>ne de caractE<egrave>res format "PYX" est une chaE<icirc>ne de caractE<egrave>res avec un premier caractE<egrave>re spE<eacute>cifique. Ce
+premier caractE<egrave>re de chaque ligne "PYX" dE<eacute>termine le type: si le premier caractE<egrave>re est un '(', alors E<ccedil>a signifie
+une balise de dE<eacute>but. Si le premier caractE<egrave>re est un ')', alors E<ccedil>a signifie une balise de fin. Si le premier
+caractE<egrave>re est un 'A', alors E<ccedil>a signifie un attribut. Si le premier caractE<egrave>re est un '-', alors E<ccedil>a signifie un
+texte. Si le premier caractE<egrave>re est un '?', alors E<ccedil>a signifie une processing-instruction. (voir
+L<http://www.xml.com/pub/a/2000/03/15/feature/index.html> pour une introduction E<agrave> PYX)
+
+La mE<eacute>thode C<pyx> n'est utile que pour l'option {filter => 4}, sinon, pour un {filter => } diffE<eacute>rent de 4, on
+retourne undef.
+
+=item is_start
+
+La mE<eacute>thode C<is_start> retourne 1, si l'E<eacute>lE<eacute>ment en cours est une balise de dE<eacute>but, sinon 0 est retournE<eacute>.
+
+=item is_end
+
+La mE<eacute>thode C<is_end> retourne 1, si l'E<eacute>lE<eacute>ment en cours est une balise de fin, sinon 0 est retournE<eacute>.
+
+=item is_decl
+
+La mE<eacute>thode C<is_decl> retourne 1, si l'E<eacute>lE<eacute>ment en cours est une XML-declaration, sinon 0 est retournE<eacute>.
+
+=item is_proc
+
+La mE<eacute>thode C<is_proc> retourne 1, si l'E<eacute>lE<eacute>ment en cours est une processing-instruction, sinon 0 est retournE<eacute>.
+
+=item is_comment
+
+La mE<eacute>thode C<is_comment> retourne 1, si l'E<eacute>lE<eacute>ment en cours est un commentaire, sinon 0 est retournE<eacute>.
+
+=item is_text
+
+La mE<eacute>thode C<is_text> retourne 1, si l'E<eacute>lE<eacute>ment en cours est un texte, sinon 0 est retournE<eacute>.
+
+=item is_attr
+
+La mE<eacute>thode C<is_attr> retourne 1, si l'E<eacute>lE<eacute>ment en cours est un attribut, sinon 0 est retournE<eacute>.
+
+=item is_value
+
+La mE<eacute>thode C<is_attr> retourne 1, si l'E<eacute>lE<eacute>ment en cours est un texte ou un attribut, sinon 0 est retournE<eacute>. Cette
+mE<eacute>thode est plutE<ocirc>t utile pour l'option {filter => 4, mode => 'pyx'}, oE<ugrave> on peut tester l'utilitE<eacute> de la mE<eacute>thode C<value>.
+
+=item rx
+
+C'est l'indexe de la branche en cours (cette fonction est valide uniquement avec {filter => 5}).
+
+=item rvalue
+
+C'est une rE<eacute>fE<eacute>rence E<agrave> une valeur scalaire (ou E<agrave> une liste) de la
+branche en cours (cette fonction est valide uniquement avec {filter => 5}). rvalue est plus rapide,
+mais moins simple E<agrave> utiliser que la fonction value (avec rvalue vous devez faire votre
+dE<eacute>rE<eacute>fE<eacute>rencement vous mE<ecirc>me).
+
+=item rstem
+
+Cette fonction est identique E<agrave> la fonction "path"
+
+=back
+
+=head1 OPTION USING
+
+L'option {using => ...} permet de sE<eacute>lectionner un sous-arbre du XML.
+
+Voici comment E<ccedil>a fonctionne en dE<eacute>tail...
+
+L'option {using => ['/chemin1/chemin2/chemin3', '/chemin4/chemin5/chemin6']} d'abord elimine toutes les lignes
+oE<ugrave> le chemin ne commence pas avec '/chemin1/chemin2/chemin3' ou '/chemin4/chemin5/chemin6'.
+
+Les lignes restantes (ceux qui n'ont pas E<eacute>tE<eacute> eliminE<eacute>) ont un chemin plus court. En fait le prE<eacute>fixe
+'/chemin1/chemin2/chemin3' (ou '/chemin4/chemin5/chemin6') a E<eacute>tE<eacute> supprimE<eacute>. En revanche, ce prE<eacute>fixe supprimE<eacute>
+apparaE<icirc>t dans la mE<eacute>thode C<prefix>.
+
+On dit que '/chemin1/chemin2/chemin3' (ou '/chemin4/chemin5/chemin6') sont "absolu" et "complE<egrave>t". Le mot "absolu"
+signifie que chaque chemin commence forcement par un caractE<egrave>re '/', et le mot "complE<egrave>t" signifie que
+la derniE<egrave>re partie 'chemin3' (ou 'chemin6') sera suivi implicitement par un caractE<egrave>re '/'.
+
+=head2 Exemple avec using
+
+Le programme suivant prend un fichier XML et le parse avec XML::Reader, y compris l'option 'using' pour
+cibler des E<eacute>lE<eacute>ments spE<eacute>cifiques:
+
+  use XML::Reader qw(XML::Parser);
+
+  my $line2 = q{
+  <data>
+    <order>
+      <database>
+        <customer name="aaa" />
+        <customer name="bbb" />
+        <customer name="ccc" />
+        <customer name="ddd" />
+      </database>
+    </order>
+    <dummy value="ttt">test</dummy>
+    <supplier>hhh</supplier>
+    <supplier>iii</supplier>
+    <supplier>jjj</supplier>
+  </data>
+  };
+
+  my $rdr = XML::Reader->new(\$line2,
+    {using => ['/data/order/database/customer', '/data/supplier']});
+
+  my $i = 0;
+  while ($rdr->iterate) { $i++;
+      printf "%3d. prf=%-29s, pat=%-7s, val=%-3s, tag=%-6s, t=%-1s, lvl=%2d\n",
+        $i, $rdr->prefix, $rdr->path, $rdr->value, $rdr->tag, $rdr->type, $rdr->level;
+  }
+
+Voici le rE<eacute>sultat de ce programme:
+
+   1. prf=/data/order/database/customer, pat=/@name , val=aaa, tag=@name , t=@, lvl= 1
+   2. prf=/data/order/database/customer, pat=/      , val=   , tag=      , t=T, lvl= 0
+   3. prf=/data/order/database/customer, pat=/@name , val=bbb, tag=@name , t=@, lvl= 1
+   4. prf=/data/order/database/customer, pat=/      , val=   , tag=      , t=T, lvl= 0
+   5. prf=/data/order/database/customer, pat=/@name , val=ccc, tag=@name , t=@, lvl= 1
+   6. prf=/data/order/database/customer, pat=/      , val=   , tag=      , t=T, lvl= 0
+   7. prf=/data/order/database/customer, pat=/@name , val=ddd, tag=@name , t=@, lvl= 1
+   8. prf=/data/order/database/customer, pat=/      , val=   , tag=      , t=T, lvl= 0
+   9. prf=/data/supplier               , pat=/      , val=hhh, tag=      , t=T, lvl= 0
+  10. prf=/data/supplier               , pat=/      , val=iii, tag=      , t=T, lvl= 0
+  11. prf=/data/supplier               , pat=/      , val=jjj, tag=      , t=T, lvl= 0
+
+=head2 Exemple sans using
+
+Le programme suivant prend un fichier XML et le parse avec XML::Reader, mais sans option 'using':
+
+  use XML::Reader qw(XML::Parser);
+
+  my $rdr = XML::Reader->new(\$line2);
+  my $i = 0;
+  while ($rdr->iterate) { $i++;
+      printf "%3d. prf=%-1s, pat=%-37s, val=%-6s, tag=%-11s, t=%-1s, lvl=%2d\n",
+       $i, $rdr->prefix, $rdr->path, $rdr->value, $rdr->tag, $rdr->type, $rdr->level;
+  }
+
+Comme on peut constater dans le rE<eacute>sultat suivant, il y a beaucoup plus de lignes, le prE<eacute>fixe est vide et
+le chemin est beaucoup plus longue par rapport au programme prE<eacute>cE<eacute>dent:
+
+   1. prf= , pat=/data                                , val=      , tag=data       , t=T, lvl= 1
+   2. prf= , pat=/data/order                          , val=      , tag=order      , t=T, lvl= 2
+   3. prf= , pat=/data/order/database                 , val=      , tag=database   , t=T, lvl= 3
+   4. prf= , pat=/data/order/database/customer/@name  , val=aaa   , tag=@name      , t=@, lvl= 5
+   5. prf= , pat=/data/order/database/customer        , val=      , tag=customer   , t=T, lvl= 4
+   6. prf= , pat=/data/order/database                 , val=      , tag=database   , t=T, lvl= 3
+   7. prf= , pat=/data/order/database/customer/@name  , val=bbb   , tag=@name      , t=@, lvl= 5
+   8. prf= , pat=/data/order/database/customer        , val=      , tag=customer   , t=T, lvl= 4
+   9. prf= , pat=/data/order/database                 , val=      , tag=database   , t=T, lvl= 3
+  10. prf= , pat=/data/order/database/customer/@name  , val=ccc   , tag=@name      , t=@, lvl= 5
+  11. prf= , pat=/data/order/database/customer        , val=      , tag=customer   , t=T, lvl= 4
+  12. prf= , pat=/data/order/database                 , val=      , tag=database   , t=T, lvl= 3
+  13. prf= , pat=/data/order/database/customer/@name  , val=ddd   , tag=@name      , t=@, lvl= 5
+  14. prf= , pat=/data/order/database/customer        , val=      , tag=customer   , t=T, lvl= 4
+  15. prf= , pat=/data/order/database                 , val=      , tag=database   , t=T, lvl= 3
+  16. prf= , pat=/data/order                          , val=      , tag=order      , t=T, lvl= 2
+  17. prf= , pat=/data                                , val=      , tag=data       , t=T, lvl= 1
+  18. prf= , pat=/data/dummy/@value                   , val=ttt   , tag=@value     , t=@, lvl= 3
+  19. prf= , pat=/data/dummy                          , val=test  , tag=dummy      , t=T, lvl= 2
+  20. prf= , pat=/data                                , val=      , tag=data       , t=T, lvl= 1
+  21. prf= , pat=/data/supplier                       , val=hhh   , tag=supplier   , t=T, lvl= 2
+  22. prf= , pat=/data                                , val=      , tag=data       , t=T, lvl= 1
+  23. prf= , pat=/data/supplier                       , val=iii   , tag=supplier   , t=T, lvl= 2
+  24. prf= , pat=/data                                , val=      , tag=data       , t=T, lvl= 1
+  25. prf= , pat=/data/supplier                       , val=jjj   , tag=supplier   , t=T, lvl= 2
+  26. prf= , pat=/data                                , val=      , tag=data       , t=T, lvl= 1
+
+=head1 OPTION PARSE_CT
+
+L'option {parse_ct => 1} permet de parser les commentaires (normalement, les commentaires ne sont
+pas pris en compte par XML::Reader, le dE<eacute>faut est {parse_ct => 0}.
+
+Voici un exemple oE<ugrave> les commentaires ne sont pas pris en compte par dE<eacute>faut:
+
+  use XML::Reader qw(XML::Parser);
+
+  my $text = q{<?xml version="1.0"?><dummy>xyz <!-- remark --> stu <?ab cde?> test</dummy>};
+
+  my $rdr = XML::Reader->new(\$text);
+
+  while ($rdr->iterate) {
+      if ($rdr->is_decl)    { my %h = %{$rdr->dec_hash};
+                              print "Found decl     ",  join('', map{" $_='$h{$_}'"} sort keys %h), "\n"; }
+      if ($rdr->is_proc)    { print "Found proc      ", "t=", $rdr->proc_tgt, ", d=", $rdr->proc_data, "\n"; }
+      if ($rdr->is_comment) { print "Found comment   ", $rdr->comment, "\n"; }
+      print "Text '", $rdr->value, "'\n" unless $rdr->is_decl;
+  }
+
+Voici le rE<eacute>sultat:
+
+  Text 'xyz stu test'
+
+Ensuite, les mE<ecirc>mes donnE<eacute>es XML et le mE<ecirc>me algorithme, sauf l'option {parse_ct => 1}, qui est maintenant active:
+
+  use XML::Reader qw(XML::Parser);
+
+  my $text = q{<?xml version="1.0"?><dummy>xyz <!-- remark --> stu <?ab cde?> test</dummy>};
+
+  my $rdr = XML::Reader->new(\$text, {parse_ct => 1});
+
+  while ($rdr->iterate) {
+      if ($rdr->is_decl)    { my %h = %{$rdr->dec_hash};
+                              print "Found decl     ",  join('', map{" $_='$h{$_}'"} sort keys %h), "\n"; }
+      if ($rdr->is_proc)    { print "Found proc      ", "t=", $rdr->proc_tgt, ", d=", $rdr->proc_data, "\n"; }
+      if ($rdr->is_comment) { print "Found comment   ", $rdr->comment, "\n"; }
+      print "Text '", $rdr->value, "'\n" unless $rdr->is_decl;
+  }
+
+Voici le rE<eacute>sultat:
+
+  Text 'xyz'
+  Found comment   remark
+  Text 'stu test'
+
+=head1 OPTION PARSE_PI
+
+L'option {parse_pi => 1} permet de parser les processing-instructions et les XML-Declarations (normalement,
+ni les processing-instructions, ni les XML-Declarations ne sont pris en compte par XML::Reader, le dE<eacute>faut
+est {parse_pi => 0}.
+
+Comme exemple, on prend exactement les mE<ecirc>mes donnE<eacute>es XML et le mE<ecirc>me algorithme du paragraphe prE<eacute>cE<eacute>dent, sauf
+l'option {parse_pi => 1}, qui est maintenant active (avec l'option {parse_ct => 1}):
+
+  use XML::Reader qw(XML::Parser);
+
+  my $text = q{<?xml version="1.0"?><dummy>xyz <!-- remark --> stu <?ab cde?> test</dummy>};
+
+  my $rdr = XML::Reader->new(\$text, {parse_ct => 1, parse_pi => 1});
+
+  while ($rdr->iterate) {
+      if ($rdr->is_decl)    { my %h = %{$rdr->dec_hash};
+                              print "Found decl     ",  join('', map{" $_='$h{$_}'"} sort keys %h), "\n"; }
+      if ($rdr->is_proc)    { print "Found proc      ", "t=", $rdr->proc_tgt, ", d=", $rdr->proc_data, "\n"; }
+      if ($rdr->is_comment) { print "Found comment   ", $rdr->comment, "\n"; }
+      print "Text '", $rdr->value, "'\n" unless $rdr->is_decl;
+  }
+
+Notez le "unless $rdr->is_decl" dans le programme ci-dessus. C'est pour E<eacute>viter le texte vide aprE<egrave>s la XML-dE<eacute>claration.
+
+Voici le rE<eacute>sultat:
+
+  Found decl      version='1.0'
+  Text 'xyz'
+  Found comment   remark
+  Text 'stu'
+  Found proc      t=ab, d=cde
+  Text 'test'
+
+=head1 OPTION FILTER / MODE
+
+L'option {filter => } ou {mode => } permet de sE<eacute>lectionner des diffE<eacute>rents modes d'opE<eacute>ratoires pour le traitement du XML.
+
+=head2 Option filter 2 mode attr-bef-start
+
+Avec l'option {filter => 2} ou {mode => 'attr-bef-start'}, XML::Reader gE<eacute>nE<egrave>re une ligne pour chaque morceau de texte. Si la balise prE<eacute>cE<eacute>dente
+est une balise de dE<eacute>but, alors la mE<eacute>tode C<is_start> retourne 1. Si la balise suivante est une balise de fin,
+alors la mE<eacute>tode C<is_end> retourne 1. Si la balise prE<eacute>cE<eacute>dente est une balise de commentaire, alors la mE<eacute>thode
+C<is_comment> retourne 1. Si la balise prE<eacute>cE<eacute>dente est une balise de XML-declaration, alors la mE<eacute>thode C<is_decl>
+retourne 1. Si la balise prE<eacute>cE<eacute>dente est une balise de processing-instruction, alors la
+mE<eacute>thode C<is_decl> retourne 1.
+
+De plus, les attributs sont reprE<eacute>sentE<eacute>s par des lignes supplE<eacute>mentaires avec la syntaxe '/@...'.
+
+Option {filter => 2, mode => 'attr-bef-start'} est le dE<eacute>faut.
+
+Voici un exemple...
+
+  use XML::Reader qw(XML::Parser);
+
+  my $text = q{<root><test param='&lt;&gt;v"'><a><b>"e"<data id="&lt;&gt;z'">'g'&amp;&lt;&gt;</data>}.
+             q{f</b></a></test>x <!-- remark --> yz</root>};
+
+  my $rdr = XML::Reader->new(\$text);
+
+  # les quatres alternatives ci-dessous sont equivalent:
+  # ----------------------------------------------------
+  #   XML::Reader->new(\$text);
+  #   XML::Reader->new(\$text, {filter => 2                          });
+  #   XML::Reader->new(\$text, {filter => 2, mode => 'attr-bef-start'});
+  #   XML::Reader->new(\$text, {             mode => 'attr-bef-start'});
+
+  while ($rdr->iterate) {
+      printf "Path: %-24s, Value: %s\n", $rdr->path, $rdr->value;
+  }
+
+Le programme (avec l'option {filter => 2, mode => 'attr-bef-start'} implicitement par dE<eacute>faut) gE<eacute>nE<egrave>re le rE<eacute>sultat suivant:
+
+  Path: /root                   , Value:
+  Path: /root/test/@param       , Value: <>v"
+  Path: /root/test              , Value:
+  Path: /root/test/a            , Value:
+  Path: /root/test/a/b          , Value: "e"
+  Path: /root/test/a/b/data/@id , Value: <>z'
+  Path: /root/test/a/b/data     , Value: 'g'&<>
+  Path: /root/test/a/b          , Value: f
+  Path: /root/test/a            , Value:
+  Path: /root/test              , Value:
+  Path: /root                   , Value: x yz
+
+L'option (implicite) {filter => 2, mode => 'attr-bef-start'} permet E<eacute>galement de reconstruire la structure du XML avec l'assistance
+des mE<eacute>thodes C<is_start> and C<is_end>. Notez que dans le rE<eacute>sultat ci-dessus, la premiE<egrave>re ligne
+("Path: /root, Value:") est vide, mais elle est importante pour la structure du XML.
+
+Prenons-nous le mE<ecirc>me exemple {filter => 2, mode => 'attr-bef-start'} avec un algorithme pour reconstruire la structure originale
+du XML. En plus, on exige de rajouter des caractE<egrave>res "** **" pour chaque texte (mais pas les balises
+et pas non plus les attributs):
+
+  use XML::Reader qw(XML::Parser);
+
+  my $text = q{<root><test param='&lt;&gt;v"'><a><b>"e"<data id="&lt;&gt;z'">'g'&amp;&lt;&gt;</data>}.
+             q{f</b></a></test>x <!-- remark --> yz</root>};
+
+  my $rdr = XML::Reader->new(\$text);
+
+  # les quatres alternatives ci-dessous sont equivalent:
+  # ----------------------------------------------------
+  #   XML::Reader->new(\$text);
+  #   XML::Reader->new(\$text, {filter => 2                          });
+  #   XML::Reader->new(\$text, {filter => 2, mode => 'attr-bef-start'});
+  #   XML::Reader->new(\$text, {             mode => 'attr-bef-start'});
+
+  my %at;
+
+  while ($rdr->iterate) {
+      my $indentation = '  ' x ($rdr->level - 1);
+
+      if ($rdr->type eq '@')  {
+          $at{$rdr->attr} = $rdr->value;
+          for ($at{$rdr->attr}) {
+              s{&}'&amp;'xmsg;
+              s{'}'&apos;'xmsg;
+              s{<}'&lt;'xmsg;
+              s{>}'&gt;'xmsg;
+          }
+      }
+
+
+      if ($rdr->is_start) {
+          print $indentation, '<', $rdr->tag, join('', map{" $_='$at{$_}'"} sort keys %at), '>', "\n";
+      }
+
+      unless ($rdr->type eq '@') { %at = (); }
+
+      if ($rdr->type eq 'T' and $rdr->value ne '') {
+          my $v = $rdr->value;
+          for ($v) {
+              s{&}'&amp;'xmsg;
+              s{<}'&lt;'xmsg;
+              s{>}'&gt;'xmsg;
+          }
+          print $indentation, "  ** $v **\n";
+      }
+
+      if ($rdr->is_end) {
+          print $indentation, '</', $rdr->tag, '>', "\n";
+      }
+  }
+
+...voici le rE<eacute>sultat:
+
+  <root>
+    <test param='&lt;&gt;v"'>
+      <a>
+        <b>
+          ** "e" **
+          <data id='&lt;&gt;z&apos;'>
+            ** 'g'&amp;&lt;&gt; **
+          </data>
+          ** f **
+        </b>
+      </a>
+    </test>
+    ** x yz **
+  </root>
+
+...ce qui donne preuve que la structure originale du XML n'est pas perdu.
+
+=head2 Option filter 3 mode attr-in-hash
+
+Pour la plupart, l'option {filter => 3, mode => 'attr-in-hash'} fonctionne comme l'option {filter => 2, mode => 'attr-bef-start'}.
+
+Mais il y a une diffE<eacute>rence: avec l'option {filter => 3, mode => 'attr-in-hash'}, les attributs sont supprimE<eacute>es et E<agrave> la place,
+les attributs sont prE<eacute>sentE<eacute>s dans un hashage "$rdr->C<att_hash>()" pour chaque balise de dE<eacute>but.
+
+Ainsi, dans l'algorithme prE<eacute>cE<eacute>dent, on peut supprimer la variable globale "%at" et la remplacer par
+%{$rdr->C<att_hash>}:
+
+Voici un nouveau algorithme avec {filter => 3, mode => 'attr-in-hash'}, on ne s'occupe pas des attributs (c'est-E<agrave>-dire,
+on ne verifie pas $rdr->type eq '@') et (comme dE<acute>jE<agrave> mentionnE<eacute> ci-dessus) la variable %at est remplacE<eacute>e
+par %{$rdr->att_hash} :
+
+  use XML::Reader qw(XML::Parser);
+
+  my $text = q{<root><test param='&lt;&gt;v"'><a><b>"e"<data id="&lt;&gt;z'">'g'&amp;&lt;&gt;</data>}.
+             q{f</b></a></test>x <!-- remark --> yz</root>};
+
+  my $rdr = XML::Reader->new(\$text, {filter => 3});
+
+  # les trois alternatives ci-dessous sont equivalent:
+  # --------------------------------------------------
+  #   XML::Reader->new(\$text, {filter => 3                        });
+  #   XML::Reader->new(\$text, {filter => 3, mode => 'attr-in-hash'});
+  #   XML::Reader->new(\$text, {             mode => 'attr-in-hash'});
+
+  while ($rdr->iterate) {
+      my $indentation = '  ' x ($rdr->level - 1);
+
+      if ($rdr->is_start) {
+          my %h = %{$rdr->att_hash};
+          for (values %h) {
+              s{&}'&amp;'xmsg;
+              s{'}'&apos;'xmsg;
+              s{<}'&lt;'xmsg;
+              s{>}'&gt;'xmsg;
+          }
+          print $indentation, '<', $rdr->tag,
+            join('', map{" $_='$h{$_}'"} sort keys %h),
+            '>', "\n";
+      }
+
+      if ($rdr->type eq 'T' and $rdr->value ne '') {
+          my $v = $rdr->value;
+          for ($v) {
+              s{&}'&amp;'xmsg;
+              s{<}'&lt;'xmsg;
+              s{>}'&gt;'xmsg;
+          }
+          print $indentation, "  ** $v **\n";
+      }
+
+      if ($rdr->is_end) {
+          print $indentation, '</', $rdr->tag, '>', "\n";
+      }
+  }
+
+...le rE<eacute>sultat de {filter => 3, mode => 'attr-in-hash'} est identique au rE<eacute>sultat de {filter => 2, mode => 'attr-bef-start'}:
+
+  <root>
+    <test param='&lt;&gt;v"'>
+      <a>
+        <b>
+          ** "e" **
+          <data id='&lt;&gt;z&apos;'>
+            ** 'g'&amp;&lt;&gt; **
+          </data>
+          ** f **
+        </b>
+      </a>
+    </test>
+    ** x yz **
+  </root>
+
+Finalement on pourrait (et on devrait) effectuer l'E<eacute>criture XML par un autre module. Je propose d'utiliser
+le module L<XML::MinWriter>. Voici un programme qui utilise L<XML::MinWriter> pour E<eacute>crire du XML:
+
+  use XML::Reader qw(XML::Parser);
+  use XML::MinWriter;
+
+  my $text = q{<root><test param='&lt;&gt;v"'><a><b>"e"<data id="&lt;&gt;z'">'g'&amp;&lt;&gt;</data>}.
+             q{f</b></a></test>x <!-- remark --> yz</root>};
+
+  my $rdr = XML::Reader->new(\$text, {filter => 3});
+  my $wrt = XML::MinWriter->new(OUTPUT => \*STDOUT, NEWLINES => 1);
+
+  while ($rdr->iterate) {
+      if ($rdr->is_start)                          { $wrt->startTag($rdr->tag, %{$rdr->att_hash}); }
+      if ($rdr->type eq 'T' and $rdr->value ne '') { $wrt->characters('** '.$rdr->value.' **'); }
+      if ($rdr->is_end)                            { $wrt->endTag($rdr->tag); }
+  }
+
+  $wrt->end();
+
+Voici le rE<eacute>sultat de L<XML::MinWriter>:
+
+  <root
+  ><test param="&lt;&gt;v&quot;"
+  ><a
+  ><b
+  >** "e" **<data id="&lt;&gt;z'"
+  >** 'g'&amp;&lt;&gt; **</data
+  >** f **</b
+  ></a
+  ></test
+  >** x yz **</root
+  >
+
+
+A la premiE<egrave>re lecture, le format est bizarre, mais c'est du XML tout E<agrave> fait correct.
+
+=head2 Option filter 4 mode pyx
+
+ME<ecirc>me si ce n'est pas la raison principale de XML::Reader, l'option {filter => 4, mode => 'pyx'} permet de gE<eacute>nE<eacute>rer des
+lignes individuelles pour chaque balise de dE<eacute>but, de fin, commentaires, processing-instruction et XML-Declaration.
+Le but est de gE<eacute>nE<eacute>rer une chaE<icirc>ne de caractE<egrave>res du modE<egrave>le "PYX" pour l'analyse par la suite.
+
+Voici un exemple:
+
+  use XML::Reader qw(XML::Parser);
+
+  my $text = q{<?xml version="1.0" encoding="iso-8859-1"?>
+    <delta>
+      <dim alter="511">
+        <gamma />
+        <beta>
+          car <?tt dat?>
+        </beta>
+      </dim>
+      dskjfh <!-- remark --> uuu
+    </delta>};
+
+  my $rdr = XML::Reader->new(\$text, {filter => 4, parse_pi => 1});
+
+  # les trois alternatives ci-dessous sont equivalent:
+  # --------------------------------------------------
+  #   XML::Reader->new(\$text, {filter => 4               , parse_pi => 1});
+  #   XML::Reader->new(\$text, {filter => 4, mode => 'pyx', parse_pi => 1});
+  #   XML::Reader->new(\$text, {             mode => 'pyx', parse_pi => 1});
+
+  while ($rdr->iterate) {
+      printf "Type = %1s, pyx = %s\n", $rdr->type, $rdr->pyx;
+  }
+
+et voici le rE<eacute>sultat:
+
+  Type = D, pyx = ?xml version='1.0' encoding='iso-8859-1'
+  Type = S, pyx = (delta
+  Type = S, pyx = (dim
+  Type = @, pyx = Aalter 511
+  Type = S, pyx = (gamma
+  Type = E, pyx = )gamma
+  Type = S, pyx = (beta
+  Type = T, pyx = -car
+  Type = ?, pyx = ?tt dat
+  Type = E, pyx = )beta
+  Type = E, pyx = )dim
+  Type = T, pyx = -dskjfh uuu
+  Type = E, pyx = )delta
+
+Il faut dire que les commentaires, qui sont gE<eacute>nE<eacute>rE<eacute>s avec l'option {parse_ct => 1}, ne font pas partie du standard "PYX".
+En fait, les commentaires sont gE<eacute>nE<eacute>rE<eacute>s avec un caractE<egrave>re '#' qui n'existe pas dans le standard. Voici un exemple:
+
+  use XML::Reader qw(XML::Parser);
+
+  my $text = q{
+    <delta>
+      <!-- remark -->
+    </delta>};
+
+  my $rdr = XML::Reader->new(\$text, {filter => 4, parse_ct => 1});
+
+  # les trois alternatives ci-dessous sont equivalent:
+  # --------------------------------------------------
+  #   XML::Reader->new(\$text, {filter => 4,                parse_ct => 1});
+  #   XML::Reader->new(\$text, {filter => 4, mode => 'pyx', parse_ct => 1});
+  #   XML::Reader->new(\$text, {             mode => 'pyx', parse_ct => 1});
+
+  while ($rdr->iterate) {
+      printf "Type = %1s, pyx = %s\n", $rdr->type, $rdr->pyx;
+  }
+
+Voici le rE<eacute>sultat:
+
+  Type = S, pyx = (delta
+  Type = #, pyx = #remark
+  Type = E, pyx = )delta
+
+Avec l'option {filter => 4, mode => 'pyx'}, les mE<eacute>thodes habituelles restent accessibles: C<value>, C<attr>, C<path>, C<is_start>,
+C<is_end>, C<is_decl>, C<is_proc>, C<is_comment>, C<is_attr>, C<is_text>, C<is_value>, C<comment>, C<proc_tgt>,
+C<proc_data>, C<dec_hash> or C<att_hash>. Voici un exemple:
+
+  use XML::Reader qw(XML::Parser);
+
+  my $text = q{<?xml version="1.0"?>
+    <parent abc="def"> <?pt hmf?>
+      dskjfh <!-- remark -->
+      <child>ghi</child>
+    </parent>};
+
+  my $rdr = XML::Reader->new(\$text, {filter => 4, parse_pi => 1, parse_ct => 1});
+
+  # les trois alternatives ci-dessous sont equivalent:
+  # --------------------------------------------------
+  #   XML::Reader->new(\$text, {filter => 4,                parse_ct => 1, parse_pi => 1});
+  #   XML::Reader->new(\$text, {filter => 4, mode => 'pyx', parse_ct => 1, parse_pi => 1});
+  #   XML::Reader->new(\$text, {             mode => 'pyx', parse_ct => 1, parse_pi => 1});
+
+  while ($rdr->iterate) {
+      printf "Path %-15s v=%s ", $rdr->path, $rdr->is_value;
+
+      if    ($rdr->is_start)   { print "Found start tag ", $rdr->tag, "\n"; }
+      elsif ($rdr->is_end)     { print "Found end tag   ", $rdr->tag, "\n"; }
+      elsif ($rdr->is_decl)    { my %h = %{$rdr->dec_hash};
+                                 print "Found decl     ",  join('', map{" $_='$h{$_}'"} sort keys %h), "\n"; }
+      elsif ($rdr->is_proc)    { print "Found proc      ", "t=",    $rdr->proc_tgt, ", d=", $rdr->proc_data, "\n"; }
+      elsif ($rdr->is_comment) { print "Found comment   ", $rdr->comment, "\n"; }
+      elsif ($rdr->is_attr)    { print "Found attribute ", $rdr->attr, "='", $rdr->value, "'\n"; }
+      elsif ($rdr->is_text)    { print "Found text      ", $rdr->value, "\n"; }
+  }
+
+Voici le rE<eacute>sultat:
+
+  Path /               v=0 Found decl      version='1.0'
+  Path /parent         v=0 Found start tag parent
+  Path /parent/@abc    v=1 Found attribute abc='def'
+  Path /parent         v=0 Found proc      t=pt, d=hmf
+  Path /parent         v=1 Found text      dskjfh
+  Path /parent         v=0 Found comment   remark
+  Path /parent/child   v=0 Found start tag child
+  Path /parent/child   v=1 Found text      ghi
+  Path /parent/child   v=0 Found end tag   child
+  Path /parent         v=0 Found end tag   parent
+
+Notez que "v=1" (c'est E<agrave> dire $rdr->C<is_value> == 1) pour tous les textes et pour tous les attributs.
+
+=head2 Option filter 5 mode branches
+
+Avec option {filter => 5, mode => 'branches'}, on spE<eacute>cifie une (ou plusieurs) racines ("roots"), chaque racine a une collection
+de "branches". En rE<eacute>sultat on obtient un enregistrement pour chaque "root" dans l'aborescence XML.
+
+Une racine peut commencer par un slash simple (par ex. {root => '/tag1/tag2'}), dans ce cas la racine est
+absolue. Ou la racine peut commencer par un double-slash (par ex. {root => '//tag1/tag2'}), dans ce cas la
+racine est relative. Si la racine ne commence pas par un slash, dans ce cas la racine est E<eacute>galement
+relative.
+
+Chaque enregistrement contient les E<eacute>lE<eacute>ments qui ont E<eacute>tE<eacute> spE<eacute>cifiE<eacute>
+dans les "branches". (il y a un cas particulier: quand la branche est '*', dans ce cas l'aborescence du
+sous-arbre est construit)
+
+Pour obtenir des valeurs qui sont spE<eacute>cifiE<eacute>es dans les branches, on peut utiliser la fonction
+$rdr->rvalue.
+
+Voici un exemple:
+
+  use XML::Reader qw(XML::Parser);
+
+  my $line2 = q{
+  <data>
+    <supplier>ggg</supplier>
+    <customer name="o'rob" id="444">
+      <street>pod alley</street>
+      <city>no city</city>
+    </customer>
+    <customer1 name="troy" id="333">
+      <street>one way</street>
+      <city>any city</city>
+    </customer1>
+    <tcustomer name="nbc" id="777">
+      <street>away</street>
+      <city>acity</city>
+    </tcustomer>
+    <supplier>hhh</supplier>
+    <zzz>
+      <customer name='"sue"' id="111">
+        <street>baker street</street>
+        <city>sidney</city>
+      </customer>
+    </zzz>
+    <order>
+      <database>
+        <customer name="&lt;smith&gt;" id="652">
+          <street>high street</street>
+          <city>boston</city>
+        </customer>
+        <customer name="&amp;jones" id="184">
+          <street>maple street</street>
+          <city>new york</city>
+        </customer>
+        <customer name="stewart" id="520">
+          <street>  ring   road   </street>
+          <city>  "'&amp;&lt;&#65;&gt;'"  </city>
+        </customer>
+      </database>
+    </order>
+    <dummy value="ttt">test</dummy>
+    <supplier>iii</supplier>
+    <supplier>jjj</supplier>
+    <p>
+      <p>b1</p>
+      <p>b2</p>
+    </p>
+    <p>
+      b3
+    </p>
+  </data>
+  };
+
+On veut lire les E<eacute>lE<eacute>ments "name", "street" et "city" de tous les clients dans
+le chemin relatif ('customer') et on veut E<eacute>galement lire les fournisseurs dans le chemin
+absolu ('/data/supplier'). Puis, on veut lire les clients dans le chemin relatif ('//customer')
+en format sous-arborescence XML (voir {branch => '*'}). Finalement on veut lire le chemin relatif
+('p') en format sous-arborescence XML.
+
+Les donnE<eacute>es pour la premiE<egrave>re racine ('customer') sont identifiable par $rdr->rx ==
+0, les donnE<eacute>es pour la deuxiE<egrave>me racine ('/data/supplier') sont identifiable par
+$rdr->rx == 1, les donnE<eacute>es pour la troisiE<egrave>me racine ('//customer') sont
+identifiable par $rdr->rx == 2, les donnE<eacute>es pour la quatriE<egrave>me racine ('p')
+sont identifiable par $rdr->rx == 3 et les donnE<eacute>es pour la cinquiE<egrave>me racine
+('//customer') sont identifiable par $rdr->rx == 4.
+
+Dans l'exemple ci-dessous, le paramE<egrave>tre {branch => '*'} indique que le rE<eacute>sultat sera du XML et
+le paramE<egrave>tre {branch => '+'} indique que le rE<eacute>sultat sera une liste des instructions PYX.
+
+Dans le programme ci-dessus on va utiliser la fonction $rdr->rvalue pour lire les donnees:
+
+  my $rdr = XML::Reader->new(\$line2, {filter => 5},
+    { root => 'customer',       branch => ['@name', 'street', 'city'] },
+    { root => '/data/supplier', branch => ['/']                       },
+    { root => '//customer',     branch => '*' },
+    { root => 'p',              branch => '*' },
+    { root => '//customer',     branch => '+' },
+  );
+
+  # les trois alternatives ci-dessous sont equivalent:
+  # --------------------------------------------------
+  #   XML::Reader->new(\$line2, {filter => 5,                   });
+  #   XML::Reader->new(\$line2, {filter => 5, mode => 'branches'});
+  #   XML::Reader->new(\$line2, {             mode => 'branches'});
+
+  my $root0 = '';
+  my $root1 = '';
+  my $root2 = '';
+  my $root3 = '';
+  my $root4 = '';
+
+  my $path0 = '';
+
+  while ($rdr->iterate) {
+      if ($rdr->rx == 0) {
+          $path0 .= "  ".$rdr->path."\n";
+          for ($rdr->rvalue) {
+              $root0 .= sprintf "  Cust: Name = %-7s Street = %-12s City = %s\n", $_->[0], $_->[1], $_->[2];
+          }
+      }
+      elsif ($rdr->rx == 1) {
+          for ($rdr->rvalue) {
+              $root1 .= "  Supp: Name = $_->[0]\n";
+          }
+      }
+      elsif ($rdr->rx == 2) {
+          for ($rdr->rvalue) {
+              $root2 .= "  Xml: $_\n";
+          }
+      }
+      elsif ($rdr->rx == 3) {
+          for ($rdr->rvalue) {
+              $root3 .= "  P: $_\n";
+          }
+      }
+      elsif ($rdr->rx == 4) {
+          for ($rdr->rvalue) {
+              local $" = "', '";
+              $root4 .= "  Pyx: '@$_'\n";
+          }
+      }
+  }
+
+  print "root0:\n$root0\n";
+  print "path0:\n$path0\n";
+  print "root1:\n$root1\n";
+  print "root2:\n$root2\n";
+  print "root3:\n$root3\n";
+  print "root4:\n$root4\n";
+
+Voici le rE<eacute>sultat:
+
+  root0:
+    Cust: Name = o'rob   Street = pod alley    City = no city
+    Cust: Name = "sue"   Street = baker street City = sidney
+    Cust: Name = <smith> Street = high street  City = boston
+    Cust: Name = &jones  Street = maple street City = new york
+    Cust: Name = stewart Street = ring road    City = "'&<A>'"
+
+  path0:
+    /data/customer
+    /data/zzz/customer
+    /data/order/database/customer
+    /data/order/database/customer
+    /data/order/database/customer
+
+  root1:
+    Supp: Name = ggg
+    Supp: Name = hhh
+    Supp: Name = iii
+    Supp: Name = jjj
+
+  root2:
+    Xml: <customer id='444' name='o&apos;rob'><street>pod alley</street><city>no city</city></customer>
+    Xml: <customer id='111' name='"sue"'><street>baker street</street><city>sidney</city></customer>
+    Xml: <customer id='652' name='&lt;smith&gt;'><street>high street</street><city>boston</city></customer>
+    Xml: <customer id='184' name='&amp;jones'><street>maple street</street><city>new york</city></customer>
+    Xml: <customer id='520' name='stewart'><street>ring road</street><city>"'&amp;&lt;A&gt;'"</city></customer>
+
+  root3:
+    P: <p><p>b1</p><p>b2</p></p>
+    P: <p>b3</p>
+
+  root4:
+    Pyx: '(customer', 'Aid 444', 'Aname o'rob', '(street', '-pod alley', ')street', '(city', '-no city', ')city', ')customer'
+    Pyx: '(customer', 'Aid 111', 'Aname "sue"', '(street', '-baker street', ')street', '(city', '-sidney', ')city', ')customer'
+    Pyx: '(customer', 'Aid 652', 'Aname <smith>', '(street', '-high street', ')street', '(city', '-boston', ')city', ')customer'
+    Pyx: '(customer', 'Aid 184', 'Aname &jones', '(street', '-maple street', ')street', '(city', '-new york', ')city', ')customer'
+    Pyx: '(customer', 'Aid 520', 'Aname stewart', '(street', '-ring road', ')street', '(city', '-"'&<A>'"', ')city', ')customer'
+
+Nous pouvons E<eacute>galement utiliser la fonction $rdr->value pour obtenir les mE<ecirc>mes donnE<eacute>es:
+
+  my $rdr = XML::Reader->new(\$line2, {filter => 5},
+    { root => 'customer',       branch => ['@name', 'street', 'city'] },
+    { root => 'p',              branch => '*' },
+  );
+
+  # les trois alternatives ci-dessous sont equivalent:
+  # --------------------------------------------------
+  #   XML::Reader->new(\$line2, {filter => 5,                   });
+  #   XML::Reader->new(\$line2, {filter => 5, mode => 'branches'});
+  #   XML::Reader->new(\$line2, {             mode => 'branches'});
+
+  my $out0 = '';
+  my $out1 = '';
+
+  while ($rdr->iterate) {
+      if ($rdr->rx == 0) {
+          my @rv = $rdr->value;
+          $out0 .= sprintf "  Cust: Name = %-7s Street = %-12s City = %s\n", $rv[0], $rv[1], $rv[2];
+      }
+      elsif ($rdr->rx == 1) {
+          $out1 .= "  P: ".$rdr->value."\n";
+      }
+  }
+
+  print "output0:\n$out0\n";
+  print "output1:\n$out1\n";
+
+Voici le rE<eacute>sultat:
+
+  output0:
+    Cust: Name = o'rob   Street = pod alley    City = no city
+    Cust: Name = "sue"   Street = baker street City = sidney
+    Cust: Name = <smith> Street = high street  City = boston
+    Cust: Name = &jones  Street = maple street City = new york
+    Cust: Name = stewart Street = ring road    City = "'&<A>'"
+
+  output1:
+    P: <p><p>b1</p><p>b2</p></p>
+    P: <p>b3</p>
+
+Il faut dire ici que le rE<eacute>sultat "root3" / "output1" { root => 'p', branch => '*' } contient
+toujours le sous-arbre XML le plus important. Ou dit autrement: la sortie "P: <p>b1</p>" et "P:
+<p>b2</p>" n'est pas possible, car une ligne plus importante qui contient les lignes "P: <p>b1</p>"
+et "P: <p>b2</p>" exsiste dE<eacute>jE<agrave>: cette ligne est "P: <p><p>b1</p><p>b2</p></p>".
+
+=head1 OPTION DUPATT
+
+L'option dupatt permet de lire multiples attributs avec le mE<ecirc>me nom dans une seule valeur. Le principe
+fonctionne par la concatenation des diffE<eacute>rentes valeurs dans une seule variable, sE<eacute>parE<eacute> par
+un caractE<egrave>re spE<eacute>cial. La liste des attributs est ensuite triE<eacute> par order alphabE<eacute>tique.
+
+L'option dupatt est valable uniquement si XML::Reader a E<eacute>tE<eacute> utilisE<eacute> avec l'option 
+XML::Parsepp.
+
+Par exemple, le code suivant concatE<egrave>ne les attribut doublons avec le caractE<egrave>re "|":
+(La chaE<icirc>ne de caractE<egrave>res ($str) {dupatt => $str} est limitE<eacute> E<agrave> des
+caractE<egrave>res Ascii visibles, sauf les caractE<egrave>res alpha-numE<eacute>riques, ' ou ")
+
+  use XML::Reader qw(XML::Parser);
+
+  my $text = q{<data><item a2="abc" a1="def" a2="ghi"></item></data>}
+
+  my $rdr = XML::Reader->new(\$text, {dupatt => '|'});
+  while ($rdr->iterate) {
+      printf "Path: %-19s, Value: %s\n", $rdr->path, $rdr->value;
+  }
+
+Voici le rE<eacute>sultat du programme:
+
+  Path: /data              , Value:
+  Path: /data/item/@a1     , Value: def
+  Path: /data/item/@a2     , Value: abc|ghi
+  Path: /data/item         , Value:
+  Path: /data              , Value:
+
+=head1 EXEMPLES
+
+Examinons-nous le XML suivant, oE<ugrave> nous souhaitons extraire les valeurs dans la balise E<lt>itemE<gt>
+(c'est la premiE<egrave>re partie 'start...', et non pas la partie 'end...' qui nous intE<eacute>resse), ensuite
+les attributs "p1" et "p3". La balise E<lt>itemE<gt> doit E<ecirc>tre dans le chemin '/start/param/data (et
+non pas dans le chemin /start/param/dataz).
+
+  my $text = q{
+    <start>
+      <param>
+        <data>
+          <item p1="a" p2="b" p3="c">start1 <inner p1="p">i1</inner> end1</item>
+          <item p1="d" p2="e" p3="f">start2 <inner p1="q">i2</inner> end2</item>
+          <item p1="g" p2="h" p3="i">start3 <inner p1="r">i3</inner> end3</item>
+        </data>
+        <dataz>
+          <item p1="j" p2="k" p3="l">start9 <inner p1="s">i9</inner> end9</item>
+        </dataz>
+        <data>
+          <item p1="m" p2="n" p3="o">start4 <inner p1="t">i4</inner> end4</item>
+        </data>
+      </param>
+    </start>};
+
+Nous expectons exactement 4 lignes de sortie dans le rE<eacute>sultat (c'est E<agrave> dire la ligne 'dataz' / 'start9'
+ne fait pas partie du rE<eacute>sultat):
+
+  item = 'start1', p1 = 'a', p3 = 'c'
+  item = 'start2', p1 = 'd', p3 = 'f'
+  item = 'start3', p1 = 'g', p3 = 'i'
+  item = 'start4', p1 = 'm', p3 = 'o'
+
+=head2 Exemple filter 2 mode attr-bef-start
+
+Ci-dessous un programme pour parser le XML avec l'option {filter => 2, mode => 'attr-bef-start'}. (Notez que le prE<eacute>fixe
+'/start/param/data/item' est renseignE<eacute> dans l'option {using =>} de la fonction new). En plus,
+nous avons besoins de 2 variables scalaires '$p1' et '$p3' pour enregistrer les paramE<egrave>tres '/@p1'
+et '/@p3' et les transfE<eacute>rer dans la partie '$rdr->is_start' du programme, oE<ugrave> on peut les afficher.
+
+  my $rdr = XML::Reader->new(\$text,
+    {mode => 'attr-bef-start', using => '/start/param/data/item'});
+
+  my ($p1, $p3);
+
+  while ($rdr->iterate) {
+      if    ($rdr->path eq '/@p1') { $p1 = $rdr->value; }
+      elsif ($rdr->path eq '/@p3') { $p3 = $rdr->value; }
+      elsif ($rdr->path eq '/' and $rdr->is_start) {
+          printf "item = '%s', p1 = '%s', p3 = '%s'\n",
+            $rdr->value, $p1, $p3;
+      }
+      unless ($rdr->is_attr) { $p1 = undef; $p3 = undef; }
+  }
+
+=head2 Exemple filter 3 mode attr-in-hash
+
+Avec l'option {filter => 3, mode => 'attr-in-hash'}, nous pouvons annuler les deux variables '$p1' et '$p3'. Le
+programme devient assez simple:
+
+  my $rdr = XML::Reader->new(\$text,
+    {mode => 'attr-in-hash', using => '/start/param/data/item'});
+
+  while ($rdr->iterate) {
+      if ($rdr->path eq '/' and $rdr->is_start) {
+          printf "item = '%s', p1 = '%s', p3 = '%s'\n",
+            $rdr->value, $rdr->att_hash->{p1}, $rdr->att_hash->{p3};
+      }
+  }
+
+=head2 Exemple filter 4 mode pyx
+
+Avec l'option {filter => 4, mode => 'pyx'}, par contre, le programme devient plus compliquE<eacute>: Comme dE<eacute>jE<agrave>
+montrE<eacute> dans l'exemple {filter => 2, mode => 'attr-bef-start'}, nous avons besoin de deux variables scalaires ('$p1' et
+'$p3') pour enregistrer les paramE<egrave>tres '/@p1' et '/@p3' et les transfE<eacute>rer E<agrave> l'endoit oE<ugrave> on peut
+les afficher. En plus, nous avons besoin de compter les valeurs de texte (voir variable '$count'
+ci-dessous), afin d'identifier la premiE<egrave>re partie du texte 'start...' (ce que nous voulons afficher)
+et supprimer la deuxiE<egrave>me partie du texte 'end...' (ce que nous ne voulons pas afficher).
+
+  my $rdr = XML::Reader->new(\$text,
+    {mode => 'pyx', using => '/start/param/data/item'});
+
+  my ($count, $p1, $p3);
+
+  while ($rdr->iterate) {
+      if    ($rdr->path eq '/@p1') { $p1 = $rdr->value; }
+      elsif ($rdr->path eq '/@p3') { $p3 = $rdr->value; }
+      elsif ($rdr->path eq '/') {
+          if    ($rdr->is_start) { $count = 0; $p1 = undef; $p3 = undef; }
+          elsif ($rdr->is_text) {
+              $count++;
+              if ($count == 1) {
+                  printf "item = '%s', p1 = '%s', p3 = '%s'\n",
+                    $rdr->value, $p1, $p3;
+              }
+          }
+      }
+  }
+
+=head2 Exemple filter 5 mode branches
+
+On peut combiner {filter => 5, mode => 'branches'} avec des expressions rE<eacute>guliE<egrave>res pour parser les donnE<eacute>es XML:
+
+  my $rdr = XML::Reader->new(\$text, {mode => 'branches'},
+    { root => '/start/param/data/item', branch => '*' });
+
+  while ($rdr->iterate) {
+      if ($rdr->value =~ m{\A <item
+          (?:\s+ p1='([^']*)')?
+          (?:\s+ p2='([^']*)')?
+          (?:\s+ p3='([^']*)')?
+          \s* > ([^<]*) <}xms) {
+          printf "item = '%s', p1 = '%s', p3 = '%s'\n", $4, $1, $3;
+      }
+  }
+
+=head2 Exemple condition d'attribut
+
+Ci-dessous un autre document XML ($text3):
+
+  my $text3 = q{
+    <data>
+      <database loc="alpha">
+        <item>
+          <customer name="smith" id="652">
+            <street>high street</street>
+            <city>rio</city>
+          </customer>
+          <customer name="jones" id="184">
+            <street>maple street</street>
+            <city>new york</city>
+          </customer>
+          <customer name="gates" id="520">
+            <street>ring road</street>
+            <city>dallas</city>
+          </customer>
+          <customer name="smith" id="800">
+            <street>which way</street>
+            <city>ny</city>
+          </customer>
+        </item>
+      </database>
+      <database loc="beta">
+        <item>
+          <customer name="smith" id="001">
+            <street>nowhere</street>
+            <city>st malo</city>
+          </customer>
+          <customer name="jones" id="002">
+            <street>all the way</street>
+            <city>leeds</city>
+          </customer>
+          <customer name="gates" id="003">
+            <street>bypass</street>
+            <city>rome</city>
+          </customer>
+        </item>
+      </database>
+      <database loc="alpha">
+        <item>
+          <customer name="peter" id="444">
+            <street>upton way</street>
+            <city>motown</city>
+          </customer>
+          <customer name="gates" id="959">
+            <street>don't leave me this way</street>
+            <city>cambridge</city>
+          </customer>
+        </item>
+      </database>
+      <database loc="alpha">
+        <item>
+          <customer name="smith" id="881">
+            <street>anyway</street>
+            <city>big apple</city>
+          </customer>
+          <customer name="thatcher" id="504">
+            <street>baker street</street>
+            <city>oxford</city>
+          </customer>
+        </item>
+      </database>
+    </data>
+  };
+
+En utilisant des chemins (root => ... and branch => ...) on peut rajouter des conditions d'attribut
+('/path1[@attr="val"]/...'), par ex.:
+
+  my $rdr = XML::Reader->new(\$text3, {mode => 'branches', sepchar => '|'}, {
+    root   => '/data/database[@loc="alpha"]',
+    branch => [
+      'item/customer[@name="smith"]/city',
+      'item/customer[@name="gates"]/city',
+    ]});
+
+  while ($rdr->iterate) {
+      my ($smith, $gates) = $rdr->value;
+
+      $smith = defined($smith) ? "'$smith'" : 'undef';
+      $gates = defined($gates) ? "'$gates'" : 'undef';
+
+      printf "smith = %-12s, gates = %s\n", $smith, $gates;
+  }
+
+Voici le rE<eacute>sultat:
+
+  smith = 'rio|ny'    , gates = 'dallas'
+  smith = undef       , gates = 'cambridge'
+  smith = 'big apple' , gates = undef
+
+=head1 FONCTIONS
+
+=head2 Fonction slurp_xml
+
+La fonction slurp_xml lit un fichier XML et aspire son contenu dans une rE<eacute>fE<eacute>rence E<agrave> une
+liste. Voici un exemple oE<ugrave> nous souhaitons aspirer le nom, la rue et la ville de tous les clients dans
+le chemin '/data/order/database/customer'. Nous souhaitons aussi d'aspirer le 'supplier' dans le chemin
+'/data/supplier'.
+
+  use XML::Reader qw(XML::Parser slurp_xml);
+
+  my $line2 = q{
+  <data>
+    <supplier>ggg</supplier>
+    <supplier>hhh</supplier>
+    <order>
+      <database>
+        <customer name="smith" id="652">
+          <street>high street</street>
+          <city>boston</city>
+        </customer>
+        <customer name="jones" id="184">
+          <street>maple street</street>
+          <city>new york</city>
+        </customer>
+        <customer name="stewart" id="520">
+          <street>ring road</street>
+          <city>dallas</city>
+        </customer>
+      </database>
+    </order>
+    <dummy value="ttt">test</dummy>
+    <supplier>iii</supplier>
+    <supplier>jjj</supplier>
+  </data>
+  };
+
+  my $aref = slurp_xml(\$line2,
+    { root => '/data/order/database/customer', branch => ['@name', 'street', 'city'] },
+    { root => '/data/supplier',                branch => '*'                         },
+  );
+
+  for (@{$aref->[0]}) {
+      printf "Cust: Name = %-7s Street = %-12s City = %s\n", $_->[0], $_->[1], $_->[2];
+  }
+
+  print "\n";
+
+  for (@{$aref->[1]}) {
+      printf "S: %s\n", $_;
+  }
+
+Le premier paramE<egrave>tre de slurp_xml est ou le nom du fichier (ou une une rE<eacute>fE<eacute>rence E<agrave>
+un scalaire, ou une rE<eacute>fE<eacute>rence E<agrave> un fichier ouvert) du XML qu'on veut aspirer.
+Dans notre cas nous avons une rE<eacute>fE<eacute>rence E<agrave> un scalaire \$line2. Le paramE<egrave>tre suivant
+est la racine de l'arbre qu'on veut aspirer (dans notre cas c'est '/data/order/database/customer') et
+nous donnons une liste des E<eacute>lE<eacute>ments que nous souhaitons sE<eacute>lectionner, relative
+E<agrave> la racine. Dans notre cas c'est ['@name', 'street', 'city']. Le paramE<egrave>tre suivant est
+la deuxiE<egrave>me racine (dE<eacute>finition root/branch), dans ce cas c'est root => '/data/supplier' avec
+branch => ['/'].
+
+Voici le rE<eacute>sultat:
+
+  Cust: Name = smith   Street = high street  City = boston
+  Cust: Name = jones   Street = maple street City = new york
+  Cust: Name = stewart Street = ring road    City = dallas
+
+  S: <supplier>ggg</supplier>
+  S: <supplier>hhh</supplier>
+  S: <supplier>iii</supplier>
+  S: <supplier>jjj</supplier>
+
+Le fonctionnement de slurp_xml est similaire E<agrave> L<XML::Simple>, c'est E<agrave> dire il lit toutes les
+donnE<eacute>es dans un seul coup dans une structure en mE<eacute>moire. En revanche, la diffE<eacute>rence
+est que slurp_xml permet de spE<eacute>cifier les donnE<eacute>es qu'on veut avant de faire l'aspiration, ce qui
+rE<eacute>sulte dans une structure en mE<eacute>moire souvent plus petite et moins compliquE<eacute>e.
+
+On peut utiliser slurp_xml() avec des attributs doublons. Dans ce cas il faut faire deux choses: PremiE<egrave>rement
+il faut faire un "use XML::Reader" avec "qw(XML::Parsepp slurp_xml)". DeuxiE<egrave>mement il faut faire appel
+E<agrave> slurp_xml avec l'option { dupatt => '|' }, comme dans l'exemple ci-dessous:
+
+  use XML::Reader qw(XML::Parser slurp_xml);
+
+  my $line3 = q{<data atr1='abc' atr2='def' atr1='ghi'></data>};
+
+  my $aref = slurp_xml(\$line3,
+    { dupatt => '|' },
+    { root => '/', branch => '*' });
+
+  print $aref->[0][0], "\n";
+
+Voici le rE<eacute>sultat:
+
+  <data atr1='abc|ghi' atr2='def'></data>
+
+=head1 AUTEUR
+
+Klaus Eichner, Mars 2009
+
+=head1 COPYRIGHT ET LICENSE
+
+Voici le texte original en Anglais:
+
+Copyright (C) 2009 by Klaus Eichner.
+
+All rights reserved. This program is free software; you can redistribute
+it and/or modify it under the terms of the artistic license 2.0,
+see http://www.opensource.org/licenses/artistic-license-2.0.php
+
+=head1 MODULES ASSOCIES
+
+Si vous souhaitez E<eacute>crire du XML, je propose d'utiliser le module "XML::Writer" ou "XML::MinWriter". Chacun de ces deux modules
+se prE<eacute>sente avec une interface simple pour E<eacute>crire un fichier XML. Si vous ne mE<eacute>langez pas le texte et les
+balises (ce qu'on appelle en Anglais "non-mixed content XML"), je propose de mettre les options DATA_MODE=>1
+et DATA_INDENT=>2, ainsi votre rE<eacute>sultat sera proprement formatE<eacute> selon les rE<egrave>gles XML.
+
+=head1 REFERENCES
+
+L<XML::TokeParser>,
+L<XML::Simple>,
+L<XML::Parser>,
+L<XML::Parsepp>,
+L<XML::Reader::RS>,
+L<XML::Reader::PP>,
+L<XML::Parser::Expat>,
+L<XML::TiePYX>,
+L<XML::Writer>,
+L<XML::MinWriter>.
+
+=cut

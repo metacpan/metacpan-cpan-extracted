@@ -1,0 +1,29 @@
+Revision history for Perl extension XML::SAX::Simple.
+
+0.08  2016-11-28 MANWAR
+      - Tried to address issue raised by CPAN Tester:
+        http://www.cpantesters.org/cpan/report/ace59efe-a65f-11e6-932a-f4415c96acb4
+
+0.07  2016-04-08 MANWAR
+      - Proposed fix for CPAN Testers FAILED reports.
+
+0.06  2016-03-23 MANWAR
+      - Added section "REPOSITORY" to the pod document.
+
+0.05  2016-03-13 MANWAR
+      - Added MIN_PERL_VERSION to Makefile.PL script.
+      - Added 'use 5.006;' to the package XML::SAX::Simple.
+
+0.04  2016-02-27 MANWAR
+      - Added LICENSE file.
+      - Fixed typo in the pod.
+
+0.03  2016-02-25 MANWAR
+      - Importing to GitHub since taking over maintaining task.
+
+0.02  2001-11-21 MSERGEANT
+      - ..
+
+0.01  2001-10-31 MSERGEANT
+      - Original version; created by h2xs 1.21 with options
+	-A -X -n XML::SAX::Simple

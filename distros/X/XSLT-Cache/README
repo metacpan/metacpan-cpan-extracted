@@ -1,0 +1,33 @@
+XSLT::Cache - Transparent preparsing and caching XSLT documents
+
+/*
+	Description
+*/
+
+XSLT::Cache provides a mechanism for transparent caching XSLT-files and
+checking their updates.
+
+/*
+	Installation
+*/
+
+perl Makefile.PL
+make
+make test
+make install
+
+/*
+	Author
+*/
+
+Andrew Shitov <andy@shitov.ru>
+
+Please feel free to contact me via e-mail.
+
+/*
+	Copyright
+*/
+
+XSLT::Cache module is a free software. 
+You may redistribute and (or) modify it under the same terms as Perl itself
+whichever version it is.

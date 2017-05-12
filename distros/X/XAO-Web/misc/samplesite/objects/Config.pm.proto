@@ -1,0 +1,107 @@
+# To build actual objects/Config.pm from this file run
+# `make' at the top level
+###############################################################################
+package XAO::DO::Config;
+use strict;
+use XAO::Utils;
+use XAO::Objects;
+use base XAO::Objects->load(objname => 'Config', baseobj => 1);
+
+my %data = (
+    base_url => '<%BASE_URL%>',
+
+    ##
+    # Some auto-executed objects
+    #
+    auto_before => [
+        'Web::Clipboard'     => {
+            mode    => 'set',
+            name    => 'auto_set_value',
+            value   => 'This value gets set in Config.pm',
+        },
+    ],
+
+    ##
+    # This defines prefix mapping if you need any.
+    #
+    path_mapping_table  => {
+        '/mapped'       => [ 'Page', path => '/bits/mapped-template' ],
+    },
+);
+
+###############################################################################
+
+sub init {
+    my $self=shift;
+
+    $self->embedded('hash')->fill(\%data);
+
+    ##
+    # This is required for most database driven sites. Once database
+    # config is "embedded" it provides some useful methods like "odb" to
+    # get to the database handle.
+    #
+    # For sites that use non-XAO::FS database layer this can also
+    # connect to some other database and provide a $dbh for instance.
+    #
+    # Sample site does not use database, so we comment this out.
+    #
+    ###my $fsconfig=XAO::Objects->new(
+    ###    objname     => 'FS::Config',
+    ###    odb_args    => {
+    ###        dsn       => '<%ODB_DSN%>',
+    ###        user      => '<%ODB_USER%>',
+    ###        password  => '<%ODB_PASSWORD%>',
+    ###    },
+    ###);
+    ###$self->embed(fs => $fsconfig);
+
+    $self->SUPER::init();
+}
+
+###############################################################################
+
+# This should define database structure for XAO::FS based sites.
+
+sub build_structure ($) {
+    my $self=shift;
+
+    my %structure = (
+        Foos => {
+            type        => 'list',
+            class       => 'Data::Foo',
+            key         => 'foo_id',
+            structure   => {
+                Bars => {
+                    type        => 'list',
+                    class       => 'Data::FooBar',
+                    key         => 'bar_id',
+                    key_format  => '<$AUTOINC$>',
+                    structure   => {
+                        name => {
+                            type        => 'text',
+                            maxlength   => 100,
+                            index       => 1,
+                        },
+                    },
+                },
+                amount => {
+                    type        => 'integer',
+                    minvalue    => 0,
+                },
+            },
+        },
+    );
+
+    $self->odb->fetch('/')->build_structure(\%structure);
+
+    ##
+    # Sites that use XAO::Content for semi-static content management
+    # shall add this:
+    #
+    ### XAO::Objects->new(objname => 'Web::Content')->build_structure;
+}
+
+###############################################################################
+1;
+# vim: ft=perl:

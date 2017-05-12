@@ -1,0 +1,32 @@
+Changes
+=======
+
+0.00008 2014-04-18T04:52:59Z
+    - Fix issue #1, and add Test::Fatal
+
+0.00007 2014-03-25T12:41:24Z
+    - Fix rt#94173 by freeing the handler at finish time
+    - Use Minilla for packaging the dist
+
+0.00006 - 20 Oct 2012
+    - No code change
+    - Upgrade to Module::Install 1.06
+      (see http://weblog.bulknews.net/post/33907905561/do-not-ship-modules-with-module-install-1-04)
+
+0.00005 - 28 Feb 2011
+  - Remove auto_include, and thus remove Test::More (rt #75361)
+
+0.00004 - 21 Oct 2011
+  - Move to github
+  - Fix docs (rt #71797)
+  - Move pod tests to xt
+
+0.00003 - 09 Sep 2008
+  - Remove previous instances of this module from ParserDetail.ini
+
+0.00002 - 17 Aug 2008
+  - Stop inserting it into ParserDetails.ini until I know how to properly
+    fix things (rt #38526)
+
+0.00001 - 28 Jul 2008
+  - Initial release

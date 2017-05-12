@@ -1,0 +1,66 @@
+XML-TreePP-Editor
+===============================
+
+This module is used for editing a XML::TreePP parsed XML Document.
+
+EXAMPLE
+
+To use stand-alone:
+
+    use strict;
+    use XML::TreePP;
+    use XML::TreePP::Editor;
+
+    my $xml =<<"XMLEOF";
+    <path>
+        <element>
+            <node myattribute="something">A</node>
+        </element>
+        <element>
+            <node myattribute="anotherthing">B</node>
+        </element>
+    </path>
+    XMLEOF;
+
+    my $tpp = XML::TreePP->new();
+    my $tree = $tpp->parse($xml);
+    my $tppe = new XML::TreePP::Editor();
+    # Replace the <node> node of the second <element> node with this
+    $tppe->replace( $tree, '/path/element[2]/node', { '-myattribute' => "new value" } );
+    # Insert this new <element> node to the beginning of the list of <element> nodes 
+    $tppe->insert( $tree, '/path/element', { node => { '-myattribute' => "someval", '#text' => "C" } } );
+
+
+INSTALLATION
+
+To install this module type the following:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    XML::TreePP
+    XML::TreePP::XMLPath >= 0.61
+    Data::Dump
+
+
+SUPPORT AND DOCUMENTATION
+
+    http://www.codepin.org/project/perlmod/XML-TreePP-Editor
+
+
+COPYRIGHT AND LICENSE
+
+Copyright (c) 2009-2013 Russell E Glaue,
+Center for the Application of Information Technologies,
+Western	Illinois University.
+All rights reserved.
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

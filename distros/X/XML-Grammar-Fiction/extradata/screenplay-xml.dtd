@@ -1,0 +1,15 @@
+<!ELEMENT document (head,body)>
+<!ELEMENT head EMPTY>
+<!ELEMENT body (scene+)>
+<!ELEMENT scene ((description|saying)*,scene*)>
+<!ELEMENT description (para+)>
+<!ELEMENT saying (para+)>
+<!ELEMENT para (#PCDATA|inlinedesc|ulink|bold|br)*>
+<!ELEMENT inlinedesc (#PCDATA|ulink|bold)*>
+<!ELEMENT ulink (#PCDATA|bold)*>
+<!ELEMENT bold (#PCDATA)>
+<!ELEMENT br EMPTY>
+<!ATTLIST scene id ID #REQUIRED title CDATA #IMPLIED>
+<!ATTLIST body id ID #REQUIRED>
+<!ATTLIST saying character CDATA #REQUIRED>
+<!ATTLIST ulink url CDATA #REQUIRED>

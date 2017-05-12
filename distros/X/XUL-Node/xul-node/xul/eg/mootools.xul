@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+<window
+	xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+	xmlns:html="http://www.w3.org/1999/xhtml"
+	onload="Go()"
+>
+<script src="../lib/JSAN.js"></script>
+<script><![CDATA[function Go () {
+
+new Class("Person", {
+
+initialize : function (name) { this.set_name(name)    },
+get_name   : function ()     { return this.name       },
+set_name   : function (name) { this.name = name       },
+as_string  : function ()     { return this.get_name() }
+
+});
+
+person = new Person("Joe");
+console.info("peson name: '%s'", person.get_name());
+console.info("peson class name: '%s'", person.$className);
+
+}]]></script>
+
+<label value="MooTools example, run with FireBug"/>
+
+</window>

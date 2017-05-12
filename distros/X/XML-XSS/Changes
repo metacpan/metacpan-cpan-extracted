@@ -1,0 +1,55 @@
+Revision history for XML::XSS
+
+0.3.4 2013-09-22
+ [MISC]
+ - Update test-compile tests (was hanging on Windows if depedencies were
+   not met). (RT#88891, Alexandr Ciornii)
+
+ [STATISTICS]
+ - code churn: 3 files changed, 59 insertions(+), 32 deletions(-)
+
+0.3.3 2013-09-19
+ [MISC]
+ - Use the native traits instead of Moose::AttributeHelpers. (RT#88824,
+   raised by Karen Etheridge)
+
+ [STATISTICS]
+ - code churn: 3 files changed, 51 insertions(+), 32 deletions(-)
+
+0.3.2 2013-07-27
+ [BUG FIXES]
+ - Fix precedence bug with return statement. (RT#87196, Reini Urban)
+
+ [STATISTICS]
+ - code churn: 7 files changed, 15 insertions(+), 13 deletions(-)
+
+0.3.1 2011-03-14T20:02:18Z
+ - fixes to work with Moose 1.99+, as well as older versions. (Dave Rolsky)
+ - templates deal with metacharacters correctly
+ - test module B renamed Beta not to clash with core's B.
+
+0.3.0 2010-12-25T22:31:17Z
+ - deal with CDATASection (as a text node)
+ - change the name of the style object from $r to $style
+ - attribute values now printed properly
+
+0.2.0_0 2010-12-20T18:32:38Z
+ - add $master to stylesheet classes.
+ - add 'style' keyword.
+
+0.1.3 2010-07-29T20:43:30Z
+ - add a first pass of template/overloading documentation 
+
+0.1.0_2 2010-07-17T10:05:12Z
+ - fix the failing tests because of overloading.
+
+0.1.0_1 2010-07-12T21:23:22Z
+ - add a Changes file.
+ - add Pod::Weaver in dist::zilla config.
+ - try to fix the bug seen at
+   http://www.cpantesters.org/cpan/report/30de628a-8d6d-11df-aac3-f82b01ce9
+   048
+
+0.1.0_0 2010-07-11
+ - Original release.
+

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<moby:MOBY xmlns:moby="http://www.biomoby.org/moby" xmlns="http://www.biomoby.org/moby">
+  <moby:mobyContent>
+    <moby:mobyData moby:queryID="sip_1_">
+      <moby:Simple articleName="allele">
+        <moby:Object id="cho" namespace="DragonDB_Allele"/>
+      </moby:Simple>
+    </moby:mobyData>
+  </moby:mobyContent>
+</moby:MOBY>

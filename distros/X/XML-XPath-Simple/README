@@ -1,0 +1,89 @@
+NAME
+    XML::XPath::Simple - Very simple interface for XPaths
+
+SYNOPSIS
+      use XML::XPath::Simple;
+  
+      $xp = new XML::XPath::Simple(
+                                   xml => $xml,
+                                   context => '/'
+                                   );
+      $content = $xp->valueof('/doc/c[2]/d[1]@id');
+
+DESCRIPTION
+    XML::XPath::Simple is designed to allow for the use of simple
+    Abbreviated XPath syntax to access values from a small XML document.
+    This module is not meant as a drop-in replacement for XML::XPath, and
+    doesn't support the entire W3C XPath Recommendation. This module is
+    meant as an easy and simple way to access XML data from small,
+    non-complex structures.
+
+    XML::XPath::Simple doesn't support documents that have elements
+    containing mixed content (text and tags), nor does it allow for the
+    walking of the tree structure, or the counting of elements. While this
+    module allows access to specific nodes using the position() function,
+    internally the module doesn't necessarially parse the XML structure in
+    any specific order, so position() calls may not return the value
+    expected.
+
+METHODS
+  Creation
+
+      $xp = new XML::XPath::Simple(
+                           			xml => $xml,
+                                    context => '/'
+                                    );
+
+    new Creates a new XML::XPath::Simple object. The constructor requires an
+    XML document be passed to it as text using the xml option. An optional
+    default context may be set using context but if no context is specified
+    it is set to '/'(root).
+
+  context()
+
+      $xp->context('/doc/a');
+      $mycont = $xp->context();
+
+    context allows for the retrieval of the currently set context as an
+    XPath expression, or for setting a new default context.
+
+  find()
+
+      $xp->find('/doc/a');
+
+    find looks for the node specified by the XPath expression provided. This
+    method returns true if the node exists, and false otherwise.
+
+  valueof()
+
+      $myval = $xp->valueof('/doc/a');
+
+    valueof returns the value stored in the node specified by the XPath
+    expression provided.
+
+DIAGNOSTICS
+    XML::XPath::Simple -- No XML to parse: This module requires an XML
+    string.
+        (F) The module was not provided an XML document to parse.
+
+AUTHOR
+    S.D. Campbell, whytwolf@spots.ab.ca
+
+SEE ALSO
+    perl(1), XML::XPath, XML::Simple.
+
+LICENSE
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by the
+    Free Software Foundation; either version 2 of the License, or (at your
+    option) any later version.
+
+    This program is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+    Public License for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program; if not, write to the Free Software Foundation, Inc.,
+    675 Mass Ave, Cambridge, MA 02139, USA.
+

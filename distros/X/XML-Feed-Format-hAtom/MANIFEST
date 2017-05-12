@@ -1,0 +1,17 @@
+Build.PL
+Changes
+lib/XML/Feed/Format/hAtom.pm
+MANIFEST			This list of files
+t/01-parse.t
+t/02-create.t
+t/04-splice-atom.t
+t/10-mix-and-match.t
+t/15-no-entries.t
+t/pod-coverage.t
+t/pod.t
+t/samples/atom.xml
+t/samples/hatom-different.html
+t/samples/hatom-explicit.html
+t/samples/hatom-implicit.html
+Makefile.PL
+META.yml

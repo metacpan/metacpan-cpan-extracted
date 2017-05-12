@@ -1,0 +1,104 @@
+@prefix cpan-uri: <http://purl.org/NET/cpan-uri/terms#> .
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://dev.perl.org/licenses/>
+	dc:title             "the same terms as the perl 5 programming language system itself".
+
+<http://purl.org/NET/cpan-uri/dist/XML-LibXML-Devel-SetLineNumber/project>
+	a                    doap:Project;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap-deps:configure-suggestion [ doap-deps:on "ExtUtils::Constant"^^doap-deps:CpanId ];
+	doap-deps:runtime-requirement [ doap-deps:on "perl 5.008003"^^doap-deps:CpanId ], [ doap-deps:on "XML::LibXML 1.90"^^doap-deps:CpanId ], [ doap-deps:on "XML::LibXML::Devel"^^doap-deps:CpanId ];
+	doap-deps:test-requirement [ doap-deps:on "Test::More 0.47"^^doap-deps:CpanId ];
+	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=XML-LibXML-Devel-SetLineNumber>;
+	doap:created         "2012-03-16"^^xsd:date;
+	doap:developer       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:download-page   <https://metacpan.org/release/XML-LibXML-Devel-SetLineNumber>;
+	doap:homepage        <https://metacpan.org/release/XML-LibXML-Devel-SetLineNumber>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:name            "XML-LibXML-Devel-SetLineNumber";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/XML-LibXML-Devel-SetLineNumber/v_0-000_00>, <http://purl.org/NET/cpan-uri/dist/XML-LibXML-Devel-SetLineNumber/v_0-000_01>, <http://purl.org/NET/cpan-uri/dist/XML-LibXML-Devel-SetLineNumber/v_0-001>, <http://purl.org/NET/cpan-uri/dist/XML-LibXML-Devel-SetLineNumber/v_0-002>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/tobyink/p5-xml-libxml-devel-setlinenumber>;
+	];
+	doap:seealso         <http://purl.org/NET/cpan-uri/dist/XML-LibXML/project>;
+	doap:shortdesc       "set the line number for an XML::LibXML::Node".
+
+<http://purl.org/NET/cpan-uri/dist/XML-LibXML-Devel-SetLineNumber/v_0-000_00>
+	a                    cpan-uri:DeveloperRelease, doap:Version;
+	rdfs:label           "Initial release; let's see how CPAN Testers cope...";
+	dc:identifier        "XML-LibXML-Devel-SetLineNumber-0.000_00"^^xsd:string;
+	dc:issued            "2012-03-16"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/XML-LibXML-Devel-SetLineNumber-0.000_00.tar.gz>;
+	doap:revision        "0.000_00"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/XML-LibXML-Devel-SetLineNumber/v_0-000_01>
+	a                    cpan-uri:DeveloperRelease, doap:Version;
+	dc:identifier        "XML-LibXML-Devel-SetLineNumber-0.000_01"^^xsd:string;
+	dc:issued            "2012-03-16"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "It might help if I added pre-requisites.";
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "I hate using EU:MM without several layers of abstraction on top.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/XML-LibXML-Devel-SetLineNumber-0.000_01.tar.gz>;
+	doap:revision        "0.000_01"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/XML-LibXML-Devel-SetLineNumber/v_0-001>
+	a                    doap:Version;
+	dc:identifier        "XML-LibXML-Devel-SetLineNumber-0.001"^^xsd:string;
+	dc:issued            "2012-03-18"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Documentation;
+			rdfs:label "Documentation improvements.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/XML-LibXML-Devel-SetLineNumber-0.001.tar.gz>;
+	doap:revision        "0.001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/XML-LibXML-Devel-SetLineNumber/v_0-002>
+	a                    doap:Version;
+	rdfs:label           "Two and a half year anniversary";
+	dc:identifier        "XML-LibXML-Devel-SetLineNumber-0.002"^^xsd:string;
+	dc:issued            "2014-09-16"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "use Dist::Inkt";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/XML-LibXML-Devel-SetLineNumber-0.002.tar.gz>;
+	doap:revision        "0.002"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/XML-LibXML/project>
+	a                    doap:Project;
+	doap:download-page   <https://metacpan.org/release/XML-LibXML>;
+	doap:homepage        <https://metacpan.org/release/XML-LibXML>;
+	doap:name            "XML-LibXML";
+	doap:programming-language "Perl".
+
+<http://purl.org/NET/cpan-uri/person/tobyink>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:tobyink@cpan.org>;
+	foaf:name            "Toby Inkster";
+	foaf:nick            "TOBYINK";
+	foaf:page            <https://metacpan.org/author/TOBYINK>.
+

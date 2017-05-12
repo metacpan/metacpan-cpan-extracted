@@ -1,0 +1,232 @@
+# English translations for xacobeo-i package.
+# Copyright (C) 2009 THE xacobeo-i'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the xacobeo-i package.
+# Emmanuel Rodriguez <emmanuel.rodriguez@gmail.com>, 2009.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: xacobeo-i 18n\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2009-12-27 20:37+0100\n"
+"PO-Revision-Date: 2009-12-27 20:40+0100\n"
+"Last-Translator: Emmanuel Rodriguez <emmanuel.rodriguez@gmail.com>\n"
+"Language-Team: English\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: lib/Xacobeo/App.pm:178
+#, perl-brace-format
+msgid "Failed to load plugin described by {file}; {error}"
+msgstr "Erreur pendant la lecture du plugin décrit par {file}; {error}"
+
+#: lib/Xacobeo/App.pm:184
+#, perl-brace-format
+msgid "Failed to scan folder {folder}; {error}"
+msgstr "Erreur pendant la lecture du dossier {folder}; {error}"
+
+#: lib/Xacobeo/App.pm:215
+msgid "File is not describing a Xacobeo plugin"
+msgstr "Le fichier ne décrit pas un plugin Xacobeo"
+
+#: lib/Xacobeo/App.pm:224
+#, perl-brace-format
+msgid "Error while load package {package}; {error}"
+msgstr "Erreur pendant le chargement du paquet {package}; {error}"
+
+#: lib/Xacobeo/App.pm:227
+#, perl-brace-format
+msgid "Package {package} failed to return a plugin"
+msgstr "Le paquet {package} n'a pas retourné de plugin"
+
+#: lib/Xacobeo/App.pm:235
+#, perl-brace-format
+msgid "Can't load script {script}; {error}"
+msgstr "Impossible de lire le script {script}: {error}"
+
+#: lib/Xacobeo/App.pm:238
+#, perl-brace-format
+msgid "Script {script} failed to return a plugin"
+msgstr "Le scripte {script} n'a pas retourné de plugin"
+
+#: lib/Xacobeo/App.pm:242
+msgid "File is missing the key Package or Script"
+msgstr "Le fichier est sans la clé Package ou Script"
+
+#: lib/Xacobeo/UI/SourceView.pm:210
+msgid "Node is undef"
+msgstr "Nœud est undef"
+
+#: lib/Xacobeo/UI/Window.pm:193
+msgid "No document"
+msgstr "Pas de document"
+
+#: lib/Xacobeo/UI/Window.pm:304
+#, perl-format
+msgid "Found %d result in %0.3fs"
+msgid_plural "Found %d results in %0.3fs"
+msgstr[0] "%d résultat a été trouvé en %0.3fs"
+msgstr[1] "%d résultats ont été trouvés en %0.3fs"
+
+#: lib/Xacobeo/UI/Window.pm:309
+msgid "XPath query issued an error"
+msgstr "La requête XPath a retournée une erreur"
+
+#: lib/Xacobeo/UI/Window.pm:359
+msgid "Load document"
+msgstr "Chargement du document"
+
+#: lib/Xacobeo/UI/Window.pm:367
+#, perl-brace-format
+msgid "Can't read {file}: {error}"
+msgstr "Impossible de lire {file}: {error}"
+
+#: lib/Xacobeo/UI/Window.pm:383
+#, perl-format
+msgid "Document loaded in %.3f second"
+msgid_plural "Document loaded in %.3f seconds"
+msgstr[0] "Document chargé en %.3f seconde"
+msgstr[1] "Document chargé en %.3f secondes"
+
+#: lib/Xacobeo/UI/Window.pm:420
+msgid "Syntax Highlight"
+msgstr "Coloration syntaxique"
+
+#: lib/Xacobeo/UI/Window.pm:429
+msgid "DOM Tree"
+msgstr "Arbre DOM"
+
+#: lib/Xacobeo/UI/Window.pm:494
+msgid "Open file..."
+msgstr "Ouvrir fichier..."
+
+#: lib/Xacobeo/UI/Window.pm:537
+#, perl-brace-format
+msgid "About {name}"
+msgstr "À propos de {name}"
+
+#: lib/Xacobeo/UI/Window.pm:552
+msgid "Simple XPath viewer"
+msgstr "Simple visualiseur XPath"
+
+#: lib/Xacobeo/UI/Window.pm:567
+msgid "_File"
+msgstr "_Fichier"
+
+#: lib/Xacobeo/UI/Window.pm:568
+msgid "_Help"
+msgstr "Aid_e"
+
+#: lib/Xacobeo/UI/Window.pm:575
+msgid "_Open"
+msgstr "_Ouvrir"
+
+#: lib/Xacobeo/UI/Window.pm:577
+msgid "Open a file"
+msgstr "Ouvrir un fichier"
+
+#: lib/Xacobeo/UI/Window.pm:583
+msgid "_Quit"
+msgstr "_Quitter"
+
+#: lib/Xacobeo/UI/Window.pm:585
+msgid "Quit"
+msgstr "Quitter"
+
+#: lib/Xacobeo/UI/Window.pm:593
+msgid "_About"
+msgstr "À _propos"
+
+#: lib/Xacobeo/UI/Window.pm:595
+msgid "About"
+msgstr "À propos"
+
+#: lib/Xacobeo/UI/Window.pm:643
+msgid "XPath:"
+msgstr "XPath:"
+
+#: lib/Xacobeo/UI/Window.pm:649
+msgid "XPath Expression..."
+msgstr "Expression XPath..."
+
+#: lib/Xacobeo/UI/Window.pm:654
+msgid "Evaluate"
+msgstr "Évaluer"
+
+#: lib/Xacobeo/UI/Window.pm:694
+msgid "Results"
+msgstr "Résultats"
+
+#: lib/Xacobeo/UI/Window.pm:698
+msgid "Prefix"
+msgstr "Préfixe"
+
+#: lib/Xacobeo/UI/Window.pm:699
+msgid "URI"
+msgstr "URI"
+
+#: lib/Xacobeo/UI/Window.pm:704
+msgid "Namespaces"
+msgstr "Espace de noms"
+
+#: lib/Xacobeo/UI/DomView.pm:145
+msgid "Element"
+msgstr "Element"
+
+#: lib/Xacobeo/UI/DomView.pm:153
+msgid "ID name"
+msgstr "ID nom"
+
+#: lib/Xacobeo/UI/DomView.pm:156
+msgid "ID value"
+msgstr "ID valeur"
+
+#: lib/Xacobeo/UI/DomView.pm:179
+msgid "_Jump to"
+msgstr "Aller vers"
+
+#: lib/Xacobeo/UI/DomView.pm:181
+msgid "Show the node"
+msgstr "Montrer le noeud"
+
+#: lib/Xacobeo/UI/DomView.pm:187
+msgid "_Copy XPath"
+msgstr "Copier XPath"
+
+#: lib/Xacobeo/UI/DomView.pm:189
+msgid "Copy the node's XPath"
+msgstr "Copier l'expression XPath du noeud"
+
+#: lib/Xacobeo/Timer.pm:151
+#, perl-format
+msgid "Time: %-20s %.4fs\n"
+msgstr "Temps: %-20s %.4fs\n"
+
+#: lib/Xacobeo/Timer.pm:152
+msgid "Unnamed"
+msgstr "Sans nom"
+
+#: lib/Xacobeo/Document.pm:136
+#: lib/Xacobeo/Document.pm:176
+msgid "Parameter 'type' must be defined"
+msgstr "Le paramètre 'type' doit être défini"
+
+#: lib/Xacobeo/Document.pm:279
+msgid "Document node is missing"
+msgstr "Le noeud du document est manquant"
+
+#: lib/Xacobeo/Document.pm:394
+#, perl-brace-format
+msgid "Namespace {name} has no URI"
+msgstr "L'espace de noms {name} n'a pas d'URI d'associé"
+
+#~ msgid "Unsupported document type {type}"
+#~ msgstr "Le document type {type} n'est pas suporté"
+#~ msgid "Can't create widget {name} because method {function} is missing"
+#~ msgstr ""
+#~ "Imposible de créer le widget {name} parce que la méthode {function} n'est "
+#~ "pas définie"
+#~ msgid "Copyright (C) 2008-2009 by Emmanuel Rodriguez."
+#~ msgstr "Copyright (C) 2008-2009 by Emmanuel Rodriguez."
+

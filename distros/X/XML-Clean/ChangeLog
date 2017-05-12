@@ -1,0 +1,24 @@
+2003-09-21 14:03  petr
+	
+	* Clean.pm: tests from Maarten Koskamp finnaly checked-in
+	
+2003-09-16 18:09  petr
+
+	* Clean.pm: add tests from "Koskamp, Maarten" <MKoskamp@kluwer.nl>
+
+2001-09-23 21:25  petr
+
+	* Clean.pm: First clean revision.
+
+2001-09-23 21:03  petr
+
+	* Clean.pm: Updates, XMLClean->Clean
+
+2001-07-27 00:15  petr
+
+	* Clean.pm: Initial revision
+
+2001-07-27 00:15  petr
+
+	* Clean.pm: Init release.
+

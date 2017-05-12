@@ -1,0 +1,34 @@
+<module name="XML::Schema::Type::Union">
+
+  <about>
+    This module implements the XML Schema union type.
+  </about>
+
+  <synopsis>
+<perl>
+
+use XML::Schema::Type;
+
+# declare some simple types
+my $int   = XML::Schema::Type::int->new();
+my $time  = XML::Schema::Type::time->new();
+my $float = XML::Schema::Type::float->new();
+
+# declare a union
+my $union = XML::Schema::Type::Union->new(
+    memberTypes => [ $int, $time, $float ],
+);
+
+# instantiate a validated member of the union
+my $i = $union->instance('14');         # ok - int
+my $t = $union->instance('11:23:36');   # ok - time
+my $f = $union->instance('1.23');	    # ok - float
+</perl>
+  </synopsis>
+</module>
+
+
+
+
+
+

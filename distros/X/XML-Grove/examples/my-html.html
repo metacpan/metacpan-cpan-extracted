@@ -1,0 +1,40 @@
+<!--
+
+    Copyright (C) 1997, 1998 Ken MacLeod
+    See the file COPYING for distribution terms.
+
+    $Id: my-html.html,v 1.1 1998/04/05 17:11:09 ken Exp $
+
+    This file can be used with the `my-html.pl' example.
+
+-->
+<HTML>
+  <HEAD>
+    <TITLE>This is the title of my page</TITLE>
+  </HEAD>
+  <BODY>
+    <H1>This is the body of my page.</H1>
+
+    <P>This page was rendered on <DATE/></P>
+
+    <P>Perl code can be used to generate any output you want.  Here's
+a list of primes between 1 and 100.</P>
+
+    <P>
+    <!-- this is a ``CDATA marked section'', the only special
+         characters in a CDATA marked section are the the closing
+         characters `]]>'.  And no, they can't be escaped :-(  -->
+    <PERL><![CDATA[
+@primes = (1);
+OUTER:
+for ($ii = 2; $ii <= 100; $ii ++) {
+    for ($jj = 2; $jj < ($ii+1)/2; $jj ++) {
+	next OUTER if (($ii % $jj) == 0);
+    }
+    push (@primes, $ii);
+}
+
+print join (", ", @primes);
+]]></PERL></P>
+  </BODY>
+</HTML>

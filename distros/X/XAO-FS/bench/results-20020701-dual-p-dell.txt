@@ -1,0 +1,67 @@
+============= /proc/cpuinfo
+processor	: 0
+vendor_id	: GenuineIntel
+cpu family	: 6
+model		: 11
+model name	: Intel(R) Pentium(R) III CPU family      1133MHz
+stepping	: 1
+cpu MHz		: 1125.832
+cache size	: 512 KB
+fdiv_bug	: no
+hlt_bug		: no
+f00f_bug	: no
+coma_bug	: no
+fpu		: yes
+fpu_exception	: yes
+cpuid level	: 2
+wp		: yes
+flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 mmx fxsr sse
+bogomips	: 2247.88
+
+processor	: 1
+vendor_id	: GenuineIntel
+cpu family	: 6
+model		: 11
+model name	: Intel(R) Pentium(R) III CPU family      1133MHz
+stepping	: 1
+cpu MHz		: 1125.832
+cache size	: 512 KB
+fdiv_bug	: no
+hlt_bug		: no
+f00f_bug	: no
+coma_bug	: no
+fpu		: yes
+fpu_exception	: yes
+cpuid level	: 2
+wp		: yes
+flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 mmx fxsr sse
+bogomips	: 2247.88
+
+============= uname -a
+Linux web.rshughes.com 2.4.9-31smp #1 SMP Tue Feb 26 06:55:00 EST 2002 i686 unknown
+============= args
+bench/bench.pl OS:MySQL_DBI:test_fs am  10000
+============= date
+Mon Jul  1 16:01:02 2002
+============= benchmark
+Benchmark: timing 50000 iterations of rd_i0, rd_i0_s, wr_i0, wr_i0_c, wr_i0_s...
+     rd_i0: 16 wallclock secs (10.01 usr +  1.15 sys = 11.16 CPU) @ 4480.29/s (n=50000)
+   rd_i0_s: 15 wallclock secs (10.31 usr +  1.50 sys = 11.81 CPU) @ 4233.70/s (n=50000)
+     wr_i0: 17 wallclock secs ( 8.60 usr +  0.91 sys =  9.51 CPU) @ 5257.62/s (n=50000)
+   wr_i0_c: 18 wallclock secs ( 9.34 usr +  0.95 sys = 10.29 CPU) @ 4859.09/s (n=50000)
+   wr_i0_s: 16 wallclock secs ( 8.92 usr +  1.15 sys = 10.07 CPU) @ 4965.24/s (n=50000)
+Benchmark: timing 10000 iterations of wr_l1_c, wr_l1_r, wr_l2_c, wr_l2_r, wr_l3_c, wr_l3_r...
+   wr_l1_c: 16 wallclock secs ( 6.44 usr +  1.08 sys =  7.52 CPU) @ 1329.79/s (n=10000)
+   wr_l1_r: 15 wallclock secs ( 7.24 usr +  0.91 sys =  8.15 CPU) @ 1226.99/s (n=10000)
+   wr_l2_c: 16 wallclock secs ( 7.29 usr +  1.05 sys =  8.34 CPU) @ 1199.04/s (n=10000)
+   wr_l2_r: 15 wallclock secs ( 7.72 usr +  0.84 sys =  8.56 CPU) @ 1168.22/s (n=10000)
+   wr_l3_c: 16 wallclock secs ( 7.12 usr +  1.06 sys =  8.18 CPU) @ 1222.49/s (n=10000)
+   wr_l3_r: 15 wallclock secs ( 7.15 usr +  0.74 sys =  7.89 CPU) @ 1267.43/s (n=10000)
+Benchmark: timing 10000 iterations of rd_l1_c, rd_l2_c, rd_l3_c...
+   rd_l1_c:  7 wallclock secs ( 3.74 usr +  0.25 sys =  3.99 CPU) @ 2506.27/s (n=10000)
+   rd_l2_c:  7 wallclock secs ( 3.80 usr +  0.35 sys =  4.15 CPU) @ 2409.64/s (n=10000)
+   rd_l3_c:  7 wallclock secs ( 3.60 usr +  0.18 sys =  3.78 CPU) @ 2645.50/s (n=10000)
+Benchmark: timing 10000 iterations of rd_l1_v, rd_l2_v, rd_l3_v...
+   rd_l1_v: 12 wallclock secs ( 6.93 usr +  0.72 sys =  7.65 CPU) @ 1307.19/s (n=10000)
+   rd_l2_v: 14 wallclock secs ( 6.29 usr +  0.70 sys =  6.99 CPU) @ 1430.62/s (n=10000)
+   rd_l3_v: 13 wallclock secs ( 6.23 usr +  0.70 sys =  6.93 CPU) @ 1443.00/s (n=10000)

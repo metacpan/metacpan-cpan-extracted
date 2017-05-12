@@ -1,0 +1,21 @@
+XMLNews::HTMLTemplate, version 0.01
+
+  This module is free for commercial or non-commercial use, and comes
+  with no warranty, explicit or implied.
+
+NOTE: The XMLNews::Meta module must be installed for this module to
+      work.  The XMLNews::Meta module is available from CPAN or from
+      www.xmlnews.org.
+
+This distribution contains a Perl module designed to create
+template-based HTML pages using news documents in XMLNews-Meta and
+XMLNews-Story format; more information about these formats is
+available at the following location:
+
+  http://www.xmlnews.org/
+
+Detailed documentation is available in POD format in module itself.
+
+
+David Megginson, david@megginson.com
+1999-12-09

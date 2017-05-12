@@ -1,0 +1,95 @@
+% layout 'default';
+% title 'Contact';
+% stash active_page => 'contact';
+
+<div class="row">
+  <div class="col-md-6">
+    % if ( form_checker_ok() ) {
+      <p class="alert alert-success"><i class="glyphicon glyphicon-ok"></i>
+        Your message was successfully sent.</p>
+    % } else {
+      %= form_for contact => (method => 'POST') => begin
+        %= csrf_field
+      <ul>
+        <%== form_checker_error_wrapped %>
+
+        <li class="form-group">
+          <label for="name">*Name:</label
+          ><%= text_field 'name', class => 'form-control' %>
+        </li>
+        <li class="form-group">
+          <label for="email">*Email:</label
+          ><%= email_field 'email', class => 'form-control' %>
+        </li>
+        <li class="form-group">
+          <label for="province">*Province:</label
+            ><%= select_field province => [
+              [ '--please select--' => 'none' ],
+              [ 'Alberta' => 'AB' ],
+              [ 'British Columbia' => 'BC'],
+              [ 'Manitoba' => 'MB'],
+              [ 'New Brunswick' => 'NB'],
+              [ 'New Foundland' => 'NF'],
+              [ 'Northwest Terriories' => 'NT'],
+              [ 'Nova Scotia' => 'NS'],
+              [ 'Nunavut' => 'NU'],
+              [ 'Ontario' => 'ON'],
+              [ 'Prince Edward Island' => 'PE'],
+              [ 'Quebec' => 'QC'],
+              [ 'Saskatchewan' => 'SK'],
+              [ 'Yukon' => 'YT'],
+            ] , class => 'form-control'
+          %>
+        </li>
+        <li class="form-group">
+          <label for="Message" class="textarea_label">*Message:</label
+            ><%= text_area 'message', cols => 40, rows => 5,
+              class => 'form-control' %>
+        </li>
+      </ul>
+        %= submit_button 'Send message', class => 'btn btn-primary'
+      % end
+    % }
+  </div>
+  <div class="col-md-6">
+    <%== xtext('maps')->{ $c->geoip_region } // xtext('maps')->{'00'} %>
+  </div>
+</div>
+<hr>
+
+<div id="locations" class="row">
+  % for my $loc ( items_in xtext('locations') ) {
+    <div class="col-sm-6 col-md-4">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title"><%== $loc->{name} %></h3>
+        </div>
+        <div class="panel-body">
+          <address class="address">
+            <%== $loc->{address} %>
+            % if ( length $loc->{hours} ) {
+              <br><span class="hours"><%= $loc->{hours} %></span>
+            % } if ( length $loc->{note} ) {
+              <br><small><%= $loc->{note} %></small>
+            % }
+          </address>
+          <address class="phones">
+            % if ( length $loc->{phone} ) {
+              <span>Phone:</span> <%= $loc->{phone} %><br>
+            % } if ( length $loc->{tfphone} ) {
+              <span>Toll-free:</span> <%= $loc->{tfphone} %><br>
+            % } if ( length $loc->{fax} ) {
+              <span>Fax:</span> <%= $loc->{fax} %><br>
+            % } if ( length $loc->{tffax} ) {
+              <span>Toll-free fax:</span> <%= $loc->{tffax} %><br>
+            % } if ( length $loc->{email} ) {
+              <span>Email:</span> <a
+                href="<%== mailto_href $loc->{email} %>"
+                  ><%== mailto $loc->{email} %></a>
+            % }
+          </address>
+        </div>
+      </div>
+    </div>
+  % }
+</div>

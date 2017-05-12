@@ -1,0 +1,63 @@
+<?xml version="1.0"?>
+<rdf:RDF
+xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+xmlns="http://my.netscape.com/rdf/simple/0.9/">
+
+<channel>
+	<title>The Daily Sedative</title>
+	<link>http://dailysedative.com</link>
+	<description>The journal of all that is useless and unnecessary</description>
+	<language>en</language>
+	<lastBuildDate>Thu, 26 Feb 2004 02:31:15 -0500</lastBuildDate>
+	<copyright>Copyright 2002 The Daily Sedative</copyright>
+	<image>
+		<url>http://dailysedative.com/wire/tinylogo.gif</url>
+		<title>The Daily Sedative</title>
+		<link>http://dailysedative.com</link>
+		<width>120</width>
+		<height>16</height>
+	</image>
+</channel>
+
+<item>
+ <title>San Francisco Demands 2-ply Bibles</title>
+ <link>http://dailysedative.com/content/675_sanfranc.html</link>
+</item>
+
+<item>
+ <title>RNC: Would You Let A Gay Man Marry Your Daughter?</title>
+ <link>http://dailysedative.com/content/674_rncwould.html</link>
+</item>
+
+<item>
+ <title>President Asks Russert For A Glass Of Water</title>
+ <link>http://dailysedative.com/content/673_presiden.html</link>
+</item>
+
+<item>
+ <title>Kerry: Will He Carry Massachusetts?</title>
+ <link>http://dailysedative.com/content/672_kerrywil.html</link>
+</item>
+
+<item>
+ <title>China, India Promise Even Loonier Space Plans</title>
+ <link>http://dailysedative.com/content/671_chinaind.html</link>
+</item>
+
+<item>
+ <title>HDTV So Accurate You Can See Emotional Torment Of Players</title>
+ <link>http://dailysedative.com/content/670_hdtvsoac.html</link>
+</item>
+
+<item>
+ <title>Bush To Send 17 Billion Dollars To The Moon</title>
+ <link>http://dailysedative.com/content/669_bushtose.html</link>
+</item>
+
+<item>
+ <title>Frasier To End In Death Match</title>
+ <link>http://dailysedative.com/content/668_frasiert.html</link>
+</item>
+
+
+</rdf:RDF>

@@ -1,0 +1,70 @@
+<?xml version="1.0"?>
+<project name="yui-build">
+
+    <property name="target.dir" value="${basedir}/target"/>
+    <property name="concat.dir" value="${target.dir}/yui/concat"/>
+    <property name="mincat.dir" value="${target.dir}/yui/mincat"/>
+    <property name="min.js.dir" value="${mincat.dir}/js/min"/>
+    <property name="min.css.dir" value="${mincat.dir}/css/min"/>
+
+    <path id="site.css.concat" location="${concat.dir}/site.css"/>
+    <path id="site.css.min" location="${min.css.dir}/site.css"/>
+    <filelist id="site.css.files" dir="${basedir}">
+        <file name="css/one.css"/>
+        <file name="css/two.css"/>
+        <file name="images/three.css"/>
+    </filelist>
+
+    <path id="site.js.concat" location="${concat.dir}/site.js"/>
+    <path id="site.js.min" location="${min.js.dir}/site.js"/>
+    <filelist id="site.js.files" dir="${basedir}">
+        <file name="js/one.js"/>
+        <file name="js/two.js"/>
+        <file name="images/three.js"/>
+    </filelist>
+
+    <target name="init">
+        <mkdir dir="${min.js.dir}"/>
+        <mkdir dir="${min.css.dir}"/>
+    </target>
+
+    <target name="concat-files">
+        <concat destfile="${toString:site.css.concat}" fixlastline="yes">
+            <filelist refid="site.css.files"/>
+        </concat>
+        <concat destfile="${toString:site.js.concat}" fixlastline="yes">
+            <filelist refid="site.js.files"/>
+        </concat>
+    </target>
+
+    <target name="compress-files" depends="concat-files">
+        <java jar="${yuicompressor.jar}" fork="true" classpath="${compile_classpath}">
+            <arg line="--type css"/>
+            <arg line="--charset utf-8"/>
+            <arg pathref="site.css.concat"/>
+            <arg value="-o"/>
+            <arg pathref="site.css.min"/>
+        </java>
+        <java jar="${yuicompressor.jar}" fork="true" classpath="${compile_classpath}">
+            <arg line="--type js"/>
+            <arg line="--charset utf-8"/>
+            <arg pathref="site.js.concat"/>
+            <arg value="-o"/>
+            <arg pathref="site.js.min"/>
+        </java>
+    </target>
+
+    <target name="move-files">
+        <mkdir dir="${basedir}"/>
+        <copy todir="${basedir}">
+            <filelist dir="${mincat.dir}">
+                <file name="${toString:site.css.min}"/>
+                <file name="${toString:site.js.min}"/>
+            </filelist>
+        </copy>
+        <delete dir="${target.dir}"/>
+    </target>
+
+    <target name="yuicompress" depends="init,compress-files,move-files"/>
+
+</project>

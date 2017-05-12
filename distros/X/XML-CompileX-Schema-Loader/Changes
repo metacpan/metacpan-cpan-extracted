@@ -1,0 +1,25 @@
+Revision history for perl module XML::CompileX::Schema::Loader
+
+0.006     2015-01-15 10:49:39-05:00 America/New_York
+    - minor fixes and added inline commentary to example scripts
+0.005     2015-01-13 20:23:35-05:00 America/New_York
+    - remove overly-specific NetSuite test
+    - add example scripts to the eg/ directory
+0.004     2015-01-08 13:38:38-08:00 America/Los_Angeles
+    - better handling of multiple URIs when building default "wsdl" attribute
+0.003     2015-01-06 16:48:40-08:00 America/Los_Angeles
+    - do not force the user to load XML::Compile::SOAP11 or
+      XML::Compile::Transport::SOAPHTTP since they may not need them
+    - simplify tests and examples to reflect the above and not duplicate URIs
+      in both WSDL11 and Loader construction
+0.002     2015-01-06 13:45:40-08:00 America/Los_Angeles (TRIAL RELEASE)
+    - Renamed from XML::Compile::WSDL11::Recursive to
+      XML::CompileX::Schema::Loader per suggestion from Mark Overmeer
+    - Remove not-quite-there caching in favor of just letting the specified
+      user_agent handle it (e.g., with WWW::Mechanize::Cached)
+    - support adding multiple WSDL URIs on construction
+    - handle both schema include and import statements
+    - rewrite to work alongside XML::Compile::WSDL11 rather than using
+      an attribute as a proxy object
+0.001     2015-01-01 16:04:27-05:00 America/New_York (TRIAL RELEASE)
+    - Initial release

@@ -1,0 +1,13 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         XML-Trivial
+version:      0.06
+version_from: lib/XML/Trivial.pm
+installdirs:  site
+requires:
+    Scalar::Util:                  >= 1.18
+    Test::More:                    >= 0.62
+    XML::Parser::Expat:            >= 2.34
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30_01

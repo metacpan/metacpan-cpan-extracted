@@ -1,0 +1,63 @@
+---
+abstract: 'extend XML::LibXML::{Attr,Element,Document} on a per-namespace/element basis'
+author:
+  - 'Toby Inkster <tobyink@cpan.org>'
+build_requires:
+  Test::More: '0.61'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+dynamic_config: 0
+generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.021, CPAN::Meta::Converter version 2.140640'
+keywords: []
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: XML-LibXML-Augment
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - t
+    - xt
+optional_features: {}
+provides:
+  XML::LibXML::Augment:
+    file: lib/XML/LibXML/Augment.pm
+    version: '0.004'
+  XML::LibXML::Augment::Attr:
+    file: lib/XML/LibXML/Augment.pm
+  XML::LibXML::Augment::CDATASection:
+    file: lib/XML/LibXML/Augment.pm
+  XML::LibXML::Augment::Comment:
+    file: lib/XML/LibXML/Augment.pm
+  XML::LibXML::Augment::Document:
+    file: lib/XML/LibXML/Augment.pm
+  XML::LibXML::Augment::DocumentFragment:
+    file: lib/XML/LibXML/Augment.pm
+  XML::LibXML::Augment::Dtd:
+    file: lib/XML/LibXML/Augment.pm
+  XML::LibXML::Augment::Element:
+    file: lib/XML/LibXML/Augment.pm
+  XML::LibXML::Augment::Node:
+    file: lib/XML/LibXML/Augment.pm
+  XML::LibXML::Augment::NodeList:
+    file: lib/XML/LibXML/Augment.pm
+  XML::LibXML::Augment::PI:
+    file: lib/XML/LibXML/Augment.pm
+  XML::LibXML::Augment::Text:
+    file: lib/XML/LibXML/Augment.pm
+requires:
+  Class::Inspector: '0'
+  Module::Runtime: '0'
+  XML::LibXML: '1.95'
+  match::simple: '0'
+  perl: '5.008'
+resources:
+  Identifier: http://purl.org/NET/cpan-uri/dist/XML-LibXML-Augment/project
+  bugtracker: http://rt.cpan.org/Dist/Display.html?Queue=XML-LibXML-Augment
+  homepage: https://metacpan.org/release/XML-LibXML-Augment
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/tobyink/p5-xml-libxml-augment.git
+version: '0.004'

@@ -1,0 +1,79 @@
+# Test an <all> where one element name is a substring of another.
+# This comes from a bug report which I couldn't replicate.
+
+--- |
+    <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="unqualified" attributeFormDefault="unqualified">
+        <xs:element name="TEST">
+           <xs:complexType>
+              <xs:sequence>
+                 <xs:element name="TEST_ELEM_1" minOccurs="0" maxOccurs="1">
+                    <xs:complexType>
+                       <xs:all>
+                          <xs:element name="FIELD_FEP" minOccurs="1" maxOccurs="1">
+                             <xs:complexType>
+                                <xs:simpleContent>
+                                   <xs:extension base="xs:string">
+                                      <xs:attribute name="valueType" type="xs:string" default="hex" use="optional" />
+                                   </xs:extension>
+                                </xs:simpleContent>
+                             </xs:complexType>
+                          </xs:element>
+                          <xs:element name="FIELD_FE" minOccurs="1" maxOccurs="1">
+                             <xs:complexType>
+                                <xs:simpleContent>
+                                   <xs:extension base="xs:string">
+                                      <xs:attribute name="valueType" type="xs:string" default="hex" use="optional" />
+                                   </xs:extension>
+                                </xs:simpleContent>
+                             </xs:complexType>
+                          </xs:element>
+                       </xs:all>
+                       <xs:attribute name="ref" type="xs:string" use="optional" />
+                    </xs:complexType>
+                 </xs:element>
+              </xs:sequence>
+           </xs:complexType>
+        </xs:element>
+    </xs:schema>
+
+--- |
+  <TEST>
+    <TEST_ELEM_1>
+       <FIELD_FEP>0x0</FIELD_FEP>
+       <FIELD_FE>0x0</FIELD_FE>
+    </TEST_ELEM_1>
+  </TEST>
+--- >
+PASS
+
+--- |
+  <TEST>
+    <TEST_ELEM_1>
+       <FIELD_FE>0x0</FIELD_FE>
+       <FIELD_FEP>0x0</FIELD_FEP>
+    </TEST_ELEM_1>
+  </TEST>
+--- >
+PASS
+
+--- |
+  <TEST>
+    <TEST_ELEM_1>
+       <FIELD_FEZ>0x0</FIELD_FEZ>
+       <FIELD_FE>0x0</FIELD_FE>
+    </TEST_ELEM_1>
+  </TEST>
+--- >
+FAIL
+
+--- |
+  <TEST>
+    <TEST_ELEM_1>
+       <FIELD_FEP>0x0</FIELD_FEP>
+       <FIELD_FEP>0x0</FIELD_FEP>
+       <FIELD_FE>0x0</FIELD_FE>
+    </TEST_ELEM_1>
+  </TEST>
+--- >
+FAIL
+

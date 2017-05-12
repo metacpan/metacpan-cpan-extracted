@@ -1,0 +1,88 @@
+CHANGES file for XML::Filter::Dispatcher
+
+0.52 Wed Jun  4 15:57:20 EDT 2003
+    - Alpha release of XML::Filter::Dispatcher::Compiler
+    - {start,end}_prefix_mapping now handled properly
+    - Use newer Parse::Yapp to make CPAN happy (Parse::Yapp embeds its
+      version number in generated parsers, CPAN finds it and
+      misconstrues it as the generated parser's version number.  If you
+      have Parse::Yapp installed on several machines and they aren't all
+      at the same version number, this can cause "retrograde version
+      numbers", as Randal Schwartz calls them).
+
+0.51 Sat May 31 07:17:29 EDT 2003
+    - Add XFDSHOWBUFFERHIGHWATER so you can tell which events are
+      causing the most buffering
+    - Add SetXValue => 0 option to speed things up if no xvalue* calls
+    - Add SortAttributes => 0 option to speed things up if attr order
+      does not need to be repeatable or stable.
+    - More common-case optimizations
+
+0.5 Mon May 26 03:38:46 EDT 2003
+    - Optimizer speeds some common cases drastically
+    - more efficient code
+    - end:: is now a nickname for end-element::, the old meaning
+      was too confusing and awkward.
+    - start:: is now a nickname for start-element::, the old meaning
+      was too confusing and awkward.
+    - Misc. bugfixes
+
+0.48
+    - xset() now tracks the name of what was set to avoid setting anything
+      twice instead of checking definedness.
+    - added xstack_max()
+    - Remove abandoned debug code.
+
+0.47 Mon Jan 27 15:21:37 EST 2003
+    - Rebuild with a new (1.05) Parse::Yapp so that X:F:D:Parser is not
+    advertising a 1.02 $VERSION due to the VERSION of Parse::Yapp being
+    inserted at an inopportune place.
+
+0.46 Fri Jan 10 09:13:37 EST 2003
+    - Updated SYNOPSIS, it was badly out of date and tripped up
+      t@tomacorp.com, as seen on perlmonks (thanks, Matt).
+    - Get '@node:*' => [ 'string()' => sub {} ] working, along with
+      other related expressions.
+
+0.45 Fri Jan  3 14:56:23 EST 2003
+    - Replace xset_fallthrough() with the much more flexible
+      xrun_next_action().  The latter is a more informative name,
+      too.
+    - xset() now croaks when overwriting a defined value.
+    - Added xoverwrite() to allow defined values to be overwritten.
+    - Empty Rules lists now work (ie do nothing).
+    - Unbuggered postponements a bit.  See t/postponements.t for a
+      couple of known failures (commented out).
+
+0.44 Tue Dec 31 10:40:20 EST 2002
+    - Added bin/xfd_dump
+    - xvalue now defaults to $_[1] (the sax data structure) if
+      the rule was a matching expression.
+    - added xvaluetype() (NEEDS TESTS!)
+    - Handle default namespace more gracefully.  Added t/namespaces.t
+    - implemented xset_fallthrough().
+
+0.43 Tue Dec 31 00:48:16 EST 2002
+    - Allow '@*' => [ 'string()' => \&foo ] rules to work.
+    - Allow 'end::foo' rules to work
+    - Add tracing support to xstack directives.
+    - The xstack is now unwound after every non-start_ event.
+    - start_element and end_element no longer accidently hide
+      events from the xstack maintenance code.
+
+0.42
+    - Add XML::SAX::EventMethodMaker to PREREQ_PM
+    - Added xadd and xset.
+
+0.41 Fri Dec 20 09:54:02 EST 2002
+    - Fix attribute ordering sensitivity on perl's hash algorithm.  This
+      gets the test suite to pass and might help somebody somewhere's
+      production code to operate in a predictable fashion across perl
+      versions.
+    - string( * ) now compiles (and works :)
+    - get xstack synced with the order events.
+    - add t/builder.t
+
+0.4 Thu Dec 12 06:32:24 EST 2002
+    - Major rewrite.  Now supports most of XPath plus EventPath goodies.
+

@@ -1,0 +1,32 @@
+XML::LibRSVG
+============
+
+This module is an interface to the gnome librsvg library.
+
+At the moment it is a toy. The api is *very* likely to change 
+at any time.
+
+However it does work, allowing you to generate PNG's from SVG
+files. Which is quite a neat hack in itself.
+
+INSTALLATION
+
+You're on your own getting librsvg working. Whatever route you
+choose (I used ximian gnome), if you use RPM's make sure you
+also have the -devel RPMs of everything.
+
+PREREQUISITES
+
+Things this requires:
+
+gtk+ 1.2
+gdk
+gdk-pixbuf
+libart
+freetype
+libpng
+librsvg
+
+And working config scripts for each (i.e. gdk-pixbuf-config 
+must work). Except libpng, which doesn't have a config script.
+

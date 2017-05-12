@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<rdf:RDF
+  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns="http://purl.org/rss/1.0/"
+  xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel rdf:about="http://www.example.com/FEED/ALTERNATE/LINK/">
+    <title>my little example feed</title>
+    <description>tagline</description>
+  </channel>
+  <item rdf:about="http://www.example.com/ENTRY/ALTERNATE/LINK">
+    <title>Hello world</title>
+    <description>first post</description>
+    <dc:creator>ENTRY CREATOR</dc:creator>
+    <dc:subject>ENTRY SUBJECT</dc:subject>
+    <dc:type>ENTRY TYPE</dc:type>
+    <dc:language>en-us</dc:language>
+    <dc:date>2001-01-01T05:00:00+0000</dc:date>
+    <dc:format>text/html</dc:format>
+    <dc:rights>ENTRY RIGHTS</dc:rights>
+    <dc:publisher>ENTRY PUBLISHER</dc:publisher>
+    <dc:source>ENTRY SOURCE</dc:source>
+    <dc:contributor>ENTRY CONTRIBUTOR 2</dc:contributor>
+    <dc:contributor>ENTRY CONTRIBUTOR 1</dc:contributor>
+    <dc:coverage>ENTRY COVERAGE</dc:coverage>
+  </item>
+</rdf:RDF>

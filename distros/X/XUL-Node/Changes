@@ -1,0 +1,75 @@
+Revision history for XUL-Node
+
+0.06 Sat Mar 24 2007
+
+    * you can no longer create nodes using $node->Label syntax- this will
+      BREAK all code using this syntax. Change it to:
+      $node->add_child(Label). Cannot support both methods, so one had
+      to go
+    * updated to support Firefox 2.0
+    * moved all javascript to mootools style classes
+      (http://dev.mootools.net/wiki/gettingStarted)
+    * started using JSAN for remote javascript classloading
+      (http://www.openjsan.org/doc/c/cw/cwest/JSAN/0.10/index.html)
+    * started using FireBug for javascript unit tests, which will not
+      run without it
+      (http://www.getfirebug.com/)
+    * fixed spelling error with ToolBarSeperator tag name (thanks to
+	  Rutger Vos)
+    * subclassing XUL::Node- create your own Perl XUL widgets, from base
+      XUL elements. See CustomWidgetsExample, CustomNodeTest,
+      CustomCompositeNodeTest, and and the custom_composite_widget_state
+      test method in the ChangeManager tests. Undocumented yet.
+    * started MVC work- see MVCTextBoxExample, MultipleViewsExample, and
+      Model::Value/MVC unit tests. Undocumented yet. API WILL change.
+    * node uses Aspect::Library::Listenable for event handling, so you
+      can add more than one listener to a node- used to be you could only
+      add one
+    * added get_parent_node to XUL::Node, using weak refs to avoid cycles-
+      now you can navigate from a node to any other node in the window
+    * fixed bug in Runner.js- value attribute should be set as late as
+      possible. You can now set the value in a TextBox, even after someone
+      changed its value by typing inside it. Hack to get around a known
+      mozilla bug (https://bugzilla.mozilla.org/show_bug.cgi?id=108482)
+    * added check in ChangeManager- dont pass to client any changes to the
+      XUL document that are already at the client
+    * refactoring: cleaned up exporting logic in XUL::Node
+    * refactoring: arranged classes more sensibly, instead of having them
+      all squatting in the same dir
+    * use latest Aspect module
+    * documentation errors fixed
+
+0.05 Fri Aug 6 2004
+
+    * you can now add widgets at specific indexes, besides appending them
+    * added support for ListBox ensureIndexIsVisible
+    * selectedIndex on ListBox works even after init
+    * remove_child can remove by node OR by index
+    * improved RemoveChildExample
+    * removed dependency on development version of Test::Class, now
+      includes it
+
+0.04 Wed Jul 7 2004
+
+    * added remove_child method to nodes, which can now be removed from
+      the document, added RemoveChildExample and tests
+    * uses a more recent version of Aspect for an improvement to
+      Test::Class
+    * removed old copy of Runner.js
+
+0.03 Tue Jul 6 2004
+
+    * equalsize attribute now works
+    * multi column list box show 1st column labels
+    * fixed multiline labels for button
+    * menus with no popups show
+
+0.02 Fri Jun 30 2004
+
+    * fixed some documentation errors
+    * sessions were commiting suicide after 3 seconds
+
+0.01 Fri Jun 18 2004
+
+    * initial version
+

@@ -1,0 +1,24 @@
+<stx:transform version="1.0" 
+  xmlns:stx="http://stx.sourceforge.net/2002/ns"
+  strip-space="yes">
+
+  <stx:template match="/root">
+    <node>
+      <stx:value-of select="index-of((10, 20, 30, 40), 30)"/>
+      <stx:text>:</stx:text>
+      <stx:value-of select="index-of((10, 20, 30, 40), 35)"/>
+      <stx:text>:</stx:text>
+      <stx:value-of select="index-of((10, 20, 30, 30, 20, 10), 20)"/>
+      <stx:text>:</stx:text>
+      <stx:value-of select="index-of(('a', 'ab', 'c', 'a'), 'a')"/>
+      <stx:process-children/>
+    </node>
+  </stx:template>
+
+  <stx:template match="node">
+    <stx:text>[</stx:text>
+    <stx:value-of select="index-of(('2', '1'), @id)"/>
+    <stx:text>]</stx:text>
+  </stx:template>
+
+</stx:transform>

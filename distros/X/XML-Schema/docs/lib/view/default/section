@@ -1,0 +1,5 @@
+[% INCLUDE bar %]
+
+<h3><a name="[% item.id %]">[% item.title %]</a></h3>
+
+[% item.content(view) %]

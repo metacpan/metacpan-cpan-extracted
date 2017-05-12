@@ -1,0 +1,59 @@
+{
+   "abstract" : "an XML Grammar for ProductsSyndication.",
+   "author" : [
+      "Shlomi Fish <shlomif@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.421",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "XML-Grammar-ProductsSyndication",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0",
+            "Test::XML" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.36"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Accessor" : "0",
+            "File::Spec" : "0",
+            "Imager" : "0.91",
+            "LWP::UserAgent" : "0",
+            "XML::Amazon" : "0",
+            "XML::LibXML" : "0",
+            "XML::LibXSLT" : "0",
+            "perl" : "5.008",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "XML::Grammar::ProductsSyndication" : {
+         "file" : "lib/XML/Grammar/ProductsSyndication.pm",
+         "version" : "0.0404"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.opensource.org/licenses/mit-license.php"
+      ],
+      "repository" : {
+         "url" : "http://bitbucket.org/shlomif/perl-xml-grammar-productssyndication"
+      }
+   },
+   "version" : "0.0404"
+}

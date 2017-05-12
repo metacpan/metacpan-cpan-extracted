@@ -1,0 +1,316 @@
+#!/usr/bin/perl -w
+#
+#
+use Getopt::Long;
+use Pod::Usage;
+use Encode;
+use Excel::Writer::XLSX;
+use Text::CSV;
+use Data::Dumper;
+
+my %args = (
+	'boarder'			=> 7,
+	'white_color'		=> '#FFFFFF',
+	'blue_color'		=> '#CCEEFF',
+	'abstract_color'	=> '#BBBBBB',
+	'border_color'		=> '#777777',
+	'table_color'		=> '#EE9A00', # orange2
+	'asr_color'			=> '#E0E0FF',
+	'total_color'		=> '#E0E0FF',
+	'binary'			=> 0,
+	'total'				=> 0,
+	'out'				=> undef,
+);
+GetOptions(\%args,
+	'<>' => sub { push @{$args{'<csvs>'}}, $_[0] },
+	'help|h', 'verbose|v',
+	'binary|b', 'total|t',
+	'out|o=s',
+);
+#print Dumper(\%args);exit;
+
+if (!defined $args{'<csvs>'}) {
+	pod2usage(-verbose => 2);
+}
+
+foreach my $file (@{$args{'<csvs>'}}) {
+	print STDERR "$file\n" if $args{'verbose'};
+	each_csv($file);
+}
+
+exit 0;
+
+
+#
+# subs
+#
+
+sub each_csv {
+	my ($file) = @_;
+	open(FH, $file) || die "$0: cannot open file($file)";
+	my $conts = join('', <FH>);
+	return if !$conts;
+	chomp $conts;
+	close FH;
+
+	my ($bn) = $file =~ /(\d{5}_[a-z]{2})/;
+	(my $out = $file) =~ s/\.csv/.xlsx/;
+	if (defined $args{'out'}) {
+		$out = $args{'out'};
+		die "$0: multi input files" if @{$args{'<csvs>'}} > 1;
+	}
+	clear_formats();
+	my $wb = Excel::Writer::XLSX->new($out);
+	$wb->set_properties(
+		'title'		=> $bn,
+	);
+	my $csv = Text::CSV->new({binary => 1});
+
+	foreach my $cont (split /\n\n/, $conts) {
+		my $rows = [];
+		foreach (split /\n/, $cont) {
+			$csv->parse($_);
+			push @$rows, [$csv->fields()];
+		}
+		my $row = shift @$rows;
+		my $name;
+		if ($$row[0] =~ /^c/) {
+			$name = Encode::decode('UTF-8', '連結');
+			#$name = '連結';
+		}
+		elsif ($$row[0] =~ /^n/) {
+			$name = Encode::decode('UTF-8', '個別');
+			#$name = '個別';
+		}
+		else {
+			$name = $row;
+		}
+		my $ws = $wb->add_worksheet($name);
+		$ws->freeze_panes(1, 1);
+		$ws->hide_gridlines(2);
+		# row = [decimals, depth, abstract, label, values...];
+		my $decimals = set_unit($rows);
+		# row = [depth, abstract, label, values...];
+		set_cols_width($ws, $$rows[0]);
+		$rows = delete_null($rows);
+		for (my $r = 0 ; $r < @$rows ; $r++) {
+			write_row($wb, $ws, $rows, $r, $decimals);
+		}
+	}
+}
+
+sub set_cols_width {
+	my ($ws, $row) = @_;
+	for (my $c = 0 ; $c < @$row ; $c++) {
+		$ws->set_column($c, $c, $c == 0 ? 40 : 18);
+	}
+}
+
+sub delete_null {
+	my ($rows) = @_;
+	# row = [depth, abstract, label, values...];
+	for (my $i = 0 ; $i < @$rows ; $i++) {
+		my $row = $$rows[$i];
+		next if $$row[1] eq 'true';
+		#print join (' ', @$row), "\n";
+		my $val = join '', @$row[3..$#$row];
+		delete $$rows[$i] if $val eq '';
+	}
+	return [grep {defined} @$rows];
+}
+
+sub is_total {
+	my ($row, $abstract) = @_;
+	return 1 if $$row[0] =~ /合計|小計/;
+	return 1 if $$row[0] =~ /キャッシュ・フロー/ && !$abstract;
+}
+
+sub set_unit {
+	my ($rows) = @_;
+	my $pre;
+	shift @{$$rows[0]};
+	foreach my $row (@$rows[1..$#$rows]) {
+		my $cur = shift @$row;
+		next if $cur eq '';
+		if (!defined $pre) {
+			$pre = $cur;
+			next;
+		}
+		#warn "$0: decimals change($pre,$cur)" if $pre != $cur;
+		$pre = $cur if $cur > $pre;
+	}
+	my $unit;
+	if (!defined $pre) {
+		$unit = 'ー';
+		$pre = 0;
+	}
+	elsif ($pre == 0) {
+		$unit = '円';
+	}
+	elsif ($pre == -3) {
+		$unit = '千円';
+	}
+	elsif ($pre == -6) {
+		$unit = '百万円';
+	}
+	else {
+		die "$0: invalid decimals($pre)";
+	}
+	$unit = Encode::decode('UTF-8', $unit);
+	$$rows[0][0] = 0;
+	$$rows[0][1] = 'false';
+	$$rows[0][2] = $unit;
+	return $pre;
+}
+
+sub write_row {
+	my ($wb, $ws, $rows, $r, $decimals) = @_;
+	my $row = $$rows[$r];
+	return if !$row;
+	# row = [depth, abstract, label, values...];
+	my ($indent, $abstract) = splice @$row, 0, 2;
+	$abstract = $abstract eq 'true';
+	# row = [label, values...];
+	write_row_key($wb, $ws, $rows, $r, $indent, $abstract);
+	write_row_vals($wb, $ws, $rows, $r, $indent, $abstract, $decimals);
+}
+
+sub write_row_key {
+	my ($wb, $ws, $rows, $r, $indent, $abstract) = @_;
+	my $row = $$rows[$r];
+	my $c = 0;
+	my $bg_color = get_cell_color($rows, $r, $c, $indent, $abstract);
+	my $fmt = get_format($wb, {'bg_color' => $bg_color, 'indent' => $indent});
+	#my $label = Encode::decode('UTF-8', $$row[$c]);
+	my $label = $$row[$c];
+	$ws->write($r, $c, $label, $fmt);
+}
+
+sub write_row_vals {
+	my ($wb, $ws, $rows, $r, $indent, $abstract, $decimals) = @_;
+	my $row = $$rows[$r];
+	for (my $c = 1 ; $c < @$row ; $c++) {
+		my $bg_color = get_cell_color($rows, $r, $c, $indent, $abstract);
+		my $fmt = get_format($wb, {'bg_color' => $bg_color, 'decimals' => $decimals});
+		my $val = $abstract ? '' : $$row[$c];
+		$ws->write($r, $c, $val, $fmt);
+	}
+}
+
+sub get_cell_color {
+	my ($rows, $r, $c, $indent, $abstract) = @_;
+	my $bg_color = $args{'white_color'};
+	if ($abstract) {
+		$bg_color = $indent == 0 ? $args{'table_color'} : $args{'abstract_color'};
+	}
+	elsif ($args{'total'} && is_total($$rows[$r], $abstract)) {
+		$bg_color = $args{'total_color'};
+	}
+	elsif ($args{'binary'} && $r % 2 == 1) {
+		$bg_color = $args{'blue_color'};
+	}
+	elsif ($$rows[0][$c] =~ /asr/) {
+		$bg_color = $args{'asr_color'};
+	}
+	return $bg_color;
+}
+
+BEGIN {
+my %fmts;
+sub clear_formats {
+	%fmts = ();
+}
+
+sub get_format {
+	my ($wb, $p) = @_;
+	if (exists $$p{'bg_color'}) {
+		if (exists $$p{'decimals'}) {
+			my ($c, $d) = @$p{'bg_color', 'decimals'};
+			return $fmts{$c}{'d'} if exists $fmts{$c}{'d'};
+			return $fmts{$c}{'d'} = $wb->add_format(
+				'bg_color' => $c,
+				'border' => $args{'border'},
+				'border_color' => $args{'border_color'},
+				'num_format' => '#,##0'. ',' x sprintf("%.0f", -$d/3),
+				#'num_format' => '#,##0',
+			);
+		}
+		elsif (exists $$p{'indent'}) {
+			my ($c, $i) = @$p{'bg_color', 'indent'};
+			return $fmts{$c}{'i'}{$i} if exists $fmts{$c}{'i'}{$i};
+			return $fmts{$c}{'i'}{$i} = $wb->add_format(
+				'bg_color' => $c,
+				'border' => $args{'border'},
+				'border_color' => $args{'border_color'},
+				'indent' => $i,
+			);
+		}
+		else {
+			die "$0: no decimals or indent.";
+		}
+	}
+	else {
+		die "$0: no format bg_color.";
+	}
+}
+}
+
+
+__END__
+
+=head1 NAME
+
+ts2xlsx
+
+=head1 SYNOPSIS
+
+ts2xlsx <csvs>...
+
+=head1 DESCRIPTION
+
+B<This program> will translate csv files created by timeseries to xlsx files.
+
+example:
+
+ts2xlsx 1301_bs.csv 1301_pl.csv 1301_cf.csv
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-h[elp]>
+
+Prints a help message and exits.
+
+=item B<-v[erbose]>
+
+Prints verbose messages.
+
+=item B<-b[inary]>
+
+Uses alternating colors for rows.
+
+=item B<-t[otal]>
+
+Uses gray color for total accounts.
+
+=item B<-o[ut] string>
+
+Saves to the specified file.
+
+=back
+
+=head1 AUTHOR
+
+Tetsuya Yamamoto <yonjouhan@gmail.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2015 by Tetsuya Yamamoto
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut
+

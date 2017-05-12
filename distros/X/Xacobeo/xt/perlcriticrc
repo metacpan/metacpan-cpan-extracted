@@ -1,0 +1,40 @@
+colour-severity-5 = dark magenta
+colour-severity-4 = dark red
+colour-severity-3 = dark yellow
+colour-severity-2 = dark blue
+colour-severity-1 = black
+
+verbose = %f line %l col %c\n    [%s] %p (%e) = %m\n    %r\n
+#         file    line   column  severity explanation   sourcecode
+#                                     policy    description
+
+[-ValuesAndExpressions::ProhibitAccessOfPrivateData]
+# see bug http://rt.cpan.org/Public/Bug/Display.html?id=35440
+
+[-Editor::RequireEmacsFileVariables]
+# no one uses Emacs here
+
+[-Miscellanea::RequireRcsKeywords]
+# git faq says rcs keywords are a stupid idea
+# http://git.or.cz/gitwiki/GitFaq#head-4a0afe71a2bb7734777a8b0b345e0308aefdbd40
+
+[Documentation::RequirePodSections]
+lib_sections = NAME | VERSION | SYNOPSIS | DESCRIPTION | INTERFACE | EXPORTS | DIAGNOSTICS | CONFIGURATION AND ENVIRONMENT | DEPENDENCIES | INCOMPATIBILITIES | BUGS AND LIMITATIONS | TO DO | MAINTAINER | SEE ALSO
+
+[Bangs::ProhibitCommentedOutCode]
+commentedcoderegex = \$(?!Id)[A-Za-z_].*=/
+# should not trigger on the RCS variable
+
+[Tics::ProhibitLongLines]
+# terminal width
+hard_max = 124
+
+[InputOutput::RequireCheckedSyscalls]
+functions = :builtins
+exclude_functions = print
+
+[Documentation::PodSpelling]
+spell_command = aspell list -l en
+
+[Modules::RequireExplicitInclusion]
+exempt_packages = /^Gtk2::.*/ /^XML::LibXML::.*/ Glib::Type Glib::Error

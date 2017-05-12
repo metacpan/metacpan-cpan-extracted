@@ -1,0 +1,20 @@
+README
+MANIFEST
+Changes
+Makefile.PL
+
+lib/XML/Writer/.Simpler.pm.swp
+lib/XML/Writer/Simpler.pm
+
+t/.01-super.t.swp
+t/.02-tag.t.swp
+t/.manifest.t.swp
+t/00-load.t
+t/01-super.t
+t/02-tag.t
+t/boilerplate.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,33 @@
+Change Log for XUL::App
+
+0.09 Aug 13, 2008
+* fixed the extension registration issue.
+
+0.08 Jul 11, 2008
+* Fixed a syntax error in JSON.js regarding Firefox 3.
+
+0.07 Jul 11, 2008
+* Fixed a syntax error in JSON.js regarding Firefox 3.
+
+0.06 Jun 24, 2008
+* Fixed various typos in the POD.
+
+0.05 Jun 24, 2008
+* Fixed a typo in the boiler-plate for XXX::App where XXX is the user app's name.
+* Added a display_name attribute to XUL::App::Schema
+* Added a new demo YahooFavorites (http://help.cn.yahoo.com/answerpage.html?product=myweb).
+* Added a new demo HelloWorld.
+* Added a new script xml2td for converting XML files to Perl code using Template::Declare.
+
+0.04 Jun 23, 2008
+* Updated the POD a bit.
+
+0.03 Jun 23, 2008
+* Added a link to the ExportReader sample Firefox extension's XPI to the POD.
+
+0.02 Jun 23, 2008
+* added missing dependencies to Makefile.PL.
+
+0.01 Jun 22, 2008
+* initial CPAN release.
+

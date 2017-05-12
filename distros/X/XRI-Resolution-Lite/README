@@ -1,0 +1,27 @@
+This is Perl module XRI::Resolution::Lite.
+
+INSTALLATION
+
+XRI::Resolution::Lite installation is straightforward. If your CPAN shell is set up,
+you should just be able to do
+
+    % cpan XRI::Resolution::Lite
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % make install
+
+DOCUMENTATION
+
+XRI::Resolution::Lite documentation is available as in POD. So you can do:
+
+    % perldoc XRI::Resolution::Lite
+
+to read the documentation online with your favorite pager.
+
+Toru Yamaguchi

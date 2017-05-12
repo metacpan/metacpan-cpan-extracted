@@ -1,0 +1,8 @@
+Revision history for Perl extension XML::SAX::SimpleDispatcher
+
+0.02  Mon Mar  9 21:03:30 PDT 2009
+		- added YAML to PREREQ_PM
+		- added more docs
+
+0.01  Fri Mar  6 16:10:26 2009
+        - original version

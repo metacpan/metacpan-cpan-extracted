@@ -1,0 +1,35 @@
+Revision history for XML-Reader-PP
+
+0.04 - 2014-12-28T09:24:30+01:00
+
+  [DOCUMENTATION]
+
+  - Migrate to Dist::Zilla
+
+0.03 - 2014-09-20T19:29:17+01:00
+
+  [DOCUMENTATION]
+
+  - Add a .gitignore file
+
+  - Changelog dates are better written as YYYY.MM.DD and probably ordered in
+    the other, descending, direction
+    Remark: I have decided to follow the ISO 8601 standard at
+    http://www.w3.org/TR/NOTE-datetime
+
+  - Just use a Makefile.PL and not a Build.PL the latter does not have any
+    added value any more
+  - In Makefile.PL ==> meta files link to repository
+
+0.02 - 2012-08-09T12:00:00+01:00
+
+  [ENHANCEMENTS]
+
+  - Refactor testcases
+
+0.01 - 2012-08-07T12:00:00+01:00
+
+  [ENHANCEMENTS]
+
+  - First version, released on an unsuspecting world.
+

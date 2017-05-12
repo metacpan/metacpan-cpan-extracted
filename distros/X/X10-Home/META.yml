@@ -1,0 +1,19 @@
+--- #YAML:1.0
+name:                X10-Home
+version:             0.04
+abstract:            Configure X10 for your Home
+license:             ~
+generated_by:        ExtUtils::MakeMaker version 6.31
+distribution_type:   module
+requires:     
+    ControlX10::CM11:              2.09
+    ControlX10::CM17:              0.07
+    DB_File:                       1.815
+    Device::SerialPort:            1
+    Log::Log4perl:                 1.1
+    YAML:                          0.35
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Mike Schilli <m@perlmeister.com>

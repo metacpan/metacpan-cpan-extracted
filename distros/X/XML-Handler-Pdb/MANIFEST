@@ -1,0 +1,11 @@
+MANIFEST
+Makefile.PL
+ChangeLog
+example/example.xml
+lib/XML/Handler/Pdb.pm
+palm/PerlDB.prc
+palm/PerlDB.prj
+palm/PerlDBa.cod
+palm/README
+scripts/xmltopdb
+t/01test.t

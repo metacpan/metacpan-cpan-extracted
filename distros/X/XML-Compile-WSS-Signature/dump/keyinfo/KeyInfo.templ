@@ -1,0 +1,190 @@
+# Describing complex ds:KeyInfo
+#     {http://www.w3.org/2000/09/xmldsig#}KeyInfo
+#
+# Produced by XML::Compile::Translate::Template version undef
+#          on Sat Jul 16 01:30:09 2016
+#
+# BE WARNED: in most cases, the example below cannot be used without
+# interpretation.  The comments will guide you.
+#
+# xmlns:ds        http://www.w3.org/2000/09/xmldsig#
+
+# is a ds:KeyInfoType
+{ # is a xsd:ID
+  # becomes an attribute
+  Id => "id_0",
+
+  # choice of ds_KeyName, ds_KeyValue, ds_RetrievalMethod,
+  #   ds_X509Data, ds_PGPData, ds_SPKIData, ds_MgmtData, ANY
+  # occurs 1 <= # <= unbounded times
+  cho_ds_KeyName => 
+  [ {
+      # is a xsd:string
+      ds_KeyName => "example",
+
+      # is a ds:KeyValueType
+      ds_KeyValue =>
+      { # choice of ds_DSAKeyValue, ds_RSAKeyValue, ANY
+
+        # is a ds:DSAKeyValueType
+        ds_DSAKeyValue =>
+        { # sequence of sequence, ds_G, ds_Y, ds_J, sequence
+
+          # sequence of ds_P, ds_Q
+          # is optional
+
+          # is a xsd:base64Binary
+          ds_P => "decoded bytes",
+
+          # is a xsd:base64Binary
+          ds_Q => "decoded bytes",
+
+          # is a xsd:base64Binary
+          # is optional
+          ds_G => "decoded bytes",
+
+          # is a xsd:base64Binary
+          ds_Y => "decoded bytes",
+
+          # is a xsd:base64Binary
+          # is optional
+          ds_J => "decoded bytes",
+
+          # sequence of ds_Seed, ds_PgenCounter
+          # is optional
+
+          # is a xsd:base64Binary
+          ds_Seed => "decoded bytes",
+
+          # is a xsd:base64Binary
+          ds_PgenCounter => "decoded bytes", },
+
+        # is a ds:RSAKeyValueType
+        ds_RSAKeyValue =>
+        { # sequence of ds_Modulus, ds_Exponent
+
+          # is a xsd:base64Binary
+          ds_Modulus => "decoded bytes",
+
+          # is a xsd:base64Binary
+          ds_Exponent => "decoded bytes", },
+
+        # any element not in ds:
+        ANY => "Anything", },
+
+      # is a ds:RetrievalMethodType
+      ds_RetrievalMethod =>
+      { # is a xsd:anyURI
+        # becomes an attribute
+        URI => "http://example.com",
+
+        # is a xsd:anyURI
+        # becomes an attribute
+        Type => "http://example.com",
+
+        # sequence of ds_Transforms
+
+        # is a ds:TransformsType
+        # is optional
+        ds_Transforms =>
+        { # sequence of ds_Transform
+
+          # is a ds:TransformType
+          # occurs 1 <= # <= unbounded times
+          ds_Transform =>
+          [ { # is a xsd:anyURI
+              # attribute Algorithm is required
+              Algorithm => "http://example.com",
+
+              # choice of ANY, ds_XPath
+              # occurs any number of times
+              cho_any => 
+              [ {
+                  # any element not in ds:
+                  ANY => "Anything",
+
+                  # is a xsd:string
+                  ds_XPath => "example", },
+              ], }, ], }, },
+
+      # is a ds:X509DataType
+      ds_X509Data =>
+      { # sequence of choice
+        # occurs 1 <= # <= unbounded times
+        seq_ds_X509IssuerSerial => 
+        [ {
+            # choice of ds_X509IssuerSerial, ds_X509SKI,
+            #   ds_X509SubjectName, ds_X509Certificate, ds_X509CRL, ANY
+
+            # is a ds:X509IssuerSerialType
+            ds_X509IssuerSerial =>
+            { # sequence of ds_X509IssuerName, ds_X509SerialNumber
+
+              # is a xsd:string
+              ds_X509IssuerName => "example",
+
+              # is a xsd:integer
+              ds_X509SerialNumber => 42, },
+
+            # is a xsd:base64Binary
+            ds_X509SKI => "decoded bytes",
+
+            # is a xsd:string
+            ds_X509SubjectName => "example",
+
+            # is a xsd:base64Binary
+            ds_X509Certificate => "decoded bytes",
+
+            # is a xsd:base64Binary
+            ds_X509CRL => "decoded bytes",
+
+            # any element not in ds:
+            ANY => "Anything", },
+        ], },
+
+      # is a ds:PGPDataType
+      ds_PGPData =>
+      { # choice of sequence, sequence
+
+        # sequence of ds_PGPKeyID, ds_PGPKeyPacket, ANY
+
+        # is a xsd:base64Binary
+        ds_PGPKeyID => "decoded bytes",
+
+        # is a xsd:base64Binary
+        # is optional
+        ds_PGPKeyPacket => "decoded bytes",
+
+        # any element not in ds:
+        # occurs any number of times
+        ANY => [ "Anything", ],
+
+        # sequence of ds_PGPKeyPacket, ANY
+
+        # is a xsd:base64Binary
+        ds_PGPKeyPacket => "decoded bytes",
+
+        # any element not in ds:
+        # occurs any number of times
+        ANY => [ "Anything", ], },
+
+      # is a ds:SPKIDataType
+      ds_SPKIData =>
+      { # sequence of ds_SPKISexp, ANY
+        # occurs 1 <= # <= unbounded times
+        seq_ds_SPKISexp => 
+        [ {
+            # is a xsd:base64Binary
+            ds_SPKISexp => "decoded bytes",
+
+            # any element not in ds:
+            # is optional
+            ANY => "Anything", },
+        ], },
+
+      # is a xsd:string
+      ds_MgmtData => "example",
+
+      # any element not in ds:
+      ANY => "Anything", },
+  ], }

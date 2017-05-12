@@ -1,0 +1,80 @@
+% title 'Review Totals';
+% layout 'default';
+
+<ul class="checkout_crumbs text-center">
+  <li class="col-md-15 label-success">Review products</li>
+  <li class="col-md-15 label-success">Enter contact information</li>
+  <li class="col-md-15 label-primary">Review Pricing</li>
+  <li class="col-md-15 label-default">Pay for the order</li>
+  <li class="col-md-15 label-default">Receive confirmation</li>
+</ul>
+
+<dl class="dl-horizontal" id="checkout_totals">
+    <dt>Cost of products:</dt>
+        <dd>$<%= cart->total %></dd>
+
+    % if ( stash('hst')+0 ) {
+        <dt><abbr title="Harmonized Sales Tax">HST</abbr>:</dt>
+            <dd><strong>$<%= stash 'hst' %></strong></dd>
+    % }
+
+    % if ( stash('gst')+0 ) {
+        <dt><abbr title="Goods and Services Tax">GST</abbr>:</dt>
+            <dd>$<%= stash 'gst' %></strong></dd>
+    % }
+
+    % if ( stash('pst')+0 ) {
+        <dt><abbr title="Provincial Sales Tax">PST</abbr>:</dt>
+            <dd><strong>$<%= stash 'pst' %></strong></dd>
+    % }
+
+    <dt>Shipping:</dt>
+        <dd class="ship_chrg">
+          % if ( defined( xtext('shipping_free') ) &&  xtext('shipping_free') < cart->total ) {
+              FREE
+          % } else {
+            $<%= stash 'shipping' %>
+              <small>(includes applicable taxes)</small>
+          % }
+        </dd>
+    <dt class="total">Total:</dt>
+        <dd class="total">$<%= stash 'total_dollars'
+            %><sup>.<%= stash 'total_cents' %></sup></dd>
+</dl>
+
+<form action="https://www.paypal.com/ca/cgi-bin/webscr" method="POST"
+    id="checkout_paynow_form">
+  %= hidden_field 'upload'            => 1
+  %= hidden_field 'cmd'               => '_cart'
+  %= hidden_field 'custom'            => stash 'custom'
+  %= hidden_field 'business'          => xtext('paypal')
+  %= hidden_field 'currency_code'     => xtext 'currency'
+  %= hidden_field 'cancel_return'     => url_for('/cart/')->to_abs
+  <%= hidden_field 'return'           =>
+    url_for('/cart/thank-you')->query({cart_id=> cart->id })->to_abs
+  %>
+  %= hidden_field 'tax_cart'        => (stash('pst')+stash('gst')+stash('hst'))
+  <%= hidden_field 'handling_cart'    =>
+    defined( xtext('shipping_free') ) &&  xtext('shipping_free') < cart->total
+      ? 0 : stash 'shipping'
+  %>
+  %= hidden_field 'address_override'  => 1
+  %= hidden_field 'country'           => 'CA'; # TODO: allow for others
+  %= hidden_field 'address1'          => param('address1')
+  %= hidden_field 'address2'          => param('address2')
+  %= hidden_field 'city'              => param('city')
+  %= hidden_field 'state'             => param('province')
+  %= hidden_field 'zip'               => param('zip')
+  %= hidden_field 'night_phone_a'     => 1; # TODO: sort phones out
+  %= hidden_field 'night_phone_b'     => param('phone')
+
+  % for ( 1 .. @{stash('cart')} ) {
+      % my $p = stash('cart')->[$_-1];
+      %= hidden_field 'item_name_'   . $_ => $p->{title}
+      %= hidden_field 'item_number_' . $_ => $p->{number}
+      %= hidden_field 'amount_'      . $_ => $p->{price}
+      %= hidden_field 'quantity_'    . $_ => $p->{quantity}
+  % }
+
+  %= submit_button 'Proceed to PayPal to complete this purchase', class => 'btn btn-lg btn-primary'
+</form>

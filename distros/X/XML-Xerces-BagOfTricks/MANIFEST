@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/XML-Xerces-BagOfTricks.t
+lib/XML/Xerces/BagOfTricks.pm
+META.yml                                 Module meta-data (added by MakeMaker)

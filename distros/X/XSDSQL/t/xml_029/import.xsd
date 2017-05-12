@@ -1,0 +1,40 @@
+﻿<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                targetNamespace="http://www.camera.org" 
+				xmlns="http://www.camera.org"
+				xmlns:xx="http://www.camera.org"
+				xmlns:ns2="namespace2"
+				xmlns:zz="namespace4"
+				xmlns:zzu="namespace5"
+ 				elementFormDefault="unqualified"
+				attributeFormDefault="qualified"
+>
+	<xs:import namespace="namespace2"  schemaLocation="schema2.xsd"/>
+	<xs:import namespace="namespace4"  schemaLocation="schema4.xsd"/>
+	<xs:import namespace="namespace5"  schemaLocation="schema5.xsd"/>
+	<xs:import namespace="namespace3"  schemaLocation="schema3.xsd"/>
+
+	<xs:element name="s1">
+		<xs:complexType>
+			<xs:sequence minOccurs="0" maxOccurs="1">
+				<xs:element name="ela" type="zz:ct0" minOccurs="0" maxOccurs="1"/>
+				<xs:element name="elb" type="zz:ct0" minOccurs="0" maxOccurs="1" form="qualified"/>  <!-- force qualified for elemento elb -->
+				<xs:element name="elc" type="xs:string" minOccurs="0" maxOccurs="1"/>			  
+				<xs:element name="eld" minOccurs="0" maxOccurs="1">
+					<xs:complexType>
+						<xs:sequence minOccurs="0" maxOccurs="1">
+						<xs:element name="eld1" type="xs:string" minOccurs="0" maxOccurs="1"/>
+						<xs:element name="eld2" type="xs:string" minOccurs="0" maxOccurs="1"/>
+						</xs:sequence>
+					</xs:complexType>
+			  	</xs:element>
+				<xs:element name="ele" type="zzu:ct0" minOccurs="0" maxOccurs="1"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="s2" type="zz:ct0"/>
+
+</xs:schema>
+
+ 

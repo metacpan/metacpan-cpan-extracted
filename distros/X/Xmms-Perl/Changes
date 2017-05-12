@@ -1,0 +1,213 @@
+=head1 NAME
+
+Changes - Perl Xmms change file
+
+=head1 CREDITS
+
+Thanks to:
+
+the xmms team for an outstanding mp3 player.
+
+Brian Moseley <ix@maz.org> for lots of help squashing bugs
+and feature suggestions.
+
+John Sachs <sax@cp.net> for lots of help squashing bugs and
+feature suggestions.
+
+Cutter Brown <cutter@cp.net> for help squashing bugs.
+
+=head1 CHANGES
+
+=over 3
+
+=item 0.12 - March 20, 2002
+
+use glib-config to help find glib.h
+[Julio Blanco Perez <jblanco@telecable.es>]
+
+=item 0.11 - March 20, 2002
+
+workaround bug in xmms_remote_playist() that caused hang with xmms 1.2.7
+
+fix bug in all_win_toggle which causes prefs win to popup with xmms 1.2.4
+thanks to cutter brown for the spot
+
+remove Audio::CD cddb support now that xmms has native cddb support
+
+Xmms::Cmd::quit now uses $remote->quit rather than kill $sig, $pid
+
+new Xmms::Remote methods: quit, is_{main,pl,eq}_win, is_{repeat,toggle}
+                          {get,set}_eq_{band,preamp}
+                          {get,set}_eq
+
+=item 0.10 - May 16, 2000
+
+fix bug where `+' in any command triggered an eval, now anchored to
+beginning of line
+
+Xmms::ExtUtils now uses xmms-config instead of gtk-config
+
+plug memory leak in Xmms::Remote->get_* functions that return gchar *
+[Oleg Smirnov <smirnov@nfra.nl>]
+
+fix bug in shell where running external commands left zombies
+
+added Xmms::waitfor_audio() function
+
+added 'list size ...'
+
+fix linkage for XFree86 [Paul Schinder <schinder@pobox.com>]
+
+=item 0.09 - January 31, 1999
+
+`track' now accepts a range
+
+$file is now set to $remote->get_playlist_file when running +perl code
+
+Xmms::urldb() and $ENV{HOME}/.xmms/.perlurldb for url completion
+
+Xmms::is_cpl() function for external Xmms::shell plugins (Audio::RaveMP)
+
+=item 0.08 - December 27, 1999
+
+xmms-playlist-delete.pat updated for xmms-0.9.5.1
+
+Xmms::shell configuration is now written to it's own
+~/.xmms/config.perl file to prevent loss of config changes made by
+xmms itself
+
+$variables set by `export' or `+ <perl code>' will be interpolated in
+cmd strings
+
+added `alias' and `export' functions
+
+added key bindings to toggle xmms windows
+
+fix bug where readline::rl_bind was called w/o Term::Readline::Perl
+installed
+
+fixed `info' "no such track" bug
+
+commands prefixed with `+' will be evaled as Perl code
+
+unknown commands will be treated as shell commands, if found in $PATH
+
+`!' will expand to the selected history (script) path
+
+new `sort order ...' sort option
+
+`history' command will look in default paths for scripts
+
+`#' in a filename will expand to the audio cd cddb id (Audio::CD required)
+
+`delete' command can handle ranges
+
+`repeat reset' will reset the repeat counter (w/ `change on')
+
+M-e bound to `eject'
+
+=item 0.07 - July 11, 1999
+
+`eject' command will open the cd tray if playing an audio cd 
+(Audio::CD required)
+
+added cddb support (Audio::CD required)
+
+=item 0.06 - June 27, 1999
+
+up/down arrow keys now bound as a volume slider
+
+shell will look for ~/.xmms/.perlrc and run as history script if exists
+
+added `resume' command
+
+added `delete' command
+
+fix 'make test' when xmms is already running
+
+history scripts can have #comments
+
+`history </...' will save directory name for `history <-<TAB>' completion
+
+change usleep() to xmms_usleep() in SongChange.xs
+
+=item 0.05 - June 18, 1999
+
+fix `sort' command completion
+
+added experimental Xmms::SongChange module
+
+=item 0.04 - June 14, 1999
+
+`track' will display {jtime} if jump time is set for that track
+
+`prefs' added to `window' list
+
+`url' command will `play' the url if not already playing
+
+last played `url' will be saved in ~/.xmms/config for `-' completion
+
+x11amp -> xmms rename
+
+new `mtime' command will "mark" the current output time for the `jtime' 
+command, also bound to `M-m'
+
+fix number of commands where <TAB> complete would actually run the
+command 
+
+a command abbreviation table is now built, so commands like `q' runs
+`quit' 
+
+`info' command will not hose the shell if track number is out of
+playlist range 
+
+`info' command will give a more friendly message if the file is not writable
+
+`info' command will now default to the current track if no track
+number or filename are specified 
+
+`info' command can now be used of files that are not in the current
+playlist 
+
+=item 0.03 - June 1, 1999
+
+fix bug where 0.02's -e exports cause help to go into deep recursion!
+
+set_mp3tag was not imported after change in 0.02
+
+=item 0.02 - May 31, 1999
+
+`add' command will also expand/save `-'
+
+`dig' command will now add to the playlist instead of replace it
+
+if X11amp::shell or test.pl needs to run x11amp, it will also kill it
+before exiting
+
+`M-`' keystoke will now run last command in the history list
+
+`M--' and `M-=' won't print current info
+
+`M-+' binding moved to `M-='
+
+added balance command
+
+current function now displays rate, frequency and mode
+
+warn if Output Plugin is disk_writer and pop prefs box if so
+
+window command displays usage if used wrong
+
+all commands are exported, for use via perl -MX11amp -e ...
+
+determine if playlist_add_url is available
+
+warn if more that 1 libx11amp.so's are found
+
+fix current, time, etc., commands when playlist is empty
+
+=item 0.01
+
+first "release"
+
+=back

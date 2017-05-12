@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<!-- 
+  The DTD for PPD documents is available from the ActiveState website and 
+  the latest version can be found at http://www.ActiveState.com/PPM/DTD/ppd.dtd
+ -->
+<!-- @TITLE : Perl Package Distribution -->
+<!DOCTYPE SOFTPKG SYSTEM "ppd.dtd">
+<!-- only use by dtd2html -->
+<SOFTPKG/>

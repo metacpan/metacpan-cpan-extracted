@@ -1,0 +1,202 @@
+<DocumentDefinition>
+  <name>_test_indexing</name>
+
+  <element><name>foo</name></element>
+  <element><name>bar</name></element>
+  <element><name>many1</name></element>
+  <element><name>many2</name></element>
+  <element><name>extra1</name></element>
+  <element><name>extra2</name></element>
+  <element><name>paragraph</name></element>
+  <element><name>count</name></element>
+
+  <nested_element>
+    <name>nel</name>
+    <element><name>buried</name></element>
+  </nested_element>    
+
+  <method>
+    <name>id_as_number</name>
+    <code><![CDATA[ sub { return ($_[0]->doc_id + 0); } ]]></code>
+  </method>
+
+  <store>
+    <name>main</name>
+    <base>test</base>
+    <location>Sequential_file:'extension','.doctest'</location>
+    <index_on_store>main</index_on_store>
+  </store>
+
+  <store>
+    <name>index_hook_abort_tests</name>
+    <base>test</base>
+    <location>Sequential_file:'extension','.doctest'</location>
+    <index_on_store>aaa_ok1</index_on_store>
+    <index_on_store>death1</index_on_store>
+    <index_on_store>death2</index_on_store>
+    <index_on_store>zzz_ok2</index_on_store>
+  </store>
+
+  <store>
+    <name>other</name>
+    <base>test/other</base>
+    <location>Sequential_file:'extension','.doctest'</location>
+  </store>
+
+  <index>
+    <name>main</name>
+    <doc_id_sql_type>CHAR(4)</doc_id_sql_type>
+
+    <field>
+      <name>foo</name>
+    </field>
+
+    <field>
+      <name>bar</name>
+      <sql_type>VARCHAR(25)</sql_type>
+    </field>
+
+    <field>
+      <name>id_as_number</name>
+      <sql_type>INT</sql_type>
+    </field>
+
+    <field><name>extra1</name></field>
+
+    <field>
+      <name>buried</name>
+      <code><![CDATA[ sub { $_[0]->nel()->buried() } ]]></code>
+    </field>
+
+    <collection>
+      <name>many1_s</name>
+      <type>many tables</type>      
+      <code><![CDATA[ sub { $_[0]->many1() } ]]></code>
+      <clean>
+        <to_size>3</to_size>
+        <size_trigger>5</size_trigger>
+        <order_by>id_as_number DESC</order_by>
+      </clean>
+    </collection>
+
+    <collection>
+      <name>many1_c</name>
+      <type>stringified</type>      
+      <code><![CDATA[ sub { $_[0]->many1() } ]]></code>      
+    </collection>
+
+    <collection>
+      <name>many1_b</name>
+      <type>binary table</type>      
+      <code><![CDATA[ sub { $_[0]->many1() } ]]></code>
+    </collection>
+
+
+    <collection>
+      <name>many2_s</name>
+      <type>many tables</type>
+      <code><![CDATA[ sub { $_[0]->many2() } ]]></code> 
+      <clean>
+        <to_size>3</to_size>
+        <size_trigger>5</size_trigger>
+        <order_by>id_as_number DESC</order_by>
+      </clean>
+    </collection>
+
+    <collection>
+      <name>many2_c</name>
+      <type>stringified</type>      
+      <code><![CDATA[ sub { $_[0]->many2() } ]]></code>      
+    </collection>
+
+    <collection>
+      <name>many2_b</name>
+      <type>binary table</type>      
+      <code><![CDATA[ sub { $_[0]->many2() } ]]></code>
+    </collection>
+
+    <textsearch>
+      <name>paragraph</name>
+    </textsearch>
+
+    <sql_index>
+      <name>idx_1</name>
+      <unique>1</unique>
+      <fields>doc_id, foo</fields>
+    </sql_index>
+
+    <order_by_expression>
+      <name>constant_exp</name>
+      <expression>10</expression>
+    </order_by_expression>
+
+    <order_by_expression>
+      <name>id_mod_3</name>
+      <expression>'id_as_number % 3'</expression>
+    </order_by_expression>
+
+    <order_by_expression>
+      <name>test_eval</name>
+      <expression>time()</expression>
+    </order_by_expression>
+
+    <clean>
+      <to_size>6</to_size>
+      <size_trigger>10</size_trigger>
+      <order_by>id_as_number DESC</order_by>
+      <erase_where_clause>foo = 'erase this one'</erase_where_clause>
+    </clean>
+
+    <index_hook>
+      <![CDATA[
+        sub {
+          my ( $doc, $index ) = @_;
+          die  if  $doc->element('foo')->get() eq 'do not index';
+        };
+      ]]>
+    </index_hook>
+
+    <default_order_by>doc_id DESC</default_order_by>
+  </index>
+
+
+
+  <index>
+    <name>other</name>
+    <field><name>bar</name></field>
+  </index>
+
+  <index>
+    <index_from_store>index_hook_abort_tests</index_from_store>
+    <index_from_store>main</index_from_store>
+    <name>death1</name>
+    <index_hook><![CDATA[
+      sub { XML::Comma::Log->warn("in death1"); die; }
+    ]]></index_hook>
+  </index>
+
+  <index>
+    <index_from_store>index_hook_abort_tests</index_from_store>
+    <index_from_store>main</index_from_store>
+    <name>death2</name>
+    <index_hook><![CDATA[
+      sub { XML::Comma::Log->warn("in death2"); die "true stuff"; };
+    ]]></index_hook>
+  </index>
+
+  <index>
+    <store>index_hook_abort_tests</store>
+    <name>aaa_ok1</name>
+    <field><name>foo</name></field>
+  </index>
+
+  <index>
+    <store>index_hook_abort_tests</store>
+    <name>zzz_ok2</name>
+    <field><name>foo</name></field>
+  </index>
+
+  <plural>'many1'</plural>
+  <plural>'many2'</plural>
+
+</DocumentDefinition>

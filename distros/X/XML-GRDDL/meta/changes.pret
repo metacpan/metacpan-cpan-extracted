@@ -1,0 +1,32 @@
+# This file acts as the project's changelog.
+
+`XML-GRDDL 0.001 cpan:TOBYINK`
+	issued  2010-07-14;
+	label   "Initial release";
+	comment "Forked from Swignition."@en;
+	seealso <http://buzzword.org.uk/swignition/#swignition>.
+
+`XML-GRDDL 0.002 cpan:TOBYINK`
+	issued  2010-07-19;
+	changeset [
+		item "Optional XSLT 2.0 support via XML::Saxon::XSLT2."^^Addition;
+	].
+
+`XML-GRDDL 0.003 cpan:TOBYINK`
+	issued  2011-02-20;
+	changeset [
+		item "Hard-code a number of profile URIs."^^Addition;
+		item "Hard-code the eRDF transformation."^^Addition;
+		item "Copyright 2011."^^Update;
+	].
+
+`XML-GRDDL 0.004 cpan:TOBYINK`
+	issued  2012-09-11;
+	changeset [
+		item "Modernize."^^Packaging;
+		item "Copyright 2012."^^Update;
+		item "Cope with changes to RDF::RDFa::Parser::Config API."^^Update;
+		item "Drop common::sense dependency."^^Packaging;
+		item "XML::GRDDL can now export a couple of constants."^^Addition;
+	].
+

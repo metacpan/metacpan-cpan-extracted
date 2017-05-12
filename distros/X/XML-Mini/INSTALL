@@ -1,0 +1,43 @@
+#!/bin/sh
+
+#   XML::Mini 
+#
+#    XML::Mini perl extension, XML parser/generator package.
+#    Copyright (C) 2002-2008 Patrick Deegan, Psychogenic INC
+#    All rights reserved
+#    http://minixml.psychogenic.com
+#    
+#    See the LICENSE file for details on terms/conditions of use.
+#    
+
+# Installation.  The usual procedure will function nicely :
+
+perl Makefile.PL
+make
+make test
+make install
+
+#   
+#   but note that, since XML::Mini is 100% perl, you could probably just:
+#   
+#   - Select a location and create an XML directory:
+#   
+#   	$ mkdir /path/to/install/XML
+#   
+#   - Move the modules to the install location
+#   
+#   	$ mv Mini  Mini.pm /path/to/install/XML
+#   
+#   - Then specify the location of the library in your code
+#   
+#   	#!/usr/bin/perl
+#   
+#   	use lib '/path/to/install';
+#   	use XML::Mini;
+#   
+#   	# ...
+#   
+#   
+#   Regards,
+#   Pat Deegan
+#   

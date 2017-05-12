@@ -1,0 +1,146 @@
+<DocumentDefinition>
+  <name>_test_validation</name>
+
+  <element><name>plu</name></element>
+  <element><name>sing</name></element>
+
+  <element>
+    <name>d8</name>
+    <macro>date_8</macro>
+  </element>
+  <element>
+    <name>ut</name>
+    <macro>unix_time</macro>
+  </element>
+
+  <element>
+    <name>ot</name>
+    <macro>range:1,10</macro>
+    <macro>integer</macro>
+  </element>
+
+  <element>
+    <name>en</name>
+    <macro>enum:'foo','bar','kazzam'</macro>
+  </element>
+
+  <element>
+    <name>en_with_default</name>
+    <macro>enum:'foo','bar','kazzam'</macro>
+    <default>foo</default>
+  </element>
+
+  <element>
+    <name>en_with_empty</name>
+    <macro>enum:'','foo','bar','kazzam'</macro>
+  </element>
+
+  <nested_element>
+    <name>nested</name>
+    <element><name>nested_plu</name></element>
+    <element><name>nested_sing</name></element>
+      <plural>'nested_plu'</plural>
+      <required>'nested_sing'</required>
+  </nested_element>
+
+  <element>
+    <name>capitalized</name>
+
+      <validate_hook>
+      <![CDATA[
+      sub {
+        my ( $doc, $content ) = @_;
+        die "not capitalized\n"  if  $content !~ /^[A-Z]/;
+      };
+      ]]>
+      </validate_hook>
+
+  </element>
+
+  <element>
+    <name>with_default</name>
+    <default>default stuff</default>
+  </element>
+
+  <validate_hook>
+      <![CDATA[
+        # empty hook just to make sure that more than one hook
+        # is successfully defined/executed.
+        sub { 1 };
+      ]]>
+  </validate_hook>
+
+  <validate_hook>
+    <![CDATA[
+      sub {
+        my $self = shift();
+        my $sing_get = $self->element('sing')->get() || '';
+        die "just to check whether hook dies"
+          if $sing_get eq 'un-typical test';
+      };
+    ]]>
+  </validate_hook>
+
+  <element><name>not_hashificated</name></element>
+
+  <element>
+    <name>bool</name>
+    <macro>boolean</macro>
+  </element>
+
+  <element>
+    <name>bool_default_true</name>
+    <macro>boolean</macro>
+    <default>TRUE</default>
+  </element>
+
+  <element><name>zero_field</name></element>
+
+  <plural>'plu'</plural>
+  <required>'plu','nested','zero_field'</required>
+  <ignore_for_hash>'not_hashificated'</ignore_for_hash>
+
+
+  <element>
+    <name>all_basic_escaped</name>
+    <escapes><auto>1</auto></escapes>
+  </element>
+
+  <element>
+    <name>esc_basic_escaped</name>
+    <escapes><auto>[1,0]</auto></escapes>
+  </element>
+
+  <element>
+    <name>unesc_basic_escaped</name>
+    <escapes><auto>[0,1]</auto></escapes>
+  </element>
+
+  <element>
+    <name>all_specify_escaped</name>
+    <escapes>
+      <escape_code> 
+        sub { my $str=shift; $str =~ s:X:--x--:g; return $str; }
+      </escape_code>
+      <unescape_code>
+        sub { my $str=shift; $str =~ s:--x--:X:g; return $str; }
+      </unescape_code>
+      <auto>1</auto>
+    </escapes>
+  </element>
+
+  <element>
+    <name>truncated</name>
+    <macro>truncate_to_length: 7</macro>
+  </element>
+
+</DocumentDefinition>
+
+
+
+
+
+
+
+
+

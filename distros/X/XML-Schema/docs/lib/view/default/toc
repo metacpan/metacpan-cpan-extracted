@@ -1,0 +1,6 @@
+<h3>Table of Contents</h3>
+<ul>
+[% FOREACH section = item.getElementsByTagName('section') %]
+<li><a href="#[% section.id %]">[% section.title or section.id %]</a>
+[% END %]
+</ul>

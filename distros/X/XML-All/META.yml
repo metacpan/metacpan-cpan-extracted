@@ -1,0 +1,18 @@
+abstract: Overloaded XML objects
+author: Audrey Tang <cpan@audreyt.org>
+distribution_type: module
+generated_by: Module::Install version 0.63
+license: MIT
+name: XML-All
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  Class::InsideOut: 0
+  Exporter::Lite: 0
+  Tie::Simple: 0
+  XML::Literal: 0
+  XML::Twig: 0
+  perl: 5.6.1
+version: 0.02

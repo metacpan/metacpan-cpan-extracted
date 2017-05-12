@@ -1,0 +1,35 @@
+XML::Validate v1.025
+
+(c) BBC 2005. This program is free software; you can redistribute it and/or
+modify it under the GNU GPL.
+
+See the file COPYING in this distribution, or http://www.gnu.org/licenses/gpl.txt
+
+QUICK START:
+
+Install XML::Validate by unpacking the tarball and running the following
+commands in the source directory:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+    Then delete the source directory tree since it's no longer needed.
+
+    run 'perldoc XML::Validate' to read the full documentation.
+
+AVAILABLE BACKENDS:
+
+Backends for the following validators are included with this distribution:
+
+    LibXML (& you'll need XML::LibXML)
+    Xerces (& you'll need XML::Xerces)
+    MSXML  (for Win32 platforms, needs Win32::OLE)
+
+The default order of preference if all 3 are available is: Xerces, MSXML, LibXML
+
+DEPENDENCIES:
+
+Other than the modules for use with the backends, the XML::Validate modules themselves
+don't depend on other CPAN distributions.  However the unit tests distributed with
+them use Test::Assertions and Log::Trace (as indicated in the Makefile.PL).

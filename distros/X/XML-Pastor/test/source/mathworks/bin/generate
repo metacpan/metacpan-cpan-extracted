@@ -1,0 +1,25 @@
+#!/usr/local/apps/bat/latest/bin/perl
+use strict;
+use warnings;
+
+use lib '/sandbox/jmicco/cpan/XML-Pastor-0.54/blib/lib';
+
+use XML::Pastor;
+
+my $p = XML::Pastor->new();
+
+$p->generate( 
+              mode         => 'offline',
+              style        => 'multiple',
+              schema       => '/sandbox/jmicco/pkg/source/component_harness/schema/product.xsd',
+              class_prefix => 'MW::Ch::',
+              destination  => '/sandbox/jmicco/pkg/source/component_harness/generated'
+);
+
+$p->generate( 
+              mode         => 'offline',
+              style        => 'multiple',
+              schema       => '/sandbox/jmicco/pkg/source/component_harness/schema/component.xsd',
+              class_prefix => 'MW::Ch::',
+              destination  => '/sandbox/jmicco/pkg/source/component_harness/generated'
+);

@@ -1,0 +1,6 @@
+Revision history for Perl extension XML::Generator::RSS10::ipsv.
+
+0.01  Tue May  2 08:08:52 2006
+	- original version; created by h2xs 1.22 with options
+		-X -n XML::Generator::RSS10::ipsv
+

@@ -1,0 +1,475 @@
+NAME
+    XML::API - Perl extension for writing XML
+
+VERSION
+    0.30 (2016-04-11)
+
+SYNOPSIS
+      use XML::API;
+      my $x = XML::API->new(doctype => 'xhtml');
+      $x->_comment('My --First-- XML::API document');
+  
+      $x->html_open();
+      $x->head_open();
+      $x->title('Test Page');
+      $x->head_close();
+      $x->body_open();
+      $x->div_open(-id => 'content');
+      $x->p(-class => 'test', 'Some <<odd>> input');
+      $x->ns__p(-class => 'test', '& some other &stuff;');
+      $x->div_close();
+      $x->body_close();
+      $x->html_close();
+
+      print $x;
+
+    Will produce this nice output:
+
+      <?xml version="1.0" encoding="UTF-8" ?>
+      <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict...>
+      <!-- My - -First- - XML::API document -->
+      <html xmlns="http://www.w3.org/1999/xhtml">
+        <head>
+          <title>Test Page</title>
+        </head>
+        <body>
+          <div id="content">
+            <p class="test">Some &lt;&lt;odd&gt;&gt; input</p>
+            <ns:p class="test">&amp; some other &stuff;</ns:p>
+          </div>
+        </body>
+      </html>
+
+DESCRIPTION
+    XML::API is a class for creating XML documents using object method
+    calls. This class is meant for generating XML programatically and not
+    for reading or parsing it.
+
+    A document author calls the desired methods (representing elements) to
+    create an XML tree in memory which can then be rendered or saved as
+    desired. The advantage of having the in-memory tree is that you can be
+    very flexible about when different parts of the document are created and
+    the final output is always nicely rendered.
+
+TUTORIAL
+    The first step is to create an object. The 'doctype' attribute is
+    mandatory. Known values (ie - distributed with XML::API) are 'xhtml' and
+    'rss'. The encoding is not mandatory and will default to 'UTF-8'.
+
+      use XML::API;
+      my $x = XML::API->new(doctype => 'xhtml', encoding => 'UTF-8');
+
+    $x is the only object we need for our entire XHTML document. It starts
+    out empty so we want to open up the html element:
+
+      $x->html_open;
+
+    Because we have called a *_open() function the 'current' or 'containing'
+    element is now 'html'. All further elements will be added inside the
+    'html' element. So lets add head and title elements and the title
+    content ('Document Title') to our object:
+
+      $x->head_open;
+      $x->title('Document Title');
+
+    The 'title()' method on its own (ie not 'title_open()') indicates that
+    we are specifiying the entire title element. Further method calls will
+    continue to place elements inside the 'head' element until we specifiy
+    we want to move on by calling the _close method:
+
+      $x->head_close();
+
+    This sets the current element back to 'html'.
+
+    So, basic elements seem relatively easy. How do we create elements with
+    attributes? When either the element() or element_open() methods are
+    called with a hashref argument the keys and values of the hashref become
+    the attributes:
+
+      $x->body_open({id => 'bodyid'}, 'Content', 'more content');
+
+    or if you want, you can also use CGI-style attributes which I prefer
+    because it takes less typing:
+
+      $x->body_open(-id => 'bodyid', 'Content', 'more content');
+
+    By the way, both the element() and element_open() methods take arbitrary
+    numbers of content arguments as shown above. However if you don't want
+    to specify the content of the element at the time you open it up you can
+    use the _add() utility method later on:
+
+      $x->div_open();
+      $x->_add('Content added after the _open');
+
+    The final thing is to close out the elements and render the docment.
+
+      $x->div_close();
+      $x->body_close();
+      print $x->_as_string();
+
+    Because we are not adding any more elements or content it is not
+    strictly necessary to close out all elements, but consider it good
+    practice.
+
+    You can add XML::API object to other objects, which lets you create for
+    instance the head and body parts separately, and just bring them all
+    together just before printing:
+
+      my $h = XML::API::XHTML->new();
+      $h->head_open
+      ...
+      my $x = XML::API::XHTML->new();
+      $x->html_open;
+      $x->_add($h);
+      $x->html_close;
+      print $x;
+
+    Note that it is also possible to call the XML::API::<doctype> class
+    directly.
+
+CLASS SUBROUTINES
+  new
+    Create a new XML::API based object. The object is initialized as empty
+    (ie contains no elements). Takes the following optional arguments:
+
+      doctype  => '(xhtml|rss|WIX2)'
+      encoding => 'xxx'
+      debug    => 1|0
+
+    If a valid (ie known to XML::API) doctype is given then an object of
+    class XML::API::DOCTYPE will be returned instead. This method will die
+    if doctype is unknown. You can also call XML::API::DOCTYPE->new()
+    directly.
+
+    For the effects of the encoding and debug parameters see the
+    documentation for '_encoding' and '_debug' below.
+
+CONTENT
+  $x->element_open(-attribute => $value, {attr2 => 'val2'}, $content)
+    Add a new element to the 'current' element, and set the current element
+    to be the element just created. Returns a reference (private data type)
+    to the new element which can be used in the _goto function below.
+
+    Ie given that $x currently represents:
+
+      <html>  <---- 'current' element
+              <---- future elements/content goes here
+      </html>
+
+    then $x->head_open(-attribute => $value) means the tree is now:
+
+      <html>
+        <head attribute="$value">  <---- 'current' element
+                                   <---- future elements/content goes here
+        </head>
+      </html>
+
+  $x->_open('element', -attribute => $value, {attr2 => 'val2'}, $content)
+    The generic/underlying implementation of $x->element_open. Useful if
+    your element names are not suitable as Perl method calls, or are
+    otherwise funny (eg starting with '_').
+
+  $x->_add($content)
+    Add $content to the 'current' element. If there is no current element
+    then this method will croak.
+
+    If $content is a scalar (ie plain text or numbers) then the characters
+    '<&">' will be XML-escaped. If $content is another XML::API object the
+    elements of that object will be added to content tree.
+
+    This method will also croak if you attempt to add $x to itself or if $x
+    is an empty XML::API object.
+
+  $x->_raw($content)
+    Adds unescaped content to the 'current' element. You need to be careful
+    of characters that mean something in XML such as '<','&' and '>'. This
+    method will die if $content is an XML::API derivative or if $x does not
+    have a current element.
+
+  $x->element_close( )
+    This does not actually modify the tree but simply tells the object that
+    future elements will be added to the parent of the current element. Ie
+    given that $x currently represents:
+
+      <div>
+        <p>  <---- 'current' element
+          $content
+               <---- future elements/content goes here
+        </p>
+      </div>
+
+    then $x->p_close() means the tree is now:
+
+      <div>    <---- 'current' element
+        <p>
+          $content
+        </p>
+               <---- future elements go here
+      </div>
+
+    If you try to call a _close() method that doesn't match the current
+    element a warning will be issued and the call will fail.
+
+  $x->_close('element')
+    The generic/underlying implementation of $x->element_close. Useful if
+    your element names are not suitable as Perl method calls, or are
+    otherwise funny (eg starting with '_').
+
+  $x->element(-attribute => $value, {attr2 => 'val2'}, $content)
+    Add a new element to the 'current' element but keep the 'current'
+    element the same. Returns a reference (private data type) to the new
+    element which can be used in the _goto function below.
+
+    This is effectively the same as the following:
+
+        $x->element_open(-attribute => $value, -attr2=>'val2');
+        $x->_add($content);
+        $x->element_close;
+
+    If $content is not given (or never added with the _add method) for an
+    element then it will be rendered as empty. Ie, $x->br() produces:
+
+        <br />
+
+  $x->_element('element',...)
+    The generic implementation of $x->element. Useful if your element names
+    are not suitable as Perl method calls, or are otherwise funny (eg
+    starting with '_').
+
+  $x->element_raw('raw content',...)
+    Adds unescaped content inside an element named 'element'. This is a
+    shortcut for the case where you find yourself doing the following:
+
+        $x->element_open();
+        $x->_raw($content);
+        $x->element_close();
+
+  $x->ns__element_open(...)
+    Same as $x->element_open but prefixed with an XML namespace. Equivalent
+    to the following.
+
+      $x->_ns('ns');
+      $x->element_open(...);
+      ...
+      $x->element_close;
+      $x->_ns(undef);
+
+  $x->ns__element(...)
+    Same as $x->element but prefixed with an XML namespace. Equivalent to
+    the following.
+
+      $x->_ns('ns');
+      $x->element(...);
+      $x->_ns(undef);
+
+  $x->_comment($comment)
+    Add an XML comment to $x. Is almost the same as this:
+
+        $x->_raw("\n<!--");
+        $x->_raw($content);
+        $x->_raw('-->')
+
+    Except that indentation is correct. Any occurences of '--' in $content
+    will be replaced with '- -'.
+
+  $x->_cdata($content)
+    A shortcut for $x->_raw("\n<![CDATA[", $content, " ]]>");
+
+  $x->_css($content )
+    Adds $content inside a pair of CDATA tags which are encapsulated inside
+    CSS comments. Similar to:
+
+     $x->_raw('/*<![CDATA[*/ '. $content .' /*]]>*/');
+
+  $x->_javascript($script )
+    A shortcut for adding $script inside a pair of <script
+    type="text/javascript"> elements and a _CDATA tag.
+
+  $x->_parse(@content)
+    Adds content to the current element, but will parse it for xml elements
+    and add them as method calls. Regardless of $content (missing end tags
+    etc) the current element will remain the same. Relies on XML::SAX to do
+    the parsing using the "parse_string" method. In this case XML::SAX
+    requires that the content is a complete xml document.
+
+  $x->_parse_chunk(@content)
+    Adds content to the current element, but will parse it for xml elements
+    and add them as method calls. Regardless of $content (missing end tags
+    etc) the current element will remain the same. Relies on XML::SAX to do
+    the parsing, but using the "parse_chunk" method. This method is suitable
+    for parsing xml fragments which are not necessarily complete.
+
+  $x->_ast(@content)
+    Sometimes you may want to just build some kind of abstract syntax tree
+    structure and just feed it to XML::API without having to make all the
+    method calls yourself. This method lets you do just that.
+
+    The following input:
+
+      p => [
+          label => 'Body',
+          textarea => [
+              -rows  => 10,
+              -cols  => 50,
+              -name  => 'body',
+              'the body',
+          ],
+      ],
+
+    results in the following xml:
+
+      <p>
+        <label>Body</label>
+        <textarea cols="50" name="body" rows="10">the body</textarea>
+      </p>
+
+  $x->_attrs( )
+    Allows you to get/set the attributes of the current element. Accepts and
+    returns and hashref.
+
+META DATA
+  $x->_encoding($value)
+    Set the encoding definition produced in the xml declaration. Returns the
+    current value if called without an argument. This is an alternative to
+    defining the encoding in the call to 'new'.
+
+    The XML encoding definition for objects is determined by the following,
+    in this order:
+
+      * the last call to _encoding
+      * the encoding parameter given at object creation
+      * $XML::API::ENCODING, set by your script before calling new
+      * UTF-8, the package default
+
+    If you _add one object to another with different encodings the top-level
+    object's definition will be used.
+
+  $x->_set_lang($lang, [$dir])
+    Add an 'xml:lang' attribute, and an optional text direction $dir to the
+    next element to be created. In terms of output created this means that:
+
+      $x->_set_lang('de', 'ltr');
+      $x->p('Was sagst du?');
+
+    is equivalent to:
+
+      $x->p(-xml:lang => 'de', -dir => 'ltr', 'Was sagst du?');
+
+    with the added difference that _set_lang keeps track of each call and
+    the list of languages set can be retrieved using the _langs method
+    below.
+
+    The first time _set_lang is called the xml:lang attribute will be added
+    to the root element instead of the next one, unless $x is a generic XML
+    document. Without a XML::API::<class> object we don't know if we have
+    the root element or not.
+
+  $x->_lang
+    Returns the language of the current element. Note that this is not
+    always the same as the last value given to _set_lang, but depends on
+    what the current element is. Returns 'undef' if the document has no
+    'xml:lang' at all.
+
+  $x->_langs
+    Returns the list of the languages that have been specified by _set_lang.
+
+  $x->_dir
+    Returns the text direction of the current element. Note that this is not
+    always the same as the last value given to _set_lang, but depends on
+    what the current element is. Returns 'undef' if the document has no
+    direction specified.
+
+  $x->_ns($namespace)
+    Sets the XML namespace for future elements added with element() or
+    element_open(). Use 'undef' for no namespace. If you just want a
+    single-shot namespace you can also call element methods with a namespace
+    postfixed by '__' (two underscores).
+
+  $x->_debug(1|0)
+    Turn on|off debugging from this point onwards. Debugging appears as xml
+    comments in the rendered XML output.
+
+  $x->_current( )
+    Returns a reference (private data type) to the current element. Can be
+    used in the _goto method to get back to the current element in the
+    future.
+
+  $x->_set_id($id)
+    Set an identifier for the current element. You can then use the value of
+    $id in the _goto() method.
+
+  $x->_goto($id)
+    Change the 'current' element. $id is a value which has been previously
+    used in the _set_id() method, or the return value of a _current() call.
+
+    This is useful if you create the basic structure of your document, but
+    then later want to go back and modify it or fill in the details.
+
+OUTPUT
+  $x->_as_string($file)
+    Returns the xml-rendered version of the object. If $x has the root
+    element for the doctype, or if $x is a pure XML::API object then the
+    string is prefixed by the XML declaration (with the encoding as defined
+    in the '_encoding' method documentation):
+
+      <?xml version="1.0" encoding="UTF-8" ?>
+
+    The optional $file argument will cause the string to be written out to
+    disk instead of being returned.
+
+  $x->_fast_string($file)
+    Returns the rendered version of the XML document without newlines or
+    indentation.
+
+    The optional $file argument will cause the string to be written out to
+    disk instead of being returned.
+
+OVERLOADING
+    See the source code of XML::API::XHTML for how to create a new doctype.
+
+    These are methods which may return interesting values if the
+    XML::API::<class> module has overloaded them.
+
+  _doctype
+    Returns the XML DOCTYPE declaration
+
+  _root_element
+    Returns the root element
+
+  _root_attrs
+    Returns a hashref containing default key/value attributes for the root
+    element
+
+  _content_type
+    Returns a string suitable for including in a HTTP 'Content-Type' header.
+
+COMPATABILITY
+    Since version 0.10 a call to new() does not automatically add the root
+    element to the object. If it did so you wouldn't be able to add one
+    object to another.
+
+    Version 0.13 made the doctype parameter to new() optional, so that
+    generic (ie no DOCTYPE declaration) XML documents can be created.
+
+    Version 0.15 removed the pointless _print method.
+
+SEE ALSO
+    XML::Generator and XML::Writer are other xml producing modules.
+
+    If you are thinking of using XML::API in a CGI program check out NCGI.
+
+AUTHOR
+    Mark Lawrence <nomad@null.net>
+
+    A small request: if you use this module I would appreciate hearing about
+    it.
+
+COPYRIGHT
+    Copyright (C) 2004-2016 Mark Lawrence <nomad@null.net>
+
+LICENSE
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by the
+    Free Software Foundation; either version 2 of the License, or (at your
+    option) any later version.
+

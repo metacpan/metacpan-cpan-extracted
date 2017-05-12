@@ -1,0 +1,98 @@
+Changelog for XML-Struct
+
+0.26  2015-06-09 09:53:04 CEST
+  - fix builder support of Moo 1.0
+  - fix encoding of empty tag in simple format as {}
+
+0.25  2015-05-22 15:05:07 CEST
+  - allow resetting to/handler of writers
+  - made most options only settable in constructors
+  - refactored XML::Struct::Simple and improved tests
+  - experimental reader option: deep (issue #16)
+
+0.24  2015-05-18 15:34:22 CEST
+  - simplified Writer, fix writing mixed XML
+  - migrated build system to Milla
+  - improved documentation
+
+0.23 2014-06-27T22:00:46
+ - much more liberal XML writer
+ - make all members mutable
+
+0.22 2014-06-24T12:22:28
+ - fixed issue #10
+ - Merge branch 'master' into issue-10
+ - merged feature branches
+ - refactored simpleXML to XML::Struct::Simple
+ - unit test for issue #10
+
+0.21 2014-06-22T21:13:53
+ - fix pretty serialization w/o xmldecl
+ - add and test xmldecl
+
+0.20 2014-06-22T10:40:04
+ - include XML serializer (issue #6)
+
+0.19 2014-06-19T07:20:35
+ - avoid quote_sub failure
+
+0.18 2014-06-12T13:47:30
+ - removed debug statement
+
+0.17 2014-06-12T12:08:50
+ - readXML from STDIN by default (close #9)
+ - support reading from XML::LibXML::Document/Element
+
+0.16 2014-02-20T09:25:51
+ - fixed empty element bug in simpleXML
+
+0.15 2013-09-23T10:22:03
+ - align empty XML elements with MicroXML data model
+ - new option: ns=>'disallow'
+ - fix namespace stripping attributes
+ - Document parallels to MicroXML
+
+0.14 2013-09-19T06:56:00
+ - fully enable option depth
+
+0.13 2013-09-17T12:17:43
+ - new option 'depth' for simpleXML
+ - support namespace stripping
+
+0.12 2013-09-17T09:35:19
+ - Support '//' in pathes
+
+0.11 2013-09-12T08:17:16
+ - new function removeXMLAttr
+ - renamed 'hashify' to 'simple'
+
+0.10 2013-09-11T12:04:45
+ - renamed 'hashify' to 'simple'
+
+0.06 2013-09-11T10:31:11
+ - bumped version
+ - added method readDocument
+ - fixed hashification with root
+ - improved writer with options 'encoding' and 'version'
+
+0.05 2013-09-10T12:09:48
+ - removed test artifact
+
+0.04 2013-09-10T11:50:06
+ - improved path matching
+ - support hashify root aka KeepRoot
+
+0.03 2013-09-09T08:32:40
+ - added function hashifyXML
+ - extended writer
+ - fix reader test
+ - implemented writer
+ - don't test on Perl 5.8 with travis
+ - first draft of writer
+
+0.02 2013-09-08T09:19:25
+ - renamed to XML::Struct
+ - added writer
+
+0.01 2013-09-06T22:50:43
+ - initial draft

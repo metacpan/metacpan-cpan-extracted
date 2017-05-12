@@ -1,0 +1,15 @@
+bin/xslt_easy.pl
+bin/xslt_easy_batch.pl
+lib/XML/LibXSLT/Easy.pm
+lib/XML/LibXSLT/Easy/Batch.pm
+lib/XML/LibXSLT/Easy/Batch/CLI.pm
+lib/XML/LibXSLT/Easy/CLI.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+t/basic.t
+t/load.t
+t/xml/foo.xml
+t/xml/foo.xsl
+META.yml                                 Module meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

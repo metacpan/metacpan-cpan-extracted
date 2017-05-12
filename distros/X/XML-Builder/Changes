@@ -1,0 +1,28 @@
+Revision history for XML-Builder
+
+0.906 Sat 27 Jun 2015
+	- Fix for foreach across fragments (reported by Maurice Aubrey)
+
+0.905 Sat 10 Jan 2015
+	- No functional changes
+	- No longer contains INSTALL file with install-as-root instructions
+
+0.904 Mon 05 Jan 2015
+	- No functional changes
+	- Re-released with workaround for insufficient Dist::Zilla smarts
+	  (c.f. <https://github.com/rjbs/Dist-Zilla/issues/404>)
+
+0.903 Sat 03 Jan 2015
+	- No functional changes
+	- Switched to MakeMaker
+	- Regenerated package
+
+0.902 Sat 05 Jun 2010
+	- Enabled `fallback` for all overloads
+	  Fixes #57778 (Test suite fails with Test-Builder-0.95_02)
+
+0.901 Mon 22 Feb 2010
+	- Fix broken package and Dist::Zilla config
+
+0.900 Mon 22 Feb 2010
+	- Initial release.

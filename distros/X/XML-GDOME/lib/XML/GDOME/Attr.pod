@@ -1,0 +1,52 @@
+=head1 NAME
+
+  XML::GDOME::Attr - Interface Attr implementation.
+
+=head1 SYNOPSIS
+
+  $str  = $a->getName();
+  $elem = $a->getOwnerElement();
+  $bool = $a->getSpecified();
+  $str  = $a->getValue();
+          $a->setValue($str);
+
+=head1 CLASS INHERITANCE
+
+L<XML::GDOME::Node> > XML::GDOME::Attr
+
+
+=head1 METHODS
+
+=over 4
+
+
+=item $str = $a->getName();
+
+
+
+I<Returns>: the qualified name of this attribute.
+
+
+=item $elem = $a->getOwnerElement();
+
+
+
+I<Returns>: the Element node this attribute is attached to or undef if this attribute is not in use.
+
+
+=item $bool = $a->getSpecified();
+
+NOT IMPLEMENTED
+
+I<Returns>: 1
+
+
+=item $str = $a->getValue();
+
+
+
+I<Returns>: the value of this attribute.
+
+
+=back
+

@@ -1,0 +1,37 @@
+<%TextTable
+  mode="start"
+  format=" l | r | l "
+%><%TextTable
+  mode="ruler" symbol="="
+%><%TextTable
+  mode="head"
+  cell.1.template="Name"
+  cell.2.template="Price"
+  cell.3.template="Description"
+%><%TextTable
+  mode="ruler" symbol="-"
+%><%TextTable
+  cell.1.template="Fubar1111111111111111100000000"
+  cell.2.template="$123.23"
+  cell.3.template="alsdj alksd aklsj dkals jdkla jsdkla skld aksld klas kl d"
+%><%TextTable
+  cell.1.template="Fubar"
+  cell.2.template="$123,234,345.00"
+  cell.3.template={<%TextTable
+                     mode="start" format="l|r"%><%TextTable
+                     cell.1.template="123" cell.2.template="234"%><%TextTable
+                     cell.1.template="12345" cell.2.template="2 3 4"%><%TextTable
+                     mode="render" width="20"%>}
+%><%TextTable
+  cell.1.template="Fubar"
+  cell.2.template="$12,123.23"
+  cell.3.template="als alksjd aklsjd aklsj dklas jdkl jaskl jddj alksd aklsj dkals jdkla jsdkla skld aksld klas kl d"
+%><%TextTable
+  cell.1.template="Fubar"
+  cell.2.template="$1.23"
+  cell.3.template="alsdj alksd aklsj dkals jdkla jsdkla skld aksld klas kl d"
+%><%TextTable
+  mode="ruler" symbol="="
+%><%TextTable
+  mode="render"
+%><%End%>

@@ -1,0 +1,28 @@
+---
+name: XML-Bits
+version: v0.0.1
+author:
+  - 'Eric Wilhelm @ <ewilhelm at cpan dot org>'
+abstract: a tree of XML nodes
+license: perl
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=XML-Bits
+  homepage: http://scratchcomputing.com/
+  license: http://dev.perl.org/licenses/
+  repository: http://svn.scratchcomputing.com/XML-Bits/trunk
+build_requires:
+  Module::Build: 0.26
+  Test::More: 0
+requires:
+  Class::Accessor::Classy: v0.9.0
+  Tree::Base: v0.10.2
+configure_requires:
+  Module::Build: 0.34
+provides:
+  XML::Bits:
+    file: lib/XML/Bits.pm
+    version: v0.0.1
+generated_by: Module::Build version 0.3406
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

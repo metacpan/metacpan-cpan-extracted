@@ -1,0 +1,84 @@
+<?xml version='1.0' encoding='utf-8'?>
+<document xmlns="http://web-cpan.berlios.de/modules/XML-Grammar-Fortune/fiction-xml-0.2/" xmlns:xlink="http://www.w3.org/1999/xlink" version="0.2">
+    <head>
+    </head>
+    <body xml:id="index">
+    <title>David vs. Goliath - Part I</title>
+    <section xml:id="top">
+    <title>The Top Section</title>
+    <!-- David has Green hair here -->
+    <p>
+    King <span xlink:href="http://en.wikipedia.org/wiki/David">David</span> and Goliath were standing by each other.
+    </p>
+    <p>
+    David said unto Goliath: "I will shoot you. I <b>swear</b> I will"
+    </p>
+    <section xml:id="goliath">
+    <title>Goliath's Response</title>
+    <!-- Goliath has to reply to that.
+New line in comment.
+Another new line.
+    -->
+    <p>
+    Goliath was not amused.
+    </p>
+    <p>
+    He said to David: "Oh, really. <i>David</i>, the red-headed!".
+    </p>
+    <p>
+    David started listing Goliath's disadvantages:
+    </p>
+    <blockquote xml:lang="fr-FR" xml:id="my_blockquote">
+    <ol>
+    <li>
+    <p>
+    You're slow.
+    </p>
+    </li>
+    <li>
+    <p>
+    You're big.
+    </p>
+    </li>
+    <li>
+    <p>
+    You're stupid.
+    </p>
+    </li>
+    </ol>
+    <p>
+    Goliath was insulted and told David he should use bullets for the
+    points, instead:
+    </p>
+    <ul>
+    <li>
+    <p>
+    David.
+    </p>
+    </li>
+    <li>
+    <p>
+    Saul.
+    </p>
+    </li>
+    <li>
+    <p>
+    Jonathan.
+    </p>
+    </li>
+    <li>
+    <p>
+    Michal.
+    </p>
+    </li>
+    <li>
+    <p>
+    Meyrav.
+    </p>
+    </li>
+    </ul>
+    </blockquote>
+    </section>
+    </section>
+</body>
+</document>

@@ -1,0 +1,30 @@
+NAME
+
+   XML::SAX::Simple
+
+This is a SAX version  of  XML::Simple. It works exactly the same as XML::Simple,
+so  see  the  documentation of that module for details. The benefit of using this
+over XML::Simple is that XML::SAX::Simple will use any Perl SAX2 parser installed
+on your system (via XML::SAX), rather than being hard coded to use XML::Parser.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  XML::Simple, XML::SAX, XML::Handler::Trees
+
+COPYRIGHT AND LICENCE
+
+This is free  software. You  may use it and distribute it under the same terms as
+Perl itself.
+
+Copyright (C) 2001 Matt Sergeant, matt@sergeant.org

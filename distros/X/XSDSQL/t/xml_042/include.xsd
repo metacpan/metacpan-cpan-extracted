@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+	targetNamespace="http://www.camera.org"
+	xmlns="http://www.camera.org"
+	elementFormDefault="unqualified"
+	attributeFormDefault="unqualified"
+>
+	<xs:include schemaLocation="schema2.xsd"/>
+	<xs:include schemaLocation="schema3.xsd"/>
+
+	<xs:complexType name="ct1">
+		<xs:sequence minOccurs="1" maxOccurs="1">
+			<xs:element name="el0_ct1" type="xs:string"/>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:element name="s1">
+		<xs:complexType>
+			<xs:sequence minOccurs="0" maxOccurs="1">
+				<xs:element ref="el0" minOccurs="0" maxOccurs="1"/>  
+				<xs:element name="elb" type="ct0" minOccurs="0" maxOccurs="1"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+    <xs:element name="s3" type="ct00"/> 
+
+</xs:schema>
+
+

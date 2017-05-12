@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<xs:schema 
+	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+>
+
+
+
+<xs:complexType name="lettertype1">
+  <xs:sequence>
+    <xs:element name="name1" type="xs:string"/>
+    <xs:element name="orderid1" type="xs:positiveInteger" maxOccurs="1"/>
+    <xs:element name="shipdate1" type="xs:date"/>
+  </xs:sequence>
+</xs:complexType> 
+
+<xs:complexType name="lettertype" mixed="true">
+  <xs:sequence>
+    <xs:element name="name" type="xs:string"/>
+    <xs:element name="p" type="lettertype1"  minOccurs="0" maxOccurs="1"/>
+    <xs:element name="orderid" type="xs:positiveInteger" maxOccurs="10"/>
+    <xs:element name="shipdate" type="xs:date"/>
+  </xs:sequence>
+</xs:complexType> 
+
+<xs:element name="letter" type="lettertype"/>
+
+<xs:element name="letter1">
+	<xs:complexType mixed="true">
+	  <xs:sequence>
+		<xs:element name="name" type="xs:string"/>
+		<xs:element name="p" type="lettertype1"  minOccurs="0" maxOccurs="1"/>
+		<xs:element name="orderid" type="xs:positiveInteger" maxOccurs="10"/>
+		<xs:element name="shipdate" type="xs:date"/>
+	  </xs:sequence>
+	</xs:complexType> 
+</xs:element>
+
+</xs:schema>
+

@@ -1,0 +1,11 @@
+Build.PL
+Changes
+MANIFEST
+MANIFEST.SKIP
+META.yml
+Makefile.PL
+README
+SIGNATURE
+lib/XML/RSS/Aggregate.pm
+t/0-signature.t
+t/1-basic.t

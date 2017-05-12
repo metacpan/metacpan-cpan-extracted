@@ -1,0 +1,11 @@
+<%
+   $t->{'linkinter'}{pre} = '<a href="{@url}">';
+   $t->{'linkinter'}{post} = '</a>';
+   $t->{'link'}{testcode} = sub {
+      my ($currentnode, $t) = @_;
+      my $url = $currentnode->getAttribute('url');
+      $t->{pre}="<a href=\"$url\">";
+      $t->{post}='</a>';
+      return 1;
+   };
+%><%= apply_templates() %>

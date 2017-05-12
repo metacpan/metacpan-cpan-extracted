@@ -1,0 +1,27 @@
+---
+abstract: 'XAO Foundation Server (OO database layer)'
+author:
+  - 'Andrew Maltsev, http://ejelta.com/xao/'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0402, CPAN::Meta::Converter version 2.150001'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: XAO-FS
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  DBD::mysql: '2.0414'
+  DBI: '1.13'
+  Error: '0.15'
+  Pod::Usage: '1.12'
+  Test::Unit: '0.15'
+  XAO::Base: '1.06'
+version: '1.15'

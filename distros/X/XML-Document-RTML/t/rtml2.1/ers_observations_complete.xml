@@ -1,0 +1,288 @@
+<?xml version="1.0"?>
+<!DOCTYPE RTML SYSTEM "http://astro.livjm.ac.uk/HaGS/rtml2.1.dtd" >
+
+<RTML version="2.1" type="observation">
+
+    <Contact PI="true">
+        <User>
+	    je
+        </User>
+
+	<Name>
+	    Jason Etherton
+	</Name>
+
+	<Institution>
+	    Liverpool John Moores University
+	</Institution>
+
+	<Address>
+	    Astrophysics Research Institute
+
+	    Twelve Quays house
+
+	    Egerton Wharf
+
+	    Birkenhead
+
+	    CH41 1LD
+
+	</Address>
+
+	<Telephone>
+	    +44 (0) 151 231 2903 
+	</Telephone>
+
+	<Fax>
+	    +44 (0) 151 231 2921
+	</Fax>
+
+	<Email>
+	    je@astro.livjm.ac.uk
+	</Email>
+
+	<Url>
+	    http://www.astro.livjm.ac.uk
+	</Url>
+    </Contact>
+
+    <Project>
+        <Title>
+	    Demonstration RTML document.
+        </Title>
+
+	<Abstract>
+	    This project is designed to test the RTML parsing modules.
+	</Abstract>
+	    This document specifies ALL the information that will be required
+	    by a Discovery Node to SCORE an observation request.
+    </Project>
+
+    <Telescope region="optical" alias="LT">
+        The Telescope is defined to specify a telescope to observe with.
+
+	There is no need to define the Aperture, FocalLength, FocalRatio etc as 
+	the specific Telescope has this data.
+
+	If partial Telescope details are defined, whilst the Name is not, then 
+	any Telescope satisfying the criteria can be used.
+
+	Also, specifying a Telescope renders the Location data redundent.
+
+	Both have been completely filled in for completeness.
+
+	<Name>
+	    Liverpool Telescope
+	</Name>
+
+	It is doubtful that the following will be filled by the Astronomer as
+	the specification of a telescope will determine all data below.
+	<Aperture units="meters">
+	    2.0
+	</Aperture>
+
+	<EffectiveAperture units="meters">
+	    1.8
+	</EffectiveAperture>
+
+	<FocalLength units="metres">
+	    20.0
+	</FocalLength>
+
+	<FocalRatio units="metres">
+	    f/10
+	</FocalRatio>
+
+	<PlateScale units="arcsec/mm">
+	    10.0
+	</PlateScale>
+    </Telescope>
+
+    <Location>
+        The Location is defined to specify a site to observe from.  Again, if a
+	Telescope has been specified this will be filled on return, otherwise
+	the observatory site will be specified.
+
+	<Name>
+	    Roque de los Muchachos.
+	</Name>
+
+	<Longitude format="sddd mm ss E" units="dms">
+	    -017 52 54 E
+	</Longitude>
+
+	<Latitude format="sdd mm ss" unit="dms">
+	    +28 45 36
+	</Latitude>
+
+	<Altitude units="metres">
+	    2395
+	</Altitude>
+    </Location>
+
+    <Observation status="ok">
+        This is the 1st Observation request.
+
+	<Score>
+	    If this is present in the submission to the ERS it will be 
+	    ignored.
+	</Score>
+
+	<CompletionTime>
+	    Replaced if filled in by the IA (see Score above).
+	</CompletionTime>
+
+	<Target type="normal" ident="Observation">
+	    This is the 1st observation Target.
+
+	    The Target attribute ident should be filled in by the Telescope.
+	    e.g.  Target ident="LT00001" 
+	    <TargetName>
+	        NGC 1234
+	    </TargetName>
+
+	    <Coordinates type="equatorial">
+	        <RightAscension format="hh mm ss.s" units="hms">
+		    12 34 56.7
+		    <ProperMotion format="ss.s" angleUnits="sec" timeUnits="yr"
+		     useEpoch="true">
+		        01.1
+		    </ProperMotion>
+	        </RightAscension>
+
+		<Declination format="sdd mm ss.s" units="dms">		
+		    +12 34 56.7
+		    <ProperMotion format="ss.s" angleUnits="arcsec" 
+		     timeUnits="yr" useEpoch="true">
+		        02.2
+		    </ProperMotion>
+		</Declination>
+
+		<Equinox>
+		    J2000
+		</Equinox>
+
+		<Epoch>
+		    2000.0
+		</Epoch>
+	    </Coordinates>
+
+	    <Parallax>
+	        0.72
+	    </Parallax>
+
+	    <RadialVelocity type="LSR" units="km/s">
+	        -22.0
+	    </RadialVelocity>
+
+	    <Flux type="continuum" wavelength="6563" units="mag">
+	        18.8
+	    </Flux>
+
+	    <TrackRate type="sidereal" />
+
+	    <Device name="RATCAM" region="optical" type="camera">
+	        LT RATCAM
+		<Filter>
+		    <FilterType type="R-Johnson" />
+		</Filter>
+	    </Device>
+	</Target>
+
+	Calcuate the minimum exposure time needed to obtain the Signal-to-Noise
+	ratio.
+	<Schedule priority="3">
+	    No binning.
+
+	    <Exposure type="snr">
+	        5.0
+	    </Exposure>
+
+	    <ExposureFactor>
+	        0.0
+	    </ExposureFactor>
+
+	    <SeeingConstraint nominal="1.0" maximum="2.0">
+	        Need at least 2.0 arcsec seeing for this!
+	    </SeeingConstraint>
+
+	    Sky must be NO brighter than 0.2 mags in the R-band.
+	    <SkyConstraint sky="dark" value="0.2" units="R-mag" />
+
+	    Moon must be no fuller than 10%, and at least 30 degrees from the
+	    target.
+	    <MoonConstraint maxPhase="0.1" distance="30.0" units="degs"/>
+
+	    The night MUST be photometric.
+	    <ExtinctionConstraint magnitudes="0.0" clouds="clear" />
+
+	    The target MUST be observed at ZD less than 60 degrees.
+	    <AirmassConstraint minimum="2.0" />
+
+	    Take observation between 31st Oct 2001 and 30th Nov 2001.
+	    <TimeConstraint>
+	        <StartDateTime>
+		    2001.10.31T23:00:00
+	        </StartDateTime>
+	        <EndDateTime>
+		    2001.11.30T23:00:00
+	        </EndDateTime>
+	    </TimeConstraint>
+
+	    Time varying target.
+	    <PhaseConstraint>
+	        Object has phase  = 0.0 @ MJD 501029
+		Object has period = 124.5 hours
+		Only interested in observing phase transition
+	        <PhaseTime units="MJD">501029</PhaseTime>
+		<PhasePeriod units="hours">124.5</PhasePeriod>
+		<StartPhase>-0.05</StartPhase>
+		<EndPhase>0.05</EndPhase>
+	    </PhaseConstraint>
+	</Schedule>
+
+	<Calibration>
+	    Bias is the frame used to de-bias, and will be filled in after the
+	    correction.  The `number' attribute will be filled in unless 
+	    specified.
+	    <Bias correct="true" overscan="true" mean="true" />
+
+	    The Dark current correction will also be filled in after the
+	    correction is performed.  The `number' attribute will be filled in 
+	    unless specified.
+	    <DarkCurrent correct="true" />
+
+	    Bad pixels will be corrected for.  The returned data is the URL
+	    of the frame showing the bad pixels.
+	    <BadPixels correct="true" />
+
+	    Correct by flat fielding using either dome- or sky-flats.  Again the
+	    data is filled on return with the correction frame and number.
+	    <FlatField correct="true" sky="true" dome="true" />
+
+	    Putting "true" to a correction will only ask for it.  If the
+	    correction is not available it will be reset to "false".
+	    <Fringing correct="true" />
+
+	    Remove cosmic rays.
+	    <CosmicRays correct="true" />
+	</Calibration>
+
+	<Telemetry>
+	    This will be filled in on completion of the observation.
+	</Telemetry>
+
+	<ImageData type="FITS16" compressed="gzip" delivery="ftp">
+	    Possibly the URL of the reduced data file.
+	</ImageData>
+
+	<Reduction>
+	    Create an object list of the 5 brightest stars within 20 arceseconds
+	    of the target
+	    <Magnitude maximum="maximum" />
+	    <Position radius="20" units="arcsec" />
+	    <ObjectList number="5" />
+	</Reduction>
+    </Observation>
+
+</RTML>

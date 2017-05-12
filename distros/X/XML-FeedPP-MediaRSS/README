@@ -1,0 +1,239 @@
+NAME
+    XML::FeedPP::MediaRSS - MediaRSS support for XML::FeedPP
+
+VERSION
+    version 0.02
+
+SYNOPSIS
+        use XML::FeedPP;
+
+        my $feed  = XML::FeedPP->new('http://a.media.rss/source');
+        my $media = XML::FeedPP::MediaRSS->new($feed);
+        for my $i ( $feed->get_item ) {
+            for my $content ( $media->for_item($i) ) {
+                die "18 or over" if $content->{adult};
+            }
+        }
+
+DESCRIPTION
+    XML::FeedPP does not support Yahoo's MediaRSS extension, and it
+    shouldn't. It's only supported in some formats, and XML::FeedPP is a
+    lowest-common-denominator kind of module. That said, sometimes you need
+    to consume feeds with MediaRSS in them.
+
+METHODS
+  new ( feed )
+    You have to pass in an XML::FeedPP object. "XML::FeedPP::MediaRSS" isn't
+    a subclass of XML::FeedPP - it has one, and inspects its dirty innards
+    (which is somewhat safe since they're produced by XML::TreePP) to find
+    media content.
+
+  for_item ( item )
+    Pass in a feed item (the things returned by "$feed->get_item") and get
+    back a list of "XML::FeedPP::MediaRSS::Content" objects.
+
+KEYS
+  adult
+    1 or ''
+
+  rating
+    A hash of all the ratings found, schema => rating.
+
+  title
+    A hash of all titles found, type => value.
+
+  keywords
+    An arrayref of all the keywords found. The comma-delimiting is undone
+    and duplicates are removed.
+
+  thumbnails
+    All thumnails found, from most specific (deepest) to least specific.
+    This means that if the channel has a thumbnail and the item has a
+    thumbnail, you'll get the item first, then the channel. If there are
+    multiple thumbnails at the same level, you'll get them in document
+    order. Time coding is not considered. They look like this:
+
+        {   url => '...', width => 400, height => 300, time => 'timecode'   }
+
+  category
+    Hash of scheme => plain contents of tag
+
+  hash
+    Deepest only.
+
+        {
+            algorithm => 'md5',
+            checksum  => 'dfdec888b72151965a34b4b59031290a',
+        }
+
+  player
+    Deepest only.
+
+        {
+            url => '...',
+            height => 300,
+            width => 400
+        }
+
+  credit
+    Hash of scheme to role-hash, like this:
+
+        {
+            'urn:ebu' => {
+                actor => [
+                    'Julia Roberts',
+                    'Tom Hanks',
+                ],
+                director => [
+                    'Stevan Spielberg',
+                ]
+            }
+        }
+
+  copyright
+    Deepest only.
+
+    { url => '...', text => '2005 Foobar Media' }
+
+  text
+    A list of text objects in document order, like this:
+
+        [
+            {
+                type  => 'plain',
+                lang  => 'en',
+                start => 'timecode',
+                end   => 'timecode',
+                text  => 'The actual value',
+            },
+        ]
+
+  restriction
+        {
+            allow => (1|0),
+            type  => (country|uri|sharing)
+            list  => [ ... ] | 'all' | 'none'
+        }
+
+    If allow is false, that means deny.
+
+  community
+    Deepest only.
+
+        {
+            starRating => {
+                average => 3.5,
+                count   => 20,
+                min     => 1,
+                max     => 10,
+            },
+            statistics => {
+                views     => 5,
+                favorites => 5,
+            },
+            tags       => {
+                news => 5,
+                abc  => 3,
+                reuters => undef,
+            },
+        }
+
+  comments
+    Simple list of strings.
+
+  embed
+    Hash of key-value pairs. Deepest only.
+
+  responses
+    Simple list of strings
+
+  backlinks
+    Simple list of strings
+
+  status
+    Deepest only.
+
+        { state => 'status', reason => 'reason' }
+
+  price
+    List of pricing structures, which are hashes with the keys "currency"
+    (optional), "info" (optional), "type" (optional), and "price"
+    (optional). If none of these is present for a given price tag, we're
+    going to pretend it doesn't exist.
+
+  license
+    Hash of type, href, and name. Deepest only.
+
+  subTitle
+    Only one per language as per the spec.
+
+        {
+            'en_us' => {
+                href => 'http://www.example.org/subtitle.smil',
+                type => 'application/smil',
+            }
+        }
+
+  peerLink
+    Deepest only, hash of type and href.
+
+  location
+    NOT SUPPORTED, mostly cause I don't need it and I don't feel like
+    reading the geoRSS spec right now. Patches welcome!
+
+  rights
+    value of the status attribute for the deepest rights element.
+
+  scenes
+    Deepest only, list of hashes with keys title, description, start_time,
+    and end_time.
+
+ALPHA
+    This software hasn't yet been tested beyond the examples provided in the
+    mRSS spec. Failing tests (even better, with patches that fix the
+    failures) are very welcome! Fork and send a pull request on "GITHUB".
+
+XML::FeedPP::MediaRSS::Content
+    These are blessed hashes, but you're allowed to look inside them. In
+    fact, you're really supposed to. It's okay, don't be nervous.
+
+    The mapping from the MediaRSS spec
+    (<http://video.search.yahoo.com/mrss>) to this hash is really
+    straightforward. See the "KEYS" section for more detail. The
+    shallowness-rules talked about in the spec are applied, e.g. specifiers
+    at higher levels are applied to lower level objects unless they have a
+    more specific rule.
+
+LIMITATIONS
+  Groups
+    You don't have to (get to?) deal with media groups. All the content for
+    an item gets flattened into one list. Future versions of this module may
+    add support for media groups under a different method name
+    ("groups_for_item") if anyone ever sends me a patch or I can ever find
+    an actual use for it.
+
+  Order
+    The MediaRSS spec says some things about order being dependent on
+    document order. We go by the order we get things from XML::FeedPP's
+    hashes, which will only be the same as document order if you "use_ixhash
+    => 1" in the feed. And even then, content in media:groups will come
+    before content outside them.
+
+  Read-Write
+    This module only supports reading MediaRSS information from a feed, not
+    adding it. I might add this someday, but of course patches are welcome
+    in the meantime.
+
+GITHUB
+    This project is hosted on github at
+    <http://github.com/frodwith/XML-FeedPP-MediaRSS>.
+
+AUTHOR
+    Paul Driver <frodwith@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2011 by Paul Driver <frodwith@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

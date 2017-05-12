@@ -1,0 +1,40 @@
+---
+abstract: 'A set of procedures and modules to implement a spooler'
+author:
+  - 'Kevin L. Esteb <kevin@kesteb.us>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4001, CPAN::Meta::Converter version 2.120351'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: XAS-Spooler
+provides:
+  XAS::Apps::Spooler::Process:
+    file: lib/XAS/Apps/Spooler/Process.pm
+    version: 0.01
+  XAS::Docs::Spooler::Installation:
+    file: lib/XAS/Docs/Spooler/Installation.pm
+    version: 0.01
+  XAS::Spooler:
+    file: lib/XAS/Spooler.pm
+    version: 0.03
+  XAS::Spooler::Connector:
+    file: lib/XAS/Spooler/Connector.pm
+    version: 0.02
+  XAS::Spooler::Processor:
+    file: lib/XAS/Spooler/Processor.pm
+    version: 0.02
+requires:
+  POE::Component::Cron: 0.021
+  XAS: 0.08
+  XAS::Model: 0.01
+  perl: 5.00808
+resources:
+  homepage: http://scm.kesteb.us/trac
+  repository: http://scm.kesteb.us/git/XAS-Spooler
+version: 0.03

@@ -1,0 +1,108 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 2554a1c42ac19f0bfc7b5c391676f3343a2ad232 Build.PL
+SHA1 6289a7b63e6cddf0139fd9d74705adf0d07464fa Changes
+SHA1 05a5f3528ef8a73c665e5e73cfe088a22841d60f MANIFEST
+SHA1 c12cf66c790482c504d042650f963b8effc940d3 META.yml
+SHA1 1794aad4c7569a63f2638e58789ee2f1ad3a86a8 Makefile.PL
+SHA1 0b05cc0bbf188500b5260ae83f500e5af82735ca README
+SHA1 585dbee14359e90630096c4c39d944c3ed5fd0df dist/rewrite-default-xml-parser
+SHA1 b8f13d00c750860ca69a0f2be632fdb0cf1b3256 examples/docbook2latex.xps
+SHA1 49de2221717af40dfd852e18c46650097290aa1f examples/sample-docbook.xml
+SHA1 477417aa6f19e280f0a99cfebe898709b43f58fc lib/XML/XPathScript.pm
+SHA1 425d3d5866d0f5214672883c58efc52f8f0188ac lib/XML/XPathScript/Processor.pm
+SHA1 2c6197b637d04230d08c55db4b5cf19804ff558c lib/XML/XPathScript/Processor/B.pm
+SHA1 873b0493b0ad13eecdfa8eaac69f139a23d75e0c lib/XML/XPathScript/Processor/LibXML.pm
+SHA1 433d1eb212012aeb6450a4137f08bbf89c958e77 lib/XML/XPathScript/Processor/XPath.pm
+SHA1 4f2bd67d33fd417629c6cff2a0d3053035c45e03 lib/XML/XPathScript/Stylesheet.pod
+SHA1 f667a41fd6c92916e6205fadbadb7d22b9c86bd2 lib/XML/XPathScript/Stylesheet/DocBook2LaTeX.pm
+SHA1 9bba29e14e803933b09efb3eadca5eefbdf2bd8c lib/XML/XPathScript/Template.pm
+SHA1 19ba4614630c35a3059dffa8e18876ba6d0d6afa lib/XML/XPathScript/Template/Tag.pm
+SHA1 44a91906b1c3ba4b2bddec121e96c77c97f30081 lib_axkit/Apache/AxKit/Language/YPathScript.pm
+SHA1 553248592b413f49ea7f739d1da52f2fc2219b53 lib_tomkit/Apache2/TomKit/Processor/XPathScript.pm
+SHA1 0475c452e5a471b610041abd6b24b177748e7186 script/xpathscript
+SHA1 0fabf086f09dd536eab3e44118e71ed456a53eb1 t/00build.t
+SHA1 9d8a3166da409cfa69237aaf8228e17f6e75cf9a t/01basic.t
+SHA1 66b1a741ea182ba1ff9fcdc6527ee3fdbbec10ef t/02interpolate.t
+SHA1 2e379f5377e9f174677c66e1261216bc94ca1b84 t/03general.t
+SHA1 f2603f080098c236d6f32a292d7270cae34cf628 t/04unicode.t
+SHA1 595ec281b37e412a8ee1368e39931bd318dde100 t/05textnode.t
+SHA1 2dbdc5e8ad96687de10598f6c80df5827a51afd6 t/06testcode.t
+SHA1 d823831b458ba27743660b4659133c1b3deba496 t/07stylesheetcallbacks.t
+SHA1 082321586d05d5edbf3e38ef82c90fca1fc32d3d t/08document.t
+SHA1 05871e12c2e3be75f30e87906f3d82934e7b9699 t/09argencoding.t
+SHA1 c773c7fce291e7ce2c2255d7627f456fc775d3e9 t/10comments.t
+SHA1 1169e0d4a63ed43244f8a0af6d292c67ff10ea98 t/11new_interface.t
+SHA1 0989a2106f79625b399ab7b09766f10266c2b5c7 t/12template.t
+SHA1 46e17a5bcf74f98408b79fbb93815d2b9ccb34ab t/13samples.t
+SHA1 2c752a84c922cd4e9c26203bc9080828b2a96f8a t/14transform.t
+SHA1 e89e45e03354bfe11460cbc369015276d69bfabb t/15stylesheet_dependencies.t
+SHA1 aace8bd5e1ed77bfa0c14486bd9d68fbe6f90591 t/16stylesheet_arguments.t
+SHA1 14910b7d7ac2aa13f5d62540ccd2a74ea5d2f0bc t/17xml_loading.t
+SHA1 dd0511247e2b26c82730e494e5c99c34bd17683a t/18tag.t
+SHA1 168cba7a97ecde70adf7eca4fa9b7a7d286c7771 t/21processor.t
+SHA1 c33c82ccbc7e8630b92166686d6ed0c4ae2a9ba0 t/22stylesheet.t
+SHA1 b8c82b094099739a1bd5d58d25f28a30d069a753 t/24content.t
+SHA1 c5f5498817eaba5a25c8f3eb5649967522961163 t/25stylesheetlines.t
+SHA1 aa137969106661854a21061390c8b6adff29733d t/26bxpath.t
+SHA1 a97bb50d22980bb033f71c9795b0d54763bd7d01 t/27template_import.t
+SHA1 14f6eca2fca5d68e6dc88f0a57e20477fa7de2e8 t/40axkit.t
+SHA1 78cfa7de755f5f7f2da6e01d22810eeb6468311b t/50tomkit.t
+SHA1 63574dc3c9f6f140fd4e0fd3a3c540522e2f87af t/99signature.t
+SHA1 304e9d0886833b0f8199ec8470f308e460927ccc t/document_file.txt
+SHA1 477e5a9175b18cae2798984c6da96bbdd2d309a7 t/include.xps
+SHA1 4a80a2e8f62d37b8118a73b9274a915e05767200 t/include2.xps
+SHA1 a1482c17667bb69441d3dffdaa01cfbbf4d323ed t/include3.xps
+SHA1 5c56f4311f58bb87f3f66112a47da4fd809c61ad t/recursive.xps
+SHA1 b3181ce69eb684d7fc5212acce436bca2708d64d t/t1.result
+SHA1 7b564ce9aa6487478c49780e2ae9436ab156ea2c t/t1.xml
+SHA1 52ec2a420e547cf73ecd5fd62249fa199eea2656 t/t1.xps
+SHA1 464f664c35726063137c74880cd35fd2db8faefd t/t1_compat.xps
+SHA1 c5d3d71d11ad619211940394bf8ae38ec834169b t/t2.xps
+SHA1 4e484373ef27d6ecfc7c86a0393c06dbda1b6073 t/t2_compat.xps
+SHA1 05aa399c1807694f018334632583548b1523ac21 t/testdocs/action_xpath
+SHA1 45f570462d179f78313417a6d3ada03bbb2f68ce t/testdocs/action_xpath.expected
+SHA1 03759f5888df1086c200f577b3d7732fc3d03122 t/testdocs/action_xpath.xml
+SHA1 f7d42bf31b05815a065027ea9b5335ef21eb626f t/testdocs/action_xpath.xps
+SHA1 4b370d7555e8d0ec9002feeb394a88cfeaadcc8c t/testdocs/dialect.expected
+SHA1 e447250cffc312f38f500b86ac0fb25a88047687 t/testdocs/dialect.xml
+SHA1 9805433131c9733bd99f11299dcc7d334a04d05d t/testdocs/dialect.xps
+SHA1 97a88873b3577fb72aad75f62061f3be51666e6a t/testdocs/do_text_as_child.expected
+SHA1 54d6ef3bba85ef6d654d7f6c818b1ded93c39a57 t/testdocs/do_text_as_child.xml
+SHA1 dc1b527243ebe2e8c91f3caf18a86f35112d75c0 t/testdocs/do_text_as_child.xps
+SHA1 269cae6e7ba50589481b7924e41f371994fec6f0 t/testdocs/interpolate.expected
+SHA1 5f92b6627249f19b3c446581f3a9a1e86f13280d t/testdocs/interpolate.xml
+SHA1 c825ea550ce270ca6bcd4d9090e5ec9f96ef01ee t/testdocs/interpolate.xps
+SHA1 05aa399c1807694f018334632583548b1523ac21 t/testdocs/interpolate2.expected
+SHA1 2e9d1978c28f88a1475377d7368a73158e28bf2c t/testdocs/interpolate2.xml
+SHA1 2c4b3803ab218ff338f48a525eaa8c824756ad06 t/testdocs/interpolate2.xps
+SHA1 a71740926ee0a82669de7b3b4a317cd1c4f247be t/testdocs/namespace.expected
+SHA1 0e85a4c84b1fd40ff4f6d658394be5f32e9c1ec4 t/testdocs/namespace.xml
+SHA1 5f090697a80fdd37fae93e2e4e03f851abed14ba t/testdocs/namespace.xps
+SHA1 eeeefb892d1185e87dafa1376e7061f8c885895b t/testdocs/shoutML.expected
+SHA1 9b30957a8e2d7bc147ddc9d9c0320d66bfebb478 t/testdocs/shoutML.xml
+SHA1 773c99eb7af5480e65c55aaed72124e082e93353 t/testdocs/shoutML.xps
+SHA1 e739fa89f56b123580d539d5e2d400c6abd108d5 t/testdocs/tag_attributes.expected
+SHA1 db53da51ad4ff13761a69ee9b0e12315f7623fc5 t/testdocs/tag_attributes.xml
+SHA1 d36ad2b5860e4ca564b845e0e7bb5d5134624d6e t/testdocs/tag_attributes.xps
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.7 (GNU/Linux)
+
+iD8DBQFIi4tn34Hwf+GwC4wRApKMAJ45/53zHAFfm4qNgae6xY3cnYYlrACg8fAn
+eArdMMSPcsD2SEX0daapB/Q=
+=lCA1
+-----END PGP SIGNATURE-----

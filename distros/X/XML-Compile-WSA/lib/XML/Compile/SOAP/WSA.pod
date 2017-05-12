@@ -1,0 +1,216 @@
+=encoding utf8
+
+=head1 NAME
+
+XML::Compile::SOAP::WSA - SOAP Web Service Addressing
+
+=head1 INHERITANCE
+
+ XML::Compile::SOAP::WSA
+   is a XML::Compile::SOAP::Extension
+
+=head1 SYNOPSIS
+
+ # use WSA via WSDL, wsa header fields start with wsa_
+ use XML::Compile::WSDL11;     # first
+ use XML::Compile::SOAP::WSA;  # hooks into wsdl
+
+ my $wsa  = XML::Compile::SOAP::WSA->new(version => '1.0');
+ my $wsdl = XML::Compile::WSDL11->new(...);
+ my $call = $wsdl->compileClient('some_operation');
+ my ($data, $trace) = $call->(wsa_MessageID => 'xyz', %data);
+
+ print $wsdl->operation('myop')->wsaAction;
+
+=head1 DESCRIPTION
+
+The Web Service Addressing protocol is used to select certain
+service and port on a SOAP server, just like the "Host" header
+in C<HTTP>.
+
+The basic SOAP design uses the URI and the C<soapAction> header of HTTP
+(in case it uses HTTP, by far the most often used transport mechanism)
+However, when the server is hidden behind firewalls and proxies, these
+fields are rewritten or replaced.  This means that the definitions by
+the WSDL for the client can differ from the configuration of the server.
+This is where WSA comes into play.
+
+When WSA is enabled, header fields are added. Automatically, the
+obligatory C<wsa_To> and C<wsa_Action> fields will be added to each
+request, although you may change their values with call parameters.
+This works both for soap clients (created with L<XML::Compile::SOAP|XML::Compile::SOAP>)
+as for the soap server (created with XML::Compile::SOAP::Daemon):
+simply require the WSA module to get the hooks installed.
+
+Supported fields:
+
+  Action
+  FaultTo
+  From
+  MessageID
+  RelatesTo
+  ReplyTo
+  RetryAfter
+  To
+
+Extends L<"DESCRIPTION" in XML::Compile::SOAP::Extension|XML::Compile::SOAP::Extension/"DESCRIPTION">.
+ 
+=head1 METHODS
+
+Extends L<"METHODS" in XML::Compile::SOAP::Extension|XML::Compile::SOAP::Extension/"METHODS">.
+ 
+=head2 Constructors
+
+Extends L<"Constructors" in XML::Compile::SOAP::Extension|XML::Compile::SOAP::Extension/"Constructors">.
+ 
+=over 4
+
+=item XML::Compile::SOAP::WSA-E<gt>B<new>(%options)
+
+ -Option --Default
+  version  <required>
+
+=over 2
+
+=item version => '0.9'|'1.0'|MODULE
+
+Explicitly state which version WSA needs to be produced.
+You may use a version number (where C<0.9> is used to represent
+the "submission" specification). You may also use the MODULE
+name, which is a namespace constant, provided via C<::Util>.
+The only option is currently C<WSA10MODULE>.
+
+=back
+
+=back
+
+=head2 WSDL11
+
+Extends L<"WSDL11" in XML::Compile::SOAP::Extension|XML::Compile::SOAP::Extension/"WSDL11">.
+ 
+=over 4
+
+=item $obj-E<gt>B<wsdl11Init>($wsdl, $args)
+
+=item XML::Compile::SOAP::WSA-E<gt>B<wsdl11Init>($wsdl, $args)
+
+Inherited, see L<XML::Compile::SOAP::Extension/"WSDL11">
+
+=back
+
+=head2 SOAP11
+
+Extends L<"SOAP11" in XML::Compile::SOAP::Extension|XML::Compile::SOAP::Extension/"SOAP11">.
+ 
+=over 4
+
+=item $obj-E<gt>B<soap11ClientWrapper>($operation, $call, $args)
+
+Inherited, see L<XML::Compile::SOAP::Extension/"SOAP11">
+
+=item $obj-E<gt>B<soap11HandlerWrapper>($operation, $callback, $args)
+
+Inherited, see L<XML::Compile::SOAP::Extension/"SOAP11">
+
+=item $obj-E<gt>B<soap11OperationInit>($operation, $args)
+
+=item XML::Compile::SOAP::WSA-E<gt>B<soap11OperationInit>($operation, $args)
+
+Inherited, see L<XML::Compile::SOAP::Extension/"SOAP11">
+
+=back
+
+=head2 SOAP12
+
+Extends L<"SOAP12" in XML::Compile::SOAP::Extension|XML::Compile::SOAP::Extension/"SOAP12">.
+ 
+=over 4
+
+=item $obj-E<gt>B<soap12ClientWrapper>($operation, $call, $args)
+
+Inherited, see L<XML::Compile::SOAP::Extension/"SOAP12">
+
+=item $obj-E<gt>B<soap12HandlerWrapper>($operation, $callback, $args)
+
+Inherited, see L<XML::Compile::SOAP::Extension/"SOAP12">
+
+=item $obj-E<gt>B<soap12OperationInit>($operation, $args)
+
+=item XML::Compile::SOAP::WSA-E<gt>B<soap12OperationInit>($operation, $args)
+
+Inherited, see L<XML::Compile::SOAP::Extension/"SOAP12">
+
+=back
+
+=head2 Attributes
+
+=over 4
+
+=item $obj-E<gt>B<version>()
+
+Returns the version number.
+
+=item $obj-E<gt>B<wsaNS>()
+
+Returns the namespace used for this WSA version.
+
+=back
+
+=head2 SEE ALSO
+
+=over 4
+
+=item Web Services Addressing 1.0 - Core
+
+F<http://www.w3.org/TR/ws-addr-core>, 9 May 2006
+
+=item Web Services Addressing 1.0 - SOAP Binding
+
+F<http://www.w3.org/TR/ws-addr-soap>, 9 May 2006
+
+=item Web Services Addressing 1.0 - WSDL Binding
+
+F<http://www.w3.org/TR/ws-addr-wsdl>, 29 May 2006
+
+=back
+
+=head1 SYNOPSYS
+
+Extends L<"SYNOPSYS" in XML::Compile::SOAP::Extension|XML::Compile::SOAP::Extension/"SYNOPSYS">.
+ 
+=head1 SEE ALSO
+
+This module is part of XML-Compile-WSA distribution version 0.94,
+built on June 11, 2015. Website: F<http://perl.overmeer.net/xml-compile/>
+
+Other distributions in this suite:
+L<XML::Compile>,
+L<XML::Compile::SOAP>,
+L<XML::Compile::WSDL11>,
+L<XML::Compile::SOAP12>,
+L<XML::Compile::SOAP::Daemon>,
+L<XML::Compile::SOAP::WSA>,
+L<XML::Compile::C14N>,
+L<XML::Compile::WSS>,
+L<XML::Compile::WSS::Signature>,
+L<XML::Compile::Tester>,
+L<XML::Compile::Cache>,
+L<XML::Compile::Dumper>,
+L<XML::Compile::RPC>,
+L<XML::Rewrite>
+and
+L<XML::LibXML::Simple>.
+
+Please post questions or ideas to the mailinglist at
+F<http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/xml-compile> .
+For live contact with other developers, visit the C<#xml-compile> channel
+on C<irc.perl.org>.
+
+=head1 LICENSE
+
+Copyrights 2010-2015 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

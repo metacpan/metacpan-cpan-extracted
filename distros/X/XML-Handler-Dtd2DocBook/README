@@ -1,0 +1,31 @@
+XML::Handler::Dtd2DocBook - Generate a DocBook documentation from a DTD
+
+Description:
+------------
+    dtd2db is a front-end for XML::Handler::Dtd2DocBook and its subclasses.
+    It uses them to generate HTML documentation from DTD source.
+
+    Because it uses XML::Parser and an external DTD is not a valid XML
+    document, the input source must be an XML document with an internal DTD
+    or an XML document that refers to an external DTD.
+
+    The goal of this tool is to increase the level of documentation in DTD
+    and to supply a more readable format for DTD.
+
+    It is a tool for DTD users, not for writer.
+
+
+Prerequisites:
+--------------
+    This tool needs XML::SAX::Expat, XML::Parser and 
+    XML::Handler::Dtd2DocBook modules.
+
+Build/Installation:
+-------------------
+    Standard build/installation supported by ExtUtils::MakeMaker(3)...
+	$ perl Makefile.PL
+	$ make
+	$ make install
+
+
+Send bug reports, comments and suggestions to francois.perrad@gadz.org

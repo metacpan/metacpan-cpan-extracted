@@ -1,0 +1,12 @@
+Aosd.xs
+Changes
+Makefile.PL
+MANIFEST
+ppport.h
+README
+t/X11-Aosd.t
+fallback/const-c.inc
+fallback/const-xs.inc
+lib/X11/Aosd.pm
+typemap
+META.yml                                 Module meta-data (added by MakeMaker)

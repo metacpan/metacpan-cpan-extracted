@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<NZSRSResponse VerMajor="3" VerMinor="99" RegistrarId="90">
+  <Response Action="UDAIValidQry" FeId="4" FeSeq="411486" OrigRegistrarId="90" RecipientRegistrarId="90">
+    <FeTimeStamp Day="11" Hour="12" Minute="03" Month="1" Second="33" TimeZoneOffset="+13:00" Year="2010"/>
+    <UDAIValid Valid="0"/>
+  </Response>
+</NZSRSResponse>

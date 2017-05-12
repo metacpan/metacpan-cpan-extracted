@@ -1,0 +1,33 @@
+---
+name: XMail-Install
+version: 1.01
+author:
+  - 'Ron Savage <ron@savage.net.au>'
+abstract: A module to install the MS Windows mail server XMail
+license: artistic
+resources:
+  license: http://opensource.org/licenses/artistic-license.php
+requires:
+  Carp: 0
+  Email::Send: 0
+  File::Copy: 0
+  File::Copy::Recursive: 0
+  File::Path: 0
+  Mail::POP3Client: 0
+  Path::Class: 0
+  Win32: 0
+  Win32::Process: 0
+  Win32::Process::List: 0
+  Win32::Service: 0
+  Win32::TieRegistry: 0
+build_requires:
+  Test::More: 0
+  Test::Pod: 0
+provides:
+  XMail::Install:
+    file: lib/XMail/Install.pm
+    version: 1.01
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

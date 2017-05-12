@@ -1,0 +1,17 @@
+\.bak$
+~$
+Makefile$
+^\.git
+^blib/
+^debian/
+-stamp$
+perltidy.pl
+\.perltidyrc
+\.tar
+pm_to_blib
+XML-SRS-
+\.(old|orig|rej)$
+debian/libxml-srs-perl
+debian/*.substvars
+debian/*.debhelper.log
+debian/files

@@ -1,0 +1,33 @@
+<h2>Table of Contents</h2>
+<ul>
+<table border="0" cellpadding="2" cellspacing="0">
+[%  FOREACH item = toc;
+        sublist = [];
+        IF (subs = item.subs.size);
+            FOREACH sub = item.subs;
+                text = "<a href=\"#${sub.id}\">${sub.title}</a>";
+	        sublist.push(text);
+            END;
+	END;
+-%]
+<tr valign="top">
+<td>
+  <li><b><a href="#[% item.id %]">[% item.title %]</a></b>
+</td>
+
+<td>
+[% IF sublist.size %]
+<b>:<b>
+[% END %]
+</td>
+
+<td>
+[% IF sublist.size %]
+<small>[% sublist.join(',&nbsp; ') %]</small>
+[% END %]
+<td>
+
+</tr>
+[% END %]
+</table>
+</ul>

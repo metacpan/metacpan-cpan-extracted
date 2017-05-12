@@ -1,0 +1,5 @@
+This is a subsystem test, I guess, with heavy emphasis on interaction bugs.
+Everything, every whitespace or non-whitespace, every indent or outdent,
+every this-before-that, every this-and-this-again, every this-first, every
+this-last, has a purpose and many have found bugs or limitations in xsubpp.
+

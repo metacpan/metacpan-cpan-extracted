@@ -1,0 +1,21 @@
+<stx:transform version="1.0" 
+  xmlns:stx="http://stx.sourceforge.net/2002/ns"
+  strip-space="yes">
+
+  <stx:template match="/*">
+    <root>
+      <stx:value-of select="normalize-space('     ko    ')"/>
+      <stx:text>:</stx:text>
+      <stx:value-of select="normalize-space('koko ')"/>
+      <stx:text>:</stx:text>
+      <stx:value-of select="normalize-space(' ko  ko  ma ')"/>
+      <stx:process-children/>
+    </root>
+  </stx:template>
+
+  <stx:template match="node[1]">
+    <stx:text>:</stx:text>
+    <stx:value-of select="normalize-space()"/>
+  </stx:template>
+  
+</stx:transform>

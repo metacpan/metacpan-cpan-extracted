@@ -1,0 +1,11 @@
+
+Revision history for XML::Filter::BufferText:
+
+1.01  2003-07-04 21:50
+    - fixed a long standing bug related to buffering of cdata events
+
+1.00  sun 20020706 20:37
+    - cleaned up docs
+
+0.01  sun 20020127 19:59:55
+    - original version

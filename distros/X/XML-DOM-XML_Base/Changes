@@ -1,0 +1,6 @@
+Revision history for Perl extension XML::DOM::XML_Base.
+
+0.01  Tue Aug 15 16:23:13 2006
+	- original version; created by h2xs 1.23 with options
+		-Xn XML::DOM::XML_Base
+

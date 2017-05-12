@@ -1,0 +1,176 @@
+=encoding utf8
+
+=head1 NAME
+
+XML::Compile::C14N - XML Canonicalization
+
+=head1 SYNOPSIS
+
+ my $schema = XML::Compile::Cache->new(...);
+ my $c14n   = XML::Compile::C14N->new(schema => $schema);
+
+=head1 DESCRIPTION
+
+XML canonicalization is used to enforce an explicit formatting style
+on de XML documents. It is required to have a reproducable output when,
+for instance, digital signatures gets applied to parts of the document.
+
+C14N currently has seen three versions: 1.0, 1.1, and 2.0.  Versions 1.*
+need [C14N-EXC] version 1.0.  There is no support for version 2.0 in
+L<XML::LibXML> yet, so also not provided by this module.
+
+=head1 METHODS
+
+=head2 Constructors
+
+=over 4
+
+=item XML::Compile::C14N-E<gt>B<new>(%options)
+
+There can be more than one C14N object active in your program.
+
+ -Option --Default
+  for      undef
+  schema   undef
+  version  '1.1'
+
+=over 2
+
+=item for => METHOD
+
+[0.92] When a canonicallization METHOD is provided, that will be used to
+automatically detect the C14N version to be loaded.
+
+=item schema => L<XML::Compile::Cache|XML::Compile::Cache> object
+
+Add the C14N extension information to the provided schema.  If not used,
+you have to call L<loadSchemas()|XML::Compile::C14N/"Internals"> before compiling readers and writers.
+
+=item version => STRING
+
+Explicitly state which version C14N needs to be used.  C14N2 is not
+yet supported.  If not specified, it is first attempted to derive the
+version from the 'for' option.
+
+=back
+
+=back
+
+=head2 Attributes
+
+=over 4
+
+=item $obj-E<gt>B<schema>()
+
+=item $obj-E<gt>B<version>()
+
+Returns the version number.
+
+=back
+
+=head2 Handling
+
+=over 4
+
+=item $obj-E<gt>B<normalize>($type, $node, %options)
+
+The $type is one of the C14* constants defined in L<XML::Compile::C14N::Util|XML::Compile::C14N::Util>.  The $node is an XML::LibXML::Element.  Returned is a normalized
+byte-sequence, for instance to be signed.
+
+ -Option     --Default
+  context      <created from NODE if needed>
+  prefix_list  []
+  xpath        undef
+
+=over 2
+
+=item context => XML::LibXML::XPathContext object
+
+=item prefix_list => ARRAY
+
+Then prefixes which are to be included in normalization, only used in
+excludeNamespaces (EXC) normalizations.
+
+=item xpath => EXPRESSION
+
+Only normalize a subset of the document.
+
+=back
+
+=back
+
+=head2 Internals
+
+=over 4
+
+=item $obj-E<gt>B<loadSchemas>($schema)
+
+Load the C14N schema to the global $schema, which must extend
+L<XML::Compile::Cache|XML::Compile::Cache>.
+
+This method will be called when you provide a value for L<new(schema)|XML::Compile::C14N/"Constructors">.
+Otherwise, you need to call this when the global $schema is known in your
+program.
+
+=back
+
+=head1 DETAILS
+
+=head2 References
+
+=over 4
+
+=item [C14N-10] Canonical XML Version 1.0
+
+F<http://www.w3.org/TR/xml-c14n>, 15 March 2001
+
+=item [C14N-EXC] Exclusive XML Canonicalization Version 1.0
+
+F<http://www.w3.org/TR/xml-exc-c14n/>, 18 July 2002
+
+=item [C14N-11] Canonical XML Version 1.1
+
+F<http://www.w3.org/TR/xml-c14n11/>, 2 May 2008
+
+=item [C14N-20] Canonical XML Version 2.0
+
+F<http://www.w3.org/TR/xml-c14n2/>, 24 January 2012
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of XML-Compile-C14N distribution version 0.94,
+built on February 18, 2014. Website: F<http://perl.overmeer.net/xml-compile/>
+
+Other distributions in this suite:
+L<XML::Compile>,
+L<XML::Compile::SOAP>,
+L<XML::Compile::WSDL11>,
+L<XML::Compile::SOAP12>,
+L<XML::Compile::SOAP::Daemon>,
+L<XML::Compile::SOAP::WSA>,
+L<XML::Compile::C14N>,
+L<XML::Compile::WSS>,
+L<XML::Compile::WSS::Signature>,
+L<XML::Compile::Tester>,
+L<XML::Compile::Cache>,
+L<XML::Compile::Dumper>,
+L<XML::Compile::RPC>,
+L<XML::Rewrite>
+and
+L<XML::LibXML::Simple>.
+
+Please post questions or ideas to the mailinglist at
+F<http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/xml-compile> .
+For live contact with other developers, visit the C<#xml-compile> channel
+on C<irc.perl.org>.
+
+=head1 LICENSE
+
+Copyrights 2011-2014 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

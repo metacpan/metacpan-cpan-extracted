@@ -1,0 +1,26 @@
+In no particular order...
+
+1. Add ResourceSets - DONE
+
+2. Add XUPDate - DONE
+
+3. Find systematic way of error-handling
+
+4. Remodel drivers to have a consistent interface - DONE
+
+5. Fix failing driver tests - DONE
+
+6. Perl File driver - DONE
+
+7. Deal with eXist XPath extensions
+
+8. Deal with Xindice indexing
+
+9. Start testing with UTF8
+
+10. Fix XMLResource:getDocumentId - DONE
+
+11. Get working with new eXist version (in CVS). Should the drivers
+be version-specific? What syntax to use for this?
+
+12. Check if can be integrated with sleepycat DB

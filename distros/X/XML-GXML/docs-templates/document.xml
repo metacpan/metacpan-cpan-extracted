@@ -1,0 +1,17 @@
+<document title-default="untitled document">
+
+<html:head><html:title>%%%title%%%</html:title></html:head>
+
+<h1>%%%title%%%</h1>
+by %%%author%%% &lt; %%%email%%% &gt;<br/>
+%%%date%%%<br/>
+
+<hr/>
+
+%%%_BODY_%%%
+
+<hr/>
+<font size="-1"><i>Copyright (c) 2001-2002 %%%author%%%</i></font>
+
+<!-- end of %%%title%%% -->
+</document>

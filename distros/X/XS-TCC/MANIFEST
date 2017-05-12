@@ -1,0 +1,19 @@
+author_tools/dthx_benchmark.pl
+author_tools/naive_math_bench.pl
+Changes
+COPYING
+lib/XS/TCC.pm
+lib/XS/TCC/Parser.pm
+lib/XS/TCC/Typemaps.pm
+Makefile.PL
+MANIFEST			This list of files
+ppport.h
+t/10_lowlevel.t
+t/20_parser.t
+t/30_inline.t
+t/data/inctest.c
+TCC.xs
+typemap_func.c
+typemap_func.h
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

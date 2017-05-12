@@ -1,0 +1,34 @@
+---
+abstract: 'Compilation based XML processing'
+author:
+  - 'Mark Overmeer'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120630'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: XML-Compile
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Digest::MD5: 2.36
+  IO: 1.22
+  List::Util: 0
+  Log::Report: 1.03
+  MIME::Base64: 3.1
+  Math::BigInt: 1.77
+  Math::BigRat: 0.1
+  Test::Deep: 0.095
+  Test::More: 0.54
+  Types::Serialiser: 0
+  XML::Compile::Tester: 0.9
+  XML::LibXML: 2.0107
+  bignum: 0.1
+version: 1.56

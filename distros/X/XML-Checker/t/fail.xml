@@ -1,0 +1,49 @@
+<!DOCTYPE root [
+ <!ENTITY default_entity SYSTEM "default_entity.gif" NDATA gif>
+ <!NOTATION default_notation SYSTEM "perl.exe">
+ <!ELEMENT root ANY>
+ <!ELEMENT p (p|b|c|q)*>
+ <!ELEMENT c (p|b)*>
+ <!ELEMENT b EMPTY>
+ <!ELEMENT unexpected EMPTY>
+ <!ATTLIST p
+  str CDATA "default p"
+  fixed CDATA #FIXED "fixed value"
+  enum (enum1|enum2|default_enum) "default_enum"
+  notation NOTATION (undef_notation|default_notation) "default_notation">
+ <!ELEMENT q ANY>
+ <!ATTLIST q
+  idref IDREF "default_id"
+  req_id ID #REQUIRED
+  second_id ID #REQUIRED>
+ <!ELEMENT n ANY>
+ <!ATTLIST n nmtoken NMTOKEN #REQUIRED>
+ <!ELEMENT bad_id EMPTY>
+ <!ATTLIST bad_id
+  bad_default_id ID "1bad_default_id"
+  bad_default_idref IDREF "1bad_default_idref"
+  bad_default_idrefs IDREFS "1bad_default_idrefs default_id">
+ <!ELEMENT bad_ent EMPTY>
+ <!ATTLIST bad_ent
+  bad_default_ent ENTITY "1bad_default_ent"
+  bad_default_ents ENTITIES "1bad_default_idref default_entity">
+]>
+<root>
+ <q req_id="default_id"/>
+ <p fixed="bad fixed value" enum="bad enum"/>
+ <p>
+  <b/>
+  <c>
+   <unexpected/>
+   <undefined/>
+  </c>
+  <q req_id="unreferenced_id"/>
+ </p>
+ <n nmtoken="1bad nmtoken"/>
+ <n nmtoken="valid_nmtoken"/>
+ <bad_id bad_idref="1bad ID"/>
+ <bad_id/>
+ <bad_ent bad_ent="1bad ENTITY"/>
+ <bad_ent/>
+ <![CDATA[ some cdata ]]>
+</root>

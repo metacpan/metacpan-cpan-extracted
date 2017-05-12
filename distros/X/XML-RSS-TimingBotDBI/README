@@ -1,0 +1,75 @@
+README for XML-RSS-TimingBotDBI
+                                        Time-stamp: "2004-04-24 01:47:41 ADT"
+
+NAME
+
+XML::RSS::TimingBotDBI - XML::RSS::TimingBot-subclass that saves state with DBI
+
+SYNOPSIS
+      use XML::RSS::TimingBotDBI;
+      use DBI;
+  
+      my $dbh = DBI->connect( 'whatever...' )
+       || die "Can't connect: $DBI::errstr\nAborting";
+  
+      my $table = "myrsstable";
+  
+      $browser = XML::RSS::TimingBotDBI->new;
+      $browser->rssagent_dbh($dbh);
+      $browser->rssagent_table($table);
+  
+      my $response = $browser->get(
+        'http://interglacial.com/rss/cairo_times.rss'
+      );
+
+      ... And process $response just as if it came from
+         a plain old LWP::UserAgent object, for example: ...
+  
+      if($response->code == '200') {
+        ...process it...
+      }
+
+DESCRIPTION
+    This class is for requesting RSS feeds only as often as needed, and
+    storing in a database the data about how often what feeds can be
+    requested.
+
+    This is a subclass of XML::RSS::TimingBot's methods that stores its data
+    in a DBI database object that you specify, instead of using
+    XML::RSS::TimingBot's behavior of storing in a local flat-file database.
+
+    To use this class, "use" it, create a new object of this class, and "use
+    DBI" and make a new database handle-object; then use "rssagent_dbh" to
+    assign that handle to this TimingBotDBI object; and use
+    "rssagent_url_field", "rssagent_lastmod_field",
+    "rssagent_nextupdate_field", and "rssagent_fetag_field" to set up the
+    right table/field names; and then, finally, you can use the TimingBotDBI
+    object just like a LWP::UserAgent (actually LWP::UserAgent::Determined)
+    object, to request RSS feeds.
+
+
+[continued in the documentation for this module, which you can read
+with perldoc]
+
+
+INSTALLATION
+
+You install this Perl module, as you would install any Perl module
+library, by running these commands:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+If you want to install a private copy of this module in your home
+directory, then you should try to produce the initial Makefile with
+something like this command:
+
+  perl Makefile.PL PREFIX=~/perl
+
+See "perldoc perlmodinstall" for more information and advice.
+
+
+This module doesn't depend on XML::RSS, nor in fact have any
+particular relationship with it.

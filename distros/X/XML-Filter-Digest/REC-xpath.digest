@@ -1,0 +1,7 @@
+<digest name="extract">
+  <collect name="section" node="//html//h2[position()&gt;3]">
+    <collect name="id" node="child::a/attribute::name" />
+    <collect name="title" node="." />
+    <collect name="intro" node="following-sibling::p[position()=1]" />
+  </collect>
+</digest>

@@ -1,0 +1,93 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+xmc - Xen Control script
+
+=head1 SYNOPSIS
+
+    xmc [CMD] [domain-name]
+    
+        CMD           is one of the: ls, create, shutdown, save, restore
+        domain-name   is optional and is not set command wil apply to all domains
+
+=head1 DESCRIPTION
+
+`xmc` script is helper script arround `xm` Xen management user control. The
+difference is that it applies the commands to all domains if the domain
+name is not specified explicitely. For example `xmc save` will suspend
+all running Xen machines.
+
+'save', 'restore' functions will by default save/restore the state file
+to/from '/var/tmp'. The file name will be constructed from the domain name
+and extension '.xen' will be added. Thus you don't have to specify state 
+file name.
+
+'create' will start domain either from state file if present or by starting
+the machine by `xm create domain-name.cfg`.
+
+The main benefit to `xm` usage is to be able to save/hibernate all machines by
+a single command and then later by one command either to restore/wakeup or
+"power on" the virtual machines.
+
+=cut
+
+use strict;
+use warnings;
+
+use Getopt::Long;
+use Pod::Usage;
+
+use List::MoreUtils 'none';
+use Xen::Control;
+
+our @AVAILABLE_CMDS = qw(
+    ls
+    list
+    create
+    shutdown
+    save
+    restore
+);
+
+exit main();
+
+sub main {
+    my $help;
+    GetOptions(
+        'help|h' => \$help,
+    ) or pod2usage;
+    
+    my $cmd         = lc shift @ARGV,
+    my $domain_name = shift @ARGV;
+    
+    pod2usage
+        if $help or !$cmd;
+    
+    pod2usage if none { $cmd eq $_ } @AVAILABLE_CMDS;
+    
+    my $xen = Xen::Control->new();
+    
+    if (($cmd eq 'ls') or ($cmd eq 'list')) {
+        print $xen->xm('list');
+    }
+    else {
+        $xen->$cmd($domain_name);
+    }
+    
+    return 0;
+}
+
+
+__END__
+
+
+=head1 SEE ALSO
+
+    perldoc Xen::Control
+
+=head1 AUTHOR
+
+Jozef Kutej
+
+=cut

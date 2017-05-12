@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<NZSRSResponse VerMajor="3" VerMinor="99" RegistrarId="90">
+  <Response
+     Action="DomainDetailsQry"
+     FeId="4"
+     FeSeq="371227"
+     OrigRegistrarId="1"
+     RecipientRegistrarId="1"
+     Rows="1"
+     >
+    <FeTimeStamp Day="7" Hour="11" Minute="10" Month="1" Second="46" TimeZoneOffset="+13:00" Year="2010"/>
+    <Domain Delegate="1" DomainName="x.geek.nz" RegistrantRef="11829" RegistrarId="104" Status="Active" Term="1">
+      <NameServers>
+        <Server FQDN="ns1.everydns.net"/>
+        <Server FQDN="ns2.everydns.net"/>
+        <Server FQDN="ns3.everydns.net"/>
+        <Server FQDN="ns4.everydns.net"/>
+      </NameServers>
+      <DNSSEC>
+        <DS KeyTag="42454" Algorithm="5" DigestType="1">
+          <Digest>3FC2FB591B6089F454B90A529C760E3F92F28399</Digest>
+        </DS>
+        <DS KeyTag="42454" Algorithm="5" DigestType="2">
+          <Digest>3A54F693DA1D3FC6073B3D065FEDFAC000610CE83C7D2A084DF883E0B308DCA6</Digest>
+        </DS>
+      </DNSSEC>      
+      <RegistrantContact Name="A Person" Email="someone@example.com">
+        <PostalAddress Address1="Road" Address2="Suburb" City="City" CountryCode="NZ"/>
+        <Phone AreaCode="4" CountryCode="64" LocalNumber="0000000"/>
+      </RegistrantContact>
+      <AdminContact Name="A Person" Email="someone@example.com">
+        <PostalAddress Address1="Road" Address2="Suburb" City="City" CountryCode="NZ" PostalCode="6000"/>
+        <Phone AreaCode="21" CountryCode="64" LocalNumber="0000000"/>
+      </AdminContact>
+      <TechnicalContact Name="A Person" Email="someone@example.com">
+        <PostalAddress Address1="Road" Address2="Suburb" City="City" CountryCode="NZ" PostalCode="6000"/>
+        <Phone AreaCode="21" CountryCode="64" LocalNumber="0000000"/>
+      </TechnicalContact>
+      <BilledUntil
+         Day="19"
+         Hour="19"
+         Minute="45"
+         Month="1"
+         Second="02"
+         TimeZoneOffset="+13:00"
+         Year="2010"
+         />
+      <RegisteredDate
+         Day="19"
+         Hour="19"
+         Minute="45"
+         Month="11"
+         Second="02"
+         TimeZoneOffset="+13:00"
+         Year="2007"
+         />
+      <AuditDetails
+         ActionId="RenewDomains-2009-12-19 23:30:00-x.geek.nz"
+         RegistrarId="50"
+         >
+        <AuditTime>
+          <From
+             Day="20"
+             Hour="03"
+             Minute="28"
+             Month="12"
+             Second="10"
+             TimeZoneOffset="+13:00"
+             Year="2009"
+             />
+        </AuditTime>
+        <AuditText><![CDATA[RenewDomains]]></AuditText>
+      </AuditDetails>
+    </Domain>
+  </Response>
+</NZSRSResponse>

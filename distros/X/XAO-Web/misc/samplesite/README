@@ -1,0 +1,44 @@
+This is a sample XAO::Web web site project
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Symlink this directory as /usr/local/xao/projects/samplesite (or to
+projects/ subdirectory of whatever you set to be XAO::* home):
+
+    mkdir /usr/local/xao/projects
+    ln -s `pwd` /usr/local/xao/projects/
+
+Try:
+
+    make
+
+    make dist
+
+    make test
+
+Check content of the files, most of them have useful comments.
+
+Apache configuration should look something like:
+
+<VirtualHost samplesite.com:80>
+  ServerName samplesite.com
+
+  <Directory /usr/local/xao/handlers>
+    Options ExecCGI FollowSymLinks
+    SetHandler cgi-script
+  </Directory>
+
+  RewriteEngine on
+  RewriteRule   ^/(.*)$  \
+                /usr/local/xao/handlers/xao-apache.pl/samplesite/$1  \
+                [L]
+</VirtualHost>
+
+Read XAO::Web::Intro man page and related man pages and documents,
+experiment with templates and have fun building your first XAO::Web
+site.
+
+If you're willing to contribute better documentation or a HOW-TO as you
+go along -- you are more than welcome.
+
+-- 
+Andrew Maltsev <am@ejelta.com>

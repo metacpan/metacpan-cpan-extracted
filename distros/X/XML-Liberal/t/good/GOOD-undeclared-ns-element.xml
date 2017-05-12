@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="pplication/xslt+xml" href="this-is-the-processing-instruction"?>
+<!DOCTYPE rss PUBLIC "-//Netscape Communications//DTD RSS 0.91//EN" "http://www.rssboard.org/rss-0.91.dtd">
+<!-- comment node -->
+<rss xmlns:content="http://purl.org/rss/1.0/modules/content/">
+ <content:encoded>foo</content:encoded>
+</rss>

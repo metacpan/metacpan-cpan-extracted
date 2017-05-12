@@ -1,0 +1,14 @@
+Build.PL
+Changelog.ini
+Changes
+data/test.xml
+lib/XML/Tiny/Tree.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+META.json
+META.yml
+README
+scripts/synopsis.pl
+t/test.t
+xt/author/pod.t

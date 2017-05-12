@@ -1,0 +1,14 @@
+Revision history for XML-Catalogs-HTML
+
+1.0.3   2011/03/28
+        Specified license more explicitly.
+
+1.0.2   2010/04/27
+        Added an XML::LibXML version requirement for test t/01_libxml.t.
+
+1.0.1   2010/04/18
+        Fixed bad markup (POD) in documentation.
+        Added POD tests.
+
+1.0.0   2010/02/26
+        Initial version

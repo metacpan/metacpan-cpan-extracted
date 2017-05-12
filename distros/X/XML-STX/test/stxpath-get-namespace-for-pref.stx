@@ -1,0 +1,14 @@
+<stx:transform version="1.0" 
+  xmlns:stx="http://stx.sourceforge.net/2002/ns"
+  strip-space="yes">
+
+  <stx:template match="*">
+    <stx:element name="{name()}">
+      <stx:value-of select="get-namespace-uri-for-prefix(., '')"/>
+      <stx:text>*</stx:text>
+      <stx:value-of select="get-namespace-uri-for-prefix(., 'foo')"/>
+      <stx:process-children/>
+    </stx:element>
+  </stx:template>
+
+</stx:transform>

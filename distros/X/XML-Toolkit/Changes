@@ -1,0 +1,461 @@
+Changelog for XML-Toolkit
+
+0.15 2012-04-04T07:42:50
+ [Chris Prather <chris@prather.org>]
+ - lots of cleanups before release, including checking we don't break CPAN
+
+ - fix the metaclass incompat bugs reported in #perl-help
+
+ - kill extraneous use of aliased
+
+ - kill stale test
+
+ - have git ignore local::lib directory
+
+ - move to Dist::Zilla
+
+ - update pod
+
+ - rename script/ to bin/
+
+ - mv bin -> script
+
+
+0.14 2011-06-08T18:24:44
+ [Chris Prather <chris@prather.org>]
+ - version bump
+
+
+0.13 2010-12-29T20:30:48
+ [Chris Prather <chris@prather.org>]
+ - * Fix missing dep on MooseX::App::Cmd spotted by mateu
+   * Fix bad synopsis code spotted by mateu
+
+
+0.12 2010-12-29T02:00:19
+ [Chris Prather <chris@prather.org>]
+ - bump version and Changes
+
+ - clean up the commands to extend XML::Toolkit::App
+
+
+0.11 2010-12-29T00:52:01
+ [Chris Prather <chris@prather.org>]
+ - update changes bump version number
+
+ - add back the XML::Toolkit::App as a stub/wrapper around the config
+
+ - changes docs and version number for 0.10 release
+
+ - bump docs and version number for 0.09 release
+
+ - clean up t/ layout
+
+ - reset state between Loader parse calls so we can re-use the loader
+
+ - try fixing namespaces a bit
+
+ - add CDATA support
+
+ - add (failing) test for CDATA
+
+ - Several small changes
+   
+   * Add README.md (back?)
+   * add lib/XML/Toolkit/Config/Container.pm (back?)
+   * modify XML::Filter::Moose and it's descendants to use MooseX::NonMoose
+   and
+     clean up the inline_constructor => 0 stuff
+
+ - tidy README.md some
+
+ - fix the spacing in README.md
+
+ - add README.md
+
+ - fix a bug in the generate command
+
+ - update PerlMongers XML example
+
+ - clean out the legacy namespace attribute
+
+ - kill Loader::FilterNS by merging it into the main Filter
+
+ - add dep on Test::Exception we added to the tests
+
+ - port commandline scripts across to the new Bread::Board
+
+ - remove MooseX::Autobox dep
+
+ - convert Generator over
+
+ - merge Loader across
+
+ - move Builder over to using Bread::Board
+
+ - add missing dep to Makefile.PL
+
+ - update for 0.08 release
+
+ - merge immutable branch
+
+ - clean up XSPF example
+
+ - update example
+
+ - add TODO test for RDF
+
+
+ [Jesse Luehrs <doy@tozt.net>]
+ - s/ToolKit/Toolkit/g
+
+
+ [Justin Hunter <justin.d.hunter@gmail.com>]
+ - silence warning
+
+
+0.07 2010-01-30T01:27:35
+ [Chris Prather <chris@prather.org>]
+ - forgot some diagnostics in a test
+
+ - clean up POD, examples, and tests
+
+ - update RNG example
+
+ - add updated XML::AIML
+
+ - kill old xmltk_make_classes
+
+ - clean up the basic test
+
+ - fix up tests before release
+
+ - remove the YP oriented tests cause *stevan* thought they were a bad
+   idea. (He is right)
+
+ - clean up the XML namespaces for yp-api.t
+
+ - build a new example based on XSPF
+   
+   going through and building a new example using the XSPF file for a
+   client, I had to perform some cleanup of how generate and the
+   templates work.
+   
+   The templates have been unified into XML::Toolkit;:Cmd::ClassTemplate
+   with the generate command wrapping it with the logic to break stuff out.
+   This cleans up some nastiness and makes the templates more uniform.
+   
+   we're also adding a test for XSPF round tripping.
+
+ - fix to run with the current Moose and MooseX::MetaDescription
+   
+   Moose 0.94 introduced some changes to the way Attributes are handled in
+   Roles. As a side effect the Attribute inheritance no longer works in
+   Role -> Role composition. We copy the Attribute now until this is fixed
+   in Moose.
+   
+   Also patch a few tests to deal with the changes that have happened in
+   the codebase that we didn't detect before.
+
+ - * add test for yp-api
+   
+   We needed to have RDF support for the YP Feed API. This adds a test that
+   slurps the current version of the API XML so we can round-trip it.
+   
+   * get the XML tests passing
+   
+   The `namespace_map` for the Generator has to be different from the ones
+   for the Loader and Builder. We fix the test for this, fix the code to
+   reflect the changes, and everything magically works.
+   
+   * clean up the logic from the unresolve_namespaces flow
+   
+   change the logic (and wording) to "unless no_unresolved_namespaces"
+   rather than "if unresovled_namespaces" since we're checking if the list
+   "is_empty"
+
+ - remove the need for MooseX::AttributeHelpers
+   
+   MX::AH was folded into core. This removes all of the places we use
+   MX::AH I think in both the processing code, and the generated code.
+
+ - clean up generated code and tests
+   
+   The Generated code was using MooseX::AttributeHelpers which has been
+   folded into core. We fix that to use Native::Attribute's now. We also
+   move to use nammespace::clean.
+   
+   We also start moving the tests to use `done_testing` instead of no_plan.
+   
+   Finally we fix the Filter to properly add the XML trait to text nodes as
+   well as non-text ones, this squishes some warnings.
+
+ - fix add_text_attribute to include 'XML::Toolkit::MetaDescription::Trait'
+   
+   We need to be sure that the generated classes have the right
+   meta-description trait. We were getting a warning for the text
+   attributes when generating them, this should fix that.
+
+ - start migrating from MXAH to Moose::Attribute::Native
+
+ - fix the moose drift
+
+ - tests_recursive
+
+ - fix the text output
+
+ - get loading working better
+
+ - add a default for the Loader Parser namespace_map
+
+ - tidy the AIML example
+
+ - refacor the AIML set
+
+ - re-work the RelaxNG classes to use a namespace
+
+ - update the tests
+
+ - move to MooseX::App:Cmd for our commands
+
+ - refactor so that we can override better the Parser
+
+ - update Makefile.PL
+
+ - start using XML::Toolkit to define our requires
+
+ - sort deps
+
+
+ [Chris Prather <cprather@hdpublishing.com>]
+ - add big honking xml file for benchmarking
+
+ - test cleanup
+
+ - unify the names
+
+ - pull out the evals as they are unneccessary
+
+ - combine two tests into one
+
+ - rename file so it is first in the directory
+
+ - move stuff into a sub directory
+
+ - add validate command that round-trips XML
+
+ - update Changes
+
+ - rename Class and ClassNS
+
+ - re-organize files heavily per discussion with robinsmidsrod
+
+ - return before doing all the work to add an attribute if we already have
+   one ... rather than after
+
+ - only create a class_type if we create a class
+
+ - refactor out the use of augment/inner
+
+ - caching and is_root refactor
+
+ - lots of small changes
+
+ - move the namespace map code into the role too
+
+ - refactor the namespace map stuff out into a namespace Registry
+
+ - use MooseX::AttributeHelpers for unresolved namespaces
+
+ - bump the version requirement because of duck_type
+
+ - add duck_type to the builder to enforce our API delegates
+
+ - add a namespace map to t/02
+
+ - fix the namespace bug in builder
+
+ - sync the tests
+
+ - 15:42 <@robinsmidsrod> the builder is namespace-aware too
+
+ - version number bump
+
+ - make ClassNS the default
+
+ - change the contents too
+
+ - rename Parser -> Filter
+
+ - make ParserNS the default and lets see what breaks
+
+ - add MX::App::Cmd dep
+
+ - more updates from robinsmidsrod
+
+ - add in changes from robinsmidsrod
+
+ - Revert "cache element => classname relationship"
+   
+   This reverts commit 076b2d21f834f69559d54c0d2379ad65ffe38b86.
+
+ - cache element => classname relationship
+
+
+ [Robin Smidsrød <robin@smidsrod.no>]
+ - Tests for namespaced loading
+
+ - Loader/ParserNS.pm now handles namespaces correctly
+
+ - Fixed typo that prevented compilation
+
+ - Added typical .gitignore file
+
+ - Changed make_classes to use MooseX::Getopt::Dashes
+
+ - Inital version of namespace-aware parser for Loader.
+
+ - Added namespace_map and filter_class handling to Loader.
+
+ - Spelling error in exception message.
+
+
+0.06 2009-06-04T13:25:23
+ [Chris Prather <chris@prather.org>]
+ - Changes, Makefile, and Version number bump for 0.06 release
+
+ - rename the make_classes script
+
+ - remove duplicate __END__ generated by podgen
+
+ - stubb in documentation
+
+ - clean up Topic
+
+ - expand the XML::Aiml coverage a bit more
+
+ - remove double __END__ tags created by podgen
+
+ - stub out documentation for RNG
+
+ - create XML trait
+
+ - Merge branch 'master' of git@github.com:perigrin/xml-toolkit
+
+ - commit podgen output
+
+ - stubb docs for XML::Filter::Moose::Class
+
+ - base documentation for XML::Filter::Moose
+
+ - add PerlMongers XML as an example
+
+ - add more tests
+
+ - get tests passing on modern Moose
+
+ - update the default template
+
+ - update the RNG demo
+
+ - add generated XML::Aiml example
+
+ - move load_classes.pl example
+
+ - add RNG example, add OUTPUT_PATH to ClassTemplate, get make_classes to
+   dump a tree
+
+ - remove README, it aint doing anything
+
+
+ [Chris Prather <cprather@hdpublishing.com>]
+ - get parsing namespaced elements working
+
+ - remove No Bugs Have Been Reported, cause thanks to confound it aint true
+
+
+0.05 2009-01-29T05:58:44
+ [Chris Prather <chris@prather.org>]
+ - fix changes
+
+ - add an __END__ token
+
+ - add an __END__ token
+
+ - document the generators
+
+ - Add docs for XML::Toolkit::Generator
+
+ - document changes
+
+ - small doc changes
+
+ - add documentation for XML::Toolkit::Loader
+
+ - remove hardcoded Parser choice
+
+ - add AIML examples
+
+ - clean up for release
+
+ - XML::SAX::Filter had a typo in its API
+
+ - bump version and Changes
+
+ - restore sort_order
+
+ - patch to support upcoming XML::SAX::Writer quoting facility
+
+ - update Changes
+
+ - fix an error confound noticed
+
+ - bump version number, update Changes
+
+ - add dep on MX::MetaDesc and add version numbers
+
+ - add docs
+
+ - clean up metadata for release
+
+ - fix the CDATA output issues in Generator::Default
+
+ - move load_classes from bin to ex
+
+ - add text nodes
+
+ - get the MetaDesc stuff working
+
+ - refactor classes around
+
+ - get make_classes to take an external template
+
+ - get output working ... requires Moose 0.60
+
+ - get classes generating
+
+ - start sketching out a Builder class
+
+ - refactor loader classes into their own namespace
+
+ - changes to tests
+
+ - stub in tests
+
+ - add back some bits
+
+ - remove extraneous bits
+
+ - remove extraneous bits
+
+ - add in extra classes
+
+ - add Loader
+
+ - remove author tests
+
+ - add files we had previously started extracting from G2
+
+ - standard layout
+
+

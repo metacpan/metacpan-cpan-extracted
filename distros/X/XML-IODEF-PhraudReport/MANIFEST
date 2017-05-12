@@ -1,0 +1,8 @@
+Changes
+examples/fraud.pl
+lib/XML/IODEF/PhraudReport.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/XML-IODEF-PhraudReport.t
+META.yml                                 Module meta-data (added by MakeMaker)

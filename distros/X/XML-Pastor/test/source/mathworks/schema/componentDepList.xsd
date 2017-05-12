@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Schema definition for the dependency list -->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+   <xsd:include schemaLocation="componentDepItem.xsd"/>
+   <xsd:element name="componentDepList" type="componentDepList"/>
+   <xsd:complexType name="componentDepList">
+      <xsd:sequence>
+         <xsd:element name="componentDep" type="componentDepItem" maxOccurs="unbounded"/>
+      </xsd:sequence>
+   </xsd:complexType>
+</xsd:schema>

@@ -1,0 +1,469 @@
+=encoding utf8
+
+=head1 NAME
+
+XML::Compile::SOAP - base-class for SOAP implementations
+
+=head1 INHERITANCE
+
+ XML::Compile::SOAP is extended by
+   XML::Compile::SOAP11
+   XML::Compile::SOAP12
+
+=head1 SYNOPSIS
+
+ ** SOAP1.[12] and WSDL1.1 over HTTP
+
+ # !!! The next steps are only required when you do not have
+ # !!! a WSDL. See XML::Compile::WSDL11 if you have a WSDL.
+ # !!! Without WSDL file, you need to do a lot manually
+
+ use XML::Compile::SOAP11::Client;
+ my $client = XML::Compile::SOAP11::Client->new;
+ $client->schemas->importDefinitions(...);
+
+ use XML::Compile::Util qw/pack_type/;
+ my $h1el = pack_type $myns, $some_element;
+ my $b1el = "{$myns}$other_element";  # same, less clean
+
+ my $encode_query = $client->compileMessage
+   ( 'SENDER'
+   , style    => 'document'           # default
+   , header   => [ h1 => $h1el ]
+   , body     => [ b1 => $b1el ]
+   , destination    => [ h1 => 'NEXT' ]
+   , mustUnderstand => 'h1'
+   );
+
+ my $decode_response = $client->compileMessage
+   ( 'RECEIVER'
+   , header   => [ h2 => $h2el ]
+   , body     => [ b2 => $b2el ]
+   , faults   => [ ... ]
+   );
+
+ my $transport = XML::Compile::Transport::SOAPHTTP
+    ->new(address => $server);
+ my $http = $transport->compileClient(action => ...);
+
+ my @query    = (h1 => ..., b1 => ...);
+ my $request  = $encode_query->(@query);
+ my ($response, $trace) = $http->($request);
+ my $answer   = $decode_response->($response);
+
+ use Data::Dumper;
+ warn Dumper $answer;     # discover a HASH with h2 and b2!
+
+ if($answer->{Fault}) ... # when an error was reported
+
+ # Simplify your life: combine above into one call
+ # Also in this case: if you have a WSDL, this is created
+ # for you.   $wsdl->compileClient('MyFirstCall');
+
+ my $call   = $client->compileClient
+   ( kind      => 'request-response'  # default
+   , name      => 'MyFirstCall'
+   , encode    => $encode_query
+   , decode    => $decode_response
+   , transport => $http
+   );
+
+ # !!! Usage, with or without WSDL file the same
+
+ my $result = $call->(@query)          # SCALAR only the result
+ print $result->{h2}->{...};
+ print $result->{b2}->{...};
+
+ my ($result, $trace) = $call->(...);  # LIST will show trace
+ # $trace is an XML::Compile::SOAP::Trace object
+
+=head1 DESCRIPTION
+
+This module handles the SOAP protocol.  The first implementation is
+SOAP1.1 (F<http://www.w3.org/TR/2000/NOTE-SOAP-20000508/>), which is still
+most often used.  The SOAP1.2 definition (F<http://www.w3.org/TR/soap12/>)
+is provided via the separate distribution L<XML::Compile::SOAP12|XML::Compile::SOAP12>.
+
+Be aware that there are three kinds of SOAP:
+
+=over 4
+
+=item 1.
+
+Document style (literal) SOAP, where there is a WSDL file which explicitly
+types all out-going and incoming messages.  Very easy to use.
+
+=item 2.
+
+RPC style SOAP literal.  The body of the message has an extra element
+wrapper, but the content is also well defined.
+
+=item 3.
+
+RPC style SOAP encoded.  The sent data is nowhere described formally.
+The data is constructed in some ad-hoc way.
+
+=back
+
+Don't forget to have a look at the examples in the F<examples/> directory
+included in the distribution.
+
+Please support my development work by submitting bug-reports, patches
+and (if available) a donation.
+
+=head1 METHODS
+
+=head2 Constructors
+
+=over 4
+
+=item $obj-E<gt>B<new>(%options)
+
+Create a new SOAP object.  You have to instantiate either the SOAP11 or
+SOAP12 sub-class of this, because there are quite some differences (which
+can be hidden for you)
+
+ -Option    --Default
+  media_type  application/soap+xml
+  schemas     created internally
+
+=over 2
+
+=item media_type => MIMETYPE
+
+=item schemas => C<XML::Compile::Cache> object
+
+Use this when you have already processed some schema definitions.  Otherwise,
+you can add schemas later with C<< $soap->schemas->importDefinitions() >>
+The Cache object must have C<any_element> and C<any_attribute> set to
+C<'ATTEMPT'>
+
+=back
+
+=item XML::Compile::SOAP-E<gt>B<register>($uri, $envns)
+
+Declare an operation type, being an (WSDL specific) $uri and envelope
+namespace.
+
+=back
+
+=head2 Accessors
+
+=over 4
+
+=item $obj-E<gt>B<mediaType>()
+
+=item $obj-E<gt>B<schemas>()
+
+Returns the L<XML::Compile::Cache|XML::Compile::Cache> object which contains the
+knowledge about the types.
+
+=item $obj-E<gt>B<version>()
+
+=back
+
+=head2 Single message
+
+=over 4
+
+=item $obj-E<gt>B<compileMessage>( <'SENDER'|'RECEIVER'>, %options )
+
+The payload is defined explicitly, where all headers and bodies are
+described in detail.  When you have a WSDL file, these ENTRIES are
+generated automatically, but can be modified and extended (WSDL files
+are often incomplete)
+
+To make your life easy, the ENTRIES use a label (a free to choose key,
+the I<part name> in WSDL terminology), to ease relation of your data with
+the type where it belongs to.  The element of an entry (the value) is
+defined as an C<any> element in the schema, and therefore you will need
+to explicitly specify the element to be processed.
+
+As %options, you can specify any listed here, but also anything which is
+accepted by L<XML::Compile::Schema::compile()|XML::Compile::Schema/"Compilers">, like
+C<< sloppy_integers => 1 >> and hooks.  These are applied to all header
+and body elements (not to the SOAP wrappers)
+
+ -Option        --Default
+  body            []
+  destination     []
+  faults          []
+  header          undef
+  mustUnderstand  []
+  procedure       undef
+  role            ULTIMATE
+  roles           []
+
+=over 2
+
+=item body => ENTRIES|HASH
+
+ARRAY of PAIRS, defining a nice LABEL (free of choice but unique, also
+w.r.t. the header and fault ENTRIES) and an element type name or CODE
+reference.  The LABEL will appear in the Perl HASH only, to be able to
+refer to a body element in a simple way.
+
+=item destination => ARRAY-OF-PAIRS
+
+Writers only.  Indicate who the target of the header entry is.
+By default, the end-point is the destination of each header element.
+
+The ARRAY contains a LIST of key-value pairs, specifying an entry label
+followed by an I<actor> (soap1.1) or I<role> (soap1.2) URI.  You may use
+the predefined actors/roles, like 'NEXT'.  See L<roleURI()|XML::Compile::SOAP/"Transcoding"> and
+L<roleAbbreviation()|XML::Compile::SOAP/"Transcoding">.
+
+=item faults => ENTRIES|HASH
+
+The SOAP1.1 and SOAP1.2 protocols define fault entries in the
+answer.  Both have a location to add your own additional
+information: the type(-processor) is to specified here, but the
+returned information structure is larger and differs per SOAP
+implementation.
+
+=item header => ENTRIES|HASH
+
+ARRAY of PAIRS, defining a nice LABEL (free of choice but unique)
+and an element type name.  The LABEL will appear in the Perl HASH, to
+refer to the element in a simple way.
+
+The element type is used to construct a reader or writer.  You may also
+create your own reader or writer, and then pass a compatible CODE reference.
+
+=item mustUnderstand => STRING|ARRAY-OF-STRING
+
+Writers only.  The specified header entry labels specify which elements
+must be understood by the destination.  These elements will get the
+C<mustUnderstand> attribute set to C<1> (soap1.1) or C<true> (soap1.2).
+
+=item procedure => TYPE
+
+Required in rpc style, when there is no C<body> which contains the
+procedure name (when the RPC info does not come from a WSDL)
+
+=item role => URI|ARRAY-OF-URI
+
+Readers only.
+One or more URIs, specifying the role(s) you application has in the
+process.  Only when your role contains C<ULTIMATE>, the body is
+parsed.  Otherwise, the body is returned as uninterpreted XML tree.
+You should not use the role C<NEXT>, because every intermediate
+node is a C<NEXT>.
+
+All understood headers are parsed when the C<actor> (soap1.1) or
+C<role> (soap1.2) attribute address the specified URI.  When other
+headers emerge which are not understood but carry the C<mustUnderstood>
+attribute, an fault is returned automatically.  In that case, the
+call to the compiled subroutine will return C<undef>.
+
+=item roles => ARRAY-OF-URI
+
+Alternative for option C<role>
+
+=back
+
+=item $obj-E<gt>B<messageStructure>($xml)
+
+=item XML::Compile::SOAP-E<gt>B<messageStructure>($xml)
+
+Returns a HASH with some collected information from a complete SOAP
+message (XML::LibXML::Document or XML::LibXML::Element).  Currenty,
+the HASH contains a C<header> and a C<body> key, with each an ARRAY
+of element names which where found in the header resp. body.
+
+=back
+
+=head2 Helpers
+
+=head2 Transcoding
+
+=over 4
+
+=item $obj-E<gt>B<replyMustUnderstandFault>($type)
+
+Produce an error structure to be returned to the sender.
+
+=item $obj-E<gt>B<roleAbbreviation>($uri)
+
+Translate a role $uri into a simple string, if predefined.  See
+L<roleURI()|XML::Compile::SOAP/"Transcoding">.
+
+=item $obj-E<gt>B<roleURI>($uri|STRING)
+
+Translates actor/role/destination abbreviations into URIs. Various
+SOAP protocol versions have different pre-defined STRINGs, which can
+be abbreviated for readibility.  Returns the unmodified $uri in
+all other cases.
+
+SOAP11 only defines C<NEXT>.  SOAP12 defines C<NEXT>, C<NONE>, and
+C<ULTIMATE>.
+
+=back
+
+=head1 DETAILS
+
+=head2 SOAP introduction
+
+Although the specifications of SOAP1.1 and WSDL1.1 are thin, the number
+of special constructs are many. And, of course, all are poorly documented.
+SOAP 1.2 has a much better specification, but is not used a lot.  I have
+not seen WSDL2 in real life.
+
+WSDL defines two kinds of messages: B<document> style SOAP and B<rpc>
+style SOAP.  In document style SOAP, the messages are described in
+great detail in the WSDL: the message components are all defined in
+Schema's. The worst things you can (will) encounter are C<any> schema
+elements which require additional manual processing.
+
+C<RPC Literal> behaves very much the same way as document style soap,
+but has one extra wrapper inside the Body of the message.
+
+C<Encoded SOAP-RPC>, however, is a very different ball-game.  It is simple
+to use with strongly typed languages, to exchange data when you create both
+the client software and the server software.  You can simply autogenerate
+the data encoding.  Clients written by third parties have to find the
+documentation on how to use the encoded  RPC call in some other way... in
+text, if they are lucky; the WSDL file does not contain the prototype
+of the procedures, but that doesn't mean that they are free-format.
+
+B<Encoded RPC> messages are shaped to the procedures which are
+being called on the server.  The body of the sent message contains the
+ordered list of parameters to be passed as 'in' and 'in/out' values to the
+remote procedure.  The body of the returned message lists the result value
+of the procedure, followed by the ordered 'out' and 'in/out' parameters.
+
+=head2 Supported servers
+
+Only the commercial hype speaks about SOAP in very positive words.
+However, the "industry quality" of these modern "technologies" clearly
+demonstrates the lack of education and experience most programmers and
+designers have.  This is clearly visible in many, many bugs you will
+encounter when working with schemas and WSDLs.
+
+Interoperability of SOAP clients and servers is more "trial and error"
+and "manually fixing" than it should be.  For instance, a server may
+report internal server errors back to the client... but a WSDL does not
+tell you which namespace/schema is used for these errors.  Both BEA and
+SharePoint servers produce illegal SOAP responses!  It is a sad story.
+
+To be able to install some fixes, you can specify a server type via
+L<XML::Compile::SOAP::Operation::new(server_type)|XML::Compile::SOAP::Operation/"Constructors">,
+L<XML::Compile::WSDL11::new(server_type)|XML::Compile::WSDL11/"Constructors">, or
+[3.06] L<XML::Compile::WSDL11::operations(server_type)|XML::Compile::WSDL11/"Introspection">.
+
+The following server types are currently understood:
+
+=over 4
+
+=item * C<BEA>, Oracle
+
+=item * C<SharePoint>, MicroSoft
+
+=item * C<XML::Compile::Daemon>
+
+=back
+
+Examples:
+
+  my $wsdl = XML::Compile::WSDL11->new($wsdlfn, server_type => 'SharePoint');
+  my $op   = XML::Compile::SOAP11::Operation->new(..., server_type => 'BEA');
+  my @op   = XML::Compile::WSDL11->operations(server_type => 'SharePoint')
+
+[3.17] B<Be warned:> the licenses of some server_type schema's are unknown
+or unclear.  At least, they touch commercial products hence can better
+not be released in a (Debian) Linux distribution, even not as non-free.
+Therefore, you need to install XML::Compile::Licensed from CPAN
+yourself.
+
+=head2 Naming types and elements
+
+XML uses namespaces: URIs which are used as constants, grouping a set
+of type and element definitions.  By using name-spaces, you can avoid
+name clashes, which have frustrated many projects in the past when they
+grew over a certain size... at a certain size, it becomes too hard to
+think of good distinguishable names.  In such case, you must be happy
+when you can place those names in a context, and use the same naming in
+separate contexts without confusion.
+
+That being said: XML supports both namespace- and non-namespace elements
+and schema's; and of cause many mixed cases.  It is by far preferred to
+use namespace schemas only. In a schema XSD file, look for the
+C<targetNamespace> attribute of the C<schema> element: if present, it
+uses namespaces.
+
+In XML data, it is seen as a hassle to write the full length of the URI
+each time that a namespace is addressed.  For this reason, prefixes are
+used as abbreviations for the namespace URI.  In programs, you can simply
+assign short variable names to long URIs, so we do not need that trick.
+
+Within your program, you use
+
+  $MYSN = 'long URI of namespace';
+  ... $type => "{$MYNS}typename" ...
+
+or nicer
+
+  use XML::Compile::Util qw/pack_type/;
+  use constant MYNS => 'some uri';
+  ... $type => pack_type(MYNS, 'typename') ...
+
+The L<XML::Compile::Util|XML::Compile::Util> module provides a helpful methods and constants,
+as does the L<XML::Compile::SOAP::Util|XML::Compile::SOAP::Util>.
+
+=head2 Client and Server implementations
+
+To learn how to create clients in SOAP, read the DETAILS section in
+L<XML::Compile::SOAP::Client|XML::Compile::SOAP::Client>.  The client implementation is platform
+independent.
+
+Servers can be created with the external L<XML::Compile::SOAP::Daemon|XML::Compile::SOAP::Daemon>
+distribution. Those servers are based on Net::Server. Can be used
+to create a test-server in a few minutes... or production server.
+
+Don't forget to have a look at the examples in the F<examples/> directory
+included in the distribution.
+
+=head2 Use of wildcards (any and anyAttribute)
+
+Start reading about wildcards in L<XML::Compile|XML::Compile>. When you receive a
+message which contains "ANY" elements, an attempt will be made to decode
+it automatically. Sending messages which contain "ANY" fields is
+harder... you may try hooks or something more along these lines:
+
+   my $doc = XML::LibXML::Document->new('1.0', 'UTF-8');
+   my $type    = pack_type $ns, $local;
+   my $node    = $wsdl->writer($type)->($doc, $value);
+   my $message = { ..., $type => $node };
+
+   my $call = $wsdl->compileClient('myOpToCall');
+   my ($answer, $trace) = $call->(_doc => $doc, message => $message);
+
+Here, C<$type> is the type of the element which needs to be filled in
+on a spot where the schema defines an "ANY" element. You need to include
+the full typename as key in the HASH (on the right spot) and a fully
+prepared C<$node>, an XML::LibXML::Element, as the value.
+
+You see that the C<$doc> which is created to produce the special node
+in the message is also passed to the C<$call>. The call produces the
+message which is sent and needs to use the same document object as the
+node inside it. The chances are that when you forget to pass the C<$doc>
+it still works... but you may get into characterset problems and such.
+
+=head1 SEE ALSO
+
+This module is part of XML-Compile-SOAP distribution version 3.21,
+built on January 11, 2017. Website: F<http://perl.overmeer.net/xml-compile/>
+
+Please post questions or ideas to the mailinglist at
+F<http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/xml-compile> .
+For live contact with other developers, visit the C<#xml-compile> channel
+on C<irc.perl.org>.
+
+=head1 LICENSE
+
+Copyrights 2007-2017 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

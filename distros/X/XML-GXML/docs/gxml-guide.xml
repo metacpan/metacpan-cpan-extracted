@@ -1,0 +1,81 @@
+<document
+	title	= "Using GXML"
+	author	= "Josh Carter"
+	email	= "josh@multipart-mixed.com"
+	date	= "May 10, 2001"
+>
+
+<section name="Welcome and Overview">
+
+<p>
+Thanks for your interest in GXML. GXML is a transformation tool for
+XML, allowing you to process XML code in many ways. It's like XSLT in
+purpose, but much simpler to learn and get started with. While simpler
+than XSLT, GXML has features powerful enough for many tasks, comes in
+an easy-to-use package, and is highly extensible for special tasks.
+</p>
+
+<p>
+These are GXML's high-level features:
+</p>
+
+<ul>
+  <li>Template substitution for any given element.</li>
+  <li>Templates may be provided by user code or files on disk.</li>
+  <li>Any part of the XML, source or template, may contain variables
+      which will be substituted according to well-defined rules.</li>
+  <li>Variable values may be: things embedded in an enclosing element's
+      start tag, other elements in scope, sub-values of an in-scope
+      element, or provided by user code.</li>
+  <li>Element tags can have variables in them.</li>
+  <li>Special commands allow conditionals and looping, e.g. "if
+      exists," "if equals," and "foreach."</li>
+  <li>User can specify callbacks for start and/or end of given tags.</li>
+  <li>Element tags can be easily remapped to other things.</li>
+  <li>XML syntax can be easily translated into HTML syntax.</li>
+</ul>
+
+</section>
+
+<section name="Running Test Files">
+
+<p>
+There are several test files in the "test" directory of your GXML
+distribution. Change into this directory and run a couple of the .pl
+files. Try <tt>variables.pl</tt> to start, since that's the next topic
+I'll cover.
+</p>
+
+</section>
+
+<section name="Getting Down to Work">
+
+<linkitem name="Object API" href="api.html">
+Creating and using GXML objects.
+</linkitem>
+
+<linkitem name="Variables" href="variables.html">
+Next, dig into variable substitution in its various forms.
+</linkitem>
+
+<linkitem name="Templates" href="templates.html">
+Templates are the power of GXML -- this is what makes it useful.
+</linkitem>
+
+<linkitem name="Commands" href="commands.html">
+Commands are a new feature to GXML 2.0, giving it the most-needed
+features from XSL.
+</linkitem>
+
+<linkitem name="Other Features" href="other.html">
+There's lots of extra stuff you can do with GXML. This is where we
+pick up the scraps.
+</linkitem>
+
+</section>
+
+<p>
+<b><a href="index.html">Back to GXML Home</a></b>
+</p>
+
+</document>

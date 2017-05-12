@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/XML-Handler-EasyTree-Generator.t
+lib/XML/Handler/EasyTree/Generator.pm
+META.yml                                 Module meta-data (added by MakeMaker)

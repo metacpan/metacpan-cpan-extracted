@@ -1,0 +1,23 @@
+<stx:transform version="1.0" 
+  xmlns:stx="http://stx.sourceforge.net/2002/ns"
+  strip-space="yes">
+
+  <stx:variable name="order" select="0"/>
+
+  <stx:template match="/root">
+    <stx:assign name="order" select="$order + 1"/>
+    <r>
+      <stx:process-children/>
+      <stx:if test="$order=1">
+	<stx:process-document href="'_data01.xml'"/>
+      </stx:if>
+    </r>
+  </stx:template>
+
+  <stx:template match="node">
+    <n>
+      <stx:value-of select="position()"/>
+    </n>
+  </stx:template>
+  
+</stx:transform>

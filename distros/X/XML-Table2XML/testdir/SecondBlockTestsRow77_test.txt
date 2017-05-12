@@ -1,0 +1,8 @@
+root
+/a/b/c	/r/#id	/r	/r/s
+test0			
+test1			
+test2			
+	1		testS
+	2	testR2	
+

@@ -1,0 +1,22 @@
+XML::Filter::XInclude
+=====================
+
+XInclude implemented as a simple SAX filter.
+
+Simple to use:
+
+  my $parser = XML::SAX::ParserFactor->parser(
+    Handler => XML::Filter::XInclude->new(
+        Handler => XML::SAX::Writer->new
+    )
+  );
+  $parser->parse_uri("foo.xml");
+
+Installation is same as any perl module:
+
+ $ perl Makefile.PL
+ $ make
+ $ make test
+ $ su
+ $ make install
+

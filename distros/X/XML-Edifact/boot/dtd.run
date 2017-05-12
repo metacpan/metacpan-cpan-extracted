@@ -1,0 +1,117 @@
+#!/usr/local/bin/perl
+# 
+# Copyright (c) 1998 Michael Koehne <kraehe@copyleft.de>
+# 
+# XML::Edifact is free software. You can redistribute and/or
+# modify this copy under terms of GNU General Public License.
+
+use strict;
+
+use vars qw($segm $segmt @segmv);
+use vars qw($comp $compt @compv);
+use vars qw($elem $elemt $coded);
+use vars qw($code %saw @codes @translated);
+use vars qw($s);
+
+use vars qw($debug);
+
+$debug=2;
+
+# -----------------------------------------------------------------------------
+open OUT,">".File::Spec->catdir("html","LIB","xml-edifact-03","edifact.dtd");
+select(OUT);
+print $XML::Edifact::DOCTYPE_HEADER;
+ 
+# -----------------------------------------------------------------------------
+
+@codes       = keys %XML::Edifact::SEGMT;
+%saw         = ();
+@translated  = ();
+@saw{@codes} = ();
+@codes = sort keys %saw;
+foreach $code (@codes) {
+	$segmt=$XML::Edifact::SEGMT{$code};
+	@segmv=split('\t', $segmt, 4);
+	push @translated, $segmv[2];
+}
+
+printf "<!ELEMENT edifact:message (\n\t  %s\n\t)* >\n",
+	join("\n\t| ", @translated);
+printf "<!ATTLIST edifact:message\n", $codes[0];
+printf "\t%s CDATA #IMPLIED\n", "xmlns:edifact";
+printf "\t%s CDATA #IMPLIED\n", "xmlns:trsd";
+printf "\t%s CDATA #IMPLIED\n", "xmlns:trcd";
+printf "\t%s CDATA #IMPLIED\n", "xmlns:tred";
+printf "\t%s CDATA #IMPLIED\n", "xmlns:uncl";
+printf "\t%s CDATA #IMPLIED\n", "xmlns:anxs";
+printf "\t%s CDATA #IMPLIED\n", "xmlns:anxc";
+printf "\t%s CDATA #IMPLIED\n", "xmlns:anxe";
+printf "\t%s CDATA #IMPLIED\n", "xmlns:unsl";
+printf "\t%s CDATA #IMPLIED >\n\n", "xmlns:unknown";
+
+foreach $segm (sort(keys %XML::Edifact::SEGMT)) {
+	$segmt=$XML::Edifact::SEGMT{$segm};
+	@segmv=split('\t', $segmt, 4);
+
+	printf "\n<!-- Segment: %s %s -->\n", $segm, $segmv[3]	if ($debug >1);
+
+	@codes       = split / /,  " ".$segmv[0];
+	%saw         = ();
+	@translated  = ();
+	@saw{@codes} = ();
+	@codes = sort keys %saw;
+
+	foreach $code (@codes) {
+		if ($code =~ /^[CS]/) {
+			$compt=$XML::Edifact::COMPT{$code};
+			@compv=split('\t', $compt, 4);
+			push @translated, $compv[2];
+		} else {
+			($elemt,$coded) = split / /, $XML::Edifact::ELEMT{$code};
+			push @translated, $elemt;
+		}
+	}
+
+	shift @translated;
+	printf "<!ELEMENT %s (\n\t  %s\n\t)* >\n", $segmv[2], 
+		join("\n\t| ", @translated);
+}
+
+foreach $comp (sort(keys %XML::Edifact::COMPT)) {
+	$compt=$XML::Edifact::COMPT{$comp};
+	@compv=split('\t', $compt, 4);
+
+	printf "\n<!-- Composite: %s %s -->\n", $comp, $compv[3]	if ($debug >1);
+
+	@codes       = split / /,  " ".$compv[0];
+	%saw         = ();
+	@translated  = ();
+	@saw{@codes} = ();
+	@codes = sort keys %saw;
+
+	foreach $code (@codes) {
+		($elemt,$coded) = split / /, $XML::Edifact::ELEMT{$code};
+		push @translated, $elemt;
+	}
+
+	shift @translated;
+	printf "<!ELEMENT %s (\n\t  %s\n\t)* >\n", $compv[2], 
+		join("\n\t| ", @translated);
+}
+
+foreach $elem (sort(keys %XML::Edifact::ELEMT)) {
+	($elemt,$coded) = split / /, $XML::Edifact::ELEMT{$elem};
+	printf "<!ELEMENT %s (#PCDATA) >\n", $elemt;
+	if ($XML::Edifact::CODET{$elem."\t"} ne "") {
+		@codes = split('\t', $XML::Edifact::CODET{$elem."\t"});
+		printf "<!ATTLIST $elemt %s:code CDATA #REQUIRED >\n", $codes[0];
+	}
+}
+
+# -----------------------------------------------------------------------------
+
+select(STDOUT);
+close(OUT);
+
+# -----------------------------------------------------------------------------
+1;

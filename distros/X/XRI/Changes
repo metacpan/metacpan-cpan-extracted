@@ -1,0 +1,56 @@
+-*- change-log -*-
+
+2004-07-02  Fen Labalme  <fen@imagine.comedia.com>
+
+	* release: v0.2.4
+
+2004-06-28  Eugene Eric Kim <eekim@blueoxen.net>
+
+	* XRI.pm: remove spurious setting to package main::
+	* Makefile.PL: properly name xriroots.xml in prompt
+
+2004-06-01  Fen Labalme  <fen@imagine.comedia.com>
+
+	* release: v0.2.3
+	* XRI.t: renamed to basic.t
+
+2004-06-01  Fen Labalme  <fen@imagine.comedia.com>
+
+	* release: v0.2.2
+	* t/readRoots.t, t/xri.t: path to local roots file for testing
+	* xriresolve.pl, splitAuthLocal.pl: moved to scripts directory
+	* hierarchy: general cleanup for new location in SourceForge
+
+2004-05-31  Fen Labalme  <fen@imagine.comedia.com>
+
+	* release: v0.2.1
+	* Makefile.PL: make backup of existing xriroots.xml (if it exists)
+	* XRI.pm: remove hack for hard-coded roots (require xriroots.xml)
+
+2004-05-31  Eugene Eric Kim <eekim@blueoxen.net>
+	
+	* Makefile.PL: added postamble to place xriroots.xml where it belongs
+
+2004-05-30  Fen Labalme  <fen@imagine.comedia.com>
+
+	* release: v0.2.0
+	* roots.xml: renamed to xriroots.xml
+	* Makefile.PL: added roots location setting code
+	* XRI.pm: added services, type checking
+	* xriresolve.pl: added -s and -t switches
+
+2004-05-26  Fen Labalme  <fen@imagine.comedia.com>
+
+	* release: v0.1.2
+	* XRI.pm: require v5.6.0;
+
+2004-05-25  Fen Labalme  <fen@imagine.comedia.com>
+
+	* release: v0.1.1
+	* XRI.pm: handle hard-coded roots better
+
+2004-05-25  Fen Labalme  <fen@imagine.comedia.com>
+
+	* release: v0.1
+	* original version; created by h2xs 1.23 with options
+	-X -A -n XRI -v 0.1

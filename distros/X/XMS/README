@@ -1,0 +1,34 @@
+XMS-MotifSet version 0.01
+=========================
+
+XMS-MotifSet are Perl XMS libraries for interconversion of XMS and motif matrix files and to create sequence logos of DNA motifs.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+XML::Writer
+XML::Writer::String
+XML::Reader
+XML::DOM
+IO::File
+TFBS::Matrix::ICM
+TFBS::Matrix::PFM
+
+COPYRIGHT AND LICENCE
+
+
+Copyright (C) 2010 by hsaini
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.9 or,
+at your option, any later version of Perl 5 you may have available.

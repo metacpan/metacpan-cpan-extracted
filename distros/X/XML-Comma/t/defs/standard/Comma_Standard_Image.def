@@ -1,0 +1,373 @@
+<!-- TODO: this API is a bit weird. really the blob_element should be
+     the top level element to save a lot of ->image calls -->
+<DocumentDefinition>
+  <name>Comma_Standard_Image</name>
+    
+  <blob_element>
+    <name>image</name>
+    <extension><![CDATA[ $self->image_extension() ]]></extension>
+ 
+    <method>
+      <name>image_checksum</name>
+      <code><![CDATA[ sub { $_[0]->_data_hash()->{checksum} }]]></code>
+    </method>
+
+    <method>
+      <name>image_dimensions</name>
+      <code><![CDATA[ sub {
+        my $dh = $_[0]->_data_hash();
+        return $dh->{width}."x".$dh->{height};
+      }]]></code>
+    </method>
+
+    <method>
+      <name>image_width</name>
+      <code><![CDATA[ sub { $_[0]->_data_hash()->{width} }]]></code>
+    </method>
+
+    <method>
+      <name>image_height</name>
+      <code><![CDATA[ sub { $_[0]->_data_hash()->{height} }]]></code>
+    </method>
+
+    <method>
+      <name>image_content_type</name>
+      <code><![CDATA[ sub { $_[0]->_data_hash()->{content_type} }]]></code>
+    </method>
+
+    <method>
+      <name>image_extension</name>
+      <code><![CDATA[ sub {
+        my $ext = $_[0]->_data_hash()->{extension};
+        if(!defined($ext)) {
+          #NOTE: this is just an artifact of <extension> use above,
+          #nothing to worry about, probably shouldn't even log it...
+          XML::Comma::Log->warn("called image_extension too soon - before any set/set_from_file/read");
+          return undef;
+        }
+        return $ext;
+      } ]]></code>
+    </method>
+
+    <!-- this method is seperate from get_thumb so that you can know
+         the width and height attributes for an <img> tag -->
+    <method>
+      <name>get_thumb_dims</name>
+      <code>
+        <![CDATA[
+          #usage:
+          #	$self->get_thumb_dims(scale => 0.5);
+          #	$self->get_thumb_dims(width => 150);
+          #	$self->get_thumb_dims(height => 200);
+          #sets width == 200 if width > height, else height = 200
+          #and proportionally scales the other dimension
+          #	$self->get_thumb_dims(max_dim => 200);
+          #or if you don't care about scaling proportionally:
+          #	$self->get_thumb_dims(width => 100, height => 200);
+          sub {
+            my ($self, %args) = @_;
+            my $img = $self->_data_hash()->{image};
+            my ($new_w, $new_h);
+            if($args{scale}) {
+              $new_w = $img->getwidth  * $args{scale};
+              $new_h = $img->getheight * $args{scale};
+            } elsif($args{max_dim}) {
+              die "illegal arguments" if($args{width} || $args{height});
+              if($img->getwidth > $img->getheight) {
+                $new_w = $args{max_dim};
+                $new_h = ($new_w / $img->getwidth) * $img->getheight;
+              } else {
+                $new_h = $args{max_dim};
+                $new_w = ($new_h / $img->getheight) * $img->getwidth;
+              }
+            } elsif($args{width}) {
+              if($args{height}) {
+                $new_w = $args{width};
+                $new_h = $args{height};
+              } else {
+                $new_w = $args{width};
+                $new_h = ($new_w / $img->getwidth) * $img->getheight;
+              }
+            } elsif($args{height}) {
+              $new_h = $args{height};
+              $new_w = ($new_h / $img->getheight) * $img->getwidth;
+            } else {
+              die "get_thumb got unrecognized args: ".join(" ", keys %args);
+            }
+            # round to ints
+            $new_w = int(0.5+$new_w);
+            $new_h = int(0.5+$new_h);
+            return ($new_w, $new_h);
+          }]]>
+      </code>
+    </method>
+
+    <method>
+      <name>get_thumb</name>
+      <code>
+        <![CDATA[
+          #usage:
+          #	$self->get_thumb(scale => 0.5);
+          #	$self->get_thumb(width => 150);
+          #	$self->get_thumb(height => 200);
+          #sets width == 200 if width > height, else height = 200
+          #and proportionally scales the other dimension
+          #	$self->get_thumb(max_dim => 200);
+          #or if you don't care about scaling proportionally:
+          #	$self->get_thumb(width => 100, height => 200);
+          #to fine tune jpeg compression:
+          #	$self->get_thumb(high_quality => [0,1]);
+          #	$self->get_thumb(jpeg_quality => 0..100);
+          #note jpeg_quality parameter overrides the "high quality" parameter
+          #which is just there to distinguish say a small thumbnail from
+          #a 600x400 -> 520x347 resize to fit in a page
+          sub {
+            my ($self, %args) = @_;
+            my $img = $self->_data_hash()->{image};
+            my ($new_w, $new_h) = $self->get_thumb_dims(%args);
+            #preserve transparency if it's there by using png
+            #1 channel = bw, 2 channels = bw+alpha, 3 channels = rgb,
+            #4 channels = rgba. use png if need transparency. else jpeg
+            #this is important because (*,*,*,1) are all equal, and
+            #different paint programs deal with fully transparent values
+            #in different ways, so you can get "a picture from nothing"
+            #in the places that were alpha instead of just white or black
+            my $thumb_format = $args{format} ||
+                    (($img->getchannels % 2) ? "jpeg" : "png");
+            my $jpeg_quality = 75; #libjpeg default
+            if($thumb_format eq "jpeg") {
+               $jpeg_quality = $args{high_quality} ? 88 : 75;
+               $jpeg_quality = $args{jpeg_quality} || $jpeg_quality;
+            }
+
+            #if you ask for a thumbnail that winds up being the same
+            #size and format as the original, just return that -- this
+            #avoids generation loss
+            #TODO: what if orig_jpeg_q == 100 and we want thumb_jpeg_q == 20?
+            #(note transitions the other way make no sense - we can't get
+            #quality back from a bad original) ... really we need a way to
+            #determine jpeg quality of an image and squirrel that in data_hash,
+            #then if the desired and actual are "close enough", return unmodified
+            my $cur_ext = (map { s/^\.//; s/jpg/jpeg/; $_ } $self->image_extension);
+            my ($blob, %sargs);
+            if( ($self->image_dimensions eq "${new_w}x${new_h}") &&
+                ($thumb_format eq $cur_ext)) {
+              $blob = $self->_data_hash()->{blob};
+              $sargs{image} = $img;
+              $sargs{checksum} = $_[0]->_data_hash()->{checksum};
+            } else {
+
+              my $thumb = Imager->new();
+              #TODO: should the cache be somewhere more permanent?
+              my $tmpdir = XML::Comma::Configuration->get("tmp_directory").
+                "/comma_standard_image_cache";
+              my $hash = $self->_data_hash()->{checksum};
+              my $cache_fn = "${tmpdir}/${hash}-${new_w}x${new_h}.${thumb_format}";
+
+              $thumb->read(file => $cache_fn) if ( -e "$cache_fn" );
+
+              #regenerate if there is no cache img or we could't load it
+              my $did_regenerate;
+              if (!$thumb->getwidth) {
+                #"mixing" previews are best when scaling down, which is
+                #what we almost always do
+                $thumb = $img->scale(xpixels=>$new_w, ypixels=>$new_h,
+                                     type => 'nonprop', qtype => 'mixing');
+                $did_regenerate = 1;
+              }
+
+              #generate the actual thumbnail image
+              #TODO: there are cases where a png/gif will be smaller
+              #*and* more accurate - try to detect those?
+              my $write_args = { data => \$blob, type => $thumb_format };
+              $write_args->{jpegquality} = $jpeg_quality if($thumb_format eq "jpeg");
+              $thumb->write(%$write_args) or die $thumb->errstr;
+
+              # caching: set the image
+              if($did_regenerate) {
+                my $old_umask = umask(0000);
+                mkdir("$tmpdir", 0777);
+                my $tmpfile = "$cache_fn.$$.".int(0.5+rand 9999);
+                open(my $fh, ">$tmpfile") || XML::Comma::Log->warn("can't cache thumbnail, open: $!");
+                print $fh $blob || XML::Comma::Log->warn("can't cache thumbnail, print: $!");
+                close($fh);
+                rename($tmpfile, $cache_fn) || XML::Comma::Log->warn("can't rename cached thumbnail into place: $!");
+                umask($old_umask);
+              }
+
+              #we already have the internal representation, don't re-parse
+              #the jpeg/png/what have you
+              $sargs{image} = $thumb;
+
+            }
+            $sargs{format} = $thumb_format;
+
+            my $thumb_img = XML::Comma::Doc->new(type => "Comma_Standard_Image");
+            # NOTE: this is a much more efficient version of
+            # $thumb_img->image->set($blob) for when we already know
+            # things that are expensive to compute, like the internal
+            # imager representation or the checksum
+            $thumb_img->element("image")->set($blob, no_set_hooks => 1);
+            $thumb_img->image->_fill_pnotes_data(\$blob, %sargs);
+            return $thumb_img;
+          }]]>
+      </code>
+    </method>
+
+    <method>
+       <name>_data_hash</name>
+       <code><![CDATA[ sub { $_[0]->{_local_hash} ||= {}; } ]]></code>
+    </method>
+
+    <method>
+      <name>_fill_pnotes_data</name>
+      <code>
+        <![CDATA[
+          sub {
+            my ( $self, $blob, %args ) = @_;
+            # TODO: this can probably be simplified since Imager->open() 
+            # supports file, fd, fh, data args...
+            # $blob is either a reference to data or a filename
+            # an empty $blob/ref means that this is an
+            # "erase", not a "set".
+            my $fn;
+            if ( (ref($blob) eq "SCALAR") && defined($$blob)) {
+              #ref to scalar data
+              $fn = "(in-memory scalar)";
+              $blob = $$blob;
+            } elsif (ref($blob) eq "GLOB") {
+              #filehandle
+              $fn = "(pre-existing filehandle)";
+              local $/;
+              $blob = <$blob>;
+            } elsif ( !ref($blob) and defined $blob ) {							
+              $fn = $blob;
+              open ( my $fh, "<$fn" ) || die "couldn't open image: '$fn'";
+              local $/;
+              $blob = <$fh>;
+              close ( $fh );
+            } else {
+              # erase: clear the pnotes field
+              $self->_data_hash()->{image}        = undef;
+              $self->_data_hash()->{file}         = undef;
+              $self->_data_hash()->{blob}         = undef;
+              $self->_data_hash()->{width}        = undef;
+              $self->_data_hash()->{height}       = undef;
+              $self->_data_hash()->{content_type} = undef;
+              $self->_data_hash()->{extension}    = undef;
+              $self->_data_hash()->{checksum}     = undef;
+              return;
+            }
+            my $img;
+            if(ref($args{image})) {
+              $img = $args{image}->copy();
+            } else {
+              $img = Imager->new();
+              $img->open(data => $blob) or die $img->errstr;
+            }
+            $self->_data_hash()->{image}        = $img;
+            $self->_data_hash()->{file}         = $fn;
+            $self->_data_hash()->{blob}         = $blob;
+            $self->_data_hash()->{width}        = $img->getwidth;
+            $self->_data_hash()->{height}       = $img->getheight;
+            my $fmt;
+            if(defined($args{format})) {
+              $fmt = ".".$args{format};
+            } else {
+              $fmt = $img->tags(name => "i_format");
+              $fmt = ".$fmt";
+            }
+            $fmt =~ s/jpeg$/jpg/;
+            $self->_data_hash()->{extension}    = $fmt;
+            $self->_data_hash()->{content_type} =
+              $self->def_pnotes->{image_content_type_sub}->($fmt);
+            my $md5_val;
+            if(defined($args{checksum})) {
+              $md5_val = $args{checksum};
+            } else {
+              my $md5;
+              $md5 = Digest::MD5->new();
+              $md5->add ( $blob );
+              $md5_val = $md5->hexdigest();
+            }
+            $self->_data_hash()->{checksum} = $md5_val;
+          }]]>
+      </code>
+    </method>
+      
+    <set_hook>
+      <![CDATA[ sub { $_[0]->_fill_pnotes_data($_[1]) } ]]>
+    </set_hook>
+    <set_from_file_hook>
+      <![CDATA[ sub { $_[0]->_fill_pnotes_data($_[1]) } ]]>
+    </set_from_file_hook>
+    <read_hook>
+      <![CDATA[ sub { $_[0]->_fill_pnotes_data($_[0]->get_location()); } ]]>
+    </read_hook>
+
+    <def_hook>
+      <![CDATA[
+        use XML::Comma::Util;
+        use Digest::MD5;
+        use Imager;
+        $self->def_pnotes->{image_content_type_sub} = sub {
+          my ($ext) = @_;
+          $ext    = lc($ext);
+          return 'image/gif'  if($ext eq '.gif');
+          return 'image/jpeg' if($ext =~ /^\.jp(e|g|eg)$/);
+          return 'image/png'  if($ext eq '.png');
+          return 'image/bmp'  if($ext eq '.bmp');
+          die "unknown image content type for ext: $ext";
+        };
+      ]]>
+    </def_hook>
+          
+  </blob_element>
+
+  <def_hook>
+    <![CDATA[
+      #HACK - blob_element should be root element!
+      $self->def_pnotes->{image_content_type_sub} = 
+        $self->def_by_name("image")->def_pnotes->{image_content_type_sub};
+    ]]>
+  </def_hook>
+
+  <!-- utility methods which can be called statically (sans-doc) from
+      XML::Comma::Def->Comma_Standard_Image() -->
+
+  <method>
+    <name>image_extension</name>
+    <code>
+      <![CDATA[
+        #TODO: there must be a way to get this info from 
+        #Imager::image.c::i_test_format_probe::formats[]
+        #for now, use this code, adapted from GD::Image::_image_type
+        sub {
+          XML::Comma::Log->warn("top level image_extension call from CSI.def discouraged, may be inaccurate!");
+          my ($self, $data) = @_;
+          return '.png' if $data =~ /^\x89PNG/;
+          return '.gif' if $data =~ /^GIF8/;
+          return '.bmp' if $data =~ /^BM/;
+          return '.jpg' if $data =~ /^\xff\xd8\xff[\xd0-\xff]/;
+
+#					return '.gd2' if $data =~ /gd2\x00/;
+#					return '.xpm' if substr($data,0,9) eq "/* XPM */";
+          die "format not supported / not an image, first 10 bytes: ".
+            join("", map { sprintf("%x", ord($_))." " }
+               split(//, substr($data,0,10))); 
+        }
+      ]]>
+    </code>
+  </method>
+
+  <method>
+    <name>image_content_type</name>
+    <code><![CDATA[ sub {
+        $_[0]->def_pnotes->{image_content_type_sub}->(@_[1..$#_]);
+##wtf!
+#        shift()->def_pnotes->{image_content_type_sub}->(@_);
+    } ]]></code>
+  </method>
+
+</DocumentDefinition>
+

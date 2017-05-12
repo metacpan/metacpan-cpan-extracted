@@ -1,0 +1,12 @@
+TYPEMAP
+
+GdomeDocument *         G_OBJECT
+GdomeXPathResult *         G_OBJECT
+
+INPUT
+G_OBJECT
+    if( sv_isobject($arg) && (SvTYPE(SvRV($arg)) == SVt_PVMG) )
+            $var = ($type)SvIV((SV*)SvRV( $arg ));
+    else{
+            $var = NULL;
+    }

@@ -1,0 +1,20 @@
+Changes
+lib/XML/Elemental/Characters.pm
+lib/XML/Elemental/Document.pm
+lib/XML/Elemental/Element.pm
+lib/XML/Elemental/Node.pm
+lib/XML/Elemental/SAXHandler.pm
+lib/XML/Elemental/Util.pm
+lib/XML/Elemental.pm
+lib/XML/Parser/Style/Elemental.pm
+Makefile.PL
+MANIFEST
+README
+t/10-main.t
+t/11-subclass.t
+t/12-ancestory.t
+t/lib/T/Characters.pm
+t/lib/T/Document.pm
+t/lib/T/Element.pm
+t/test.xml
+META.yml                                 Module meta-data (added by MakeMaker)

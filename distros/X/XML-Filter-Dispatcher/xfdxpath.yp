@@ -1,0 +1,631 @@
+## Grammar by James Clark.  Funky Perl by yours truely.
+#
+# Grammar copied from a message on the xsl-list:
+#   Subject: Re: New XSLT draft
+#   From: James Clark <jjc@jclark.com>
+#   Date: Mon, 12 Jul 1999 09:03:55 +0700
+
+
+%{
+    use Carp;
+    use UNIVERSAL;
+    use XML::Filter::Dispatcher::Ops;
+
+    sub _no {
+        my $p = shift;
+#        push @{$p->{USER}->{NONONO}}, join(
+die join(
+            "",
+            "XPath construct not supported: ",
+            join( " ", map
+                defined $_
+                    ? ref $_
+                        ? do {
+                            my $f = ref $_;
+                            $f =~ s/^XFD:://;
+                            $f;
+                        }
+                        : $_
+                    : "<undef>" ,
+                @_
+            ),
+            " (grammar rule at ",
+            (caller)[1],
+            ", line ",
+            (caller)[2],
+            ")"
+        );
+
+        return ();
+    }
+
+    sub _step {
+        my @ops = grep $_, @_;
+
+        for ( 0..$#ops-1 ) {
+            $ops[$_]->set_next( $ops[$_+1] );
+        }
+            
+        return $ops[0];
+    }
+%}
+
+%token QNAME
+%token NAME_COLON_STAR
+%token DOT
+%token DOT_DOT
+%token AT
+%token AXIS_NAME
+%token FUNCTION_NAME
+%token COMMENT
+%token PI
+%token TEXT
+%token NODE
+%token STAR
+%token LPAR
+%token RPAR
+%token LSQB
+%token RSQB
+%token LITERAL
+%token NUMBER
+%token COLON_COLON
+%token DOLLAR_QNAME
+%token SLASH
+%token SLASH_SLASH
+%token VBAR
+%token COMMA
+%token PLUS
+%token MINUS
+%token EQUALS
+%token GT
+%token LT
+%token GTE
+%token LTE
+%token MULTIPLY
+%token AND
+%token OR
+%token MOD
+%token DIV
+# %token QUO
+
+## We also catch some Perl tokens so we can give useful advice
+%token EQUALS_EQUALS
+%token VBAR_VBAR
+%token AMP_AMP
+
+%%
+
+## NOTE: I use the paren-less format for Perl subcalls here so that
+## perl will warn me if I don't have one defined.
+
+expr :
+    or_expr
+    ;
+
+or_expr :
+    and_expr
+    | or_expr OR and_expr                  { XFD::Operator::or->new( @_[1,3] ) }
+    | or_expr VBAR_VBAR and_expr           {
+        die "XPath uses 'or' instead of Perl's '||'\n";
+    }
+    ;
+
+and_expr :
+    equality_expr
+    | and_expr AND equality_expr           { XFD::Operator::and->new( @_[1,3] ) }
+    | and_expr AMP_AMP equality_expr       {
+        die "XPath uses 'and' instead of Perl's '&&'\n";
+    }
+    | and_expr AMP equality_expr       {
+        die "XPath uses 'and' instead of Perl's '&'\n";
+    }
+    ;
+
+equality_expr :
+    relational_expr
+    | equality_expr EQUALS relational_expr      { XFD::relational_op equals     => @_[1,3] }
+    | equality_expr BANG_EQUALS relational_expr { XFD::relational_op not_equals => @_[1,3] }
+    | equality_expr EQUALS_EQUALS relational_expr { 
+        die "XPath uses '=' instead of Perl's '=='\n";
+    }
+    ;
+
+relational_expr :
+    additive_expr
+    | relational_expr LT additive_expr    { XFD::relational_op lt  => @_[1,3] }
+    | relational_expr GT additive_expr    { XFD::relational_op gt  => @_[1,3] }
+    | relational_expr LTE additive_expr   { XFD::relational_op lte => @_[1,3] }
+    | relational_expr GTE additive_expr   { XFD::relational_op gte => @_[1,3] }
+    ;
+
+additive_expr :
+    multiplicative_expr
+    | additive_expr PLUS multiplicative_expr  { XFD::math_op addition    => @_[1,3] }
+    | additive_expr MINUS multiplicative_expr { XFD::math_op subtraction => @_[1,3] }
+    ;
+
+multiplicative_expr :
+    unary_expr
+    | multiplicative_expr MULTIPLY unary_expr { XFD::math_op multiplication => @_[1,3] }
+    | multiplicative_expr DIV unary_expr      { XFD::math_op division       => @_[1,3] }
+    | multiplicative_expr MOD unary_expr      { XFD::math_op modulus        => @_[1,3] }
+    ;
+
+unary_expr :
+    union_expr
+    | MINUS unary_expr                        { XFD::Negation->new( $_[2] ) }
+    ;
+
+union_expr :
+    path_expr
+    | union_expr VBAR path_expr          {
+        for ( $_[1], $_[3] ) {
+            next if $_->can( "set_next" );
+            $_ = ref $_;
+            s/^XFD:://;
+            die "Can't use a $_ in a union, perhaps you want || instead of |\n";
+        }
+
+        my $union;
+        if ( $_[1]->isa( "XFD::union" ) ) {
+            $_[1]->add( $_[3] );
+            $union = $_[1];
+        }
+        else {
+            $union = XFD::union->new( @_[1,3] )
+        }
+        $union;
+    }
+    ;
+
+path_expr :
+    location_path
+    | primary_expr predicates segment    {
+        return $_[1] unless defined $_[2] || defined $_[3];
+
+        my $expr = $_[1];
+        $expr = $expr->[0] if $expr->isa( "XFD::Parens" );
+
+        ## TODO: Cope with nodesets passed in vars or
+        ## returned from functions.
+        die "node-set is required before a predicate or '/' (variables and functions returning nodesets are not (yet) supported)"
+            unless $expr->isa( "XFD::PathTest" );
+
+        $expr->set_next( $_[2] ) if defined $_[2];
+        $expr->set_next( $_[3] ) if defined $_[3];
+        $expr;
+    }
+    ;
+
+segment :
+    /* empty */
+    | SLASH relative_location_path        { $_[2] }
+    | SLASH_SLASH relative_location_path  {
+        my $op = XFD::Axis::descendant_or_self->new;
+        $op->set_next( $_[2] );
+        $op;
+    };
+
+location_path :
+    relative_location_path
+    | absolute_location_path
+    ;
+
+absolute_location_path :
+    SLASH                                { XFD::doc_node->new }
+    | SLASH relative_location_path       {
+        my $op = XFD::doc_node->new;
+        $op->set_next( $_[2] );
+        $op;
+    }
+    | SLASH_SLASH relative_location_path { 
+        ## /descendant-or-self::node()/relative_location_path
+        my $op = XFD::doc_node->new;
+        my $step = _step(
+            XFD::Axis::descendant_or_self->new,
+            XFD::EventType::node->new,
+        );
+        $op->set_next( $step );
+        $step->set_next( $_[2] );
+        $op;
+    };
+
+relative_location_path :
+    step
+    | relative_location_path SLASH step    { $_[1]->set_next( $_[3] ) ; $_[1] }
+    ## This next rule means that the grammar does not like "////" :(.
+    ## TODO: add a rule for successive "//" paths
+    | relative_location_path SLASH_SLASH step {
+        my $step = _step(
+            XFD::Axis::descendant_or_self->new,
+            XFD::EventType::node->new,
+        );
+        $_[1]->set_next( $step );
+        $step->set_next( $_[3] );
+        $_[1];
+    }
+    ;
+
+step :
+    axis node_test predicates         { _step( @_[1..$#_] ) }
+    | DOT                             { XFD::self_node->new }
+    | DOT_DOT { _no @_; }
+    ;
+
+axis:
+    /* empty */                 { XFD::Axis::child->new     }
+    | AXIS_NAME COLON_COLON     { XFD::axis( $_[1] )        }
+    | AT                        { XFD::Axis::attribute->new }
+    ;
+
+predicates :
+    /* empty */
+    | predicates LSQB expr RSQB {
+        my $p = XFD::predicate->new( $_[3] );
+        if ( defined $_[1] ) {
+            $_[1]->set_next( $p );
+            return $_[1];
+        }
+        return $p;
+    }
+    ;
+
+primary_expr :
+    DOLLAR_QNAME     { XFD::VariableReference->new( $_[1] ) }
+    | LPAR expr RPAR { XFD::Parens->new( $_[2] ) }
+    | LITERAL
+    | NUMBER
+    | FUNCTION_NAME LPAR opt_args RPAR { XFD::function( @_[1,3] ) }
+    ;
+
+opt_args :
+    /* empty */             { [] }
+    | args                  ## pass thru
+    ;
+
+args :
+    expr              { [ $_[1] ] }
+    | args COMMA expr {
+        push @{$_[1]}, $_[3];
+        $_[1];
+    }
+    ;
+  
+node_test :
+    QNAME {
+        $XFD::dispatcher->{Namespaces}
+            ? do {
+                my ( $ns_uri, $local_name ) =
+                    XFD::PathTest->_parse_ns_uri_and_localname( $_[1] );
+
+                my $op = XFD::namespace_test->new( $ns_uri );
+                $op->set_next(
+                    XFD::node_local_name->new( $local_name )
+                );
+                $op;
+            }
+            : XFD::node_name->new( $_[1] );
+    }
+    | STAR                                { XFD::EventType::principal_event_type->new; }
+    | NAME_COLON_STAR {
+        my ( $ns_uri ) = 
+            XFD::PathTest->_parse_ns_uri_and_localname( $_[1] );
+        XFD::namespace_test->new( $ns_uri )
+    }
+    | PI            LPAR opt_literal RPAR { XFD::EventType::processing_instruction
+                                                           ->new( $_[2] ) }
+    | COMMENT       LPAR RPAR             { XFD::EventType::comment      ->new }
+    | TEXT          LPAR RPAR             { XFD::EventType::text         ->new }
+    | NODE          LPAR RPAR             { XFD::EventType::node         ->new }
+    ;
+
+opt_literal :
+    /* empty */
+    | LITERAL { _no @_; }
+    ;
+
+%%
+
+=head1
+
+XML::Filter::Dispatcher::Parser - Parses the XPath subset used by ...::Dispatcher
+
+=head1 SYNOPSIS
+
+   use XML::Filter::Dispatcher::Parser;
+
+   my $result = XML::Filter::Dispatcher::Parser->parse( $xpath );
+
+=head1 DESCRIPTION
+
+Some notes on the parsing and evaluation:
+
+=over
+
+=item *
+
+Result Objects
+
+The result expressions alway return true or false.  For XPath
+expressions that would normally return a node-set, the result is true if
+the current SAX event would build a node that would be in the node set.
+No floating point or string return objects are supported (this may
+change).
+
+=item *
+
+Context
+
+The XPath context node is the document root (theoretically; in reality
+there is none).  The variables are the Dispatcher's data members, and
+the function library is XXX.
+
+Not sure what to do about the context position, but the context size is
+of necessity undefined.
+
+The namespace mapping will be added in when I grok the NamespaceHelper.
+
+=back
+
+=cut
+
+use Carp;
+
+my %tokens = (qw(
+    .           DOT
+    ..          DOT_DOT
+    @           AT
+    *           STAR
+    (           LPAR
+    )           RPAR
+    [           LSQB
+    ]           RSQB
+    ::          COLON_COLON
+    /           SLASH
+    //          SLASH_SLASH
+    |           VBAR
+    +           PLUS
+    -           MINUS
+    =           EQUALS
+    !=          BANG_EQUALS
+    >           GT
+    <           LT
+    >=          GTE
+    <=          LTE
+
+    ==          EQUALS_EQUALS
+    ||          VBAR_VBAR
+    &&          AMP_AMP
+    &           AMP
+),
+    "," =>      "COMMA"
+);
+
+my $simple_tokens =
+    join "|",
+        map
+            quotemeta,
+            reverse
+                sort {
+                    length $a <=> length $b
+                } keys %tokens;
+
+my $NCName = "(?:[a-zA-Z_][a-zA-Z0-9_.-]*)"; ## TODO: comb. chars & Extenders
+
+my %EventType = qw(
+    node                   NODE
+    text                   TEXT
+    comment                COMMENT
+    processing-instruction PI
+);
+
+my $EventType = "(?:" .
+    join( "|", map quotemeta, sort {length $a <=> length $b} keys %EventType ) .
+    ")";
+
+my $AxisName = "(?:" .  join( "|", split /\n+/, <<AXIS_LIST_END ) . ")" ;
+ancestor
+ancestor-or-self
+attribute
+child
+descendant
+descendant-or-self
+following
+following-sibling
+namespace
+parent
+preceding
+preceding-sibling
+self
+end
+AXIS_LIST_END
+
+my %preceding_tokens = map { ( $_ => undef ) } ( qw(
+    @ :: [
+    and or mod div
+    *
+    / // | + - = != < <= > >=
+
+    == & && ||
+    ),
+    "(", ","
+) ;
+
+
+sub debugging () { 0 }
+
+
+sub lex {
+    my ( $p ) = @_;
+
+    ## Optimization notes: we aren't parsing War and Peace here, so
+    ## readability over performance.
+
+    my $d = $p->{USER};
+    my $input = \$d->{Input};
+
+    ## This needs to be more contextual, only recognizing axis/function-name
+    if ( ( pos( $$input ) || 0 ) == length $$input ) {
+        $d->{LastToken} = undef;
+        return ( '', undef );
+    }
+
+    my ( $token, $val ) ;
+    ## First do the disambiguation rules:
+
+    ## If there is a preceding token and the preceding token is not
+    ## one of "@", "::", "(", "[", "," or an Operator,
+    if ( defined $d->{LastToken}
+        && ! exists $preceding_tokens{$d->{LastToken}}
+    ) {
+        ## a * must be recognized as a MultiplyOperator
+        if ( $$input =~ /\G\s*\*/gc ) {
+            ( $token, $val ) = ( MULTIPLY => "*" );
+        }
+        ## an NCName must be recognized as an OperatorName.
+        elsif ( $$input =~ /\G\s*($NCName)/gc ) {
+            die "Expected and, or, mod or div, got '$1'\n"
+                unless 0 <= index "and|or|mod|div", $1;
+            ( $token, $val ) = ( uc $1, $1 );
+        }
+    }
+
+    ## NOTE: \s is only an approximation for ExprWhitespace
+    unless ( defined $token ) {
+        $$input =~ m{\G\s*(?:
+            ## If the character following an NCName (possibly after
+            ## intervening ExprWhitespace) is (, then the token must be
+            ## recognized as a EventType or a FunctionName.
+            ($NCName)\s*(?=\()
+
+            ## If the two characters following an NCName (possibly after
+            ## intervening ExprWhitespace) are ::, then the token must be
+            ## recognized as an AxisName
+            |($NCName)\s*(?=::)
+
+            ## Otherwise, it's just a normal lexer.
+            |($NCName:\*)                           #NAME_COLON_STAR
+            |((?:$NCName:)?$NCName)                 #QNAME
+            |('[^']*'|"[^"]*")                      #LITERAL
+            |(-?\d+(?:\.\d+)?|\.\d+)                #NUMBER
+            |\$((?:$NCName:)?$NCName)               #DOLLAR_QNAME
+            |($simple_tokens)
+        )\s*}gcx;
+
+        ( $token, $val ) =
+            defined $1  ? (
+                exists $EventType{$1}
+                    ? ( $EventType{$1}, $1 )
+                    : ( FUNCTION_NAME => $1 )
+            ) :
+        
+            defined $2 ? ( AXIS_NAME        =>  $2 ) :
+            defined $3 ? ( NAME_COLON_STAR  =>  $3 ) :
+            defined $4 ? ( QNAME            =>  $4 ) :
+            defined $5 ? ( LITERAL          =>  do {
+                    my $s = substr( $5, 1, -1 );
+                    $s =~ s/([\\'])/\\$1/g;
+                    XFD::StringConstant->new( $s );
+                }
+            ) :
+            defined $6 ? ( NUMBER           =>
+                XFD::NumericConstant->new( "$6")
+            ) :
+            defined $7 ? ( DOLLAR_QNAME     =>  $7 ) :
+            defined $8 ? ( $tokens{$8}      =>  $8 ) :
+            die "Failed to parse '$$input' at ",
+                pos $$input,
+                "\n";
+    }
+
+    $d->{LastToken} = $val;
+
+    if ( debugging ) {
+        warn
+            "'",
+            $$input,
+            "' (",
+            pos $$input,
+            "):",
+            join( " => ", map defined $_ ? $_ : "<undef>", $token, $val ),
+            "\n";
+    }
+
+    return ( $token, $val );
+}
+
+
+sub error {
+    my ( $p ) = @_;
+    print "Couldn't parse '$p->{USER}->{Input}' at position ", pos $p->{USER}->{Input}, "\n";
+}
+
+## _parse is an internal, reentrant entry point; it's used to parse rules
+## and subrules.
+sub _parse {
+    my $self = shift;
+    my ( $expr, $action_code ) = @_;
+
+    my $options = $XFD::dispatcher;
+
+    warn "Parsing '$expr'\n" if $options->{Debug};
+
+    my $p = XML::Filter::Dispatcher::Parser->new(
+        yylex   => \&lex,
+        yyerror => \&error,
+        ( $options->{Debug} || 0 ) > 5
+            ? ( yydebug => 0x1D )
+            : (),
+    );
+
+    %{$p->{USER}} = %$options if $options;
+    $p->{USER}->{Input} = $expr;
+    local $XFD::dispatcher->{ParseNestingDepth}
+        = $XFD::dispatcher->{ParseNestingDepth} + 1;
+
+    my $op_tree = eval {
+        $p->YYParse;                ## <== the actual parse
+    };
+
+    die $@ if $@;
+
+    die map "$_\n", @{$p->{USER}->{NONONO}}
+        if $p->{USER}->{NONONO} ;
+
+    return undef unless defined $op_tree;
+
+    die "grammar returned '$op_tree', needed a ref\n"
+        unless ref $op_tree;
+
+    ## TODO: figure a way to allow a limited subset
+    ## of EventPath patterns, kinda like allowing
+    ## a pattern match against the generated Op tree,
+    ## or alternate grammar files.  The former could
+    ## give more helpful error messages, the latter
+    ## could be more flexible because it would allow
+    ## non-standard grammars.
+    $op_tree = XFD::ExprEval->new( $op_tree )
+        unless $op_tree->isa( "XFD::PathTest" );
+
+    $op_tree->set_next( XFD::action( $action_code ) );
+
+    return $op_tree;
+}
+
+
+sub parse {
+    my $self = shift;
+    local $XFD::dispatcher = shift;
+    my ( $expr, $context ) = @_;
+
+    $XFD::dispatcher->{ParseNestingDepth} = 0;
+    $XFD::dispatcher->{OpTree} ||= XFD::union->new;
+
+    my $op_tree = $self->_parse( @_ );
+
+    my $rule = XFD::Rule->new( $expr );
+    $rule->set_next( $op_tree );
+    $XFD::dispatcher->{OpTree}->add( $rule );
+}
+
+1 ;

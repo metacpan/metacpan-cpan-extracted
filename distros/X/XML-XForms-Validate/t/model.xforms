@@ -1,0 +1,4 @@
+<a xmlns:xf="http://www.w3.org/2002/xforms">
+	<xf:model id="a"><xf:submission id="s1"/></xf:model>
+	<xf:model id="b"><xf:submission id="s2"/></xf:model>
+</a>

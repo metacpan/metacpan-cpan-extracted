@@ -1,0 +1,81 @@
+Revision history for Perl extension XML::GDOME
+
+0.86  March 30th, 2004
+	- Fixed bug when calling appendText with value "0" (Marc Slagle)
+
+0.85  December 1st, 2003
+	- removed #include <libxml/hash.h> from GDOME.xs - workaround for libxml2 2.6.2
+		(Mike Castle)
+
+0.84  November 28th, 2003
+	- Updated Makefile.PL to work with gdome2 0.8 - see
+	rt.cpan.org ticket 4410
+
+0.83  July 31st, 2003
+	- Added CLONE method in increment reference count - first stage of
+	  support for threading (Stephen Clouse)
+	- Adapted 01_basic.t to accept new libxml2 error message (Stephen Clouse)
+
+0.82  September 15th, 2002
+        - Require XML::LibXML::Common for rountines and constants
+          shared with XML::LibXML, removed duplicate
+          encodeToUTF8, decodeFromUTF8 functions from XML::GDOME.
+        - Fixed bug in generate script - use xpath instead of
+          getElementsByName.
+        - Doc fixes
+	- Fixed namespace in test-document3.xml DTD for
+	  libxml2 >= 2.4.23
+	- Checks for gdome2 0.7.2 or greater, not just equal
+
+0.81  June 5th, 2002
+	- Added toStringEnc method, supports encoding
+
+0.80  May 7th, 2002
+	- Fixed appendText for when $xmlString is undef
+	  (Richard Titmuss)
+
+0.79  April 25th, 2002
+	- Added XML::LibXML methods including getAttributeNS,
+	  findvalue, find, insertAfter, getChildrenByTagName,
+	  getChildrenByTagNameNS, getElementsByLocalName,
+	  appendTextChild, appendWellBalancedChunk,
+	  createAttribute, to_literal and several aliases (Richard Titmuss)
+	- Fixed getElementsByTagName when return empty list
+	  in array context (Richard Titmuss)
+	- Fixed bugs in XML::GDOME::SAX::Generator (Richard Titmuss)
+	- Added README.LibXML, includes notes on LibXML/GDOME compatability
+	  (Richard Titmuss)
+
+0.78  April 16th, 2002
+	- Removed #include <gdome-traversal.h> from GDOME.xs.
+	- Added iterator method (Richard Titmuss)
+
+0.77  March 22nd, 2002
+	- API CHANGE: Removed GDOME_ prefix from GDOME constants.
+	- getElemenetsByTagName(NS)? now returns array if wantarray is set
+	- more doc improvements.
+	- Moved validation throwing exception fix to generate script.
+
+0.76  March 5th, 2002
+	- Updated to use lastest version of gdome2 from CVS
+	    API CHANGE: XPath now follows DOM Level 3 XPath
+	    08 February 2002 Working Draft.
+	- Validation now throws exceptions instead of printing
+           to stderr (Martin Oldfield)
+	- Documentation fixes and improvements
+	- Bug fix - doc nodes returned by getParentNode are now
+	    blessed as "XML::GDOME::Document"
+
+0.75  February 16th, 2002
+	- Memory leak fixes in XS wrapper and gdome2 library.
+	    All tests should run without any memory leaks.
+	- Added XPath module
+	- Improved Documentation
+	- Added SAX Interface
+	- Added XML::LibXML compabitilty
+	- Added XML::GDOME::Node::toString
+
+0.7.0 December 23, 2001
+	- original version; created by h2xs 1.21 with options
+		-X -n XML::GDOME
+

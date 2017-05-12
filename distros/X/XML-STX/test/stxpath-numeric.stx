@@ -1,0 +1,23 @@
+<stx:transform version="1.0" 
+  xmlns:stx="http://stx.sourceforge.net/2002/ns"
+  strip-space="yes">
+
+  <stx:template match="/root">
+    <node>
+      <stx:value-of select="round(2.5)"/>
+      <stx:text>:</stx:text>
+      <stx:value-of select="round(2.4999)"/>
+      <stx:text>:</stx:text>
+      <stx:value-of select="round(-2.5)"/>
+      <stx:text>/</stx:text>
+      <stx:value-of select="floor(10.5)"/>
+      <stx:text>:</stx:text>
+      <stx:value-of select="floor(-10.5)"/>
+      <stx:text>/</stx:text>
+      <stx:value-of select="ceiling(10.5)"/>
+      <stx:text>:</stx:text>
+      <stx:value-of select="ceiling(-10.5)"/>
+    </node>
+  </stx:template>
+
+</stx:transform>

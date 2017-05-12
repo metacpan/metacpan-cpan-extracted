@@ -1,0 +1,44 @@
+#! /usr/bin/perl
+
+use lib qw(/src/intermezzo/XDR /src/intermezzo/lento);
+
+use Lento::XDR::InterMezzo;
+use Data::XDR::Encode 'record';
+use Data::XDR::Decode;
+
+my ($bin) = Lento::XDR::InterMezzo->binding ();
+my $ser = Lento::XDR::InterMezzo->server ();
+
+$bin->bind ($bin->LEGACY,
+sub
+{
+    my ($rpc, @args) = @_;
+    $rpc->reply ($ser->LEGACY ($args[0]));
+});
+$bin->bind ($bin->REQ, sub { print "REQ <", $_[1], "> <", $_[2], ">\n"; '24' });
+
+my ($cli) = Lento::XDR::InterMezzo->client ();
+my $dec = Data::XDR::Decode->new ();
+
+foreach my $i ('foo bar baz', 'zot arg', 'gord', 'foo me over again')
+{
+    my $packet;
+    if ($i =~ /^foo/)
+    {
+	$packet = record ($cli->LEGACY ($i));
+o    }
+    else
+    {
+	$packet = record ($cli->REQ (length ($i) * 2 + 1, $i));
+    }
+	
+    # Read a whole record from the string.
+    $dec->record ($packet);
+
+    # Next decode the RPC and get a reply.
+    my ($rep) = $bin->dispatch ($dec->rpc);
+    if ($rep)
+    {
+	print "<", record ($rep), ">\n";
+    }
+}

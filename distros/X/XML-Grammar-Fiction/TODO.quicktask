@@ -1,0 +1,29 @@
+# Quicktask v1.2
+
+CURRENT TASKS:
+    - ::Fiction: correct handling of leading special characters in lines.
+        * Currently, they are processed as they are, without generating an
+          error.
+        * Added [Wed 2013-04-10]
+    - Convert the parsing errors from Carp::confess to Exception::Class
+        * This will allow a friendlier diagnostic. Carp::confess was
+          implemented due to laziness on the programmers' part.
+        * Added [Wed 2013-04-10]
+    - ::Fiction : add a feature for a formatting tag at the beginning of a
+        * paragraph, that will not be mistaken for a top-level tag:
+        * Added [Wed 2013-04-10]
+    - Convert the XML grammar to use the xlink namespace for links.
+        * Added [Wed 2013-04-10]
+    - Make the Screenplay exceptions contain the opening line closing line
+        * and generally more context (currently they are guess-work).
+      * Added [Wed 2013-04-10]
+
+
+    - Fix innerdesc on start of line in middle of paragraph.
+      * «Hi I went to the store and
+      * «[walks around the room, nervous] bought a chocolate bar.
+      * Added [Wed 2013-04-10]
+
+COMPLETED TASKS:
+
+# vim:ft=quicktask:sw=4:ts=4

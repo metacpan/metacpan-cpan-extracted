@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+
+	<xs:simpleType name="noLowerCase">
+		<xs:restriction base="xs:string">
+			<xs:pattern value="[^:lower:]+"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="NLstrLn2">
+		<xs:restriction base="noLowerCase">
+			<xs:length value="2"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+
+	<xs:simpleType name="Union">
+		<xs:union memberTypes="NLstrLn2 noLowerCase xs:string"/>
+	</xs:simpleType>
+
+	<xs:element name="Types">
+		<xs:complexType>
+			<xs:sequence minOccurs="1" maxOccurs="1">
+				<xs:element name="union" type="Union"/> 
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

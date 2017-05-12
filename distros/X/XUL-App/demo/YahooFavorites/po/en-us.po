@@ -1,0 +1,84 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=ASCII\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: lib/YahooFavorites/View/WebDigest.pm:109
+msgid "About Yahoo Favorites"
+msgstr ""
+
+#: lib/YahooFavorites/View/About.pm:19
+msgid "About Yahoo! Favorites"
+msgstr ""
+
+#: lib/YahooFavorites/View/WebDigest.pm:145
+msgid "Add the current link to Yahoo Favorites"
+msgstr ""
+
+#: lib/YahooFavorites/View/About.pm:82
+msgid "Close window"
+msgstr ""
+
+#: lib/YahooFavorites/View/About.pm:34
+msgid "Copyright (c) 2006, 2007, 2008."
+msgstr ""
+
+#: lib/YahooFavorites/View/Options.pm:69
+msgid "Display Menu"
+msgstr ""
+
+#: lib/YahooFavorites/View/Options.pm:76
+msgid "Hide Menu"
+msgstr ""
+
+#: lib/YahooFavorites/View/About.pm:40
+msgid "Home Page"
+msgstr ""
+
+#: lib/YahooFavorites/View/WebDigest.pm:101
+msgid "Latest Digest"
+msgstr ""
+
+#: lib/YahooFavorites/View/Options.pm:58
+msgid "Menu Option"
+msgstr ""
+
+#: lib/YahooFavorites/View/WebDigest.pm:86
+msgid "My Web Digest"
+msgstr ""
+
+#: lib/YahooFavorites/View/Options.pm:95
+msgid "OK"
+msgstr ""
+
+#: lib/YahooFavorites/View/Options.pm:17
+msgid "Options for Yahoo! Favorites"
+msgstr ""
+
+#: lib/YahooFavorites/View/WebDigest.pm:125 lib/YahooFavorites/View/WebDigest.pm:135 lib/YahooFavorites/View/WebDigest.pm:55 lib/YahooFavorites/View/WebDigest.pm:56 lib/YahooFavorites/View/WebDigest.pm:77
+msgid "Tag this page"
+msgstr ""
+
+#: lib/YahooFavorites/View/WebDigest.pm:94
+msgid "Top Digest"
+msgstr ""
+
+#: lib/YahooFavorites/View/About.pm:27 lib/YahooFavorites/View/Options.pm:42 lib/YahooFavorites/View/WebDigest.pm:47 lib/YahooFavorites/View/WebDigest.pm:69
+msgid "Yahoo Favorites"
+msgstr ""
+
+#: lib/YahooFavorites/View/About.pm:60
+msgid "Yahoo! China, Aliaba Inc."
+msgstr ""

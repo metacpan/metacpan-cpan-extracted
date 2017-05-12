@@ -1,0 +1,88 @@
+#!/usr/local/bin/perl
+# 
+# Copyright (c) 1998 Michael Koehne <kraehe@copyleft.de>
+# 
+# XML::Edifact is free software. You can redistribute and/or
+# modify this copy under terms of GNU General Public License.
+
+=head1 NAME
+
+create_codes - read uncl to create code data
+
+=head1 SYNOPSIS
+
+./bin/create_codes.pl
+
+=head1 DESCRIPTION
+
+Read UNCL to create codes.txt and codes.dat for further processing
+
+=cut
+
+open (OUTFILE, ">".File::Spec->catdir("html","LIB","xml-edifact-03","codes.txt") ) || die "can not open codes.txt for writing";
+
+open (INFILE, "un_edifact_d96b/uncl-1.96b") || die "can not open uncl-1.96b for reading";
+printf STDERR "reading uncl-1.96b\n";
+while (<INFILE>) { read_code("uncl"); };
+close(INFILE);
+print STDERR "\n";
+
+open (INFILE, "un_edifact_d96b/uncl-2.96b") || die "can not open uncl-2.96b for reading";
+printf STDERR "reading uncl-2.96b\n";
+while (<INFILE>) { read_code("uncl"); };
+close(INFILE);
+print STDERR "\n";
+
+#$verbose=1;
+open (INFILE, "un_edifact_d96b/unsl.96b") || die "can not open unsl.96b for reading";
+printf STDERR "reading unsl.96b\n";
+while (<INFILE>) { read_code("unsl"); };
+close(INFILE);
+print STDERR "\n";
+
+close(OUTFILE);
+
+sub read_code {
+    my ($codelist) = @_;
+    chop;	# strip record separator
+    if (!($. % 64)) {
+	printf STDERR '.' unless $verbose;
+    }
+
+    $ok = 0;
+
+    if ($_ =~ '^[+*#|X -] [0-9][0-9][0-9][0-9]  ') {
+	$cod = substr($_, 2, 4);
+	$des = substr($_, 8);
+	$s = '^ *', $des =~ s/$s//;
+	$s = " *\$", $des =~ s/$s//;
+	$fld = '';
+	$ok = 1;
+    }
+    elsif (($_ =~ '^[+*#|X -][+*#|X -] [0-9A-Z ][0-9A-Z ][0-9A-Z ][0-9A-Z ][0-9A-Z ][0-9A-Z] ')
+        || ($_ =~ '^[+*#|X -][+*#|X -] [0-9A-Z][0-9A-Z ][0-9A-Z ][0-9A-Z ][0-9A-Z ][0-9A-Z ] '))
+
+      {
+	$fld = substr($_, 3, 6);
+	$s = ' ', $fld =~ s/$s//g;
+	$des = substr($_, 10);
+	$s = '^ *', $des =~ s/$s//;
+	$s = " *\$", $des =~ s/$s//;
+	$ok = 2;
+    }
+
+    if ($ok) {
+	printf OUTFILE "%s\t%s\t%s\t%s\n", $cod, $fld, $codelist, $des;
+
+	$XML::Edifact::CODET{$cod."\t".$fld}=$codelist."\t".$des;
+
+        if ($ok == 1) {
+            my ($elemt,$coded) = split / /, $XML::Edifact::ELEMT{$cod};
+            $elemt=XML::Edifact::recode_mark($des)	unless $elemt;
+	    $XML::Edifact::ELEMT{$cod}="$elemt coded"	unless $coded;
+	    print $cod,"\t",$XML::Edifact::ELEMT{$cod},"\n" if $verbose;
+        }
+    }
+}
+
+1;

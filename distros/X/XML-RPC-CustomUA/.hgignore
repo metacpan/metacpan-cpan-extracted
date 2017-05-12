@@ -1,0 +1,6 @@
+server/websocket.pyc
+server/tmp.*html$
+MANIFEST.bak
+server/webgui.lock
+server/webgui_ssl.lock
+server/MegaSAS.log

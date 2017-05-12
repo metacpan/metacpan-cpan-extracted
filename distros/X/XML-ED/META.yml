@@ -1,0 +1,28 @@
+---
+abstract: 'A process to impliemtent editing of xml files.'
+author:
+  - 'G. Allen Morris III <gam3@gam3.net>'
+build_requires:
+  ExtUtils::CBuilder: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3601'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: XML-ED
+provides:
+  XML::ED:
+    file: lib/XML/ED.pm
+    version: v0.0.2
+  XML::ED::Bare:
+    file: lib/XML/ED/Bare.pm
+    version: v0.0.2
+  XML::ED::Node:
+    file: lib/XML/ED/Node.pm
+  XML::ED::NodeSet:
+    file: lib/XML/ED/NodeSet.pm
+resources:
+  license: http://dev.perl.org/licenses/
+version: v0.0.2

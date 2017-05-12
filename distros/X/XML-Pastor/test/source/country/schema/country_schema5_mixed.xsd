@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2005 sp2 U (http://www.altova.com) by any (Ru-Board) -->
+<xs:schema xmlns="http://www.example.com/country" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.example.com/country" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:simpleType name="CodeUNLocode">
+		<xs:restriction base="xs:string">
+			<xs:minLength value="2"/>
+			<xs:maxLength value="6"/>
+			<xs:pattern value="qsd"/>
+			<xs:pattern value="hello"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="CodeIATA">
+		<xs:restriction base="xs:string">
+			<xs:length value="3"/>
+			<xs:whiteSpace value="collapse"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="Code">
+		<xs:union memberTypes="CodeIATA CodeUNLocode">
+			<xs:simpleType>
+				<xs:union>
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:minLength value="1"/>
+							<xs:maxLength value="6"/>
+						</xs:restriction>
+					</xs:simpleType>
+					<xs:simpleType>
+						<xs:restriction base="xs:date"/>
+					</xs:simpleType>
+				</xs:union>
+			</xs:simpleType>
+		</xs:union>
+	</xs:simpleType>
+	<xs:simpleType name="CodeList">
+		<xs:list itemType="Code"/>
+	</xs:simpleType>
+	<xs:complexType name="City">
+		<xs:sequence minOccurs="0">
+			<xs:element name="name" type="xs:string" minOccurs="0"/>
+			<xs:element ref="population" minOccurs="0"/>
+		</xs:sequence>
+		<xs:attribute name="code" type="Code" use="required"/>
+	</xs:complexType>
+	<xs:complexType name="Country">
+		<xs:sequence minOccurs="0">
+			<xs:element name="name" type="xs:string" minOccurs="0"/>
+			<xs:element ref="population" minOccurs="0"/>
+			<xs:element name="currency" minOccurs="0">
+				<xs:complexType>
+					<xs:attribute name="code" type="xs:string"/>
+					<xs:attribute name="name" type="xs:string"/>
+				</xs:complexType>
+			</xs:element>
+			<xs:element ref="city" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element ref="description" minOccurs="0"/>
+		</xs:sequence>
+		<xs:attribute name="code" type="xs:string"/>
+	</xs:complexType>
+	<xs:complexType name="Population">
+		<xs:attribute name="date" type="xs:date"/>
+		<xs:attribute name="figure" type="xs:nonNegativeInteger"/>
+	</xs:complexType>
+	<xs:element name="city" type="City"/>
+	<xs:element name="country" type="Country"/>
+	<xs:element name="population" type="Population"/>
+	<xs:element name="htmlFragment">
+		<xs:complexType mixed="1">
+			<xs:sequence minOccurs="0">
+				<xs:any namespace="http://www.w3.org/1999/xhtml" processContents="skip" maxOccurs="unbounded"/>
+			</xs:sequence>
+			<xs:attribute name="src" type="xs:anyURI" use="optional"/>
+			<xs:anyAttribute namespace="hello"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="description">
+		<xs:complexType>
+			<xs:sequence minOccurs="0">
+				<xs:element ref="htmlFragment" minOccurs="0"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

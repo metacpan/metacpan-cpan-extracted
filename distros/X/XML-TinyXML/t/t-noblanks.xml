@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xml xmlns="foo://bar" xmlns:bar="bar://foo"><hello>world</hello><foo/><bar:parent xmlns="bar://child" xmlns:special_child="bar://special_child"><child1/><special_child:child2/><child3/></bar:parent><parent attr="val"><blah attr="val2">SECOND</blah></parent><qtest qattr="&quot;qval&quot;"> </qtest></xml>

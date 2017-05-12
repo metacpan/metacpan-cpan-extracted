@@ -1,0 +1,58 @@
+<?xml version="1.0"?>
+
+<!--
+    $CQ->parsefile("example4.xml")->cute_query(m=>{ten=>'', fifteen=>''})
+    { fifteen => "dispossession's", ten => "saintliest" }
+
+    $CQ->parsefile("example4.xml")->cute_query(m=>[ten=>'', fifteen=>''])
+    [ "substratum", ..., "saintliest", "excommunication", ..., "dispossession's", ]
+
+    What we'd like to see is:
+    { fifteen=>["excommunication", ..., "dispossession's"], ten=>["substratum", ..., "saintliest"] }
+
+    Note that this does work, but is expensive since it issues a re-query for each ten and for each fifteen
+    $CQ->parsefile("example4.xml")->cute_query(m=>{ten=>["../ten"=>''], fifteen=>["../fifteen"=>'']})
+
+    Possibly Query Forms:
+    <strike>1) $CQ->parsefile("example4.xml")->cute_query(m=>[{ten=>'', fifteen=>''}])</strike>
+
+    I think this is clearest
+    2) $CQ->parsefile("example4.xml")->cute_query(m=>{'[]ten'=>'', '[]fifteen'=>})
+
+    extra points for handling both m's too
+    $CQ->parsefile("example4.xml")->cute_query('.'=>{'[]m'=>{'[]ten'=>'', '[]fifteen'=>}})
+-->
+
+<r>
+    <m>
+        <ten>substratum</ten>
+        <ten>infatuated</ten>
+        <ten>hyperbolae</ten>
+        <ten>Limousin's</ten>
+        <ten>grumbler's</ten>
+        <ten>badmouthed</ten>
+        <ten>spoliation</ten>
+        <ten>deliveries</ten>
+        <ten>pedestrian</ten>
+        <ten>saintliest</ten>
+
+        <fifteen>excommunication</fifteen>
+        <fifteen>exemplification</fifteen>
+        <fifteen>congratulations</fifteen>
+        <fifteen>philosophically</fifteen>
+        <fifteen>antidepressants</fifteen>
+        <fifteen>impossibility's</fifteen>
+        <fifteen>pessimistically</fifteen>
+        <fifteen>archbishopric's</fifteen>
+        <fifteen>reincarnation's</fifteen>
+        <fifteen>dispossession's</fifteen>
+
+    </m>
+    <m>
+        <seven>Sukkoth</seven>
+        <seven>Almohad</seven>
+        <seven>cheeked</seven>
+        <seven>dogmata</seven>
+        <seven>happily</seven>
+    </m>
+</r>

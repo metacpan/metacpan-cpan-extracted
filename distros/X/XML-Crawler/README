@@ -1,0 +1,39 @@
+XML-Crawler version 0.01
+========================
+
+Honestly, I'm a little embarassed to add yet another module to
+the crowded XML namespace. I wrote this for myself because it 
+seems everyone was writing XML modules that didn't do quite what
+I want.
+
+What I want:
+
+  my $hash_ref = xml_to_rh( $xml );
+
+Yes, it's true that XML doesn't conveniently translate to Perl 
+data structures. But it's also true that one doesn't necessarily 
+need a perfect translation much of the time.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  XML::LibXML
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010 by Dylan Doxey
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.0 or,
+at your option, any later version of Perl 5 you may have available.
+

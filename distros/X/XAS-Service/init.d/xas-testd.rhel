@@ -1,0 +1,115 @@
+#!/bin/sh
+#
+# File: xas-testd
+# Date: 23-Aug-2016
+# By  : Kevin Esteb
+#
+# This is the startup procedure for xas-testd on rhel.
+#
+### chkconfig info
+# chkconfig: 2345 80 80
+# description: Starts/Stops the xas-testd utility
+###
+#
+
+USER="root"
+NAME="xas-testd"
+PROGRAM="/usr/sbin/$NAME"
+LCKFILE="/var/lock/subsys/$NAME"
+PIDFILE="/var/run/xas/$NAME.pid"
+LOGFILE="/var/log/xas/$NAME.log"
+CFGFILE="/etc/xas/$NAME.ini"
+
+# integrate the overrides
+
+if [ -f /etc/sysconfig/$NAME ];then
+    . /etc/sysconfig/$NAME
+fi
+
+if [ -f /etc/profile.d/xas.sh ]; then
+    . /etc/profile.d/xas.sh
+fi
+
+PARAMS="--pid-file $PIDFILE --log-file $LOGFILE --cfg-file $CFGFILE --daemon"
+
+# integrate the RHEL functions
+
+. /etc/init.d/functions
+
+# Some simple tests
+
+[[ -f $PROGRAM ]] || exit 0
+RETVAL=0
+
+fn_start() {
+
+    echo -n $"Starting $NAME: "
+    daemon --user $USER $PROGRAM "$PARAMS"
+    RETVAL=$?
+    echo ""
+    [ "$RETVAL" -eq 0 ] && touch $LCKFILE
+
+    return $RETVAL
+
+}
+
+fn_stop() {
+
+    echo -n $"Shutting down $NAME: "
+    killproc $NAME
+    RETVAL=$?
+    [ -f $PIDFILE ] && rm -f $PIDFILE
+    [ "$RETVAL" -eq 0 ] && rm -f $LCKFILE
+    echo ""
+
+    return $RETVAL
+
+}
+
+fn_status() {
+
+    status -p $PIDFILE $PROGRAM
+    RETVAL=$?
+
+    return $RETVAL
+
+}
+
+# See how we were called
+
+case "$1" in
+    start)
+        fn_start
+        ;;
+
+    stop)
+        fn_stop
+        ;;
+
+    status)
+        fn_status
+        ;;
+
+    restart|reload)
+        fn_stop
+        sleep 5
+        fn_start
+        ;;
+
+    condrestart)
+        if [ -f $LCKFILE ] 
+        then
+            fn_stop
+            sleep 3
+            fn_start
+        fi
+        ;;
+
+    *)
+        echo "Usage $0 (start|stop|restart|reload|status|condrestart)"
+        exit 1
+
+esac
+
+exit $RETVAL
+

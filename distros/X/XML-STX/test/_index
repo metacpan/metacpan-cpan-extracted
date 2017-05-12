@@ -1,0 +1,147 @@
+# catched warnings and recoverable errors
+
+$ERRORS 5 1 0
+
+# options --------------------
+
+default-ignore|01|0|OK
+default-text|02|0|<root >koko text<![CDATA[<&>]]></root>
+default-copy|02|0|<root ><node id="1" >koko</node><!-- comment --> text<![CDATA[<&>]]><?pi pi-content?></root>
+default-group1|01|0|[<node ></node>] [<node ></node>] [<node ></node>]
+default-group2|01|0|[<node ></node>] [<node ></node>] [<node ></node>]
+default-stxpath-ns|03|0|OK
+default-stxpath-ns2|04|0|OK
+stxpath-ns|04|0|OK
+cdata|01|0|[<![CDATA[<<cdata-text>>]]>]
+cdata-yes|01|0|[ text1] [<![CDATA[<<cdata-text>>]]>] [ text2]
+cdata-no|01|0|[ text1<<cdata-text>> text2]
+cdata-group1|01|0|[ text1] [<![CDATA[<<cdata-text>>]]>] [ text2]
+cdata-group2|01|0|[ text1] [<![CDATA[<<cdata-text>>]]>] [ text2]
+strip-space1|01|0|[koko] [mato] [ text1] [<![CDATA[<<cdata-text>>]]>] [ text2]
+strip-space2|01|0|[koko] [mato] [ text1] [<![CDATA[<<cdata-text>>]]>] [ text2]
+strip-space3|01|0|[koko] [mato] [ text1] [<![CDATA[<<cdata-text>>]]>] [ text2]
+
+# matching & groups --------------------
+
+template-match1|01|0|root-3node-2node-1node-2
+template-match2|01|0|root-3node-2node-2node-2
+template-match3|01|0|OK
+template-match4|01|0|OK2OK3OK1
+template-match-position|01|0|<el >root<el >node</el><id >2</id><node > text1</node><cdata ><![CDATA[<<cdata-text>>]]></cdata><text > text2</text></el>
+template-lookup|01|0|root-3
+process-attributes|01|0|<n ><id >1</id></n><n ><id >2</id></n><n ><a0 >B</a0><a1 >A</a1><a3 >C</a3></n>
+process-self|01|0|<a ><b ><c >OK</c></b></a>
+process-combined|01|0|<n >koko(koko){1}[koko]</n><n >mato(mato){2}[mato]</n><n >{B}{A}{C}[]</n>
+groups|01|0|root.1 node.1 node.2 node.3
+groups-named|01|0|root.1 node.1 koko node.2 mato <<cdata-text>> node.3
+groups-named-att|01|0|/1 @id {koko} $id/2 @id {mato} $id/3 @a0 @a1 @a3 $a0 $a1 $a3
+namespaces01|04|0|<root xmlns="http://koko" ><test:node id="1" xmlns:test="http://test_ns" >1</test:node></root>
+process-siblings1|01|0|<a ><n ><s >2</s><s >3</s></n></a>
+process-siblings2|01|0|<a ><n ><s >2</s></n><s >3</s></a>
+process-siblings3|01|0|<a ><n ><s >2</s></n><s >3</s></a>
+
+# flow control --------------------
+
+if|01|0|<root >n:tT:Nn:t2text(mato)T:Nn::N</root>
+else|01|0|<root >1[2]OK[]3</root>
+choose|01|0|<root >(1:koko)(2:mato)(other)</root>
+call-procedure|01|0|<a ><b ><c ><d >OK</d><e >OK</e></c></b></a>
+call-procedure2|01|0|<a ><b ><c >1-koko</c><c >2-mato</c><c >3-</c></b></a>
+call-procedure3|01|0|<a ><b >p1</b><b >p1</b><b >p1</b><r >3</r></a>
+call-procedure4|01|0|OK1OK2OK3
+for-each-item1|01|0|<root ><i >abckoko</i><i >abcmato</i><i >abc</i></root>
+for-each-item2|01|0|<root ><i ><j >1a0</j><j >1b0</j></i><i ><j >2a0</j><j >2b0</j></i><i ><j >3a0</j><j >3b0</j></i></root>
+while1|01|0|<root >0123456789</root>
+while2|01|0|<root ><w >0<i >a1</i><i >b2</i></w><w >2<i >a3</i><i >b4</i></w><w >4<i >a5</i><i >b6</i></w></root>
+while3|01|0|<root ><w >0-1M</w><w >1-2M</w><w >2-3M</w><w >3-4M</w><w >4-5M</w><w >5-6M</w></root>
+while4|01|0|<root ><w >0-1M</w></root>
+
+# output --------------------
+
+text|01|0|A B C D
+cdata-out|01|0|<![CDATA[&]]>&
+literal|01|0|<element name="node" >literal text</element>
+literal-avt|01|0|<r att-node="1" avt="1+2" ><lit a1="3" a2="1+2=3" a3="a2/b1" ></lit></r>
+copy|02|0|<root ><node id="1" >koko</node><!-- comment --> text<![CDATA[<&>]]><?pi pi-content?></root>
+value-of|01|0|<root >text:52 2:5:true:Hi there:a-2-b:a2b</root>
+value-of-att|01|0|1(1)2(1)AC(3)
+value-of-path|01|0|<root >koko:koko:koko:koko:koko:tek:1:1:1:1</root>
+element|01|0|<node ><p:el xmlns:p="NS1" ><g0:el xmlns:g0="NS2" ></g0:el></p:el></node>
+element2|03|0|<root ><node ></node></root>
+element-separate|01|0|<node ><p:el xmlns:p="NS1" ></p:el></node>
+attribute|01|0|<node g0:node="9koko" a1="4" xmlns:g0="NS" ></node>
+comment|01|0|T1<!-- Comment Text:2 -->T2T3
+processing-instruction|01|0|T1<?node PI-text?>T2
+string-value1|01|0| other node types  text1 <<cdata-text>> text2 pi-content
+string-value2|01|0|koko/1|/mato/2|//B|A|C|/
+string-value3|03|0|<root >--:koko</root>
+namespace-alias|01|0|<stx:r xmlns:stx="http://stx.sourceforge.net/2002/ns" ><p2:n xmlns:p2="ns:p2" ></p2:n><p1:n stx:a1="c" a2="d" xmlns:p1="ns:p1" ></p1:n></stx:r>
+
+# STXPath --------------------
+
+node-test-text|01|0|<root >mato:mato::</root>
+funct-qname|01|0|<n >1:1:1:1</n><n >2:2:2:2</n><n >3:3:3:3</n>
+stxpath-bool|03|0|<node >false-true-false-true-false</node>
+stxpath-position|01|0|<root >p:1<node >p:1</node><node>p:2</node><node >p:3</node></root>
+stxpath-position-att|01|0|<root ><a >a0:1</a><a >a1:1</a><a >a3:1</a></root>
+stxpath-concat|03|0|<node >aabb-name: node ns:http://test_ns-2*5=10</node>
+stxpath-string-join|01|0|<n >a-b-c::koko-sep-5:Now is the time:abracadabra</n>
+stxpath-translate|03|0|<node >tata-baba-aa-baba</node>
+stxpath-has-child-nodes|01|0|<root c="true" ><node c="true" ><n c="false" ></n></node><node c="true" ><n c="false" ></n></node><n c="false" ></n><n c="false" ></n><n c="false" ></n><node c="false" ></node></root>
+stxpath-starts-with|01|0|<root >true:false:true:true:false:true</root>
+stxpath-ends-with|01|0|<root >true:false:true:true:false:true</root>
+stxpath-contains|01|0|<root >true:true:false:true:true:false:true</root>
+stxpath-substring|01|0|<root >auto:uto:ut:uto::auto:234</root>
+stxpath-substring-ba|01|0|<root >k::kokom::kokomato/komato:ato:::kokomato</root>
+stxpath-string-length|01|0|<root >4:8:5::2:4</root>
+stxpath-count|01|0|<node >3:3-5:5-1:1-0:0</node>
+stxpath-empty|01|0|<node >false:false-true:true</node>
+stxpath-exists|01|0|<node >true:true-false:false</node>
+stxpath-item-at|01|0|<node >b:b-mato:</node>
+stxpath-index-of|01|0|<node >3::2 5:1 4[2][1][]</node>
+stxpath-subsequence|01|0|<node >5;3:c-e 5;2:b-c</node>
+stxpath-insert-before|01|0|<node >z a b c:z a b c:a z b c:a b z c:a b c z/a b c:z/z:a b c/z a b c:a b c z</node>
+stxpath-remove|01|0|<node >a b c:b c:a c:a b:a b c/a b c//a b c:a b c</node>
+stxpath-case|01|0|<root >ABCD0-abcd0</root>
+stxpath-string-pad|01|0|<root >XMLQueryXMLQuery-aaaa-</root>
+stxpath-node-kind|01|0|<document nm="" ><element nm="root" ><element nm="node" ><text nm="" ></text></element><element nm="node" ><text nm="" ></text></element><comment nm="" ></comment><text nm="" ></text><cdata nm="" ></cdata><text nm="" ></text><processing-instruction nm="pi" ></processing-instruction><element nm="node" >attribute</element></element></document>
+stxpath-normalize-space|01|0|<root >ko:koko:ko ko ma:koko</root>
+stxpath-aggregate|01|0|<node >9.8:0/2.45:/-1:1/5:100</node>
+stxpath-numeric|01|0|<node >3:2:-2/10:-11/11:-10</node>
+stxpath-get-in-scope-prefs|03|0|<root >*foo*xml*xmlns<node >*foo*xml*xmlns</node></root>
+stxpath-get-namespace-for-pref|03|0|<root >http://test_ns*http://test_ns2<node >http://test_ns*http://test_ns2</node></root>
+
+# variables & parameters --------------------
+
+variable-local|01|0|<root >5:<text >name is root</text></root>
+variable-group-01|01|0|<root >9<node >123:2</node></root>
+variable-group-02|01|0|<root >OK</root>
+assign|01|0|<root >1:2:OK<inner >a:b</inner>OK</root>
+recursive|05|0|<root ><list count="4" level="2" no="2" ></list><list count="3" level="2" no="3" ></list><list count="6" level="1" no="1" ></list><list-total count="3" ></list-total><li-total count="13" ></li-total></root>
+param-top|01|p1=OK p3=6|<root >OK:OK:16</root>
+param-template1|01|0|<root ><n >3:foo-n1::6:koko</n></root>
+param-template2|01|0|<root ><i >3:foo-n1::6:koko</i></root>
+param-template3|01|0|<root ><a >3:foo-n2::6:koko</a></root>
+param-template4|01|0|<root ><b >3:foo-n1::6:koko</b></root>
+param-template5|01|0|<root ><p >3:foo-n1::6:koko</p></root>
+
+# includes --------------------
+
+include1|01|0|Node[id=1]Node[id=2]Node[a0=B][a1=A][a3=C]
+include-params|01|top1=d1|d1d2Node1[id=1]Node2[id=2]Node3[a0=B]3[a1=A]3[a3=C]
+
+# multiple I/O --------------------
+
+process-document1|02|0|<r ><n >1</n><r ><n >1</n><n >2</n><n >3</n></r></r>
+process-document2|02|0|<r ><n >1</n><er ><en >1</en><en >2</en><en>3</en></er></r>
+process-document3|07|0|<d ><l ><r ><n >1</n><n >2</n><n >3</n></r><r ><n >1</n></r></l></d>
+result-document|01|0|<r >false</r>
+
+# buffers --------------------
+
+buffers01|01|0|<root >:<e >foo</e><n a="1" ></n><n a="2" ></n><n a="3" ></n></root>
+buffers-group|01|0|<root >:<e >hoo</e><e >foo</e></root>
+buffers-clear|01|0|<root >e:ef:g</root>
+buffers-local|01|0|<root >:i2eG2:i1eG1</root>
+buffers-recursive|05|0|<l i="2" >:[i.1i.2i.3]<l i="3" >[:[i.1i.2i.3i.4]]</l>[i.4]<l i="3" >[:[i.1i.2i.3]]</l>[i.5i.6]</l>
+

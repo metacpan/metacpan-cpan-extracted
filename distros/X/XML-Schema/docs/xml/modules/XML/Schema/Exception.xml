@@ -1,0 +1,77 @@
+<module name="XML::Schema::Exception">
+
+  <about>
+    This module implements an exception class for XML::Schema.
+  </about>
+
+  <synopsis>
+<perl>
+use XML::Schema::Exception;
+
+my $err = XML::Schema::Exception->new('type_x', 'info_y');
+
+print $err->type();	# type_x
+print $err->info();     # info_y
+print $err->text();     # [type_x] info_y
+print $err;             # [type_x] info_y
+
+die $err;
+</perl>
+  </synopsis>
+
+  <description>
+    <p>
+    This module implements a simple object for representing errors
+    thrown by various XML::Schema modules.
+    </p>
+  </description>
+
+  <methods>
+    <method id="new" args="$type, $info">
+      <p>
+        Constructor method called to create a new exception object.
+	The first argument should be a simple string to identifying
+        the exception type.  The second can be a string containing
+        further information or a reference to any other data type.
+<perl>
+die XML::Schema::Exception->new( parser => 'parse error at line 42' );
+</perl>
+      </p>
+    </method>
+
+    <method id="type">
+	Returns the exception type.
+<perl>
+my $e = XML::Schema::Exception->new( parser => 'parse error at line 42' );
+
+print $e->type();   # 'parser'
+</perl>
+    </method>
+
+    <method id="info">
+	Returns the value of the additional information field.
+<perl>
+print $e->info();   # 'parse error at line 42'
+</perl>
+    </method>
+
+    <method id="text">
+	Returns a text string of the form "[$type] $info".
+<perl>
+print $e->text();   # '[parser] parse error at line 42'
+</perl>
+	This method is overloaded to the stringifiation operator.
+        In other words, printing an exception object will generate
+        the output returned from this method.
+<perl>
+print $e;           # '[parser] parse error at line 42'
+</perl>
+    </method>
+  </methods>
+</module>
+
+
+
+
+
+

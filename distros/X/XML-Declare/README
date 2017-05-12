@@ -1,0 +1,79 @@
+NAME
+    XML::Declare - Create XML documents with declaration style
+
+SYNOPSIS
+        my $doc = doc {
+            element feed => sub {
+                attr xmlns => 'http://www.w3.org/2005/Atom';
+                comment "generated using XML::Declare v$XML::Declare::VERSION";
+                for (1..3) {
+                    element entry => sub {
+                        element title     => 'Title', type => 'text';
+                        element content   => sub {
+                            attr type => 'text';
+                            cdata 'Desc';
+                        };
+                        element published => '123123-1231-123-123';
+                        element author => sub {
+                            element name => 'Mons';
+                        }
+                    };
+                }
+            };
+        } '1.0','utf-8';
+
+        print $doc;
+
+        doc { DEFINITIONS } < args to XML::LibXML::Document->new >
+
+        Where DEFINITIONS are
+
+        element name => sub { DEFINITIONS }
+        or
+        element
+            name => 'TextContent',
+            attr => value,
+            attr1 => [qw(more values)];
+
+        attr name => values;
+
+        text $content;
+
+        cdata $content;
+
+        comment $content;
+
+EXPORT
+  doc BLOCK [ $version, $charset ];
+    Create XML::LibXML::Document;
+
+  element $name, sub { ... };
+    Create XML::LibXML::Element with name $name; everything, called within
+    "sub { ... }" will be appended as children to this element
+
+  element $name, ATTRS
+    Create XML::LibXML::Element with name $name and set it's attributes.
+    "ATTRS" is a pairs of "key =" "value">
+
+  attr $name, $value
+    Create XML::LibXML::Attribute with name $name and value $value
+
+  text $content
+    Create XML::LibXML::Text node with content $content
+
+  cdata $content
+    Create XML::LibXML::CDATASection node with content $content
+
+  comment $content
+    Create XML::LibXML::Comment node with content $content
+
+AUTHOR
+    Mons Anderson <mons@cpan.org>
+
+LICENSE AND COPYRIGHT
+    Copyright 2009-2010 Mons Anderson.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+

@@ -1,0 +1,83 @@
+CHANGES file for XML-SAX-Machines
+
+0.46      2013-08-19 12:16:00 America/New_York
+
+0.45      2013-08-19 11:30:07 America/New_York
+
+0.44      2013-08-18 11:51:46 America/New_York
+
+0.43      2013-03-11 00:37:03 America/New_York
+    - update to use Dist::Zilla and stop using Module::Install 
+
+0.42 Jun 11, 2009
+    - remove psudo hashes (RT #1523)
+    - Update packaging to use Module::Install
+
+0.41 Tue Jan 20 11:57:39 EST 2004
+    - XML::SAX::Pipeline SYNOPSIS doc fixed (reported by bplatz a t
+      agere dt com )
+    - XML::SAX::Machine now implements the Handler option to new
+      properly.  (reported by bplatz a t agere dt com )
+
+
+0.40
+    - Add several state getter methods to XML::Filter::Merger to
+      make subclassing easier.
+
+0.39 Fri Sep  6 11:44:23 EDT 2002
+    - Get end_document to return the next handler's end_document()
+      result when not in manifold mode.
+
+0.38 Fri Sep  6 10:05:32 EDT 2002
+    - Require XML::SAX::Writer > 0.41.
+    - Allow merger to be subclassed
+    - Remove need to call start_/end_manifold_document() if you're
+      just merging secondary documents that occur inline.
+
+0.37 Thu Sep  5 17:35:02 EDT 2002
+    - Make XML::Filter::Merger handle nested documents correctly and
+      tweak XML::Filter::DocSplitter to agree.
+
+0.36 Tue Jul 23 14:00:47 EDT 2002
+    - Correct t/xsw_version.t to test for 0.41 instead of 0.39
+
+0.35 Mon Jul 22 13:10:23 EDT 2002
+    - Remove a dependency on hash order that perl5.8.0's new
+      hash algorithm exposes.  THIS AFFECTS ONLY THE TEST SUITE unless
+      you are checking for $@ =~ /.../ in order to catch/filter
+      cycle dependancy checks.
+    - Makefile.PL warn()s if XML::SAX::Writer 0.40 is detected.  It's
+      too broken.  There's also a new test suite t/00xsw_version.t to
+      barn again and fail.
+
+0.34 Thu Mar 21 09:55:46 EST 2002
+    - Get Merger.pm to properly deal with events before and
+      after the root element events.  Reported by
+      ASSAD Arnaud <arnaud@cruncher.underlands.org>
+
+0.33 Tue Mar 19 10:59:42 EST 2002
+    - Port back to perl5.00503 (reported by Kip Hampton
+        - no named regexp character classes ([...[:alpha:]...])
+	- can't supress "used only once, possible typo" warnings
+
+0.32 Wed Mar  6 10:09:55 EST 2002
+    - fix eval { return } thinko in X::S::Machine::parse(),
+      reported by Rick Frankel <rick@rickster.com>.
+    - test for $class->can( "new" ) before doing eval "require $class"
+      awkward code highlighted by christian.glahn@uibk.ac.at
+    - Added diagnositc errors for undef or '' filter names
+    - Added t/10bad_machine.t
+    - Prevent unresolvable filters from causing later, additional,
+      confusing error messages.
+    - Add test to make sure an "empty derived class" can be specced by
+      name (this worked ok before and now; just added a test).
+
+0.311
+    - Require at least XML::SAX::Base 1.02, removed X::S::B::set_handler
+      workaround.
+    - Require XML::SAX 0.05, not 0.3
+    - Added two more examples to MANIFEST
+
+0.31 Tue Jan 22 12:27:55 EST 2002
+    - ByRecords now counts stack depth accurately.  Tested with patched
+    XML::Filter::LibXSLT.

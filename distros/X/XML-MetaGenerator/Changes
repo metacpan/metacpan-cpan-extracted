@@ -1,0 +1,7 @@
+Revision history for Perl extension WoW.
+
+0.01  Thu Nov 23 20:24:37 2000
+	- original version; created by h2xs 1.19
+
+0.03  Tue Dec 12 16:00:23 2000
+	- changed name to XML::MetaGenerator

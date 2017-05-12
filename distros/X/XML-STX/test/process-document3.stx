@@ -1,0 +1,34 @@
+<stx:transform version="1.0" 
+  xmlns:stx="http://stx.sourceforge.net/2002/ns"
+  strip-space="yes">
+
+  <stx:template match="/data">
+    <d>
+      <stx:process-children/>
+    </d>
+  </stx:template>
+
+  <stx:template match="link">
+    <l>
+      <stx:process-document href="@src1"/>
+      <stx:process-document href="@src2"/>
+    </l>
+  </stx:template>
+
+  <stx:group>
+
+    <stx:template match="/root" public="yes">
+      <r>
+	<stx:process-children/>
+      </r>
+    </stx:template>
+  
+    <stx:template match="node">
+      <n>
+	<stx:value-of select="position()"/>
+      </n>
+    </stx:template>
+
+  </stx:group>
+
+</stx:transform>

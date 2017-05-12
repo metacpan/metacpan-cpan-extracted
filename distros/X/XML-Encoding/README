@@ -1,0 +1,26 @@
+			XML::Encoding
+
+Version 1.x Copyright (c) 1998 Clark Cooper <coopercc@netheaven.com>
+Changes in Version 2.00 onwards Copyright (C) 2007-2010 Steve Hay
+All rights reserved.
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself. 
+
+This module, built as a subclass of XML::Parser, parses encoding map
+XML files. Included in the distribution is the compile_encoding script
+that compiles these to the binary form used by XML::Parser in order to
+parse scripts in the given encoding. Also included is a script that
+generates encoding map XML files from the type of mapping files obtained
+at ftp://ftp.unicode.org/Public/MAPPINGS.
+
+Several encoding maps are included in the maps subdirectory.
+
+There is nothing to build, but to test and install you need to do the
+following:
+
+	perl Makefile.PL
+	make test
+	make install
+
+Clark Cooper
+December 12, 1998

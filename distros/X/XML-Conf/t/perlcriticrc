@@ -1,0 +1,9 @@
+[-Subroutines::ProhibitExplicitReturnUndef]
+
+[-BuiltinFunctions::ProhibitStringyEval]
+
+[-InputOutput::ProhibitBarewordFileHandles]
+
+[-InputOutput::ProhibitTwoArgOpen]
+
+[-TestingAndDebugging::ProhibitNoStrict]

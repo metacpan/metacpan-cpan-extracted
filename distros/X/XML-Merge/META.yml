@@ -1,0 +1,27 @@
+---
+abstract: 'flexibly merge XML documents'
+author:
+  - 'Pip Stuart <Pip@CPAN.Org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test: '0'
+  Test::More: '0'
+  Test::Pod: '0'
+  Test::Pod::Coverage: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001'
+license: gpl
+meta-spec:
+  url: HTTP://Module-Build.SourceForge.Net/META-spec-v1.4.html
+  version: '1.4'
+name: XML-Merge
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  XML::Tidy: '0'
+version: '1.4'

@@ -1,0 +1,23 @@
+<!DOCTYPE encmap [
+  <!ENTITY part1 SYSTEM 'x-euc-jp-part1.ent'>
+  <!ENTITY part2 SYSTEM 'x-euc-jp-part2.ent'>
+  <!ENTITY part3 SYSTEM 'x-euc-jp-part3.ent'>
+  <!ENTITY part4 SYSTEM 'x-euc-jp-part4.ent'>
+]>
+<encmap name='X-EUC-JP-JISX0221' expat='yes'>
+  <!-- JIS X 0201 -->
+  <prefix byte='x8e'>
+    <range byte='xa1' len='63' uni='xff61'/>
+  </prefix>
+
+  <!-- JIS X 0212 -->
+  &part1;
+
+  <prefix byte='xa1'>
+    &part2;
+    <ch byte='xbd' uni='x2014'/> <!-- differ from Unicode -->
+    &part3;
+  </prefix>
+
+  &part4;
+</encmap>

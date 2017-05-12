@@ -1,0 +1,15 @@
+Revision history for Perl extension Xpriori::XMS.
+
+0.03  Wed Jul 29 11:40:00 2009
+	- Add SID-specified connection (in document)
+	- Add AUTO_LOGOFF option
+	- Add SID-specified connection and AUTO_LOGOFF sample
+
+0.02  Someday in 2009
+	- Fix some problems
+
+0.01  Mon Jul  9 15:07:23 2007
+	- original version; created by h2xs 1.23 with options
+		-AX -n Xpriori::XMS
+
+

@@ -1,0 +1,14 @@
+#!/usr/bin/perl -w
+#
+# Creating or updating database structure
+#
+use strict;
+use XAO::Web;
+
+my $site=XAO::Web->new(sitename => '<%PROJECT%>');
+$site->set_current();
+$site->config->build_structure();
+
+exit(0);
+
+# vim: ft=perl

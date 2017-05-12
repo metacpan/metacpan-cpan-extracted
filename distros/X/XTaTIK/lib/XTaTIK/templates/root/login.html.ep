@@ -1,0 +1,21 @@
+% layout 'default';
+% title 'Login';
+
+% if ( flash 'is_login_failed' ) {
+  <p class="alert alert-danger">Your login or password is incorrect.</p>
+% }
+
+%= form_for login => ( method => 'POST' ) => begin
+  %= csrf_field
+  <ul>
+    <li class="form-group"><label for="login">Login:</label>
+      <%= text_field 'login' => ( id => 'login'),
+        class => 'form-control' %>
+    </li>
+    <li class="form-group"><label for="pass">Password:</label>
+      <%= password_field 'pass' => ( id => 'pass' ),
+        class => 'form-control' %>
+    </li>
+  </ul>
+  %= submit_button 'Login', class => 'btn btn-primary'
+%= end

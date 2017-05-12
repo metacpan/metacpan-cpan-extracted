@@ -1,0 +1,21 @@
+XML::Parser::YahooRESTGeocode
+=============================
+
+XML::Parser subclass for parsing the xml data returned by Yahoo's
+geocode REST webservicee
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  blah blah blah
+

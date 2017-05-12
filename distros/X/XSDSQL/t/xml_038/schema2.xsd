@@ -1,0 +1,39 @@
+﻿<?xml version="1.0"?>
+<std:schema 
+	xmlns:std="http://www.w3.org/2001/XMLSchema" 
+	targetNamespace="namespace2"  
+	elementFormDefault="qualified"
+	xmlns:ns4="namespace2"
+	>
+
+	<std:attribute name="lang" type="std:language">
+		<std:annotation>
+			<std:documentation>attribute lang</std:documentation>
+		</std:annotation>
+	</std:attribute>
+
+	<std:complexType name="ct1">
+		<std:sequence minOccurs="1" maxOccurs="1">
+			<std:element name="el0_ct1" type="std:string"/>
+		</std:sequence>
+	</std:complexType>
+
+	<std:complexType name="ct0">
+		<std:sequence minOccurs="1" maxOccurs="1">
+			<std:element name="el0" type="std:string"/>
+			<std:element name="el1" type="ns4:ct1" minOccurs="0" maxOccurs="1"/> <!-- per fortuna in type il  namespace va sempre qualificato -->
+		</std:sequence>
+	</std:complexType>
+
+<!--	<std:attribute name="lang" type="std:string"/> -->
+
+	<std:element name="el0" type="std:string"/>
+	<std:element name="el1">
+		<std:complexType>
+			<std:sequence>
+				<std:element  name="elc" type="std:string"/>
+			</std:sequence>
+		</std:complexType>
+	</std:element>
+		
+</std:schema>

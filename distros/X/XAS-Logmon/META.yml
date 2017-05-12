@@ -1,0 +1,67 @@
+---
+abstract: 'A set of procedures and modules to monitor files'
+author:
+  - 'Kevin L. Esteb <kevin@kesteb.us>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4001, CPAN::Meta::Converter version 2.120351'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: XAS-Logmon
+provides:
+  XAS::Apps::Logmon::Monitor:
+    file: lib/XAS/Apps/Logmon/Monitor.pm
+    version: 0.01
+  XAS::Apps::Logmon::XAS::Process:
+    file: lib/XAS/Apps/Logmon/XAS/Process.pm
+    version: 0.01
+  XAS::Docs::Logmon::Installation:
+    file: lib/XAS/Docs/Logmon/Installation.pm
+    version: 0.01
+  XAS::Lib::Regexp::Log::XAS:
+    file: lib/XAS/Lib/Regexp/Log/XAS.pm
+    version: 0.01
+  XAS::Logmon:
+    file: lib/XAS/Logmon.pm
+    version: 0.01
+  XAS::Logmon::Filter::Merge:
+    file: lib/XAS/Logmon/Filter/Merge.pm
+    version: 0.01
+  XAS::Logmon::Format::Logstash:
+    file: lib/XAS/Logmon/Format/Logstash.pm
+    version: 0.01
+  XAS::Logmon::Input::File:
+    file: lib/XAS/Logmon/Input/File.pm
+    version: 0.01
+  XAS::Logmon::Input::Tail:
+    file: lib/XAS/Logmon/Input/Tail.pm
+    version: 0.01
+  XAS::Logmon::Input::Tail::Default:
+    file: lib/XAS/Logmon/Input/Tail/Default.pm
+    version: 0.01
+  XAS::Logmon::Input::Tail::Linux:
+    file: lib/XAS/Logmon/Input/Tail/Linux.pm
+    version: 0.01
+  XAS::Logmon::Input::Tail::Win32:
+    file: lib/XAS/Logmon/Input/Tail/Win32.pm
+    version: 0.01
+  XAS::Logmon::Output::Spool:
+    file: lib/XAS/Logmon/Output/Spool.pm
+    version: 0.01
+  XAS::Logmon::Parser::XAS::Logs:
+    file: lib/XAS/Logmon/Parser/XAS/Logs.pm
+    version: 0.01
+requires:
+  Linux::Inotify2: 0
+  Regexp::Log: 0
+  XAS: 0.12
+  perl: 5.00808
+resources:
+  homepage: http://scm.kesteb.us/trac
+  repository: http://scm.kesteb.us/git/XAS-Logmon
+version: 0.01

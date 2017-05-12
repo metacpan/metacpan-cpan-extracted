@@ -1,0 +1,14 @@
+<!DOCTYPE root [
+ <!ELEMENT root ANY>
+ <!-- ELEMENT rule for c is of type 'children' and may contain insignif ws. -->
+ <!ELEMENT c (a|b)*>
+ <!ELEMENT e EMPTY>
+]>
+<root>
+ <c>
+  <a>AA</a>
+  <b>BB</b>
+ </c>
+ <e>
+ </e>
+</root>

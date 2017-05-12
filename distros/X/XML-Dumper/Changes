@@ -1,0 +1,183 @@
+Revision history for Perl extension XML::Dumper.
+
+0.81  Wed Apr  5 13:16:58 PDT 2006
+    - FANY@cpan.org reported that XML::Dumper does not work for binary 
+      data. This is noted in the Changes log, but not in the documentation.
+      Therefore, the documentation has been updated, with a suggested
+      workaround. I'm not proud of the workaround bit, but implementing a
+      real solution is a can of worms that I'd rather not touch at this time,
+      and would affect backwards-compatibility.
+
+0.79  Fri Sep  9 12:13:21 PDT 2005
+    - New bug report on CPAN from Dustin Cram reports that xml_compare
+      and xml_identify should have an OO invocation too. Seems like
+      a reasonable request, so here it is!
+
+0.78  Mon Aug  1 18:05:44 PDT 2005
+    - Saw a bug report on CPAN that's nearly two years old. This
+      fixes my poor test-skipping technique with a far better one.
+      Bug and fix reported by Steve. Don't know why I didn't see
+      this one before.
+
+0.77  (not released)
+    - Changed 'quote_xml_chars()' to 'xml_escape()' to reflect its
+      added functionality. Hope no-one was relying on this internal
+      function, as there are probably better escape functions.
+
+0.76  Tue Jul  5 12:24:23 PDT 2005
+    - Got a bug report from Steven Allen with regards to the overloaded
+      "" operator. Unfortunately, I can't seem to re-create
+      the bug, although the patch doesn't fail any tests. Apparently,
+      the "" operator kicks in before scalar() gets a chance to do its
+      thing. Seems to work OK, so here's the patched version.
+
+0.75  Tue Jun 28 10:35:19 PDT 2005
+    - Got tip from Kerry Jones re-look at the untainting regex as too
+      constraining. Found that the look-ahead was unnecessary. Changed
+      the regex a bit (keeping the [\w-]+ pattern; evidently someone's
+      using dashes in their package names), and extended the test.
+      Also noted that the untainting didn't happen before the eval
+      which does the symbol table lookup, so I fixed that.
+
+0.74  Sun Jun 19 12:35:20 PDT 2005
+    - Included a patch developed by Lasse Makholm which prevented
+      evaluation of tainted xml. Thanks again to Lasse for his
+      vigilence and care!
+
+0.73  Thu Jun  2 01:57:54 PDT 2005
+    - Included a patch developed by Lasse Makholm which corrected a stupid 
+      but subtle mistake on my part on requiring modules. Thanks to
+      Lasse for the patch and his incredible patience.
+
+0.72  Thu Jun  2 01:43:35 PDT 2005
+    - Addressed an issue brought up by Emery Ford where intermediate Perl
+      data was generating not well-formed XML due to control characters.
+      XML::Dumper now filters out control characters. IF YOU NEED
+      CONTROL CHARACTERS OR OTHER NON-TEXT INFORMATION, BE SURE TO
+      ENCODE THE INFORMATION. Thanks to Emery for the submitted patch.
+
+    - I've survived my first year of graduate school and will dig up all 
+      those patches that people have submitted to me. Sorry if you've
+      tried to get a hold of me over this past year, it's been busy!
+
+0.71  Mon Feb  2 22:45:33 PST 2004
+    - Fixed a backwards-compatibility issue with 0.40 and <hash> vs. <hashref>
+      bug report by Jon Lapham, who also suggested the fix. <hash> is still
+      wrong, but for the sake of backwards-compatibility, I'm not going to
+      argue about who killed who. In the interest of forward progression, 
+      <hash> will be converted (correctly) to <hashref> on writing.
+
+    - Added test 10_backwards_compatible.t
+
+    - Fixed the MANIFEST to include t/09_repeated_references.t
+
+    - Re-named 'profile.pl' to 'profile' per suggestion from CPAN testers
+
+0.70  Tue Jan 27 15:07:50 PST 2004
+    - Fixed a bug sent in by Alex Pavlovic which demonstrated that re-used
+      memory addresses weren't being properly implemented for hashes. See
+      t/09_repeated_references.t for an example.
+
+0.69  Sun Oct  5 10:51:27 PDT 2003
+    - Figured out a kooky method to discover whether or not a package is
+      loaded and added a feature to automatically attempt to load that
+      package. We'll see if anyone likes this.
+
+    - Added a patch sent in by Pekka Marjola which adds utf8-compatibility.
+
+0.68  Thu Aug 28 07:33:32 PDT 2003
+    - Found bug where compression tests run even if compression is not
+      available. Removed bug.
+
+0.67  Tue Aug 19 02:45:55 PDT 2003
+    - Broke tests out to document the tests and group similar tests together.
+      Numbered tests reflect feature additions; named tests reflect bug
+      reports and patches.
+    - Finally incorporated GZip header signature test code by Richard Evans.
+      Thanks for your patience (and code!), Richard. It works great!
+    - Andreas Koenig corrected ownership issue; CPAN module now correctly
+      downloads the latest version of this module
+    - Corrected documentation which removes EXPORT_OK lie. Functional
+      version of xml2pl() and pl2xml() are, indeed, exported by default.
+    - Removed Credits section, preferring rather to credit people in the
+      blow-by-blow updates
+
+0.65  Mon Jul 21 14:07:17 PDT 2003
+    - Applied patch sent it by Florian Hinzmann which documents profile.pl
+      for the Debian packaging tool lintian. The profile.pl script now
+      has a =head NAME POD section.
+
+0.64  Sat Jul  5 19:22:30 PDT 2003
+    - Changed INIT optional Compression::Zlib dependency to BEGIN block
+      for mod_perl compatibility. Startup now issues no errors due to
+      XML::Dumper.
+
+0.63  Wed Jun 18 14:18:00 PDT 2003
+    - Added 'use warnings' pragma and applied patch to bugs. Both the bug 
+      report and the patch were supplied by Honza Holecek. Thanks, Honza!
+
+0.62  Sun Jan 12 19:48:12 PST 2003
+    - Added the ability to dump a DTD for a valid XML document. Investigating
+      more interesting forms of XML data (given DTD or Schema, slurp XML into
+      Perl and back). Corrected errors in POD, Changes, README, and tests.
+
+0.60  Tue Jan  7 22:00:15 PST 2003
+    - Responded to some old comments by crazyinsomniac, from Perl Monks. 
+      The module now dumps and undumps with or without the OO-ish interface. 
+      I might add the punDump feature, but the feedback from pun-loving Perl 
+      monks may lead to pun-demonium.
+
+0.59  Thu Nov 28 22:43:51 PST 2002
+    - Responded to bug report by Peter S. May. XML::Dumper now correctly
+      interprets undef() values as being undefined as opposed to being a zero-
+      length string. 
+    - Added capability to distinguish the difference between a reference to
+      a zero-length string and a reference to an undefined value. While the
+      use model escapes me at the moment, it was the consistent and right
+      thing to do.
+    - Moved credits and changes from perldoc to Changes file.
+
+0.58  Thu Nov 28 13:22:18 PST 2002
+    - Added optional feature to read and write zlib-compressed XML. Added
+      optional dependency to Compress::Zlib.
+
+0.57
+    - Responded to bug report by Niels Vegter. Code now better handles literal
+      scalar references. 
+    - Changed the rest of the test suite to scale better, using some more of 
+      the features of Test::Harness
+
+0.56
+    - Added file reading and writing features
+
+0.55
+    - Removed documentation of non-implemented code, fixed MANIFEST errors.
+      Fixed false dependency on Data::Dumper
+
+0.54
+    - Added ability to handle soft referenced callbacks
+
+0.53
+    - Added ability to handle circular references
+
+0.5
+    - XML::Dumper changes ownership from Jon Eizenzopf to Mike Wong
+    - Added ability to dump and undump Perl objects
+
+0.4   Sun Jun 20 02:29:12 EDT 1999
+    - Added code to balance the XML output in nested hashes. Thanks
+      to L.M. Orchard and DeWitt Clinton for reporting the bug.
+
+0.3   Mon Jan 11 03:23:08 EST 1999
+    - updated example scripts
+
+0.2   Sat Jan  9 03:47:05 EST 1999
+    - Updated routine to encode characters in x80-xFF range to Unicode.
+      Also added encoding for complete set of pre-declared entities.
+
+0.1   Sat Jan  9 03:43:19 EST 1999
+    - Added undumper routines from Chris Thorman <ct@ignitiondesign.com>
+
+0.02  Thu Oct 15 02:19:04 1998
+    - original version; created by h2xs 1.18
+

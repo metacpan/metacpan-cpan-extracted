@@ -1,0 +1,40 @@
+=head1 Name
+
+XML::Entities::Data - XML entity definitions
+
+=head1 Synopsis
+
+ use XML::Entities::Data;
+ $ISONUM_map = XML::Entities::Data::isonum;
+ $all = XML::Entities::Data::all;
+ @available_sets = XML::Entities::Data::names;
+ $reverse_mapping = XML::Entities::Data::char2entity('isonum');
+
+ # regenerate the data
+ perl download-entities.pl > XML/Entities/Data.pm
+ perl download-entities.pl http://from.where.org/ > Data.pm
+
+=head1 Description
+
+This module is a bunch of hashes encapsulated by subroutines
+that map XML entity names to their unicode characters (or strings).
+It should be used from the XML::Entities module or the hashes
+it provides can be passed to HTML::Entities::_decode_entities.
+
+The data can be re-generated when definitions are changed or altered
+or when you want to use another set that is defined someplace
+online in an .ent file (of type DTD). See the download-entities.pl
+script.
+
+=head1 SEE ALSO
+
+HTML::Entities, XML::Entities
+
+=head1 COPYRIGHT
+
+Copyright 2010 Jan Oldrich Kruza E<lt>sixtease@cpan.orgE<gt>. All rights reserved.
+
+This library is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=cut

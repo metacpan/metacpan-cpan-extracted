@@ -1,0 +1,308 @@
+Revision history for Perl module XML::RSS::Feed / XML::RSS::Headline
+
+2.4      8/4/2013
+        - add =encoding utf-8 to pod to fix RT issue #78918
+        - add guid to serialization so we can properly restore it
+          to fix RT issue #50467
+        - Fix blantantly broken test
+        - Suppress warnings on deprecated methods during tests
+        - Fix pod coverage issues with Feed::Factory
+        - I wrote this code so long ago it makes me throw up in my mouth 
+              just a little bit :P
+
+2.32     6/30/2008
+        - add URI::Escape as a prereq. 
+
+2.31     6/30/2008
+        - update README from pod
+        - remainder of perlcritic changes
+            - init local var in slurp
+                -  my $xml = do { local $/, <$fh> };
+                +  my $xml = do { local $/ = undef, <$fh> };
+            - implictly use decode_entities from HTML::Entities
+                - use HTML::Entities;
+                + use HTML::Entities qw(decode_entities);
+            - use character classes and break up log compiled regexes into chunks
+
+                -    my $stripit = qr/
+                -        http\:\/\/
+                -        go\.fark\.com\/
+                -        cgi\/fark\/go\.pl\?
+                -        IDLink\=\d+\&
+                -        location\=
+                -    /x;
+
+                +    my $domain = qr{ http [:] [/] [/] go [.] fark [.] com }x;
+                +    my $uri    = qr{ [/] cgi [/] fark [/] go [.] pl }x;
+                +    my $args   = qr{ [?] IDLink [=] \d+ [&] location [=] }x;
+
+2.3      6/26/2008
+        - new constructor param "init_headlines_seen" so you can fetch a feed,
+          mark everything as seen, then only get updates after the fact.
+          Thanks to Carl Fürstenberg for suggesting.
+        - Applied Aaron Krowne's patch for XML::RSS::Headline to use guid instead
+          of the url if available.  Thanks Aaron!
+            - wrote t/021_headline_guid.t for XML::RSS::Headline->guid
+        - fix t/008_store_retrieve.t to check if not only is /tmp a dir but also if
+          its writeable.  This fixes testing errors reported by Slaven Rezić.
+        - Also no longer use LWP::Simple to try to call jbisbee.com/rsstest, just
+          hard code the XML in the test because jbisbee.com no longer exists.
+        - wrote tests for coverage of the 'init_headlines_seen' param.
+        - make some of the logic a bit easier to read the first time through
+        - Added Carp as a prerequsiste
+        - fixed 013_legacy.t to skip if File::Temp isn't isntalled
+        - perlcritic updates
+            - use carp instead of warn for errors (not for debug)
+            - moved all the pod to after __END__
+            - three argument open
+            - use constant DEFAULT_DELAY for the default delay between fetches (3600)
+            - no shifting of @_, unpack all args at once (except for accessors)
+            - return statments on each sub
+            - changed any double quoted string that didn't need to be interpolated to
+              a single quoted string.
+        - migrated code from CVS to git.  added .gitignore file to repository
+
+2.212    11/06/2006
+	- fix META.yml generation by upgrading to ExtUtils::MakeMaker 6.31
+        - add examples directory with an example (part deux)
+
+2.211    11/05/2006
+	- fix META.yml generation by upgrading to ExtUtils::MakeMaker 6.31
+        - add examples directory with an example
+
+2.21    11/01/2006
+	- make cpants compatible with updated META.yml
+        - fix broken tests pointing to old jbisbee.com/rsstest
+2.2
+        - ran code through perltidy
+        - switched to perl best practices pod template
+
+2.1
+        - Added $self->{process_count} so that the first time we
+          process a feed, we won't mark all headlines as read if
+          this is the first time we processed the feed OR if we're 
+          pulling up cached headlines.  (This fixes RT bug #12682)
+          Thanks to James Armstrong for reporting it.
+        - Also updated a bunch of tests so they passed because of this
+          bug fix.
+
+2.04
+        - Just added a use Perl; journals sub class example
+          XML::RSS::Headline::UsePerlJournals
+
+2.03
+        - Needed to use URI::Escape qw(uri_unescape) on 
+          XML::RSS::Headline::Fark URLs.
+        - fixed the t/019_fark.t test to match correctly decoded URL
+        - simple change of use vars qw($VERSION); to our $VERSION in 
+          XML::RSS::Headline::PerlJobs and XML::RSS::Headline::Fark
+
+2.02
+        - Fixed decode_entities to actually work (added tests to verify)
+        - added XML::RSS::Headline::Fark subclass
+        - added tests for XML::RSS::Headline::Fark subclass
+        - fixed typos in the pod for XML::RSS::Headline::PerlJobs 
+        - fixed pod formating of methods and attributes (C<> looked like crap 
+          on search.cpan.org)
+        - caught and tested warnings issued by 008_store_retrieve
+
+2.01
+        - Fixed the 011_test_pod and 012_test_pod_coverage tests to correctly 
+          detect if the relative Test::Pod and Test::Pod::Coverage modules 
+          are installed (Thanks to Randal Schwartz for taking the time to 
+          shoot me an e-mail and pointing it out) :)
+
+2.0
+        - The biggest change in in the tests.  This distrobution is now at 
+          100% coverage!  I found serveral major issues just by painstakingly 
+          making sure that each bit was tested.  While I don't think that 
+          100% is always nessesary, it just feels really good to see all o
+          green 100%'s on that coverage report.
+        - Added encode_utf8 before md5_base64 so watching uniqueness via 
+          headline_as_id works with uft8 headlines (thanks hachi!)
+        - You can now create XML::RSS::Headline objects with just a url 
+          and description.
+          It seems that you can have an RSS item without a title and the 
+          title is build from a substr of the description.
+        - added XML::RSS::Headline::PerlJobs example of subclassing 
+          XML::RSS::Headline
+        - Now if caching is turned on, it caches after every parse rather 
+          than on DESTROY
+        - now traps a bad 'store' attempt and issues a warn.  I had an if 
+          statement and for got I needed to try/catch with eval when using 
+          Storable.
+        - now decodes HTML entities in XML::RSS::Headline
+        - Lots of documentation updates and clarifications, and formatting 
+          changes.
+
+1.1
+        - Change the description in the modules name
+        - Added HTML::Entities decode on headlines (wonder why XML::RSS 
+          doesn't do it)
+        - cleaned up pod
+        - Beefed up the tests using Devel::Coverage
+        - Added sample subclass of XML::RSS::Headline 
+          (XML::RSS::Headline::PerlJobs) was in documentation and just added 
+          it to the distrobution.
+
+1.05
+        - Fixed caching issue.  Now cache in post process after every fetch
+          instead of on object destroy (which was broken) :(
+        - Did "pod2text XML/RSS/Feed.pm > README"
+
+1.04
+        - updated my e-mail address to jbisbee@cpan.org
+        - stupid regression, the order of the headline array was reversed
+          from version 0.25 to 1.00 and has been fixed in 1.04.  This is
+          a seriously regression so make sure you don't use releases
+          1.00-1.03.  (I wrote tests for the module AFTER I had the order
+          reversed, had I written the tests first, the whole bug would 
+          have been avoided.  I'm now a test driven development 
+
+
+1.03
+        - added failed_to_fetch and failed_to_parse back as deprecated 
+          methods that return false and issue a warn statement if they're 
+          used
+        - added a test to make sure that the methods stay and they return false
+
+1.02
+        - changed C<> to B<> because pod looks crap on search.cpan.org
+
+1.01
+        - fixed pod error for $feed->parse()
+
+1.00
+        - Broke down and learned how to write tests then wrote a bunch
+          to make future development and bug fixes fun instead of painful.
+          (and kicked myself for not doing it sooner)
+        - Holy crap that is pod documention for every public method for
+          both XML::RSS::Feed and XML::RSS::Headline
+        - XML::RSS::Headlines have a new attribute 'description'
+        - Caching is now done using storables rather than using the XML.
+          With headlines the title, url, description, and first_seen timestamp
+          are cached, and with feeds, the channel title, url, and last_updated
+          are cached.
+        - New timestamps on feeds and headlines.  The ones on feeds are set
+          everytime the feed is updated and the ones on headlines are only
+          set when the headline is first seen.
+        - Previously the headline limit was set by the RSS feed now you can 
+          as many headlines as you have memory.  You can set a limit by
+          setting the new attribute max_headlines
+        - added new methods to support not using XML::RSS to parse feeds
+          you can use the module 4 ways now
+
+              1.  $feed->parse($xml_string);
+
+              2.  $feed->process($items_array_ref,$feed_title,$feed_link);
+
+              3.  $feed->pre_process;
+                  $feed->process_items($items_array_ref);
+                  $feed->post_process;
+
+              4.  $feed->pre_process;
+                  $feed->create_headline(
+                      headline => "headline",
+                      url      => "http://..."
+                  );
+                  $feed->post_process;
+
+          This was implemented to support using POE::Filter::XML as a non- 
+          blocking way to parse feeds rather than using the block XML::RSS 
+          via PoCo::RSSAggregator
+ 
+        - removed failed_to_parse and failed_to_fetch
+        - changed default delay from 600 to 3600
+        - added description set/get method to XML::RSS::Headline
+        - changed XML::RSS::Feed->headlines to check 'wantarray' so you get
+          either an array or an array ref based on context.
+        - you can now create a XML::RSS::Headline object by either passing in
+          an XML::RSS item datastructure 
+
+            my $headline = XML::RSS::Headline->new(
+                item => {
+                    title => "blah",
+                    link  => "http://blah.blash",
+                    more  => "..."
+                },
+                headline_as_id => 1,    # bool value
+            );
+
+          or you can just pass in a headline and url which makes a lot more 
+          sense.  (LotR asked me why I did initated the object with the 
+          XML::RSS item structure...  I did it because I'm LAZY ok) :P
+
+            my $headline = XML::RSS::Headline->new(
+                headline       => "blah",
+                url            => "http://blah.blash",
+                headline_as_id => 1,                     # bool value
+            );
+
+        - Moved XML::RSS::Headline to its own package and wrote actual
+          pod to describes its accessors.  XML::RSS::Headline objects are
+          returned by XML::RSS::Feed->late_breaking_news and merlyn suggested
+          it would be nice to see what methods could be called upon the
+          the returned headline object.
+
+0.25
+        - added Clone 0.13 dependency
+        - upped version to 0.25
+
+0.20
+        - added new param 'tmpdir'.  The module will now attempt to load 
+          cached XML when this param is given.  The XML is held in memory
+          until the DESTROY method is called and the XML is written to the
+          tmpdir if it is defined.
+        - better debugging if 'debug' is defined.
+
+0.11
+        - issue with Module::Release
+
+0.10
+        - moved XML::RSS::Feed::Headline into XML::RSS::Feed as 
+          XML::RSS::Headline
+        - fixed a return code error on parse - was returning 0 on parse and 
+          should returning 1 (this didn't really affect anything though)
+        - added a 'hlobj' attribute so that you can subclass XML::RSS::Headline
+          to customize a headline.  An example of this is subclassing 
+          XML::RSS::Headline to create a new headline method that takes 
+          advantage of the extra info found with in the <item> xml block
+
+            package XML::RSS::Headline::PerlJobs;
+            use strict;
+            use XML::RSS::Feed;
+            use base qw(XML::RSS::Headline);
+
+            sub headline {
+                my ($self) = @_;
+
+                # no idea why they use 'http://jobs.perl.org/rss/' as a hash key
+                my $sub_hash = $self->{item}{'http://jobs.perl.org/rss/'};
+                return "$self->{item}{title}\n$sub_hash->{company_name} - "
+                    . "$sub_hash->{location}\n"
+                    . "$sub_hash->{hours}, "
+                    . "$sub_hash->{employment_terms}";
+            }
+
+            1;
+
+          Which produced a more detailed headline than you would normally get.
+          This example is from rssbot on irc.perl.org in channel #news.
+
+              <rssbot>  + Part Time Perl
+              <rssbot>    Brian Koontz - United States, TX, Dallas
+              <rssbot>    Part time, Independent contractor (project-based)
+              <rssbot>    http://jobs.perl.org/job/950
+
+        - removed _build_headline because this was fixed by sublcassing 
+          XML::RSS::Headline instead of XML::RSS::Feed;
+        - changed late breaking news to use scalar instead of quote
+
+            scalar @{$self->{late_breaking_news}}; 
+
+          instead of
+
+            "@{$self->{late_breaking_news}}";
+
+0.01
+        - original version

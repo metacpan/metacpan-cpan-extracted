@@ -1,0 +1,91 @@
+{
+   "abstract" : "A processor for the CompareML markup language",
+   "author" : [
+      "Shlomi Fish"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4214",
+   "keywords" : [
+      "Better SCM",
+      "categories",
+      "compare",
+      "CompareML",
+      "comparison",
+      "criteria",
+      "criterion",
+      "grammar",
+      "language",
+      "markup",
+      "scm-comparison",
+      "systems",
+      "tree",
+      "version control",
+      "xml",
+      "XML"
+   ],
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "XML-CompareML",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "IO::Scalar" : "0",
+            "Test::Differences" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.36"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CGI" : "0",
+            "Class::Accessor" : "0",
+            "XML::LibXML" : "0",
+            "XML::LibXML::Common" : "0",
+            "XML::LibXSLT" : "0",
+            "perl" : "5.008",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "XML::CompareML" : {
+         "file" : "lib/XML/CompareML.pm",
+         "version" : "v0.2.10"
+      },
+      "XML::CompareML::Base" : {
+         "file" : "lib/XML/CompareML/Base.pm"
+      },
+      "XML::CompareML::DTD::Generate" : {
+         "file" : "lib/XML/CompareML/DTD/Generate.pm"
+      },
+      "XML::CompareML::DocBook" : {
+         "file" : "lib/XML/CompareML/DocBook.pm"
+      },
+      "XML::CompareML::HTML" : {
+         "file" : "lib/XML/CompareML/HTML.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://web-cpan.berlios.de/modules/XML-CompareML/",
+      "license" : [
+         "http://www.opensource.org/licenses/mit-license.php"
+      ],
+      "repository" : {
+         "url" : "https://bitbucket.org/shlomif/xml-compareml"
+      },
+      "x_Demo" : "http://better-scm.berlios.de/comparison/"
+   },
+   "version" : "v0.2.10",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

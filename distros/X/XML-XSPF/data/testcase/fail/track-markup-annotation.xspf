@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  Description: annotation must not contain HTML
+
+  Expect:      ContainsHTML{element:annotation,parent:track}
+-->
+
+<playlist version="1" xmlns="http://xspf.org/ns/0/">
+
+  <trackList>
+    <track>
+
+      <annotation><blink>My Way</blink></annotation>
+
+    </track>
+  </trackList>
+
+</playlist>

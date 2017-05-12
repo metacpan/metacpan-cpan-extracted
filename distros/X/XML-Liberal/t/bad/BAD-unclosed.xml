@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0">
+  <channel>
+    <title>Foo</title>
+  </channel>
+  <item>
+    <title>Blah blah blah</title>
+    <description>
+      <p>This &lt;description&gt; is raw HTML pasted without care.</p>
+      <pre>
+say 'It contains a code sample';
+# which just stops in the mi
+    </description>
+  </item>
+</rss>

@@ -1,0 +1,100 @@
+<body id="index">
+
+<title>David vs. Goliath - Part I</title>
+
+<s id="top">
+
+<title>The Top Section</title>
+
+<!--
+David has Green hair here
+-->
+
+King <a href="http://en.wikipedia.org/wiki/David">David</a> and Goliath were standing by each other.
+
+David said unto Goliath: "I will shoot you. I <b>swear</b> I will"
+
+<s id="goliath">
+
+<title>Goliath's Response</title>
+
+<!-- Goliath has to reply to that.
+New line in comment.
+Another new line.
+-->
+
+Goliath was not amused.
+
+He said to David: "Oh, really. <i>David</i>, the red-headed!".
+
+David started listing Goliath's disadvantages:
+
+<blockquote lang="fr-FR" id="my_blockquote">
+
+<ol>
+
+<li>
+
+You're slow.
+
+</li>
+
+<li>
+
+You're big.
+
+</li>
+
+<li>
+
+You're stupid.
+
+</li>
+
+</ol>
+
+Goliath was insulted and told David he should use bullets for the points,
+instead:
+
+<ul>
+
+<li>
+
+David.
+
+</li>
+
+<li>
+
+Saul.
+
+</li>
+
+<li>
+
+Jonathan.
+
+</li>
+
+<li>
+
+Michal.
+
+</li>
+
+<li>
+
+Meyrav.
+
+</li>
+
+</ul>
+
+</blockquote>
+
+</s>
+
+</s>
+
+</body>
+

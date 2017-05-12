@@ -1,0 +1,8 @@
+Revision history for Perl module X::Tiny
+
+0.01 Wed Mar 1 2017
+- Initial release
+
+0.02 Sun Apr 2 2017
+- Added “get_message” to X::Tiny::Base
+- Set minimum version to 5.10 since 5.8 doesn’t grok overload.pm lazy-load

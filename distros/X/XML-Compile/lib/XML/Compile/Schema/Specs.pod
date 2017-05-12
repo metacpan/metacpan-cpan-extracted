@@ -1,0 +1,82 @@
+=encoding utf8
+
+=head1 NAME
+
+XML::Compile::Schema::Specs - Predefined Schema Information
+
+=head1 SYNOPSIS
+
+ # not for end-users
+ use XML::Compile::Schema::Specs;
+
+=head1 DESCRIPTION
+
+This package defines the various schema-specifications.
+
+=head1 METHODS
+
+=over 4
+
+=item XML::Compile::Schema::Specs-E<gt>B<builtInType>( <$node|undef>, $expanded | <$uri,$local>, %options )
+
+Provide an $expanded (full) type name or an namespace $uri and a $local node
+name.  Returned is a HASH with process information or C<undef> if not
+found.
+
+ -Option         --Default
+  json_friendly    <false>
+  sloppy_floats    <false>
+  sloppy_integers  <false>
+
+=over 2
+
+=item json_friendly => BOOLEAN
+
+The READER is slightly different, to produce output which can be passed
+on to JSON serializers without need for conversion.  Implies C<sloppy_floats>.
+
+=item sloppy_floats => BOOLEAN
+
+The float types of XML are all quite big, and support NaN, INF, and -INF.
+Perl's normal floats do not, and therefore Math::BigFloat is used.  This,
+however, is slow.  When true, your application will crash on any value which
+is not understood by Perl's default float... but run much faster.
+
+=item sloppy_integers => BOOLEAN
+
+the <integer> types must accept huge integers, which require
+C<Math::BigInt> objects to process.  But often, Perl's normal signed
+32bit integers suffice... which is good for performance, but not standard
+compliant.
+
+=back
+
+=item XML::Compile::Schema::Specs-E<gt>B<predefinedSchema>($uri)
+
+Return a HASH which contains the schema information for the specified
+$uri (or undef if it doesn't exist).
+
+=item XML::Compile::Schema::Specs-E<gt>B<predefinedSchemas>()
+
+Returns the uri of all predefined schemas.
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of XML-Compile distribution version 1.56,
+built on March 30, 2017. Website: F<http://perl.overmeer.net/xml-compile/>
+
+Please post questions or ideas to the mailinglist at
+F<http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/xml-compile> .
+For live contact with other developers, visit the C<#xml-compile> channel
+on C<irc.perl.org>.
+
+=head1 LICENSE
+
+Copyrights 2006-2017 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the Artistic license.
+See F<http://dev.perl.org/licenses/artistic.html>
+

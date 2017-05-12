@@ -1,0 +1,20 @@
+
+=== XML-Compile-SOAP-Daemon things to do
+= last update: 2008-04-07, release 0.10
+
+1. Test with SOAP1.2.
+   waits for SOAP1.2 implementation in XML-Compile-SOAP
+
+2. Test with WSDL1.2.
+   waits for WSDL1.2 implementation in XML-Compile-SOAP
+
+3. Demonstrate how to implement a proxy (simple).
+
+4. Write automated regression tests.
+   quite a lot of work, because it's a daemon.  For now, the example
+   covers may corners of the implementation.
+
+5. Reorganize the docs.
+   currently, mostly in programming order...
+
+6. Write section "Operation handlers" in lib/XML/Compile/SOAP/Daemon.pm

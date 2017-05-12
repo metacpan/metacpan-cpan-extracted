@@ -1,0 +1,17 @@
+# test an attempt to restrict along an unsupported facet
+
+--- |
+ <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:element name="one" type="bad"/>
+    <xs:simpleType name="bad">
+        <xs:restriction base="xs:string">
+            <xs:minInclusive value="10"/>
+        </xs:restriction>
+    </xs:simpleType>
+ </xs:schema>
+
+--- |
+  <one>aaaaabbbbcccc</one>
+--- >
+FAIL /illegal restriction/
+

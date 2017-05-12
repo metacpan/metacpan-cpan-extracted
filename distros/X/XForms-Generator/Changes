@@ -1,0 +1,76 @@
+XML::XForms::Generator Revision History
+=======================================
+
+0.70 Sat Oct 23 22:53:31 2004
+	- Added a prepend{CHILD} function to compliment append{CHILD}.  I imagine
+	  only concrete sequential people will care about this.
+	- Tweaked some tests.
+	- Updated documentation.
+
+0.65 Sun Jun 16 16:02:44 2003
+	- Added XML::XForms::Generator::Extension.
+	- Added more testing.
+
+0.62 Thu Mar 20 21:56:16 2003
+	- Minor changes to make things a little more compliant with the way
+	  perl wants things in terms of requires, etc.
+	- Minor change to work around some screwy logic in Exporter.
+
+0.61 Tue Nov 26 18:22:26 2002
+	- Updated XML::XForms::Generator to the latest XForms specification.
+	- Updated documentation.
+
+0.60 Wed Sep 25 18:03:46 2002
+   - Updated XML::XForms::Generator to the latest XForms specification.
+     *WARNING* This change will break your pre-existing code! *WARNING*
+   - Changed version system as it appears Perl didn't like they way I 
+     was doing it before.
+   - Added a new version of Rick's XSLT to handle the new specification.
+
+0.5.2 Mon Sep 02 12:43:04 2002
+	- Added the latest version of Rick Frankel's XForms -> HTML XSLT.
+	- Minor code revisions.
+
+0.5.1 Mon Aug 12 23:36:50 2002
+	- Small bug in node identification with the result of attributes
+      not getting set correctly (maybe that isn't a small bug after all).
+	- Documentation updates and corrections.
+
+0.5.0 Tue Aug 06 22:23:53 2002
+	- Cleaned up the code for control generation which included removing
+      some dead code *sigh* and introducing speed-ups.
+	- Correct a few copy and paste errors with the copyright line.
+	- Corrected a bug in attribute creation on controls.
+	- Various documentation and comment updates and corrections.
+	- Started the implementation of XForms User Interface elements.
+	- Updated the XForms XSLT conversion to XHTML to a version contributed
+      by Rick Frankel <rick@rickster.com>.
+
+0.4.5 Thu Aug 01 0:914:18 2002
+	- Added some more sanity checks to ensure that "we do the right thing [tm]"
+	  with adding data to the DOM tree.
+	- Documentation corrections from Mike Castle <dalgoda@ix.netcom.com>
+
+0.4.0 Sun Jul 21 13:59:30 2002
+	- Moved more of the 'schema' control variables into Common.pm
+	- Added a hash with all of the possible events in XForms.
+	- Fixed a small typo in Common.pm.
+	- More modifications to the XForms->HTML XSLT file.
+
+0.3.5 Wed Jul 17 01:42:07 2002
+	- Moved some redundant code into Common.pm.
+	- Started implementing actions in Action.pm
+	- Added the start of a XSLT file for transforming XForms into HTML forms.
+
+0.3.0 Tue Jul 09 02:37:18 2002
+	- Documentation has been added for all major sections.
+	- A few misc. bugs were stomped out.
+	- An example was added to show basic functionality.
+	- The test system was revamped and new tests were added.
+
+0.2.0 Mon Jul 01 15:10:32 2002
+	- Basic functionality has been completed.
+
+0.1.0 Wed Jun 26 20:06:22 2002
+	- original version; created by h2xs 1.21 with options
+		-A -X -n XML::XForms::Generator

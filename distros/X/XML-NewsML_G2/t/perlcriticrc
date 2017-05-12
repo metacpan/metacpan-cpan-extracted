@@ -1,0 +1,17 @@
+severity = 3
+verbose  = %f:%l: [%p] %m\n
+
+[Subroutines::ProhibitUnusedPrivateSubroutines]
+private_name_regex = _(?!build_)\w
+
+[ValuesAndExpressions::ProhibitInterpolationOfLiterals]
+severity = 3
+
+[Subroutines::RequireArgUnpacking]
+short_subroutine_statements = 2
+
+[CodeLayout::ProhibitParensWithBuiltins]
+severity = 2
+
+[RegularExpressions::RequireExtendedFormatting]
+severity = 2

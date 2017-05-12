@@ -1,0 +1,129 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<!--  If you are running a bot please visit this policy page outlining rules you must respect. http://www.livejournal.com/bots/  -->
+<rss version='2.0' xmlns:lj='http://www.livejournal.org/rss/lj/1.0/'>
+<channel>
+  <title>Shlomi Fish&apos; Home Site</title>
+  <link>http://community.livejournal.com/shlomif_hsite/</link>
+  <description>Shlomi Fish&apos; Home Site - LiveJournal.com</description>
+  <managingEditor>shlomif@iglu.org.il</managingEditor>
+  <generator>LiveJournal / LiveJournal.com</generator>
+  <pubDate>Sun, 24 Sep 2006 10:12:49 GMT</pubDate>
+<item>
+  <guid isPermaLink='true'>http://community.livejournal.com/shlomif_hsite/3573.html</guid>
+  <pubDate>Sun, 24 Sep 2006 10:12:49 GMT</pubDate>
+  <title>New Additions to the Site</title>
+  <author>shlomif@iglu.org.il</author>  <link>http://community.livejournal.com/shlomif_hsite/3573.html</link>
+  <description>&lt;p&gt;
+Exactly two weeks passed since the last update and many things have been
+added or improved. Read below for what&apos;s new.
+&lt;/p&gt;
+&lt;p&gt;
+Two of the pages in &lt;a href=&quot;http://www.shlomifish.org/MathVentures/&quot;&gt;the
+    MathVentures section&lt;/a&gt; were converted to use embedded
+&lt;a href=&quot;http://www.w3.org/Math/&quot;&gt;MathML&lt;/a&gt;. This should make viewing
+them with MathML-compliant browsers easier. The old ASCII-art based pages are 
+still available.
+&lt;/p&gt;
+
+&lt;p&gt;
+The ideas 
+&lt;a href=&quot;http://www.shlomifish.org/philosophy/ideas/#tucan&quot;&gt;Tucan&lt;/a&gt; and
+&lt;a href=&quot;http://www.shlomifish.org/philosophy/ideas/#unixdoc&quot;&gt;Unixdoc&lt;/a&gt;
+were added to the Random Ideas page.
+&lt;/p&gt;
+
+&lt;p&gt;
+I&apos;ve placed &lt;a href=&quot;http://www.shlomifish.org/open-source/nostalgia/&quot;&gt;some of 
+    my old DOS-era programs online&lt;/a&gt; for your amusement.
+&lt;/p&gt;
+
+&lt;p&gt;
+I added a &lt;a href=&quot;http://www.shlomifish.org/meta/FAQ/#site_history&quot;&gt;question
+    about the site history&lt;/a&gt; to the &lt;a href=&quot;http://www.shlomifish.org/meta/FAQ/&quot;&gt;FAQ&lt;/a&gt;.
+&lt;/p&gt;
+
+&lt;p&gt;
+More CDs were added to the &lt;a href=&quot;http://www.shlomifish.org/art/recommendations/music/&quot;&gt;Music Recommendations&lt;/a&gt;.
+&lt;/p&gt;
+
+&lt;p&gt;
+There&apos;s &lt;a href=&quot;http://www.shlomifish.org/humour.html#if_god_exists&quot;&gt;a new
+    Joke&lt;/a&gt; in the Humour archive.
+&lt;/p&gt;</description>
+  <comments>http://community.livejournal.com/shlomif_hsite/3573.html</comments>
+  <category>mathml</category>
+  <category>mathematics</category>
+  <category>math</category>
+  <category>dos</category>
+  <category>jokes</category>
+  <category>tucan</category>
+  <category>ideas</category>
+  <category>mathventures</category>
+  <category>unixdoc</category>
+  <lj:music>Metallica - Nothing Else Matters</lj:music>
+  <lj:mood>full</lj:mood>
+  <lj:security>public</lj:security>
+</item>
+<item>
+  <guid isPermaLink='true'>http://community.livejournal.com/shlomif_hsite/3165.html</guid>
+  <pubDate>Sun, 10 Sep 2006 13:41:17 GMT</pubDate>
+  <title>Changes at Shlomi Fish Homesite</title>
+  <author>shlomif@iglu.org.il</author>  <link>http://community.livejournal.com/shlomif_hsite/3165.html</link>
+  <description>&lt;p&gt;
+It&apos;s been about two weeks since my last update, and here&apos;s what&apos;s new:
+&lt;/p&gt;
+&lt;ol&gt;
+    &lt;li&gt;
+    &lt;p&gt;
+    &lt;a href=&quot;http://www.shlomifish.org/art/recommendations/music/&quot;&gt;A currently
+        partial list&lt;/a&gt; of my favourite compact discs is now live. Creating
+    this list involved a large amount of 
+    &lt;a href=&quot;http://en.wikipedia.org/wiki/Document_Type_Definition&quot;&gt;DTD&lt;/a&gt;,
+    &lt;a href=&quot;http://www.w3.org/TR/xslt&quot;&gt;XSLT&lt;/a&gt;, &lt;a href=&quot;http://perl-begin.berlios.de/&quot;&gt;Perl&lt;/a&gt;, and CSS hacking on the 
+    &lt;a href=&quot;http://search.cpan.org/dist/XML-Grammar-ProductsSyndication/&quot;&gt;XML-Grammar-ProductsSyndication&lt;/a&gt; 
+    framework, that was written from scratch to facilitate making construction 
+    of such lists possible by and others. 
+    &lt;/p&gt;
+    &lt;p&gt;
+    I will add the missing CDs as time goes by, and will also later on add
+    lists for fiction books and for movies, as well as convert the existing
+    &lt;a href=&quot;http://www.shlomifish.org/philosophy/books-recommends/&quot;&gt;non-fiction
+        books recommendations&lt;/a&gt; into the new framework.
+    &lt;/p&gt;
+    &lt;/li&gt;
+    &lt;li&gt;
+    &lt;p&gt;
+    More pages on the site were made to validate according to the 
+    &lt;a href=&quot;http://www.w3.org/&quot;&gt;World-wide-web consortium&lt;/a&gt; standards, and
+    some ancient leftovers that were no longer important were removed.
+    &lt;/p&gt;
+    &lt;/li&gt;
+    &lt;li&gt;
+    &lt;p&gt;
+    &lt;a href=&quot;http://www.shlomifish.org/open-source/favourite/&quot;&gt;My list of 
+        favourite open source software&lt;/a&gt; was updated, with many corrections, 
+    added programs and a new navigation menu.
+    &lt;/p&gt;
+    &lt;/li&gt;
+    &lt;li&gt;
+    &lt;p&gt;
+    &lt;a href=&quot;http://www.shlomifish.org/prog-evolution/pre-elpas.html&quot;&gt;My memoirs
+        as a programmer from High School&lt;/a&gt; were heavily fixed and updated.
+    &lt;/p&gt;
+    &lt;/li&gt;
+&lt;/ol&gt;</description>
+  <comments>http://community.livejournal.com/shlomif_hsite/3165.html</comments>
+  <category>xml</category>
+  <category>grammar</category>
+  <category>homesite</category>
+  <category>shlomi fish</category>
+  <category>syndication</category>
+  <category>memoirs</category>
+  <category>products</category>
+  <category>valid html</category>
+  <lj:music>Monkey Island Am I Evil OC Remix</lj:music>
+  <lj:mood>annoyed</lj:mood>
+  <lj:security>public</lj:security>
+</item>
+</channel>
+</rss>

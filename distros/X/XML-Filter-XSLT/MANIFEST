@@ -1,0 +1,9 @@
+Changes
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+README
+lib/XML/Filter/XSLT.pm
+lib/XML/Filter/XSLT/LibXSLT.pm
+t/00basic.t
+t/01filter.t

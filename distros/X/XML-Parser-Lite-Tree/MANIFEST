@@ -1,0 +1,15 @@
+Makefile.PL
+MANIFEST
+README
+t/00_xmlparserlite.t
+t/01_basic.t
+t/02_options.t
+t/03_comments.t
+t/04_processing_instructions.t
+t/05_doctypes.t
+t/06_attributes.t
+t/07_stack.t
+t/08_cdata.t
+lib/XML/Parser/LiteCopy.pm
+lib/XML/Parser/Lite/Tree.pm
+META.yml                                 Module meta-data (added by MakeMaker)

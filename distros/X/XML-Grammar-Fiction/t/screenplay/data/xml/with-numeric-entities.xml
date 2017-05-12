@@ -1,0 +1,64 @@
+<?xml version='1.0' encoding='utf-8'?>
+<document xmlns="http://web-cpan.berlios.de/modules/XML-Grammar-Screenplay/screenplay-xml-0.2/">
+    <head>
+    </head>
+    <body id="index">
+<scene id="top">
+    <scene id="david_and_goliath">
+        <description>
+            <para>
+            David &amp; Goliath &lt;are&gt; standing by each other.
+        </para>
+        <para>
+            David is a red-head. "Hello"[ Something in square brackets. ]
+        </para>
+        <para>
+            Goliath is very tall.
+        </para>
+        </description>
+        <saying character="David">
+            <para>
+                I will kill you.
+            </para>
+        </saying>
+        <saying character="Goliath">
+            <para>
+                no way, you little idiot!
+            </para>
+        </saying>
+        <saying character="David">
+            <para>
+                yes way!
+            </para>
+            <para>
+                In the name of Allah, the merciful, I will show you the power
+                of my sling.
+            </para>
+            <para>
+                I shall sling you and bing you till infinity.
+            </para>
+        </saying>
+        <description>
+            <para>
+                David takes his sling.
+            </para>
+        </description>
+    <saying character="Goliath">
+        <para>
+            I'm still waiting.
+        </para>
+    </saying>
+    <saying character="David">
+        <para>
+            so you are.
+        </para>
+    </saying>
+    <description>
+        <para>
+            David puts a stone in his sling and shoots Goliath. He hits.
+        </para>
+    </description>
+</scene>
+</scene>
+</body>
+</document>

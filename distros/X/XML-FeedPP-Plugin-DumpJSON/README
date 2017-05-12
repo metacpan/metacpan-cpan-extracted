@@ -1,0 +1,57 @@
+NAME
+    XML::FeedPP::Plugin::DumpJSON - FeedPP Plugin for generating JSON
+
+SYNOPSIS
+        use XML::FeedPP;
+        my $feed = XML::FeedPP->new( 'index.rss' );
+        $feed->limit_item( 10 );
+        $feed->call( DumpJSON => 'index-rss.json' );
+
+DESCRIPTION
+    This plugin generates a JSON data representation.
+
+FILE OR STRING
+    If a JSON filename is "undef" or '', this module returns a JSON string
+    instead of generating a JSON file.
+
+        $feed->call( DumpJSON => 'feed.json' );     # generates a JSON file
+        my $json = $feed->call( 'DumpJSON' );       # returns a JSON string
+
+OPTIONS
+    This plugin allows some optoinal arguments following:
+
+        my %opt = (
+            slim             => 1,
+            slim_element_add => [ 'media:thumbnail@url' ],
+            slim_element     => [ 'link', 'title', 'pubDate' ],
+        );
+        my $json = $feed->call( DumpJSON => %opt );
+
+  slim
+    This plugin converts the whole feed into JSON format by default. All
+    elements and attribuets are included in a JSON generated. If this
+    boolean is true, some limited elements are only included.
+
+  slim_element_add
+    An array reference for element/attribute names which is given by
+    set()/get() method's format. These elements/attributes are also appended
+    for slim JSON.
+
+  slim_element
+    An array reference for element/attribute names. The default list of
+    limited elements is replaced by this value.
+
+MODULE DEPENDENCIES
+    XML::FeedPP, XML::TreePP and JSON::Syck
+
+SEE ALSO
+    JSON, JavaScript Object Notation: <http://www.json.org/>
+
+AUTHOR
+    Yusuke Kawasaki, http://www.kawa.net/
+
+COPYRIGHT AND LICENSE
+    Copyright (c) 2006-2008 Yusuke Kawasaki. All rights reserved. This
+    program is free software; you can redistribute it and/or modify it under
+    the same terms as Perl itself.
+

@@ -1,0 +1,14 @@
+<module name="XML::Schema::Handler::Simple">
+
+  <about>
+    This module implements a handler responsible for receiving parse
+    events for an element of a simple type.
+  </about>
+
+</module>
+
+
+
+
+
+

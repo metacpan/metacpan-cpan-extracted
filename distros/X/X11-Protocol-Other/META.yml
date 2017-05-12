@@ -1,0 +1,36 @@
+---
+abstract: 'Miscellaneous helpers for X11::Protocol connections.'
+author:
+  - 'Kevin Ryde <user42_kevin@yahoo.com.au>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150010'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: X11-Protocol-Other
+no_index:
+  directory:
+    - t
+    - inc
+    - devel
+    - xt
+optional_features:
+  maximum_interoperation:
+    description: 'All the optional things which may be used.'
+    requires:
+      Encode: '1'
+      Encode::HanExtra: '0.06'
+requires:
+  X11::Protocol: '0'
+  perl: '5.004'
+resources:
+  homepage: http://user42.tuxfamily.org/x11-protocol-other/index.html
+  license: http://www.gnu.org/licenses/gpl.html
+version: '30'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

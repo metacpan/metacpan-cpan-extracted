@@ -1,0 +1,12 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         XML-ParseDTD
+version:      0.1.4
+version_from: ParseDTD.pm
+installdirs:  site
+requires:
+    Cache::Cache:                  1.02
+    LWP::UserAgent:                2.003
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

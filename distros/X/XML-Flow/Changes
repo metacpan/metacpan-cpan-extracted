@@ -1,0 +1,14 @@
+Revision history for Perl extension XML::Flow.
+0.86
+    - add default handler '*'
+0.85
+    - support for nested tags into text, eg.:
+        <tag> text text <tag2>some</tag2> continued text</tag>
+0.84
+     - tune xml size 
+0.83 - fix: don't pass undefined value of text to tags handler
+
+0.82 - add function xml2ref(), ref2xml;
+     - add tests;
+     - add support handlers withow embeded xml_flow_struct
+0.81 - remove debug, fix pod

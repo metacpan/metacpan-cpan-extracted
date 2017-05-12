@@ -1,0 +1,256 @@
+=encoding utf8
+
+=head1 NAME
+
+XML::Compile::RPC::Client - XML-RPC based on unofficial schema
+
+=head1 DESCRIPTION
+
+Client XML-RPC implementation, based on an unofficial XML-RPC schema. The
+schema used is an extended version from one produced by Elliotte Rusty Harold.
+
+Using the schema with L<XML::Compile|XML::Compile> means that the messages are validated.
+Besides, XML::Compile offers you some tricks: for instance, you can pass
+a C<time()> result (seconds since epoc)to a C<dateTime.iso8601> field,
+which will automaticallu get formatted into the right format.
+
+In XML-RPC, values which do not explicitly specify their type are
+interpreted as string. So, you may encounter two notations for the
+same:
+
+    <value><string>Hello, World!</string></value>
+    <value>Hello, World!</value>
+
+The reader (used to produce the C<$response>) will translate the second
+syntax in the first. This simplifies your code.
+
+=head1 METHODS
+
+=head2 Constructors
+
+=over 4
+
+=item XML::Compile::RPC::Client-E<gt>B<new>(OPTIONS)
+
+ -Option                --Default
+  autoload_underscore_is  '_'
+  destination             <required>
+  http_header             []
+  schemas                 <created for you>
+  user_agent              <created internally>
+  xmlformat               0
+
+=over 2
+
+=item autoload_underscore_is => STRING
+
+When calls are made using the autoload mechanism you may encounter
+problems when the method names contain dashes (C<->). So, with this
+option, you can use underscores which will B<all> be replaced to STRING
+value specified.
+
+=item destination => URI
+
+The address of the XML-RPC server.
+
+=item http_header => ARRAY|OBJECT
+
+Additional headers for the HTTP request.  This is either an ARRAY of
+key-value pairs, or an HTTP::Headers OBJECT.
+
+=item schemas => OBJECT
+
+When you need special additional trics with the schemas, you may pass
+your own L<XML::Compile::RPC|XML::Compile::RPC> instance. However, by default this is
+created for you.
+
+=item user_agent => OBJECT
+
+You may pass your own L<LWP::UserAgent> object, fully loaded with your
+own settings. When you do not, one will be created for you.
+
+=item xmlformat => 0|1|2
+
+XML::LibXML has three different output formats. Format C<0> is the
+most condense, and C<1> is nicely indented. Of course, a zero value is
+fastest.
+
+=back
+
+=back
+
+=head2 Accessors
+
+=over 4
+
+=item $obj-E<gt>B<headers>()
+
+Returns the internal HTTP::Headers, which you may modify (for instance
+to change/set the Authentication field.
+
+=item $obj-E<gt>B<schemas>()
+
+Returns the internal L<XML::Compile::RPC|XML::Compile::RPC> object, used to encode and
+decode the exchanged XML messages.
+
+=back
+
+=head2 Handlers
+
+=over 4
+
+=item $obj-E<gt>B<call>(METHOD, PARAM-(HASH|PAIR)S)
+
+example: 
+
+ my ($rc, $response) = $rpc->call('getQuote', string => 'IBM');
+ $rc == 0
+     or die "error: $response\n";
+ my $trace = $rpc->trace;  # facts about the last call
+
+ # same call, via autoload. One simple parameter
+ my ($rc, $response) = $rpc->getQuote(string => 'IBM');
+
+ # function produces a HASH, one complex parameter
+ my $struct = struct_from_hash string => symbol => 'IBM';
+ my ($rc, $response) = $rpc->call('getQuote', $struct);
+ my ($rc, $response) = $rpc->getQuote($struct);
+
+ # or mixed simple and complex types
+ # Three parameters, of which two are complex structures.
+ my ($rc, $ans) = $rcp->someMethod($struct, int => 3, $struct2);
+
+=item $obj-E<gt>B<printTrace>([FILEHANDLE])
+
+Pretty print the trace, by default to STDERR.
+
+=item $obj-E<gt>B<trace>()
+
+Returns a HASH with various facts about the last call; timings,
+the request and the response from the server. Be aware that C<LWP>
+will add some more header lines to the request before it is sent.
+
+=back
+
+=head1 DETAILS
+
+=head2 Create an interface
+
+My advice: if you have to use XML-RPC, first create an abstraction
+layer. That layer should implement error handling and logging.
+Have a look at XML::eXistDB::Client for an extended example.
+
+  package My::Service;
+  use base 'XML::Compile::RPC::Client';
+
+  sub getQuote($)
+  {   my ($self, $symbol) = @_;
+      my $params = struct_from_hash string => {symbol => $symbol};
+      my ($rc, $data) = $self->call(getQuote => $params);
+      $rc==0 or die "error: $data ($rc)";
+
+      # now simplify $data
+      $data;
+  }
+
+Now, the main program runs like this:
+
+  my $service = My::Service->new(destination => $uri);
+  my $price   = $service->getQuote('IBM');
+
+=head2 Comparison
+
+The XML::RPC module uses the XML::TreePP XML parser and parameter type
+guessing, where XML::Compile::RPC uses strict typed and validated XML
+via XML::LibXML: smaller chance on unexpected behavior. For instance,
+the XML::Compile::RPC client application will not produce incorrect
+messages when a string contains only digits. Besides, XML::RPC does not
+support all data types.
+
+XML::RPC::Fast is compatible with XML::RPC, but uses XML::LibXML
+which is faster and safer. It implements "manually" what L<XML::Compile|XML::Compile>
+offers for free in XML::Compile::RPC. Getting the types of the parameters
+right is difficult for other things than strings and numbers.
+
+Finally, RPC::XML makes you handle parameters as object: create a typed
+object for each passed value. It offers a standard method signatures to 
+simplify that task. On the other hand, RPC::XML does offer more features.
+
+There are many ways to do it.
+
+=head1 SYNOPSYS
+
+ my $rpc = XML::Compile::RPC::Client->new
+   ( destination => $service_uri
+   , xmlformat   => 1
+   , autoload_underscore_is => '-'
+   );
+
+ # Call the server
+ my ($rc, $answer) = $rpc->call($procedure, @param_pairs);
+ my ($rc, $answer) = $rpc->call($procedure, \%params);
+ $rc==0 or die "error: $answer ($rc)";
+
+ # explict and autoload examples of the same.
+ my ($rc, $answer) = $rpc->call('getQuote", string => 'IBM');
+ my ($rc, $answer) = $rpc->getQuote(string => 'IBM');
+
+ # when param is a structure:
+ my $data = struct_from_hash string => {symbol => 'IBM'};
+ my ($rc, $answer) = $rpc->call('getQuote", $data);
+ my ($rc, $answer) = $rpc->getQuote($data);
+
+ # Data::Dumper is your friend
+ use Data::Dumper;
+ $Data::Dumper::Indent = 1;
+ print Dumper $answer;
+
+ # Many useful functions in XML::Compile::RPC::Util
+ use XML::Compile::RPC::Util;
+ if($answer->{array})
+ {   my @a = rpcarray_values $answer->{array};
+ }
+
+ # Retreive detailed trace of last call
+ my $trace = $rpc->trace;
+ print $trace->{response}->as_string;
+ print "$trace->{total_elapse}\n";
+
+ # clean-up of connections depends on LWP
+ undef $rpc;
+
+=head1 SEE ALSO
+
+This module is part of XML-Compile-RPC distribution version 0.17,
+built on September 12, 2013. Website: F<http://perl.overmeer.net/xml-compile/>
+
+Other distributions in this suite:
+L<XML::Compile>,
+L<XML::Compile::SOAP>,
+L<XML::Compile::SOAP12>,
+L<XML::Compile::SOAP::Daemon>,
+L<XML::Compile::SOAP::WSA>,
+L<XML::Compile::C14N>,
+L<XML::Compile::WSS>,
+L<XML::Compile::WSS::Signature>,
+L<XML::Compile::Tester>,
+L<XML::Compile::Cache>,
+L<XML::Compile::Dumper>,
+L<XML::Compile::RPC>,
+L<XML::Rewrite>
+and
+L<XML::LibXML::Simple>.
+
+Please post questions or ideas to the mailinglist at
+F<http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/xml-compile> .
+For live contact with other developers, visit the C<#xml-compile> channel
+on C<irc.perl.org>.
+
+=head1 LICENSE
+
+Copyrights 2009-2013 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

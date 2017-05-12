@@ -1,0 +1,20 @@
+Revision history for Perl extension XML::Filter::Sort.
+
+1.01  21-Apr-2005
+        - Fixed similar serious bug with text content of sort key was '0',
+          also reported by Rishi Dhupar
+
+1.00  20-Apr-2005
+        - Fixed serious bug with text content = '0' reported by Rishi Dhupar
+
+0.91  11-Jun-2002
+        - CPAN release
+        - imported into CVS on SourceForge
+
+0.90  11-Jun-2002
+        - pre-CPAN release
+
+0.01  11-Apr-2002
+        - original version; created by h2xs 1.20 with options
+                -AX -n XML::Filter::Sort
+

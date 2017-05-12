@@ -1,0 +1,188 @@
+
+==== How to run a SOAP::Daemon under CGI
+
+(for mod_perl see further down)
+
+Example of a XML::Compile CGI script
+
+   Patrick Powell papowell at astart dot com
+   Thu Dec 23 2010
+   Updated Wed Jun 22 13:14:12 PDT 2011 for 
+     XML-Compile-SOAP-Daemon-3.00
+
+This text uses the ~/examples/namesservice/ as a example application. Of
+course, you should copy that into your own workspace.
+
+1. Put the Perl Modules, WSDL and schema files in a well known location
+     (i.e. - the SOAP directory)
+     and make sure they are readable by the HTTPD server:
+
+     mkdir /usr/local/www/SOAP
+     chmod 755 /usr/local/www/SOAP
+     cp namesservice.wsdl namesservice.xsd *.pm /usr/local/www/SOAP
+     chmod 644 /usr/local/www/SOAP/*
+
+2. Edit the nph-server.cgi script and set the 'use lib' entry to the directory
+     where you copied the Perl Modules. i.e.:
+     use lib '/usr/local/www/SOAP';
+     my $schemas = '/usr/local/www/SOAP';
+
+3. You might want to use a lot of debugging at first.
+    Set the default 'mode' entry to 'DEBUG' and change the
+    dispatcher to put messages into a file.
+
+    vi nph-server.cgi
+      Change:
+        # dispatcher FILE => 'log', mode => $mode, to => \*STDERR;
+        dispatcher FILE => 'log', mode => $mode, to => '/tmp/serverlog'
+      Change:
+      #my $mode = 0;
+      my $mode = 'DEBUG';
+
+4. Put the nph-server.cgi script into a HTTPD directory
+   which allows CGI execution (i.e. - the CGI-BIN directory)
+   and make sure the script has execute permissions:
+     cp nph-server.cgi *.pm /usr/local/www/apache/cgi-bin/
+     chmod 755 /usr/local/www/apache/cgi-bin/nph-server.cgi
+
+5. If you are running Apache + ModPerl2 check your Apache httpd.conf
+   file and find the mod_perl configuration setup:
+    
+    <IfModule mod_perl.c>
+       PerlTaintCheck On
+       # PerlSendHeaders
+       PerlOptions -ParseHeaders
+       PerlPostConfigRequire /usr/local/www/apache22/startup.pl
+    </IfModule>
+
+    You MUST turn ParseHeaders OFF, i.e. PerlOptions -ParseHeaders
+    You MUST remove or turn off the PerlSendHeaders function
+    If you make any changes, restart Apache:
+      apachectl restart
+
+6. Check the version of CGI installed on your system.  This MUST
+   be at least 3.53:
+    perl -MCGI -e 'print "$CGI::VERSION\n"'
+   You should update the CGI module if it is not.
+
+7. Test to see if you can connect to the HTTPD server and the CGI
+   script is executed:
+
+    rm /tmp/soap   # delete the log file
+    perl client.pl --server=http://localhost/cgi-bin/nph-server.cgi
+ 
+
+==== How to run a SOAP::Daemon under mod_perl
+
+Example of a XML::Compile CGI script
+   Patrick Powell papowell at astart dot com
+   Thu Dec 23 2010
+
+This text uses the ~/examples/namesservice/ as example application. Of
+course, you should change that into your own.
+
+You need to create a module, say MyServer.pm, that has all of the content of
+this script up to the point where the call to runRequest is made.  The ways
+to do this are many and varied.  The following is shortcut to help with this.
+
+1. run the 'create_MyServer' script:
+   sh create_MyServer
+
+2. Copy MyServer.pm to the SOAP directory and set read and execute
+   permissions
+
+   cp MyServer.pm /usr/local/www/SOAP
+   chmod a+rx /usr/local/www/SOAP/*.pm
+
+2. Copy the nph-server2.cgi file to the CGI-BIN directory
+   and set read and execute permissions.
+   This script contains just enough code to call the runCgiRequest()
+   routine in the MyServer.pm module:
+
+   nph-server2.cgi START
+
+   #!/usr/bin/perl
+   use lib '/usr/local/www/SOAP';
+   use Log::Report   'example', syntax => 'SHORT';
+   use CGI;
+   use MyServer;
+   my $mode = 'DEBUG';
+   dispatcher FILE => 'log', mode => $mode, to => "/tmp/soap";
+   my $query = CGI->new;
+   runCgiRequest( $query );
+   exit 0;
+
+   nph-server2.cgi END
+
+   cp nph-server.cgi *.pm /usr/local/www/apache/cgi-bin/
+   chmod 755 /usr/local/www/apache/cgi-bin/nph-server.cgi
+
+
+4. Check that the new script can load the MyServer.pm modules:
+   rm /tmp/soap
+   /usr/local/www/apache/cgi-bin/nph-server2.cgi
+
+5.  Now run the query:
+      rm /tmp/soap
+      perl client.pl --server=http://localhost/cgi-bin/nph-server2.cgi
+    Look at the log file: more /tmp/soap
+
+6.  If you are running Apache+ModPerl2,  you can preload the MyServer
+    module and precompile (almost) all of the code.  Edit your Apache
+    httpd.conf file and find the mod_perl configuration setup:
+    
+    <IfModule mod_perl.c>
+       PerlTaintCheck On
+       PerlOptions -ParseHeaders
+       PerlPostConfigRequire /usr/local/www/apache22/startup.pl
+    </IfModule>
+
+    Now edit that startup.pl file and add the following:
+
+      use lib '/usr/local/www/SOAP';
+      use MyServer;
+      chmod 0666, "/tmp/soap" if -f "/tmp/soap";
+      1;
+
+   The reason for the chmod is that the startup script runs as ROOT
+   but the CGI scripts run as the Apache User (usually 'www')
+
+7. Remove any log files and Restart Apache:
+      rm /tmp/soap
+      apachectl restart
+   Now check the log file:
+      more /tmp/soap
+   and you should see 
+      trace: register prefix wsdl for 'http://schemas.xmlsoap.org/wsdl/'
+      trace: register prefix soap for 'http://schemas.xmlsoap.org/wsdl/soap/'
+      trace: register prefix http for 'http://schemas.xmlsoap.org/wsdl/http/'
+      trace: initialize SOAP11 operations for WSDL11
+
+8.  Now run the query:
+      rm /tmp/soap
+      perl client.pl --server=http://localhost/cgi-bin/nph-server2.cgi
+
+    Now check the log file:
+      more /tmp/soap
+   and you should see 
+        trace: REQUEST$VAR1 = bless( {
+         '_protocol' => 'HTTP/1.1',
+         '_content' => '<?xml version="1.0" encoding="UTF-8"?>
+   We are using the compiled code for $daemon generated by MyServer.pm
+
+Caveats and Warnings:
+   Apache and ModPerl do not always set the current directory of the 
+   running CGI script to the directory where the script is located.
+   This is partly due to the effect of using Threads.  Rather than trying
+   to fix a large number of (non-Apache) libraries, etc, the Apache and Mod_perl
+   developers simply state that you should assume that the current
+   directory is not the one in which the CGI script is executing.
+
+   This gets even worse when you combine ModPerl and startup scripts.
+   The Mod_perl developers explicitly warn that the current directory
+   is NOT the directory where the startup script is located.
+
+   Finally, the startup script is executed as ROOT, not as the
+   Apache user/group while the CGI scripts are exectuted as the
+   Apache user/group.  This can lead to issues if you open log files
+   at startup time and then use them at run time.

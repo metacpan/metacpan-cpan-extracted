@@ -1,0 +1,55 @@
+Revision history for Perl extension XML::Filter::XML_Directory_2::Base
+
+1.4.4	 Mon Jul 22 2003
+
+	 - Added 'set_encoding' and 'encoding' methods
+
+1.4.3	 Sat Jul 20 2002
+
+	 - Renamed 'get_handler' as 'retrieve_handler'
+
+	 - Renamed 'get_callback' as 'retrieve_callback'
+
+	 - Upped requirement for XML::Filter::XML_Directory_Pruner to 1.3
+
+1.4.2	 Mon Jul 08 2002
+
+	 - Forgot to remove debugging output. Ach!
+
+1.4.1	 Sun Jul 07 2002
+
+	 - Fixed a bug where the cwd was not being pruned when the first item in a directory was flagged for pruning.
+
+1.4	 Fri Jul 05 2002
+
+	 - Added check to $pkg->compare($data) when excluding root (duh)
+
+	 - Removed $pkg->mtype - now package method in XML::Filter::XML_Directory_Pruner
+
+	 - Updated Makefile.PL accordingly
+
+	 - Upped requirement for XML::Filter::XML_Directory_Pruner to 1.2
+
+1.3	 Wed Jul 03 2002
+
+	 - Added $pkg->current_location()
+
+	 - Added $pkg->current_directory()
+
+	 - Updated POD
+
+1.2	 Wed Jul 03 2002
+
+	 - Ack! Fixed a bug with the way exclude_root was being interpreted because Ima::Moron and forgot that there might be files might also be the first items in a directory.
+
+1.1	 Wed Jul 03 2002
+
+	 - Added $pkg->exclude_root()
+
+	 - Removed restriction that (set_)handlers must be derived from XML::SAX::Base because it prevents the use of XML::SAX::ParserFactory
+
+	 - Updated POD
+
+1.0	 Tue Jul 02 2002
+
+	 - Initial revision

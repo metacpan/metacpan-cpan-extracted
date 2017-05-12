@@ -1,0 +1,11 @@
+Changes
+GenericChunk.pm
+CharacterChunk.pm
+MANIFEST
+LICENSE
+README
+Makefile.PL
+t/01base.t
+t/02filter.t
+t/03generic.t
+META.yml                                 Module meta-data (added by MakeMaker)

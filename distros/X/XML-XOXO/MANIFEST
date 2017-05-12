@@ -1,0 +1,9 @@
+Changes
+MANIFEST
+README
+Makefile.PL
+lib/XML/XOXO/Parser.pm
+lib/XML/XOXO.pm
+lib/XML/XOXO/Node.pm
+test.pl
+META.yml                                Module meta-data (added by MakeMaker)

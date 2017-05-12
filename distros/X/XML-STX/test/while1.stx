@@ -1,0 +1,16 @@
+<stx:transform version="1.0" 
+  xmlns:stx="http://stx.sourceforge.net/2002/ns"
+  strip-space="yes">
+
+  <stx:variable name="n" select="0"/>
+
+  <stx:template match="/root">
+    <root>
+      <stx:while test="$n &lt; 10">
+	<stx:value-of select="$n"/>
+	<stx:assign name="n" select="$n + 1"/>
+      </stx:while>
+    </root>
+  </stx:template>
+
+</stx:transform>

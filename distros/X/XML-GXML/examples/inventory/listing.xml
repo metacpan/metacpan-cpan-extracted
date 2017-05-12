@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<list>
+
+<title>Warehouse Inventory 12/04/74</title>
+<compiled-by>Nobody Smith</compiled-by>
+
+<itemlist>
+	<item>
+		<name>frob</name>
+		<quantity>100</quantity>
+		<notes>starting to leak</notes>
+		<agent>Bob Jones</agent>
+	</item>
+	
+	<item>
+		<name>nob</name>
+		<quantity>42</quantity>
+		<notes>molding on outside</notes>
+		<agent>Bill T. Catt</agent>
+	</item>
+	
+	<item>
+		<name>slob</name>
+		<quantity>2</quantity>
+		<notes>need to remove quickly!</notes>
+		<agent>Bill T. Catt</agent>
+	</item>
+</itemlist>
+
+</list>

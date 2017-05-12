@@ -1,0 +1,17 @@
+#!/usr/bin/perl
+
+@l = <ofex*.pl>;
+
+$name = "ofex". (@l+1) .".pl";
+
+open (G,">>../MANIFEST") or die;
+print G "examples/$name\n";
+close G;
+
+open (F,">$name ") or die;
+
+print F "#!/usr/bin/perl\n\n=head1 $name\n\n\n\=cut\n\n use XML::DT\n\n";
+
+close F;
+
+exec("vi $name");

@@ -1,0 +1,8 @@
+Benchmark: timing 2000 iterations of date, sim, sim4, var, var2, var3, var4...
+  sim:  1 wallclock secs ( 0.54 usr +  0.00 sys =  0.54 CPU) @ 3703.70/s (n=2000)
+ sim4:  3 wallclock secs ( 1.65 usr +  0.00 sys =  1.65 CPU) @ 1212.12/s (n=2000)
+  var:  1 wallclock secs ( 0.58 usr +  0.00 sys =  0.58 CPU) @ 3448.28/s (n=2000)
+ var2:  2 wallclock secs ( 1.01 usr +  0.00 sys =  1.01 CPU) @ 1980.20/s (n=2000)
+ var3:  3 wallclock secs ( 1.49 usr +  0.00 sys =  1.49 CPU) @ 1342.28/s (n=2000)
+ var4:  4 wallclock secs ( 1.90 usr +  0.00 sys =  1.90 CPU) @ 1052.63/s (n=2000)
+ date:  4 wallclock secs ( 1.84 usr +  0.00 sys =  1.84 CPU) @ 1086.96/s (n=2000)

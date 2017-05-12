@@ -1,0 +1,3 @@
+<html>
+<?php foo > 3??>
+</html>

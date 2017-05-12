@@ -1,0 +1,35 @@
+#!/usr/bin/perl
+
+use X11::Wcl;
+
+my $app_context;
+my $timeout;
+
+X11::Wcl::mainloop(
+	ARGV => ["XtAppTimeout"],
+	NO_INITIAL_RESOURCES => 1,
+	NO_REALIZE => 1,
+	STARTUP => \&startup,
+);
+
+# called after timeout by Xt toolkit
+sub timeout
+{
+	X11::Wcl::XtAppAddTimeOut($app_context, 1000, $timeout, undef);
+	print "timeout\n";
+}
+
+# for application-specific startup actions
+sub startup
+{
+	my($toplevel, $_app_context) = @_;
+
+	# save application context
+	$app_context = $_app_context;
+
+	$timeout = X11::Wcl::MakeXtTimerCallbackProc("::timeout");
+	X11::Wcl::XtAppAddTimeOut($app_context, 1000, $timeout, undef);
+
+    # finally, enter the main application loop
+    X11::Wcl::XtMainLoop();
+}

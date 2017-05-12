@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tei:text xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:sp="http://web-cpan.berlios.de/modules/XML-Grammar-Screenplay/screenplay-xml-0.2/">
+  <tei:body>
+    <tei:div type="act" xml:id="index">
+      <tei:head>ACT I</tei:head>
+      <tei:div type="scene" xml:id="top">
+        <tei:head>top</tei:head>
+        <tei:div type="scene" xml:id="a-better-scene">
+          <tei:head>A Better Scene</tei:head>
+        </tei:div>
+        <tei:div type="scene" xml:id="another-scene">
+          <tei:head>another-scene</tei:head>
+        </tei:div>
+        <tei:div type="scene" xml:id="exodus">
+          <tei:head>The Exodus</tei:head>
+          <tei:sp><tei:speaker>Moses</tei:speaker>
+                    <tei:p>
+                        let us get out of here!
+                    </tei:p>
+                </tei:sp>
+          <tei:sp><tei:speaker>Joshua</tei:speaker>
+                    <tei:p>
+                        amen!
+                    </tei:p>
+                </tei:sp>
+        </tei:div>
+      </tei:div>
+    </tei:div>
+  </tei:body>
+</tei:text>

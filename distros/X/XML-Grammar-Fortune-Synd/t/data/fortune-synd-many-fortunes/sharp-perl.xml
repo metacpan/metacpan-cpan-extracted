@@ -1,0 +1,872 @@
+<?xml version="1.0" encoding="utf-8"?>
+<?xml-stylesheet type="text/xml" href="fortune-xml-to-html.xsl"?>
+<collection>
+  <head/>
+  <list>
+    <fortune id="documentation-for-bl">
+      <meta>
+        <title>Documentation for BL</title>
+      </meta>
+      <irc>
+        <body>
+          <saying who="rindolf">buu: do you have a working manual of BL?</saying>
+          <saying who="rindolf">s/working/up-to-date/</saying>
+          <saying who="buu">It's kind of sort of up to date</saying>
+          <saying who="perlygatekeeper">he means NO</saying>
+          <saying who="buu">I've got some docs!</saying>
+          <saying who="rindolf">buu: do you have a functional spec? An architecture document? An interface whitepaper? A developer's guide?  A user manual? A "The BL-Book" and "BL - The Program"?</saying>
+          <saying who="buu">rindolf: no, no, no no and no</saying>
+      </body>
+        <info>
+            <channel>#perl</channel>
+            <network>Freenode</network>
+            <tagline>Discussing the merits of documenting one's pet languages on #perl</tagline>
+        </info>
+      </irc>
+    </fortune>
+    <fortune id="newline-prices">
+      <meta>
+        <title>Did anybody see my newline at Freenode's #perl channel.</title>
+      </meta>
+      <irc>
+        <body>
+          <saying who="rindolf">sleeper: why are people obsessed with one-liners?</saying>
+          <saying who="rindolf">It takes 3 lines - OMG what a disaster!</saying>
+          <saying who="Botje">rindolf: newline prices went up again</saying>
+          <saying who="rindolf">Botje: I buy my newlines in the black market</saying>
+          <saying who="dabreegster">Botje: again? drat.</saying>
+          <me_is who="Botje">reports rindolf to the newline police</me_is>
+          <saying who="dabreegster">Botje: I know about an... (underground) operation going on to pirate newlines.</saying>
+          <saying who="rindolf">Botje: I bribed a few cops in the newline police, but nice try.</saying>
+          <saying who="dabreegster">Botje: Some crazy guys are trying to free newlines from  patents! They want to rid the market!</saying>
+          <me_is who="cursor">gets called up to serve in the newline jury</me_is>
+          <saying who="rindolf">I think we need to start a campaign to lift all restrictions  off newlines.</saying>
+          <saying who="dabreegster">rindolf: La Resistance lives on!\n</saying>
+          <saying who="Botje">I already stockpiled millions of newlines</saying>
+          <saying who="dabreegster">Botje: We can have the one-liners destroyed by sundown</saying>
+          <saying who="dabreegster">Not destroyed, but... TURNED INTO TWO-LINERS! Mwuhahaha!</saying>
+        </body>
+        <info>
+            <channel>#perl</channel>
+            <network>Freenode</network>
+            <tagline>The Cost of Newlines</tagline>
+        </info>
+      </irc>
+    </fortune>
+    <fortune id="verbing-the-verb">
+      <meta>
+        <title>Verbing the verb on Freenode's #perl</title>
+      </meta>
+      <irc>
+        <body>
+          <me_is who="buu">Stevie[FP] with a plunger.</me_is>
+          <me_is who="Stevie[FP]">looks for the verb in that sentence</me_is>
+          <saying who="sili">i think you're missing a verb</saying>
+          <saying who="Stevie[FP]">I think he's missing a brain.</saying>
+          <saying who="sili">unless Stevie[FP] is a verb i don't know</saying>
+          <saying who="sili">Stevie[FP]: v. see Stevie[FP]</saying>
+          <saying who="Stevie[FP]">I am not a verb!</saying>
+          <saying who="sili">you've been verbatized</saying>
+          <me_is who="rindolf">Stevie[FP]'s Chris62vw</me_is>
+          <saying who="Stevie[FP]">verbalized?</saying>
+          <saying who="rindolf">Stevie[FP]: verbalized is a different thing.</saying>
+          <saying who="rindolf">Stevie[FP]: it comes from "verbal".</saying>
+          <saying who="Stevie[FP]">Verbified.</saying>
+          <saying who="Stevie[FP]">Verbiated.</saying>
+          <saying who="rindolf">stefan: verbificated.</saying>
+          <saying who="Botje">verbed.</saying>
+          <saying who="Stevie[FP]">Verberated.</saying>
+          <saying who="rindolf">Stevie[FP]: verberation is overrated.</saying>
+        </body>
+        <info>
+            <channel>#perl</channel>
+            <network>Freenode</network>
+            <tagline>Verbing the Verb</tagline>
+        </info>
+      </irc>
+    </fortune>
+    <fortune id="sharp-perl-human-xml">
+      <meta>
+        <title>Human XML</title>
+      </meta>
+      <irc>
+        <body>
+          <saying who="BarnacleBob">i hate xml.....</saying>
+          <saying who="mcrawfor">&lt;response to="BarnacleBob"&gt;indeed&lt;/response&gt;</saying>
+          <saying who="rindolf">mcrawfor: :-)</saying>
+          <saying who="rindolf">mcrawfor++ # Nice joke</saying>
+          <saying who="Botje">ehm. ouch.</saying>
+          <saying who="Botje">rindolf: no!</saying>
+          <saying who="Botje">&lt;postincrement comment="Nice joke"&gt;mcrawfor&lt;/postincrement&gt;</saying>
+          <saying who="rindolf">Botje: LOL.</saying>
+          <saying who="rindolf">&lt;postincrement comment="As you wish"&gt;Botje&lt;/postincrement&gt;</saying>
+        </body>
+        <info>
+            <channel>#perl</channel>
+            <network>Freenode</network>
+            <tagline>Human XML</tagline>
+        </info>
+      </irc>
+    </fortune>
+    <fortune id="IRC-me-I-you-we">
+      <meta>
+        <title>/me (or I, you or we) is finding it amusing on Freenode's #perl.</title>
+      </meta>
+      <irc>
+        <body>
+          <me_is who="__you">fart</me_is>
+          <me_is who="__you">say "oops"</me_is>
+          <saying who="rindolf">__you: heh</saying>
+          <me_is who="__you">kick rindolf</me_is>
+          <saying who="__you">(rindolf, you're now being kicked by 435 people)</saying>
+          <saying who="squeeks">__you need to go outside.</saying>
+          <saying who="kspath">__you: Who owns you?</saying>
+          <me_is who="__you">go outside</me_is>
+          <me_is who="__you">are pwned by dazjorz</me_is>
+          <me_is who="__you">is now known as we</me_is>
+          <me_is who="we">are having a useless off-topic conversation right now</me_is>
+          <saying who="rindolf">we: hahah</saying>
+          <me_is who="we">we is now known as __you</me_is>
+          <me_is who="__you">decide this channel is now useless and decide to leave</me_is>
+          <me_is who="simcop2387">is now known as we</me_is>
+          <me_is who="we">are not amused</me_is>
+          <me_is who="__you">and I are together simcop2387</me_is>
+          <me_is who="squeeks">is now known as _I_</me_is>
+          <me_is who="_I_">need to tell __you something</me_is>
+          <me_is who="__you">listen</me_is>
+          <me_is who="simcop2387">is now known as we</me_is>
+          <me_is who="we">need help</me_is>
+          <me_is who="_I_">think we are getting a bit sick of the shenanigans</me_is>
+          <saying who="rindolf">I'm so making a fortune out of it.</saying>
+          <me_is who="we">want to be on bash.org</me_is>
+        </body>
+        <info>
+            <channel>#perl</channel>
+            <network>Freenode</network>
+            <tagline>/me (or I, you or we) is finding it amusing</tagline>
+        </info>
+      </irc>
+    </fortune>
+    <fortune id="prog-lang-multi-lingual">
+      <meta>
+        <title>Multi-linguality</title>
+      </meta>
+      <irc>
+        <body>
+          <saying who="spyro_boy">Oh! I fixed it :D</saying>
+          <saying who="spyro_boy">Yay :D</saying>
+          <saying who="rindolf">spyro_boy: congrats!</saying>
+          <saying who="spyro_boy">Thanks for your help, everyone. :)</saying>
+          <saying who="rindolf">spyro_boy: now you should translate this script to O'Caml, Haskell, Perl 6.</saying>
+          <saying who="spyro_boy">rindolf, huh?</saying>
+          <saying who="rindolf">spyro_boy: Smalltalk, C, C++, Visual Basic...</saying>
+          <saying who="spyro_boy">rindolf, translate to what?</saying>
+          <saying who="rindolf">spyro_boy: to all these programming languages.</saying>
+          <saying who="spyro_boy">haha</saying>
+          <saying who="spyro_boy">rindolf, yeah.</saying>
+          <saying who="rindolf">Because a script in perl is Not Enough&lt;tm&gt;.</saying>
+          <saying who="rindolf">spyro_boy: but see the Great Computer Language Shootout.</saying>
+          <saying who="spyro_boy">rindolf, I tried learning C,C++, and Java, but I couldn't catch on.</saying>
+        </body>
+        <info>
+            <channel>#perl</channel>
+            <network>Freenode</network>
+            <tagline>Mulit-linguality</tagline>
+        </info>
+      </irc>
+    </fortune>
+    <fortune id="chuck-norris-and-perl-6">
+      <meta>
+        <title>Chuck Norris and Perl 6</title>
+      </meta>
+      <irc>
+        <body>
+          <saying who="rindolf">wankit</saying>
+          <saying who="buubot">Perl 6, unlike most people, is able to breathe in the vacuum of space. In fact, anything else would damage its respiratory system. Because of this, whenever it's visiting Earth, it wears a respirator, which resembles a kickass beard.</saying>
+          <saying who="rindolf">Heh heh.</saying>
+          <saying who="rindolf">Are all of buubot's wankit factoids about Perl 6?</saying>
+          <saying who="rindolf">He should have some about Chuck Norris, too.</saying>
+          <saying who="merlyn">fictional factoids about a partially designed, partially implemented, partially wanted language. :)</saying>
+          <saying who="rindolf">merlyn: yeah.</saying>
+          <saying who="merlyn">Heh - those are all Chuck Norris quotes with s/Chuck/P6/</saying>
+          <saying who="dabreegster">rindolf: It's written in Chuck Norris, right</saying>
+          <saying who="merlyn">Chuck Norris writes code in Perl 6. Before Larry's done. And it works.</saying>
+          <saying who="rindolf">merlyn: Chuck Norris wrote Perl 6 in a day but then destroyed all evidence with his bare hands, so no one will know his secrets.</saying>
+        </body>
+        <info>
+            <channel>#perl</channel>
+            <network>Freenode</network>
+            <tagline>Chuck Norris and Perl 6</tagline>
+        </info>
+      </irc>
+    </fortune>
+    <fortune id="leonerd-life-readiness">
+      <meta>
+        <title>Is a Life Ready for Prime Time?</title>
+      </meta>
+      <irc>
+        <body>
+          <saying who="rindolf">LeoNerd: I need to get a life.</saying>
+          <saying who="LeoNerd">They can be quite useful, but they do have a crazy amount of dependencies..</saying>
+          <saying who="LeoNerd">And sometimes they can be a bit unstable - I think they're still beta-testing</saying>
+        </body>
+        <info>
+            <channel>#perl</channel>
+            <network>Freenode</network>
+            <tagline>Is a Life Ready for Prime Time</tagline>
+        </info>
+      </irc>
+    </fortune>
+    <fortune id="sharp-perl-for-elisabeth">
+      <meta>
+        <title>#perl for Elisabeth</title>
+      </meta>
+      <irc>
+        <body>
+          <saying who="simcop2387">Daveman: i use a ZED PEE EM to power my computer, its the ultimate YOU PEE ES</saying>
+          <me_is who="Daveman">throws an Elisabeth at Simcop</me_is>
+          <saying who="rindolf">Me catches the Elisabeth in mid-air.</saying>
+          <saying who="SubStack">with an s, excellent choice</saying>
+          <saying who="Daveman">:o</saying>
+          <saying who="Daveman">Interception!</saying>
+          <saying who="rindolf">Daveman: when my friend and I played Frisbee, we had an intra-tree move.</saying>
+          <me_is who="SubStack">pirates Elisabeth and seeds a torrent</me_is>
+          <saying who="rindolf">Which was unintended.</saying>
+          <saying who="rindolf">Elisabeth: are you here?</saying>
+          <saying who="Daveman">HAHAHAHHA</saying>
+          <saying who="Daveman">Substack++</saying>
+          <me_is who="SubStack">wins at life.</me_is>
+          <saying who="rindolf">An Elisabeth for all! And all for an Elisabeth.</saying>
+        </body>
+        <info>
+            <channel>#perl</channel>
+            <network>Freenode</network>
+            <tagline>#perl for Elisabeth</tagline>
+        </info>
+      </irc>
+    </fortune>
+    <fortune id="books-for-learning-perl">
+      <meta>
+        <title>Books for Learning Perl</title>
+      </meta>
+      <irc>
+        <body>
+          <saying who="Alexi5">what is a good book for getting up to speed with  perl?</saying>
+          <saying who="merlyn">learning perl!</saying>
+          <saying who="merlyn">intermediate perl!</saying>
+          <saying who="nachos_">the camel is the _only book_</saying>
+          <saying who="nachos_">:-P</saying>
+          <me_is who="merlyn">bats nachos silly</me_is>
+          <saying who="nachos_">:-(</saying>
+          <saying who="rindolf">Alexi5: there's also Beginning Perl, which is available  online.</saying>
+          <me_is who="f00li5h">saw that coming</me_is>
+          <saying who="rindolf">You should learn Perl from "Learning Perl in 24 minutes  Unleashed!"</saying>
+          <saying who="f00li5h">rindolf: ``Learning perl in 24 minutes Unleashed, in a  nutshell for dummies'' is the one i have</saying>
+          <saying who="rindolf">f00li5h: that's even better.</saying>
+        </body>
+        <info>
+            <channel>#perl</channel>
+            <network>Freenode</network>
+            <tagline>Books for Learning Perl</tagline>
+        </info>
+      </irc>
+    </fortune>
+    <fortune id="vintage-hypertext">
+      <meta>
+        <title>Discussing Vintage Hypertext on Freenode's #perl</title>
+      </meta>
+      <irc>
+        <body>
+          <saying who="rindolf">Are you using Firefox?</saying>
+          <saying who="Imaginativeone">yeah...</saying>
+          <saying who="rindolf">Interesting...</saying>
+          <saying who="rindolf">Don't know.</saying>
+          <saying who="[x86]">use a real browser... you know... like IE!</saying>
+          <me_is who="[x86]">runs</me_is>
+          <saying who="infi">IE 3 &gt; *</saying>
+          <saying who="rindolf">IE 2 &gt; *</saying>
+          <saying who="infi">gopher!</saying>
+          <saying who="infi">firefox can actually do gopher URLs</saying>
+          <saying who="rindolf">GNU info!</saying>
+          <saying who="infi">feh.</saying>
+        </body>
+        <info>
+            <channel>#perl</channel>
+            <network>Freenode</network>
+            <tagline>Vintage Hypertext</tagline>
+        </info>
+      </irc>
+    </fortune>
+    <fortune id="free-as-in-what">
+      <meta>
+        <title>Free as in what?</title>
+      </meta>
+      <irc>
+        <body>
+          <saying who="rindolf">ofer0: what's up?</saying>
+          <saying who="ofer0">rindolf, nothing much. what's with you?</saying>
+          <saying who="rindolf">ofer0: I restored my fonts to my nouveau-enabled X server.</saying>
+          <saying who="jagerman">What is nouveau?</saying>
+          <saying who="ofer0">jagerman, "new" in french ?</saying>
+          <saying who="jagerman">Yes, I know it's a word, but what is the nouveau rindolf is talking about?</saying>
+          <saying who="ofer0">I have no idea. rindolf ?</saying>
+          <saying who="rindolf">jagerman, ofer0: it's the free-as-in-speech Nvidia drivers.</saying>
+          <saying who="dmq">jagerman++ (Yes i know its a word).</saying>
+          <saying who="pkrumins">free as in freedom</saying>
+          <saying who="nainef">free as in richard stallman?</saying>
+          <saying who="ofer0">free as in free Microsoft Windows Vista CDs</saying>
+          <saying who="nainef">lol</saying>
+          <saying who="pkrumins">vista--</saying>
+          <saying who="ofer0">"What do you mean? Windows XP isn't free?" -- My neighbour.</saying>
+          <saying who="Ikarus">ofer0: sounds familiar</saying>
+          <saying who="ofer0">(when telling him that I can't format his hard-drive and re-install XP because he doesn't own a license)</saying>
+        </body>
+        <info>
+            <channel>#perl</channel>
+            <network>Freenode</network>
+            <tagline>Free as in what?</tagline>
+        </info>
+      </irc>
+    </fortune>
+    <fortune id="the-only-prog-lang">
+      <meta>
+        <title>The Only Programming Language</title>
+      </meta>
+      <irc>
+        <body>
+          <saying who="rindolf">This reminds me of a fun discussion I had with my co-worker.</saying>
+          <saying who="rindolf">He had a Firefox window open with an ActiveState page and I read "Perl, PHP, Python, Tcl, XSLT".</saying>
+          <saying who="rindolf">So he said: "Heresy! C is the only language."</saying>
+          <saying who="rindolf">So I thought for a moment and said "Intercal is the only language."</saying>
+          <saying who="nanonyme">lol</saying>
+          <saying who="rindolf">And then "Real men write in Intercal."</saying>
+          <saying who="rindolf">"COME FROM" anyone?</saying>
+        </body>
+        <info>
+            <channel>#perl</channel>
+            <network>Freenode</network>
+            <tagline>The Only Programming Language</tagline>
+        </info>
+      </irc>
+    </fortune>
+    <fortune id="misleading-textbooks-about-perl">
+      <meta>
+        <title>Misleading Textbooks about Perl</title>
+      </meta>
+      <irc>
+        <body>
+          <saying who="rindolf">mortal5: you need to print the header.</saying>
+          <saying who="rindolf">mortal5: print header()</saying>
+          <saying who="mortal5">rindolf, ...I absolutely love it when my textbook leads me wrong..</saying>
+          <saying who="rindolf">mortal5: what is your textbook?</saying>
+          <saying who="mortal5">"web wizards guide to perl and cgi"</saying>
+          <saying who="mortal5">lol</saying>
+          <saying who="mortal5">only the finest for the students at my university</saying>
+          <saying who="buu">Hahaha</saying>
+          <saying who="buu">That's awesome.</saying>
+          <saying who="cfedde">Is this what we're teacing these days? Oh my.</saying>
+          <saying who="somian">Blows the mind, doesn't it cfedde!</saying>
+          <saying who="cfedde">somian: it does.</saying>
+          <saying who="cfedde">I suppose that I'm commenting out of context. but why the mix and match.</saying>
+          <saying who="f3ew">What mind?</saying>
+          <saying who="cfedde">yours, with this .48</saying>
+          <me_is who="somian">sends in CSI las vegas to clean up</me_is>
+          <saying who="rindolf">mortal5: what is your university?</saying>
+          <saying who="mortal5">rindolf, I'm too ashamed to tell :p</saying>
+          <saying who="rindolf">mortal5: heh.</saying>
+          <saying who="rindolf">mortal5: is it bad?</saying>
+          <saying who="mortal5">rindolf, no not really, we have a fairly well known cs dept</saying>
+          <saying who="somian">Just so long as it isn't SUNY@BUFFALO</saying>
+          <saying who="mortal5">it's just the teacher i'm using, she's a total flake</saying>
+        </body>
+        <info>
+            <channel>#perl</channel>
+            <network>Freenode</network>
+            <tagline>Misleading Textbooks about Perl</tagline>
+        </info>
+      </irc>
+    </fortune>
+    <fortune id="perl-dongs-and-everything-in-between">
+      <meta>
+        <title>Perl, dongs and everything between on Freenode's #perl</title>
+      </meta>
+      <irc>
+        <body>
+          <me_is who="CPAN">rating: Net-DNS-Check rated 4 stars by Ævar Arnfjörð Bjarmason</me_is>
+          <saying who="rindolf">Oooh! avar has rated a module.</saying>
+          <saying who="somian^{}">avar! WHAT ARE YOU DOING rating CPAN modules!?! Do you really think you are QUALIFIED to be doing that!?! ;-P</saying>
+          <me_is who="avar">dongs somian^{}</me_is>
+          <me_is who="somian^{}">laughs</me_is>
+          <saying who="avar">somian^{}: I'M A PROFESSIONAL PERL PROGRAMMER</saying>
+          <saying who="avar">I know PERL</saying>
+          <saying who="somian^{}">But can u mAke teh weB with teh PERL!?</saying>
+          <saying who="Earle_Martin">avar: I know DONGS</saying>
+          <saying who="avar">Earle_Martin: SHOW ME</saying>
+          <saying who="avar">Earle_Martin: Don't you mean DONG foo?</saying>
+          <me_is who="somian^{}">has a silly grin on his face as he decends the stairs to make some fresh coffee</me_is>
+          <saying who="avar">somian^{}: I maek teh web really well with PERL</saying>
+          <saying who="Earle_Martin">/DCC MATRIX avar</saying>
+          <saying who="avar">Earle_Martin: IT'S SO LARGE AND HARD!</saying>
+          <saying who="Earle_Martin">avar: You think that's milk you're drinking?</saying>
+          <saying who="f3ew">heh]</saying>
+          <saying who="avar">I was wondering why it was so delcicious</saying>
+          <saying who="avar">"I can't belive it's not jizz"</saying>
+          <saying who="f3ew">Take the red pill</saying>
+          <saying who="rfordinal_">blue!</saying>
+          <saying who="Earle_Martin">I know PERL: Programmer's Elite Robotic Language</saying>
+          <me_is who="avar">goes back to work</me_is>
+          <saying who="Shadow42">I wonder what would happen if Neo was colorblind and took the wrong pill.</saying>
+          <saying who="Earle_Martin">10 DO ROBOT DANCE</saying>
+          <saying who="Earle_Martin">20 GOTO 10</saying>
+          <saying who="avar">which doesn't involving discussing dongs in great detail, unfortunately</saying>
+          <saying who="Earle_Martin">avar: the real world sucks</saying>
+        </body>
+        <info>
+            <channel>#perl</channel>
+            <network>Freenode</network>
+            <tagline>Perl and Dongs on Freenode's #perl</tagline>
+        </info>
+      </irc>
+    </fortune>
+    <fortune id="n-uple-negative">
+      <meta>
+        <title>N-uple negative on Freenode's #perl</title>
+      </meta>
+      <irc>
+        <body>
+          <saying who="polak">mauke: so how does that "translate" into eng</saying>
+          <saying who="merlyn">"eng"?</saying>
+          <saying who="mauke">I spe eng goo</saying>
+          <saying who="rindolf">mauke: I spe eng wel</saying>
+          <saying who="rindolf">I spe goo eng</saying>
+          <saying who="sts">just a short question. besides personal preference is there any difference if you use if(! or unless(?</saying>
+          <saying who="rindolf">sts: no.</saying>
+          <saying who="rindolf">sts: they do the same thing.</saying>
+          <saying who="Botje">sts: pfft. Real Men(tm) use unless(!...)</saying>
+          <saying who="rindolf">Botje: heh.</saying>
+          <saying who="sts">lol unless(! makes sense. thanks Botje, i'll rather use this one. =D</saying>
+          <saying who="LeoNerd">For me it's a readability thing - I express what seems more likely</saying>
+          <saying who="rindolf">Botje: File::HomeDir used to have a triple or quadruple negative in one of its test files.</saying>
+          <saying who="Botje">unless(! $str !~ /(?!foo)/)</saying>
+          <saying who="rindolf">Botje: heh</saying>
+          <saying who="merlyn">whoa</saying>
+          <saying who="merlyn">unless (!) makes no sense to me at all</saying>
+          <saying who="Botje">of course not.</saying>
+          <saying who="sts">Botje: wow!</saying>
+          <saying who="Botje">it's still cool to confuse people with :]</saying>
+          <saying who="LeoNerd">Heh.. Should just use !!! in there anywa y:)</saying>
+          <saying who="merlyn">it's 7 characters too many</saying>
+          <saying who="xand">some people don't understand double negatives</saying>
+          <saying who="merlyn">I don't want no complaints!</saying>
+          <saying who="Botje">xand: you mean don't not understnad?</saying>
+          <saying who="LeoNerd">We don't know nobody who don't want no double-negatives</saying>
+          <saying who="sts">Botje: what does (?!foo) do?</saying>
+          <saying who="nanonyme">lol</saying>
+          <saying who="xand">Botje: don't not misunderstand</saying>
+          <saying who="mauke">Botje: that always executes the block</saying>
+          <saying who="merlyn">there's an argument that can be successfully made that "I don't want no complaints" doesn't necessarily work logically</saying>
+          <saying who="Botje">xand: oh, I don't not think I didn't not misunderstand you.</saying>
+          <saying who="Botje">mauke: I know. it just looks cool.</saying>
+          <saying who="mauke">and you want !($str !~ /.../)</saying>
+          <saying who="xand">don't you?#</saying>
+          <saying who="merlyn">so it might actually mean what people think they're meaning</saying>
+        </body>
+        <info>
+            <channel>#perl</channel>
+            <network>Freenode</network>
+            <tagline>N-uple negative on Freenode's #perl</tagline>
+        </info>
+      </irc>
+    </fortune>
+    <fortune id="my-os-is-better-than-yours">
+      <meta>
+        <title>My operating system is better than yours on Freenode's #perl</title>
+      </meta>
+      <irc>
+        <body>
+          <saying who="Yaakov">LINUX &lt; WINDOWS XP</saying>
+          <saying who="rindolf">Yaakov: Linux "&gt;" x Inf Windows XP</saying>
+          <saying who="rindolf">Yaakov: DOS &gt; Linux</saying>
+          <saying who="rindolf">Yaakov: CTSS &gt; Linux</saying>
+          <saying who="rindolf">Yaakov: TOPS-10 &gt; Linux</saying>
+          <saying who="rindolf">Multics &gt; Linux</saying>
+          <saying who="rindolf">Multics &gt; *</saying>
+          <saying who="rindolf">I think I'll stop.</saying>
+          <saying who="Supaplex">I think I'll /clear</saying>
+          <saying who="Kobaz">CP/M &gt; *</saying>
+          <saying who="rindolf">Kobaz: heh!</saying>
+          <saying who="rindolf">Kobaz++</saying>
+          <saying who="Kobaz">Heh.</saying>
+          <saying who="Kobaz">CP/M was teh sexy.</saying>
+          <saying who="Kobaz">How much more of an OS do you really need?</saying>
+          <saying who="Kobaz">I still have my Apple II sitting in the corner.</saying>
+        </body>
+        <info>
+            <channel>#perl</channel>
+            <network>Freenode</network>
+            <tagline>My Operating System is Better than Yours</tagline>
+        </info>
+
+      </irc>
+    </fortune>
+    <fortune id="many-types-of-wheels">
+      <meta>
+        <title>Freenode's #perl on the many types of Wheels.</title>
+      </meta>
+      <irc>
+        <body>
+          <saying who="rindolf">Mahmoud: what's up?</saying>
+          <saying who="Mahmoud">rindolf, writing a CMS from scratch with perl.. really cool, making my own template engine</saying>
+          <saying who="rindolf">Mahmoud: why???</saying>
+          <saying who="rindolf">Mahmoud: use TT2.</saying>
+          <saying who="rindolf">Or whatever.</saying>
+          <saying who="Mahmoud">rindolf, i dislike other CMS engines.. they are bloated and i don't trust them</saying>
+          <saying who="rindolf">Mahmoud: TT2 is pure perl.</saying>
+          <me_is who="Mahmoud">looks for TT2</me_is>
+          <saying who="rindolf">Mahmoud: a CMS doesn't stay simple forever.</saying>
+          <saying who="rindolf">Mahmoud: and a CMS != Templating system.</saying>
+          <saying who="Mahmoud">rindolf, the template engine is quite simple, it's similar to how SimpleMachines forum does its templates</saying>
+          <saying who="Mahmoud">rindolf, just an external file with print 'foo'; commands</saying>
+          <saying who="amnesiac">Mahmoud, TT2 is very powerful</saying>
+          <saying who="amnesiac">Mahmoud, there are more templating systems, why not use any ofo the existing ones?</saying>
+          <saying who="rindolf">Mahmoud: please don't re-invent square wheels.</saying>
+          <saying who="Mahmoud">heh..</saying>
+          <saying who="NOTevil">oval!</saying>
+          <me_is who="amnesiac">likes hexagonal wheels</me_is>
+          <saying who="NOTevil">very small octagon wheels aren't too bad.</saying>
+          <saying who="rindolf">amnesiac: triangular wheels are the best!</saying>
+          <saying who="Shaine">i like star shaped wheels :/</saying>
+        </body>
+        <info>
+            <channel>#perl</channel>
+            <network>Freenode</network>
+            <tagline>On the Many Types of Wheels</tagline>
+        </info>
+      </irc>
+    </fortune>
+    <fortune id="code-golf-pyramid">
+      <meta>
+        <title>The Pyramid of Code Golf on Freenode's #perl</title>
+      </meta>
+      <irc>
+        <body>
+          <saying who="ferret">LeoNerd: That was one of the first blobs of Java I wrote, it's allowed to be even more verbose and convoluted than Java normally is. ;P</saying>
+          <saying who="rindolf">ferret: link?</saying>
+          <saying who="ferret">/las Cat.java</saying>
+          <saying who="rindolf">ferret: an implementation of the UNIX "cat" program in Java??</saying>
+          <saying who="ferret">Actually, specifically the GNU cat program, and only a subset thereof.</saying>
+          <saying who="rindolf">ferret: oh.</saying>
+          <saying who="rindolf">ferret: how many lines did it take?</saying>
+          <me_is who="f00li5h">heads off to #codegolf and tries to convince them to allow java submissions</me_is>
+          <saying who="ferret">rindolf: It's mostly argument parser.</saying>
+          <saying who="rindolf">ferret: I once implemented a parser for a subset of the Bourne Shell args, in really hideous ANSI C.</saying>
+          <saying who="rindolf">f00li5h: good luck.</saying>
+          <saying who="rindolf">f00li5h: Java Golf...</saying>
+          <saying who="f00li5h">yeah, for sure!</saying>
+          <saying who="rindolf">Java Golf would be longer than a non-Golfed Perl program.</saying>
+          <saying who="f00li5h">rindolf: this is true</saying>
+          <saying who="rindolf">f00li5h: COBOL Golf!</saying>
+        </body>
+        <info>
+            <channel>#perl</channel>
+            <network>Freenode</network>
+            <tagline>The Pyramid of Code Golf</tagline>
+        </info>
+      </irc>
+    </fortune>
+    <fortune id="scary-perl-expertise">
+      <meta>
+        <title>Scary Perl Expertise on Freenode's #perl</title>
+      </meta>
+      <irc>
+        <body>
+          <saying who="pasteling">"struggling intern" at 129.162.1.31 pasted "Here it is.." (220 lines, 5.7K) at http://sial.org/pbot/25279</saying>
+          <saying who="strugglingintern">woohoo</saying>
+          <saying who="strugglingintern">there it goes...</saying>
+          <saying who="rindolf">strugglingintern: oh my god!</saying>
+          <saying who="rindolf">strugglingintern: this code looks really bad.</saying>
+          <saying who="strugglingintern">heh...</saying>
+          <saying who="rindolf">strugglingintern: if ($records eq 0 ) - don't you want ($records == 0)?</saying>
+          <saying who="rindolf">strugglingintern: do you have unit tests?</saying>
+          <saying who="rindolf">strugglingintern: and you should factor it better.</saying>
+          <saying who="rindolf">strugglingintern: and possibly use Template Toolkit or something.</saying>
+          <saying who="rindolf">strugglingintern: and you may have some HTML-injection (or XSS) problems.</saying>
+          <saying who="Ani-_">rindolf: and probably SQL injection problems.</saying>
+          <saying who="rindolf">Ani-_: indeed!</saying>
+          <saying who="strugglingintern">:-/</saying>
+          <saying who="Ani-_">strugglingintern: really, ask them to review that code when they get back.</saying>
+          <saying who="strugglingintern">alright</saying>
+          <saying who="strugglingintern">I appreciate it anyway</saying>
+          <saying who="rindolf">strugglingintern: how long have you been programming perl?</saying>
+          <saying who="strugglingintern">hah, about 3 months</saying>
+          <saying who="strugglingintern">This isn't all my code ;)</saying>
+          <saying who="strugglingintern">I'll look into it</saying>
+          <saying who="strugglingintern">Thanks guys (and gals).</saying>
+          <saying who="rindolf">strugglingintern: you're welcome.</saying>
+          <saying who="strugglingintern">not my choice ;)</saying>
+          <saying who="strugglingintern">it's my 3rd week here :)</saying>
+          <saying who="rindolf">Amazing how much more experienced programmers can tell a code is bad from a quick glance.</saying>
+          <saying who="rindolf">It's a bit scary.</saying>
+          <saying who="Ani-_">nothing amazing about it. It's called skill. :)</saying>
+          <saying who="The_SB">yeh even I can tell it by a look</saying>
+          <saying who="ology">It's not scary or amazing at all.</saying>
+          <saying who="ology">It is called experience!</saying>
+          <saying who="Ani-_">rindolf: what do you find scary?</saying>
+          <saying who="Ani-_">rindolf: that experienced programmers can tell it? Or the code itself?</saying>
+          <saying who="Ani-_">I would disagree on the first one but agree on the later! :)</saying>
+          <saying who="rindolf">Ani-_: no, that I'm so experienced.</saying>
+          <saying who="rindolf">Ani-_: I hope I don't sound out as a snob.</saying>
+          <saying who="ology">narcissism is fun</saying>
+          <saying who="rindolf">I should get a life.</saying>
+          <saying who="rindolf">Get a girlfriend, go to movies.</saying>
+          <saying who="rindolf">Instead all I do is write Perl.</saying>
+          <saying who="rindolf">And chat about writing Perl.</saying>
+          <saying who="Ikarus">a life, tried that, didn't mix with me</saying>
+        </body>
+        <info>
+            <channel>#perl</channel>
+            <network>Freenode</network>
+            <tagline>Scary Perl Expertise</tagline>
+        </info>
+      </irc>
+    </fortune>
+    <fortune id="sharp-perl-to-wikipedia">
+      <meta>
+        <title>(Human) Language Fun on Freenode's #perl</title>
+      </meta>
+      <irc>
+        <body>
+          <saying who="rindolf">Let me wikipedia it.</saying>
+          <saying who="f00li5h">so now wikipedia is a verb?</saying>
+          <saying who="rindolf">f00li5h: it's gonna enter the OED.</saying>
+          <saying who="rindolf">f00li5h: in English every verb can be nounified and every noun can be verbed.</saying>
+          <saying who="rindolf">f00li5h: google is now a verb too.</saying>
+          <saying who="f00li5h">rindolf: q{ just one second and i'll "computer" it up for you"}</saying>
+          <saying who="rindolf">f00li5h: LOL.</saying>
+          <saying who="rindolf">f00li5h++</saying>
+          <me_is who="rindolf">f00li5hes jql</me_is>
+          <saying who="rindolf">I'm rindolfed</saying>
+          <me_is who="f00li5h">finds it odd that irssi hilighted half of that word</me_is>
+          <saying who="rindolf">f00li5h: it's much harder to do it in Hebrew.</saying>
+          <saying who="jql">computer is from the verb compute already</saying>
+          <saying who="rindolf">jql: there's computerise though.</saying>
+          <saying who="f00li5h">jql: but to computer something is different than computing it</saying>
+          <saying who="f00li5h">COMPUTIFY!</saying>
+          <saying who="rindolf">jql: I once thought that the study of Objectivity is Objectivism.</saying>
+          <saying who="f00li5h">"configurated"</saying>
+          <saying who="jql">you shouldn't noun up a verb that's been nouned already</saying>
+          <saying who="rindolf">And the study of Objectivism is Objectivistalism.</saying>
+          <saying who="Caelum">heh</saying>
+          <saying who="rindolf">And that study of that is Objectvisitalistalism.</saying>
+          <saying who="rindolf">And to infinity it's Objectivist-elementalism!</saying>
+          <saying who="f00li5h">eval: object .((ism)x100)</saying>
+          <saying who="buubot">f00li5h: objectismismismismismismismismismismismismismismismismismismismism ismismismismismismismismismismismismismismismismismismismismismism ismismismismismismismismismismismismismismismismismismismi</saying>
+          <saying who="rindolf">With apologies to the 4 people who ever spoke Latin correctly.</saying>
+          <saying who="jql">I can't help but read that as smi smi smi</saying>
+          <saying who="Caelum">me too</saying>
+          <saying who="rindolf">jql: reminds me of Peter Pan. </saying>
+        </body>
+        <info>
+            <channel>#perl</channel>
+            <network>Freenode</network>
+            <tagline>(Human) Language Fun on Freenode's #perl</tagline>
+        </info>
+      </irc>
+    </fortune>
+    <fortune id="how-many-clicks">
+      <meta>
+        <title>How many clicks must a one man do, before he selects what he wants on Freenode's #perl.</title>
+      </meta>
+      <irc>
+        <body>
+          <saying who="dkr">I use nedit, the only app with a quadruple-click feature</saying>
+          <saying who="naquad">wtf is quadruple-click??? %-/</saying>
+          <saying who="dkr">double-click selects a word, triple-click selects a line, quadruple-click select the whole document. heh :)</saying>
+          <saying who="Patterner">quintuple-click selects the whole harddisk</saying>
+          <saying who="rindolf">hexuple-click selects the entire Intranet.</saying>
+          <saying who="rindolf">And septapable-click selects the entire Internet</saying>
+          <saying who="Patterner">How many for the multiverse?</saying>
+          <saying who="naquad">people, who uses what editor?</saying>
+          <saying who="arw">octaple click selects the known universe and nonaple the rest too.</saying>
+          <saying who="rindolf">arw: how long does it takes these clicks to run?</saying>
+          <saying who="rindolf">I think it's super-exponential complexity.</saying>
+          <saying who="arw">rindolf: no matter, the universe is finite :)</saying>
+          <saying who="arw">rindolf: only problem is, the information about your clicking will never reach the entire universe as it expands ;)</saying>
+        </body>
+        <info>
+            <channel>#perl</channel>
+            <network>Freenode</network>
+            <tagline>How many clicks must a one man do, before he selects what he wants?</tagline>
+        </info>
+      </irc>
+    </fortune>
+    <fortune id="sharp-perl-meaning-of-I">
+      <meta>
+        <title>The meaning of "I" on Freenode's #perl.</title>
+      </meta>
+      <irc>
+        <body>
+          <me_is who="reflexive">huzzahs. His Perl books just arrived.</me_is>
+          <saying who="apeiron">reflexive, Which?</saying>
+          <saying who="reflexive">apeiron: IP and PBP. A couple others are still in transit.</saying>
+          <saying who="apeiron">reflexive, Nice. :)</saying>
+          <saying who="reflexive">:)</saying>
+          <saying who="rindolf">reflexive: what is IP?</saying>
+          <saying who="reflexive">Intermediate Perl.</saying>
+          <saying who="rindolf">reflexive: oh, OK.</saying>
+          <saying who="rindolf">Intellectual Perl.</saying>
+          <saying who="rindolf">Internet Perl.</saying>
+          <saying who="kojiro">Invasive Perl</saying>
+          <saying who="kspath">Idiot Perl</saying>
+          <saying who="rindolf">Interactive Perl.</saying>
+          <saying who="rindolf">I, Perl.</saying>
+          <saying who="kojiro">Implementing Pies</saying>
+          <saying who="kojiro">mmm, pie</saying>
+          <saying who="rindolf">Improbably Perl</saying>
+          <saying who="kspath">Ignoble Perl</saying>
+          <saying who="kojiro">Probably Inverted</saying>
+          <saying who="rindolf">kojiro: :-)</saying>
+          <saying who="kspath">Improper Perl</saying>
+          <saying who="reflexive">Insidious Perl?</saying>
+          <saying who="mst">ALL PERL IS IMPROPER</saying>
+          <saying who="kojiro">API?</saying>
+          <saying who="rindolf">In Soviet Russia all improper is Perl.</saying>
+          <saying who="rindolf">APII.</saying>
+          <saying who="qrck">impudent perl</saying>
+          <saying who="kojiro">no, you never count words like "is"</saying>
+          <saying who="kspath">Incoherent Perl</saying>
+          <saying who="kojiro">ALL PERL IS INCOHERENT</saying>
+          <saying who="reflexive">So true.</saying>
+        </body>
+        <info>
+            <channel>#perl</channel>
+            <network>Freenode</network>
+            <tagline>The Meaning of "I".</tagline>
+        </info>
+      </irc>
+    </fortune>
+    <fortune id="sharp-perl-got-the-slashdot">
+      <meta>
+        <title>Got the Slashdot? on Freenode's #perl.</title>
+      </meta>
+      <irc>
+        <body>
+          <saying who="dkr">which is that ACME:: filter that obfusctaes all your source into whitespace? :)</saying>
+          <saying who="preaction">Acme::Bleach</saying>
+          <saying who="rindolf">dkr: as preaction said it is Acme::Bleach.</saying>
+          <saying who="dkr">moderation -1 Redundant</saying>
+          <me_is who="dkr">smirks</me_is>
+          <saying who="nws">get out you slashdotter</saying>
+          <saying who="nws">jk</saying>
+          <saying who="dkr">I got moderated overrated yesterday. I felt so loved</saying>
+          <saying who="dkr">GumbyGumby: how often do you post to /.?</saying>
+          <saying who="GumbyGumby">dkr: do it to system() a ssh command. Is doing that often.</saying>
+          <saying who="rindolf">GumbyBRAIN: how often do you post dkr to Slashdot?</saying>
+          <saying who="GumbyBRAIN">do it to list.</saying>
+        </body>
+        <info>
+            <channel>#perl</channel>
+            <network>Freenode</network>
+            <tagline>Got the Slashdot?</tagline>
+        </info>
+      </irc>
+    </fortune>
+    <fortune id="sharp-perl-whats-in-a-var-name">
+      <meta>
+        <title>What's in a variable-name? on Freenode's #perl.</title>
+      </meta>
+      <irc>
+        <body>
+          <saying who="WebDragon">y'all should spell it in uppercase it being an acronym and all</saying>
+          <saying who="reaction">Yes, but we're *lazy*!</saying>
+          <me_is who="WebDragon">*so* noticed ;)</me_is>
+          <saying who="dkr">WebDragon: people that use CamelCase have no right to criticize about capitalization. :)</saying>
+          <saying who="WebDragon">dkr: I hate underscores</saying>
+          <me_is who="dkr">contemplates a source code filter that does lets you use spaces in var names by switch them to underscores at compile time</me_is>
+          <saying who="preaction">black magic</saying>
+          <saying who="mst">dkr: source filters are evil.</saying>
+          <saying who="mst">dkr: in a bad way.</saying>
+          <saying who="mst">dkr: hacking the compiler is much more fun, and evil in a useful way :)</saying>
+          <saying who="mst">WebDragon: recommended perl style is $var_name</saying>
+          <saying who="mst">WebDragon: it's also more readable than $varName or $VarName</saying>
+          <saying who="mst">WebDragon: I'd recommend trying it for at least a month</saying>
+          <saying who="mst">WebDragon: also note that it'll make life easier because you'll be consistent with the rest of perl code</saying>
+          <saying who="WebDragon">mst: I was thinking more along the lines of filenames and irc nicknames than perl variables</saying>
+          <saying who="mst">WebDragon: ah. fair enough :)</saying>
+          <me_is who="WebDragon">doesn't use camelcase for perlvars</me_is>
+          <saying who="mst">WebDragon: then I shall cease complaining :)</saying>
+          <saying who="avar">${"Insert a descriptive essay about the variable here"}</saying>
+          <saying who="WebDragon">rofl</saying>
+          <saying who="rindolf">avar: that won't work with 'use strict 'refs''</saying>
+          <saying who="WebDragon">avar: I've seen things like that in RL and had recurring nightmares about them when I saw similar and sometimes worse things on thedailywtf.com</saying>
+          <saying who="mst">rindolf: ${main::}{"Insert a descriptive essay about the variable here"} would :)</saying>
+          <saying who="mst">rindolf: or you could just use %_ :)</saying>
+          <saying who="dkr">my boss still occasionally uses vars like $x. still trying to beat that behavior out of him</saying>
+          <me_is who="WebDragon">only uses x|y|z for cartesian coordinate math</me_is>
+          <saying who="WebDragon">which, since I hardly ever do any of that, means the obvious</saying>
+        </body>
+        <info>
+            <channel>#perl</channel>
+            <network>Freenode</network>
+            <tagline>What's in a variable name?</tagline>
+        </info>
+      </irc>
+    </fortune>
+    <fortune id="sharp-perlcafe-watched-the-fountain">
+      <meta>
+        <title>Watched the fountain on Freenode's #perlcafe</title>
+      </meta>
+      <irc>
+        <body>
+          <saying who="mofino">watched the Fountain</saying>
+          <saying who="mofino">pretty cool'</saying>
+          <saying who="q[ender]">yep</saying>
+          <saying who="sili">what?</saying>
+          <saying who="sili">you think The Fountain was cool?</saying>
+          <saying who="sili">it was pretty artsy.</saying>
+          <saying who="sili">I don't understand the necessity of repeating that same scene 50k times, though.</saying>
+          <saying who="mofino">then you didn't get the movie</saying>
+          <saying who="rindolf">sili: if you repeat a scene 50k times, then the movie will have less entropy and will compress better.</saying>
+        </body>
+        <info>
+            <channel>#perl</channel>
+            <network>Freenode</network>
+            <tagline>Watched the fountain on Freenode's #perlcafe</tagline>
+        </info>
+      </irc>
+    </fortune>
+    <fortune id="commitment-to-prog-langs">
+      <meta>
+        <title>Commiting yourself to a programming language on Freenode's #perl.</title>
+      </meta>
+      <irc>
+        <body>
+          <saying who="convivial">high-rez, but I don't know enough to help you because I am a newbie to perl programming and although I am in deep luv with perl and planning on marrying perl, I still have a lot to learn.</saying>
+          <saying who="rindolf">convivial: you can only marry Perl if polygamy is legal where you live.</saying>
+          <saying who="rindolf">convivial: because Perl and I are already married. :-D</saying>
+          <saying who="convivial">why is that? i'm single :)</saying>
+          <saying who="rindolf">convivial: but Perl isn't.</saying>
+          <saying who="convivial">oh crap !</saying>
+          <saying who="convivial">all the good languages are already married :(</saying>
+          <saying who="rindolf">convivial: COBOL is still single.</saying>
+          <saying who="rindolf">convivial: but I heard she's a total bitch.</saying>
+          <saying who="convivial">ewwwwwwwwwwww, so is JCL and no one is knocking down either of their doors</saying>
+          <saying who="convivial">rindolf, janet reno is single!</saying>
+          <saying who="rindolf">convivial: what kind of programming language is "Janet Reno"?</saying>
+          <saying who="convivial">:)</saying>
+          <saying who="convivial">she is a person</saying>
+          <saying who="rindolf">convivial: I'm not interested in people, I'm only interested in programming languages.</saying>
+          <saying who="shaldannon">rindolf: you should try Ada</saying>
+          <saying who="rindolf">shaldannon: Ada 95?</saying>
+          <saying who="shaldannon">yeah</saying>
+          <saying who="shaldannon">the syntax of Pascal, the power of Basic and the friendliness of Java</saying>
+        </body>
+        <info>
+            <channel>#perl</channel>
+            <network>Freenode</network>
+            <tagline>Commiting yourself to a programming language on Freenode's #perl.</tagline>
+        </info>
+      </irc>
+    </fortune>
+</list>
+</collection>

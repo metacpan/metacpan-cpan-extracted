@@ -1,0 +1,40 @@
+---
+abstract: 'A set of modules and procedures to supervise processes'
+author:
+  - 'Kevin L. Esteb <kevin@kesteb.us>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4001, CPAN::Meta::Converter version 2.120351'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: XAS-Supervisor
+provides:
+  XAS::Apps::Supervisor::Client:
+    file: lib/XAS/Apps/Supervisor/Client.pm
+    version: 0
+  XAS::Apps::Supervisor::Monitor:
+    file: lib/XAS/Apps/Supervisor/Monitor.pm
+    version: 0.01
+  XAS::Supervisor:
+    file: lib/XAS/Supervisor.pm
+    version: 0.01
+  XAS::Supervisor::Client:
+    file: lib/XAS/Supervisor/Client.pm
+    version: 0.01
+  XAS::Supervisor::Controller:
+    file: lib/XAS/Supervisor/Controller.pm
+    version: 0.01
+  XAS::Supervisor::Monitor:
+    file: lib/XAS/Supervisor/Monitor.pm
+    version: 0.01
+requires:
+  XAS: 0.12
+resources:
+  homepage: http://scm.kesteb.us/trac
+  repository: http://scm.kesteb.us/git/XAS-Supervisor
+version: 0.01

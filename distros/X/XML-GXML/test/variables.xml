@@ -1,0 +1,51 @@
+<variables>
+
+<!-- test file for variables.pl -->
+
+<!-- declare some elements -->
+<a>dog</a>
+<b>cat</b>
+
+<!-- test by getting the value of a and b -->
+a is %%%a%%%, b is %%%b%%%
+
+<!-- if there are multiple instances of an element, the first
+     will be used. To demonstrate, we'll add another "a" element
+     here. If you need to do stuff with each possible value of
+     a variable, see the gxml:foreach command. -->
+<a>penguin</a>
+
+a is %%%a%%%, b is %%%b%%%
+
+<!-- vars can be either elements (as with a and b above) or things
+     declared in the start tag of an enclosing entity. -->
+<thing c="horse">
+a is %%%a%%%, b is %%%b%%%, c is %%%c%%%
+</thing>
+
+<!-- note that normal scoping rules apply; c above is only in scope
+     within the "thing" entity, so it's not in scope here anymore. -->
+a is %%%a%%%, b is %%%b%%%, c is %%%c%%%
+
+<!-- that said, you can drill down using a special syntax: "thing:c"
+     will get us the value. -->
+a is %%%a%%%, b is %%%b%%%, thing:c is %%%thing:c%%%
+
+<!-- now let's get even weirder: -->
+<thing2>
+  <creatures>
+    <reptile>gecko</reptile>
+    <reptile>skink</reptile>
+    <reptile>iguana</reptile>
+  </creatures>
+</thing2>
+
+thing2:creatures:reptile is %%%thing2:creatures:reptile%%%
+
+<!-- for demonstration, let's use a foreach to enumerate the reptiles: -->
+
+<gxml:foreach expr="thing2:creatures:reptile">
+  I see a reptile: %%%thing2:creatures:reptile%%%
+</gxml:foreach>
+
+</variables>

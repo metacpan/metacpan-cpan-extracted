@@ -1,0 +1,36 @@
+XML/DocStats version 0.01
+=============================
+
+XML::DocStats parses an xml document using a SAX handler built
+using Ken MacLeod's XML::Parser::PerlSAX. It produces a listing
+indented to show the element heirarchy, and collects counts of
+various xml components along the way. A summary of the counts is
+produced following the conclusion of the parse. This is useful to
+visualize the structure and content of an XML document.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+XML::Parser::PerlSAX, XML::Parser, 
+Object::_Initializer (included in distribution).
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2001-2002 Alan Dickey
+All rights reserved.
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+

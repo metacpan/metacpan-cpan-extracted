@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:creativeCommons="http://backend.userland.com/creativeCommonsRssModule">
+  <channel>
+    <title>my little example feed</title>
+    <link>http://www.example.com/</link>
+    <description>example tagline</description>
+    <language>en</language>
+    <creativeCommons:license>FEED RIGHTS</creativeCommons:license>
+  <item>
+    <title>First post</title>
+    <link>http://www.example.com/archives/1</link>
+    <description>First post!</description>
+    <category>ENTRY CATEGORY</category>
+    <source>ENTRY SOURCE</source>
+    <expirationDate>ENTRY VALID</expirationDate>
+  </item>
+  </channel>
+</rss>

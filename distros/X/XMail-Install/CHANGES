@@ -1,0 +1,11 @@
+Revision history for Perl extension XMail::Install.
+
+1.01  Thu May 01 10:18:00 2008
+	- Rename Changes.txt to CHANGES
+	- Fix errors in the documentation. The POD was cut-and-pasted from another module,
+	  and not all traces of the old module were removed
+	- Change docs now that we only ship Unix-style distros
+	- Change docs to clarify how to call new()
+
+1.00  Tue Jan 09 11:30:45 2007
+	- Original version

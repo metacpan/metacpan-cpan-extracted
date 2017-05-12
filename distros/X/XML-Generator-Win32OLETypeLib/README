@@ -1,0 +1,25 @@
+XML::Generator::Win32OLETypeLib
+===============================
+
+This module allows you to query the Win32 COM database and return
+an XML representation (via SAX) of your object(s) properties and
+methods. It is based on some code from Jan Dubois to do something
+similar to build a web-based COM database browser.
+
+The only requirement is Win32::OLE (so it only works on Win32),
+but you will probably want some way of showing the XML
+generated, so XML::Handler::YAWriter would be your best option.
+
+Alternatively you can feed the results directly into XML::LibXML
+via the SAX builder. You can get a Win32 build of XML::LibXML
+from Randy Kobes' repository:
+
+C:\> ppm
+ppm> set repository RK http://theoryx5.uwinnipeg.ca/ppmpackages/
+ppm> set save
+ppm> install XML::LibXML
+
+This module is released as free software, under the same terms
+as Perl itself. It is copyright 2001 MessageLabs Limited, and
+with kind thanks to them for allowing me to release it.
+

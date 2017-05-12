@@ -1,0 +1,19 @@
+<stx:transform version="1.0" 
+	       xmlns:stx="http://stx.sourceforge.net/2002/ns"
+	       xmlns="ns:def"
+	       xmlns:p1="ns:p1"
+	       xmlns:p2="ns:p2"
+	       strip-space="yes">
+
+  <stx:namespace-alias stylesheet-prefix="p1" result-prefix="stx"/>
+  <stx:namespace-alias stylesheet-prefix="#default" result-prefix="p2"/>
+  <stx:namespace-alias stylesheet-prefix="p2" result-prefix="p1"/>
+
+  <stx:template match="/root">
+    <p1:r>
+      <n/>
+      <p2:n p1:a1="c" a2="d"/>
+    </p1:r>
+  </stx:template>
+
+</stx:transform>

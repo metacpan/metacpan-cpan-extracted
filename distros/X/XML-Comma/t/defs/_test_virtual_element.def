@@ -1,0 +1,85 @@
+<DocumentDefinition>
+  <name>_test_virtual_element</name>
+
+  <element>
+    <name>first</name>
+    <def_hook>
+      <![CDATA[ 
+        $self->def_pnotes()->{first_value} = 'plop'; 
+      ]]>
+    </def_hook>
+  </element>
+
+  <element><name>second</name></element>
+
+  <element>
+    <name>third</name>
+    <set_hook>
+    <![CDATA[
+    sub {
+      my ( $self, $content_ref, $args ) = @_;
+      $$content_ref = $args->{value};
+    }
+    ]]>
+    </set_hook>
+  </element>
+
+  <method>
+  <name>both</name>
+  <code>
+    <![CDATA[
+    sub {
+      my $self = shift();
+      return $self->element('first')->get() . $self->element('second')->get();
+    }
+    ]]>
+  </code>
+  </method>
+
+  <method>
+  <name>test_args</name>
+  <code>
+    <![CDATA[
+    sub {
+      my ( $self, $arg1, $arg2 ) = @_;
+      $self->element('first')->set($arg1);
+      $self->element('second')->set($arg2);
+      return 1;
+    }
+    ]]>
+  </code>
+  </method>
+
+  <element><name>plu</name></element>
+
+  <nested_element>
+    <name>nested_sing</name>
+    <element><name>ns_inside</name></element>
+  </nested_element>
+
+  <nested_element>
+    <name>nested_plu</name>
+    <element><name>np_inside</name></element>
+  </nested_element>
+
+  <element>
+    <name>looks_at_firsts_pnotes</name>
+    <method>
+      <name>pn</name>
+      <code>
+        <![CDATA[
+          sub { return XML::Comma->def_pnotes('_test_virtual_element:first'); }
+        ]]>
+      </code>
+    </method>
+  </element>
+
+  <plural>'plu','nested_plu'</plural>
+
+  <def_hook>
+    <![CDATA[ 
+      $self->def_pnotes()->{test} = 'ok';
+    ]]>
+  </def_hook>
+
+</DocumentDefinition>

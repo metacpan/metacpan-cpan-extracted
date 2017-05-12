@@ -1,0 +1,29 @@
+Revision history for Perl extension XML::XOXO.
+
+0.034 Apr 15 2005
+    - Fixed condition where XPath queries on attributes that may not 
+      be present would generate undefined variable warnings.
+    - Code clean-up.
+
+0.033 Jan 08 2005
+    - Documentation fixes
+
+0.032 Jan 07 2005
+    - Signals were crossed and 0.31 got blocked from entry into CPAN.
+    - Merged tests from 0.03 and documentation from 0.31
+
+0.031 Jan 07 2005
+	- Documentation.
+
+0.03  Dec 31 2004
+	- Added as_xml to XML::XOXO::Node
+	- Numerous tweaks.
+    - Added tests (Ian Kellan)
+	- Initial release into CPAN by Ian (Jan 07 2005)
+
+0.02  Dec 30 2004
+	- Converted XML::Parse::Style::XOXO to XML::Parser subclass 
+	  XML::XOXO::Parser
+
+0.01  Dec 30 2004
+	- Initial version. Private use only.

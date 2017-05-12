@@ -1,0 +1,66 @@
+<?xml version="1.0"?><rdf:RDF
+xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+xmlns="http://my.netscape.com/rdf/simple/0.9/">
+
+  <channel>
+    <title>Slashdot:News for Nerds. Stuff that Matters.</title>
+    <link>http://slashdot.org/</link>
+    <description>News for Nerds.  Stuff that Matters</description>
+  </channel>
+
+  <image>
+    <title>Slashdot</title>
+    <url>http://slashdot.org/images/slashdotlg.gif</url>
+    <link>http://slashdot.org</link>
+  </image>
+
+  <item>
+    <title>Red Hat Tightening Trademarks?</title>
+    <link>http://slashdot.org/articles/99/09/01/0943219.shtml</link>
+  </item>
+
+  <item>
+    <title>Scientists map schematic of brain's fibers</title>
+    <link>http://slashdot.org/articles/99/09/01/1429226.shtml</link>
+  </item>
+
+  <item>
+    <title>More Mission-Critical Linux</title>
+    <link>http://slashdot.org/articles/99/09/01/1827215.shtml</link>
+  </item>
+
+  <item>
+    <title>Amiga's president unexpectedly resigns</title>
+    <link>http://slashdot.org/articles/99/09/01/1856251.shtml</link>
+  </item>
+
+  <item>
+    <title>XFree86 3.3.5 released</title>
+    <link>http://slashdot.org/articles/99/09/01/0716233.shtml</link>
+  </item>
+
+  <item>
+    <title>GT Interactive Sued for piracy</title>
+    <link>http://slashdot.org/articles/99/09/01/1347204.shtml</link>
+  </item>
+
+  <item>
+    <title>ProjectUDI spec goes 1.0</title>
+    <link>http://slashdot.org/articles/99/09/01/1430242.shtml</link>
+  </item>
+
+  <item>
+    <title>Chad Davis May Be the Next Kevin Mitnick</title>
+    <link>http://slashdot.org/articles/99/09/01/1547226.shtml</link>
+  </item>
+
+  <item>
+    <title>Clearing up FreeBSD confusion</title>
+    <link>http://slashdot.org/articles/99/09/01/141247.shtml</link>
+  </item>
+
+  <item>
+    <title>Linuxcare and Sun partner on StarOffice for Linux</title>
+    <link>http://slashdot.org/articles/99/09/01/1333220.shtml</link>
+  </item>
+</rdf:RDF>

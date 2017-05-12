@@ -1,0 +1,572 @@
+Revision history for XML-Reader
+
+0.65 - 2014-12-28T09:24:30+01:00
+
+  [DOCUMENTATION]
+
+  - Migrate to Dist::Zilla
+
+0.64 - 2014-08-24T18:23:41+01:00
+
+  [DOCUMENTATION]
+
+  - Add a .gitignore file (suggested by Gabor SZABO)
+
+  - Specify the actual version for the depenency Acme::HTTP in Makefile.PL
+
+0.63 - 2014-08-23T15:55:12+01:00
+
+  [DOCUMENTATION]
+
+  - Changelog dates are better written as YYYY.MM.DD and probably ordered in
+    the other, descending, direction (suggested by Gabor SZABO)
+    Remark: I have decided to follow the ISO 8601 standard at
+    http://www.w3.org/TR/NOTE-datetime
+
+0.62 - 2014-08-23T12:49:55+01:00
+
+  [DOCUMENTATION]
+
+  - Just use a Makefile.PL and not a Build.PL the latter does not have any
+    added value any more (suggested by Gabor SZABO)
+
+  - In Makefile.PL ==> meta files link to repository (suggested by Gabor SZABO)
+
+0.61 - 2014-08-22T10:41:06+01:00
+
+  [ENHANCEMENTS]
+
+  - Reflect latest changes in Acme::HTTP that make Acme::HTTP require
+    Net::HTTP/S::NB dynamically
+
+0.60 - 2014-08-22T08:39:19+01:00
+
+  [ENHANCEMENTS]
+
+  - Reflect latest changes in Acme::HTTP that returns a correctly blessed
+    Acme::HTTP object, also there is now more data abstraction in Acme::HTTP using
+    getter and setter subroutines
+
+0.59 - 2014-08-21T10:53:28+01:00
+
+  [ENHANCEMENTS]
+
+  - Reflect latest changes in Acme::HTTP that allows non-blocking read
+
+0.58 - 2014-08-19T09:25:15+01:00
+
+  [BUG FIX]
+
+  - Error correction in get_token(): Change the existing if-statement:
+    if (ref($self->NB_fh) eq 'Net::HTTP')
+    into
+    if (ref($self->NB_fh) eq 'Net::HTTP' or ref($self->NB_fh) eq 'Net::HTTPS')
+
+  [DOCUMENTATION]
+
+  - update the documentation and test cases
+
+0.57 - 2014-08-18T19:48:15+01:00
+
+  [ENHANCEMENTS]
+
+  - Allow a simple conditional [@attr="value"] inside a path expression,
+    for example { root => '/abs/sub1[@name="alpha"]/sub2',
+    branch => [ 'path3[@id="t1"]/path4', 'path5/path6/@code="data"' ] }
+
+0.56 - 2014-08-18T17:57:07+01:00
+
+  [ENHANCEMENTS]
+
+  - allow the branch section to contain sub-paths that don't start with slash
+    before: { root => '/abs/sub1/sub2', branch => [ '/path3/path4', '/path5/path6' ] }
+    after:  { root => '/abs/sub1/sub2', branch => [ 'path3/path4', 'path5/path6' ] }
+
+0.55 - 2014-08-18T13:24:47+01:00
+
+  [ENHANCEMENTS]
+
+  - replace the comple time "use Acme::HTTP" by the run time "require Acme::HTTP"
+
+0.54 - 2014-08-17T16:17:50+01:00
+
+  [ENHANCEMENTS]
+
+  - introduce Acme::HTTP
+
+0.53 - 2014-08-13T15:10:37+01:00
+
+  [DOCUMENTATION]
+
+  - This entry (0.53) only exists because I have forgotten to put in a changes entry
+    in the previous version (0.52)
+
+0.52 - 2014-08-12T16:02:50+01:00
+
+  [DOCUMENTATION]
+
+  - I had forgotten to change another thing in the documentation (since 0.40, 24 Jun 2012):
+    use XML::Reader; should be spelled: use XML::Reader qw(XML::Parser);
+
+0.51 - 2014-08-09T12:07:58+01:00
+
+  [BUG FIX]
+
+  - Fix a typing error in the POD documentation: "...an URL..." ==> "...a URL..."
+
+0.50 - 2014-08-08T17:50:47+01:00
+
+  [ENHANCEMENTS]
+
+  - Add the possibility of reading http (using Net::HTTP)
+
+0.49 - 2012-08-09T14:24:35+01:00
+
+  [ENHANCEMENTS]
+
+  - Make "use XML::Reader" (without any arguments) not load any of the modules "XML::Parser"
+    or "XML::Parsepp".
+
+0.48 - 2012-08-09T09:38:38+01:00
+
+  [DOCUMENTATION]
+
+  - Refactor Test cases in XML::Reader::Testcases.
+
+0.47 - 2012-08-07T17:12:59+01:00
+
+  [DOCUMENTATION]
+
+  - Remove the dependencies on XML::Parser and XML::Parsepp and refactor/move the tests
+    out into XML::Reader::Testcases. The tests will later be called by the new modules
+    XML::Reader::PP and by XML::Reader::RS
+
+  [BUG FIX]
+
+  - Yet more error correction in the code that allows { root => '/' }
+    with { filter => 5 } ==> slurp_xml()
+
+0.46 - 2012-08-06T10:06:18+01:00
+
+  [BUG FIX]
+
+  - Error correction in the code that allows { root => '/' } with { filter => 5 } / slurp_xml()
+
+0.45 - 2012-08-05T09:42:57+01:00
+
+  [REFACTORING]
+
+  - Refactor the code that allows { root => '/' } with { filter => 5 } / slurp_xml()
+
+0.44 - 2012-08-04T17:13:43+01:00
+
+  [ENHANCEMENTS]
+
+  - Allow { dupatt => '|' } with slurp_xml()
+
+  - Allow { root => '/' } with { filter => 5 } / slurp_xml()
+
+0.43 - 2012-08-04T12:21:12+01:00
+
+  [ENHANCEMENTS]
+
+  - Add a new option "dupatt" to XML::Reader->new() to allow for duplicate
+    attributes: (only valid when used in conjunction with "use XML::Reader qw(XML::Parsepp);")
+    my $rdr = XML::Reader->new('test.xml', {dupatt => '|'});
+
+  - The concatenation string {dupatt => $str} is restricted to printable ascii excluding alphanumeric, " and '
+
+  [DOCUMENTATION]
+
+  - Include explicit dependency on version 0.04 of XML::Parsepp
+
+0.42 - 2012-07-30T08:38:04+01:00
+
+  [DOCUMENTATION]
+
+  - Add test file 0040_test_Module.t
+
+0.41 - 2012-07-28T10:02:58+01:00
+
+  [ENHANCEMENTS]
+
+  - Change the way XML::Reader->new is used: (XML::Reader->new() now throws an
+    exception)
+    Old way: my $rdr = XML::Reader->new('test.xml') or die "Error: $!";
+    New way: my $rdr = eval{ XML::Reader->new('test.xml') } or die "Error: $@";
+    or new : my $rdr = XML::Reader->new('test.xml');
+
+0.40 - 2012-06-24T10:58:34+01:00
+
+  [ENHANCEMENTS]
+
+  - Allow XML::Reader to use the pure perl parser XML::Parsepp as an alternative to the
+    usual XML::Parser.
+
+0.39 - 2011-10-28T12:17:53+01:00
+
+  [ENHANCEMENTS]
+
+  - For filter => 5, add a new option '+' : {root => '/path1/path2', branch => '+'}
+    that allows to return an array of PYX-elements.
+
+  - For filter => 5, existing option '*' : {root => '/path1/path2', branch => '*'}
+    replace reference to scalar in $self->{rvalue} by a plain scalar.
+
+  [DEPRECATIONS]
+
+  - Remove deprecated functions newhd() and rstem()
+
+  [DOCUMENTATION]
+
+  - Introduce XML::MinWriter
+
+0.38 - 2011-10-18T13:22:28+01:00
+
+  [ENHANCEMENTS]
+
+  - For PYX output, replace a single \ by a double \\ and replace tabs by a literal "\t"
+
+  [DOCUMENTATION]
+
+  - Remove META.yml from MANIFEST
+
+0.37 - 2010-06-02T13:47:18+01:00
+
+  [DOCUMENTATION]
+
+  - The POD documentation has headers (=head1 and =head2) that are too
+    complicated, i.e. they contain characters like '(', ')' and '>'. This confuses
+    the POD Parser. This version simplifies the headers. (all 3 POD files are
+    affected: 'Reader.pm', 'Reader_fr.pod' and 'Reader_de.pod'
+
+0.36 - 2010-06-01T16:32:23+01:00
+
+  [ENHANCEMENTS]
+
+  - in case of {filter => 5}, make value() take over the role of rvalue()
+
+  [DOCUMENTATION]
+
+  - Improve the content of the README file
+
+0.35 - 2010-04-28T11:46:18+01:00
+
+  [ENHANCEMENTS]
+
+  - Replace XML::Reader::newhd() by XML::Reader::new()
+
+  - Add option {mode => 'attr-bef-start' | 'attr-in-hash' | 'pyx' | 'branches'}
+    as an alternative to the existing {filter => 2|3|4|5}
+
+  - Add an option {sepchar => 'xyz'} to XML::Reader->new
+
+  [BUG FIX]
+
+  - For {parse_pi => 1}, fix a bug with $rdr->dec_hash->{standalone}
+    used to be '1' and '' which is false, 'yes' and 'no' is correct
+
+  - For {filter => 5} function rstem() is redundant ==> replace function rstem() by path()
+
+  - Fix a bug in functions is_text() / is_value()
+
+  - Allow the writing of comments and PI if {branch => '*'} is selected
+
+  [DOCUMENTATION]
+
+  - Relicencing under the "Artistic Licence 2.0"
+
+0.34 - 2010-04-26T16:33:09+01:00
+
+  [ENHANCEMENTS]
+
+  - For {filter => 5}: restrict { branch => '...' } to { branch => '*' } only
+
+0.33 - 2010-04-25T09:15:52+01:00
+
+  [ENHANCEMENTS]
+
+  - For {filter => 5} you can now have duplicate roots (which was not possible before)
+
+  - added a new function $self->rstem
+
+  - allow relative roots, such as 'tag1/tag2' or '//tag1/tag2'
+
+  - allow branch => '*' which will effectively collect all events and construct
+    a sub-tree in XML format, that XML-format has the correct translations
+    char < into &lt;
+    char > into &gt;
+    char & into &amp;
+    char ' into &apos;
+    char " into &quot;
+
+
+0.32 - 2010-02-17T17:32:56+01:00
+
+  [BUG FIX]
+
+  - Fix a problem in Build.PL which had an incorrect version use 5.010; the correct
+    version is use 5.008;
+
+0.31 - 2010-01-29T08:52:34+01:00
+
+  [BUG FIX]
+
+  - I am suddenly getting automated reports about test failures on systems where
+    XML::Parser has not been installed. To fix that problem, I have to add the
+    correct module dependency in Build.PL and in Makefile.PL.
+
+  [DOCUMENTATION]
+
+  - harmonize the version number in XML::Reader::Token with the version number
+    in XML::Reader
+
+0.30 - 2010-01-25T11:00:16+01:00
+
+  [DOCUMENTATION]
+
+  - include
+    translated POD-documentation into French: XML-Reader-fr.pod
+    translated POD-documentation into German: XML-Reader-de.pod
+    add Build.PL
+
+0.29 - 2009-10-29T14:20:21+01:00
+
+  [ENHANCEMENTS]
+
+  - Add {filter => 5}
+
+0.28 - 2009-10-13T11:35:54+01:00
+
+  [ENHANCEMENTS]
+
+  - Allow multiple roots in 'slurp_xml'
+
+  [DOCUMENTATION]
+
+  - inject a "use 5.008" into Makefile.PL
+
+0.27 - 2009-10-10T14:24:33+01:00
+
+  [ENHANCEMENTS]
+
+  - Change the way 'slurp_xml' handles its parameters
+
+0.26 - 2009-10-09T11:41:32+01:00
+
+  [ENHANCEMENTS]
+
+  - Introduce a new function: 'slurp_xml' to slurp xml into an array-ref
+
+0.25 - 2009-09-20T17:34:28+01:00
+
+  [DOCUMENTATION]
+
+  - Need to bump up the version number, the indexing is still not working.
+    renamed the two *.pm files into *.pod again.
+
+0.24 - 2009-09-19T08:29:45+01:00
+
+  [DOCUMENTATION]
+
+  - Need to bump up the version number again, the indexing is still not working.
+    That's probably due to the missing =pod directive.
+    I have now added the =pod directive and I keep my fingers crossed
+
+0.23 - 2009-09-19T08:41:26+01:00
+
+  [DOCUMENTATION]
+
+  - Needed to bump up the version number again due to wrong indexing.
+    Now I am introducing two new dummy *.pm files with their proper Packages
+    rename pod/XML-Reader-de.pod into lib/XML/Reader/German.pm
+    rename pod/XML-Reader-fr.pod into lib/XML/Reader/French.pm
+
+0.22 - 2009-09-18T09:42:04+01:00
+
+  [DOCUMENTATION]
+
+  - Needed to bump up the version number due to wrong indexing of the
+    pod/XML-Reader-de/-fr.pod file in http://search.cpan.org/
+    Basically, I am renaming/relocating the two files
+    pod/XML-Reader-de.pod into lib/XML/Reader-de.pod
+    pod/XML-Reader-fr.pod into lib/XML/Reader-fr.pod
+
+0.21 - 2009-09-12T11:16:08+01:00
+
+  [BUG FIX]
+
+  - in method XML::Reader::DESTROY()
+    replace $self->{ExpatNB}->parse_done;
+    by      $self->{ExpatNB}->release;
+
+  [DOCUMENTATION]
+
+  - in XML::Reader->new(): inject an {XR_debug} into $self->{ExpatNB}, if so requested
+    by $opt{debug}
+
+  - add t/0030_test.t to test that XML::Reader does not leak memory
+
+  - explain documentation (=item is_value) in more detail
+
+  - translate POD-documentation into French: pod/XML-Reader-fr.pod
+    translate POD-documentation into German: pod/XML-Reader-de.pod
+
+  - re-licence under the Artistic licence
+
+0.20 - 2009-08-25T12:05:55+01:00
+
+  [ENHANCEMENTS]
+
+  - add method is_value()
+
+  [DOCUMENTATION]
+
+  - add some example code to parse an XML file with XML::Reader
+
+0.19 - 2009-08-22T10:59:28+01:00
+
+  [DEPRECATIONS]
+
+  - remove option {filter => 0} and {filter => 1}
+
+  - remove method new()
+
+  [ENHANCEMENTS]
+
+  - introducing "use Carp" and "croak"
+
+  [DOCUMENTATION]
+
+  - clean up documentation and test cases
+
+0.18 - 2009-07-30T11:30:05+01:00
+
+  [DEPRECATIONS]
+
+  - remove method XML::Reader->is_init_attr()
+
+  [ENHANCEMENTS]
+
+  - add processing instructions ("PI")
+
+  - add option {parse_ct} for comments
+
+  - add option {parse_pi} for processing-instructions
+
+  - add option {filter => 4} and method XML::Reader->pyx() for PYX compliant data
+
+0.17 - 2009-07-05T16:09:06+01:00
+
+  [REFACTORING]
+
+  - even more internal tuning in handle_start() and in handle_end()
+
+0.16 - 2009-06-30T08:26:47+01:00
+
+  [REFACTORING]
+
+  - more internal tuning
+
+0.15 - 2009-06-29T08:47:08+01:00
+
+  [REFACTORING]
+
+  - internal tuning
+
+0.14 - 2009-06-29T14:30:23+01:00
+
+  [ENHANCEMENTS]
+
+  - add {filter => 3} and method $rdr->att_hash()
+
+0.13 - 2009-06-28T12:26:39+01:00
+
+  [BUG FIX]
+
+  - error correction in XML::Reader->is_init_attr()
+
+0.12 - 2009-06-28T13:02:58+01:00
+
+  [ENHANCEMENTS]
+
+  - add constructor XML::Reader->newhd, which is almost identical to
+    XML::Reader->new, except it defaults to {filter => 2}, whereas
+    the existing XML::Reader->new defaults to {filter => 0}
+
+0.11 - 2009-06-24T08:51:28+01:00
+
+  [ENHANCEMENTS]
+
+  - add method XML::Reader->is_init_attr() and XML::Reader->attr().
+
+  - in case of {filter => 1}, undefine XML::Reader->is_start(),
+    XML::Reader->is_init_attr(), XML::Reader->is_end(), XML::Reader->comment().
+
+  - Introduce {filter => 2} which removes the redundant start-line before
+    attributes.
+
+0.10 - 2009-06-20T08:45:05+01:00
+
+  [DOCUMENTATION]
+
+  - Take out one test from t/0010-test.t
+
+0.09 - 2009-04-06T15:28:58+01:00
+
+  [DOCUMENTATION]
+
+  - update licence
+    update Makefile.PL
+
+0.08 - 2009-04-06T17:34:07+01:00
+
+  [DOCUMENTATION]
+
+  - update warranty
+
+0.07 - 2009-04-02T08:39:53+01:00
+
+  [ENHANCEMENTS]
+
+  - add a method XML::Reader->comment
+
+0.06 - 2009-03-30T08:24:50+01:00
+
+  [ENHANCEMENTS]
+
+  - re-order the output in XML::Reader->path
+
+0.05 - 2009-03-28T17:25:28+01:00
+
+  [BUG FIX]
+
+  - fix a bug in option {using => ...}
+
+0.04 - 2009-03-27T15:04:18+01:00
+
+  [ENHANCEMENTS]
+
+  - Replace XML::TokeParser by XML::Parser
+
+  - add option {using => ...}
+
+  - add method prefix
+
+0.03 - 2009-03-26T15:27:59+01:00
+
+  [BUG FIX]
+
+  - resolve circular reference in XML::TokeParser to avoid Memory leak
+
+0.02 - 2009-03-25T17:31:44+01:00
+
+  [ENHANCEMENTS]
+
+  - add method level to indicate the nesting level of the XPath expression.
+
+0.01 - 2009-03-22T12:30:17+01:00
+
+  [ENHANCEMENTS]
+
+  - First version, released on an unsuspecting world.

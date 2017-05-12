@@ -1,0 +1,614 @@
+#!/usr/bin/perl -w
+#
+# 四半期{累計,会計}期間
+#   四半期累計期間を並べてるが、四半期会計期間だけの企業もあるかも。
+#   jpfr-di: を見れば分かる。
+#   上場全銘柄を計算して問題ないので、全企業に四半期累計期間があるようです。
+#
+# no tree
+#   bs, pl で no tree になるのは、「2013-08-31基準」の下記銘柄(2015/01/23時点)
+#   22820 24130 24320 27680 29140 31970 35910 36590 37740 45020 45030 45190 45230 45280 45650 45680 46890 47390 47550 49010 52010 52020 63010 63260 65010 65020 65030 65860 65940 66450 67020 67240 67520 67540 67580 67620 67790 68570 69710 69810 69880 72030 72510 72670 77410 77510 77520 80010 80020 80310 80530 80580 81330 84730 85910 86040 86980 94320 94370 97660 99830 99840
+#   2193 6028
+#   で、IFRS、米国基準採用銘柄（多分）。
+#   cf はよく no tree になる。四半期決算時にcfを作成してない（多分）。
+#
+# name も label も異なる場合がある:
+#   1301/S1000F8V/jpfr-q2r-E00012-000-2013-09-30-01-2013-11-14.xbrl
+#     name='DecreaseIncreaseInOtherReceivablesOpecCF', label='その他債権の増減額（△は増加）'
+#   1301/S10025H8/XBRL/PublicDoc/jpcrp030000-asr-001_E00012-000_2014-03-31_01_2014-06-24.xbrl
+#     name='DecreaseIncreaseInOtherReceivablesOpeCF', label='その他の債権の増減額（△は増加）'
+#
+# merge_trees 時に find_branch_by_label_and_relation より find_branch_by_name を
+# 優先したほうが綺麗に並ぶ可能性もある
+#
+
+use Getopt::Long;
+use Pod::Usage;
+use XBRL::JPFR;
+use Encode;
+use Data::Dumper;
+
+my %pre_roles;
+
+my %args = (
+	'asr'				=> undef,
+	'dir'				=> undef,
+	#'type'				=> ['bs', 'pl', 'cf'],
+	'type'				=> undef,
+);
+GetOptions(\%args,
+	'asr|a',
+	'dir|d=s',
+	'type|t=s@{1,4}',
+	'<>' => sub { $args{'<xbrls>'} = $_[0] },
+	'help|h',
+	'verbose|v',
+);
+$args{'type'} = ['bs', 'pl', 'cf'] if !$args{'type'};
+#print Dumper(\%args);exit;
+
+if (!-e $args{'<xbrls>'} || !-e $args{'dir'} || $args{'help'}) {
+	pod2usage(-verbose => 2);
+}
+
+my @files = `find $args{'<xbrls>'} -name \*.xbrl`;
+chomp @files;
+@files = select_files(@files);
+
+my $trees = {};
+foreach (@files) {
+	my ($file, $quarter, $date, $num) = @$_;
+	print STDERR "$args{'<xbrls>'} $quarter $date $num $file\n" if $args{'verbose'};#next;
+	my $xbrl = XBRL::JPFR->new({
+		file => $file,
+		schema_dir => $args{'dir'},
+		only_ja => 1,
+		std_labels => 1,
+	});
+	my $context = "$date|$num|$quarter";
+	foreach my $type (@{$args{'type'}}) {
+		my $t = make_trees($xbrl, $type);
+		foreach my $cn ('c', 'n') {
+			if (!$$trees{$type}{$cn}) {
+				$$trees{$type}{$cn} = $$t{$cn};
+				values2hash($$trees{$type}{$cn}, $context);
+			}
+			else {
+				merge_trees($$trees{$type}{$cn}, $$t{$cn}, $context);
+			}
+		}
+	}
+}
+
+foreach my $type (@{$args{'type'}}) {
+	my $of = "$args{'<xbrls>'}_$type.csv";
+	open ($fh, ">$of") || die "$0: cannot open file($of)";
+	foreach my $cn ('c', 'n') {
+		my $tree = $$trees{$type}{$cn};
+		next if !$tree;
+		print $fh "\"$cn\"\n";
+		my @contexts = sort keys %{$$tree{'values'}};
+		print_line($fh, 'decimals', 'depth', 'abstract', 'label', @contexts);
+		dump_trees($tree, \@contexts);
+		print $fh "\n";
+	}
+	close $fh;
+}
+
+exit 0;
+
+
+sub select_files {
+	my @files = @_;
+	my @ret;
+	foreach my $file (@files) {
+		next if $file =~ /ifrs/;
+		next if $file !~ /-(asr|q\dr|ssr)-/;
+		next if $args{'asr'} && $file !~ /-(asr)-/;
+		my $quarter = $1;
+		$quarter = 'q2r' if $quarter eq 'ssr';
+		my ($date, $num) = $file =~ /(\d{4}-\d{2}-\d{2})[-_](\d{2})/;
+		push @ret, [$file, $quarter, $date, $num];
+	}
+	return sort {qd2s($b) cmp qd2s($a)} @ret;
+}
+
+BEGIN {
+my %q2s = (
+	'asr'	=> '8',
+	'ssr'	=> '7',
+	'q2r'	=> '6',
+	'q1r'	=> '5',
+	'q3r'	=> '4',
+	'q4r'	=> '3',
+	'q5r'	=> '2',
+);
+
+sub qd2s {
+	my ($a) = @_;
+	my $q = $$a[1];
+	my $d = $$a[2];
+	my $n = $$a[3];
+	return "$q2s{$q}$d$n";
+}
+}
+
+sub make_trees { 
+	my ($xbrl, $type) = @_;
+	my $trees;
+	my $roles = $pre_roles{$type};
+	foreach $role (keys %$roles) {
+		my $tree = $xbrl->get_trees('pre', $role);
+		next if !$tree;
+		my $context = $$roles{$role};
+		my $cn = $context =~ /NonConsolidated/ ? 'n' : 'c';
+		if (@$tree > 1) {
+			warn "$0: multi trees($role)\n";
+			foreach (@$tree) {
+				warn "\t". $_->name(). "\n";
+			}
+			$tree = [grep {$_->name() =~ /BalanceSheet|Statement[s]{0,1}OfIncome|Statement[s]{0,1}OfCashFlows|StatementsOfChangesInNetAssets|StatementOfChangesInEquity}/} @$tree];
+			if (@$tree == 1) {
+				warn "\tusing a tree(". $$tree[0]->name(). ")\n";
+			}
+			else {
+				warn "$0: no tree or multi trees($role)\n";
+				next;
+			}
+		}
+		attach_values($xbrl, $tree, $context);
+		warn "$0: tree already exists($cn,$role)" if exists $$trees{$cn};
+		$$trees{$cn} = root_tree($$tree[0], $type);
+	}
+	warn "$0: no tree($$xbrl{'file'},$type)" if !$trees && ($args{'verbose'} || $type ne 'cf');
+	return $trees;
+}
+
+sub attach_values {
+	my ($xbrl, $trees, $context) = @_;
+	foreach my $tree (@$trees) {
+		my $id_short = $tree->id_short();
+		if ($tree->prefLabel() && $tree->prefLabel() =~ /periodStartLabel/) {
+			my $from = $tree->from();
+			$from->delete_branch_by_id_short($id_short, $tree->prefLabel());
+			next;
+		}
+		#unite_labels($tree);
+		# Instant と Duration が同時に値を持つことはないはず
+		foreach my $cont (split /&/, $context) {
+			if (exists $$xbrl{'itemhash'}{$id_short}{$cont}) {
+				my $item = $$xbrl{'itemhash'}{$id_short}{$cont};
+				$item = $$item[0] if ref($item) =~ /ARRAY/;
+				next if $item->type() =~ /textBlockItemType/;
+				my $val = $item->value();
+				$val = 0 if !defined $val || $val eq '';
+				$$tree{'value'} = 0 if !defined $$tree{'value'};
+				die "$0: double values $cont" if $$tree{'value'} != 0 && $val != 0;
+				$$tree{'value'} += $val;
+				$$tree{'decimals'} = $item->decimals();
+			}
+		}
+		my $tos = $$tree{'tos'};
+		attach_values($xbrl, $tos, $context) if @$tos;
+		$tree->splice_undefs();
+	}
+}
+
+sub unite_labels {
+	my ($tree) = @_;
+	my $label = $tree->label();
+	#$label =~ s/四半期末|当期末|期末|四半期|当期|連結|個別//;
+	$label =~ s/四半期末|当期末|期末|四半期|当期//;
+	$tree->label($label);
+}
+
+sub root_tree {
+	my ($tree, $type) = @_;
+	if ($type eq 'bs') {
+		if ($tree->name() ne 'BalanceSheetsAbstract') {
+			# 2013-08-31基準
+			$tree = $tree->find_branch_by_name('BalanceSheetLineItems');
+			return undef if !$tree;
+			recalc_depth($tree);
+			$tree->from(undef);
+			$tree->from_short(undef);
+			$tree->from_full(undef);
+			# preferredLabel が設定されてることがある。
+			#$tree->label(Encode::decode('UTF-8', '貸借対照表'));
+			$tree->label('貸借対照表');
+		}
+	}
+	elsif ($type eq 'pl') {
+		if ($tree->name() ne 'StatementsOfIncomeAbstract') {
+			# 2013-08-31基準
+			$tree = $tree->find_branch_by_name('StatementOfIncomeLineItems');
+			return undef if !$tree;
+			recalc_depth($tree);
+			$tree->from(undef);
+			$tree->from_short(undef);
+			$tree->from_full(undef);
+			#$tree->label(Encode::decode('UTF-8', '損益計算書'));
+			$tree->label('損益計算書');
+		}
+	}
+	elsif ($type eq 'cf') {
+		if ($tree->name() ne 'StatementsOfCashFlowsAbstract') {
+			# 2013-08-31基準
+			$tree = $tree->find_branch_by_name('StatementOfCashFlowsLineItems');
+			return undef if !$tree;
+			recalc_depth($tree);
+			$tree->from(undef);
+			$tree->from_short(undef);
+			$tree->from_full(undef);
+			#$tree->label(Encode::decode('UTF-8', 'キャッシュ・フロー計算書'));
+			$tree->label('キャッシュ・フロー計算書');
+		}
+	}
+	elsif ($type eq 'ss') {
+		if ($tree->name() ne 'StatementsOfChangesInNetAssetsAbstract') {
+			# 2013-08-31基準
+			$tree = $tree->find_branch_by_name('StatementOfChangesInEquityLineItems');
+			return undef if !$tree;
+			recalc_depth($tree);
+			$tree->from(undef);
+			$tree->from_short(undef);
+			$tree->from_full(undef);
+			#$tree->label(Encode::decode('UTF-8', '株主資本等変動計算書'));
+			$tree->label('株主資本等変動計算書');
+		}
+	}
+	else {
+		die "$0: invalid type($type)";
+	}
+
+	return $tree;
+}
+
+sub recalc_depth {
+	my ($tree, $root) = @_;
+	return if !$tree;
+	$root = $tree->depth() if !defined $root;
+	$tree->depth($tree->depth() - $root);
+	foreach my $to (@{$$tree{'tos'}}) {
+		recalc_depth($to, $root);
+	}
+}
+
+sub values2hash {
+	my ($tree, $context) = @_;
+	return if !$tree;
+	$$tree{'values'}{$context} = $$tree{'value'};
+	#print Dumper($tree) if grep {!defined} @{$$tree{'tos'}};
+	foreach my $to (sort {$$a{'order'} <=> $$b{'order'}} @{$$tree{'tos'}}) {
+		values2hash($to, $context);
+	}
+}
+
+sub merge_trees {
+	my ($tree, $b2, $context) = @_;
+	return if !$b2;
+	my $b1 = $tree->find_branch_by_label_and_relation($b2);
+	if ($b1) {
+		$$b1{'values'}{$context} = $$b2{'value'};
+		set_decimals($b1, $b2);
+	}
+	else {
+		my $parent = find_parent($tree, $b2);
+		my $child = $parent->find_branch_by_name($b2->name());
+		if ($child) {
+			$$child{'values'}{$context} = $$b2{'value'};
+			set_decimals($child, $b2);
+		}
+		else {
+			my $id_short = $b2->id_short();
+			values2hash($b2, $context);
+			# 合計ラベル等より下に科目がこないように調整
+			my ($o1, $o2) = sort {$b->order() <=> $a->order()} @{$$parent{'tos'}};
+			if ($o1) {
+				#if ($b2->order() >= $o1->order()) {
+					if ($o2) {
+						$b2->order(($o1->order()+$o2->order())/2);
+					}
+					else {
+						$b2->order($o1->order() - 0.0001);
+					}
+				#}
+			}
+			push @{$$parent{'tos'}}, $b2;
+		}
+	}
+	foreach my $to (@{$$b2{'tos'}}) {
+		merge_trees($tree, $to, $context);
+	}
+}
+
+sub set_decimals {
+	my ($b1, $b2) = @_;
+	if (defined $$b2{'decimals'}) {
+		if (!defined $$b1{'decimals'}) {
+			$$b1{'decimals'} = $$b2{'decimals'};
+		}
+		elsif ($$b1{'decimals'} < $$b2{'decimals'}) {
+			$$b1{'decimals'} = $$b2{'decimals'};
+		}
+	}
+}
+
+sub find_parent {
+	my ($tree, $branch) = @_;
+	my $name = $branch->name();
+	my $id_short = $branch->id_short();
+	my $parent_id = $branch->from_short();
+	(my $parent_name = $parent_id) =~ s/^.*_//;
+	my $parent = $tree->find_branch_by_id($parent_id);
+	return $parent if $parent;
+	$parent = $tree->find_branch_by_name($parent_name);
+	return $parent if $parent;
+	$parent = $tree->find_branch_by_label_and_relation($branch->from()) if $branch->from();
+	return $parent if $parent;
+	if ($branch->from()) {
+		$parent = find_parent($tree, $branch->from());
+		return $parent if $parent;
+	}
+	die "$0: no parent($id_short,$parent_id,$parent_name)";
+}
+
+sub dump_trees {
+	my ($tree, $contexts) = @_;
+	my $depth = $tree->depth();
+	my $label = $tree->label();
+	my $abstract = $tree->abstract();
+	my $decimals = $$tree{'decimals'};
+	my @values = map {$$tree{'values'}{$_}} @$contexts;
+	print_line($fh, $decimals, $depth, $abstract, $label, @values);
+	foreach my $to (sort {$$a{'order'} <=> $$b{'order'}} @{$$tree{'tos'}}) {
+		dump_trees($to, $contexts);
+	}
+}
+
+sub print_line {
+	my $fh = shift @_;
+	no warnings;
+	print $fh '"'. join ('","', @_). "\"\n";
+}
+
+BEGIN {
+# EDINET role 一覧は「企業別タクソノミ作成ガイドライン〔添付資料〕」
+%pre_roles = (
+	'bs' => {
+		# 2013-03-01基準
+		'http://info.edinet-fsa.go.jp/jp/fr/gaap/role/NonConsolidatedBalanceSheets' =>
+			'CurrentYearNonConsolidatedInstant',
+		'http://info.edinet-fsa.go.jp/jp/fr/gaap/role/ConsolidatedBalanceSheets' =>
+			'CurrentYearConsolidatedInstant',
+		'http://info.edinet-fsa.go.jp/jp/fr/gaap/role/NonConsolidatedInterimBalanceSheets' =>
+			'InterimNonConsolidatedInstant',
+		'http://info.edinet-fsa.go.jp/jp/fr/gaap/role/ConsolidatedInterimBalanceSheets' =>
+			'InterimConsolidateInstant',
+		'http://info.edinet-fsa.go.jp/jp/fr/gaap/role/NonConsolidatedQuarterlyBalanceSheets' =>
+			'CurrentQuarterNonConsolidatedInstant',
+		'http://info.edinet-fsa.go.jp/jp/fr/gaap/role/ConsolidatedQuarterlyBalanceSheets' =>
+			'CurrentQuarterConsolidatedInstant',
+		# 2013-08-31基準
+		'http://disclosure.edinet-fsa.go.jp/role/jppfs/rol_BalanceSheet' =>
+			'CurrentYearInstant_NonConsolidatedMember',
+		'http://disclosure.edinet-fsa.go.jp/role/jppfs/rol_ConsolidatedBalanceSheet' =>
+			'CurrentYearInstant',
+		'http://disclosure.edinet-fsa.go.jp/role/jppfs/rol_QuarterlyBalanceSheet' =>
+			'CurrentQuarterInstant_NonConsolidatedMember',
+		'http://disclosure.edinet-fsa.go.jp/role/jppfs/rol_QuarterlyConsolidatedBalanceSheet' =>
+			'CurrentQuarterInstant',
+		'http://disclosure.edinet-fsa.go.jp/role/jppfs/rol_SemiAnnualBalanceSheet' =>
+			'InterimInstant_NonConsolidatedMember',
+		'http://disclosure.edinet-fsa.go.jp/role/jppfs/rol_SemiAnnualConsolidatedBalanceSheet' =>
+			'InterimInstant',
+	},
+	'pl' => {
+		# 2013-03-01基準
+		'http://info.edinet-fsa.go.jp/jp/fr/gaap/role/NonConsolidatedStatementsOfIncome' =>
+			'CurrentYearNonConsolidatedDuration',
+		'http://info.edinet-fsa.go.jp/jp/fr/gaap/role/ConsolidatedStatementsOfIncome' =>
+			'CurrentYearConsolidatedDuration',
+		'http://info.edinet-fsa.go.jp/jp/fr/gaap/role/NonConsolidatedInterimStatementsOfIncome' =>
+			'InterimNonConsolidatedDuration',
+		'http://info.edinet-fsa.go.jp/jp/fr/gaap/role/ConsolidatedInterimStatementsOfIncome' =>
+			'InterimConsolidateDuration',
+		# YTD = 四半期累計期間（期首からの累計）
+		'http://info.edinet-fsa.go.jp/jp/fr/gaap/role/NonConsolidatedQuarterlyStatementsOfIncomeYTD' =>
+			'CurrentYTDNonConsolidatedDuration',
+		'http://info.edinet-fsa.go.jp/jp/fr/gaap/role/ConsolidatedQuarterlyStatementsOfIncomeYTD' =>
+			'CurrentYTDConsolidatedDuration',
+		# Quarter = 四半期会計期間（３ヶ月間）
+		#'http://info.edinet-fsa.go.jp/jp/fr/gaap/role/NonConsolidatedQuarterlyStatementsOfIncomeQuarter' =>
+		#	'CurrentYTDNonConsolidatedDuration',
+		#'http://info.edinet-fsa.go.jp/jp/fr/gaap/role/ConsolidatedQuarterlyStatementsOfIncomeQuarter' =>
+		#	'CurrentYTDConsolidatedDuration',
+		# 2013-08-31基準
+		'http://disclosure.edinet-fsa.go.jp/role/jppfs/rol_StatementOfIncome' =>
+			'CurrentYearDuration_NonConsolidatedMember',
+		'http://disclosure.edinet-fsa.go.jp/role/jppfs/rol_ConsolidatedStatementOfIncome' =>
+			'CurrentYearDuration',
+		# 四半期会計期間
+		#'http://disclosure.edinet-fsa.go.jp/role/jppfs/rol_QuarterPeriodStatementOfIncome' =>
+		#	'CurrentQuarterDuration_NonConsolidatedMember',
+		#'http://disclosure.edinet-fsa.go.jp/role/jppfs/rol_QuarterPeriodConsolidatedStatementOfIncome' =>
+		#	'CurrentQuarterDuration',
+		'http://disclosure.edinet-fsa.go.jp/role/jppfs/rol_SemiAnnualStatementOfIncome' =>
+			'InterimDuration_NonConsolidatedMember',
+		'http://disclosure.edinet-fsa.go.jp/role/jppfs/rol_SemiAnnualConsolidatedStatementOfIncome' =>
+			'InterimDuration',
+		'http://disclosure.edinet-fsa.go.jp/role/jppfs/rol_YearToQuarterEndStatementOfIncome' =>
+			'CurrentYTDDuration_NonConsolidatedMember',
+		'http://disclosure.edinet-fsa.go.jp/role/jppfs/rol_YearToQuarterEndConsolidatedStatementOfIncome' =>
+			'CurrentYTDDuration',
+	},
+	'cf' => {
+		# 2013-03-01基準
+		#   Indirect
+		'http://info.edinet-fsa.go.jp/jp/fr/gaap/role/NonConsolidatedStatementsOfCashFlowsIndirect' =>
+			'CurrentYearNonConsolidatedInstant&CurrentYearNonConsolidatedDuration',
+		'http://info.edinet-fsa.go.jp/jp/fr/gaap/role/ConsolidatedStatementsOfCashFlowsIndirect' =>
+			'CurrentYearConsolidatedInstant&CurrentYearConsolidatedDuration',
+		'http://info.edinet-fsa.go.jp/jp/fr/gaap/role/NonConsolidatedInterimStatementsOfCashFlowsIndirect' =>
+			'InterimNonConsolidatedInstant&InterimNonConsolidatedDuration',
+		'http://info.edinet-fsa.go.jp/jp/fr/gaap/role/ConsolidatedInterimStatementsOfCashFlowsIndirect' =>
+			'InterimConsolidateInstant&InterimConsolidateDuration',
+		'http://info.edinet-fsa.go.jp/jp/fr/gaap/role/NonConsolidatedQuarterlyStatementsOfCashFlowsIndirect' =>
+			'CurrentQuarterNonConsolidatedInstant&CurrentYTDNonConsolidatedDuration',
+		'http://info.edinet-fsa.go.jp/jp/fr/gaap/role/ConsolidatedQuarterlyStatementsOfCashFlowsIndirect' =>
+			'CurrentQuarterConsolidatedInstant&CurrentYTDConsolidatedDuration',
+		#   Direct
+		'http://info.edinet-fsa.go.jp/jp/fr/gaap/role/NonConsolidatedStatementsOfCashFlowsDirect' =>
+			'CurrentYearNonConsolidatedInstant&CurrentYearNonConsolidatedDuration',
+		'http://info.edinet-fsa.go.jp/jp/fr/gaap/role/ConsolidatedStatementsOfCashFlowsDirect' =>
+			'CurrentYearConsolidatedInstant&CurrentYearConsolidatedDuration',
+		'http://info.edinet-fsa.go.jp/jp/fr/gaap/role/NonConsolidatedInterimStatementsOfCashFlowsDirect' =>
+			'InterimNonConsolidatedInstant&InterimNonConsolidatedDuration',
+		'http://info.edinet-fsa.go.jp/jp/fr/gaap/role/ConsolidatedInterimStatementsOfCashFlowsDirect' =>
+			'InterimConsolidateInstant&InterimConsolidateDuration',
+		'http://info.edinet-fsa.go.jp/jp/fr/gaap/role/NonConsolidatedQuarterlyStatementsOfCashFlowsDirect' =>
+			'CurrentQuarterNonConsolidatedInstant&CurrentYTDNonConsolidatedDuration',
+		'http://info.edinet-fsa.go.jp/jp/fr/gaap/role/ConsolidatedQuarterlyStatementsOfCashFlowsDirect' =>
+			'CurrentQuarterConsolidatedInstant&CurrentYTDConsolidatedDuration',
+		# 2013-08-31基準
+		#   indirect
+		'http://disclosure.edinet-fsa.go.jp/role/jppfs/rol_StatementOfCashFlows-indirect' =>
+			'CurrentYearInstant_NonConsolidatedMember&CurrentYearDuration_NonConsolidatedMember',
+		'http://disclosure.edinet-fsa.go.jp/role/jppfs/rol_ConsolidatedStatementOfCashFlows-indirect' =>
+			'CurrentYearInstant&CurrentYearDuration',
+		'http://disclosure.edinet-fsa.go.jp/role/jppfs/rol_SemiAnnualStatementOfCashFlows-indirect' =>
+			'InterimInstant_NonConsolidatedMember&InterimDuration_NonConsolidatedMember',
+		'http://disclosure.edinet-fsa.go.jp/role/jppfs/rol_SemiAnnualConsolidatedStatementOfCashFlows-indirect' =>
+			'InterimInstant&InterimDuration',
+		'http://disclosure.edinet-fsa.go.jp/role/jppfs/rol_QuarterlyStatementOfCashFlows-indirect' =>
+			'CurrentYTDInstant_NonConsolidatedMemberCurrentYTDDuration_NonConsolidatedMember',
+		'http://disclosure.edinet-fsa.go.jp/role/jppfs/rol_QuarterlyConsolidatedStatementOfCashFlows-indirect' =>
+			'CurrentQuarterInstant&CurrentYTDDuration',
+		#   direct
+		'http://disclosure.edinet-fsa.go.jp/role/jppfs/rol_StatementOfCashFlows-direct' =>
+			'CurrentYearInstant_NonConsolidatedMember&CurrentYearDuration_NonConsolidatedMember',
+		'http://disclosure.edinet-fsa.go.jp/role/jppfs/rol_ConsolidatedStatementOfCashFlows-direct' =>
+			'CurrentYearInstant&CurrentYearDuration',
+		'http://disclosure.edinet-fsa.go.jp/role/jppfs/rol_SemiAnnualStatementOfCashFlows-direct' =>
+			'InterimInstant_NonConsolidatedMember&InterimDuration_NonConsolidatedMember',
+		'http://disclosure.edinet-fsa.go.jp/role/jppfs/rol_SemiAnnualConsolidatedStatementOfCashFlows-direct' =>
+			'InterimInstant&InterimDuration',
+		'http://disclosure.edinet-fsa.go.jp/role/jppfs/rol_QuarterlyStatementOfCashFlows-direct' =>
+			'CurrentYTDInstant_NonConsolidatedMemberCurrentYTDDuration_NonConsolidatedMember',
+		'http://disclosure.edinet-fsa.go.jp/role/jppfs/rol_QuarterlyConsolidatedStatementOfCashFlows-direct' =>
+			'CurrentQuarterInstant&CurrentYTDDuration',
+	},
+	'ss' => {
+		# 2013-03-01基準
+		'http://info.edinet-fsa.go.jp/jp/fr/gaap/role/NonConsolidatedStatementsOfChangesInNetAssets' =>
+			'CurrentYearNonConsolidatedInstant&CurrentYearNonConsolidatedDuration',
+		'http://info.edinet-fsa.go.jp/jp/fr/gaap/role/ConsolidatedStatementsOfChangesInNetAssets' =>
+			'CurrentYearConsolidatedInstant&CurrentYearConsolidatedDuration',
+		'http://info.edinet-fsa.go.jp/jp/fr/gaap/role/NonConsolidatedInterimStatementsOfChangesInNetAssets' =>
+			'InterimNonConsolidatedInstant&InterimNonConsolidatedDuration',
+		'http://info.edinet-fsa.go.jp/jp/fr/gaap/role/ConsolidatedInterimStatementsOfChangesInNetAssets' =>
+			'InterimConsolidatedInstant&InterimConsolidatedDuration',
+		# 2013-08-31基準
+		'http://disclosure.edinet-fsa.go.jp/role/jppfs/rol_StatementOfChangesInEquity' =>
+			'CurrentYearDuration_NonConsolidatedMember',
+		'http://disclosure.edinet-fsa.go.jp/role/jppfs/rol_ConsolidatedStatementOfChangesInEquity' =>
+			'CurrentYearDuration',
+		'http://disclosure.edinet-fsa.go.jp/role/jppfs/rol_SemiAnnualStatementOfChangesInEquity' =>
+			'InterimDurationDuration_NonConsolidatedMember',
+		'http://disclosure.edinet-fsa.go.jp/role/jppfs/rol_SemiAnnualConsolidatedStatementOfChangesInEquity' =>
+			'InterimDurationDuration',
+	},
+);
+}
+
+
+__END__
+
+=head1 NAME
+
+timeseries
+
+=head1 SYNOPSIS
+
+timeseries -d dir/to/schema/files [options] <dir/to/xbrl/files>
+
+=head1 DESCRIPTION
+
+B<This program> will parse the given xbrl files and create csv file(s) which discribe
+timeseries of EDINET's BS/PL/CF/SS.
+
+example:
+
+ls 1301/
+
+1301/S000133I
+1301/S0001U0D
+1301/S0002J5Z
+1301/S0003GXT
+1301/S0003WWV
+1301/S0004JNJ
+1301/S00055MB
+1301/S0006132
+1301/S0006MMB
+1301/S000766R
+1301/S0007T99
+1301/S0008INZ
+1301/S00096Y3
+1301/S0009R1H
+1301/S000ABWA
+1301/S000B3JK
+1301/S000BMYD
+1301/S000CBI7
+1301/S000CVH7
+1301/S000DNUV
+1301/S000E9PF
+1301/S1000F8V
+1301/S1000ZB4
+1301/S10014G9
+1301/S10024J9
+1301/S10025H8
+1301/S1002DU2
+1301/S1002PMU
+1301/S10030KB
+1301/S1003FL5
+
+timeseries -d dir/to/schema/files 1301
+
+ts2xlsx 1301_bs.csv 1301_pl.csv 1301_cf.csv
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-h[elp]>
+
+Prints a help message and exits.
+
+=item B<-v[erbose]>
+
+Prints verbose messages.
+
+=item B<-a[sr]>
+
+Parses asr files only
+
+=item B<-t[ype] type...>
+
+Sets types to show(bs|pl|cf|ss).
+
+=back
+
+=head1 AUTHOR
+
+Tetsuya Yamamoto <yonjouhan@gmail.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2015 by Tetsuya Yamamoto
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut
+

@@ -1,0 +1,34 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.44.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 430fc6c5588f3fa6e601b4a365c9a01305dff6bb Changes
+SHA1 e619ba8b81664481a8b508b0260109832bb0854b MANIFEST
+SHA1 5b081ea6d6125cf58f4ed2a0a52ca50411d72279 MANIFEST.SKIP
+SHA1 810924372b55a88bf30a88c4ab1d1c65c8c95a6e META.yml
+SHA1 adb05ec1c368d48e2615329ac620f725da4f1ba6 Makefile.PL
+SHA1 f11cb58d575a36570a6d9aea5dddbf6b87c9638f README
+SHA1 4452ff6dfacae5050ac6fd300541b057b88fafde bin/foafvcard
+SHA1 5911d0e3bb8ee6ba73786afd440b5fbca48a7b49 lib/XML/FOAFKnows/FromvCard.pm
+SHA1 069daea9485b89df58c402bc4bf1ed3997ce1c75 t/01use.t
+SHA1 05de6f11fb421cd37676ec3bcd3ee7b0ab2b4a80 t/02insert.t
+SHA1 c7d61e6f472d61679d9c0e09c0dece391a185a46 t/03utf8.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.1 (GNU/Linux)
+
+iD8DBQFDf6xTlE/Gp2pqC7wRAkk1AJ0aUZExnjIAgizru45OuNMJA2LLHgCeNvDJ
+8Tja+TBsAJJ9NjE2bFVFwAI=
+=pC36
+-----END PGP SIGNATURE-----

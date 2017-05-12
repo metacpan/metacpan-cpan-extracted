@@ -1,0 +1,26 @@
+<level1>
+  <name>level 1 name</name>
+
+  <sublevels>  
+  <level2>
+    <name>level 2a name</name>
+  </level2>
+  
+  <level2>
+    <sublevels>
+    <level3>
+      <name>level 3 name</name>
+    </level3>
+    </sublevels>
+  </level2>
+  
+  <level2 name="level 2c name embedded in tag">
+    <sublevels>
+    <level3>
+    </level3>
+    </sublevels>
+  </level2>
+  </sublevels>
+  
+</level1>
+

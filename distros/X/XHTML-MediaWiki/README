@@ -1,0 +1,77 @@
+NAME
+    XHTML::MediaWiki - Translate Wiki markup into xhtml
+
+SYNOPSIS
+            use XHTML::MediaWiki;
+            my $mediawiki = XHTML::MediaWiki->new( link_path => "http://example.com/base/" );
+            my $xhtm = $mediawiki->format($text);
+
+DESCRIPTION
+    http://www.mediawiki.org/ and its sister projects use the PHP Mediawiki
+    to format their pages. This module attempts to duplicate the Mediawiki
+    formatting rules. Those formatting rules can be simple and easy to use,
+    while providing more advanced options for the power user.
+
+  Constructors
+    * new( link_path => 'base path' )
+        Create a new XHTML:;MediaWiki object. `link_path' is used as the
+        base for hyperlinks.
+
+  Methods
+    * format()
+        The format method is the only method that needs to be called for the
+        normal operation of this object. You call format() with the raw
+        *wikitext* and it returns the xhtml representation of that
+        *wikitext*.
+
+    * reset_counters()
+        Call this method to reset the footnote counter.
+
+  Overridable Methods
+    The following methods can be overridden to change the functionality of
+    the object.
+
+    * get_block()
+        If you would like to override the Block objects you can override
+        this method.
+
+    * encode()
+        You can override the encode function if you would like to change
+        what is encoded. Currently only &, <, and > are encoded.
+
+    * emphasized()
+        emphasized controls the output of "<em>" tags.
+
+    * link()
+        The link method is often overridden to modify the display and
+        operation of links.
+
+        link takes 3 arguments the Link, any extra_text, and the type of the
+        link;
+
+        The type is true for footnotes.
+
+    * find_links()
+        The `find_links' method is also often overridden in order to change
+        the way links are detected.
+
+    * template_text()
+        Override this method to control the text that is generated for an
+        unknown template ({{word}}).
+
+    * format_line()
+        Override this method to extend or modify line level parsing.
+
+ACKNOWLEDGEMENTS
+    This module is derived from Text::WikiFormat, written by chromatic.
+
+AUTHOR
+    "G. Allen Morris III" <gam3@gam3.net>
+
+COPYRIGHT
+    Copyright (C) 2008-2010 G. Allen Morris III, all rights reserved.
+
+LICENSE
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

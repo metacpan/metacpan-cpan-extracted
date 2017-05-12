@@ -1,0 +1,10 @@
+use XML::Essex;
+
+my $count = 0;
+
+while (1) {
+    get "start_element::*";
+    ++$count;
+}
+
+print $count;

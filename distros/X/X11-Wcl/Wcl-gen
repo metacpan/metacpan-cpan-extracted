@@ -1,0 +1,279 @@
+#!/usr/bin/perl
+#
+# generate the SWIG input file by preprocessing the X and Motif header files
+#
+# This was developed incrementally, by feeding the output to SWIG,
+# seeing what it did not like, and developing PERL regular expressions
+# to do the proper massaging.
+#
+# Porting to another platform will require changes to the way that the
+# preprocessor is invoked (including possibly a different set of
+# header files) and some new regexp processing. 
+#
+
+$INFILE = $ARGV[0];
+$NUM_XTPROCS = $ARGV[1];
+
+read_input();
+discard_uninteresting_header_files();
+make_defines();
+make_output();
+add_xtprocs();
+add_standard_member_functions();
+
+# helper function to emit SWIG input lines
+sub emit
+{
+	my($s) = @_;
+	$s =~ s#^[^\S\n]*\n##;
+	$s =~ s#^[^\S\n]+\Z##m;
+	$s =~ m#^([^\S\n]*\|?)#;
+	my $x = quotemeta $1;
+	$s =~ s#^$x##gm;
+	print STDOUT $s;
+}
+
+# generate and read in the input
+sub read_input
+{
+	# run the preprocessor on the header files in which we are interested
+	open(IN, q{
+		set -x
+		TEMP=/tmp/temp.wcl-gen.$$.c
+		grep '^#include' } . $INFILE . q{ >$TEMP
+		$CC -E $CCFLAGS $TEMP
+		rm -f $TEMP
+	|});
+
+	# read it all into a string
+	$x = $/;
+	undef $/;
+	$data = <IN>;
+	$/ = $x;
+
+	close(IN);
+}
+
+# chuck header files not apropos to this application
+sub discard_uninteresting_header_files
+{
+	# remove header files we are not interested in
+	# this is undoubtedly somewhat preprocessor dependent
+	$data =~ s@^#line @# @gm;
+	$data =~ s@^# \d+\n@@gm;
+	$data =~ s@^# \d+ "/usr/include/(?!X).*\n(([^#\n].*)?\n)*@@gm;
+	$data =~ s@^# \d+ "/usr/lib/.*\n(([^#\n].*)?\n)*@@gm;
+	$data =~ s@^# \d+ "/usr/local/lib/.*\n(([^#\n].*)?\n)*@@gm;
+	$data =~ s@^# \d+ "/usr/X11R6/include/.*P[.]h".*\n(([^#\n].*)?\n)*@@gm;
+}
+
+# pull #defines out of input; they disappear from cpp output
+sub make_defines
+{
+	# extract #define constants from header files mentioned in input
+	while ($data =~ m@^# \d+ "(\S+)"@gm) {
+		next unless !$seen{$1}++;
+		open(IN, "<$1");
+		while (<IN>) {
+			# define with no arguments
+			next unless /^\s*#\s*define\s+\w+\s+/;
+			# strip trailing comments
+			s#\s*/\*((?!\*/).)*\*/[^\S\n]$##;
+			# empty
+			next if /^\s*#\s*define\s+\w+\s*$/;
+			# strings
+			next if /^\s*#\s*define\s+\w+\s+"[^"]*"\s*$/; #"
+			# integer expressions
+			next unless (/^
+				\s*\#\s*define\s+(\w+)\s+
+				((
+				-?\d+L? |
+				-?0[xX][0-9a-fA-F]+L? |
+				[()|] |
+				<< |
+				>>
+				)\s*)+
+			$/x);
+			print STDOUT "#ifndef $1\n";
+			print STDOUT;
+			print STDOUT "#endif\n";
+		}
+		close(IN);
+	}
+}
+
+# massage input header files into something that SWIG can digest
+sub make_output
+{
+	# chuck preprocessor lines
+	$data =~ s@^#.*\n@@gm;
+
+	# chuck blank lines
+	$data =~ s/^[^\S\n]*\n//gm;
+
+	# eliminate trailing white space
+	$data =~ s/[^\S\n]+\n/\n/g;
+
+	# convert multiple white space to single blank
+	$data =~ s/[^\S\n]+/ /g;
+
+	# eliminate keywords not known to SWIG
+	$data =~ s#\b(register|__signed||unsigned)\b##gm;
+
+	# rename C++ reserved words
+	$data =~ s#\b(new|class)\b#PASS_THROUGH_SWIG_$1#gm;
+
+	# eliminate global arrays
+	$data =~ s/^\s*(typedef|extern)( \w+)+ \w+\[\];\n//mg;
+
+	# eliminate vararg declarations
+	$data =~ s/^(extern|typedef)( \w+)? \(?\*?\w+\)?\s*\([^)]*,\s*\.\.\.\s*\)\s*;\s*\n//mg;
+
+	# eliminate function pointer declarations
+	$data =~ s/^extern \S+ \(\*\w+\(((?!\)\s*;)(.|\n))*\)\s*;\n//mg;
+
+	# eliminate functions that get passed function pointers
+	$data =~ s/^extern( \S+)? \*?\w+\(((?!\)\s*;)(.|\n))*,\s*\w+\s*\(\s*\*\s*\)\s*\(((?!\)\s*;)(.|\n))*\)\s*;\n//mg;
+
+	# various other special cases
+	$data =~ s/^extern( \w+)? WcWidgetResourcesInitialize\s*\(\s*[^;]*;\n//m;
+	$data =~ s/^typedef struct( \S+)?\s*\{\n(([^}\n].*)?\n)*\}\s*XImage;\n//m;
+	$data =~ s/^typedef struct( \S+)?\s*\{\n(([^}\n].*)?\n)*\}\s*XExtData;\n//m;
+	$data =~ s/^typedef struct( \S+)?\s*\{\n(([^}\n].*)?\n)*\}\s*XSizeHints;\n//m;
+	$data =~ s/^typedef struct( \S+)?\s*\{\n(([^}\n].*)?\n)*\}\s*\*_XPrivDisplay;\n//m;
+	# added for aix 3.2.5 and HPUX 10
+	$data =~ s/^typedef struct( \S+)?\s*\{\n(([^}\n].*)?\n)*\}\s*\*GC;\n//m;
+	$data =~ s/^void XmpChangeNavigationType \( Widget \)\s*;\n//m;
+	$data =~ s/^extern void ToggleCursorGC\s*\([^()]*\)\s*;\n//m;
+	# seems to be in header file but missing from libraries in RedHat Motif
+	$data =~ s/^extern \S+ XmCSTextGetTextPath\s*\([^()]*\)\s*;\s*\n//m;
+	$data =~ s/^extern \S+ XmCSTextSetTextPath\s*\([^()]*\)\s*;\s*\n//m;
+	$data =~ s/^extern \S+ XmCSTextMarkRedraw\s*\([^()]*\)\s*;\s*\n//m;
+
+	# done massaging
+	print STDOUT $data;
+}
+
+# create Xt*Proc() interface
+sub add_xtprocs
+{
+	while ($data =~ m#typedef\s+(\S+)\s*\(\s*\*\s*(Xt\w+Proc)\s*\)\s*\(([^()]*)\)#g) {
+		my($type, $name, $args) = ($1, $2, $3);
+		my @args = split(/\s*,\s*/, $args);
+		my $arg;
+		my @x;
+		my @argnames;
+		my $i = 0;
+		for $arg (@args) {
+			push(@x, "$arg arg$i");
+			push(@argnames, ", arg$i");
+			++$i;
+		}
+		$args = join(",\n", @x);
+
+		# emit the standard functions
+		emit(qq(
+			\%{
+		));
+		emit(qq(
+			static int xtproc_key_$name;
+
+			static $type
+			Standard$name(int function_number, $args)
+			{
+				char *perl_procedure_name =
+					MapAg_Find(_X11_Wcl_agent, &xtproc_key_$name, function_number, 0);
+				if (perl_procedure_name) {
+					char *argv[1];
+					argv[0] = 0;
+					/* do the callback, discarding any results */
+					perl_call_argv(perl_procedure_name, G_DISCARD, argv);
+				}
+			}
+
+		));
+		for ($i=0; $i<$NUM_XTPROCS; ++$i) {
+			emit(qq(
+				static $type
+				Standard$name$i($args)
+				{
+					Standard$name($i @argnames);
+				}
+
+			));
+		}
+
+		# emit the table of standard functions
+		emit(qq(
+			static $name table_$name\[] = {
+		));
+		for ($i=0; $i<$NUM_XTPROCS; ++$i) {
+			emit(qq(
+				Standard$name$i,
+			));
+		}
+		emit(qq(
+			};
+		));
+		emit(qq(
+			\%}
+		));
+
+		# emit allocator for standard functions
+		emit(qq(
+			\%inline \%{
+			$name
+			Make$name(char *perl_procedure_name)
+			{
+				static int counter = 0;
+				if ((counter + 1) < $NUM_XTPROCS) {
+					char *x = strdup(perl_procedure_name);
+					MapAg_Define(_X11_Wcl_agent, &xtproc_key_$name, counter, 0, x);
+					return(table_$name\[counter++]);
+				} else {
+					return(($name)0);
+				}
+			}
+			\%}
+
+		));
+	}
+}
+
+# add constructors, destructors and other member functions to structs
+# found in the input header files of interest
+sub add_standard_member_functions
+{
+	while ($data =~ m/
+		typedef	\s*
+		(?:struct|union)(?:\s+\S+)? \s*
+		{ (?:
+			[^{}]+ |
+			{ (?:
+				[^{}]+ |
+				{ (?:
+					[^{}]+
+				)* }
+			)* }
+		)* } \s*
+		(\*?\w+)
+	/mgx) {
+		$struct = $1;
+		next unless $struct =~ /^\w+$/;
+		emit(qq(
+			\%addmethods $struct {
+				$struct(int address = 0, int count = 0) {
+					return(($struct *)_X11_Wcl_do_constructor(address, count, sizeof($struct)));
+				}
+				~$struct() {
+					_X11_Wcl_do_destructor((char *)self);
+				}
+				$struct *
+				idx(int i) {
+					return(self + i);
+				}
+			};
+
+		));
+	}
+}

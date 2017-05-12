@@ -1,0 +1,10 @@
+Revision history for XML-Hash
+
+0.92	12-11-2008
+        Alpha Release, released on an unsuspecting world.
+0.93	14-11-2008
+		Docs updated, dependencies corrected
+0.94	20-11-2008
+		Updated version
+0.95	21-11-2008
+		Fixed license in ExtUtils::MakeMaker and added META.yml

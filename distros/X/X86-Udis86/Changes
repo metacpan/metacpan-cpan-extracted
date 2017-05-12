@@ -1,0 +1,20 @@
+Revision history for Perl extension X86::Udis86.
+
+0.01  Fri Nov 20 10:31:25 2009
+	- original version; created by h2xs 1.23 with options
+		-b 5.8.0 -O -a -n X86::Udis86 X86-Udis86/src/udis86.h
+
+0.02  Thu Nov 18 20:46:25 2010
+        - add checks to Makefile.PL for C library and refuse to build unless it exists
+
+1.7.2.1  Sun Oct 27 20:46:25 2013
+        - modify op code to work with 1.7.2 
+          renumber to track udis86
+          add facility to build locally installed version of udis86
+
+1.7.2.2  Fri Nov 01 20:46:25 2013
+        - unlink Makefile if there is no libudis86
+        - add missing header files to MANIFEST
+
+1.7.2.3  Tue Jan 28 20:36:25 2014
+        - fix for https://rt.cpan.org/Public/Bug/Display.html?id=92317

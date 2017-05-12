@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<delta>
+  <uri value="first">
+    <word value="1."/>
+  </uri>
+  <uri value="second">
+    <word value="2."/>
+  </uri>
+  <uri value="fourth">
+    <word value="4."/>
+  </uri>
+</delta>

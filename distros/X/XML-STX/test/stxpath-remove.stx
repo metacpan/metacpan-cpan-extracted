@@ -1,0 +1,29 @@
+<stx:transform version="1.0" 
+  xmlns:stx="http://stx.sourceforge.net/2002/ns"
+  strip-space="yes">
+
+  <stx:template match="/root">
+    <node>
+      <stx:variable name="x" select="('a', 'b', 'c')"/>
+
+      <stx:value-of select="remove($x, 0)"/>
+      <stx:text>:</stx:text>
+      <stx:value-of select="remove($x, 1)"/>
+      <stx:text>:</stx:text>
+      <stx:value-of select="remove($x, 2)"/>
+      <stx:text>:</stx:text>
+      <stx:value-of select="remove($x, 3)"/>
+      <stx:text>:</stx:text>
+      <stx:value-of select="remove($x, 4)"/>
+      <stx:text>/</stx:text>
+      <stx:value-of select="$x"/>
+      <stx:text>/</stx:text>
+      <stx:value-of select="remove((), 1)"/>
+      <stx:text>/</stx:text>
+      <stx:value-of select="remove($x, -2)"/>
+      <stx:text>:</stx:text>
+      <stx:value-of select="remove($x, 9)"/>
+    </node>
+  </stx:template>
+
+</stx:transform>

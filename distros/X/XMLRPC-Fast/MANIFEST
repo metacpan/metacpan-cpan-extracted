@@ -1,0 +1,20 @@
+MANIFEST
+Makefile.PL
+Build.PL
+README
+README.md
+Changes
+lib/XMLRPC/Fast.pm
+alt/XMLRPC/Fast/DecodeWith/XMLLibXML.pm
+alt/XMLRPC/Fast/DecodeWith/XMLTreePP.pm
+tools/bench-decode
+tools/bench-encode
+t/00-load.t
+t/01-api.t
+t/50-xmlrpc.t
+xt/alt-00-load.t
+xt/dist-check.t
+xt/pod-coverage.t
+xt/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

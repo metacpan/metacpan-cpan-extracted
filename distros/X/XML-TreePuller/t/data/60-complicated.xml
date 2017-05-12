@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<complex test1="value1" test2="value2">
+	<child>
+		<subchild test3="value3">
+			<grandchild><![CDATA[I have some text in me]]></grandchild></subchild></child></complex>

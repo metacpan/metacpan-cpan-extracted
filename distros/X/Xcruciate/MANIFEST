@@ -1,0 +1,14 @@
+Build.PL
+Changes
+lib/Xcruciate.pm
+lib/Xcruciate/UnitConfig.pm
+lib/Xcruciate/Utils.pm
+lib/Xcruciate/XcruciateConfig.pm
+Makefile.PL
+MANIFEST
+MANIFEST.skip
+META.yml
+README
+t/00-load.t
+t/pod-coverage.t
+t/pod.t

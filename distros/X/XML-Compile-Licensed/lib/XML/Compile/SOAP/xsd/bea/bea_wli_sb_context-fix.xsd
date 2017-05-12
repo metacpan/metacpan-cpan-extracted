@@ -1,0 +1,24 @@
+<schema targetNamespace="http://www.bea.com/wli/sb/context"
+        xmlns:mc="http://www.bea.com/wli/sb/context"
+        xmlns="http://www.w3.org/2001/XMLSchema"
+        elementFormDefault="qualified"
+        attributeFormDefault="unqualified">
+
+    <complexType name="LocationType">
+        <all>
+            <element name="node" type="string" minOccurs="0" />
+            <element name="pipeline" type="string" minOccurs="0" />
+            <element name="stage" type="string" minOccurs="0" />
+            <element name="error-handler" type="boolean" minOccurs="0" />
+
+    <!-- MO 2014-01-05:
+         used in routing errors, and in many examples on internet, but
+         not in the schema
+      -->
+            <element name="path" type="string" minOccurs="0" />
+
+        </all>
+    </complexType>
+    <!-- Encapsulates any stack-traces that may be added to a fault <details> -->
+    <element name="stack-trace" type="string"/>
+</schema>

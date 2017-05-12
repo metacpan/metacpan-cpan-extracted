@@ -1,0 +1,1576 @@
+#!/usr/bin/perl
+
+# copyright 2001, T.J. Mather
+
+use strict;
+use XML::GDOME;
+use Tie::IxHash;
+use Data::Dumper;
+
+my $gdome_dir = $ARGV[0];
+
+unless ($gdome_dir) {
+  print STDERR "Usage: $0 gdome_dir\n";
+  exit;
+}
+
+#TODO
+my %class_description = ();
+
+my %abbrv_lookup;
+
+my %return_var = (Document => 'doc',
+		  ProcessingInstruction => 'pi',
+		  DocumentFragment => 'docFrag',
+		  Comment => 'comment',
+		  DOMImplementation => 'DOMImpl',
+		  CDATASection => 'cdata',
+		  Element => 'elem',
+		  Node => 'node',
+		  Event => 'event',
+		  EntityReference => 'entRef',
+		  DOMString => 'str',
+		  Boolean => 'bool',
+		  Text => 'text',
+		  DocumentType => 'docType',
+		  NodeList => 'nodeList',
+		  Attr => 'attr',
+		  NamedNodeMap => 'nnm',
+		  gulong => 'int',
+		  'unsigned short' => 'int',
+		  double => 'num',
+		  XPathSetIterator => 'xpsetiter',
+		  XPathNSResolver => 'xpnsresolv',
+		  XPathResult => 'xpresult',
+		  XPathEvaluator => 'xpeval',
+		  NodeFilter => 'nodeFilter',
+		  NodeIterator => 'nodeIter',
+		  EventTarget => 'evtTarget',
+		 );
+
+#print Dumper($docs->{Node}->{firstChild});
+
+open XS, ">GDOME.xs";
+open PM, ">GDOME.pm";
+
+print XS <<END;
+/* generated automatically from generate */
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#include "EXTERN.h"
+#include "perl.h"
+#include "XSUB.h"
+
+#include <libxml/xmlerror.h>
+#include "gdome.h"
+#include "gdome-xpath.h"
+/*#include "gdome-traversal.h"
+#include "gdome-events.h"*/
+
+#include "dom.h"
+
+typedef struct _Gdome_xml_Node Gdome_xml_Node;
+struct _Gdome_xml_Node {
+        GdomeNode super;
+        const GdomeNodeVtab *vtab;
+        int refcnt;
+  xmlNode *n;
+  GdomeAccessType accessType;
+  void *ll;
+  xmlNs *ns;
+};
+
+xmlNs * gdome_xmlGetNsDeclByAttr (xmlAttr *a);
+
+#ifdef __cplusplus
+}
+#endif
+
+char *errorMsg[101];
+
+#define SET_CB(cb, fld) \\
+    RETVAL = cb ? newSVsv(cb) : &PL_sv_undef;\\
+    if (SvOK(fld)) {\\
+        if (cb) {\\
+            if (cb != fld) {\\
+                sv_setsv(cb, fld);\\
+            }\\
+        }\\
+        else {\\
+            cb = newSVsv(fld);\\
+        }\\
+    }\\
+    else {\\
+        if (cb) {\\
+            SvREFCNT_dec(cb);\\
+            cb = NULL;\\
+        }\\
+    }
+
+static SV * GDOMEPerl_match_cb = NULL;
+static SV * GDOMEPerl_read_cb = NULL;
+static SV * GDOMEPerl_open_cb = NULL;
+static SV * GDOMEPerl_close_cb = NULL;
+static SV * GDOMEPerl_error = NULL;
+
+/* Shamelessly cribbed straight from LibXML.xs */
+/* This handler function appends 
+   an error message to the GDOMEPerl_error global */
+void
+GDOMEPerl_error_handler(void * ctxt, const char * msg, ...) 
+{ 
+    va_list args; 
+    SV * sv; 
+     
+    sv = NEWSV(0,512); 
+     
+    va_start(args, msg); 
+    sv_vsetpvfn(sv, msg, strlen(msg), &args, NULL, 0, NULL); 
+    va_end(args); 
+     
+    sv_catsv(GDOMEPerl_error, sv); /* remember the last error */ 
+    SvREFCNT_dec(sv); 
+} 
+
+int 
+GDOMEPerl_input_match(char const * filename)
+{
+    int results = 0;
+    SV * global_cb;
+    SV * callback = NULL;
+
+    if ((global_cb = perl_get_sv("XML::GDOME::match_cb", FALSE))
+            && SvTRUE(global_cb)) {
+        callback = global_cb;
+    }
+    else if (GDOMEPerl_match_cb && SvTRUE(GDOMEPerl_match_cb)) {
+        callback = GDOMEPerl_match_cb;
+    }
+
+    if (callback) {
+        int count;
+        SV * res;
+
+        dSP;
+
+        ENTER;
+        SAVETMPS;
+
+        PUSHMARK(SP);
+        EXTEND(SP, 1);
+        PUSHs(sv_2mortal(newSVpv((char*)filename, 0)));
+        PUTBACK;
+
+        count = perl_call_sv(callback, G_SCALAR);
+
+        SPAGAIN;
+        
+        if (count != 1) {
+            croak("match callback must return a single value");
+        }
+        
+        res = POPs;
+
+        if (SvTRUE(res)) {
+            results = 1;
+        }
+        
+        PUTBACK;
+        FREETMPS;
+        LEAVE;
+    }
+    
+    return results;
+}
+
+void * 
+GDOMEPerl_input_open(char const * filename)
+{
+    SV * results;
+    SV * global_cb;
+    SV * callback = NULL;
+
+    if ((global_cb = perl_get_sv("XML::GDOME::open_cb", FALSE))
+            && SvTRUE(global_cb)) {
+        callback = global_cb;
+    }
+    else if (GDOMEPerl_open_cb && SvTRUE(GDOMEPerl_open_cb)) {
+        callback = GDOMEPerl_open_cb;
+    }
+
+    if (callback) {
+        int count;
+
+        dSP;
+
+        ENTER;
+        SAVETMPS;
+
+        PUSHMARK(SP);
+        EXTEND(SP, 1);
+        PUSHs(sv_2mortal(newSVpv((char*)filename, 0)));
+        PUTBACK;
+
+        count = perl_call_sv(callback, G_SCALAR);
+
+        SPAGAIN;
+        
+        if (count != 1) {
+            croak("open callback must return a single value");
+        }
+
+        results = POPs;
+
+        SvREFCNT_inc(results);
+
+        PUTBACK;
+        FREETMPS;
+        LEAVE;
+    }
+    
+    return (void *)results;
+}
+
+int 
+GDOMEPerl_input_read(void * context, char * buffer, int len)
+{
+    SV * results = NULL;
+    STRLEN res_len = 0;
+    const char * output;
+    SV * global_cb;
+    SV * callback = NULL;
+    SV * ctxt = (SV *)context;
+
+    if ((global_cb = perl_get_sv("XML::GDOME::read_cb", FALSE))
+            && SvTRUE(global_cb)) {
+        callback = global_cb;
+    }
+    else if (GDOMEPerl_read_cb && SvTRUE(GDOMEPerl_read_cb)) {
+        callback = GDOMEPerl_read_cb;
+    }
+    
+    if (callback) {
+        int count;
+
+        dSP;
+
+        ENTER;
+        SAVETMPS;
+
+        PUSHMARK(SP);
+        EXTEND(SP, 2);
+        PUSHs(ctxt);
+        PUSHs(sv_2mortal(newSViv(len)));
+        PUTBACK;
+
+        count = perl_call_sv(callback, G_SCALAR);
+
+        SPAGAIN;
+        
+        if (count != 1) {
+            croak("read callback must return a single value");
+        }
+
+        output = POPp;
+        if (output != NULL) {
+            res_len = strlen(output);
+            if (res_len) {
+                strncpy(buffer, output, res_len);
+            }
+            else {
+                buffer[0] = 0;
+            }
+        }
+        
+        FREETMPS;
+        LEAVE;
+    }
+    
+    /* warn("read, asked for: %d, returning: [%d] %s\n", len, res_len, buffer); */
+    return res_len;
+}
+
+void 
+GDOMEPerl_input_close(void * context)
+{
+    SV * global_cb;
+    SV * callback = NULL;
+    SV * ctxt = (SV *)context;
+
+    if ((global_cb = perl_get_sv("XML::GDOME::close_cb", FALSE))
+            && SvTRUE(global_cb)) {
+        callback = global_cb;
+    }
+    else if (GDOMEPerl_close_cb && SvTRUE(GDOMEPerl_close_cb)) {
+        callback = GDOMEPerl_close_cb;
+    }
+
+    if (callback) {
+        int count;
+
+        dSP;
+
+        ENTER;
+        SAVETMPS;
+
+        PUSHMARK(SP);
+        EXTEND(SP, 1);
+        PUSHs(ctxt);
+        PUTBACK;
+
+        count = perl_call_sv(callback, G_SCALAR);
+
+        SPAGAIN;
+
+        SvREFCNT_dec(ctxt);
+        
+        if (!count) {
+            croak("close callback failed");
+        }
+
+        PUTBACK;
+        FREETMPS;
+        LEAVE;
+    }
+}
+
+void
+GDOMEPerl_load_error_strings() {
+END
+
+# constants
+my %constants;
+tie %constants, "Tie::IxHash";
+parseHeader("$gdome_dir/libgdome/gdome.h");
+parseHeader("$gdome_dir/libgdome/gdome-xpath.h");
+#parseHeader("$gdome_dir/libgdome/gdome-traversal.h");
+#parseHeader("$gdome_dir/libgdome/gdome-events.h");
+
+while (my ($k, $v) = each %constants) {
+  next unless $k =~ m!_ERR!;
+  print XS qq{  errorMsg[$v] = "$k";\n};
+}
+
+print XS "}\n\n";
+
+print PM q{package XML::GDOME;
+
+# generated automatically from generate script
+
+use strict;
+use vars qw($VERSION @ISA @EXPORT);
+
+use XML::LibXML::Common qw(:encoding :w3c);
+
+$VERSION = '0.86';
+
+require DynaLoader;
+require Exporter;
+@ISA = qw(DynaLoader Exporter);
+
+bootstrap XML::GDOME $VERSION;
+
+my $di = XML::GDOME::DOMImplementation::mkref();
+
+sub CLONE {
+  XML::GDOME::DOMImplementation::ref($di);
+}
+
+};
+
+my $parser = XML::GDOME->new;
+
+my @nodes;
+
+#for my $module (qw(core xpath traversal events)) {
+for my $module (qw(core xpath)) {
+  my $dom = $parser->parse_file("$gdome_dir/test/apigen/$module.xml");
+  my $api = $dom->getDocumentElement;
+  push @nodes, $api->findnodes("//INTERFACE");
+}
+
+for (@nodes) {
+  $abbrv_lookup{$_->getAttribute("PREFIX")} = $_->getAttribute("NAME");
+  
+}
+
+my $docs;
+parseDocs("$gdome_dir/libgdome/gdome.c");
+parseDocs("$gdome_dir/libgdome/gdome-xpath.c");
+#parseDocs("$gdome_dir/libgdome/gdome-traversal.c");
+#parseDocs("$gdome_dir/libgdome/gdome-events.c");
+
+$docs->{Node}->{attributes}->{return} .= " In array context, returns array.";
+$docs->{Node}->{childNodes}->{return} .= " In array context, returns array.";
+$docs->{Element}->{getElementsByTagName}->{return} .= " In array context, returns array.";
+$docs->{Element}->{getElementsByTagNameNS}->{return} .= " In array context, returns array.";
+
+my $firstTime = 1;
+my @isa_strings;
+my %parent_class;
+for (@nodes) {
+  my $class = $_->getAttribute("NAME");
+  my $perl_class = perlEscape($class);
+  (my $file_class = $perl_class) =~ s!::!/!g;
+  next if $class eq 'DOMString';
+  my $parentNode = $_->parentNode;
+  if ($parentNode->getName eq 'INTERFACE') {
+    my $parent_class = perlEscape($parentNode->getAttribute("NAME"));
+    push @isa_strings, "\@XML::GDOME::${perl_class}::ISA = 'XML::GDOME::$parent_class';";
+    $parent_class{$perl_class} = $parent_class;
+  }
+
+  my %synopsis;
+  tie %synopsis, "Tie::IxHash";
+  my @description;
+  my $prefix = $_->getAttribute("PREFIX");
+  print XS "MODULE = XML::GDOME       PACKAGE = XML::GDOME::$perl_class\n\n";
+  print XS <<END if $firstTime == 1;
+PROTOTYPES: DISABLE
+
+BOOT:
+    GDOMEPerl_load_error_strings();
+    xmlInitParser();
+    xmlRegisterInputCallbacks((xmlInputMatchCallback) GDOMEPerl_input_match,
+                              (xmlInputOpenCallback) GDOMEPerl_input_open,
+                              (xmlInputReadCallback) GDOMEPerl_input_read,
+                              (xmlInputCloseCallback) GDOMEPerl_input_close);
+    xmlSetGenericErrorFunc(PerlIO_stderr(),
+                           (xmlGenericErrorFunc)GDOMEPerl_error_handler);
+
+END
+  $firstTime = 0;
+
+# * used by XML::Canonical if nowhere else.  Returns
+# * pointer to underlying node, or namespace for namespace declaration
+# * attributes and xpath namespaces.
+# */
+
+  if($class eq 'Node'){
+    print XS <<END;
+int
+gdome_ref(self)
+        GdomeNode * self
+    PREINIT:
+        Gdome_xml_Node *priv;
+        xmlNs *ns;
+    CODE:
+        priv = (Gdome_xml_Node *)self;
+        if (priv->n->type == XML_ATTRIBUTE_NODE) {
+          ns = gdome_xmlGetNsDeclByAttr((xmlAttr *)priv->n);
+          if (ns != NULL)
+            RETVAL = (int) ns;
+          else
+            RETVAL = (int) priv->n;
+        } else if (priv->n->type == XML_NAMESPACE_DECL)
+          RETVAL = (int) priv->n->ns;
+        else
+          RETVAL = (int) priv->n;
+    OUTPUT:
+        RETVAL
+
+char *
+toString( self )
+        GdomeNode * self
+    PREINIT:
+        Gdome_xml_Node *priv;
+        xmlBufferPtr buffer;
+        char *ret = NULL;
+    CODE:
+        priv = (Gdome_xml_Node *)self;
+        buffer = xmlBufferCreate();
+        xmlNodeDump( buffer, priv->n->doc, priv->n, 0, 0 );
+        if ( buffer->content != 0 ) {
+            ret= xmlStrdup( buffer->content );
+        }
+        xmlBufferFree( buffer );
+
+        if ( priv->n->doc != NULL ) {
+            xmlChar *retDecoded = domDecodeString( priv->n->doc->encoding, ret );
+            xmlFree( ret );
+            RETVAL = retDecoded;
+        } else {
+            RETVAL = ret;
+        }
+
+    OUTPUT:
+        RETVAL
+
+char *
+string_value ( self )
+	GdomeNode * self
+    ALIAS:
+        to_literal = 1
+    PREINIT:
+	Gdome_xml_Node *priv;
+	char *ret = NULL;
+    CODE:
+	priv = (Gdome_xml_Node *)self;
+	ret = (char *)xmlXPathCastNodeToString(priv->n);
+
+        if ( priv->n->doc != NULL ) {
+            xmlChar *retDecoded = domDecodeString( priv->n->doc->encoding, ret );
+            xmlFree( ret );
+            RETVAL = retDecoded;
+        } else {
+            RETVAL = ret;
+        }
+    OUTPUT:
+        RETVAL
+
+END
+  } elsif ($class eq 'Document'){
+    print XS <<END;
+void
+process_xinclude(self)
+        GdomeDocument* self
+    PREINIT:
+        Gdome_xml_Node *priv;        
+    CODE:
+        priv = (Gdome_xml_Node *)self;
+        xmlXIncludeProcess((xmlDocPtr)priv->n);
+
+END
+  }
+
+  my @attr = $_->findnodes("./ATTR");
+  my @method = $_->findnodes("./METHOD");
+  for (@attr) {
+    my $readonly = $_->getAttribute("READONLY");
+    my $type = $_->getAttribute("TYPE");
+    my $bless = getBless($type);
+    my $method = $_->getAttribute("NAME");
+    my $pn = $_->getParentNode->getAttribute("NAME");
+    my $Method = ucfirst($method);
+    my $private;
+    if ($method eq 'attributes' ||
+        $method eq 'childNodes') {
+      $private = '_';
+    } else {
+      $private = '';
+    }
+    my ($r) = ($type =~ m!^Gdome(\w*)!);
+    my $return_var;
+    if ($method eq 'nodeType') {
+      $return_var = 'type';
+    } elsif ($type eq 'gulong' || $type eq 'unsigned short' || $type eq 'guint32' || $type eq 'gushort' || $type eq 'GdomeDOMTimeStamp') {
+      $return_var = 'int';
+    } elsif ($type eq 'double') {
+      $return_var = 'num';
+    } elsif (exists $return_var{$r}) {
+      $return_var = $return_var{$r};
+    } else {
+      warn "Cannot find return var for $type ($r)";
+    }
+
+    my $synopsis = qq{\$$return_var = \$${prefix}->get$Method();};
+    $synopsis{$method} = $synopsis;
+    unless ($readonly eq 'YES') {
+      print XS <<END;
+void
+${private}set$Method(self, val)
+        Gdome$class * self
+        $type val
+    PREINIT:
+        GdomeException exc;
+    CODE:
+        gdome_${prefix}_set_$method(self, val, &exc);
+END
+if ($type eq 'GdomeDOMString *'){
+        print XS <<END
+        if (val != NULL)
+          gdome_str_unref(val);
+END
+}
+      print XS "\n";
+      my $synopsis = qq{\$${prefix}->set$Method(\$$return_var);};
+      $synopsis{"set_$method"} = $synopsis;
+    }
+    print XS <<END;
+$type
+$private$method(self)
+        Gdome$class * self
+END
+    unless ($private) {
+      print XS <<END;
+    ALIAS:
+        XML::GDOME::${class}::get$Method = 1
+END
+    }
+    print XS <<END;
+    PREINIT:
+END
+    print XS <<END if $bless;
+        char * CLASS = "$bless";
+END
+    print XS <<END;
+        GdomeException exc;
+    CODE:
+        RETVAL = gdome_${prefix}_$method(self, &exc);
+        if (exc>0){
+          croak("%s",errorMsg[exc]);
+        }
+    OUTPUT:
+        RETVAL
+
+END
+  }
+
+  for (@method) {
+    my $error_handling;
+    my $return = $_->getAttribute("TYPE");
+    my $method = $_->getAttribute("NAME");
+    my $private;
+    if ($method eq 'getElementsByTagName' ||
+        $method eq 'getElementsByTagNameNS' ||
+        $method eq 'createAttribute') {
+      $private = '_';
+    } else {
+      $private = '';
+    }
+    if ($method =~ m!^createDoc! && $class eq 'DOMImplementation') {
+      $error_handling = 1;
+    }
+    next if $method eq 'query_interface';
+    next if $method =~ m!WithEntitiesTable$!;
+    # for some inexplicable reason, causes segfaults when uncommented
+#    next if $method =~ m!Event!;
+    if ($method eq 'saveDocToMemory') {
+      print XS <<END;
+char *
+saveDocToString(self,doc,mode)
+        GdomeDOMImplementation * self
+        GdomeDocument * doc
+        GdomeSavingCode mode
+    PREINIT:
+        char ** mem = malloc(sizeof(char *));
+        GdomeException exc;
+    CODE:
+        if ( gdome_di_saveDocToMemory(self,doc,mem,mode,&exc) ) {
+          RETVAL = *mem;
+          free(mem);
+        }
+    OUTPUT:
+        RETVAL
+
+END
+      next;
+    }
+    if ($method eq 'saveDocToMemoryEnc') {
+      print XS <<END;
+char *
+saveDocToStringEnc(self,doc,encoding,mode)
+        GdomeDOMImplementation * self
+        GdomeDocument * doc
+        const char * encoding
+        GdomeSavingCode mode
+    PREINIT:
+        char ** mem = malloc(sizeof(char *));
+        GdomeException exc;
+    CODE:
+        if ( gdome_di_saveDocToMemoryEnc(self,doc,mem,encoding,mode,&exc) ) {
+          RETVAL = *mem;
+          free(mem);
+        }
+    OUTPUT:
+        RETVAL
+
+END
+      next;
+    }
+    my $raw = $_->getAttribute("RAW");
+    my @param = $_->findnodes("./PARAM");
+    my @args = ();
+    my $exception = ',&exc';
+    my $bless = getBless($return);
+    my @strings;
+    unless ($raw eq 'YES') {
+      push @args, { type => "Gdome$class *",
+		    name => "self" };
+    }
+    for (@param) {
+      my $name = $_->getAttribute("NAME");
+      my $type = $_->getAttribute("TYPE");
+      $name = 'str' if $name eq 'buffer';
+      unless ($name) {
+	$exception = undef;
+      } else {
+	push @args, { type => $type,
+		      name => $name };
+	if ($type eq 'GdomeDOMString *') {
+	  push @strings, $name;
+	}
+      }
+    }
+    my $arg_names = join(",",map {$_->{name}} @args);
+    my $syn_names = join(",",map {'$' . $_->{name}} grep {$_->{name} ne 'self' } @args);
+
+    unless ($method =~ m!Event!) {
+      if ($return eq 'void') {
+        $synopsis{$method} = qq{\$${prefix}->$method($syn_names);} unless ($method eq 'ref' || $method eq 'unref');
+      } elsif ($method eq 'mkref') {
+        my ($r) = ($return =~ m!^Gdome(\w*)!);
+        $synopsis{$method} = qq{\$$return_var{$r} = XML::GDOME::${class}::$method($syn_names);};
+      } else {
+        my ($r) = ($return =~ m!^Gdome(\w*)!);
+        $synopsis{$method} = qq{\$$return_var{$r} = \$${prefix}->$method($syn_names);};
+      }
+    }
+
+    print XS <<END;
+$return
+$private$method($arg_names)
+END
+    for (@args) {
+      print XS "        $_->{type} $_->{name}\n";
+    }
+    if ($method eq 'unref') {
+      print XS <<END;
+    ALIAS:
+        XML::GDOME::${perl_class}::DESTROY = 1
+END
+    }
+    if ($exception || $bless) {
+      print XS "    PREINIT:\n";
+    }
+    if ($bless) {
+      print XS qq{        char * CLASS = "$bless";\n};
+    }
+    if ($exception) {
+      print XS "        GdomeException exc;\n";
+    }
+    if ($error_handling) {
+      print XS "        char * errstr;\n";
+      print XS "        STRLEN len = 0;\n";
+    }
+    print XS "    CODE:\n";
+    if ($error_handling) {
+      print XS qq{        GDOMEPerl_error = NEWSV(0, 512);\n};
+      print XS qq{        sv_setpvn(GDOMEPerl_error, "", 0);\n};
+    }
+    if ($return eq 'void') {
+      print XS qq{        gdome_${prefix}_$method($arg_names$exception);\n};
+      for (@strings) {
+        print XS "        if($_ != NULL)\n";
+        print XS "          gdome_str_unref($_);\n";
+      }
+      if ($exception) {
+        print XS <<END;
+        if (exc>0){
+          croak("%s",errorMsg[exc]);
+        }
+END
+      }
+      print XS "\n";
+    } else {
+      print XS "        RETVAL = gdome_${prefix}_$method($arg_names$exception);\n";
+      for (@strings) {
+        print XS "        if($_ != NULL)\n";
+        print XS "          gdome_str_unref($_);\n";
+      }
+      if ($error_handling) {
+        print XS <<END;
+        sv_2mortal(GDOMEPerl_error);
+
+        errstr = SvPV(GDOMEPerl_error, len);
+        if (len > 0){
+          croak("%s",errstr);
+        }
+END
+      }
+      if ($exception) {
+        print XS <<END;
+        if (exc>0){
+          croak("%s",errorMsg[exc]);
+        }
+END
+      }
+      print XS <<END;
+    OUTPUT:
+        RETVAL
+
+END
+    }
+  }
+  if($class eq 'Document') {
+    $synopsis{"toString"} = q{$str = $doc->toString($mode);};
+    $docs->{Document}->{toString} = {
+				     desc => "Save the DOM tree of the Document to a string",
+				     vars => {
+					      mode => "the indentation mode wanted, either GDOME_SAVE_STANDARD or GDOME_SAVE_LIBXML_INDENT"
+					     },
+				     return => "string representation of DOM tree",
+				    };
+    $synopsis{"toStringEnc"} = q{$str = $doc->toStringEnc($encoding,$mode);};
+    $docs->{Document}->{toStringEnc} = {
+				     desc => "Save the DOM tree of the Document to a string",
+				     vars => {
+					      encoding => "character encoding to use when generating XML text",
+					      mode => "the indentation mode wanted, either GDOME_SAVE_STANDARD or GDOME_SAVE_LIBXML_INDENT"
+					     },
+				     return => "string representation of DOM tree using the specified character encoding standard",
+				    };
+  } elsif($class eq 'Node') {
+    $synopsis{"toString"} = q{$str = $n->toString($mode);};
+    $docs->{Node}->{toString} = {
+				     desc => "This is the equivalent to XML::GDOME::Document::toString for a single node. This means a node and all its
+       childnodes will be dumped into the result string. There is no formating implemented yet, which may cause an
+       unreadable output. ",
+				     return => "string representation of node and childnodes",
+				    };
+    $synopsis{"findnodes"} = q{@nodes = $n->findnodes($xpath);};
+    $docs->{Node}->{findnodes} = {
+                                     desc => "findnodes performs the xpath statement on the current node and returns the result as an array."
+                                  };
+    $synopsis{"iterate"} = q{$n->iterator( \&nodehandler )};
+    $docs->{Node}->{iterate} = {
+                                     desc => q{This is little helper function, that lets one define a function, that will be processed on the current node and all its
+children. The function will recieve as its only parameter the node to proceed. The function uses inorder
+proceeding to traverse the subtree. Therefore you can't reach the childnodes anymore, if the nodehandler
+removes childnodes. 
+
+  $node->iterator( sub { print $_[0]->nodeName(), "\n"; } );    
+
+The example will print all node names in the current subtree.},
+			            return => "return value of the nodehandler while processing the last child of the current node."
+		       };
+    $synopsis{"gdome_ref"} = q{$pointer = $n->gdome_ref;};
+    $docs->{Node}->{gdome_ref} = {
+				     desc => "This returns the pointer to the node in the underlying C libxml2 library.  It is useful for testing if two nodes are the same.  For namespace declaration attributes and xpath namespaces, returns pointer to libxml2 namespace.  Similar to getPointer method in XML::LibXML",
+				     return => "Value of pointer to libxml2 C structure.",
+				    };
+  } elsif($class eq 'Element') {
+    $synopsis{"appendText"} = q{$elem->appendText($PCDATA);};
+    $docs->{Element}->{appendText} = {
+                                      desc => "This wrapper function lets you add a string directly to an element node."
+                                 };
+  }
+
+  unless ($class eq 'DOMImplementation') {
+    open POD, ">lib/XML/GDOME/$file_class.pod";
+    print POD <<END;
+=head1 NAME
+
+  XML::GDOME::$perl_class - Interface $class implementation.
+
+=head1 SYNOPSIS
+
+END
+    my @synopsis = values %synopsis;
+    alignEquals(\@synopsis);
+    for (@synopsis) {
+      print POD "  $_\n";
+    }
+    my $parent_class = $perl_class;
+    my @class_hierarchy;
+    while ($parent_class = $parent_class{$parent_class}) {
+      unshift @class_hierarchy, $parent_class;
+    }
+    if (@class_hierarchy) {
+      print POD <<END;
+
+=head1 CLASS INHERITANCE
+
+END
+      for my $class (@class_hierarchy) {
+        print POD "L<XML::GDOME::$class> > ";
+      }
+      print POD "XML::GDOME::$perl_class\n\n";
+    }
+#    print POD <<END;
+#
+#=head1 DESCRIPTION
+#
+#$class_description{$class}
+#
+#END
+
+    print POD <<END;
+
+=head1 METHODS
+
+=over 4
+
+END
+
+    while (my ($method, $synopsis) = each %synopsis) {
+      my $hash_ref = $docs->{$class}->{$method};
+      if ($hash_ref) {
+        print POD "\n=item $synopsis{$method}\n\n";
+        print POD "$hash_ref->{desc}\n\n" if exists $hash_ref->{desc};
+        while (my ($k, $v) = each %{$hash_ref->{vars}}) {
+          print POD "I<C<$k>>: $v\n\n";
+        }
+        print POD "I<Returns>: $hash_ref->{return}\n\n" if exists $hash_ref->{return};
+        while (my ($k, $v) = each %{$hash_ref->{exc}}) {
+          print POD "C<$k>: $v\n\n";
+        }
+      }
+    }
+
+    print POD <<END;
+
+=back
+
+END
+
+    close POD;
+  }
+
+}
+
+print PM q{@EXPORT = qw( } . join(" ", keys %constants) . qq{
+encodeToUTF8
+decodeFromUTF8
+);\n\n};
+
+while (my ($k, $v) = each %constants) {
+  if ($k !~ m!_NODE$! ||
+      $k eq 'READONLY_NODE' ||
+      $k eq 'READWRITE_NODE' ||
+      $k eq 'XPATH_NAMESPACE_NODE' ) {
+    print PM "sub $k(){$v;}\n";
+  }
+}
+print PM "\n";
+
+alignEquals(\@isa_strings);
+print PM join("\n",@isa_strings);
+
+print PM q{
+
+sub createDocFromString {
+  my $class = shift;
+  my $str = shift;
+  my $mode = shift || 0;
+  return $di->createDocFromMemory($str, $mode);
+}
+
+sub createDocFromURI {
+  my $class = shift;
+  my $uri = shift; 
+  my $mode = shift || 0;
+  return $di->createDocFromURI($uri, $mode);
+}
+
+sub createDocument {
+  my $class = shift;
+  return $di->createDocument(@_);
+}
+
+sub createDocumentType {
+  my $class = shift;
+  return $di->createDocumentType(@_);
+}
+
+sub hasFeature {
+  my $class = shift;
+  return $di->hasFeature(@_);
+}
+
+sub new {
+  my $class = shift;
+  my %options = @_;
+  my $self = bless \%options, $class;
+
+  return $self;
+}
+
+sub parse_fh {
+  my ($self, $fh) = @_;
+  local $/ = undef;
+  my $str = <$fh>;
+  $self->init_parser();
+  my $doc = __PACKAGE__->createDocFromString($str);
+  if ( $self->{XML_GDOME_EXPAND_XINCLUDE} ) {
+    $doc->process_xinclude();
+  }
+  return $doc;
+}
+
+sub parse_string {
+  my ($self, $str) = @_;
+  $self->init_parser();
+  my $doc =__PACKAGE__->createDocFromString($str);
+  if ( $self->{XML_GDOME_EXPAND_XINCLUDE} ) {
+    $doc->process_xinclude();
+  }
+  return $doc;
+}
+
+sub parse_file {
+  my ($self, $uri) = @_;
+  $self->init_parser();
+  my $doc = __PACKAGE__->createDocFromURI($uri);
+  if ( $self->{XML_GDOME_EXPAND_XINCLUDE} ) {
+    $doc->process_xinclude();
+  }
+  return $doc;
+}
+
+sub match_callback {
+    my $self = shift;
+    return $self->{XML_GDOME_MATCH_CB} = shift;
+}
+
+sub read_callback {
+    my $self = shift;
+    return $self->{XML_GDOME_READ_CB} = shift;
+}
+
+sub close_callback {
+    my $self = shift;
+    return $self->{XML_GDOME_CLOSE_CB} = shift;
+}
+
+sub open_callback {
+    my $self = shift;
+    return $self->{XML_GDOME_OPEN_CB} = shift;
+}
+
+sub callbacks {
+    my $self = shift;
+    if (@_) {
+        my ($match, $open, $read, $close) = @_;
+        @{$self}{qw(XML_GDOME_MATCH_CB XML_GDOME_OPEN_CB XML_GDOME_READ_CB XML_GDOME_CLOSE_CB)} = ($match, $open, $read, $close);
+    }
+    else {
+        return @{$self}{qw(XML_GDOME_MATCH_CB XML_GDOME_OPEN_CB XML_GDOME_READ_CB XML_GDOME_CLOSE_CB)};
+    }
+}
+
+sub expand_xinclude  {
+    my $self = shift;
+    $self->{XML_GDOME_EXPAND_XINCLUDE} = shift if scalar @_;
+    return $self->{XML_GDOME_EXPAND_XINCLUDE};
+}
+
+sub init_parser {
+    my $self = shift;
+    $self->_match_callback( $self->{XML_GDOME_MATCH_CB} )
+      if $self->{XML_GDOME_MATCH_CB};
+    $self->_read_callback( $self->{XML_GDOME_READ_CB} )
+      if $self->{XML_GDOME_READ_CB};
+    $self->_open_callback( $self->{XML_GDOME_OPEN_CB} )
+      if $self->{XML_GDOME_OPEN_CB};
+    $self->_close_callback( $self->{XML_GDOME_CLOSE_CB} )
+      if $self->{XML_GDOME_CLOSE_CB};
+}
+
+package XML::GDOME::Document;
+
+sub toString {
+  my $doc = shift;
+  my $mode = shift || 0;
+  return $di->saveDocToString($doc,$mode);
+}
+
+sub toStringEnc {
+  my $doc = shift;
+  my $encoding = shift;
+  my $mode = shift || 0;
+  return $di->saveDocToStringEnc($doc,$encoding,$mode);
+}
+
+package XML::GDOME::Node;
+
+sub attributes {
+  getAttributes(@_);
+}
+
+sub getAttributes {
+  my ($elem) = @_;
+  my $nnm = $elem->_attributes;
+  if (wantarray) {
+    return () if !$nnm;
+    my @attrs;
+    for my $i (0 .. $nnm->getLength - 1) {
+      push @attrs, $nnm->item("$i");
+    }
+    return @attrs;
+  } else {
+    return $nnm;
+  }
+}
+
+sub xpath_evaluate {
+  my ($contextNode, $expression, $resolver, $type) = @_;
+  $XML::GDOME::XPath::xpeval ||= XML::GDOME::XPath::Evaluator::mkref();
+  no warnings;
+  return $XML::GDOME::XPath::xpeval->evaluate($expression, $contextNode, $resolver, $type, undef);
+}
+
+sub findnodes {
+  my $res = xpath_evaluate(@_);
+
+  my @nodes;
+  while (my $node = $res->iterateNext) {
+    push @nodes, $node;
+  }
+  return @nodes;
+}
+
+sub xpath_createNSResolver {
+  my ($node) = @_;
+  $XML::GDOME::XPath::xpeval ||= XML::GDOME::XPath::Evaluator::mkref();
+  return $XML::GDOME::XPath::xpeval->createNSResolver($node);
+}
+
+sub childNodes {
+  getChildNodes(@_);
+}
+
+sub getChildNodes {
+  my ($elem) = @_;
+  my $nl = $elem->_childNodes;
+  if (wantarray) {
+    return () if !$nl;
+    my @nodes;
+    for my $i (0 .. $nl->getLength - 1) {
+      push @nodes, $nl->item("$i");
+    }
+    return @nodes;
+  } else {
+    return $nl;
+  }
+}
+
+sub iterator {
+  my $self = shift;
+  my $funcref = shift;
+  my $child = undef;
+
+  my $rv = $funcref->( $self );
+  foreach $child ( $self->getChildNodes() ){
+    $rv = $child->iterator( $funcref );
+  }
+  return $rv;
+}
+
+sub getAttributesNS {
+  my ($self, $nsuri) = @_;
+  my @attr;
+  for my $attr ($self->getAttributes()) {
+    push @attr, $attr if $attr->getNamespaceURI() eq $nsuri;
+  }
+  return @attr;
+}
+
+sub findvalue {
+  my $res = xpath_evaluate(@_);
+
+  my $val = '';
+  while (my $node = $res->iterateNext) {
+    $val .= $node->to_literal;
+  }
+  return $val;
+}
+
+sub find {
+  my $res = xpath_evaluate(@_);
+
+  my $type = $res->resultType;
+  if ($type == XML::GDOME::UNORDERED_NODE_ITERATOR_TYPE ||
+      $type == XML::GDOME::ORDERED_NODE_ITERATOR_TYPE) {
+    my @nodes;
+    while (my $node = $res->iterateNext) {
+      push @nodes, $node;
+    }
+    return @nodes;
+  }
+  elsif ($type == XML::GDOME::NUMBER_TYPE()) {
+    return $res->numberValue;
+  }
+  elsif ($type == XML::GDOME::STRING_TYPE()) {
+    return $res->stringValue;
+  }
+  elsif ($type == XML::GDOME::BOOLEAN_TYPE()) {
+    return $res->booleanValue;
+  }
+  else {
+    croak("Unknown result type");
+  }
+}
+
+sub insertAfter {
+  my ($parent, $newChild, $refChild) = @_;
+
+  if (!$refChild) {
+    return $parent->appendChild($newChild);
+  }
+  my $nextChild = $refChild->getNextSibling();
+  if ($nextChild) {
+    $parent->insertBefore($newChild, $nextChild);
+  } else {
+    $parent->appendChild($newChild);
+  }
+}
+
+sub getChildrenByTagName {
+  my ($self, $tagname) = @_;
+  my @nodes;
+  for my $node ($self->getChildNodes()) {
+    if ($node->getNodeName() eq $tagname) {
+      push @nodes, $node;
+    }
+  }
+  return @nodes;
+}
+
+sub getChildrenByTagNameNS {
+  my ($self, $nsURI, $tagname) = @_;
+  my @nodes;
+  for my $node ($self->getChildNodes()) {
+    if ($node->getLocalName() eq $tagname &&
+      $node->getNamespaceURI eq $nsURI) {
+      push @nodes, $node;
+    }
+  }
+  return @nodes;
+}
+
+sub getElementsByLocalName {
+  my ($self, $localname) = @_;
+  # FIXME must fetch all descendants of node with local name
+  my @elem;
+  for my $elem ($self->getChildNodes()) {
+    push @elem, $elem if $elem->getLocalName() eq $localname;
+  }
+  return @elem;
+}
+
+sub getName {
+  getNodeName(@_);
+}
+
+sub getData {
+  getNodeValue(@_);
+}
+
+sub getType {
+  getNodeType(@_);
+}
+
+sub getOwner {
+  getOwnerDocument(@_);
+}
+
+sub getChildnodes {
+  getChildNodes(@_);
+}
+
+sub localname {
+  getLocalName(@_);
+}
+
+package XML::GDOME::Element;
+
+sub appendTextNode {
+  appendText(@_);
+}
+
+sub appendText {
+  my ($node, $xmlString) = @_;
+  if ($xmlString != '') {
+    my $text = $node->getOwnerDocument->createTextNode($xmlString);
+    $node->appendChild($text);
+  }
+  return;
+}
+
+sub getElementsByTagName {
+  my $elem = shift;
+  my $nl = $elem->_getElementsByTagName(@_);
+  if (wantarray) {
+    return () if !$nl;
+    my @nodes;
+    for my $i (0 .. $nl->getLength - 1) {
+      push @nodes, $nl->item("$i");
+    }
+    return @nodes;
+  } else {
+    return $nl;
+  }
+}
+
+sub getElementsByTagNameNS {
+  my $elem = shift;
+  my $nl = $elem->_getElementsByTagNameNS(@_);
+  if (wantarray) {
+    return () if !$nl;
+    my @nodes;
+    for my $i (0 .. $nl->getLength - 1) {
+      push @nodes, $nl->item("$i");
+    }
+    return @nodes;
+  } else {
+    return $nl;
+  }
+}
+
+sub appendTextChild {
+  my ($node, $tagName, $xmlString) = @_;
+  my $dom = $node->getOwnerDocument();
+  my $child = $node->appendChild($dom->createElement($tagName));
+  return $child->appendChild($dom->createTextNode($xmlString));
+  return $child;
+}
+
+sub appendWellBalancedChunk {
+  my ($self, $chunk) = @_;
+  my $dom0 = $self->getOwnerDocument();
+  my $dom1 = XML::GDOME->createDocFromString("<gdome>".$chunk."</gdome>");
+  for my $child ($dom1->getDocumentElement()->getChildNodes()) {
+    my $copy = $dom0->importNode($child, 1);
+    $self->appendChild($copy);
+  }
+}
+
+package XML::GDOME::Document;
+
+sub getElementsByTagName {
+  my $elem = shift;
+  my $nl = $elem->_getElementsByTagName(@_);
+  if (wantarray) {
+    return () if !$nl;
+    my @nodes;
+    for my $i (0 .. $nl->getLength - 1) {
+      push @nodes, $nl->item("$i");
+    }
+    return @nodes;
+  } else {
+    return $nl;
+  }
+}
+
+sub getElementsByTagNameNS {
+  my $elem = shift;
+  my $nl = $elem->_getElementsByTagNameNS(@_);
+  if (wantarray) {
+    return () if !$nl;
+    my @nodes;
+    for my $i (0 .. $nl->getLength - 1) {
+      push @nodes, $nl->item("$i");
+    }
+    return @nodes;
+  } else {
+    return $nl;
+  }
+}
+
+sub createAttribute {
+  my ($elem, $name, $value) = @_;
+  my $attr = $elem->_createAttribute($name);
+  if ($value) {
+    $attr->setValue($value);
+  }
+  return $attr;
+}
+
+sub createPI {
+  createProcessingInstruction(@_);
+}
+
+1;
+};
+
+print XS qq{
+
+MODULE = XML::GDOME         PACKAGE = XML::GDOME
+
+SV *
+_match_callback(self, ...)
+        SV * self
+    CODE:
+        if (items > 1) {
+            SET_CB(GDOMEPerl_match_cb, ST(1));
+        }
+        else {
+            RETVAL = GDOMEPerl_match_cb ? sv_2mortal(GDOMEPerl_match_cb) : &PL_sv_undef;
+        }
+    OUTPUT:
+        RETVAL
+
+SV *
+_open_callback(self, ...)
+        SV * self
+    CODE:
+        if (items > 1) {
+            SET_CB(GDOMEPerl_open_cb, ST(1));
+        }
+        else {
+            RETVAL = GDOMEPerl_open_cb ? sv_2mortal(GDOMEPerl_open_cb) : &PL_sv_undef;
+        }
+    OUTPUT:
+        RETVAL
+
+SV *
+_read_callback(self, ...)
+        SV * self
+    CODE:
+        if (items > 1) {
+            SET_CB(GDOMEPerl_read_cb, ST(1));
+        }
+        else {
+            RETVAL = GDOMEPerl_read_cb ? sv_2mortal(GDOMEPerl_read_cb) : &PL_sv_undef;
+        }
+    OUTPUT:
+        RETVAL
+
+SV *
+_close_callback(self, ...)
+        SV * self
+    CODE:
+        if (items > 1) {
+            SET_CB(GDOMEPerl_close_cb, ST(1));
+        }
+        else {
+            RETVAL = GDOMEPerl_close_cb ? sv_2mortal(GDOMEPerl_close_cb) : &PL_sv_undef;
+        }
+    OUTPUT:
+        RETVAL
+
+};
+
+close XS;
+close PM;
+
+sub perlEscape {
+  my $str = shift;
+  $str =~ s!^(XPath)!$1::!;
+  if ($str =~ m!^Node(Filter|Iterator)$!) {
+    $str = 'Traversal::' . $str;
+  }
+  return $str;
+}
+
+sub getBless {
+  my ($struct) = @_;
+  if ($struct =~ m!^Gdome(.*) \*$!) {
+    my $perl_class = perlEscape($1);
+    unless ($struct eq 'GdomeDOMString *') {
+      return "XML::GDOME::$perl_class";
+    }
+    return;
+  }
+}
+
+sub alignEquals {
+  my $lines = shift;
+  my $max_indent = 0;
+  for (@$lines) {
+    if (m!=!g) {
+      my $indent = pos;
+      pos = 0;
+      if ($indent > $max_indent) {
+	$max_indent = $indent;
+      }
+    }
+  }
+  for (@$lines) {
+    if (m!=!g) {
+      my $indent = pos;
+      my $spacing = " " x ($max_indent - $indent);
+      $_ =~ s!=!$spacing=!;
+    } else {
+      $_ = (' ' x ($max_indent + 1)) . $_;
+    }
+  }
+}
+
+sub parseHeader {
+  my $file = shift;
+  open HEADER, "$file";
+  while (<HEADER>) {
+    if (my ($k, $v) = m!(GDOME_[A-Z_]*) = (\d+)!) {
+      if ($k =~ m!_NODE$! ||
+          $k =~ m!_ERR$! ||
+          $k =~ m!_TYPE$!) {
+        unless ($k eq 'GDOME_NOEXCEPTION_ERR' ||
+                $k eq 'GDOME_NULL_POINTER_ERR' ||
+                $k eq 'GDOME_READONLY_NODE' ||
+                $k eq 'GDOME_READWRITE_NODE' ) {
+          $k =~ s!GDOME_!!g;
+        }
+      }
+      $constants{$k} = $v;
+    }
+  }
+  close HEADER;
+}
+
+sub filterDoc {
+  my $text = shift;
+  $$text =~ s!\@(\w+)!I<$1>!g;
+  $$text =~ s!\%NULL!undef!g;
+  $$text =~ s!NULL!undef!g;
+  $$text =~ s!\%TRUE!1!g;
+  $$text =~ s!\%FALSE!0!g;
+  $$text =~ s!\%0!0!g;
+  $$text =~ s!\%GDOME_(\w+)_NODE!$1!g;
+  $$text =~ s!16-bit unit!character!g;
+}
+
+sub parseDocs {
+  my $file = shift;
+  my ($method_doc, $class, $in_return_section, $in_exc_section);
+  open DOC, "$file";
+  while (<DOC>) {
+    chomp;
+    if ($_ eq '/**') {
+      $method_doc = <DOC>;
+      $method_doc =~ s!^ \* !!;
+      $method_doc =~ s!:\n$!!;
+
+      $method_doc =~ m!^gdome_(\w+)_(.+)!;
+      $class = $abbrv_lookup{$1};
+      $method_doc = $2;
+
+      # get variables
+      my $var;
+      tie %{$docs->{$class}->{$method_doc}->{vars}}, "Tie::IxHash";
+      while (<DOC>) {
+	last unless m!^ \* (\@(\w+):  )?(.+)\n!;
+	$var = $2 if $2;
+	my $desc = $3;
+	next if ($var eq 'self' || $var eq 'exc');
+        filterDoc(\$desc);
+	$docs->{$class}->{$method_doc}->{vars}->{$var} .= $desc;
+      }
+    }
+    if ($method_doc) {
+      my $text = $_;
+      if ($_ eq ' */') {
+	$method_doc = undef;
+	$in_return_section = 0;
+	$in_exc_section = undef;
+	next;
+      } elsif ($_ =~ m!^ \*\s*$!) {
+	next;
+      } elsif (m!^ \* Returns: !) {
+	$in_return_section = 1;
+	$in_exc_section = undef;
+	$text = $';
+      } elsif (m!^ \* \%(GDOME.*): !) {
+	$in_exc_section = $1;
+	$in_return_section = 0;
+	$text = $';
+      } else {
+	$text =~ s!^ \*!!;
+      }
+      filterDoc(\$text);
+
+      if ($in_return_section) {
+	$docs->{$class}->{$method_doc}->{return} .= $text;
+      } elsif ($in_exc_section) {
+	$docs->{$class}->{$method_doc}->{exc}->{$in_exc_section} .= $text;
+      } else {
+	$docs->{$class}->{$method_doc}->{desc} .= $text;
+      }
+    }
+    $docs->{$class}->{$method_doc}->{desc} =~ s!^\s+!!g;
+  }
+  close DOC;
+}

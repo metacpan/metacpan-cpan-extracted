@@ -1,0 +1,5 @@
+<!ELEMENT a (b,c)>
+<!ELEMENT b (#PCDATA)>
+<!ELEMENT c (#PCDATA)>
+<!ATTLIST b title CDATA #IMPLIED>
+<!ATTLIST c title CDATA #IMPLIED>

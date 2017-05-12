@@ -1,0 +1,67 @@
+=head1 NAME
+
+  XML::GDOME::DocumentType - Interface DocumentType implementation.
+
+=head1 SYNOPSIS
+
+  $nnm = $dt->getEntities();
+  $str = $dt->getInternalSubset();
+  $str = $dt->getName();
+  $nnm = $dt->getNotations();
+  $str = $dt->getPublicId();
+  $str = $dt->getSystemId();
+
+=head1 CLASS INHERITANCE
+
+L<XML::GDOME::Node> > XML::GDOME::DocumentType
+
+
+=head1 METHODS
+
+=over 4
+
+
+=item $nnm = $dt->getEntities();
+
+
+
+I<Returns>: a NamedNodeMap containing the general entities, both external and internal, declared in the DTD. Parameter entities are not contained. Duplicates are discarded.
+
+
+=item $str = $dt->getInternalSubset();
+
+
+
+I<Returns>: The internal subset as a string, or undef if there is none or on error.
+
+
+=item $str = $dt->getName();
+
+
+
+I<Returns>: the name of DTD; i.e., the name immediately following the %DOCTYPE keyword.
+
+
+=item $nnm = $dt->getNotations();
+
+
+
+I<Returns>: a NamedNodeMap containing the notations declared in the DTD. Duplicates are discarded. Every node in this map also implements the Notation interface.
+
+
+=item $str = $dt->getPublicId();
+
+
+
+I<Returns>: the public identifier of the external subset.
+
+
+=item $str = $dt->getSystemId();
+
+
+
+I<Returns>: the public identifier of the external subset.
+
+
+=back
+

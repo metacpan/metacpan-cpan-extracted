@@ -1,0 +1,21 @@
+use XML::Handler::Essex;
+use XML::SAX::Machines qw( Pipeline );
+
+my $count = 0;
+
+Pipeline(
+
+
+    XML::Handler::Essex->new(
+        Main => sub {
+            while (1) {
+                get "start-element::*";
+                ++$count;
+            }
+        },
+    ),
+
+
+)->parse_file( \*STDIN );
+
+print $count, "\n";

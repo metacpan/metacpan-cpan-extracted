@@ -1,0 +1,4 @@
+0.13    2016-04-11
+    - Convert to Dist-Zilla instead of Module-Install.
+    - Skip failing tests (for now)
+    - Various cleanups.

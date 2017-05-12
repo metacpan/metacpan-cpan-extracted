@@ -1,0 +1,3 @@
+<?xml version="1.0"?>
+<gameinfo>
+<plugins><plugin parse="pre_load" type="create_fighter"><params><![CDATA[<wddxPacket version='1.0'><header/><data><struct><var name='NAME'><string>AceFighter</string></var><var name='CODE'><string>RenderPlugin</string></var><var name='FIGHTERS'><array length='3'><string>F16</string><string>LCA</string><string>Harrier</string></array></var></struct></data></wddxPacket>]]></params></plugin></plugins></gameinfo>

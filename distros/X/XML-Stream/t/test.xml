@@ -1,0 +1,67 @@
+<test_xml>
+    <blah test='2'/>
+    <foo test='3'>
+        <bar/>
+    </foo>
+    <!---
+        <comment_test test='4'/>
+    -->
+    <last test='5'>
+        <test1>
+            <test2>
+                <test3>This is a test.</test3>
+            </test2>
+        </test1>
+    </last>
+    <a>
+        <b>
+            <c>
+                <d>
+                    <e>
+                        <e>foo1</e>
+                    </e>
+                </d>
+                <q>
+                    <d>
+                        <e>foo2</e>
+                    </d>
+                </q>
+            </c>
+        </b>
+    </a>
+    <e>bar</e>
+    <library>
+        <pamphlet>
+            <section><para>pA</para></section>
+        </pamphlet>
+        <book>
+            <chapter>
+                <section><para>p1</para><para>p2</para></section>
+            </chapter>
+            <chapter>
+                <section><para test='b'>p7</para><para>p8</para></section>
+            </chapter>      
+            <chapter>
+                <section><para>p13</para><para test='a'>p14</para></section>
+            </chapter>
+            <appendix>
+                <section><para>p19</para><para>p20</para></section>
+            </appendix>
+        </book>
+    </library>
+    <filter id='a' mytest='2'>valueA</filter>
+    <filter id='b' mytest='1'>valueB</filter>
+    <filter>valueC</filter>
+    <newfilter bar='1'><sub>foo1</sub></newfilter>
+    <newfilter bar='2'><add>foo2</add></newfilter>
+    <newfilter bar='3'><div>foo3</div></newfilter>
+    <newfilter foo='1'><sub>foo4</sub></newfilter>
+    <newfilter foo='2'><add>foo5</add></newfilter>
+    <newfilter foo='3'><div>foo6</div></newfilter>
+    <startest>
+        <foo test='1'/>
+        <bar/>
+        <bing test='2'/>
+    </startest>
+    <cdata_test test='6'><![CDATA[This is cdata with <tags/> embedded <in>it</in>.]]></cdata_test>
+</test_xml>

@@ -1,0 +1,11 @@
+#!/usr/local/bin/perl -w
+
+use GraphViz::Parse::Yapp;
+use strict ;
+
+# Pass in a file generated via yapp -v
+my $g= GraphViz::Parse::Yapp->new(shift) ;
+print $g->as_dot;
+#print $g->as_png;
+
+

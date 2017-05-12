@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<collection>
+    <head />
+    <list>
+        <fortune id="bad-python-code">
+            <meta>
+                <title>Bad Python Code</title>
+            </meta>
+            <irc>
+                <body>
+                    <saying who="rindolf">sussman: for the record, I think the
+                        build system is the ultimate proof that python code
+                        can be as bad as Perl one.</saying>
+                    <me_is who="clkao">giggles</me_is>
+                    <saying who="jackr">hehe</saying>
+                    <saying who="rindolf">hopes he's not starting a flamewar</saying>
+                    <saying who="clkao">btw, freebsd svn port maintainer was
+                        complaining about unable to do --with-swig specifying
+                        only perl or pythong bindings to build..</saying>
+
+                    <me_is who="cmpilato">notes that the topic of this channel
+                        is Subversion.</me_is>
+                    <saying who="clkao">(so he refused to include the option
+                        for building either bindings in the port!)</saying>
+                    <saying who="rindolf">I once saw a perl5 code written in
+                        perl4 style. Now that was hideous.</saying>
+                    <saying who="fitz">complicated != bad</saying>
+                    <saying who="fitz">"Building is complicated--that's why
+                        build systems are complicated." --kfogel</saying>
+                </body>
+                <info>
+                    <channel>#svn</channel>
+                    <network>Freenode</network>
+                    <tagline>Discussing the Subversion Build System</tagline>
+                </info>
+            </irc>
+        </fortune>
+    </list>
+</collection>

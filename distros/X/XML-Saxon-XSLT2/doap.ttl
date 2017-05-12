@@ -1,0 +1,310 @@
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-bugs: <http://ontologi.es/doap-bugs#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://purl.org/NET/cpan-uri/dist/XML-Saxon-XSLT2/project>
+	a                    doap:Project;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap-bugs:issue      <http://purl.org/NET/cpan-uri/rt/ticket/60584>, <http://purl.org/NET/cpan-uri/rt/ticket/60589>, <http://purl.org/NET/cpan-uri/rt/ticket/60645>, <http://purl.org/NET/cpan-uri/rt/ticket/60646>, <http://purl.org/NET/cpan-uri/rt/ticket/60648>, <http://purl.org/NET/cpan-uri/rt/ticket/66276>, <http://purl.org/NET/cpan-uri/rt/ticket/66278>, <http://purl.org/NET/cpan-uri/rt/ticket/79463>;
+	doap-deps:runtime-requirement [ doap-deps:on "perl 5.008000"^^doap-deps:CpanId ], [ doap-deps:on "Inline::Java"^^doap-deps:CpanId ], [ doap-deps:on "XML::LibXML 1.60"^^doap-deps:CpanId ];
+	doap-deps:test-requirement [ doap-deps:on "Test::More 0.61"^^doap-deps:CpanId ];
+	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=XML-Saxon-XSLT2>;
+	doap:category        [ rdfs:label "XSL transformations" ], [ rdfs:label "XSLT" ], [ rdfs:label "Java" ];
+	doap:created         "2010-07-14"^^xsd:date;
+	doap:developer       <http://tobyinkster.co.uk/#i>;
+	doap:documenter      <http://tobyinkster.co.uk/#i>;
+	doap:download-page   <https://metacpan.org/release/XML-Saxon-XSLT2>;
+	doap:homepage        <https://metacpan.org/release/XML-Saxon-XSLT2>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      <http://tobyinkster.co.uk/#i>;
+	doap:name            "XML-Saxon-XSLT2";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/XML-Saxon-XSLT2/v_0-001>, <http://purl.org/NET/cpan-uri/dist/XML-Saxon-XSLT2/v_0-002>, <http://purl.org/NET/cpan-uri/dist/XML-Saxon-XSLT2/v_0-003>, <http://purl.org/NET/cpan-uri/dist/XML-Saxon-XSLT2/v_0-004>, <http://purl.org/NET/cpan-uri/dist/XML-Saxon-XSLT2/v_0-005>, <http://purl.org/NET/cpan-uri/dist/XML-Saxon-XSLT2/v_0-006>, <http://purl.org/NET/cpan-uri/dist/XML-Saxon-XSLT2/v_0-007>, <http://purl.org/NET/cpan-uri/dist/XML-Saxon-XSLT2/v_0-008>, <http://purl.org/NET/cpan-uri/dist/XML-Saxon-XSLT2/v_0-009>, <http://purl.org/NET/cpan-uri/dist/XML-Saxon-XSLT2/v_0-010>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/tobyink/p5-xml-saxon-xslt2>;
+	];
+	doap:shortdesc       "process XSLT 2.0 using Saxon 9.x"@en;
+	doap:tester          <http://tobyinkster.co.uk/#i>.
+
+<http://purl.org/NET/cpan-uri/dist/XML-Saxon-XSLT2/v_0-001>
+	a                    doap:Version;
+	rdfs:label           "Original version"@en;
+	dc:issued            "2010-07-15"^^xsd:date;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/XML-Saxon-XSLT2-0.001.tar.gz>;
+	doap:revision        "0.001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/XML-Saxon-XSLT2/v_0-002>
+	a                    doap:Version;
+	dc:issued            "2010-07-15"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Can capture output from <xsl:message>."@en;
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Can specify a base URI in the constructor."@en;
+		], [
+			rdfs:label "No longer default to 'xml' output method, but respect XSLT's specified output method."@en;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/XML-Saxon-XSLT2/v_0-001>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/XML-Saxon-XSLT2-0.002.tar.gz>;
+	doap:revision        "0.002"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/XML-Saxon-XSLT2/v_0-003>
+	a                    doap:Version;
+	dc:issued            "2010-07-19"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Can determine <xsl:output> media-type, doctype-public, doctype-system, encoding and version attributes."@en;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/XML-Saxon-XSLT2/v_0-002>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/XML-Saxon-XSLT2-0.003.tar.gz>;
+	doap:revision        "0.003"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/XML-Saxon-XSLT2/v_0-004>
+	a                    doap:Version;
+	dc:issued            "2011-02-18"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Allow parameters to be passed through to Inline::Java from the 'use' line."@en;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/XML-Saxon-XSLT2/v_0-003>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/XML-Saxon-XSLT2-0.004.tar.gz>;
+	doap:revision        "0.004"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/XML-Saxon-XSLT2/v_0-005>
+	a                    doap:Version;
+	dc:issued            "2011-10-03"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Change how $classpath is constructed."@en;
+			doap-changeset:fixes [
+				rdfs:label "Classpath is searched in wrong order";
+				doap-bugs:id "66276";
+			];
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/XML-Saxon-XSLT2/v_0-004>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/XML-Saxon-XSLT2-0.005.tar.gz>;
+	doap:revision        "0.005"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/XML-Saxon-XSLT2/v_0-006>
+	a                    doap:Version;
+	dc:issued            "2011-10-06"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Upgrade Module::Package::RDF version."@en;
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Mention that the 'default' value for the output format of the 'transform' method is broken."@en;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/XML-Saxon-XSLT2/v_0-005>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Module-Install-RDF-0.006.tar.gz>;
+	doap:revision        "0.006"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/XML-Saxon-XSLT2/v_0-007>
+	a                    doap:Version;
+	rdfs:label           "Shaken, not stirred"@en;
+	dc:issued            "2012-09-11"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Drop common::sense dependency."@en;
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Improve documentation of base URIs."@en;
+			doap-changeset:fixes <http://purl.org/NET/cpan-uri/rt/ticket/79463>;
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Improve documentation of import function."@en;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/XML-Saxon-XSLT2/v_0-006>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Module-Install-RDF-0.007.tar.gz>;
+	doap:revision        "0.007"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/XML-Saxon-XSLT2/v_0-008>
+	a                    doap:Version;
+	dc:identifier        "XML-Saxon-XSLT2-0.008"^^xsd:string;
+	dc:issued            "2014-09-10"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Switch to Dist::Inkt.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/XML-Saxon-XSLT2-0.008.tar.gz>;
+	doap:revision        "0.008"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/XML-Saxon-XSLT2/v_0-009>
+	a                    doap:Version;
+	dc:identifier        "XML-Saxon-XSLT2-0.009"^^xsd:string;
+	dc:issued            "2014-09-15"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			rdfs:label "Add `/usr/local/share/java/classes/saxon9he.jar` to the list of paths where Saxon may be found.";
+			doap-changeset:thanks <http://purl.org/NET/cpan-uri/person/srezic>;
+			rdfs:comment "For FreeBSD";
+			rdfs:seeAlso <http://purl.org/NET/cpan-uri/rt/ticket/98875>;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/XML-Saxon-XSLT2-0.009.tar.gz>;
+	doap:revision        "0.009"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/XML-Saxon-XSLT2/v_0-010>
+	a                    doap:Version;
+	dc:identifier        "XML-Saxon-XSLT2-0.010"^^xsd:string;
+	dc:issued            "2014-09-23"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			rdfs:label "Add `/usr/local/share/java/classes/saxon9he.jar` to Makefile.PL too.";
+			rdfs:comment "For FreeBSD";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/XML-Saxon-XSLT2-0.010.tar.gz>;
+	doap:revision        "0.010"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/srezic>
+	a                    foaf:Person;
+	doap:name            "Slaven Rezić";
+	foaf:nick            "SREZIC";
+	foaf:page            <https://metacpan.org/author/SREZIC>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/60584>
+	a                    doap-bugs:Issue;
+	rdfs:label           "mismatch Manifest";
+	dc:created           "2010-08-21T05:04:04"^^xsd:dateTime;
+	dc:modified          "2010-08-23T17:33:00"^^xsd:dateTime;
+	doap-bugs:assignee   _:B1;
+	doap-bugs:id         "60584"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=60584>;
+	doap-bugs:reporter   _:B2;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/60589>
+	a                    doap-bugs:Issue;
+	rdfs:label           "usage more explicit?";
+	dc:created           "2010-08-21T14:24:06"^^xsd:dateTime;
+	dc:modified          "2011-02-18T23:20:58"^^xsd:dateTime;
+	doap-bugs:assignee   _:B1;
+	doap-bugs:id         "60589"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=60589>;
+	doap-bugs:reporter   _:B2;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/60645>
+	a                    doap-bugs:Issue;
+	rdfs:label           "";
+	dc:created           "2010-08-23T17:32:51"^^xsd:dateTime;
+	dc:modified          "2011-02-18T22:47:26"^^xsd:dateTime;
+	doap-bugs:assignee   _:B3;
+	doap-bugs:id         "60645"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=60645>;
+	doap-bugs:reporter   _:B2;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/rejected>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/60646>
+	a                    doap-bugs:Issue;
+	rdfs:label           "variable memory requirements";
+	dc:created           "2010-08-23T17:37:21"^^xsd:dateTime;
+	dc:modified          "2011-02-18T23:19:31"^^xsd:dateTime;
+	doap-bugs:assignee   _:B1;
+	doap-bugs:id         "60646"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=60646>;
+	doap-bugs:reporter   _:B2;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/60648>
+	a                    doap-bugs:Issue;
+	rdfs:label           "measuring performance";
+	dc:created           "2010-08-23T17:51:32"^^xsd:dateTime;
+	dc:modified          "2011-02-18T23:13:18"^^xsd:dateTime;
+	doap-bugs:assignee   _:B3;
+	doap-bugs:id         "60648"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=60648>;
+	doap-bugs:reporter   _:B2;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/rejected>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/66276>
+	a                    doap-bugs:Issue;
+	rdfs:label           "Classpath is searched in wrong order";
+	dc:created           "2011-03-01T09:32:22"^^xsd:dateTime;
+	dc:modified          "2011-10-03T22:33:21"^^xsd:dateTime;
+	doap-bugs:assignee   _:B1;
+	doap-bugs:id         "66276"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=66276>;
+	doap-bugs:reporter   _:B4;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/66278>
+	a                    doap-bugs:Issue;
+	rdfs:label           "xsl:result-document element doesn't work";
+	dc:created           "2011-03-01T10:46:58"^^xsd:dateTime;
+	dc:modified          "2011-10-03T21:47:56"^^xsd:dateTime;
+	doap-bugs:assignee   _:B1;
+	doap-bugs:id         "66278"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=66278>;
+	doap-bugs:reporter   _:B4;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/open>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/79463>
+	a                    doap-bugs:Issue;
+	rdfs:label           "Insufficient documentation - baseuri";
+	dc:created           "2012-09-05T22:35:39"^^xsd:dateTime;
+	dc:modified          "2012-09-11T12:44:53"^^xsd:dateTime;
+	doap-bugs:assignee   _:B1;
+	doap-bugs:id         "79463"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=79463>;
+	doap-bugs:reporter   [
+		a foaf:Agent;
+		foaf:mbox <mailto:mail@tobyinkster.co.uk>;
+	];
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/98875>
+	a                    doap-bugs:Issue;
+	doap-bugs:id         "98875"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=98875>.
+
+<http://tobyinkster.co.uk/#i>
+	a                    foaf:Person;
+	foaf:homepage        <http://tobyinkster.co.uk/>;
+	foaf:mbox            <mailto:tobyink@cpan.org>;
+	foaf:name            "Toby Inkster";
+	foaf:page            <https://metacpan.org/author/TOBYINK>;
+	owl:sameAs           <http://purl.org/NET/cpan-uri/person/tobyink>.
+
+_:B2
+	a                    foaf:Agent;
+	foaf:mbox            <mailto:mauricemengel@gmail.com>.
+
+_:B1
+	a                    foaf:Agent;
+	foaf:nick            "TOBYINK".
+
+_:B3
+	a                    foaf:Agent;
+	foaf:nick            "Nobody".
+
+_:B4
+	a                    foaf:Agent;
+	foaf:mbox            <mailto:quentin@mit.edu>.
+

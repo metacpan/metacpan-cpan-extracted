@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<entry xmlns="http://www.w3.org/2005/Atom"
+       xmlns:app="http://www.w3.org/2007/app">
+  <link href="http://example.com/foo.html"/>
+  <link rel="edit-media" href="http://example.com/foo.png"/>
+  <title>Title</title>
+  <content type="image/png" src="http://example.com/foo.png"/>
+  <app:edited>2007-01-01T00:00:00Z</app:edited>
+  <app:control>
+    <app:draft>yes</app:draft>
+  </app:control>
+</entry>

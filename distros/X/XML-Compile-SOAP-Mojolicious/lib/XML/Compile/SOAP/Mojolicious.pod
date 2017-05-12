@@ -1,0 +1,68 @@
+=encoding utf8
+
+=head1 NAME
+
+XML::Compile::SOAP::Mojolicious - use XML::Compile::SOAP from Mojolicious
+
+=head1 SYNOPSIS
+
+ # As a client
+ use XML::Compile::Transport::SOAPHTTP_MojoUA;
+ my $http = XML::Compile::Transport::SOAPHTTP_MojoUA->new(@options);
+
+ # As a server (daemon)
+ #XXX not implemented yet
+
+=head1 DESCRIPTION
+
+This module is used to wrap various L<XML::Compile::SOAP|XML::Compile::SOAP> extensions
+which relate to Mojolicious.  It should also be used as dependency
+reference (contains the leading version number)
+
+At the momement, there is one extension included:
+
+=over 4
+
+=item * XML::Compile::Transport::SOAPHTTP_MojoUA
+
+(Contributed by Heiko Jansen)  Event driven implementation on of a
+SOAP client: you can handle many SOAP requests in parallel.
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of XML-Compile-SOAP-Mojolicious distribution version 0.02,
+built on March 17, 2016. Website: F<http://perl.overmeer.net/xml-compile/>
+
+Other distributions in this suite:
+L<XML::Compile>,
+L<XML::Compile::SOAP>,
+L<XML::Compile::WSDL11>,
+L<XML::Compile::SOAP12>,
+L<XML::Compile::SOAP::Daemon>,
+L<XML::Compile::SOAP::WSA>,
+L<XML::Compile::C14N>,
+L<XML::Compile::WSS>,
+L<XML::Compile::WSS::Signature>,
+L<XML::Compile::Tester>,
+L<XML::Compile::Cache>,
+L<XML::Compile::Dumper>,
+L<XML::Compile::RPC>,
+L<XML::Rewrite>
+and
+L<XML::LibXML::Simple>.
+
+Please post questions or ideas to the mailinglist at
+F<http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/xml-compile> .
+For live contact with other developers, visit the C<#xml-compile> channel
+on C<irc.perl.org>.
+
+=head1 LICENSE
+
+Copyrights 2016 by [Heiko Jansen/Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

@@ -1,0 +1,32 @@
+XML::Filter::Reindent version 0.03
+==================================
+
+DESCRIPTION
+
+XML::Filter::Reindent is a sub class of XML::Filter::DetectWS. 
+
+XML::Filter::Reindent can be used as a PerlSAX filter to reformat an XML document before sending it to a PerlSAX
+handler that prints it (like XML::Handler::Composer.) 
+
+Like XML::Filter::DetectWS, it detects ignorable whitespace and blocks of whitespace characters in certain places. It
+uses this information and information supplied by the user to determine where whitespace may be modified, deleted or
+inserted. Based on the indent settings, it then modifies, inserts and deletes characters and ignorable_whitespace
+events accordingly. 
+
+This is just a first stab at the implementation. It may be buggy and may change completely! 
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 1999,2000 Enno Derksen
+All rights reserved.
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

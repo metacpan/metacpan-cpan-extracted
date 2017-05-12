@@ -1,0 +1,68 @@
+This module is a fast XSLT library, based on the GNOME libxslt engine
+that you can find at http://www.xmlsoft.org/XSLT/
+
+Performance is currently about twice that of XML::Sablotron (based on
+XSLTMark tests converted to Perl).
+
+The libxslt processor is also highly standards compliant
+implementation of XSLT 1.0.
+
+A NOTE ON INSTALLATION
+----------------------
+
+The library depends on libxslt. You have to have both the library and
+its header files installed (on various Linux/UNIX distributions thay
+are usually packaged as libxslt-dev or libxslt-devel). The module can
+further make use of libexslt, which is distributed with libxslt, but
+on some systems packaged separately. These libraries may have their
+own dependencies (usually resolved automatically by the packaging
+system).
+
+Note that if you want any global data to be shared between the libxml2
+libraries used by this module and XML-LibXML, e.g. the input callback
+table, then each module must link dynamically against libxml2 so that
+they both use the same shared library (this is in fact default on most
+UNIX/POSIX platforms).
+
+The Makefile.PL tries to determine the correct compiler and linker
+flags for its library dependencies using pkg-config and
+xslt-config. If this fails, you may override the values like this
+
+  perl Makefile.PL INC="..." LIBS="..."
+
+where INC contains flags for the compiler (such as -I/some_path/include etc.) and LIBS contains linker flags (such as -L/some_path/lib -llibsomething ...).
+
+WIN32 BUILDING ISSUES ---------------------
+
+It is recommended that when building this module on Win32 you also
+link dynamically against libxslt and libexslt, since linking
+statically against these libraries but dynamically against libxml2 may
+cause some "unresolved symbol" linker errors.
+
+Dynamic linking, however, causes a name clash between the name of this
+module's DLL (LibXSLT.dll) and that of libxslt (libxslt.dll) on
+Win32's case-insensitive filesystem. So, if you link dynamically then
+you'll probably have to build your libxslt DLL as, say,
+libxslt_win32.dll and then make the appropriate changes to this
+module's build process to look for that instead of libxslt.dll.
+
+PATCHES AND DEVELOPER VERSION
+=============================
+
+As XML::LibXSLT is open source software help and patches are appreciated. If you
+find a bug in the current release, make sure this bug still exists in the
+developer version of XML::LibXSLT. This version can be downloaded from its
+Mercurial repository. The repository can be cloned via:
+
+    hg clone ssh://hg@bitbucket.org/shlomif/perl-xml-libxslt
+
+Note this account does not allow direct commits.
+
+Please consider the tests as correct. If any test fails it is most certainly
+related to a bug.
+
+COPYRIGHT AND LICENSE
+---------------------
+
+This is free software, you may use it and distribute it under the same
+terms as Perl itself. Copyright 2001 AxKit.com Ltd.

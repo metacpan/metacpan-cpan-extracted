@@ -1,0 +1,10 @@
+<encmap name='ISO-8859-5' expat='yes'>
+  <range byte='x80' len='33' uni='x0080'/>
+  <range byte='xa1' len='12' uni='x0401'/>
+  <ch byte='xad' uni='x00ad'/>
+  <range byte='xae' len='66' uni='x040e'/>
+  <ch byte='xf0' uni='x2116'/>
+  <range byte='xf1' len='12' uni='x0451'/>
+  <ch byte='xfd' uni='x00a7'/>
+  <range byte='xfe' len='2' uni='x045e'/>
+</encmap>

@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<!DOCTYPE teleord:extension
+  SYSTEM "http://www.teleord.co.uk/LIB/xml-edifact-03/teleord.dtd" >
+<teleord:extension
+  xmlns:edifact='http://www.xml-edifact.org/LIB/xml-edifact-03/edifact.rdf'
+  xmlns:teleord='http://www.teleord.co.uk/LIB/xml-edifact-03/teleord.rdf' >
+
+  <edifact:responsibility
+    agency="TeleOrdering UK"
+    contact="Richard A.R. Braganza"
+    email="richardb@teleord.co.uk"
+    myself="http://www.teleord.co.uk/LIB/xml-edifact-03/teleord-19990825.xml"
+    update="http://www.teleord.co.uk/LIB/xml-edifact-03/teleord.xml"
+    about="http://www.teleord.co.uk/about_teleordering_code_list.html"
+    />
+
+  <teleord:extend
+  	edifact:element="tred:item.characteristic.coded"
+  	teleord:element="teleord:item.characteristic.coded"
+	>
+    <by teleord:code="BAU">Book Author</by>
+    <by teleord:code="BPU">Book Publisher</by>
+    <by teleord:code="BTI">Book Title</by>
+  </teleord:extend>
+
+  <teleord:extend
+	edifact:segment="trsd:item.description"
+	teleord:segment="teleord:item.description"
+	>
+    <by teleord:element="teleord:item.characteristic.coded" />
+  </teleord:extend>
+
+  <teleord:extend
+	edifact:message="edifact:orders"
+	teleord:message="teleord:orders"
+	>
+    <by teleord:segment="teleord:tem.description" />
+  </teleord:extend>
+  
+</teleord:extension>

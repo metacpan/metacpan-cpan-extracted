@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<NZSRSRequest VerMinor="11" VerMajor="3">
+
+    <!-- ActionID and HandleId seem to be in protocol.rnc twice, under HandleCreate and ContactAttr -->
+    <HandleCreate
+       ActionId="xx102"
+       HandleId="xx102"
+       Name="A Person"
+       Email="a@example.com"
+       >
+      <PostalAddress
+         Address1="1 Acacia Ave"
+         Address2="Pendleton"
+         City="Wellington"
+         CountryCode="NZ"
+         PostalCode="6011"
+         />
+      <Phone
+         CountryCode="64"
+         AreaCode="4"
+         LocalNumber="000 0000"
+         />
+      <Fax
+         CountryCode="64"
+         AreaCode="4"
+         LocalNumber="000 0001"
+         />
+      <AuditDetails
+         ActionId="HandleCreate-2010-06-08 14:11:00"
+         RegistrarId="90"
+         >
+        <AuditTime>
+          <From
+             Day="20"
+             Hour="03"
+             Minute="28"
+             Month="12"
+             Second="10"
+             TimeZoneOffset="+13:00"
+             Year="2009"
+             />
+        </AuditTime>
+        <AuditText><![CDATA[HandleCreate]]></AuditText>
+      </AuditDetails>
+    </HandleCreate>
+
+</NZSRSRequest>

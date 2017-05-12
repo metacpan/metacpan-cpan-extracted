@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tei:text xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:sp="http://web-cpan.berlios.de/modules/XML-Grammar-Screenplay/screenplay-xml-0.2/">
+  <tei:body>
+    <tei:div type="act" xml:id="index">
+      <tei:head>ACT I</tei:head>
+      <tei:div type="scene" xml:id="top">
+        <tei:head>top</tei:head>
+        <tei:div type="scene" xml:id="david_and_goliath">
+          <tei:head>david_and_goliath</tei:head>
+          <tei:stage>
+            <tei:p>
+                David and
+                <tei:ref target="http://en.wikipedia.org/wiki/Goliath">Goliath</tei:ref>
+                are standing by each other.
+            </tei:p>
+        </tei:stage>
+          <tei:sp><tei:speaker>David</tei:speaker>
+            <tei:p>
+                I will kill you.<tei:lb/>
+                I will kill you.<tei:lb/>
+                You will not survive.<tei:lb/>
+                I will kill you.<tei:lb/>
+                I will kill you.<tei:lb/>
+                Ask Jive.
+            </tei:p>
+        </tei:sp>
+          <tei:sp><tei:speaker>Goliath</tei:speaker>
+            <tei:p>
+                no way, you little idiot!
+            </tei:p>
+        </tei:sp>
+          <tei:sp><tei:speaker>David</tei:speaker>
+            <tei:p>
+                yes way!
+            </tei:p>
+        </tei:sp>
+        </tei:div>
+      </tei:div>
+    </tei:div>
+  </tei:body>
+</tei:text>

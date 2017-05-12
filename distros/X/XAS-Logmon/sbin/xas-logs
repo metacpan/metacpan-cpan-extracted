@@ -1,0 +1,167 @@
+#!/usr/bin/perl
+# ============================================================================
+#             Copyright (c) 2012-2015 Kevin L. Esteb All Rights Reserved
+#
+#
+# TITLE:       xas-logs
+#
+# FACILITY:    XAS
+#
+# ABSTRACT:    This procedure will parse XAS log files.
+#
+# ENVIRONMENT: The XAS Middleware Environment
+#
+# PARAMETERS:
+#              --filename     name of log file to monitor
+#              --spooldir     the directory tp write the messages too
+#              --ignore       ignore log entries older then these days
+#              --process      name of the process that created file
+#              --log-type     toggles the log type
+#              --log-facility changes the log facility to use
+#              --log-file     name of the log file
+#              --help         prints out a helpful help message
+#              --manual       prints out the procedures manual
+#              --version      prints out the procedures version
+#              --debug        toggles debug output
+#              --alerts       toggles alert notification
+#
+# RETURNS:
+#              0 - success
+#              1 - failure
+#
+# Version      Author                                              Date
+# -------      ----------------------------------------------      -----------
+# 0.01         Kevin Esteb                                         02-Dec-2015
+#
+# ============================================================================
+#
+
+use lib "../lib";
+use XAS::Apps::Logmon::XAS::Process;
+
+main: {
+
+    my $app = XAS::Apps::Logmon::XAS::Process->new(
+        -throws => 'xas-logs',
+    );
+
+    exit $app->run();
+
+}
+
+__END__
+
+=head1 NAME
+
+xas-logs - monitor and parse XAS log files
+
+=head1 SYNOPSIS
+
+xas-logs [--help] [--debug] [--manual] [--version]
+
+ options:
+   --filename     name of log file to monitor
+   --spooldir     the directory tp write the messages too
+   --ignore       ignore log entries older then these days
+   --process      name of the process that created file
+   --help         outputs simple help text
+   --manual       outputs the procedures manual
+   --version      outputs the apps version
+   --debug        toogles debugging output
+   --alerts       toogles alert notifications
+   --log-file     name of the log file 
+   --log-type     toggles the log type
+   --log-facility changes the log facility
+
+=head1 DESCRIPTION
+
+This procedure will monitor and parse one log file. The resulting message
+is written to a spool directory. Where the spooler will pick it up and
+send it to the message queue server.
+
+=head1 OPTIONS AND ARGUMENTS
+
+=over 4
+
+=item B<--filename>
+
+The name of the file to monitor and parse.
+
+=item B<--spooldir>
+
+The directory to write the messages too.
+
+=item B<--ignore>
+
+Ignore any log lines older then these days.
+
+=item B<--process>
+
+That name of the process that create the file.
+
+=item B<--help>
+
+Displays a simple help message.
+
+=item B<--debug>
+
+Turns on debbuging.
+
+=item B<--alerts>
+
+Togggles alert notification.
+
+=item B<--log-type>
+
+Toggles the log type. Defaults to 'console'. Can be 'console', 'file', 
+'json' or 'syslog'.
+
+=item B<--log-facility>
+
+Toggles the log facilty. Defaults to 'local6'. This follows syslog
+convention.
+
+=item B<--log-file>
+
+Optional logfile. When specified the log type is set to 'file'.
+
+=item B<--manual>
+
+The complete documentation.
+
+=item B<--version>
+
+Prints out the apps version
+
+=back
+
+=head1 EXIT CODES
+
+ 0 - success
+ 1 - failure
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<XAS::Apps::Logmon::XAS::Process|XAS::Apps::Logmon::XAS::Process>
+
+=item L<XAS::Logmon|XAS::Logmon>
+
+=item L<XAS|XAS>
+
+=back
+
+=head1 AUTHOR
+
+Kevin L. Esteb, E<lt>kevin@kesteb.usE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2012-2015 Kevin L. Esteb
+
+This is free software; you can redistribute it and/or modify it under
+the terms of the Artistic License 2.0. For details, see the full text
+of the license at http://www.perlfoundation.org/artistic_license_2_0.
+
+=cut

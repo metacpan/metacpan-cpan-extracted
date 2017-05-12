@@ -1,0 +1,167 @@
+- document and write tests for Index->distinct_field_values
+
+- document decorator stuff
+
+- replace auto-loading of method calls with symbol table
+  manipulation. this will require making module stubs for each def --
+  not just mixins, but would allow methods in defs to overide 
+  methods defined in perl modules.
+
+- check whether simple index fields actually correspond to methods or
+  elements. if index field names are misspelled, for example, indexing
+  ends up not adding records, and it's hard to figure out why.
+
+- die'ing in an index collection code section seems to make the
+  "undo_collection" fail -- figure out why. also, the die is silently
+  ignored. is this the right thing?
+
+- improve and flexibilify "escape" functionality. perhaps: there
+  should be a short-cut element-level def tag that allows escape
+  behavior to be specified. the tag content should e a two-argument
+  list: first argument denoting escape and second argument denoting
+  unescape method. arguments will be turned into code refs,
+  somehow. defaults will remain XML_basic_escape and
+  XML_basic_unescape, BUT default behavior will change. If escaping is
+  specified in the Def, then escape=>1 becomes the default for set()
+  and unescape=>1 becomes the default for get(). 
+
+- file_permissions stuff should be part of the "location" arguments,
+  not a stand-alone element. there should be a file_group argument, to
+  go with file_permissions.
+
+- DON'T LET RESERVED METHOD NAMES BE USED AS ELEMENT NAMES
+
+- misspelled methods called on classes should throw more understandable errors:
+  ex 'XML::Comma::Doc->retrrieve( ... )'
+
+- document "distinct" iterator arg
+
+- add the "test existence of element without creating" construction to
+  the FAQ (same as the "how many instances" construction.
+
+- check for multiply same-named stores (and indexes) in Defs
+
+- read-only errors should give a tiny bit of context, so they're not
+  so hard to track down.
+
+- Index.pm line 286. A die'ing index hook indicates to the system that
+  a Doc should not be indexed at all. The entirely reasonable action
+  of index_remove()ing the Doc is therefore taken. But that breaks on
+  any read_only Doc (as with rebuild()). What to do?
+
+- an $index->pre_store_check_for_duplicates($doc) method. requires
+  parsing sql_type and sql_index methods for UNIQUEosity, and figuring
+  out how to check whether fields (or combinations thereof) are
+  already present in the database. this method should be automatically
+  called in the pre_store_hook for any index_on_store'ing store.
+
+- quote() method to expose $dbh->quote() to DBH_User children
+
+- document the "aggregate" stuff in Iterator/Index
+
+- framework to handle translation between two related (but differently
+  Def'ed) document collections
+
+- sherrard found a bug in rebuild such that flags are set for all
+  tables that hve a given index_name (not just for all tables of a
+  certain doctype with a given index_name. It looks like the following
+  three methods need to have more specific where clauses:
+    sql_set_all_table_comma_flags_politely
+    sql_get_all_tables_with_comma_flags_set
+    sql_unset_all_table_comma_flags
+
+- sherrard notes that we should be tricky enough to spool blobs
+  somewhere for documents that haven't been stored yet, and then save
+  the blobs on eventual store.
+
+- retrieve does not do a permissions check on retrieve -- that's no
+  good. retrieve should fail, rather than store failing. and probably
+  store needs some better code to fail earlier and more gracefully
+  than it does?
+
+- does a <default>0</default> work as it should?
+
+- make SQL syntax be an ISA thing rather than a crufty begin-block thing
+
+- think about whether plural elements should be "order-able" by a def
+  (the def should maintain plural element order based on a code block
+  passed to sort, or something?)
+
+- work on permissions for files (Sherrard says doc->erase() doesn't
+  erase and doesn't warn if you don't have write permission to file --
+  but that index entries are removed.)
+
+- maybe Indexing::Iterator->_make_sort_spec shouldn't die just because
+  it doesn't find a sort table
+
+- figure out what to do about postgres 31-char name limit
+
+- sql defaults for index fields should maybe be something other than NULL?
+
+- rebuild() should read() rather than retrieve()?
+
+- rebuild() needs to NOT erase docs at the end that were added during
+  rebuild. wasn't this the origingal idea?
+
+- should errors have an "object context" field, passing a reference to
+  the object that is "most involved" in the error. Ie, for
+  validate_content errors, the element that failed to validate?
+
+- add error-handling and a better error message around the req_el
+  fetch in the validate_hook that <required> installs. As it is, the
+  error message is confusing if the <required> list gets out of sync
+  with the declared elements.
+
+- AbstractElement should define an is_empty() test that is overridden
+  by Element and NestedElement. This will make required's
+  validate_hook simpler and eliminate the bug wherein an nested
+  element with no sub-elements is okay. 
+
+- range macro needs argument checking
+
+- macros: length (min=> and max=>) ;  email
+
+- validate_content() should return the empty string
+
+- auto-CDATA on element set?
+
+- validate defs on load, to make use of 'required' and any other
+available internal functions, and avoid special-purpose validation
+code in Def.pm
+
+- function arg-checking (like Class::NamedParms, or something)
+
+- command line tools to examine/prune Doc locks
+
+- throw an error if a process is trying to lock a file that it
+  (itself) already has locked. (that's an easy "deadlock" to catch)
+
+- re-add permissions checking to index add and delete
+
+- add error-throwing to Index->rebuild() and Index->clean()
+
+- make clean use the PID as its comma flag, and if that PID is no
+  longer running, then clean anyway?
+
+- make SQL stuff really robust -- for example, recover from multiple
+  fields with the same name, needing to reconstruct a broken data
+  table, etc.
+
+- clean up the errors thrown by iterators a little more
+
+- throw an error if you try to keep_open a new-then-store()ed Doc?
+
+- add_element hook
+
+--- Parser wishlist ----
+
+  improved line-number reporting from parser
+
+  re-write PurePerl parser to use index() rather than getc()
+
+  inheritance so parsers share code
+
+  make #include stuff a clean callback hiding the interface
+
+  delayed element instantiation
+

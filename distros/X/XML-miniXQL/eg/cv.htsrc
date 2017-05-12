@@ -1,0 +1,132 @@
+<?xml version="1.0"?>
+<html xmlns="http://www.w3.org/HTML/1998/html4"
+			xmlns:xmerge="http://www.sergeant.org/xmerge">
+<head>
+<title><xmerge:replace name="/resume/person/persname/forename"/>
+		<xmerge:replace name="/resume/person/persname/surname"/>
+		- CV
+</title>
+<link rel="stylesheet" type="text/css" href="cv.css"/>
+</head>
+<body text="#000000" bgcolor="#FFFFFF" link="#0000FF" vlink="#FF0000" alink="#000088">
+
+<h1 align="center">
+	<xmerge:replace name="/resume/person/persname/forename"/>
+	<xmerge:replace name="/resume/person/persname/surname"/>
+</h1>
+
+<center>
+<hr WIDTH="100%"/>
+<i><xmerge:repeat><xmerge:replace name="/resume/person/address/line"/> / </xmerge:repeat><xmerge:replace name="../postcode"/></i>
+<br/><b>Tel:</b> <xmerge:repeat> <i><xmerge:replace name="/resume/person/phone/@Type"/>:</i> <xmerge:replace name="/resume/person/phone"/></xmerge:repeat> / <b>e-mail:</b> <xmerge:replace name="/resume/person/email"/>
+<p/><b>DoB:</b> <xmerge:replace name="/resume/person/dob"/></center>
+<br/>
+<b><font size="+1">Education</font></b>
+<center>
+<hr WIDTH="100%"/></center>
+<table>
+	<tr>
+		<td width="25">&amp;nbsp;</td>
+		<td width="400"><xmerge:replace name="/resume/education/establishment/name"/></td>
+		<td><i>Graduated:</i> <xmerge:replace name="/resume/education/establishment/dateto"/></td>
+	</tr>
+	<tr>
+		<td></td>
+		<td><xmerge:replace name="/resume/education/establishment/qualification/name"/></td>
+		<td></td>
+	</tr>
+</table>
+<br/>
+<b><font size="+1">Key Skills</font></b>
+<hr width="100%"/>
+<table width="100%" cellpadding="1" cellspacing="0" border="1">
+	<tr valign="top">
+		<td>
+			<table width="100%" cellpadding="1" cellspacing="0" border="0">
+				<tr><th>Languages</th></tr>
+				<xmerge:repeat>
+					<tr>
+						<td><xmerge:replace name="/resume/skills/area[@name=&quot;Languages&quot;]/item"/>
+						</td>
+					</tr>
+				</xmerge:repeat>
+			</table>
+		</td>
+		<td>
+			<table width="100%" cellpadding="1" cellspacing="0" border="0">
+				<tr><th>Protocols</th></tr>
+				<xmerge:repeat>
+					<tr>
+						<td><xmerge:replace name="/resume/skills/area[@name=&quot;Protocols&quot;]/item"/>
+						</td>
+					</tr>
+				</xmerge:repeat>
+			</table>
+		</td>
+		<td>
+			<table width="100%" cellpadding="1" cellspacing="0" border="0">
+				<tr><th>Software</th></tr>
+				<xmerge:repeat>
+					<tr>
+						<td><xmerge:replace name="/resume/skills/area[@name=&quot;Software&quot;]/item"/>
+						</td>
+					</tr>
+				</xmerge:repeat>
+			</table>
+		</td>
+		<td>
+			<table width="100%" cellpadding="1" cellspacing="0" border="0">
+				<tr><th>Databases</th></tr>
+				<xmerge:repeat>
+					<tr>
+						<td><xmerge:replace name="/resume/skills/area[@name=&quot;Databases&quot;]/item"/>
+						</td>
+					</tr>
+				</xmerge:repeat>
+			</table>
+		</td>
+	</tr>
+</table>
+<br/>
+<b><font size="+1">Current Work</font></b>
+<hr width="100%"/>
+<table>
+	<tr>
+		<td width="25">&amp;nbsp;</td>
+		<td width="400"><b><xmerge:replace name="/resume/experience/employee/name"/></b></td>
+<!--		
+		<td><i>End Date:</i> <xmerge:replace name="/resume/experience/employee/dateto"/></td>
+-->
+	</tr>
+</table>
+<br/>
+<b><font size="+1">Work Experience</font></b>
+<hr width="100%"/>
+<table>
+	<xmerge:repeat>
+	<tr>
+		<td width="25">&amp;nbsp;</td>
+		<td><b><xmerge:replace name="/resume/experience/employee/name"/></b></td>
+		<td><b><xmerge:replace name="/resume/experience/employee/datefrom"/> -
+			<xmerge:replace name="/resume/experience/employee/dateto"/></b></td>
+	</tr>
+	<tr>
+		<td width="25">&amp;nbsp;</td>
+		<td colspan="2"><xmerge:replace name="/resume/experience/employee/details"/><br/></td>
+	</tr>
+	</xmerge:repeat>
+</table>
+<br/>
+<b><font size="+1">Training</font></b>
+<hr width="100%"/>
+<table>
+	<xmerge:repeat>
+	<tr>
+		<td width="25">&amp;nbsp;</td>
+		<td><xmerge:replace name="/resume/training/course/name"/>
+				(<xmerge:replace name="/resume/training/course/trainee"/>)</td>
+	</tr>
+	</xmerge:repeat>
+</table>
+</body>
+</html>

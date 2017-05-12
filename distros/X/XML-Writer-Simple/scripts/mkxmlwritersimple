@@ -1,0 +1,61 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use XML::DT;
+
+my $xmlfile = shift;
+
+die "No file supplied\n" unless $xmlfile && -f $xmlfile;
+
+my %tags;
+my $code = dt( $xmlfile,
+               -pcdata => sub {
+                   return "" if $c =~ m/^[\s\n\r]+$/;
+                   $c =~ s/"/\\"/g;
+                   $c =~ s/\$/\\\$/g;
+                   '"' . $c . '",';
+               },
+               -default => sub {
+                   if ($q =~ /[.:]/) {
+                       my $otag = "<$q";
+                       if (%v) {
+                           for my $key (keys %v) {
+                               $otag.= " $key='$v{$key}'";
+                           }
+                       }
+                       $otag.=">";
+                       return '"'.$otag.'",' . $c . "\"</$q>\""
+                   } else {
+                       $tags{$q}++;
+                       my $attrs = "";
+                       if (%v) {
+                           $attrs = '{'.join(",",map {
+                               $v{$_} =~ s/"/\\"/g;
+                               $v{$_} =~ s/\$/\\\$/g;
+                               "'$_'=>\"$v{$_}\""
+                           } keys %v).'},';
+                       }
+                       "$q($attrs$c),"
+                   }
+               });
+
+
+$code =~ s/"",//g;
+$code =~ s/,\)/)/g;
+$code =~ s/,([a-zA-Z])/,\n\t$1/g;
+binmode(STDOUT, ":utf8");
+
+my $tags = join(" ", sort keys %tags);
+print <<"EOP";
+#!/usr/bin/perl
+use utf8;
+use strict;
+use warnings;
+use XML::Writer::Simple tags => [qw/$tags/];
+
+binmode(STDOUT, ":utf8");
+print xml_header(encoding => 'UTF-8');
+print $code;
+EOP

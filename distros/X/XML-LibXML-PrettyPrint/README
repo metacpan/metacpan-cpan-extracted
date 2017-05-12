@@ -1,0 +1,248 @@
+NAME
+    XML::LibXML::PrettyPrint - add pleasant whitespace to a DOM tree
+
+SYNOPSIS
+     my $document = XML::LibXML->new->parse_file('in.xml');
+     my $pp = XML::LibXML::PrettyPrint->new(indent_string => "  ");
+     $pp->pretty_print($document); # modified in-place
+     print $document->toString;
+
+DESCRIPTION
+    Long XML files can be daunting for humans to read. Of course, XML is
+    really designed for computers to read - not people - but there are times
+    when mere mortals do need to read and edit XML by hand. For example, if
+    your application stores its configuration in XML, or you need to dump some
+    XML to STDOUT for debugging purposes.
+
+    Syntax highlighting helps, but to really make sense of some XML, proper
+    indentation can be vital. Hence `XML::LibXML::PrettyPrint` - it can be
+    applied to an XML::LibXML DOM tree to reformat it into a more readable
+    result.
+
+    Pretty-printing XML is not as CPU-efficient as dumping it out sloppily, so
+    unless you're pretty sure that a human is going to need to make sense of
+    your XML, you should probably not use this module.
+
+  Constructors
+    `new(%options)`
+        Constructs a pretty-printer object.
+
+        Options:
+
+        *   indent_string - The string to use to indent each line. Defaults to
+            a single tab character. Setting it to a non-whitespace character
+            is allowed, but will carp a warning.
+
+        *   new_line - The string to use to begin a new line. Defaults to
+            "\n".
+
+        *   element - A hashref of element categorisations. Each
+            categorisation is a reference to an array of element names or
+            callback functions. Element names may use Clark notation.
+
+              my $callback = sub {
+                my $node = shift;
+                return 1 if $node->hasAttribute('is_block');
+                return undef;
+              };
+              my $pp = XML::LibXML::PrettyPrint->new(
+                  element => {
+                      inline   => [qw/span strong em b i a/],
+                      block    => [qw/p div body html head/, $callback],
+                      compact  => [qw/title caption li dd dt th td/],
+                      preserves_whitespace => [qw/pre script style/],
+                      }
+                  );
+
+            Callbacks should return 1 (true), 0 (false) or undef (dunno).
+
+    `new_for_html(%options)`
+        Constructs a pretty printer object pre-configured to be suitable for
+        HTML and XHTML. The indent_string and new_line options are supported.
+
+  Methods
+    If you just need to use a default configuration (no options passed to the
+    constructor, then you can call these as class methods, unless otherwise
+    stated.
+
+    `strip_whitespace($node)`
+        Strips superfluous whitespace from an `XML::LibXML::Document` or
+        `XML::LibXML::Element`.
+
+        Whitespace just before, just after or leading/trailing within an
+        inline element is not considered superfluous. Runs of multiple
+        whitespace characters are replaced with a single space. Whitespace is
+        not changed within an element that preserves whitespace.
+
+        The node is modified in place.
+
+    `indent($node, $level)`
+        Indents the node to a certain indentation level, and its direct
+        children to `$level + 1`, grandchildren to `$level + 2`, etc.
+        Typically you'd just want to indent the root node to level 0.
+
+        The node is modified in place.
+
+        Elements that preserve whitespace are not changed.
+
+    `pretty_print($node, $level)`
+        Strip whitespace and indent. The node is modified in place and
+        returned.
+
+        Example use as a class method:
+
+         print XML::LibXML::PrettyPrint
+           ->pretty_print(XML::LibXML->new->parse_string($XML))
+           ->toString;
+
+    `indent_string($level)`
+        Returns the string that would be used to indent something to a
+        particular level. Descendent classes could override this method to do
+        funky indentation, such as having varying levels of indentation.
+
+    `new_line`
+        Returns the string that would be used to begin a new line.
+
+    `element_category($node)`
+        Returns EL_INLINE, EL_BLOCK, EL_COMPACT or undef.
+
+    `element_preserves_whitespace($node)`
+        Boolean indicating whether the contents of the element have
+        significant whitespace that needs preserving.
+
+        Returns undef if $node is not an `XML::LibXML::Element`.
+
+  Functions
+    `print_xml $xml`
+        Given an XML string or an XML::LibXML::Node object, prints it nicely.
+
+        This function is not exported by default, but can be requested:
+
+         use XML::LibXML::PrettyPrint 0.001 qw(print_xml);
+
+        Use like this:
+
+         print_xml '<foo> <bar> </bar> </foo>';
+
+    `IO::Handle::print_xml($handle, $xml)`
+        Partly experimental, partly mental. You can enable this feature like
+        this:
+
+         use XML::LibXML::PrettyPrint 0.001 qw(-io);
+
+        And that will allow stuff like this to work:
+
+         open LOG, '>mylog.xml';
+         print_xml LOG '<foo> <bar> </bar> </foo>';
+         close LOG;
+
+         open my $log, '>otherlog.xml';
+         print_xml $log '<foo> <bar> </bar> </foo>';
+         close $log;
+
+         print_xml STDERR '<foo> <bar> </bar> </foo>';
+
+  Constants
+    These can be exported:
+
+     use XML::LibXML::PrettyPrint 0.001 qw(:constants);
+
+    `EL_BLOCK`
+    `EL_COMPACT`
+    `EL_INLINE`
+
+ELEMENT CATEGORIES
+    There are three categories of element: inline, block and compact.
+
+    For inline elements the presence of whitespace (though not the amount of
+    whitespace) is considered significant just before the element, just after
+    the element, or just within the element.
+
+    In XHTML, consider the difference between the block element `<div>`:
+
+     <div>Will</div><div>Carlton</div> <div>Ashley</div>
+
+    and the inline element `<span>`:
+
+     <span>Spider</span>-<span>Man</span> <span>lives</span>
+
+    The space or lackthereof between `<div>` elements does not matter one
+    whit. The lack of spaces between the first two `<span>` elements allows
+    them to be read as a single (in this case, hyphenated) word, whereas the
+    space before the third `<span>` separates out the word "lives".
+
+    In terms of indentation, inline elements do not start a new indented line,
+    unless they are the first element within their block, or are preceded by a
+    block or compact element.
+
+    Block elements always start a new line, and cause their child nodes to be
+    indented to the next level.
+
+    Compact elements are somewhere in-between. When it comes to whitespace
+    stripping, they're treated as block elements. In terms of indentation,
+    they always start a new line, but they only cause their child nodes to be
+    indented to the next level if they have block descendents. If we imagine
+    that in HTML, `<ul>` is a block element, `<i>` is an inline element, and
+    `<li>` is a compact element:
+
+     <ul>
+       <li>Will Smith - Will Smith</li>
+       <li>Carlton Banks - Alfonso Ribeiro</li>
+       <li>
+         Vivian Banks:
+         <ul>
+           <li>Janet Hubert-Whitten <i>(seasons 1-3)</i></li>
+           <li>Daphne Maxwell Reid <i>(seasons 3-6)</i></li>
+         </ul>
+       </li>
+     </ul>
+
+    The third `<li>` element is indented like a block element because it
+    contains a block `<ul>` element. The other `<li>` elements do not have
+    their contents indented, because they contain only inline content.
+
+    Elements default to being block, but you can specify particular elements
+    as inline or compact by passing node names or callbacks to the
+    constructor. Elements default to not preserving whitespace unless they
+    have an `xml:space="preserve"` attribute, but again you can use the
+    constructor to change this.
+
+    Comments and processing instructions default to being compact, but you can
+    make particular comments or PIs inline or block by passing appropriate
+    callbacks to the constructor. Whitespace within comments and PIs is always
+    preserved. (There is rarely any reason to make comments and processing
+    instructions block, but making them inline can occasionally be useful, as
+    it will mean that the presence of whitespace just before or just after the
+    comment is treated as significant.)
+
+    Text nodes are always inline.
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=XML-LibXML-PrettyPrint>.
+
+SEE ALSO
+    Related: XML::LibXML, HTML::HTML5::Writer.
+
+    XML::Tidy - similar, but based on XML::XPath. Doesn't differentiate
+    between inline and block elements.
+
+    XML::Filter::Reindent - similar again, based on XML::Parser. Doesn't
+    differentiate between inline and block elements.
+
+    Sermon: <http://www.derkarl.org/why_to_tabs.html>. Read it.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2011-2014 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

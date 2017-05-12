@@ -1,0 +1,46 @@
+<dirindex>
+  <dir>
+    <name>sanfrancisco</name>
+    <title>Trip To San Francisco 3/21/02 - 3/26/02</title>
+  </dir>
+  <dir>
+    <name>la</name>
+    <title>Trip to Los Angeles 8/10/02 - 8/17/02</title>
+  </dir>
+  <dir>
+    <name>emily</name>
+    <title>Pictures of Emily</title>
+  </dir>
+  <dir>
+    <name>new_years_2003</name>
+    <title>New Years 2003</title>
+  </dir>
+  <dir>
+    <name>wtc</name>
+    <dir>
+      <name>Holiday_party_2001</name>
+      <dir>
+        <name>brooklyn_bridge_at_night</name>
+	<dir>
+	  <name>paste_test_1</name>
+	  <title>paste test 1</title>
+	</dir>
+        <title>Brooklyn Bridge</title>
+      </dir>
+      <title>CheetahMail Holiday party 2001</title>
+    </dir>
+    <title>Ground Zero</title>
+  </dir>
+  <dir>
+    <name>ed_last_day_at_cheetahmail</name>
+    <dir>
+      <name>chicago_and_indiana</name>
+      <title>Side Trip to Chicago</title>
+    </dir>
+    <dir>
+      <name>ed_kesa_wedding</name>
+      <title>Ed and Kesa's  Wedding</title>
+    </dir>
+    <title>Ed's last day at Cheetahmail</title>
+  </dir>
+</dirindex>

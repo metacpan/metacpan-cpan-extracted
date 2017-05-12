@@ -1,0 +1,59 @@
+{
+   "abstract" : "Perl extension for writing XML",
+   "author" : [
+      "Mark Lawrence <nomad@null.net>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.421",
+   "keywords" : [],
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "XML-API",
+   "no_index" : {
+      "package" : [
+         "XML::API::Element",
+         "XML::API::SAXHandler"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4004"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Scalar::Util" : "0",
+            "XML::LibXML::SAX" : "0",
+            "XML::SAX" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Slurp" : "0",
+            "Test::Exception" : "0",
+            "Test::Memory::Cycle" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/NoAuth/ReportBug.html?Queue=XML-API"
+      },
+      "homepage" : "https://github.com/mlawren/xml-api",
+      "license" : [
+         "http://www.gnu.org/licenses/gpl-3.0.txt"
+      ],
+      "repository" : {
+         "url" : "git://github.com/mlawren/xml-api.git"
+      }
+   },
+   "version" : "0.30"
+}

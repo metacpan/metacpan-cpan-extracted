@@ -1,0 +1,29 @@
+Revision history for Perl extension XML::Perl.
+
+0.09
+	- CDATA
+
+0.08
+	- fix for not XML files
+
+0.07
+	- fix for Unicode BOM
+
+0.06
+	- mv to lib dir
+
+0.05
+	- sort attrs
+
+0.04
+	- xpath
+
+0.03
+	- perlbase2xml
+
+0.02
+	- xml2perlbase
+	- xmlformat
+
+0.01
+	- perl2xml

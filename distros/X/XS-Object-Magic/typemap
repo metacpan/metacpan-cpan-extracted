@@ -1,0 +1,4 @@
+INPUT
+T_PTROBJ_MG
+	$var = ($type)xs_object_magic_get_struct_rv_pretty(aTHX_ $arg, \"$var\");
+

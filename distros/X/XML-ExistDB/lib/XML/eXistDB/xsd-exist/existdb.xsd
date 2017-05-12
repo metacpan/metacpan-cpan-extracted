@@ -1,0 +1,30 @@
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+   targetNamespace="http://exist.sourceforge.net/NS/exist"
+   xmlns:ex="http://exist.sourceforge.net/NS/exist"
+   elementFormDefault="qualified"
+   attributeFormDefault="unqualified"
+   version="1.0">
+>
+
+<!-- this is a very unofficial schema.  Hopefully, it will grow into
+     an official schema (or be replaced with one)
+  -->
+
+<element name="result" type="ex:resultType" />
+
+<complexType name="resultType">
+  <sequence>
+    <any namespace="##other" processContent="lax"
+       minOccurs="0" maxOccurs="unbounded"/>
+  </sequence>
+
+  <!-- returned by querySummary -->
+  <attribute name="hitCount" type="unsignedInt" />
+
+  <!-- all returned by describeResultSet -->
+  <attribute name="hits"     type="unsignedInt" />
+  <attribute name="start"    type="unsignedInt" />
+  <attribute name="count"    type="unsignedInt" />
+</complexType>
+
+</schema>

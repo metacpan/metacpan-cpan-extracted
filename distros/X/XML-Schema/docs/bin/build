@@ -1,0 +1,41 @@
+#!/usr/bin/perl -w                                         # -*- perl -*-
+#
+# $XML-SCHEMA/bin/build
+#
+# Simple Perl script to build the web site.  Calls tpage to first
+# process the ttree config file to install the correct paths.  The
+# output is written to docs/tmp/ttreecfg.tmp and then ttree is called
+# specifying this as a configuration file.
+#
+
+use strict;
+use Template;
+use Template::Config;
+use Cwd qw( chdir getcwd );
+
+my $path = getcwd;
+my $prog = $0;
+my $root = ($prog =~ m[^/]) ? $prog : "$path/$prog";
+$root =~ s[/bin/build$][];
+
+my $src   = "$root/etc/ttree.tt2";
+my $tmp   = "$root/tmp/ttreecfg.tmp";
+my $ttdir = Template::Config->instdir('templates');
+my $debug = @ARGV && $ARGV[0] eq '-d' ? (shift && 1) : 0;
+
+die "cannot find root directory for web site: $root\n"
+    unless -d $root;
+
+$ttdir ||= '/usr/local/tt2/templates';
+print "ttdir: $ttdir\n";
+
+local $" = ' ';
+
+run("tpage --define root=$root --define ttroot=$ttdir --define debug=$debug $src > $tmp\n");
+run("ttree -f $tmp @ARGV");
+
+sub run {
+    my $cmd = shift;
+    print STDERR "\$ $cmd\n"if $debug;
+    system($cmd) && die "failed to run command:\n  $cmd\n";
+}

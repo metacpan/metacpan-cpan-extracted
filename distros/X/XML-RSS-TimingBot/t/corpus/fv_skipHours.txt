@@ -1,0 +1,1 @@
+skipHours=1

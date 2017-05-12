@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<rss version="2.0" 
+  xmlns:dc="http://purl.org/dc/elements/1.1/"
+  xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+  xmlns:admin="http://webns.net/mvcb/"
+  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+
+<channel>
+<title>The Loom</title>
+<link>http://www.corante.com/loom/</link>
+<description>A blog about life, past and future</description>
+<dc:language>en-us</dc:language>
+<dc:creator>carl@carlzimmer.com</dc:creator>
+<dc:date>2004-03-05T00:21:01-05:00</dc:date>
+<admin:generatorAgent rdf:resource="http://www.movabletype.org/?v=2.64" />
+<sy:updatePeriod>hourly</sy:updatePeriod>
+<sy:updateFrequency>1</sy:updateFrequency>
+<sy:updateBase>2000-01-01T12:00+00:00</sy:updateBase>
+
+<item>
+<title>The Loom In the News</title>
+<link>http://www.corante.com/loom/archives/002261.html</link>
+<description>The Austin Chronicle has an interesting piece today on blogs, which marks the first time anyone&apos;s ever interviewed me about the Loom. Conclusion: no money, uncertain future, but much fun....</description>
+<guid isPermaLink="false">2261@http://www.corante.com/loom/</guid>
+<dc:subject>General</dc:subject>
+<dc:date>2004-03-05T00:21:01-05:00</dc:date>
+</item>
+<item>
+<title>Secrets of the Teeth</title>
+<link>http://www.corante.com/loom/archives/002260.html</link>
+<description>Probing the origins of humanity is actually a lot like being a dentist. The bones of our hominid ancestors tend to fall apart, leaving behind a smattering of shards. But teeth, made of enamel, can do a better job of...</description>
+<guid isPermaLink="false">2260@http://www.corante.com/loom/</guid>
+<dc:subject>Evolution</dc:subject>
+<dc:date>2004-03-05T00:11:45-05:00</dc:date>
+</item>
+<item>
+<title>The Dawn of Medicine, Plus or Minus a Couple Million Years</title>
+<link>http://www.corante.com/loom/archives/002226.html</link>
+<description>I was puzzled by an article in today&apos;s New York Times called &quot;Researchers rewrite first chapter for the history of medicine.&quot; William Honan, the reporter, announced that &quot;an art historian and a medical researcher say they have pushed back by...</description>
+<guid isPermaLink="false">2226@http://www.corante.com/loom/</guid>
+<dc:subject>Evolution</dc:subject>
+<dc:date>2004-03-02T23:18:45-05:00</dc:date>
+</item>
+<item>
+<title>17th Century Soul, 21st Century Mind</title>
+<link>http://www.corante.com/loom/archives/002221.html</link>
+<description>If you want to hear about brain science at its birth and today, check out the public radio show Tech Nation, this week. In the first half of the show, I&apos;ll be talking about Soul Made Flesh. In the second...</description>
+<guid isPermaLink="false">2221@http://www.corante.com/loom/</guid>
+<dc:subject>Brains</dc:subject>
+<dc:date>2004-03-02T16:18:41-05:00</dc:date>
+</item>
+<item>
+<title>The Creativity of Microbes</title>
+<link>http://www.corante.com/loom/archives/002202.html</link>
+<description>In my last post, I wrote about how our genes work in networks, much like circuits made of elements wired together in various ways. As genes are accidentally duplicated, mutated, and rewired, old networks can give rise to new ones....</description>
+<guid isPermaLink="false">2202@http://www.corante.com/loom/</guid>
+<dc:subject>Evolution</dc:subject>
+<dc:date>2004-03-02T00:27:27-05:00</dc:date>
+</item>
+<item>
+<title>Networks Under Construction</title>
+<link>http://www.corante.com/loom/archives/002172.html</link>
+<description>As biologists figure out more about how life is, they can then figure out how it got to be that way. First there were genes. Mendel noticed that somehow the wrinkles on wrinkled peas could be transmitted down through the...</description>
+<guid isPermaLink="false">2172@http://www.corante.com/loom/</guid>
+<dc:subject>Evolution</dc:subject>
+<dc:date>2004-02-29T23:40:22-05:00</dc:date>
+</item>
+<item>
+<title>Return of the Howlers</title>
+<link>http://www.corante.com/loom/archives/002109.html</link>
+<description>Apologies for the long radio silence. Travelling and the obligatory pre-travelling frenzy shut down the blogging assembly line for a couple weeks. Having wrapped up my west-coast jaunt (thanks to the great crowd that came out for the CSPAN taping...</description>
+<guid isPermaLink="false">2109@http://www.corante.com/loom/</guid>
+<dc:subject>Evolution</dc:subject>
+<dc:date>2004-02-26T20:57:05-05:00</dc:date>
+</item>
+<item>
+<title>West Coast Soul, or How to Get on TV</title>
+<link>http://www.corante.com/loom/archives/001974.html</link>
+<description>If you live in the Bay Area, please join me noon on Monday, February 23, at Stanford University for a talk about Soul Made Flesh. (Here are all the details.) The talk is sponsored by the Stanford University Center for...</description>
+<guid isPermaLink="false">1974@http://www.corante.com/loom/</guid>
+<dc:subject>Brains</dc:subject>
+<dc:date>2004-02-18T21:14:24-05:00</dc:date>
+</item>
+<item>
+<title>My Darwinian Daughters</title>
+<link>http://www.corante.com/loom/archives/001866.html</link>
+<description>My wife and I have two lovely daughters: Charlotte is two and a half, and Veronica is seven weeks. And we are tired. We think of ourselves as being on the losing end of a tag-team wrestling match--particularly at about...</description>
+<guid isPermaLink="false">1866@http://www.corante.com/loom/</guid>
+<dc:subject>Evolution</dc:subject>
+<dc:date>2004-02-12T16:12:08-05:00</dc:date>
+</item>
+<item>
+<title>Flesh Air</title>
+<link>http://www.corante.com/loom/archives/001789.html</link>
+<description>I&apos;ll be on Fresh Air with Terry Gross today, talking about Soul Made Flesh. If you miss it today, it will be archived at the show&apos;s web site....</description>
+<guid isPermaLink="false">1789@http://www.corante.com/loom/</guid>
+<dc:subject>Brains</dc:subject>
+<dc:date>2004-02-09T10:08:20-05:00</dc:date>
+</item>
+<item>
+<title>Flower Power</title>
+<link>http://www.corante.com/loom/archives/001768.html</link>
+<description>“Abominable” is not the sort of word that most people may associate with flowers, but for Darwin, it was a perfect fit. He saw life on Earth today as the result of millions of years of victories and defeats in...</description>
+<guid isPermaLink="false">1768@http://www.corante.com/loom/</guid>
+<dc:subject>Evolution</dc:subject>
+<dc:date>2004-02-06T16:55:46-05:00</dc:date>
+</item>
+<item>
+<title>Aristotle, Darwin, Watson, and Co. Now Online</title>
+<link>http://www.corante.com/loom/archives/001753.html</link>
+<description>A while back I had the pleasure to join a team of scientists and teachers to build web site that explains evolution. Funded by the National Science Foundation and the Howard Hughes Medical Foundation, it charts the history of evolutionary...</description>
+<guid isPermaLink="false">1753@http://www.corante.com/loom/</guid>
+<dc:subject>Evolution</dc:subject>
+<dc:date>2004-02-05T20:40:36-05:00</dc:date>
+</item>
+<item>
+<title>The Monkeys Win</title>
+<link>http://www.corante.com/loom/archives/001752.html</link>
+<description>Georgia&apos;s State Schools superintendent Kathy Cox has backed down from her ban on the word evolution. While this is excellent news, Georgia is still left with an incompetent superintendent. For one thing, she thinks Intelligent Design is an acceptable theory...</description>
+<guid isPermaLink="false">1752@http://www.corante.com/loom/</guid>
+<dc:subject>Evolution</dc:subject>
+<dc:date>2004-02-05T19:33:51-05:00</dc:date>
+</item>
+<item>
+<title>Where Have I Heard &quot;Sound Science&quot; Before...?</title>
+<link>http://www.corante.com/loom/archives/001743.html</link>
+<description>&quot;Conservative board members said they wanted to make sure that schools teach sound science, arguing that evolution is a flawed theory that cannot be proven.&quot; --&quot;In Kansas, key decision on teaching evolution&quot; Associated Press, August 12, 1999. If the new...</description>
+<guid isPermaLink="false">1743@http://www.corante.com/loom/</guid>
+<dc:subject>Evolution</dc:subject>
+<dc:date>2004-02-05T07:59:12-05:00</dc:date>
+</item>
+<item>
+<title>Unsound unscience</title>
+<link>http://www.corante.com/loom/archives/001742.html</link>
+<description>Check out Chris Mooney&apos;s post on the latest move in Washington to gut government science, which cloaks itself in bogus terms like &quot;sound science.&quot; This dreadful campaign probably won&apos;t get much attention in the national media, but its effects--on conservation,...</description>
+<guid isPermaLink="false">1742@http://www.corante.com/loom/</guid>
+<dc:subject>General</dc:subject>
+<dc:date>2004-02-05T07:18:38-05:00</dc:date>
+</item>
+
+
+</channel>
+</rss>

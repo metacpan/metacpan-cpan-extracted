@@ -1,0 +1,413 @@
+=head1 NAME
+
+XML::Parser::GlobEvents - event driven XML parser, filtered on tag
+path, with element tree for parameter
+
+=head1 SYNOPSIS
+
+ use XML::Parser::GlobEvents qw(parse);
+ parse(\*DATA,
+     item => sub {  # for each tag with name 'item':
+         my($node) = @_;
+         print "$node->{title}{-text} ($node->{-attr}{id}): $node->{description}{-text}\n";
+     }
+ );
+
+ __DATA__
+ <root>
+   <item id="1">
+     <title>Floor Wax</title>
+     <description>Is it a floor wax?</description>
+   </item>
+   <item id="2">
+     <title>Dessert Topping</title>
+     <description>Is it a dessert topping?</description>
+   </item>
+ </root>
+
+=head1 DESCRIPTION
+
+C<XML::Parser::GlobEvents> is a module aimed to parse data from XML
+files that have a predictable, repetitive structure, in a "process as
+you parse" manner. It lets you to specify event handlers that get
+invoked when start and/or end tags are being parsed. They are filtered
+on a pattern specifying which tag, and where it should appear in the
+document. As it parses, it builds a complete tree for the element, that
+gets passed to the End handler.
+
+Afterwards, if there are no more pending End handlers for an element or
+any of its enclosing elements, then it is automatically discarded -
+usually before the rest of the document is even parsed.
+
+Note that this module is I<only> a parser, it does not produce XML. But parsing
+XML is the hard part, producing XML is easy.
+
+=head1 FUNCTIONS
+
+The core API of this module is a single function: "parse", which you
+can choose to import under its alias "parse_xml". There are no objects,
+there is no need for subclassing.
+
+=head2 parse
+
+ parse($file,  # file name, filehandle, or ref to scalar containing the XML
+     pattern => {
+         Start => sub { my($node) = @_; ... },  # Start handler, optional
+         End => sub { my($node) = @_; ... },    # End handler, optional
+         Other => 1, ...                        # other specifiers, optional
+      },
+      pattern2 = > { ... },                     # repeatable
+      pattern2 => sub { my($code) = @_; ... },  # End handler only
+ );
+
+The first parameter you have to pass it is the file name, filehandle,
+or a ref to a scalar containing the XML data.
+
+Next follow any number of pattern+specifier pairs:
+
+ "pattern" => \%spec
+
+If you pass a code ref instead of a hashref as the specifier, it is
+taken to mean an End handler.
+
+ "pattern" => sub { ... }   # End handler
+
+=head1 PATHS AND PATTERNS
+
+These are inspired by XPath, but absolutely minimal. Even if you're new
+to this, you can most likely pick it up in minutes.
+
+=head2 paths
+
+A path is written just like a Unix file path, where the directory names
+are replaced by tag names. The reason why this can even work reliably
+is because a "/" character is not allowed in a tag name.
+
+For example, in the following XML, the path to the element with tag
+name "gamma" is "C</alpha/beta/gamma>".
+
+ <alpha>
+   <beta>
+     <gamma>HERE</gamma>
+   </beta>
+ </alpha>
+
+=head2 patterns
+
+The rules to specify path patterns are like this:
+
+=over
+
+=item C<foo>
+
+matches if the current tag has the name "foo", on any depth
+
+=item C<alpha/foo>
+
+matches if the current tag is "foo" and its parent is "alpha"
+
+=item C<*>
+
+matches any tag
+
+=item C<alpha/*>
+
+matches any child tag under "alpha"
+
+=item C<alpha//foo>
+
+matches any tag "foo" that is I<somewhere> under "alpha" (AKA a
+descendant), either directly (a child) or at any depth: i.e. it will
+match for all of "alpha/foo", "alpha/beta/foo" and
+"alpha/beta/gamma/foo".
+
+=item C<alpha//*>
+
+matches any descendant tag under "alpha"
+
+=item C</alpha/beta>
+
+is an absolute path, anchored to the root. Note that "alpha/beta" is
+equivalent to "//alpha/beta", i.e. not anchored.
+
+=back
+
+That's about it. I'm not planning to ever implement more of XPath,
+simply because we don't need it: why should I emulate silly functions
+when it's so much easier and faster to deal with them, in the handlers,
+in Perl? This includes expressions and comparisons, and filtering on
+attributes. Simply return early from the handler.
+
+=head1 HANDLERS
+
+There are 2 types of handlers:
+
+=over
+
+=item Start tag handler
+
+This one is invoked when the pattern matches as the
+start tag is parsed, and before any of the child elements.
+
+The properties passed to the callback in the first parameter include
+the path, the tag name, and the attributes hash.
+
+You cannot get at the element's contents, because the contents haven't
+been parsed yet.
+
+=item End tag handler
+
+It is invoked when the end tag is parsed (and the
+pattern matches). It is in general much more useful than the Start
+handler, because in addition to the above properties as passed to the
+Start handler (including attributes from the start tag, as these are
+actually properties of the element of which this tag is the closing
+tag), you also get a tree for the parsed content.
+
+=back
+
+If you have more than one handler matching for one tag, they will be
+invoked in sequence, from the most specific pattern first (meaning: more
+fixed parts, and fewer wildcards) to the least specific one.
+
+The first parameter to these handlers is the "node", which represents
+the contents for the current tag/element.
+
+Note that restrictions on well-formedness of XML by the underlying
+parser enforces the fact that these events always come in pairs: a
+Start event is always complemented by an associated End event -
+whether you have set a handler on it, or not.
+
+=head1 NODE
+
+A node is a hash ref, plain and simple. That hash contains generic
+properties, such as the tag name and the attributes, and, in case of an
+End handler, references to its text contents, and to child nodes, which
+are similar hash refs. They represent a tree for the element and its decendants.
+
+=head2 node properties
+
+Generic node properties have a name that starts with a "-" sign, which
+will not ever clash with the name of any tag.
+
+Thanks to the special syntax rules of Perl, you don't have to quote them:
+C<$node-E<gt>{-name}> means exactly the same thing as
+C<$node-E<gt>{'-name'}>.
+
+=over
+
+=item -name
+
+the tag name
+
+=item -path
+
+the element's path, in the form C</alpha/beta/gamma> where
+'alpha' is the root element and 'gamma' is the current tag's name, plus
+every other tag in between.
+
+=item -attr
+
+a hash ref with the attributes, entities decoded and converted to
+UTF8
+
+=item -position
+
+the number of the current tag among its siblings (under the
+same parent) with the same name. The first item has number 1.
+
+=item -contents
+
+an array ref containing all top level texts as plain strings,
+and child nodes as hash refs, in the order as in the document.
+
+=item -text
+
+the plain text contents from the top level, excluding text in
+nested tags, as a plain string. Entities are decoded and the whole text
+is converted to UTF8.
+
+=back
+
+=head2 Accessing child nodes
+
+There is more than one way to access a child node. They are:
+
+=over
+
+=item C<$node-E<gt>{TAG}>
+
+(replace "TAG" with the actual name of the tag)
+
+This is the direct access to a child node for an element with that tag
+name. In case there's more than one such element, then it'll be the
+last one in the document.
+
+Because, even though tag names may contain "-" characters, they
+I<cannot> ever start with one, this will not clash with our ordinary node
+properties.
+
+=item C<$node-E<gt>{'TAG[]'}>
+
+(replace "TAG" with the actual name of the tag)
+
+This will be an array ref with all child elements with this tag name,
+in the order of the document.
+
+=item C<$node-E<gt>{-contents}>
+
+An array ref that contains plain text (simple strings) and child nodes
+(hashrefs), in the order of the document.
+
+=back
+
+=head2 Text
+
+Accessing text can be done through the node property "-text":
+C<$node-E<gt>{-text}>
+
+This includes only text immediately at the top level of the current element;
+text in child elements is ignored.
+
+Entities are decoded and the text is converted to UTF8.
+
+=head3 Whitespace
+
+Whitespace is trimmed and normalized (meaning: any sequence of
+whitespace is replaced by a single space) by default. To prevent this, you
+can specify
+
+    Whitespace => $mode
+
+in the specifier for this
+pattern, in the hash, alongside the Start and/or End handler. The values for
+mode are:
+
+=over
+
+=item C<normalize>
+
+default behaviour: trim and collapse
+
+=item C<trim>
+
+trim only, to prevent collapse
+
+=item C<collapse>
+
+no trim, collapse only
+
+=item C<keep>
+
+no trim, no collapse
+
+=back
+
+=head3 CDATA
+
+CDATA sections in the document are also included as plain text.
+
+=head1 DEPENDENCIES
+
+=head2 Expat
+
+This module is built on top of L<XML::Parser::Expat|XML::Parser::Expat>, which
+is part of the L<XML::Parser|XML::Parser> distro, but without all the unnecessary
+fluff that the latter layer module adds.
+
+=head3 Text
+
+It is Expat that decodes the entities and converts text to UTF-8, for text
+contents and for attributes. If your XML file uses a character encoding that
+your instance of L<XML::Parser::Expat|XML::Parser::Expat> doesn't currently
+handle, you can most likely add it, for example using L<XML-Encoding|XML::Encoding>.
+
+=head3 Namespace Support
+
+Expat has a primitive but workable take on namespaces: a tag with a namespace like
+"RDF:rdf" is just taken as is: the tag's name is simply "RDF:rdf".
+
+Although the original idea behind namespaces was that the URI was the real
+identifier of the namespace, and the namespace prefix before the colon was just
+a temporary abbreviation, people ended up remembering the prefix as the
+namespace name, while nobody remembers the namespace URI.
+
+In short: those namespace prefixes are I<very unlikely> to ever change between
+files from the same source, although theoretically, they can.
+
+I I<may> at one time add support to associate a namespace prefix with the URI
+specified in the document, and have the patterns automatically adapt to them,
+but at this time, it looks very unlikely that I ever will need it.
+
+
+=head3 CDATA
+
+Expat treats CDATA sections, although parsed differently, as plain text.
+So that's where they end up.
+
+=head3 Other XML document contents
+
+This module does not include a handler for processing instructions nor for
+comments, so they're just ignored.
+
+=head1 RELEASE NOTES
+
+This is a historical release. It's pretty much the module as I wrote it
+in 2000-2001. It's one of the modules I have always been the most proud
+of. Whenever I think of parsing XML, this module is still the module I
+think of first...
+
+I have changed very little to this module, it is for most parts the
+same as I have used so often, a long long time ago. There are bugs, and
+I do have more plans for future development, but I prefer to release it
+now and let you get to know it, rather than keeping it in the cellar
+for another year in the hope to get it up to snuff.
+
+There's a few things that don't quote work the way I think they ought
+to. I'll probably get around them sometime. But I had to release this
+module some time, and sooner rather than later...
+
+But: there is room for growth.
+
+=head1 AUTHOR
+
+Bart Lateur, bart.lateur@pandora.be (mailto:bart.lateur@pandora.be)
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2000-2009 by Bart Lateur
+
+This library is free software; you can redistribute it and/or modify it
+under the same terms as any version of Perl 5 you may have available.
+
+=head1 SEE ALSO
+
+=over
+
+=item SAX
+
+=item DOM
+
+=item XPath
+
+=item XSLT
+
+=item L<XML::Twig|XML::Twig> as an alternative module (allegedly)
+
+I understood that XML::Twig is supposed to work in a similar way. When I
+started out looking at various XML parsers, I did have a good long look at it.
+After 1 to 2 days  of intensive study, I gave up and decided to write my own
+parsing module instead. That was easier...
+
+=item L<http://www.xml.com/lpt/a/1564>
+
+XML Namespaces Don't Need URIs
+
+=item L<XML::Encoding>
+
+for adding support for more character encodings to your XML parser
+
+=back
+
+=cut
+

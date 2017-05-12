@@ -1,0 +1,59 @@
+---
+abstract: 'creates and updates RSS files'
+author:
+  - 'Shlomi Fish <shlomif@cpan.org>'
+build_requires:
+  Test::Manifest: '0.9'
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.36'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4214, CPAN::Meta::Converter version 2.150005'
+keywords:
+  - feed
+  - feeds
+  - generate
+  - generating
+  - parse
+  - parsing
+  - rss
+  - RSS
+  - web-feed
+  - web-feeds
+  - xml
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: XML-RSS
+provides:
+  XML::RSS:
+    file: lib/XML/RSS.pm
+    version: '1.59'
+  XML::RSS::Private::Output::Base:
+    file: lib/XML/RSS/Private/Output/Base.pm
+  XML::RSS::Private::Output::Roles::ImageDims:
+    file: lib/XML/RSS/Private/Output/Roles/ImageDims.pm
+  XML::RSS::Private::Output::Roles::ModulesElems:
+    file: lib/XML/RSS/Private/Output/Roles/ModulesElems.pm
+  XML::RSS::Private::Output::V0_9:
+    file: lib/XML/RSS/Private/Output/V0_9.pm
+  XML::RSS::Private::Output::V0_91:
+    file: lib/XML/RSS/Private/Output/V0_91.pm
+  XML::RSS::Private::Output::V1_0:
+    file: lib/XML/RSS/Private/Output/V1_0.pm
+  XML::RSS::Private::Output::V2_0:
+    file: lib/XML/RSS/Private/Output/V2_0.pm
+requires:
+  DateTime: '0'
+  DateTime::Format::Mail: '0'
+  DateTime::Format::W3CDTF: '0'
+  HTML::Entities: '0'
+  XML::Parser: '2.23'
+  perl: '5.008'
+resources:
+  homepage: http://perl-rss.sourceforge.net/
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/shlomif/perl-XML-RSS
+version: '1.59'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

@@ -1,0 +1,290 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<clinical_study rank="373">
+  <!-- This xml conforms to an XML Schema at:
+    http://clinicaltrials.gov/ct2/html/images/info/public.xsd
+ and an XML DTD at:
+    http://clinicaltrials.gov/ct2/html/images/info/public.dtd -->
+  <required_header>
+    <download_date>ClinicalTrials.gov processed this data on November 07, 2013</download_date>
+    <link_text>Link to the current ClinicalTrials.gov record.</link_text>
+    <url>http://clinicaltrials.gov/show/NCT01811784</url>
+  </required_header>
+  <id_info>
+    <org_study_id>PR-12053</org_study_id>
+    <nct_id>NCT01811784</nct_id>
+  </id_info>
+  <brief_title>Community Intervention to Prevent Nipah Spillover</brief_title>
+  <official_title>A Community Intervention Trial Utilizing Behavior Change to Reduce the Risk of Nipah Spillover Through Date Palm Sap in Bangladesh</official_title>
+  <sponsors>
+    <lead_sponsor>
+      <agency>International Centre for Diarrhoeal Disease Research, Bangladesh</agency>
+      <agency_class>Other</agency_class>
+    </lead_sponsor>
+    <collaborator>
+      <agency>FHI 360</agency>
+      <agency_class>Other</agency_class>
+    </collaborator>
+    <collaborator>
+      <agency>IEDCR, DGHS, Bangladesh</agency>
+      <agency_class>Other</agency_class>
+    </collaborator>
+    <collaborator>
+      <agency>Stanford University</agency>
+      <agency_class>Other</agency_class>
+    </collaborator>
+  </sponsors>
+  <source>International Centre for Diarrhoeal Disease Research, Bangladesh</source>
+  <oversight_info>
+    <authority>Bangladesh: Ethical Review Committee</authority>
+    <has_dmc>Yes</has_dmc>
+  </oversight_info>
+  <brief_summary>
+    <textblock>
+      Several human Nipah virus (NiV) outbreaks have occurred in Bangladesh since 2001with 71%
+      case fatality. Outbreak investigations have repeatedly identified drinking fresh date palm
+      sap as a risk factor for NiV transmission. Bats are the reservoir of NiV and infected bats
+      can shed virus through both saliva and urine and can contaminate the raw sap. The virus can
+      transmit to humans through ingestion of contaminated sap. To interrupt bats access to the
+      sap, sap harvesters (gachhis) occasionally use skirts make by local materials. These skirts
+      have been found to be effective to interrupt bats' access to the sap. As an indirect effect
+      of the community level skirt promotion, some people stopped drinking raw sap. When trees
+      have skirts, bats cannot access the sap and when people do not drink sap, they are at much
+      lower risk of contracting Nipah virus. The purpose of this study is to design, implement and
+      evaluate behavior change interventions to prevent human consumption of NiV contaminated sap
+      through reducing raw sap consumption from unprotected trees in a district of the NiV
+      affected regions in Bangladesh.
+    </textblock>
+  </brief_summary>
+  <detailed_description>
+    <textblock>
+      Purpose:
+
+      Objectives: To evaluate the effectiveness of a behavior change communication (BCC)
+      intervention in changing raw sap consumption behavior to prevent human consumption of NiV
+      contaminated sap from unprotected trees in the districts of Rajbari (Phase one) and Natore
+      (Phase two), in NiV-affected regions in Bangladesh.
+
+      Methods: The research study will be conducted in two phases.
+
+      Phase one:
+
+      We will conduct a BCC program to test the effectiveness of a single message of &quot;do not drink
+      raw sap&quot;. We will conduct a baseline survey as pre-intervention assessment in two
+      intervention upazillas in Rajbari District and two control upazillas in Kushtia District.
+      The intervention will consist of  community meetings in each of the intervention area
+      villages as well as an awareness campaign through closed circuit television in selected
+      village tea stalls. We will conduct endline survey to as a post intervention assessment in
+      the same upazillas in Rajbari and Kushtia Districts.
+
+      Main outcome measures/variables: Proportion of people who continue drinking raw date palm
+      sap.
+
+      Phase two If a substantial proportion of the population continues to consume raw date palm
+      sap even after implementation of the &quot;avoid drinking sap&quot; intervention, and the Government
+      of Bangladesh agrees, we will conduct a BCC program to test the effectiveness of a risk
+      reduction approach, encouraging people to avoid drinking sap, but telling them that if they
+      do, to reduce risk they should only drink sap that comes from trees protected by banas.  In
+      addition to community meetings to convey this message to the general public, we will meet
+      with gachhis and tree owners to encourage them to use banas. We will conduct a baseline
+      survey as pre-intervention assessment in both intervention and control areas in Natore and
+      Gopalganj Districts respectively. The intervention will consist of meetings with gachhis,
+      tree owners and the community in each of the intervention area villages as well as an
+      awareness campaign through closed circuit television in village tea stalls. We will conduct
+      endline survey to as a post intervention assessment in both intervention (Natore District)
+      and control areas  (Gopalganj District).
+
+      Main outcome measures/variables: Proportion of people who stop drinking sap or who drink sap
+      from skirt protected trees.
+    </textblock>
+  </detailed_description>
+  <overall_status>Recruiting</overall_status>
+  <start_date>November 2012</start_date>
+  <completion_date type="Anticipated">December 2014</completion_date>
+  <primary_completion_date type="Anticipated">May 2014</primary_completion_date>
+  <phase>Phase 1/Phase 2</phase>
+  <study_type>Interventional</study_type>
+  <study_design>Allocation: Randomized, Endpoint Classification: Efficacy Study, Intervention Model: Parallel Assignment, Masking: Open Label, Primary Purpose: Prevention</study_design>
+  <primary_outcome>
+    <measure>Phase one: Proportion of people who continue drinking raw date palm sap.</measure>
+    <time_frame>16 months</time_frame>
+    <safety_issue>No</safety_issue>
+  </primary_outcome>
+  <primary_outcome>
+    <measure>Phase two: Proportion of people who stop drinking sap or who drink sap from skirt protected trees.</measure>
+    <time_frame>10 months</time_frame>
+    <safety_issue>No</safety_issue>
+  </primary_outcome>
+  <secondary_outcome>
+    <measure>Reduce human exposure to Nipah virus thought bat contaminated sap and increase the awareness level on prevention of Nipah virus by refraining from sap consumption.</measure>
+    <time_frame>16 months</time_frame>
+    <safety_issue>No</safety_issue>
+  </secondary_outcome>
+  <number_of_arms>4</number_of_arms>
+  <enrollment type="Anticipated">7696</enrollment>
+  <condition>Human NiV Infection</condition>
+  <arm_group>
+    <arm_group_label>Use skirt on raw sap consumption</arm_group_label>
+    <arm_group_type>Experimental</arm_group_type>
+    <description>Phase one:  Test the effectiveness of a single message of &quot;do not drink raw sap&quot;.</description>
+  </arm_group>
+  <arm_group>
+    <arm_group_label>Ask people not to drink sap</arm_group_label>
+    <arm_group_type>Experimental</arm_group_type>
+    <description>Test the effectiveness of a risk reduction approach, encouraging people to avoid drinking sap, if they do, they should only drink sap from skirt protected trees.</description>
+  </arm_group>
+  <arm_group>
+    <arm_group_label>Phase 1: Routine raw sap consumption among household members.</arm_group_label>
+    <arm_group_type>No Intervention</arm_group_type>
+    <description>Test the effectiveness of a single message of &quot;do not drink raw sap&quot;</description>
+  </arm_group>
+  <arm_group>
+    <arm_group_label>Phase 2:</arm_group_label>
+    <arm_group_type>No Intervention</arm_group_type>
+    <description>Raw sap consumption from skirt protected trees</description>
+  </arm_group>
+  <intervention>
+    <intervention_type>Behavioral</intervention_type>
+    <intervention_name>Ask people not to drink raw sap</intervention_name>
+    <arm_group_label>Use skirt on raw sap consumption</arm_group_label>
+  </intervention>
+  <intervention>
+    <intervention_type>Behavioral</intervention_type>
+    <intervention_name>Ask people not to drink sap or drink sap from skirt protected trees</intervention_name>
+    <description>Behavioural</description>
+    <arm_group_label>Ask people not to drink sap</arm_group_label>
+  </intervention>
+  <intervention>
+    <intervention_type>Other</intervention_type>
+    <intervention_name>No Intervention</intervention_name>
+    <arm_group_label>Use skirt on raw sap consumption</arm_group_label>
+  </intervention>
+  <intervention>
+    <intervention_type>Other</intervention_type>
+    <intervention_name>No Intervention</intervention_name>
+    <arm_group_label>Ask people not to drink sap</arm_group_label>
+  </intervention>
+  <eligibility>
+    <criteria>
+      <textblock>
+        Inclusion Criteria:
+
+        For baseline and endline:
+
+          -  Women:  the wife of the main male income earner in the household.
+
+          -  Men: the main income earner.
+
+          -  Sap harvesters.
+
+        Exclusion Criteria:
+
+          -  If the desired respondent is not in the household the team will make an appointment
+             to return to the household.  If the desired respondent will not be available within
+             24 hours, the household will be skipped.
+
+          -  Household visitors.
+      </textblock>
+    </criteria>
+    <gender>Both</gender>
+    <minimum_age>3 Years</minimum_age>
+    <maximum_age>70 Years</maximum_age>
+    <healthy_volunteers>Accepts Healthy Volunteers</healthy_volunteers>
+  </eligibility>
+  <overall_contact>
+    <last_name>Rebeca Sultana, MSS in Anthropology</last_name>
+    <phone>+88029827001-10</phone>
+    <phone_ext>2548</phone_ext>
+    <email>rebeca@icddrb.org</email>
+  </overall_contact>
+  <overall_contact_backup>
+    <last_name>Stephen P Luby, MD</last_name>
+    <email>sluby@stanford.edu</email>
+  </overall_contact_backup>
+  <location>
+    <facility>
+      <name>Two sub-districts in Gopalganj</name>
+      <address>
+        <city>Gopalganj</city>
+        <country>Bangladesh</country>
+      </address>
+    </facility>
+    <status>Recruiting</status>
+    <contact>
+      <last_name>Rebeca Sultana, MSS in Anthropology</last_name>
+      <phone>+88029827001-10</phone>
+      <phone_ext>2548</phone_ext>
+      <email>rebeca@icddrb.org</email>
+    </contact>
+  </location>
+  <location>
+    <facility>
+      <name>Mirpur and Bheramara</name>
+      <address>
+        <city>Kushtia</city>
+        <country>Bangladesh</country>
+      </address>
+    </facility>
+    <status>Recruiting</status>
+    <contact>
+      <last_name>Rebeca Sultana, MSS</last_name>
+      <phone>+88029827001-10</phone>
+      <phone_ext>2548</phone_ext>
+      <email>rebeca@icddrb.org</email>
+    </contact>
+  </location>
+  <location>
+    <facility>
+      <name>two sub-districts in Natore</name>
+      <address>
+        <city>Natore</city>
+        <country>Bangladesh</country>
+      </address>
+    </facility>
+    <status>Recruiting</status>
+    <contact>
+      <last_name>Rebeca Sultana, MSS in Anthropology</last_name>
+    </contact>
+  </location>
+  <location>
+    <facility>
+      <name>Pangsha and Kalukhali sub-districts</name>
+      <address>
+        <city>Rajbari District</city>
+        <country>Bangladesh</country>
+      </address>
+    </facility>
+    <status>Recruiting</status>
+    <contact>
+      <last_name>Rebeca Sultana, MSS in Anthropology</last_name>
+      <phone>+88029827001-10</phone>
+      <phone_ext>2548</phone_ext>
+      <email>rebeca@icddrb.org</email>
+    </contact>
+    <investigator>
+      <last_name>Rebeca Sultana, MSS in Anthropology</last_name>
+      <role>Principal Investigator</role>
+    </investigator>
+  </location>
+  <location_countries>
+    <country>Bangladesh</country>
+  </location_countries>
+  <verification_date>July 2012</verification_date>
+  <lastchanged_date>November 7, 2013</lastchanged_date>
+  <firstreceived_date>March 13, 2013</firstreceived_date>
+  <responsible_party>
+    <responsible_party_type>Sponsor</responsible_party_type>
+  </responsible_party>
+  <keyword>Nipah virus infection</keyword>
+  <keyword>date palm sap</keyword>
+  <keyword>community intervention</keyword>
+  <keyword>capacity building</keyword>
+  <keyword>disease prevention</keyword>
+  <keyword>Bangladesh</keyword>
+  <keyword>Healthy Community people</keyword>
+  <keyword>Sap harvesters</keyword>
+  <keyword>Date palm three owners</keyword>
+  <keyword>Date palm sap consumers</keyword>
+  <is_fda_regulated>No</is_fda_regulated>
+  <has_expanded_access>No</has_expanded_access>
+  <!-- Results have not yet been posted for this study                                -->
+</clinical_study>

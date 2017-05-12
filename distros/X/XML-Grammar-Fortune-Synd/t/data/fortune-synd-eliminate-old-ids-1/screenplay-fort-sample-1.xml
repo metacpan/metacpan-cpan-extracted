@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<collection>
+<head />
+<list>
+<fortune id="david-and-goliath-1">
+<meta>
+<title>David and Goliath - 1</title>
+</meta>
+<screenplay>
+<body>
+<description>
+<para>
+David and 
+<ulink url="http://en.wikipedia.org/wiki/Goliath">Goliath</ulink> 
+are standing by each other.
+</para>
+</description>
+<saying character="David">
+<para>
+I will kill you.<br />
+I will kill you.<br />
+You will not survive.<br />
+I will kill you.<br />
+I will kill you.<br />
+Ask Jive.
+</para>
+</saying>
+<saying character="Goliath">
+<para>
+no way, you little idiot!
+</para>
+</saying>
+<saying character="David">
+<para>
+yes way!
+</para>
+</saying>
+</body>
+<info>
+<author>Shlomi Fish</author>
+<work href="http://www.shlomifish.org/">David and Goliath Skit</work>
+</info>
+</screenplay>
+</fortune>
+        <fortune id="let-me-wikipedia-it">
+            <meta>
+                <title>(Human) Language Fun on Freenode's #perl</title>
+            </meta>
+            <irc>
+                <body>
+                    <saying who="rindolf">Let me wikipedia it.</saying>
+                    <saying who="f00li5h">so now wikipedia is a verb?</saying>
+                    <saying who="rindolf">f00li5h: it's gonna enter the OED.</saying>
+                    <saying who="rindolf">f00li5h: in English every verb can be nounified and every noun can be verbed</saying>
+                </body>
+                <info>
+                    <channel>#perl</channel>
+                    <network>Freenode</network>
+                    <tagline>(Human) Language Fun</tagline>
+                </info>
+            </irc>
+        </fortune>
+</list>
+</collection>

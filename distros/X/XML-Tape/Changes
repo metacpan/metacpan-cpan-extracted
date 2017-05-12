@@ -1,0 +1,23 @@
+0.22 Mon Sep  5 10:46:56 CEST 2005
+    - fixed bugs in oaitape to return correct ListMetadataFormats
+      responses
+
+0.21 Thu Sep  1 10:18:35 CEST 2005
+    - fixed a bugs in the oaitape and XML::Tape::Index
+      on searching for non existing identifiers
+
+0.20 Tue Aug  9 15:46:40 CEST 2005
+    - fixed a bug in oaitape resumptionToken handling
+    - upgrade the tape structure to the new version
+      published by LANL. Keeping cabality to read old
+      tape files.
+
+0.10 Thu Aug  4 13:43:03 CEST 2005
+    - added example index file to the ex directory
+    - added example OAI-PMH interface on XML::Tape using HTTP::OAI
+    - added get_record_num, get_tape_file, get_earliest_date 
+      methods to XML::Tape::Index
+    - added oaitape script
+
+0.01 Wed Jun  8 13:35:24 CEST 2005
+    - original version

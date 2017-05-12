@@ -1,0 +1,49 @@
+# This module produces results rather like L<XML::Simple>, but
+# without the ambiguity problems inherent in going from XML to
+# Perl.
+
+use strict;
+use warnings;
+use XML::CuteQueries;
+
+my $CQ = XML::CuteQueries->new;
+   $CQ->parse(<<"EOXML");
+
+<root>
+    <result>OK</result>
+    <data>
+        <row><f1> 7</f1><f2>11</f2><f3>13</f3></row>
+        <row><f1>17</f1><f2>19</f2><f3>23</f3></row>
+        <row><f1>29</f1><f2>31</f2><f3>37</f3></row>
+    </data>
+</root>
+
+EOXML
+
+my $arrayref_of_hashrefs = $CQ->cute_query(
+    # the top level query is for the <data> elements
+    # the shape of the only top level query is [],
+    # so it returns one [] -- for the one <data> element
+
+    "data" => [
+
+        # the contents of the top level [] is a sub query for row elements.
+        # Each row element should be a hashref, so the data-[] will contain
+        # three row-{} hashrefs
+
+        row => {
+
+            # the contents of those hashrefs is a subquery for any tag found
+            # there.  The tag names are preserved as keys because we're
+            # sitting in the context of a hashref.
+            # the shape of each match result is '', so it just returns the
+            # contents of each tag as a string.
+
+            '*' => '',
+        }
+    ],
+);
+
+# [ {f1=> 7, f2=>11, f3=>13},
+#   {f1=>17, f2=>19, f3=>23},
+#   {f1=>29, f2=>31, f3=>37}, ]

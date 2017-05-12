@@ -1,0 +1,8 @@
+INSTALL for XML::Conf
+
+$Id: INSTALL,v 1.1 2003/01/18 18:39:09 jonasbn Exp $
+
+% perl Makefile.PL
+% make
+% make test
+% make install

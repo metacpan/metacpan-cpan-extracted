@@ -1,0 +1,10 @@
+ <rindolf>  sussman: for the record, I think the build system is the
+            ultimate proof that python code can be as bad as Perl one.
+         *  clkao giggles
+   <jackr>  hehe
+       -->  mofino has joined #perlcafe
+  <mofino>  I'm not an asshole. I just play one on T.V.
+       <--  mofino has left #perlcafe
+
+    -- Discussing the Subversion Build System
+    -- #perlcafe, Freenode

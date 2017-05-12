@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<NZSRSResponse VerMajor="5" VerMinor="0" RegistrarId="140">
+  <Response Action="GetMessages" FeId="8" FeSeq="4769438" MoreRowsAvailable="1" OrigRegistrarId="1" RecipientRegistrarId="140" Rows="1">
+    <FeTimeStamp Day="30" Hour="13" Minute="30" Month="6" Second="34" TimeZoneOffset="+12:00" Year="2010" />
+    <Response Action="DomainUpdate" FeId="5" FeSeq="103433490029" OrigRegistrarId="50" RecipientRegistrarId="100" Rows="2" TransId="1034394336128521553">
+      <FeTimeStamp Day="12" Hour="00" Minute="15" Month="10" Second="00" TimeZoneOffset="+1300" Year="2002" />
+      <Domain Delegate="1" DomainName="monster.co.nz" RegistrantRef="1178175" RegistrarId="100" Status="Active" Term="1">
+        <NameServers>
+          <Server FQDN="idns1.netxxl.com" IP4Addr="192.168.224.18" />
+        </NameServers>
+        <RegistrantContact Name="fun Pharmaceuticals, Inc." Email="domain.names@fun.com">
+          <PostalAddress Address1="399 Interpace Parkway" City="Parsippany" CountryCode="US" PostalCode="07054" Province="New Jersey" />
+          <Phone AreaCode="1" CountryCode="33" LocalNumber="557 44442" />
+          <Fax AreaCode="1" CountryCode="33" LocalNumber="557 44441" />
+        </RegistrantContact>
+        <AdminContact Name="Domain Names fun" Email="domain.names@fun.com">
+          <PostalAddress Address1="3 myfun Parkway" City="Parsippany" CountryCode="US" PostalCode="07664" Province="New york" />
+          <Phone AreaCode="1" CountryCode="33" LocalNumber="557 44492" />
+          <Fax AreaCode="1" CountryCode="33" LocalNumber="557 44491" />
+        </AdminContact>
+        <TechnicalContact Name="Domain Names fun" Email="domain.names@fun.COM">
+          <PostalAddress Address1="2 Raymond place" Address2="Anny 960 R" />
+          <Phone AreaCode="1" CountryCode="33" LocalNumber="55 71 4444" />
+          <Fax AreaCode="1" CountryCode="33" LocalNumber="55 71 4444" />
+        </TechnicalContact>
+        <BilledUntil Day="28" Hour="00" Minute="00" Month="3" Second="00" TimeZoneOffset="+1300" Year="2003" />
+        <RegisteredDate Day="28" Hour="00" Minute="00" Month="3" Second="00" TimeZoneOffset="+1200" Year="2001" />
+        <CancelledDate Day="17" Hour="14" Minute="10" Month="9" Second="31" TimeZoneOffset="+1200" Year="2002" />
+        <AuditDetails ActionId="1034394336128521553" RegistrarId="50">
+          <AuditTime>
+            <From Day="12" Hour="00" Minute="15" Month="10" Second="00" TimeZoneOffset="+1300" Year="2002" />
+          </AuditTime>
+          <AuditText>RenewDomains</AuditText>
+        </AuditDetails>
+      </Domain>
+      <Domain Delegate="0" DomainName="tag.org.nz" RegistrantRef="1182410" RegistrarId="100" Status="Active" Term="1">
+        <NameServers>
+          <Server FQDN="ns1.2day.com" IP4Addr="192.168.20.1" />
+          <Server FQDN="ns2.2day.com" IP4Addr="192.168.2.1" />
+          <Server FQDN="ns3.2day.com" IP4Addr="192.168.66.42" />
+        </NameServers>
+        <RegistrantContact Name="bob Boisen" Email="bob@field.co.nz">
+          <PostalAddress Address1="59 Gravatt St" Address2="Royal Palm Beach" City="Mt Maunganui" CountryCode="NZ" />
+          <Phone AreaCode="25" CountryCode="64" LocalNumber="9444412" />
+          <Fax AreaCode="7" CountryCode="64" LocalNumber="57444414" />
+        </RegistrantContact>
+        <AdminContact Name="Stacy Boisen" Email="bob@field.co.nz">
+          <PostalAddress Address1="5 Local St" Address2="Royal Palm Beach" City="Sydney" CountryCode="NZ" />
+          <Phone AreaCode="25" CountryCode="64" LocalNumber="9044442" />
+          <Fax AreaCode="7" CountryCode="64" LocalNumber="57544444" />
+        </AdminContact>
+        <TechnicalContact Name="2Day Internet Ltd - 2Day DNS Admin" Email="dns@2day.com">
+          <PostalAddress Address1="P O Box 36 502" Address2="Wellington" />
+          <Phone AreaCode="9" CountryCode="64" LocalNumber="489 4444" />
+          <Fax AreaCode="9" CountryCode="64" LocalNumber="489 4444" />
+        </TechnicalContact>
+        <BilledUntil Day="4" Hour="00" Minute="00" Month="5" Second="00" TimeZoneOffset="+1300" Year="2003" />
+        <RegisteredDate Day="04" Hour="00" Minute="00" Month="5" Second="00" TimeZoneOffset="+1200" Year="2001" />
+        <AuditDetails ActionId="1034394336128521553" RegistrarId="50">
+          <AuditTime>
+            <From Day="12" Hour="00" Minute="15" Month="10" Second="00" TimeZoneOffset="+1300" Year="2002" />
+          </AuditTime>
+          <AuditText>RenewDomains</AuditText>
+        </AuditDetails>
+      </Domain>
+    </Response>
+  </Response>
+</NZSRSResponse>

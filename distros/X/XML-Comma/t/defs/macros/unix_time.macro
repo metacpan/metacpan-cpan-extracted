@@ -1,0 +1,32 @@
+use Time::Local qw();
+my ( $t2arr, $arr2t ) = ( sub { localtime($_[0]) },
+                          sub { Time::Local::timelocal(@_) } );
+
+$self->add_hook ( 'validate_hook',
+
+  sub {
+    my ( $el, $content ) = @_;
+    #dbg "unix-time macro", $self, $el, $content;
+    if ( $content !~ /^\d*$/ ) {
+      die "'$content' isn't just digits\n";
+    };
+  }
+
+);
+
+$self->add_method ( 'date_8',
+                    sub {
+                      my @tm = $t2arr->( $_[0]->get || return );
+                      return ($tm[5]+1900) .
+                        substr("00".($tm[4]+1),-2) .
+                          substr("00".$tm[3],-2);
+                    } );
+
+$self->add_method ( 'date_8',
+                    sub {
+                      my @tm = $t2arr->( $_[0]->get || return );
+                      return ($tm[5]+1900) .
+                        substr("00".($tm[4]+1),-2) .
+                          substr("00".$tm[3],-2);
+                    } );
+1;

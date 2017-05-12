@@ -1,0 +1,19 @@
+--- #YAML:1.0
+name:                XML-OverHTTP
+version:             0.08
+abstract:            ~
+license:             perl
+author:              ~
+generated_by:        ExtUtils::MakeMaker version 6.44
+distribution_type:   module
+requires:     
+    CGI:                           0
+    Class::Accessor::Chained::Fast: 0
+    Class::Accessor::Fast:         0
+    Data::Page:                    0
+    Data::Pageset:                 0
+    Test::More:                    0
+    XML::TreePP:                   0.33
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

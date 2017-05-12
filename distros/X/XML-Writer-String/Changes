@@ -1,0 +1,6 @@
+Revision history for Perl extension XML::Writer::String.
+
+0.1  Wed Mar  6 13:35:15 2002
+	- original version; created by h2xs 1.21 with options
+		-AX -n XML::Writer::String -v 0.1
+

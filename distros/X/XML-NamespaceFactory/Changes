@@ -1,0 +1,15 @@
+
+Revision history for XML-NamespaceFactory
+
+1.02      2014-07-02 23:57:07-05:00 America/Chicago
+
+    - Make the constructor confess (kjetilk)
+
+1.01      2014-05-06 22:30:34-05:00 America/Chicago
+    - Modernize
+
+1.0   2010-04-13
+    - re-release original version as 1.0 since after 7 years it's probably stable
+
+0.01  2003-06-29 15:14:34
+	- original version

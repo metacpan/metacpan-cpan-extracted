@@ -1,0 +1,58 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 50d9ba9467217a576024128e09372f3bee519db7 Build.PL
+SHA1 78a78d7e3f2c1c9c42b3e95ed605b91474341f3e CHANGES
+SHA1 196d154af87fc5e3d911add822f01102f2b924da INFO
+SHA1 e6382a2e4814837e0034b5b1fe6338d75068d7d8 LICENSE
+SHA1 14cbe18243296497226fedb5722a86383d6ec9ba MANIFEST
+SHA1 2f59d1a2a6f46c54b69ccca1059176d054474f38 META.json
+SHA1 d2fee66e0042926ca6eee118eb999c015565c859 META.yml
+SHA1 c6d88a9a28f4318a0947edf501f829e29be51c8f Makefile.PL
+SHA1 8e0ae69be8bd205563922ccb867cdf4dcb086d51 README
+SHA1 198175ef7f62b84298ea6c7cd4176aea4f8770a9 lib/XML/Stream.pm
+SHA1 fcb5630ffa0e0b63cc95d475f32fe356d08deefe lib/XML/Stream/IO/Select/Win32.pm
+SHA1 69e88671f9d5191a4eef810e868d14f9d81800eb lib/XML/Stream/Namespace.pm
+SHA1 694fc22f9f4a6fb1d55d2b8008b75e933278bc2f lib/XML/Stream/Node.pm
+SHA1 17d0f2d0c61af08a5331cdfd5bd839d58c993489 lib/XML/Stream/Parser.pm
+SHA1 3a369f4ec19f87441ea11ba9e617dd449a05c820 lib/XML/Stream/Parser/DTD.pm
+SHA1 ffe36acb769a8408c0c82b9f2f9b089ae8a50831 lib/XML/Stream/Tools.pm
+SHA1 f60a701eda50942a8de00e21c6ab07af1bd3ff2e lib/XML/Stream/Tree.pm
+SHA1 691d6c822e434d28159d175d259a8f4436bc79cf lib/XML/Stream/XPath.pm
+SHA1 aa8f58a1ac65c303f302ec86e3c52d48da35fcac lib/XML/Stream/XPath/Op.pm
+SHA1 1f4fb71bc08b45e1af29e16e5a827a728a4b532c lib/XML/Stream/XPath/Query.pm
+SHA1 fa6f0b83e6c3e9d9ce30c8d3d5f55c309c2ac6d7 lib/XML/Stream/XPath/Value.pm
+SHA1 850e2740a75782524068bf075c62dce17b6097d9 t/0-signature.t
+SHA1 2d39967d76139beb8af25377d4a6c51d7bcb5b76 t/buildxml.t
+SHA1 ed3c8cf8b15161f0584c3b37a66de39963358e35 t/cdata.t
+SHA1 53a1b80e7a605c905e8bccba2ce0ab65182b5648 t/load.t
+SHA1 94a8c53a14c1771ab1b4a5daf331a7cbaed07766 t/memory_cycle.t
+SHA1 5f335ada56c5454226e78d0a83b055b24f64a2c4 t/net_xmpp.t
+SHA1 c783fee53c26174b36405469041b59aadd816bb0 t/parse_node.t
+SHA1 da1f249867d9b27201b2157f0db7a3ee252ad4c4 t/parse_tree.t
+SHA1 1bdcc7aaf3b3377f0966976c6d52f243b5fe2fb4 t/quotes.t
+SHA1 416b6a366a45b581886130d4d6ecabfc953ff893 t/tcpip.t
+SHA1 721484da679b9a4e684001845831f617d7deed96 t/tcpip2ssl.t
+SHA1 191c3a9c3eeca7b58b096436ee241342e6984d2f t/test.xml
+SHA1 734b87f26e0f144ed9ad207649c893d153495885 t/xml2config.t
+SHA1 a6848d74df02bbe5be2096df4f6256c3231e47b1 t/xpath.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlSYevgACgkQjJ7fFJrTQRdJ0wCgx8i6XY4ip5b3QXaifP+sbjvQ
+Zy4AnivGLOdLGxWdHEck+XYA2qeQhZTD
+=jUG1
+-----END PGP SIGNATURE-----

@@ -1,0 +1,7 @@
+root
+/common	/a/d/e	/a/b/c
+testC		test1
+testC	testA	
+testC		test2
+testC	testB	
+

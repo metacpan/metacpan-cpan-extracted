@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<opml version="1.1">
+<head>
+<title>opml test file</title>
+<dateCreated>Sat 2004 02 14 09:22:00 GMT</dateCreated>
+<dateModified>Sat 2004 02 14 09:22:00 GMT</dateModified>
+<ownerName>michael szul</ownerName>
+<ownerEmail>michael@madghoul.com</ownerEmail>
+<expansionState></expansionState>
+<vertScrollState></vertScrollState>
+<windowTop></windowTop>
+<windowLeft></windowLeft>
+<windowBottom></windowBottom>
+<windowRight></windowRight>
+</head>
+<body>
+<outline description="Looking for something Strange?" htmlurl="http://www.madghoul.com/ghoul/InsaneRapture/lunacy.mhtml" text="madghoul.com | the dark night of the soul" title="madghoul.com | the dark night of the soul" type="rss" version="RSS" xmlurl="http://www.madghoul.com/cgi-bin/fearsome/fallout/index.rss10"  />
+<outline description="" htmlurl="http://opml.blogenstein.com" text="opml news from opml.blogenstein.com" title="opml.blogenstein.com" type="rss" version="RSS" />
+<outline text="Embedded" >
+<outline description="thankfully parsing works without having to many tricky things" text="Second Embedded outline for parsing opml content"  />
+<outline description="more outlines" htmlurl="no url" text="new additions to OPML" title="a blank title" type="rss" version="RSS" xmlurl="definitely no rss feed"  />
+<outline description="a long description for this embedded outline so that I can see it when debugging with ptkdb" text="Embedded outline for parsing format"  />
+</outline>
+</body>
+</opml>

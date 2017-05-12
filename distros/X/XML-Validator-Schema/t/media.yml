@@ -1,0 +1,84 @@
+# test against a real-world schema used on a CMS project
+
+--- |
+ <?xml version="1.0" encoding="UTF-8"?>
+ <!-- edited with XMLSPY v5 rel. 4 U (http://www.xmlspy.com) by rth77 (rth77) -->
+ <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="unqualified" attributeFormDefault="unqualified">
+     <xs:element name="media">
+         <xs:annotation>
+             <xs:documentation>Comment describing your root element</xs:documentation>
+         </xs:annotation>
+         <xs:complexType>
+             <xs:sequence>
+                 <xs:element name="media_id" type="xs:int"/>
+                 <xs:element name="media_type" type="xs:string"/>
+                 <xs:element name="title" type="xs:string"/>
+                 <xs:element name="filename" type="xs:string"/>
+                 <xs:element name="path" type="xs:string">
+                     <xs:annotation>
+                         <xs:documentation>must name a file inside the kds archive</xs:documentation>
+                     </xs:annotation>
+                 </xs:element>
+                 <xs:element name="category_id" type="xs:int"/>
+                 <xs:element name="url" type="xs:string"/>
+                 <xs:element name="caption" type="xs:string"/>
+                 <xs:element name="copyright" type="xs:string"/>
+                 <xs:element name="alt_tag" type="xs:string"/>
+                 <xs:element name="notes" type="xs:string"/>
+                 <xs:element name="version" type="xs:int"/>
+                 <xs:element name="published_version" type="xs:int" minOccurs="0"/>
+                 <xs:element name="creation_date" type="xs:dateTime"/>
+                 <xs:element name="publish_date" type="xs:dateTime" minOccurs="0"/>
+                 <xs:element name="contrib" minOccurs="0" maxOccurs="unbounded">
+                     <xs:complexType>
+                         <xs:sequence>
+                             <xs:element name="contrib_id" type="xs:int"/>
+                             <xs:element name="contrib_type" type="xs:string"/>
+                         </xs:sequence>
+                     </xs:complexType>
+                 </xs:element>
+             </xs:sequence>
+         </xs:complexType>
+     </xs:element>
+ </xs:schema>
+
+--- |
+ <?xml version="1.0" encoding="UTF-8"?>
+ <media>
+     <media_id>151</media_id>
+     <media_type>Image</media_type>
+     <title>Lorelei Dangle Blurs</title>
+     <filename>affluent.png</filename>
+     <path>media_151/affluent.png</path>
+     <category_id>264</category_id>
+     <url>superscripted.kra/affluent.png</url>
+     <caption></caption>
+     <copyright></copyright>
+     <alt_tag></alt_tag>
+     <notes></notes>
+     <version>1</version>
+     <creation_date>2003-06-09T00:00:00</creation_date>
+ </media>
+--- >
+PASS
+
+--- |
+ <?xml version="1.0" encoding="UTF-8"?>
+
+ <media xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="media.xsd">
+     <media_id>151</media_id>
+     <media_type>Image</media_type>
+     <title>Lorelei Dangle Blurs</title>
+     <filename>affluent.png</filename>
+     <path>media_151/affluent.png</path>
+     <category_id>264</category_id>
+     <url>superscripted.kra/affluent.png</url>
+     <caption></caption>
+     <copyright></copyright>
+     <alt_tag></alt_tag>
+     <notes></notes>
+     <version>1</version>
+     <creation_date>2003-06-09T00:00:00</creation_date>
+ </media>
+--- >
+PASS

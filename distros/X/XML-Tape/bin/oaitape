@@ -1,0 +1,224 @@
+#!/usr/bin/perl
+#
+# $Id: oaitape,v 1.5 2005/09/05 08:47:34 patrick Exp $
+#
+# An example OAI interface on XML tapes
+#
+use strict;
+use XML::LibXML;
+use HTTP::OAI;
+use HTTP::OAI::Repository qw/:validate/;
+use XML::SAX::Writer;
+use XML::Tape::Index qw(:all);
+use CGI qw/:standard -oldstyle_urls/;
+
+#--local-configuration--------------------------------
+my $base_url         = "http://yourhost/cgi/oai";
+my $admin_email      = "youremail\@yourhost";
+my $repository_name  = "agoodname";
+my $tape             = "../ex/tape.xml";
+my @metadata_formats = (
+    new HTTP::OAI::MetadataFormat(
+     metadataPrefix => 'didl' , 
+     schema => 'http://standards.iso.org/ittf/PubliclyAvailableStandards/MPEG-21_schema_files/did/didl.xsd' , 
+     metadataNamespace => 'urn:mpeg:mpeg21:2002:02-DIDL-NS'
+     )
+   );
+my $max_num_record   = 2;
+#--end-local-configuration----------------------------
+
+
+#--main-----------------------------------------------
+binmode(STDOUT,':utf8');
+print header( -type=>'text/xml; charset=utf-8', -charset=>'utf-8',);
+
+my $index = indexopen($tape,'r');
+my @errs  = validate_request(CGI::Vars());
+my $resp;
+
+&oaiError(@errs) if @errs;
+
+my %attr = CGI::Vars();
+my $verb = $attr{verb};
+
+if (0) {}
+elsif ($verb eq 'Identify') {
+    my $earliest_date = $index->get_earliest_date();
+    my $granularity   = length($earliest_date) == 10 ? 
+                        "YYYY-MM-DD" : "YYYY-MM-DDThh:mm:ssZ";
+
+    $resp = new HTTP::OAI::Identify(
+                baseURL=>$base_url,
+                adminEmail=>$admin_email,
+                repositoryName=>$repository_name,
+                earliestDatestamp=>$earliest_date,
+                granularity=>$granularity,
+                requestURL=>self_url()
+             );
+}
+elsif ($verb eq 'ListMetadataFormats') {
+    my $identifier     = $attr{identifier};
+
+    if ($identifier) {
+        my $rec = $index->get_identifier($identifier);
+
+        &oaiError(new HTTP::OAI::Error(code=>'idDoesNotExist')) 
+                        unless $rec;
+    }
+
+    $resp = new HTTP::OAI::ListMetadataFormats;
+    foreach my $mdf (@metadata_formats) {
+        $resp->metadataFormat($mdf);
+    }
+}
+elsif ($verb eq 'ListSets') {
+    &oaiError(new HTTP::OAI::Error(code=>'noSetHierarchy'));
+}
+elsif ($verb eq 'ListIdentifiers') {
+    my $set   = $attr{set};
+    my $from  = $attr{from};
+    my $until = $attr{until};
+    my $metadataPrefix = $attr{metadataPrefix};
+    my $resumptionToken = $attr{resumptionToken};
+    my $token = undef;
+
+    if ($resumptionToken) {
+        ($set,$from,$until,$metadataPrefix,$token) = split(/\*/,$resumptionToken);
+    }
+
+    &oaiError(new HTTP::OAI::Error(code=>'cannotDisseminateFormat')) 
+                        unless getFormat($metadataPrefix);
+
+    $resp = new HTTP::OAI::ListIdentifiers();
+
+    my $cnt = 0;
+    my $new_token = undef;
+    for (my $rec = $index->list_identifiers(length $token ? $token : ($from,$until)) ;
+         defined($rec) ;
+         $rec = $index->list_identifiers($rec->{token}) ) {
+
+         $cnt++;
+
+         my $id =  new HTTP::OAI::Header(
+                       'identifier' => $rec->{identifier} ,
+                       'datestamp'  => $rec->{date} ,
+                   );
+
+         $resp->identifier($id);
+
+         if ($cnt > $max_num_record) {
+             $new_token = $rec->{token};
+             last;
+         }
+    }
+
+    $resumptionToken = join("*",$set,$from,$until,$metadataPrefix,$new_token);
+
+    $resp->resumptionToken(new HTTP::OAI::ResumptionToken(resumptionToken=>$resumptionToken))
+                        if defined $new_token;
+
+    &oaiError(new HTTP::OAI::Error(code=>'noRecordsMatch')) 
+                        if $cnt == 0;
+}
+elsif ($verb eq 'ListRecords') {
+    my $set   = $attr{set};
+    my $from  = $attr{from};
+    my $until = $attr{until};
+    my $metadataPrefix = $attr{metadataPrefix};
+    my $resumptionToken = $attr{resumptionToken};
+    my $token = undef;
+
+    if ($resumptionToken) {
+        ($set,$from,$until,$metadataPrefix,$token) = split(/\*/,$resumptionToken);
+    }
+
+    &oaiError(new HTTP::OAI::Error(code=>'cannotDisseminateFormat')) 
+                        unless getFormat($metadataPrefix);
+
+    $resp = new HTTP::OAI::ListRecords();
+
+    my $cnt = 0;
+    my $new_token = undef;
+    for (my $rec = $index->list_identifiers(length $token ? $token : ($from,$until)) ;
+         defined($rec) ;
+         $rec = $index->list_identifiers($rec->{token}) ) {
+
+         $cnt++;
+
+         my $id =  new HTTP::OAI::Header(
+                       'identifier' => $rec->{identifier} ,
+                       'datestamp'  => $rec->{date} ,
+                   );
+
+         my $xml = $index->get_record($rec->{identifier});
+         my $dom = XML::LibXML->new->parse_string($xml);
+
+         my $metadata = new HTTP::OAI::Metadata(dom => $dom);
+
+         my $record = new HTTP::OAI::Record( header => $id, metadata => $metadata);
+
+         $resp->record($record);
+
+         if ($cnt > $max_num_record) {
+             $new_token = $rec->{token};
+             last;
+         }
+    }
+
+    $resumptionToken = join("*",$set,$from,$until,$metadataPrefix,$new_token);
+
+    $resp->resumptionToken(new HTTP::OAI::ResumptionToken(resumptionToken=>$resumptionToken))
+                        if defined $new_token;
+
+    &oaiError(new HTTP::OAI::Error(code=>'noRecordsMatch')) 
+                        if $cnt == 0;
+}
+elsif ($verb eq 'GetRecord') {
+    my $identifier     = $attr{identifier};
+    my $metadataPrefix = $attr{metadataPrefix};
+
+    &oaiError(new HTTP::OAI::Error(code=>'cannotDisseminateFormat')) 
+                        unless getFormat($metadataPrefix);
+
+    $resp = new HTTP::OAI::GetRecord;
+
+    my $rec = $index->get_identifier($identifier);
+
+    my $id =  new HTTP::OAI::Header(
+                       'identifier' => $rec->{identifier} ,
+                       'datestamp'  => $rec->{date} ,
+                   );
+
+    my $xml = $index->get_record($rec->{identifier});
+
+    &oaiError(new HTTP::OAI::Error(code=>'idDoesNotExist')) 
+                        unless $xml;
+
+    my $dom = XML::LibXML->new->parse_string($xml);
+
+    my $metadata = new HTTP::OAI::Metadata(dom => $dom);
+
+    my $record = new HTTP::OAI::Record( header => $id, metadata => $metadata);
+
+    $resp->record($record);
+}
+
+$resp->set_handler(XML::SAX::Writer->new(Output=>\*STDOUT));
+$resp->generate;
+
+sub oaiError {
+    my @errs = @_;
+    $resp = HTTP::OAI::Response->new( requestURL=>self_url() );
+    $resp->errors(@errs);
+    $resp->set_handler(XML::SAX::Writer->new(Output=>\*STDOUT));
+    $resp->generate;
+    exit(0);
+}
+
+sub getFormat {
+    my $metadataPrefix = shift;
+    foreach my $mdf (@metadata_formats) {
+        return $mdf if ($mdf->metadataPrefix() eq $metadataPrefix);
+    }
+    return undef;
+}

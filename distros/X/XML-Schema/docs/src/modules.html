@@ -1,0 +1,165 @@
+[% META
+    title = 'Modules Index'
+%]
+
+<h1>Modules</h1>
+
+[% WRAPPER table %]
+<tr bgcolor="[% col.table.header %]">
+[% PROCESS th FOREACH text = [ 'Modules', 'Architecture' ] %]
+</tr>
+
+<tr bgcolor="[% col.table.cells %]" valign="top">
+<td>
+[%  modlist = [ ];
+    "  * Generating module pages\n" | stderr;
+    FOREACH modname = modules;
+	modfile = modname.replace('::', '/');
+	module  = { 
+	    title = modname 
+	    url   = "modules/${modfile}.html", 
+	    xml   = "${dir.xml}/modules/${modfile}.xml"
+	};
+	USE File(module.url, nostat=1);
+	uplink = File.home;
+	modlist.push( module );
+	INCLUDE module WRAPPER layout FILTER redirect(module.url);
+	"    - $module.title => $module.url\n" | stderr;
+    END;
+    uplink = '';
+%]
+
+[% INCLUDE docset/toc
+    docset = modlist
+%]
+</td>
+<td>
+
+<p>
+  At the very bottom of everything lies [% cl('XML::Schema::Base') %],
+  the base class module from which everything else is derived.  It
+  defines a bunch of useful methods that are common to the other modules.
+</p>
+
+<p> 
+  The [% cl('XML::Schema::Type') %] defines a base class for
+  representing types.  From this [% cl('XML::Schema::Type::Simple') %]
+  and [% cl('XML::Schema::Type::Complex') %] are derived to represent
+  simple and complex types, respectively.
+</p>
+
+<p> 
+  A simple type is one which describes a single value.  These are
+  used to represent attribute values (e.g. '<code>baz</code>' in
+  <code>&lt;foo bar="baz"/&gt;</code>) and also simple elements that
+  have no attributes and only simple character content
+  (e.g. '<code>baz</code>' in <code>&lt;foo&gt;baz&lt;/foo&gt;</code>).
+  There are over 40 simple types built in to XML Schema to represent
+  values like string, integer, float, date, time, year, month, etc.
+  These are defined in [% cl('XML::Schema::Type::Builtin') %].  You 
+  can also define lists and unions of different simple types with 
+  the [% cl('XML::Schema::Type::List') %] and 
+  [% cl('XML::Schema::Type::Union') %] modules.
+<p>
+
+<p>
+  Starting from an existing simple type you can create your own custom
+  types by applying additional validation facets.  A facet is essentially
+  a constraint which you can apply to a type to specify, for example,
+  that the value should match a regular expression, be numerically 
+  greater or less than a certain value, and so on.  In fact, many of
+  the inbuilt simple types are layered on top of each other by applying
+  additional facets (e.g. <code>positiveInteger</code> is based on 
+  <code>integer</code> with the facet <code>minInclusive =&gt; 1</code>
+  applied). The  [% cl('XML::Schema::Facet') %] module defines a base 
+  class for facets and [% cl('XML::Schema::Facet::Builtin') %] defines 
+  numerous facets built in to XML Schema.
+</p>
+
+<p> Complex types are... more complex.  They are used to represent
+  elements that contain attributes and/or have non-character content,
+  e.g. child-elements.  You define your own complex types, specifying
+  the permitted attributes and the content model, including
+  definitions of child elements, mixed/empty flags, and so on.
+  We'll come back to this later.
+</p>
+
+<p> User defined simple and complex types are defined within a schema
+  and remain local to the containing complex type in which they are
+  defined or the schema as a whole if defined outside any complex
+  type.  In other words, they are lexically scoped.  The [%
+  cl('XML::Schema::Scope') %] module implements a mixin class which
+  various other modules such as [% cl('XML::Schema::Type::Complex') %]
+  are derived from, to implement methods for registering and
+  retrieving information about types as well as various other XML
+  Schema components like element and attribute groups.
+</p>
+
+<p>
+  Complimentary to that is the [% cl('XML::Schema::Scoped') %] module
+  which also implements a mixin class but this time for the purpose of
+  accessing type (and other information) from a scope. 
+</p>
+
+<p> This might all become a little clearer when we start to consider
+  the [% cl('XML::Schema::Attribute') %] module.  Objects of this
+  class are used to represent XML element attributes and define at
+  least two items: their name and their type.  
+</p>
+<p>
+  The type item may reference an [% cl('XML::Schema::Type::Simple') %]
+  object directly or, more frequently, it will contain the name of one
+  of the 45 or so simple types inbuilt to XML Schema (e.g. integer,
+  string, month) or the name of a user-defined simple type defined
+  elsewhere.  When an attribute needs to fetch its type object, say to
+  validate attributes provided in an instance document, it calls its
+  type() method which is inherited from [% cl('XML::Schema::Scoped') %].
+  This delegates the request to the scope to which it is bound, which in
+  the case of an attribute, will be the complex type or attribute group
+  in which it is defined.  The request may be delegated upwards and 
+  outwards until the outermost scope of the schema document is reached.
+  If the request cannot be serviced by that point then the name 
+  specified does not match any defined simple type visible to the 
+  attribute.
+</p>
+<p> 
+  The benefits of this are twofold.  Firstly, you have the
+  convenience of referencing types by names, rather than having to
+  rely on passing references to type objects around.  Secondly, and
+  perhaps more significantly, it means that you can use types before
+  you define them, something which the XML Schema specification
+  explicitly permits.  
+</p>
+<p> 
+  Moving upwards from attributes, we have the 
+  [% cl('XML::Schema::Attribute::Group') %] module which acts as a
+  container for attributes.  Complex types use an attribute group
+  to define their attributes.  They are also used to represent
+  free-standing collections of attributes which can be relocated 
+  into numerous different complex type definitions.
+</p>
+<p>
+  The [% cl('XML::Schema::Type::Complex') %] module implements the 
+  complex types.  A complex type has an attribute group which defines
+  the permitted attributes for the element and a content model which 
+  specifies what other elements and/or character content the element
+  may contain.  Complex types can nest indefinately within complex
+  type.
+</p>
+<p>
+  With a schema defined in terms of the above objects, a parser
+  can be constructed as an object of the [% cl('XML::Schema::Parser') %]
+  class which receives XML parse events from an expat XML parser
+  instance and consults the schema to ensure that the document 
+  being parser conforms to the structure permitted by the schema.
+  In addition, the schema can be annotated with events that define
+  a schedule of actions to be performed when instance documents are 
+  parsed.  These are implemented by the [% cl('XML::Schema::Schedule') %]
+  module.
+</p>
+
+
+</td>
+</tr>
+[% END %]
+

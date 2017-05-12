@@ -1,0 +1,124 @@
+#!/usr/bin/perl
+# ============================================================================
+#             Copyright (c) 2012 Kevin L. Esteb All Rights Reserved
+#
+#
+# TITLE:       xas-pg-extract-global
+#
+# FACILITY:    XAS application system
+#
+# ABSTRACT:    This procedure will cut out database sections from
+#              a postgress pg_dumpall file.
+#
+# ENVIRONMENT: XAS Perl Environment
+#
+# PARAMETERS:  --help     prints out a helpful help message
+#              --debug    toggles debug output
+#              --file     the database backup file to use
+#              --database the database defination to extract
+#
+# RETURNS:     0 - success
+#              1 - failure
+#
+# Version      Author                                              Date
+# -------      ----------------------------------------------      -----------
+# 0.01         Kevin Esteb                                         29-May-2012
+#
+# 0.02         Kevin Esteb                                         08-Aug-2012
+#              Updated to the new app framework.
+#
+# ============================================================================
+#
+
+use lib "../lib";
+use XAS::Apps::Database::ExtractGlobals;
+
+main: {
+
+    my $app = XAS::Apps::Database::ExtractGlobals->new(
+        -throws  => 'xas-pg-extract-global',
+    );
+
+    exit $app->run();
+
+}
+
+__END__
+
+=head1 NAME
+
+xas-pg-extract-global - Extract global data from a PostgreSQL dump file
+
+=head1 SYNOPSIS
+
+xas-pg-extract-global [--help] [--debug] [--manual] [--version]
+
+ options:
+   --file       the postgres dump file
+   --database   the database to use
+   --help       outputs simple help text
+   --manual     outputs the procedures manual
+   --version    outputs the apps version
+   --debug      toogles debugging output
+   --[no]alerts toogles alert notifications
+
+=head1 DESCRIPTION
+
+This procedure will cut out database sections from a postgress pg_dumpall file.
+
+=head1 OPTIONS AND ARGUMENTS
+
+=over 4
+
+=item B<-file>
+
+The postgres dump file.
+
+=item B<-database>
+
+The database defination to extract.
+
+=item B<--help>
+
+Displays a simple help message.
+
+=item B<--debug>
+
+Turns on debbuging.
+
+=item B<--alerts>
+
+Togggles alert notification. The default is on. 
+
+=item B<--manual> 
+
+The complete documentation.
+  
+=item B<--version>
+
+Prints out the apps version
+
+=back
+
+=head1 EXIT CODES
+
+ 0 - success
+ 1 - failure
+
+=head1 SEE ALSO
+
+ XAS::Apps::Database::ExtractGlobals
+
+=head1 AUTHOR
+
+Kevin L. Esteb, E<lt>kevin@kesteb.usE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2012 by Kevin L. Esteb
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

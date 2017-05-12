@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<moby:MOBY xmlns:moby="http://www.biomoby.org/moby">
+  <moby:mobyContent>
+    <moby:serviceNotes>
+      <moby:Notes>getUniprotDescriptorsByKeyword - contact service provider if you note any irregularities.</moby:Notes>
+    </moby:serviceNotes>
+    <moby:mobyData moby:queryID="sip_1_">
+      <moby:Collection moby:articleName="descriptors">
+        <moby:Simple>
+          <moby:Descriptor moby:id="Q7TMS5" moby:namespace="UniProt">
+            <moby:String moby:id="" moby:namespace="" moby:articleName="description">RecName: Full=ATP-binding cassette sub-family G member 2; AltName: Full=Breast cancer resistance protein 1 homolog; AltName: CD_antigen=CD338;</moby:String>
+          </moby:Descriptor>
+        </moby:Simple>
+        <moby:Simple>
+          <moby:Descriptor moby:id="Q9JJR5" moby:namespace="UniProt">
+            <moby:String moby:id="" moby:namespace="" moby:articleName="description">RecName: Full=Proline-rich protein BCA3; AltName: Full=Breast cancer-associated gene 3 protein; AltName: Full=PKA-interacting protein; AltName: Full=AKIP1;</moby:String>
+          </moby:Descriptor>
+        </moby:Simple>
+        <moby:Simple>
+          <moby:Descriptor moby:id="Q61140" moby:namespace="UniProt">
+            <moby:String moby:id="" moby:namespace="" moby:articleName="description">RecName: Full=Breast cancer anti-estrogen resistance protein 1; AltName: Full=CRK-associated substrate; AltName: Full=p130cas;</moby:String>
+          </moby:Descriptor>
+        </moby:Simple>
+        <moby:Simple>
+          <moby:Descriptor moby:id="Q9QZK2" moby:namespace="UniProt">
+            <moby:String moby:id="" moby:namespace="" moby:articleName="description">RecName: Full=Breast cancer anti-estrogen resistance protein 3; AltName: Full=p130Cas-binding protein AND-34;</moby:String>
+          </moby:Descriptor>
+        </moby:Simple>
+        <moby:Simple>
+          <moby:Descriptor moby:id="Q80YN3" moby:namespace="UniProt">
+            <moby:String moby:id="" moby:namespace="" moby:articleName="description">RecName: Full=Breast carcinoma-amplified sequence 1 homolog; AltName: Full=Novel amplified in breast cancer 1 homolog;</moby:String>
+          </moby:Descriptor>
+        </moby:Simple>
+        <moby:Simple>
+          <moby:Descriptor moby:id="Q8CCN5" moby:namespace="UniProt">
+            <moby:String moby:id="" moby:namespace="" moby:articleName="description">RecName: Full=Breast carcinoma-amplified sequence 3 homolog; AltName: Full=K20D4;</moby:String>
+          </moby:Descriptor>
+        </moby:Simple>
+        <moby:Simple>
+          <moby:Descriptor moby:id="P48754" moby:namespace="UniProt">
+            <moby:String moby:id="" moby:namespace="" moby:articleName="description">RecName: Full=Breast cancer type 1 susceptibility protein homolog;</moby:String>
+          </moby:Descriptor>
+        </moby:Simple>
+        <moby:Simple>
+          <moby:Descriptor moby:id="P97929" moby:namespace="UniProt">
+            <moby:String moby:id="" moby:namespace="" moby:articleName="description">RecName: Full=Breast cancer type 2 susceptibility protein homolog; AltName: Full=Fanconi anemia group D1 protein homolog;</moby:String>
+          </moby:Descriptor>
+        </moby:Simple>
+        <moby:Simple>
+          <moby:Descriptor moby:id="Q3U1T3" moby:namespace="UniProt">
+            <moby:String moby:id="" moby:namespace="" moby:articleName="description">RecName: Full=Breast cancer metastasis-suppressor 1-like protein;</moby:String>
+          </moby:Descriptor>
+        </moby:Simple>
+        <moby:Simple>
+          <moby:Descriptor moby:id="Q99N20" moby:namespace="UniProt">
+            <moby:String moby:id="" moby:namespace="" moby:articleName="description">RecName: Full=Breast cancer metastasis-suppressor 1 homolog;</moby:String>
+          </moby:Descriptor>
+        </moby:Simple>
+        <moby:Simple>
+          <moby:Descriptor moby:id="Q9CQE7" moby:namespace="UniProt">
+            <moby:String moby:id="" moby:namespace="" moby:articleName="description">RecName: Full=Endoplasmic reticulum-Golgi intermediate compartment protein 3; AltName: Full=Serologically defined breast cancer antigen NY-BR-84 homolog;</moby:String>
+          </moby:Descriptor>
+        </moby:Simple>
+        <moby:Simple>
+          <moby:Descriptor moby:id="P61969" moby:namespace="UniProt">
+            <moby:String moby:id="" moby:namespace="" moby:articleName="description">RecName: Full=LIM domain transcription factor LMO4; AltName: Full=LIM domain only protein 4;          Short=LMO-4; AltName: Full=Breast tumor autoantigen;</moby:String>
+          </moby:Descriptor>
+        </moby:Simple>
+        <moby:Simple>
+          <moby:Descriptor moby:id="Q8CHK3" moby:namespace="UniProt">
+            <moby:String moby:id="" moby:namespace="" moby:articleName="description">RecName: Full=Membrane-bound O-acyltransferase domain-containing protein 7;          Short=O-acyltransferase domain-containing protein 7;          EC=2.3.-.-; AltName: Full=Leukocyte receptor cluster member 4; AltName: Full=Bladder and breast carcinoma-overexpressed gene 1 protein;</moby:String>
+          </moby:Descriptor>
+        </moby:Simple>
+        <moby:Simple>
+          <moby:Descriptor moby:id="O09000" moby:namespace="UniProt">
+            <moby:String moby:id="" moby:namespace="" moby:articleName="description">RecName: Full=Nuclear receptor coactivator 3;          Short=NCoA-3;          EC=2.3.1.48; AltName: Full=Thyroid hormone receptor activator molecule 1;          Short=TRAM-1;          Short=ACTR; AltName: Full=Receptor-associated coactivator 3;          Short=RAC-3; AltName: Full=Amplified in breast cancer-1 protein homolog;          Short=AIB-1; AltName: Full=Steroid receptor coactivator protein 3;          Short=SRC-3; AltName: Full=CBP-interacting protein;          Short=p/CIP;          Short=pCIP;</moby:String>
+          </moby:Descriptor>
+        </moby:Simple>
+        <moby:Simple>
+          <moby:Descriptor moby:id="Q9JL19" moby:namespace="UniProt">
+            <moby:String moby:id="" moby:namespace="" moby:articleName="description">RecName: Full=Nuclear receptor coactivator 6; AltName: Full=Amplified in breast cancer protein 3; AltName: Full=Cancer-amplified transcriptional coactivator ASC-2; AltName: Full=Activating signal cointegrator 2;          Short=ASC-2; AltName: Full=Peroxisome proliferator-activated receptor-interacting protein;          Short=PPAR-interacting protein; AltName: Full=Nuclear receptor-activating protein, 250 kDa; AltName: Full=Nuclear receptor coactivator RAP250;          Short=NRC; AltName: Full=Thyroid hormone receptor-binding protein;</moby:String>
+          </moby:Descriptor>
+        </moby:Simple>
+        <moby:Simple>
+          <moby:Descriptor moby:id="Q9CQN3" moby:namespace="UniProt">
+            <moby:String moby:id="" moby:namespace="" moby:articleName="description">RecName: Full=Overexpressed breast tumor protein homolog;</moby:String>
+          </moby:Descriptor>
+        </moby:Simple>
+        <moby:Simple>
+          <moby:Descriptor moby:id="Q91V93" moby:namespace="UniProt">
+            <moby:String moby:id="" moby:namespace="" moby:articleName="description">RecName: Full=Rho-related BTB domain-containing protein 2; AltName: Full=Deleted in breast cancer 2 gene protein homolog;</moby:String>
+          </moby:Descriptor>
+        </moby:Simple>
+        <moby:Simple>
+          <moby:Descriptor moby:id="Q9D287" moby:namespace="UniProt">
+            <moby:String moby:id="" moby:namespace="" moby:articleName="description">RecName: Full=Pre-mRNA-splicing factor SPF27; AltName: Full=Breast carcinoma-amplified sequence 2 homolog; AltName: Full=DNA amplified in mammary carcinoma 1 protein;</moby:String>
+          </moby:Descriptor>
+        </moby:Simple>
+        <moby:Simple>
+          <moby:Descriptor moby:id="A2A4Q4" moby:namespace="UniProt">
+            <moby:String moby:id="" moby:namespace="" moby:articleName="description">SubName: Full=Breast cancer 1;</moby:String>
+          </moby:Descriptor>
+        </moby:Simple>
+        <moby:Simple>
+
+          <moby:Descriptor moby:id="A2AVX0" moby:namespace="UniProt">
+            <moby:String moby:id="" moby:namespace="" moby:articleName="description">SubName: Full=Breast carcinoma amplified sequence 1; Flags: Fragment;</moby:String>
+          </moby:Descriptor>
+        </moby:Simple>
+        <moby:Simple>
+          <moby:Descriptor moby:id="A2AVX1" moby:namespace="UniProt">
+            <moby:String moby:id="" moby:namespace="" moby:articleName="description">SubName: Full=Breast carcinoma amplified sequence 1;</moby:String>
+          </moby:Descriptor>
+        </moby:Simple>
+        <moby:Simple>
+          <moby:Descriptor moby:id="A2AVX2" moby:namespace="UniProt">
+            <moby:String moby:id="" moby:namespace="" moby:articleName="description">SubName: Full=Breast carcinoma amplified sequence 1;</moby:String>
+          </moby:Descriptor>
+        </moby:Simple>
+        <moby:Simple>
+          <moby:Descriptor moby:id="B0FEU7" moby:namespace="UniProt">
+            <moby:String moby:id="" moby:namespace="" moby:articleName="description">SubName: Full=Breast regression protein 39;</moby:String>
+          </moby:Descriptor>
+        </moby:Simple>
+        <moby:Simple>
+          <moby:Descriptor moby:id="B1AR74" moby:namespace="UniProt">
+            <moby:String moby:id="" moby:namespace="" moby:articleName="description">SubName: Full=Breast carcinoma amplified sequence 3;</moby:String>
+          </moby:Descriptor>
+        </moby:Simple>
+        <moby:Simple>
+          <moby:Descriptor moby:id="B1AR75" moby:namespace="UniProt">
+            <moby:String moby:id="" moby:namespace="" moby:articleName="description">SubName: Full=Breast carcinoma amplified sequence 3; Flags: Fragment;</moby:String>
+          </moby:Descriptor>
+        </moby:Simple>
+        <moby:Simple>
+          <moby:Descriptor moby:id="B1AR76" moby:namespace="UniProt">
+            <moby:String moby:id="" moby:namespace="" moby:articleName="description">SubName: Full=Breast carcinoma amplified sequence 3; Flags: Fragment;</moby:String>
+          </moby:Descriptor>
+        </moby:Simple>
+        <moby:Simple>
+          <moby:Descriptor moby:id="B1AR77" moby:namespace="UniProt">
+            <moby:String moby:id="" moby:namespace="" moby:articleName="description">SubName: Full=Breast carcinoma amplified sequence 3; Flags: Fragment;</moby:String>
+          </moby:Descriptor>
+        </moby:Simple>
+        <moby:Simple>
+          <moby:Descriptor moby:id="B1AR78" moby:namespace="UniProt">
+            <moby:String moby:id="" moby:namespace="" moby:articleName="description">SubName: Full=Breast carcinoma amplified sequence 3; Flags: Fragment;</moby:String>
+          </moby:Descriptor>
+        </moby:Simple>
+        <moby:Simple>
+          <moby:Descriptor moby:id="B1ARH6" moby:namespace="UniProt">
+            <moby:String moby:id="" moby:namespace="" moby:articleName="description">
+			SubName: Full=Breast carcinoma amplified sequence 3;</moby:String>
+          </moby:Descriptor>
+        </moby:Simple>
+        <moby:Simple>
+          <moby:Descriptor moby:id="B1B0B3" moby:namespace="UniProt">
+            <moby:String moby:id="" moby:namespace="" moby:articleName="description">SubName: Full=Breast carcinoma amplified sequence 3; Flags: Fragment;</moby:String>
+          </moby:Descriptor>
+        </moby:Simple>
+        <moby:Simple>
+          <moby:Descriptor moby:id="Q05CL7" moby:namespace="UniProt">
+            <moby:String moby:id="" moby:namespace="" moby:articleName="description">SubName: Full=Bcas2 protein; SubName: Full=Breast carcinoma amplified sequence 2, isoform CRA_a;</moby:String>
+          </moby:Descriptor>
+        </moby:Simple>
+        <moby:Simple>
+          <moby:Descriptor moby:id="Q5SWI1" moby:namespace="UniProt">
+            <moby:String moby:id="" moby:namespace="" moby:articleName="description">SubName: Full=Breast carcinoma amplified sequence 3; Flags: Fragment;
+			</moby:String>
+          </moby:Descriptor>
+        </moby:Simple>
+        <moby:Simple>
+          <moby:Descriptor moby:id="Q6NV63" moby:namespace="UniProt">
+            <moby:String moby:id="" moby:namespace="" moby:articleName="description">SubName: Full=Breast cancer 1;
+			</moby:String>
+          </moby:Descriptor>
+        </moby:Simple>
+        <moby:Simple>
+          <moby:Descriptor moby:id="Q6PFF9" moby:namespace="UniProt">
+            <moby:String moby:id="" moby:namespace="" moby:articleName="description">                 SubName: Full=Breast cancer anti-estrogen resistance 1; SubName: Full=Putative uncharacterized protein;           </moby:String>
+          </moby:Descriptor>
+        </moby:Simple>
+        <moby:Simple>
+          <moby:Descriptor moby:id="Q8VHD0" moby:namespace="UniProt">
+            <moby:String moby:id="" moby:namespace="" moby:articleName="description">                 SubName: Full=Breast cancer 2;                 </moby:String>
+          </moby:Descriptor>
+        </moby:Simple>
+      </moby:Collection>
+    </moby:mobyData>
+  </moby:mobyContent>
+</moby:MOBY>
+

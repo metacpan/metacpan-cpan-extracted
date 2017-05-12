@@ -1,0 +1,144 @@
+#!/usr/bin/perl -s
+
+use strict;
+use utf8;
+use XML::DT;
+#use bytes;
+
+our ($twente,$latin1,$utf8,$q,$cutmaxlen);
+
+my $filename = $ARGV[0];
+
+my %files;
+my $data;
+my %h = (
+	 # '-outputenc' => "ISO-8859-1",
+	 'seg' => sub{
+	   for ($c){
+	     # s/\&/\&amp;/g;
+	     # s/</\&lt;/g;
+	     # s/>/\&gt;/g;
+	     s/\s\s+|^\s+|\s+$/ /g;
+	   };
+	   $c
+	 },
+	 'ut'  => sub{" "},
+	 'tu'  => sub{$c},
+	 'tuv' => sub{
+	   $c =~ s/^[\s\n]*//;
+	   $c =~ s/[\s\n]*$//;
+	   $data->{$v{lang}||$v{"xml:lang"}} = 
+	     $cutmaxlen && length($c) > $cutmaxlen 
+	       ? substr($c,0,$cutmaxlen)."||" : $c},
+	);
+
+$h{-outputenc} = "ISO-8859-1" if $twente || $latin1;
+undef $h{-outputenc} if $utf8;
+
+my $i = 0;
+$| = 1;
+my $f;
+for $f (@ARGV){
+  #  print "\n$f" unless $q;
+  print STDERR "\n$f";
+  $/ = "\n";
+  open X, $f or die "cannot open file $f";
+  do {
+    if(/encoding=.ISO-8859-1./i){$h{-outputenc}=$h{-inputenc}="ISO-8859-1";}
+  } while ($_ = <X> and $_ !~ /<body\b/);
+
+  my $resto = "";
+  m!<body.*?>!s and $resto = $';
+  $/ = "</tu>";
+
+  while(<X>) {
+    ($_ = $resto . $_ and $resto = "" ) if $resto; 
+    $i++;
+    last if /<\/body>/;
+    #print "." if (!$q && $i%500==0);
+    print STDERR "." if ($i % 1000==0);
+    s/\>\s+/>/;
+    undef($data);
+    eval {dtstring($_, %h)} ; ## don't die in invalid XML
+    if($@){warn($@)}
+    else{
+      for my $k (keys %$data) {
+        if (exists($files{"$filename-$k"})) {
+	  myprint($files{"$filename-$k"}, $data->{$k},$i);
+        } else {
+          my $x;
+          open $x, ">$filename-$k" or die("cant >$filename-$k\n");
+          binmode($x,":utf8") if $utf8;
+          myprint($x, $data->{$k},$i);
+          $files{"$filename-$k"} = $x;
+        }
+      }
+    }
+  }
+  close X;
+}
+
+for my $key (keys %files) {
+  print "$key\n";
+}
+
+sub myprint{
+  my($f,$tu,$i)=@_;
+  if ($twente){
+    for ($tu){
+      s/<.*?>/ /gs;
+      s/[\|\$]/ /gs;
+      s/(\w)([.;,!:?«»"])/$1 $2/g;
+      s/([.;,!:?«»"])(\w)/$1 $2/g;
+      s/\s\s+|^\s+|\s+$/ /g;
+    }
+    print {$f} "$tu\n\$\n";
+  } else {
+    print {$f} "<tu id=\"$i\">$tu</tu>\n";
+  }
+}
+
+__END__
+
+=encoding utf-8
+
+=head1 NAME
+
+tmxsplit - splits a TMX file several files, one for each language
+
+=head1 SYNOPSIS
+
+ tmxsplit f.tmx f2.tmx ...
+ tmxsplit -twente f.tmx
+
+=head1 DESCRIPTION
+
+splits a TMX file in several files (one per language) and puts
+a tag C<tu id=...> in each translation unit.
+
+The names for output files is based on the first tmx file supplied.
+
+=head1 Options
+
+ -twente  -- makes a format compatible with twente-aligner
+
+ -latin1  -- a make latin1-encoded output
+ -utf8    -- a make   utf8-encoded output
+
+ -q       -- don't print filenames and "."
+
+ -cutmaxlen=n -- cut translations by the n character
+
+=head1 AUTHOR
+
+Alberto Simões, albie@di.uminho.pt
+
+J.Joao Almeida, jj@di.uminho.pt
+
+=head1 SEE ALSO
+
+perl(1).
+
+tmx2cqp(1)
+
+=cut

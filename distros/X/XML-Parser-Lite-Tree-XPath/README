@@ -1,0 +1,27 @@
+XML::Parser::Lite::Tree::XPath
+==============================
+
+XPath access to XML::Parser::Lite::Tree structures
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Test::More
+  XML::Parser::Lite::Tree (0.10 or greater)
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004-2009 Cal Henderson <cal@iamcal.com>
+License: Perl Artistic License 2.0

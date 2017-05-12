@@ -1,0 +1,13 @@
+Revision history for Perl extension X86::Disasm.
+
+0.01  Thu Jun 11 20:57:03 2009
+	- original version; created by h2xs 1.23 with options
+		-A -a -n X86::Disasm /usr/include/libdis.h
+
+0.02  Fri Nov 19 20:10:25 2010
+        - add checks to Makefile.PL for C library and refuse to build unless it exists
+
+0.23.1  Sun Oct 27 11:32:33 2013
+        - drop support for disassemble_forward and disassemble_range. The functions no
+          longer work? 
+        Increase version number to that of the library

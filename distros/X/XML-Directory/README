@@ -1,0 +1,108 @@
+#--------------------------------#
+# README file for XML::Directory #
+#--------------------------------#
+
+1. Description
+2. License
+3. Prerequisites
+4. Build and Install
+5. Authors
+6. Examples
+
+
+1. Description
+==============
+
+XML::Directory - Perl extension to get a content of directory including 
+sub-directories as an XML file. The current version is 0.95. See Changes
+for a list of recent changes.
+
+!!! There is one important change of the interface for v0.70 or later: 
+The XML::Directory class is no more used directly; instead derived subclasses 
+XML::Directory::String and XML::Directory::SAX are to be used. All methods
+supported by previous versions work for subclasses (when it makes sense),
+so nothing has to be modified but constructors.
+
+
+2. License
+==========
+
+Copyright (c) 2001 Ginger Alliance. All rights reserved. This program is free 
+software; you can redistribute it and/or modify it under the same terms as 
+Perl itself. 
+
+
+3. Prerequisites
+================
+
+There are no strict prerequisites for this module. However, if you want to 
+use the XML::Directory::Apache module, Apache and mod_perl are required.
+
+To include RDF/N3 meta-data, RDF::Notation3 module version 0.30 or later
+is required.
+
+To use XML::Directory::SAX, XML::SAX::Base module is required.
+
+
+4. Build and Install
+====================
+
+The module builds and installs in a standard way:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+To install on Windows (with ActivePerl), just replace "make" with "nmake".
+
+
+5. Authors
+==========
+
+Petr Cimprich <petr@gingerall.cz> 
+	- package maintainer
+
+Duncan Cameron <dcameron@bcs.org.uk> 
+	- subclass-based redesign (0.70)
+
+Chris Snyder <csnyder@longitude.com> 
+	- changes to handle symbolic links (0.90)
+
+Aaron Straup Cope <asc@vineyard.net> 
+	- modular DTD, order_by (0.9x)
+
+
+6. Examples
+===========
+
+The examples directory contains examples of scripts using this module.
+
+dir2xml.pl
+	command line interface to old, procedural interface
+	Usage: ./dir2xml.pl <directory>
+
+dir2xml_string.pl
+	command line interface using the XML::Directory::String class
+	Usage: ./dir2xml_string.pl <directory>
+
+dir2xml_sax.pl
+	command line interface using the XML::Directory SAX generator
+	Usage: ./dir2xml_sax.pl <directory>
+
+dir2xml_rdf.pl
+	command line interface using the XML::Directory String generator
+	with RDF/N3 meta-data (see index.n3)
+	Usage: ./dir2xml_rdf.pl <directory>
+
+MyHandler.pm
+	working template of SAX content handler
+
+MyErrorHandler.pm
+	working template of SAX error handler
+
+MyLexicalHandler.pm
+	working template of SAX lexical handler
+
+index.n3
+	an example of RDF/N3 file with files/directories meta-data

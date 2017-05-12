@@ -1,0 +1,82 @@
+XML::Checker ERROR-100: undefined NOTATION [undef_notation] in ATTLIST
+	Context: Element p, Attr notation, line 14, column 55, byte 362
+XML::Checker ERROR-151: only one ID allowed per ELEMENT first=[req_id]
+	Context: Element q, Attr second_id, line 21, column 16, byte 483
+XML::Checker ERROR-120: invalid default NMTOKEN [1bad default nmtoken]
+	Context: Element n, Attr bad_def, line 27, column 19, byte 584
+XML::Checker ERROR-123: invalid default ID [1bad_default_id], must be #REQUIRED or #IMPLIED
+	Context: Element bad_id, Attr bad_default_id, line 38, column 21, byte 808
+XML::Checker ERROR-120: invalid default IDREF [1bad_default_idref]
+	Context: Element bad_id, Attr bad_default_idref, line 39, column 27, byte 853
+XML::Checker ERROR-121: invalid default [1bad_default_idrefs] in IDREFS [1bad_default_idrefs default_id]
+	Context: Element bad_id, Attr bad_default_idrefs, line 40, column 29, byte 903
+XML::Checker ERROR-120: invalid default ENTITY [1bad_default_ent]
+	Context: Element bad_ent, Attr bad_default_ent, line 46, column 26, byte 1075
+XML::Checker ERROR-121: invalid default [1bad_default_idref] in ENTITIES [1bad_default_idref default_entity]
+	Context: Element bad_ent, Attr bad_default_ents, line 47, column 29, byte 1123
+XML::Checker ERROR-110: attribute [dupl_attr] of element [dupl] already defined
+	Context: Element dupl, Attr dupl_attr, line 53, column 18, byte 1249
+multiple definitions of attribute dupl_attr for element dupl, only first one is recognized
+XML::Checker ERROR-159: unspecified value for #REQUIRED attribute [second_id]
+	Context: Element q, Attr second_id, line 60, column 1, byte 1300
+XML::Checker ERROR-150: bad #FIXED attribute value [bad fixed value], it should be [fixed value]
+	Context: Element p, Attr fixed, line 61, column 1, byte 1326
+XML::Checker ERROR-160: invalid Enumeration value [bad enum]
+	Context: Element p, Attr enum, line 61, column 1, byte 1326
+XML::Checker ERROR-157: unexpected Element [unexpected]
+	Context: ChildElementIndex 0, line 65, column 3, byte 1392
+XML::Checker ERROR-157: unexpected Element [undefined]
+	Context: ChildElementIndex 1, line 66, column 3, byte 1409
+XML::Checker ERROR-101: undefined ELEMENT [undefined]
+	Context: line 66, column 3, byte 1409
+XML::Checker ERROR-159: unspecified value for #REQUIRED attribute [second_id]
+	Context: Element q, Attr second_id, line 68, column 2, byte 1431
+XML::Checker ERROR-130: invalid NMTOKEN [1bad nmtoken]
+	Context: Element n, Attr nmtoken, line 70, column 1, byte 1468
+XML::Checker ERROR-130: invalid NMTOKEN [1bad default nmtoken]
+	Context: Element n, Attr bad_def, line 70, column 1, byte 1468
+XML::Checker ERROR-130: invalid NMTOKEN [1bad default nmtoken]
+	Context: Element n, Attr bad_def, line 71, column 1, byte 1497
+XML::Checker ERROR-130: invalid NMTOKEN [1bad default nmtoken]
+	Context: Element n, Attr bad_def, line 72, column 1, byte 1529
+XML::Checker ERROR-103: undefined attribute [bad_idref]
+	Context: Element bad_id, line 76, column 1, byte 1608
+XML::Checker ERROR-131: invalid ID [1bad_default_id]
+	Context: Element bad_id, Attr bad_default_id, line 76, column 1, byte 1608
+XML::Checker ERROR-132: invalid IDREF [1bad_default_idref]
+	Context: Element bad_id, Attr bad_default_idref, line 76, column 1, byte 1608
+XML::Checker ERROR-132: invalid IDREF [1bad_default_idrefs]
+	Context: Element bad_id, Attr bad_default_idrefs, line 76, column 1, byte 1608
+XML::Checker ERROR-131: invalid ID [1bad_default_id]
+	Context: Element bad_id, Attr bad_default_id, line 77, column 1, byte 1639
+XML::Checker ERROR-111: ID [1bad_default_id] already defined
+	Context: Element bad_id, Attr bad_default_id, line 77, column 1, byte 1639
+XML::Checker ERROR-132: invalid IDREF [1bad_default_idref]
+	Context: Element bad_id, Attr bad_default_idref, line 77, column 1, byte 1639
+XML::Checker ERROR-132: invalid IDREF [1bad_default_idrefs]
+	Context: Element bad_id, Attr bad_default_idrefs, line 77, column 1, byte 1639
+XML::Checker ERROR-103: undefined attribute [bad_ent]
+	Context: Element bad_ent, line 78, column 1, byte 1650
+XML::Checker ERROR-133: invalid ENTITY name [1bad_default_ent]
+	Context: Element bad_ent, Attr bad_default_ent, line 78, column 1, byte 1650
+XML::Checker ERROR-102: undefined unparsed ENTITY [1bad_default_ent]
+	Context: Element bad_ent, Attr bad_default_ent, line 78, column 1, byte 1650
+XML::Checker ERROR-133: invalid ENTITY name [1bad_default_idref]
+	Context: Element bad_ent, Attr bad_default_ents, line 78, column 1, byte 1650
+XML::Checker ERROR-102: undefined unparsed ENTITY [1bad_default_idref]
+	Context: Element bad_ent, Attr bad_default_ents, line 78, column 1, byte 1650
+XML::Checker ERROR-133: invalid ENTITY name [1bad_default_ent]
+	Context: Element bad_ent, Attr bad_default_ent, line 79, column 1, byte 1684
+XML::Checker ERROR-102: undefined unparsed ENTITY [1bad_default_ent]
+	Context: Element bad_ent, Attr bad_default_ent, line 79, column 1, byte 1684
+XML::Checker ERROR-133: invalid ENTITY name [1bad_default_idref]
+	Context: Element bad_ent, Attr bad_default_ents, line 79, column 1, byte 1684
+XML::Checker ERROR-102: undefined unparsed ENTITY [1bad_default_idref]
+	Context: Element bad_ent, Attr bad_default_ents, line 79, column 1, byte 1684
+XML::Checker ERROR-153: Element should be EMPTY, found text [text in empty]
+	Context: line 80, column 8, byte 1703
+XML::Checker WARNING-200: undefined ID [1bad_default_idrefs] was referenced [2] times
+XML::Checker WARNING-200: undefined ID [1bad_default_idref] was referenced [2] times
+XML::Checker INFO-300: [0] references to ID [1bad_default_id]
+XML::Checker INFO-300: [4] references to ID [default_id]
+XML::Checker INFO-300: [0] references to ID [unreferenced_id]

@@ -1,0 +1,10 @@
+<stx:transform version="1.0" 
+  xmlns:stx="http://stx.sourceforge.net/2002/ns"
+  strip-space="yes" 
+  recognize-cdata="yes">
+
+  <stx:template match="cdata()">
+    [<stx:copy/>]
+  </stx:template>
+
+</stx:transform>

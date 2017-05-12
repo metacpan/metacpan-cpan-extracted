@@ -1,0 +1,38 @@
+---
+abstract: 'Consume XML with Moose and xpath queries'
+author:
+  - 'Robin Smidsrød <robin@smidsrod.no>'
+build_requires:
+  Test::Exception: 0
+  Test::More: 0
+  lib: 0
+  utf8: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+  XML::LibXML: 1.70
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.015, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: XML-Rabbit
+requires:
+  Carp: 0
+  Class::Load: 0
+  Encode: 0
+  Moose: 0.89
+  Moose::Exporter: 0
+  Moose::Role: 0
+  Moose::Util::TypeConstraints: 0
+  MooseX::Role::Parameterized: 0
+  Perl6::Junction: 0
+  Scalar::Util: 0
+  XML::LibXML: 1.70
+  namespace::autoclean: 0
+  perl: 5.008
+  strict: 0
+  warnings: 0
+resources:
+  repository: git://github.com/robinsmidsrod/XML-Rabbit.git
+version: 0.4.1

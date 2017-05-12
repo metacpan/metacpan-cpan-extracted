@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  Description: All legal track-level items
+  Expect:      !Error
+-->
+
+<playlist version="1" xmlns="http://xspf.org/ns/0/">
+
+  <trackList>
+
+    <track>
+
+      <!-- URL of resource to be rendered. Probably an audio resource, but MAY be any type of resource with a well-known duration, such as video, a SMIL document, or an XSPF document. The duration of the resource defined in this element defines the duration of rendering. xspf:track elements MAY contain zero or more location elements, but a user-agent MUST NOT render more than one of the named resources. -->
+      <location>http://example.com/my.mp3</location>
+
+      <!-- Canonical ID for this resource. Likely to be a hash or other location-independent name, such as a MusicBrainz identifier or isbn URN (if there existed isbn numbers for audio). MUST be a legal URN. xspf:playlist elements MAY contain zero or more identifier elements. -->
+      <identifier>magnet:?xt=urn:sha1:YNCKHTQCWBTRNJIV4WNAE52SJUQCZO5C</identifier>
+
+      <!-- Human-readable name of the track that authored the resource which defines the duration of track rendering. This value is primarily for fuzzy lookups, though a user-agent may display it. xspf:track elements MAY contain exactly one. -->
+      <title>My Way</title>
+
+      <!-- Human-readable name of the entity (author, authors, group, company, etc) that authored the resource which defines the duration of track rendering. This value is primarily for fuzzy lookups, though a user-agent may display it. xspf:track elements MAY contain exactly one. -->
+      <creator>Frank Sinatra</creator>
+
+      <!-- A human-readable comment on the track. This is character data, not HTML, and it may not contain markup. xspf:track elements MAY contain exactly one. -->
+      <annotation>This is my theme song.</annotation>
+
+      <!-- URL of a place where this resource can be bought or more info can be found. -->
+      <info>http://franksinatra.com/myway</info>
+
+      <!-- URL of an image to display for the duration of the track. xspf:track elements MAY contain exactly one. -->
+      <image>http://franksinatra.com/img/myway</image>
+
+      <!-- Human-readable name of the collection from which the resource which defines the duration of track rendering comes. For a song originally published as a part of a CD or LP, this would be the title of the original release. This value is primarily for fuzzy lookups, though a user-agent may display it. xspf:track elements MAY contain exactly one. -->
+      <album>Frank Sinatra&apos;s Greatest Hits</album>
+
+      <!-- Integer with value greater than zero giving the ordinal position of the media on the xspf:album. This value is primarily for fuzzy lookups, though a user-agent may display it. xspf:track elements MAY contain exactly one. It MUST be a valid XML Schema nonNegativeInteger. -->
+      <trackNum>3</trackNum>
+
+      <!-- The time to render a resource, in milliseconds. It MUST be a valid XML Schema nonNegativeInteger. This value is only a hint - different XSPF generators will generate slightly different values. A user-agent MUST NOT use this value to determine the rendering duration, since the data will likely be low quality. xspf:track elements MAY contain exactly one duration element. -->
+      <duration>19200</duration>
+
+      <!-- The link element allows non-XSPF web resources to be included in xspf:track elements without breaking XSPF validation. -->
+      <link rel="http://foaf.org/namespace/version1">http://socialnetwork.org/foaf/mary.rdfs</link>
+      
+      <!-- The meta element allows non-XSPF metadata to be included in xspf:track elements without breaking XSPF validation. -->
+      <meta rel="http://example.org/key">value</meta>
+                                        
+      <!-- The extension element allows non-XSPF XML to be included in XSPF documents without breaking XSPF validation. The purpose is to allow nested XML, which the meta and link elements do not. xspf:playlist elements MAY contain zero or more extension elements. -->
+      <extension application="http://example.com">
+        <clip start="25000" end="34500"/>
+      </extension>
+
+    </track>
+
+  </trackList>
+
+</playlist>

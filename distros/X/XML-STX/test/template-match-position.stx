@@ -1,0 +1,36 @@
+<stx:transform version="1.0" 
+  xmlns:stx="http://stx.sourceforge.net/2002/ns"
+  strip-space="yes">
+
+  <stx:template match="node[position()=2]">
+    <id>
+      <stx:value-of select="@id"/>
+    </id>
+  </stx:template>
+
+  <stx:template match="*[1]">
+    <el>
+      <stx:value-of select="name()"/>
+      <stx:process-children/>
+    </el>
+  </stx:template>
+
+  <stx:template match="node()[position()=4]">
+    <node>
+      <stx:copy/>
+    </node>
+  </stx:template>
+
+  <stx:template match="cdata()[position()=1]">
+    <cdata>
+      <stx:copy/>
+    </cdata>
+  </stx:template>
+
+  <stx:template match="text()[3]">
+    <text>
+      <stx:copy/>
+    </text>
+  </stx:template>
+
+</stx:transform>

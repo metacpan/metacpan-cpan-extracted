@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0"
+        xmlns:media="http://search.yahoo.com/mrss/"
+	    xmlns:dc="http://purl.org/dc/elements/1.1/"
+	    	    xmlns:flickr="urn:flickr:" >
+	<channel>
+
+
+		<title>Uploads from shlomif2</title>
+		<link>http://www.flickr.com/photos/shlomif/</link>
+ 		<description></description>
+		<pubDate>Thu, 4 Dec 2008 03:02:12 -0800</pubDate>
+		<lastBuildDate>Thu, 4 Dec 2008 03:02:12 -0800</lastBuildDate>
+		<generator>http://www.flickr.com/</generator>
+		<image>
+			<url>http://farm1.static.flickr.com/79/buddyicons/81969889@N00.jpg?1158015125#81969889@N00</url>
+			<title>Uploads from shlomif2</title>
+			<link>http://www.flickr.com/photos/shlomif/</link>
+		</image>
+
+		<item>
+			<title>Zarro Bugs</title>
+			<link>http://www.flickr.com/photos/shlomif/3081446735/</link>
+			<description>&lt;p&gt;&lt;a href=&quot;http://www.flickr.com/people/shlomif/&quot;&gt;shlomif2&lt;/a&gt; posted a photo:&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;http://www.flickr.com/photos/shlomif/3081446735/&quot; title=&quot;Zarro Bugs&quot;&gt;&lt;img src=&quot;http://farm4.static.flickr.com/3043/3081446735_b4d7492611_m.jpg&quot; width=&quot;240&quot; height=&quot;193&quot; alt=&quot;Zarro Bugs&quot; /&gt;&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;No active bugs in perl-XML-RSS-1.41! Let's see how long it will last…&lt;/p&gt;</description>
+			<pubDate>Thu, 4 Dec 2008 03:02:12 -0800</pubDate>
+			                        <dc:date.Taken>2008-12-04T13:02:12-08:00</dc:date.Taken>
+            			<author flickr:profile="http://www.flickr.com/people/shlomif/">nobody@flickr.com (shlomif2)</author>
+			<guid isPermaLink="false">tag:flickr.com,2004:/photo/3081446735</guid>
+                            			<media:content url="http://farm4.static.flickr.com/3043/3081446735_6ea84a6e37_o.png"
+				       type="image/jpeg"
+				       height="859"
+				       width="1066"/>
+            <media:title>Zarro Bugs</media:title>
+        <media:description type="html">&lt;p&gt;No active bugs in perl-XML-RSS-1.41! Let's see how long it will last…&lt;/p&gt;</media:description>
+        <media:thumbnail url="http://farm4.static.flickr.com/3043/3081446735_b4d7492611_s.jpg" height="75" width="75" />
+        <media:credit role="photographer">shlomif2</media:credit>
+		<media:category scheme="urn:flickr:tags">screenshot firefox rss landmark bugs xml zero milestone perl zarro</media:category>
+
+
+		</item>
+		<item>
+			<title>Cupcakes</title>
+			<link>http://www.flickr.com/photos/shlomif/3059592974/</link>
+			<description>&lt;p&gt;&lt;a href=&quot;http://www.flickr.com/people/shlomif/&quot;&gt;shlomif2&lt;/a&gt; posted a photo:&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;http://www.flickr.com/photos/shlomif/3059592974/&quot; title=&quot;Cupcakes&quot;&gt;&lt;img src=&quot;http://farm4.static.flickr.com/3272/3059592974_4d79fde160_m.jpg&quot; width=&quot;240&quot; height=&quot;180&quot; alt=&quot;Cupcakes&quot; /&gt;&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;Photographs of cupcakes that my sister prepared.&lt;br /&gt;
+&lt;br /&gt;
+The licence is Creative Commons Public Domain, but an attribution or donation would be appreciated.&lt;/p&gt;</description>
+			<pubDate>Tue, 25 Nov 2008 11:11:58 -0800</pubDate>
+			                        <dc:date.Taken>2008-11-23T15:04:42-08:00</dc:date.Taken>
+            			<author flickr:profile="http://www.flickr.com/people/shlomif/">nobody@flickr.com (shlomif2)</author>
+			<guid isPermaLink="false">tag:flickr.com,2004:/photo/3059592974</guid>
+                            			<media:content url="http://farm4.static.flickr.com/3272/3059592974_ec763dd5c7_o.jpg"
+				       type="image/jpeg"
+				       height="2304"
+				       width="3072"/>
+            <media:title>Cupcakes</media:title>
+        <media:description type="html">&lt;p&gt;Photographs of cupcakes that my sister prepared.&lt;br /&gt;
+&lt;br /&gt;
+The licence is Creative Commons Public Domain, but an attribution or donation would be appreciated.&lt;/p&gt;</media:description>
+        <media:thumbnail url="http://farm4.static.flickr.com/3272/3059592974_4d79fde160_s.jpg" height="75" width="75" />
+        <media:credit role="photographer">shlomif2</media:credit>
+		<media:category scheme="urn:flickr:tags">food hearts muffins cupcakes baking sweet sister sugar cupcake bakery muffin</media:category>
+
+
+		</item>
+	</channel>
+</rss>

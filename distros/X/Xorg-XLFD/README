@@ -1,0 +1,152 @@
+NAME
+    Xorg::XLFD - X logical font description interface
+
+SYNOPSIS
+        use Xorg::XLFD qw(get_all_xfld);
+
+        my $desc = get_all_xlfd();
+
+DESCRIPTION
+    X logical fond description is a font standard used by the X Window
+    System. This module provides an interface for accessing these
+    descriptions.
+
+EXPORTS
+    None by default.
+
+FUNCTIONS
+  get_all_xfld()
+    get_all_xfld() takes no arguments and returns a hash reference that
+    contains all available fonts on the system, grouped by family.
+
+  STRUCTURE
+    An example structure for the standard 'Fixed' font:
+
+                  fixed => {
+                             charset => [
+                                          "jisx0208.1983",
+                                          "iso10646",
+                                          "iso8859",
+                                          "koi8",
+                                          "jisx0201.1976",
+                                          0,
+                                          120,
+                                          180
+                                        ],
+                             foundary => [
+                                           "jis",
+                                           "misc",
+                                           "sony"
+                                         ],
+                             horiz_dpi => [
+                                            75,
+                                            100,
+                                            0,
+                                            120
+                                          ],
+                             pixels => [
+                                         0,
+                                         16,
+                                         24,
+                                         13,
+                                         14,
+                                         15,
+                                         18,
+                                         10,
+                                         20,
+                                         6,
+                                         7,
+                                         8,
+                                         9,
+                                         "ja",
+                                         "ko",
+                                         12
+                                       ],
+                             "set width" => [
+                                              "normal",
+                                              "semicondensed"
+                                            ],
+                             slant => [
+                                        "r",
+                                        "o"
+                                      ],
+                             spacing => [
+                                          "c",
+                                          100,
+                                          75
+                                        ],
+                             tenths => [
+                                         0,
+                                         110,
+                                         150,
+                                         170,
+                                         230,
+                                         100,
+                                         120,
+                                         130,
+                                         140,
+                                         70,
+                                         200,
+                                         60,
+                                         50,
+                                         80,
+                                         90,
+                                         13,
+                                         18
+                                       ],
+                             vert_dpi => [
+                                           75,
+                                           100
+                                         ],
+                             weight => [
+                                         "medium",
+                                         "bold"
+                                       ],
+                             width => [
+                                        0,
+                                        160,
+                                        240,
+                                        70,
+                                        80,
+                                        90,
+                                        60,
+                                        140,
+                                        100,
+                                        40,
+                                        50,
+                                        "c",
+                                        120
+                                      ]
+                           },
+
+XLFD SPECIFICATION
+    The XLFD is made up from 12/14 font properties as visualized below.
+
+    <SEE POD>
+
+
+CAVEATS
+    We are relying on an external application for fetching the available
+    font descriptions. This is not good. We will look at the xlsfonts source
+    code and try to come up with a smarter way.
+
+REPORTING BUGS
+    Report bugs on rt.cpan.org or to magnus@trapd00r.se
+
+AUTHOR
+      Magnus Woldrich
+      CPAN ID: WOLDRICH
+      magnus@trapd00r.se
+      http://japh.se
+
+CONTRIBUTORS
+    None required yet.
+
+COPYRIGHT
+    Copyright 2011 the Xorg::XLFD "AUTHOR" and "CONTRIBUTORS" as listed
+    above.
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

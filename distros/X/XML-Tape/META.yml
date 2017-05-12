@@ -1,0 +1,19 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         XML-Tape
+version:      0.22
+version_from: 
+installdirs:  site
+requires:
+    DB_File:                       0
+    Digest::MD5:                   0
+    File::Temp:                    0
+    HTTP::OAI:                     0
+    IO::File:                      0
+    Test::More:                    0
+    XML::LibXML:                   0
+    XML::Parser:                   0
+    XML::SAX::Writer:              0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

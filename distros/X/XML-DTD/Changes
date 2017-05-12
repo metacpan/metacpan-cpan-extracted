@@ -1,0 +1,59 @@
+Revision history for Perl extension XML::DTD.
+
+0.01  2004-02-27
+	- Original version; created by h2xs 1.22 with options
+		-X -n XML::DTD
+
+0.02  2006-06-10
+	- Significant changes to dtdto script, including addition of a
+          validating XSLT generating capability, and a man page in POD
+          format.
+
+0.03  2006-07-01
+	- Changed rule modifications in Makefile.PL to be less
+	  sensitive to specific MakeMaker version (with the result
+	  that dtdto script was broken for some MakeMaker versions).
+
+0.04  2007-03-22
+	- Fixed minor documentation errors.
+	- Applied patch from Peter Lamb for ContentModel bugs.
+
+0.05  2007-05-11
+	- Incorporated a number of significant improvements (including
+	  bug fixes, more robust parsing, fetching of external entities,
+	  and improved entity substitution) from Peter Lamb.
+
+0.06  2007-06-16
+	- Some bug fixes, and improvements to dtdto HTML and DocBook
+	  output.
+
+0.07  2008-03-14
+	- Fixed bug in parsing of ATTLIST declaration with empty
+	  string following CDATA.
+
+0.08  2008-11-11
+	- Synchronised package version with XML::DTD module version.
+
+0.09  2010-05-15
+	- Fixed some parsing problems causing the problem reported in 
+          rt.cpan.org bug 57072.
+        - In XSLT used by dtdto utility, fixed bug preventing display
+          of ENTITY and ELEMENT definitions within INCLUDE sections.
+	- Error handling is now via exceptions based on Error module.
+        - Added debug flag to dtdto utility.
+        - Improved documentation for a number of modules.
+
+0.10  2010-11-06
+	- Fixed some parsing problems in a DTD example reported by a
+          user. One of these modifications addresses entity definitions 
+          which violate the "Proper Group/PE Nesting" constraint (see
+          http://www.w3.org/TR/REC-xml/#vc-PEinGroup) but which 
+          nevertheless seem to be accepted without error by some common 
+          XML parsers, and are therefore now at least partially supported
+          by XML::DTD.
+
+0.11  2013-08-09
+        - Improved excessively complicated and platform-dependent 
+          Makefile.PL to address rt.cpan.org bug 85144. No changes to 
+          modules.
+

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Schema definition for the dependency list -->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+   <xsd:element name="packingList" type="packingList"/>
+   <xsd:complexType name="packingList">
+      <xsd:sequence>
+         <xsd:element name="retail" type="xsd:string"/>
+         <xsd:element name="sdk" type="xsd:string" minOccurs="0"/>
+      </xsd:sequence>
+   </xsd:complexType>
+</xsd:schema>

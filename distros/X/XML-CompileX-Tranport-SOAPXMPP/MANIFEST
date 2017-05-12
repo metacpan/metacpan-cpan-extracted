@@ -1,0 +1,7 @@
+t/transport-xmpp.t
+Changes
+Makefile.PL
+README
+MANIFEST
+lib/XML/CompileX/Transport/SOAPXMPP.pm
+META.yml                                 Module meta-data (added by MakeMaker)

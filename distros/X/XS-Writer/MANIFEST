@@ -1,0 +1,12 @@
+Build.PL
+lib/XS/Writer.pm
+MANIFEST			This list of files
+META.yml
+t/Some-Employee/Build.PL
+t/Some-Employee/employee.h
+t/Some-Employee/lib/Some/Employee.pm
+t/Some-Employee/lib/Some/Employee.xs
+t/Some-Employee/lib/Some/typemap
+t/Some-Employee/t/employee.t
+t/struct.t
+t/tryit.t

@@ -1,0 +1,12 @@
+None.
+
+Well, ok, none I am aware of.
+
+There is, however, one strange occurence when running the xyplotall.pl demo 
+on xforms 0.84 - it crashes the X server! It does on my setup, anyway. Since I 
+have recreated this using plain C, it is not considered to be an Xforms4Perl 
+bug. Its not even acknowledged as an xforms bug since I appear to be the only 
+one who has experienced this. I would be VERY interested with news from anyone
+else who can make it happen. I do it be running the xyplotall.pl demo an number
+of times consecutively.
+

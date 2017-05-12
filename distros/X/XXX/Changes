@@ -1,0 +1,71 @@
+0.31 Thu Jan  5 12:07:51 PST 2017
+ - Fix dumping global regex vars. @EvanCarroll++ PR/2
+
+0.30 Wed Apr 27 06:54:32 PDT 2016
+ - Apply PR/9 by @mienaikage++.
+
+0.29 Sat Oct 11 18:30:39 CEST 2014
+ - Apply PR/7 by @perlancar++.
+
+0.28 Wed Sep  3 00:11:39 MDT 2014
+ - Add support for Data::Dump::Color. @perlancar++. PR/6
+
+0.27 Sat Aug 16 14:49:50 PDT 2014
+ - Change Meta email
+
+0.26 Sat Aug 16 12:55:18 PDT 2014
+ - Meta 0.0.2
+
+0.25 Fri Aug 15 21:02:18 PDT 2014
+ - Add t/000-compile-modules.t
+
+0.24 Mon Aug  4 00:46:46 PDT 2014
+ - Remove (c) from Copyright
+
+0.23 Thu Jul 31 12:08:56 PDT 2014
+ - Fix encoding bug in Pod
+
+0.22 Wed Jul 30 16:23:52 PDT 2014
+ - Doc to swim
+ - Fix Meta and add Contributing
+ - Switch IRC to '#pkg'
+
+0.21 Tue Jun 17 10:50:13 PDT 2014
+ - Switch to manual VERSION
+
+0.20 Sun Jun 15 11:36:29 PDT 2014
+ - Remove extra comments from the top
+
+0.19 Sun Jun 15 11:13:11 PDT 2014
+ - Switch to Zilla::Dist
+
+0.18 Mon Sep  5 09:42:01 BST 2011
+ - Add XXX_skip support
+ - Released from Liz++ and Wendy++'s Kitchen
+
+0.17 Fri Aug 20 08:26:52 PDT 2010
+ - Remove t/yyy.t
+ - Support 'require XXX'
+ - Support $XXX::DumpModule
+
+0.16 Fri Jun 18 12:53:41 PDT 2010
+ - With Test::More, use diag for WWW and note for YYY. Thanks to theory and
+   schwern.
+ - Use $Data::Dumper::Indent = 2 (instead of 1).
+
+0.15 Tue Jun  8 12:27:35 PDT 2010
+ - Got rid of YYY.pm. Hopefully we can fix CPAN indexing!
+ - Use Test::More::diag with YYY if it is loaded.
+
+0.14 Mon Jun  7 23:27:45 PDT 2010
+ - Added `use XXX -with => 'Other::Dump::Module';` syntax.
+ - Updated docs.
+
+0.12 Tue Jun  3 13:07:31 PDT 2008
+ - Get rid of a bareword error.
+
+0.11 Sun Jun  1 22:28:12 PDT 2008
+ - Add YYY.pm to get around CPAN indexing.
+
+0.10 Sat Feb 18 10:29:44 PST 2006
+ - Maiden voyage

@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<messages>
+ <message>
+   <from>claudius@elsinore.gov</from>
+   <to>maddog@elsinore.gov</to>
+   <subject>Re: [RSVP] Impromtu Theatrical Performance Today!</subject>
+   <body>
+     Hamlet,
+
+     The Queen and I sincerly look forward to attending your play.
+     Glad to see that you're feeling better.
+
+     Your Uncle and King,
+     Claudius
+   </body>
+ </message>
+ <message>
+   <from>rosencrantz@elsinore.gov</from>
+   <to>claudius@elsinore.gov</to>
+   <subject>Project Update</subject>
+   <body>
+     My King,
+
+     He suspects nothing. Guildenstern and I should be home
+     within the week.
+
+     -rosey
+   </body>
+ </message>
+</messages>

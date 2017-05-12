@@ -1,0 +1,48 @@
+XML-Atom-FromOWL
+================
+
+Created:      2011-01-12
+Home page:    <https://metacpan.org/release/XML-Atom-FromOWL>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=XML-Atom-FromOWL>
+Maintainer:   Toby Inkster <tobyink@cpan.org>
+
+0.102	2014-09-11
+
+ [ Packaging ]
+ - Switch to Dist::Inkt.
+
+0.101	2012-05-30
+
+ - Drop RDF::TrineShortcuts dependency; use RDF::TrineX::Functions instead.
+ - Drop common::sense dependency; use strict instead.
+
+0.100	2011-10-27
+
+ [ Packaging ]
+ - Module::Package::RDF
+
+ [ Other ]
+ - Added: Rudimentary support for ActivityStrea.ms.
+   <http://activitystrea.ms/>
+ - Updated: use 5.010
+
+0.003	2011-01-19
+
+ - Added: Export triples of the form { ?e ?p ?o . } where ?e is a feed or
+   entry and ?o is a literal, using Atom+RDFa
+ - Added: Support for Atom Feed Paging and Archiving.
+   <http://tools.ietf.org/rfc/rfc5005.txt>
+ - Added: Support for Atom Threading Extensions.
+   <http://tools.ietf.org/rfc/rfc4685.txt>
+ - Added: Support for exporting links which do not use AtomOWL's reified
+   Link construct.
+ - Added: Support for hNews.
+   <http://microformats.org/wiki/hnews>
+
+0.002	2011-01-14
+
+ - Force <entry> and <feed> elements to contain an <id> even if none is
+   provided in the input data.
+ - use Data::UUID
+
+0.001	2011-01-13	Initial release

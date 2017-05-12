@@ -1,0 +1,27 @@
+This perl module is uses internally another Perl module called
+XML::Sablotron, which in turn encapsulates the XML processor called
+Sablotron. You can find more info about XML::Sablotron and Sablotron 
+at http://www.gingerall.org.
+
+XML::SAXDriver::Sablotron is a SAX2 driver based on Sablotron XSLT
+processor. An XSLT transformation result is outputted as a stream of
+SAX2 events. The result tree is not build at all - SAX2 events are
+emitted directly instead.
+
+To build up this module, change into the XML-SAXDriver-Sablotron 
+directory and type:
+
+  perl Makefile.PL
+  make
+  make test
+  make install (may require the root privileges)
+
+
+The creator of XML::SAXDriver::Sablotron is Ginger Alliance.
+Maintainer of this package is Pavel Hlavnicka (pavel@gingerall.cz)
+
+Enjoy XML::SAXDriver::Sablotron!!
+
+
+
+

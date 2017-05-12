@@ -1,0 +1,95 @@
+=encoding utf8
+
+=head1 NAME
+
+XML::Compile::SOAP12::Util - general purpose routines for XML::Compile::SOAP12
+
+=head1 INHERITANCE
+
+ XML::Compile::SOAP12::Util
+   is a Exporter
+
+=head1 DESCRIPTION
+
+This module collects functions which are useful on many places in the
+SOAP 1.2 implemention, just as L<XML::Compile::Util|XML::Compile::Util> does for general XML
+implementations (often you will needs things from both).
+
+On the moment, only constant URIs are exported.
+
+=head1 FUNCTIONS
+
+The export TAG C<:soap12> groups the SOAP version 1.2 related exported
+constants
+
+=over 4
+
+=item basic constants
+
+C<SOAP12ENV>, C<SOAP12ENC>, C<SOAP12RPC>, C<SOAP12BIND>, C<SOAP12MEP>,
+C<SOAP12FEATURES>.
+
+=item role abbreviations
+
+C<SOAP12NONE>, C<SOAP12NEXT>, C<SOAP12ULTIMATE>
+
+=item binding framework
+
+C<SOAP12CONTEXT>
+
+=item exchange context
+
+C<SOAP12CTXPATTERN>, C<SOAP12CTXFAILURE>, C<SOAP12CTXROLE>,
+C<SOAP12CTXSTATE>
+
+=item Features
+
+C<SOAP12WEBMETHOD>, C<SOAP12METHODPROP>, C<SOAP12ACTION>, C<SOAP12ACTIONPROP>
+
+=item MEP
+
+C<SOAP12REQRESP>, C<SOAP12RESP>,
+C<SOAP12MEPOUT>, C<SOAP12MEPIN>, C<SOAP12MEPDEST>, C<SOAP12MEPSEND>
+
+=back
+
+=head1 SYNOPSYS
+
+ use XML::Compile::SOAP12::Util;
+
+=head1 SEE ALSO
+
+This module is part of XML-Compile-SOAP12 distribution version 3.04,
+built on December 09, 2015. Website: F<http://perl.overmeer.net/xml-compile/>
+
+Other distributions in this suite:
+L<XML::Compile>,
+L<XML::Compile::SOAP>,
+L<XML::Compile::WSDL11>,
+L<XML::Compile::SOAP12>,
+L<XML::Compile::SOAP::Daemon>,
+L<XML::Compile::SOAP::WSA>,
+L<XML::Compile::C14N>,
+L<XML::Compile::WSS>,
+L<XML::Compile::WSS::Signature>,
+L<XML::Compile::Tester>,
+L<XML::Compile::Cache>,
+L<XML::Compile::Dumper>,
+L<XML::Compile::RPC>,
+L<XML::Rewrite>
+and
+L<XML::LibXML::Simple>.
+
+Please post questions or ideas to the mailinglist at
+F<http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/xml-compile> .
+For live contact with other developers, visit the C<#xml-compile> channel
+on C<irc.perl.org>.
+
+=head1 LICENSE
+
+Copyrights 2009-2015 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

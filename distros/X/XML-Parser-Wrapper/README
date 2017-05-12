@@ -1,0 +1,316 @@
+NAME
+    XML::Parser::Wrapper - A simple object wrapper around XML::Parser
+
+VERSION
+     0.14
+
+SYNOPSIS
+     use XML::Parser::Wrapper;
+     
+ my $xml = qq{<foo><head id="a">Hello World!</head><head2><test_tag id="b"/></head2></foo>};
+     my $root = XML::Parser::Wrapper->new($xml);
+     
+ my $root2 = XML::Parser::Wrapper->new({ file => '/tmp/test.xml' });
+     
+ my $parser = XML::Parser::Wrapper->new;
+     my $root3 = $parser->parse({ file => '/tmp/test.xml' });
+     
+ my $root4 = XML::Parser::Wrapper->new_sax_parser({ class => 'XML::LibXML::SAX',
+                                                        handler => $handler,
+                                                        start_tag => 'stuff',
+                                                        # start_depth => 2,
+                                                      }, $xml);
+     
+ my $root_tag_name = $root->name;
+     my $roots_children = $root->elements;
+     
+ foreach my $element (@$roots_children) {
+         if ($element->name eq 'head') {
+             my $id = $element->attr('id');
+             my $hello_world_text = $element->text; # eq "Hello World!"
+         }
+     }
+     
+ my $head_element = $root->first_element('head2');
+     my $head_elements = $root->elements('head2');
+     my $test = $root->element('head2')->first_element('test_tag');
+     
+ my $root = XML::Parser::Wrapper->new_doc('root_tag', { root => 'attr' });
+     
+ my $new_element = $root->add_kid('test4', { attr1 => 'val1' });
+     
+ my $kid = $root->update_kid('root_child', { attr2 => 'stuff2' }, 'blah');
+     $kid->update_node({ new_attr => 'new_stuff' });
+     
+ $new_element->add_kid('child', { myattr => 'stuff' }, 'bleh');
+     
+ my $another_element = $root->new_element('foo', { bar => '1' }, 'test');
+     $root->add_kid($another_element);
+     
+ my $new_xml = $root->to_xml;
+
+     my $doctype_info = $root->get_doctype;
+
+     my $xml_decl_info = $root->get_xml_decl;
+
+DESCRIPTION
+    XML::Parser::Wrapper provides a simple object around XML::Parser to make
+    it more convenient to deal with the parse tree returned by XML::Parser.
+
+    For a list of changes in recent versions, see the documentation for
+    XML::Parser::Wrapper::Changes.
+
+METHODS
+  "new()", "new($xml)", "new({ file => $filename })"
+    Calls XML::Parser to parse the given XML and returns a new
+    XML::Parser::Wrapper object using the parse tree output from
+    XML::Parser.
+
+    If no parameters are passed, a reusable object is returned -- see the
+    parse() method.
+
+  "new_sax_parser(\%params)", "new_sax_parser(\%params, $xml)", "new_sax_parser(\%params, { file => $filename })"
+    Experimental support for SAX parsers based on XML::SAX::Base. Valid
+    parameters are
+
+   class
+    SAX parser class (defaults to XML::LibXML::SAX)
+
+   start_tag
+    SAX tag name starting the section you are looking for if stream parsing.
+
+   handler
+    Handler function to call when stream parsing.
+
+   start_depth
+    Use this option for picking up sections that occur inside another
+    section with the same tag name. E.g., if you want to get the inside
+    "foo" section in this example:
+
+     <doc><foo><bar><foo>here</foo></bar></foo></doc>
+
+    instead of the one at the top level, set start_depth to 2. This is the
+    number of times your start_tag occurs in the hierarchy before you get to
+    the section you want (not the tag depth).
+
+  "parse($xml)", "parse({ file => $filename })"
+    Parses the given XML and returns a new XML::Parser::Wrapper object using
+    the parse tree output from XML::Parser.
+
+  "get_xml_decl()"
+    Returns information about the XML declaration at the beginning of the
+    document. E.g., for the declaration
+
+     <?xml version="1.0" encoding="utf-8"?>
+
+    The return value is
+
+        {
+         'version' => '1.0',
+         'standalone' => undef,
+         'encoding' => 'utf-8'
+        }
+
+    NOTE: This does not work for the SAX parser interface.
+
+  "get_doctype()"
+    Returns information about the doctype declaration. E.g., for the
+    declaration
+
+     <!DOCTYPE greeting SYSTEM "hello.dtd">
+
+    The return value is
+
+        {
+         'pubid' => undef,
+         'sysid' => 'hello.dtd',
+         'name' => 'greeting',
+         'internal' => ''
+        }
+
+    NOTE: This does not work for the SAX parser interface.
+
+  "name()"
+    Returns the name of the element represented by this object.
+
+    Aliases: tag(), getName(), getTag()
+
+  "is_text()"
+    Returns a true value if this element is a text element, false otherwise.
+
+    Aliases: isText()
+
+  "text()"
+    If this element is a text element, the text is returned. Otherwise,
+    return the text from the first child text element, or undef if there is
+    not one.
+
+    Aliases: content(), getText(), getContent()
+
+  "html()"
+    Like text(), except HTML-escape the text (escape &, <, >, and ") before
+    returning it.
+
+    Aliases: content_html(), getContentHtml()
+
+  "xml()"
+    Like text(), except XML-escape the text (escape &, <, >, and ") before
+    returning it.
+
+    Aliases: content_xml(), getContentXml()
+
+  "to_xml(\%options)"
+    Converts the node back to XML. The ordering of attributes may not be the
+    same as in the original XML, and CDATA sections may become plain text
+    elements, or vice versa. This assumes the data is encoded in utf-8.
+
+    Valid options
+
+   pretty
+    If pretty is a true value, then whitespace is added to the output to
+    make it more human-readable.
+
+   cdata
+    If cdata is defined, any text nodes with length greater than cdata are
+    output as a CDATA section, unless it contains "]]>", in which case the
+    text is XML escaped.
+
+    Aliases: toXml()
+
+   decl
+    If a true value, output an XML declaration before outputing the
+    converted document, i.e.,
+
+     <?xml version="1.0" encoding="UTF-8"?>
+
+  "attributes()", "attributes($name1, $name2, ...)"
+    If no arguments are given, returns a hash of attributes for this
+    element. If arguments are present, an array of corresponding attribute
+    values is returned. Returns an array in array context and an array
+    reference if called in scalar context.
+
+    E.g., for
+
+         <field name="foo" id="42">bar</field>
+
+    use this to get the attributes:
+
+         my ($name, $id) = $element->attributes('name', 'id');
+
+    Aliases: attrs(), getAttributes(), getAttrs()
+
+  "attribute($name)"
+    Similar to attributes(), but only returns one value.
+
+    Aliases: attr(), getAttribute(), getAttr()
+
+  "elements()", "elements($element_name)"
+    Returns an array of child elements. If $element_name is passed, a list
+    of child elements with that name is returned.
+
+    Aliases: getElements(), kids(), getKids(), children(), getChildren()
+
+  "first_element()", "first_element($element_name)"
+    Returns the first child element of this element. If $element_name is
+    passed, returns the first child element with that name is returned.
+
+    Aliases: getFirstElement(), kid(), first_kid()
+
+  "first_element_if($element_name)"
+    Like first_element(), except if there is no corresponding child, return
+    an object that will work instead of undef. This allows for reliable
+    chaining, e.g.
+
+     my $class = $root->kid_if('field')->kid_if('field')->kid_if('element')
+                  ->kid_if('field')->attribute('class');
+
+    Aliases: getFirstElementIf(), kidIf(), first_kid_if()
+
+  "new_doc($root_tag_name, \%attr)"
+    Create a new XML document.
+
+  "new_element($tag_name, \%attr, $text_val)"
+    Create a new XML element object. If $text_val is defined, a child text
+    node will be created.
+
+  "add_kid($tag_name, \%attributes, $text_value)", "add_kid($element_obj)"
+    Adds a child to the current node. If $text_value is defined, it will be
+    used as the text between the opening and closing tags. The return value
+    is the newly created node (XML::Parser::Wrapper object) that can then in
+    turn have child nodes added to it. This is useful for loading and XML
+    file, adding an element, then writing the modified XML back out. Note
+    that all parameters must be valid UTF-8.
+
+    If the first argument is an element object created with the
+    new_element() method, that element will be added as a child.
+
+        my $root = XML::Parser::Wrapper->new($input);
+     
+    my $new_element = $root->add_kid('test4', { attr1 => 'val1' });
+        $new_element->add_kid('child', { myattr => 'stuff' }, 'bleh');
+     
+    my $foo = $root->new_element('foo', { bar => 1 }, 'some text');
+        $new_element->add_kid($foo);
+
+    Aliases: addKid(), add_child, addChild()
+
+  "set_attr($name, $val)"
+    Set the value of the attribute given by $name to $val for the element.
+
+  "set_attrs(\%attrs)"
+    Convenience method that calls set_attr() for each key/value pair in
+    %attrs.
+
+  "replace_attrs(\%attrs)"
+    Replaces all attributes for the element with the provided ones. That is,
+    the old attributes are all removed and the new ones are added.
+
+  "remove_kids()"
+    Removes all child nodes (include text nodes) from this element.
+
+  "remove_kid($name)"
+    Removes the first child node with name $name.
+
+  "set_text($text_val)"
+    Sets the first text child node to $text_val. If there is no text child
+    node, one is created. If $text_val is undef, the first text child node
+    is removed.
+
+  "update_node(\%attrs, $text_val)"
+    Updates the node, setting the attributes to the ones provided in %attrs,
+    and sets the text child node to $text_val if it is defined. Note that
+    this removes all child nodes.
+
+    Aliases: updateNode()
+
+  "update_kid($tag_name, \%attrs, $text_val)"
+    Calls update_node() on the first child node with name $tag_name if it
+    exists. If there is no such child node, one is created by calling
+    add_kid().
+
+    Aliases: updateKid(), update_child(), updateChild()
+
+  "simple_data()"
+    Assume a data structure of hashes, arrays, and strings are represented
+    in the xml with no attributes. Return the data structure, leaving out
+    the root tag.
+
+  "dump_simple_data($data)"
+    The reverse of simple_data() -- return xml representing the data
+    structure passed.
+
+AUTHOR
+    Don Owens <don@regexguy.com>
+
+CONTRIBUTORS
+    David Bushong
+
+COPYRIGHT
+    Copyright (c) 2003-2010 Don Owens
+
+    All rights reserved. This program is free software; you can redistribute
+    it and/or modify it under the same terms as Perl itself.
+
+SEE ALSO
+    XML::Parser
+

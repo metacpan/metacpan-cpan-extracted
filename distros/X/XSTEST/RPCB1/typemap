@@ -1,0 +1,2 @@
+TYPEMAP
+Netconfig *	T_PTROBJ

@@ -1,0 +1,120 @@
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://purl.org/NET/cpan-uri/dist/XML-LibXML-Debugging/project>
+	a                    doap:Project;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap-deps:runtime-requirement [
+		doap-deps:on "HTML::HTML5::Entities"^^doap-deps:CpanId;
+	], [ doap-deps:on "XML::LibXML"^^doap-deps:CpanId ], [ doap-deps:on "parent"^^doap-deps:CpanId ];
+	doap-deps:test-requirement [ doap-deps:on "Test::More 0.61"^^doap-deps:CpanId ];
+	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=XML-LibXML-Debugging>;
+	doap:category        [ rdfs:label "XML" ], [ rdfs:label "Debugging" ];
+	doap:created         "2010-04-26"^^xsd:date;
+	doap:developer       <http://tobyinkster.co.uk/#i>;
+	doap:documenter      <http://tobyinkster.co.uk/#i>;
+	doap:download-page   <https://metacpan.org/release/XML-LibXML-Debugging>;
+	doap:homepage        <https://metacpan.org/release/XML-LibXML-Debugging>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      <http://tobyinkster.co.uk/#i>;
+	doap:name            "XML-LibXML-Debugging";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/XML-LibXML-Debugging/v_0-04>, <http://purl.org/NET/cpan-uri/dist/XML-LibXML-Debugging/v_0-100>, <http://purl.org/NET/cpan-uri/dist/XML-LibXML-Debugging/v_0-101>, <http://purl.org/NET/cpan-uri/dist/XML-LibXML-Debugging/v_0-102>, <http://purl.org/NET/cpan-uri/dist/XML-LibXML-Debugging/v_0-103>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/tobyink/p5-xml-libxml-debugging>;
+	];
+	doap:shortdesc       "get debugging information from XML::LibXML nodes"@en;
+	doap:tester          <http://tobyinkster.co.uk/#i>;
+	rdfs:seeAlso         <http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Sanity/project>.
+
+<http://purl.org/NET/cpan-uri/dist/XML-LibXML-Debugging/v_0-04>
+	a                    doap:Version;
+	rdfs:label           "Fork from HTML-HTML5-Sanity."@en;
+	dc:issued            "2010-04-28"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			rdfs:label "Split the to_hashref and to_clarkml functions out into a separate distribution."@en;
+		], [
+			rdfs:label "Make functions into object methods."@en;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Sanity/v_0-03>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/XML-LibXML-Debugging-0.04.tar.gz>;
+	doap:revision        "0.04"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/XML-LibXML-Debugging/v_0-100>
+	a                    doap:Version;
+	rdfs:label           "We're not dead yet!"@en;
+	dc:issued            "2011-02-09"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [ rdfs:label "Minor refactoring."@en ], [
+			a doap-changeset:Documentation, doap-changeset:Update;
+			rdfs:label "Copyright 2011."@en;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/XML-LibXML-Debugging/v_0-04>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/XML-LibXML-Debugging-0.100.tar.gz>;
+	doap:revision        "0.100"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/XML-LibXML-Debugging/v_0-101>
+	a                    doap:Version;
+	dc:issued            "2011-11-26"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Module::Package::RDF"@en;
+		], [
+			rdfs:label "Switch from HTML::Entities to HTML::HTML5::Entities."@en;
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "Include small example script."@en;
+		], [
+			rdfs:label "Slightly different output for @xmlns in Clark notation."@en;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/XML-LibXML-Debugging/v_0-100>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/XML-LibXML-Debugging-0.101.tar.gz>;
+	doap:revision        "0.101"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/XML-LibXML-Debugging/v_0-102>
+	a                    doap:Version;
+	dc:issued            "2011-12-04"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix, doap-changeset:Packaging;
+			rdfs:label "Newer version of Module::Package::RDF."@en;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/XML-LibXML-Debugging/v_0-101>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/XML-LibXML-Debugging-0.102.tar.gz>;
+	doap:revision        "0.102"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/XML-LibXML-Debugging/v_0-103>
+	a                    doap:Version;
+	dc:identifier        "XML-LibXML-Debugging-0.103"^^xsd:string;
+	dc:issued            "2014-09-11"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Switch to Dist::Inkt.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/XML-LibXML-Debugging-0.103.tar.gz>;
+	doap:revision        "0.103"^^xsd:string.
+
+<http://tobyinkster.co.uk/#i>
+	a                    foaf:Person;
+	foaf:homepage        <http://tobyinkster.co.uk/>;
+	foaf:mbox            <mailto:tobyink@cpan.org>;
+	foaf:name            "Toby Inkster";
+	foaf:page            <https://metacpan.org/author/TOBYINK>;
+	owl:sameAs           <http://purl.org/NET/cpan-uri/person/tobyink>.
+

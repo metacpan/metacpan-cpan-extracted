@@ -1,0 +1,52 @@
+Revision history for XML::CompareML
+
+0.2.10  2015-12-13
+    - Update old E-mail address.
+
+0.2.9   2014-02-01
+    - Minimal version of perl (CPANTS).
+    - Add separate LICENSE file (CPANTS).
+
+0.2.8   2013-08-17
+    - Fix https://rt.cpan.org/Ticket/Display.html?id=87902
+        - «Changing "Repository" to "repository" in Build.PL will allow this
+        metadata to be seen/used».
+
+0.2.7   2013-05-22
+    - Got rid of trailing whitespace.
+        - t/style-trailing-space.t .
+
+0.2.6   2009-11-23
+    - Provided a workaround for testing the code on recent (and older)
+    versions of XML-LibXSLT.
+
+0.2.5   2009-07-17
+    - Added XML::LibXSLT to the dependencies.
+    - Converted Build.PL to use XML::Grammar::Builder.
+    - Enhanced the Build.PL with keywords and resources.
+
+0.2.4   2008-07-12
+    - Added the XSLT stylesheet under extradata/
+    - Adapted Build.PL accordingly.
+    - XML::CompareML::HTML now uses the XSLT stylesheet.
+    - Added support for the <b> (bold) element in HTML text.
+    - Added support for <a> and <b> inside <expl>
+    - Added some tests.
+
+0.2.3   2008-03-18
+    - Now testing XML::CompareML::DocBook.
+    - Added t/pod-coverage.t and made sure we have full test coverage.
+    - Changed the license ID from "bsd" to "mit" which is more accurate.
+    - Moved "Test::More" and "IO::Scalar" to the build_requires.
+    - now generating a Makefile.PL from the Build.PL.
+    - added an example under examples/.
+    - added more dependencies to the Build.PL
+
+0.2.2   2008-02-29
+    - Fixed the die in the last patch to reference the name correctly.
+
+0.2.1   2008-02-29
+    - Implemented <url>, <fullname> and <vendor> elements for the <impl>.
+
+0.2.0   2005-04-12
+    - First CPAN Release

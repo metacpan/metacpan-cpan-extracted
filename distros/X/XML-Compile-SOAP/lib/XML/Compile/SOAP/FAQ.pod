@@ -1,0 +1,215 @@
+=encoding utf8
+
+=head1 NAME
+
+XML::Compile::SOAP::FAQ - frequently asked questions
+
+=head1 DESCRIPTION
+
+On this page, a wild collection of questions are answered related to
+the XML::Compile::SOAP modules.  Or better said: let's hope there will
+be more in the future. If you have contributions either in question or
+as answer, then please contribute via the xml mailinglist.
+
+Also read L<XML::Compile::FAQ|XML::Compile::FAQ>.
+
+=head2 Modifing the messages
+
+=head3 add XML header fields
+
+Although WSDLs offer a nice way to define header-fields explicitly, quite
+a number of applications require fields which are not described. Also
+some W3C standards play this game.  See L<XML::Compile::SOAP::WSA|XML::Compile::SOAP::WSA>
+for a complex example. A simple example follows here.
+
+  use warnings;
+  use strict;
+
+  package XML::Compile::SOAP::MYEXT;
+  use base 'XML::Compile::SOAP::Extension';
+
+  use Log::Report;
+  use XML::Compile::SOAP::Util      qw/WSDL11/;
+  use XML::Compile::Util            qw/pack_type/;
+
+  my $my_ns = 'http://..../';
+  my $my_schema_fie = 'aaa.xsd';
+
+  sub wsdl11Init($@)
+  {   my ($self, $wsdl, $args) = @_;
+      $wsdl->addPrefixes(myprefix => $my_ns);
+      $wsdl->importDefinitions($my_schema_file);
+      $self;
+  }
+
+  sub soap11Operation$$)
+  {   my ($self, $op, $args) = @_;
+      # towards the server
+      $op->addHeader(INPUT
+        => "myprefix_$fieldname" => "{$my_ns}$fieldtype");
+
+      # in server answers
+      $op->addHeader(OUTPUT => ...);
+  }
+
+With C<soap11ClientWrapper()> and C<soap11HandlerWrapper()>
+you can influence the client respectively server processing, for
+instance to fill-in default values.
+
+=head3 adding HTTP headers
+
+Some applications require to add headers to the HTTP headers sent or
+check headers which are received. SOAP is not about HTTP, so you have
+to dive deeper in the underlaying constructs; you have to construct the
+code references in more steps, not using the auto-generation mechanisms
+of some objects, by default hidden to you.
+
+Examples of needs: authentication/cookies in the header, content
+(crypt) checksums, non-standard content-type headers.
+
+The ::WSDL11 module detects that the soap-http protocol is needed.
+(There is also a pure http protocol defined in the SOAP spec, which
+is never used).  When the operation gets compiled (with compileClient),
+the ::SOAPHTTP module is used to create the soap-http specific message
+transport logic. Then, that module uses LWP to do the actual HTTP
+exchange. To be able to access the in- and outgoing messages, you have
+to reach to that LWP::UserAgent.
+
+Michael Ludwig contributed the following example (slightly adapted)
+Of course, select your own preferences carefully.
+
+  my $ua = LWP::UserAgent->new(timeout => 10);
+
+  # First the HTTP logic
+  # defaults when https is used
+  $ua->ssl_opts(verify_hostname => 0, keep_alive => 1);
+
+  # Auto-use cookies
+  $ua->cookie_jar( {file => $my_jar_file
+    , autosave => 1, ignore_discard => 1 });
+
+  # Now, we need the SOAP logic
+  my $trans = XML::Compile::Transport::SOAPHTTP
+    ->new(user_agent => $ua, address => $srv_url);
+
+  # Finally the message, with explicit transporter
+  my $call = $wsdl->compileClient($opname, transport => $trans);
+
+  # Or more operations at the same time
+  # $wsdl->compileCalls(transport => $trans);
+
+  # $answer is the decoded XML content.
+  my($answer, $trace) = $call->( \%parms );
+
+  # If you need headers from the response HTTP headers.
+  my $http_response = $trace->response;
+  print $http_response->header('X-Secret');
+
+You may know the C<$srv_url> to get the address of the server, but
+you can also ask the operation itself. Here a different implementation:
+
+  my $op    = $wsdl->operation($opname);
+  my $srv   = ($op->addresses)[0];
+  my $trans = XML::Compile::Transport::SOAPHTTP->new(address => $srv
+    , timeout => 15, ssl_opts => { verify_hostname => 0 });
+
+  # Now configure the userAgent
+  my $ua    = $trans->userAgent;
+  ...
+
+  my $call  = $op->compileClient(transport => $trans);
+  ...
+
+The L<LWP::UserAgent> has many useful hooks (<i>Handlers</i>), for
+instance C<request_send> and C<response_done>.
+
+Even shorter, The next works as well. In the whole XML::Compile::SOAP
+suite, parameters passed on higher levels are passed to all lower
+levels. Yeh, unclean programming but useful.
+
+  my $ua    = $trans->userAgent;
+  my $call  = $wsdl->compileClient(transport => $trans
+    , user_agent => $ua);
+
+When you only need to add simple authentication to the headers, you
+may use the magic of LWP: provide your server address into
+
+  http://user:password@example.com/service
+
+=head3 add Basic Auth HTTP header
+
+An simple example for the previous section, is the often needed basic
+authentication.  You need something like this:
+
+   my $ua = LWP::UserAgent->new(timeout => 10);
+   my $call = $wsdl->compileClient($operation, user_agent => $ua
+    , transport_hook => \&basic_auth);
+
+   sub basic_auth($$)
+   {   my ($request, $trace) = @_;
+       $request->authorization_basic($user, $password);
+       $ua->request($request);     # returns $response
+   }
+
+That's all.  When you use L<XML::Compile::Cache|XML::Compile::Cache> to maintain the
+calls (advised), it would look like this:
+
+   $wsdl->compileCalls(user_agent => $ua, transport_hook => \&basic_auth);
+
+=head2 Collection XSD imports
+
+From a maintenance point of view, it is a very bad idea that some XML
+client implementations load all the required schemas on the moment they
+start off. The server may change the schemas at any moment, which may
+break the application at any moment. Also, network problems will cause
+the application to break easily. Therefore, XML::Compile requires the
+schemas to be on local disk (although you can use tricks with wget at
+start-up time to voluntarily give-up your stability)
+
+To collect the imported schema files, you may use this (on the
+UNIX/Linux prompt)
+
+  wget -c -nv $(cat * |
+                sed -n 's/.*schemaLocation="\([^"]*\)".*/\1/p' |
+                sort -u)
+
+In your program, you typically start with
+
+  my $wsdl = XML::Compile::WSDL11->new($wsdl_filename);
+  $wsdl->importDefinitions([glob "*.xsd"]);
+
+=head2 Using SSL
+
+Abeltje contributed an SSL usage example, which then got adapted to this:
+
+   use LWP::UserAgent;
+
+   my $wsdl = XML::Compile::WSDL11->new($wsdlfn);
+
+   # LWP 6.00 introduces ssl_opts
+   @ENV{keys %lwp5_ssl} = values %lwp5_ssl
+       if LWP::UserAgent->VERSION < 6;
+   my $ua = LWP::UserAgent->new(ssl_opts => \%lwp6_ssl);
+
+   $wsdl->compileCalls(user_agent => $ua);
+
+Do not forget to explicitly install C<LWP::Protocol::https> !!!
+
+=head1 SEE ALSO
+
+This module is part of XML-Compile-SOAP distribution version 3.21,
+built on January 11, 2017. Website: F<http://perl.overmeer.net/xml-compile/>
+
+Please post questions or ideas to the mailinglist at
+F<http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/xml-compile> .
+For live contact with other developers, visit the C<#xml-compile> channel
+on C<irc.perl.org>.
+
+=head1 LICENSE
+
+Copyrights 2007-2017 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

@@ -1,0 +1,43 @@
+=head1 NAME
+
+XML::Catalog - Resolve public identifiers and remap system identifiers
+
+=head1 SYNOPSIS
+
+  use XML::Catalog;
+  my $catalog=XML::Catalog->new('/xml/catalog.cat');
+  $catalog->add('http://www.w3.org/xcatalog/mastercat.xml');
+  my $sysid=$catalog->resolve_public('-//John Cowan//LOC Diacritics');
+  my $newsysid=$catalog->remap_system('http://www.w3.org');
+  $parser->setHandlers(ExternEnt=>$catalog->get_handler($parser));
+
+=head1 DESCRIPTION
+
+This module implements draft 0.4 of John Cowan's XML Catalog (formerly 
+known as XCatalog) proposal 
+(<http://www.ccil.org/~cowan/XML/XCatalog.html>).  Catalogs may be written 
+in either SOCAT or XML syntax (see the proposal for syntax details); 
+XML::Catalog will assume SOCAT syntax if the catalog is not in well-formed 
+XML syntax.
+
+This module, as of 1.0.0, also supports Oasis XML catalogs.
+
+=head1 AUTHOR
+
+Current Author:
+
+	Jeff Fearn E<lt>jfearn@cpan.orgE<gt>.
+
+Former Authors:
+
+	Eric Bohlman (ebohlman@netcom.com)
+
+=head1 COPYRIGHT
+
+Copyright (c) 1999-2000 Eric Bohlman.  All rights reserved.
+Copyright (c) 2013 Jeff Fearn. All rights reserved.
+
+This program is free software; you can use/modify/redistribute it under the 
+same terms as Perl itself.
+
+=cut

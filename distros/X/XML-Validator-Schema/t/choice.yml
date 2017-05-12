@@ -1,0 +1,52 @@
+# simple choice test
+
+--- |
+  <?xml version="1.0" encoding="UTF-8"?>
+  <schema xmlns="http://www.w3.org/2001/XMLSchema">
+    <element name="foo">
+      <complexType>
+        <choice>
+          <element name="this" />
+          <element name="that" />
+          <element name="other"/>
+        </choice>
+      </complexType>
+    </element>
+  </schema>
+
+--- |
+  <foo>
+    <this/>
+  </foo>
+--- >
+PASS
+
+--- |
+  <foo>
+    <that/>
+  </foo>
+--- >
+PASS
+
+--- |
+  <foo>
+    <other/>
+  </foo>
+--- >
+PASS
+
+--- |
+  <foo>
+    <this/>
+    <that/>
+  </foo>
+--- >
+FAIL /'that' does not match/
+
+--- |
+  <foo>
+    <that/>
+    <other/>
+  </foo>
+--- >
+FAIL

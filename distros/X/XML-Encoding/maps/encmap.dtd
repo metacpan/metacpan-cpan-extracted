@@ -1,0 +1,129 @@
+<!--
+	This is a document type declaration (DTD) for the mapping
+	of a character set encoding to Unicode. Documents of this type are
+	used by the perl module XML::Parser to register character encodings.
+
+	This dtd is provided for informational purposes only. XML::Parser
+	doesn't read it.
+
+	Author:	  Clark Cooper <coopercc@netheaven.com>
+	Date:     $Date: 1998/12/15 01:55:45 $
+	Revision: $Revision: 1.1.1.1 $
+-->
+
+<!--
+	encmap
+
+	The expat attribute must be set to 'yes' in order for XML::Parser
+	to load the encoding. When this is set, it implies the following
+	restrictions on the encoding, which are required by the expat
+	library.
+
+	================
+	I quote these restrictions from the xmlparse.h file in the
+	expat distribution:
+
+	1. Every ASCII character that can appear in a well-formed XML
+	   document other than the characters
+
+	     $@\^`{}~
+
+	   must be represented by a single byte, and that byte must be
+	   the same byte that represents that character in ASCII.
+
+	2. No character may require more than 4 bytes to encode.
+
+	3. All characters encoded must have Unicode scalar values <= 0xFFFF,
+	   (ie characters that would be encoded by surrogates in UTF-16
+	   are  not allowed).  Note that this restriction doesn't apply to
+	   the built-in support for UTF-8 and UTF-16.
+
+	4. No Unicode character may be encoded by more than one distinct
+	   sequence of bytes.
+
+	In addition, the number of bytes in mult-byte encodings must be
+	determined from the 1st byte. The encoding of the 1st byte is
+	assumed to be ASCII for byte values < 128, although this assumed
+	value may be overridden for the set of characters mentioned above.
+	Trying to override any other character in the ASCII set is an error.
+
+	The 1st requirement implies that a uniform 2-byte encoding can't be
+	mapped using this mechanism.
+
+	================
+
+	In XML::Parser, the string provided by the name attribute is used
+	to refer to this encoding.
+
+-->
+<!ELEMENT encmap ((prefix|range|ch)+)>
+<!ATTLIST encmap
+	name		CDATA		#REQUIRED
+	expat		(yes|no)	'no'
+	>
+
+<!--
+	prefix
+
+	Groups together encodings that have the same prefix. The
+	actual prefix is a concatenation of all the containing prefix
+	elements. So the following:
+
+	<prefix byte="x9A">
+	  <prefix byte="x23">
+	    <ch byte="x77" uni="x2375"/>
+	  </prefix>
+	</prefix>
+
+	Maps the byte sequence '9A 23 77' to U+2375. Note that in
+	expat mode, all encodings under a given prefix must have
+	the same length. This implies that sibling prefixes below
+	top level must have parallel structure.
+-->
+<!ELEMENT prefix ((prefix|range|ch)+)>
+<!ATTLIST prefix
+	byte		CDATA		#REQUIRED
+	>
+
+<!--
+	range
+
+	Maps a range of characters in the encoding that have
+	have the same relative positions in the Unicode scalar value
+	as they do in their final encoding bytes. A range may not
+	cross a byte boundary.
+
+	All three attributes take numeric values expressed either
+	in decimal (just the digits 0-9) or hex (x followed by hex
+	digits 0-9a-f, case ignored).
+
+	The start attribute is the value of the final byte of the
+	starting character in the range.
+
+	The length attribute is the size of the range. This value
+	plus the start value must be less than 256.
+
+	The uni attribute is the scalar value of the Unicode
+	character that corresponds to the start character. This value
+	must be 0xFFFF or less, and the sum of the uni and len attributes
+	must also be 0xFFFF or less.
+-->
+<!ELEMENT range EMPTY>
+<!ATTLIST range
+	  byte		CDATA		#REQUIRED
+	  uni		CDATA		#REQUIRED
+	  len		CDATA		#REQUIRED
+	>
+
+<!--
+	ch
+
+	Maps the byte, with the current prefix, to the given Unicode scalar
+	value. Both attributes are constrained the same way as the
+	corresponding attribues of the range element.
+-->
+<!ELEMENT ch EMPTY>
+<!ATTLIST ch
+	byte		CDATA		#REQUIRED
+	uni		CDATA		#REQUIRED
+	>

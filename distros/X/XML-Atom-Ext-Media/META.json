@@ -1,0 +1,24 @@
+{
+   "resources" : {
+      "repository" : "http://github.com/omega/xml-atom-ext-media"
+   },
+   "meta-spec" : {
+      "version" : 1.4,
+      "url" : "http://module-build.sourceforge.net/META-spec-v1.4.html"
+   },
+   "generated_by" : "Dist::Zilla version 1.092680",
+   "version" : "0.092840",
+   "name" : "XML-Atom-Ext-Media",
+   "author" : [
+      "Andreas Marienborg <andremar@cpan.org>"
+   ],
+   "license" : "perl",
+   "requires" : {
+      "base" : "0",
+      "XML::Atom::Feed" : "0",
+      "Test::More" : "0.92",
+      "ok" : "0",
+      "ExtUtils::MakeMaker" : 0
+   },
+   "abstract" : "An XML::Atom extenstion for the yahoo Media RSS extension"
+}

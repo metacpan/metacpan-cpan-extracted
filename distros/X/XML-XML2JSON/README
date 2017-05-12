@@ -1,0 +1,39 @@
+XML-XML2JSON
+============
+
+INSTALLATION
+
+To install this module type the following:
+
+	perl Makefile.PL --defaultdeps
+	make
+	make test
+	make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+	XML::LibXML;
+   
+You must also have a JSON module installed.
+Currently supports:
+
+	JSON::Syck 
+	JSON::XS 
+	JSON
+	JSON::DWIW
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2007-2008 Ken Prows
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.6.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+DISCLAIMER
+
+THIS PROGRAM IS DISTRIBUTED IN THE HOPE THAT IT WILL BE USEFUL, BUT WITHOUT ANY
+WARRANTY; WITHOUT EVEN THE IMPLIED WARRANTY OF MERCHANTABILITY OR FITNESS FOR A
+PARTICULAR PURPOSE.

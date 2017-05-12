@@ -1,0 +1,124 @@
+<?xml version="1.0"?>
+<!DOCTYPE RTML SYSTEM "http://astro.livjm.ac.uk/HaGS/rtml2.1.dtd" >
+<RTML version="2.1" type="request">
+    <Contact PI="true">
+        <User>je</User>
+	<Name>Jason Etherton</Name>
+	<Institution>
+	    Liverpool John Moores University
+	</Institution>
+	<Email>
+	    je@astro.livjm.ac.uk
+	</Email>
+    </Contact>
+    <IntelligentAgent host="ltobs5.livjm.ac.uk" port="1234">
+        IATEST0001:CT1:0004
+    </IntelligentAgent>
+    <Project>
+        <Title>
+	    Demonstration RTML document.
+        </Title>
+	<Abstract>
+	    This project is designed to test the RTML parsing modules.
+	</Abstract>
+    </Project>
+    <Telescope region="optical" alias="eSTAR">
+	<Name>
+	    eSTAR Telescope
+	</Name>
+	<Aperture units="meters">
+	    0.2
+	</Aperture>
+	<FocalRatio units="metres">
+	    f/10
+	</FocalRatio>
+    </Telescope>
+    <Location>
+	<Name>
+	    Astrohphysics Research Institute.
+	</Name>
+	<Longitude format="sddd mm ss E" units="dms">
+	    -003 04 00 E
+	</Longitude>
+	<Latitude format="sdd mm ss" unit="dms">
+	    +53 23 00
+	</Latitude>
+	<Altitude units="metres">
+	    10
+	</Altitude>
+    </Location>
+    <Observation status="ok">
+	<Target type="normal" ident="Observation">
+	    <TargetName>
+	        Test Target 2
+	    </TargetName>
+	    <Coordinates type="equatorial">
+	        <RightAscension format="hh mm ss.s" units="hms">
+		    23 10 20.7
+	        </RightAscension>
+
+		<Declination format="sdd mm ss.s" units="dms">		
+		    -04 56 12.7
+		</Declination>
+
+		<Equinox>
+		    J2000
+		</Equinox>
+
+		<Epoch>
+		    2000.0
+		</Epoch>
+	    </Coordinates>
+
+	    <TrackRate type="sidereal" />
+
+	    <Device name="MX916" region="optical" type="camera">
+	        Starlight Express Mx916
+		<Filter>
+		    <FilterType type="clear" />
+		</Filter>
+	    </Device>
+	</Target>
+
+	<Schedule priority="3">
+	    No binning.
+
+	    <Exposure type="time" units="msec">
+	        11.0
+	    </Exposure>
+
+	    <ExposureFactor>
+	        0.0
+	    </ExposureFactor>
+
+	    <TimeConstraint>
+	        <StartDateTime>
+		    2001-10-31T23:00:00
+	        </StartDateTime>
+	        <EndDateTime>
+		    2002-11-30T23:00:00
+	        </EndDateTime>
+	    </TimeConstraint>
+
+	</Schedule>
+
+	<Calibration>
+	    <Bias correct="false" overscan="true" mean="true" />
+
+	    <DarkCurrent correct="false" />
+
+	    <BadPixels correct="false" />
+
+	    <FlatField correct="false" sky="true" dome="true" />
+
+	    <Fringing correct="false" />
+
+	    <CosmicRays correct="false" />
+	</Calibration>
+
+	<ImageData type="FITS16" compressed="gzip" delivery="ftp">
+	    Possibly the URL of the reduced data file.
+	</ImageData>
+    </Observation>
+
+</RTML>

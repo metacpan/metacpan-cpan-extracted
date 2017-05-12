@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>[% view.title %]</title>
+[% INCLUDE meta.inc %]
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="/css/flexiable-grids.css" rel="stylesheet" type="text/css" />
+    <!--[if lte IE 7]>
+    <link href="/yaml/core/iehacks.min.css" rel="stylesheet" type="text/css" />
+    <![endif]-->
+    <!--[if lt IE 9]>
+    <script src="/yaml/lib/html5shiv/html5shiv.js"></script>
+    <![endif]-->
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+    <script type="text/javascript" src="/js/links.js"></script>
+  </head>
+  <body>
+    <ul class="ym-skiplinks">
+      <li><a class="ym-skip" href="#nav">Skip to navigation (Press Enter)</a></li>
+      <li><a class="ym-skip" href="#main">Skip to main content (Press Enter)</a></li>
+    </ul>
+    <header>
+      <div class="ym-wrapper">
+        <div class="ym-wbox">
+          <h1>[% view.title %]</h1>
+          <h6>[% view.description %]</h6>
+        </div>
+      </div>
+    </header>
+[%- PROCESS navigation.tt -%]
+    <main>
+      <div class="ym-wrapper">
+        <div class="ym-column linearize-level-1">
+          <div class="ym-col1">
+            <div class="ym-cbox">
+[%- PROCESS vmenu.tt -%]
+            </div>
+          </div>
+          <div class="ym-col3">
+            <div class="ym-cbox">
+[%- INCLUDE $view.template -%]
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+    <footer>
+[% INCLUDE footer.inc -%]
+    </footer>
+  </body>
+</html>

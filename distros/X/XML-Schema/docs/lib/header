@@ -1,0 +1,16 @@
+[%  DEFAULT page.title = template.title or site.title;
+    INCLUDE html/header 
+	title = page.title
+-%]
+[% img = uplink ? "$uplink/images" : 'images' %]
+[% ndx = uplink ? "$uplink/index.html" : 'index.html' %]
+<table border="0" width="100%">
+<tr>
+<td align="left"><a href="[% ndx %]"><img src="[% img %]/canon.gif" border="0"></a></td>
+<td align="right"><img src="[% img %]/canre.gif"></td>
+</tr>
+</table>
+<div align="right">
+<small><a href="[% ndx %]">XML Schema Home</a></small>
+</div>
+

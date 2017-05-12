@@ -1,0 +1,149 @@
+# real-world schema from a CMS
+
+--- |
+ <?xml version="1.0" encoding="UTF-8"?>
+ <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="unqualified" attributeFormDefault="unqualified">
+   <xs:element name="story">
+     <xs:complexType>
+       <xs:sequence>
+         <xs:element name="story_id" type="xs:int"/>
+         <xs:element name="class">
+           <xs:simpleType>
+             <xs:restriction base="xs:string">
+               <xs:minLength value="1"/>
+             </xs:restriction>
+           </xs:simpleType>
+         </xs:element>
+         <xs:element name="title">
+           <xs:simpleType>
+             <xs:restriction base="xs:string">
+               <xs:minLength value="1"/>
+             </xs:restriction>
+           </xs:simpleType>
+         </xs:element>
+         <xs:element name="slug" type="xs:string"/>
+         <xs:element name="version">
+           <xs:simpleType>
+             <xs:restriction base="xs:int">
+               <xs:minInclusive value="1"/>
+             </xs:restriction>
+           </xs:simpleType>
+         </xs:element>
+         <xs:element name="published_version" type="xs:int" minOccurs="0"/>
+         <xs:element name="cover_date" type="xs:dateTime"/>
+         <xs:element name="publish_date" type="xs:dateTime" minOccurs="0"/>
+         <xs:element name="priority"/>
+         <xs:element name="notes"/>
+         <xs:element name="category_id" type="xs:int" maxOccurs="unbounded"/>
+         <xs:element name="url" maxOccurs="unbounded">
+           <xs:simpleType>
+             <xs:restriction base="xs:string">
+               <xs:minLength value="1"/>
+             </xs:restriction>
+           </xs:simpleType>
+         </xs:element>
+         <xs:element name="contrib" minOccurs="0" maxOccurs="unbounded">
+           <xs:complexType>
+             <xs:sequence>
+               <xs:element name="contrib_id" type="xs:int"/>
+               <xs:element name="contrib_type">
+                 <xs:simpleType>
+                   <xs:restriction base="xs:string">
+                     <xs:minLength value="1"/>
+                   </xs:restriction>
+                 </xs:simpleType>
+               </xs:element>
+             </xs:sequence>
+           </xs:complexType>
+         </xs:element>
+         <xs:element name="element" type="element_type"/>
+       </xs:sequence>
+     </xs:complexType>
+   </xs:element>
+   <xs:complexType name="element_type">
+     <xs:sequence>
+       <xs:element name="class">
+         <xs:simpleType>
+           <xs:restriction base="xs:string">
+             <xs:minLength value="1"/>
+           </xs:restriction>
+         </xs:simpleType>
+       </xs:element>
+       <xs:element name="data" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+       <xs:element name="element" type="element_type" minOccurs="0" maxOccurs="unbounded"/>
+     </xs:sequence>
+   </xs:complexType>
+ </xs:schema>
+
+--- |
+ <?xml version="1.0" encoding="UTF-8"?>
+
+ <story xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="story.xsd">
+     <story_id>100</story_id>
+     <class>cover</class>
+     <title>Bernstein Infrastructure Ebbing</title>
+     <slug>bogeymen</slug>
+     <version>1</version>
+     <cover_date>2020-03-24T00:00:00</cover_date>
+     <priority>2</priority>
+     <notes></notes>
+     <category_id>96</category_id>
+     <category_id>97</category_id>
+     <url>equilibrium.kra/semblance/</url>
+     <url>equilibrium.kra/resemblance/</url>
+     <element>
+         <class>cover</class>
+         <data></data>
+         <element>
+             <class>metadata_title</class>
+             <data>acquaints oleander samson eyeglass</data>
+         </element>
+         <element>
+             <class>metadata_description</class>
+             <data>rattlers alfred empty reflecting evasive subsequently grievers construing checks floppies infringe intermediate cytology apologia aggressions planned powdery notoriously blatz incidental prover blower coarsened rioters schematics garcia insertions slyly referee ran asses incrementing incompetent tilted planners final ravages stomp bookmark contained buyers actualities runaway jonas counterfeited gatherings</data>
+         </element>
+         <element>
+             <class>cover_page</class>
+             <data></data>
+             <element>
+                 <class>double_column</class>
+                 <data></data>
+                 <element>
+                     <class>left_column</class>
+                     <data></data>
+                     <element>
+                         <class>lead_in</class>
+                         <data>50</data>
+                     </element>
+                     <element>
+                         <class>lead_in</class>
+                         <data>62</data>
+                     </element>
+                 </element>
+                 <element>
+                     <class>right_column</class>
+                     <data></data>
+                     <element>
+                         <class>image</class>
+                         <data></data>
+                         <element>
+                             <class>alignment</class>
+                             <data>Left</data>
+                         </element>
+                         <element>
+                             <class>media</class>
+                             <data>46</data>
+                         </element>
+                     </element>
+                     <element>
+                         <class>lead_in</class>
+                         <data>87</data>
+                     </element>
+                 </element>
+             </element>
+         </element>
+     </element>
+ </story>
+
+--- >
+PASS

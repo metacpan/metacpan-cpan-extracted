@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<catalog>
+    <book id="book1" delete="me">
+        <author>Damian Conway</author>
+        <title>Perl Best Practices</title>
+        <author>Delete Me!</author>
+        <isbn>9780596001735</isbn>
+    </book>
+    <book id="book2" delete="me">
+        <author>Larry Wall</author>
+        <author>Tom Christiansen</author>
+        <title>Programming Perl: There's More Than One Way To Do It</title>
+        <isbn>9780596000271</isbn>
+    </book>
+    <book id="book3">
+        <author>Elliotte Rusty Harold</author>
+        <author>W. Scott Means</author>
+        <title>XML in a Nutshell: A Desktop Quick Reference</title>
+        <isbn>9780596007645</isbn>
+    </book>
+    <book id="book5">
+        <author>Adobe Systems Inc</author>
+        <title>PostScript(R) Language Tutorial and Cookbook (APL)</title>
+        <isbn>9780201101799</isbn>
+    </book>
+</catalog>

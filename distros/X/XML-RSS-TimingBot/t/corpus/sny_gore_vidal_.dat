@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="iso-8859-1" ?> 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://purl.org/rss/1.0/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:taxo="http://purl.org/rss/1.0/modules/taxonomy/">
+<image>
+<title>Yahoo! News</title>
+<width>142</width>
+<height>18</height>
+<link>http://news.yahoo.com/</link>
+<url>http://us.i1.yimg.com/us.yimg.com/i/us/nws/th/main_142.gif</url>
+</image>
+<channel rdf:about="http://news.yahoo.com/rss">
+<title>Yahoo! News - Search Results for %26quot%3Bgore+vidal%26quot%3B</title>
+<link>http://search.news.yahoo.com/search/news/?c=&amp;p=%26quot%3Bgore+vidal%26quot%3B</link><description>Yahoo! News - Search Results for %26quot%3Bgore+vidal%26quot%3B</description>
+<language>en-us</language>
+<lastBuildDate>Tue, 09 Mar 2004 09:42:04 GMT</lastBuildDate>
+<ttl>5</ttl>
+<items>
+<rdf:Seq>
+<li rdf:resource="http://us.rd.yahoo.com/dailynews/rss/search/%26quot%3Bgore+vidal%26quot%3B/*http://story.news.yahoo.com/news?tmpl=story&amp;u=/variety/20040309/va_ne_al/_myra__makers_make_up_for_rancor_1" /><li rdf:resource="http://us.rd.yahoo.com/dailynews/rss/search/%26quot%3Bgore+vidal%26quot%3B/*http://story.news.yahoo.com/news?tmpl=story&amp;u=/variety/20040309/va_ne_al/gray_s_body_pulled_from_gotham_s_east_1" /><li rdf:resource="http://us.rd.yahoo.com/dailynews/rss/search/%26quot%3Bgore+vidal%26quot%3B/*http://story.news.yahoo.com/news?tmpl=story&amp;u=/eo/20040309/en_celeb_eo/13655" /><li rdf:resource="http://us.rd.yahoo.com/dailynews/rss/search/%26quot%3Bgore+vidal%26quot%3B/*http://story.news.yahoo.com/news?tmpl=story&amp;u=/ap/20040308/ap_on_en_mo/obit_gray_6" /><li rdf:resource="http://us.rd.yahoo.com/dailynews/rss/search/%26quot%3Bgore+vidal%26quot%3B/*http://story.news.yahoo.com/news?tmpl=story&amp;u=/playbill/20040308/en_playbill/84806" /></rdf:Seq>
+</items>
+</channel>
+ 
+<item rdf:about="http://us.rd.yahoo.com/dailynews/rss/search/%26quot%3Bgore+vidal%26quot%3B/*"><title><![CDATA['Myra' makers make up for rancor (Variety)]]></title><link>http://us.rd.yahoo.com/dailynews/rss/search/%26quot%3Bgore+vidal%26quot%3B/*http://story.news.yahoo.com/news?tmpl=story&amp;u=/variety/20040309/va_ne_al/_myra__makers_make_up_for_rancor_1</link><pubDate>Tue, 09 Mar 2004 00:00:00 GMT</pubDate><description><![CDATA[...&quot; author &lt;b&gt;Gore Vidal&lt;/b&gt; &quot;has forgiven me for making this picture....]]></description></item><item rdf:about="http://us.rd.yahoo.com/dailynews/rss/search/%26quot%3Bgore+vidal%26quot%3B/*"><title><![CDATA[Gray's body pulled from Gotham's East River (Variety)]]></title><link>http://us.rd.yahoo.com/dailynews/rss/search/%26quot%3Bgore+vidal%26quot%3B/*http://story.news.yahoo.com/news?tmpl=story&amp;u=/variety/20040309/va_ne_al/gray_s_body_pulled_from_gotham_s_east_1</link><pubDate>Tue, 09 Mar 2004 00:00:00 GMT</pubDate><description><![CDATA[...&quot; In fall 2000, Gray returned to Broadway in a revival of &lt;b&gt;Gore Vidal&lt;/b&gt;'s &quot;The Best Man....]]></description></item><item rdf:about="http://us.rd.yahoo.com/dailynews/rss/search/%26quot%3Bgore+vidal%26quot%3B/*"><title><![CDATA[Spalding Gray's Body Found (E! Online)]]></title><link>http://us.rd.yahoo.com/dailynews/rss/search/%26quot%3Bgore+vidal%26quot%3B/*http://story.news.yahoo.com/news?tmpl=story&amp;u=/eo/20040309/en_celeb_eo/13655</link><pubDate>Tue, 09 Mar 2004 00:15:00 GMT</pubDate><description><![CDATA[... in which he played the stage manager, and the 2000 revival of &lt;b&gt;Gore Vidal&lt;/b&gt;'s political drama The Best Man....]]></description></item><item rdf:about="http://us.rd.yahoo.com/dailynews/rss/search/%26quot%3Bgore+vidal%26quot%3B/*"><title><![CDATA[Spalding Gray's Body Found in East River (AP)]]></title><link>http://us.rd.yahoo.com/dailynews/rss/search/%26quot%3Bgore+vidal%26quot%3B/*http://story.news.yahoo.com/news?tmpl=story&amp;u=/ap/20040308/ap_on_en_mo/obit_gray_6</link><pubDate>Mon, 08 Mar 2004 22:34:27 GMT</pubDate><description><![CDATA[...In 2000, he was in the less-acclaimed revival of &lt;b&gt;Gore Vidal&lt;/b&gt;'s 1960 political drama, &quot;The Best Man....]]></description></item><item rdf:about="http://us.rd.yahoo.com/dailynews/rss/search/%26quot%3Bgore+vidal%26quot%3B/*"><title><![CDATA[Police Suspect Found Body May Be Missing Spalding Gray (Playbill)]]></title><link>http://us.rd.yahoo.com/dailynews/rss/search/%26quot%3Bgore+vidal%26quot%3B/*http://story.news.yahoo.com/news?tmpl=story&amp;u=/playbill/20040308/en_playbill/84806</link><pubDate>Mon, 08 Mar 2004 20:56:52 GMT</pubDate><description><![CDATA[...He last performed on Broadway in another writer's work on Broadway - &lt;b&gt;Gore Vidal&lt;/b&gt;'s The Best Man....]]></description></item> 
+</rdf:RDF>

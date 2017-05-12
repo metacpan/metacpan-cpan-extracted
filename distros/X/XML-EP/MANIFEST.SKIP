@@ -1,0 +1,7 @@
+~$
+^Makefile(\.old)?$
+^lib/XML/EP/Config.pm$
+^xmlep$
+^blib/
+^pm_to_blib$
+^XML-EP-\d+\.\d+(/|\.tar\.gz$)

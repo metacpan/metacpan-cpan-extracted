@@ -1,0 +1,22 @@
+README
+LICENSE
+Changes
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+lib/XML/SAX/Simple.pm
+t/00-load.t
+t/1_XMLin.t
+t/1_XMLin.xml
+t/2_XMLout.t
+t/3_Storable.t
+t/4_MemShare.t
+t/5_MemCopy.t
+t/6_ObjIntf.t
+t/pod.t
+t/desertnet.src
+t/subdir/test2.xml
+t/srt.xml
+t/test1.xml
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

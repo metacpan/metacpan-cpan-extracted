@@ -1,0 +1,28 @@
+[%#                                                    -%]
+[%# File: error.tt                                     -%]
+[%# Date: 20-Apr-2016                                  -%]
+[%# By  : Kevin Esteb                                  -%]
+[%#                                                    -%]
+[%# invoke INCLUDE error.tt errors = <variable>        -%]
+[%#                                                    -%]
+[%# USE dumper(ident=>0, pad=>"<br>") -%]
+[%# dumper.dump(data)                 -%]
+[%- FOREACH error IN errors %]
+<table class="bordertable">
+  <caption>[% error.title %]</caption>
+  <tbody>
+    <tr>
+      <td>Status</td>
+      <td>[% error.status %]</td>
+    </tr>
+    <tr>
+      <td>Type</td>
+      <td>[% error.code %]</td>
+    </tr>
+    <tr>
+      <td>Message</td>
+      <td>[% error.detail %]</td>
+    </tr>
+  </tbody>
+</table>
+[% END -%]

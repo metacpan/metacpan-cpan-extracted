@@ -1,0 +1,18 @@
+--- #YAML:1.0
+name:                XML-Validator-Schema
+version:             1.10
+abstract:            validate XML against a subset of W3C XML Schema
+license:             ~
+author:              
+    - Sam Tregar <sam@tregar.com>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Carp:                          0
+    Test::More:                    0.47
+    Tree::DAG_Node:                0
+    XML::Filter::BufferText:       0
+    XML::SAX:                      0.12
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

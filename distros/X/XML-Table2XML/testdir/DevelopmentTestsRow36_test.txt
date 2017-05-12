@@ -1,0 +1,26 @@
+DBs
+/cc	/fp	/pc	/table	/a/#id	/a/f	/a/t	/c/#id	/c/connID	/co/#id	/co/f/a	/co/f/fk	/co/f/fl	/co/f/ft	/co/f/l	/co/f/n	/co/f/o	/co/f/pk	/ec/#id	/ec	/z
+0	Wahr	1	EMPLOYEES	1	Wahr	15														
+0	Wahr	1	EMPLOYEES	2	Wahr	15														
+0	Wahr	1	EMPLOYEES	3	Wahr	15														
+0	Wahr	1	EMPLOYEES				1	ORACLE												
+0	Wahr	1	EMPLOYEES				2	ORACLE												
+0	Wahr	1	EMPLOYEES				3	ORACLE												
+0	Wahr	1	EMPLOYEES						1	Numeric					*EMPLOYEE_ID		Y			
+0	Wahr	1	EMPLOYEES						2	VarChar					FIRST_n					
+0	Wahr	1	EMPLOYEES						3	VarChar					*LAST_n					
+0	Wahr	1	EMPLOYEES						4	VarChar					*EMAIL					
+0	Wahr	1	EMPLOYEES						5	VarChar					PHONE_NUMBER					
+0	Wahr	1	EMPLOYEES						6	DBTimeStamp					*HIRE_DATE					
+0	Wahr	1	EMPLOYEES						7	VarChar	JOB_ID	JOB_TITLE	hr.JOBS	SELECT JOB_TITLE,JOB_ID FROM HR.JOBS ORDER BY JOB_TITLE	*JOB_ID	Y				
+0	Wahr	1	EMPLOYEES						8	Numeric	TESTID	TESTn	BUMSTI.TEST	SELECT TESTn SALARY,TESTID FROM TEST ORDER BY TESTn	SALARY	Y				
+0	Wahr	1	EMPLOYEES						9	Numeric					COMMISSION_PCT					
+0	Wahr	1	EMPLOYEES						10	Numeric	EMPLOYEE_ID	FIRST_n	HR.EMPLOYEES	SELECT LAST_n || ' ' || FIRST_n MANAGER_ID,EMPLOYEE_ID FROM EMPLOYEES ORDER BY FIRST_n	MANAGER_ID	Y				
+0	Wahr	1	EMPLOYEES						11	Numeric	DEPARTMENT_ID	DEPARTMENT_n	HR.DEPARTMENTS	SELECT DEPARTMENT_n,DEPARTMENT_ID FROM DEPARTMENTS ORDER BY DEPARTMENT_n	DEPARTMENT_ID	Y				
+0	Wahr	1	EMPLOYEES															1	Falsch	
+0	Wahr	1	EMPLOYEES															2	Falsch	
+0	Wahr	1	EMPLOYEES															3	Falsch	
+0	Wahr	1	EMPLOYEES																	asdasd2
+0	Wahr	1	EMPLOYEES																	asdasd3
+0	Wahr	1	EMPLOYEES																	asdasd4
+

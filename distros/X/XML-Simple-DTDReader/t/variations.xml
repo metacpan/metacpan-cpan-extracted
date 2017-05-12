@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE collection [
+  <!ELEMENT collection (variation+)>
+  <!ELEMENT variation (layout, colors, credit)>
+  <!ATTLIST variation id ID #REQUIRED>
+  <!ELEMENT layout (image, spotlight, navigation, mit?)>
+  <!ELEMENT image     (location, url)>
+    <!ELEMENT location  (id|(x,y))>
+    <!ELEMENT url       (#PCDATA)>
+  <!ELEMENT spotlight  (id|(x,y))>
+  <!ELEMENT navigation (id|(x,y))>
+  <!ELEMENT mit (id|(x,y))>
+  <!ELEMENT id (#PCDATA)>
+  <!ELEMENT x (#PCDATA)>
+  <!ELEMENT y (#PCDATA)>
+  <!ELEMENT colors    (text,textfocus,textclick,textvisited,headline)>
+    <!ELEMENT text        (#PCDATA)> 
+    <!ELEMENT textfocus   (#PCDATA)> 
+    <!ELEMENT textclick   (#PCDATA)> 
+    <!ELEMENT textvisited (#PCDATA)> 
+    <!ELEMENT headline    (#PCDATA)> 
+  <!ELEMENT credit (#PCDATA)>
+]>
+<collection>
+  <variation id="working">
+    <layout>
+      <image>
+        <location><id>img-all</id></location>
+        <url>images/variation/working.gif</url>
+      </image>
+      <spotlight><x>68px</x><y>197px</y></spotlight>
+      <navigation><id>right</id></navigation>
+    </layout>
+    <colors>
+      <text>#666666</text>
+      <textfocus>#669900</textfocus>
+      <textclick>#ff0000</textclick>
+      <textvisited>#669999</textvisited>
+      <headline>#ff3300</headline>
+    </colors>
+    <credit>alex</credit>
+  </variation>
+  <variation id="switch">
+    <layout>
+      <image>
+        <location><x>152px</x><y>206px</y></location>
+        <url>images/variation/switch.gif</url>
+      </image>
+      <spotlight><x>100px</x><y>100px</y></spotlight>
+      <navigation><id>right</id></navigation>
+    </layout>
+    <colors>
+      <text>#666666</text>
+      <textfocus>#669900</textfocus>
+      <textclick>#ff0000</textclick>
+      <textvisited>#669999</textvisited>
+      <headline>#ff3300</headline>
+    </colors>
+    <credit>ben</credit>
+  </variation>
+</collection>

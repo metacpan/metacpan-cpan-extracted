@@ -1,0 +1,56 @@
+{
+   "abstract" : "Create a full-screen window with Xlib",
+   "author" : [
+      "Stephen Nelson <stephenenelson@mac.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.132140",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "X11-FullScreen",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Devel::CheckLib" : "1.01",
+            "ExtUtils::PkgConfig" : "1.14",
+            "Module::Build" : "0.3601"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "FindBin" : "0",
+            "XSLoader" : "0",
+            "lib" : "0",
+            "perl" : "v5.10.0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Kwalitee" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/stephenenelson/x11-fullscreen",
+         "web" : "https://github.com/stephenenelson/x11-fullscreen"
+      }
+   },
+   "version" : "0.994"
+}
+

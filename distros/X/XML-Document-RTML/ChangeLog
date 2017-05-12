@@ -1,0 +1,32 @@
+2006-11-18 Alasdair Allan <aa@astro.ex.ac.uk> (Version 1.16)
+
+	* RTML.pm: Major bug fixed, now parses messages with only
+	  one <ImageData> tag, used ForceArray => ["ImageData"] to
+	  fix this problem. Was previously assuming multiple tags.
+	  
+2006-11-17 Alasdair Allan <aa@astro.ex.ac.uk> (Version 1.14)
+
+	* RTML.pm: Numerous bug fixes, packaged for shipping.
+	
+	* t/*: Reached 100% test coverage?
+	
+2006-11-16 Alasdair Allan <aa@astro.ex.ac.uk> 
+
+	* RTML.pm: Lots of bug fixes, some odd corner cases fixed.
+	
+	* t/*: Increased test coverage
+	
+2006-11-15 Alasdair Allan <aa@astro.ex.ac.uk> 
+
+	* RTML.pm: Working build, able to parse a valid document and 
+	  replicate this using the build() function. Needs more test
+	  coverage.
+	  
+2006-11-14 Alasdair Allan <aa@astro.ex.ac.uk> 
+
+	* RTML.pm: Working parsing routine for RTML 2.2 documents, needs
+	  more tests as test coverage is still fairly poor.
+	  
+2006-11-13 Alasdair Allan <aa@astro.ex.ac.uk> 
+
+        * Original version.

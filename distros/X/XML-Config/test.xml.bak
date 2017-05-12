@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+
+<GoXML_Conf_File proc="spider">
+	<MaxTimeOut>30</MaxTimeOut>
+	<SomeVar>foo</SomeVar>
+</GoXML_Conf_File>

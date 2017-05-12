@@ -1,0 +1,23 @@
+Hello        <%- $x = 1 %> world
+Hello <% $x = 1 -%> world
+Hello <%- $x = 1 -%>
+world
+Hello        <%-= ":" -%>        world
+
+<%#
+    invisible
+
+    fdgdssfd
+
+    die die die
+
+
+
+
+
+
+
+
+%>
+
+<%~ //foo %>

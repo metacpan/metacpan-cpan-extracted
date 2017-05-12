@@ -1,0 +1,118 @@
+% layout 'email';
+
+% if ( items_in 'quote' ) {
+  % if ( items_in 'quote' and items_in 'cart' ) {
+    <h2>Your Quote Request</h2>
+  % }
+  <p>Thank you for interest in our products. A sales representative
+    will contact you within 2 business days.</p>
+
+  <h3>Quote Number</h3>
+
+  <p>Your quote number is <strong><%= stash 'quote_number' %></strong>.
+  Have this number handy if you contact us with any questions about your
+  quote request.</p>
+
+  <h3>Quote Request Products</h3>
+
+  <table>
+  <thead>
+    <tr>
+      <th>Number</th>
+      <th>Name</th>
+      <th>Quantity</th>
+      <th><abbr title="Unit of Measure">UoM</abbr></th>
+    </tr>
+  </thead>
+  <tbody>
+    % for ( 1 .. items_in 'quote' ) {
+      % my $p = stash('quote')->[$_-1];
+      <tr>
+        <td><%= $p->{number} %></td>
+        <td><%= $p->{title} %></td>
+        <td><%= $p->{quantity} %></td>
+        <td><%= $p->{unit} %></td>
+      </tr>
+    % }
+  </tbody>
+  </table>
+% }
+
+% if ( items_in 'cart' ) {
+  % if ( items_in 'quote' and items_in 'cart' ) {
+    <hr>
+    <h2>Your Purchase</h2>
+  % }
+  <p>Thank you for your purchase! If the products you ordered are in stock,
+    your order will be shipped on
+    the <strong>next business day</strong> and will arrive within
+      <strong>5–7 business days</strong>.</p>
+
+  <h3>Order Number</h3>
+
+  <p>Your order number is <strong><%= stash 'order_number' %></strong>.
+  Have this number handy if you contact us with any questions about your
+  order.</p>
+
+  <h3>Order Summary</h3>
+
+  <div class="unsemantic-list">
+    <p><b>Cost of products:</b> $<%= cart->total %></p>
+
+    % if ( 0 + stash 'hst' ) {
+      <p><b><abbr title="Harmonized Sales Tax">HST</abbr></b>:
+          $<%= stash 'hst' %></p>
+    % }
+
+    % if ( 0 + stash 'gst' ) {
+      <p><b><abbr title="Goods and Services Tax">GST</abbr></b>:
+          $<%= stash 'gst' %></p>
+    % }
+
+    % if ( 0 + stash 'pst' ) {
+      <p><b><abbr title="Provincial Sales Tax">PST</abbr></b>:
+        $<%= stash 'pst' %></p>
+    % }
+
+    <p><b>Shipping:</b>
+      % if ( defined( xtext('shipping_free') ) &&  xtext('shipping_free') < cart->total ) {
+              FREE
+          % } else {
+            $<%= stash 'shipping' %>
+              <small>(includes applicable taxes)</small>
+          % }
+      </p>
+
+    <p style="font-size: 130%; color: blue">
+      <b>Total:</b>
+        <strong>$<%= stash 'total_dollars' %><sup>.<%= stash 'total_cents'
+          %></sup></strong>
+    </p>
+  </div>
+
+  <h3>Products on Your Order</h3>
+
+  <table>
+  <thead>
+    <tr>
+      <th>Number</th>
+      <th>Name</th>
+      <th>Quantity</th>
+      <th>Price per unit</th>
+      <th><abbr title="Unit of Measure">UoM</abbr></th>
+    </tr>
+  </thead>
+  <tbody>
+    % for ( 1 .. items_in 'cart' ) {
+      % my $p = stash('cart')->[$_-1];
+      <tr>
+        <td><%= $p->{number} %></td>
+        <td><%= $p->{title} %></td>
+        <td><%= $p->{quantity} %></td>
+        <td><%= $p->{price} == 0 ? 'FREE' : '$' . $p->{price} %></td>
+        <td><%= $p->{unit} %></td>
+      </tr>
+    % }
+  </tbody>
+  </table>
+% }

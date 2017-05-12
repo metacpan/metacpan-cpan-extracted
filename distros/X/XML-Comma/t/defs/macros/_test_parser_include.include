@@ -1,0 +1,13 @@
+<element>
+  <name>included_element_one</name>
+</element>
+
+<!-- a comment -->
+
+<element>
+  <name>included_element_two</name>
+  <macro>enum: 'a', 'b', 'c'</macro>
+</element>
+
+<!-- another comment -->
+

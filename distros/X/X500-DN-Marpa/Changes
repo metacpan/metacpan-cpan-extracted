@@ -1,0 +1,13 @@
+Revision history for Perl extension X500::DN::Marpa.
+
+1.00  2015-11-17T20:42:31
+	- Fix t/dn.t to avoid an uninit warning for the deliberate error case.
+	- Remove Build.PL.
+	- Start pushing tags to repo.
+
+0.81  2015-01-18T10:19:00
+	- Add docs for X500::DN::Marpa::Actions.
+	- Update scripts/pod2html.sh to match.
+
+0.80  2015-01-13T17:59:00
+	- Original version

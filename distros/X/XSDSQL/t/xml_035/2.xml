@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<root>
+ 	<e1>EE</e1>
+	<e2>
+		<col1>col1</col1>
+		<col2>col2</col2>
+	</e2>
+</root>
+

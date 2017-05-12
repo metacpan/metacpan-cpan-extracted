@@ -1,0 +1,13 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+lib/XML/Parser/Lite.pm
+t/07-xmlrpc_payload.t
+t/26-xmlrpc.t
+t/27-xmlparserlite.t
+t/37-mod_xmlrpc.t
+t/adam.xml
+t/Lite.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

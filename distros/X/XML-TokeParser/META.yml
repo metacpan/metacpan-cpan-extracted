@@ -1,0 +1,10 @@
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         XML-TokeParser
+version:      0.05
+version_from: TokeParser.pm
+installdirs:  site
+requires:
+    XML::Parser:                   2
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.10_06

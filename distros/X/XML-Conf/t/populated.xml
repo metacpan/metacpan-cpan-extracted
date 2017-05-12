@@ -1,0 +1,12 @@
+<?xml version='1.0' standalone='yes'?>
+<opt debugfile="/tmp/foo.debug" logdir="/var/log/foo/">
+  <server osversion="2.0.34" name="kalahari" osname="linux">
+    <address>10.0.0.103</address>
+    <address>10.0.1.103</address>
+  </server>
+  <server osversion="2.6" name="sahara" osname="solaris">
+    <address>10.0.0.101</address>
+    <address>10.0.1.101</address>
+  </server>
+  <server osversion="6.5" address="10.0.0.102" name="gobi" osname="irix" />
+</opt>

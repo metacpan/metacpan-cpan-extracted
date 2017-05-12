@@ -1,0 +1,7 @@
+lib/XML/Canonical.pm
+Changes
+Makefile.PL
+MANIFEST
+README
+t/spec.t
+world.txt

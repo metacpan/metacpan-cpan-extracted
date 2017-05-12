@@ -1,0 +1,21 @@
+Revision history for XML-Declare
+
+0.06    2012-05-29
+        Fix for libxml overloading
+
+0.05    2011-10-26
+        Fix work under namespace::[auto]clean
+        [#68434] Allow to call element outside document
+
+0.04    2011-03-14
+        Fix overloading of XML::LibXML::Node stringification
+
+0.03    2010-06-01
+        Fix docs ;)
+
+0.02    2010-06-01
+        Fix tests
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

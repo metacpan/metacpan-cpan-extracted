@@ -1,0 +1,23 @@
+---
+abstract: 'Store (restore) perl data structures in XML stream.'
+author:
+  - 'Zahatski Aliaksandr zag@cpan.org'
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3601'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: XML-Flow
+provides:
+  XML::Flow:
+    file: lib/XML/Flow.pm
+    version: 0.86
+requires:
+  Encode: 0
+  XML::Parser: 0
+  XML::Writer: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.86

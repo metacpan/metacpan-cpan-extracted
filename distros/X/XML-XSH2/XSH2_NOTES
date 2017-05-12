@@ -1,0 +1,271 @@
+This file contains some notes about how things should (do?) work in
+XSH2 - the next generation XSH.
+
+The main motivations for XSH2:
+
+- tighter integration of XPath and Perl:
+  XPath _has_ variables, XSH1 has support for 
+  scalar variables and very limited an syntactically
+  clumsy support for node-list variables. 
+  XSH1 never passes variables to the XPath engine because
+  in //foo[@bar = $b], $b gets interpolated before the
+  expression is passed to the XPath engine. XSH2 should
+  simplify this by sharing variables between XSH, Perl and! XPath.
+  Interpolation can still be forced using ${b}, which in XPath
+  itself has no semantics anyway.
+
+- XSH1 commands are hard to parse: some arguments are parsed
+  as string expressions, some as XPath and these are not
+  syntactically (and visually) distinguished, making XSH also hard
+  to learn and understand.
+
+- XSH1's expression language is poor. To compute rather easy things,
+  one has to wrap the whole block into a perl { ... } command
+  and use lots of variables to get the results. That's why XSH2
+  introduces perl expressions { ... }.
+
+- In XSH1, commands and user-defined subroutines can't return values
+  (some commands do, using lvalue arguments). The result can be assigned
+  to a variable using := assignment, or used as an expression
+  using &{ command }. 
+  
+
+XSH2
+====
+
+
+XSH2 command looks like
+
+command-name [optional-parameters] [expression ....] [redirection];
+
+Optional parameters usually have a long name and a single-character
+short name. Long option names are prefixed with `--' whereas short
+options use a colon `:' as a prefix.
+
+Data types: 
+
+   XSH2 combines three data models: Perl, XPath and DOM.  DOM is
+   reperesented via XML::LibXML Perl module. The data among XPath
+   engine and Perl are passed through variables using some implicit
+   conversions. This is how XPath object are mapped to Perl objects:
+
+   string => XML::LibXML::Literal
+   number (float) => XML::LibXML::Number
+   boolean => XML::LibXML::Boolean
+   node-set => XML::LibXML::NodeList (ARRAY ref)
+
+   XML::LibXML objects are vastly overloaded in XSH2, so
+   they can be treated as arbitrary Perl scalar without
+   notice. 
+
+   This is how Perl objects map to XPath objects:
+
+   XML::LibXML::Literal => string
+   XML::LibXML::Boolean => boolean
+   XML::LibMXL::Number  => number
+   XML::LibXML::NodeList => node-set
+   XML::LibXML::Node     => node-set (consisting of 1 node)
+   ARRAY                 => node-set (members are mapped too)
+   HASH                  => depends on context
+   SCALAR                => depends on context
+
+   XSH2 commands usually either require a scalar value or a
+   node-list. For example, ls command requires a node-list, count
+   command accepts any object, and echo expects all expressions to
+   result in a string.
+
+   If a node-list is required, but scalar (string, number, etc) is
+   given, XSH2 creates a XML document fragment such as
+   <xsh:string xmlns:xsh="http://xsh.sourceforge.net/xsh/">foo</xsh:string>
+   or
+   <xsh:number xmlns:xsh="http://xsh.sourceforge.net/xsh/">1</xsh:number>
+   
+   Try 
+   $foo="foo"; ls $foo; # here XPath evaluates $foo to 'foo'
+                        # and XSH casts it to a node-list
+
+   ls 1; ls "foo";      # similar
+
+   ls {$foo}            # perl returns 'foo', XSH casts it
+                        # to a node-list
+
+   If scalar value is required, XSH forces everything to scalar.
+   XPath (a.k.a XML::LibXML) objects simply return their value, except
+   for node-sets which either return their volume (as in count
+   command) or their literal content - same as XPath function
+   'string' would return (e.g. echo).
+
+1) XSH2 syntactically recognizes the following types of expressions:
+
+   a) XPath (including variables) - this has some limitations:
+      While XPath allows arbitrary whitespace between tokens,
+      XSH allows whitespace within those parts of XPath expression
+      that are enclosed in quotes (literal strings) or brackts
+      (XPath has two types of brackets - plain and square).
+      So, while 
+      / foo / bar 
+      is a valid XPath expression matching element named bar under
+      root element foo, in XSH this expression should be written as
+      /foo/bar or (/ foo / bar) or (/foo/bar) etc.
+  
+   b) Perl blocks. These are enclosed in braces like: { perl-code }.
+      Perl expressions can be used to evaluate more complicated
+      things, like complex string expressions, regexp matches,
+      perl commands, etc. In short, arbitrary perl.
+      Of course, things like {`ls`} work too.
+
+   c) Result of one XSH command can be directly passed as an argument
+      to another. This is done using &{ xsh-code } expressions.
+      Most XSH commands only return undef, but some do return a value,
+      usually a node-list. Examples of such commands are open, copy, move,
+      wrap, edit.
+
+   d) Larger blocks of literal data can be passed to commands via
+      "inline document" expressions <<EOF, <<'EOF', <<"EOF",
+      where EOF is an arbitrary ID string. <<EOF and <<"EOF" are
+      equivallent, and are subject to ${...} interpolation,
+      where as <<'EOF' does not. The result of evaluation of these 
+      three is the literal content (with ${...} possibly interpolated)
+      of the script starting at the following line and ending
+      at a line containing just EOF. <<{EOF} and <<(EOF) are
+      implemented too, but I'm not sure they are of any use
+      since putting the expression in ( ) or { } has the same
+      effect.
+      
+   Expressions are evaluated by XSH commands themselves, so the value
+   returned by an expression may also be slightly command dependent,
+   e.g.  if filename is expected as a command argument (as in open or
+   save --filename), simple XPath expressions not containing brackets
+   and quotes aren't evaluated but are considered as filenames. To
+   evaluate them as XPath, put (...) around them:
+
+	  save --file test.xml $foo      # file is saved to file named text.xml
+	  save --file "test.xml" $foo    # the same
+	  save --file {"test.xml"} $foo  # the same
+
+   but
+
+	  save --file (test.xml) $foo    # file is saved to a file whose name
+                                         # is computed from an element named
+                                         # text.xml !!!
+                                
+2) XSH2 recognises variables of the form $variable and maps them
+   either to XML::XSH::Map Perl namespace (global, local) or stores
+   them in an internal hash (lexical variables). All XSH2 variables
+   are transparently available to the XPath engine. XSH2 variables may
+   containany XPath object (mapped to a perl object via XML::LibXML)
+   as well as arbitrary Perl scalar (including Array, Hash ref and
+   other objects). XSH1 node-list variables (%var) were completely
+   removed from XSH2, since $var can now contain any XPath object
+   and there are also ways to specify and preserve ordering of a 
+   node-set stored in $var (generally, {$var} preserves order
+   while $var always implies document encoding, since it's XPath).
+
+3) XSH2 has no documents: it only has variables containing
+   document nodes. Thus
+  
+   open foo = "lll"
+
+   open $foo = $filename
+
+   can also be expressed as
+
+   $foo = xsh:open($filename) 
+   (xsh prefix may be omitted by calling xpath-extensions)
+
+   or 
+
+   $foo := open $filename;
+
+4) insert/add become almost obsolete, because there
+   are convenient node-constructing xpath extension functions
+   available (for all kinds of nodes):
+
+   thus 
+
+   insert attribute "foo=bar" into /scratch
+
+   can also be expressed as
+
+   copy new-attribute("foo","bar") into /scratch
+
+   which also allows for better control over the name and value
+   (avoiding any inter-mediate parsing of "foo=bar" and similar).
+
+5) foreach context node can be mapped to a variable:
+
+   foreach my $foo in //word {
+     # foo is lexical
+     # current node is untouched
+      ...
+   }
+
+   foreach $foo in //word {
+     # foo is automatically local!
+     # current node is untouched
+      ...
+   }
+
+   foreach //word {
+     # iterate thorgh words using current node
+     ...
+   }  
+   
+6) node-list varibles: obsoleted with
+   usual XPath nodeset i.e. Perl XML::LibXML::NodeList objects.
+   If ordering of the nodes matters, one can use
+
+   { @$variable } or
+   { $variable->[n] }
+
+   Also, + is overloaded for NodeList to provide list concatenation:
+
+   { $lista + $listb } # contains nodes from $lista followed by
+                       # nodes from $listb
+   
+   $lista += $listb  # append to $lista
+
+   Similarly, for command-assignment := :
+
+   $result = //para;
+   $result +:= wrap "link" //a
+
+   # now $result contains all //para elements as well as new link elements
+   # that were used to wrapped all //a elements
+
+   Planned but not YET implemented for NodeList - things like:
+
+   { $variable->filter('xpath') } or
+   { $variable->findnodes('foo') }  or
+
+   would be usefull too.
+
+7) Redirection still remains as in XSH1, but some
+   I'm considering some drastical changes:
+
+   ls |= $a    # for redirection to a variable
+   ls |> file  # for redirection to a file
+   ls |>> file # for redirection to a file (append)
+
+8) XSH2 user-defined subroutines can be called without
+   the call command:
+
+   def foo $param1 $param2 { 
+        # param1 and $param2 are lexical (a.k.a. my)
+	ls $param1; 
+	echo $param2 
+   }
+   foo (//chapter)[1] (//chapter)[1]/title
+
+   The expressions passed to a subroutine as its arguments 
+   are evaluated (and the result assigned to the corresponding
+   lexical variables) _before_ the subroutine is entered.
+
+   In XSH2, subroutine can return value via return command:
+
+   def inc $param1 { return ($param1 + 1) }
+
+   $two := inc 1;
+
+
+more ?

@@ -1,0 +1,32 @@
+use XML::SAX::Machines 0.31;
+use XML::SAX::Machines qw( Pipeline ByRecord Tap );
+use XML::Filter::XSLT;
+
+my $f = XML::Filter::XSLT->new( Source => { ByteStream => \*DATA } );
+
+Pipeline(
+    ByRecord( $f ),
+    \*STDOUT
+)->parse_uri( $ARGV[0] );
+
+
+## "in-place upgrades" until some new releases hit CPAN ;)
+use IO::Handle;   ## XML::LibXML needs this to read from filehandles...
+
+sub XML::Filter::XSLT::LibXSLT::set_handler {
+    my $self = shift;
+    $self->{Handler} = shift;
+    $self->{Parser}->set_handler( $self->{Handler} )
+        if $self->{Parser};
+}
+
+
+
+__END__
+<xslt:transform version="1.0"
+            xmlns:xslt="http://www.w3.org/1999/XSL/Transform"
+>
+    <xslt:template match="state">
+        <xslt:copy-of select="."/>
+    </xslt:template>
+</xslt:transform>

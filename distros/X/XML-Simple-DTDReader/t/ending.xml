@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE data [
+  <!ELEMENT data (stuff+)>
+  <!ELEMENT stuff (name,other,optional?,nonoptional,last?)>
+  <!ELEMENT name  (#PCDATA)>
+  <!ELEMENT other (#PCDATA)>
+  <!ELEMENT optional    (#PCDATA)>
+  <!ELEMENT nonoptional (#PCDATA)>
+  <!ELEMENT last        (#PCDATA)>
+]>
+<data>
+  <stuff>
+    <name>Moose</name>
+    <other>Value</other>
+  </stuff>
+  <stuff>
+    <name>Thingy</name>
+    <other>Value2</other>
+  </stuff>
+</data>

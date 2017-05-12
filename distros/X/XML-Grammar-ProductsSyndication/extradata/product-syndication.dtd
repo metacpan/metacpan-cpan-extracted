@@ -1,0 +1,86 @@
+<!-- ....................................................................... -->
+<!-- MYML DTD  ............................................................. -->
+<!-- file: myml-1_0.dtd -->
+
+<!-- This is the DTD driver for myml 1.0.
+
+     Please use this formal public identifier to identify it:
+
+         "-//MY COMPANY//DTD XHTML MYML 1.0//EN"
+
+     And this namespace for myml-unique elements:
+
+         xmlns:myml="http://www.example.com/xmlns/myml"
+-->
+<!ENTITY % XHTML.version  "-//MY COMPANY//DTD XHTML MYML 1.0//EN" >
+
+<!-- reserved for use with document profiles -->
+<!ENTITY % XHTML.profile  "" >
+
+<!-- Tell the framework to use our qualified names module as an extra qname
+driver -->
+<!ENTITY % xhtml-qname-extra.mod
+     SYSTEM "myml-qname-1.mod" >
+
+<!-- Define the Content Model for the framework to use -->
+<!ENTITY % xhtml-model.mod
+	 SYSTEM "myml-model-1.mod" >
+
+<!-- Disable bidirectional text support -->
+<!ENTITY % XHTML.bidi  "IGNORE" >
+
+<!ENTITY % xhtml-legacy-redecl.mod
+     SYSTEM "xhtml-legacy-redecl-1.mod" >
+%xhtml-legacy-redecl.mod;
+
+<!-- Basic Text Module (Required)  ............................... -->
+<!ENTITY % xhtml-text.mod
+     SYSTEM "xhtml-text-1.mod" >
+%xhtml-text.mod;
+
+<!-- Hypertext Module (required) ................................. -->
+<!ENTITY % xhtml-hypertext.mod
+     SYSTEM "xhtml-hypertext-1.mod" >
+%xhtml-hypertext.mod;
+
+<!-- Lists Module (required)  .................................... -->
+<!ENTITY % xhtml-list.mod
+     SYSTEM "xhtml-list-1.mod" >
+%xhtml-list.mod;
+
+<!ENTITY % xhtml-pres.mod
+     SYSTEM "xhtml-pres-1.mod" >
+%xhtml-pres.mod;
+
+<!-- My Elements Module   ........................................ 
+<!ENTITY % MyML-elements.mod
+     SYSTEM "myml-elements-1.mod" >
+%MyML-elements.mod;
+-->
+
+<!-- XHTML Images module  ........................................ -->
+<!ENTITY % xhtml-image.mod
+   SYSTEM "xhtml-image-1.mod" >
+%xhtml-image.mod;
+
+
+<!ELEMENT product-syndication (meta?,data)>
+<!ELEMENT meta (#PCDATA)>
+<!ELEMENT data (cat)>
+<!ELEMENT cat (title,desc?,(cat|prod|set)*)>
+<!ELEMENT prod (title,isbn,creator*,rellink*,ref*,desc?)>
+<!ELEMENT set (title,prod*,desc?)>
+<!ELEMENT desc ((%Flow.mix;)*)>
+<!ELEMENT isbn (#PCDATA)>
+<!ELEMENT title (#PCDATA)>
+<!ELEMENT rellink EMPTY>
+<!ELEMENT creator (#PCDATA)>
+<!ELEMENT ref EMPTY>
+<!ATTLIST cat id ID #REQUIRED>
+<!ATTLIST prod id ID #REQUIRED>
+<!ATTLIST creator type (author|artist|performer|composer|director) "author">
+<!ATTLIST ref href CDATA "" affil CDATA "">
+<!ATTLIST rellink href CDATA "" text CDATA "">
+<!ATTLIST set id ID #REQUIRED>
+<!ATTLIST isbn disable (0|1) "0">
+<!ATTLIST desc appendtoc CDATA "">

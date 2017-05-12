@@ -1,0 +1,22 @@
+XML::Generator::DBI
+===================
+
+This module allows you to generate SAX events (and thus XML) from
+DBI database queries. It should be considered a replacement for
+the outdated DBIx::XML_RDB, since it is better in many many ways.
+
+INSTALLATION
+
+In order to run the tests you need DBD::SQLite 0.27 installed, but
+they will run cleanly without DBD::SQLite installed (it just won't
+execute any SQL!).
+
+Then simply do the usual jiggery pokery:
+
+perl Makefile.PL
+make
+make test
+su
+make install
+
+And start plugging SAX stuff together.

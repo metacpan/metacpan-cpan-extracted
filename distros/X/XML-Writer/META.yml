@@ -1,0 +1,27 @@
+--- #YAML:1.0
+meta-spec:
+  version: 1.4
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+name:         XML-Writer
+version:      0.625
+abstract:     Easily generate well-formed, namespace-aware XML.
+author:
+  - David Megginson <david@megginson.com>
+  - Ed Avis <ed@membled.com>
+  - Joseph Walton <joe@kafsemo.org>
+license:      unrestricted
+distribution_type: module
+installdirs:  site
+
+build_requires:
+  perl: 5.006_000
+  Test::More: 0.047
+recommends:
+  perl: 5.008_001
+
+no_index:
+  package:
+    - XML::Writer::Namespaces
+
+dynamic_config: 0
+generated_by: Hand

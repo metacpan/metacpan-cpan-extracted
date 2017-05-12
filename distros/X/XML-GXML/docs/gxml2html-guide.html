@@ -1,0 +1,261 @@
+
+
+<head><title>Using gxml2html</title></head>
+
+<h2>Using gxml2html</h2>
+by Josh Carter &lt; josh@multipart-mixed.com &gt;<br>
+May 10, 2001<br>
+
+<hr>
+
+
+
+
+<br clear="all">
+<h2>Welcome</h2>
+
+
+
+<p>
+Thanks for your interest in gxml2html. This tool uses the GXML engine
+to convert a tree of XML source files into a matching tree of HTML
+files, using templates and other GXML features for the XML->HTML
+transformation.
+</p>
+
+<p>
+Since most of the gxml2html features are actually GXML features, many
+of the documentation pages are shared. This document covers the basics
+of gxml2html and links to the other shared docs.
+</p>
+
+
+
+
+
+
+<br clear="all">
+<h2>Running the Samples</h2>
+
+
+
+<p>
+gxml2html comes with example files and templates in the "examples"
+directory. Looking at the "article" example, this is how the
+directories are laid out:
+</p>
+
+
+<ul>
+
+	
+<li><b>article:</b> this contains the raw XML which the
+	tool will process.</li>
+
+
+	
+<li><b>article-templates:</b> this contains the templates
+	(obviously).</li>
+
+
+	
+<li><b>article-output:</b> this is where the resulting
+	HTML files will wind up.</li>
+
+
+</ul>
+
+	
+<p>
+First, install GXML. (See the README file.) Next, to ensure that
+gxml2html is installed and working properly, switch to the examples
+directory and run:
+</p>
+
+
+
+<p><tt>
+<b>&gt;</b> 
+../gxml2html.pl --work=article --force
+
+</tt></p>
+
+
+
+<p>
+You should wind up with a simple HTML file and images directory in the
+"article-output" directory. Try the same for the scoping example to
+see gxml2html's variable scoping rules in action. The inventory
+example shows off the gxml:foreach command.
+</p>
+
+
+
+
+
+
+<br clear="all">
+<h2>Configuring gxml2html</h2>
+
+
+
+<p>
+Here are the command line params and what they do:
+</p>
+
+
+<ul>
+
+	
+<li><b>--templates=directory:</b> changes the templates
+	directory to <i>directory</i>. </li>
+
+	
+	
+<li><b>--work=directory:</b> changes the work (source)
+	directory to <i>directory</i>. </li>
+
+
+	
+<li><b>--final=directory:</b> changes the final
+	(destination) directory to, you guessed it, <i>directory</i>.
+	</li>
+
+
+	
+<li><b>--debug:</b> turns on lots of debugging messages. If
+	you're having problems, email me a run of the program with --debug
+	turned on.</li>
+
+
+	
+<li><b>--force:</b> forces all files to be processed.
+	Normally files which have not been modified since the last time
+	you ran gxml2html will get skipped. IMPORTANT: if you modify the
+	.gxml2html file (more later) so that tag remappings are different,
+	you'll have to use --force for the first run afterwards to ensure
+	all files are updated.</li>
+
+
+</ul>
+
+
+<p>
+You can also put configuration params in a file named ".gxml2html".
+The syntax is the same as above, just without the leading "--" on the
+configuration param. (See the included "sample_dot_gxml2html" file as
+an example.) The .gxml2html file should either reside in the same
+directory as gxml2html.pl, or in the work directory. In the latter
+case, you could provide the work directory as a command line param,
+and the rest of the configuration would be read from the .gxml2html
+file. This is how I generate the HTML versions of this documentation,
+in fact.
+</p>
+
+
+
+
+
+
+<br clear="all">
+<h2>Documents, Templates, and Variables</h2>
+
+
+
+<p>
+Now we get into the meat of writing templates, using variables, and so
+forth. The following pages go into detail on each topic.
+</p>
+
+
+<p><b><a href="variables.html">Variables</a>:</b> 
+First, dig into variable substitution in its various forms.
+</p>
+
+
+
+<p><b><a href="templates.html">Templates</a>:</b> 
+Templates are the meat of gxml2html -- this is what makes it useful.
+</p>
+
+
+
+<p><b><a href="commands.html">Commands</a>:</b> 
+Commands are a new feature to GXML 2.0, giving it the most-needed
+features from XSL.
+</p>
+
+
+
+<p><b><a href="other.html">Other Features</a>:</b> 
+There's lots of extra stuff you can do with gxml2html. This is where
+we pick up all the rest.
+</p>
+
+
+
+
+
+
+
+<br clear="all">
+<h2>Other Notes</h2>
+
+
+
+<p>
+The work directory may contain a mix of .xml and other files. Only the
+.xml files will be parsed; everything else will be copied. As such,
+you can have images and whatnot in there, and these will get carried
+into the destination directory unharmed. Also, the .xml source will
+also get copied in case someone wants to grab the unmolested XML
+instead of the HTML.
+</p>
+
+<p>
+The work directory can be a tree of files. The directory structure will 
+be mirrored in the destination directory.
+</p>
+
+<p>
+gxml2html tries to be smart about only processing files which need
+processing. Basically, if you modify a file, it'll get processed.
+Also, if you modify a template, all XML files will get processed even
+if they haven't been modified, since the template change could affect
+the final HTML file. If you suspect that something is out of date, run
+gxml2html with the "--force" option.
+</p>
+
+<p>
+The XML::Parser module which provides the parser core for gxml2html is
+very strict about proper syntax in the XML sources, and it will barf
+on any errors. I consider this a feature, and intentionally let it
+stop gxml2html so you can fix the error.
+</p>
+
+<p>
+While the included sample documents are extremely simple, gxml2html
+can (and should) be used in more ambitious ways. FWIW, the entire
+multipart-mixed.com web site is written in XML and makes extensive use
+of templates. To see the XML source for any HTML file, just change the
+".html" part of the URL to ".xml", and then view the source.
+</p>
+
+<p>
+Other comments, bug reports, feature requests, etc.: send me an email!
+</p>
+
+
+
+
+
+<p>
+<b><a href="index.html">Back to GXML Home</a></b>
+</p>
+
+
+
+<hr>
+<font size="-1"><i>Copyright (c) 2001-2002 Josh Carter</i></font>
+
+<!-- end of Using gxml2html -->

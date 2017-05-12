@@ -1,0 +1,12 @@
+Revision history for Perl module XML::Saxtract
+
+1.03 2016-10-31
+    - added support for subspec type 'sub'
+
+1.02 2016-09-04
+    - Fixed namespace support so that you do not have to redeclare namespaces
+      in subspecs
+
+1.01 2014-04-01
+    - Added ability to supply result hash to saxtract_xxx methods
+

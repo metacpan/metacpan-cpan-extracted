@@ -1,0 +1,2 @@
+0.951 2013-11-06:
+	moved from transform_gi to a more general config method.

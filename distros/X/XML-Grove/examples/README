@@ -1,0 +1,25 @@
+$Id: README,v 1.3 1999/02/05 17:54:43 kmacleod Exp $
+Copyright (C) 1998 Ken MacLeod
+See the file COPYING for distribution terms.
+
+
+			    Grove Examples
+
+The following examples are listed in concept order, starting with the
+first will lead into concepts in the later examples.  All examples use
+XML::Parser.
+
+    grove.pl
+        Uses the simplest form of XML objects to recursively dump the
+        object tree, similar to the `debug' style of XML::Parser.
+
+    visitor.pl
+        Uses a visitor class and callbacks to dump the tree.  This is
+        similar to the `sub' style of XML::Parser except that it uses
+        generic `visit_element' callbacks instead of by-tag-name
+        callbacks (see my-html.pl for that).
+
+    my-html.pl, my-html.html
+        Uses a visitor class and by-tag-name callbacks to add new tags
+        to HTML-like documents.  This example in particular shows one
+        way to embed Perl code into HTML documents.

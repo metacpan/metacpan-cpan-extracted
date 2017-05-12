@@ -1,0 +1,34 @@
+XML::Parser::Lite::Tree
+=======================
+
+Lightweight XML tree builder
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Test::More
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004-2009 Cal Henderson <cal@iamcal.com>
+License: Perl Artistic License 2.0
+
+Contains XML::Parser::Lite:
+Copyright (C) 2000-2007 Paul Kulchenko <paulclinger@yahoo.com>
+Copyright (C) 2008 Martin Kutter <martin.kutter@fen-net.de>
+Copyright (C) 2009 Cal Henderson <cal@iamcal.com>
+SOAP::Lite is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.

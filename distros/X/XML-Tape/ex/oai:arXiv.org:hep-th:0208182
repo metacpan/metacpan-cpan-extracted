@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <oai_dc:dc xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+ <dc:title>Virasoro Algebra for Particles with Higher Derivative Interactions</dc:title>
+ <dc:creator>Ho, Pei-Ming</dc:creator>
+ <dc:description>  In this paper we show that the worldline reparametrization for particles with
+higher derivative interactions appears as a higher dimensional symmetry on the
+phase space. In the limit of infinite order time dervatives, the fields on the
+worldline get naturally promoted to those living on a two dimensional space,
+and the reparametrization symmetry is locally the same as the conformal
+symmetry.
+</dc:description>
+ <dc:description>Comment: 11 pages</dc:description>
+ <dc:date>2002-08-25</dc:date>
+ <dc:type>text</dc:type>
+ <dc:identifier>http://arXiv.org/abs/hep-th/0208182</dc:identifier>
+ </oai_dc:dc>

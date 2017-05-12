@@ -1,0 +1,12 @@
+Makefile.PL
+Changes
+MANIFEST
+README
+CompactTree.pm
+t/00-load.t
+t/01-object.t
+t/02-feature.t
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

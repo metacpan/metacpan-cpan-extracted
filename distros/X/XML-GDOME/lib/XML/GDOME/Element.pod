@@ -1,0 +1,213 @@
+=head1 NAME
+
+  XML::GDOME::Element - Interface Element implementation.
+
+=head1 SYNOPSIS
+
+  $str      = $el->getTagName();
+  $str      = $el->getAttribute($name);
+  $str      = $el->getAttributeNS($namespaceURI,$localName);
+  $attr     = $el->getAttributeNode($name);
+  $attr     = $el->getAttributeNodeNS($namespaceURI,$localName);
+  $nodeList = $el->getElementsByTagName($name);
+  $nodeList = $el->getElementsByTagNameNS($namespaceURI,$localName);
+  $bool     = $el->hasAttribute($name);
+  $bool     = $el->hasAttributeNS($namespaceURI,$localName);
+              $el->removeAttribute($name);
+              $el->removeAttributeNS($namespaceURI,$localName);
+  $attr     = $el->removeAttributeNode($oldAttr);
+              $el->setAttribute($name,$value);
+              $el->setAttributeNS($namespaceURI,$qualifiedName,$value);
+  $attr     = $el->setAttributeNode($newAttr);
+  $attr     = $el->setAttributeNodeNS($newAttr);
+              $elem->appendText($PCDATA);
+
+=head1 CLASS INHERITANCE
+
+L<XML::GDOME::Node> > XML::GDOME::Element
+
+
+=head1 METHODS
+
+=over 4
+
+
+=item $str = $el->getTagName();
+
+
+
+I<Returns>: the qualified name of the element.
+
+
+=item $str = $el->getAttribute($name);
+
+Retrieves an attribute value by name.
+
+I<C<name>>: The name of attribute of which the value is wanted
+
+I<Returns>: the Attr value as a string, or the empty string if that attribute does not have a specified or default value.
+
+
+=item $str = $el->getAttributeNS($namespaceURI,$localName);
+
+Retrieves an attribute value by local name and namespace URI.
+
+I<C<namespaceURI>>: The namespaceURI of attribute to retrieve
+
+I<C<localName>>: The localName of the attribute to retrieve
+
+I<Returns>: the Attr value as a string, or the empty string if that attribute does not have a specified or default value.
+
+
+=item $attr = $el->getAttributeNode($name);
+
+Retrieves an attribute node by name. To retrieve an attribute node by qualified name and namespace URI, use the gdome_el_getAttributeNodeNS() method.
+
+I<C<name>>: The name of the attribute to retreive
+
+I<Returns>: the Attr node with the specified I<name> or undef if there is no such attribute.
+
+
+=item $attr = $el->getAttributeNodeNS($namespaceURI,$localName);
+
+Retrieves an Attr node by local name and namespace URI.
+
+I<C<namespaceURI>>: The namespace URI of the attribute to retrieve.
+
+I<C<localName>>: The local name of the attribute to retrieve.
+
+I<Returns>: the Attr node with the specified attribute local name and namespace URI or undef if there is no such attribute.
+
+
+=item $nodeList = $el->getElementsByTagName($name);
+
+
+
+I<C<name>>: The name of the tag to match on. The special value * matches all        tags.
+
+I<Returns>: a NodeList of all descendant elements with a given tag name, in the order in which they are encountered in a preorder traversal of this Element tree. In array context, returns array.
+
+
+=item $nodeList = $el->getElementsByTagNameNS($namespaceURI,$localName);
+
+
+
+I<C<namespaceURI>>: The namespace URI of the elements to match on. The special             value * matches all namespaces.
+
+I<C<localName>>: The local name of the elements to match on. The special value             * matches all local names.
+
+I<Returns>: a NodeList of all the descendant elements with a given local name and namespace URI in the order in which they are encountered in a preorder traversal of this Element tree. In array context, returns array.
+
+
+=item $bool = $el->hasAttribute($name);
+
+
+
+I<C<name>>: The name of the attribute to look for.
+
+I<Returns>: 1 when an attribute with a given name is specified on this element or has a default value, 0 otherwise.
+
+
+=item $bool = $el->hasAttributeNS($namespaceURI,$localName);
+
+
+
+I<C<namespaceURI>>: The namespaceURI of the attribute to look for.
+
+I<C<localName>>: The localName of the attribute to look for.
+
+I<Returns>: 1 when an attribute with a given local name and namespace URI is specified on this element or has a default value, 0 otherwise.
+
+
+=item $el->removeAttribute($name);
+
+Removes an attribute by name. If the removed attribute is known to have a default value, an attribute immediately appears containing the default value as well as the corresponding namespace URI, local name, and prefix when applicable. To remove an attribute by local name and namespace URI, use the gdome_el_removeAttributeNS() function.
+
+I<C<name>>: The name of the attribute to remove
+
+C<GDOME_NO_MODIFICATION_ALLOWED_ERR>: Raised if this node is readonly.
+
+
+=item $el->removeAttributeNS($namespaceURI,$localName);
+
+Removes an attribute by local name and namespace URI. If the removed attribute has a default value it is immediately replaced. The replacing attribute has the same namespace URI and local name, as well as the original prefix.
+
+I<C<namespaceURI>>: The namespaceURI of attribute to remove
+
+I<C<localName>>: The localName of the attribute to remove
+
+C<GDOME_NO_MODIFICATION_ALLOWED_ERR>: Raised if this node is readonly.
+
+
+=item $attr = $el->removeAttributeNode($oldAttr);
+
+Removes the specified attribute node. If the removed Attr has a default value it is immediately replaced. The replacing attribute has the same namespace URI and local name, as well as the original prefix, when applicable.
+
+I<C<oldAttr>>: The Attr node to remove from the attribute list
+
+I<Returns>: the Attr node that was removed.
+
+C<GDOME_NO_MODIFICATION_ALLOWED_ERR>: Raised if this node is readonly.
+
+C<GDOME_NOT_FOUND_ERR>: Raised if I<oldAttr> is not an attribute of the element.
+
+
+=item $el->setAttribute($name,$value);
+
+Adds a new attribute. If an attribute with that name is already present in the element, its value is changed to be that of the value parameter.
+
+I<C<name>>: The name of the attribute to create or alterI<value>: Value to set in string form
+
+C<GDOME_NO_MODIFICATION_ALLOWED_ERR>: Raised if this node is readonly.
+
+
+=item $el->setAttributeNS($namespaceURI,$qualifiedName,$value);
+
+Adds a new attribute. If an attribute with the same I<namespaceURI> and localName is already present in the element, its value is changed to be that of the value parameter.
+
+I<C<namespaceURI>>: The namespace URI of attribute to create or alter
+
+I<C<qualifiedName>>: The qualifiedName of the attribute to create or alterI<value>: Value to set in string form
+
+C<GDOME_NAMESPACE_ERR>: Raised if the I<qualifiedName> is malformed, if the I<qualifiedName> has a prefix and the I<namespaceURI> is undef, if the I<qualifiedName> has a prefix that is "xml" and the I<namespaceURI> is different from "http://www.w3.org/XML/1998/namespace", or if the I<qualifiedName> is "xmlns" and the namespaceURI is different from "http://www.w3.org/2000/xmlns/".
+
+C<GDOME_NO_MODIFICATION_ALLOWED_ERR>: Raised if this node is readonly.
+
+
+=item $attr = $el->setAttributeNode($newAttr);
+
+Adds a new attribute node. If an attribute with that name is already present in the element, it is replaced by the new one. To add a new attribute node with a qualified name and namespace URI, use the gdome_el_setAttributeNodeNS() method.
+
+I<C<newAttr>>: The Attr node to add to the attribute list
+
+I<Returns>: if the I<newAttr> attribute replaces an existing attribute, the replaced Attr node is returned, otherwise undef is returned.
+
+C<GDOME_INUSE_ATTRIBUTE_ERR>: Raised if I<newAttr> is already an attribute of another Element object. The DOM user must explicitly clone Attr nodes to re-use them in other elements.
+
+C<GDOME_NO_MODIFICATION_ALLOWED_ERR>: Raised if this node is readonly.
+
+C<GDOME_WRONG_DOCUMENT_ERR>: Raised if I<newAttr> was created from a different document than the one that created the element.
+
+
+=item $attr = $el->setAttributeNodeNS($newAttr);
+
+Adds a new attribute. If an attribute with that local name and that namespace URI is already present in the element, it is replaced by the new one.
+
+I<C<newAttr>>: The Attr node to add to the attribute list
+
+I<Returns>: if the I<newAttr> attribute replaces an existing attribute with the same local name and namespace URI, the replaced Attr node is returned, otherwise undef is returned.
+
+C<GDOME_INUSE_ATTRIBUTE_ERR>: Raised if I<newAttr> is already an attribute of another Element object. The DOM user must explicitly clone Attr nodes to re-use them in other elements.
+
+C<GDOME_NO_MODIFICATION_ALLOWED_ERR>: Raised if this node is readonly.
+
+C<GDOME_WRONG_DOCUMENT_ERR>: Raised if I<newAttr> was created from a different document than the one that created the element.
+
+
+=item $elem->appendText($PCDATA);
+
+This wrapper function lets you add a string directly to an element node.
+
+
+=back
+

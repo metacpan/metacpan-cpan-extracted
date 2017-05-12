@@ -1,0 +1,41 @@
+<?xml version="1.0" ?>
+<formula id="user">
+   <filter type='trim'/>
+   <filter type='strip'/>
+   <element name="nome" desc="Nome" type="string" size="20" required="yes"/>
+   <element name="cognome" desc="Cognome" type="string" size="20" required="yes"/>
+   <element name="cfisc" desc="Codice Fiscale" type="string" size="16" required="yes">
+		<check type='cfisc'/>
+	</element>
+   <element name="indirizzo" desc="Indirizzo" type="string" size="120"/>
+   <element name="cap" desc="CAP" type="string">
+       <check type="cap_zip"/>
+   </element>
+   <element name="localita" desc="Localita" type="string" size="120"/>
+   <element name="provincia" desc="Provincia" type="string">
+		<check type="state_province">
+	   	   <param id="country"><ref label="paese"/></param> 
+		</check>
+   </element>
+   <element name="paese" desc="Paese" type="string"/>
+   <element name="email" desc="E-Mail" type="string" required="yes">
+       <check type="email"/>
+   </element>
+   <element name="nickname" desc="Nickname" type="string" size="8" required="yes"/>
+   <element name="passwd" desc="Password" type="password" size="8" required="yes">
+		<check type="eq">
+	   		<param><ref label="passwd_2"/></param>
+		</check>
+		<check type="min_length">
+	   		<param>4</param>
+		</check>
+   </element>
+   <element name="passwd_2" desc="Confirm Password" type="password" size="8" required="yes">
+        <check type="eq">
+            <param><ref label="passwd"/></param>
+        </check>
+        <check type="min_length">
+            <param>4</param>
+        </check>
+   </element>
+</formula>

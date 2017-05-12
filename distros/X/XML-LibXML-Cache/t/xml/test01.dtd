@@ -1,0 +1,5 @@
+<!ELEMENT document (title, content)>
+<!ELEMENT title (#PCDATA)>
+<!ELEMENT content (#PCDATA)>
+
+<!ENTITY title SYSTEM "test01-entity.xml">

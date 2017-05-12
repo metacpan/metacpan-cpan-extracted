@@ -1,0 +1,30 @@
+XML/Generator/CGI version $Revision: 0.01 $
+=========================================
+
+XML::Generator::CGI will generate SAX events from a CGI object,
+query string, or otherwise the current environment.  It also
+allows only certain parameters to be included or excluded from the
+resulting XML, as well as adding cookie data to the XML tree.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+XML::Generator::CGI builds off XML::SAX::Base, and uses CGI.pm for 
+it's internal workings.  The test case uses XML::Handler::YAWriter
+but should skip testing if this module is not available.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2002 Michael K. Neylon <mneylon-pm@masemware.com>. 
+All rights reserved.
+
+This library is free software.  You can redistribute it and/or modify it
+under the same terms as Perl itself.

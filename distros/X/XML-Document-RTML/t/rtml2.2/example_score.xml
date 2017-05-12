@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="US-ASCII"?>
+<!DOCTYPE RTML SYSTEM "http://www.estar.org.uk/documents/rtml2.2.dtd">
+
+<RTML version="2.2" type="score">
+    <IntelligentAgent host="localhost" port="1234">12345</IntelligentAgent>
+    <Telescope />
+    <Contact PI="true">
+        <User>TMC/estar</User>
+        <Name>Chris Mottram</Name>
+        <Institution>LJM</Institution>
+        <Email>cjm@astro.livjm.ac.uk</Email>
+    </Contact>
+    <Project />
+    <Observation status="ok">
+        <Target type="normal" ident="test-ident">
+            <TargetName>test</TargetName>
+            <Coordinates type="equatorial">
+                <RightAscension format="hh mm ss.s" units="hms">01 02 03.0</RightAscension>
+                <Declination format="sdd mm ss.s" units="dms">+45 56 01.0</Declination>
+                <Equinox>J2000</Equinox>
+            </Coordinates>
+        </Target>
+        <Device type="camera">
+            <Filter>
+                <FilterType>R</FilterType>
+            </Filter>
+        </Device>
+        <Schedule priority="3">
+            <Exposure type="time" units="seconds">
+                <Count>2</Count>120
+            </Exposure>
+            <TimeConstraint>
+                <StartDateTime>2005-01-01T12:00:00</StartDateTime>
+                <EndDateTime>2005-12-31T12:00:00</EndDateTime>
+            </TimeConstraint>
+            <SeriesConstraint>
+                <Count>3</Count>
+                <Interval>PT1H</Interval>
+                <Tolerance>PT30M</Tolerance>
+            </SeriesConstraint>
+        </Schedule>
+    </Observation>
+</RTML>

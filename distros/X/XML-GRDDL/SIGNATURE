@@ -1,0 +1,67 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 a2dd9d71b1ecb8c14e96b37512a4bb4203c4e141 Changes
+SHA1 cc087c3dd6e1b519c680e68cd0231735a68300a0 LICENSE
+SHA1 54e7ad124c09dc0d8ef0d64927f8e69b8b04df3c MANIFEST
+SHA1 ca90eae2868c108895cd0de0f7e8d67f2f343f91 META.yml
+SHA1 da50d35f9bc21473691888031579fd3ad684e205 Makefile.PL
+SHA1 5721059052a469abf58725fb3ecd8c57e591f924 README
+SHA1 27a8a4a1699060d427fb0f4cdef4e3f53850014c examples/erdf.pl
+SHA1 bb795bb7a3353224f4fd82a56e7ce41c58674e0c examples/rubbish-example.pl
+SHA1 06c410f05488c1612ed66b06d3a86b2580581e4a inc/Module/AutoInstall.pm
+SHA1 8a924add836b60fb23b25c8506d45945e02f42f4 inc/Module/Install.pm
+SHA1 61ab1dd37e33ddbe155907ce51df8a3e56ac8bbf inc/Module/Install/AutoInstall.pm
+SHA1 c04f94f91fa97b9f8cfb5a36071098ab0e6c78e3 inc/Module/Install/AutoManifest.pm
+SHA1 2d0fad3bf255f8c1e7e1e34eafccc4f595603ddc inc/Module/Install/Base.pm
+SHA1 f0e01fff7d73cd145fbf22331579918d4628ddb0 inc/Module/Install/Can.pm
+SHA1 7328966e4fda0c8451a6d3850704da0b84ac1540 inc/Module/Install/Fetch.pm
+SHA1 66d3d335a03492583a3be121a7d888f63f08412c inc/Module/Install/Include.pm
+SHA1 b62ca5e2d58fa66766ccf4d64574f9e1a2250b34 inc/Module/Install/Makefile.pm
+SHA1 1aa925be410bb3bfcd84a16985921f66073cc1d2 inc/Module/Install/Metadata.pm
+SHA1 3b9281ddf7dd6d6f5de0a9642c69333023193c80 inc/Module/Install/Package.pm
+SHA1 9de7b5129351499c048328dfa718d0eab557cf30 inc/Module/Install/TrustMetaYml.pm
+SHA1 e4196994fa75e98bdfa2be0bdeeffef66de88171 inc/Module/Install/Win32.pm
+SHA1 c3a6d0d5b84feb3280622e9599e86247d58b0d18 inc/Module/Install/WriteAll.pm
+SHA1 26d58a041cd6b3d21db98b32e8fd1841aae21204 inc/Module/Package.pm
+SHA1 c18deb3025b83dda8ac7c97f1e29599e1d2c7378 inc/Module/Package/Dist/RDF.pm
+SHA1 0e0eed2e69d9583081868cf4f220068d0a018568 inc/Scalar/Util.pm
+SHA1 feb933cefe2e3762e8322bd6071a2499f3440da1 inc/YAML/Tiny.pm
+SHA1 8105c0510a773b56840995fb4dd2dc64fe9ddaee inc/unicore/Name.pm
+SHA1 36df501c7c9b73c282c5174ed54d8283b2f2cbf2 inc/utf8.pm
+SHA1 38979f010738ace437616fd3dbb6a0bb020de714 lib/XML/GRDDL.pm
+SHA1 35c7b9546f2cb5adb38ab866017bc1817263ec93 lib/XML/GRDDL/External.pm
+SHA1 710ae25f249d79f155dcd1326059130352e1fe65 lib/XML/GRDDL/Namespace.pm
+SHA1 ab8d9190772e084cc7d54fcd98f9dd824899828c lib/XML/GRDDL/Profile.pm
+SHA1 8abf4151acc4227067cad21793790871040f4d09 lib/XML/GRDDL/Transformation.pm
+SHA1 39d206b7e919050f24f7d7557ada99a646284386 lib/XML/GRDDL/Transformation/Hardcoded.pm
+SHA1 a878f78473b819e9cc9913cf1c5608a34de182b8 lib/XML/GRDDL/Transformation/Hardcoded/eRDF.pm
+SHA1 ddeb98d660eed910bd86edf5ed5a105ec0ff8bc6 lib/XML/GRDDL/Transformation/RDF_EASE.pm
+SHA1 f60943135ff970c6d1c9d82214acd7a7150eda7f lib/XML/GRDDL/Transformation/RDF_EASE/Functional.pm
+SHA1 0316b700b3abaa20ab682127fcfaa4c348450925 lib/XML/GRDDL/Transformation/RDF_EASE/Selector.pm
+SHA1 d2189b3d508acae0f5c337988d01cf95d1de3ef1 lib/XML/GRDDL/Transformation/XSLT_1.pm
+SHA1 3718123775a180d2bfc0e42cfdd4ab3e9e841846 lib/XML/GRDDL/Transformation/XSLT_2.pm
+SHA1 553d759768941ae2ba577bc586d78d914c9397f8 meta/changes.pret
+SHA1 5d42d0d5b1e082451ae8b0938499c6d9c698726c meta/doap.pret
+SHA1 e16591abbe5aace7f289f2535c17def1afb1c5b5 meta/makefile.pret
+SHA1 f3bd5e850938963dea34a49157e46e7a7d091751 t/01basic.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+
+iEYEARECAAYFAlBO92EACgkQzr+BKGoqfTmBUACeIVyllpjZEg1NswfVGRtpZB3/
+AnEAn2GemzVOticApxIGRBCUKCp9sE2Y
+=BcDW
+-----END PGP SIGNATURE-----

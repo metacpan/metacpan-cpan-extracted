@@ -1,0 +1,129 @@
+=encoding utf8
+
+=head1 NAME
+
+XML::Compile::Util - Utility routines for XML::Compile components
+
+=head1 INHERITANCE
+
+ XML::Compile::Util
+   is a Exporter
+
+=head1 SYNOPSIS
+
+ use XML::Compile::Util;
+ my $node_type = pack_type $ns, $localname;
+ my ($ns, $localname) = unpack_type $node_type;
+
+=head1 DESCRIPTION
+
+The functions provided by this package are used by various XML::Compile
+components, which on their own may be unrelated.
+
+=head1 FUNCTIONS
+
+=head2 Constants
+
+The following URIs are exported as constants, to avoid typing
+in the same long URIs each time again: XMLNS, SCHEMA1999,
+SCHEMA2000, SCHEMA2001, and SCHEMA2001i.
+
+=head2 Packing
+
+=over 4
+
+=item B<pack_id>($ns, $id)
+
+Translates the two arguments into one compact string representation of
+the node id.
+
+example: 
+
+ print pack_id 'http://my-ns', 'my-id';
+ # shows:  http://my-ns#my-id
+
+=item B<pack_type>( [$ns], $localname )
+
+Translates the arguments into one compact string representation of
+the node type.  When the $ns is not present, C<undef>, or an
+empty string, then no namespace is presumed, and no curly braces
+part made.
+
+example: 
+
+ print pack_type 'http://my-ns', 'my-type';
+ # shows:  {http://my-ns}my-type 
+
+ print pack_type 'my-type';
+ print pack_type undef, 'my-type';
+ print pack_type '', 'my-type';
+ # all three show:   my-type
+
+=item B<unpack_id>($string)
+
+Returns a LIST of two elements: the name-space and the id, as
+included in the $string.  That $string must be compatible with the
+result of L<pack_id()|XML::Compile::Util/"Packing">.
+
+=item B<unpack_type>($string)
+
+Returns a LIST of two elements: the name-space and the localname, as
+included in the $string.  That $string must be compatible with the
+result of L<pack_type()|XML::Compile::Util/"Packing">.  When no name-space is present, an empty
+string is used.
+
+=back
+
+=head2 Other
+
+=over 4
+
+=item B<add_duration>( $duration, [$time] )
+
+[1.44] Add the $duration to the $time (defaults to 'now')  This is an
+expensive operation: in many cases the L<duration2secs()|XML::Compile::Util/"Other"> produces
+useful results as well.
+
+example: 
+
+   my $now      = time;
+   my $deadline = add_duration 'P1M', $now;  # deadline in 1 month
+
+=item B<duration2secs>($duration)
+
+[1.44] Translate any format into seconds.  This is an example of
+a valid duration: C<-PT1M30.5S>  Average month and year lengths
+are used.  If you need more precise calculations, then use L<add_duration()|XML::Compile::Util/"Other">.
+
+=item B<even_elements>(LIST)
+
+Returns the even-numbered elements from the LIST.
+
+=item B<odd_elements>(LIST)
+
+Returns the odd-numbered elements from the LIST.
+
+=item B<type_of_node>($node)
+
+Translate an XML::LibXML::Node into a packed type.
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of XML-Compile distribution version 1.56,
+built on March 30, 2017. Website: F<http://perl.overmeer.net/xml-compile/>
+
+Please post questions or ideas to the mailinglist at
+F<http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/xml-compile> .
+For live contact with other developers, visit the C<#xml-compile> channel
+on C<irc.perl.org>.
+
+=head1 LICENSE
+
+Copyrights 2006-2017 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the Artistic license.
+See F<http://dev.perl.org/licenses/artistic.html>
+

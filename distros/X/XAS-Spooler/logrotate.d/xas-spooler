@@ -1,0 +1,18 @@
+
+/var/log/xas/xas-spooler.log {
+    prerotate
+        /usr/sbin/service xas-spooler stop
+    endscript
+    daily
+    nodateext
+    rotate 5
+    missingok
+    notifempty
+    sharedscripts
+    su xas xas
+    create 0664 xas xas
+    postrotate
+        /usr/sbin/service xas-spooler start
+    endscript
+}
+

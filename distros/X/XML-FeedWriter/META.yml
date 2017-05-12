@@ -1,0 +1,22 @@
+--- #YAML:1.0
+name:                XML-FeedWriter
+version:             0.06
+abstract:            simple RSS writer
+license:             perl
+author:              
+    - Kenichi Ishigaki <ishigaki@cpan.org>
+generated_by:        ExtUtils::MakeMaker version 6.44
+distribution_type:   module
+requires:     
+    Class::Accessor::Fast:         0
+    Class::Data::Inheritable:      0
+    DateTime:                      0
+    DateTimeX::Web:                0.03
+    Encode:                        0
+    Test::Classy:                  0.03
+    Test::More:                    0.47
+    Test::UseAllModules:           0.09
+    XML::Writer:                   0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

@@ -1,0 +1,8 @@
+<p>
+[% IF item.title -%]
+<b>[% item.title %]</b>
+[% END -%]
+<ul>
+<b><pre>[% item.content(site.view.text) | html( entity => 1 ) %]</pre></b>
+</ul>
+</p>

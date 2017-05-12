@@ -1,0 +1,48 @@
+Revision history for XML-OPML-SimpleGen
+0.07
+   - Full release of strtime() changes. (Stephen Cardie)
+
+0.06_01  Tue May 14 22:59:08 2013 +0100
+   - Use DateTime instead of POSIX::strfrime() - avoids problems on win32 and
+     other platforms which implement strftime differently. (Stephen Cardie)
+
+0.06 
+   - Release v0.06. (Stephen Cardie)
+   - Fix RT77725 - 03-localefix.t incorrectly fails on first 9 days of month.
+(Provided by gregoa [at ] debian.org) (Stephen Cardie)
+
+0.05    Fri May 18 16:04:55 2012 +0100
+    - Release v0.05 - includes bugfix for RT51000
+
+0.040_004  Fri May 18 15:26:16 2012 +0100
+    - Bug fix - merge KAPPA's fix for RT51000. (Stephen Cardie)
+
+0.040_003  Fri May 18 14:54:13 2012 +0100
+    - Developer release - add perlcritic tests to release stage (Stephen
+Cardie)
+
+0.040_002  Fri May 18 14:47:59 2012 +0100
+    - Developer release  - fix indirect object syntax; was causing perlcritic
+failures (Stephen Cardie)
+
+0.040_001  Fri May 18 14:34:40 2012 +0100
+    - Developer release - move to Dist::Zilla for managing infrastructure.
+(Stephen Cardie)
+
+0.04 2008-02-08 10:27:00 UTC
+    - fix improper plan() declaration in t/02-parse.t. (Stephen Cardie)
+
+0.03 2008-02-03 23:25 UTC
+    - make 5.6.0 oldest supported Perl version.
+    - use version pragma.
+    - eliminate dependencies on Date* modules.
+    - revise tests to add taint mode, pod coverage and remove un-needed
+      includes.
+
+0.02    2005-03-23 17:55 UTC
+	- dogh.. had atom still in my head
+	. added a test for passing XML::OPMLs parser
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

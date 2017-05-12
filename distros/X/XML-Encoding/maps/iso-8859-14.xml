@@ -1,0 +1,40 @@
+<encmap name='ISO-8859-14' expat='yes'>
+  <range byte='x80' len='33' uni='x0080'/>
+  <range byte='xa1' len='2' uni='x1e02'/>
+  <ch byte='xa3' uni='x00a3'/>
+  <range byte='xa4' len='2' uni='x010a'/>
+  <ch byte='xa6' uni='x1e0a'/>
+  <ch byte='xa7' uni='x00a7'/>
+  <ch byte='xa8' uni='x1e80'/>
+  <ch byte='xa9' uni='x00a9'/>
+  <ch byte='xaa' uni='x1e82'/>
+  <ch byte='xab' uni='x1e0b'/>
+  <ch byte='xac' uni='x1ef2'/>
+  <range byte='xad' len='2' uni='x00ad'/>
+  <ch byte='xaf' uni='x0178'/>
+  <range byte='xb0' len='2' uni='x1e1e'/>
+  <range byte='xb2' len='2' uni='x0120'/>
+  <range byte='xb4' len='2' uni='x1e40'/>
+  <ch byte='xb6' uni='x00b6'/>
+  <ch byte='xb7' uni='x1e56'/>
+  <ch byte='xb8' uni='x1e81'/>
+  <ch byte='xb9' uni='x1e57'/>
+  <ch byte='xba' uni='x1e83'/>
+  <ch byte='xbb' uni='x1e60'/>
+  <ch byte='xbc' uni='x1ef3'/>
+  <range byte='xbd' len='2' uni='x1e84'/>
+  <ch byte='xbf' uni='x1e61'/>
+  <range byte='xc0' len='16' uni='x00c0'/>
+  <ch byte='xd0' uni='x0174'/>
+  <range byte='xd1' len='6' uni='x00d1'/>
+  <ch byte='xd7' uni='x1e6a'/>
+  <range byte='xd8' len='6' uni='x00d8'/>
+  <ch byte='xde' uni='x0176'/>
+  <range byte='xdf' len='17' uni='x00df'/>
+  <ch byte='xf0' uni='x0175'/>
+  <range byte='xf1' len='6' uni='x00f1'/>
+  <ch byte='xf7' uni='x1e6b'/>
+  <range byte='xf8' len='6' uni='x00f8'/>
+  <ch byte='xfe' uni='x0177'/>
+  <ch byte='xff' uni='x00ff'/>
+</encmap>

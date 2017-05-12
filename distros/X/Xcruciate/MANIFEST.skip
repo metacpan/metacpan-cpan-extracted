@@ -1,0 +1,11 @@
+\~$
+.gz$
+.bak$
+.diff$
+.patch$
+.lwpcookies
+.releaserc
+_build
+^Build$
+^Makefile$
+.svn

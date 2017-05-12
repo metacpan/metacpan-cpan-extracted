@@ -1,0 +1,16 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/XML-FXN.t
+lib/XML/FXN.pm
+docs/xml_shallow_parsing.pl
+examples/PSI.xml
+examples/bpel.xml
+examples/excel.xml
+examples/fxn2xml.pl
+examples/word.xml
+examples/xml2fxn.pl
+xml_tools/xmldiff.pl
+xml_tools/xmlpp.pl
+META.yml                                 Module meta-data (added by MakeMaker)

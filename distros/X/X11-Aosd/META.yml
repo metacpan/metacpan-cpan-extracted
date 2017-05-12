@@ -1,0 +1,15 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         X11-Aosd
+version:      0.03
+version_from: lib/X11/Aosd.pm
+installdirs:  site
+requires:
+    Cairo:                         0
+    ExtUtils::Depends:             0
+    ExtUtils::PkgConfig:           0
+    Gtk2:                          0
+    Test::More:                    0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30_01

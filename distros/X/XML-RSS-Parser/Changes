@@ -1,0 +1,96 @@
+Revision history for Perl extension XML::RSS::Parser.
+
+4.0  Nov 18 2005
+    - Made into its own package again. Bad idea now fixed.
+    - Requires XML::Elemental 2.0 for SAX-based parsing.
+    - Switched internal storage of element and attribute names to 
+      Clarkian notation.
+    - Too many bug fixes and minor enhancements to list.
+    - Added atom, itunes, openSerch, feedburner and creativeCommons 
+      namespaces to default set.
+    - Moved XPath namespace and prefixes storage from Element to the 
+      Parser module.
+    - Added register_ns_prefix, prefix and namespace methods to parser
+      for OO access to the internal hashes.
+    - Introduced use of Class::ErroHandler for more quieter error 
+      handling.
+    - We have tests.
+    - Introduction of Util module. Moved as_xml and encode_xml methods 
+      from Element to Util.
+
+3.0  Sep 29 2004
+    - Folded into RAI.
+
+2.15 May 03 2004
+    - Fix error where zero items causes crash. (Greg Saylor)
+    - Added xhtml/div to pass-thrus.
+
+2.14 Apr 06 2004
+    - Fix bug were XPath routines were not retrieving attributes 
+      properly.
+
+2.13 Apr 05 2004
+    - Fix bug with some xpath related routines were // notation was
+      generating warnings and errors.
+    - Added the xml prefix and URI to the XPath namespace registry.
+    - Documentation fixes.
+
+2.12 Mar 11 2004
+    - Attributes were not inheriting the namespace of its associated 
+      element during parsing as it should have according to the 
+      XML-Namespaces specification. Fixed.
+    - Relatedly, XPath attribute name mapping also was not handling 
+      namespaces properly. Fixed.
+    - Documentation clean-up.
+    - Added query method alias to XPath match method. query is the 
+      preferred method to use going forward.
+
+2.11 Mar 01 2004
+	- Fixed missing dependency in Makefile.PL
+
+2.1  Mar 01 2004
+	- Added XPath capabilities to XML::RSS::Parser::Element.
+
+2.01 Jan 20 2004
+	- Fixed installation problem with the policy of the newest 
+	  ExtUtils::MakeMaker. (Mike Castle)
+	- Fixed POD error. (Mike Castle)
+
+2.0 Jan 16 2004
+	- Being terribly unsatisfied with where 1.0 was, performed a major
+	  overhaul of all the code and API while adding new features.
+	- XML::RSS::Parser::Element has been significantly changed. Modeled
+	  on XML::SimpleObject.
+	- XML::RSS::Parser::Feed is inherited from 
+	  XML::RSS::Parser::Element.
+	- XML::RSS::Parser::Block is gone.
+	- Now handles all RSS tags including skiphours, skipdays and
+	  textinput.
+	- Preserves xhtml/body and foaf/person blocks as a single element
+	- Many other flaws too numerous to list addressed.
+
+1.02 Jan 03 2004
+	- Fixed bug in element method of Block object where map keys 
+          were created when an undefined element was called.
+	- Better handling of ignored elements to avoid "noise" from 
+	  being included in the result. Added xhtml:body and 
+	  foaf:Person to the list for now.
+
+1.01 Jan 01 2004
+	- Fixed botched install.
+	- Documentation fixes.
+
+1.0 Dec 30 2003
+	- OO Rewrite.
+
+0.21 Jun 03 2003
+	- Fixed botched CPAN upload.
+
+0.2  Jun 02 2003
+	- Initial release into CPAN.
+	- Fixed several "incorrect presumptions."
+	- Added documentation.
+	- Added accessor methods.
+		
+0.1  Jan 13 2003
+	- Original version. Unreleased.

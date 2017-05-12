@@ -1,0 +1,17 @@
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         XML-XSH
+version:      1.8.4
+version_from: lib/XML/XSH/Functions.pm
+installdirs:  site
+requires:
+    XML::LibXSLT:                  1.53
+    XML::LibXML:                   1.54
+    XML::XUpdate::LibXML:          0.4.0
+    XML::LibXML::Iterator:         0
+    XML::LibXML::XPathContext:     0.04
+    Parse::RecDescent:             1.94
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.11
+x_deprecated: 1
+abstract: XSH (DEPRECATED) scripting language for XPath-based editing of XML

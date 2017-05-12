@@ -1,0 +1,20 @@
+<Orders>
+  These are the orders:
+  <Order ID="0008" Date="11/14/1999">
+    <Item>A Book</Item>
+    <Quantity>1</Quantity>
+    <TagsThatIDontCare>Something</TagsThatIDontCare>
+   </Order>
+   <TagsThatIDontCare>Blah Blah</TagsThatIDontCare>
+   <Order>
+    <Item>A Pencil</Item>
+    <Quantity>2</Quantity>
+    <TagsThatIDontCare>Something</TagsThatIDontCare>
+   </Order>
+   <Order ID="0018" Date="11/15/1999">
+    <Item>A Pen</Item>
+    <Quantity>4</Quantity>
+    <TagsThatIDontCare>Something</TagsThatIDontCare>
+   </Order>
+   End of all orders.
+</Orders>

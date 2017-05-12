@@ -1,0 +1,17 @@
+Changes file for XHTML::Util
+
+0.04    20091026
+        - Lost track a bit... On the road to a pretty comprehensive UI
+          revamp to act a lot more like jQuery which is an awesome way
+          to handle this stuff and pass it around.
+
+0.03    20090314
+        - Embarrassing Pod typo fixed; couple other things tweaked.
+
+0.02    20090314
+        - Added a skosh of Pod; corrected SEE ALSO section.
+        - Fixed a bug with parsing empty elements like br and hr.
+        - Surfaced the remove() method.
+
+0.01    20090313
+        - Alpha release; plenty o' stuff undone but a nice start.

@@ -1,0 +1,25 @@
+[% UNLESS (name = item.id or item.name);
+       view.base.print(item);
+       RETURN;
+   END;
+-%]
+
+[% view.print(synopsis)
+    IF (synopsis = item.getElementsByTagName('synopsis', 0)) 
+-%]
+
+[% view.print(desc)
+    IF (desc = item.getElementsByTagName('description', 0))
+-%]
+
+[% view.print(pkgvars)
+    IF (pkgvars = item.getElementsByTagName('pkgvars', 0)) 
+-%]
+
+[% view.print(methods)
+    IF (methods = item.getElementsByTagName('methods', 0)) -%]
+
+[% IF (sections = item.getElementsByTagName('section', 0)) -%]
+[% view.print(s) FOREACH s = sections -%]
+[% END %]
+

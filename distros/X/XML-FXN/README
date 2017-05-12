@@ -1,0 +1,35 @@
+XML-FXN version 0.01
+====================
+
+XML is used more and more in specifications like BPEL 
+as a notation for programming tasks. There is a need for a XML 
+notation, which can help handle XML in text mode in a manner 
+similar to 'normal' programming languages. Fast XML 
+Transformation applies only to well-formed XML documents and 
+should allow 1:1 transformation in both directions 
+without any loss in the content meaning and editorial structure.
+The transformation is based on shallow XML parsing.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires no other modules or libraries. 
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 by Jerzy Wachowiak
+
+This library is free software; you can redistribute it and/or 
+modify it under the same terms as Perl itself, either Perl 
+version 5.8.6 or,at your option, any later version of Perl 5 
+you may have available.
+
+

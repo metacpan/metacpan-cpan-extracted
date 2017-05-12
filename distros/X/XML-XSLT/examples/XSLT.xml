@@ -1,0 +1,629 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<pod xmlns="http://axkit.org/ns/2000/pod2xml">
+<head>
+	<title>	XML::XSLT - A perl module for processing XSLT
+	</title>
+</head>
+<sect1>
+<title>SYNOPSIS</title>
+<verbatim><![CDATA[
+use XML::XSLT;
+]]></verbatim>
+<verbatim><![CDATA[
+my $xslt = XML::XSLT->new ($xsl, warnings => 1);
+]]></verbatim>
+<verbatim><![CDATA[
+$xslt->transform ($xmlfile);
+print $xslt->toString;
+]]></verbatim>
+<verbatim><![CDATA[
+$xslt->dispose();
+]]></verbatim>
+</sect1>
+<sect1>
+<title>DESCRIPTION</title>
+<para>
+This module implements the W3C's XSLT specification. The goal is full
+implementation of this spec, but we have not yet achieved
+that. However, it already works well.  See <link xref='XML::XSLT Commands'>XML::XSLT Commands</link> for
+the current status of each command.
+</para>
+<para>
+XML::XSLT makes use of XML::DOM and LWP::Simple, while XML::DOM
+uses XML::Parser.  Therefore XML::Parser, XML::DOM and LWP::Simple
+have to be installed properly for XML::XSLT to run.
+</para>
+</sect1>
+<sect1>
+<title>Specifying Sources</title>
+<para>
+The stylesheets and the documents may be passed as filenames, file
+handles regular strings, string references or DOM-trees.  Functions
+that require sources (e.g. new), will accept either a named parameter
+or simply the argument.
+</para>
+<para>
+Either of the following are allowed:
+</para>
+<verbatim><![CDATA[
+my $xslt = XML::XSLT->new($xsl);
+my $xslt = XML::XSLT->new(Source => $xsl);
+]]></verbatim>
+<para>
+In documentation, the named parameter `Source' is always shown, but it
+is never required.
+</para>
+<sect2>
+<title>METHODS</title>
+<list>
+<item><itemtext>new(Source =&gt; $xml [, %args])</itemtext>
+<para>
+Returns a new XSLT parser object.  Valid flags are:
+</para>
+</item>
+<list>
+<item><itemtext>DOMparser_args</itemtext>
+<para>
+Hashref of arguments to pass to the XML::DOM::Parser object's parse
+method.
+</para>
+</item>
+<item><itemtext>variables</itemtext>
+<para>
+Hashref of variables and their values for the stylesheet.
+</para>
+</item>
+<item><itemtext>base</itemtext>
+<para>
+Base of URL for file inclusion.
+</para>
+</item>
+<item><itemtext>debug</itemtext>
+<para>
+Turn on debugging messages.
+</para>
+</item>
+<item><itemtext>warnings</itemtext>
+<para>
+Turn on warning messages.
+</para>
+</item>
+<item><itemtext>indent</itemtext>
+<para>
+Starting amount of indention for debug messages.  Defaults to 0.
+</para>
+</item>
+<item><itemtext>indent_incr</itemtext>
+<para>
+Amount to indent each level of debug message.  Defaults to 1.
+</para>
+</item>
+</list>
+<item><itemtext>open_xml(Source =&gt; $xml [, %args])</itemtext>
+<para>
+Gives the XSLT object new XML to process.  Returns an XML::DOM object
+corresponding to the XML.
+</para>
+</item>
+<list>
+<item><itemtext>base</itemtext>
+<para>
+The base URL to use for opening documents.
+</para>
+</item>
+<item><itemtext>parser_args</itemtext>
+<para>
+Arguments to pase to the parser.
+</para>
+</item>
+</list>
+<item><itemtext>open_xsl(Source =&gt; $xml, [, %args])</itemtext>
+<para>
+Gives the XSLT object a new stylesheet to use in processing XML.
+Returns an XML::DOM object corresponding to the stylesheet.  Any
+arguments present are passed to the XML::DOM::Parser.
+</para>
+</item>
+<list>
+<item><itemtext>base</itemtext>
+<para>
+The base URL to use for opening documents.
+</para>
+</item>
+<item><itemtext>parser_args</itemtext>
+<para>
+Arguments to pase to the parser.
+</para>
+</item>
+</list>
+<item><itemtext>process(%variables)</itemtext>
+<para>
+Processes the previously loaded XML through the stylesheet using the
+variables set in the argument.
+</para>
+</item>
+<item><itemtext>transform(Source =&gt; $xml [, %args])</itemtext>
+<para>
+Processes the given XML through the stylesheet.  Returns an XML::DOM
+object corresponding to the transformed XML.  Any arguments present
+are passed to the XML::DOM::Parser.
+</para>
+</item>
+<item><itemtext>serve(Source =&gt; $xml [, %args])</itemtext>
+<para>
+Processes the given XML through the stylesheet.  Returns a string
+containg the result.  Example:
+</para>
+<verbatim><![CDATA[
+use XML::XSLT qw(serve);
+]]></verbatim>
+<verbatim><![CDATA[
+$xslt = XML::XSLT->new($xsl);
+print $xslt->serve $xml;
+]]></verbatim>
+</item>
+<list>
+<item><itemtext>http_headers</itemtext>
+<para>
+If true, then prepends the appropriate HTTP headers (e.g. Content-Type,
+Content-Length);
+</para>
+<para>
+Defaults to true.
+</para>
+</item>
+<item><itemtext>xml_declaration</itemtext>
+<para>
+If true, then the result contains the appropriate &lt;?xml?&gt; header.
+</para>
+<para>
+Defaults to true.
+</para>
+</item>
+<item><itemtext>xml_version</itemtext>
+<para>
+The version of the XML.
+</para>
+<para>
+Defaults to 1.0.
+</para>
+</item>
+<item><itemtext>doctype</itemtext>
+<para>
+The type of DOCTYPE this document is.  Defaults to SYSTEM.
+</para>
+</item>
+</list>
+<item><itemtext>toString</itemtext>
+<para>
+Returns the result of transforming the XML with the stylesheet as a
+string.
+</para>
+</item>
+<item><itemtext>to_dom</itemtext>
+<para>
+Returns the result of transforming the XML with the stylesheet as an
+XML::DOM object.
+</para>
+</item>
+<item><itemtext>media_type</itemtext>
+<para>
+Returns the media type (aka mime type) of the object.
+</para>
+</item>
+<item><itemtext>dispose</itemtext>
+<para>
+Executes the <code>dispose</code> method on each XML::DOM object.
+</para>
+</item>
+</list>
+</sect2>
+</sect1>
+<sect1>
+<title>XML::XSLT Commands</title>
+<list>
+<item><itemtext>xsl:apply-imports		no</itemtext>
+<para>
+Not supported yet.
+</para>
+</item>
+<item><itemtext>xsl:apply-templates		limited</itemtext>
+<para>
+Attribute 'select' is supported to the same extent as xsl:value-of
+supports path selections.
+</para>
+<para>
+Not supported yet:
+- attribute 'mode'
+- xsl:sort and xsl:with-param in content
+</para>
+</item>
+<item><itemtext>xsl:attribute			partially</itemtext>
+<para>
+Adds an attribute named to the value of the attribute 'name' and as value
+the stringified content-template.
+</para>
+<para>
+Not supported yet:
+- attribute 'namespace'
+</para>
+</item>
+<item><itemtext>xsl:attribute-set		yes</itemtext>
+<para>
+Partially
+</para>
+</item>
+<item><itemtext>xsl:call-template		yes</itemtext>
+<para>
+Takes attribute 'name' which selects xsl:template's by name.
+</para>
+<para>
+Weak support:
+- xsl:with-param (select attrib not supported)
+</para>
+<para>
+Not supported yet:
+- xsl:sort
+</para>
+</item>
+<item><itemtext>xsl:choose			yes</itemtext>
+<para>
+Tests sequentially all xsl:whens until one succeeds or
+until an xsl:otherwise is found. Limited test support, see xsl:when
+</para>
+</item>
+<item><itemtext>xsl:comment			yes</itemtext>
+<para>
+Supported.
+</para>
+</item>
+<item><itemtext>xsl:copy				partially</itemtext>
+</item>
+<item><itemtext>xsl:copy-of			limited</itemtext>
+<para>
+Attribute 'select' functions as well as with
+xsl:value-of
+</para>
+</item>
+<item><itemtext>xsl:decimal-format		no</itemtext>
+<para>
+Not supported yet.
+</para>
+</item>
+<item><itemtext>xsl:element			yes</itemtext>
+</item>
+<item><itemtext>xsl:fallback			no</itemtext>
+<para>
+Not supported yet.
+</para>
+</item>
+<item><itemtext>xsl:for-each			limited</itemtext>
+<para>
+Attribute 'select' functions as well as with
+xsl:value-of
+</para>
+<para>
+Not supported yet:
+- xsl:sort in content
+</para>
+</item>
+<item><itemtext>xsl:if				limited</itemtext>
+<para>
+Identical to xsl:when, but outside xsl:choose context.
+</para>
+</item>
+<item><itemtext>xsl:import			no</itemtext>
+<para>
+Not supported yet.
+</para>
+</item>
+<item><itemtext>xsl:include			yes</itemtext>
+<para>
+Takes attribute href, which can be relative-local, 
+absolute-local as well as an URL (preceded by
+identifier http:).
+</para>
+</item>
+<item><itemtext>xsl:key				no</itemtext>
+<para>
+Not supported yet.
+</para>
+</item>
+<item><itemtext>xsl:message			no</itemtext>
+<para>
+Not supported yet.
+</para>
+</item>
+<item><itemtext>xsl:namespace-alias		no</itemtext>
+<para>
+Not supported yet.
+</para>
+</item>
+<item><itemtext>xsl:number			no</itemtext>
+<para>
+Not supported yet.
+</para>
+</item>
+<item><itemtext>xsl:otherwise			yes</itemtext>
+<para>
+Supported.
+</para>
+</item>
+<item><itemtext>xsl:output			limited</itemtext>
+<para>
+Only the initial xsl:output element is used.  The &quot;text&quot; output method
+is not supported, but shouldn't be difficult to implement.  Only the
+&quot;doctype-public&quot;, &quot;doctype-system&quot;, &quot;omit-xml-declaration&quot;, &quot;method&quot;,
+and &quot;encoding&quot; attributes have any support.
+</para>
+</item>
+<item><itemtext>xsl:param			experimental</itemtext>
+<para>
+Synonym for xsl:variable (currently). See xsl:variable for support.
+</para>
+</item>
+<item><itemtext>xsl:preserve-space		no</itemtext>
+<para>
+Not supported yet. Whitespace is always preserved.
+</para>
+</item>
+<item><itemtext>xsl:processing-instruction	yes</itemtext>
+<para>
+Supported.
+</para>
+</item>
+<item><itemtext>xsl:sort				no</itemtext>
+<para>
+Not supported yet.
+</para>
+</item>
+<item><itemtext>xsl:strip-space			no</itemtext>
+<para>
+Not supported yet. No whitespace is stripped.
+</para>
+</item>
+<item><itemtext>xsl:stylesheet			limited</itemtext>
+<para>
+Minor namespace support: other namespace than 'xsl:' for xsl-commands
+is allowed if xmlns-attribute is present. xmlns URL is verified.
+Other attributes are ignored.
+</para>
+</item>
+<item><itemtext>xsl:template			limited</itemtext>
+<para>
+Attribute 'name' and 'match' are supported to minor extend.
+('name' must match exactly and 'match' must match with full
+path or no path)
+</para>
+<para>
+Not supported yet:
+- attributes 'priority' and 'mode'
+</para>
+</item>
+<item><itemtext>xsl:text				yes</itemtext>
+<para>
+Supported.
+</para>
+</item>
+<item><itemtext>xsl:transform			limited</itemtext>
+<para>
+Synonym for xsl:stylesheet
+</para>
+</item>
+<item><itemtext>xsl:value-of			limited</itemtext>
+<para>
+Inserts attribute or element values. Limited support:
+</para>
+<para>
+&lt;xsl:value-of select=&quot;.&quot;/&gt;
+</para>
+<para>
+&lt;xsl:value-of select=&quot;/root-elem&quot;/&gt;
+</para>
+<para>
+&lt;xsl:value-of select=&quot;elem&quot;/&gt;
+</para>
+<para>
+&lt;xsl:value-of select=&quot;//elem&quot;/&gt;
+</para>
+<para>
+&lt;xsl:value-of select=&quot;elem[n]&quot;/&gt;
+</para>
+<para>
+&lt;xsl:value-of select=&quot;//elem[n]&quot;/&gt;
+</para>
+<para>
+&lt;xsl:value-of select=&quot;@attr&quot;/&gt;
+</para>
+<para>
+&lt;xsl:value-of select=&quot;text()&quot;/&gt;
+</para>
+<para>
+&lt;xsl:value-of select=&quot;processing-instruction()&quot;/&gt;
+</para>
+<para>
+&lt;xsl:value-of select=&quot;comment()&quot;/&gt;
+</para>
+<para>
+and combinations of these.
+</para>
+<para>
+Not supported yet:
+- attribute 'disable-output-escaping'
+</para>
+</item>
+<item><itemtext>xsl:variable			experimental</itemtext>
+<para>
+Very limited. It should be possible to define a variable and use it with
+&amp;lt;xsl:value select=&quot;$varname&quot; /&amp;gt; within the same template.
+</para>
+</item>
+<item><itemtext>xsl:when				limited</itemtext>
+<para>
+Only inside xsl:choose. Limited test support:
+</para>
+<para>
+&lt;xsl:when test=&quot;@attr='value'&quot;&gt;
+</para>
+<para>
+&lt;xsl:when test=&quot;elem='value'&quot;&gt;
+</para>
+<para>
+&lt;xsl:when test=&quot;path/[@attr='value']&quot;&gt;
+</para>
+<para>
+&lt;xsl:when test=&quot;path/[elem='value']&quot;&gt;
+</para>
+<para>
+&lt;xsl:when test=&quot;path&quot;&gt;
+</para>
+<para>
+path is supported to the same extend as with xsl:value-of
+</para>
+</item>
+<item><itemtext>xsl:with-param			experimental</itemtext>
+<para>
+It is currently not functioning. (or is it?)
+</para>
+</item>
+</list>
+</sect1>
+<sect1>
+<title>SUPPORT</title>
+<para>
+General information, bug reporting tools, the latest version, mailing
+lists, etc. can be found at the XML::XSLT homepage:
+</para>
+<verbatim><![CDATA[
+http://xmlxslt.sourceforge.net/
+]]></verbatim>
+</sect1>
+<sect1>
+<title>DEPRECATIONS</title>
+<para>
+Methods and interfaces from previous versions that are not documented in this
+version are deprecated.  Each of these deprecations can still be used
+but will produce a warning when the deprecation is first used.  You
+can use the old interfaces without warnings by passing <code>new()</code> the
+flag <code>use_deprecated</code>.  Example:
+</para>
+<verbatim><![CDATA[
+$parser = XML::XSLT->new($xsl, "FILE",
+                         use_deprecated => 1);
+]]></verbatim>
+<para>
+The deprecated methods will disappear by the time a 1.0 release is made.
+</para>
+<para>
+The deprecated methods are :
+</para>
+<list>
+<item><itemtext>output_string</itemtext>
+<para>
+use toString instead
+</para>
+</item>
+<item><itemtext>result_string</itemtext>
+<para>
+use toString instead
+</para>
+</item>
+<item><itemtext>output</itemtext>
+<para>
+use toString instead
+</para>
+</item>
+<item><itemtext>result</itemtext>
+<para>
+use toString instead
+</para>
+</item>
+<item><itemtext>result_mime_type</itemtext>
+<para>
+use media_type instead
+</para>
+</item>
+<item><itemtext>output_mime_type</itemtext>
+<para>
+use media_type instead
+</para>
+</item>
+<item><itemtext>result_tree</itemtext>
+<para>
+use to_dom instead
+</para>
+</item>
+<item><itemtext>output_tree</itemtext>
+<para>
+use to_dom instead
+</para>
+</item>
+<item><itemtext>transform_document</itemtext>
+<para>
+use transform instead
+</para>
+</item>
+<item><itemtext>process_project</itemtext>
+<para>
+use process instead
+</para>
+</item>
+<item><itemtext>open_project</itemtext>
+<para>
+use <code>Source</code> argument to <strong>new()</strong> and <strong>transform</strong> instead.
+</para>
+</item>
+<item><itemtext>print_output</itemtext>
+<para>
+use <strong>serve()</strong> instead.
+</para>
+</item>
+</list>
+</sect1>
+<sect1>
+<title>BUGS</title>
+<para>
+Yes.
+</para>
+</sect1>
+<sect1>
+<title>HISTORY</title>
+<para>
+Geert Josten and Egon Willighagen developed and maintained XML::XSLT
+up to version 0.22.  At that point, Mark Hershberger started moving
+the project to Sourceforge and began working on it with Bron Gondwana.
+</para>
+</sect1>
+<sect1>
+<title>LICENCE</title>
+<para>
+Copyright (c) 1999 Geert Josten &amp; Egon Willighagen. All Rights
+Reserverd.  This module is free software, and may be distributed under
+the same terms and conditions as Perl.
+</para>
+</sect1>
+<sect1>
+<title>AUTHORS</title>
+<para>
+Geert Josten &lt;gjosten@sci.kun.nl&gt;
+</para>
+<para>
+Egon Willighagen &lt;egonw@sci.kun.nl&gt;
+</para>
+<para>
+Mark A. Hershberger &lt;mah@everybody.org&gt;
+</para>
+<para>
+Bron Gondwana &lt;perlcode@brong.net&gt;
+</para>
+<para>
+Jonathan Stowe &lt;jns@gellyfish.com&gt;
+</para>
+</sect1>
+<sect1>
+<title>SEE ALSO</title>
+<para>
+<link xref='XML::DOM'>XML::DOM</link>, <link xref='LWP::Simple'>LWP::Simple</link>, <link xref='XML::Parser'>XML::Parser</link>
+</para>
+</sect1>
+</pod>

@@ -1,0 +1,6 @@
+Here's the TODO list, in no particular order:
+
+- cleanup code, maybe refactor (as per http://perlmonks.com/index.pl?node_id=264094 ).
+- XML::Parser will die on bad xml, so I might wrap some calls in eval ... 
+- Improve test suite (add optional Catalog tests for one).
+- Improve documentation (add more examples).

@@ -1,0 +1,7 @@
+XML::XForms::Generator TODO list
+================================
+
+*) Complete more of the documentation.
+*) Need to add XForms events
+*) Look for a better methodology for generating the XPath to instance data.
+*) Add some more examples of scripts and rendered code.

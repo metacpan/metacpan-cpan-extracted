@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<overlay>
+    <target xpath="/catalog/book[@id='book2']">
+        <action type="appendChild">
+            <author>Jon Orwant</author>
+        </action>
+    </target>
+    <target xpath="/catalog/book[@id='book1']/author[text()='Delete Me!']">
+        <action type="delete" />
+    </target>
+    <target xpath="/catalog/book[@id='book1']">
+        <action type="insertBefore">
+            <book id="book0">
+                <author>Mark Jason Dominus</author>
+                <title>Higher-Order Perl. Transforming Programs with Programs</title>
+                <isbn>9781558607019</isbn>
+            </book>
+        </action>
+    </target>
+    <target xpath="/catalog/book[@id='book3']">
+        <action type="insertAfter">
+            <book id="book4">
+                <author>Damian Conway</author>
+                <title>Object Oriented Perl: A Comprehensive Guide to Concepts and Programming Techniques</title>
+                <isbn>9781884777790</isbn>
+            </book>
+        </action>
+    </target>
+    <target xpath="/catalog/book[@id='book5']">
+        <action type="setAttribute" attribute="myAttribute">attr</action>
+    </target>
+    <target xpath="/catalog/book">
+        <action type="removeAttribute" attribute="delete" />
+    </target>
+</overlay>

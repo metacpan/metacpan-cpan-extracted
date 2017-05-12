@@ -1,0 +1,39 @@
+XML::Filter::DetectWS version 0.01
+==================================
+
+DESCRIPTION
+
+This a PerlSAX filter that detects which character data contains ignorable whitespace and optionally filters it. 
+
+Note that this is just a first stab at the implementation and it may change completely in the near future. Please provide
+feedback whether you like it or not, so I know whether I should change it. 
+
+The XML spec defines ignorable whitespace as the character data found in elements that were defined in an
+<!ELEMENT> declaration with a model of 'EMPTY' or 'Children' (Children is the rule that does not contain '#PCDATA'.)
+
+In addition, XML::Filter::DetectWS allows the user to define other whitespace to be ignorable. The ignorable whitespace
+is passed to the PerlSAX Handler with the ignorable_whitespace handler, provided that the Handler implements this
+method. (Otherwise it is passed to the characters handler.) If the SkipIgnorableWS is set, the ignorable whitespace is
+simply discarded. 
+
+XML::Filter::DetectWS also takes xml:space attributes into account. See below for details. 
+
+CDATA sections are passed in the standard PerlSAX way (i.e. with surrounding start_cdata and end_cdata events),
+unless the Handler does not implement these methods. In that case, the CDATA section is simply passed to the
+characters method. 
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 1999,2000 Enno Derksen
+All rights reserved.
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

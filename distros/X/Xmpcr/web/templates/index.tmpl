@@ -1,0 +1,51 @@
+<head>
+<meta http-equiv="refresh" content="60; URL=?">
+<title>XM Radio</title></head>
+<body background=/background.png>
+<center><h2>XM Radio</h2></center>
+
+<table border=0 align=center><tr><td>
+
+<TMPL_IF GENREROW>
+<table align=center border=1 bgcolor=#f2d7ef>
+<tr><th colspan=2>Listen now!<br>
+<a href="<TMPL_VAR NAME=ICEADDR>/xmhi">Higher Quality (for broadband)</a><br>
+<a href="<TMPL_VAR NAME=ICEADDR>/xmlo">Lower Quality (for dialup)</a>
+</th></tr>
+</table>
+</TMPL_IF>
+
+</td><td>
+
+<table align=center border=1>
+<tr><th bgcolor=#f2d7ef>Power:</th><td bgcolor=#d7f7f5><TMPL_VAR NAME=CURPOWER> (<a href="?cmd=<TMPL_VAR NAME=NEWPOWER>">Turn power <TMPL_VAR NAME=NEWPOWER></a>)</td></tr>
+<TMPL_IF GENREROW>
+<tr><th bgcolor=#f2d7ef>Satellite Signal Strength:</th><td bgcolor=#d7d7f7><TMPL_VAR NAME=SIGNAL>%</td></tr>
+<tr><th bgcolor=#f2d7ef>Currently Playing:</th><td bgcolor=#d7f7f5>
+	<TMPL_VAR NAME=CURCHANNUM> <TMPL_VAR NAME=CURCHANNAME> (<TMPL_VAR NAME=CURCAT>)<br>
+	<TMPL_VAR NAME=CURART> - <TMPL_VAR NAME=CURSONG>
+</td></tr>
+<tr><th bgcolor=#f2d7ef>Locked by:</th><td bgcolor=#d7f7f5>
+<TMPL_VAR NAME=LOCKER></td></tr>
+</TMPL_IF>
+</table>
+
+</td></tr></table> <br>
+
+<TMPL_IF GENREROW>
+<table align=center border=1>
+<tr bgcolor=#f2d7ef><th colspan=3><font size=+1>Channel Listing</font></th></tr>
+<tr bgcolor=#f2d7ef> <th>&nbsp;</th><th>Go</th> <th>Channel</th> </tr>
+
+<TMPL_LOOP NAME=GENREROW>
+<tr bgcolor=#f2d7ef><th rowspan=<TMPL_VAR NAME=NUMROWS>><TMPL_VAR NAME=GENRE></th></tr>
+<TMPL_LOOP NAME=ROW>
+	<tr bgcolor=<TMPL_VAR NAME=BGCOLOR>>
+	<td><a href="?cmd=change&channel=<TMPL_VAR NAME=NUM>"><img border=0 src="/ball.green.gif"></a></td>
+	<td><b><TMPL_VAR NAME=NUM> - <TMPL_VAR NAME=NAME></b> - <TMPL_VAR NAME=ARTIST> <TMPL_IF ARTIST>/</TMPL_IF> <TMPL_VAR NAME=SONG> </td>
+	</tr>
+</TMPL_LOOP>
+</TMPL_LOOP>
+</table>
+</TMPL_IF>
+

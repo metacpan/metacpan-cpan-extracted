@@ -1,0 +1,57 @@
+{
+   "abstract" : "A tool-kit providing a wrapper around a HTTP client,",
+   "author" : [
+      "Adam Trickett, E<lt>atrickett@cpan.orgE<gt>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.141170",
+   "license" : [
+      "open_source"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "XML-RSS-Tools",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "IO::Capture" : "0.04",
+            "Module::Build" : "0.4",
+            "Pod::Coverage" : "0.21",
+            "Test::Pod" : "1.0",
+            "Test::Warn" : "0.09",
+            "URI::file" : "4.19",
+            "YAML" : "0.60"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "LWP" : "6.0",
+            "URI" : "1.58",
+            "XML::LibXML" : "1.70",
+            "XML::LibXSLT" : "1.70",
+            "XML::RSS" : "1.46",
+            "perl" : "v5.10.0"
+         }
+      }
+   },
+   "provides" : {
+      "XML::RSS::Tools" : {
+         "file" : "lib/XML/RSS/Tools.pm",
+         "version" : "0.34"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.gnu.org/licenses/lgpl-3.0.txt"
+      ]
+   },
+   "version" : "0.34"
+}

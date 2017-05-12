@@ -1,0 +1,3 @@
+* when 2.9 is removed, remove _create_hierarchy
+
+* we always create sig:correction, never sig:update - make that configurable

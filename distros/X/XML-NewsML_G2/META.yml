@@ -1,0 +1,138 @@
+---
+abstract: 'generate NewsML-G2 news items'
+author:
+  - 'Philipp Gortan <philipp.gortan@apa.at>'
+  - 'Mario Paumann <mario.paumann@apa.at>'
+  - 'Christian Eder <christian.eder@apa.at>'
+  - 'Stefan Hrdlicka <stefan.hrdlicka@apa.at>'
+build_requires:
+  Test::Exception: '0'
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.4004'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4205, CPAN::Meta::Converter version 2.140640'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: XML-NewsML_G2
+provides:
+  XML::NewsML_G2:
+    file: lib/XML/NewsML_G2.pm
+    version: v0.2.6
+  XML::NewsML_G2::AnyItem:
+    file: lib/XML/NewsML_G2/AnyItem.pm
+  XML::NewsML_G2::Audio:
+    file: lib/XML/NewsML_G2/Audio.pm
+  XML::NewsML_G2::Copyright_Holder:
+    file: lib/XML/NewsML_G2/Copyright_Holder.pm
+  XML::NewsML_G2::Desk:
+    file: lib/XML/NewsML_G2/Desk.pm
+  XML::NewsML_G2::Genre:
+    file: lib/XML/NewsML_G2/Genre.pm
+  XML::NewsML_G2::Graphics:
+    file: lib/XML/NewsML_G2/Graphics.pm
+  XML::NewsML_G2::Group:
+    file: lib/XML/NewsML_G2/Group.pm
+  XML::NewsML_G2::Icon:
+    file: lib/XML/NewsML_G2/Icon.pm
+  XML::NewsML_G2::Link:
+    file: lib/XML/NewsML_G2/Link.pm
+  XML::NewsML_G2::Location:
+    file: lib/XML/NewsML_G2/Location.pm
+  XML::NewsML_G2::Media_Topic:
+    file: lib/XML/NewsML_G2/Media_Topic.pm
+  XML::NewsML_G2::News_Item:
+    file: lib/XML/NewsML_G2/News_Item.pm
+  XML::NewsML_G2::News_Item_Audio:
+    file: lib/XML/NewsML_G2/News_Item_Audio.pm
+  XML::NewsML_G2::News_Item_Graphics:
+    file: lib/XML/NewsML_G2/News_Item_Graphics.pm
+  XML::NewsML_G2::News_Item_Picture:
+    file: lib/XML/NewsML_G2/News_Item_Picture.pm
+  XML::NewsML_G2::News_Item_Text:
+    file: lib/XML/NewsML_G2/News_Item_Text.pm
+  XML::NewsML_G2::News_Item_Video:
+    file: lib/XML/NewsML_G2/News_Item_Video.pm
+  XML::NewsML_G2::News_Message:
+    file: lib/XML/NewsML_G2/News_Message.pm
+  XML::NewsML_G2::Organisation:
+    file: lib/XML/NewsML_G2/Organisation.pm
+  XML::NewsML_G2::Package_Item:
+    file: lib/XML/NewsML_G2/Package_Item.pm
+  XML::NewsML_G2::Picture:
+    file: lib/XML/NewsML_G2/Picture.pm
+  XML::NewsML_G2::Product:
+    file: lib/XML/NewsML_G2/Product.pm
+  XML::NewsML_G2::Provider:
+    file: lib/XML/NewsML_G2/Provider.pm
+  XML::NewsML_G2::Role::HasQCode:
+    file: lib/XML/NewsML_G2/Role/HasQCode.pm
+  XML::NewsML_G2::Role::Remote:
+    file: lib/XML/NewsML_G2/Role/Remote.pm
+  XML::NewsML_G2::Role::RemoteAudible:
+    file: lib/XML/NewsML_G2/Role/RemoteAudible.pm
+  XML::NewsML_G2::Role::RemoteVisual:
+    file: lib/XML/NewsML_G2/Role/RemoteVisual.pm
+  XML::NewsML_G2::Role::Writer:
+    file: lib/XML/NewsML_G2/Role/Writer.pm
+  XML::NewsML_G2::Role::Writer::News_Item_Audio:
+    file: lib/XML/NewsML_G2/Role/Writer/News_Item_Audio.pm
+  XML::NewsML_G2::Role::Writer::News_Item_Graphics:
+    file: lib/XML/NewsML_G2/Role/Writer/News_Item_Graphics.pm
+  XML::NewsML_G2::Role::Writer::News_Item_Picture:
+    file: lib/XML/NewsML_G2/Role/Writer/News_Item_Picture.pm
+  XML::NewsML_G2::Role::Writer::News_Item_Text:
+    file: lib/XML/NewsML_G2/Role/Writer/News_Item_Text.pm
+  XML::NewsML_G2::Role::Writer::News_Item_Video:
+    file: lib/XML/NewsML_G2/Role/Writer/News_Item_Video.pm
+  XML::NewsML_G2::Role::Writer::News_Message:
+    file: lib/XML/NewsML_G2/Role/Writer/News_Message.pm
+  XML::NewsML_G2::Role::Writer::Package_Item:
+    file: lib/XML/NewsML_G2/Role/Writer/Package_Item.pm
+  XML::NewsML_G2::Role::Writer_2_12:
+    file: lib/XML/NewsML_G2/Role/Writer_2_12.pm
+  XML::NewsML_G2::Role::Writer_2_15:
+    file: lib/XML/NewsML_G2/Role/Writer_2_15.pm
+  XML::NewsML_G2::Role::Writer_2_18:
+    file: lib/XML/NewsML_G2/Role/Writer_2_18.pm
+  XML::NewsML_G2::Role::Writer_2_9:
+    file: lib/XML/NewsML_G2/Role/Writer_2_9.pm
+  XML::NewsML_G2::Scheme:
+    file: lib/XML/NewsML_G2/Scheme.pm
+  XML::NewsML_G2::Scheme_Manager:
+    file: lib/XML/NewsML_G2/Scheme_Manager.pm
+  XML::NewsML_G2::Service:
+    file: lib/XML/NewsML_G2/Service.pm
+  XML::NewsML_G2::Topic:
+    file: lib/XML/NewsML_G2/Topic.pm
+  XML::NewsML_G2::Types:
+    file: lib/XML/NewsML_G2/Types.pm
+  XML::NewsML_G2::Video:
+    file: lib/XML/NewsML_G2/Video.pm
+  XML::NewsML_G2::Writer:
+    file: lib/XML/NewsML_G2/Writer.pm
+  XML::NewsML_G2::Writer::News_Item:
+    file: lib/XML/NewsML_G2/Writer/News_Item.pm
+  XML::NewsML_G2::Writer::News_Message:
+    file: lib/XML/NewsML_G2/Writer/News_Message.pm
+  XML::NewsML_G2::Writer::Package_Item:
+    file: lib/XML/NewsML_G2/Writer/Package_Item.pm
+requires:
+  DateTime: '0'
+  DateTime::Format::XSD: '0'
+  Module::Runtime: '0'
+  Moose: '0.64'
+  Moose::Util: '0.64'
+  UUID::Tiny: '1.02'
+  XML::LibXML: '0'
+  namespace::autoclean: '0.05'
+  perl: v5.8.0
+  version: '0.77'
+resources:
+  IRC: irc://irc.perl.org/#xml-newsml-g2
+  bugtracker: https://github.com/apa-it/xml-newsml-g2/issues
+  license: http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt
+  repository: https://github.com/apa-it/xml-newsml-g2
+version: v0.2.6

@@ -1,0 +1,4 @@
+<doc>
+<linkinter url="/some/where"><blah/></linkinter>
+<link url="/some/where"><blah/></link>
+</doc>

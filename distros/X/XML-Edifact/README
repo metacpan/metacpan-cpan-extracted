@@ -1,0 +1,62 @@
+
+        XML::Edifact
+
+        an approach towards XML/EDI as a prototype in perl
+
+        release 0.47 - character hander bug fix
+        Thu Jul 31 19:10:43 CEST 2003
+
+        (c) Michael Koehne, mailto:kraehe@copyleft.de
+
+
+       Abstract
+
+       XML::Edifact is a set of perl scripts, for translating
+       EDIFACT into XML.
+
+       0.47 is a bug fix to work around the character hander race
+       condition in XML::Parser. Thanks to Sergey Groznyh <gsm@fct.ru>,
+       who found and fixed the bug. I also migrated documentation from
+       linuxdoc-sgml to Perldoc, as the former got obsolete.
+
+       Introduction
+
+       EDIFACT is often called "the nightmare of the paperless
+       office" when you show a programmer the standard draft.
+       Those 2700 pages of horror-filled advisory-board English
+       have given many programmers headaches.
+
+       EDIFACT is trying the impossible: a single form for the
+       real world.
+
+       Orders, invoices, freight papers, etc., always look dif­
+       ferent, if they come from different companies. EDIFACT
+       tries to fulfill all needs of commercial messages, regard­
+       less of type and origin. Of course the real world is nei­
+       ther simple nor complete.  Nevertheless, it's important
+       for the top companies and their suppliers -  you know,
+       those who have been in business for years and can pay for
+       a mainframe and a pack of gurus.
+
+       XML/EDI is meant to provide a simpler (KISS) format that
+       can be translated to and from EDI, to allow smaller compa­
+       nies to avoid slashing down forests and retyping into a
+       computer keyboard stupid lines printed by other computers.
+
+       This is NOT XML/EDI, it's certainly not KISS. The edi­
+       fact03.dtd reflects the original words of the EDIFACT
+       standard as closely as possible, on a segment, composite
+       and element level.
+
+       This DTD simplifies EDI inasmuch as it doesn't distinguish
+       between e.g. INVOICE or PRICAT, but only defines a generic
+       message type called edifact:message. The benefit is of
+       course that it's possible to convert any EDI message into
+       edifact. The drawback is that the dtd is really relaxed.
+       Validation of EDIFACT message design can therefore not be
+       done by a validating XML parser. Message designers will
+       still need knowledge about EDIFACT message design and EDI­
+       FACT tools.
+
+       But once the message is designed, it's simpler to read it
+       with XML.

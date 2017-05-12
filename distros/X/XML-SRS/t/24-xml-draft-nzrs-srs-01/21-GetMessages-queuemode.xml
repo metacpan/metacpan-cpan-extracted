@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<NZSRSRequest VerMajor="5" VerMinor="0" RegistrarId="140">
+  <GetMessages QueueMode="1" MaxResults="7">
+    <TypeFilter Type="server-generated-data" />
+    <TypeFilter Type="third-party" />
+  </GetMessages>
+</NZSRSRequest>

@@ -1,0 +1,31 @@
+% layout 'default';
+% title 'User Section';
+
+<ul class="btn-group-vertical list_button_group" role="group">
+  % if ( session('user')->{roles}{quotes} ) {
+    <li class="btn-group" role="group"><a
+      href="/user/quotes"
+      type="button" class="btn btn-default">Quotes</a></li>
+  % }
+  % if ( session('user')->{roles}{users} ) {
+    <li class="btn-group" role="group"><a
+      href="/user/manage-users"
+      type="button" class="btn btn-default">User management</a></li>
+  % }
+  % if ( session('user')->{roles}{products} ) {
+    <li class="btn-group" role="group"><a
+      href="/user/site-products"
+      type="button" class="btn btn-default">Site products</a></li>
+  % }
+  % if ( session('user')->{roles}{products} ) {
+    <li class="btn-group" role="group"><a
+      href="/user/hot-products"
+      type="button" class="btn btn-default">Hot products</a></li>
+    <li class="btn-group" role="group"><a
+      href="/user/master-products-database"
+      type="button" class="btn btn-default">Master products
+      database</a></li>
+  % }
+</ul>
+
+<p><a href="/logout" type="button" class="btn btn-danger">Log out</a></p>

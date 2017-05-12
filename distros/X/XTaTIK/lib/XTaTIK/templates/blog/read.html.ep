@@ -1,0 +1,8 @@
+% layout 'default';
+% stash active_page => 'blog';
+
+%= include 'blog/blog_nav';
+  <article id="blog_article_content">
+    <%== $blog_body %>
+  </article>
+%= include 'blog/blog_nav';

@@ -1,0 +1,20 @@
+<!ELEMENT Client (ClientData)*>
+
+<!ELEMENT ClientData (client_desc, branch_desc, branch_ref_no, client_no, address, zip, city, state, country, phone, fax, email_id, contact, notes, division_name, department)>
+
+<!ELEMENT client_desc (#PCDATA)>
+<!ELEMENT branch_desc (#PCDATA)>
+<!ELEMENT branch_ref_no (#PCDATA)>
+<!ELEMENT client_no (#PCDATA)>
+<!ELEMENT address (#PCDATA)>
+<!ELEMENT zip (#PCDATA)>
+<!ELEMENT city (#PCDATA)>
+<!ELEMENT state (#PCDATA)>
+<!ELEMENT country (#PCDATA)>
+<!ELEMENT phone (#PCDATA)>
+<!ELEMENT fax (#PCDATA)>
+<!ELEMENT email_id (#PCDATA)>
+<!ELEMENT contact (#PCDATA)>
+<!ELEMENT notes (#PCDATA)>
+<!ELEMENT division_name (#PCDATA)>
+<!ELEMENT department (#PCDATA)>

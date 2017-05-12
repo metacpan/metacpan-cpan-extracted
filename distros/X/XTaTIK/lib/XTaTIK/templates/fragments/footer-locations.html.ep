@@ -1,0 +1,84 @@
+% my $n = items_in xtext('locations');
+% $n = 6 if $n > 6;
+
+% if ( $n == 1 ) { ## Special-case single locations
+  % my $loc = xtext('locations')->[0];
+  <div class="col-sm-6 col-sm-push-3">
+    <h4><%== $loc->{name} %></h4>
+    <div class="row">
+      <address class="address col-sm-4">
+        <%== $loc->{address} %>
+        % if ( length $loc->{hours} ) {
+          <br><span class="hours"><%= $loc->{hours} %></span>
+        % } if ( length $loc->{note} ) {
+          <br><small><%= $loc->{note} %></small>
+        % }
+      </address>
+      <address class="phones col-sm-4">
+        % if ( length $loc->{phone} ) {
+          <span>Phone:</span> <%= $loc->{phone} %><br>
+        % } if ( length $loc->{tfphone} ) {
+          <span>Toll-free:</span> <%= $loc->{tfphone} %><br>
+        % }
+      </address>
+      <address class="phones col-sm-4">
+        % if ( length $loc->{fax} ) {
+          <span>Fax:</span> <%= $loc->{fax} %><br>
+        % } if ( length $loc->{tffax} ) {
+          <span>Toll-free fax:</span> <%= $loc->{tffax} %><br>
+        % } if ( length $loc->{email} ) {
+          <span>Email:</span> <a
+            href="<%== mailto_href $loc->{email} %>"
+              ><%== mailto $loc->{email} %></a>
+        % }
+      </address>
+    </div>
+  </div>
+% } else {
+  % my %size_map = (
+  %  2 => [  8, 3,  12, 0,  12, 0,   4, 6, 12 ],
+  %  3 => [  8, 2,  12, 0,  12, 0,   4, 4, 6  ],
+  %  4 => [ 10, 1,  12, 0,  12, 0,   3, 6, 6  ],
+  %  5 => [ 12, 1,  12, 0,  12, 0,   2, 4, 6  ],
+  %  6 => [ 12, 0,  12, 0,  12, 0,   2, 4, 6  ],
+  % );
+  <div class="col-lg-<%= $size_map{$n}[0] %>
+              col-lg-push-<%= $size_map{$n}[1] %>
+              col-sm-<%= $size_map{$n}[2] %>
+              col-sm-push-<%= $size_map{$n}[3] %>
+              col-xs-<%= $size_map{$n}[4] %>
+              col-xs-push-<%= $size_map{$n}[5] %>">
+    <div class="row">
+      % for my $loc ( items_in xtext('locations') ) {
+        <div class="col-lg-<%= $size_map{$n}[6] %>
+                    col-sm-<%= $size_map{$n}[7] %>
+                    col-xs-<%= $size_map{$n}[8] %>">
+          <h4><%== $loc->{name} %></h4>
+          <address class="address">
+            <%== $loc->{address} %>
+            % if ( length $loc->{hours} ) {
+              <br><span class="hours"><%= $loc->{hours} %></span>
+            % } if ( length $loc->{note} ) {
+              <br><small><%= $loc->{note} %></small>
+            % }
+          </address>
+          <address class="phones">
+            % if ( length $loc->{phone} ) {
+              <span>Phone:</span> <%= $loc->{phone} %><br>
+            % } if ( length $loc->{tfphone} ) {
+              <span>Toll-free:</span> <%= $loc->{tfphone} %><br>
+            % } if ( length $loc->{fax} ) {
+              <span>Fax:</span> <%= $loc->{fax} %><br>
+            % } if ( length $loc->{tffax} ) {
+              <span>Toll-free fax:</span> <%= $loc->{tffax} %><br>
+            % } if ( length $loc->{email} ) {
+              <span>Email:</span> <a
+                href="<%== mailto_href $loc->{email} %>"
+                  ><%== mailto $loc->{email} %></a>
+            % }
+          </address>
+        </div>
+      % }
+    </div>
+  </div>
+% }

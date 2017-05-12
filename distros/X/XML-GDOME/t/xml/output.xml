@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<TEST xmlns:tns="urn:test.tst">
+  <NODE5/>
+  <NODE4/>
+  <!--*** Start of the new nodes ***-->
+  <DTEL1 DTATTR1="dtattr1">
+    <DTEL2 DTATTR2="dtattr2"/>
+  </DTEL1>
+  <DTEL3/>
+  <!--*** Stop of the new nodes ***-->
+  <NODE3 ATTR1="Ciao" tns:ATTR1="Bye">This a attributed node</NODE3>
+  <xxx:NODE2>xxxxx</xxx:NODE2>
+  <NODE1>This is a test string</NODE1>
+</TEST>

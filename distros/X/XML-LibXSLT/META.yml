@@ -1,0 +1,29 @@
+---
+abstract: 'Interface to GNOME libxslt library'
+author:
+  - 'Matt Sergeant'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.16, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: XML-LibXSLT
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Encode: '0'
+  XML::LibXML: '1.70'
+  perl: '5.008001'
+  strict: '0'
+  warnings: '0'
+resources:
+  repository: https://bitbucket.org/shlomif/perl-xml-libxslt
+version: '1.95'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

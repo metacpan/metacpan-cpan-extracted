@@ -1,0 +1,63 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/css" href="./rss.css"?>
+<rss
+  version="2.0"
+  xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+>
+<channel>
+  <title>Weebl and Bob</title>
+  <description>the everyday happenings of weebl and sometimes weebls friend bob</description>
+  <link>http://www.weebl.jolt.co.uk/</link>
+  <language>en</language>
+  <webMaster>sburke@cpan.org</webMaster>
+
+  <sy:updatePeriod>daily</sy:updatePeriod>
+  <sy:updateFrequency>1</sy:updateFrequency>
+  <sy:updateBase>2002-01-01T12:33</sy:updateBase>
+
+  <docs>http://www.interglacial.com/rss/about.html</docs>
+
+  <image>
+    <title>Weebl and Bob</title>
+    <url>http://interglacial.com/rss/weebl.gif</url>
+    <width>140</width>
+    <height>106</height>
+    <link>http://www.weebl.jolt.co.uk/</link>
+  </image>
+
+<item>
+<title>weebl + bob: awards</title>
+<link>http://www.weebl.jolt.co.uk/go.php?date=2004-03-04</link>
+<description>weebl + bob 2004-03-04: awards</description></item>
+
+<item>
+<title>weebl + bob: jelly</title>
+<link>http://www.weebl.jolt.co.uk/go.php?date=2004-02-19</link>
+<description>weebl + bob 2004-02-19: jelly</description></item>
+
+<item>
+<title>weebl + bob: moon</title>
+<link>http://www.weebl.jolt.co.uk/go.php?date=2004-02-02</link>
+<description>weebl + bob 2004-02-02: moon</description></item>
+
+<item>
+<title>weebls stuff: kenya</title>
+<link>http://www.weebls-stuff.com/toons/29/</link>
+<description>[weebls-stuff.com extra 2004-01-28] &lt;br&gt;Come and visit sunny Kenya. &lt;br&gt;Toon size: 388.9kb &lt;br&gt;&lt;img src=&quot;/data/toons/preview/kenya.gif&quot; width=&quot;75&quot; height=&quot;75&quot; border=&quot;0&quot;&gt;</description></item>
+
+<item>
+<title>weebl + bob: germs</title>
+<link>http://www.weebl.jolt.co.uk/go.php?date=2004-01-20</link>
+<description>weebl + bob 2004-01-20: germs</description></item>
+
+<item>
+<title>weebls stuff: hos</title>
+<link>http://www.weebls-stuff.com/toons/28/</link>
+<description>[weebls-stuff.com extra 2004-01-19] &lt;br&gt;Nothing special. Just letting you know I'm alive. Music by Perez Prado. &lt;br&gt;Toon size: 750.55kb &lt;br&gt;&lt;img src=&quot;/data/toons/preview/hos1.gif&quot; width=&quot;75&quot; height=&quot;75&quot; border=&quot;0&quot;&gt;</description></item>
+
+<item>
+<title>weebl + bob: diet</title>
+<link>http://www.weebl.jolt.co.uk/go.php?date=2004-01-08</link>
+<description>weebl + bob 2004-01-08: diet</description></item>
+
+</channel></rss>

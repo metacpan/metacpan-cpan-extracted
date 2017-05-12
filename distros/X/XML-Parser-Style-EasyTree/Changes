@@ -1,0 +1,32 @@
+Revision history for XML-Parser-Style-EasyTree
+
+0.09    2009-08-27
+        Kwalitee fixes
+
+0.08    2009-08-27
+        Holy shit. Previous dist was built with 0.05 inside
+
+0.07    2009-08-26
+        Fix version in EasyTree
+
+0.06    2009-08-26
+        Fix docs, META.yml
+
+0.05    2009-08-14
+        Fix docs
+
+0.04    2009-08-14
+        Move functionality to ETree (to avoid clash with XML::Parser::EasyTree)
+        Add $TEXT{TRIM}
+        Fix distribution
+        Add example
+
+0.03    2009-03-04
+        Tune perfomance, one more fix joining of text nodes
+
+0.02    2009-02-05
+        Fix joining of text nodes
+
+0.01    2009-01-28
+        First version
+

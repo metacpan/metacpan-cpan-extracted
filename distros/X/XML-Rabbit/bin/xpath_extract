@@ -1,0 +1,108 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+# PODNAME: xpath_extract
+# ABSTRACT: Extracts the matches for the given XPath query from an XML file
+
+binmode(STDOUT, ':encoding(UTF-8)');
+
+my $xpath = shift;
+die("No XPath query specified!\n") unless $xpath;
+{
+    my $old_sep = $/;
+    local $/ = undef; # Enable slurp mode
+    while( <> ) {
+        local $/ = $old_sep; # Restore normal mode
+        print_matches($_,$xpath);
+        #print_xml($_,$xpath);
+    }
+}
+
+sub print_matches {
+    my ($xml, $query) = @_;
+    my $doc = XML::Rabbit::XPathExtract->new( xml => $xml, xpath => $query );
+    foreach my $value ( @{ $doc->values } ) {
+        print $value, "\n" if defined($value) and length($value) > 0;
+    }
+    return 1;
+}
+
+sub print_xml {
+    my ($xml, $query) = @_;
+    my $doc = XML::Rabbit::XPathExtract->new( xml => $xml, xpath => $query );
+    foreach my $object ( @{ $doc->objects } ) {
+        print STDOUT $object->dump_xml, "\n";
+    }
+    return 1;
+}
+
+# Stupid Perl::Critic doesn't know how to differentiate between a BEGIN {}
+# and a normal sub. Let's just override it.
+## no critic qw(Subroutines::ProhibitNestedSubs)
+## no critic qw(Modules::ProhibitMultiplePackages)
+BEGIN {
+    package XML::Rabbit::XPathExtract;
+$XML::Rabbit::XPathExtract::VERSION = '0.4.1';
+use Moose;
+    with 'XML::Rabbit::RootNode';
+
+    has 'xpath' => (
+        is       => 'ro',
+        isa      => 'Str',
+        required => 1,
+    );
+
+    has 'values' => (
+        isa         => 'ArrayRef[Str]',
+        traits      => [qw(XPathValueList)],
+        xpath_query => sub { shift->xpath },
+    );
+
+    has 'objects' => (
+        isa         => 'ArrayRef[XPathObject]',
+        traits      => [qw(XPathObjectList)],
+        xpath_query => sub { shift->xpath },
+    );
+
+    no Moose;
+    __PACKAGE__->meta->make_immutable();
+
+    package XPathObject;
+$XPathObject::VERSION = '0.4.1';
+use Moose;
+    with 'XML::Rabbit::Node';
+
+    no Moose;
+    __PACKAGE__->meta->make_immutable();
+}
+
+1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+xpath_extract - Extracts the matches for the given XPath query from an XML file
+
+=head1 VERSION
+
+version 0.4.1
+
+=head1 AUTHOR
+
+Robin Smidsrød <robin@smidsrod.no>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Robin Smidsrød.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -1,0 +1,27 @@
+____________________________________________________________________________
+[  2924] By: autrijus                              on 2002/12/25  15:04:33
+        Log: * This be 0.02.
+             * Work around Date::Parse's inability to handle
+	       +08:00-style
+             ISO dates by removing the colon.
+	   ! lib/XML/RSS/Aggregate.pm
+____________________________________________________________________________
+[  2923] By: autrijus                              on 2002/12/25  15:01:47
+        Log: * oops, can't value(@taxo).
+	   ! lib/XML/RSS/Aggregate.pm
+____________________________________________________________________________
+[  2922] By: autrijus                              on 2002/12/25  15:00:54
+        Log: * only encode entities for dc, syn and taxo, as we
+	       shouldn't
+             know about user-defined properties.
+	   ! lib/XML/RSS/Aggregate.pm
+____________________________________________________________________________
+[  2921] By: autrijus                              on 2002/12/25  14:44:46
+        Log: * changes and signatures.
+	   + Changes META.yml SIGNATURE
+____________________________________________________________________________
+[  2920] By: autrijus                              on 2002/12/25  14:43:18
+        Log: * Initial CPAN Release for RSS Aggregator.
+	   + Build.PL MANIFEST MANIFEST.SKIP Makefile.PL
+	   + README lib/XML/RSS/Aggregate.pm
+	   + t/0-signature.t t/1-basic.t

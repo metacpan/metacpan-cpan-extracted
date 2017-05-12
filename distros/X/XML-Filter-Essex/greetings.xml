@@ -1,0 +1,7 @@
+<greetings>
+  <hi    cc="us">&lt;'Hi', "how are you"&gt;</hi>
+  <hello cc="us" />
+  <howdy cc="us" />
+  <bonjour   cc="fr" />
+  <bonjourno cc="fr" />
+</greetings>

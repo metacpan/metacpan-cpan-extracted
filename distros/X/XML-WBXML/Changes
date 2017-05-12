@@ -1,0 +1,32 @@
+Revision history for Perl extension XML::WBXML.
+
+0.09 2015-05-22
+    - Changed my email
+
+0.08 2015-05-21
+    - The module got back the name XML::WBXML
+
+0.07 2015-05-13
+    - File MANIFEST was fixed
+    - Information about the authors and the history module has been updated
+    
+0.06  2015-05-05
+    - Added meta-info (repository)
+
+0.05  2015-05-05
+    - Module renamed from XML::WBXML in XML::WB
+
+0.04  2015-04-29
+    - Fork XML-WBXML-0.03
+    - Fixed bug https://rt.cpan.org/Public/Bug/Display.html?id=39702 (t/01-basic.t fails)
+
+0.03  Thu Jul 27 13:41:09 EDT 2006
+        - Allow it to work on Perl 5.6, as reported
+          to work by aaron@freebsd.org
+
+0.02  Thu Aug 11 22:55:04 2005
+	- Bigger test suite
+
+0.01  Thu Aug 11 17:41:04 2005
+	- original version; created by h2xs 1.23 with options
+      		-n XML::WBXML -A -x -b 5.8.3 wbxml

@@ -1,0 +1,101 @@
+NAME
+
+   XUL-Node - server-side XUL for Perl
+
+SYNOPSIS
+
+   package XUL::Node::Application::HelloWorld; # XUL-Node Hello World
+   use XUL::Node;
+   use base 'XUL::Node::Application';
+
+   sub start { Window Label value => 'Hello World!' }
+
+   1;
+
+DESCRIPTION
+
+   XUL-Node is a rich user interface framework for server-based Perl
+   applications. It includes a server, a UI framework, and a Javascript
+   XUL client for the Firefox web browser. Perl applications run inside
+   a POE server, and are displayed in a remote web browser.
+
+   The XUL::Node POD has more information.
+
+FEATURES
+
+   * Develop user interfaces as you would using frameworks such as Tk or
+     WxPerl, but deploy to Firefox web clients with no special security
+     permissions or downloads
+   * Support for almost all of the XUL, see TODO for unsupported features
+   * Client-server communication is done through HTTP
+   * Page never reloads, only UI deltas are sent over the wire
+   * Almost a 1-1 correspondence with the XUL DOM API, with minimal Perl
+     syntactic sugar- if you you know XUL, and you know Perl, you can
+     program in XUL-Node
+   * 18 examples, including the XUL Periodic Table of Elements,
+     demonstrating the usage of every widget, attribute, and event
+   * Unicode and BiDi support
+   * Lots of unit tests, very high coverage
+
+PREREQUISITES
+
+   XUL-Node requires Perl 5.8.2, Firefox 2.0, and the following
+   modules, which can be obtained from CPAN:
+
+     Scalar::Util
+     LWP
+     MIME::Types
+     POE
+     POE::Component::Server::HTTPServer
+     Digest::MD5
+     Aspect
+
+   If you install XUL-Node from the CPAN shell, these modules will, if
+   necessary, be installed automatically as well.
+
+INSTALLATION
+
+   Install this distribution using the standard build process for Perl
+   modules:
+
+      perl Makefile.PL
+      (...maybe answer two questions...)
+      make
+      make test
+      make install
+
+    Or you could use the CPAN shell, as described in the "CPAN" module
+    documentation.
+
+    During installation you can provide a port and a server root
+    directory path for the XUL-Node server when prompted, or you can
+    just accept the defaults.
+
+    Several Perl modules, one script (the XUL-Node server), and a server
+    root directory (to be served by the web server) will be installed.
+
+    You can then run the server using the command:
+
+      xul-node-server
+
+    And point your Firefox web browser at the following URL to see the
+    demos, assuming you chose the default port:
+
+      http://localhost:8077
+
+AVAILABILITY
+
+   XUL-Node has been uploaded to the CPAN.
+
+AUTHOR
+
+   Ran Eilam <eilara@cpan.org>. Please mail me bugs and suggestions.
+
+COPYRIGHT
+
+   Copyright 2003-2005 Ran Eilam. All rights reserved.
+
+   This library is free software; you can redistribute it and/or modify
+   it under the same terms as Perl itself.
+
+

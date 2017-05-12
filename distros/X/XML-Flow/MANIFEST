@@ -1,0 +1,14 @@
+Build.PL
+Changes
+lib/XML/Flow.pm
+Makefile.PL
+MANIFEST
+README
+t/XML-Flow.t
+t/XML-Flow_array.t
+t/XML-Flow_tags_embd.t
+t/XML-Flow_write_read.t
+t/XML-Flow_xml_01.t
+t/XML-Flow_xml_02.t
+t/XML-Flow_xml_03.t
+META.yml

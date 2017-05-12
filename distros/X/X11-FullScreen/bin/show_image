@@ -1,0 +1,27 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use FindBin '$Bin';
+use lib "$Bin/../lib";
+
+our $VERSION = '0.994'; # VERSION
+
+use X11::FullScreen;
+
+@ARGV == 1 or die "Usage: $0 IMAGE_FILENAME\n";
+
+my ($filename) = @ARGV;
+
+my $Delay_Time = 30;
+
+my $Display = $ENV{'DISPLAY'} // ':0';
+
+MAIN: {
+	my $display = X11::FullScreen::Display->new($Display);
+	my $window = $display->createWindow();
+	$display->sync();
+    $display->clearWindow( $window );
+	$display->displayStill( $window, $filename );
+	sleep($Delay_Time);
+}

@@ -1,0 +1,2 @@
+<!ENTITY % detail SYSTEM "detail/level3.mod">
+%detail;

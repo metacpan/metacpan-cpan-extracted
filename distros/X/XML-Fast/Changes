@@ -1,0 +1,42 @@
+Revision history for Perl extension XML::Fast.
+
+0.11  2010-12-17
+      - Fix decoding of &quot; (was inserting \0 after ")
+
+0.10  2010-12-01
+      - Add tests for broken xml's
+      - Fix some error reporting
+
+0.09_01 2010-11-20
+      - Make fixes for XML like '<a/>' (Thanks to Chad <chadh@pobox.com>)
+
+0.09  2010-11-27
+      - Added license to META
+
+0.08  2010-10-24
+      - One more SvRV checking fix
+
+0.07  2010-10-15
+      - Fix dummy warning (again ;)
+
+0.06  2010-10-15
+      - Fix autoclose for second level (like <x><y></x>)
+
+0.05  2010-10-14
+      - Fix dummy warning
+
+0.04  2010-10-14
+      - Tests
+      - Replace index() with chrchr()
+      - Use public allocation API (thanks to vovkasm)
+      - Fix SvRV checking
+      - Create static entity definitions
+
+0.03  2010-07-22
+      Fix parsing of <!DOCTYPE ...> (was faulting)
+
+0.02  2010-07-17
+      Just remove dummy depencency from test
+
+0.01  Wed Jun  2 01:21:26 2010
+      - original version; created by h2xs 1.23 with options -A -n XML::Fast

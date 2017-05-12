@@ -1,0 +1,139 @@
+2012-04-04  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+	* release 0.16.1:
+	* t/02.categories.t and t/05.service.t
+	- fixed a bug on regexp
+
+2010-03-15  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+	* release 0.16.1:
+	* Build.PL
+	- fix dependency
+	* t/perlcritic.t
+	- check $ENV{TEST_CRITIC} whether to execute this test
+
+2008-03-25  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+	* release 0.16.0:
+	* lib, t
+	- change coding conventions
+
+2007-09-18  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+	* release 0.15.4:
+	* Build.PL
+	- change version of XML::Atom
+
+2007-09-18  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+	* release 0.15.3:
+	* t/06.atompub
+	- fix a bug
+
+2007-09-14  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+	* release 0.15.2:
+	* t/03.collection.t t/04.workspace.t t/05.service.t t/06.atompub
+	- fix namespaces
+
+2007-09-12  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+	* release 0.15.1:
+	* XML/Atom/Atompub.pm
+	- avoid redefining subroutines for XML::Atom::Thing
+
+2007-09-10  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+	* release 0.15.0:
+	* XML/Atom/Service.pm
+	- change the default namespaces to new ones,
+	  'http://purl.org/atom/ns#' and 'http://www.w3.org/2007/app'
+	* XML/Atom/Atompub.pm
+	- move extension methods of XML::Atom::Entry from
+	  XML/Atom/Service.pm
+	- add short-cut for link/@href
+	* XML/Atom/Service.pm, XML/Atom/Categories.pm
+	- fix document bugs
+
+
+2007-08-12  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+	* release 0.14.0:
+	* XML/Atom/Service.pm
+	- getService is moved in Atompub::Client
+	* XML/Atom/Categories.pm
+	- getCategories is moved in Atompub::Client
+
+2007-07-24  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+	* release 0.13.4:
+	* XML/Atom/Service.pm
+	- support //entry/content/@src
+
+2007-07-23  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+	* release 0.13.3:
+	* MANIFEST
+	- add t/samples/atom-1.0/06.entry
+
+2007-07-21  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+	* release 0.13.2:
+	* XML/Atom/Service.pm, XML/Atom/Collection.pm:
+	- support multiple //collection/accept
+
+2007-07-21  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+	* release 0.13.1:
+	* XML/Atom/Service.pm, XML/Atom/Categories.pm:
+	- avoid redefining subroutines for XML::Atom
+
+2007-07-21  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+	* release 0.13.0:
+	* XML/Atom/Service.pm:
+	- add some APP elements to XML::Atom::Entry, //entry/edited,
+	  //entry/control/draft
+	* add t/06.entry.t
+	* XML/Atom/Categories.pm:
+	- getCategory is DEPRECATED (will be removed in the near future)
+	* t/0*.t
+	- change namespace to 'http://www.w3.org/2007/app'
+
+2007-07-02  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+	* release 0.12.1:
+	* XML/Atom/Service.pm:
+	- introduce global variable $DefaultNamespace
+
+2007-07-02  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+	* release 0.12.0:
+	- change namespace to 'http://www.w3.org/2007/app' based on
+	  the new APP specirfication
+
+2007-06-10  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+	* release 0.11.1:
+	* t/0*.t
+	- xmlns is optional in regexp for newer LibXML
+
+2007-03-22  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+	* release 0.11.0:
+	* XML/Atom/Service.pm:
+	- implement XML::Atom::Client::getService()
+	* XML/Atom/Categories.pm:
+	- implement XML::Atom::Client::getCategories()
+	* add t/05.client.t
+
+2007-02-13  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+	* release 0.10.1 (0.010001): updated by Module::Starter
+	* write README
+	* add use warnings; use Carp;
+        * add POD tests
+
+2007-02-12  Takeru INOUE  <takeru.inoue _ gmail.com>
+	* release 0.01: created by h2xs 1.23 with options
+	  -XAn XML::Atom::Service

@@ -1,0 +1,95 @@
+#!/usr/bin/env perl
+
+=head1 NAME
+
+xen - A perl REPL interface to the Xen XML-RPC API.
+
+=head1 SYNOPSIS
+
+xen [-help] <command files> ...
+
+=head1 USAGE
+
+You will probably want to first instantiate a Xen connection:
+
+  $x=Xen::API->new('servername')
+
+or 
+
+  $x=xen 'servername'
+
+All XenAPI commands are available for use. Simply add the Xen object as the first
+parameter, and replace any dots with double-colons in the command name, e.g.:
+
+VM.get_all_records -> $x->VM::get_all_records()
+
+The Xen API documentation can be found here:
+
+    http://docs.vmd.citrix.com/XenServer/6.1.0/1.0/en_gb/
+    http://docs.vmd.citrix.com/XenServer/6.1.0/1.0/en_gb/api/
+
+=cut
+
+use Getopt::Long qw(:config require_order);
+use Pod::Usage qw(pod2usage);
+use Pod::Find qw(pod_where);
+use FindBin;
+use lib $FindBin::Bin;
+use Xen::API qw(:all);
+$Xen::API::PACKAGE_PREFIX = '';
+
+use RPC::XML qw(:all);
+use IO::Prompt ();
+use Net::OpenSSH;
+use Number::Format qw(:subs);
+use Devel::REPL;
+
+use strict;
+use warnings;
+
+# XenAPI seems to prefer numeric values passed as string types. So mark any
+# unknown types as strings.
+$RPC::XML::FORCE_STRING_ENCODING=1;
+
+BEGIN {
+  $SIG{PIPE}=sub {die "Broken pipe\n"};
+}
+
+my $help;
+GetOptions(
+  'help!'=>\$help,
+);
+pod2usage(-verbose=>99, -sections=>'') if $help;
+
+my $repl = Devel::REPL->new;
+$repl->load_plugin($_) for (qw(
+    Colors Completion CompletionDriver::INC CompletionDriver::LexEnv
+    CompletionDriver::Keywords CompletionDriver::Methods History
+    LexEnv DDC Packages Commands MultiLine::PPI ReadLineHistory
+  ));
+$repl->eval('no strict; no warnings; package main');
+
+if (-t STDIN && !@ARGV) {
+  print "Welcome to Xen shell. Type \"help\" for help.\n";
+  $repl->run;
+}
+else {
+  while (<>) {
+    $repl->eval($_);
+  }
+}
+exit 0;
+
+=head2 help
+
+Displays a help message.
+
+=cut
+
+sub help {
+  pod2usage(-exitval=>'NOEXIT', -verbose=>99, -sections=>'');
+  pod2usage(-exitval=>'NOEXIT', -verbose=>99, -sections=>'', 
+    -input=>pod_where({-inc=>1}, 'Xen::API'));
+  return '';
+}
+

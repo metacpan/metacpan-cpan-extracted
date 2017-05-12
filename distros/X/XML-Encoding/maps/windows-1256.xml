@@ -1,0 +1,59 @@
+<encmap name='windows-1256' expat='yes'>
+  <ch byte='x80' uni='x20ac'/>
+  <ch byte='x81' uni='x067e'/>
+  <ch byte='x82' uni='x201a'/>
+  <ch byte='x83' uni='x0192'/>
+  <ch byte='x84' uni='x201e'/>
+  <ch byte='x85' uni='x2026'/>
+  <range byte='x86' len='2' uni='x2020'/>
+  <ch byte='x88' uni='x02c6'/>
+  <ch byte='x89' uni='x2030'/>
+  <ch byte='x8a' uni='x0679'/>
+  <ch byte='x8b' uni='x2039'/>
+  <ch byte='x8c' uni='x0152'/>
+  <ch byte='x8d' uni='x0686'/>
+  <ch byte='x8e' uni='x0698'/>
+  <ch byte='x8f' uni='x0688'/>
+  <ch byte='x90' uni='x06af'/>
+  <range byte='x91' len='2' uni='x2018'/>
+  <range byte='x93' len='2' uni='x201c'/>
+  <ch byte='x95' uni='x2022'/>
+  <range byte='x96' len='2' uni='x2013'/>
+  <ch byte='x98' uni='x06a9'/>
+  <ch byte='x99' uni='x2122'/>
+  <ch byte='x9a' uni='x0691'/>
+  <ch byte='x9b' uni='x203a'/>
+  <ch byte='x9c' uni='x0153'/>
+  <range byte='x9d' len='2' uni='x200c'/>
+  <ch byte='x9f' uni='x06ba'/>
+  <ch byte='xa0' uni='x00a0'/>
+  <ch byte='xa1' uni='x060c'/>
+  <range byte='xa2' len='8' uni='x00a2'/>
+  <ch byte='xaa' uni='x06be'/>
+  <range byte='xab' len='15' uni='x00ab'/>
+  <ch byte='xba' uni='x061b'/>
+  <range byte='xbb' len='4' uni='x00bb'/>
+  <ch byte='xbf' uni='x061f'/>
+  <ch byte='xc0' uni='x06c1'/>
+  <range byte='xc1' len='22' uni='x0621'/>
+  <ch byte='xd7' uni='x00d7'/>
+  <range byte='xd8' len='4' uni='x0637'/>
+  <range byte='xdc' len='4' uni='x0640'/>
+  <ch byte='xe0' uni='x00e0'/>
+  <ch byte='xe1' uni='x0644'/>
+  <ch byte='xe2' uni='x00e2'/>
+  <range byte='xe3' len='4' uni='x0645'/>
+  <range byte='xe7' len='5' uni='x00e7'/>
+  <range byte='xec' len='2' uni='x0649'/>
+  <range byte='xee' len='2' uni='x00ee'/>
+  <range byte='xf0' len='4' uni='x064b'/>
+  <ch byte='xf4' uni='x00f4'/>
+  <range byte='xf5' len='2' uni='x064f'/>
+  <ch byte='xf7' uni='x00f7'/>
+  <ch byte='xf8' uni='x0651'/>
+  <ch byte='xf9' uni='x00f9'/>
+  <ch byte='xfa' uni='x0652'/>
+  <range byte='xfb' len='2' uni='x00fb'/>
+  <range byte='xfd' len='2' uni='x200e'/>
+  <ch byte='xff' uni='x06d2'/>
+</encmap>

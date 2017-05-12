@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root
+	xmlns:a="http://www.example.org/a"
+	xmlns:b="http://www.example.org/b"
+	xmlns:c="http://www.example.org/c"
+>
+	<p>Some text <b:i>with markup</b:i>.</p>
+ 
+	<g>
+		<a:p>More text</a:p>
+		<c:tag>Namespace 'c'</c:tag>
+	</g>
+ 
+	<!-- Use default NS (new: x is default) -->
+	<g1 xmlns="http://www.example.org/x">
+		<p>This is in the namespace 'x' ('default')</p>
+	</g1>
+ 
+	<!-- Use another default NS (new: y is default1) -->
+	<g2 xmlns="http://www.example.org/y">
+		<a:span>Namespace 'a' and parent uses <b>'y'</b> ('default1')</a:span>
+	</g2>
+ 
+	<!-- Swap namespaces prefixes -->
+	<g3 xmlns:a="http://www.example.org/c"  xmlns:c="http://www.example.org/a">
+		<a:pre>This is in the namespace 'c' even if the prefix tells 'a'</a:pre>
+		<c:div>and this is in the namespace 'a' even if the prefix tells 'c'</c:div>
+		<reset xmlns="">while this is back into the default namespace</reset>
+	</g3>
+ 
+	<!-- Reuse a NS as a default (new: a) -->
+	<g4 xmlns="http://www.example.org/a">
+		<a:p>Default NS is 'a' and this node is too in 'a'</a:p>
+	</g4>
+ 
+</root>

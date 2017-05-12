@@ -1,0 +1,78 @@
+Revision history for Perl module X11::Protocol.
+
+0.01  Tue Dec 31 1996
+	- original version; created by h2xs 1.18
+	- as seen briefly on c.l.p.m
+
+0.02  Tue Jul 29 1997
+	- first CPAN release
+	- changed pack("Ii") to "Ll", for Alphas, etc
+	- added next_event(), as suggested by Brian Wheeler
+	- reworked event handling, based on work by Brian Wheeler
+	- added X11::Auth, ditched xauth(1)
+	- added README
+	- changed format of $x->pixmap_formats based on a closer reading
+	  of the spec
+	- $x->visuals now corresponds to documentation	
+	- moved Connection::* and Ext::* under X11::Protocol::
+	- random cleanup
+
+0.03  Wed Aug 27 1997
+	- fixed minor bug in SelectionNotify event 
+	- added forgotten `format' field in ClientMessage event
+	- added forgotten `GCFillRule' const type	
+	- added $x->{'do_interp'} to control interpretation
+	- renamed forgotten X11::Connection::INETFH
+	- fixed typos
+
+0.04  Thu Jan 15 1998
+	- made anim.pl's letters rectangular instead of square
+	- changed default display on Win32 from unix:0 to localhost:0
+	- fixed ORA's contatct information in pod
+	- fixed typo
+
+0.50  Sun Jan 26 2003
+	- fixed [GS]etModifierMapping to be 8 x N, not N x 8
+	- fixed doc typo re ChangeKeyboardMapping
+	- fixed TranslateCoordinates reply, thanks to Damien Neil
+	- authorization -w cleanup suggested by Harold Bamford
+	- fixed QueryTree reply, also found by Craig Agricola
+	- minor stylistic changes
+	- added more examples
+	- make Auth work in more cases (including one that can happen
+	  when SSH tunneling)
+
+0.51  Sun May 11 2003
+	- enabled buffering on sockets, added ->flush()
+	- added Ext/{XC_MISC,DPMS,XFree86_Misc}.pm from Jay Kominek
+	- improved resource reuse, with XC_MISC, for long running
+          programs
+	- fixed embarrassing "elseQ" typo in pack_event
+
+0.52  Mon Oct 13 2003
+	- fixed some -w warnings
+	- fixed "bufffer" typo spotted by Jason Zou
+	- corrected a few documentation typos
+	- fixed buffering bug: "read" should have been "sysread"
+          (problem reported by Scott Smedley)
+	- allow reply processing to recover from getting an error instead
+	  (modeled after a patch from Scott Smedley)
+	- add a version of req() that automatically catches errors
+
+0.53  Sun Apr  4 2004
+	- Fixed AUTOLOAD scalar context bug reported by Mark Horowitz
+	- Added Render extension
+
+0.54  Sun May  1 2005
+	- Minor changes to render-clock example
+	- Add new Host types from X11R6.7
+	- Fix handle_input_for bug reported by Rich Williams
+
+0.55  Thu Jan 19 2006
+	- Fix spurious error on zero-length .Xauthority field in
+	  X11::Auth (reported independently by Cyril Bouthors and
+          Anthony DeStefano)
+
+0.56  Sun Oct 8 2006
+	- Fix infinite loop regression in robust_req in 0.54 caused by
+	  handle_input change (found by Scott Smedley)

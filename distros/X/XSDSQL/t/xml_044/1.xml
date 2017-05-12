@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<b:book xmlns:b="http://www.book.org" b:id="1" b:available="1">
+	<b:isbn>isbn</b:isbn>
+	<b:title>title</b:title>
+</b:book>
+
+

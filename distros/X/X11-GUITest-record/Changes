@@ -1,0 +1,40 @@
+Revision history for Perl extension X11::GUITest::record.
+
+0.01  Wed Sep 26 10:33:10 2007
+	- original version; created by h2xs 1.23 with options
+		-n X11::GUITest::record
+
+0.02 [MKO] - Sep 27 2007 - Implementation of core functions
+
+0.03 [MKO] - Sep 28 2007 - Dispatch Handling to perl
+
+0.04 [MKO] - Sep 20 2007 - Tested with X11::GUITest
+
+0.05 [MKO] - Oct 18 2007 - Fixed infomation duplication
+
+0.06 [MKO] - Oct 24 2007 - Now its possible to add new ranges (unstable)
+
+0.07 [MKO] - Oct 25 2007 - New function to set up the ranges SetRecordContext
+
+0.08 [MKO] - Oct 25 2007 - Add ranges now stable
+
+0.09 [MKO] - Oct 28 2007 - Documentation
+
+0.09b[MKO] - Oct 29 2007 - Adding constant resulting type and category
+
+0.1  [MKO] - Nov 02 2007 - Constants are now usable for importing
+
+# Final release
+0.11 [MKO] - Nov 02 2007 - Fixed problems with X_PolyText8 
+
+0.12
+0.13 [MKO] - Nov 09 2007 - Some changes for cpan 
+			 - Testscripts should now work correctly
+
+0.14 [MKO] - Jan 09 2009 - Fixed problems with tests and unset 
+		 	   display var
+			 - Server timestamp value added
+			 - X_DestroyWindow request is handled like 
+			   X_CreateWindow
+
+0.15 [MKO] - Mar 09 2009 - 

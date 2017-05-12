@@ -1,0 +1,144 @@
+#!/usr/bin/perl -s
+
+use strict;
+use warnings;
+
+use XML::TMX::CWB;
+
+our (
+     $v,               # verbose
+     $h,               # help
+     $from,            # source language
+     $mono,            # for monolingual corpora
+     $to,              # target language
+     $registry,        # CWB registry folder
+     $corpora,         # corpora folder
+     $toksource,       # tokenize source language?
+     $toktarget,       # tokenize target language?
+     $tok,             # monolingual tokenize
+    );
+
+my $file = shift;
+
+$h = 1 unless defined $file;
+
+if ($h) {
+    print "   tmx2cwb <-from=PT> <-to=EN> <-corpora=/corpora>\n";
+    print "           <-registry=/usr/share/cwb/registry>\n";
+    print "           <-toksource> <-toktarget>\n";
+    print "           [file.tmx]\n\n";
+    print "   tmx2cwb <-mono=PT> <-corpora=/corpora>\n";
+    print "           <-registry=/usr/share/cwb/registry>\n";
+    print "           <-tok>\n";
+    print "           [file.tmx]\n";
+    exit 1;
+}
+
+
+
+my %args;
+$args{mono}            = $mono      if $mono;
+$args{tok}             = $tok       if $tok;
+$args{to}              = $to        if $to;
+$args{from}            = $from      if $from;
+$args{corpora}         = $corpora   if $corpora;
+$args{registry}        = $registry  if $registry;
+$args{tokenize_source} = $toksource if $toksource;
+$args{tokenize_target} = $toktarget if $toktarget;
+$args{verbose}         = $v || 0;
+
+XML::TMX::CWB->toCWB(tmx => $file, %args);
+
+=encoding UTF-8
+
+=head1 NAME
+
+tmx2cwb - encodes a pair of languages from a TMX file as a CWB corpus
+
+=head1 SYNOPSIS
+
+   tmx2cwb <-from=PT> <-to=EN> <-corpora=/corpora>
+           <-registry=/usr/share/cwb/registry>
+           <-toksource> <-toktarget>
+           [file.tmx]
+
+   tmx2cwb <-mono=PT> <-corpora=/corpora>
+           <-registry=/usr/share/cwb/registry>
+           <-tok>
+           [file.tmx]
+
+=head1 DESCRIPTION
+
+This program encodes a pair of languages extracted from a TMX file as
+a CWB corpus. Optionally it can tokenize the text (using basic
+tokenizing rules).
+
+Accepted options are:
+
+=over 4
+
+=item C<-from>
+
+=item C<-to>
+
+These two parameters are useful when more than two languages are
+available. They let the user to choose what languages to be
+encoded. When only two languages are present, they are used by
+default. If you want to force an order on those two languages, it is
+enough to specify one of the two options.
+
+=item C<-mono>
+
+We know TMX are for translation memories. But you might want to encode
+a monolingual corpus from a TMX. We let you do that from C<tmx2cwb>,
+using this switch, together with the language name to be encoded.
+
+=item C<-corpora>
+
+Path to the directory where the corpus should be encoded. Defaults to
+the C</corpora> folder.
+
+=item C<-registry>
+
+Path to the CWB registry folder. The tool tries to guess it using the
+C<cwb-config> command or the environment variable
+C<CORPUS_REGISTRY>. If not, you will need to specify it.
+
+=item C<-toksource>
+
+=item C<-toktarget>
+
+These two options can be used to make the tool to tokenize the source
+and/or the target language. Note that the used rules are good for
+Portuguese, acceptable for Spanish, English, French and Italian, and
+should be quite bad for other languages.
+
+=item C<-tok>
+
+When using the monolingual switch C<-mono> described above, you might
+want to tokenize its source. Use this switch for that.
+
+=item C<-v>
+
+Verbose mode
+
+=item C<-h>
+
+Prints basic help information.
+
+=back
+
+=head1 SEE ALSO
+
+XML::TMX::CWB(3)
+
+=head1 AUTHOR
+
+Alberto Manuel Brandão Simões, E<lt>ambs@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2010-2011 by Alberto Manuel Brandão Simões
+
+=cut
+

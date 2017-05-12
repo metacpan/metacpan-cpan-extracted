@@ -1,0 +1,16 @@
+<stx:transform version="1.0" 
+  xmlns:stx="http://stx.sourceforge.net/2002/ns"
+  strip-space="yes">
+
+  <stx:template match="*">
+    <stx:element name="{name()}">
+      <stx:attribute name="c" select="has-child-nodes()"/>
+      <stx:process-children/>
+    </stx:element>
+  </stx:template>
+
+  <stx:template match="text()[1]|comment()|processing-instruction()">
+    <n c="{has-child-nodes()}"/>
+  </stx:template>
+  
+</stx:transform>

@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='ISO-8859-1'?>
+<musica>
+ <music>Luís Represas</music>
+ <lyrics>Camões</lyrics>
+
+an element with attributs
+
+ <title acordes="*">Fora do tempo</title>
+
+ <com>letra incompleta</com>
+
+An empty element with attributs
+
+ <arquivo file="arq.xml"/>
+
+ Fora do tempo ...
+ Vindos da mesma mãe..
+
+ O tempo também se engana
+ ...
+
+</musica>

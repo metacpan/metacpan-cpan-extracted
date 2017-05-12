@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+	<xs:element name="choice_test">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="begin" type="xs:string" minOccurs="0" maxOccurs="1"/>
+				<xs:choice maxOccurs="1">
+					<xs:element name="c">
+						<xs:complexType>
+							<xs:sequence>
+		          				<xs:element name="elc" type="xs:string"/>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+					<xs:element name="d">
+						<xs:complexType>
+							<xs:sequence>
+		          				<xs:element name="eld" type="xs:string"/>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+				</xs:choice>
+				<xs:choice maxOccurs="1">
+					<xs:element name="c1"     type="xs:string"/>
+					<xs:element name="c2"     type="xs:string"/>
+				</xs:choice>				
+				<xs:element name="end" type="xs:string" minOccurs="0" maxOccurs="1"/>
+			</xs:sequence> 
+		</xs:complexType>
+	</xs:element>
+</xs:schema>
+

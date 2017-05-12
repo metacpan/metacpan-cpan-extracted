@@ -1,0 +1,45 @@
+Revision history for Perl extension XML::DTDParser.
+
+1.0  Tue Feb 12 23:41:58 2002
+	- original version
+
+1.1  Wed Feb 13 00:20 2002
+	- small fix
+
+1.2  Sun Dec 29
+	- renamed from Jenda::QD::DTDParser to XML::DTDParser
+	- uploaded to CPAN
+
+1.3  Sun Jan 5
+	- fixed a typo on line 34 (close IN; instead of close $IN;, thanks to hughmyers@micron.com)
+	- handling <!ELEMENT D (A? | B? | C?)> properly
+	- added childrenSTR option to the elements
+
+1.4 GOK
+	- internal only
+
+1.5 Tue Feb 11 2003
+	- allows <!ELEMENT Foo (#PCDATA|Bar|Baz)*>
+	- incorrectly formated chlidren lists are reported as incorrectly formated
+	  (instead of some bogus "Element @#*&^*&^$ referenced by Element was not found")
+	- supports enumerated attributes <!ATTLIST A Name ( 1 | 2 | 3) #REQUIRED>
+
+1.6 GOK
+	- added support for <!--#info --> comments
+
+1.7 Web Mar 19, 2003
+	- fixed a small bug in the regexp parsing the <!--#info --> comments
+
+1.8 GOK
+	- internal only
+
+1.9 Fri Nov 05 2004
+	- ParseDTDFile function
+	- handle <!ELEMENT id (id, type, type*)> correctly (the multiplicity of the "type" should be "+", not "*" in this case
+	- fixes in regexps
+
+2.00 Fri Nov 05 2004
+	- return the multiplicity as chindrenX => { child => '1..', other => 1, another => '1..3', ...}
+
+2.01 Fri Nov 05 2004
+	- do not include #PCDATA in childrenX, fix test

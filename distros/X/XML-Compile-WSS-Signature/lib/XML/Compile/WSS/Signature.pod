@@ -1,0 +1,267 @@
+=encoding utf8
+
+=head1 NAME
+
+XML::Compile::WSS::Signature - WSS Signatures
+
+=head1 INHERITANCE
+
+ XML::Compile::WSS::Signature
+   is a XML::Compile::WSS
+
+=head1 SYNOPSIS
+
+B<WARNING: Only limited real-life experience.>  Many optional
+extensions have never been tried.
+
+ # You may need a few constants
+ use XML::Compile::WSS::Util  qw/:dsig/;
+ use XML::Compile::C14N::Util qw/:c14n/;
+
+ # This modules van be used "stand-alone" ...
+ my $schema = XML::Compile::Cache->new(...);
+ my $sig    = XML::Compile::WSS::Signature->new
+   (sign_method => DSIG_RSA_SHA1, ...);
+
+ # ... or as SOAP slave (strict order of object creation!)
+ my $wss    = XML::Compile::SOAP::WSS->new;
+ my $wsdl   = XML::Compile::WSDL11->new($wsdlfn);
+ my $sig    = $wss->signature(sign_method => ...);
+
+=head1 DESCRIPTION
+
+The generic Web Service Security protocol is implemented by the super
+class L<XML::Compile::WSS|XML::Compile::WSS>.  This extension implements cypto signatures.
+
+On this moment, there are two versions of this standard:
+
+=over 4
+
+=item * F<http://www.w3.org/TR/2002/REC-xmldsig-core-20020212/>
+
+=item * F<http://www.w3.org/TR/xmldsig-core2/>
+
+=back
+
+One or more elements of a (SOAP) document can be selected to be signed. They
+are canonalized (serialized in a well-described way) and then digested
+(usually via SHA1).  The digest is put in a C<SignedInfo> component of
+the C<Signature> element in the C<Security> header.  When all digests
+are in place, the whole SignedInfo structure gets signed.
+
+Extends L<"DESCRIPTION" in XML::Compile::WSS|XML::Compile::WSS/"DESCRIPTION">.
+ 
+=head2 Limitations
+
+Many companies use their own selection from a large the pile of standards
+for this feature.  Some of the resulting limitations are known by the author:
+
+=over 4
+
+=item * digests
+
+Only digest algorithms which are provided via the Digest module are
+supported for the elements to be signed.  (But that's quite a lot)
+
+=item * signatures
+
+Only a limited subset of signing (algorithm, hash) combinations are
+supported.  Lower on this page, you find details about each of the
+provided signing implementations.
+
+=back
+
+=head1 METHODS
+
+Extends L<"METHODS" in XML::Compile::WSS|XML::Compile::WSS/"METHODS">.
+ 
+=head2 Constructors
+
+Extends L<"Constructors" in XML::Compile::WSS|XML::Compile::WSS/"Constructors">.
+ 
+=over 4
+
+=item XML::Compile::WSS::Signature-E<gt>B<new>(%options)
+
+The %options you provide here, will will passed to various objects
+which are created automatially.  But you may also give pre-instantiated
+objects, for instance when you decide to use your own extension on a
+certain spot.
+
+ -Option      --Defined in       --Default
+  checker                          undef
+  key_info                         {}
+  prepare       XML::Compile::WSS  'ALL'
+  remote_token                     undef
+  schema        XML::Compile::WSS  undef
+  sign_types                       <required>
+  signed_info                      {}
+  signer                           DSIG_RSA_SHA1
+  token                            <depends on sign_method>
+  version       XML::Compile::WSS  undef
+  wss_version   XML::Compile::WSS  '1.1'
+
+=over 2
+
+=item checker => OBJECT|HASH|TYPE
+
+The signer object with server information, anything what is accepted by
+L<XML::Compile::WSS::Sign::fromConfig()|XML::Compile::WSS::Sign/"Constructors">.  When provided, we do not need
+to collect the information from the incoming messages.
+
+=item key_info => HASH
+
+Read L<XML::Compile::WSS::KeyInfo::new()|XML::Compile::WSS::KeyInfo/"Constructors">
+
+=item prepare => 'READER'|'WRITER'|'ALL'|'NONE'
+
+=item remote_token => OBJECT|HASH|FILENAME
+
+To defend against man-in-the-middle attacks, you need to specify the
+server's public key.  When specified, that key will be used to verify
+the signature, not the one listed in the XML response.
+
+Only when this C<remote_token> is specified, we will require the
+signature.  Otherwise, the check of the signature will only be performed
+when a Signature is available in the Security header.
+
+=item schema => an L<XML::Compile::Cache|XML::Compile::Cache> object
+
+=item sign_types => ARRAY
+
+Specify the types of elements which need to be signed.  If you
+have more elements of the same type, they will all get signed.
+
+=item signed_info => HASH
+
+Settings for the SignedInfo structure.
+Read L<XML::Compile::WSS::SignedInfo::new()|XML::Compile::WSS::SignedInfo/"Constructors">
+
+=item signer => OBJECT|HASH|TYPE
+
+The client-side signer object, anything what is accepted by
+L<XML::Compile::WSS::Sign::fromConfig()|XML::Compile::WSS::Sign/"Constructors">.
+
+=item token => OBJECT|HASH|FILENAME
+
+The token, anything which is accepted by
+L<XML::Compile::WSS::SecToken::fromConfig()|XML::Compile::WSS::SecToken/"Constructors">.  This contains at least the
+public information.
+
+=item version => STRING
+
+=item wss_version => '1.1'|MODULE
+
+=back
+
+=back
+
+=head2 Attributes
+
+Extends L<"Attributes" in XML::Compile::WSS|XML::Compile::WSS/"Attributes">.
+ 
+=over 4
+
+=item $obj-E<gt>B<keyInfo>()
+
+=item $obj-E<gt>B<schema>()
+
+Inherited, see L<XML::Compile::WSS/"Attributes">
+
+=item $obj-E<gt>B<signedInfo>()
+
+=item $obj-E<gt>B<signer>()
+
+=item $obj-E<gt>B<wssVersion>()
+
+Inherited, see L<XML::Compile::WSS/"Attributes">
+
+=back
+
+=head3 Security Tokens
+
+To prove the signature, there usually is some security token.  This token
+may (or may not) be included in the SOAP message itself.
+
+=over 4
+
+=item $obj-E<gt>B<remoteToken>()
+
+Returns the security token of the server, which is an
+L<XML::Compile::WSS::SecToken|XML::Compile::WSS::SecToken> object. Either, this token is provided
+by L<new(remote_token)|XML::Compile::WSS::Signature/"Constructors">, to taken from the first message.
+
+=item $obj-E<gt>B<token>()
+
+Returns the security token, which is an L<XML::Compile::WSS::SecToken|XML::Compile::WSS::SecToken> object.
+
+=back
+
+=head2 Apply
+
+Extends L<"Apply" in XML::Compile::WSS|XML::Compile::WSS/"Apply">.
+ 
+=over 4
+
+=item $obj-E<gt>B<check>($security)
+
+Inherited, see L<XML::Compile::WSS/"Apply">
+
+=item $obj-E<gt>B<create>($doc, $security, $data)
+
+Inherited, see L<XML::Compile::WSS/"Apply">
+
+=back
+
+=head2 Helpers
+
+Extends L<"Helpers" in XML::Compile::WSS|XML::Compile::WSS/"Helpers">.
+ 
+=over 4
+
+=item $obj-E<gt>B<dateTime>($time|$string|HASH)
+
+Inherited, see L<XML::Compile::WSS/"Helpers">
+
+=back
+
+=head2 Internals
+
+Extends L<"Internals" in XML::Compile::WSS|XML::Compile::WSS/"Internals">.
+ 
+=over 4
+
+=item $obj-E<gt>B<loadSchemas>($schema, $version)
+
+=item XML::Compile::WSS::Signature-E<gt>B<loadSchemas>($schema, $version)
+
+Inherited, see L<XML::Compile::WSS/"Internals">
+
+=item $obj-E<gt>B<writerHookWsuId>($type)
+
+Inherited, see L<XML::Compile::WSS/"Internals">
+
+=back
+
+=head1 DETAILS
+
+Extends L<"DETAILS" in XML::Compile::WSS|XML::Compile::WSS/"DETAILS">.
+ 
+=head1 SEE ALSO
+
+This module is part of XML-Compile-WSS-Signature distribution version 2.02,
+built on July 16, 2016. Website: F<http://perl.overmeer.net/xml-compile/>
+
+Please post questions or ideas to the mailinglist at
+F<http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/xml-compile> .
+For live contact with other developers, visit the C<#xml-compile> channel
+on C<irc.perl.org>.
+
+=head1 LICENSE
+
+Copyrights 2012-2016 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

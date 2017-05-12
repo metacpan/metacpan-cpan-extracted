@@ -1,0 +1,9 @@
+# Quicktask v1.2
+
+CURRENT TASKS:
+    - Implement an automated test.
+        * Current bad-elements page and its DocBook 5 output.
+        * Added [Fri 2013-01-18]
+COMPLETED TASKS:
+
+# vim:ft=quicktask:sw=4:ts=4:et

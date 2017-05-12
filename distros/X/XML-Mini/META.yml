@@ -1,0 +1,13 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         XML-Mini
+version:      1.38
+version_from: lib/XML/Mini.pm
+installdirs:  site
+requires:
+    Data::Dumper:                  2.1
+    FileHandle:                    2
+    Text::Balanced:                1.95
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

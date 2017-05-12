@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+
+
+<hh:s1 
+		xmlns:xs='http://www.w3.org/2001/XMLSchema-instance' 
+		xmlns:hh="http://www.camera.org" 
+		xmlns:zz="namespace2" 
+    	xs:schemaLocation="http://www.camera.org ./schema.xsd"
+> 
+	<zz:el0>el0</zz:el0>
+	<ela>
+		<zz:el0>ela_2</zz:el0>
+		<zz:el1>
+			<zz:el0_ct1>el01_ct1</zz:el0_ct1>
+		</zz:el1>
+	</ela>	
+</hh:s1>
+
+
+

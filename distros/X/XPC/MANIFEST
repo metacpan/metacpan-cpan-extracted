@@ -1,0 +1,10 @@
+lib/XPC/Daemon.pm
+lib/XPC/Agent.pm
+lib/XPC.pm
+Makefile.PL
+MANIFEST
+README
+script/xpcc
+script/xpcd
+t/01_parse.t
+t/02_basic.t

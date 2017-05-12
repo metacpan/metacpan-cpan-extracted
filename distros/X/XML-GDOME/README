@@ -1,0 +1,42 @@
+XML::GDOME version 0.83
+=======================
+
+REQUIREMENTS
+
+Requires gdome2 0.7.2 or higher, available from
+http://phd.cs.unibo.it/gdome2/#downloads
+
+For gdome2 related questions, e-mail the gdome2 mailing list:
+http://mail.gnome.org/mailman/listinfo/gdome
+
+THREADING SUPPORT
+
+As of 0.8.3, the module should work under ithreads as long as you don't try to
+share gdome objects between threads.
+
+DESCRIPTION
+
+XML::GDOME is a perl module that provides the DOM Level 2 Core API
+for accessing XML documents.
+
+It uses a XS wrapper around the gdome2 library.
+
+INSTALLATION
+
+To install, run
+
+perl Makefile.PL
+make
+make test
+make install
+
+NOTES
+
+If t/09_sax.t test 20 fails because of whitespace differences, probably nothing to worry about...
+
+COPYRIGHT AND LICENCE
+
+Copyright 2002 T.J. Mather.  
+Copyright 2001 AxKit.com Ltd. All rights reserved. 
+XML::GDOME is free software;
+you may redistribute it and/or modify it under the same terms as Perl itself. 

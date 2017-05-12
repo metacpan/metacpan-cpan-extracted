@@ -1,0 +1,11 @@
+[% UNLESS (name = item.id or item.name);
+       view.base.print(item);
+       RETURN;
+   END;
+   id = name.replace('\W+', '');
+   id = "pkgvar_$id";
+   subtoc(name, id);
+-%]
+<a name="[% id %]"><b>[% name %]</b></a>
+<br>
+[% item.content(site.view.default) %]

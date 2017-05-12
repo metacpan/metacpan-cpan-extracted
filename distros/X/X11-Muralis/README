@@ -1,0 +1,253 @@
+NAME
+
+    muralis - display wallpaper on your desktop.
+
+SYNOPSIS
+
+    muralis --help | --manpage | --version
+
+    muralis --backends
+
+    muralis --provides backend
+
+    muralis --list { --dir directory } [ --exclude string ] [ --is_image
+    string ] [ --listformat format ] [ --match string ] [ --outfile
+    filename ]
+
+    muralis [ --centre | --center ] [ --colours num | --colors num ] [
+    --config_dir directory ] [ --dir directory ] [ --exclude string ] [
+    --is_image string ] [ --fullscreen ] [ --match string ] [ --option
+    string ] [ --stretch ] [ --tile ] [ --unseen ] [ --verbose ] [ --window
+    window-id ] [ --zoom percent ] --use backend ( --random | --repeat_last
+    | file )
+
+DESCRIPTION
+
+    The muralis script displays a given image file on the desktop
+    background (that is, the root window) of an X-windows display.
+
+    This tries to determine what size would best suit the image; whether to
+    show it fullscreen or normal size, whether to show it tiled or centred
+    on the screen. Setting the options overrides this behaviour.
+
+    One can also repeat the display of the last-displayed image, changing
+    the display options as one desires.
+
+    This uses the an external program to display the image file; display
+    backends are implemented as plugins. To find out which bckends are
+    available, use the --backends option to print a list of them.
+
+    This also depends on xwininfo to get information about the root window.
+
+ The Name
+
+    The name "muralis" comes from the Latin "muralis" which is the word
+    from which "mural" was derived. I just thought it was a cool name for a
+    wallpaper script.
+
+OPTIONS
+
+    Boolean options can be disabled by prefixing them with 'no'; for
+    example, --notile will turn off tiling of the image.
+
+    --backends
+
+      List which display backends are available. Note that this doesn't
+      just check which plugin modules are installed, but also checks
+      whether the program used by the backend is available.
+
+    --centre | --center
+
+      Centre the image on the root window.
+
+    --colours num | --colors num
+
+      Limit the number of colours used to display the image. This is useful
+      for a 256-colour display. Only supported by some backends.
+
+    --config_dir directory
+
+      Alternative directory in which to look for muralis config files.
+
+    --dir directory
+
+      Directory in which to look for image files. This can be repeated for
+      more directories.
+
+    --exclude string
+
+      If an image matches this, it is excluded from --random, --list, or
+      --nth display.
+
+    --is_image string
+
+      What files are considered to be image files? This is a regular
+      expression checked against the filenames to see if they are image
+      files. By default, muralis checks for commonly known image
+      extensions, so that it doesn't try to display non-image files (such
+      as text files) which might be in the image directories. Most of the
+      time you don't need to use this option.
+
+    --fullscreen
+
+      The image will be zoomed to fit the size of the screen, keeping the
+      aspect ratio the same if the backend supports this.
+
+    --help
+
+      Print help message and exit.
+
+    --list
+
+      List all the images muralis knows about. If --match is given, this
+      will restrict the list to those images matching the match-string.
+      (see --listformat)
+
+    --listformat format
+
+      This defines the format used in the --list command. The format is
+      either "normal" or "fullname". The normal format gives the directory
+      names followed by the files in them. The "fullname" format gives just
+      the full names of the files.
+
+    --manpage
+
+      Print the full help documentation (manual page) and exit. This will
+      only work if you have perldoc installed.
+
+    --match string
+
+      If using the --list or --random options, limit the image(s) to those
+      which match the string.
+
+    --nth num
+
+      Display the nth image. If --match is given, limit the selection to
+      images which match the match-string.
+
+    --option string
+
+      An additional option or options to pass on to the backend. Used for
+      uncommon options which are supported in one backend and not another.
+
+    --outfile
+
+      Output file for the --list command to print its output. If this
+      argument is not given, list will list to standard output.
+
+    --provides backend
+
+      What options will work for this backend?
+
+    --random
+
+      Pick a random image to display. If --match is given, limit the
+      selection to images which match the match-string.
+
+    --repeat_last
+
+      Display the last image which was displayed. This is useful to
+      re-display an image while overriding the default display options.
+
+    --stretch
+
+      The image will be zoomed to fit the size of the screen. This does not
+      preserve the aspect ratio. Some backends support both fullscreen and
+      stretch, while some support only one or the other, in which case they
+      are treated the same.
+
+    --tile
+
+      Tile the image to fill the root window.
+
+    --unseen
+
+      When using the --rand or --nth option, this selects the images from a
+      list of 'unseen' images. This can be used to cycle through your
+      images without repeats. If this option is not used, then the --random
+      option is truly random.
+
+      The 'unseen' list is in the '~/.muralis/unseen' file, which is
+      automatically updated or created whenever the --unseen option is
+      used. Note that if this file exists and the --unseen option is used,
+      muralis does not check the image directories, so if you have added a
+      new directory to your options, you will need to delete the 'unseen'
+      file in order to reset the list of unseen images.
+
+    --use backend
+
+      Which backend to use. See backends.
+
+    --verbose
+
+      Print informational messages.
+
+    --version
+
+      Print version information and exit.
+
+    --window window-id
+
+      Display on the given window, rather than the root window. This is
+      useful for window-managers which take over the desktop display. Only
+      works for backends which provide this option.
+
+    --zoom percent
+
+      Enlarge or reduce the size of the image by the given percent.
+
+ENVIRONMENT
+
+    HOME
+
+      muralis looks in the HOME directory for config files.
+
+FILES
+
+    Configuration files for muralis are placed in the $HOME/.muralis
+    directory (which is created if it doesn't exist).
+
+    ~/.muralis/config
+
+      Configuration file; contains command-line arguments in
+      Getopt::ArgvFile format.
+
+    ~/.muralis/last
+
+      The name of the most recently displayed image.
+
+    ~/.muralis/unseen
+
+      Contains a list of unseen image files.
+
+REQUIRES
+
+        Getopt::Long
+        Pod::Usage
+        Getopt::ArgvFile
+        File::Basename
+        File::Find::Rule
+        Image::Info
+        X11::Muralis;
+
+SEE ALSO
+
+    perl(1) Getopt::Long Getopt::ArgvFile Pod::Usage X11::Muralis
+
+BUGS
+
+    Please report any bugs or feature requests to the author.
+
+AUTHOR
+
+        Kathryn Andersen (RUBYKAT)
+        perlkat AT katspace dot com
+        http://www.katspace.org/tools/muralis
+
+COPYRIGHT AND LICENCE
+
+    Copyright (c) 2005-2016 by Kathryn Andersen
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

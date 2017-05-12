@@ -1,0 +1,38 @@
+What it is:
+===========
+This is XML::Ximple, a way to structure XML in Perl in a really easy way.
+
+XML to a Perl data structure and back again.
+
+Installation:
+=============
+See INSTALL for installation instructions.
+
+Dependency:
+=============
+- XML::Parser
+
+Usage:
+======
+Read the perldoc of XML::Ximple for complete usage instructions.
+
+Data:
+=====
+  <ximple_tree>     ::=  [ <ximple_tag> ... ]
+                     
+  <ximple_tag>      ::=  { tag_name => <tag-name>,
+                           attribs  => <attribs>
+                           content => <ximple_tree>
+                           tag_type => <tag-type> }
+
+  <tag-name>        ::= <xml-identifier>
+
+  <attribs>         ::= { <xml-identifier> => String, ... }
+                     
+  <tag-type>        ::= PL | XML_Decl | DOCTYPE | undef
+
+Authors:
+========
+  Reliance Technology Consultants, Inc.   <http://goreliance.com>
+    Mike MacHenry <dskippy@ccs.neu.edu>   <http://www.ccs.neu.edu/home/dskippy>
+    Mike Burns    <netgeek@speakeasy.net> <http://netgeek.ws>

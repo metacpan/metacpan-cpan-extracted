@@ -1,0 +1,8 @@
+1.2
+    - Protect against I<*> (or other markup) at the start of a paragraph.
+
+1.1
+    - Allow markup within bullet points
+
+1.0
+    - Initial Version

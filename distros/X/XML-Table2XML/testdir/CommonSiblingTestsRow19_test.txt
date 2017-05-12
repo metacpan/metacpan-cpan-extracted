@@ -1,0 +1,9 @@
+root
+/#text	/a/#id	/a/@x	/a/@y	/a/z	/a/b/c
+RootText	1	test1	testy	testZ1	testC1
+RootText	1	test1	testy	testZ1	testC2
+RootText	1	test1	testy	testZ1	testC3
+RootText	2	test2	testy	testZ2	testC1
+RootText	2	test2	testy	testZ2	testC2
+RootText	2	test2	testy	testZ2	testC3
+

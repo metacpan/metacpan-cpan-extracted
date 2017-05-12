@@ -1,0 +1,19 @@
+ChangeLog
+MANIFEST
+Makefile.PL
+README
+bin/wsdl-explain.pl
+bin/xsd-explain.pl
+lib/XML/Compile/WSDL11.pm
+lib/XML/Compile/WSDL11.pod
+lib/XML/Compile/WSDL11/xsd/wsdl-http.xsd
+lib/XML/Compile/WSDL11/xsd/wsdl-mime.xsd
+lib/XML/Compile/WSDL11/xsd/wsdl.xsd
+t/50wsdl.t
+t/51wsdloneway.t
+t/52wsdlfault.t
+t/53wsdlrpclit.t
+t/54wsdlrpclit.t
+t/TestTools.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

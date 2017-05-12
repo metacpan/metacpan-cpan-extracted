@@ -1,0 +1,15 @@
+# .gxml2html file for the docs. Yes, I eat my own dog food (that is,
+# I use the tools I build).
+
+# stick the resulting .html files in the same directory as the source
+# .xml files
+final = ./docs
+
+# and use a custom set of templates
+templates = ./docs-templates
+
+# scale down the size of headings a bit...
+<h1>		<h2>
+<h2>		<h3>
+<h3>		<h4>
+

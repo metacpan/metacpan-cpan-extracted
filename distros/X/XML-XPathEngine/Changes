@@ -1,0 +1,91 @@
+Revision history for XML::XPathEngine
+
+version 0.14
+fixed   POD error
+
+version 0.13
+added:  error, with (hopefully!) proper error message when trying to
+        follow XML axes from a litteral, see 
+        http://stackoverflow.com/questions/7761509/xpath-expression-to-access-parent-or-sibling-using-htmltreebuilderxpath-modul
+
+version 0.12
+added:  findvalues method which returns the results as a list of strings
+
+version 0.11
+fix:    axis_descendant returns descendants in incorrect order.
+        found and patched by Kumagai Kentaro
+        http://rt.cpan.org/Ticket/Display.html?id=35049
+
+fix:    calling id() function in some situations causes an error
+        found and patched by Kumagai Kentaro
+        http://rt.cpan.org/Ticket/Display.html?id=35049
+
+version 0.10
+fix:    overloading did not quite work (literals returned by findvalue
+        woult cause an exception when used as numbers).
+        the fix is to return a real string in findvalue, instead of
+        an XML::XPath::Engine::Literal object that then needs to be overloaded
+        while this theoretically could break code that would rely on 
+        the return being an object, I doubt this is the case in Real Code.
+        let me know if this causes any problem
+        Bug found by Niko Tyni and reported on Debian 
+        http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=460297 
+        reported on RT: http://rt.cpan.org/Public/Bug/Display.html?id=34908
+        bug tested in the XML::DOM::XPath 0.14 test suite
+
+fix:    predicates using the position and/or other conditions would fail,
+        as the position would not be saved in Step.pm
+        Reported by Stephane Bortzmeyer, patched by Niko Tyni
+        http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=460281
+        http://rt.cpan.org/Ticket/Display.html?id=34907
+        bug tested in the XML::DOM::XPath 0.14 test suite
+
+version: 0.09
+fix:    namespace processing was a bit dodgy, it's been cleaned up now.
+        Tested through XML::Twig::XPath and XML::DOM::XPath
+fix:    count did not work (RT #34854), found and patched by 
+        Yasuhiro Matsumoto
+        http://rt.cpan.org/Ticket/Display.html?id=34854
+added:  XML::XPathEngine set_strict_namespaces method, which makes 
+        namespace processing more standard compliant, and probably often
+        more of a pain.
+        Tested through XML::Twig::XPath
+        Thanks to Timothy Appnel for his input in that matter
+added:  XML::XPathEngine findnodes_as_strings method, which returns an
+        array of strings (the getValue of the nodes). 
+fixed:  findnodes_as_string now returns the empty string if the result
+        of the XPath query is a boolean (XML::XPathEngine::Boolean), as
+        when querying //@id="foo" for example. This makes the behaviour
+        similar to XML::LibXML's.
+
+version:0.08
+fix:    Fixed bug in XML::XPathEngine::Step::axis_preceding
+        (same bug as with axis_following)
+
+version: 0.07    
+fix:    Fixed bug in the previous bug fix
+
+version: 0.06
+fix:    Fixed bug in XML::XPathEngine::Step::axis_following
+        that messed up queries using the 'following' axis
+       (tested by HTML::TreeBuilder::XPath 0.07)
+
+version: 0.05
+fix:    Fixed bug in XML::XPathEngine::Function::as_xml
+        as per RT #21951 (spotted by BJOERN)
+        see http://rt.cpan.org/Ticket/Display.html?id=21951
+
+version: 0.04
+fix:    Fixed bug in Step.pm
+
+version: 0.03
+fix:    Bug fixes for queries involving elt="text" (tested through 
+        XML::Twig::XPath),
+        the lang() function
+
+version: 0.02
+released: First version on CPAN
+
+version: 0.01 
+created:  First version, released on an unsuspecting world.
+

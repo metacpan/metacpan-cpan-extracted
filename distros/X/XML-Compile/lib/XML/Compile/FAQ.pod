@@ -1,0 +1,232 @@
+=encoding utf8
+
+=head1 NAME
+
+XML::Compile::FAQ - frequently asked questions
+
+=head1 DESCRIPTION
+
+On this page, a wild collection of questions are answered.  If you have
+contributions either in question or as answer, then please contribute
+via the mailinglist.
+
+See also L<XML::Compile::SOAP::FAQ|XML::Compile::SOAP::FAQ>.
+
+=head2 The data structure
+
+=head3 what do the cho_, seq_ and all_ start of labels mean?
+
+X::C tries to give you a simple data-structure in Perl, however XML
+does not always map directly only that.  One such situation is where
+you have blocks within a list of elements.  In such case, the block gets
+a name which is composed by the type of block and the first element in
+the block.  You will encounter these names in some error messages and
+when these block have a maxOccurs larger than 1.
+
+Example. The name C<cho_tic> is used to represent the following nameless
+choice block:
+
+  <choice>
+    <element name="tic" />
+    <element name="tac" />
+    <element name="toe" />
+  </choice>
+
+=head3 localName collission
+
+In the default behavior, only the "local" names of the XML elements are
+used in the Perl structure.  However, it is very well possible that the
+same name appears in more than on XML name-space, used within the same
+data structure.  So see this often with substitutionGroups.
+
+When collissions happen, you have to switch to use
+C<< key_rewrite => 'PREFIXED' >> in the compile rules.  All keys will
+now get rewritten: the name-space prefix will be prepended.  The prefixes
+are defined by the mapping table provided with the C<< prefixes >> option
+or by default from the XML schemas.
+
+See L<XML::Compile::Schema/"Key rewrite"> for the full list of options.
+
+=head2 Schemas
+
+Be aware that the "2001" schema specification is continuously under
+development.  So, the namespace has not been changed over time, but
+the content has.
+
+=head3 qualified elements
+
+One of the more noticeable problems with schemas is the specification of
+the namespaces to be used for the schema.  In older schema's, like many
+important protocols, there was no way to specify whether elements should
+be used qualified or not.  Some schema's lack the target namespace
+declaration.  Those fields did not exist in earlier versions of the
+"2001" spec; it was defined in the documentation.
+
+So, what you may encounter is something like:
+
+  <schema xmlns="http://www.w3.org/2001/XMLSchema">
+
+where (in the current syntax) it should have been
+
+  <schema xmlns="http://www.w3.org/2001/XMLSchema"
+    targetNamespace="http://my-namespace"
+    elementFormDefault="qualified"
+    attributeFormDefault="unqualified">
+
+The default for C<targetNamespace> is "namespace-less".  The C<*FormDefault>
+defaults are C<unqualified>, which is a pity: most schemas will use
+qualified elements.
+
+Of course, you can add these fields to the schema file, but that violates
+the intergrity of that external resource.  Therefore, use options:
+
+  my $schema = XML::Compile::Schema->new;
+  $schema->importDefinitions("schema.xsd"
+     , target_namespace     => 'http://my-namespace'
+     , element_form_default => 'qualified'
+     );
+
+You may also provide all these options with C<new()> directly.
+
+  my $schema = XML::Compile::Schema->new("schema.xsd"
+     , target_namespace     => 'http://my-namespace'
+     , element_form_default => 'qualified'
+     );
+
+If you use the L<XML::Compile::Cache> object, which extends ::Schema, then
+you have a nice C<printIndex> method which shows you what has been read.
+
+=head3 schema location
+
+The official idea about the use of schema's, is that you get the latest
+version of them on the moment you start the application.  There are two
+major problems with that:
+
+=over 4
+
+=item . you may not have (a working) internet connection on that moment
+
+=item . remote changes in the spec may break your application unexpectedly
+
+=back
+
+In general, IMO as author of the XML::Compile suite, you should B<never>
+want this dynamic, unpredictable behavior!
+
+Besides, the content of the C<schemaLocation> attribute to C<import>,
+C<include> and C<schema> elements are usually broken, missing and/or
+flawed.  You can better do it by hand.
+
+Collect the schema's you need in a directory.  The name of the schema
+file does not need to means anything useful.  Then, add the location
+where the schema's are found:
+
+   my $schema = XML::Compile::Cache->new;
+   $schema->addSchemaDirs($my_schema_dir);
+
+Add the mapping from namespaces to filenames (you may provide an ARRAY of
+names or use the same namespace multiple times).  It is useful to have
+a constant defined for your namespace.
+
+   use constant MY_NS => 'http://very-long';
+   $schema->knownNamespace(&MY_NS => 'schemafile.xsd');
+   $schema->importDefinitions(MY_NS, @options);
+
+There is also a less clean solution:
+
+   my $schema = XML::Compile::Cache->new('schemafile.xsd', @options);
+
+When you have many xsd's to include, you may do this:
+
+   my @xsds = glob "$my_schema_dir/*.xsd";
+   my $schema = XML::Compile::Cache->new;
+   $schema->knownNamespace(&MY_NS => \@xsds);
+   $schema->importDefinitions(MY_NS, @options);
+
+or
+
+   my $schema = XML::Compile::Cache->new(\@xsds, @options);
+
+=head3 fixing schemas
+
+Many schema's are broken.  L<XML::Compile> is not a good tool to figure-out
+what is wrong with the schema.  Have you tried C<xmllint>?  Sometimes, you
+get sufficient help adding to the top of your script:
+
+   use Log::Report mode => 'DEBUG';
+
+When you know what is wrong, you can overrule parts of the schema by
+redefining elements; simply: the last definition for an element wins.
+For instance:
+
+   $schema->importDefinition(<<'_PATCH');
+   <schema ....>
+     <element name="has_bug">
+        ...
+     </element>
+   _PATCH
+
+Of course, you can also use an external file for this.
+
+=head3 Example
+
+This is a piece of code actually used.  It shows various complications
+when an external schema is "loaded" "dynamically" into another schema.
+
+  # In the top of your script
+  my $schema_dir = '/usr/share/schemas';
+  my $xyz_ns     = 'http://www.xyzeorder.com/workflow';
+  my $xyz_xsd    = 'xyzSchema.xsd';
+
+  # In the main part of your script
+  my $schema     = XML::Compile::Cache->new(....);
+  $schema->addSchemaDirs($schema_dir);
+  $schema->importDefinitions($xyz_xsd, target_namespace => $xyz_ns);
+  $schema->addPrefixes(xyz => $xyz_ns);
+  $schema->addKeyRewrite('PREFIXED(xyz)');
+
+The schema "forgets" to mention its C<targetNamespace>, so it is
+overruled.  The ::Cache extension handles prefixes much nicer than
+the ::Schema base object.  So, with reading/writing the hash keys
+which relate to the elements in this schema will have C<xyz_> as
+prefix for clarity.
+
+=head2 Processing
+
+=head3 my data is not recognized
+
+You do specify the data in your structure, but it seems not to
+be recognized.  See L</"wrong error message">
+
+=head3 wrong error message
+
+You may get an error message about a "missing data item" on a higher
+structural level than where the problem actually is.  This especially
+happens with unions and substitutionGroups.  The problem
+is cause by the fact that on a certain structural level, multiple
+alternatives may appear which only differ many levels deep in structure.
+X::C needs to scan all the alternatives, and when all fail it does not
+know which of the alternatives was "the best" alternative.
+
+Try turning on debugging with:
+
+  use Log::Report  mode => "DEBUG";
+
+=head1 SEE ALSO
+
+This module is part of XML-Compile distribution version 1.56,
+built on March 30, 2017. Website: F<http://perl.overmeer.net/xml-compile/>
+
+Please post questions or ideas to the mailinglist at
+F<http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/xml-compile> .
+For live contact with other developers, visit the C<#xml-compile> channel
+on C<irc.perl.org>.
+
+=head1 LICENSE
+
+Copyrights 2006-2017 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the Artistic license.
+See F<http://dev.perl.org/licenses/artistic.html>
+

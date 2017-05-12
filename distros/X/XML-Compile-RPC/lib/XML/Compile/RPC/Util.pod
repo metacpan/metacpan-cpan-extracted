@@ -1,0 +1,199 @@
+=encoding utf8
+
+=head1 NAME
+
+XML::Compile::RPC::Util - XML-RPC convenience functions
+
+=head1 INHERITANCE
+
+ XML::Compile::RPC::Util
+   is a Exporter
+
+=head1 DESCRIPTION
+
+=head1 SYNOPSYS
+
+ use XML::Compile::RPC::Util;
+
+ my $h  = struct_to_hash $d->{struct};
+ my @r  = struct_to_rows $d->{struct};
+ my $d  = struct_from_rows @r;
+ my $d  = struct_from_hash int => %h;
+
+ my @a  = rpcarray_values $d->{array};
+ my $d  = rpcarray_from int => @a;
+
+ my $rc = fault_code $d->{fault};
+ my ($rc, $rcmsg) = fault_code $d->{fault};
+
+ my $d  = fault_from $rc, $msg;
+
+=head1 Functions
+
+=head2 Struct
+
+=over 4
+
+=item B<struct_from_hash>(TYPE, HASH)
+
+Only usable when all key-value pairs are of the same type, usually C<string>.
+The keys are included alphabetically.
+
+example: 
+
+  my $data = struct_from_hash int => { begin => 3, end => 5 };
+
+=item B<struct_from_rows>(ROW, ROW, ...)
+
+Each ROW is an ARRAY which contains member name, member type, and member
+value. Returned is a structure.
+
+example: 
+
+   $d = struct_from_rows [symbol => string => 'RHAT']
+                       , [limit => double => 2.25];
+   print Dumper $d;
+
+prints:
+
+   { struct => { member =>
+      [ { name => 'symbol', value => {string => 'RHAT' }}
+      , { name => 'limit', value => {double => 2.25} }
+      ] }};
+
+which will become in XML
+
+   <struct>
+     <member>
+       <name>symbol</name>
+       <value><string>RHAT</string></value>
+     </member>
+     <member>
+       <name>limit</name>
+       <value><double>2.25</double></value>
+     </member>
+   </struct>
+
+=item B<struct_to_hash>(STRUCT)
+
+Returns a HASH containing the structure information. The order of the
+keys and type of the values is lost. When keys appear more than once,
+only the last one is kept.
+
+example: 
+
+   if(my $s = $d->{struct})
+   {   my $h = struct_to_hash $s;
+       print "$h->{limit}\n";
+   }
+
+=item B<struct_to_rows>(STRUCT)
+
+Returns a LIST of all the members of the structure. Each element of the
+returned LIST is an ARRAY with contains three fields: member name,
+member type and member value.
+
+example: 
+
+   if(my $s = $d->{struct})
+   {   my @rows = struct_to_rows $s;
+       foreach my $row (@rows)
+       {   my ($key, $type, $value) = @$row;
+           print "$key: $value ($type)\n";
+       }
+   }
+
+=back
+
+=head2 Array
+
+=over 4
+
+=item B<rpcarray_from>(TYPE, LIST)
+
+Construct an rpc-array structure from a LIST of values. These values must
+all have the same type.
+
+example: 
+
+  my $d = rpcarray_from int => @a;
+
+=item B<rpcarray_values>(RPC-ARRAY)
+
+Remove all array information except the values fron an RPC-array structure.
+Actually, only the type information is lost: the other components of the
+complex XML structure are overhead.
+
+example: 
+
+   if(my $a = $d->{array})
+   {   my @v = rpcarray_values $a;
+   }
+
+=back
+
+=head2 Faults
+
+=over 4
+
+=item B<fault_code>(DATA)
+
+In LIST context, it returns both the integer faultCode as the
+corresponding faultString.  In SCALAR context, only the code.
+
+When the faultCode is C<0>, the value of C<-1> will be returned.
+Some servers (like ExistDB 1.4) accidentally forget to set a
+good numeric value.
+
+example: 
+
+   if(my $f = $d->{fault})
+   {    my ($rc, $rcmsg) = fault_code $f;
+        my $rc = fault_code $f;
+   }
+
+=item B<fault_from>(CODE, STRING)
+
+Construct a fault structure from an error code and the related error STRING.
+
+example: 
+
+   my $d = fault_from 42,'no answer';
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of XML-Compile-RPC distribution version 0.17,
+built on September 12, 2013. Website: F<http://perl.overmeer.net/xml-compile/>
+
+Other distributions in this suite:
+L<XML::Compile>,
+L<XML::Compile::SOAP>,
+L<XML::Compile::SOAP12>,
+L<XML::Compile::SOAP::Daemon>,
+L<XML::Compile::SOAP::WSA>,
+L<XML::Compile::C14N>,
+L<XML::Compile::WSS>,
+L<XML::Compile::WSS::Signature>,
+L<XML::Compile::Tester>,
+L<XML::Compile::Cache>,
+L<XML::Compile::Dumper>,
+L<XML::Compile::RPC>,
+L<XML::Rewrite>
+and
+L<XML::LibXML::Simple>.
+
+Please post questions or ideas to the mailinglist at
+F<http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/xml-compile> .
+For live contact with other developers, visit the C<#xml-compile> channel
+on C<irc.perl.org>.
+
+=head1 LICENSE
+
+Copyrights 2009-2013 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

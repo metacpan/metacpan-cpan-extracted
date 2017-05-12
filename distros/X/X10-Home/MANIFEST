@@ -1,0 +1,15 @@
+Changes
+eg/x10
+eg/x10.cgi
+eg/x10.conf
+eg/x10.js
+eg/x10.tmpl
+Home.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/001Basic.t
+t/002Locks.t
+t/003DB.t
+META.yml                                 Module meta-data (added by MakeMaker)

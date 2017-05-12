@@ -1,0 +1,5 @@
+<!element musica (music|lyrics|title|com|arquivo)* >
+<!element (music,lyrics,title,com) (#PCDATA) >
+<!element arquivo EMPTY >
+<!element outro ANY >
+<!attribute acordes title>

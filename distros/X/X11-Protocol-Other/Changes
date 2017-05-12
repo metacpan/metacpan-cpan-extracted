@@ -1,0 +1,159 @@
+Copyright 2011, 2012, 2013, 2014, 2017 Kevin Ryde
+
+This file is part of X11-Protocol-Other.
+
+X11-Protocol-Other is free software; you can redistribute it
+and/or modify it under the terms of the GNU General Public License as
+published by the Free Software Foundation; either version 3, or (at
+your option) any later version.
+
+X11-Protocol-Other is distributed in the hope that it will be
+useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You can get a copy of the GNU General Public License online at
+<http://www.gnu.org/licenses/>.
+
+
+
+Version 30, April 2017
+    - view-root.pl in examples dir
+
+Version 29, January 2014
+    - Tests WM.t don't test iconify() since various window managers by
+      design don't have IconicState; don't test withdraw() since a few
+      window managers seem a bit doubtful on that; XFIXES-5.t allow
+      for past X.org server XFixesCreatePointerBarrier() not accepting
+      device args.  As reported by Dima Kogan RT#92183.
+
+Version 28, November 2013
+    - X11::Protocol::XSetRoot new use_esetroot option
+
+Version 27, October 2013
+    - X11::Protocol::WM new functions get_net_wm_state(), set_net_wm_state(),
+      change_net_wm_state()
+
+Version 26, October 2013
+    - XFixesCreatePointerBarrier() correction to sending device IDs
+
+Version 25, September 2013
+    - tests TOG_CUP.t and XFree86_DGA.t further fixes
+
+Version 24, September 2013
+    - X11::Protocol::XSetRoot clear Esetroot too
+
+Version 23, December 2012
+    - tests fix WM.t withdraw(), and yet more relaxing XFree86_DGA.t
+
+Version 22, November 2012
+    - tests MIT_SCREEN_SAVER.t allow for saver disabled
+
+Version 21, November 2012
+    - X11::Protocol::WM new functions set_text_property(), get_wm_icon_size(),
+      get_wm_hints(), change_wm_hints()
+
+Version 20, September 2012
+    - X11::Protocol::WM new aspect_to_num_den()
+
+Version 19, September 2012
+    - new X11::Protocol::Ext::XTEST (protocol version 2.2)
+    - X11::Protocol::WM new root_to_virtual_root()
+    - X11::Protocol::ChooseWindow use virtual root
+
+Version 18, March 2012
+    - X11::Protocol::WM new iconify() and withdraw()
+    - X11::Protocol::XSetRoot act on __SWM_VROOT
+
+Version 17, January 2012
+    - tests more relaxing of XFree86_DGA expectations
+
+Version 16, January 2012
+    - tests fixes
+
+Version 15, January 2012
+    - new X11::Protocol::Ext::XFree86_DGA, protocol version 1.0
+    - new X11::Protocol::Ext::TOG_CUP
+    - XSetRoot check TOG-CUP reserved pixels
+
+Version 14, November 2011
+    - X11::Protocol::WM new set_wm_normal_hints(), pack_wm_size_hints(),
+      set_motif_wm_hints(), pack_motif_wm_hints(),
+      pack_wm_hints(), unpack_wm_state(),
+      get_net_frame_extents(),
+
+Version 13, November 2011
+    - XFIXES 5.0 pointer barriers
+
+Version 12, October 2011
+    - X11::Protocol::WM fix is_utf8() fallback
+
+Version 11, June 2011
+    - new Encode::X11
+    - X11::Protocol::WM new functions
+        set_wm_class()
+	set_wm_client_machine()
+	set_wm_client_machine_from_syshostname()
+	set_wm_command()
+	set_wm_icon_name()
+	set_wm_name()
+	set_wm_protocols()
+	set_net_wm_pid()
+
+Version 10, June 2011
+    - new X11::CursorFont
+    - new X11::Protocol::ChooseWindow
+    - new X11::Protocol::Ext::DOUBLE_BUFFER
+    - X11::Protocol::WM new functions
+        frame_window_to_client()
+        get_wm_state()
+        set_net_wm_user_time()
+
+Version 9, May 2011
+    - new X11::Protocol::Ext::MIT_SUNDRY_NONSTANDARD
+
+Version 8, April 2011
+    - new X11::Protocol::Ext::XFIXES
+    - tests avoid some warning messages
+
+Version 7, April 2011
+    - new X11::Protocol::Ext::MIT_SHM
+    - new X11::Protocol::Ext::MIT_SCREEN_SAVER
+
+Version 6, April 2011
+    - new X11::Protocol::Ext::XINERAMA
+    - DAMAGE error "Damage"
+    - tests X_Resource don't stringize floats when comparing
+
+Version 5, April 2011
+    - new X11::Protocol::Ext::DAMAGE extension 1.1
+
+Version 4, April 2011
+    - new X11::Protocol::Ext::Composite extension 0.3
+    - new X11::Protocol::Ext::X_Resource extension 1.0
+    - XSetRoot allow pixmap=>'None' as well as 0
+    - WM set_net_wm_window_type() document atom integer arg
+
+Version 3, April 2011
+    - new X11::Protocol::XSetRoot with set_background()
+    - X11::Protocol::Other new hexstr_to_rgb()
+
+Version 2, March 2011
+    - new X11::AtomConstants
+    - new X11::Protocol::WM with functions
+        set_wm_hints()
+	set_wm_transient_for()
+        set_net_wm_window_type()
+
+Version 1, February 2011
+    - the first version
+    - initial X11::Protocol::GrabServer
+    - initial X11::Protocol::Other, with functions
+        root_to_screen()
+	root_to_screen_info()
+        default_colormap_to_screen()
+	default_colormap_to_screen_info()
+        visual_is_dynamic()
+	visual_class_is_dynamic()
+        window_size()
+	window_visual()

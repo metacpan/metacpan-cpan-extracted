@@ -1,0 +1,10 @@
+Revision history for Perl extension XML::RSS::Headline::PerlMonks.
+
+0.02  Wed Oct 10 09:46:21 2007
+	- Updated tests to provide the correct response when the required modules
+		Not Found
+
+0.01  Thu Nov  2 12:02:34 2006
+	- original version; created by h2xs 1.23 with options
+		-AX --skip-exporter --use-new-tests -n XML::RSS::Headline::PerlMonks
+

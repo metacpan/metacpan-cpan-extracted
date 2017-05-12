@@ -1,0 +1,35 @@
+---
+abstract: 'Perl extension for getting information from Amazon'
+author:
+  - 'Shlomi Fish <shlomif@cpan.org>'
+build_requires:
+  File::Spec: '0'
+  File::Temp: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+  blib: '1.01'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: XML-Amazon
+requires:
+  Data::Dumper: '0'
+  Digest::SHA: '0'
+  LWP::Simple: '0'
+  POSIX: '0'
+  URI::Escape: '0'
+  XML::Simple: '0'
+  perl: '5.008'
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=XML-Amazon
+  repository: https://github.com/shlomif/perl-XML-Amazon.git
+version: '0.13'

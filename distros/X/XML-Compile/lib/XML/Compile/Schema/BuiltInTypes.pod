@@ -1,0 +1,383 @@
+=encoding utf8
+
+=head1 NAME
+
+XML::Compile::Schema::BuiltInTypes - Define handling of built-in data-types
+
+=head1 INHERITANCE
+
+ XML::Compile::Schema::BuiltInTypes
+   is a Exporter
+
+=head1 SYNOPSIS
+
+ # Not for end-users
+ use XML::Compile::Schema::BuiltInTypes qw/%builtin_types/;
+
+=head1 DESCRIPTION
+
+Different schema specifications specify different available types,
+but there is a lot over overlap.  The L<XML::Compile::Schema::Specs|XML::Compile::Schema::Specs>
+module defines the availability, but here the types are implemented.
+
+This implementation certainly does not try to be minimal in size:
+following the letter of the restriction rules and inheritance structure
+defined by the W3C schema specification would be too slow.
+
+=head1 FUNCTIONS
+
+=head2 Real functions
+
+=over 4
+
+=item B<builtin_type_info>($type)
+
+Returns the configuration for $type, which is a HASH.  Be aware that
+the information in this HASH will change over time without too much
+notice.  Implement regression-tests in this if you use it!
+
+=back
+
+=head2 The Types
+
+The functions named in this section are all used at compile-time
+by the translator.  At that moment, they will be placed in the
+kind-of opcode tree which will process the data at run-time.
+You B<cannot call> these functions yourself.
+
+XML::Compile will automatically format the value for you.  For instance,
+a float supplied to a field defined as type Integer will be converted
+to an integer. Data supplied to a field of type base64Binary will be
+encoded as Base64 for you: you shouldn't do the conversion yourself,
+you'll get double encoding!
+
+=head3 Any
+
+=over 4
+
+=item B<anyAtomicType>()
+
+=item B<anySimpleType>()
+
+=item B<anyType>()
+
+Both any*Type built-ins can contain any kind of data.  Perl decides how
+to represent the passed values.
+
+=item B<error>()
+
+=back
+
+=head3 Ungrouped types
+
+=over 4
+
+=item B<boolean>()
+
+Contains C<true>, C<false>, C<1> (is true), or C<0> (is false).
+When the writer sees a value equal to 'true' or 'false', those are
+used.  Otherwise, the trueth value is evaluated into '0' or '1'.
+
+The reader will return '0' (also when the XML contains the string
+'false', to simplify the Perl code) or '1'.
+
+=item B<pattern>()
+
+=back
+
+=head3 Big Integers
+
+Schema's define integer types which are derived from the C<decimal>
+type.  These values can grow enormously large, and therefore can only be
+handled correctly using Math::BigInt.  When the translator is
+built with the C<sloppy_integers> option, this will simplify (speed-up)
+the produced code considerably: all integers then shall be between
+-2G and +2G.
+
+=over 4
+
+=item B<integer>()
+
+An integer with an undertermined (but possibly large) number of
+digits.
+
+=item B<long>()
+
+A little bit shorter than an integer, but still up-to 19 digits.
+
+=item B<negativeInteger>()
+
+=item B<nonNegativeInteger>()
+
+=item B<nonPositiveInteger>()
+
+=item B<positiveInteger>()
+
+=item B<unsignedInt>()
+
+Just too long to fit in Perl's ints.
+
+=item B<unsignedLong>()
+
+Value up-to 20 digits.
+
+=back
+
+=head3 Integers
+
+=over 4
+
+=item B<byte>()
+
+Signed 8-bits value.
+
+=item B<int>()
+
+=item B<short>()
+
+Signed 16-bits value.
+
+=item B<unsignedByte>()
+
+Unsigned 8-bits value.
+
+=item B<unsignedShort>()
+
+unsigned 16-bits value.
+
+=back
+
+=head3 Floating-point
+
+=over 4
+
+=item B<decimal>()
+
+Decimals are painful: they can be very large, much larger than Perl's
+internal floats.  Therefore, we need to use Math::BigFloat which are
+slow but nearly seamlessly invisible in the application.
+
+=item B<double>()
+
+A floating-point value "m x 2**e", where m is an integer whose absolute
+value is less than 253, and e is an integer between −1074 and 971, inclusive.
+
+The implementation does not limited the double in size, but maps it onto an
+precisionDecimal (Math::BigFloat) unless C<sloppy_float> is set.
+
+=item B<float>()
+
+A small floating-point value "m x 2**e" where m is an integer whose absolute
+value is less than 224, and e is an integer between −149 and 104, inclusive.
+
+The implementation does not limited the float in size, but maps it onto an
+precisionDecimal (Math::BigFloat) unless C<sloppy_float> is set.
+
+=item B<precisionDecimal>()
+
+Floating point value that closely corresponds to the floating-point
+decimal datatypes described by IEEE/ANSI-754.
+
+=back
+
+=head3 Encoding
+
+=over 4
+
+=item B<base64Binary>()
+
+In the hash, it will be kept as binary data.  In XML, it will be
+base64 encoded.
+
+=item B<hexBinary>()
+
+In the hash, it will be kept as binary data.  In XML, it will be
+hex encoded, two hex digits per byte.
+
+=back
+
+=head3 Dates
+
+=over 4
+
+=item B<date>()
+
+A day, represented in localtime as C<YYYY-MM-DD> or C<YYYY-MM-DD[-+]HH:mm>.
+When a decimal value is passed, it is interpreted as C<time> value in UTC,
+and will be formatted as required.  When reading, the date string will
+not be parsed.
+
+=item B<dateTime>()
+
+A moment, represented as "date T time tz?", where date is C<YYYY-MM-DD>,
+time is C<HH:MM:SS>, and the time-zone tz is either C<-HH:mm>, C<+HH:mm>,
+or C<Z> for UTC.  The time-zone is optional, but can better be used
+because the default is not defined in the standard. For that reason,
+the C<dateTimeStamp> got introduced, which requires the timezone.
+
+When a decimal value is passed, it is interpreted as C<time> value in UTC,
+and will be formatted as required.  This will not work when the dateTime
+extended type has facet C<explicitTimeZome="prohibited">.
+
+When reading, the date string will not be parsed.  Parsing timestamps
+is quite expensive, therefore not preformed automatically.   You may try
+Time::Local in combination with Date::Parse, or Time::Piece::ISO.
+Be very careful with the timezone settings in your program, which effects
+C<mktime> which is used by these implementations.  Best to run your
+application in GMT/UTC/UCT/Z.
+
+=item B<dateTimeStamp>()
+
+Like C<dateTime>, but with required timezone which means that it is
+better defined. All other handling is the same.
+
+=item B<gDay>()
+
+Format C<---12> or C<---12+09:00> (12 days, optional time-zone)
+
+=item B<gMonth>()
+
+Format C<--09> or C<--09+07:00> (9 months, optional time-zone)
+
+=item B<gMonthDay>()
+
+Format C<--09-12> or C<--09-12+07:00> (9 months 12 days, optional time-zone)
+
+=item B<gYear>()
+
+Format C<2006> or C<2006+07:00> (year 2006, optional time-zone)
+
+=item B<gYearMonth>()
+
+Format C<2006-11> or C<2006-11+07:00> (november 2006, optional time-zone)
+
+=item B<time>()
+
+An moment in time, as can happen every day.
+
+=back
+
+=head3 Duration
+
+See L<XML::Compile::Util::duration2secs()|XML::Compile::Util/"Other"> to convert duration stamps
+into seconds.
+
+=over 4
+
+=item B<dayTimeDuration>()
+
+Format C<-PnDTnHnMnS>, where optional starting C<-> means negative.
+The C<P> is obligatory, and the C<T> indicates start of a time part.
+All other C<n[DHMS]> are optional.
+
+=item B<duration>()
+
+Format C<-PnYnMnDTnHnMnS>, where optional starting C<-> means negative.
+The C<P> is obligatory, and the C<T> indicates start of a time part.
+All other C<n[YMDHMS]> are optional.
+
+=item B<yearMonthDuration>()
+
+Format C<-PnYnMn>, where optional starting C<-> means negative.
+The C<P> is obligatory, the C<n[YM]> are optional.
+
+=back
+
+=head3 Strings
+
+=over 4
+
+=item B<ID>(, IDREF, IDREFS)
+
+A label, reference to a label, or set of references.
+
+PARTIAL IMPLEMENTATION: the validity of used characters is not checked.
+
+=item B<NCName>(, ENTITY, ENTITIES)
+
+A name which contains no colons (a non-colonized name).
+
+=item B<Name>()
+
+=item B<language>()
+
+An RFC3066 language indicator.
+
+=item B<normalizedString>()
+
+String where all sequence of white-spaces (including new-lines) are
+interpreted as one blank.  Blanks at beginning and the end of the
+string are ignored.
+
+=item B<string>()
+
+(Usually utf8) string.
+
+=item B<token>(, NMTOKEN, NMTOKENS)
+
+=back
+
+=head3 URI
+
+=over 4
+
+=item B<NOTATION>()
+
+NOT IMPLEMENTED, so treated as string.
+
+=item B<QName>()
+
+A qualified type name: a type name with optional prefix.  The prefix notation
+C<prefix:type> will be translated into the C<{$ns}type> notation.
+
+For writers, this translation can only happen when the C<$ns> is also
+in use on some other place in the message: the name-space declaration
+can not be added at run-time.  In other cases, you will get a run-time
+error.  Play with L<XML::Compile::Schema::compile(prefixes)|XML::Compile::Schema/"Compilers">,
+predefining evenything what may be used, setting the C<used> count to C<1>.
+
+=item B<anyURI>()
+
+You may pass a string or, for instance, an URI object which will be
+stringified into an URI.  When read, the data will not automatically
+be translated into an URI object: it may not be used that way.
+
+=back
+
+=head3 only in 1999 and 2000/10 schemas
+
+=over 4
+
+=item B<binary>()
+
+Perl strings can contain any byte, also nul-strings, so can
+contain any sequence of bits.  Limited to byte length.
+
+=item B<timeDuration>()
+
+'Old' name for L<duration()|XML::Compile::Schema::BuiltInTypes/"Duration">.
+
+=item B<uriReference>()
+
+Probably the same rules as L<anyURI()|XML::Compile::Schema::BuiltInTypes/"URI">.
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of XML-Compile distribution version 1.56,
+built on March 30, 2017. Website: F<http://perl.overmeer.net/xml-compile/>
+
+Please post questions or ideas to the mailinglist at
+F<http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/xml-compile> .
+For live contact with other developers, visit the C<#xml-compile> channel
+on C<irc.perl.org>.
+
+=head1 LICENSE
+
+Copyrights 2006-2017 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the Artistic license.
+See F<http://dev.perl.org/licenses/artistic.html>
+

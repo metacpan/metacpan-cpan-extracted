@@ -1,0 +1,346 @@
+
+=head1 NAME
+
+XML::RSS::TimingBot - for efficiently fetching RSS feeds
+
+=head1 SYNOPSIS
+
+  use XML::RSS::TimingBot;
+  $browser = XML::RSS::TimingBot->new;
+
+  my $response = $browser->get(
+    'http://interglacial.com/rss/cairo_times.rss'
+     # or whatever feed
+  );
+
+  ... And process $response just as if it came from
+     a plain old LWP::UserAgent object, for example: ...
+  
+  if($response->code == 200) {  # 200 = "okay, here it is"
+    ...process it...
+  } elsif($response->code == 304) { # 304 = "Not Changed"
+    # do nothing
+  } else {
+    print "Hm, couldn't access it: ", $response->status_line, "\n";
+  }
+  
+  $browser->commit;   # Save our history.  Don't forget!!
+
+=head1 DESCRIPTION
+
+If you use LWP::UserAgent for fetching RSS/RDF feeds, use
+XML::RSS::TimingBot instead! XML::RSS::TimingBot has the same interface,
+but knows when to more efficiently request the data.
+
+=head2 DETAILED DESCRIPTION
+
+XML::RSS::TimingBot is for requesting RSS feeds only as often as needed.
+This class does this in two ways:
+
+* When you request a feed the first time, this class remembers
+what Last-Modified and ETag headers it has; that the next time you
+request that feed, this class can specify that the feed's server
+should return data only if that feed has changed since last time,
+or has a different ETag value.
+If the feed I<has> changed, you'll get the HTTP response back with
+full content and with a normal "200" status code.  If the feed
+I<hasn't> changed, you'll get a contentless
+"304" response (meaning "I'm not giving you any content, because it
+hasn't changed").
+
+* When you request a feed, this class remembers any data that might
+be in the RSS that says how often this feed updates.  See
+L<XML::RSS::Timing> for the full story; but as a common example
+if there's a C<< <ttl>180</ttl> >> in the feed, that means that
+the feed will rebuild only once every three hours (180 minutes).
+When this class sees that in the received RSS data, it remembers
+this so that if you go to get the feed more often than that, it
+will stop you and give a "304" (Not Modified) error response.
+
+
+=head1 METHODS
+
+This module inherits all of the methods from L<LWP::UserAgent>
+and L<LWP::UserAgent::Determined>,
+and adds the following ones.
+
+
+=over
+
+=item $browser->commit
+
+This saves to disk (or database, whatever) all the data that this
+browser object has accumulated about how long to wait before
+re-requesting what URLs with what Last-Modified and ETag headers.
+
+
+=item $browser->minAge(60*60);  # an hour
+
+=item $minage_seconds = $browser->minAge();
+
+This sets (or in the second case, just reads) this browser object's
+C<minAge> attribute.  This attribute
+denotes the I<minimum> amount of time (in seconds) that your
+client will go between polling, I<overriding> whatever this feed says
+if it says a shorter interval.
+
+For example, if a feed says it can update every 5 minutes, but you've
+set your
+C<minAge> to a half hour, then this timing object will act as if the feed
+really said to update only half hour at most.
+(This won't have any effect on feeds that
+say they update at intervals longer than what minAge is set to.)
+
+
+If you set minAge, you should probably set it only to a smallish value, like
+the number of seconds in an hour (60*60). By default, minAge is
+not set, meaning no minimum is enforced.
+
+=item $maxage_minutes = $browser->maxAge();
+
+
+
+=item $browser->maxAge(62*24*60*60);  # two months
+
+This sets (or in the second case, just reads) this browser object's
+C<maxAge> attribute.  This attribute
+denotes the I<maximum> amount of time (in I<seconds>) that
+your client will go between polling, I<overriding> whatever this feed
+says if it says a longer interval.
+
+For example, if a feed says it updates only once a year but you've
+set your C<minAge> to
+two months, then this timing object will act as if the feed really said
+to update every two months.  (This won't have any effect on feeds that
+say they update at intervals shorter than what maxAge is set to.)
+
+If you set this, you should probably set it only to a large value, like
+the number of seconds in two months (62*24*60*60). By default, maxAge is
+not set, meaning no maximum is enforced.  (So if a feed says to update
+only once a year, then that's what this timing object faithfully
+implements.)
+
+
+=back
+
+
+
+=head1 THE BASIC STORAGE SYSTEM
+
+XML::RSS::TimingBot uses a simple flat-file database system to store
+information about what URLs shouldn't be requested until when, and
+what the last-modified and ETag headers were from what URLs.
+
+If you're using XML::RSS::TimingBot to poll vast numbers
+of feeds, you can try out XML::RSS::TimingBot, but you'll probably want
+to use L<XML::RSS::TimingbotDBI>, which stores all its data not in a flat
+file database, but in an SQL table that you specify.
+
+(Users who aren't polling vast numbers of feeds are still free to
+use L<XML::RSS::TimingbotDBI>!  It's just that XML::RSS::Timingbot is
+probably more convenient for you, since it doesn't need to have L<DBI>
+installed, etc.)
+
+There are two notable drawbacks to the basic flat-file storage system:
+It doesn't do any file-locking, and it doesn't ever tidy up its
+database.
+
+The lack of file-locking means that if two different processes
+have been polling feeds (possibly different feeds, possibly the same
+feeds) and then call C<< $browser->commit >> at the same time, the files
+may get corrupted as both processes try writing to them at the same
+time. If this is a potential problem, either use XML::RSS::TimingBotDBI,
+or use lock files (semaphore files) to make sure that no two processes
+are ever calling C<< $browser->commit >> at the same time.
+
+The fact that XML::RSS::TimingBot never tidies up its database is less
+serious. Basically, XML::RSS::TimingBot offers no way to say "I don't
+plan to ever look at $url again, so go ahead and delete your database's
+data on it". This lack is unlikely to be a problem for you unless you have a
+lot of feeds constantly being added and removed from polling. There's no
+obvious tidy solution, but a crude and effective solution is to just
+delete the local flat-file database directory every now and then (like
+every two months).
+
+
+The current flat-file database works by keeping a bunch of text files
+in a directory called "rssdata", which is a subdirectory of one of the
+following:
+
+  $ENV{'TIMINGBOTPATH'} if it's defined,
+  otherwise $ENV{'APPDATA'} if it's defined,
+  otherwise $ENV{'HOME'} if it's defined (and it usually is)
+  otherwise, in the current directory ('.' in Unix terms, not `pwd`)
+
+Normally you don't need to deal with any of this; but if having
+a "rssdata" directory in your home directory annoys you, then go
+ahead and set C<< $ENV{'TIMINGBOTPATH'} = "/wherever/the/hell/you/want" >>
+before you go manipulating an XML::RSS::TimingBot object.
+
+(If the "rssdata" directory doesn't exist where XML::RSS::TimingBot
+expects it to be, it will be created there with default permissions.
+If that's not what you want, create it with whatever permissions
+you like.)
+
+
+=head1 SEMI-INTERNAL METHODS
+
+These are internal methods used by XML::RSS::TimingBot objects,
+but I document them here in case they might be useful to you.
+(Subclassers: you really shouldn't ever need to override these.)
+
+=over
+
+=item $epoch_time = $browser->feed_get_next_update($url);
+
+=item $browser->feed_set_next_update($url, $next_update_epoch_time);
+
+This queries (or in the second case, sets) the earliest time
+(in epoch time) that this feed will actually be queried.
+
+=item $last_mod_string = $browser->feed_get_last_modified($url);
+
+=item $browser->feed_set_last_modified($url, $last_mod_string);
+
+This queries (or in the second case, sets) what the last-mod string
+for the given URL is.
+
+=item $etag_string = $browser->feed_get_etag($url);
+
+=item $browser->feed_set_etag($url, $etag_string);
+
+This queries (or in the second case, sets) what the ETag string
+for the given URL is.
+
+=back
+
+
+=head1 SUBCLASS INTERFACE METHODS
+
+Read this section only if XML::RSS::TimingBot and XML::RSS::TimingBotDBI
+don't work for you and you need to write an XML::RSS::TimingBot subclass
+to do what you want.
+
+To write a subclass, you need to override two crucial methods,
+C<datum_from_db> and C<commit>, which get called like so by either the
+user or XML:RSS::TimingBot itself:
+
+  $value = $browser->datum_from_db($url, $attribute_name);
+
+  $browser->commit();
+
+The first method, C<datum_from_db> is called whenever a particular bit
+of data needs to be gotten from the database.  The C<commit> method
+is called whenever the user wants to commit to disk/database all of
+this object's newly acquired memory of URLs and their attributes.
+"Attributes" is my term for fields.  Currently XML::RSS::TimingBot
+only uses three attribute names:
+"lastmodified", "nextupdate", and "etag".  You may consider any other
+attribute names to be an error.  (Although I just might, in the future,
+add more; but I consider this unlikely at the moment.)
+
+When C<< $browser->commit >> is called, C<<
+$browser->{'rsstimingbot_for_db'} >> will either be blank or C<{}>
+(nothing to write out), or will be reference to a hash-of-hash of
+strings, i.e.,
+
+  $browser->{'rsstimingbot_for_db'}{$url}{$attribute} = $value
+
+You can traverse that structure like so:
+
+  my $hoh = $browser->{'rsstimingbot_for_db'} || return;
+  return unless scalar keys %$hoh;
+  foreach my $url (sort keys %$hoh) {
+    $for_this_url = $hoh->{$url} || next;
+    foreach my $attr (sort keys %$for_this_url) {
+      $value = $for_this_url->{$attr};
+      $value = '' unless defined $value;
+      ... and here you do something to save
+       the datum that $url's $attrib is $value ...
+    }
+  }
+  # And if all went well, clear the cache:
+  %$hoh = ();
+
+If neither XML::RSS::TimingBot nor XML::RSS::TimingBotDBI do what you
+want, and you need to write a new subclass of XML::RSS::TimingBot that
+will do what you want, feel free to email me for suggestions if the
+above isn't what you need.
+
+
+=head1 IMPLEMENTATION
+
+This class works by subclassing LWP::UserAgent (actually
+LWP::UserAgent::Determined, which subclasses LWP::UserAgent) and
+overriding its C<simple_request> method with an around-method.
+The around-method blocks the request if earlier requests expressed
+that the feed would not have new data by now (via C<ttl>, C<skipHours>,
+C<updateBase>, etc elements).
+
+Otherwise the request gets a If-Modified-Since header added if that
+feed's Last-Modified line was noted last time, and the request gets
+an If-None-Match header added if that feed's ETag line was noted
+last time.  Then the superclass's
+C<simple_request> method is called to actually perform the request.
+
+If it returns non-RSS data, or returns an error, then that response is
+simply returned. Otherwise it is scanned for timing elements (C<ttl>,
+etc), whose contents are fed to an L<XML::RSS::Timing> object to
+calculate when the feed could next have new data.  The response's
+Last-Modified and ETag values are also stored, if they're found.
+
+These pieces of data -- the feed's Last-Modified value, its ETag value,
+and the time
+that it shouldn't be polled again until -- are kept in the object until
+you call the C<commit> method, at which point they are written to
+disk (or to a DBI object, in the case of L<XML::RSS::TimingBotDBI>'s
+C<commit> override method).
+
+
+
+=head1 XML PARSING
+
+Thing module uses some regular expressions to extract the values
+of the timing elements from the RSS data.  Using regexps for
+parsing XML is I<generally> a bad idea, but in this specific case,
+it seems quite unproblematic.  Email me if you come across a
+real-life case that my regexps don't handle.
+
+
+
+=head1 ENVIRONMENT
+
+This module is influenced by three environment variables:
+TIMINGBOTPATH, APPDATA, and HOME.  See above, under
+L</"THE BASIC STORAGE SYSTEM">.
+
+
+
+=head1 SEE ALSO
+
+L<lwptut>, L<lwpcook>, L<LWP::UserAgent>, L<HTTP::Response>,
+and the book I<Perl & LWP> by Sean Burke.
+
+L<XML::RSS::TimingBotDBI>, L<XML::RSS::Timing>,
+L<LWP::UserAgent::Determined>, L<LWP>
+
+The HTTP spec, currently RFC 2616.
+
+
+=head1 COPYRIGHT AND DISCLAIMER
+
+Copyright 2004, Sean M. Burke C<sburke@cpan.org>, all rights
+reserved.  This program is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.
+
+This program is distributed in the hope that it will be useful,
+but without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+
+=head1 AUTHOR
+
+Sean M. Burke, C<sburke@cpan.org>
+
+=cut
+

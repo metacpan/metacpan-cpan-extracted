@@ -1,0 +1,9 @@
+<p>
+[% text = BLOCK; item.content(site.view.text) | html(entity = 1); END -%]
+[% IF item.title -%]
+<b>[% item.title %]</b>
+[% END -%]
+<ul>
+<pre>[% text.replace("\\[\%", "<b>[\%").replace("%\\]", "%\]</b>").replace('&amp;lt;', '&lt;') %]</pre>
+</ul>
+</p>

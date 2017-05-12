@@ -1,0 +1,13 @@
+<address-book>
+    <name>My Address Book</name>
+    <entry>
+        <name type="Person">Mark</name>
+        <street>Perl Place</street>
+    </entry>
+    <entry>
+        <name>Bob</name>
+        <street>Heck Ave.</street>
+        <state>FL</state>
+    </entry>
+</address-book>
+

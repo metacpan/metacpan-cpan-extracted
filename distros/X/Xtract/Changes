@@ -1,0 +1,82 @@
+Changes for Perl extension Xtract
+
+0.16 Mon 7 Nov 2011
+	- Migrating all code from ->fill to ->create_table
+	- Completed refactoring to only use the driver API for scanning
+
+0.15 Mon 24 Oct 2011
+	- Upgrading to Module::Install::DSL 1.04
+	- Upgrading to Aspect 1.00
+	- Migrating from Moose to the lighter Mouse
+	- Indexing no longer assumes all target tables match source tables
+	- In principle support for parallel testing
+
+0.14 Sat  3 Apr 2010
+	- Upgrading test skipping to use Test::Database.
+	- Upgrading Aspect to the latest light-dependency version.
+
+0.13 Thu 14 Jan 2010
+	- Fixed major bugs in the type auto-detection code
+	- While type-detection, scan for uniqueness in the first column
+	  of the exported table. If the column is both NONNEGINT and UNIQUE
+	  create the column as a PRIMARY KEY.
+
+0.12 Mon 23 Nov 2009
+	- Fixed some binmode-related bugs on Windows
+	- Updated to use DBD::SQLite 1.27
+
+0.11 Mon  6 Jul 2009
+	- Bug fix to moose flag constructor
+
+0.10 Mon  6 Jul 2009
+	- If we are building indexes (because the consumer cares about speed)
+	  then we now also run ANALYZE during the database cleanup.
+	- Separated publish logic into a standalone module.
+
+0.09 Sun  3 May 2009
+	- Fleshing out some of the tests a bit more
+	- Merged DBIx::Publish down into Xtract.pm
+	- Added mysql table support
+
+0.08 Sun  3 May 2009
+	- Added LZMA compression support
+	- Started migration to Moose
+
+0.07 Sat  2 May 2009
+	- The "DBI:" in --from is now optional
+	- Rewrote the autotype code (faster and uses less memory)
+	- Add support for autotype columns with only NULLs
+
+0.06 Wed 29 Apr 2009
+	- Adding timestamp on trace messages
+	- Adding dependency on Time::Elapsed for human elapsed times
+	- Adding experimental tuning option --sqlite_cache param to boost
+	  SQLite memory use
+	- Disabled the cleanup VACUUM, it takes an very long time to run
+	  (for very little benefit)
+
+0.05 Sun 26 Apr 2009
+	- Factored out the indexing and filling code to seperate methods
+	- Moved the old ->table to ->select
+	- Made a new fast ->table for complete table extraction
+	- Allow ->table to have a different implementation depending on
+	  the type of the source database driver.
+	- select, table and fill now track and return inserted rows
+	- Automatically generated a compressed version of the database
+	- Add a timer to the publishing run and report elapsed time
+	- Use (faster?) UNIQUE indexes if column values are all different
+	- Indexing is now a specific command line option --index
+	- Added quiet mode --quiet
+
+0.04 Sat 25 Apr 2009
+	- Merged DBIx::Publish into this distribution for now
+
+0.03 Sat 25 Apr 2009
+	- More fixes
+	- Updating to DBIx::Publish 0.03
+
+0.02 Sat 25 Apr 2009
+	- Forgot to add the script to the Makefile.PL
+
+0.01 Sat 25 Apr 2009
+	- Created the initial version

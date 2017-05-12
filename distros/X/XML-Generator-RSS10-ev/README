@@ -1,0 +1,36 @@
+XML/Generator/RSS10/ev version 0.01
+=====================================
+
+This module extends Dave Rolsky's XML::Generator::RSS10 to
+support the RSS 1.0 Event module.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+DEPENDENCIES
+
+This module requires:
+
+   XML::Generator::RSS10
+	DateTime
+	DateTime::Format::W3CDTF
+	Params::Validate
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 Andrew Green, andrew@article7.co.uk
+
+Sponsored by Woking Borough Council, http://www.woking.gov.uk/
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

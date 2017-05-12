@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<NZSRSResponse VerMajor="5" VerMinor="0" RegistrarId="140">
+  <Response Action="GetMessages" FeId="8" FeSeq="4769412" MoreRowsAvailable="1" OrigRegistrarId="1" RecipientRegistrarId="140" Rows="1">
+    <FeTimeStamp Day="30" Hour="12" Minute="35" Month="6" Second="51" TimeZoneOffset="+12:00" Year="2010" />
+    <Message Remaining="0">
+      <Response Action="DomainUpdate" FeId="8" FeSeq="4660773" OrigRegistrarId="50" RecipientRegistrarId="107" Rows="1" TransId="RenewDomains-2010-05-31 23:30:00-local.school.nz">
+        <FeTimeStamp Day="1" Hour="00" Minute="00" Month="6" Second="00" TimeZoneOffset="+12:00" Year="2010" />
+        <Domain Delegate="1" DomainName="local.school.nz" RegistrantRef="52671249" RegistrarId="107" Status="Active" Term="1">
+          <NameServers>
+            <Server FQDN="ns1.registerdirect.net.nz" />
+            <Server FQDN="ns2.registerdirect.net.nz" />
+          </NameServers>
+          <RegistrantContact Name="St X's College" Email="principal@local.school.nz">
+            <PostalAddress Address1="Street addr1" City="London" CountryCode="AU" />
+            <Phone AreaCode="37" CountryCode="61" LocalNumber="844467" />
+            <Fax AreaCode="3" CountryCode="44" LocalNumber="9444516" />
+          </RegistrantContact>
+          <AdminContact Name="Boob Moloney" Email="principal@local.school.nz">
+            <PostalAddress Address1="4 Brougham Street" City="London" CountryCode="AU" />
+            <Phone AreaCode="37" CountryCode="64" LocalNumber="897467" />
+          </AdminContact>
+          <TechnicalContact Name="Hostmaster" Email="hostmaster@registerdirect.net.nz">
+            <PostalAddress Address1="PO Box 1" Address2="Auckland Mail Centre" City="Auckland" CountryCode="AU" />
+            <Phone AreaCode="3" CountryCode="61" LocalNumber="962 4444" />
+            <Fax AreaCode="3" CountryCode="44" LocalNumber="962 4444" />
+          </TechnicalContact>
+          <BilledUntil Day="30" Hour="00" Minute="00" Month="6" Second="00" TimeZoneOffset="+12:00" Year="2010" />
+          <RegisteredDate Day="31" Hour="00" Minute="00" Month="5" Second="00" TimeZoneOffset="+12:00" Year="2002" />
+          <AuditDetails ActionId="RenewDomains-2010-05-31 23:30:00-local.school.nz" RegistrarId="50">
+            <AuditTime>
+              <From Day="01" Hour="00" Minute="00" Month="6" Second="00" TimeZoneOffset="+12:00" Year="2010" />
+            </AuditTime>
+            <AuditText>RenewDomains
+       </AuditText>
+          </AuditDetails>
+        </Domain>
+      </Response>
+    </Message>
+  </Response>
+</NZSRSResponse>

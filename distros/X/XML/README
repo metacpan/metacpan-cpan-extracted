@@ -1,0 +1,36 @@
+--WARNING The current version works with eXist 0.9 (though the 'createId'
+function is still not available; this will show as a failure in the tests),
+and Xindice 1.0, aka 'birthday'. It will almost certainly fail to work
+with Xindice 1.1, when that's released, though a new driver may eventually
+be written for Xindice 1.1
+--
+
+
+This is a perl implementation of the XML:DB API (http://www.xmldb.org).
+It should pass 100% of its own tests with Xindice, and 95% with eXist. 
+See BUGS for more details. There's also a simple file driver, which is extremely
+slow, but gives a consistent interface for things like copying from files
+to a real database.
+
+This package currently implements most of the core XML:DB API, though some
+parts are just stubs. XUPDate is implemented for eXist and File (which dont 
+have a native version), and Xindice (which does)! This also means that you
+only get a kind of lowest common denominator to the dbs - non-standard, db
+specific functions are not implemented (though they could be).
+
+Error handling is awful, and will be improved. 
+
+Performance will never be good - this is a front end to XML-RPC implementations,
+which has to duplicate a lot of what's already going on the other side of
+the XML-RPC connection. For good performance we'll need a C/Perl backend
+written... The File driver may grow up to be this one day.
+
+There will be a more complete README when this is all more stable.
+
+Ohhh... to install:
+
+perl Makefile.PL
+make
+make test
+make install
+

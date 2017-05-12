@@ -1,0 +1,22 @@
+<outline>
+  <sect title="first">
+    <para>This is the first section</para>
+    <sect title="first subsection">
+      <para>This is the first subsection of the first section</para>
+      <sect title="first sub-subsection">
+      <para>This is what the title says it is</para>
+      <para>And this is the second paragraph</para>
+      </sect>
+      <para>This is more text for the first subsection.  Doesn't this look good?</para>
+    </sect>
+    <sect title="second subsection">
+    <para>This is the text of the second subsection of the first section</para>
+    </sect>
+  </sect>
+  <sect title="second">
+    <para>This very simple program was designed to demonstrate stream-based parsing of XML documents.
+It reads a file written according to a very simple XML vocabulary and outputs a text file with appropriately
+numbered and indented sections.
+    </para>
+  </sect>
+</outline>

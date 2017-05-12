@@ -1,0 +1,142 @@
+# plankton's example from Perlmonks.
+# http://perlmonks.org/index.pl?node_id=295416
+
+--- |
+ <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+ 
+ <xsd:element name="invoiceNumber" type="xsd:string">
+ </xsd:element>
+ 
+ <xsd:element name="originator">
+  <xsd:complexType>
+   <xsd:sequence>
+    <xsd:element ref="companyName"/>
+    <xsd:element ref="companyContact"/>
+    <xsd:element ref="companyIdentifier"/>
+   </xsd:sequence>
+  </xsd:complexType>
+ </xsd:element>
+ 
+ <xsd:element name="companyName" type="xsd:string">
+ </xsd:element>
+ 
+ <xsd:element name="companyContact" type="xsd:string">
+ </xsd:element>
+ 
+ <xsd:element name="companyIdentifier" type="xsd:string">
+ </xsd:element>
+ 
+ <xsd:element name="receiver">
+  <xsd:complexType>
+   <xsd:sequence>
+    <xsd:element ref="companyName"/>
+    <xsd:element ref="companyContact"/>
+    <xsd:element ref="companyIdentifier"/>
+   </xsd:sequence>
+  </xsd:complexType>
+ </xsd:element>
+ 
+ <xsd:element name="itemDescription" type="xsd:string">
+ </xsd:element>
+ 
+ <xsd:element name="itemCount" type="xsd:string">
+ </xsd:element>
+ 
+ <xsd:element name="itemUnit" type="xsd:string">
+ </xsd:element>
+ 
+ <xsd:element name="itemPrice">
+  <xsd:complexType>
+  <xsd:simpleContent>
+  <xsd:extension base="xsd:string">
+   <xsd:attribute name="currency" 
+    type="xsd:string" use="required"/>
+   </xsd:extension>
+   </xsd:simpleContent>
+  </xsd:complexType>
+ </xsd:element>
+ 
+ <xsd:element name="itemTotal">
+  <xsd:complexType>
+  <xsd:simpleContent>
+  <xsd:extension base="xsd:string">
+   <xsd:attribute name="currency" 
+    type="xsd:string" use="required"/>
+   </xsd:extension>
+   </xsd:simpleContent>
+  </xsd:complexType>
+ </xsd:element>
+ 
+ <xsd:element name="lineItem">
+  <xsd:complexType>
+   <xsd:sequence>
+    <xsd:element ref="itemDescription"/>
+    <xsd:element ref="itemCount"/>
+    <xsd:element ref="itemUnit"/>
+    <xsd:element ref="itemPrice"/>
+    <xsd:element ref="itemTotal"/>
+   </xsd:sequence>
+  </xsd:complexType>
+ </xsd:element>
+ 
+ <xsd:element name="lineItems">
+  <xsd:complexType>
+   <xsd:sequence maxOccurs="unbounded">
+    <xsd:element ref="lineItem" />
+   </xsd:sequence>
+  </xsd:complexType>
+ </xsd:element>
+ 
+ <xsd:element name="total" type="xsd:string">
+ </xsd:element>
+ 
+ <xsd:element name="invoice">
+  <xsd:complexType>
+   <xsd:sequence>
+    <xsd:element ref="invoiceNumber"/>
+    <xsd:element ref="originator"/>
+    <xsd:element ref="receiver"/>
+    <xsd:element ref="lineItems"/>
+    <xsd:element ref="total"/>
+   </xsd:sequence>
+  </xsd:complexType>
+ </xsd:element>
+ </xsd:schema>
+
+--- |
+ <invoice>
+   <invoiceNumber>A1112CD</invoiceNumber>
+   <originator>
+      <companyName>Metaphorical Web</companyName>
+      <companyContact>James Eldridge</companyContact>
+      <companyIdentifier>MetWeb</companyIdentifier>
+   </originator>
+   <receiver>
+      <companyName>Semantic Web</companyName>
+      <companyContact>Sarah Tremaine</companyContact>
+      <companyIdentifier>SemanticWeb</companyIdentifier>
+ 
+   </receiver>
+   <lineItems>
+      <lineItem>
+         <itemDescription>Essay on Metaphorical 
+           Web</itemDescription>
+         <itemCount>1</itemCount>
+         <itemUnit>Article</itemUnit>
+         <itemPrice currency="USD">155.60</itemPrice>
+         <itemTotal currency="USD">155.60</itemTotal>
+      </lineItem>
+      <lineItem>
+         <itemDescription>Lesson Package
+           </itemDescription>
+         <itemCount>4</itemCount>
+         <itemUnit>Lesson</itemUnit>
+         <itemPrice currency="USD">176.13</itemPrice>
+         <itemTotal currency="USD">704.52</itemTotal>
+      </lineItem>
+   </lineItems>
+   <total>860.12</total>
+ </invoice>
+
+--- >
+PASS

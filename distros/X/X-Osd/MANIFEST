@@ -1,0 +1,11 @@
+Changes
+README
+MANIFEST
+Makefile.PL
+Osd.pm
+Osd.xs
+typemap
+SIGNATURE
+MANIFEST.SKIP
+t/0-signature.t
+t/1-basic.t

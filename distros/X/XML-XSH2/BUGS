@@ -1,0 +1,14 @@
+KNOWN BUGS
+
+- open :B does not seem to override keep_blanks 1
+
+- it is not possible to perform XPath searches on namespace nodes
+  (it is a limitation of libxml2)
+
+- --skip-xmldecl doesn't work for --file and --pipe (toFile and toFH)
+so we need a workaround. The problem here is compression.
+
+- command redirection fails (no output) if the script is passed to
+xsh2 as STDIN and encoding is applied (either via $ENCODING variable
+or the encoding command). Seems to be due to a (reported) bug in Perl.
+

@@ -1,0 +1,25 @@
+<stx:transform version="1.0" 
+	       xmlns:stx="http://stx.sourceforge.net/2002/ns"
+	       strip-space="yes" pass-through="none">
+
+  <stx:template match="/root">
+    <a>
+      <stx:process-children/>
+    </a>
+  </stx:template>
+
+  <stx:template match="node[1]">
+    <n>
+      <stx:process-siblings until="node[@a1]"/>
+    </n>
+  </stx:template>
+
+
+  <stx:template match="node">
+    <s>
+      <stx:value-of select="position()"/>
+    </s>
+  </stx:template>
+
+
+</stx:transform>

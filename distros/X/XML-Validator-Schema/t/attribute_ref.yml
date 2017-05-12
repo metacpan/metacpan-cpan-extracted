@@ -1,0 +1,38 @@
+# test a simple schema that uses attribute refs
+
+--- |
+  <?xml version="1.0" encoding="UTF-8"?>
+  <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+     <xs:simpleType name="color">
+       <xs:restriction base="xs:string">
+         <xs:enumeration value="red" />
+         <xs:enumeration value="white" />
+         <xs:enumeration value="blue" />
+       </xs:restriction>
+     </xs:simpleType>
+     <xs:attribute name="color" type="color" />
+     <xs:element name="foo">
+      <xs:complexType>
+       <xs:simpleContent>
+          <xs:extension base="xs:string">
+             <xs:attribute ref="color" use="required"/>
+          </xs:extension>
+       </xs:simpleContent>
+     </xs:complexType>
+   </xs:element>
+  </xs:schema>
+
+--- |
+ <foo color="red">bar</foo>
+--- >
+PASS
+
+--- |
+ <foo color="yellow">bar</foo>
+--- >
+FAIL /[iI]llegal value/
+
+--- |
+ <foo>bar</foo>
+--- >
+FAIL /[mM]issing required/

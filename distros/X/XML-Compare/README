@@ -1,0 +1,80 @@
+XML-Compare
+Test-XML-Compare
+======================
+
+These two modules help enable you to check if two XML documents are
+semantically the same. Some other modules try this but don't check
+namespaces. These modules check that the namespaces of each element (if
+defined) even if they are mapped to different prefixes.
+
+The XML::Compare module export the same(), is_same() and is_different()
+functions. The latter two return true or false (but no reason why) whereas the
+former returns true but throws an exception containing reasoning information if
+different. The latter _could_ be used as an assert statement in your code.
+
+The Test::XML::Compare modules enable you to use is_xml_same() and
+is_xml_different() functions in your unit tests as you would usually use
+Test::More et al.
+
+EXAMPLE XML COMPARISON
+======================
+
+For example, the following two documents should be considered semantically
+equal:
+
+    <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+    <message xmlns="urn:message" type="simple">
+      <!-- comment node -->
+      <content>Hello, World!</content>
+    </message>
+
+    <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+    <msg:message xmlns:msg="urn:message" type="simple">
+      <!-- comment node -->
+      <msg:content>Hello, World!</msg:content>
+    </msg:message>
+
+Currently, far more complicated tests are being performed but this gives a
+small example of how different XML documents might be considered semantically
+the same.
+
+INSTALLATION
+============
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+============
+
+This module requires these other modules and libraries:
+
+XML::LibXML (>= 1.70)
+Test::Simple (Test::More/Test::Builder -- core)
+
+AUTHOR, COPYRIGHT AND LICENCE
+=============================
+
+Written by Andrew Chilton:
+
+* andychilton@gmail.com
+* andy@catalyst.net.nz
+
+Hacked on by Sam Vilain:
+
+* sam@vilain.net
+* samv@catalyst.net.nz
+
+This software development is sponsored and directed by New Zealand Registry
+Services, http://www.nzrs.net.nz/
+
+The work is being carried out by Catalyst IT, http://www.catalyst.net.nz/
+
+Copyright (c) 2009, NZ Registry Services.  All Rights Reserved.  This software
+may be used under the terms of the Artistic License 2.0.  Note that this
+license is compatible with both the GNU GPL and Artistic licenses.  A copy of
+this license is supplied with the distribution in the file COPYING.txt.

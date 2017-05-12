@@ -1,0 +1,8 @@
+root
+/common	/f/commonF	/f/a/commonA	/f/a/b/#id	/f/a/b/@att	/f/a/b/commonB	/f/a/b/c
+testR	testF	testA	1	testAtt1	testB	test0
+testR	testF	testA	1	testAtt1	testB	test1
+testR	testF	testA	1	testAtt1	testB	test2
+testR	testF	testA	2	testAtt2		test1
+testR	testF	testA	3			test2
+

@@ -1,0 +1,9 @@
+root
+/a	/a/@x	/r/#id	/r/x	/r/s/t
+testA	test1			
+	test2			
+		1	testX1	TestT11
+		1	testX1	TestT21
+		2	testX2	TestT12
+		2	testX2	TestT22
+

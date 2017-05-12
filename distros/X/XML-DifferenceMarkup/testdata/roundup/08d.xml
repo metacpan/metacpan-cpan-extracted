@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<dm:diff xmlns:dm="http://www.locus.cz/diffmark">
+  <delta>
+    <dm:copy count="2"/>
+    <dm:delete>
+      <uri value="third"/>
+    </dm:delete>
+    <dm:copy count="1"/>
+  </delta>
+</dm:diff>

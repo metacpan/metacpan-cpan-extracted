@@ -1,0 +1,49 @@
+#web-button-webdigest { 
+  list-style-image: url("chrome://yahoofavorites/content/mywebdigest-mac.png"); 
+  -moz-image-region: rect(0px 32px 32px 0px);  
+}
+
+#web-button-webdigest:hover {
+  -moz-image-region: rect(32px 32px 64px 0px);
+}
+
+#web-button-webdigest[disabled="true"] { 
+  -moz-image-region: rect(64px 32px 96px 0px);
+}
+
+toolbar[iconsize="small"] #web-button-webdigest {
+  list-style-image: url("chrome://yahoofavorites/content/mywebdigest-mac-small.png");
+  -moz-image-region: rect(0px 24px 24px 0px);
+}
+toolbar[iconsize="small"] #web-button-webdigest:hover {
+  -moz-image-region: rect(24px 24px 48px 0px);
+}
+toolbar[iconsize="small"] #web-button-webdigest[disabled="true"] {
+  -moz-image-region: rect(48px 24px 72px 0px);
+}
+
+
+
+#web-button-tagPage { 
+  list-style-image: url("chrome://yahoofavorites/content/tagwebdigest-mac.png"); 
+  -moz-image-region: rect(0px 32px 32px 0px);  
+}
+
+#web-button-tagPage:hover {
+  -moz-image-region: rect(32px 32px 64px 0px);
+}
+
+#web-button-tagPage[disabled="true"] { 
+  -moz-image-region: rect(64px 32px 96px 0px);
+}
+
+toolbar[iconsize="small"] #web-button-tagPage {
+  list-style-image: url("chrome://yahoofavorites/content/tagwebdigest-mac-small.png");
+  -moz-image-region: rect(0px 24px 24px 0px);
+}
+toolbar[iconsize="small"] #web-button-tagPage:hover {
+  -moz-image-region: rect(24px 24px 48px 0px);
+}
+toolbar[iconsize="small"] #web-button-tagPage[disabled="true"] {
+  -moz-image-region: rect(48px 24px 72px 0px);
+}

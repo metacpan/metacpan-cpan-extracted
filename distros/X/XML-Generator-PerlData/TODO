@@ -1,0 +1,3 @@
+* Change external attrmap interface to allow 'parent' => 'child'. (just push 'child' into an anon. array) (?)
+* add examples to all the config options in the docs for the new() method.
+* address "many things are non-starters for arrays" issues where possible.

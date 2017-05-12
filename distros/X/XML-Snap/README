@@ -1,0 +1,29 @@
+XML-Snap
+
+XML::Snap is a quick and relatively modern way to work with XML. If, like me, you have
+little patience for the endless reams of standards the XML community burdens you with,
+maybe you'll like it too! If you want to maintain compatibility with normal people,
+though, and you want to avoid scaling problems later, you're probably better off sitting
+down and understanding XML::LibXML and the SAX ecosystem.
+
+The other large omission from the model at present is namespaces. If you use namespaces
+(and honestly, most applications do) then again, you should be using libxml or one of
+the SAX parsers.
+
+Still here? Cool. XML::Snap is my personal way of dealing with XML when I can't avoid it.
+It's roughly based on my experiences with my ANSI C library "xmlapi", which I wrote back
+in 2000 to wrap the Expat parser. Along the way, I ended up building a lot of handy
+functionality into the library that made C programming palatable - and a lot of that was
+string and list manipulation that Perl renders superfluous. So after working with a port
+for a while, I tossed it. This is what I ended up with.
+
+Its primary purpose is the extraction of data, including linguistic data, from XML-based
+storage files, which are very common in the translation industry.
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2014 Michael Roberts
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the the Artistic License (2.0).

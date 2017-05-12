@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<test><directory path="/root/" blocks="1024" perms="drwxr-xr-x">
+<file name="file1" size="1234" perms="-rw-rw-rw-"/>
+<file name="file2" size="2234" perms="-rw-rw-rw-"/>
+<file name="file3" size="3234" perms="-rw-rw-rw-"/>
+</directory><directory path="/home/" blocks="1024" perms="drwxr-xr-x">
+<file name="file1" size="1234" perms="-rw-rw-rw-"/>
+<file name="file2" size="2234" perms="-rw-rw-rw-"/>
+<file name="file3" size="3234" perms="-rw-rw-rw-"/>
+</directory></test>

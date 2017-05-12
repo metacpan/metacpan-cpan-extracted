@@ -1,0 +1,11 @@
+
+/var/log/xas/xas-supervisor.log {
+    su xas xas
+    daily
+    nodateext
+    rotate 5
+    missingok
+    notifempty
+    copytruncate
+}
+

@@ -1,0 +1,20 @@
+Revision history for XML-FeedWriter
+
+0.06 2008/08/17
+  - sorry the test was still broken...
+
+0.05 2008/08/06
+  - no code changes: fixed pod glitches
+
+0.04 2008/07/10
+  - the test was still broken: dynamic use should be stringified
+
+0.03 2008/07/10
+  - also stale was SYNOPSIS with an obsolete API. orz
+  - basic test requires XML::Simple 2.17 (for parse_string)
+
+0.02 2008/07/09
+  - oops, MANIFEST was stale
+
+0.01 2008/07/09
+  - initial release with RSS 2.0 support only

@@ -1,0 +1,36 @@
+=head1 NAME
+
+  XML::GDOME::ProcessingInstruction - Interface ProcessingInstruction implementation.
+
+=head1 SYNOPSIS
+
+  $str = $pi->getData();
+         $pi->setData($str);
+  $str = $pi->getTarget();
+
+=head1 CLASS INHERITANCE
+
+L<XML::GDOME::Node> > XML::GDOME::ProcessingInstruction
+
+
+=head1 METHODS
+
+=over 4
+
+
+=item $str = $pi->getData();
+
+
+
+I<Returns>: the content of this processing instruction. This is from the first non white space character after the target to the character immediately preceding the %?>.
+
+
+=item $str = $pi->getTarget();
+
+
+
+I<Returns>: the target of this processing instruction. XML defines this as being the first token following the markup that begins the processing instruction.
+
+
+=back
+

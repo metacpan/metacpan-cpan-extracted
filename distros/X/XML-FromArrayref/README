@@ -1,0 +1,49 @@
+XML-FromArrayref
+
+The previously existing XML generation modules, such as XML::Writer, aren't
+really that expressive or concise in use, so here's a simple module that
+takes a list of arrayrefs and renders them as XML elements, replacing any
+whose tag names are false with their contents.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc XML::FromArrayref
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=XML-FromArrayref
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/XML-FromArrayref
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/XML-FromArrayref
+
+    Search CPAN
+        http://search.cpan.org/dist/XML-FromArrayref/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2011 Nic Wolff
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

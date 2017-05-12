@@ -1,0 +1,15 @@
+<stx:transform version="1.0" 
+  xmlns:stx="http://stx.sourceforge.net/2002/ns"
+  strip-space="yes">
+
+  <stx:include href="module2.stx"/>
+
+  <stx:template match="/root">
+    <stx:value-of select="$top1"/>
+    <stx:value-of select="$top2"/>
+    <stx:process-children>
+      <stx:with-param name="node" select="'Node'"/>
+    </stx:process-children>
+  </stx:template>
+
+</stx:transform>

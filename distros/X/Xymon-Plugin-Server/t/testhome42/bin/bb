@@ -1,0 +1,6 @@
+#!/bin/sh
+
+test -d t/tmp || mkdir -p t/tmp
+cd t/tmp
+echo $* > cmdline.txt
+cat > input.txt

@@ -1,0 +1,40 @@
+# test some simpletype restrictions, done as anonymous simple types
+
+--- |
+ <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:element name="container">
+       <xs:complexType>
+          <xs:sequence>
+             <xs:element name="one" minOccurs="0" maxOccurs="unbounded">
+               <xs:simpleType>
+                 <xs:restriction base="xs:string">
+                    <xs:pattern value="[a-z]+"/>
+                 </xs:restriction>
+               </xs:simpleType>
+             </xs:element>
+          </xs:sequence>
+       </xs:complexType>
+    </xs:element>     
+ </xs:schema>
+
+
+--- |
+ <container>
+  <one>aaaaabbbbcccc</one>
+ </container>
+--- >
+PASS
+
+--- |
+ <container>
+   <one>aaaaabbbbccccZZZZ</one>
+ </container>
+--- >
+FAIL
+
+--- |
+ <container>
+   <one></one>
+ </container>
+--- >
+FAIL

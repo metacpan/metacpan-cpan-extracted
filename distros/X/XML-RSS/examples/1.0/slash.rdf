@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<rdf:RDF
+ xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+ xmlns="http://purl.org/rss/1.0/"
+ xmlns:dc="http://purl.org/dc/elements/1.1/"
+ xmlns:syn="http://purl.org/rss/1.0/modules/syndication/"
+ xmlns:slash="http://purl.org/rss/modules/slash/"
+>
+
+<channel rdf:about="http://yaz.pudge.net/">
+<title>Slash Site</title>
+<link>http://yaz.pudge.net/</link>
+<description>Slash Site</description>
+<dc:creator>nobody@yaz.pudge.net</dc:creator>
+<dc:language>en</dc:language>
+<dc:subject>rdfsubject</dc:subject>
+<dc:publisher>rdfpublisher</dc:publisher>
+<dc:rights>rdfcopyright</dc:rights>
+<dc:date>somedate</dc:date>
+<syn:updatePeriod>rdfupdate</syn:updatePeriod>
+<syn:updateFrequency>rdffrequency</syn:updateFrequency>
+<syn:updateBase>somedate</syn:updateBase>
+<items>
+ <rdf:Seq>
+  <rdf:li
+rdf:resource="http://yaz.pudge.net/article.pl?sid=00/01/25/1430236" />
+  <rdf:li
+rdf:resource="http://yaz.pudge.net/article.pl?sid=00/01/25/1236215" />
+ </rdf:Seq>
+</items>
+<image rdf:resource="http://yaz.pudge.net/images/topics/topicslash.gif"
+/>
+<textinput rdf:resource="http://yaz.pudge.net/search.pl" />
+</channel>
+
+<image rdf:about="http://yaz.pudge.net/images/topics/topicslash.gif">
+<title>Slash Site</title>
+<url>http://yaz.pudge.net/images/topics/topicslash.gif</url>
+<link>http://yaz.pudge.net/</link>
+</image>
+
+<item rdf:about="http://yaz.pudge.net/article.pl?sid=00/01/25/1430236">
+<title>You've Installed Slash!</title>
+<link>http://yaz.pudge.net/article.pl?sid=00/01/25/1430236</link>
+<description>sometext ... define elsewhere</description>
+<dc:creator>pudge</dc:creator>
+<dc:subject>slash</dc:subject>
+<slash:department>congratulations-dude</slash:department>
+<slash:section>articles</slash:section>
+<slash:comments>1</slash:comments>
+<slash:hitparade>1,1,1,0,0,0,0</slash:hitparade>
+</item>
+
+<item rdf:about="http://yaz.pudge.net/article.pl?sid=00/01/25/1236215">
+<title>Now What?</title>
+<link>http://yaz.pudge.net/article.pl?sid=00/01/25/1236215</link>
+<description>sometext ... define elsewhere</description>
+<dc:creator>pudge</dc:creator>
+<dc:subject>slash</dc:subject>
+<slash:department>where-do-you-go-from-here?</slash:department>
+<slash:section>articles</slash:section>
+<slash:comments>0</slash:comments>
+<slash:hitparade>0,0,0,0,0,0,0</slash:hitparade>
+</item>
+
+<textinput rdf:about="http://yaz.pudge.net/search.pl">
+<title>Search Slash Site</title>
+<description>Search Slash Site stories</description>
+<name>query</name>
+<link>http://yaz.pudge.net/search.pl</link>
+</textinput>
+
+</rdf:RDF>

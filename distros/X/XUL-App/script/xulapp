@@ -1,0 +1,743 @@
+#!/usr/bin/env perl
+
+#use lib 'lib';
+#use lib 'tmplib/lib';
+use strict;
+use warnings;
+
+#use Smart::Comments;
+#use Smart::Comments '####';
+use Cwd ();
+use File::Spec;
+use File::Slurp;
+use Text::Diff;
+use Getopt::Long;
+use File::Find;
+use XUL::App;
+use XUL::App::I18N ();
+use Encode qw(encode decode);
+use Sys::Hostname;
+
+my $operation = lc(shift);
+if (!$operation) {
+    die "No operation specified. See --help for usage.\n";
+}
+#if ($operation =~ /overlay|debug/) {
+    #$XUL::App::APP_NAME .= '_debug';
+#}
+
+my $app_name;
+if ($operation =~ /^(?:-h|--help)$/) { help() }
+my ($profile_dir);
+my ($op_table);
+my (@pofiles, @xulfiles);
+
+GetOptions(
+    "help" => \(my $help),
+    "name=s" => \(my $name),
+    "profile|p=s" => \(my $profile),
+    "lang|l=s" => \(my $lang),
+    "type=s" => \(my $type),
+    "target=s" => (\my $target),
+) or help();
+
+if ($operation eq 'app') {
+    if ($name) {
+        my $dir = $name;
+        if (-e $dir) {
+            die "Directory $dir already exists. No overriding.\n";
+        }
+        print "Creating new application $name\n";
+        mkdir($dir);
+        chdir($name);
+        create_dir("lib");
+        create_dir("lib/$name");
+        gen_app_pm($name);
+        create_dir("js");
+        create_dir("css");
+        create_dir("icons");
+        create_dir("icons/default");
+        create_dir("t");
+        create_dir("po");
+        create_dir("docs");
+        chdir('..');
+    } else {
+        die "No --name option specified.\n";
+    }
+    exit;
+} elsif ($operation eq 'view') {
+    ($app_name) = glob 'lib/*/App.pm';
+    if ($app_name && $app_name =~ m{lib/([^/]+)/App.pm$}) {
+        $app_name = $1;
+    }
+
+    gen_view($name, $type);
+    exit;
+}
+
+sub create_dir {
+    my $dir = shift;
+    print "Creating directory $dir/\n";
+    mkdir($dir);
+}
+
+sub gen_app_pm {
+    my $name = shift;
+    my $id = lc($name);
+    my $author = getlogin || '';
+    my $hostname = hostname;
+    my $content = <<"_EOC_";
+use strict;
+use warnings;
+
+package ${name}::App;
+our \$VERSION = '0.01';
+
+use XUL::App::Schema;
+use XUL::App schema {
+    xpifile '$id.xpi' =>
+        name is '$name',
+        display_name is '$name',
+        id is '$id\@$author.$hostname', # FIXME: ensure id is unique.
+        version is '0.0.1',
+        description is '',
+        targets {
+            Firefox => ['2.0' => '3.0.*'],  # FIXME
+            Mozilla => ['1.5' => '1.8'],  # FIXME
+        },
+        creator is 'The $name development team',
+        developers are ['$author'],
+        contributors are [],
+        homepageURL is 'http://$id.$author.org', # FIXME
+        iconURL is '',  # like 'chrome://$id/content/logo.png'
+        updateURL is '', # This should not set for AMO extensions.
+        aboutURL is '';
+};
+
+1;
+_EOC_
+    my $outfile = "lib/$name/App.pm";
+    print "Writing file $outfile\n";
+    write_file($outfile, $content);
+}
+
+sub gen_view {
+    my ($name, $type) = @_;
+    my $outdir = "lib/$app_name/View";
+    create_dir($outdir) unless -d $outdir;
+    my $outfile = "$outdir/$name.pm";
+    if (-e $outfile) {
+        die "File $outfile already exists. No overriding.\n";
+    }
+
+    my $body = '';
+    my $attrs = '';
+    $type = lc($type);
+    if ($type eq 'window' or $type eq 'page') {
+        $attrs = <<"_EOC_";
+            title => '$app_name',
+            width => 800,
+            height => 600,
+            persist => 'sizemode screenX screenY width height',
+_EOC_
+    } elsif ($type eq 'overlay') {
+        $body .= <<'_EOC_';
+        # Add your elements here...
+_EOC_
+    }
+    my $id = lc("$app_name-$name");
+    $attrs =~ s/\n+$//s;
+    my $content = <<"_EOC_";
+use strict;
+use warnings;
+
+package ${app_name}::View::$name;
+use base 'XUL::App::View::Base';
+use Template::Declare::Tags
+    #'HTML' => { namespace => 'html' },  # HTML namespace support
+    'XUL';
+
+template main => sub {
+    show 'header';  # from XUL::App::View::Base
+    $type {
+        attr {
+            id => "$id",
+            xmlns => \$::XUL_NAME_SPACE,
+            #'xmlns:html' => \$::HTML_NAME_SPACE,  # HTML namespace support
+$attrs
+        }
+$body
+    }
+};
+
+1;
+_EOC_
+    print "Writing file $outfile\n";
+    write_file($outfile, $content);
+}
+
+### $help
+if ($help) { help() }
+
+my ($file) = glob "lib/*/App.pm";
+if (!$file) {
+    die "File lib/*/App.pm not found.\n";
+}
+eval { require $file; };
+if ($@) {
+    die "Can't load $file: $@";
+}
+
+#if ($operation =~ /overlay|debug/) {
+    #$XUL::App::APP_NAME .= '_debug';
+#}
+
+
+if ($operation =~ /debug|bundle|overlay/i) {
+    shell("rm -rf tmp");
+    die "Cannot remove tmp/" if -d 'tmp';
+}
+
+mkdir 'tmp';
+mkdir 'tmp/content';
+
+my $id = $XUL::App::ID;
+$app_name = $XUL::App::APP_NAME;
+
+(my $package = $file) =~ s/.*lib\/|\.pm$//g;
+$package =~ s/\//::/g;
+#warn $package;
+#warn $XUL::App::APP_NAME;
+
+### files: $package->FILES
+my $files;
+
+#$XUL::App::ID = $XUL::App::ID;
+sub help {
+    die <<'_EOC_';
+Usage:
+    xulapp <operaton> <options>
+
+Operatons:
+    app             Create new application tree.
+    setup           Setup the things needed for debugging and bundling.
+    debug <xulfile> Launch Firefox to debug the specified .xul file.
+    overlay         Launch Firefox to debug the XUL overlay.
+    po <locale>     Generate/update the po/<locale>.po file.
+    po              Update po/*.po files.
+    bundle <dir>    Bundle the extension to <dir>/<name>.xpi
+    profile         Start Firefox's profile manager.
+Options:
+    --help          Print this message
+    --name <s>      Use <name> as the extension or view name
+    --profile <s>   Use <s> as the Firefox profile
+    --lang <s>      Use <s> as the locale language
+                    (like en-US and zh-CN)
+_EOC_
+}
+
+$op_table = {
+    findprofile => sub {
+        if (!$profile) {
+            die "error: No profile specified.\n"
+                ."  Use --profile option to specify one.\n";
+        }
+        #die $profile;
+        my $root = '~/.mozilla/firefox';
+        ($profile_dir) = glob "$root/*.$profile";
+        my $count = 0;
+        while (!$profile_dir) {
+            if (++$count > 3) {
+                die "No $profile_dir found. Please try again";
+            }
+            warn "No $profile found. Please create one.\n";
+            shell("MOZ_NO_REMOTE=1 firefox -CreateProfile $profile");
+            ($profile_dir) = glob "$root/*.$profile";
+        }
+        print "Found profile $profile_dir\n";
+    },
+
+    overlay => sub {
+        $op_table->{setup}->();
+        $lang =~ s/_/-/g;
+        $lang =~ s/-(\w+)/'-'.uc($1)/e;
+        my $cmd = '';
+        if ($lang) {
+            $cmd = qq{MOZ_NO_REMOTE=1 LANG="$lang.UTF-8" LC_CTYPE="$lang.UTF-8"};
+        }
+        shell("MOZ_NO_REMOTE=1 $cmd firefox -jsconsole -P $profile");
+    },
+
+    profile => sub {
+        #$op_table->{findprofile}->();
+        # XXX
+        shell("MOZ_NO_REMOTE=1 firefox -ProfileManager");
+    },
+
+    register => sub {
+        $op_table->{findprofile}->();
+        register_ext($profile_dir, "tmp/");
+        shell("rm $profile_dir/compreg.dat $profile_dir/xpti.dat");
+    },
+
+    unregister => sub {
+        $op_table->{findprofile}->();
+        unregister_ext($profile_dir, "tmp/");
+    },
+
+    po => sub {
+        unlink("po/meta.po");
+            unlink("po/foo.po");
+        my $pofiles = $lang ? "po/$lang.po" : "po/*.po";
+        @pofiles = glob $pofiles;
+        #die "!!! @pofiles";
+        my @files;
+        find(
+           {
+             wanted =>  sub { if (/(?:\.pm|\.pl)$/) { push @files, $_ }  },
+             no_chdir => 1,
+           },
+           'lib',
+        );
+        if (($operation ne 'debug' && $operation ne 'overlay') || @pofiles == 1) {
+            for my $pofile (@pofiles) {
+                shell("xgettext.pl -u @files -o $pofile");
+            }
+        }
+        gen_meta_po();
+        shell("cp po/meta.po po/foo.po");
+        #@pofiles = 'po/foo.po';
+        $XUL::App::I18N::Lang = ['foo'];
+        XUL::App::I18N->new();
+    },
+
+    setup => sub {
+        $op_table->{po}->();
+        gen_manifest($app_name);
+        shell("cp -rf components tmp/");
+        shell("cp js/*.js tmp/content/");
+        shell("cp -r js/* tmp/content/");
+        shell("cp icons/*.* tmp/content/");
+        shell("cp js/*.*html tmp/content/");
+        shell("cp css/*.css tmp/content/");
+        shell("cp -r js/thirdparty/* tmp/content/");
+        #die "@files";
+        while (my ($file, $obj) = each %$files) {
+            #warn "$file => $obj";
+            if ($file =~ /\.xul$/) {
+                push @xulfiles, $file;
+            }
+            $obj->go($file);
+        }
+        if (@pofiles) {
+            for my $xulfile (@xulfiles) {
+                add_doctype("tmp/content/$xulfile");
+            }
+        }
+
+        if ($operation ne 'bundle') {
+            $op_table->{register}->();
+        }
+    },
+
+    debug => sub {
+        my $file = shift;
+        $op_table->{setup}->();
+        if (!-f "tmp/content/$file") {
+            die "ERROR: Can't find $file under tmp/content/.\n";
+        }
+        my $cmd = "MOZ_NO_REMOTE=1 firefox -jsconsole -P $profile -chrome chrome://$app_name/content/$file";
+        #warn "$cmd\n";
+        shell($cmd);
+    },
+
+    bundle => sub {
+        my $out_dir = shift || 'tmp';
+        $op_table->{setup}->();
+        my $xpi_dir = 'tmp/xpi';
+        my $jar_dir = 'tmp/jar';
+	shell("rm tmp/*.xpi tmp/*.jar");
+	shell("rm -rf $xpi_dir");
+	shell("mkdir -p $xpi_dir/chrome/icons/default");
+	shell("cp icons/default/* $xpi_dir/chrome/icons/default/");
+	shell("mkdir -p $xpi_dir/chrome");
+        shell("cp -rf tmp/components $xpi_dir/");
+	shell("rm -rf $jar_dir");
+	shell("mkdir -p $jar_dir/content");
+	shell("mkdir -p $jar_dir/locale");
+	shell("cp tmp/install.rdf $xpi_dir");
+	#cp contents.rdf searchall-jar/content/searchall/
+	shell("cp tmp/chrome.manifest $xpi_dir");
+        shell("rm -rf tmp/content/thirdparty");
+        shell("find tmp/content -name '*~' -delete");
+	shell("cp -rf tmp/content/* $jar_dir/content/");
+	shell("cp -rf tmp/locale/* $jar_dir/locale/");
+	shell("cd $jar_dir && zip -q -r ../$app_name.jar *");
+	shell("mv tmp/$app_name.jar $xpi_dir/chrome/");
+	shell("cd $xpi_dir && zip -q -r ../$app_name.xpi *");
+        shell("cp tmp/$app_name.xpi $out_dir");
+    },
+};
+
+if (my $code = $op_table->{$operation}) {
+    $code->(@ARGV);
+}
+
+sub gen_manifest {
+    my @overlay;
+    $files = $package->FILES;
+    while (my ($file, $obj) = each %$files) {
+        #warn "$file => $obj";
+        if ($obj->can('overlays') &&
+                (my $target = $obj->overlays)) {
+            #die $file;
+            push @overlay, [$file => $target];
+        }
+    }
+
+    warn "Write tmp/chrome.manifest\n";
+    my $content_dir = File::Spec->rel2abs( 'tmp/content' );
+    my $locale_dir = File::Spec->rel2abs( 'tmp/locale' );
+    my $s;
+    if ($operation eq 'bundle') {
+        #die "HERE!";
+        $s .= "content $app_name jar:chrome/$app_name.jar!/content/ xpcnativewrappers=no\n";
+    } else {
+        $s .= "content $app_name file://$content_dir/\n",
+        $s .= "content $app_name file://$content_dir/ contentaccessible=yes\n",
+    }
+    for my $item (@overlay) {
+        $s .= "overlay $item->[1] chrome://$XUL::App::APP_NAME/content/$item->[0]\n";
+    }
+
+    for my $pofile (@pofiles) {
+        (my $lang = $pofile) =~ s/.*?([-\w]+)\.po$/$1/i;
+        $lang =~ s/_/-/g;
+        $lang =~ s/-(\w+)/'-' . uc($1)/ge;
+        next if $lang eq 'meta' or $lang eq 'foo';
+        warn "LANG: $lang\n";
+
+        if ($operation eq 'bundle') {
+            $s .= "locale $app_name $lang jar:chrome/$app_name.jar!/locale/$lang/\n";
+        } else {
+            $s .= "locale $app_name $lang file://$locale_dir/$lang/\n";
+        }
+        my $dir = "tmp/locale/$lang";
+        shell("mkdir -p $dir");
+        gen_dtd($dir, $pofile);
+    }
+    write_file(
+        "tmp/chrome.manifest",
+        # XXX more work needed here for overlays...
+        #"overlay $target_xul $my_xul\n",
+        {binmode => ':raw'},
+        $s
+    );
+}
+
+sub str2ent {
+    my $s = shift;
+    $s =~ s/[^A-Za-z]/'_' . ord($&) . '_'/ge;
+    $s =~ s/_$//g;
+    $s = "QQQ_" . $s;
+    $s =~ s/__/_/g;
+    return $s;
+}
+
+sub gen_dtd {
+    my ($locale_dir, $pofile) = @_;
+    my $outfile = "$locale_dir/$app_name.dtd";
+    warn "Write $outfile using $pofile\n";
+    open my $in, $pofile or die "Can't open $pofile for reading: $!";
+    my ($entity, $old);
+    my $s;
+    while (<$in>) {
+        $_ = decode('UTF-8', $_);
+        if (/^\s*msgid "(.+)"\s*$/) {
+            $old = $1;
+            $entity = str2ent($old);
+        } elsif (/^\s*msgstr (".*")\s*$/) {
+            next if !defined $old or $old eq '';
+            my $value  = $1;
+            if ($value eq '""') { $value = qq{"$old"}; }
+            #$value =~ s/</\&\#60;/g;
+            #$value =~ s/>/\&\#62;/g;
+            #$value =~ s/\&/\&#38;/g;
+            $s .= "<!ENTITY $entity $value>\n";
+        }
+    }
+    #die $s;
+    close $in;
+    #warn "Write $locale_dir/$app_name.dtd\n";
+    $s = encode("UTF-8", $s);
+    write_file($outfile, {binmode => ':raw'}, $s);
+}
+
+sub gen_meta_po {
+    my $pofile = $pofiles[0];
+    return unless $pofile and -f $pofile;
+    open my $in, $pofile or die "Can't open $pofile for reading: $!";
+    my ($s, $key, $entity);
+    while (<$in>) {
+        if (/^\s*msgid "(.+)"\s*$/) {
+            $key = $1;
+            $entity = str2ent($key);
+        } elsif (/^\s*msgstr (".*")\s*$/) {
+            next if !defined $key or $key eq '';
+            $s .= qq{msgstr "\&$entity;"\n};
+            next;
+        }
+        $s .= $_;
+    }
+    #die $s;
+    my $outfile = 'po/meta.po';
+    warn "Write $outfile\n";
+    write_file($outfile, {binmode => ':raw'}, $s);
+}
+
+sub add_doctype {
+    my $xulfile = shift;
+    my $content = read_file($xulfile, binmode => ':raw');
+    $content = decode("UTF-8", $content);
+    my $old_content = $content;
+    $content =~ s{<(window|dialog|page|overlay)}{<!DOCTYPE $1 SYSTEM "chrome://$app_name/locale/$app_name.dtd">\n\n$&};
+    $content =~ s/\&#38;(QQQ_[A-Za-z0-9_]*;)/\&$1/g;
+    if ($content ne $old_content) {
+        warn "Write $xulfile with DOCTYPE\n";
+        $content = encode("UTF-8", $content);
+        write_file($xulfile, {binmode => ':raw'}, $content);
+    }
+}
+
+sub set_prefs {
+    my $prefs = shift;
+    my $old_content = read_file($prefs, binmode => ':raw');
+    my $content = $old_content;
+    set_pref_var(\$content, 'nglayout.debug.disable_xul_cache', 'true');
+    set_pref_var(\$content, 'javascript.options.showInConsole', 'true');
+    set_pref_var(\$content, 'javascript.options.strict', 'true');
+    set_pref_var(\$content, 'browser.dom.window.dump.enabled', 'true');
+    set_pref_var(\$content, 'browser.sessionstore.resume_from_crash', 'false');
+    if ($content ne $old_content) {
+        warn "Write $prefs\n";
+        shell("cp $prefs $prefs.bak");
+        write_file($prefs, {binmode => ':raw'}, $content);
+    }
+}
+
+sub set_pref_var {
+    my ($rcontent, $var, $value) = @_;
+    warn "Checking if Firefox config var $var is $value\n";
+    if ($$rcontent !~ s/\buser_pref\("\Q$var\E",\s*[^)]+\);/user_pref("$var", $value);/gm) {
+        chomp($$rcontent);
+        $$rcontent .= qq{\nuser_pref("$var", $value);\n};
+    }
+}
+
+sub register_ext {
+    my ($meta_dir, $chrome_dir) = @_;
+    #my $meta_path = "$meta_dir/$opts->{id}";
+    #warn "creating $meta_path\n";
+    #mkdir $meta_path;
+    my $manifest = File::Spec->rel2abs($chrome_dir);
+    my $metafile = "$meta_dir/extensions.ini";
+    my $count = 0;
+    while (!-f $metafile) {
+        if (++$count > 3) {
+            die "Can't find $metafile";
+        }
+        warn "$metafile not found. starting Firefox. please close it after it starts\n";
+        my $close_me = File::ShareDir::module_file('XUL::App', 'html/close-me.html');
+        #die $close_me;
+        if (-f $close_me) {
+            shell("MOZ_NO_REMOTE=1 firefox -P $profile file://$close_me");
+        }
+    }
+    my $prefs = "$meta_dir/prefs.js";
+    $count = 0;
+    while (!-f $prefs) {
+        if (++$count > 3) {
+            die "Can't find $prefs";
+        }
+        warn "$prefs not found. starting Firefox. please close it after it starts\n";
+        shell("MOZ_NO_REMOTE=1 firefox -P $profile");
+    }
+    set_prefs($prefs);
+    $metafile = Cwd::realpath($metafile);
+    open my $in, $metafile or
+        die "Can't open $metafile for reading: $!";
+    my $state = 'init';
+    my ($buf, $c);
+    $c = -1;
+    my $write_back = 1;
+    while (<$in>) {
+        s/\r\n/\n/g;
+        if ($state eq 'init' and /^\s*\[ExtensionDirs\]\s*$/i) {
+            $state = 'begin';
+        } elsif ($state eq 'begin') {
+            if (/^\s*\[\w+\]\s*$/) {
+                $c++;
+                $buf .= "Extension$c="
+                    . $manifest
+                    . "\r\n";
+                $state = 'end';
+            } elsif (/^\s*Extension(\d+)\s*=\s*([^\r\n]*)\r?$/i) {
+                if ($2 eq $manifest) {
+                    warn "Great! $manifest already registered.\n";
+                    $write_back = 0;
+                    last;
+                } else {
+                    ### $2
+                    ### $manifest
+                }
+                $c = $1;
+            }
+        }
+    } continue {
+        s/\n/\r\n/g;
+        $buf .= $_;
+    }
+    #print $buf;
+    #$buf .= "AAA\n";
+    close $in;
+    if ($write_back) {
+        shell("cp $metafile $metafile.bak");
+        warn "Write $metafile\n";
+        #my $orig = read_file($metafile);
+        #warn "Diff: ", diff \$orig, \$buf;
+        write_file($metafile, {binmode => ':raw'}, $buf);
+    }
+    #shell($cmd);
+}
+
+# XXX untested...
+sub unregister_ext {
+    my ($meta_dir, $chrome_dir) = @_;
+    #my $meta_path = "$meta_dir/$opts->{id}";
+    #warn "creating $meta_path\n";
+    #mkdir $meta_path;
+    my $manifest = File::Spec->rel2abs($chrome_dir);
+    my $metafile = File::Spec->canonpath("$meta_dir/extensions.ini");
+    open my $in, $metafile or
+        die "Can't open $metafile for reading: $!";
+    my $state = 'init';
+    my ($buf, $c);
+    $c = 0;
+    my $found = 0;
+    while (<$in>) {
+        s/\r\n/\n/g;
+        #warn "$state : *$found* | *$_* | *$manifest*\n";
+        if ($state eq 'init' and /^\s*\[ExtensionDirs\]\s*$/i) {
+            $state = 'begin';
+        } elsif ($state eq 'begin') {
+            if (!$found and /^\s*Extension(\d+)\s*=\s*\Q$manifest\E\n/) {
+                warn "Removing entry pointed to $manifest\n";
+                $c = $1;
+                $found = 1;
+                next;
+            } else {
+                #warn "Loss!\n";
+            }
+            if (/^\s*\[\w+\]\s*$/) {
+                $state = 'end';
+            } elsif ($found) {
+                if (s/^(\s*Extension)(\d+)(\s*=)/$1$c$3/) {
+                    $c++;
+                }
+            }
+        }
+        s/\n/\r\n/g;
+        $buf .= $_;
+    }
+    close $in;
+    if ($found) {
+        warn "Write $metafile.bak\n";
+        shell("cp $metafile $metafile.bak");
+
+        #my $orig = read_file($metafile);
+        #warn "Diff: ", diff \$orig, \$buf;
+        warn "Write $metafile\n";
+        write_file($metafile, {binmode => ':raw'}, $buf);
+    } else {
+        warn "No registration found.\n";
+    }
+}
+
+sub shell {
+    print join(" ", @_), "\n";
+    system @_;
+}
+
+__END__
+
+=head1 NAME
+
+xulapp - frontend script for XUL::App
+
+=head1 SYNOPSIS
+
+    # setup the components
+    xulapp setup --profile dev
+
+    # register the (debugging) chrome to ~/.mozilla/firefox/*/extensions.ini
+    xulapp register --profile dev
+
+    # unregister the (debugging) chrome from ~/.mozilla/firefox/*/extensions.ini
+    xulapp unregister  --profile dev
+
+    # launch a ff window loading searchall.xul :
+    xulapp debug searchall.xul --profile dev
+
+    # launch a ff window loading searchall-debug.xul :
+    xulapp debug searchall-debug.xul --profile dev
+
+    # launch a ff window loading searchall-debug.xul but using the zh-tw locale:
+    xulapp debug searchall-debug.xul --profile dev --lang zh-tw
+
+    # lauch a ff window to test the overlay:
+    xulapp overlay --profile dev
+
+    # lanch an FF window to test the overlay using the zh-cn locale:
+    xulapp overlay -l zh-cn -p dev
+
+    # create a new the po/fr.po file (or update if it's already there):
+    xulapp po --lang fr
+
+    # update all the po/*.po files:
+    xulapp po
+
+    # generate tmp/searchall.xpi :
+    xulapp bundle
+
+    # generate ./searchall.xpi :
+    xulapp bundle .
+
+    # The --profile option used above can be abbriviated as -p
+    # The --lang option can be abbriviated as -l as well.
+    #
+    # Note that xulapp uses the info in lib/*/App.pm
+    # (i.e. lib/SearchAll/App.pm in the SearchAll project repos)
+
+=head1 DESCRIPTION
+
+More information about its usage can be found in my XUL::App talk's slides:
+
+L<http://agentzh.org/misc/slides/xulapp.pdf>
+
+Yes, I really need to put more documentation here :P I'm working on it :)
+
+=head1 SEE ALSO
+
+L<XUL::App>
+
+=head1 AUTHOR
+
+Agent Zhang C<< <agentzh@yahoo.cn> >>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2007, 2008 by Agent Zhang.
+
+This library is free software; you can redistribute it and/or modify it under
+the same terms as perl itself, either Artistic and GPL.
+

@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="a_là_node">
+	<xs:complexType>
+    		<xs:sequence minOccurs="0" maxOccurs="1">
+		      <xs:element name="Αel1Ώ" type="xs:string" minOccurs="0" maxOccurs="1"/>
+		      <xs:element name="Աel2ֆԱ" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+    		</xs:sequence>
+	</xs:complexType>
+  </xs:element>
+</xs:schema>
+
+ 

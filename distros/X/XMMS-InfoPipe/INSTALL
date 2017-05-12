@@ -1,0 +1,6 @@
+On *nix:
+
+    perl Build.PL
+    ./Build
+    ./Build test    (doesn't do anything right now, no tests defined)
+    ./Build install

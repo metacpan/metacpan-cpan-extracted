@@ -1,0 +1,29 @@
+XML::BMEcat - A simple module to help in generating BMEcat-XML documents
+
+Version 0.55 - 2003.05.25
+~~~~~~~~~~~~~~~~~~~~~~~~~
+- Standardversion for BMEcat is 1.2
+
+- The Groupsystem is orderd
+
+- New Methods:
+	+ getData
+		
+	+ addMember
+	
+	+ getMembers
+	
+	+ getGroupSystem
+	
+	+ getKey
+
+- some little bugs fixed
+
+
+Version 0.52 - 2000.06.29
+~~~~~~~~~~~~~~~~~~~~~~~~~
+- first release
+
+Copyright (c) 2000-2003 Frank-Peter Reich (fp$). All rights reserved.
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.

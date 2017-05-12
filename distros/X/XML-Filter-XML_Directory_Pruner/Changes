@@ -1,0 +1,38 @@
+Revision history for Perl extension XML::Filter::XML_Directory_Pruner.
+
+1.3  Sat Jul 20	2002
+
+     - Fixed a bug when exclude_matching
+
+     - Added debugging output when debug >= 4
+
+     - Upped requirement for XML::Directory to 0.97
+
+1.2  Fri Jul 05 2002
+
+     - Added package method __PACKAGE__->mtype()
+
+     - Updated $pkg->debug() to accept arguments > 1
+
+     - Updated $pkg->exclude and $pkg->include to accept multiple 'matching' criteria (is backwards compatible)
+
+     - Updated POD
+
+1.1  Tue Jul 02 2002
+
+     - Added $pkg->on_enter_start_element()
+
+     - Added $pkg->on_exit_end_element()
+
+     - Added $pkg->current_level()
+
+     - Added $pkg->skip_level()
+
+     - Fixed a typo in test.pl
+
+     - Updated POD
+
+1.0  Thu May 04 2002
+
+     - original version.
+

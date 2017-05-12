@@ -1,0 +1,25 @@
+Revision history for XML-OPDS
+
+0.05 2016-03-10
+
+ - Added opensearch support for the results
+
+0.04 2016-03-08
+
+ - Fixed Moo syntax for older moos
+ - Doc fixes
+
+0.03 2016-03-06
+
+ - Added support for logo and icon
+
+0.02 2016-03-06
+
+ - Added support for paging
+ - Enforce RFC3339 format for updated fields
+
+0.01 2016-03-05
+
+ - Initial (and working) release.
+
+

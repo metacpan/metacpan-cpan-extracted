@@ -1,0 +1,20 @@
+Changes
+Makefile.PL
+MANIFEST
+TODO
+PerlData.pm
+t/00basic.t
+t/01namere.t
+t/02cfg_rootname.t
+t/03cfg_defaultname.t
+t/04cfg_keymap.t
+t/05cfg_attrmap.t
+t/06cfg_namespacemap.t
+t/10arry_keymap.t
+t/12nstest1.t
+t/13nstest2.t
+t/14processing_instruction.t
+t/15circular.t
+
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

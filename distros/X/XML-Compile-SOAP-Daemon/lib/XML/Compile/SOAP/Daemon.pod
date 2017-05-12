@@ -1,0 +1,461 @@
+=encoding utf8
+
+=head1 NAME
+
+XML::Compile::SOAP::Daemon - SOAP accepting server (base class)
+
+=head1 INHERITANCE
+
+ XML::Compile::SOAP::Daemon is extended by
+   XML::Compile::SOAP::Daemon::AnyDaemon
+   XML::Compile::SOAP::Daemon::CGI
+   XML::Compile::SOAP::Daemon::NetServer
+   XML::Compile::SOAP::Daemon::PSGI
+
+=head1 SYNOPSIS
+
+ #### have a look in the examples directory!
+ use XML::Compile::SOAP::Daemon::CGI;
+ my $daemon  = XML::Compile::SOAP::Daemon::CGI->new;
+
+ # operation definitions from WSDL
+ my $wsdl    = XML::Compile::WSDL11->new(...);
+ $wsdl->importDefinitions(...); # more schemas
+ $daemon->operationsFromWSDL($wsdl, callbacks => ...);
+
+ $daemon->setWsdlResponse($wsdl_fn);
+ $daemon->setWsdlResponse($wsdl_fn, $soap11->mediaType);
+
+ # operation definitions added manually
+ my $soap11  = XML::Compile::SOAP11::Server->new(schemas => $wsdl->schemas);
+ my $handler = $soap11->compileHandler(...);
+ $daemon->addHandler('getInfo', $soap11, $handler);
+
+=head1 DESCRIPTION
+
+This base class implements the common needs between various types of
+SOAP daemons. Ache daemon can handle various kinds of SOAP protocols at
+the same time, when possible hidden from the user of this module.
+
+The following extensions are implemented on the moment:
+
+=over 4
+
+=item *
+
+L<XML::Compile::SOAP::Daemon::AnyDaemon|XML::Compile::SOAP::Daemon::AnyDaemon>, for transport over HTTP
+based on Any::Daemon (a generic pre-forked daemon) and LWP.
+It uses Log::Report as exception and loggin frame-work, just as all
+C<XML::Compile> modules do, hence cleaner integration.
+
+=item *
+
+L<XML::Compile::SOAP::Daemon::CGI|XML::Compile::SOAP::Daemon::CGI>, for transport over HTTP
+based on CGI and LWP.
+
+=item *
+
+L<XML::Compile::SOAP::Daemon::PSGI|XML::Compile::SOAP::Daemon::PSGI> allows to run SOAP server as a
+part of larger PSGI application (mixing webservice with standard
+webserver) or to integrate with existing event loop framework (AnyEvent,
+Coro, POE).
+
+=item *
+
+L<XML::Compile::SOAP::Daemon::NetServer|XML::Compile::SOAP::Daemon::NetServer>, for transport over HTTP
+based on Net::Server and LWP.  The C<Net::Server> distribution
+offers a number of very different daemon implementations.  There are
+too many ways to configure it.
+
+=back
+
+If you have a WSDL describing your procedures (operations), then the
+only thing you have to worry about is adding callbacks for each of the
+defined ports.  Without WSDL, you will need to do more manually, but it
+is still relatively simple to achieve.
+
+Do not forget to take a look at the extensive example, enclosed in the
+L<XML::Compile::SOAP::Daemon|XML::Compile::SOAP::Daemon> distribution package.  It is really worth
+the time.
+
+=head1 METHODS
+
+=head2 Constructors
+
+=over 4
+
+=item XML::Compile::SOAP::Daemon-E<gt>B<new>(%options)
+
+ -Option            --Default
+  accept_slow_select  <true>
+  output_charset      'UTF-8'
+  soap_action_input   {}
+  wsa_action_input    {}
+  wsa_action_output   {}
+
+=over 2
+
+=item accept_slow_select => BOOLEAN
+
+Traditional SOAP does not have a simple way to find out which operation
+is being called. The only way to determine which operation is needed,
+is by trying all defined operations until one matches.
+
+Later, people started to use the soapAction HTTP header (which
+was officially only for proxies) and then the WSA SOAP header
+extension. Either of them make it easy to determine the right handler
+one on one.
+
+Disabling C<accept_slow_select> will protect you against various
+forms of DoS-attacks, however this is often not possible as many
+WSDLs do not define soapAction or WSA action keys.
+
+=item output_charset => STRING
+
+The character-set to be used for the output XML document.
+
+=item soap_action_input => HASH|ARRAY
+
+The keys are port names, with as value the related SOAPAction header
+field content (without quotes). Often, these SOAPAction fields originate
+from the WSDL.
+
+=item wsa_action_input => HASH|ARRAY
+
+The keys are port names, the values are strings which are used by
+clients to indicate which server operation they want to use. Often,
+an WSDL contains this information in C<wsaw:Action> attributes; that
+info is added to this HASH automatically when XML::Compile::SOAP::WSA
+is loaded.
+
+=item wsa_action_output => HASH|ARRAY
+
+The keys are port names, the values are strings which the server will
+add to replies to the client. Often, an WSDL contains this information in
+C<wsaw:Action> attributes; that info is added to this HASH automatically
+when XML::Compile::SOAP::WSA is loaded.
+
+=back
+
+=back
+
+=head2 Attributes
+
+=over 4
+
+=item $obj-E<gt>B<addSoapAction>(HASH|PAIRS)
+
+Map SOAPAction headers only operations. You do not need to map
+explicitly when the info can be derived from the WSDL.
+
+=item $obj-E<gt>B<addWsaTable>( <'INPUT'|'OUTPUT'>, [HASH|PAIRS] )
+
+Map operation name onto respectively server-input or server-output
+messages, used for C<wsa:Action> fields in the header. Usually, these
+values are automatically taken from the WSDL (but only if the WSA
+extension is loaded).
+
+=item $obj-E<gt>B<outputCharset>()
+
+The character-set to be used for output documents.
+
+=back
+
+=head2 Running the server
+
+=over 4
+
+=item $obj-E<gt>B<process>($client, $xmlin, $request, $action)
+
+This method is called to process a single request.
+The $xmlin is a SOAP-structured message (an XML::LibXML::Element,
+XML::LibXML::Document, or XML as string), was received from the $client
+(some extension specific object).
+
+The full $request is passed in, however its format depends on the
+kind of server. The $action parameter relates to the soapAction header
+field which may be available in some form.
+
+Returned is an XML document (XML::LibXML::Document) as answer or a
+protocol specific ready response object (usually an error object).
+
+This C<process> method will determine which callback routine to use to
+generate a reply and then call the routine. See L</Operation handlers>
+for details on how the routines are called.
+
+See L<operationsFromWSDL()|XML::Compile::SOAP::Daemon/"Preparations"> and L<addHandler()|XML::Compile::SOAP::Daemon/"Preparations"> on how the callback
+routines can be specified.  See L<new()|XML::Compile::SOAP::Daemon/"Constructors"> for a description of the options
+which control how the callback routine is chosen.
+
+=item $obj-E<gt>B<run>(%options)
+
+How the daemon is run depends much on the extension being used. See the
+C<::NetServer> and C<::CGI> manual-page.
+
+=back
+
+=head2 Preparations
+
+=over 4
+
+=item $obj-E<gt>B<addHandler>($name, $soap, CODE)
+
+The $soap value is C<SOAP11>, C<SOAP12>, or a $soap server object or and
+$soap Operation object.  The CODE reference is called with the incoming
+document (an XML::LibXML::Document) of the received input message.
+
+In case the handler does not understand the message, it should
+return undef.  Otherwise, it must return a correct answer message as
+XML::LibXML::Document.
+
+=item $obj-E<gt>B<operationsFromWSDL>($wsdl, %options)
+
+Compile the operations found in the $wsdl object (an
+XML::Compile::WSDL11).  You can add the operations from many different
+WSDLs into one server, simply by calling this method repeatedly.
+
+You can also specify %options for XML::Compile::WSDL11 subroutine operations.
+Those parameters may be needed to distinguish between the test-server
+and the live-server, provided protocol support and such.
+
+ -Option          --Default
+  callbacks         {}
+  default_callback  <produces fault reply>
+  operations        undef
+
+=over 2
+
+=item callbacks => HASH
+
+The keys are the port names, as defined in the $wsdl.  The values are CODE
+references which are called in case a message is received which is
+addressing the port (this is a guess). See L</Operation handlers>
+
+=item default_callback => CODE
+
+When a message arrives which has no explicit handler attached to it,
+this handler will be called.  By default, an "not implemented" fault will
+be returned.  See L</Operation handlers>
+
+=item operations => ARRAY
+
+Load the selected operations only (L<XML::Compile::SOAP::Operation|XML::Compile::SOAP::Operation> objects)
+If not specified, all operations will be taken which are selected with
+the C<service>, C<port>, and C<binding> %options for
+XML::Compile::WSDL11 subroutine operations.
+
+=back
+
+example: 
+
+ $daemon->operationsFromWSDL($wsdl, service => 'MyService',
+    binding => 'MyService-soap11', callbacks => {get => \$f11});
+ $daemonwsdl->operationsFromWSDL($wsdl, service => 'MyService-test',
+    binding => 'MyService-soap12', callbacks => {get => \$f12});
+
+=item $obj-E<gt>B<setWsdlResponse>( $filename, [$filetype] )
+
+Many existing SOAP servers will response to GET queries which end on "?WSDL"
+by sending the WSDL in use by the service.
+
+The default $filetype is C<application/wsdl+xml>.  You may need C<text/xml>
+
+=back
+
+=head2 Helpers
+
+=over 4
+
+=item $obj-E<gt>B<faultInvalidXML>($error)
+
+=item $obj-E<gt>B<faultNotSoapMessage>($nodetype)
+
+=item $obj-E<gt>B<faultUnsupportedSoapVersion>($env_ns)
+
+Produces a text message, because we do not know how to produce
+an error in a SOAP which we do not understand.
+
+=item $obj-E<gt>B<handlers>( <'SOAP11'|'SOAP12'|$soap> )
+
+Returns all the handler names for a certain soap version.
+
+example: 
+
+ foreach my $version (sort $server->soapVersions)
+ {   foreach my $action (sort $server->handlers($version))
+     {  print "$version $action\n";
+     }
+ }
+
+=item $obj-E<gt>B<printIndex>( [$fh] )
+
+Print a table which shows the messages that the server can handle,
+by default to STDOUT.
+
+=item $obj-E<gt>B<soapVersions>()
+
+=back
+
+=head1 DETAILS
+
+=head2 Operation handlers
+
+Per operation, you define a callback which handles the request. There can
+also be a default callback for all your operations. Besides, when an
+operation does not have a handler defined, one is created for you.
+
+ sub my_callback($$$)
+ {   my ($soap, $data_in, $request) = @_;
+
+     return $data_out;
+ }
+
+The C<$soap> parameter is the actual C<XML::Compile::SOAP> object which
+handles this protocol version (at the moment only L<XML::Compile::SOAP11|XML::Compile::SOAP11>.
+C<$data_in> is a HASH with the decoded information from the request.
+The type and content of C<$request> depends on the type of server,
+often an HTTP::Request.
+
+The C<$data_out> is a nested HASH which will be translated in the right
+XML structure.  This could be a Fault, like shown in the next section.
+
+Please take a look at the scripts in the F<examples/> directory within
+the distribution.
+
+=head2 Returning errors
+
+In WSDLs you may find explicitly defined error details types. There is
+only one such error structure per operation: when an operation may return
+different kinds of errors, they will be wrapped into one structure which
+contains the details. See section L</"Returning private errors"> below.
+
+Errors which do not return an C<details> record can always be reported
+with code and string. Let's first explain those.
+
+=head3 Returning general errors
+
+To have a handler return an error, leave the callback with something
+like this:
+
+ use XML::Compile::Util        qw/pack_type/;
+
+ sub my_callback($$)
+ {   my ($soap, $data) = @_;
+
+     my $code = pack_type $my_err_ns, 'error-code';
+
+     return
+      +{ Fault =>
+          { faultcode   => $code
+          , faultstring => 'something is wrong'
+          , faultactor  => $soap->role
+          }
+       , _RETURN_CODE => 404
+       , _RETURN_TEXT => 'sorry, not found'
+       };
+ }
+
+Fault codes are "prefix:error-name", XML::Compile finds the right prefix
+based on the URI. If your error namespace is not mentioned in the WSDL or
+other loaded schemas, you should use XML::Compile::WSDL11 subroutine prefixes
+first.
+
+SOAP uses error codes in the SOAPENV namespace.  It shows whether errors
+are client or server side. This is produced like:
+
+  use XML::Compile::SOAP::Util 'SOAP11ENV';
+  $code = pack_type SOAP11ENV, 'Server.validationFailed';
+
+[release 2.02] Fields C<_RETURN_CODE> and C<_RETURN_TEXT> can be used to
+change the HTTP response (and maybe other protocol headers in the future).
+These can also be used with valid answers, not limited to errors. There
+is no clear definition how SOAP faults and HTTP return codes should work
+together for user errors.
+
+B<Be warned> that WCF (MicroSoft's .NET) interprets the return code in
+SOAP1.2 style, not SOAP1.1.  The 1.2 specification says that only
+_RETURN_CODE 200 and 202 can contain a SOAP respons.  Other servers will
+code the content for any 2xx code.
+
+=head3 Returning private errors
+
+In a WSDL, we can specify own fault types. These defined elements describe
+the C<detail> component of the message.
+
+For example, in the WSDL and Schema we may have:
+
+ <xs:element name="errorReportMsg" type="ErrorReportType"/>
+ <xs:complexType name="ErrorReportType">
+   <xs:sequence>
+     <xs:element name="info" type="string">
+     <xs:element name="cause" type="string" minOccurs="0">
+   </xs:sequence>
+ </xs:complexType>
+
+ <message name="ErrorReport">
+     <part name="message" element="tmdd:errorReportMsg"/>
+ </message>
+
+ <operation name="GetData">
+   <input message="GetDataRequest"/>
+   <output message="GetDataRequest"/>
+   <fault name="errorReport" message="ErrorReport"/>
+ </operation>
+
+To return a private error you need to determine the name of the fault
+part.  In the example above the fault parts name is C<errorReport>.
+However,  in some WSDLs the C<name> option is not present and
+L<XML::Compile::SOAP|XML::Compile::SOAP> assumes that C<fault> will be used to indicate
+the fault part.
+
+You need to return a HASH with values for the ErrorReport element
+together with values for the fields in the Fault value shown
+in the previous section.  For example:
+
+  my $msg = "Unknown Error";
+  return
+   +{ errorReport =>   # the name of the fault part
+        { # this gets put into the 'detail' part of
+          # the fault message
+          info => $msg
+
+          # these are used for the other parts of the fault message
+        , faultcode   => pack_type(SOAP11ENV, 'Server.BadOperation')
+        , faultstring => $msg
+        , faultactor  => $soap->role
+        }
+    };
+
+If no name is specified for the fault part, then you can use:
+
+  return
+   +{ fault =>   # the name of the fault part
+        { faultcode   => pack_type(SOAP11ENV, 'Server.BadOperation')
+        , faultstring => $msg
+        , faultactor  => $soap->role
+        , detail => { info=> $msg }
+        }
+    };
+
+It has been observed that several SOAP toolkits do not handle user defined
+faults messages very well.  However, they do provide the faultcode and
+faultstring values from the fault message.
+
+=head1 SEE ALSO
+
+This module is part of XML-Compile-SOAP-Daemon distribution version 3.12,
+built on May 13, 2016. Website: F<http://perl.overmeer.net/xml-compile/>
+
+Please post questions or ideas to the mailinglist at
+F<http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/xml-compile> .
+For live contact with other developers, visit the C<#xml-compile> channel
+on C<irc.perl.org>.
+
+=head1 LICENSE
+
+Copyrights 2007-2016 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

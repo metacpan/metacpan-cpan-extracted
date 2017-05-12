@@ -1,0 +1,25 @@
+<wiki version="0.3">
+
+<!-- schema says that there is always 1 siteinfo and zero or more page 
+  elements follow -->
+<siteinfo>
+  <sitename>ExamplePedia</sitename>
+  <url>http://example.pedia/</url>
+  <namespaces>
+    <namespace key="-1">Special</namespace>
+    <namespace key="0" />
+    <namespace key="1">Talk</namespace>
+  </namespaces>
+</siteinfo>
+
+<page>
+  <title>A good article</title>
+  <text>Some good content</text>
+</page>    
+
+<page>
+  <title>A bad article</title>
+  <text>Some bad content</text>
+</page>
+
+</wiki>

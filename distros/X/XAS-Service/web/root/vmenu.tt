@@ -1,0 +1,38 @@
+[%#                                                 -%]
+[%#  File: vmenu.tt                                 -%]
+[%#  Date: 01-Jun-2014                              -%]
+[%#  By  : Kevin Esteb                              -%]
+[%#                                                 -%]
+[%# Invoke with INCLUDE vmenu.tt                    -%]
+[%#                                                 -%]
+[%# USE dumper(ident=>0, pad=>"<br>") -%]
+[%- SET parent_ul = 0 -%]
+[%- SET self_ul = 0 -%]
+[%- IF view.data._links -%]
+  [%- IF view.data._links.parent -%]
+    [%- parent_ul = 1 -%]
+    [%- parent = view.data._links.parent %]
+             <ul>
+               <li><a href="[% parent.href %]">[% parent.title %]</a>
+  [%- END -%]
+  [%- IF view.data._links.self -%]
+    [%- self = view.data._links.self -%]
+    [%- self_ul = 1 %]
+               <ul>
+                 <li><a href="[% self.href %]">[% self.title %]</a>
+  [%- END %]
+  [%- IF view.data._links.children %]
+                   <ul>
+    [%- FOREACH child IN view.data._links.children %]
+                     <li><a href="[% child.href %]" >[% child.title %]</a></li>
+    [%- END %]
+                   </ul>
+  [%- END %]
+  [%- IF self_ul %]
+                 </li>
+               </ul>
+  [%- END %]
+  [%- IF parent_ul %]
+             </li></ul>
+  [%- END %]
+[%- END %]

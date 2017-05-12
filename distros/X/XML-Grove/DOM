@@ -1,0 +1,102 @@
+$Id: DOM,v 1.3 1999/05/26 15:42:16 kmacleod Exp $
+
+These are some notes relating XML::Grove to the core Document Object
+Model <http://www.w3.org/DOM/> (REC-DOM-Level-1-19981001).  In theory
+it should be relatively easy to create a strict DOM interface that
+closely matches the DOM spec, I will keep such an interface in mind to
+avoid conflicting designs.
+
+On the left are DOM classes and methods and on the right are
+equivalent XML::Grove classes, methods, and notes.  Equivalents marked
+with an asterisk (*) are available with the XML::Grove extensions
+Data::Grove::Parent, XML::Grove::Normalize, or
+XML::Grove::GetElementsByTagName.
+
+DOMImplementation                   No Equivalent
+  boolean hasFeature(feature, version)
+
+DocumentFragment                    Any XML::Grove object can be
+                                    a document fragment.
+
+Document                            XML::Grove::Document
+  doctype                             not yet implemented
+  implementation                      not yet implemented
+  documentElement                     $grove->root  (*)
+  createXXX                           XXX->new
+  getElementsByTagName                $grove->get_elements_by_tag_name (*)
+
+`Node' in DOM is a superclass of all other nodes in DOM, `XML::Grove'
+is the superclass of all objects in the XML::Grove module.
+
+Node                                XML::Grove
+  nodeName                            $element->{Name}
+  nodeValue                           $element->{Value}
+  nodeType                            use `ref()' and pattern matching
+                                      (match /.*::TYPE(::.*)?$/)
+  parentNode                          $obj->{Parent}  (*)
+  childNodes                          $obj->{Contents}
+  firstChild                          $obj->{Contents}[0]
+  lastChild                           $obj->{Contents}[-1]
+  previousSibling                     no equivalent
+  nextSibling                         no equivalent
+  attributes                          $element->{Attributes}
+  ownerDocument                       $obj->root->{Parent}  (*)
+  insertBefore                        splice(@{$node->{Contents}},
+                                        $index, 0, $new_child)
+  replaceChild                        splice(@{$node->{Contents}},
+                                        $index, 1, $new_child)
+  removeChild                         splice(@{$node->{Contents}},
+                                        $index, 1)
+
+  appendChild                         push(@{$node->{Contents}}, $new_child)
+  hasChildNodes                       $#{$node->{Contents}} != -1
+  cloneNode                           $new = $obj->clone()
+
+NodeList                            NodeLists are Perl arrays
+
+NamedNodeMap                        NamedNodeMap are Perl hashes
+
+CharacterData
+  data                                $characters->{Data}
+
+Attr                                Attr are stored in Perl hashes,
+                                    unspecified values are undef
+
+Element                             XML::Grove::Element
+  getAttribute                        $element->{Attributes}{$name}
+  setAttribute                        $element->{Attributes}{$name} = $value
+  removeAttribute                     undef $element{Attributes}{$name}
+  getAttributeNode                    no equivalent
+  setAttributeNode                    no equivalent
+  removeAttributeNode                 delete $element{Attributes}{$name}
+  getElementsByTagName                $elem->get_elements_by_tag_name (*)
+  normalize                           $elem->normalize  (*)
+
+Text
+  data                                $characters->{Data}
+
+Comment                             XML::Grove::Comment
+  data                                $comment->{Data}
+
+CDATASection                        XML::Grove::CData
+
+DocumentType                        see XML::Grove::Document
+
+Notation                            XML::Grove::Notation
+  nodeName                            $notation->{Name}
+  publicId                            $notation->{PublicId}
+  systemId                            $notation->{SystemId}
+
+Entity                              XML::Grove::ExtEntity
+  nodeName                            $ext_entity->{Name}
+  publicId                            $ext_entity->{PublicId}
+  systemId                            $ext_entity->{SystemId}
+  notationName                        $ext_entity->{Notation}{Name}
+
+EntityReference                     XML::Grove::Entity
+  nodeName                            $entity->{Name}
+  nodeValue                           $entity->{Data}
+
+ProcessingInstruction               XML::Grove::PI
+  target                              $pi->{Target}
+  data                                $pi->{Data}

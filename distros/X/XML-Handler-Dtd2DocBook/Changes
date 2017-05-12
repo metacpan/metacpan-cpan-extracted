@@ -1,0 +1,12 @@
+Revision history for Perl extension XML::Handler::Dtd2DocBook.
+
+0.41  Wed Nov 12 12:30:00 2003
+	- add options : -h -v -D
+
+0.40  Mon Oct  6 12:30:00 2003
+	- first release (synchro with XML::Handler::Dtd2Html 0.40)
+
+0.01  Fri Oct  3 14:10:15 2003
+	- original version; created by h2xs 1.21 with options
+		-XA -n XML::Handler::Dtd2DocBook
+

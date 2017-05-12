@@ -1,0 +1,28 @@
+--- #YAML:1.0
+name:                XML-Comma
+version:             1.998
+abstract:            XML::Comma document life-cycle platform
+license:             gpl
+author:              ~
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Class::ClassDecorator:         0
+    Clone:                         0
+    Compress::Zlib:                0
+    Crypt::Blowfish:               0
+    Crypt::CBC:                    0
+    DBD::mysql:                    0
+    DBI:                           0
+    Digest::HMAC_MD5:              0
+    Inline:                        0
+    Lingua::Stem:                  0
+    Math::BaseCalc:                0
+    PAR:                           0
+    Proc::Exists:                  0.04
+    Storable:                      0
+    String::CRC:                   0
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

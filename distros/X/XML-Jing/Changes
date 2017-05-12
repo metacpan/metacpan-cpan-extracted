@@ -1,0 +1,12 @@
+Revision history for XML::Jing
+
+
+0.04      2013-05-28 19:16:18 America/Los_Angeles
+	Fixed copyright information
+0.03      2013-05-21 15:35:57 America/Los_Angeles
+	Better error checking during validation
+0.02      2013-05-13 10:37:57 America/Los_Angeles
+	Don't include a corrupted jar file
+	Use Env::Path instead of Config module
+0.01      2013-05-04 04:02:18 UTC
+	First release.

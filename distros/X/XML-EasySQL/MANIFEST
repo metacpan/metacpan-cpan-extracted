@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/XML-EasySQL.t
+lib/XML/EasySQL.pm
+lib/XML/EasySQL/XMLnode.pm
+lib/XML/EasySQL/XMLobj.pm
+lib/XML/EasySQL/XMLobj/Node.pm

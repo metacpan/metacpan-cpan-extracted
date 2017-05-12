@@ -1,0 +1,12 @@
+<stx:transform version="1.0" 
+  xmlns:stx="http://stx.sourceforge.net/2002/ns"
+  pass-through="text"
+  strip-space="yes">
+
+  <stx:template match="/root">
+    <stx:copy>
+      <stx:process-children/>
+    </stx:copy>      
+  </stx:template>
+
+</stx:transform>

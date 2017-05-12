@@ -1,0 +1,4 @@
+MANIFEST
+Makefile.PL
+XFontStruct.pm
+XFontStruct.xs

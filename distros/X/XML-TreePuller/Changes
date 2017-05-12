@@ -1,0 +1,28 @@
+Revision history for XML-TreePuller
+
+0.1.2	
+		* Changed over to using constants for array offsets in
+		  ::Element
+		* Added ::CookBook::Patterns
+
+0.1.1	April 24, 2010
+		* Added in XPath support using Tree::XPathEngine
+		* Improved documentation 
+		  * Added Cookbook
+		  * Fleshed out existing documentation
+
+0.1.0	April 22, 2010
+		* API change: config() becomes iterate_at()
+		* Added more documentation
+
+0.0.3	April 17, 2010
+		* Added output of example program to documentation
+		* Commented code more
+
+0.0.2	Apr 04, 2010
+		* Twiddled carp a bit to do better error reporting when constructing
+		  XML::LibXML::Reader fails
+
+0.0.1   Feb 21, 2010
+        * First version, released on an unsuspecting world.
+

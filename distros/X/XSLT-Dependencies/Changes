@@ -1,0 +1,5 @@
+Revision history for XSLT::Dependencies
+
+0.2	Reset the state between explore() calls.
+
+0.1	Basic explore() method.

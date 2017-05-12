@@ -1,0 +1,49 @@
+Revision history for Perl extension XML::RSS::TimingBot
+                                        Time-stamp: "2004-05-19 12:57:23 ADT"
+
+2004-05-19  Sean M. Burke  sburke@cpan.org
+        * Release 2.03 -- important bugfix version
+	* In the previous version, the maxAge method actually read and
+	wrote tho minAge slot in the object!  This version fixes that.
+
+	
+	BTW: a 3.x version will be out soon.  It'll be smarter with the
+	situations (which the current version doesn't handle well) of a
+	feed that keeps returning an HTTP 304 even when we would have
+	expected it to have updated.  (That often happens when a feed
+	generator decides (rightly) that when there's no new content, it
+	shouldn't bother touching the RSS file.)  The current version
+	basically figures that until it gets an HTTP 200 (instead of the
+	not-modified), a feed can be polled and repolled as often as we
+	want.  The new version will instead poll the feed only once or
+	twice per update period, even if the polls ever only return 304.
+
+	
+2004-04-30  Sean M. Burke  sburke@cpan.org
+        * Release 2.02 -- first CPAN release.
+
+	Added rss_semaphore_file and support for it.
+
+	Added a longish note about "USING UNDER WITH LWP::Simple", for
+	when want to just drop in this class in programs that's using
+	LWP::Simple.
+	
+	
+2004-04-24  Sean M. Burke  sburke@cpan.org
+	* Release 2.01 -- first CPAN release.
+
+	This version now has docs.
+
+	This version now supports etags.
+
+	This version has a larger tast-base now, including even a test
+	corpus of files.  That makes the dist much larger, but don't
+	worry, all those fat files don't get installed, they're just test
+	files.
+	
+	XML::RSS::TimingBotDBI is in its own dist now, to simplify the
+	prerequisite-declaration stuff for you.
+
+
+2004-04-07  Sean M. Burke  sburke@cpan.org
+	* Release 1.01 -- ALPHA

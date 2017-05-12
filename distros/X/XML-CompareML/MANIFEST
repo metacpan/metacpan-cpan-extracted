@@ -1,0 +1,27 @@
+Build.PL
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml # Will be created by "make dist"
+README
+examples/render.pl
+examples/scm-comparison.output.html
+examples/scm-comparison.xml
+extradata/compare-ml.xslt
+inc/Test/Run/Builder.pm
+inc/XML/Grammar/Builder.pm
+lib/XML/CompareML.pm
+lib/XML/CompareML/Base.pm
+lib/XML/CompareML/DTD/Generate.pm
+lib/XML/CompareML/DocBook.pm
+lib/XML/CompareML/HTML.pm
+t/00-load.t
+t/01generate.t
+t/02sys-list.t
+t/cpan-changes.t
+t/files/scm-comparison.xml
+t/files/scm-sys-list-1.xml
+t/pod-coverage.t
+t/pod.t
+t/style-trailing-space.t

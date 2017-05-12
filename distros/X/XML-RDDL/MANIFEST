@@ -1,0 +1,10 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+RDDL.pm
+lib/XML/RDDL/Directory.pm
+lib/XML/RDDL/Resource.pm
+lib/XML/RDDL/Driver.pm
+t/00base.t
+t/05driver.t

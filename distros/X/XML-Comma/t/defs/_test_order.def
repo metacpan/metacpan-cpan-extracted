@@ -1,0 +1,21 @@
+<DocumentDefinition>
+  <name>_test_order</name>
+
+  <element><name>a</name></element>
+  <element><name>b</name></element>
+
+  <nested_element>
+    <name>ranked</name>
+    <element>
+      <name>rank</name>
+      <default>0</default>      
+    </element>
+    <sort_sub>
+      <![CDATA[ sub ($$) { $_[1]->rank() <=> $_[0]->rank() } ]]>
+    </sort_sub>
+  </nested_element>
+
+  <plural>'a','b', 'ranked'</plural>
+  <sort_sub><![CDATA[ sub ($$) { $_[1]->get() <=> $_[0]->get(); } ]]></sort_sub>
+
+</DocumentDefinition>

@@ -1,0 +1,6 @@
+Revision history for Perl extension XML::Generator::RSS10::ev.
+
+0.01  Fri Mar 10 10:59:30 2006
+	- original version; created by h2xs 1.22 with options
+		-X -n XML::Generator::RSS10::ev
+

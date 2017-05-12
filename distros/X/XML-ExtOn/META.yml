@@ -1,0 +1,43 @@
+---
+abstract: 'The handler for expansion of Perl SAX by objects.'
+author:
+  - 'Zahatski Aliaksandr, <zag@cpan.org>'
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3624'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: XML-ExtOn
+provides:
+  XML::ExtOn:
+    file: lib/XML/ExtOn.pm
+    version: 0.17
+  XML::ExtOn::Attributes:
+    file: lib/XML/ExtOn/Attributes.pm
+  XML::ExtOn::Context:
+    file: lib/XML/ExtOn/Context.pm
+  XML::ExtOn::Element:
+    file: lib/XML/ExtOn/Element.pm
+  XML::ExtOn::IncXML:
+    file: lib/XML/ExtOn/IncXML.pm
+  XML::ExtOn::SAX12ExtOn:
+    file: lib/XML/ExtOn/SAX12ExtOn.pm
+  XML::ExtOn::TieAttrs:
+    file: lib/XML/ExtOn/TieAttrs.pm
+    version: 0.01
+  XML::ExtOn::TieAttrsName:
+    file: lib/XML/ExtOn/TieAttrsName.pm
+  XML::ExtOn::Writer:
+    file: lib/XML/ExtOn/Writer.pm
+requires:
+  Tie::UnionHash: 0
+  XML::Filter::SAX1toSAX2: 0
+  XML::Flow: 0.85
+  XML::Parser::PerlSAX: 0
+  XML::SAX: 0
+  XML::SAX::Writer: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.17

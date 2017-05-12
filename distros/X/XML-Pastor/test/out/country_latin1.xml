@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<country xmlns="http://www.example.com/country" code="FR">
+  <name lang="en">France</name>
+  <population date="2000-01-01" figure="60000000"/>
+  <currency code="EUR" name="Euro"/>
+  <city code="AVA">
+    <name>Ambrières-les-Vallées</name>
+  </city>
+  <city code="BCX">
+    <name>Beire-le-Châtel</name>
+  </city>
+  <city code="LYO">
+    <name>Lyon</name>
+  </city>
+  <city code="NCE">
+    <name>Nice</name>
+  </city>
+  <city code="PAR">
+    <name>Paris</name>
+  </city>
+</country>

@@ -1,0 +1,11 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/01_use.t
+t/02_add.t
+t/03_url_opts.t
+t/04_itunes_opts.t
+t/test.mp3
+lib/XML/FeedPP/Plugin/AddMP3.pm
+META.yml                                 Module meta-data (added by MakeMaker)

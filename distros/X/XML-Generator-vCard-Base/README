@@ -1,0 +1,52 @@
+NAME
+    XML::Generator::vCard::Base - base class for generating SAX2 events for
+    vCard data
+
+SYNOPSIS
+     # Ceci n'est pas une boite noire.
+ 
+     package XML::Generator::vCard::FooBar;
+     use base qw (XML::Generator::vCard::Base);
+
+DESCRIPTION
+    Base class for generating SAX2 events for vCard data
+
+PACKAGE METHODS
+  __PACKAGE__->prepare_uri($uri)
+    Encodes (decoding first, where necessary) a URI's path as UTF-8.
+
+    Returns a string.
+
+  __PACKAGE__->prepare_qname($qname)
+    Utility method to return a hash reference suitable for passing a XML
+    QName to *XML::SAX*.
+
+    Returns a hash reference.
+
+  __PACKAGE__->prepare_attrs(\%attrs)
+    Utility method to return a hash reference suitable for passing XML
+    attributes to *XML::SAX*.
+
+    Returns a hash reference.
+
+  __PACKAGE__->namespaces()
+    Returns a hash reference of commonly used prefixes and namespace URIs.
+
+VERSION
+    1.0
+
+DATE
+    $Date: 2004/12/28 21:49:53 $
+
+AUTHOR
+    Aaron Straup Cope <ascope@cpan.org>
+
+SEE ALSO
+    XML::SAX
+
+LICENSE
+    Copyright (c) Aaron Straup Cope. All rights reserved.
+
+    This is free software, you may use it and distribute it under the same
+    terms as Perl itself.
+

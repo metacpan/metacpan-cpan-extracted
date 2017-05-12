@@ -1,0 +1,14 @@
+<stx:transform version="1.0" 
+  xmlns:stx="http://stx.sourceforge.net/2002/ns"
+  strip-space="yes">
+
+  <stx:template match="node[@id=2]">
+    <stx:text>T1</stx:text>
+    <stx:processing-instruction name="{name()}">
+      <stx:text>PI-</stx:text>
+      <stx:text>text</stx:text>
+    </stx:processing-instruction>
+    <stx:text>T2</stx:text>
+  </stx:template>
+  
+</stx:transform>

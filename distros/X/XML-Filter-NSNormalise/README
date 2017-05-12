@@ -1,0 +1,32 @@
+DESCRIPTION
+
+  XML::Filter::NSNormalise - SAX filter to normalise namespace prefixes
+ 
+  This module is a SAX (version 2) filter which 'normalises' the namespace
+  prefixes used on elements and attributes.  See the module POD for more
+  details.
+
+
+PREREQUISITES
+
+  Requires XML::SAX
+
+
+INSTALLATION
+
+  To install this module type the following:
+
+     perl Makefile.PL
+     make
+     make test
+     make install
+
+
+COPYRIGHT AND LICENCE
+
+  Copyright 2002 Grant McLean <grantm@cpan.org>
+
+  This library is free software; you can redistribute it and/or modify
+  it under the same terms as Perl itself.
+
+

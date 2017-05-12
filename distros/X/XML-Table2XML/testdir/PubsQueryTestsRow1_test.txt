@@ -1,0 +1,24 @@
+data
+/publishers/@pub_id	/publishers/pub_name	/publishers/city	/publishers/state	/publishers/country	/publishers/titles/@title_id	/publishers/titles/title	/publishers/titles/type	/publishers/titles/stores/@stor_id	/publishers/titles/stores/ord_num	/publishers/titles/stores/ord_date	/publishers/titles/stores/qty	/publishers/titles/stores/payterms
+0736	New Moon Books	Boston	MA	USA	PS2091	Is Anger the Enemy?	psychology	6380	722a	13.Sep.94	3	Net 60
+0736	New Moon Books	Boston	MA	USA	PS2091	Is Anger the Enemy?	psychology	7066	QA7442.3	13.Sep.94	75	ON invoice
+0736	New Moon Books	Boston	MA	USA	PS2091	Is Anger the Enemy?	psychology	7067	D4482	14.Sep.94	10	Net 60
+0736	New Moon Books	Boston	MA	USA	PS2091	Is Anger the Enemy?	psychology	7131	N914008	14.Sep.94	20	Net 30
+0736	New Moon Books	Boston	MA	USA	PS2106	Life Without Fear	psychology	7131	P3087a	29.Mai.93	25	Net 60
+0736	New Moon Books	Boston	MA	USA	PS3333	Prolonged Data Deprivation: Four Case Studies	psychology	7131	P3087a	29.Mai.93	15	Net 60
+0736	New Moon Books	Boston	MA	USA	PS7777	Emotional Security: A New Algorithm	psychology	7131	P3087a	29.Mai.93	25	Net 60
+0736	New Moon Books	Boston	MA	USA	BU2075	You Can Combat Computer Stress!	business	7896	X999	21.Feb.93	35	ON invoice
+0877	Binnet & Hardley	Washington	DC	USA	MC3021	The Gourmet Microwave	mod_cook	8042	423LL922	14.Sep.94	15	ON invoice
+0877	Binnet & Hardley	Washington	DC	USA	MC2222	Silicon Valley Gastronomic Treats	mod_cook	7896	TQ456	12.Dez.93	10	Net 60
+0877	Binnet & Hardley	Washington	DC	USA	PS1372	Computer Phobic AND Non-Phobic Individuals: Behavior Variations	psychology	7131	P3087a	29.Mai.93	20	Net 60
+0877	Binnet & Hardley	Washington	DC	USA	MC3021	The Gourmet Microwave	mod_cook	7131	N914014	14.Sep.94	25	Net 30
+0877	Binnet & Hardley	Washington	DC	USA	TC3218	Onions, Leeks, and Garlic: Cooking Secrets of the Mediterranean	trad_cook	7067	P2121	15.Jun.92	40	Net 30
+0877	Binnet & Hardley	Washington	DC	USA	TC4203	Fifty Years in Buckingham Palace Kitchens	trad_cook	7067	P2121	15.Jun.92	20	Net 30
+0877	Binnet & Hardley	Washington	DC	USA	TC7777	Sushi, Anyone?	trad_cook	7067	P2121	15.Jun.92	20	Net 30
+1389	Algodata Infosystems	Berkeley	CA	USA	PC8888	Secrets of Silicon Valley	popular_comp	7066	A2976	24.Mai.93	50	Net 30
+1389	Algodata Infosystems	Berkeley	CA	USA	BU1032	The Busy Executive's Database Guide	business	6380	6871	14.Sep.94	5	Net 60
+1389	Algodata Infosystems	Berkeley	CA	USA	BU7832	Straight Talk About Computers	business	7896	QQ2299	28.Okt.93	15	Net 60
+1389	Algodata Infosystems	Berkeley	CA	USA	BU1032	The Busy Executive's Database Guide	business	8042	423LL930	14.Sep.94	10	ON invoice
+1389	Algodata Infosystems	Berkeley	CA	USA	BU1111	Cooking with Computers: Surreptitious Balance Sheets	business	8042	P723	11.Mär.93	25	Net 30
+1389	Algodata Infosystems	Berkeley	CA	USA	PC1035	But Is It User Friendly?	popular_comp	8042	QA879.1	22.Mai.93	30	Net 30
+

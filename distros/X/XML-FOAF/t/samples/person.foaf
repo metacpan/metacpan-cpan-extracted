@@ -1,0 +1,19 @@
+<rdf:RDF
+      xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+      xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+      xmlns:foaf="http://xmlns.com/foaf/0.1/">
+<foaf:Person>
+<foaf:name>Benjamin Trott</foaf:name>
+<foaf:firstName>Benjamin</foaf:firstName>
+<foaf:surname>Trott</foaf:surname>
+<foaf:nick>Ben</foaf:nick>
+<foaf:mbox rdf:resource="mailto:ben@stupidfool.org"/>
+<foaf:homepage rdf:resource="http://www.stupidfool.org/"/>
+<foaf:workplaceHomepage rdf:resource="http://www.sixapart.com/"/>
+<foaf:knows>
+<foaf:Person>
+<foaf:name>Mena Trott</foaf:name>
+<foaf:mbox rdf:resource="mailto:mena@dollarshort.org"/></foaf:Person>
+</foaf:knows>
+</foaf:Person>
+</rdf:RDF>

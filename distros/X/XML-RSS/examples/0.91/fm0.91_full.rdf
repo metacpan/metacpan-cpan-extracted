@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!DOCTYPE rss PUBLIC "-//Netscape Communications//DTD RSS 0.91//EN"
+            "http://www.rssboard.org/rss-0.91.dtd">
+
+<rss version="0.91">
+
+<channel>
+<title>freshmeat.net</title>
+<link>http://freshmeat.net</link>
+<description>the one-stop-shop for all your Linux software needs</description>
+<language>en</language>
+<rating>(PICS-1.1 "http://www.classify.org/safesurf/" 1 r (SS~~000 1))</rating>
+<copyright>Copyright 1999, Freshmeat.net</copyright>
+<pubDate>Thu, 23 Aug 1999 07:00:00 GMT</pubDate>
+<lastBuildDate>Thu, 23 Aug 1999 16:20:26 GMT</lastBuildDate>
+<docs>http://www.blahblah.org/fm.cdf</docs>
+
+<image>
+<title>freshmeat.net</title>
+<url>http://freshmeat.net/images/fm.mini.jpg</url>
+<link>http://freshmeat.net</link>
+<width>88</width>
+<height>31</height>
+<description>This is the Freshmeat image stupid</description>
+</image>
+
+<item>
+<title>kdbg 1.0beta2</title>
+<link>http://www.freshmeat.net/news/1999/08/23/935449823.html</link>
+<description>This is the Freshmeat image stupid</description>
+</item>
+
+<item>
+<title>HTML-Tree 1.7</title>
+<link>http://www.freshmeat.net/news/1999/08/23/935449856.html</link>
+<description>This is the Freshmeat image stupid</description>
+</item>
+
+<textinput>
+<title>quick finder</title>
+<description>Use the text input below to search freshmeat</description>
+<name>query</name>
+<link>http://core.freshmeat.net/search.php3</link>
+</textinput>
+
+<skipHours>
+<hour>2</hour>
+</skipHours>
+
+<skipDays>
+<day>1</day>
+</skipDays>
+
+</channel>
+</rss>

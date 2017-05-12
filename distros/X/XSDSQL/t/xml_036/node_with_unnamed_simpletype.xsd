@@ -1,0 +1,20 @@
+﻿<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+	<xs:element name="s1">
+    	<xs:complexType>
+			<xs:sequence minOccurs="0" maxOccurs="1">
+				<xs:element name="el0">
+					<xs:simpleType>
+					  <xs:restriction base="xs:integer">
+						<xs:totalDigits value="2" />
+						<xs:enumeration value="1" />
+					  </xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+			</xs:sequence>
+     	</xs:complexType>
+	</xs:element>
+</xs:schema>
+
+ 

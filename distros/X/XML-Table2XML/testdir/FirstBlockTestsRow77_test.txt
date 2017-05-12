@@ -1,0 +1,5 @@
+root
+/a/@x	/a/@y	/a/b/c
+test1	testy	testC
+test2	testy	
+

@@ -1,0 +1,36 @@
+README for XML-RSS-Timing
+                                        Time-stamp: "2004-01-24 22:12:37 AST"
+
+RSS/RDF modules can use the skipHours, skipDays, ttl, and sy:update*
+elements to express what days/times they won't update, so that RSS/RDF
+clients can conserve network resources by not bothering to poll a feed
+more than once during such a period.
+
+This Perl module is for taking in the RSS/RDF skipHours, skipDays, ttl,
+and sy:update* elements' values, and figuring out when they say new
+content might be available.
+
+
+
+INSTALLATION
+
+You install XML::RSS::Timing et al, as you would install any Perl module
+library, by running these commands:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+If you want to install a private copy of XML::RSS::Timing in your home
+directory, then you should try to produce the initial Makefile with
+something like this command:
+
+  perl Makefile.PL PREFIX=~/perl
+
+See "perldoc perlmodinstall" for more information and advice.
+
+
+
+This module doesn't depend on XML::RSS, nor in fact have any
+particular relationship with it.

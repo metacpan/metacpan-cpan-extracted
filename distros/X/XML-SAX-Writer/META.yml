@@ -1,0 +1,28 @@
+---
+abstract: 'SAX2 XML Writer'
+author:
+  - 'Robin Berjon <robin@knowscape.com>'
+  - 'Chris Prather <chris@prather.org>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0.40'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.025, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: XML-SAX-Writer
+requires:
+  Encode: '2.12'
+  XML::Filter::BufferText: '1.00'
+  XML::NamespaceSupport: '1.00'
+  XML::SAX::Exception: '1.01'
+resources:
+  homepage: https://github.com/perigrin/xml-sax-writer
+  repository: https://github.com/perigrin/xml-sax-writer.git
+version: '0.56'

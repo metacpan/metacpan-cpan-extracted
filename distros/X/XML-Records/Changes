@@ -1,0 +1,17 @@
+Revision history for Perl extension XML::Records.
+
+0.01  Fri Jan 26 18:03:59 2001
+	- original version; created by h2xs 1.19
+
+0.10  Fri Jul 20 23:59:00 2001
+	- implemented as a subclass of XML::TokeParser
+	- added get_simple_tree and drive_SAX methods
+	- added 'here' option
+
+0.11  Mon Nov 05 10:00:00 2001
+	- attributes on field elements are now returned in record structure
+
+0.12  Mon Nov 05 12:30:00 2001
+	- get_simple_tree() and drive_SAX() now correctly handle nested top-level elements
+	- indicated that get_simple_tree() is deprecated
+

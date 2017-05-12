@@ -1,0 +1,6 @@
+c
+//r/pr/@v	/r/ar/@r
+INFO	DIALOG
+INFO	CONSOLE-WARN
+INFO	FILE
+

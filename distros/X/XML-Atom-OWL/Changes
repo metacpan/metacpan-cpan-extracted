@@ -1,0 +1,66 @@
+XML-Atom-OWL
+============
+
+Created:      2010-01-15
+Home page:    <https://metacpan.org/release/XML-Atom-OWL>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=XML-Atom-OWL>
+Maintainer:   Toby Inkster <tobyink@cpan.org>
+
+0.104	2014-09-11
+
+ [ Packaging ]
+ - Switch to Dist::Inkt.
+
+0.103	2011-10-27
+
+ [ Packaging ]
+ - Module::Package::RDF
+
+ [ Other ]
+ - Added: ActivityStrea.ms support.
+ - Updated: use 5.010
+
+0.102	2011-03-05
+
+ [ Documentation ]
+ - Various formatting fixes and other minor improvements to documentation.
+
+ [ Other ]
+ - use Scalar::Util qw(blessed).
+
+0.101	2010-07-19
+
+ [ Bug Fixes ]
+ - Fix packaging error; Makefile.PL and META.yml didn't note dependency on
+   common::sense.
+
+0.100	2010-07-19
+
+ [ REGRESSIONS ]
+ - Switched to using common::sense instead of strict, but didn't note
+   change in Makefile.PL/META.yml
+
+ [ Other ]
+ - Automatically call 'consume' as required.
+
+0.04	2010-04-29
+
+ - Keep base URI and lang information for <content> element.
+
+0.03	2010-04-28
+
+ - Added: Ability to automatically fetch <content src> links and include
+   the content as if it had been inline.
+ - Compliance improvements for <content> element.
+
+0.02	2010-01-23
+
+ - Added: Support arbitrary other extensions using XML literals.
+ - Added: Support for Atom License Extension
+   <http://www.ietf.org/rfc/rfc4946.txt>
+ - Added: Support for Atom Threading Extension
+   <http://www.ietf.org/rfc/rfc4685.txt>
+ - Added: Support for Feed Paging and Archiving
+   <http://www.ietf.org/rfc/rfc5005.txt>
+
+0.01	2010-01-18	First release

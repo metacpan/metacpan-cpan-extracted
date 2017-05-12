@@ -1,0 +1,338 @@
+#    README - An extension to Perl to access Xforms functions.
+#    Copyright (C) 1996-1997  Martin Bartlett
+#
+#    This program is free software; you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation; either version 2 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program; if not, write to the Free Software
+#    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+*** INTRODUCTION
+
+This is an extension to Perl that allows you to call the Xforms GUI api
+from a standard Perl script. The implications are quite impressive - you
+can now develop complex X applications in Perl. The package includes a
+number of examples in the DEMOS directory, many of which are unashamedly 
+plagerised from the Xforms DEMOS directory. See, especially, the ProcExp.pl
+DEMO for an example of how to really get under the covers of Xforms and
+produce a neat little application - its a filesystem explorer complete with
+splitter bar, tree view and list view. Run it with 'ProcExp.pl -fs' for its
+general filesystem mode, or with no switch if you have a Linux system and
+a /proc filesystem, for its special proc filesystem mode.
+
+This is the 0.8.4 release of the extension and operates with both the 0.88
+public release, and the previous 0.86 public release of the Xforms 
+library. It requires at least Perl 5.002 and has been successfully compiled 
+and run on all major versions of Perl up to and including 5.004. Perl 5.004
+with Xforms 0.88 is the recommended platform.
+
+Please consider this an Alpha release - that is, it's a release that may cause
+you to 'alf-beat your head on a hard spiky object! I have not tested EVERY 
+function. As releases pile up on each other this becomes less and less of a 
+'good-thing' since now most of the functions are definitely NOT implemented 
+with bog-standard XSUB code. 
+
+*** WHAT'S IMPLEMENTED
+
+Almost everything in Xforms 0.86 and 0.88! From basic forms to XEvent 
+processing, from GL canvases to XY plots. The man page X11::Xforms details
+what's NOT here - and why.
+
+There are also two major 'Value Added Features' that give you additional 
+facilities not provided with the Xforms library itself:
+
+	. The Class Initialization Callback
+	. The Global Initialization Script
+
+Those familiar with Xforms programming will know the pains they have to go
+through in order to customize objects to get a common system look-and-feel
+other than the Xforms default. These two facilities provide a very effective 
+solution for Perl programmers! The X11::Xforms man page has full usage details
+for these facilities.
+
+If you want to see what effect these have, after installation run the demos,
+then copy the X4Pinit.pl script from the DEMO directory to your home directory
+and rename it to .X4Pinit.pl, and then re-run the demos!!!! You will not have
+changed a line of code, but the entire look and feel of the demos will have
+changed!!
+
+For the most part, the Xforms functions have the same protocols from Perl 
+as they do from C. This proves mighty useful, since you can very easily 
+convert the nnnnnnn.c output from Fdesign into equivalent Perl statements. 
+
+To this end, the master directory contains a program named fd2Perl which is
+an fdesign filter program. By invoking fdesign in the following way:
+
+	fdesign -Perl
+
+a file, by the name of your .fd file but with a .pl suffix, will be generated.
+This will contain the Perl code to build your fdesign-ed forms. The program is
+also callable from the command line. If you are installing from an rpm, then
+this program gets copied to your /usr/local/bin directory.
+
+The Xforms library documentation for C (available from the Xforms ftp site) 
+pertains to a large extent to the Perl interface. So I rely upon that to give 
+you the low-down on general Xforms programming. 
+
+The new X11::Xforms man page, and the ubiquitous Xforms.functions file in
+the doc directory, complete the picture by telling you how to interpret the 
+Xforms doc for use with Perl, and by providing programming notes and call 
+protocols when these cannot be easily derived from the Xforms doc.
+
+Before using the extension, please read the man page X11::Xforms and then
+the comments at the top of the Xforms.functions file in the doc directory. 
+
+*** HOW'S IT IMPLEMENTED
+
+Its a Perl Xsub that does quite a lot of magic things under the covers
+in order to make Perl scripts believe they are calling Perl subroutines
+and to make Xforms believe that it is being called by a C application.
+
+Actually the magic only really gets involved when dealing with callbacks.
+The callback mechanism is complex and convoluted and you don't really want
+to know its guts!!! 
+
+*** WHAT'S CHANGED SINCE VERSION 0.7
+
+	. Xforms 0.88 support is added.
+	. Xforms 0.81 - 0.85 and 0.87 support removed.
+	. Class Initialization Callback facility added, allowing a callback
+	  subroutine to be invoked every time an object of a particular type
+	  is created.
+	. Global Initialization Script facility added, allowing a single script
+	  to be written to provide initialization for all X11::Xforms
+	  applications - customize look-and-feel once and it applies to all 
+      scripts!!
+	. Full pup callback support enabled (by virtue of 0.88 changes).
+	. proc-dtls.pl demo replaced with ProcExp.pl filesystem explorer.
+	. Bug fixes to fl_set_defaults, fl_interpolate and others.
+	. all textbox support removed since 0.88 removed it and it always
+	  was an internal thing anyway.
+	. menubar api's removed since 0.88 was delivered without them. No
+	  doubt they will come back when support is completed.
+	. Man page created for X11::Xforms (was already there for XEvent and
+	  XFontStruct). Contains enhanced detailed programming information, 
+	  details on the Value Added Features, the contents from the old 
+	  Xforms.not_implemented doc file, and pointers to where to get more 
+      detailed information.
+	. Consequently Xforms.not_implemented is deleted
+	. All previous version change information moved to a new CHANGES file
+	  in the doc directory.
+
+*** WHAT YOU NEED
+
+You need a couple of things: 
+
+	. T.C.Zhao's and Mark Overmars' Forms Library for X, version 0.86 or 0.88
+	  You can get that from
+
+		ftp://einstein.phys.uwm.edu/pub/Xforms
+
+	. Perl version 5.003 or 5.004. You need to have installed the full 
+      distribution (though you don't need the source tree itself). You 
+      need the Perl extensions that get distributed with Perl but no others.
+	  The package may compile successfully on 5.002 as well.
+
+*** HOW TO INSTALL IT
+
+If you installed from a binary RPM, this section is an elephant .. er ...
+sorry, irrelevant.
+
+If you installed from a SOURCE rpm, then use rpm -ba from the RedHat SPECS
+directory in order to build and install the binaries - then skip the remainder
+of the section.
+
+Otherwise If you are reading this then you know how to gunzip/untar the 
+distribution! From there you SHOULD be able to just do the following IF you 
+want to use the extension as a dynamically loaded extension. If you want it 
+statically bound then you need to read the comments that are found in the 
+Makefile generated by the first step:
+
+In the Xforms, XEvent and XFontStruct subdirectories of the X11 
+directory:
+
+    1) edit Makefile.PL # Read the comments in Makefile.PL that pertain
+                        # to Include paths, Library paths, OpenGL, and
+                        # object file 'stripping' and make any
+                        # necessary changes.
+
+Then, in the X11 directory, do
+
+    2) Perl Makefile.PL # to make the makefile using the Perl 
+                        # MakeMaker.pm extension 
+
+    3) make             # To make a dynamic extension. 
+
+    4) make install     # To install the extension.
+
+Then,
+
+    5) cp fd2Perl ...   # Where ... is a directory that is in your
+                        # PATH when you run fdesign
+
+    6) Convert previous Xforms4Perl scripts to 0.8 (see below)
+
+*** HOW TO CONVERT Xforms4Perl 0.4, 0.5, 0.6 or 0.7 SCRIPTS TO Xforms4Perl 0.8
+
+YOU DON'T NEED TO CONVERT 0.7 SCRIPTS. Thankfully the interface seems to
+have stabilized!!
+
+For others, the only changes are in the format and quantity of 'use' 
+statements.
+
+There is a Perl script named cnvtto8.pl, found in the doc directory,  which
+will do the work for you. Invoke it like this:
+
+	cnvtto8.pl <script.1> ...
+
+It will back up the old script with a suffix of '.x4p.old'.
+
+Note that the 0.4, 0.5 or 0.6 packages are NOT removed by 0.8. They are 
+not even disabled. On the other hand, 0.7 will probably be completely wiped
+out by installing 0.8 - back it up if you need to!
+
+To remove the 0.4-0.6 versions of Xforms4Perl you must look in the site_Perl 
+directory of your base Perl directory (mine is /usr/lib/Perl5) and remove all 
+files and directories with names matching 'Forms_*', 'Xforms', 'XEvent' or 
+'XFontStruct' EXCEPT those found under the X11 directory trees trees (sorry 
+it's so confusing). If you do accidentally remove any under the X11 trees, 
+just re-install 0.8
+
+*** HOW TO USE IT
+
+Basically just add
+
+	use X11::Xforms;
+
+to your Perl script, then follow the instructions given in the Xforms
+documentation, making any necessary semantic transformations between the
+C presented therein and the Perl you are using. 
+
+To access XFontStruct or XEvent structure fields, you will also have to 
+add:
+
+	use X11:XFontStruct;
+
+and/or
+
+	use X11:XEvent; 
+
+All three packages now have detailed man pages named X11::<package name>. 
+Read X11::Xforms before doing anything - it tells you just about everything
+you need to know to get started - or, at least, where to go for more info
+
+*** THE DEMOS
+
+There is a directory, named DEMOS, that, funnily enough, contains
+demonstration scripts! Many of these are converted native Xforms demos and, as 
+such, should work on any OS platform that has successfully installed 
+Xforms4Perl. The scripts X4Pinit.pl and psf.pl are not intended to be run
+stand-alone. The former is a sample Global Initialization Script, the latter
+is a Perl implementation of a tree-formatted 'ps' command that you might
+want to try with the ProcCntl.pl script on non-Linux platforms.
+
+Note that some of the DEMOS rely on Xforms version 0.88 being installed. If you
+try to run these against 0.86 you will get an error message on stdout that
+explains the problem, and the script will die.
+
+The original inspiration for this project is also included. Its a toolbar (yawn
+yawn - another toolbar). But the fact that it is written in Perl is what's
+impressive. It has full GUI configuration, pixmap button support, tool tips
+etc etc. Acts a bit like the M* Of*ice toolbar of Win*ows 3.*! This should also
+work on all platforms. 
+
+There is an interactive grepper, XFgrep.pl, that allows you to double click on 
+a grep result line to edit the file in which the RE was found, even positioning
+the editor at that line (depending on editor capabilities).
+
+There are also three 'useful' demos that are designed specifically for
+Linux - ProcCntl.pl, XFbat.pl and ProcExp.pl. They all use the Linux /proc 
+file system,  ProcCntl also relies on the GNU ps 'tree' display for its pretty 
+look. These are, therefore, unlikely to work on non-Linux systems, though 
+ProcExp.pl, a filesystem explorer complete with a splitter bar, can be made 
+more general by changing a program switch. However, I would be very interested 
+to see someone else's workings of these in order to include more generic 
+versions in future releases.
+
+And if someone wants to re-work the XFtool.pl demo to look like Of*ice 95/97 
+then that might be quite cool too.
+
+TRY THIS:
+
+	After installation, run the demos. Then copy X4Pinit.pl from the DEMOS
+	directory to your home directory, renaming it .X4Pinit.pl. Then run
+	the demos again.
+
+	THATS what the Value Added Features do!
+  
+*** OPENGL NOTES
+
+The OpenGL related functions are now part of the X11::Xforms package. 
+To use them you MUST change the Makefile.PL file in the Xforms directory. 
+See the comments in Makefile.PL for details. If you attempt to use an OpenGL 
+function WITHOUT compiling them into the package then your Perl script will 
+die with a message:
+
+	Xforms4Perl OpenGL functions are not installed.
+
+To rectify, make the changes necessary in the Makefile.PL and re-build the 
+package.
+
+*** DEVELOPMENT DETAILS
+
+This version was developed on an IBM Thinkpad 760ED running Linux 2.0.30
+from RedHat, X11R6, the Xforms Library 0.86-to-88 and Perl 5.002-5.004. It 
+should work on any version of Linux that runs other Xforms applications and 
+Perl 5.002 and above. It should also run on any Unix system that can run 
+Xforms and Perl 5.002 and above, or at least be reasonably easy to port.
+
+Your implementation stories, along with comments/questions/bug-reports and ecstatic testimonials are welcome, to 
+
+	martin@nitram.demon.co.uk
+
+or on the Xforms mailing list, which I read (but to make sure I do, put the
+phrase 'Xforms4Perl' in the heading!!)
+
+*** THANKS
+
+My main 'other party' thanks goes to Zoran Popovic <zoran@cs.cmu.edu> for
+his extensive testing efforts on the original versions (especially around the 
+OpenGL area) and suggestions, and also for the convert fd file script upon 
+which the fdesign filter is based (fd2Perl, found in the master directory). 
+
+Thanks to the CPAN people for their packaging comments - it only took me six
+months to implement their ideas!!
+
+Thanks to Reza Naima <reza@reza.extern.ucsd.edu>, who tested and championed 
+previous versions of this otherwise personal project. 
+
+Thanks to Dr Zhao (Dr. Xforms) for his patience with my nagging about API
+protocol strategies that aren't suitable for Perl, for thanking ME in HIS
+doc, and, or course, for Xforms itself (along with Mark Overmars).
+
+Thanks to Michael Fulbright of RedHat for help with building the RPM.
+
+Thanks to the following for platform problem reports (in no particular order):
+
+	Randy J. Ray 		(HP-UX)
+	Michael J. Salay	(HP-UX)
+	Arthur Blair		(SunOS 4.1.3)
+	Thomas Eickermann	(AIX and others)
+	Phillips Nguyen		(SGI)
+	Joshua S. Pincus    (SunOS)
+
+Further thanks to Randy for other suggestions that make this more portable,
+more standard, and much cleaner. Incidentally, Randy has a Perl extension of
+his own, named X11::Fvwm that assists in the creation of FVWM modules written
+in Perl. An Xforms extension to that package is being developed using 
+Xforms4Perl. See any CPAN mirror site for details.
+
+Martin Bartlett

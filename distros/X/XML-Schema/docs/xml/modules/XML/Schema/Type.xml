@@ -1,0 +1,58 @@
+<module name="XML::Schema::Type">
+
+  <about>
+    This module implements a base class for XML Schema datatypes.
+  </about>
+
+  <synopsis>
+<perl>
+package XML::Schema::Type::MyType;
+use base qw( XML::Schema::Type );
+
+package main;
+my $type = XML::Schema::Type::MyType->new(
+    name      => 'MyTypeName',
+    namespace => 'http://my.namespace.com/xyz',
+);
+
+print $type->name(), ", ", $type->namespace(), "\n";
+</perl>
+  </synopsis>
+
+  <description>
+    <p>
+      The XML::Schema::Type module is a base class for objects that
+      represent XML Schema types.  The module also loads the
+      <module>XML::Schema::Type::Simple</module> and
+      <module>XML::Schema::Type::Complex</module> modules (which may
+      go on to load further modules of their own).  Thus, it should
+      usually be sufficient to <code>use XML::Schema::Type;</code>
+      and expect all relevant datatype related modules to be loaded.
+    </p>
+  </description>
+
+  <methods>
+
+    <method id="base">
+	Returns the value for the internal <code>base</code> item
+	which may be set as a configuration parameter passed to the
+	<method class="XML::Schema::Base">new()</method> constructor
+	method to represent a base class type.
+    </method>
+
+    <method id="name">
+	Returns the name of the type.
+    </method>
+
+    <method id="namespace">
+	Returns the XML namespace of the type.
+    </method>
+  </methods>
+</module>
+
+
+
+
+
+
+

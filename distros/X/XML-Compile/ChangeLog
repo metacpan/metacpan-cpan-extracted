@@ -1,0 +1,2302 @@
+
+=== version history of XML::Compile
+
+Unless noted otherwise, these changes where initiated and applied by
+Mark Overmeer.
+
+Plans and unwanted limitations? see README.todo
+
+version 1.56: Thu 30 Mar 08:54:49 CEST 2017
+
+	Fixes:
+	- disabled a few regression tests which involve json_friendly, because
+	  the modules changed behavior.
+
+version 1.55: Wed  8 Mar 08:28:02 CET 2017
+
+	Changes:
+	- xml2yaml: new option --keep-root, default true.
+
+	Improvements:
+	- spell fix Debian rt.cpan.org#118569 [Lucas Kanashiro, Debian]
+	- add json_friendly, patch by Slaven Rezic.
+	- added bin/xml2json
+
+version 1.54: Mon Sep 19 22:26:02 CEST 2016
+
+	Fixes:
+	- dependency on XML::LibXML should be at lease 2.0107
+	  rt.cpan.org#117295 [Andreas Schipplock]
+	- examples where not included in the man-page [Andrew Beverley]
+
+	Improvements:
+	- spell fix Debian rt.cpan.org#116326 [Lucas Kanashiro, Debian]
+
+version 1.53: Sat 16 Jul 01:32:17 CEST 2016
+
+	Fixes:
+	- precissionDecimal --> precisionDecimal [Bernhard Reutner-Fischer]
+	- NMTOKENS has minLength=1
+	- support some facets on (extensions of) xs:Date
+
+	Improvements:
+	- spell fix Debian rt.cpan.org#111235 [Lucas Kanashiro]
+
+version 1.52: Fri 15 Jan 08:48:32 CET 2016
+
+	Fixes:
+	- stricter check for totalFracDigits [Max Maischein]
+	- implement facets on duration [Anthony Yen]
+
+	Improvements:
+	- split t/55facet_date.t from t/55facet.t
+
+version 1.51: Thu  5 Nov 17:50:06 CET 2015
+
+	Fixes:
+	- stricter check for date field [Rolf Schaufelberger]
+	- base64Binary writer will check for wide characters
+	  rt.cpan.org#108410 [Mark Gardner]
+
+	Improvements:
+	- reader: added replace hook XML_NODE
+	- writer: mixed_elements => 'ATTRIBUTES' became much smarter
+	- writer: compileType for types without namespace
+
+version 1.50: di jul 21 17:35:33 CEST 2015
+
+	Changes:
+	- input of simpletype hooks is now a simpletype
+
+	Fixes:
+	- root elements cannot be substituted
+	- nested substitutionGroup's (broken since 1.44)
+	- multi-level fallback type inheritance for substGroups
+
+	Improvements:
+	- writer: minor improvements in hooks
+
+version 1.49: Thu Jun 11 09:40:55 CEST 2015
+
+	Fixes:
+	- writer: use of prefix in key field for any.
+	- doc spelling, rt.cpan.org #104333 [gregor herrmann]
+	- do not attempt to find hooks on "unnamed complex"
+	  rt.cpan.org#105161 [Nick Wellnhofer]
+
+version 1.48: Mon Dec 22 08:22:03 CET 2014
+
+	Improvements:
+	- ::dataToXML will show more about the input it does not understand
+	  unless it is XML [Jan-willem van Eys]
+	- writer: new ::Schema::compile() option xsi_type_everywhere
+	  with tests in t/64xsi.t
+	- ::Schema::compile() options show which are limited to use in
+	  readers resp writers only.
+	- add hooks selector 'extends'
+	- writer: hooks get fulltype parameter, otherwise you cannot see
+	  the type for 'extends' selectors.
+
+version 1.47: Sat Oct 11 01:33:15 CEST 2014
+
+	Fixes:
+	- xsi:type compilation cache problem [Lloyd Roles]
+
+version 1.46: Tue Sep  2 09:30:22 CEST 2014
+
+	Fixes:
+	- xsi:type AUTO with very local namespace declarations.
+	- template: sometimes output got cleaned-up a little too much.
+	- translated: calls to prefixed() for documentation/error
+	  purposes should not cause xmlns in the result XML.
+
+version 1.45: Mon Aug 11 09:16:56 CEST 2014
+
+	Fixes:
+	- reader: optional substitutionGroup's
+	- tests: disable t/03duration.t when tzset is not supported
+	  (Windows)  [cpantesters]
+	- remove default elements_qualified => 'TOP' [Ciaran Deignan]
+	- the nodePath is not unique enough for the cache, in case
+	  of [René Keldermann]  Requires XML::LibXML 2.0100
+
+	Improvements:
+	- use prefixes in $path (for errors) when known.
+
+version 1.44: Wed May 28 09:23:24 CEST 2014
+
+	Changes:
+	- namespace qualification of global element and attributes was
+	  implemented incorrectly.  Had little consequence for most
+	  schema's, because they use elementFormDefault="qualified",
+	  but does show when using global attributes across namespaces.
+	  Discovered by  [Michiel Ootjers]
+
+	Fixes:
+	- writer: prefixes on required attributes [Christian Cebular]
+	- failing open with unknown filename did report <undef>, not filename
+	- template XML: show attributes not as elements
+	- template XML: XML compatible example for list elements
+	- memory-leak keeping ::Reader and ::Writer objects [Michiel Ootjers]
+	- do not accept to read NIL when not nillable
+
+	Improvements:
+	- ::Util new functions add_duration() and duration2secs()  tests
+	  in t/03duration.t
+	- adapt no try{} changes in Log::Report
+	- writer: ignore_unused_tags for tagged.
+
+version 1.43: Thu Feb  6 15:34:01 CET 2014
+
+	Fixes:
+	- two schema's with same basename, size and mtime are possible
+	  rt.cpan.org#92090 [Brendan Knox]
+	- preparation of "tagged" default element [Wesley Schwengle]
+
+	Improvements:
+	- change documentation style.
+	- ::dataToXML() will produce a clearer error when it thinks to
+	  see a filename which is missing.
+
+version 1.42: Mon Jan  6 00:53:54 CET 2014
+	Fixes:
+	- another attempt on namespaces with ref attributes
+
+version 1.41: Sun Jan  5 17:44:35 CET 2014
+	Fixes:
+	- schema's without elements did not get registered.  They may
+	  contain <import>, for instance.
+	- namespace, qualified and attributes to attributes via ref
+
+	Improvements:
+	- small trick to around namespace problems with namespace-less
+	  schema's in SOAP [Patrick Powell]
+	- add ::Namespaces::importIndex()
+
+version 1.40: Tue Nov 26 09:57:33 CET 2013
+	Fixes:
+	- whiteSpace facet on dateTime [magallanes]
+	- support for explicitTimeZone facet on dates
+
+	Improvements:
+	- error on build-in type now shows location [Radek Šťastný]
+
+version 1.39: Fri Oct 11 15:55:05 CEST 2013
+	Fixes:
+	- all: add enumeration and pattern facets on dates.
+	  rt.cpan.org#89259 [Rumen Palov]
+	- base64binary encoded fields without newlines
+
+version 1.38: Tue Sep 10 14:56:24 CEST 2013
+	Fixes:
+	- reader: simple-type nillable with default value [Ciaran Deignan]
+	- templates: show array when "shown above" is quoted as array.
+	- writer: nested particle blocks produced "undef" error when
+	  used incorrectly. Reported by [Alex Bernier]
+	- all: namespace qualification where ref with attribute not
+	  the tns. [Alex Bernier]
+
+	Improvements:
+	- test for nested choice blocks
+
+version 1.37: Thu Aug 22 16:11:24 CEST 2013
+
+	Changes:
+	- reader: mixed_element own handler now also gets the $path
+
+	Improvements:
+	- template: display '' around default and fixed values
+	- typemap hooks now also use new 'action' parameter
+
+version 1.36: Sat Aug 10 00:09:44 CEST 2013
+
+	Fixes:
+	- example of base64Binary should show that Perl's version is
+	  automatically encoded and decoded.
+	- ::Instance::element typo in hash field name
+	  rt.cpan.org#87682 [Jason Prondak]
+
+	Improvements:
+	- ::Schema::addHook() now permits to specify a processing direction
+	- also for ::Schema::hooks()
+
+version 1.35: Fri Jun 28 16:15:48 CEST 2013
+
+	Fixes:
+	- use of element explicit 'form' qualifier.  Test in t/77form.t
+	  rt.cpan.org#86079 [Manfred Stock]
+	- type of element in substitutionGroup defaults to type of base,
+	  not anyType. [Mark Hofstetter]
+
+version 1.34: Mon May 13 16:16:30 CEST 2013
+
+	Fixes:
+	- writer: fix <any> as only component of particle block.
+
+version 1.33: Fri May  3 10:02:27 CEST 2013
+
+	Fixes:
+	- schema's used elementFormDefault=TOP when there was a
+	  targetNamespace.  That's too much.
+	- some schemas have not named types, to recursion is not
+	  detected: detection based on label is also required.
+	- reader: replace hook should not get extra '_' level.
+	- detection whether Big::Float is needed was incorrect
+	  rt.cpan.org#85000 [James Davis]
+	- reader hook: added INCLUDE_PATH
+
+	Improvements:
+	- improvement in OODoc generated pods
+	- reader: introduction of nodePath in some error messages.
+	- moved some TODO from ChangeLog into README.todo
+
+version 1.32: Thu Mar 28 11:13:33 CET 2013
+
+	Fixes:
+	- templates must detect recursion and reuse based on type, not
+	  label. [Max Maischein]
+
+	Improvements:
+	- support facets on dateTime types, needed by [Andrew Campbell]
+	- add xml2yaml option --mixed
+	  rt.cpan.org#83274 [Slaven Rezic]
+
+version 1.31: Thu Jan 24 15:33:04 CET 2013
+
+	Fixes:
+	- reader: elements after xsi:type elements.
+	  reported by [Lars Thegler]
+	- typos: rt.cpan.org#82919 [Joenio Marques da Costa]
+
+	Improvements:
+	- writer: support prefix notation with XSI_TYPE
+
+version 1.30: Mon Nov 26 09:28:10 CET 2012
+
+	Fixes:
+
+	- produce predictable results for writer order of choice, when
+	  there are specials to fix tests in 5.17.5, where the HASH
+	  algorithm changed. [cpantesters]
+
+version 1.29: Tue Oct 16 16:27:13 CEST 2012
+
+	Fixes:
+
+	- template: fix understanding of predefined hook names.
+
+	- writer: sort any and anyAttribute elements before processing
+	  them, so the elements are in predictable order (required for
+	  regression tests)
+
+	Improvements:
+
+	- new function ::BuiltInTypes::builtin_type_info()
+
+version 1.28: Sat Oct  6 13:38:15 CEST 2012
+
+	Changes:
+
+	- template: the type of the element is listed before other info.
+
+	Fixes:
+
+	- major rewrite on handling of nillable.
+	  rt.cpan.org #79986 [Karen Etheridge]
+
+	Improvements:
+
+	- writer: support for any blocks where the type keys is not
+	  specified as '{$ns}local', but as '$prefix:local'.
+
+version 1.27: Fri Aug 31 00:26:13 CEST 2012
+
+	Fixes:
+
+	- Nillable in combination with empty complexTypes.
+	  Reported by [Graeme Stewart]
+
+	Improvements:
+
+	- use [0-9], not \d in regexes for types.
+
+	- writer: added explanation and example for complexType/singleContent
+	  use with single value, not HASH.  Suggested by
+	  rt.cpan.org#79270 [Karen Etheridge]
+
+	- changed implementation of XML::Compile::Schema::Namespaces
+	  autoexpand_xsi_type()
+
+version 1.26: Thu Aug 16 00:07:44 CEST 2012
+
+	Changes:
+
+	- there was no way to encode or decode attributes to NILled
+	  elements.  The fix implies that the reader will not return
+	  a simple "NIL" anymore for tagged and complex elements,
+	  but { _ => 'NIL' }   Reported by [Ivan Šimoník]
+
+	Fixes:
+
+	- fix use of default in "tagged" simple.
+	  Reported by [Philip Garrett]
+
+	- documentation mistake in Translate::Reader, declare typemaps
+	  with addTypemaps(), not typemap().  Reported by [Ivan Šimoník]
+
+	Improvements:
+
+	- template: nillable much clearer presented
+
+	- added some test for use of CDATA as node text.
+
+	- add $schema->template(TREE => ...)
+
+version 1.25: Fri Mar  9 21:34:36 CET 2012
+
+	Fixes:
+
+	- fix compiling of simpleContent with facets.
+	  rt.cpan.org#75235 [Piers Cawley]
+
+	Improvements:
+
+	- better check for NCName.
+
+	- warn for automatic (base64) formatting in ::BuildInTypes
+	  [Michael Ludwig]
+
+	- permit base-type in list of xsi_type alternatives (although
+	  still not required in that list)
+
+	- xsi_type table now can have 'AUTO' to replace the explicit
+	  alternatives list.  May be slow, but it DWIMs.
+
+	- when "integer" type values stay small, we do not use Math::BigInt
+	  anymore.  Less need for sloppy_integer.
+
+version 1.24: Wed Dec 28 12:23:13 CET 2011
+
+	Fixes:
+
+	- hexBinary should use capitals.
+	  rt.cpan.org #73130 [Piotr Roszatycki]
+
+	Improvements:
+
+	- doc-fix use of addHook [Michael Ludwig]
+
+	- fixes to the documentation system.
+
+version 1.23: Wed Nov 23 09:44:07 CET 2011
+
+	Improvements:
+
+	- writer: show more of the string in failed union match.
+
+	- added 'no warnings recursion' to the translators.
+	  [Brian Phillips]
+
+	- added extra tests for union of date and dateTime
+
+	- template: change display of facet whitespace.
+
+	- template: do not use comments in XML which contain '--'
+	  rt.cpan.org#72616 [Piotr Roszatycki]
+
+	- template: add xs and xsi declarations to XML example when
+	  show_type is in effect.
+	  rt.cpan.org#72616 [Piotr Roszatycki]
+
+version 1.22: Mon Jun 20 14:25:14 CEST 2011
+
+	Fixes:
+
+	- man-page of bin/schema2example told that the name of the
+	  program still was xml2example.
+
+	- template: show occurance of ANY elements.
+
+	- initialize XML::LibXML::Parser into safe mode.
+	  rt.cpan.org#68803 [Yann Kerherve]
+
+	Improvements:
+
+	- template: with restrictions on any and anyAttribute namespaces,
+	  show prefixes not full names except for the default namespace.
+
+	- template: correct example of simpleType list.
+
+	- template: remove superfluous element name from default/fixed/nil
+
+version 1.21: Fri Dec 24 10:20:15 CET 2010
+
+	Fixes:
+
+	- some tests fail with new versions of Test::More
+
+version 1.20: Wed Dec 22 16:34:24 CET 2010
+
+	Changes:
+
+	- ::Schema::compile(include_namespaces) with a personal filter will
+	  now be called for all known namespaces, not only the used
+	  namespaces. (Needed to reseolve qname problems)
+
+	Fixes:
+
+	- added missing formatter when both totalDigits and fractionDigits
+	  are restricted.  rt.cpan.org#63464 [mimoň-cz]
+
+	Improvements:
+
+	- base64Binary length facet implemented with new
+	  MIME::Base64::decoded_base64_length()
+
+	- disable t/55facet_list.t tests for old libxml2 versions,
+	  because the used regexp is broken in those releases, causing
+	  daily mails from cpantesters.
+
+version 1.19: Mon Oct 25 00:06:25 CEST 2010
+
+	Fixes:
+
+	- template: missing '{' in some cases [Patrick Powell]
+
+	- unsignedInt max value has 10 digits, not 9. Repair validation
+	  limit.  rt.cpan.org#62281 [Aleksey Mashanov]
+
+	- fix pod problem in ::FAQ, spotted by [Patrick Powell]
+
+	- added missing built-in type dateTimeStamp.
+
+	- writer: implemented/fixed length validation of base64Binary and
+	  hexBinary.
+
+	- implemented/fixed enumeration validation of a QName type
+	  rt.cpan.org#62237 [Aleksey Mashanov]
+
+	Improvements:
+
+	- ::Instance does not look for 'ref' attributes, because that
+	  cannot be used on top-level elements and types.
+
+	- ::Instance only collects info about type lazily, which speeds-up
+	  applications with huge schemas which are only partially used.
+	  In general it uses less memory.
+
+	- rewrote administration of substitutionGroups to access it faster.
+	  This may change the examples produced in template.
+
+	- new ::Namespaces::doesExtend() to walk inheritance, tested
+	  in t/02ext.t
+
+version 1.18: Thu Sep 30 17:00:29 CEST 2010
+
+	Fixes:
+
+	- hexBinary processing was simply wrong.
+
+	- template: call parameters of replace hook.
+
+	- writer: substitutionGroup of simpleType value 0 got ignored.
+
+	- template: recursive substitutionGroups with abstracts will
+	  not crash.
+
+	- template: apply key rewrite also on unqualified names.
+
+	- preferred prefix for SCHEMA2001i is xsi, not xs
+	- reorganized the ::Schema manpage a little.
+
+	- template: show types in prefixed form, not qname.
+
+	- template: show enums which contain blanks within quotes.
+
+	- template: if a simpletype has facet enumeration, one of
+	  those values will be used as example.
+
+	- template: always lead a block display by a blank line, not
+	  only when there is comment.
+
+	- template: do also show types of complex elements.
+
+	- template: show types of alternatives to substitutionGroups
+
+	- template: show when an substitutionGroups is abstract (not
+	  instantiatable)
+
+	- template: pick an non-abstract alternative as example for
+	  a substitionGroup. Let it point to a correct example value
+	  if available.
+
+version 1.17: Thu Sep 23 09:31:40 CEST 2010
+
+	Changes:
+
+	- removed 'IGNORE' choice for abstract_types options. Either
+	  they produce and ERROR or you ACCEPT them in your message,
+	  ignoring them to be abstract.
+
+	- move t/99pod.t to xt/ which removes dependency from Test::Pod
+
+	Fixes:
+
+	- writer: do not complain about mal-formatted integers when
+	  validation is off [Titi Ala'ilima]
+
+	- reader: do not complain about mal-formed integers when
+	  validation is off.
+
+	- template: do not show "TEMPLATE_ERROR" when the defaults
+	  of fields are '0'.
+
+	- template: did not show extensions of abstract types.
+
+	- template: fix line folding with long words.
+
+	- template: remove double blanks before '['
+
+	Improvements:
+
+	- template: report wrong value of action parameter before
+	  anything else.
+
+	- template: show reason for empty sequences
+
+	- template: do not show abstract types in substitutionGroups
+
+version 1.16: Tue Jun 15 15:16:29 CEST 2010
+
+	Fixes:
+
+	- template: processing of nillable objects.
+	  rt.cpan.org#58321 [Max Cohan]
+
+	- the chaching needed for recursive schemas, did not contain
+	  xsi:type logic. [Knut Arne Bjørndal]
+
+version 1.15: Mon May 10 15:20:17 CEST 2010
+
+	Fixes:
+
+	- reader: namespace qualified attributes. Discovered by [Heiko Jansen]
+
+	- reader: namespace of attributeGroups.
+
+	- writer: namespace qualified fixed value attribute.
+
+	Improvements:
+
+	- remove out-dated constants from the ::BuildInTypes manual-page
+
+	- ::Translate::keyRewrite accepts split ns/local as well. This
+	  avoids clumpsy pack/unpack.
+
+version 1.14: Mon Apr 26 09:39:28 CEST 2010
+
+	Fixes:
+
+	- ::Template(PERL) improve key_rewrite use.
+
+	- xsi:type when schema-namespace has the default prefix and the
+	  user defined elements/types are namespace-less. [Brendan Knox]
+
+	- ::Writer report misfit failed due to reuse of $@
+
+	- correct validation of type "duration" by [Titi Ala'ilima]
+
+	Improvements:
+
+	- with xsi_type switches of simple types, the value is translated
+	  into a HASH containing that value, so the XSI_TYPE can be added.
+
+	- add check for dateTime and duration validation.
+
+	- ::Template(PERL) add start line '# Describing ....'
+
+	- ::Template(PERL) explicit list blocked default prefix.
+
+version 1.13: Sun Feb 21 00:09:24 CET 2010
+
+	Fixes:
+
+	- xsi:type switch between elements based on the same abstract
+	  type. Reported by [Roman Daniel]
+
+	- template: display of fixed and default elements. [Anton Berezin]
+
+	- writer: add attributes to display of available tags in case
+	  of problems.
+
+	Improvements:
+
+	- template: show more details about applicable facets.
+
+version 1.12: Mon Jan 11 11:46:43 CET 2010
+
+	Fixes:
+
+	- writer: optional block was not optional [Roman Daniel]
+
+	- accept xsi:type with alternative in namespace which is not
+	  used by the schema itself [Roman Daniel]
+
+version 1.11: Fri Jan  8 12:37:23 CET 2010
+
+	Fixes:
+
+	- forgot to document the new xsi_type option to ::Schema::compile()
+
+	- implement facets on lists correctly. Tests in new t/55facet_list.t
+	  Pushed by rt.cpan.org #53392 [Николай Шуляковский]
+
+version 1.10: Thu Dec 24 16:56:13 CET 2009
+
+	Changes:
+
+	- keyRewrite now also applies to attributes.
+
+	Fixes:
+
+	- writer sometimes destroyed the data-structure which was
+	  passed in. Now automatically tested for each test_rw.
+
+	- support sub-seconds in time format.
+
+	- writer: do not produce an empty element when minOccurs is
+	  combined with nillable in a complexType.
+	  rt.cpan.org#51264 [Roman Daniel]
+
+	- ::Iterator::currentType() could crash.
+
+	Improvements:
+
+	- writer: major readibility changes.
+
+	- all: implemented xsi:type
+
+	- template: do not produce superfluous quotes in Perl template
+	  examples when anonymous HASH of ARRAY is included.
+
+version 1.09: Fri Nov 13 10:56:45 CET 2009
+
+	Fixes:
+
+	- writer: do not produce an empty element when minOccurs is
+	  combined with nillable in a simpleType
+	  rt.cpan.org#51264 [Roman Daniel]
+
+	Improvements:
+
+	- template: use prefixes to avoid namespaces in types.
+
+version 1.08: Sat Oct 24 20:11:10 CEST 2009
+
+	Fixes:
+
+	- reader: fix last parameter of replacement hook
+
+	Improvements:
+
+	- template: support for key_rewrite
+
+	- use the new XML::LibXML::RegExp, to replace tricky XML::RegExp.
+
+version 1.07: Mon Jun 22 11:35:22 CEST 2009
+
+	Fixes:
+
+	- mixed attribute on complexContent not detected.
+
+	- anyType elements which have sub-elements will not stringify, but only
+	  simple strings will get simplified.  Otherwise, an XML::LibXML::Node
+	  is kept.
+
+	Improvements:
+
+	- reader: anyType element processing can be hooked via a new
+	  compile(any_type) option.
+
+	- partial support for attribute targetNamespace on element
+	  and attribute declarations.  Currently produces a warning.
+
+version 1.06: Thu May 28 10:28:45 CEST 2009
+
+	Fixes:
+
+	- prefer simpleType child over base type attribute in
+	  simpleContent/restriction.  rt.cpan.org#46212 [Erich Weigand]
+
+	Improvements:
+
+	- ignore all references to an (unloaded) schema, for instance
+	  with deprecated structures via ::compile(block_namespace) with
+	  tests in t/76blocked.t
+
+	- fixed tests in t/91noqual.t
+
+	- include t/75type.t in the distribution.
+
+	- added test for base64Binary to t/21types.t
+
+	- reader and writer: replace hook also gets code-ref able to
+	  process what is being replaced, implementing a wrapper.
+
+version 1.05: di apr 28 13:04:42 CEST 2009
+
+	Improvements:
+
+	- writer: accept single element for tagged and mixed.
+
+	- writer: accept scalar for mixed, upgraded to text node.
+
+version 1.04: Fri Apr 24 16:08:43 CEST 2009
+
+	Fixes:
+
+	- the use of cached schema elements must be limited to single
+	  ::Schema objects (for instance per WSDL object).
+	  rt.cpan.org#44959 [Jozef Kutej]
+
+	- complex extension of anyType types.
+
+	Improvements:
+
+	- document that key_rewrite only applies to elements, not
+	  attributes.
+
+	- add 'target_namespace' overrule option to importDefinitions()
+	  and ::Schema::addSchemas()
+
+	- have ::Schema::new() pass options to importDefinitions()
+
+	- added various entries about fixing-up schema's to the FAQ.
+
+version 1.03: Wed Mar 25 15:41:43 CET 2009
+
+	Fixes:
+
+	- template: protect output against combinatorial explosion, which
+	  did hurt [Anton Berezin]
+
+	Improvements:
+
+	- new option ::Schema::compile(abstract_types)
+
+	- template: compact the output of substitutionGroups, leaving the
+	  abstract types out and use columns in the display.
+
+	- template: add namespace details to XML and PERL output
+
+	- template: add header to XML and PERL output.
+	  New option  ::Schema::template(skip_header)
+
+version 1.02: Thu Feb 12 11:37:49 CET 2009
+
+	Fixes:
+
+	- fix useSchema() deep recursion
+
+	- writer: repair ARRAY complaint when scalar given on place
+	  where an array of values is acceptable.  [Allan Wind]
+
+version 1.01: Thu Feb 12 09:39:50 CET 2009
+
+	Fixes:
+
+	- do not use /bin/pwd in t/pod.t
+
+	- writer: report warnings when accepting a difficult construction.
+
+	- key_rewrite(PREFIXED) options now do stack, without the
+	  possibility to get it rewritten twice.
+
+	- reader: complain if no data was recognized. [Jozef Kutej]
+
+	- handle schema's with targetNamespace but not qualified
+	  elements.  http://www.w3.org/TR/xmlschema-0/#UnqualLocals
+	  [Jozef Kutej]
+
+	Improvements:
+
+	- ::Schema::useSchema() let you share definitions between
+	  various ::Schema extensions.
+
+	- document that XML::Compile::dataToXML() can be used as
+	  instance method as well.
+
+version 1.00: Wed Jan 21 10:51:23 CET 2009
+
+	Changes:
+
+	- oops, rename elementFormDefault parameters into
+	  element_form_default.  Breaks only XML::Compile::SOAP 2.00_01
+
+	- substitutionGroup keys did not get prefixed, when key_rewrite
+	  was enabled.
+
+	Fixes:
+
+	- writer: name-space qualified for NIL [Mark Blackman]
+
+	- template: be more careful not to put trailing '}' on a line
+	  with comment.
+
+	- writer: contents of tagged elements were not processed, so
+	  not checked or whitespace corrected.
+
+	- report rewritten key when required value is missing, not the
+	  full key.
+
+	- compile(mixed_elements=STRUCTURAL) was ignored when the mixed
+	  option was found with the complexContent.
+
+	Improvements:
+
+	- template: hook "COLLAPSE" to reduce output size for well-known
+	  types.
+
+	- writer: accept {_ => $value} as alternative for $value.
+
+	- writer: optimize seq block with one block element.
+
+	- added XML::Compile::Util::even_elements()
+
+	- writer: show available tags in complex block with unused tags
+	  when in debug mode.
+
+	- show substitutionGroup members in debug mode.
+	  Requires Log::Report v0.21
+
+	- make addHooks() use addHook(), easier to override.
+
+	- reader: elements with mixed="true" by default only unpacks the
+	  ATTRIBUTES.  It is hard to figure-out why the node is not
+	  translated into Perl.  Therefore, the resulting HASH now
+	  contains a _MIXED_ELEMENT_MODE key as explanation.
+
+	- with "Log::Report mode => 'DEBUG'", you may get extra help
+	  on some errors.
+
+version 0.99: Mon Dec 29 10:16:28 CET 2008
+
+	Changes:
+
+	- reset "used count" when include_namespaces
+
+	- Qname will not complain about "unused namespace", because
+	  that is often not true.  If true, than you have to provide
+	  a the compile(prefixes) as HASH with used flag set.
+
+	Fixes:
+
+	- elements and attributes with non-default "form" attribute
+	  were not recognized.
+
+	- type-based replace hook selected too often.
+
+	Improvements:
+
+	- compile(include_namespaces) can have a code reference to
+	  filter included namespace declarations to be included.
+
+	- addSchemas/importDefinitions now have options
+	  {element,attribute}FormDefault to overrule the (missing) info
+	  in many (old) schemas (even those of soap and wsdl).
+
+	- dataToXML() also finds filenames in the SCHEMADIR, not only
+	  known namespaces.  That was always intended to happen.
+
+	- optimize reading of complex with zero or one component.
+
+	- new reader hook after => 'NODE_TYPE'
+
+	- error when schema definition contains components of other
+	  namespaces.
+
+	- you now can compile types only, where the schema does not
+	  contain the definition of the element which will be produced.
+	  But I will not tell you how until the interface has settled ;-)
+
+version 0.98: Tue Dec 16 08:32:04 CET 2008
+
+	Fixes:
+
+	- writer failed for choice with an element containing a false
+	  value, like "0" or ''.  Reported by [Sander Hulst]
+
+	- do not attempt to add namespace declarations to produced
+	  attributes in the writer.
+
+	- elements with minOccurs=0/maxOccurs=unbounded and optional
+	  content failed.  rt.cpan.org#41725 [Osfameron]
+
+	Improvements:
+
+	- easier to understand error messages in block writer.
+
+	- started XML::Compile::FAQ
+
+version 0.97: Mon Nov 24 15:51:54 CET 2008
+
+	Fixes:
+
+	- dataToXML() with document node will return document element.
+
+	- dateTime reversed minutes/seconds.  Fixed by [Allan Wind]
+
+	- dateTime timezone part is optional.  Fixed in docs by [Allan Wind]
+
+	- count error with array of elements writer, when maxOccurs is
+	  an integer value larger than 1.  An error will be produced when
+	  too many elements are provided.
+
+	Improvements:
+
+	- bigfloat support for xml2yaml [Slaven Rezic]
+
+version 0.96: Fri Oct 10 16:02:09 CEST 2008
+
+	Fixes:
+
+	- warning condition on old libxml2 version was broken: warned too
+	  often.  rt.cpan.org#39807 [Joerg Plate]
+
+	- overruling "qualified" on top-level elements did not work anymore.
+
+	- writer hook "replace" crashed on missing (optional) data.
+
+version 0.95: Wed Oct  1 17:38:07 CEST 2008
+
+	Fixes:
+
+	- top-level elements could not be have as nillable, default, and
+	  fixed.  rt.cpan.org#39215 [Tom Hukins]
+
+	- do pattern match on unmodified float values.
+	  rt.cpan.org#39224 [MIROD]
+
+	- automatically defined xsi when any element is nillable.  You will
+	  still need to specify "include_namespaces => 1" to have the
+	  compiler add the name-space definition to the root namespace.
+	  For the moment only supports SCHEMA2001
+
+	- the applications of facets is explicitly ordered, to avoid
+	  colissions between checks in lexical space and conversions
+	  made in value-space.
+
+	- accept but ignore minScale and maxScale facets (cannot be
+	  represented in Perl objects yet)
+
+	- removed facet totalFracDigits, which does not exist.  How did it
+	  get in?
+
+	- precissionDecimal was handled as int, should be float.
+
+	- positiveInteger value check broken. [Sander Hulst]
+
+	- accept the 'error' base-type.
+
+	Improvements:
+
+	- small (<1e9) float/decimal values will not become Math::Big*
+
+	- facet lists and non-lists various optimizations in reader.
+
+	- pre-lexical facet whiteSpace on list does not need to be checked
+	  in writer.
+
+	- handling of (+|-|)INF and NaN for precissionDecimals, floats and
+	  doubles.
+
+	- adapt names of test helpers to new X::C::Tester standard.  v0.03
+	  of that module is now required.
+
+version 0.94: Tue Aug 26 10:09:05 CEST 2008
+
+	Fixes:
+
+	- repair whitespace facets collapse and replace. [Allan Wind]
+
+	- NMTOKEN has no blanks, but token may have them.
+	  rt.cpan.org#38675 [Allan Wind]
+
+	Improvements:
+
+	- show more useful features of Log::Report in ::Schema SYNOPSIS
+
+version 0.93: Mon Aug 11 21:13:22 CEST 2008
+
+	Changes:
+
+	- changed order of attributes back to situation of 0.90: the
+	  base-class attributes are probably more important than the
+	  attributes of the extension.
+
+	- groups with maxOccurs > 1 renamed
+	    from   gr_<label of first element>
+	    into   gr_<name of group>
+	  For example, when parsing schemas themselves (with PREFIXED)
+	    was    gr_xs_minExclusive
+	    now    gr_xs_facets
+	  minExclusive is the name of the first element in the group
+	    was    gr_xs_minExclusive
+	    now    gr_xs_facets
+	  minExclusive is the name of the first element in the group
+	  block. xs:facets is the name of the group as used in the
+	  schema schema and probably more consistent over releases.
+
+	Fixes:
+
+	- documentation on use of typemaps and hooks got mutulated
+	  in 0.90
+
+version 0.92: Wed Aug  6 11:33:27 CEST 2008
+
+	Fixes:
+
+	- minOccurs=0 in writer.  Reported by [Drew Taylor]
+
+	Improvements:
+
+	- WRITER "after" hook also gets the data, not only the produced XML.
+
+	- extra tests for extension of empty complexType.
+
+version 0.91: Fri Aug  1 13:25:26 CEST 2008
+
+	Changes:
+
+	- removed block_label from ::Util because it does not work with
+	  key rewrite.  Probably not used by anyone.
+
+	- "any" without maxOccurs>1 did still return an ARRAY,
+	  which is inconsequent.  Needed to be fixed.
+
+	- the output order of attributes has changed: the extended additions
+	  before the base class attributes.  This does not change the meaning,
+	  but may be painful for your regression tests.
+
+	- writer adds prefixes always in the same order (alphabetic) to
+	  ease regression-tests.
+
+	Fixes:
+
+	- Do not confuse un-used keys as 'any' elements in WRITER
+
+	- key rewrite PREFIXED did not work with blocks.
+
+	- QNAME in name-space-less schema's can go without prefix.
+
+	- Fixed QName in list.  Tests in new t/74qname.t
+
+	- undouble attributes when extending types.
+
+	- ::Schema::compile(use_default_prefix) renamed into
+	  use_default_namespace, which was already used in the
+	  ::Translate docs.  Both names will work.
+
+	- WRITER production errors did not arrive correctly to the
+	  application.  Reported by [Gert Doering]
+
+	- particle block handling in the WRITER was not as sophisticated
+	  as in the READER, which cause problems reported by [Gert Doering]
+
+	- groups which ref'd to an other name-spaces did not use the new
+	  targetNamespace.
+
+	- READER when choice/sequence/all with minOccurs=0 in the middle
+	  of a list of elements failed if the data was not present.
+
+	Improvements:
+
+	- List existence of XML::Rewrite.
+
+	- Collect prefix-table when reading.
+
+	- better error when an any_(element|attribute) is not understood.
+
+	- the writer will attempt to use the same prefixes as used in
+	  the schema, unless these name-spaces are already pre-defined
+	  in the 'prefixes' table.
+
+	- be more careful that empty text fragments do not end-up as
+	  text nodes in the WRITER output.
+
+	- some error message did not show the path in the message where
+	  the error was produced.
+
+version 0.90: Fri Jul 18 21:52:52 CEST 2008
+
+	Changes:
+
+	- It was permitted to use an ARRAY with one element where a
+	  single elements was needed in the WRITER.  This has been
+	  removed because it did not work together with simpleType
+	  lists.
+
+	- Reworked the three back-ends from functional into clean OO.
+	  Module renames:
+	    ::Schema::Translate -> ::Translate
+	    ::Schema::XmlReader -> ::Translate::Reader
+	    ::Schema::XmlWriter -> ::Translate::Writer
+	    ::Schema::Template  -> ::Translate::Template 
+	  All functions renamed into methods from
+	    element_wrapper  into  makeElementWrapper
+
+	Improvements:
+
+	- you can now register new translator back-ends.
+
+version 0.89: Sat Jul 12 12:40:57 CEST 2008
+
+	Fixes:
+
+	- pattern restrictions on lists must be applied "late",
+	  after the split.
+
+	- repair facets on lists.
+
+	- complexType/complexContent/restriction will only redefine the
+	  elements, but will still take the attributes from the base-class.
+	  Tests in new t/45ctcres.t
+
+	- disabled a broken pattern optimization.
+
+	Changes:
+
+	- ::Schema::compile() options anyElement and anyAttribute renamed
+	  to the consequent any_element and any_attribute.  The old names
+	  are still supported.
+
+	Improvements:
+
+	- xml2yaml output filename '-' for STDOUT
+
+	- xml2yaml exit when illegal options were detected
+
+	- mixed_elements option STRUCTURAL now also works for writers.
+
+version 0.88: Tue Jul  8 10:38:26 CEST 2008
+
+	Fixes:
+
+	- SubstitutionGroups do not require to be based on abstract
+	  elements.
+
+	- include name-space while collecting nodes to read, not only
+	  local-names.	Now nodes with the same local-name but different
+	  name-space can be used in one block or substituteGroup.
+
+	- make rewrite work for substitutionGroups
+
+	Improvements:
+
+	- error when abstract elements are being used, tests
+	  in t/34abstract.t
+
+	- more speed at subst-group lookups.
+
+	- template shows empty blocks explicitly.
+
+version 0.87: Fri Jul  4 15:12:17 CEST 2008
+
+	Changes:
+
+	- removed /el() and #el(name) from location of error message,
+	  which makes the location simpler and probably not less clear.
+
+	Improvements:
+
+	- implemented key_rewrite, tests in t/73rewrite.t
+
+	- removed double check for existence of required value in writer.
+
+	- renamed ::Schema::new() option 'output_namespaces' into
+	  the nicer 'prefixes'.  Old name still available.
+
+version 0.86: Mon Jun 23 17:01:43 CEST 2008
+
+	Fixes:
+
+	- fixed attributes are always optional, both in reader and
+	  writer.
+
+	- fixed elements are optional, but do return that value as
+	  default in the reader.
+
+	- class labels to group error messages should be spelled
+	  _class in ::Translate.
+
+	- fix choice with multiple substitutionGroups or any's.
+
+	Changes:
+
+	- mixed element default will always return a HASH, not a node
+	  when there are no attributes defined.
+
+	Improvements:
+
+	- many more options to handle mixed elements.  See
+	  ::Schema::compile option mixed_elements.
+
+	- error for typemaps which specify a none-existing type, as
+	  coding help.
+
+	- error when both default and fixed are set.
+
+version 0.85: Mon Jun 16 15:07:23 CEST 2008
+
+	Fixes:
+
+	- template with multiple name-spaces crashed on the handling of
+	  prefixes.
+
+	- permit empty substitutionGroups.
+
+	Improvements:
+
+	- template will show facets, when only simple enumerate or pattern
+	  restrictions are used.
+
+	- switch network access explicitly off for default parser, to
+	  avoid unexpected network access.
+
+	- fixes in manual-page footer.
+
+	- reordering methods in documentation
+
+	- few additional trace statements
+
+version 0.84: Fri Jun  6 12:50:21 CEST 2008
+
+	Fixes:
+
+	- element and attribute qualification was incorrect when
+	   - a complex was extended, based on a type in an other name-space
+	   - substitutionGroup elements from different name-spaces
+	     were combined
+
+	- xs:pattern was missing
+
+	- output of any and anyAttribute in example templates.
+
+	- capability to write an empty list
+
+	- accept default for list.  Reported by [Peter Hartmann].
+
+	- interpret empty content as missing for elements with
+	  a default, as the spec wants.
+
+	Changes:
+
+	- you cannot use an ARRAY with one element where one element
+	  is required in the WRITER. (conflicts with list type needs)
+
+	Improvements:
+
+	- better template examples for ID and family.
+
+	- improve documentation on how 'boolean' is handled.  Spotted
+	  by [Allan Wind]
+
+	- list XML::Compile::Cache as available module.
+
+	- printIndex() got filter option 'kind'
+
+	- simplified the prefix generation algorithm.
+
+version 0.83: Wed May 14 22:22:41 CEST 2008
+
+	Fixes:
+
+	- builtin optimization needed fix.  cpan-tester [Slaven Rezic]
+
+version 0.82: Tue May 13 21:04:02 CEST 2008
+
+	Fixes:
+
+	- qname should collapse whitespace.
+
+	- qname prefix is blank by default, not an error. [Daniel Ruoso]
+
+	- gYear has no month fragment, but has an optional timezone
+	  rt.cpan.org#35699 [Daniel Carrol]
+
+	- recursion detected where there wasn't. [Sander Hulst]
+
+	Changes:
+
+	- template output in Perl will not start with "type =>", so can
+	  directly be used as test message.  Requested by [Alan Wind]
+
+	- template output in Perl will not quote the objects, where
+	  "mixed" elements need to be inserted.
+
+	Improvements:
+
+	- minor fix to template for substgroup
+
+	- warn on useless type assertions (uncheckable types), not panic.
+
+	- start of testing calling convensions (to be more flexible in
+	  the future) in t/22call.t
+
+	- implemented hooks for templates.
+
+	- implemented typemaps in PERL example templates, not for XML
+	  templates (yet).
+
+	- weaken circular reference in Instance.
+
+version 0.81: Tue Apr 29 18:57:48 CEST 2008
+
+	Fixes:
+
+	- pattern match facet did not anchor [Sander Hulst]
+
+	- ::Translate::complextContentExtension with mixed produced
+	  error message. [Ari Jolma]
+
+	- re-use already compiled structures, which avoids combinatory
+	  explosions.
+
+	Changes:
+
+	- requires XML::Compile::Tester
+
+	Improvements:
+
+	- add ::Schema::addTypemap() as synonym for ::addTypemaps()
+
+	- extracted useful test-script tools from t/TestTools.pm
+	  into new distribution XML::Compile::Tester.
+
+	- converted test scripts to use XML::Compile::Tester.
+
+	- ::Schema::compile(ignore_unused_tags) now accepts a regular
+	  expression to indicate exactly which tags are to be ignored.
+	  Added global ::new(ignore_unused_tags)
+
+	- warn if people call the writer without document as first parameter.
+
+version 0.80: Mon Apr 21 10:34:56 CEST 2008
+
+	Improvements:
+
+	- refer to mailinglist and IRC channal, set-up by [Matt S Trout]
+
+	- implementation of typemaps in READER and WRITER, tests in
+	  t/72typemap.t
+
+	- refer to related distributions in PODTAIL.
+
+version 0.79: Fri Apr 18 16:01:57 CEST 2008
+
+	Fixes:
+
+	- much better "mixed" support.
+
+	Changes:
+
+	- require Log::Report 0.17 to fulfil promissed of the doc (was 0.09)
+
+	Improvements:
+
+	- trace compiles of schema elements.
+
+	- when debug is enabled, then <choice> will show the errors of the
+	  special blocks involved.
+
+	- optimize <sequence>, <choice>, and <all> with only one element
+	  in reader and writer.
+
+	- template Perl did quote keys with length 1.
+
+	- template warning resolved in example value for nonNegativeInt
+
+	- template Perl did not show '_' for a tagged element, and
+	  did show an example twice.
+
+	- renamed ::template(show) to clearer ::template(show_comments),
+	  but old flag will stay supported.
+
+	- template XML did not represent attributes correctly.
+
+	- template XML did not understand '_'
+
+version 0.78: Wed Apr 16 13:03:36 CEST 2008
+
+	Fixes:
+
+	- fix string length check in float facet [Sven Neuhaus]
+
+	Improvements:
+
+	- more trace with dataToXML.
+
+version 0.77: Sun Apr 13 00:45:28 CEST 2008
+
+	Fixes:
+
+	- XML::RegExp version mix-up... lowered required release
+	  from 0.03 to 0.02 [Alan Wind]
+
+version 0.75: Sat Apr 12 09:57:29 CEST 2008
+
+	Fixes:
+
+	- fixed <choice> with nested blocks, substgroups, or any.
+
+	- fixed <all> with nested blocks, substgroups, or any.
+	  needed by [Sander Hulst]  Needs serious beating.
+
+	- required is XML::RegExp for pattern to regexp translations.
+
+	- NMTOKENS, IDREFS, and ENTITIES where not processed as list
+	  type (not spilt into an ARRAY)
+
+	Improvements:
+
+	- remove annoying extra component in the location shown in
+	  errors, which appeared with element refs.
+
+version 0.74: Thu Apr 10 23:17:18 CEST 2008
+
+	Improvements:
+
+	- removed "try => GMP" from Math::BigInt invocation, because
+	  Linux distributions currently have v1.77 which does not support
+	  try.  Documented how you can get the performance improvements
+	  yourself.  rt.cpan.org #34817 [Jesper Krogh]
+
+	- lowered requiremet for Math::BigInt to 1.77.
+
+version 0.73: Tue Apr  8 23:47:05 CEST 2008
+
+	Fixes:
+
+	- recursion detection is example template production.
+
+	- example template fix: add ',' after some ']'.
+
+	- reader in list context should not return the label of the
+	  element.  rt.cpan.org#34597 [Andreas Koenig]
+
+	- removed test print when bigfloat was used.
+
+	- nesting of substitutionGroups supported.
+	  Requested by [Sander Hulst]
+
+	Improvements:
+
+	- reuse schema parsing results, when the same file or string is
+	  passed multiple times.  Adds dependency to Digest::MD5.
+
+	- added script schema2example
+
+	- pass an ARRAY of schema sources at once to ::Schema::new()
+	  and ::importDefinitions.
+
+	- Math::BigInt warns us to upgrade Math::BigRat and bignum, so
+	  included that as dependencies.
+
+	- ::Namespaces::add() now accept multiple schema instances at
+	  a time.
+
+	- explain how XML::LibXML::Simple can be used in a READER
+	  replace hook.
+
+	- adding debug info about the parsing of XML information via
+	  dataToXML().
+
+        - timezoneFrag was not wrong (as stated by the 0.72 release).
+	  Reverted the changes for simpler code.
+
+	- more examples in ::Schema SYNOPSIS
+
+version 0.72: Tue Mar 25 10:22:39 CET 2008
+
+	Fixes:
+
+	- [Drew Taylor] experienced that 'time' basic type was not
+	  implemented.
+
+	- ::Template::anyElement fix [Drew Taylor]
+
+        - timezoneFrag is optional, wrongly implemented in many regexes.
+
+	- ::Template::union incorrectly processed [Drew Taylor]
+
+	Improvements:
+
+	- document that XML::LibXML nodes can be specified on any location
+	  for WRITERs. (feature was added in 0.70)
+
+	- document how to handle mixed content.
+
+version 0.71: Tue Mar 18 16:52:34 CET 2008
+
+	Fixes:
+
+	- require Math::BigInt 1.78, to understand 'try'
+
+	- cannot run t/59big tests with BigInt GMP library.
+
+version 0.70: Fri Mar 14 17:35:22 CET 2008
+
+	Fixes:
+
+	- document that ::Schema::compile(check_occurs) default value
+	  is true, not false.
+
+	- maxOccurs==0 now works.  Some tools use it, but it is silly.
+
+	- more name-space switches.
+
+	- missed an element component in simpleType facet related error
+	  messages.  Spotted by [Allan Wind]
+
+	- die when illegal float value [Sander Hulst]
+
+	- template example for empty complexType incorrect.
+
+	- template example for repeated blocks incorrect.
+
+	- repeated particle blocks within particle blocks caused
+	  problems. rt.cpan.org#34079 [Drew Taylor]
+
+	Improvements:
+
+	- minor typos in man-pages [Allan Wind]
+
+	- ::Translate::compileTree() can start with a type.
+
+	- path displayed in error-messages now use @ before attributes,
+	  not at()
+
+	- more docs on how substitutionGroups are represented.
+
+	- new option ::Schema::compile(validation), which covers the
+	  existing three flags for partial validations.
+
+	- option check_values was not documented in ::Translate
+
+	- template Perl did not use Data::Dumper; don't invoke it.
+
+	- protect difficult characters in perl template keys.
+
+	- The writer now accepts a prepared XML element, not only a HASH
+	  or single value, for any simple or complex type element.
+
+	- Math::BigInt uses Math::BigInt::GMP for more performance, if
+	  installed.
+
+version 0.69: Tue Feb 12 09:59:30 CET 2008
+
+	Fixes:
+
+	- name-space switch accidentally took 'qualified' on elements
+	  to be used for attributes. Detected by [Sander Hulst]
+
+version 0.68: Fri Feb  8 09:32:20 CET 2008
+
+	Fixes:
+
+	- ref element did not switch to settings of destination namespace.
+	  Reported by [Sander Hulst]
+
+	- ref attribute idem.
+
+	- ref attributes should lookup namespace in destination schema,
+	  not source schema.
+
+	Improvements:
+
+	- added ::Namespaces::printIndex() to list defined toplevel items.
+
+	- XML::Compile::dataToXML() returns information about the source if
+	  requested.
+
+version 0.67: Mon Feb  4 09:31:17 CET 2008
+
+	Fixes:
+
+	- use of boolean 0 produced an error. [Allan Wind]
+	  tests in t/21types.t
+
+version 0.66: Thu Jan 31 09:32:00 CET 2008
+
+	Fixes:
+
+	- added a few tests to t/48subst.t to prove that min/maxOccurs
+	  works with substitutionGroups. Had to remove two error checks.
+
+	- ::Namespaces::findID() failed, because ::Instance::id()
+	  was missing. [Philippe B]
+
+	- ignore element when maxOccurs==0 [Allan Wind]
+
+	Improvements:
+
+	- added xml2yaml script, based on code by [Slaven Rezic]
+
+	- XSD search path will split on ';' on Windows.
+
+	- refrased start text of XML::Compile.  Suggested by [Sander Hulst]
+
+	- looking for schema files with XML::Compile::findSchemaFile(),
+	  will not check for readability, because using "-r" is useless.
+	  So, the existence of the file suffices.
+
+	- describe syntax of repetative substitutionGroups.
+
+	- all errors in ::Schema are either marked in class 'usage', or
+	  in class 'schema'.  Errors in other packages still need
+	  classification.
+
+	- ::Schema::Instance now reports include and import information.
+
+	- reformulation in "{url}name" explanation, spotted by [Allan Wind]
+
+version 0.65: Wed Jan 16 10:28:53 CET 2008
+
+	Fixes:
+
+	- fix an error "isa on unblessed" in XmlWriter.  An error will
+	  be produced when an ARRAY or HASH is found where a simple
+	  element value is expected.
+
+	Improvements:
+
+	- support schemas without targetNamespace.  Tests in t/71nons.t.
+
+	- ::Schema::compile(interpret_nillable_as_optional) added, for
+	  broken schemas, where people have interpreted the Schema
+	  specs wrongly. Reported by [Christian Mueller]
+
+version 0.64: Mon Jan  7 11:49:49 CET 2008
+
+	Fixes:
+
+	- ::BuiltInFacets requires Math::Big{Int,Float}
+
+	- template() made mistake when a prohibited attribute was
+	  encountered.
+
+	- empty complexTypes are acceptable. [Kaare Rasmussen]
+
+	- typo: implemented base64binary, but should have been
+	  base64Binary.  Detected by [Gert Doering]
+
+	Improvements:
+
+	- perl template output with a long list of sequence element
+	  names now split over multiple lines.
+
+	- XML::Compile::Schema now explains how to use xsd files and
+	  imports/includes found in them.
+
+version 0.63: Sat Dec 15 15:15:43 CET 2007
+
+	Changes:
+
+	- Require XML::LibXML 1.65, which solves attribute creating
+	  issues.
+
+	Fixes:
+
+	- dateTime did not format correctly: missing colon between
+	  minute and seconds.
+
+	- example template production failed on explicitly optional
+	  attributes and any kind of arrays.  Reported by [Gareth Kirwan]
+
+	Improvements:
+
+	- Added XML::Compile::Util::type_of_node()
+
+	- some error paths are cleaner, but still a few to be improved.
+
+	- ::compile() new option 'ignore_unused_tags", requested by
+	  rt.cpan.org#31539 [Slaven Rezic]
+
+version 0.62: Tue Nov 27 12:23:38 CET 2007
+
+	Fixes:
+
+	- Remove requirement for Data::Dump::Streamer.
+
+version 0.61: Tue Nov 27 11:43:08 CET 2007
+
+	Changes:
+
+	- Moved XML::Compile::Dumper from this distribution into
+	  its own.
+
+	Fixes:
+
+	- ::compileClient(element_qualified => 'TOP') did remove the
+	  existing qualification need.
+
+version 0.60: Sat Nov 24 10:22:53 CET 2007
+
+	Changes:
+
+	- ELEMENT_ORDER hook returns packed types, not nodeName's,
+	  because that would include a (non constant) prefix.
+
+	Fixes:
+
+	- ::Util::pack_type() with undef namespace returned undef.
+
+	Improvements:
+
+	- Warn people about out-dated libxml2 when running tests
+	  in t/01use.t.  Let's see of CPANTesters like this.
+
+	- when a READER is compiled with C<rpc_hrefs>, then elements
+	  may have a href attribute, used for SOAP-RPC encoding.
+
+version 0.59: Thu Nov  8 14:04:44 CET 2007
+
+	Fixes:
+
+	- Schema recursion detected too often.  It had to be based on the
+	  schema-node, not the type name (which isn't unique enough)
+	  Spotted by [Gert Doering].
+
+version 0.58: Tue Nov  6 12:35:28 CET 2007
+
+	Fixes:
+
+	- could not handle empty sequences.
+
+	- boolean 'true' and 'false' must be decoded into 1 and 0.
+
+	- parsing of boolean was sensitive for blanks.
+
+	- elements_qualified overrule extended too far.
+
+version 0.57: Mon Nov  5 15:53:19 CET 2007
+
+	Fixes:
+
+	- basic schema elements (like SCHEMA2001 int) could not be
+	  used as starting point for translation.
+
+	Improvements:
+
+	- XML::Compile::Util now exports some standard name-spaces as
+	  symbolic names, like SCHEMA2001.
+
+	- added 2001 XMLSchema instance xsd.
+
+	- XML::Compile::Schema::importDefinitions ignores undef param.
+
+	- compile(output_namespaces) now can be initialized with a
+	  simple ARRAY, and explained a little better.
+
+version 0.56: Thu Oct 18 09:25:16 CEST 2007
+
+	Improvements:
+
+	- XML::Compile::Util::pack_type() and ::unpack_type() now
+	  understand name-spaceless types.
+
+	- filled-in pre-declared type tables for older schema
+	  definitions, but did NOT IMPLEMENT the differences in
+	  SCHEMA RULES.  Some initial checks in t/81-2000.t
+
+	- XML::Compile::SOAP::Server split-off from XML::Compile::SOAP;
+	  documentation updated to reflect this.
+
+	- added README.todo
+
+	- implemented correct QNAME run-time "{ns}local" to "prefix:local"
+	  translator, for writer.  May cause run-time error message.  
+
+version 0.55: Wed Sep 26 10:32:49 CEST 2007
+
+	Changes:
+
+	- split-off the SOAP and WSDL things into a separate
+	  XML::Compile::SOAP distribution, because they need more
+	  complex dependencies and need more releases in the near
+	  future.
+
+	- install xsd's automatically in XML/Compile/xsd/
+	  (XML::Compile::SOAP's xsd-files are in XML/Compile/SOAP/xsd/)
+
+	Improvements:
+
+	- added display of XML::LibXML version to t/01use.t
+
+	- accept recursive schema's.  Reported by [Scott Peimann]
+	  tests in t/62recurse.t
+
+	- old bug in XML::LibXML shows up in its 1.64 release in combination
+	  with the XML::Compile test-set.  XML::LibXML 1.65 contains the
+	  patch.
+
+	- skip t/pod.t when manuals are still in OODoc format.
+
+	- XML::Compile::addSchemaDirs() effects are now global.
+
+	- XML::Compile::knownNamespaces() can be used to define own
+	  files for name-spaces, also global.
+
+version 0.54: Fri Sep 14 15:35:53 CEST 2007
+
+	Fixes:
+
+	- XmlReader::block_handler called "last", where "return" was
+	  ment, resulting in a warning. [Gert Doering]
+
+	- Handle case where choice has minOccurs==1, but one (or more)
+	  of the options has minOccurs==0... which makes the choice
+	  optional implicitly.  Found by  [Gert Doering]
+
+version 0.53: Thu Sep  6 21:15:14 CEST 2007
+
+	Changes:
+
+	- When calling SOAP operations, the elements do not use a Body
+	  or Header anymore: these structures are flattened for the
+	  user's convenience.
+
+	Fixes:
+
+	- totalDigits did only handle floats, not integers.  Reported
+	  by [Gert Doering]
+
+	- float values should not show trailing zeros.  The use of
+	  sprintf "%lf" was superfluous, hence removed.
+
+	- produce error when pre-installed schemas are not found.
+
+	Improvements:
+
+	- a bit of progress on WSDL/SOAP
+
+	- YAPC::EU 2007 presentation available on the website.
+
+version 0.52: Tue Aug 14 09:37:14 CEST 2007
+
+	Fixes:
+
+	- sloppy_integer did not pass some usage restrictions for
+	  other than Integer->int translation.
+
+version 0.51: Fri Aug 10 14:27:05 CEST 2007
+
+	Changes:
+
+	- the labels for blocks when maxOccurs >= 2 have changed from
+	  f.i. 'xyz' into 'seq_xyz', to become clearer.
+
+	Fixes:
+
+	- both attribute with own simpleType definition, as attribute ref
+	  to attribute with own simpleType were missing.
+
+	- got direct compilation of top-level attributes to work, and
+	  all available soap11 tests with it.
+
+	Improvements:
+
+	- much clearer docs about repetative blocks.
+
+	- reread/corrected a few manual pages, but there is still a
+	  lot to do.
+
+version 0.50: Thu Aug  9 23:19:19 CEST 2007
+
+	MAJOR REWRITE of the schema parser and code generators.
+
+	Changes:
+
+	- any maxOccurs >1 will produce/require an ARRAY.  Until now,
+	  the sequence, all, choice, and group didn't work correctly.
+
+	- removed a way to catch the errors produced while processing
+	  a message: an error is an error (or use hooks).
+
+	- convert error handling to Log::Report, which allows translations
+	  and clean processing.
+
+	- much improved error messages.
+
+	- hooks are called differently, to be more useful.
+
+	Fixes:
+
+	- the reader now requires the correct order of the elements
+	  inside the message.
+
+	- "any" can appear everywhere, not only at the end of blocks.
+
+	- "any" now correctly defaults as minOccur==maxOccur==1
+
+	- accept attributes for complexType/simpleContent
+
+	- floating-point restriction (facet) did not process well.
+
+	- an empty XML container will be produced when an {} was
+	  given: it will not be ignored.
+
+	- improved template output
+
+	Improvements:
+
+	- added t/pod.t, which flagged some (produced) pod errors
+
+	- added XML::Compile::Iterator, to ease the implementation of
+	  XML::Compile::Schema::Translate
+
+	- more checks whether the schema is sound.
+
+	- added XML::Compile::Util
+
+	- removed XML::Compile::parse() and parseFile() from the
+	  public interface.
+
+	- in doc: schema's should be schemas [Sven Neuhaus]
+
+	- many more tests
+
+	- no need for wsdl-patch.xsd anymore.
+
+version 0.18: Wed Jun  6 22:46:44 CEST 2007
+
+	Changes:
+
+	- renamed XML::Compile::Schema::importData() into
+	  ::importDefinitions()
+
+	- renamed XML::Compile::WSDL::addSchemas() into
+	  ::importDefinitions()
+
+	- Schema::addSchema() will only add parsed XML.
+	  Use Schema::importDefinitions() to added any (other) kind
+	  of data.
+
+	- reworked Namespaces::findElement() and ::findType() into
+	  ::find(KIND, ...)
+
+	- upgraded XML::LibXML requirement to 1.63
+
+	Fixes:
+
+	- Added dependency for IO 1.22 (IO::File)
+
+	- Preference to address elements with a certain name, about
+	  types.
+
+	- Regular expression for all date types was not precise enough.
+	  Now following the specs more closely.
+	  Bug report from [Gerard Gerritsen]
+
+	- Namespace of schema now separates attributeGroup and group
+	  names from element, attributes and types.
+
+	- include_namespaces parameter to Schema::compile() was always
+	  set to 1.
+
+	Improvements:
+
+	- added xsd/2003-* for SOAP1.2
+
+	- initial implementation for SOAP in lib/XML/Compile/SOAP.pm
+	  and lib/XML/Compile/SOAP/SOAP1[12].pm
+
+	- hooks with type/id/path will be invoked on all nodes.
+
+	- removed Translate::reference(), in favour of a reference
+	  lookup per kind of object.
+
+	- ::Translate::element_by_node() renamed to ::element().
+
+	- ::Schema::compile() and ::template() do not check provided
+	  name anymore, but leave that to ::Translate::new()
+
+	- ::Schema::compile(elements_qualified) now can limit ns-qual
+	  to the TOP element only.
+
+version 0.17: Tue Mar 20 12:21:57 CET 2007
+
+	Improvements:
+
+	- added XML::Compile::Dumper and t/21dump.t.  Added automatic
+	  compatibility tests with non-dumped parsing.  However, this
+	  results in "PmmREFCNT_dec: REFCNT decremented below 0! during
+	  global destruction." errors in XML::LibXML, so is disabled by
+	  default (see $skip_dumper in t/TestTools.pm)
+
+version 0.16: Sun Feb 25 00:28:48 CET 2007
+
+	Changes:
+
+	- rename Schema::importSchema() into Schema::importData(), because
+	  its parameter is very different from what addSchemas() expects
+	  but the name was too close.
+
+	- added patch to WSDL, to simplify the tOperation type, which
+	  is overly complex.
+
+	- now all four kinds of operations are detected.
+
+	- build-in type anyURI is relative, hence cannot be checked at
+	  parse time.  This means that XML::Compile doesn't need
+	  Regexp::Common anymore (which was a forgotten dependency).
+
+version 0.15: Fri Feb 16 16:21:59 CET 2007
+
+	Changes:
+
+	- removed "top()" from XML::Compile, because with multiple
+	  XML sepcification files, there is no real "top" element.
+
+	Fixes:
+
+	- do not destroy caller's data when creating complex or tagged
+	  elements.
+
+	- added missing str2num() in BuiltInTypes for floats and doubles.
+
+	Improvements:
+
+	- move non-distributed xsd's to private dir.
+
+	- added XML::Compile::WSDL and t/80wsdl.t, partial implementation
+
+	- added XML::Compile::SOAP::Operation, partial implementation
+
+	- added reader hooks and t/60hooks_r.t
+
+	- added writer hooks and t/61hooks_w.t
+
+	- implemented attribute by ref
+
+version 0.14: Tue Jan 30 12:30:34 CET 2007
+
+	Fixes:
+
+	- Sequence of choices will multiply min/max.  Required to
+	  understand WSDL.
+
+	- Give error on unknown particles.
+
+	Improvements:
+
+	- Implemented 'any' element
+
+	- fields of type QName are translated from "prefix:type"
+	  into "{namespace}type".
+
+	- Makefile.PL requires 5.8.0, which is probably still a mild
+	  setting.  XML::LibXML is probably more demanding.
+
+version 0.13: Mon Jan 29 00:11:12 CET 2007
+
+	Fixes:
+
+	- One place with nested Complex extensions, but more may need
+	  fixing.
+
+	Improvements:
+
+	- Added WSDL and SOAP schema's
+
+	- fixed importSchema() where addSchema() missed an 's'
+	  -> addSchemas().
+
+	- XML::Compile::new() now also accepts a filename, a ref
+	  Scalar, and pre-defined name-spaces.
+
+	- skip key, keyref, unique, selector, fields elements; just
+	  like notation and annotation are lost.
+
+	- defined top-level element "attribute", but not yet used.
+	  Only useful in anyAttribute, which is not checked.
+
+	- check all top-level elements for their name, to find typo's.
+
+	- implemented anyAttribute
+
+	- XML::Compile::dataToXML is used to accept user spec of XML
+	  on many places.
+
+version 0.12: Tue Dec 19 15:22:59 CET 2006
+
+	Fixes:
+
+	- fixed attributes can be optional. [Igor Shynkarev]
+
+	- correct dateTime values were disapproved. [John R.]
+
+	- converted to use oodist script (new feature of OODoc)
+
+version 0.11: Wed Oct 25 08:08:20 CEST 2006
+
+	Fixes:
+
+	- Need to use "getChildrenBy..." in stead of "getElementsBy" in
+	  XmlReader, because otherwise we search the whole tree.
+	  Problem reported by [Igor Shynkarev]
+
+	Improvements:
+
+	- When the reader is called with a document, its document-element
+	  is taken automatically.  In response to [Igor Shynkarev]
+
+	- First attempt for XML template output.
+
+version 0.10: Tue Oct 24 11:40:09 CEST 2006
+
+	Fixes:
+
+	- Some minor cleanups in XmlWriter
+
+	- Now depends on XML::LibXML 1.61, which has a lot of improvements
+	  and fixes.  As disadvantage does it require a recent libxml2,
+	  which is only included with very recent Linux distributions.
+
+	- t/49big.t test failed when installed on 64bit Perl, because
+	  one of the test-values was smaller then MAX_INT in that case.
+
+	- Default attribute type anyType.
+
+	- anyType is correct namespace.
+
+	- Type resolving when schemaNamespace is not the default was
+	  broken.
+
+	- Complex body permitted to be empty.
+
+	- Default for "check_occurs" set to `true', because default should
+	  give best results.
+
+	- Missing element with default gave error when check_occurs.
+
+	Improvements:
+
+	- Added Template.pm to produce a Perl template example of a certain
+	  type.  See XML::Compile::Schema::template()
+
+	- Implemented type definitions contain an example which is used
+	  for the templates.
+
+version 0.09: Mon Sep 25 08:40:24 CEST 2006
+
+	Fixes:  [thanks to cpan-testers work by Slavan Rezic]
+
+	- MANIFEST not correct: contained old files
+
+	- Removed dependency for Regex::Common, added Math::BigInt
+
+	- Upgraded to XML::LibXML 1.60, which changed from Attribute
+	  handling.
+
+	Improvements:
+
+	- Reorganized order in some man-pages.
+
+version 0.08: Fri Sep 22 15:52:49 CEST 2006
+
+	Improvements:
+
+	- Turned XML::Compile::Schema::Translate into a singleton object,
+	  and reshaped functions into methods.  The arguments hash intern
+	  in object.  Together much cleaner.
+
+	- Replaced use of "croak" for errors during translation into a
+	  call to the error() method, with nicer and more consequent
+	  error text layout.
+
+	- Split XML::Compile::Schema::BuiltinStructs into lazy loading
+	  XML::Compile::Schema::XmlReader and ::XmlWriter.
+
+version 0.07: Thu Sep 21 15:06:05 CEST 2006
+
+	- implemented substitution-groups
+
+	- implementation of ref-element was bogus.
+
+	- improved documentation (more about Schemas)
+
+	- $schema->addSchemas from text
+
+	- $schema->importSchema() with support of search-path.  Schema's not
+	  automatically installed (yet)
+
+	- added other schema's to the distribution.
+
+version 0.06: Thu Sep 14 10:10:31 CEST 2006
+
+	- The internals of the translator (and the produced code) are
+	  fully rewritted to support complexType/simpleContent in a
+	  clean way.
+
+	- better support for list.
+
+	- major improvements in the documentation.
+
+version 0.05: Sun Aug 27 12:00:00 CEST 2006
+
+	- Release as OODoc processed package :(
+
+version 0.04: Sun Aug 27 11:49:54 CEST 2006
+
+	- Rewrote the particle handling to better process nesting and
+	  min/maxOccurs.
+
+	- Many rewrites to implement complexType/simpleType processing.
+
+	- Extended list describing missing features (and resolved quite
+	  a few of them).  Parser is much stricter now, closer to the
+	  specs.
+
+version 0.03: Tue Aug 15 09:13:06 CEST 2006
+
+	- Doc about what to pass as type to compile() was not updated.
+
+	- Added attribute default, fixed and use=forbidden.
+
+	- Added simpleType within list.
+
+	- Added memberTypes with union.
+
+version 0.02: Mon Aug 14 13:42:02 CEST 2006
+
+	- Perl internal integer dependent size of INT_MIN and INT_MAX
+	  to avoid use of BigInt.  Idea by [Merijn H Brand]
+
+	- Added type assertions to translator, to check known attributes
+	  to follow the spec.
+
+	- All constructing routines are called with ($path, $args, ...)
+	  where before, the $args option had different locations in the
+	  parameter lists.
+
+	- Moved element fixed tests to t/47fixed.t, reimplemented it to
+	  make it work with BigInt.
+
+	- Implemented element default and t/48default.t
+
+	- Non-sloppy integers implemented in BigInts, tests t/49big.t
+
+	- Element ref() should not specify own name.
+
+	- XML::Compile::Schema::Instance collects info about one single
+	  schema.
+
+	- XML::Compile::Schema::Namespaces collects schema instances.
+
+	- Under fly adding of schemas with ::Schema::addSchema
+
+	- understands qualified and unqualified processing
+
+	- and many more...
+

@@ -1,0 +1,87 @@
+Revision history for Perl extension XML::Pastor 
+
+1.0.4
+	- Fixed an embarrassing bug where "xml_validate_further()" was misspelled in Type.pm (thanks to karlwb@gmail.com for the bug report #78956 on CPAN RT)
+	- Fixed an undefined error in SimpleType.pm also thanks to thanks to karlwb@gmail.com for the bug report #78956 on CPAN RT
+	- Fixed the infamous _sprint_xml_element misspelling bug. The provided workaround patch was not used. Instead, all references to _sprint_xml_element were replaced by sprint_xml_element in Schema::Parser.pm
+	- Fixed a bug that caused attributeGroup refs not to be supported. Thanks to IKEGAMI for the patch on bug report #39691: An xs:attributeGroup can't contain an xs:attributeGroup ref
+	- Fixed RT bug : #44760: Namespaces broken for xs:union memberTypes: By manually applying the patch proposed by IKEGAMI
+	
+	
+1.0.3 Sat Aug 02 2008
+	- Now, XML::Pastor also generates a special class $class_prefix . "::Pastor::Meta", which may be used to get at the schema Model()
+	- XML::Pastor::Schema::Model now has two new instance methods: xml_item() and xml_item_class  
+	- Updated the documentation.
+	
+1.0.2 Sat Aug 02 2008
+	- Now, XML::Pastor::Type has a method named 'xml_text_content()' which is an alias for '__value()'.
+	- Added generation of a header module with 'use' statements for all the element and type modules (in case of multiple).
+	- Took some ANTI-SPAM measures by making the email address in the documentation harder to parse by a machine.
+	- Added 'use warnings' all over the place (except uninitialized), including generated code.
+	- Added a 'version()' method to XML::Pastor.
+	
+1.0.1 Mon Jul 14 2008
+	- Corrected some documentation errors.
+	- Re-added version numbers to NodeArray.pm and Pastorize.pm (because of PAUSE indexing issues)
+	- Bumped up version number because of PAUSE indexing errors.
+	
+1.0.0 Mon Jul 14 2008
+	- Corrected some documentation errors.
+	- Bumped up version number because of PAUSE indexing errors.
+	
+0.6.3 Mon Jul 14 2008
+	- Better namespace support
+	- Schema IMPORT is now supported
+	- New test schema and xml source for the IMPORT case
+	
+0.6.2 Sun Jul 13 2008
+	- Added a test case for mode offline/multiple.
+	- Added POD generation in mode offline/multiple.
+	- Further fixed the 'use' statements in sub-modules (they are almost all within the package declaration now), for Test::Unit's sake.
+
+
+0.6.1 Sun Jul 13 2008
+	- Somehow, the Pastor generated mathworks test modules had made it to the MANIFEST. Fixed it.
+	 
+0.6.0 Sat Jul 12 2008
+	- Changed versioning scheme. It's now on two dots.
+	- Builtin::boolean  boolify OVERLOAD was not working properly. Fixed it.
+	- Data::HashArray was missing from the required modules in Makefile.PL. Fixed it.
+	- Code refactoring from XML::Pastor::ComplexType and XML::Pastor::SimpleType into XML::Pastor::Type
+	- Added John Micco's 'product.xsd' schema to the test suite
+	- Moved the use statement to within the package declaration in XML::Pastor to help Test::Unit's loader (as requested by John Micco from Mathworks).
+	- Fixed a bug that prevented the correct 'use' statements to be generated in generated code (Thanks to John Micco from Mathworks)
+	- Added support for simpleContent elements (those that a have a simple content but possibly with attributes).
+	
+0.54 Sat Jul 05 2008
+	- Added some more examples to documentation. Also brought some clarity, hopefully. 
+	- Fixed incorrect sprint_xml_element calls in XML::Pastor::Schema::Parser (it should have been imported from XML::Pastir::Util)
+	_ XML::Pastor::NodeArray has been refactored to Data::HashArray which is now a separate module.
+	- XML::Pastor::NodeArray->hash() can now accept CODE references as key fields. 
+	- Attributes are now prefixed with an underscore '_' in the element hash. 
+	  Attribute accessors follow the same pattern. However, non-prefixed accessor aliases
+	  are provided when this doesn't conflict with a child element name.
+	  
+0.53 Sun Jun 29 2008
+	- LICENSE was missing from Makefile.PL
+	- README was missing. Generated it with pod2text.
+	- Changes and Makefile.PL had executable bit set for some reason. Fixed it.
+	
+
+0.52 Sun Jun 29 2008
+	- still the CPAN indexing problem
+	- Bumped the version anyway.
+	
+0.51 Sun Jun 29 2008
+	- (Hopefully) solve the CPAN indexing problem
+	- Bumped the version anyway.
+	
+0.50 Sun Jun 29 2008
+	- Added XML::Pastor::Pastorize
+	- Added test scripts (eval, instance)
+	- Added script bin/pastorize
+	- Bumped version number to 0.50
+	
+0.01 Sat Nov 15 2003
+	- original version; created by copying from another project
+

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<NZSRSRequest VerMinor="11" VerMajor="3" RegistrarId="100">
+  <RegistrarDetailsQry RegistrarId="100" />
+  <AccessControlListQry List="allow" Type="registrar_ip" Resource="epp_connect">
+    <RegistrarIdFilter>100</RegistrarIdFilter>
+    <AddressFilter>101.1.5.17</AddressFilter>
+  </AccessControlListQry>
+  <AccessControlListQry List="allow" Type="registrar_domain" Resource="epp_client_certs">
+    <RegistrarIdFilter>100</RegistrarIdFilter>
+    <AddressFilter>epp.client.cert.example.com</AddressFilter>
+  </AccessControlListQry>
+</NZSRSRequest>

@@ -1,0 +1,560 @@
+=encoding utf8
+
+=head1 NAME
+
+XML::Compile::Cache - Cache compiled XML translators
+
+=head1 INHERITANCE
+
+ XML::Compile::Cache
+   is a XML::Compile::Schema
+   is a XML::Compile
+
+=head1 SYNOPSIS
+
+ my $cache = XML::Compile::Cache->new(...);
+
+ $cache->declare('READER',  $type,  @options);
+ $cache->declare(RW     => \@types, @options);
+ $cache->declare(WRITER =>  $type, \@options);
+
+ $cache->compileAll;
+ $cache->compileAll('RW');
+
+ # get the cached code ref for the reader
+ my $reader = $cache->reader($type, @opts);
+ use Data::Dumper;
+ print Dumper $reader->($xml);
+
+ # get the cached code ref for the writer, and use it
+ my $doc = XML::LibXML::Document->new('1.0', 'UTF-8');
+ my $xml = $cache->writer($type)->($doc, $perl);
+ print $xml->toString(1);
+
+ # use the base-class uncached, the XML::Compile::Schema
+ my $do = $cache->compile(READER => $type, @opts);
+
+=head1 DESCRIPTION
+
+Extends L<"DESCRIPTION" in XML::Compile::Schema|XML::Compile::Schema/"DESCRIPTION">.
+ 
+=head1 METHODS
+
+Extends L<"METHODS" in XML::Compile::Schema|XML::Compile::Schema/"METHODS">.
+ 
+=head2 Constructors
+
+Extends L<"Constructors" in XML::Compile::Schema|XML::Compile::Schema/"Constructors">.
+ 
+=over 4
+
+=item XML::Compile::Cache-E<gt>B<new>( [$xml], %options )
+
+ -Option            --Defined in          --Default
+  allow_undeclared                          <false>
+  any_element                               'ATTEMPT'
+  block_namespace     XML::Compile::Schema  []
+  hook                XML::Compile::Schema  undef
+  hooks               XML::Compile::Schema  []
+  ignore_unused_tags  XML::Compile::Schema  <false>
+  key_rewrite         XML::Compile::Schema  []
+  opts_readers                              []
+  opts_rw                                   []
+  opts_writers                              []
+  parser_options      XML::Compile          <many>
+  prefixes                                  <smart>
+  schema_dirs         XML::Compile          undef
+  typemap                                   {}
+  xsi_type                                  {}
+
+=over 2
+
+=item allow_undeclared => BOOLEAN
+
+When true, you may call the reader or writer with types which were
+not registered with L<declare()|XML::Compile::Cache/"Administration">.  In that case, the reader or
+writer may also get options passed for the compiler, as long as
+they are consistent over each use of the type.
+
+=item any_element => CODE|'TAKE_ALL'|'SKIP_ALL'|'ATTEMPT'|'SLOPPY'
+
+See L<anyElement()|XML::Compile::Cache/"Accessors">.
+
+[1.02] the default is to ATTEMPT compiling any handlers automatically.
+Before version 1.02, the default was to SKIP_ALL elements which would
+match the occurs and namespace restrictions of the any specification.
+However, that fails for reperative blocks (for instance, it fails for
+an choice which may occur unbounded times)
+
+=item block_namespace => NAMESPACE|TYPE|HASH|CODE|ARRAY
+
+=item hook => HOOK|ARRAY
+
+=item hooks => ARRAY
+
+=item ignore_unused_tags => BOOLEAN|REGEXP
+
+=item key_rewrite => HASH|CODE|ARRAY
+
+=item opts_readers => HASH|ARRAY-of-PAIRS
+
+=item opts_rw => HASH|ARRAY-of-PAIRS
+
+Options added to both READERs and WRITERS.  Options which are passed
+with L<declare()|XML::Compile::Cache/"Administration"> and C<opts_readers> or C<opts_writers> will overrule
+these.  See L<addCompileOptions()|XML::Compile::Cache/"Compilers">.
+
+=item opts_writers => HASH|ARRAY-of-PAIRS
+
+=item parser_options => HASH|ARRAY
+
+=item prefixes => HASH|ARRAY-of-PAIRS
+
+Define prefix name to name-space mappings.  Passed to L<compile(prefixes)|XML::Compile::Schema/"Compilers">
+for each reader and writer, but also used to permit L<findName()|XML::Compile::Cache/"Administration"> to
+accept types which use a prefix.
+
+Specify an ARRAY of (prefix, name-space) pairs, or a HASH which maps
+name-spaces to prefixes (HASH order is reversed from ARRAY order!)  When
+you wish to collect the results, like usage counts, of the translation
+processing, you will need to specify a HASH.
+
+ prefixes => [ mine => $myns, your => $yourns ]
+ prefixes => { $myns => 'mine', $yourns => 'your' }
+
+ # the previous is short for:
+ prefixes => { $myns => [ uri => $myns, prefix => 'mine', used => 0 ]
+             , $yourns => [ uri => $yourns, prefix => 'your', ...] }
+
+=item schema_dirs => DIRECTORY|ARRAY-OF-DIRECTORIES
+
+=item typemap => HASH|ARRAY
+
+=item xsi_type => HASH|ARRAY
+
+=back
+
+=back
+
+=head2 Accessors
+
+Extends L<"Accessors" in XML::Compile::Schema|XML::Compile::Schema/"Accessors">.
+ 
+=over 4
+
+=item $obj-E<gt>B<addHook>($hook|LIST|undef)
+
+Inherited, see L<XML::Compile::Schema/"Accessors">
+
+=item $obj-E<gt>B<addHooks>( $hook, [$hook, ...] )
+
+Inherited, see L<XML::Compile::Schema/"Accessors">
+
+=item $obj-E<gt>B<addKeyRewrite>($predef|CODE|HASH, ...)
+
+Inherited, see L<XML::Compile::Schema/"Accessors">
+
+=item $obj-E<gt>B<addSchemaDirs>(@directories|$filename)
+
+=item XML::Compile::Cache-E<gt>B<addSchemaDirs>(@directories|$filename)
+
+Inherited, see L<XML::Compile/"Accessors">
+
+=item $obj-E<gt>B<addSchemas>($xml, %options)
+
+Inherited, see L<XML::Compile::Schema/"Accessors">
+
+=item $obj-E<gt>B<addTypemap>(PAIR)
+
+Inherited, see L<XML::Compile::Schema/"Accessors">
+
+=item $obj-E<gt>B<addTypemaps>(PAIRS)
+
+Inherited, see L<XML::Compile::Schema/"Accessors">
+
+=item $obj-E<gt>B<addXsiType>( [HASH|ARRAY|LIST] )
+
+[1.01] add global xsi_type declarations.  Returns the xsiType set.
+The ARRAY or LIST contains pairs, just like the HASH.
+
+The value component can be 'AUTO' to automatically detect the C<xsi:type>
+extensions.  This does only work for complex types.
+
+=item $obj-E<gt>B<allowUndeclared>( [BOOLEAN] )
+
+Whether it is permitted to create readers and writers which are not
+declared cleanly.
+
+=item $obj-E<gt>B<anyElement>('ATTEMPT'|'SLOPPY'|'SKIP_ALL'|'TAKE_ALL'|CODE)
+
+[as method since 0.99] How to process ANY elements, see also
+L<new(any_element)|XML::Compile::Cache/"Constructors">.
+
+Reader: C<ATTEMPT> will convert all any elements, applying the reader for
+each element found. When an element is not found in a schema, it will
+be included as XML::LibXML::Element node.
+
+[0.93] Reader: With C<SLOPPY>, first automatic typed conversion is
+attempted. But is the type is not known, L<XML::LibXML::Simple::XMLin()|XML::LibXML::Simple/"Translators">
+is called to the resque.
+
+=item $obj-E<gt>B<blockNamespace>($ns|$type|HASH|CODE|ARRAY)
+
+Inherited, see L<XML::Compile::Schema/"Accessors">
+
+=item $obj-E<gt>B<hooks>( [<'READER'|'WRITER'>] )
+
+Inherited, see L<XML::Compile::Schema/"Accessors">
+
+=item $obj-E<gt>B<typemap>( [HASH|ARRAY|PAIRS] )
+
+[0.98] Add global knowledge on typemaps.  Returns the typemap.
+
+=item $obj-E<gt>B<useSchema>( $schema, [$schema, ...] )
+
+Inherited, see L<XML::Compile::Schema/"Accessors">
+
+=back
+
+=head2 Prefix management
+
+The cache layer on top of L<XML::Compile::Schema|XML::Compile::Schema> adds smart use of
+prefixes.  Of course, smartness comes with a small performance cost,
+but the code gets much cleaner.
+
+=over 4
+
+=item $obj-E<gt>B<addNicePrefix>(BASE, NAMESPACE)
+
+[1.03] Register NAMESPACE -if not yet defined- with prefix name BASE.  When
+that prefix name is already in use for some other namespace, BASE followed
+by a number are attempted (starting with 01).  The prefix is returned.
+
+When the BASE already ends on a number, that number will get counted.
+
+example: 
+
+  my $prefix = $schema->addNicePrefix('call', $myns);
+  # $prefix now can be call, call01, call02 etc
+
+=item $obj-E<gt>B<addPrefixes>( [PAIRS|ARRAY|HASH] )
+
+The X::C logic does auto-detect prefix/namespaces combinations from
+the XML, but does not search extensively for namespace declarations.
+Also, sometimes the same namespace is used with different prefixes.
+Sometimes, the same prefix is used for different namesapces.  To complete
+the list, or control the actual prefix being used, you explicitly declare
+combinations.
+
+The B<best way> to add prefixes is via L<new(prefixes)|XML::Compile::Cache/"Constructors">, which will give
+your names preference over the names found in the schema's which get loaded.
+For instance, use C<< ::WSDL->new(prefixes => [ $prefix => $ns ] >>
+
+[0.995] Returns the HASH with prefix to name-space translations.  You should
+not modify the returned HASH: new PAIRS of prefix to namespace relations
+can be passed as arguments.
+
+[0.14] If a name-space appears for the second time, then the new
+prefix will be recognized by L<findName()|XML::Compile::Cache/"Administration">, but not used in the output.
+When the prefix already exists for a different namespace, then an error
+will be casted.
+
+[0.90] You may also provide an ARRAY of pairs or a HASH.
+
+=item $obj-E<gt>B<learnPrefixes>($node)
+
+[0.993] Take all the prefixes defined in the $node, and XML::LibXML::Element.
+This is not recursive: only on those defined at the top $node.
+
+=item $obj-E<gt>B<prefix>($prefix)
+
+Lookup a prefix definition.  This returns a HASH with namespace info.
+
+=item $obj-E<gt>B<prefixFor>($uri)
+
+Lookup the preferred prefix for the $uri.
+
+=item $obj-E<gt>B<prefixed>( $type|<$ns,$local> )
+
+Translate the fully qualified $type into a prefixed version.  Will produce
+undef if the namespace is unknown.
+
+[0.993] When your $type is not in packed form, you can specify a namespace
+and $local type name as separate arguments.
+
+example: 
+
+   print $schema->prefixed($type) || $type;
+   print $schema->prefixed($ns, $local);
+
+=item $obj-E<gt>B<prefixes>( [$params] )
+
+Return prefixes table.  The $params are deprecated since [0.995], see
+L<addPrefixes()|XML::Compile::Cache/"Prefix management">.
+
+=back
+
+=head2 Compilers
+
+The name of this module refers to its power to administer compiled
+XML encoders (writers) and decoders (readers).  This means that
+your program only need to pass on a ::Cache object (for instance
+a XML::Compile::WSDL11, not a CODE reference for each compiled
+translator.
+
+Extends L<"Compilers" in XML::Compile::Schema|XML::Compile::Schema/"Compilers">.
+ 
+=over 4
+
+=item $obj-E<gt>B<addCompileOptions>( ['READERS'|'WRITERS'|'RW'], %options )
+
+[0.99] You may provide global compile options with L<new(opts_rw)|XML::Compile::Cache/"Constructors">,
+C<opts_readers> and C<opts_writers>, but also later using this method.
+
+=item $obj-E<gt>B<compile>( <'READER'|'WRITER'>, $type, %options )
+
+Inherited, see L<XML::Compile::Schema/"Compilers">
+
+=item $obj-E<gt>B<compileAll>( ['READERS'|'WRITERS'|'RW', [$ns]] )
+
+Compile all the declared readers and writers with the default 'RW').  You may
+also select to pre-compile only the READERS or only the WRITERS.  The
+selection can be limited further by specifying a $ns.
+
+By default, the processors are only compiled when used.  This method is
+especially useful in a B<daemon process>, where preparations can take as
+much time as they want to... and running should be as fast as possible.
+
+=item $obj-E<gt>B<compileType>( <'READER'|'WRITER'>, $type, %options )
+
+Inherited, see L<XML::Compile::Schema/"Compilers">
+
+=item $obj-E<gt>B<dataToXML>($node|REF-XML|XML-STRING|$filename|$fh|$known)
+
+=item XML::Compile::Cache-E<gt>B<dataToXML>($node|REF-XML|XML-STRING|$filename|$fh|$known)
+
+Inherited, see L<XML::Compile/"Compilers">
+
+=item $obj-E<gt>B<initParser>(%options)
+
+=item XML::Compile::Cache-E<gt>B<initParser>(%options)
+
+Inherited, see L<XML::Compile/"Compilers">
+
+=item $obj-E<gt>B<reader>($type|$name, %options)
+
+Returns the reader CODE for the $type or $name (see L<findName()|XML::Compile::Cache/"Administration">).
+%options are only permitted if L<new(allow_undeclared)|XML::Compile::Cache/"Constructors"> is true, and the
+same as the previous call to this method.
+
+The reader will be compiled the first time that it is used, and that
+same CODE reference will be returned each next request for the same
+$type.  Call L<compileAll()|XML::Compile::Cache/"Compilers"> to have all readers compiled by force.
+
+ -Option --Default
+  is_type  <false>
+
+=over 2
+
+=item is_type => BOOLEAN
+
+[1.03] use L<compileType()|XML::Compile::Schema/"Compilers"> with the given element, to replace L<compile()|XML::Compile::Schema/"Compilers">
+You probably want an additional C<element> parameter.
+
+=back
+
+example: 
+
+  my $schema = XML::Compile::Cache->new(\@xsd,
+     prefixes => [ gml => $GML_NAMESPACE ] );
+  my $data   = $schema->reader('gml:members')->($xml);
+
+  my $getmem = $schema->reader('gml:members');
+  my $data   = $getmem->($xml);
+
+=item $obj-E<gt>B<template>( <'XML'|'PERL'|'TREE'>, $element, %options )
+
+Inherited, see L<XML::Compile::Schema/"Compilers">
+
+=item $obj-E<gt>B<writer>($type|$name)
+
+Returns the writer CODE for the $type or $name (see L<findName()|XML::Compile::Cache/"Administration">).
+OPTIONS are only permitted if L<new(allow_undeclared)|XML::Compile::Cache/"Constructors"> is true, and the
+same as the previous call to this method.
+
+The writer will be compiled the first time that it is used, and that
+same CODE reference will be returned each next request for the same
+type.
+
+ -Option --Default
+  is_type  <false>
+
+=over 2
+
+=item is_type => BOOLEAN
+
+[1.03] use L<compileType()|XML::Compile::Schema/"Compilers"> with the given element, to replace L<compile()|XML::Compile::Schema/"Compilers">
+You probably want an additional C<element> parameter.
+
+=back
+
+example: 
+
+  my $xml = $cache->writer('gml:members')->($doc, $data);
+
+  my $doc = XML::LibXML::Document->new('1.0', 'UTF-8');
+  my $wr  = $cache->writer('gml:members');
+  my $xml = $wr->($doc, $data);
+  $doc->setDocumentElement($xml);
+  print $doc->toString(1);
+
+=back
+
+=head2 Administration
+
+Extends L<"Administration" in XML::Compile::Schema|XML::Compile::Schema/"Administration">.
+ 
+=over 4
+
+=item $obj-E<gt>B<declare>( <'READER'|'WRITER'|'RW'>, <$type|ARRAY>, %options )
+
+Register that the indicated $type (or ARRAY of them) may be used, and needs to
+be translated with the %options (either specified as ARRAY or PAIRS).
+Specify whether it may get used as READER, WRITER, or both (RW).  If the
+READER and WRITER need different options, then you need to declare them
+separately; in that case you cannot use RW.
+
+The $type should be understood by L<findName()|XML::Compile::Cache/"Administration">, so may be prefixed.
+
+example: 
+
+  $cache->declare(READER => 'pref:count', sloppy_integers => 1)
+        ->declare(RW     => '{myns}mylocal');
+
+  $cache->declare(WRITER => [ 'xsd:int', '{http://}aap' ]);
+
+=item $obj-E<gt>B<doesExtend>($exttype, $basetype)
+
+Inherited, see L<XML::Compile::Schema/"Administration">
+
+=item $obj-E<gt>B<elements>()
+
+Inherited, see L<XML::Compile::Schema/"Administration">
+
+=item $obj-E<gt>B<findName>($name)
+
+Translate the $name specification into a schema defined full type.
+The $name can be a full type (like '{namespace}localname', usually
+created with L<XML::Compile::Util::pack_type()|XML::Compile::Util/"Packing">) or a prefixed type
+(like 'myns:localname', where C<myns> is defined via L<new(prefixes)|XML::Compile::Cache/"Constructors">
+or L<prefixes()|XML::Compile::Cache/"Prefix management">).
+
+When the form is 'myns:' (so without local name), the namespace uri is
+returned.
+
+example: of findName()
+
+  $schema->addPrefixes(pre => 'http://namespace');
+
+  my $type = $schema->findName('pre:name');
+  print $type;   # {http://namespace}name
+
+  my $ns   = $schema->findName('pre:');
+  print $ns;     # http://namespace
+
+  my $type = $schema->findName('{somens}name');
+  print $type;   # {somens}name    [a no-op]
+
+=item $obj-E<gt>B<findSchemaFile>($filename)
+
+=item XML::Compile::Cache-E<gt>B<findSchemaFile>($filename)
+
+Inherited, see L<XML::Compile/"Administration">
+
+=item $obj-E<gt>B<importDefinitions>($xmldata, %options)
+
+Inherited, see L<XML::Compile::Schema/"Administration">
+
+=item $obj-E<gt>B<knownNamespace>($ns|PAIRS)
+
+=item XML::Compile::Cache-E<gt>B<knownNamespace>($ns|PAIRS)
+
+Inherited, see L<XML::Compile/"Administration">
+
+=item $obj-E<gt>B<namespaces>()
+
+Inherited, see L<XML::Compile::Schema/"Administration">
+
+=item $obj-E<gt>B<printIndex>( [$fh], %options )
+
+ -Option       --Default
+  show_declared  <true>
+
+=over 2
+
+=item show_declared => BOOLEAN
+
+Add an indicator to each line, about whether readers and writers are
+declare for the type.  Declared readers and writers will show flags
+C<r> and C<w> respectively.  Compiled readers and writers carry a
+C<R> and/or C<W>.
+
+=back
+
+=item $obj-E<gt>B<types>()
+
+Inherited, see L<XML::Compile::Schema/"Administration">
+
+=item $obj-E<gt>B<walkTree>($node, CODE)
+
+Inherited, see L<XML::Compile/"Administration">
+
+=back
+
+=head1 DETAILS
+
+Extends L<"DETAILS" in XML::Compile::Schema|XML::Compile::Schema/"DETAILS">.
+ 
+=head1 DESCRIPTIONS
+
+C<XML::Compile::Cache> is the smart brother of L<XML::Compile::Schema|XML::Compile::Schema>;
+it keeps track of your compiled readers and writers, and also helps
+you administer the parameters to handle compilation.  Besides, it
+lat you use easy prefixes instead of full namespaces.
+
+With L<XML::Compile::Schema::compile()|XML::Compile::Schema/"Compilers"> (defined in the SUPER class of
+this module) you can construct translators from XML to Perl and back.
+These translators are code references, which are "expensive" to create,
+but "cheap" in use; call them as often as you want.  This module helps
+you administer them.
+
+When the schemas grow larger, it gets harder to see which code reference
+have already be created and which not. And, these code references need
+compile options which you do not want to distribute over your whole
+program.  Finally, in a daemon application, you do not want to create
+the translators when used (which can be in every client again), but once
+during the initiation of the daemon.
+
+One of the most important contributions to the compile management, is
+the addition of smart prefix handling. This means that you can use
+prefixed names in stead of full types, often created with
+L<XML::Compile::Util::pack_type()|XML::Compile::Util/"Packing">.
+
+=head1 SEE ALSO
+
+This module is part of XML-Compile-Cache distribution version 1.05,
+built on September 19, 2016. Website: F<http://perl.overmeer.net/xml-compile/>
+
+Please post questions or ideas to the mailinglist at
+F<http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/xml-compile> .
+For live contact with other developers, visit the C<#xml-compile> channel
+on C<irc.perl.org>.
+
+=head1 LICENSE
+
+Copyrights 2008-2016 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

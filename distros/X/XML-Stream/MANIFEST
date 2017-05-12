@@ -1,0 +1,36 @@
+Build.PL
+CHANGES
+INFO
+lib/XML/Stream.pm
+lib/XML/Stream/IO/Select/Win32.pm
+lib/XML/Stream/Namespace.pm
+lib/XML/Stream/Node.pm
+lib/XML/Stream/Parser.pm
+lib/XML/Stream/Parser/DTD.pm
+lib/XML/Stream/Tools.pm
+lib/XML/Stream/Tree.pm
+lib/XML/Stream/XPath.pm
+lib/XML/Stream/XPath/Op.pm
+lib/XML/Stream/XPath/Query.pm
+lib/XML/Stream/XPath/Value.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/0-signature.t
+t/buildxml.t
+t/cdata.t
+t/load.t
+t/memory_cycle.t
+t/net_xmpp.t
+t/parse_node.t
+t/parse_tree.t
+t/quotes.t
+t/tcpip.t
+t/tcpip2ssl.t
+t/test.xml
+t/xml2config.t
+t/xpath.t
+SIGNATURE    Added here by Module::Build

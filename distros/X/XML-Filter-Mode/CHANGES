@@ -1,0 +1,12 @@
+Changes file for XML::Filter::Mode
+
+0.02 Tue Jun 17 08:51:35 EDT 2003
+    - Removed \s+ as a keyworkd (too confusing).  Need to come up with
+      a synonym for '&'.  Perhaps /\band\b/ ?
+
+0.01
+    - Added \s+ as a keyword as per Robin
+    - First CPAN release
+
+0.000_1 Wed Jun  4 13:19:00 2003
+    - Created

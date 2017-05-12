@@ -1,0 +1,15 @@
+<stx:transform version="1.0" 
+  xmlns:stx="http://stx.sourceforge.net/2002/ns"
+  strip-space="yes">
+
+  <stx:template match="node[@id=2]">
+    <stx:element name="{name()}">
+      <stx:attribute name="a1" select="2+2"/>
+      <stx:attribute name="{local-name()}" namespace="NS">
+	<stx:value-of select="3*3"/>
+	<stx:text>koko</stx:text>
+      </stx:attribute>
+    </stx:element>
+  </stx:template>
+  
+</stx:transform>

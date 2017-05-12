@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:ldWeather="http://weather.livedoor.com/ns/rss/2.0">
+<channel>
+<title>佐賀県の警報・注意報 - livedoor 天気情報</title>
+<link>http://weather.livedoor.com/warn/41?r=rss</link>
+<description>livedoor 天気情報が配信する佐賀県の警報・注意報発表情報</description>
+<lastBuildDate></lastBuildDate><author>livedoor Weather Team.</author>
+<language>ja</language>
+<category>天気情報</category>
+<generator>http://weather.livedoor.com/</generator>
+<copyright>(C) LINE Corporation</copyright>
+<image>
+<title>livedoor 天気情報</title>
+<link>http://weather.livedoor.com/</link>
+<url>http://weather.livedoor.com/img/cmn/livedoor.gif</url>
+<width>118</width>
+<height>26</height>
+</image>
+<ldWeather:provider name="（株）ハレックス" link="http://www.halex.co.jp/halexbrain/weather/" />
+<ldWeather:provider name="日本気象協会" link="http://tenki.jp/" />
+
+<item>
+  <title>[ PR ] ブログでお天気を簡単ゲット！</title>
+  <link>http://weather.livedoor.com/weather_hacks/plugin.html</link>
+  <category>PR</category>
+  <description>
+livedoor 天気情報「Weather Hacks」では一般のブロガーの皆さん向けにブログでお天気を表示できる、お天気プラグインを公開しました。使い方はとってもカンタン！手順に沿って作成したHTMLソースを自分のブログに貼り付けるだけです！
+  </description>
+  <image>
+    <title>お天気プラグイン - livedoor 天気情報</title>
+    <link>http://weather.livedoor.com/weather_hacks/plugin.html</link>
+    <url>http://weather.livedoor.com/img/weather_hacks/news_title.gif</url>
+    <width>151</width>
+    <height>50</height>
+  </image>
+  <pubDate></pubDate>
+</item>
+
+<item>
+<title>佐賀多久地区 - 乾燥注意報が発表されています。</title>
+<link>http://weather.livedoor.com/warn/41?r=rss</link>
+<category>警報・注意報</category>
+<description>5月31日15時11分現在、佐賀多久地区に乾燥注意報が発表されています。</description><image>
+<title>注意報が発表されています</title>
+<link>http://weather.livedoor.com/warn/41?r=rss</link>
+<url>http://weather.livedoor.com/img/icon/warn/cyuihou.gif</url>
+<width>15</width>
+<height>15</height>
+</image><pubDate>Sat, 31 May 2014 15:11:00 +0900</pubDate>
+</item><item>
+<title>鳥栖地区 - 乾燥注意報が発表されています。</title>
+<link>http://weather.livedoor.com/warn/41?r=rss</link>
+<category>警報・注意報</category>
+<description>5月31日15時11分現在、鳥栖地区に乾燥注意報が発表されています。</description><image>
+<title>注意報が発表されています</title>
+<link>http://weather.livedoor.com/warn/41?r=rss</link>
+<url>http://weather.livedoor.com/img/icon/warn/cyuihou.gif</url>
+<width>15</width>
+<height>15</height>
+</image><pubDate>Sat, 31 May 2014 15:11:00 +0900</pubDate>
+</item><item>
+<title>武雄地区 - 乾燥注意報が発表されています。</title>
+<link>http://weather.livedoor.com/warn/41?r=rss</link>
+<category>警報・注意報</category>
+<description>5月31日15時11分現在、武雄地区に乾燥注意報が発表されています。</description><image>
+<title>注意報が発表されています</title>
+<link>http://weather.livedoor.com/warn/41?r=rss</link>
+<url>http://weather.livedoor.com/img/icon/warn/cyuihou.gif</url>
+<width>15</width>
+<height>15</height>
+</image><pubDate>Sat, 31 May 2014 15:11:00 +0900</pubDate>
+</item><item>
+<title>鹿島地区 - 乾燥注意報が発表されています。</title>
+<link>http://weather.livedoor.com/warn/41?r=rss</link>
+<category>警報・注意報</category>
+<description>5月31日15時11分現在、鹿島地区に乾燥注意報が発表されています。</description><image>
+<title>注意報が発表されています</title>
+<link>http://weather.livedoor.com/warn/41?r=rss</link>
+<url>http://weather.livedoor.com/img/icon/warn/cyuihou.gif</url>
+<width>15</width>
+<height>15</height>
+</image><pubDate>Sat, 31 May 2014 15:11:00 +0900</pubDate>
+</item><item>
+<title>唐津地区 - 濃霧注意報、乾燥注意報が発表されています。</title>
+<link>http://weather.livedoor.com/warn/41?r=rss</link>
+<category>警報・注意報</category>
+<description>5月31日15時11分現在、唐津地区に濃霧注意報、乾燥注意報が発表されています。</description><image>
+<title>注意報が発表されています</title>
+<link>http://weather.livedoor.com/warn/41?r=rss</link>
+<url>http://weather.livedoor.com/img/icon/warn/cyuihou.gif</url>
+<width>15</width>
+<height>15</height>
+</image><pubDate>Sat, 31 May 2014 15:11:00 +0900</pubDate>
+</item><item>
+<title>伊万里地区 - 濃霧注意報、乾燥注意報が発表されています。</title>
+<link>http://weather.livedoor.com/warn/41?r=rss</link>
+<category>警報・注意報</category>
+<description>5月31日15時11分現在、伊万里地区に濃霧注意報、乾燥注意報が発表されています。</description><image>
+<title>注意報が発表されています</title>
+<link>http://weather.livedoor.com/warn/41?r=rss</link>
+<url>http://weather.livedoor.com/img/icon/warn/cyuihou.gif</url>
+<width>15</width>
+<height>15</height>
+</image><pubDate>Sat, 31 May 2014 15:11:00 +0900</pubDate>
+</item></channel>
+</rss>

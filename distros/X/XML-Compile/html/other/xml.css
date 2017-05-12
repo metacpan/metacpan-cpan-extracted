@@ -1,0 +1,26 @@
+
+BODY {
+   font-family: Arial, Herlvetica, sans-serif
+}
+
+H2 {
+   font-variant: small-caps;
+}
+
+A:link {
+   color: green;
+   text-decoration: none;
+}
+
+A:visited {
+   color: blue;
+   text-decoration: none;
+}
+
+UL {
+   margin-top: 0;
+}
+
+DL {
+   margin-top: 1ex;
+}

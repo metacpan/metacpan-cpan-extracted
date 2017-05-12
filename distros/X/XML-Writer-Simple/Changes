@@ -1,0 +1,45 @@
+Revision history for XML-Writer-Simple
+
+0.12    2014, 22 September
+        - Fixed version issue;
+
+0.11    2014, 21 September
+        - Removed some extra files;
+
+0.10    2014, 21 September
+        - Dzilification;
+        - Added metacpan metadata;
+
+0.09    2014, 20 February
+        - Add the protect_entities function;
+        - Quote automatically quotes inside attributes;
+
+0.08    2012, 5 June
+        - POD fixes
+
+0.07    2011, 11 April
+        - Added the ':html' tagset (full set XHTML 1.1)
+
+0.06    2011, 11 April
+        - Added the ':html' tagset (still incomplete)
+
+0.05    2009, 17 April
+        - Fixed bug with toxml that found a(0) to the <a/>
+          Thanks to TONNERRE for the bug report.
+
+0.04	2009, 16 February
+        - Added newlines at the end of start_tag and end_tag.
+        - Require a recent perl version (5.8.3 or higher);
+
+0.03    2009, 9 February
+        - Added support to partial tags construction.
+
+0.02    2009, 6 February
+        - About three years after the first release, here comes a new
+          one with new features. Would love to know if someone is using
+          this module.
+        - added xml_header function. Optional argument encoding => '...'
+
+0.01    2006, 30 January
+        First version with basic functionality
+

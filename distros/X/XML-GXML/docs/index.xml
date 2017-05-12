@@ -1,0 +1,82 @@
+<document
+	title	= "GXML: Generic XML Transformation Tool"
+	author	= "Josh Carter"
+	email	= "josh@multipart-mixed.com"
+	date	= "Feb 24, 2002"
+>
+
+<section name="About GXML">
+
+<p>
+GXML is a perl module for transforming XML. It may be put to a variety
+of tasks; in scope it is similar to XSL, but less ambitious. GXML is
+an outgrowth of gxml2html, my tool for converting web sites written in
+XML to HTML output. gxml2html is now "just another application" that
+uses the GXML engine to do its work.
+</p>
+
+</section>
+<section name="About gxml2html">
+
+<p>
+gxml2html is a generic, template-based tool for converting XML to
+HTML. It determines how to render XML based on templates the web site
+designer creates. These templates are in standard XML syntax with HTML
+tags, they may use other templates within them, and they support
+variables which will be replaced with attributes from the document.
+</p>
+
+</section>
+
+<section name="Documentation">
+
+<p>
+Documentation is mostly shared between GXML and gxml2html, but the
+intro pages to the User's Guides are independent. Both are available
+here:
+</p>
+
+<ul>
+  <li>
+  <b><a href="gxml2html-guide.html">Read the gxml2html docs</a></b>
+  </li>
+  <li>
+  <b><a href="gxml-guide.html">Read the GXML docs</a></b>
+  </li>
+</ul>
+
+</section>
+
+<!--
+<section name="Download it">
+
+<p>
+<b>Current GXML version: 2.1, uploaded May 22, 2001.</b>
+</p>
+
+<p>
+GXML and gxml2html are provided in a single archive. The usual
+procedure for installing Perl modules applies to GXML. GXML must be
+installed before gxml2html will run.
+</p>
+
+<p>
+This tool requires Perl 5, and the XML::Parser and File::Spec modules,
+both available from CPAN. It should work on any platform which
+supports XML::Parser. I personally test on MacOS X and MkLinux, and
+I've had positive reports from people running on other Unixes and
+Windows. If you find any problems, let me know. Without further ado:
+</p>
+
+<p>
+<b><a href="gxml-2.0.tar.gz">Download GXML/gxml2html 2.1</a></b> (xxx kb .tar.gz)
+</p>
+
+</section>
+-->
+
+<p>
+If you have any comments, questions, bug reports: please email me!
+</p>
+
+</document>

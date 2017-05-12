@@ -1,0 +1,8 @@
+<feed xmlns="http://www.w3.org/2005/Atom">
+<entry>
+    <title>Entry 1</title>
+</entry>
+<entry>
+    <title>Entry 2</title>
+</entry>
+</feed>

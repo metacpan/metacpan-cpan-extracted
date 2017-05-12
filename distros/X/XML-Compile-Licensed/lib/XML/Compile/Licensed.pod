@@ -1,0 +1,58 @@
+=encoding utf8
+
+=head1 NAME
+
+XML::Compile::Licensed - collection of schema's which have restricted licenses
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
+Many XML schema's and WSDL files have copyrights and restricted licenses.
+For instance, because a party (like W3C) does not want to other people to
+edit their published standards.  You are allowed to copy and use these
+files freely, but not change them.  For some open source environments,
+like Debian, do not like these restrictions, hence put them in the
+'non-free' packages.
+
+But there are also even less-free schema's which you may need.
+For instance, if you speak to a BEA SOAP server, you may get responses
+which contain elements which are in some BEA namespace.  Often, the
+license of those schema files are unclear.  So, read the following
+carefully:
+
+B<The files contained in this distribution were available on internet.
+Their use may be restricted, for instance may need a server license.
+The author of this module does not grant you any rights on these files.>
+
+When you are owner of any material in here, please contact the author of
+this distribution to explicitly state the license on these files.
+
+=head1 METHODS
+
+=over 4
+
+=item XML::Compile::Licensed-E<gt>B<soapServer>($type)
+
+Currently supported are "BEA" and "SharePoint".
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of XML-Compile-Licensed distribution version 0.01,
+built on March 21, 2016. Website: F<http://perl.overmeer.net/xml-compile/>
+
+Please post questions or ideas to the mailinglist at
+F<http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/xml-compile> .
+For live contact with other developers, visit the C<#xml-compile> channel
+on C<irc.perl.org>.
+
+=head1 LICENSE
+
+Copyrights 2016 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

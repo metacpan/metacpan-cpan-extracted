@@ -1,0 +1,191 @@
+=head1 XML Terminology
+
+To understand the nature of XML Schema it is important to be familiar 
+with some basic XML terminology.
+
+An XML B<tag> begins with a C<E<lt>> and ends with a C<E<gt>>.
+For example:
+
+    <foo>
+
+The XML B<element> shown below comprises a B<start tag>
+(C<E<lt>nameE<gt>>), some B<character content> (C<Mithrandir>), and an
+B<end tag> (C<E<lt>/nameE<gt>>).
+
+    <name>Mithrandir</name>
+
+In additional to character content, an element may include other
+B<child elements> nested within in.  In this example, the
+C<E<lt>wizardE<gt> ... E<lt>/wizardE<gt>> element contains the
+C<E<lt>nameE<gt> ... E<lt>/nameE<gt>> and 
+C<E<lt>aliasE<gt> ... E<lt>/aliasE<gt>> elements.
+
+    <wizard>
+      <name>Mithrandir</name>
+      <alias>Gandalf</alias>
+    </wizard>
+
+The start tag of an element may contain B<attributes>
+each comprising of a name and quoted value. 
+
+    <name lang="Elvish">Mithrandir</name>
+
+An element is said to have a B<simple type> if it contains character
+content, the whole character content and nothing but the character
+content.
+
+    <name>Mithrandir</nam>	    # simple type
+
+If an element has attributes or non-character child elements then 
+it is said to have a B<complex type>.
+
+    <name lang="EN">Frank</name>    # complex type (attributes)
+
+    <name>			    # complex type (child elements)
+      <first>Frank</first>
+      <last>Sidebottom</last>
+    </name>
+
+A complex element defines a B<content model> to specify what is
+permitted within the element in terms of character content and child
+elements.  Content models may be defined in terms of B<particles>
+which specify the child elements that may appear within an element,
+along with minimum and maximum occurence constraints.  These particles
+may be specified as a B<sequence> (each element particle must match in
+order), a B<choice> (match just one particle) or B<all> (match all
+particles but in any order).  Particles can be nested recursively
+allowing content models of arbitrary complexity to be defined.
+
+    <wizard>			    # sequence:
+      <name>Gandalf</name>	    #   name   min=1 max=1
+      <colour>Grey</colour>	    #   colour min=1 max=1
+      <alias>Mithrandir</alias>     #   alias  min=0 max=unbounded
+      <alias>Beardy</alias>
+      ...
+    </wizard>
+
+If an element accepts both character content and child elements then
+it is said to have a B<mixed content model>.
+
+    <p>
+      An HTML paragraph is an example of an XML element with a 
+      <b>mixed content model</b>.  It can contain plain text 
+      and <i>other XML elements</i>
+    </p>
+
+Elements can also have an B<empty content model> in which case the
+start and end tags can be combined like this:
+
+    <br />
+
+B<NOTE:> The space before the trailing C</> is optional.  However, if
+you find yourself writing XHTML documents, then you should always add
+the space to allow HTML browsers to display the markup correctly.
+
+=head1 XML Schema Overview
+
+A schema is a description of the permitted structure and characteristics
+of a class of XML instance documents.  W3C XML Schema is one particular 
+schema standard and is documented extensively at L<http://w3c.org/|http://w3c.org/>.
+
+This is an XML fragment which describes a E<lt>personE<gt>.  This is
+termed an "XML instance document".
+
+    <person id="abw">
+      <name>
+        <first>Andy</first> <last>Wardley</last>
+      </name>
+     <email>abw@kfs.org</email>
+   </person>
+
+Here is the schema for this element:
+
+    <schema>
+
+      <element name="person" type="personType"/>
+
+      <complexType name="personType">
+        <attribute name="id" type="string"/>
+        <element name="name" type="nameType"/>
+        <element name="email" type="emailType"/>
+      </complexType>
+
+      <complexType name="nameType">
+        <element name="first" type="string"/>
+        <element name="last" type="string"/>
+      </complexType>
+
+      <simpleType name="emailType">
+        <restriction base="string">
+          <pattern value="\w+@(\w+\.)+\w+"/>
+        </restriction>
+      </simpleType>
+
+    </schema>
+
+=head1 XML Schema Perl Modules
+
+These Perl modules implement various objects which can be used to
+define schemata.  At the time of writing, these modules offer "minimal
+conformance" but not "full conformance".  Full conformance implies
+that a schema can be specified as an XML document (like that above)
+which can be processed automatically to construct an internal schema
+representation.  Currently, schemata must be built "by hand" as Perl
+programs as shown below.  However, we intend to encode the schema for
+XML Schema itself to build a minimally conformant parser which can
+bootstrap itself into being a fully conformant parser.
+
+
+    use XML::Schema;
+
+    my $schema = XML::Schema->new();
+ 
+    #------------------------------------------------------------
+    # define simple type for email addresses
+
+    my $emailType = $schema->simpleType( name => 'email',
+				         base => 'string' );
+
+    $emailType->constrain( pattern => '\w+@(\w+\.)+\w+' );
+
+    #------------------------------------------------------------
+    # define complex type for name
+
+    my $nameType = $schema->complexType( name => 'nameType' );
+
+    $nameType->element( name => 'first', 
+			type => 'string' );
+
+    $nameType->element( name => 'last', 
+			type => 'string' );
+
+
+    #------------------------------------------------------------
+    # define complex type for person
+
+    my $personType = $schema->complexType( name => 'personType' );
+
+    $personType->attribute( name => 'id', 
+			    type => 'string' );
+
+    $personType->element( name => 'name', 
+			  type => 'nameType' );
+
+    $personType->element( name => 'email', 
+			  type => 'emailType' );
+
+
+    #------------------------------------------------------------
+    # define key schema element
+
+    $schema->element( name => 'person',
+		      type => 'personType' );
+
+Having constructed a schema model in this way, an XML parser can be
+generated to parse instances of this schema.
+
+    my $parser = $schema->parser();
+
+    my $result = $parser->parse('person.xml');
+
+

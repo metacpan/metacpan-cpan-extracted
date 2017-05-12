@@ -1,0 +1,212 @@
+version 0.009; 2011-10-27
+
+  * change usage of Params::Classify functions to take advantage of
+    custom ops in Params::Classify 0.012
+
+  * fix a latent bug where SvCUR() was used without first checking SvPOK()
+    (but SvPOK was guaranteed by other circumstances)
+
+  * correct dynamic_config setting to 0
+
+  * include META.json in distribution
+
+  * convert .cvsignore to .gitignore
+
+  * add MYMETA.json to .gitignore
+
+version 0.008; 2010-10-24
+
+  * in XS, declare "PROTOTYPES: DISABLE" to prevent automatic generation
+    of unintended prototypes
+
+  * jump through hoops to avoid compiler warnings
+
+  * in t/setup_pp.pl, avoid a warning and consequent false test failure
+    that occurs if XSLoader::load() is given no arguments, which is now
+    a valid usage
+
+version 0.007; 2010-10-15
+
+  * bugfix: avoid memory leak in construction of content objects
+
+  * in XS, use newSVpvs(), sv_catpvs_nomg(), and gv_stashpvs() wherever
+    appropriate
+
+  * in XS, use PERL_NO_GET_CONTEXT for efficiency
+
+  * use full stricture in test suite
+
+  * also test POD coverage of pure Perl implementation
+
+  * in test suite, make all numeric comparisons against $] stringify it
+    first, to avoid architecture-dependent problems with floating point
+    rounding giving it an unexpected numeric value
+
+  * in Build.PL, explicitly set needs_compiler to avoid bogus
+    auto-dependency on ExtUtils::CBuilder
+
+  * list XML::Easy::SimpleSchemaUtil and
+    XML::Easy::Transform::RationalizeNamespacePrefixes in documentation's
+    lists of other distributions
+
+  * in Build.PL, complete declaration of configure-time requirements
+
+  * move declaration of $VERSION in XML::Easy::Syntax to match all
+    other modules
+
+  * slightly reformat some C code to avoid exceeding 80 columns
+
+version 0.006; 2010-05-20
+
+  * bugfix: in XS, check SvOBJECT before looking at SvSTASH, because
+    the latter isn't guaranteed to be meaningful otherwise
+
+  * port to Perl 5.11, supporting new first-class regexp objects in
+    type checking
+
+  * check for required Perl version at runtime
+
+  * in XS, avoid using "class" as a variable name, for compatibility
+    with C++ compilers
+
+  * in Build.PL, explicitly declare configure-time requirements
+
+  * remove bogus "exit 0" from Build.PL
+
+  * in XML::Easy::NodeBasics documentation, reference
+    XML::Easy::ProceduralWriter
+
+  * add MYMETA.yml to .cvsignore
+
+version 0.005; 2009-08-16
+
+  * bugfix: in xml_content_object(), xml_content(), and xml_element(),
+    avoid clobbering function arguments (this occurred when passing a
+    content array as an argument)
+
+  * in XML::Easy::NodeBasics, add node equality comparison functions
+
+  * introduce the term "twine" for content
+    arrays, and corresponding methods and functions
+    (XML::Easy::Content->twine, XML::Easy::Element->content_twine,
+    XML::Easy::Classify::is_xml_content_twine,
+    XML::Easy::Text::xml10_read_{content,extparsedent}_twine,
+    XML::Easy::NodeBasics::xml{,_c,_e}_content_twine)
+
+  * in XML::Easy::Classify, add "check_" functions for argument checking
+
+  * in XML::Easy::NodeBasics, add short names for all functions
+
+  * tweak introductory documentation to improve comprehension
+
+  * in documentation, note that returned twine arrays and attribute
+    hashes must not be modified
+
+  * list Test::XML::Easy in documentation's list of other distributions
+
+version 0.004; 2009-05-20
+
+  * bugfix: correct character classification code that was incorrectly
+    rejecting characters U+ac00 to U+d7a3 (precomposed Hangul syllables)
+    in XML names
+
+  * XS implementation of low-level constructors and accessors for element
+    and content nodes
+
+  * document the XML::Easy::Transform:: namespace
+
+  * in XS code, fix the char_unicode() function to return the documented
+    sentinel value (it was returning a different value than intended,
+    but one which still operated correctly)
+
+version 0.003; 2009-05-13
+
+  * in XS code, use the correct "PREINIT:" instead of "INIT:" to introduce
+    variable declarations
+
+  * in XS code, use the cheaper SvOBJECT() in place of truth-value uses
+    of SvSTASH()
+
+  * use simpler "parent" pragma in place of "base"
+
+version 0.002; 2009-03-07
+
+  * in t/syntax_main.t, shortcut test for regexp iteration limit bug on
+    pre-5.10 perls, because the test is liable to overflow the stack
+
+  * work around Module::Build bug that was causing broken
+    ExtUtils::CBuilder objects that failed to compile anything
+
+  * to check whether C compilation is available, use Module::Build's
+    more robust ->have_c_compiler method, rather than just checking for
+    the availability of a C builder object
+
+  * avoid return with expression in void function (not valid in C90)
+
+  * add casts for pointer target signedness, and other small changes to
+    the C code, to avoid compiler warnings
+
+  * in XML::Easy::Syntax documentation, note the possibility of pre-5.10
+    perls overflowing the stack when executing regexps
+
+version 0.001; 2009-03-03
+
+  * introduce class XML::Easy::Content to encapsulate XML content
+
+  * add friendlier node manipulation functions in XML::Easy::NodeBasics
+
+  * bugfix: work around perl bug that was causing spurious errors in
+    the pure-Perl parser and serialiser for inputs with long (>= 32 Ki)
+    sequences of characters (the XS parser and serialiser were unaffected)
+
+  * document that the long-input perl bug affects the XML::Easy::Syntax
+    regular expressions in a way that can't be effectively worked around
+
+  * bugfix: make pure Perl parser always generate its own exception,
+    not a Perl exception, when processing a character reference for
+    an illegal Unicode character such as U+d800, and not emit a Perl
+    warning when processing a character reference for a dubious Unicode
+    character such as U+1ffff (the XS parser is unaffected)
+
+  * bugfix: make element construction and pure Perl serialiser always
+    generate its own exception, not a Perl exception, when given data
+    containing an illegal Unicode character such as U+d800 (the XS
+    serialiser is unaffected)
+
+  * new module XML::Easy::Classify, with data classification functions
+
+  * move parser and serialiser into new module XML::Easy::Text, leaving
+    XML::Easy itself to be just documentation of the suite
+
+  * revise documentation and some code for consistency of terminology
+
+  * detect and complain about use of non-string input to parser functions
+
+  * detect and complain about use of invalid attribute name in
+    $element->attribute()
+
+  * bugfix: properly detect and complain about use of glob as encoding
+    name argument to XS serialiser functions (they were being treated
+    as undef on perl 5.8)
+
+  * where a content array or attribute hash has multiple errors,
+    consistently complain about the first one rather than any other
+
+  * detect and complain about globs used in place of string arguments,
+    in XS version (the pure-Perl version already detected them)
+
+  * add #line directive to XML::Easy::Text to give useful line numbers
+    in error messages regarding the code in the __DATA__ section
+
+  * more test cases
+
+  * don't use literal CR in t/read.data, because it was causing signature
+    checking problems
+
+  * avoid declaration-after-statement in C code (not valid in C90)
+
+  * use full stricture in Build.PL
+
+version 0.000; 2008-04-08
+
+  * initial released version

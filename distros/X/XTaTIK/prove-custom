@@ -1,0 +1,7 @@
+#!/bin/sh
+BAIL_ON_FAIL=1 XTATIK_TESTING=1 \
+ XTATIK_COMPANY="/var/www/xtatik-company" \
+ XTATIK_SITE_ROOT="/var/www/0-xtatik-sites/midwifery/silo" \
+ XTATIK_SITE=default \
+ XTATIK_PG_URL='postgresql:///midwifery?host=localhost&user=zoffix' \
+ prove -vlr t

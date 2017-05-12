@@ -1,0 +1,24 @@
+[% key = item.key
+   id  = key.replace('\W+', '');
+   id  = "config_$id";
+-%]
+<tr valign="top" bgcolor="[% col.table.cells %]">
+  <td>
+    <a name="[% id %]"><code><b>[% key %]</b></code></a>
+  </td>
+  <td>
+[% IF (value = item.value) -%]
+    <code><b>[% value | replace('\s', '&nbsp;') %]</b></code>
+[% ELSIF (vals = item.getElementsByTagName('value', 0));
+     FOREACH value = vals -%]
+    <code><b>[% value.content(view) | replace('\s', '&nbsp;') %]</b></code>
+    <br>
+[%   END;
+   ELSE -%]
+     &nbsp;
+[% END %]
+  </td>
+  <td>
+[% item.content(view) %]
+  </td>
+</tr>

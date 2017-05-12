@@ -1,0 +1,10 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+CREDITS
+t/XML-DOM-BagOfTricks.t
+examples/bag_create.pl
+examples/simple_create.pl
+lib/XML/DOM/BagOfTricks.pm
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<collection>
+    <head />
+    <list>
+        <fortune id="I-need-to-get-a-life">
+            <meta>
+                <title>Getting a Life</title>
+            </meta>
+            <irc>
+                <body>
+                    <saying who="rindolf">LeoNerd: I need to get a life.</saying>
+                    <saying who="LeoNerd">They can be quite useful, but they do have a crazy amount of dependencies..</saying>
+                    <saying who="LeoNerd">And sometimes they can be a bit unstable - I think they're still beta-testing</saying>
+                </body>
+                <info>
+                    <channel>#perl</channel>
+                    <network>Freenode</network>
+                    <tagline>Geek Humour</tagline>
+                </info>
+            </irc>
+        </fortune>
+    </list>
+</collection>

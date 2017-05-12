@@ -1,0 +1,5 @@
+<%Condition
+  a.arg='RUN'
+  a.path='/bits/test-recurring'
+  default.template='final-run'
+%><%End%>

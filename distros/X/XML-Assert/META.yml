@@ -1,0 +1,26 @@
+---
+abstract: 'Asserts XPaths into an XML Document for correct values/matches'
+author:
+  - 'Andrew Chilton <andychilton@gmail.com>'
+build_requires:
+  Test::Builder::Tester: 0
+  Test::Exception: 0
+  Test::More: 0
+distribution_type: module
+generated_by: 'Module::Install version 0.76'
+license: artistic
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: XML-Assert
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Any::Moose: 0
+  XML::LibXML: 1.58
+  perl: 5.01
+resources:
+  repository: git://github.com/catalyst/XML-Assert
+version: 0.03

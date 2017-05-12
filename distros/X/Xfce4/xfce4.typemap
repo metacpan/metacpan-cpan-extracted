@@ -1,0 +1,7 @@
+# hand-coded typemaps
+
+TYPEMAP
+
+Xfce4::AboutInfo        T_PTROBJ
+Xfce4::Rc               T_PTROBJ
+Xfce4::Kiosk            T_PTROBJ

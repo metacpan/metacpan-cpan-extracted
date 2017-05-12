@@ -1,0 +1,102 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+use XML::Handler::YAWriter;
+use XML::Generator::Pdb;
+use IO::File;
+use File::Temp 'tempfile';
+use Getopt::Long;
+use Pod::Usage;
+
+my ($Source, $Output, $Format, $Verbose,  $Help);
+
+GetOptions(	"source=s"	=> \$Source,
+			"output=s"	=> \$Output,
+			"format=s"	=> \$Format,
+			"verbose"	=> \$Verbose,
+			"help"		=> \$Help
+			);
+
+pod2usage(-verbose => 2) if $Help;
+pod2usage(-verbose => 1) unless $Format;
+
+unless (defined $Source) {
+	my ($fh, $file) = tempfile;
+	
+	binmode $fh;
+	print $fh $_ while (<>);
+	$fh->close;	
+	$Source = $file;
+}
+
+$Output ||= "-";
+
+my @Format = split /,/, $Format;
+
+my $writer = XML::Handler::YAWriter->new(
+					Output => IO::File->new( ">$Output" ),
+					Pretty => {
+						PrettyWhiteIndent => 1,
+						PrettyWhiteNewline => 1
+					}
+				);
+my $driver = XML::Generator::Pdb->new(
+				Handler => $writer,
+				PDBFile => $Source,
+				Layout => [ @Format ]
+				);
+$driver->parse;
+
+exit(0);
+
+__END__
+
+=head1 NAME
+
+pdbtoxml - Generate an XML description form a Palm PDB
+
+=head1 SYNOPSIS
+
+ pdbtoxml --format=int,data,time,text --source=./input.pdb --output=./out.xml
+
+ cat input.pdb | pdbtoxml --format=int,data,time,text --output=./out.xml
+
+ cat input.pdb | pdbtoxml --format=int,data,time,text > out.xml
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--source>
+
+A PDB file, an alternative is to use standard input.
+
+=item B<--output>
+
+The file to write XML description to. An alternative is to use standard output.
+
+=item B<--format>
+
+The layout of a PDB record which is a list of datatypes seperated by commas. This option is mandatory.
+
+=item B<--help>
+
+What you are reading now.
+
+=back
+
+=head1 DESCRIPTION
+
+This tool generates an XML description starting form a Palm PDB. The datatypes supported are especially targetted to NSBasic (http://www.nsbasic.com), but can be used with any other PalmOS dev. language. The only drawback is that every record in the database needs to have the same layout.
+
+=head1 AUTHOR
+
+Johan Van den Brande <johan@vandenbrande.com>
+
+=head1 LICENSE
+
+This is free software, distributed underthe same terms as Perl itself.
+
+=cut
+

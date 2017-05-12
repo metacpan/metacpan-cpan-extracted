@@ -1,0 +1,63 @@
+Revision history for Perl extension XML::XUpdate::LibXML.
+
+0.01  Wed Mar  6 10:04:47 2002 Petr Pajas <pajas@matfyz.cz>
+	- original version; created by h2xs 1.20 with options
+		-Xn XML::XUpdate::LibXML
+
+0.02  Fri Mar 15 17:04:52 2002 Petr Pajas <pajas@matfyz.cz>
+        - fixed segmentation fault with LibXML 1.40
+0.2.1 Petr Pajas <pajas@matfyz.cz>
+        - XML::XUpdate::LibXML bugfix in 'update'
+
+0.2.2 Mon Jun 24 16:37:06 2002 Petr Pajas <pajas@matfyz.cz>
+        - XML::Normalize::LibXML doc typo fixed
+
+0.2.3 Wed Jul 3 11:51:33 2002 thnx2 Steve McKay <steve@colgreen.com>
+        - bugfixes: allow multiple variable replacements in select
+        - fixed double literalization in xupdate:value-of handling
+
+      Sat Jul 13 16:25:00 2002 Petr Pajas <pajas@matfyz.cz>
+        - XML::Normalize::LibXML xml_strip_whitespace now also removes
+          empty text_nodes
+
+0.3.0 Thu Nov  7 10:52:19 2002 Petr Pajas <pajas@matfyz.cz>
+	- Different implementation of XUpdate variables is used. Now
+	  variables contain the actual objects resulting from an XPath query,
+	  and not their textual content as in versions 0.2.x of
+	  XML::XUpdate::LibXML.
+        - value-of instruction result in copies of the actual objects it
+          select rather than its textual content
+        - extra indentation option -j added
+        - indentation implies removable ws stripping XML parser
+
+0.4.0 Mon Mar 10 15:07:17 2003 Petr Pajas <pajas@matfyz.cz>
+
+	XML::XUpdate::LibXML:
+        - commands apply to all nodes of a selected node-set
+        - xu:comment instruction support
+	- insert_before/insert_after work even if applied on attribute nodes
+
+	xupdate:
+	- some whitespace treatment changes (yes, again)
+        - added --debug|-D flag
+
+        XML::Normalize::LibXML:
+	- now uses XML::LibXML::Iterator
+
+0.5.0 Mon Sep 29 12:45:18 2003 Petr Pajas <pajas@matfyz.cz>
+
+	XML::XUpdate::LibXML:
+        - using XML::LibXML::XPathContext as a XPath engine
+          (for better variable and NS support)
+        - xu:append/@child reimplemented
+        - xu:attribute bug fixed
+        - regiserNs added
+
+	xupdate:
+	- --namespace|-n added
+        - allow compact command-line flags
+        - die on command-line parsing errors
+
+        XML::Normalize::LibXML:
+	- fixed serious bug in xml_strip_element
+	

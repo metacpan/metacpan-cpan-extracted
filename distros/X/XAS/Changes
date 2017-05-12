@@ -1,0 +1,73 @@
+Revision history for XAS
+
+0.01    07-Mar-2013 Kevin L. Esteb
+        First version, released on an unsuspecting world.
+
+0.02    13-Mar-2013 Kevin L. Esteb
+        Fixed some documentation problems.
+        Added spooler stuff.
+
+0.03    16-Mar-2013 Kevin L. Esteb
+        Fixed some documentation problems. Doesn't display correctly
+          on CPAN.
+
+0.04    17-Mar-2013 Kevin L. Esteb
+        Fixed some documentation problems. Doesn't display correctly
+          on CPAN.
+
+0.05    13-Jun-2013 Kevin L. Esteb
+        Added STOMP support, ported POE::Component::Client::Stomp,
+          POE::Component::Client::Stomp::Utils and
+          POE::Filter::Stomp to XAS.
+        Added tests for STOMP support.
+        Updated various modules for STOMP support.
+        Ported Supervisor into the framework
+
+0.06    06-Dec-2013 Kevin L. Esteb
+        Updated logging to be able to use Log::Log4perl.
+        Updated cli option handling.
+        Added modules for Win32 Services.
+        Added module to RPC over SSH.
+
+0.07    30-May-2014 Kevin L. Esteb
+        Due to problems with releasing 0.06. I rethought how code would 
+          be distributed. This lead to breaking everything up
+          into smaller chunks for easier maintenance. This also lead to a
+          rewrite and simplification of the code base itself.
+        Now using git as the source repository. It seems to be what the
+          "cool kids" are using.
+
+0.08    13-Jun-2015 Kevin L. Esteb
+        Changed the license to Artistic License 2.0
+        Improved the documentation.
+        Corrected problems.
+
+0.09    06-Jul-2015 Kevin L. Esteb
+        Fixed problems the CPAN flagged
+
+0.10    13-Jul-2015 Kevin L. Esteb
+        More fixes for CPAN testers
+
+0.11    09-Sep-2015 Kevin L. Esteb
+        Added handling for Batch Systems
+        Added a general purpose iterator
+        Documentation fixes
+
+0.12    23-Aug-2016 Kevin L. Esteb
+        Added routines for WS-Manage
+        Added routines for spawning background processes
+        Fixed several bugs
+
+0.13    24-Aug-2016 Kevin L. Esteb
+        Added some missing files to the MANIFEST
+        Thank you cpantesters
+
+0.14    28-Aug-2016 Kevin L. Esteb
+        Added some missing dependencies.
+        Thank you cpantesters.
+
+0.15    02-Nov-2016 Kevin L. Esteb
+        Working with locking.
+        Added tests for locking.
+        Added a FTP transfer module
+

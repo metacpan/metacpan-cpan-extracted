@@ -1,0 +1,689 @@
+<html><head>
+<title>French stemming algorithm</title></head>
+
+<body bgcolor="WHITE">
+<h1 align="center">French stemming algorithm</h1>
+
+<table width="75%" align="center" cols="1">
+<tbody><tr><td>
+<br> <h2>Links to resources</h2>
+
+<dl><dd><table cellpadding="0">
+<tbody><tr><td><a href="http://snowball.tartarus.org/"> Snowball main page</a>
+</td></tr><tr><td><a href="http://snowball.tartarus.org/french/stem.sbl">    The stemmer in Snowball</a>
+</td></tr><tr><td><a href="http://snowball.tartarus.org/french/stem.c">      The ANSI C stemmer</a>
+</td></tr><tr><td><a href="http://snowball.tartarus.org/french/stem.h">      - and its header</a>
+</td></tr><tr><td><a href="http://snowball.tartarus.org/french/voc.txt">     Sample French vocabulary</a>
+</td></tr><tr><td><a href="http://snowball.tartarus.org/french/output.txt">  Its stemmed equivalent</a>
+</td></tr><tr><td><a href="http://snowball.tartarus.org/french/diffs.txt">   Vocabulary + stemmed equivalent in two columns</a>
+</td></tr><tr><td><a href="http://snowball.tartarus.org/french/tarball.tgz"> Tar-gzipped file of all of the above</a>
+<br><br>
+</td></tr><tr><td><a href="http://snowball.tartarus.org/french/stop.txt">    French stop word list</a>
+</td></tr></tbody></table></dd></dl>
+
+<dl><dd><table cellpadding="0">
+<tbody><tr><td><a href="http://snowball.tartarus.org/french/stem-MS-DOS-Latin-I.sbl">    The stemmer in Snowball - MS DOS Latin I encodings</a>
+</td></tr></tbody></table></dd></dl>
+
+<dl><dd><table cellpadding="0">
+<tbody><tr><td><a href="http://snowball.tartarus.org/texts/romance.html">
+                  Romance language stemmers</a>
+</td></tr></tbody></table></dd></dl>
+
+</td></tr>
+
+<tr><td bgcolor="lightpink">
+
+<br><br>
+
+Here is a sample of French vocabulary, with the stemmed forms that will
+be generated with this algorithm.
+
+<br><br>
+
+
+
+<dl><dd><table cellpadding="0">
+<tbody><tr><td>  <b>word</b> </td>
+ <td></td><td> </td>
+ <td></td><td> <b>stem</b> </td>
+ <td></td><td>        </td>
+ <td></td><td> <b>word</b> </td>
+ <td></td><td> </td>
+ <td></td><td> <b>stem</b> </td>
+</tr>
+
+<tr><td>
+continu<br>
+continua<br>
+continuait<br>
+continuant<br>
+continuation<br>
+continue<br>
+continué<br>
+continuel<br>
+continuelle<br>
+continuellement<br>
+continuelles<br>
+continuels<br>
+continuer<br>
+continuera<br>
+continuerait<br>
+continueront<br>
+continuez<br>
+continuité<br>
+continuons<br>
+contorsions<br>
+contour<br>
+contournait<br>
+contournant<br>
+contourne<br>
+contours<br>
+contractait<br>
+contracté<br>
+contractée<br>
+contracter<br>
+contractés<br>
+contractions<br>
+contradictoirement<br>
+contradictoires<br>
+contraindre<br>
+contraint<br>
+contrainte<br>
+contraintes<br>
+contraire<br>
+contraires<br>
+contraria<br>
+</td>
+<td></td><td>  <tt><b> =&gt; </b></tt>  </td>
+<td></td><td>
+continu<br>
+continu<br>
+continu<br>
+continu<br>
+continu<br>
+continu<br>
+continu<br>
+continuel<br>
+continuel<br>
+continuel<br>
+continuel<br>
+continuel<br>
+continu<br>
+continu<br>
+continu<br>
+continu<br>
+continu<br>
+continu<br>
+continuon<br>
+contors<br>
+contour<br>
+contourn<br>
+contourn<br>
+contourn<br>
+contour<br>
+contract<br>
+contract<br>
+contract<br>
+contract<br>
+contract<br>
+contract<br>
+contradictoir<br>
+contradictoir<br>
+contraindr<br>
+contraint<br>
+contraint<br>
+contraint<br>
+contrair<br>
+contrair<br>
+contrari<br>
+</td>
+<td></td><td> </td>
+<td></td><td>
+main<br>
+mains<br>
+maintenaient<br>
+maintenait<br>
+maintenant<br>
+maintenir<br>
+maintenue<br>
+maintien<br>
+maintint<br>
+maire<br>
+maires<br>
+mairie<br>
+mais<br>
+maïs<br>
+maison<br>
+maisons<br>
+maistre<br>
+maitre<br>
+maître<br>
+maîtres<br>
+maîtresse<br>
+maîtresses<br>
+majesté<br>
+majestueuse<br>
+majestueusement<br>
+majestueux<br>
+majeur<br>
+majeure<br>
+major<br>
+majordome<br>
+majordomes<br>
+majorité<br>
+majorités<br>
+mal<br>
+malacca<br>
+malade<br>
+malades<br>
+maladie<br>
+maladies<br>
+maladive<br>
+</td>
+<td></td><td>  <tt><b> =&gt; </b></tt>  </td>
+<td></td><td>
+main<br>
+main<br>
+mainten<br>
+mainten<br>
+mainten<br>
+mainten<br>
+maintenu<br>
+maintien<br>
+maintint<br>
+mair<br>
+mair<br>
+mair<br>
+mais<br>
+maï<br>
+maison<br>
+maison<br>
+maistr<br>
+maitr<br>
+maîtr<br>
+maîtr<br>
+maîtress<br>
+maîtress<br>
+majest<br>
+majestu<br>
+majestu<br>
+majestu<br>
+majeur<br>
+majeur<br>
+major<br>
+majordom<br>
+majordom<br>
+major<br>
+major<br>
+mal<br>
+malacc<br>
+malad<br>
+malad<br>
+malad<br>
+malad<br>
+malad<br>
+</td>
+</tr>
+</tbody></table></dd></dl>
+
+
+</td></tr>
+
+<tr><td>
+
+<br><br>
+<br> <h2>The stemming algorithm</h2>
+
+Letters in French include the following accented forms,
+<dl><dd>
+    <b><i>â     à     ç     ë     é     ê     è     ï     î     ô     û     ù</i></b>
+</dd></dl>
+The following letters are vowels:
+<dl><dd>
+    <b><i>a     e     i     o     u     y     â     à     ë     é     ê     è     ï     î     ô     û     ù</i></b>
+</dd></dl>
+Assume the word is in lower case. Then put into upper case <b><i>u</i></b> or <b><i>i</i></b> preceded
+and followed by a vowel, and <b><i>y</i></b> preceded or followed by a vowel. <b><i>u</i></b> after <b><i>q</i></b> is
+also put into upper case. For example,
+<dl><dd><table cellpadding="0">
+<tbody><tr><td>    jouer   </td><td></td><td> <tt>-&gt;</tt> </td><td></td><td>  joUer
+</td></tr><tr><td>    ennuie  </td><td></td><td> <tt>-&gt;</tt> </td><td></td><td>  ennuIe
+</td></tr><tr><td>    yeux    </td><td></td><td> <tt>-&gt;</tt> </td><td></td><td>  Yeux
+</td></tr><tr><td>    quand   </td><td></td><td> <tt>-&gt;</tt> </td><td></td><td>  qUand
+</td></tr></tbody></table></dd></dl>
+(The upper case forms are not then classed as vowels - see <a href="http://snowball.tartarus.org/texts/vowelmarking.html"> note</a> on vowel
+marking.)
+<br><br>
+If the word begins with two vowels, <i>RV</i> is the region after the third
+letter, otherwise the region after the first vowel not at the beginning of
+the word, or the end of the word if these positions cannot be found.
+<br><br>
+For example,
+<br><pre>    a i m e r     a d o r e r     v o l e r
+         |...|         |.....|       |.....|
+</pre>
+<i>R</i>1 is the region after the first non-vowel following a vowel, or the end of
+the word if there is no such non-vowel.
+
+<i>R</i>2 is the region after the first non-vowel following a vowel in <i>R</i>1, or the
+end of the word if there is no such non-vowel.
+(See <a href="http://snowball.tartarus.org/texts/r1r2.html"> note</a> on <i>R</i>1 and <i>R</i>2.)
+<br><br>
+For example:
+<br><pre>    f a m e u s e m e n t
+         |......R1.......|
+               |...R2....|
+</pre>
+Note that <i>R</i>1 can contain <i>RV</i> (<i>adorer</i>), and <i>RV</i> can contain <i>R</i>1 (<i>voler</i>).
+<br><br>
+Below, &#8216;delete if in <i>R</i>2&#8217; means that a found suffix should be removed if it
+lies entirely in <i>R</i>2, but not if it overlaps <i>R</i>2 and the rest of the word.
+&#8216;delete if in <i>R</i>1 and preceded by <i>X</i>&#8217; means that <i>X</i> itself does not have to
+come in <i>R</i>1, while &#8216;delete if preceded by <i>X</i> in <i>R</i>1&#8217; means that <i>X</i>, like the
+suffix, must be entirely in <i>R</i>1.
+<br><br>
+Start with step 1
+<br><br>
+Step 1: Standard suffix removal
+<dl><dd>
+    Search for the longest among the following suffixes, and perform the
+    action indicated.
+<br><br>
+</dd><dl><dt><b><i>ance     iqUe     isme     able     iste     eux     ances     iqUes     ismes     ables     istes</i></b>
+        </dt><dd>delete if in <i>R</i>2
+<br><br>
+    </dd><dt><b><i>atrice     ateur     ation     atrices     ateurs     ations</i></b>
+        </dt><dd>delete if in <i>R</i>2
+        </dd><dd>if preceded by <b><i>ic</i></b>, delete if in <i>R</i>2, else replace by <b><i>iqU</i></b>
+<br><br>
+    </dd><dt><b><i>logie     logies</i></b>
+        </dt><dd>replace with <b><i>log</i></b> if in <i>R</i>2
+<br><br>
+    </dd><dt><b><i>usion     ution     usions     utions</i></b>
+        </dt><dd>replace with <b><i>u</i></b> if in <i>R</i>2
+<br><br>
+    </dd><dt><b><i>ence     ences</i></b>
+        </dt><dd>replace with <b><i>ent</i></b> if in <i>R</i>2
+<br><br>
+    </dd><dt><b><i>ement     ements</i></b>
+        </dt><dd>delete if in <i>RV</i>
+        </dd><dd>if preceded by <b><i>iv</i></b>, delete if in <i>R</i>2 (and if further preceded by <b><i>at</i></b>,
+        delete if in <i>R</i>2), otherwise,
+        </dd><dd>if preceded by <b><i>eus</i></b>, delete if in <i>R</i>2, else replace by <b><i>eux</i></b>
+          if in <i>R</i>1, otherwise,
+        </dd><dd>if preceded by <b><i>abl</i></b> or <b><i>iqU</i></b>, delete if in <i>R</i>2, otherwise,
+        </dd><dd>if preceded by <b><i>ièr</i></b> or <b><i>Ièr</i></b>, delete if in <i>RV</i>
+<br><br>
+    </dd><dt><b><i>ité     ités</i></b>
+        </dt><dd>delete if in <i>R</i>2
+        </dd><dd>if preceded by <b><i>abil</i></b>, delete if in <i>R</i>2, else replace by <b><i>abl</i></b>,
+        otherwise,
+        </dd><dd>if preceded by <b><i>ic</i></b>, delete if in <i>R</i>2, else replace by <b><i>iqU</i></b>, otherwise,
+        </dd><dd>if preceded by <b><i>iv</i></b>, delete if in <i>R</i>2
+<br><br>
+    </dd><dt><b><i>if     ive     ifs     ives</i></b>
+        </dt><dd>delete if in <i>R</i>2
+        </dd><dd>if preceded by <b><i>at</i></b>, delete if in <i>R</i>2 (and if further preceded by <b><i>ic</i></b>,
+        delete if in <i>R</i>2, else replace by <b><i>iqU</i></b>)
+<br><br>
+    </dd><dt><b><i>eaux</i></b>
+        </dt><dd>replace with <b><i>eau</i></b>
+<br><br>
+    </dd><dt><b><i>aux</i></b>
+        </dt><dd>replace with <b><i>al</i></b> if in <i>R</i>1
+<br><br>
+    </dd><dt><b><i>euse     euses</i></b>
+        </dt><dd>delete if in <i>R</i>2, else replace by <b><i>eux</i></b> if in <i>R</i>1
+<br><br>
+    </dd><dt><b><i>issement     issements</i></b>
+        </dt><dd>delete if in <i>R</i>1 and preceded by a non-vowel
+<br><br>
+    </dd><dt><b><i>amment</i></b>
+        </dt><dd>replace with <b><i>ant</i></b> if in <i>RV</i>
+<br><br>
+    </dd><dt><b><i>emment</i></b>
+        </dt><dd>replace with <b><i>ent</i></b> if in <i>RV</i>
+<br><br>
+    </dd><dt><b><i>ment     ments</i></b>
+        </dt><dd>delete if preceded by a vowel in <i>RV</i>
+</dd></dl></dl>
+
+In steps 2<i>a</i> and 2<i>b</i> all tests are confined to the <i>RV</i> region.
+<br><br>
+Do step 2<i>a</i> if either no ending was removed by step 1, or if one of endings
+<b><i>amment</i></b>, <b><i>emment</i></b>, <b><i>ment</i></b>, <b><i>ments</i></b> was found.
+<br><br>
+Step 2<i>a</i>: Verb suffixes beginning <b><i>i</i></b>
+<dl><dd>
+    Search for the longest among the following suffixes and if found,
+    delete if preceded by a non-vowel.
+<br><br>
+</dd><dl><dd>
+        <b><i>îmes     ît     îtes     i     ie     ies     ir     ira     irai     iraIent     irais     irait     iras
+            irent     irez     iriez     irions     irons     iront     is     issaIent     issais     issait
+            issant     issante     issantes     issants     isse     issent     isses     issez     issiez
+            issions     issons     it</i></b>
+</dd></dl><br>(Note that the non-vowel itself must also be in <i>RV</i>.)
+</dl>
+Do step 2<i>b</i> if step 2<i>a</i> was done, but failed to remove a suffix.
+<br><br>
+Step 2<i>b</i>: Other verb suffixes
+<dl><dd>
+    Search for the longest among the following suffixes, and perform the
+    action indicated.
+<br><br>
+</dd><dl><dt><b><i>ions</i></b>
+        </dt><dd>delete if in <i>R</i>2
+<br><br>
+    </dd><dt><b><i>é     ée     ées     és     èrent     er     era     erai     eraIent     erais     erait     eras     erez
+        eriez     erions     erons     eront     ez     iez</i></b>
+        </dt><dd>delete
+<br><br>
+    </dd><dt><b><i>âmes     ât     âtes     a     ai     aIent     ais     ait     ant     ante     antes     ants     as     asse
+        assent     asses     assiez     assions</i></b>
+        </dt><dd>delete
+        </dd><dd>if preceded by <b><i>e</i></b>, delete
+</dd></dl><br>(Note that the <b><i>e</i></b>that may be deleted in this last step must also be in
+    <i>RV</i>.)
+</dl>
+If the last step to be obeyed - either step 1, 2<i>a</i> or 2<i>b</i> - altered the word,
+do step 3
+<br><br>
+Step 3
+<dl><dd>
+    Replace final <b><i>Y</i></b> with <b><i>i</i></b> or final <b><i>ç</i></b> with <b><i>c</i></b>
+</dd></dl>
+Alternatively, if the last step to be obeyed did not alter the word, do
+step 4
+<br><br>
+Step 4: Residual suffix
+<dl><dd>
+    If the word ends <b><i>s</i></b>, not preceded by <b><i>a</i></b>, <b><i>i</i></b>, <b><i>o</i></b>, <b><i>u</i></b>, <b><i>è</i></b> or <b><i>s</i></b>, delete it.
+<br><br>
+    In the rest of step 4, all tests are confined to the <i>RV</i> region.
+<br><br>
+    Search for the longest among the following suffixes, and perform the
+    action indicated.
+<br><br>
+</dd><dl><dt><b><i>ion</i></b>
+        </dt><dd>delete if in <i>R</i>2 and preceded by <b><i>s</i></b> or <b><i>t</i></b>
+<br><br>
+    </dd><dt><b><i>ier     ière     Ier     Ière</i></b>
+        </dt><dd>replace with <b><i>i</i></b>
+<br><br>
+    </dd><dt><b><i>e</i></b>
+        </dt><dd>delete
+<br><br>
+    </dd><dt><b><i>ë</i></b>
+        </dt><dd>if preceded by <b><i>gu</i></b>, delete
+</dd></dl><br>(So note that <b><i>ion</i></b>is removed only when it is in <i>R</i>2 - as well as being
+    in <i>RV</i>- and preceded by <b><i>s</i></b>or <b><i>t</i></b>which must be in <i>RV</i>.)
+</dl>
+Always do steps 5 and 6.
+<br><br>
+Step 5: Undouble
+<dl><dd>
+    If the word ends <b><i>enn</i></b>, <b><i>onn</i></b>, <b><i>ett</i></b>, <b><i>ell</i></b> or <b><i>eill</i></b>, delete the last letter
+</dd></dl>
+Step 6: Un-accent
+<dl><dd>
+    If the words ends <b><i>é</i></b> or <b><i>è</i></b> followed by at least one non-vowel, remove
+    the accent from the <b><i>e</i></b>.
+</dd></dl>
+And finally:
+<dl><dd>
+    Turn any remaining <b><i>I</i></b>, <b><i>U</i></b> and <b><i>Y</i></b> letters in the word back into lower case.
+</dd></dl>
+
+
+</td></tr>
+
+<tr><td bgcolor="lightblue">
+
+<br> <h2>The same algorithm in Snowball</h2>
+
+<br><pre><dl><dd>
+routines (
+           prelude postlude mark_regions
+           RV R1 R2
+           standard_suffix
+           i_verb_suffix
+           verb_suffix
+           residual_suffix
+           un_double
+           un_accent
+)
+
+externals ( stem )
+
+integers ( pV p1 p2 )
+
+groupings ( v keep_with_s )
+
+stringescapes {}
+
+/* special characters (in ISO Latin I) */
+
+stringdef a^   hex 'E2'  // a-circumflex
+stringdef a`   hex 'E0'  // a-grave
+stringdef c,   hex 'E7'  // c-cedilla
+
+stringdef e"   hex 'EB'  // e-diaeresis (rare)
+stringdef e'   hex 'E9'  // e-acute
+stringdef e^   hex 'EA'  // e-circumflex
+stringdef e`   hex 'E8'  // e-grave
+stringdef i"   hex 'EF'  // i-diaeresis
+stringdef i^   hex 'EE'  // i-circumflex
+stringdef o^   hex 'F4'  // o-circumflex
+stringdef u^   hex 'FB'  // u-circumflex
+stringdef u`   hex 'F9'  // u-grave
+
+define v 'aeiouy{a^}{a`}{e"}{e'}{e^}{e`}{i"}{i^}{o^}{u^}{u`}'
+
+define prelude as repeat goto (
+
+    (  v [ ('u' ] v &lt;- 'U') or
+           ('i' ] v &lt;- 'I') or
+           ('y' ] &lt;- 'Y')
+    )
+    or
+    (  ['y'] v &lt;- 'Y' )
+    or
+    (  'q' ['u'] &lt;- 'U' )
+)
+
+define mark_regions as (
+
+    $pV = limit
+    $p1 = limit
+    $p2 = limit  // defaults
+
+    do (
+        ( v v next ) or ( next gopast v )
+        setmark pV
+    )
+    do (
+        gopast v gopast non-v setmark p1
+        gopast v gopast non-v setmark p2
+    )
+)
+
+define postlude as repeat (
+
+    [substring] among(
+        'I' (&lt;- 'i')
+        'U' (&lt;- 'u')
+        'Y' (&lt;- 'y')
+        ''  (next)
+    )
+)
+
+backwardmode (
+
+    define RV as $pV &lt;= cursor
+    define R1 as $p1 &lt;= cursor
+    define R2 as $p2 &lt;= cursor
+
+    define standard_suffix as (
+        [substring] among(
+
+            'ance' 'iqUe' 'isme' 'able' 'iste' 'eux'
+            'ances' 'iqUes' 'ismes' 'ables' 'istes'
+               ( R2 delete )
+            'atrice' 'ateur' 'ation'
+            'atrices' 'ateurs' 'ations'
+               ( R2 delete
+                 try ( ['ic'] (R2 delete) or &lt;-'iqU' )
+               )
+            'logie'
+            'logies'
+               ( R2 &lt;- 'log' )
+            'usion' 'ution'
+            'usions' 'utions'
+               ( R2 &lt;- 'u' )
+            'ence'
+            'ences'
+               ( R2 &lt;- 'ent' )
+            'ement'
+            'ements'
+            (
+                RV delete
+                try (
+                    [substring] among(
+                        'iv'   (R2 delete ['at'] R2 delete)
+                        'eus'  ((R2 delete) or (R1&lt;-'eux'))
+                        'abl' 'iqU'
+                               (R2 delete)
+                        'i{e`}r' 'I{e`}r'      //)
+                               (RV &lt;-'i')      //)--new 2 Sept 02
+                    )
+                )
+            )
+            'it{e'}'
+            'it{e'}s'
+            (
+                R2 delete
+                try (
+                    [substring] among(
+                        'abil' ((R2 delete) or &lt;-'abl')
+                        'ic'   ((R2 delete) or &lt;-'iqU')
+                        'iv'   (R2 delete)
+                    )
+                )
+            )
+            'if' 'ive'
+            'ifs' 'ives'
+            (
+                R2 delete
+                try ( ['at'] R2 delete ['ic'] (R2 delete) or &lt;-'iqU' )
+            )
+            'eaux' (&lt;- 'eau')
+            'aux'  (R1 &lt;- 'al')
+            'euse'
+            'euses'((R2 delete) or (R1&lt;-'eux'))
+
+            'issement'
+            'issements'(R1 non-v delete) // verbal
+
+            // fail(...) below forces entry to verb_suffix. -ment typically
+            // follows the p.p., e.g 'confus{e'}ment'.
+
+            'amment'   (RV fail(&lt;- 'ant'))
+            'emment'   (RV fail(&lt;- 'ent'))
+            'ment'
+            'ments'    (test(v RV) fail(delete))
+                       // v is e,i,u,{e'},I or U
+        )
+    )
+
+    define i_verb_suffix as setlimit tomark pV for (
+        [substring] among (
+            '{i^}mes' '{i^}t' '{i^}tes' 'i' 'ie' 'ies' 'ir' 'ira' 'irai'
+            'iraIent' 'irais' 'irait' 'iras' 'irent' 'irez' 'iriez'
+            'irions' 'irons' 'iront' 'is' 'issaIent' 'issais' 'issait'
+            'issant' 'issante' 'issantes' 'issants' 'isse' 'issent' 'isses'
+            'issez' 'issiez' 'issions' 'issons' 'it'
+                (non-v delete)
+        )
+    )
+
+    define verb_suffix as setlimit tomark pV for (
+        [substring] among (
+            'ions'
+                (R2 delete)
+
+            '{e'}' '{e'}e' '{e'}es' '{e'}s' '{e`}rent' 'er' 'era' 'erai'
+            'eraIent' 'erais' 'erait' 'eras' 'erez' 'eriez' 'erions'
+            'erons' 'eront' 'ez' 'iez'
+
+            // 'ons' //-best omitted
+
+                (delete)
+
+            '{a^}mes' '{a^}t' '{a^}tes' 'a' 'ai' 'aIent' 'ais' 'ait' 'ant'
+            'ante' 'antes' 'ants' 'as' 'asse' 'assent' 'asses' 'assiez'
+            'assions'
+                (delete
+                 try(['e'] delete)
+                )
+        )
+    )
+
+    define keep_with_s 'aiou{e`}s'
+
+    define residual_suffix as (
+        try(['s'] test non-keep_with_s delete)
+        setlimit tomark pV for (
+            [substring] among(
+                'ion'           (R2 's' or 't' delete)
+                'ier' 'i{e`}re'
+                'Ier' 'I{e`}re' (&lt;-'i')
+                'e'             (delete)
+                '{e"}'          ('gu' delete)
+            )
+        )
+    )
+
+    define un_double as (
+        test among('enn' 'onn' 'ett' 'ell' 'eill') [next] delete
+    )
+
+    define un_accent as (
+        atleast 1 non-v
+        [ '{e'}' or '{e`}' ] &lt;-'e'
+    )
+)
+
+define stem as (
+
+    do prelude
+    do mark_regions
+    backwards (
+
+        do (
+            (
+                 ( standard_suffix or
+                   i_verb_suffix or
+                   verb_suffix
+                 )
+                 and
+                 try( [ ('Y'   ] &lt;- 'i' ) or
+                        ('{c,}'] &lt;- 'c' )
+                 )
+            ) or
+            residual_suffix
+        )
+
+        // try(['ent'] RV delete) // is best omitted
+
+        do un_double
+        do un_accent
+    )
+    do postlude
+)
+
+</dd></dl>
+</pre>
+</td></tr></tbody></table>
+</body></html>

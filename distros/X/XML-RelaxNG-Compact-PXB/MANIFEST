@@ -1,0 +1,16 @@
+Changes
+MANIFEST
+META.yml
+Makefile.PL
+README
+lib/XML/RelaxNG/Compact/PXB.pm
+lib/XML/RelaxNG/Compact/DataModel.pm
+t/XML__RelaxNG__Compact__PXB.t
+doc/perlcritic
+doc/perltidyrc
+doc/pxb-docs.pod
+doc/pxb-docs.html
+examples/logger.conf
+examples/test_pxb.pl
+examples/ps_schemaPXB.pl
+test.pl

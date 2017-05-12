@@ -1,0 +1,28 @@
+--- #YAML:1.0
+name:               XML-RAI
+version:            1.3031
+abstract:           ~
+author:  []
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Date::Format:      2.22
+    Date::Parse:       2.26
+    File::Spec:        0
+    Scalar::Util:      1.19
+    Task::Weaken:      1.02
+    Test::More:        0
+    Test::Weaken:      0
+    XML::RSS::Parser:  4
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.54
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

@@ -1,0 +1,24 @@
+This is Dean's XS test suite.   Mar2,96
+
+Read the README's for each suite before you run it.  Sometimes they're not
+expected to make a working extension, sometimes they have failing test cases
+which are documented and are waiting on xsubpp bug fixes.
+
+In some cases these suites need my typemap, called "perlobject.map".  You'll
+probably find it on CPAN in the same place you found this.  You'll have to
+modify some of the Makefile.PL files in here to point at it.
+
+These suites require Perl5.002.
+
+XSTEST::XS1
+
+	subsystem test for XS, emphasis is on finding interaction bugs.
+
+XSTEST::RPCB1
+
+	test suite for the code in the perlxs manpage
+
+test.pl
+
+	test suite driver, will run all of the suites.
+

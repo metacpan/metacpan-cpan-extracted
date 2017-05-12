@@ -1,0 +1,162 @@
+#!/usr/bin/env perl
+
+use warnings;
+use strict;
+
+use XML::Compile::Schema ();
+use XML::Compile::Util   qw/type_of_node/;
+use Getopt::Long         qw/GetOptions :config gnu_compat bundling/;
+use JSON::XS             qw/encode_json/;
+
+my ($xml_input, $root_type, @schemas, $bigints, $bigfloats, $json_out);
+my $mixed  = 'TEXTUAL';
+my $keep_root = 1;
+
+GetOptions
+   'bigints|bi|b!' => \$bigints
+ , 'bigfloats|bf'  => \$bigfloats
+ , 'output|o=s'    => \$json_out
+ , 'schema|s=s'    => \@schemas
+ , 'type|t=s'      => \$root_type
+ , 'xml|x=s'       => \$xml_input
+ , 'mixed=s'       => \$mixed
+ , 'keep-root|r!'  => \$keep_root
+   or exit 1;
+
+$xml_input = '-' if @schemas && !defined $xml_input;
+$json_out  = '-' unless defined $json_out;
+
+if(@ARGV)
+{   die "ERROR: either use options or no options, not mixed\n"
+        if defined $xml_input && @ARGV;
+    ($xml_input, @schemas) = @ARGV;
+}
+
+defined $xml_input
+    or die "ERROR: no input message specified\n";
+
+@schemas
+    or die "ERROR: no schema's specified\n";
+
+@schemas   = map { split /\,/ } @schemas;
+
+my $parser = XML::LibXML->new;
+
+my $msg    = $xml_input eq '-'
+           ? $parser->parse_fh(\*STDIN)
+           : $parser->parse_file($xml_input);
+
+my $top    = $msg->documentElement;
+$root_type ||= type_of_node $top;
+
+my $schema = XML::Compile::Schema->new( \@schemas );
+
+my $read   = $schema->compile
+  ( READER          => $root_type
+  , sloppy_integers => !$bigints
+  , sloppy_floats   => !$bigfloats
+  , json_friendly   => 1
+  , mixed_elements  => $mixed
+  );
+
+my $ast  = $read->($top);
+
+$ast     = { $top->localname => $ast }
+    if $keep_root;
+
+my $data = encode_json $ast;
+
+if($json_out eq '-')
+{   print $data;
+}
+else
+{   open OUT, ">:utf8", $json_out
+        or die "ERROR: cannot write json to $json_out: $!\n";
+
+    print OUT $data;
+    close OUT
+        or die "ERROR: write error for $json_out: $!\n";
+}
+
+exit 0;
+
+__END__
+
+=head1 NAME
+
+xml2json - convert an XML message with a schema into JSON
+
+=head1 SYNOPSIS
+
+ xml2json xml-file schema-file(s)  >json-file
+
+ xml2json -x xml-file -s schema-files -o json-file
+
+=head1 DESCRIPTION
+
+Convert an XML message into JSON with the same structure.  A schema
+is required to enforce the correct syntax, especially for optionally
+repeated elements.
+
+=head2 Options
+
+You can either specify an XML message filename and one or more
+schema filenames as arguments, or use the options.
+
+=over 4
+
+=item --xml|-x filename
+
+The file which contains the xml message.  A single dash means "stdin".
+
+=item --schema|-s filename(s)
+
+This option can be repeated, or the filenames separated by comma's, if
+you have more than one schema file to parse.  All imported and included
+schema components have to be provided explicitly.
+
+=item --bigints|-b  (boolean)
+
+By default, the translation is a little sloppy: Integer types are defined
+to support at least 18 digits in XML.  However, this is usually unnecessary
+large and unreadible in JSON.
+
+=item --no-keep-root  (boolean)
+
+Do not include the top node in the output.
+
+=item --mixed HOW
+
+[1.32] How to treat mixed elements.  The default is TEXTUAL.  Other values
+are C<ATTRIBUTES>, C<XML_STRING>, and C<STRUCTURAL>.  More details
+about mixed_elements in XML::Compile::Translate::Reader.
+
+=item --type|-t TYPE
+
+The type of the root element, required if the XML is not namespaceo
+qualified, although the schema is.  If not specified, the root element
+is automatically inspected.
+
+The TYPE notation is C<{namespace}localname>.  Be warned to use quoting
+on the UNIX command-line, because curly braces have a special meaning
+for the shell.
+
+=item --output|-o filename
+
+By default (or when the filename is a dash), the output is printed to stdout.
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of Perl's XML-Compile distribution.
+Website: F<http://perl.overmeer.net/xml-compile/>
+
+=head1 LICENSE
+
+Copyrights 2017 by Slaven Rezic and Mark Overmeer. For other contributors
+see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE feed SYSTEM "http://dtd.rivalsdm.com/football/latestNews/1.0">
+<feed vendorName="RIVALSDM" id="RDM_football_latest_news" status="NORMAL">
+<!-- for internal rivals use -->
+<feed-info comp-id="" event-type="" gen-date=""/> 
+    <content.item id="RDM_football_latest_news_20011029" order="1">
+        <content.meta>
+            <author>RivalsDM</author>
+            <category>News</category>
+            <copyright>RivalsDM</copyright>
+            <vendor>RivalsDM</vendor>
+           <keywords>
+                 <keyword>Manchester United</keyword>
+                 <keyword>Beckham</keyword>
+          </keywords>
+        </content.meta>
+	<foobar/>
+        <content.head>
+            <title>Football365 Latest News</title>
+            <dateline>29/10/2001 20:23 +0100</dateline>
+        </content.head>
+        <content.body>
+            <article>
+                <FullVersion>
+                    <FullHeadline>Beckham Quits Old Trafford</FullHeadline>
+                    <FullStrapline>England captain, Daid Beckhams, has finally announced he is leaving Manchester United after a record 6 Premiership wins</FullStrapline>
+                    <FullBodytext>
+                        <Para>Beckham's wife Victoria 'Posh Spice' Adams was at his side when he made the announcement to a massive gallery of journalists and well wishers.</para>
+                    <Para>Beckham has signed a lucrative five year deal with Real Madrid and will be leaving Old Trafford at the end of next season </Para>
+                  <Para>United manager Sir Alex Ferguson wished Beckham well and paid him the compliment of telling the assembled media corps that Beckham was without doubt United's greatest ever player.</para>
+                   </FullBodytext>
+                </FullVersion>
+                <ShortVersion>
+                    <ShortHeadline> Beckham Quits Old Trafford </ShortHeadline>
+                    <ShortBodytext>
+                        <Para> England captain, David Beckham, has finally announced he is leaving Manchester United after signing a five year deal at Real Madrid.</Para>
+                        <Para>The United skipper will be leaving Old Trafford at the end of this season and was described by Sir Alex Ferguson as United's greatest ever player.</para>
+                    </ShortBodytext>
+                </ShortVersion>
+		     <XShortVersion>
+			<XShortHeadline></XShortHeadline>
+			<XShortBodytext>England captain, David Beckham, has finally announced he is leaving Manchester United after signing a five year deal at Real Madrid.</XShortBodytext>
+</XShortVersion>
+            </article>
+        </content.body>
+    </content.item>
+</feed>

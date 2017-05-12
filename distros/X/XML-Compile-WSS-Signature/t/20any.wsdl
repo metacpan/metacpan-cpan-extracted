@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions
+    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+    xmlns:tns="http://example.net/"
+    xmlns:s="http://www.w3.org/2001/XMLSchema"
+    xmlns:http="http://schemas.xmlsoap.org/wsdl/http/"
+    xmlns="http://schemas.xmlsoap.org/wsdl/"
+    targetNamespace="http://example.net/">
+    <types>
+        <s:schema targetNamespace="http://example.net/" 
+            elementFormDefault="qualified">
+
+            <s:element name="TestReqResp">
+                <s:complexType>
+                    <s:all>
+                        <s:element name="One" type="s:string"/>
+                        <s:element name="Two" type="s:string"/>
+                        <s:element name="Three" type="s:string"/>
+                    </s:all>
+                </s:complexType>
+            </s:element>
+        </s:schema>
+    </types>
+    <message name="TestRequest">
+        <part name="TestRequest" element="tns:TestReqResp" />
+    </message>
+    <message name="TestResponse">
+        <part name="TestResponse" element="tns:TestReqResp"/>
+    </message>
+    <portType name="Example">
+        <operation name="Test">
+            <input message="tns:TestRequest"/>
+            <output message="tns:TestResponse"/>
+        </operation>
+    </portType>
+    <binding name="Example" type="tns:Example">
+        <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="rpc"/>
+        <operation name="Test">
+            <soap:operation style="rpc"/>
+            <input>
+                <soap:body use="literal" namespace="http://example.net/"/>
+            </input>
+            <output>
+                <soap:body use="literal" namespace="http://example.net/"/>
+            </output>
+        </operation>
+    </binding>
+    <service name="Example">
+        <port name="Example" binding="tns:Example">
+            <soap:address location="http://localhost:5000/Example"/>
+        </port>
+    </service>
+</definitions>

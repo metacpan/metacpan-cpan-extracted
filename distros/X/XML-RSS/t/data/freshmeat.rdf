@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<rdf:RDF
+ xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+ xmlns="http://purl.org/rss/1.0/"
+ xmlns:dc="http://purl.org/dc/elements/1.1/"
+ xmlns:fm="http://freshmeat.net/backend/fm-releases-0.1.dtd"
+>
+  <channel rdf:about="http://themes.freshmeat.net/">
+    <title>freshmeat.net - Themes</title>
+    <link>http://themes.freshmeat.net/</link>
+    <description>freshmeat.net maintains the Web's largest index of Unix and cross-platform open source software. Thousands of applications are meticulously cataloged in the freshmeat.net database, and links to new code are added daily.</description>
+    <dc:language>en-us</dc:language>
+    <dc:subject>Technology</dc:subject>
+
+    <dc:publisher>freshmeat.net</dc:publisher>
+    <dc:creator>freshmeat.net contributors</dc:creator>
+    <dc:rights>Copyright (c) 1997-2002 OSDN</dc:rights>
+    <dc:date>2003-01-18T01:20+00:00</dc:date>
+    <items>
+      <rdf:Seq>
+        <rdf:li rdf:resource="http://themes.freshmeat.net/releases/109704/" />
+
+        <rdf:li rdf:resource="http://themes.freshmeat.net/releases/109670/" />
+        <rdf:li rdf:resource="http://themes.freshmeat.net/releases/109706/" />
+        <rdf:li rdf:resource="http://themes.freshmeat.net/releases/109705/" />
+        <rdf:li rdf:resource="http://themes.freshmeat.net/releases/109489/" />
+        <rdf:li rdf:resource="http://themes.freshmeat.net/releases/109383/" />
+        <rdf:li rdf:resource="http://themes.freshmeat.net/releases/109250/" />
+        <rdf:li rdf:resource="http://themes.freshmeat.net/releases/109215/" />
+        <rdf:li rdf:resource="http://themes.freshmeat.net/releases/109204/" />
+        <rdf:li rdf:resource="http://themes.freshmeat.net/releases/108775/" />
+
+      </rdf:Seq>
+    </items>
+    <image rdf:resource="http://images.freshmeat.net/button.gif" />
+    <textinput rdf:resource="http://themes.freshmeat.net/search/" />
+  </channel>
+  <image rdf:about="http://images.freshmeat.net/button.gif">
+    <title>freshmeat.net</title>
+    <url>http://images.freshmeat.net/button.gif</url>
+
+    <link>http://themes.freshmeat.net/</link>
+  </image>
+  <item rdf:about="http://themes.freshmeat.net/releases/109704/">
+    <title>AlterEgo 1.0 (Stable)</title>
+    <link>http://themes.freshmeat.net/releases/109704/</link>
+    <description>A classy theme with blue, silver, grey, and green.</description>
+    <dc:date>2003-01-16T14:12-06:00</dc:date>
+
+    <fm:screenshot_url>http://images.freshmeat.net/screenshots/34238_thumb.jpg</fm:screenshot_url>
+  </item>
+  <item rdf:about="http://themes.freshmeat.net/releases/109670/">
+    <title>WhiteBox 0.1 </title>
+    <link>http://themes.freshmeat.net/releases/109670/</link>
+    <description>A light and clean theme.</description>
+    <dc:date>2003-01-16T14:12-06:00</dc:date>
+
+    <fm:screenshot_url>http://images.freshmeat.net/screenshots/34235_thumb.png</fm:screenshot_url>
+  </item>
+  <item rdf:about="http://themes.freshmeat.net/releases/109706/">
+    <title>MacOS9 .3 </title>
+    <link>http://themes.freshmeat.net/releases/109706/</link>
+    <description>A MacOS 9  theme.</description>
+    <dc:date>2003-01-16T10:21-06:00</dc:date>
+
+    <fm:screenshot_url>http://images.freshmeat.net/screenshots/33230_thumb.png</fm:screenshot_url>
+  </item>
+  <item rdf:about="http://themes.freshmeat.net/releases/109705/">
+    <title>MacOS9 .2 </title>
+    <link>http://themes.freshmeat.net/releases/109705/</link>
+    <description>A MacOS 9  theme.</description>
+    <dc:date>2003-01-16T10:21-06:00</dc:date>
+
+    <fm:screenshot_url>http://images.freshmeat.net/screenshots/33230_thumb.png</fm:screenshot_url>
+  </item>
+  <item rdf:about="http://themes.freshmeat.net/releases/109489/">
+    <title>Fossils of the Machines 1.1 </title>
+    <link>http://themes.freshmeat.net/releases/109489/</link>
+    <description>An old rusty machine look. Some elements inspired by the steamgoth Winamp theme.</description>
+    <dc:date>2003-01-13T22:50-06:00</dc:date>
+
+    <fm:screenshot_url>http://images.freshmeat.net/screenshots/31633_thumb.jpg</fm:screenshot_url>
+  </item>
+  <item rdf:about="http://themes.freshmeat.net/releases/109383/">
+    <title>Think Tux 1.0 </title>
+    <link>http://themes.freshmeat.net/releases/109383/</link>
+    <description>An Aqua/MacOS-style background featuring Tux.</description>
+    <dc:date>2003-01-13T09:21-06:00</dc:date>
+
+    <fm:screenshot_url>http://images.freshmeat.net/screenshots/34165_thumb.jpg</fm:screenshot_url>
+  </item>
+  <item rdf:about="http://themes.freshmeat.net/releases/109250/">
+    <title>Radio Birdman Clothified 1.0 </title>
+    <link>http://themes.freshmeat.net/releases/109250/</link>
+    <description>The Radio Birdman emblem clothied</description>
+    <dc:date>2003-01-12T17:25-06:00</dc:date>
+
+    <fm:screenshot_url>http://images.freshmeat.net/screenshots/34142_thumb.png</fm:screenshot_url>
+  </item>
+  <item rdf:about="http://themes.freshmeat.net/releases/109215/">
+    <title>Slackflux_Blue 1.0 </title>
+    <link>http://themes.freshmeat.net/releases/109215/</link>
+    <description>A simple Fluxbox theme featuring the Slack logo and Mr. Penguin.</description>
+    <dc:date>2003-01-12T17:25-06:00</dc:date>
+
+    <fm:screenshot_url>http://images.freshmeat.net/screenshots/34129_thumb.png</fm:screenshot_url>
+  </item>
+  <item rdf:about="http://themes.freshmeat.net/releases/109204/">
+    <title>MyBox 0.1 </title>
+    <link>http://themes.freshmeat.net/releases/109204/</link>
+    <description>A bright/bluish clean theme for Fluxbox/Blackbox.</description>
+    <dc:date>2003-01-12T17:24-06:00</dc:date>
+
+    <fm:screenshot_url>http://images.freshmeat.net/screenshots/34124_thumb.jpg</fm:screenshot_url>
+  </item>
+  <item rdf:about="http://themes.freshmeat.net/releases/108775/">
+    <title>Linux Power Wallpaper 1.0 </title>
+    <link>http://themes.freshmeat.net/releases/108775/</link>
+    <description>Wallpaper depicting the &amp;quot;power&amp;quot; of Linux.</description>
+
+    <dc:date>2003-01-12T17:24-06:00</dc:date>
+    <fm:screenshot_url>http://images.freshmeat.net/screenshots/34019_thumb.jpg</fm:screenshot_url>
+  </item>
+  <textinput rdf:about="http://themes.freshmeat.net/search/">
+    <title>Search freshmeat.net</title>
+    <description>Search freshmeat.net projects</description>
+    <name>q</name>
+
+    <link>http://themes.freshmeat.net/search/</link>
+  </textinput>
+</rdf:RDF>

@@ -1,0 +1,103 @@
+{
+   "abstract" : "XML Syndication Feed Support",
+   "author" : [
+      "Six Apart"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4214",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "XML-Feed",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "URI" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::ErrorHandler" : "0",
+            "DateTime" : "0",
+            "DateTime::Format::Mail" : "0",
+            "DateTime::Format::W3CDTF" : "0",
+            "Feed::Find" : "0",
+            "HTML::Entities" : "0",
+            "HTML::TokeParser" : "0",
+            "LWP::UserAgent" : "0",
+            "List::Util" : "0",
+            "Module::Pluggable" : "0",
+            "Scalar::Util" : "0",
+            "Test::More" : "0",
+            "URI::Fetch" : "0",
+            "XML::Atom" : "0.38",
+            "XML::LibXML" : "1.66",
+            "XML::RSS" : "1.47"
+         }
+      }
+   },
+   "provides" : {
+      "XML::Feed" : {
+         "file" : "lib/XML/Feed.pm",
+         "version" : "0.53"
+      },
+      "XML::Feed::Content" : {
+         "file" : "lib/XML/Feed/Content.pm",
+         "version" : "0.53"
+      },
+      "XML::Feed::Enclosure" : {
+         "file" : "lib/XML/Feed/Enclosure.pm",
+         "version" : "0.53"
+      },
+      "XML::Feed::Entry" : {
+         "file" : "lib/XML/Feed/Entry.pm",
+         "version" : "0.53"
+      },
+      "XML::Feed::Entry::Format::Atom" : {
+         "file" : "lib/XML/Feed/Entry/Format/Atom.pm",
+         "version" : "0.53"
+      },
+      "XML::Feed::Entry::Format::RSS" : {
+         "file" : "lib/XML/Feed/Entry/Format/RSS.pm",
+         "version" : "0.53"
+      },
+      "XML::Feed::Format::Atom" : {
+         "file" : "lib/XML/Feed/Format/Atom.pm",
+         "version" : "0.53"
+      },
+      "XML::Feed::Format::RSS" : {
+         "file" : "lib/XML/Feed/Format/RSS.pm",
+         "version" : "0.53"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/davorg/xml-feed"
+      }
+   },
+   "version" : "0.53",
+   "x_contributors" : [
+      "Dave Cross <davecross@cpan.org>",
+      "Jakob Voss <voss@gbv.de>",
+      "Tatsuhiko Miyagawa <miyagawa@bulknews.net>",
+      "Simon Wistow <simon@thegestalt.org>",
+      "Gabor Szabo <szabgab@cpan.org>",
+      "Minty Walker <mintywalker@gmail.com>",
+      "Karen Etheridge <ether@cpan.org>",
+      "Gerard Ribugent Navarro <ribugent@cpan.org>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

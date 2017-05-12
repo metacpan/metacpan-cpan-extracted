@@ -1,0 +1,10 @@
+<p>
+[% IF (n = docset.size) > 1 -%]
+There are [% n %] documents for your inspection:
+[% ELSIF n == 1 -%]
+There is just 1 document available:
+[% ELSE %]
+There are no further documents available.
+[% END %]
+[% INCLUDE docset/index IF n %]
+<p>

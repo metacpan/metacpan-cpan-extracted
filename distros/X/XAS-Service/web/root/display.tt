@@ -1,0 +1,32 @@
+[%#                                                    %]
+[%# File: display.tt                                   %]
+[%# Date: 01-Apr-2016                                  %]
+[%# By  : Kevin Esteb                                  %]
+[%#                                                    %]
+[%# invoke INCLUDE display.tt data = <variable>        %]
+[%#                                                    %]
+<table class="bordertable">
+  <caption>[% data.heading %]</caption>
+  <tbody>
+[%- FOREACH field IN data.fields %]
+    <tr>
+  [% UNLESS field == '_links' %]
+      <td>[% field %]</td>
+      <td>[% data.$field %]</td>
+  [% END -%]
+    </tr>
+[% END-%]
+  </tbody>
+  <tfoot>
+    <tr>
+      <td>
+[%- IF data._links.delete %]
+ <a href="[% data._links.delete.href %]" class="ym-button ym-delete action_delete">[% data._links.delete.title %]</a> 
+[% END -%]
+[%- IF data._links.update %]
+ <a href="[% data._links.update.href %]" class="ym-button ym-edit">[% data._links.update.title %]</a>
+[% END -%]
+      </td>
+    </tr>
+  </tfoot>
+</table>

@@ -1,0 +1,53 @@
+#!/usr/bin/env perl
+
+use XML::LibXML::PrettyPrint qw(print_xml);
+print_xml <>;
+
+__END__
+
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+xml-pretty - pretty-print XML to STDOUT
+
+=head1 SYNOPSIS
+
+B<< xml-pretty >> INPUTFILE
+
+B<< cat >> INPUTFILE | B<< xml-pretty >>
+
+=head1 DESCRIPTION
+
+B<xml-pretty> reads XML from an input file or STDIN, formats it using
+L<XML::LibXML::PrettyPrint> using its default settings, and prints it
+to STDOUT.
+
+=head1 BUGS
+
+Please report any bugs to
+L<http://rt.cpan.org/Dist/Display.html?Queue=XML-LibXML-PrettyPrint>.
+
+=head1 SEE ALSO
+
+L<XML::LibXML::PrettyPrint>, L<xmllint(1)>.
+
+=head1 AUTHOR
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2014 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

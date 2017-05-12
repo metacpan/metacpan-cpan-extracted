@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0">
+  <channel>
+    <title>my little example feed</title>
+    <link>http://www.example.com/</link>
+    <description>example tagline</description>
+    <language>en</language>
+    <author>FEED AUTHOR</author>
+    <generator>FEED GENERATOR</generator>
+    <lastBuildDate>Sat, 01 Jan 2000 12:00:00 GMT</lastBuildDate>
+    <webMaster>WEBMASTER</webMaster>
+    <source>FEED SOURCE</source>
+    <category>FEED SUBJECT</category>
+    <expirationDate>Sat, 01 Jan 2000 12:00:00 GMT</expirationDate>
+  <item>
+    <title>First post</title>
+    <link>http://www.example.com/archives/1</link>
+    <description>First post!</description>
+  </item>
+  </channel>
+</rss>

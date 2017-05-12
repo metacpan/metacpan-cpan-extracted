@@ -1,0 +1,11 @@
+<ul>
+[% FOREACH item = docset -%]
+<li><a href="[% item.url %]">[% item.title %]</a>
+[% IF item.about -%]
+<br>
+<ul>
+[% about %]
+</ul>
+[% END -%]
+[% END -%]
+</ul>

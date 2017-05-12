@@ -1,0 +1,214 @@
+Revision history for Perl extension XML::Smart.
+
+
+1.78 2013-9-12
+    - Fixed hash randomization bug Id:84929
+    - lib/XML/Smart.pm:  Formatting update, no changes to code. 
+    - lib/XML/Smart/Data.pm: Fixed hash randomization bug Id:84929
+    - lib/XML/Smart/Tree.pm: Formatting update, no changes to code. 
+    - Updated the following files to reflect bug fix:
+      	t/base_tests.t
+	t/base_tests_for_mem_leak.t
+    	t/base_tests_for_objcopy.t
+	t/base_tests_multi_obj.t
+	t/special_char_from_url.t
+    - Added License to Makefile.PL
+    - Fixed warnigns bug id:84006
+    - Fixed pod errors.
+
+1.77  2013-2-13
+    - Rewrote tests with Test::More to prevent fails in OpenBSD, Fedora and some versions of Win.
+
+1.76  2013-2-05
+    - Fixed dependency fail by skipping author tests.
+
+1.75  2013-2-05
+    - Fixed dependency fail by adding prerequisite 'Object::MultiType'  => 0.03
+
+1.74  2013-2-04
+    - Fixed POD errors
+    - Removed unnecessary modules from tests.
+    - Removed warnings from Tree and Tie
+    - Removed Binary data from Smart.pm
+    - Added or croak to all file open()s
+
+1.73  2013-1-28
+    - Fixed bug 17834 in Tree.pm
+    - Fixed object copy bug 34695
+    - Updated POD to reflect where obj copy is not supported.
+    - Fixed object Deep copy bug ( bug id 56806 ) 
+    - Fixed Mem leak and added tests.
+    - Added ANNIHILATE for better object destruction
+    - Fixed Encoding errors, added tests and added to pod
+
+1.71  2013-1-26
+    - Updated all pm to use strict and warnings
+    - Updated tests to use strict and warnings 
+    - Added basic tests such as load
+    - Moved tests to t/
+    - Gramatical Corrections to POD
+    - Removed binary data from POD ( bug id 53321 ) 
+    - Updated list of binary data thats handled. 
+    - Tree.pm updated to allow warnings after usage ( patch from bug ticket id: 27310 )
+    - XML encoding declaration changed from utf-8 to UTF-8 ( bug id 76668 )
+    - Fixed URL tests ( bug id 34562 fix provided )
+    - Check added for existence of object in destructor ( bug id 62091 fix provided )
+
+1.6.9 2004-9-21
+    - dump_tree() and similars methods will dump hash keys sorted now.
+    - Hooks on_start, on_char and on_end for the parser will receive the parser object too.
+
+
+1.6.8 2004-8-3
+    - Fixed minor bug for order of keys and new multiple elements.
+    - Fixed assigment of content with the method content() for new trees.
+    - Added order to the attributes when using apply_dtd().
+    - Fixed apply_dtd() when we have an ELEMENT and an ATTRIBUTE with the same name.
+
+
+1.6.7 2004-7-19
+    - Fixed minor bug with internal flag {null}. use as a boolean, and not as defined {null} changed.
+    - Fixed minor bug with data_pointer() and root element name.
+
+
+1.6.6 2004-7-8
+    - Fixed minor bug on content order for multiple contents and null contents chunks.
+    - Fixed wrong creation of key in the tree when using is_node() for null pointers.
+
+
+1.6.5 2004-5-29
+    - Fixed some minor bug for the bugged Perl 5.8.0.
+
+
+1.6.4 2004-5-29
+    - ReFixed minor bug on internal function _is_unicode().
+
+
+1.6.3 2004-5-29
+    - Fixed minor bug on internal function _is_unicode().
+    
+
+1.6.2 2004-5-28
+    - Fixed minor bug on XML::Smart::DTD.
+
+
+1.6.1 2004-5-26
+    - Added support to DTD: new method apply_dtd().
+    - Fixed bug when values are XML::Smart objects and the key order.
+    - Fixed bug with creation of null trees and orders of already existing keys.
+    - Added FAQ and Tutorial documents for XML::Smart.
+
+
+1.6 2004-5-9
+    - Fixed minor bug with search of attributes when they are as contents.
+
+
+1.5.9 2004-4-12
+    - Fixed minor bug with null trees and arrays.
+
+
+1.5.8 2004-4-11
+    - Added methods tree_ok(), tree_pointer_ok(), pointer_ok(), dump_tree(),
+      dump_tree_pointer(), dump_pointer().
+    - Fixed position of CONTENT for single content with tags when creating the XML data().
+    - Fixed comment handling: <!-- ... -->
+
+
+1.5.7 2004-03-23
+    - Fixed minor bug with BINARY data and XML::Parser, that handles each line
+      of a content as a multiple content.
+    
+    * Thanks to Rusty Allen <mallen8@houston.sns.slb.com> for the extensive tests
+      of CDATA and BINARY handling of XML::Smart.
+
+
+1.5.6 2004-03-23
+    - Fixed minor mistake on set_cdata() method and cdata id inside data().
+
+
+1.5.5 2004-03-23
+    - Added methods set_auto() , set_auto_node(), set_binary(), set_cdata().
+    - Fixed bug on copy().
+    - Fixed bug with data() when CONTENT key is found and should be CDATA or BINARY.
+
+
+1.5.4 2004-02-23
+    - Added autoload of parts of the module, to save load memory.
+
+
+1.5.3 2004-02-23
+    - Just minor changes and fixes.
+
+
+1.5.2 2004-02-15
+    - Fixed some minor bug on PUSH and UNSHIFT.
+    - Added support for multiple nodes for the same tag and interpolation of different nodes.
+    - Removed duplicated entry of '/.CONTENT/0' at '/order' key.
+    - Added new tests and revision of the previous tests.
+
+
+1.5.1 2004-02-05
+    - Fixed simple bug when XML::Smart object used on recursions/loops.
+
+
+1.5 2004-01-15
+    - Added method aliase tree_pointer().
+    - Added method root().
+    - Added event handlers: on_start, on_char, on_end.
+    - Multiple contents handled in different way. $xml->{CONTENT} is tied
+      and the data will be at $xml->{'/.CONTENT/0} , $xml->{'/.CONTENT/1} , $xml->{'/.CONTENT/2}...
+    - data() will keep the multiple contents order.
+    - content(i , data) can be used to set a content part.
+    - $srt = content() returns all the multiple contents grouped.
+
+
+1.4.1 25/10/2003
+    - Fixed set_node(). Not full implemented on previous version! sorry.
+    - Fixed openned tags for XML::Smart::HTMLParser. Now closing near the open tag.
+    - Fixed external access of /nodes and /order, avoiding internal handling of
+      them as normal keys.
+    - Fixed bug at nodes(), nodes_keys(), args(), to identify HASH/ARRAY ref().
+    - Fixed bug at XML::Smart::HTMLParser, when an attribute value has 2 '>' inside.
+    - Fixed prerequisite at test.pl.
+    - Fixed warnings.
+
+1.4 10/10/2003
+    - Fixed bug for {arg}{CONTENT}, when {arg} not defined yet.
+    - An argument now can be forced/unforced to be a node (tag) when XML data is generated.
+    - Generation of XML data now keep the elements order, based in the previous document loaded or in the elements creation.
+    - Added multiple searches at the same time to find().
+    - Fixed delete {arg}[0].
+    - Fixed pointer() when pointing to a content.
+    - Fixed some others minor bugs.
+    - New methods: nodes(), nodes_keys(), args(), args_values(), set_node(), set_order(), path(), path_as_xpath(), xpath(), xpath_pointer().
+
+
+1.3.1 18/06/2003
+    - Just a bug fix in XML::Smart::Parser for CDATA.
+
+1.3  15/06/2003
+    - Can build/load Wild XML data (like HTML).
+    - New methods: null(), key(), i().
+    - Fixed select search with multiple values. And added support to search in keys, not only ARRAY ref.
+    - Accept a XML::Smart object as a value in the tree. When parsing to generate the data, the XML::Smart->tree is got.
+    - Upgrade to Object::MultiType 0.2, due a bug when using XML::Smart as a boolean.
+
+1.2  Mon May 30 02:03:00 2003
+    - Added cut_root(), base(), back(), copy() and data_pointer() methods.
+    - New resource "return format".
+    - Support for basic entities (defaults).
+    - Added Support for URLs (with LWP::UserAgent).
+    - Unicode (UTF-8) support. (Work only on Perl-5.8+)
+    - Added support for binary and CDATA content and automatically detection of both.
+    - Added meta generator tag.
+    - Fixed bug in XML::Smart::Parser (XML::Parser::Lite). Break of REGEX parser on sub REGEX execution.
+    - Fixed bug with quotes.
+
+1.1  Mon May 23 03:12:12 2003
+    - Fixed some bugs.
+
+1.0  Mon May 12 11:02:48 2003
+    - First release!
+    - original version; created by h2xs 1.21 with options
+        -X -A -n XML::Smart
+

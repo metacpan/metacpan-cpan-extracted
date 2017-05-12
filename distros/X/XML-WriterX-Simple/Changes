@@ -1,0 +1,13 @@
+Revision history for XML-WriterX-Simple
+
+0.151401  2015-05-20 19:16:49+02:00 Europe/Paris
+        add perl 5.10 dependency
+0.151400  2015-05-20 17:23:14+02:00 Europe/Paris
+        add tag sequence production
+0.151380  2015-05-18 08:04:42+02:00 Europe/Paris
+        add XML::Writer to prereqs manually
+0.151350  2015-05-15 12:19:09+02:00 Europe/Paris
+        fix "my $_" in stringify.
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

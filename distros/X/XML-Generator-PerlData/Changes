@@ -1,0 +1,36 @@
+Revision history for Perl extension XML::Generator::PerlData.
+
+0.95 Fri Oct 2 2015
+    - Make things more CPAN-friendly
+      patches graciously submitted by Alan Berndt
+
+0.89  Fri Jun 5 2003
+	- Fix for start_document. Bug reported by
+	  Tim Müller-Seydlitz <tms@nagler-company.com>
+
+0.87  Fri Feb 08 2002
+	- Added 'charmap' option and methods
+	- allowed keymaps to take a coderef for renaming.
+	- added support for '*' (all keys) in keymap.
+	- added more docs.
+
+0.85  Sat Jan 26 2002
+	- fixed overzealous attribute ref() bug (Thanks to Bryan Dumm for the catch).
+	- more doc fixes.
+
+0.77  Sat Jan 26 2002
+	- added start/endprefix mapping events.
+
+0.73  Fri Jan 25 2002
+	- lots of interface cleanup.
+	- doc fixes.
+
+0.71  Fri Jan 25 2002
+	- added element/attr name fixing.
+
+0.50  Mon Jan 14 2002
+	- Initial import from backyard project.
+
+0.01  Mon Jan 14 2002
+	- original version; created by h2xs 1.19
+

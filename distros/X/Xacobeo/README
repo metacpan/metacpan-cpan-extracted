@@ -1,0 +1,49 @@
+Xacobeo
+=======
+
+This CPAN package provides a simple GUI for building and running XPath queries.
+It consists of a graphical user interface which shows the content of an XML
+document and allows the user to write and execute arbitrary XPath queries. Once
+a query has been executed its results are displayed in the application.
+
+The main goal of this program is to provide a view of the XML document as an XML
+parser sees it. Thus, each element and attribute is prefixed with a namespace
+if the node uses one in the original document, this is no matter if in the
+original document it was declared with a default namespace, if it inherited the
+parent's namespace or if it was using a prefix.
+
+The program registers automatically the namespaces declared in the document.
+This allows the XPath expressions to use namespaces automatically without any
+configuration.
+
+INSTALLATION
+
+To install this module type the following:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+PROJECT
+
+The project is now hosted on github (http://github.com/potyl/xacobeo/) which
+provides the latest source code and a simple bug tracking.
+
+Even tough github provides a download facility, the project's source code
+bundles will always be published through CPAN. It's easier this way for the
+project and after all this is a Perl project!
+
+BUGS
+
+Please when possible try to submit the bugs through the github issue tracker
+(http://github.com/potyl/xacobeo/issues) otherwise simply create a ticket
+through RT.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008-2009 by Emmanuel Rodriguez
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.

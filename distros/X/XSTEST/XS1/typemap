@@ -1,0 +1,3 @@
+TYPEMAP
+AV *	O_AvRV
+SV *	T_SV

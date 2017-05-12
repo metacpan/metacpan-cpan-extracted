@@ -1,0 +1,194 @@
+=encoding utf8
+
+=head1 NAME
+
+XML::Compile::Schema::Instance - Represents one schema
+
+=head1 SYNOPSIS
+
+ # Used internally by XML::Compile::Schema
+ my $schema = XML::Compile::Schema::Instance->new($xml);
+
+=head1 DESCRIPTION
+
+This module collect information from one schema, and helps to
+process it.
+
+=head1 METHODS
+
+=head2 Constructors
+
+=over 4
+
+=item $obj-E<gt>B<new>($top, %options)
+
+Get's the top of an XML::LibXML tree, which must be a schema element.
+The tree is parsed: the information collected.
+
+ -Option                --Default
+  attribute_form_default  <undef>
+  element_form_default    <undef>
+  filename                undef
+  source                  undef
+  target_namespace        <undef>
+
+=over 2
+
+=item attribute_form_default => 'qualified'|'unqualified'
+
+=item element_form_default => 'qualified'|'unqualified'
+
+Overrule the default as found in the schema.  Many old schemas (like
+WSDL11 and SOAP11) do not specify the default in the schema but only
+in the text.
+
+=item filename => FILENAME
+
+When the source is some file, this is its name.
+
+=item source => STRING
+
+An indication where this information came from.
+
+=item target_namespace => NAMESPACE
+
+Overrule or set the target namespace.
+
+=back
+
+=back
+
+=head2 Accessors
+
+=over 4
+
+=item $obj-E<gt>B<attributeGroups>()
+
+Returns a list of all defined attribute groups.
+
+=item $obj-E<gt>B<attributes>()
+
+Returns a lost of all globally defined attribute names.
+
+=item $obj-E<gt>B<complexTypes>()
+
+Returns a list with all complexType names.
+
+=item $obj-E<gt>B<element>($uri)
+
+Returns one global element definition.
+
+=item $obj-E<gt>B<elements>()
+
+Returns a list of all globally defined element names.
+
+=item $obj-E<gt>B<filename>()
+
+=item $obj-E<gt>B<groups>()
+
+Returns a list of all defined model groups.
+
+=item $obj-E<gt>B<schema>()
+
+=item $obj-E<gt>B<schemaInstance>()
+
+=item $obj-E<gt>B<schemaNamespace>()
+
+=item $obj-E<gt>B<sgs>()
+
+Returns a HASH with the base-type as key and an ARRAY of types
+which extend it.
+
+=item $obj-E<gt>B<simpleTypes>()
+
+Returns a list with all simpleType names.
+
+=item $obj-E<gt>B<source>()
+
+=item $obj-E<gt>B<targetNamespace>()
+
+=item $obj-E<gt>B<tnses>()
+
+A schema can defined more than one target namespace, where recent
+schema spec changes provide a targetNamespace attribute.
+
+=item $obj-E<gt>B<type>($uri)
+
+Returns the type definition with the specified name.
+
+=item $obj-E<gt>B<types>()
+
+Returns a list of all simpleTypes and complexTypes
+
+=back
+
+=head2 Index
+
+=over 4
+
+=item $obj-E<gt>B<find>($kind, $fullname)
+
+Returns the definition for the object of $kind, with $fullname.
+
+example: of find
+
+  my $attr = $instance->find(attribute => '{myns}my_global_attr');
+
+=item $obj-E<gt>B<importLocations>($ns)
+
+Returns a list of all schemaLocations specified with the import $ns
+(one of the values returned by L<imports()|XML::Compile::Schema::Instance/"Index">).
+
+=item $obj-E<gt>B<imports>()
+
+Returns a list with all namespaces which need to be imported.
+
+=item $obj-E<gt>B<includeLocations>()
+
+Returns a list of all schemaLocations which where specified with include
+statements.
+
+=item $obj-E<gt>B<printIndex>( [$fh], %options )
+
+Prints an overview over the defined objects within this schema to the
+selected $fh.
+
+ -Option       --Default
+  kinds          <all>
+  list_abstract  <true>
+
+=over 2
+
+=item kinds => KIND|ARRAY-of-KIND
+
+Which KIND of definitions would you like to see.  Pick from
+C<element>, C<attribute>, C<simpleType>, C<complexType>, C<attributeGroup>,
+and C<group>.
+
+=item list_abstract => BOOLEAN
+
+Show abstract elements, or skip them (because they cannot be instantiated
+anyway).
+
+=back
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of XML-Compile distribution version 1.56,
+built on March 30, 2017. Website: F<http://perl.overmeer.net/xml-compile/>
+
+Please post questions or ideas to the mailinglist at
+F<http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/xml-compile> .
+For live contact with other developers, visit the C<#xml-compile> channel
+on C<irc.perl.org>.
+
+=head1 LICENSE
+
+Copyrights 2006-2017 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the Artistic license.
+See F<http://dev.perl.org/licenses/artistic.html>
+

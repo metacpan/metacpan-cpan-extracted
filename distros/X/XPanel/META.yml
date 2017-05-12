@@ -1,0 +1,14 @@
+name: XPanel
+version: 0.0.1
+version_from: lib/XPanel.pm
+installdirs:  site
+requires:
+   CGI::Session:
+   File::Type:
+   Digest::MD5:
+   Test::More:
+   HTML::Template:
+   Geo::IP::PurePerl:
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

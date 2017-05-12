@@ -1,0 +1,48 @@
+Revision history for Perl extension XML::FOAFKnows::FromvCard.
+
+0.6   2005-11-19 23:46
+        - Fixed a spec violation (duh!) bug, I had used uri instead of
+	  url.
+
+
+0.51  2005-10-20 00:25
+        - Previous release did not pass tests, so, fixed that bug.
+	- Added another 6 UTF8-related tests.
+	
+0.5   2005-10-12 23:00
+	- Punycode-encode nodeIDs, to support nicks that have non-ASCII
+	  characters.
+	- Document that people will have to ensure that their input is
+	  UTF-8.
+	- foafvcard attempts to decode the data to ensure that it is
+	  UTF-8, as is required above.
+	- I think these UTF-8 changes makes it depend on 5.7.3.
+	- Handle no data more gracefully.
+
+0.4   2005-09-18 00:50
+	- More privacy features.
+	- More documentation, especially about privacy issues.
+	- Many more tests.
+	- Added a dependency to the most recent Text::vCard since previous
+	  versions had seqfault issues.
+	- URLs will be added even for non-public data, but not with title.
+	- Thanks to Libby Miller for sharing her vCards and for testing. :-)
+	
+0.3   2005-09-17 00:20
+	- New tests.
+	- Will install the foafvcard script appropriately and make it more 
+	  usable.
+	- A little more documentation.
+	
+0.2   2005-08-30 01:00
+	- Renamed it since it isn't really a Formatter, even though it
+	  conforms to the specification. Thanks to Tom Insam for
+	  discussion.
+	- Implemented a more thorough scheme for identifying the Person
+	  behind the knows. Thanks to Jim Ley.
+	- Added a simple person count as nodeID if there is no nick.
+	
+0.01  Sat Aug 27 20:58:30 2005
+	- original version; created by h2xs 1.23 with options
+		-AX -b 5.6.0 -n Formatter::FOAFKnows::vCard
+

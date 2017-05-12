@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+
+
+<s1 
+		xmlns:xs='http://www.w3.org/2001/XMLSchema-instance' 
+>   
+	<ela>
+		<el0>ela_2</el0>
+<!--		<el1>
+			<el0_ct1>el01_ct1</el0_ct1>
+		</el1>
+-->
+	</ela>
+
+	<elb> 			
+		<el0>elb_2</el0>
+	</elb>
+	<elc>elc_2</elc>
+	<eld>
+		<eld1>eld_1</eld1>
+		<eld2>eld_2</eld2>
+	</eld>
+	<ele>
+		<el0>ele_2</el0>  
+	</ele>
+
+</s1>
+
+
+

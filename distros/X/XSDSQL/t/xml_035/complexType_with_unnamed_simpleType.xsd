@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+
+ 	<xs:complexType name="c">
+		<xs:sequence>
+		  <xs:element name="col1">
+			<xs:simpleType>
+			  <xs:restriction base="xs:string">
+			    <xs:maxLength value="60" />
+			  </xs:restriction>
+			</xs:simpleType>
+		  </xs:element>
+		  <xs:element minOccurs="0" name="col2">
+			<xs:simpleType>
+			  <xs:restriction base="xs:string">
+			    <xs:maxLength value="30" />
+			  </xs:restriction>
+			</xs:simpleType>
+		  </xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	
+
+	<xs:element name="root">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="e1">
+					<xs:simpleType>
+					  <xs:restriction base="xs:string">
+						<xs:maxLength value="50" />
+					  </xs:restriction>
+					</xs:simpleType>
+				</xs:element>			
+				<xs:element name="e2" type="c" minOccurs="0" maxOccurs="1"/>
+				<xs:element name="e3" minOccurs="0" maxOccurs="7">
+					<xs:simpleType>
+					  <xs:restriction base="xs:string">
+						<xs:maxLength value="40" />
+					  </xs:restriction>
+					</xs:simpleType>
+				</xs:element>			
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+</xs:schema>
+
+

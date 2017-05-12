@@ -1,0 +1,33 @@
+<stx:transform version="1.0" 
+	       xmlns:stx="http://stx.sourceforge.net/2002/ns">
+
+  <stx:template match="/root">
+    <root>
+      <stx:process-children/>
+    </root>
+  </stx:template>
+  
+  <stx:group>
+
+    <stx:template match="node" public="yes">
+      <stx:text>n:</stx:text>
+      <stx:if test="@id">
+	<stx:text>t</stx:text>
+	<stx:if test="@id=2">
+	  <stx:value-of select="@id"/>
+	  <stx:process-children/>
+	</stx:if>
+	<stx:text>T</stx:text>
+      </stx:if>
+      <stx:text>:N</stx:text>
+    </stx:template>
+    
+    <stx:template match="text()">
+      <stx:text>text(</stx:text>
+      <stx:value-of select="."/>
+      <stx:text>)</stx:text>
+    </stx:template>
+
+  </stx:group>
+
+</stx:transform>

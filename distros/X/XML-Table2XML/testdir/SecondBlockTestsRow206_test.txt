@@ -1,0 +1,13 @@
+root
+/a/@x	/a/@y	/a/z	/a/b	/a/b/c	/r/#id	/r/x	/r/s/t
+test1	testy	testZ1	testB	testC1			
+test1	testy	testZ1	testB	testC2			
+test1	testy	testZ1	testB	testC3			
+test2	testy	testZ2	testB	testC1			
+test2	testy	testZ2	testB	testC2			
+test2	testy	testZ2	testB	testC3			
+					1	testX1	TestT11
+					1	testX1	TestT21
+					2	testX2	TestT12
+					2	testX2	TestT22
+

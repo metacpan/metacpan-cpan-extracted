@@ -1,0 +1,78 @@
+{
+   "abstract" : "chained way of manipulating and inspecting XML documents",
+   "author" : [
+      "Jozef Kutej <jkutej@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4214",
+   "keywords" : [
+      "XML",
+      "chain",
+      "build",
+      "manipulation",
+      "traversal",
+      "LibXML"
+   ],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "XML-Chain",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "File::Temp" : "0",
+            "Path::Class" : "0",
+            "Pod::Simple::Text" : "0",
+            "Test::Most" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.36"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "IO::Any" : "0",
+            "Moose" : "0",
+            "Moose::Exporter" : "0",
+            "MooseX::Aliases" : "0",
+            "XML::LibXML" : "2.01",
+            "XML::Tidy" : "0",
+            "perl" : "5.01"
+         }
+      }
+   },
+   "provides" : {
+      "XML::Chain" : {
+         "file" : "lib/XML/Chain.pm",
+         "version" : "0.03"
+      },
+      "XML::Chain::Element" : {
+         "file" : "lib/XML/Chain/Element.pm",
+         "version" : "0.03"
+      },
+      "XML::Chain::Selector" : {
+         "file" : "lib/XML/Chain/Selector.pm",
+         "version" : "0.03"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/meon/XML-Chain/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/meon/XML-Chain.git"
+      }
+   },
+   "version" : "0.03",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

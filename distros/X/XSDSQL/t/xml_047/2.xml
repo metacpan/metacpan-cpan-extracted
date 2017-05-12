@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<bp:book
+	xmlns:bp="http://www.site.org/bookperson"
+	xmlns:p="http://www.site.org/book"
+>
+	<p:isbn>isbn</p:isbn>
+	<p:title>title</p:title>
+</bp:book>
+

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+        xmlns:gh="http://www.w3.org/2009/xmlsec-gh#"
+        xmlns:xenc="http://www.w3.org/2001/04/xmlenc#"
+        xmlns:xenc11='http://www.w3.org/2009/xmlenc11#'
+        targetNamespace="http://www.w3.org/2009/xmlsec-gh#"
+        version="0.1" elementFormDefault="qualified">
+
+<!-- $Revision: 1.1 $-->
+
+<element name="GenericHybridCipherMethod"
+ type="gh:GenericHybridCipherMethodType"/> 
+<complexType name="GenericHybridCipherMethodType">
+  <sequence>
+    <element name="KeyEncapsulationMethod"
+     type="gh:KeyEncapsulationMethodType"/> 
+    <element name="DataEncapsulationMethod"
+     type="xenc:EncryptionMethodType"/> 
+  </sequence>
+</complexType>
+
+<complexType name="KeyEncapsulationMethodType">
+  <sequence>
+    <element ref="xenc11:KeyDerivationMethod"/>
+    <element name="KeyLen" type="positiveInteger"/>
+    <any namespace="##other" minOccurs="0" maxOccurs="unbounded"/>
+  </sequence>
+  <attribute name="Algorithm" type="anyURI" use="required"/>
+</complexType>
+
+</schema>

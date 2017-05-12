@@ -1,0 +1,9 @@
+Changes
+lib/XML/RPC.pm
+make-dist.sh
+Makefile.PL
+MANIFEST
+META.yml
+README
+t/00-load.t
+t/01.t

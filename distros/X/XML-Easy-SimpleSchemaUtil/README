@@ -1,0 +1,41 @@
+NAME
+
+XML::Easy::SimpleSchemaUtil - help with simple kinds of XML schema
+
+DESCRIPTION
+
+The rules by which some class of thing is encoded in XML constitute a
+schema.  (A schema does not need to be codified in a formal language such
+as Schematron: a natural-language specification can also be a schema.
+Even if there is no explicit specification at all, the behaviour of
+the interoperating processors of related XML documents constitutes a de
+facto schema.)  Certain kinds of rule are commonly used in all manner
+of schemata.  This module supplies functions that help to implement such
+common kinds of rule, regardless of how a schema is specified.
+
+This module processes XML data in the form used by XML::Easy, consisting
+of XML::Easy::Element and XML::Easy::Content objects and twine arrays.
+In this form, character data are stored fully decoded, so they can be
+manipulated with no knowledge of XML syntax.
+
+INSTALLATION
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+AUTHOR
+
+Andrew Main (Zefram) <zefram@fysh.org>
+
+COPYRIGHT
+
+Copyright (C) 2010 PhotoBox Ltd
+
+Copyright (C) 2011 Andrew Main (Zefram) <zefram@fysh.org>
+
+LICENSE
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

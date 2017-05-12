@@ -1,0 +1,64 @@
+Revision history for XML-GrammarBase
+
+v0.2.3  2014-02-01
+        - Add the separate LICENSE file (CPANTS Kwalitee).
+        - Minimal version of perl (CPANTS).
+        - Add t/style-trailing-space.t .
+
+v0.2.2  2013-05-09
+        - Bump the minimal version of XML-LibXML to 2.0017.
+            - Done in order to avoid test failures with too low versions
+            of libxml2 .
+        - Add scripts/tag-release.pl .
+
+v0.2.1  2013-01-23
+        - Bump the minimal version of XML-LibXSLT to 1.80.
+            - Done in order to avoid test failures.
+
+v0.2.0  2013-01-20
+        - Add support for XSLT parameters into the XSLT role.
+
+v0.1.5  2013-01-18
+        - More fixes to the tests and Unicode handling.
+            - Test for properly emitting Unicode characters.
+
+v0.1.4  2013-01-15
+        - Add t/cpan-changes.t and tweaked "Changes" (= this file
+        accordingly).
+
+v0.1.3   2013-01-15
+         - lib/XML/GrammarBase/Role/RelaxNG.pm : add the
+         _calc_parser method that can be overrided for calculating and
+         returning the XML::LibXML parser.
+
+         - Fix module_base to only accept a distribution directory
+         style (e.g: "XML-Grammar-MyGrammar" rather than the wrong
+         "XML::Grammar::MyGrammar" which File::ShareDir's dist_dir did
+         not like).
+            - add a check for it in Moo using isa => ...
+
+v0.1.2   2013-01-05
+         - Add t/01libxml-basic.t for diag()s for libxml2 and XML::LibXML
+         (so we'll know which versions of them are failing).
+         - Add scripts/bump-version-number.pl .
+
+v0.1.1   2013-01-03
+         - Add keywords and resources to the META.yml / META.json.
+
+v0.1.0   2013-01-03
+         - Add the 'encoding' parameter for output_as_chars() vs.
+         output_as_bytes().
+
+v0.0.3   2012-12-29
+         - Change a wrong synopsis - it was "use Any::Moose;" instead of
+         "use MooX 'late';".
+
+v0.0.2   2012-12-25
+         - Convert to «use MooX::Role 'late';» instead of the previous
+         incantation.
+            - it broke the tests on many CPAN smokers and on a fresh perl
+            installation.
+
+v0.0.1  2012-12-03
+        - First version, released on an unsuspecting world.
+

@@ -1,0 +1,4 @@
+1.1     2009-07-15    Empty elements now stringify as empty string
+
+1.0     2009-03-24    DOMmish stuff moved from XML::Tiny 2.01 into this
+                        seperate dist

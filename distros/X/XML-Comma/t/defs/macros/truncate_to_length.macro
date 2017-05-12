@@ -1,0 +1,13 @@
+my ( $len ) = @macro_args;
+
+$self->add_hook ( 'set_hook',
+
+  sub {
+    my ( $self, $content_ref ) = @_;
+    my $truncated = substr ( $$content_ref, 0, $len );
+    $$content_ref = $truncated;
+  }
+
+);
+
+1;

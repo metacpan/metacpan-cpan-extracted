@@ -1,0 +1,45 @@
+{
+   "abstract" : "SOAP with AnyEvent",
+   "author" : [
+      "Aleksey Mashanov/Mark Overmeer"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120630",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "XML-Compile-SOAP-AnyEvent",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AnyEvent::HTTP" : "1.46",
+            "HTTP::Message" : "6.07",
+            "Log::Report" : "1.05",
+            "Time::HiRes" : "0",
+            "XML::Compile::SOAP" : "3.05"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.90"
+}

@@ -1,0 +1,6 @@
+root
+/a/b/c
+test0
+test1
+test2
+

@@ -1,0 +1,48 @@
+{
+   "abstract" : "SOAP Web Service Addressing",
+   "author" : [
+      "Mark Overmeer"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "XML-Compile-SOAP-WSA",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Basename" : "0",
+            "File::Spec" : "0",
+            "Log::Report" : "0.28",
+            "Test::More" : "0.54",
+            "XML::Compile" : "1.28",
+            "XML::Compile::Cache" : "0.96",
+            "XML::Compile::SOAP" : "2.30",
+            "XML::Compile::Tester" : "0.06"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.13"
+}

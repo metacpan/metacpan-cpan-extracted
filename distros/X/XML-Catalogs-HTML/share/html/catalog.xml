@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<!DOCTYPE catalog PUBLIC "-//OASIS//DTD Entity Resolution XML Catalog V1.0//EN"
+    "http://www.oasis-open.org/committees/entity/release/1.0/catalog.dtd">
+<catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog" prefer="public">
+    <public publicId="-//W3C//DTD XHTML 1.0 Strict//EN"                        uri="xhtml1-strict.dtd"       />
+    <public publicId="-//W3C//DTD XHTML 1.0 Transitional//EN"                  uri="xhtml1-transitional.dtd" />
+    <public publicId="-//W3C//DTD XHTML 1.0 Frameset//EN"                      uri="xhtml1-frameset.dtd"     />
+    <public publicId="-//W3C//ENTITIES Latin 1 for XHTML//EN"                  uri="xhtml-lat1.ent"          />
+    <public publicId="-//W3C//ENTITIES Symbols for XHTML//EN"                  uri="xhtml-symbol.ent"        />
+    <public publicId="-//W3C//ENTITIES Special for XHTML//EN"                  uri="xhtml-special.ent"       />
+
+    <system systemId="http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"       uri="xhtml1-strict.dtd"       />
+    <system systemId="http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd" uri="xhtml1-transitional.dtd" />
+    <system systemId="http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd"     uri="xhtml1-frameset.dtd"     />
+    <system systemId="http://www.w3.org/TR/xhtml1/DTD/xhtml-lat1.ent"          uri="xhtml-lat1.ent"          />
+    <system systemId="http://www.w3.org/TR/xhtml1/DTD/xhtml-symbol.ent"        uri="xhtml-symbol.ent"        />
+    <system systemId="http://www.w3.org/TR/xhtml1/DTD/xhtml-special.ent"       uri="xhtml-special.ent"       />
+
+    <public publicId="-//W3C//DTD HTML 4.01//EN"                               uri="html401-strict.dtd"      />
+    <public publicId="-//W3C//DTD HTML 4.01 Transitional//EN"                  uri="html401-loose.dtd"       />
+    <public publicId="-//W3C//DTD HTML 4.01 Frameset//EN"                      uri="html401-frameset.dtd"    />
+    <public publicId="-//W3C//ENTITIES Latin1//EN//HTML"                       uri="html401-HTMLlat1.ent"    />
+    <public publicId="-//W3C//ENTITIES Special//EN//HTML"                      uri="html401-HTMLspecial.ent" />
+    <public publicId="-//W3C//ENTITIES Symbols//EN//HTML"                      uri="html401-HTMLsymbol.ent"  />
+
+    <system systemId="http://www.w3.org/TR/html401/strict.dtd"                 uri="html401-strict.dtd"      />
+    <system systemId="http://www.w3.org/TR/html401/loose.dtd"                  uri="html401-loose.dtd"       />
+    <system systemId="http://www.w3.org/TR/html401/frameset.dtd"               uri="html401-frameset.dtd"    />
+    <system systemId="http://www.w3.org/TR/html401/HTMLlat1.ent"               uri="html401-HTMLlat1.ent"    />
+    <system systemId="http://www.w3.org/TR/html401/HTMLspecial.ent"            uri="html401-HTMLspecial.ent" />
+    <system systemId="http://www.w3.org/TR/html401/HTMLsymbol.ent"             uri="html401-HTMLsymbol.ent"  />
+</catalog>

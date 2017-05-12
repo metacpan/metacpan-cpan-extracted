@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<!DOCTYPE edifact:message SYSTEM "edifact03.dtd">
+<!-- XML message produced by edi2xml.pl (c) Kraehe@Bakunin.North.De -->
+<edifact:message
+  xmlns:edifact='http://www.xml-edifact.org/LIB/xml-edifact-03/edifact.rdf'
+  xmlns:trsd='http://www.xml-edifact.org/LIB/xml-edifact-03/trsd.rdf'
+  xmlns:trcd='http://www.xml-edifact.org/LIB/xml-edifact-03/trcd.rdf'
+  xmlns:tred='http://www.xml-edifact.org/LIB/xml-edifact-03/tred.rdf'
+  xmlns:uncl='http://www.xml-edifact.org/LIB/xml-edifact-03/uncl.rdf'
+  xmlns:anxs='http://www.xml-edifact.org/LIB/xml-edifact-03/anxs.rdf'
+  xmlns:anxc='http://www.xml-edifact.org/LIB/xml-edifact-03/anxc.rdf'
+  xmlns:anxe='http://www.xml-edifact.org/LIB/xml-edifact-03/anxe.rdf'
+  xmlns:unsl='http://www.xml-edifact.org/LIB/xml-edifact-03/unsl.rdf'
+  xmlns:unknown='http://www.xml-edifact.org/LIB/xml-edifact-03/unknown.rdf' >
+
+<!-- SEGMENT CED+2+:::Linux:1.2:13 -->
+<trsd:computer.environment.details>
+  <tred:computer.environment.details.qualifier uncl:code="1501:2">Operating system</tred:computer.environment.details.qualifier>
+  <trcd:computer.environment.identification>
+    <tred:computer.environment>Linux</tred:computer.environment>
+    <tred:version>1.2</tred:version>
+    <tred:release>13</tred:release>
+  </trcd:computer.environment.identification>
+</trsd:computer.environment.details>
+<!-- SEGMENT UNZ+1 -->
+<anxs:interchange.trailer>
+  <anxe:interchange.control.count>1</anxe:interchange.control.count>
+</anxs:interchange.trailer>
+</edifact:message>

@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<deep>
+  <tree>
+    <with>
+      <some>
+        <subtree/>
+      </some>
+    </with>
+  </tree>
+</deep>

@@ -1,0 +1,61 @@
+XPath Completion:
+
+/a/b/c[e/f/g[foo((h|i[z]),/g)]]
+
+NOTE: \& denotes the match
+      \1..\n denotes n'th matched bracked
+
+parse reversed string:
+
+SPACE:    matches whitespace
+NAME:     matches [-_[:alnum:]][-:_[:alnum:]]*[_[:alpha:]]
+NAMECHAR: matches [-_[:alnum:]]
+NNAMECHAR: matches [-:_[:alnum:]]
+
+
+OPER:  matches ',' | '=' | '<' | '>' | '+' | '|' |
+               '-' (?!NAME) |
+               ('vid'|'dom'|'dna'|'ro') (SPACE* ']' | SPACE* ')' | SPACE* [0-9]+(?!NNAMECHAR) | SPACE NAMECHAR | SPACE '*')               
+               '*' SPACE* ('*' | NAME | ')' | ']' | '.' )) |
+
+WILDCARD: '*' (?!'*' | NAME | ')' | ']' | '.' ))
+           
+
+
+0. if SPACE * ']' -> [return: '']
+
+1. if (NAMECHAR+) ':' (NNAMECHARS) '@' 
+      store @\2:*[starts-with(local-name(),"\1")]
+   if (NAMECHAR+) '@'
+      store @*[starts-with(local-name(),"\1")]
+   if (NAMECHAR+) ':' (NNAMECHAR+) 
+      store \2:*[starts-with(local-name(),"\1")]
+   if (NAMECHAR+)
+      store *[starts-with(local-name(),"\1")]
+   if '@'
+      store '@*'
+   else
+      store '*'
+   -> [2]
+
+2. store while ':' | '::' | '@' | '/' | NAME '$' | NAME | WILDCARD | ballanced '[]' and '()' 
+   -> [3]
+
+3. if last = '/'
+      if "'" or '"' -> [return: '']    # unballanced
+      if SPACE* '(' | '[' | OPER -> [end]
+      else -> [end] # uncertain if / with spaces are used
+   else
+      if SPACE+ (?! OPER ) -> [end]
+
+  -> [4]
+
+4. skip (ballanced(']', ')', '"', "'"), anychar) till '[' or end
+   if '[' 
+     store '/' -> [2]
+   if end -> [end]
+
+Example:
+
+/a/b[2]/c[vvv + e/f/g[foo((h|i[z<TAB> -> /a/b[2]/c/e/f/g/i/starts-with(.,"z")
+

@@ -1,0 +1,367 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en">
+<id>tag:theregister.co.uk,2005:feed/theregister.co.uk/</id>
+<title>The Register</title>
+<link rel="self" type="application/atom+xml" href="http://www.theregister.co.uk/headlines.atom"/>
+<link rel="alternate" type="text/html" href="http://www.theregister.co.uk/"/>
+<rights>Copyright © 2011, Situation Publishing</rights>
+<author>
+<name>Team Register</name>
+<email>webmaster@theregister.co.uk</email>
+<uri>http://www.theregister.co.uk/odds/about/contact/</uri>
+</author>
+<icon>http://www.theregister.co.uk/Design/graphics/icons/favicon.png</icon>
+<subtitle>Biting the hand that feeds IT — sci/tech news and views for the world</subtitle>
+<logo>http://www.theregister.co.uk/Design/graphics/Reg_default/The_Register_r.png</logo>
+<updated>2011-02-07T19:07:57Z</updated>
+<entry>
+<id>tag:theregister.co.uk,2005:story/2011/02/07/google_negotiating_with_eu_over_antitrust_investigation/</id>
+<updated>2011-02-07T19:08:38Z</updated>
+<link rel="alternate" type="text/html" href="http://go.theregister.com/feed/www.theregister.co.uk/2011/02/07/google_negotiating_with_eu_over_antitrust_investigation/"/>
+<title type="html">Google keen to settle antitrust investigation</title>
+<summary type="html" xml:base="http://www.theregister.co.uk/">&lt;h4&gt;In 'tentative talks' as probe seeks traffic data, ad contacts&lt;/h4&gt; &lt;p&gt;Google is in "tentative" negotiations with European Union regulators to end the EU's investigation into allegations that the company abused its dominant position in the online search market, according to a report citing a source familiar with the case.…&lt;/p&gt;</summary>
+</entry>
+<entry>
+<id>tag:theregister.co.uk,2005:story/2011/02/07/federal_domain_seizure_slammed/</id>
+<updated>2011-02-07T18:32:36Z</updated>
+<link rel="alternate" type="text/html" href="http://go.theregister.com/feed/www.theregister.co.uk/2011/02/07/federal_domain_seizure_slammed/"/>
+<title type="html">Critics slam feds for 'unprecedented' domain seizure</title>
+<summary type="html" xml:base="http://www.theregister.co.uk/">&lt;h4&gt;What would China do?&lt;/h4&gt; &lt;p&gt;A vocal chorus of lawmakers and policy wonks are decrying the US government's practice of seizing large numbers of internet domain names without first giving the owners a chance to defend themselves in court.…&lt;/p&gt;</summary>
+</entry>
+<entry>
+<id>tag:theregister.co.uk,2005:story/2011/02/07/disabled_man_plays_games_with_chin/</id>
+<updated>2011-02-07T16:55:35Z</updated>
+<link rel="alternate" type="text/html" href="http://go.theregister.com/feed/www.reghardware.com/2011/02/07/disabled_man_plays_games_with_chin/"/>
+<title type="html">Disabled dude demands EA improves gaming access</title>
+<summary type="html" xml:base="http://www.theregister.co.uk/">&lt;h4&gt;Control customisation is key&lt;/h4&gt; &lt;p&gt;A disabled man is campaigning for EA to adapt the controls on &lt;i&gt;Dead Space 2&lt;/i&gt;, so he can play the game using only his chin.…&lt;/p&gt;</summary>
+</entry>
+<entry>
+<id>tag:theregister.co.uk,2005:story/2011/02/07/nokia_elop_definnistration/</id>
+<updated>2011-02-07T16:41:09Z</updated>
+<link rel="alternate" type="text/html" href="http://go.theregister.com/feed/www.theregister.co.uk/2011/02/07/nokia_elop_definnistration/"/>
+<title type="html">De-Finnistration: Nokia to shift HQ to US?</title>
+<summary type="html" xml:base="http://www.theregister.co.uk/">&lt;h4&gt;Elop's radical plan&lt;/h4&gt; &lt;p&gt;&lt;strong&gt;Exclusive&lt;/strong&gt;  Well-placed sources at Nokia suggest Stephen Elop is considering shifting the executive centre of gravity to Silicon Valley, creating a virtual HQ in the United States. The move would be as radical as any of those made by his predecessors in the company's 150-year history.…&lt;/p&gt;</summary>
+</entry>
+<entry>
+<id>tag:theregister.co.uk,2005:story/2011/02/07/ghonim_release/</id>
+<updated>2011-02-07T16:40:24Z</updated>
+<link rel="alternate" type="text/html" href="http://go.theregister.com/feed/www.theregister.co.uk/2011/02/07/ghonim_release/"/>
+<title type="html">Google exec/activist 'released' by Egyptian authorities</title>
+<summary type="html" xml:base="http://www.theregister.co.uk/">&lt;h4&gt;Wael Ghonim had been missing for two weeks&lt;/h4&gt; &lt;p&gt;A Google executive who is believed to have been held in detention in Cairo since last month has been released, according to reports.…&lt;/p&gt; &lt;p&gt;&lt;p&gt;&lt;strong&gt;&lt;small&gt;&lt;a href="http://whitepapers.theregister.co.uk/paper/view/1340/?ftd=rss"&gt;Reg Guide to Improving Systems Agility - Free Download!&lt;/a&gt;&lt;/small&gt;&lt;/strong&gt;&lt;/p&gt;&lt;/p&gt;</summary>
+</entry>
+<entry>
+<id>tag:theregister.co.uk,2005:story/2011/02/07/cisco_munches_inlet/</id>
+<updated>2011-02-07T16:38:19Z</updated>
+<link rel="alternate" type="text/html" href="http://go.theregister.com/feed/www.theregister.co.uk/2011/02/07/cisco_munches_inlet/"/>
+<title type="html">Cisco munches Inlet for $95m</title>
+<summary type="html" xml:base="http://www.theregister.co.uk/">&lt;h4&gt;Why invent when you can buy?&lt;/h4&gt; &lt;p&gt;With video streaming in its many different forms hogging an increasing chunk of bandwidth out there on the Intertubes, networking giant Cisco Systems wants to be dominant in IP TV – whatever that might be some day. That is why it has ponied up $95m in cash to acquire Inlet Technologies.…&lt;/p&gt;</summary>
+</entry>
+<entry>
+<id>tag:theregister.co.uk,2005:story/2011/02/07/difference_between_smartphones_and_superphones/</id>
+<updated>2011-02-07T16:00:03Z</updated>
+<link rel="alternate" type="text/html" href="http://go.theregister.com/feed/www.theregister.co.uk/2011/02/07/difference_between_smartphones_and_superphones/"/>
+<title type="html">Superphones: A security nightmare waiting to happen</title>
+<summary type="html" xml:base="http://www.theregister.co.uk/">&lt;h4&gt;Smartphones don't tell the half of it&lt;/h4&gt; &lt;p&gt;If I sit down with a PC from the late 90s and a modern PC I bought yesterday they are quite obviously the same animal. The operating system has changed, and there have been some minor innovations. With the exception of speed and support for the newest protocols, a PC from the late 90s could be used to perform exactly the same tasks we would buy PC for today.…&lt;/p&gt;</summary>
+</entry>
+<entry>
+<id>tag:theregister.co.uk,2005:story/2011/02/07/hargreaves_on_tour_2011/</id>
+<updated>2011-02-07T15:58:03Z</updated>
+<link rel="alternate" type="text/html" href="http://go.theregister.com/feed/www.theregister.co.uk/2011/02/07/hargreaves_on_tour_2011/"/>
+<title type="html">IP review visits Silicon Valley shrines</title>
+<summary type="html" xml:base="http://www.theregister.co.uk/">&lt;h4&gt;Screw the creatives, show us the money!&lt;/h4&gt; &lt;p&gt;Two years ago Google embarked on a campaign to import US-style "fair use" into British copyright law. Three months ago the new Coalition obliged, by commissioning an independent review to examine growth and intellectual property, specifically &lt;a href="http://www.ipo.gov.uk/about/press/press-release/press-release-2010/press-release-20101104.htm" target="_blank"&gt;tacking onto&lt;/a&gt; the group's To Do list.…&lt;/p&gt;</summary>
+</entry>
+<entry>
+<id>tag:theregister.co.uk,2005:story/2011/02/07/lastfm_mobile_subscriptions/</id>
+<updated>2011-02-07T15:47:13Z</updated>
+<link rel="alternate" type="text/html" href="http://go.theregister.com/feed/www.theregister.co.uk/2011/02/07/lastfm_mobile_subscriptions/"/>
+<title type="html">Last.fm charges for mobile</title>
+<summary type="html" xml:base="http://www.theregister.co.uk/">&lt;h4&gt;Free-for-all across other platforms&lt;/h4&gt; &lt;p&gt;&lt;a href="http://www.last.fm/"&gt;Last.fm&lt;/a&gt; will start charging for streaming to its mobile applications from next Tuesday, although the desktop web versions of the site in the UK, Germany and the USA will remain free.…&lt;/p&gt;</summary>
+</entry>
+<entry>
+<id>tag:theregister.co.uk,2005:story/2011/02/07/hp_touchsmart_610/</id>
+<updated>2011-02-07T15:09:37Z</updated>
+<link rel="alternate" type="text/html" href="http://go.theregister.com/feed/www.reghardware.com/2011/02/07/hp_touchsmart_610/"/>
+<title type="html">HP intros 'lay it flat' all-in-one touchscreen PC</title>
+<summary type="html" xml:base="http://www.theregister.co.uk/">&lt;h4&gt;Rather like Apple 2009 patent application...&lt;/h4&gt; &lt;p&gt;HP has revamped its touchscreen all-in-one desktop PCs with the ability to lay them almost flat, tablet style.…&lt;/p&gt;</summary>
+</entry>
+<entry>
+<id>tag:theregister.co.uk,2005:story/2011/02/07/derren_brown_ofcom/</id>
+<updated>2011-02-07T14:36:00Z</updated>
+<link rel="alternate" type="text/html" href="http://go.theregister.com/feed/www.theregister.co.uk/2011/02/07/derren_brown_ofcom/"/>
+<title type="html">Ofcom okays Derren Brown psychic-baiting</title>
+<summary type="html" xml:base="http://www.theregister.co.uk/">&lt;h4&gt;Opinion of regulator's dead relatives pending&lt;/h4&gt; &lt;p&gt;Ofcom has ruled that the psychic at the centre of an episode of &lt;i&gt;Derren Brown Investigates&lt;/i&gt; was treated fairly.…&lt;/p&gt; &lt;p&gt;&lt;p&gt;&lt;strong&gt;&lt;small&gt;&lt;a href="http://whitepapers.theregister.co.uk/paper/view/1340/?ftd=rss"&gt;Reg Guide to Improving Systems Agility - Free Download!&lt;/a&gt;&lt;/small&gt;&lt;/strong&gt;&lt;/p&gt;&lt;/p&gt;</summary>
+</entry>
+<entry>
+<id>tag:theregister.co.uk,2005:story/2011/02/07/vbs_remodelling_still_underway/</id>
+<updated>2011-02-07T13:53:05Z</updated>
+<link rel="alternate" type="text/html" href="http://go.theregister.com/feed/www.theregister.co.uk/2011/02/07/vbs_remodelling_still_underway/"/>
+<title type="html">Overzealous anti-paedo scheme not dead yet</title>
+<summary type="html" xml:base="http://www.theregister.co.uk/">&lt;h4&gt;Scale back and rebrand of VBS is likely later this week&lt;/h4&gt; &lt;p&gt;Volunteers and those working with children will only need to undergo intrusive vetting of their private lives in future if they work in "sensitive posts" or "have intensive contact with children or vulnerable people".…&lt;/p&gt;</summary>
+</entry>
+<entry>
+<id>tag:theregister.co.uk,2005:story/2011/02/07/iran_cookery_ban/</id>
+<updated>2011-02-07T13:30:40Z</updated>
+<link rel="alternate" type="text/html" href="http://go.theregister.com/feed/www.theregister.co.uk/2011/02/07/iran_cookery_ban/"/>
+<title type="html">Iranian state telly bins foreign cuisine</title>
+<summary type="html" xml:base="http://www.theregister.co.uk/">&lt;h4&gt;Local recipes only for Persian Jamie Olivers&lt;/h4&gt; &lt;p&gt;Iran has banned cookery programmes featuring foreign fare in an attempt to combat the threat of alien nosh to the nation's gastronomic identity.…&lt;/p&gt;</summary>
+</entry>
+<entry>
+<id>tag:theregister.co.uk,2005:story/2011/02/07/nationwide_problems/</id>
+<updated>2011-02-07T13:26:49Z</updated>
+<link rel="alternate" type="text/html" href="http://go.theregister.com/feed/www.theregister.co.uk/2011/02/07/nationwide_problems/"/>
+<title type="html">Nationwide customers find online front door shut</title>
+<summary type="html" xml:base="http://www.theregister.co.uk/">&lt;h4&gt;It pays to decide to go outside and find a branch&lt;/h4&gt; &lt;p&gt;Nationwide Building Society customers looking to check their accounts or peruse mortgage rates via its online front door were left frustrated today as its website's front page told them it was, er, too busy.…&lt;/p&gt;</summary>
+</entry>
+<entry>
+<id>tag:theregister.co.uk,2005:story/2011/02/07/aerosol_rainfall_amazon/</id>
+<updated>2011-02-07T12:54:41Z</updated>
+<link rel="alternate" type="text/html" href="http://go.theregister.com/feed/www.theregister.co.uk/2011/02/07/aerosol_rainfall_amazon/"/>
+<title type="html">Hawaii boffins: Aerosols add to Amazon rainfall</title>
+<summary type="html" xml:base="http://www.theregister.co.uk/">&lt;h4&gt;More pollutants equal less crazy weather&lt;/h4&gt; &lt;p&gt;Boffins based in Hawaii say that over the last 60 years emissions of aerosols - soot and other particulates often emitted by diesel engines, coal powerplants etc - have led to increased rainfall in the rainforests of the Amazon and central Africa, and have also resulted in "fewer extreme [weather] events".…&lt;/p&gt;</summary>
+</entry>
+<entry>
+<id>tag:theregister.co.uk,2005:story/2011/02/07/nfc_api_android/</id>
+<updated>2011-02-07T12:46:35Z</updated>
+<link rel="alternate" type="text/html" href="http://go.theregister.com/feed/www.theregister.co.uk/2011/02/07/nfc_api_android/"/>
+<title type="html">Android Open NFC gets a bit more open</title>
+<summary type="html" xml:base="http://www.theregister.co.uk/">&lt;h4&gt;Our abstraction is more abstract than your abstraction&lt;/h4&gt; &lt;p&gt;Inside Secure is about to launch a more abstracted NFC API, one compatible with Android versions 2.3 and (notably) 2.4, allowing developers to start showing what's possible with NFC.…&lt;/p&gt; &lt;p&gt;&lt;p&gt;&lt;strong&gt;&lt;small&gt;&lt;a href="http://whitepapers.theregister.co.uk/paper/view/1472/?td=rss"&gt;Reg Guide to Enterprise Virtualization - Free Download!&lt;/a&gt;&lt;/small&gt;&lt;/strong&gt;&lt;/p&gt;&lt;/p&gt;</summary>
+</entry>
+<entry>
+<id>tag:theregister.co.uk,2005:story/2011/02/07/nanosheets/</id>
+<updated>2011-02-07T12:34:30Z</updated>
+<link rel="alternate" type="text/html" href="http://go.theregister.com/feed/www.theregister.co.uk/2011/02/07/nanosheets/"/>
+<title type="html">Super-thin materials could POWER our WORLD</title>
+<summary type="html" xml:base="http://www.theregister.co.uk/">&lt;h4&gt;Basic research on 1-atom-thick nanosheets shows many hypothetical uses&lt;/h4&gt; &lt;p&gt;Oxford and Dublin boffins have unlocked a doorway leading to more than 150 super-thin exotic nanosheet materials just one atom thick.…&lt;/p&gt;</summary>
+</entry>
+<entry>
+<id>tag:theregister.co.uk,2005:story/2011/02/07/wikileaks_trial_starts/</id>
+<updated>2011-02-07T12:19:15Z</updated>
+<link rel="alternate" type="text/html" href="http://go.theregister.com/feed/www.theregister.co.uk/2011/02/07/wikileaks_trial_starts/"/>
+<title type="html">Assange fights extradition in court</title>
+<summary type="html" xml:base="http://www.theregister.co.uk/">&lt;h4&gt;Charge me or release me&lt;/h4&gt; &lt;p&gt;Julian Assange's lawyers are in court now to fight his extradition to Sweden by arguing that prosecutors have failed to follow correct procedures.…&lt;/p&gt;</summary>
+</entry>
+<entry>
+<id>tag:theregister.co.uk,2005:story/2011/02/07/x_47b_first_flight/</id>
+<updated>2011-02-07T12:16:39Z</updated>
+<link rel="alternate" type="text/html" href="http://go.theregister.com/feed/www.theregister.co.uk/2011/02/07/x_47b_first_flight/"/>
+<title type="html">Robot naval stealth fighter takes to the air</title>
+<summary type="html" xml:base="http://www.theregister.co.uk/">&lt;h4&gt;Mav and Iceman get to work on their CVs&lt;/h4&gt; &lt;p&gt;&lt;strong&gt;Vid&lt;/strong&gt;  The disappearance of swaggering pilots from the flight decks of US naval aircraft carriers came a step closer on Friday with the first flight of the X-47B robot tailhook stealth jet.…&lt;/p&gt;</summary>
+</entry>
+<entry>
+<id>tag:theregister.co.uk,2005:story/2011/02/07/dc_virt_networking/</id>
+<updated>2011-02-07T12:05:10Z</updated>
+<link rel="alternate" type="text/html" href="http://go.theregister.com/feed/www.theregister.co.uk/2011/02/07/dc_virt_networking/"/>
+<title type="html">Getting your virtual hands dirty with virtual networking</title>
+<summary type="html" xml:base="http://www.theregister.co.uk/">&lt;h4&gt;You need something to link all those virtual servers&lt;/h4&gt; &lt;p&gt;We're all familiar with the concept of a virtual server. However, when planning and implementing a virtualisation project, it's not just the servers that can be and should be virtualised – it's the network too.…&lt;/p&gt;</summary>
+</entry>
+<entry>
+<id>tag:theregister.co.uk,2005:story/2011/02/07/toshiba_3dtv_sales_are_poor/</id>
+<updated>2011-02-07T11:58:22Z</updated>
+<link rel="alternate" type="text/html" href="http://go.theregister.com/feed/www.reghardware.com/2011/02/07/toshiba_3dtv_sales_are_poor/"/>
+<title type="html">Glasses-free 3D TV sales stumble</title>
+<summary type="html" xml:base="http://www.theregister.co.uk/">&lt;h4&gt;Demand half of what Toshiba hoped for&lt;/h4&gt; &lt;p&gt;Toshiba's attempt to interest us all in 3D TVs that don't require special glasses has fallen flat. The company sold fewer than half the sets it expected it would in the first month of sales, a senior executive has revealed.…&lt;/p&gt;</summary>
+</entry>
+<entry>
+<id>tag:theregister.co.uk,2005:story/2011/02/07/investing_in_egypt/</id>
+<updated>2011-02-07T11:42:08Z</updated>
+<link rel="alternate" type="text/html" href="http://go.theregister.com/feed/www.channelregister.co.uk/2011/02/07/investing_in_egypt/"/>
+<title type="html">North Africa will need more revolution before it attracts IT tourists</title>
+<summary type="html" xml:base="http://www.theregister.co.uk/">&lt;h4&gt;Soviet-like red tape still choking small firms and free markets&lt;/h4&gt; &lt;p&gt;&lt;strong&gt;Comment&lt;/strong&gt;  Woo Hoo! Tens of millions of well-educated, young and above all, cheap workers for the capitalists among us to go and exploit! Quick, quick, get out the airline schedule and book that seat to Tunis, or Cairo or – coming soon no doubt – Algiers. Money money money, it's a capitalist world!…&lt;/p&gt;</summary>
+</entry>
+<entry>
+<id>tag:theregister.co.uk,2005:story/2011/02/07/sony_ericsson_playstation_phone/</id>
+<updated>2011-02-07T11:40:16Z</updated>
+<link rel="alternate" type="text/html" href="http://go.theregister.com/feed/www.reghardware.com/2011/02/07/sony_ericsson_playstation_phone/"/>
+<title type="html">Sony Ericsson confirms PlayStation phone</title>
+<summary type="html" xml:base="http://www.theregister.co.uk/">&lt;h4&gt;Ready to Play?&lt;/h4&gt; &lt;p&gt;Sony Ericsson has confirmed the imminent launch of the Xperia Play, promising a full revelation set for 13 February, just ahead of Mobile World Congress (MWC).…&lt;/p&gt;</summary>
+</entry>
+<entry>
+<id>tag:theregister.co.uk,2005:story/2011/02/07/elton_john_ipad_2/</id>
+<updated>2011-02-07T11:34:13Z</updated>
+<link rel="alternate" type="text/html" href="http://go.theregister.com/feed/www.reghardware.com/2011/02/07/elton_john_ipad_2/"/>
+<title type="html">Sir Elton outs iPad 2 release date</title>
+<summary type="html" xml:base="http://www.theregister.co.uk/">&lt;h4&gt;Pop star wants fondleslab for Skyping&lt;/h4&gt; &lt;p&gt;Several readers emailed us this morning claiming that Elton John today suggested that the iPad 2 will be on sale in April.…&lt;/p&gt;</summary>
+</entry>
+<entry>
+<id>tag:theregister.co.uk,2005:story/2011/02/07/bt_virtual_data_centre_private/</id>
+<updated>2011-02-07T11:29:25Z</updated>
+<link rel="alternate" type="text/html" href="http://go.theregister.com/feed/www.theregister.co.uk/2011/02/07/bt_virtual_data_centre_private/"/>
+<title type="html">BT erects private cloud defences</title>
+<summary type="html" xml:base="http://www.theregister.co.uk/">&lt;h4&gt;Hybrid vigour&lt;/h4&gt; &lt;p&gt;BT is offering a private cloud option to data centre customers.…&lt;/p&gt; &lt;p&gt;&lt;p&gt;&lt;strong&gt;&lt;small&gt;&lt;a href="http://whitepapers.theregister.co.uk/paper/view/1340/?ftd=rss"&gt;Reg Guide to Improving Systems Agility - Free Download!&lt;/a&gt;&lt;/small&gt;&lt;/strong&gt;&lt;/p&gt;&lt;/p&gt;</summary>
+</entry>
+<entry>
+<id>tag:theregister.co.uk,2005:story/2011/02/07/apple_ipad_tomorrow_people/</id>
+<updated>2011-02-07T11:08:50Z</updated>
+<link rel="alternate" type="text/html" href="http://go.theregister.com/feed/www.reghardware.com/2011/02/07/apple_ipad_tomorrow_people/"/>
+<title type="html">First fondleslab found in 1970s kids TV sci-fi gem</title>
+<summary type="html" xml:base="http://www.theregister.co.uk/">&lt;h4&gt;Apple iPad inspired by &lt;i&gt;Tomorrow People&lt;/i&gt;&lt;/h4&gt; &lt;p&gt;At last it can be revealed: Apple owes the look of the "magical" iPad to a team of telepathic teens from the 1970s - &lt;i&gt;The Tomorrow People.&lt;/i&gt;…&lt;/p&gt;</summary>
+</entry>
+<entry>
+<id>tag:theregister.co.uk,2005:story/2011/02/07/nasdaq_malware_breach/</id>
+<updated>2011-02-07T11:08:01Z</updated>
+<link rel="alternate" type="text/html" href="http://go.theregister.com/feed/www.theregister.co.uk/2011/02/07/nasdaq_malware_breach/"/>
+<title type="html">Nasdaq admits hackers planted malware on web portal</title>
+<summary type="html" xml:base="http://www.theregister.co.uk/">&lt;h4&gt;Stock tickler&lt;/h4&gt; &lt;p&gt;Nasdaq admitted on Saturday that unidentified hackers had succeeded in planting malware on one of its portals.…&lt;/p&gt;</summary>
+</entry>
+<entry>
+<id>tag:theregister.co.uk,2005:story/2011/02/07/roundup_six_blu_ray_disc_players/</id>
+<updated>2011-02-07T11:00:03Z</updated>
+<link rel="alternate" type="text/html" href="http://go.theregister.com/feed/www.reghardware.com/2011/02/07/roundup_six_blu_ray_disc_players/"/>
+<title type="html">Six... budget Blu-ray Disc players</title>
+<summary type="html" xml:base="http://www.theregister.co.uk/">&lt;h4&gt;HD hardware at low prices&lt;/h4&gt; &lt;p&gt;&lt;strong&gt;Product Round-up&lt;/strong&gt;  Christmas is past but it's still winter. The nights are cold and damp. What better way to spend them that at home, snug the sofa, a cool nut-brown ale in your hand and a fine film on your new HD TV?…&lt;/p&gt;</summary>
+</entry>
+<entry>
+<id>tag:theregister.co.uk,2005:story/2011/02/07/telegraph_astrology_bunkum/</id>
+<updated>2011-02-07T10:55:33Z</updated>
+<link rel="alternate" type="text/html" href="http://go.theregister.com/feed/www.theregister.co.uk/2011/02/07/telegraph_astrology_bunkum/"/>
+<title type="html">Indian courts 'rule astrology is a science'</title>
+<summary type="html" xml:base="http://www.theregister.co.uk/">&lt;h4&gt;British papers about as truthful as astrologers&lt;/h4&gt; &lt;p&gt;Oh those crazy Indians! A high court judge in the subcontinent has apparently ruled that astrology is a pukka science like physics or chemistry. Or maybe not.…&lt;/p&gt;</summary>
+</entry>
+<entry>
+<id>tag:theregister.co.uk,2005:story/2011/02/07/bluearc_thin_replication/</id>
+<updated>2011-02-07T10:53:40Z</updated>
+<link rel="alternate" type="text/html" href="http://go.theregister.com/feed/www.theregister.co.uk/2011/02/07/bluearc_thin_replication/"/>
+<title type="html">BlueArc puts replication on a diet</title>
+<summary type="html" xml:base="http://www.theregister.co.uk/">&lt;h4&gt;Thin replication&lt;/h4&gt; &lt;p&gt;Hardware-accelerated filer supplier BlueArc has stopped replicating useless data with its latest software release.…&lt;/p&gt;</summary>
+</entry>
+<entry>
+<id>tag:theregister.co.uk,2005:story/2011/02/07/nasa_captures_sun_in_3d_with_stereo/</id>
+<updated>2011-02-07T10:24:52Z</updated>
+<link rel="alternate" type="text/html" href="http://go.theregister.com/feed/www.theregister.co.uk/2011/02/07/nasa_captures_sun_in_3d_with_stereo/"/>
+<title type="html">NASA snaps Sun in super STEREO</title>
+<summary type="html" xml:base="http://www.theregister.co.uk/">&lt;h4&gt;Twin probes image star's 'three-dimensional glory'&lt;/h4&gt; &lt;p&gt;NASA has released the first images from its twin Solar TErrestrial RElations Observatory (&lt;a target="_blank" href="http://www.nasa.gov/mission_pages/stereo/main/index.html"&gt;STEREO&lt;/a&gt;) probes as they moved into position on opposite sides of the Sun.…&lt;/p&gt;</summary>
+</entry>
+<entry>
+<id>tag:theregister.co.uk,2005:story/2011/02/07/anon_pwns_hbgary/</id>
+<updated>2011-02-07T10:15:27Z</updated>
+<link rel="alternate" type="text/html" href="http://go.theregister.com/feed/www.theregister.co.uk/2011/02/07/anon_pwns_hbgary/"/>
+<title type="html">Anonymous pwns security firm that probed its membership</title>
+<summary type="html" xml:base="http://www.theregister.co.uk/">&lt;h4&gt;HBGary gets the ACS:Law treatment&lt;/h4&gt; &lt;p&gt;The Anonymous hacking collective took revenge on a security firm that had investigated its membership on Sunday.…&lt;/p&gt; &lt;p&gt;&lt;p&gt;&lt;strong&gt;&lt;small&gt;&lt;a href="http://whitepapers.theregister.co.uk/paper/view/1340/?ftd=rss"&gt;Reg Guide to Improving Systems Agility - Free Download!&lt;/a&gt;&lt;/small&gt;&lt;/strong&gt;&lt;/p&gt;&lt;/p&gt;</summary>
+</entry>
+<entry>
+<id>tag:theregister.co.uk,2005:story/2011/02/07/vodafone_google_samsung_nexus_s/</id>
+<updated>2011-02-07T10:14:19Z</updated>
+<link rel="alternate" type="text/html" href="http://go.theregister.com/feed/www.reghardware.com/2011/02/07/vodafone_google_samsung_nexus_s/"/>
+<title type="html">Vodafone nabs new Nexus</title>
+<summary type="html" xml:base="http://www.theregister.co.uk/">&lt;h4&gt;Operator to offer second-gen Googlephone&lt;/h4&gt; &lt;p&gt;Vodafone has got its hands on the Google-Samsung Nexus S - &lt;a href="http://www.reghardware.com/2011/01/12/review_smartphone_google_nexus_s/"&gt;reviewed here&lt;/a&gt;.…&lt;/p&gt;</summary>
+</entry>
+<entry>
+<id>tag:theregister.co.uk,2005:story/2011/02/07/ryanair_mutiny/</id>
+<updated>2011-02-07T10:03:56Z</updated>
+<link rel="alternate" type="text/html" href="http://go.theregister.com/feed/www.theregister.co.uk/2011/02/07/ryanair_mutiny/"/>
+<title type="html">Stroppy Belgian students in Ryanair mutiny</title>
+<summary type="html" xml:base="http://www.theregister.co.uk/">&lt;h4&gt;Baggage fees rumpus grounds university mob&lt;/h4&gt; &lt;p&gt;More than 100 Belgians are stranded in Lanzarote's Guacimeta airport after staging a "mutiny" over Ryanair baggage fees.…&lt;/p&gt;</summary>
+</entry>
+<entry>
+<id>tag:theregister.co.uk,2005:story/2011/02/07/violin_toshiba_and_juniper/</id>
+<updated>2011-02-07T10:00:18Z</updated>
+<link rel="alternate" type="text/html" href="http://go.theregister.com/feed/www.theregister.co.uk/2011/02/07/violin_toshiba_and_juniper/"/>
+<title type="html">Juniper stuffs money into Violin</title>
+<summary type="html" xml:base="http://www.theregister.co.uk/">&lt;h4&gt;Joins Toshiba in backing startup&lt;/h4&gt; &lt;p&gt;Juniper Networks has joined Toshiba in pumping money into flash memory array startup Violin Memory to the tune of $35m. Violin uses Toshiba chips in its products, but what is Juniper's angle?…&lt;/p&gt;</summary>
+</entry>
+<entry>
+<id>tag:theregister.co.uk,2005:story/2011/02/07/kelly_endeavour/</id>
+<updated>2011-02-07T09:53:27Z</updated>
+<link rel="alternate" type="text/html" href="http://go.theregister.com/feed/www.theregister.co.uk/2011/02/07/kelly_endeavour/"/>
+<title type="html">NASA 'naut Kelly rejoins Endeavour crew</title>
+<summary type="html" xml:base="http://www.theregister.co.uk/">&lt;h4&gt;Wife Gabrielle Giffords on the mend&lt;/h4&gt; &lt;p&gt;NASA astronaut Mark Kelly is back on board space shuttle Endeavour's &lt;a target="_blank" href="http://www.nasa.gov/mission_pages/shuttle/shuttlemissions/sts134/index.html"&gt;STS-134&lt;/a&gt; mission to the ISS, following a month's leave to be at the bedside of his wife Gabrielle Giffords.…&lt;/p&gt;</summary>
+</entry>
+<entry>
+<id>tag:theregister.co.uk,2005:story/2011/02/07/nokia_definnification/</id>
+<updated>2011-02-07T09:49:30Z</updated>
+<link rel="alternate" type="text/html" href="http://go.theregister.com/feed/www.theregister.co.uk/2011/02/07/nokia_definnification/"/>
+<title type="html">Nokia boss 'plans Great Purge'</title>
+<summary type="html" xml:base="http://www.theregister.co.uk/">&lt;h4&gt;De-Finnification of the leadership&lt;/h4&gt; &lt;p&gt;Stephen Elop wants to purge Nokia's Executive Board, with some key executives leaving the company, reports German weekly &lt;a href="http://www.wiwo.de/unternehmen-maerkte/nokia-baut-konzernspitze-radikal-um-456187/"&gt;WirthschaftsWoche&lt;/a&gt;. Up to half of the nine &lt;a href="http://www.nokia.com/about-nokia/corporate-governance/group-executive-board"&gt;Board appointees&lt;/a&gt; will leave or be replaced, reports the weekly, representing a "De-Finnification" of the company's leadership.…&lt;/p&gt;</summary>
+</entry>
+<entry>
+<id>tag:theregister.co.uk,2005:story/2011/02/07/aol_buys_huff_post/</id>
+<updated>2011-02-07T09:23:33Z</updated>
+<link rel="alternate" type="text/html" href="http://go.theregister.com/feed/www.theregister.co.uk/2011/02/07/aol_buys_huff_post/"/>
+<title type="html">AOL buys Huffington Post</title>
+<summary type="html" xml:base="http://www.theregister.co.uk/">&lt;h4&gt;1 + 1 = 11 ... err, yes ...&lt;/h4&gt; &lt;p&gt;AOL is paying £190m for the &lt;a href="http://www.huffingtonpost.com/"&gt;Huffington Post&lt;/a&gt; – the ragbag collection of once Democrat-leaning blogs founded in 2005.…&lt;/p&gt; &lt;p&gt;&lt;p&gt;&lt;strong&gt;&lt;small&gt;&lt;a href="http://whitepapers.theregister.co.uk/paper/view/1472/?td=rss"&gt;Reg Guide to Enterprise Virtualization - Free Download!&lt;/a&gt;&lt;/small&gt;&lt;/strong&gt;&lt;/p&gt;&lt;/p&gt;</summary>
+</entry>
+<entry>
+<id>tag:theregister.co.uk,2005:story/2011/02/07/myer_breaks_ranks_on_net_retailing/</id>
+<updated>2011-02-07T06:39:22Z</updated>
+<link rel="alternate" type="text/html" href="http://go.theregister.com/feed/www.theregister.co.uk/2011/02/07/myer_breaks_ranks_on_net_retailing/"/>
+<title type="html">Myer breaks ranks on 'net retailing</title>
+<summary type="html" xml:base="http://www.theregister.co.uk/">&lt;h4&gt;The internet &lt;i&gt;didn’t&lt;/i&gt; eat our homework&lt;/h4&gt; &lt;p&gt;Australian retailer Myer has broken ranks with other major retailers like Gerry Harvey and Solomon Lew by saying that internet shopping isn’t slaughtering its sales.…&lt;/p&gt;</summary>
+</entry>
+<entry>
+<id>tag:theregister.co.uk,2005:story/2011/02/07/google_labs_fractal_generator/</id>
+<updated>2011-02-07T05:50:55Z</updated>
+<link rel="alternate" type="text/html" href="http://go.theregister.com/feed/www.theregister.co.uk/2011/02/07/google_labs_fractal_generator/"/>
+<title type="html">Google does fractals in HTML5</title>
+<summary type="html" xml:base="http://www.theregister.co.uk/">&lt;h4&gt;Take a break with Julia and Mandelbrot&lt;/h4&gt; &lt;p&gt;Fractals. They're porn for techies. Well, truth be told, porn is porn for techies. But fractals aren't far behind.…&lt;/p&gt;</summary>
+</entry>
+<entry>
+<id>tag:theregister.co.uk,2005:story/2011/02/07/revolution_r_sas_challenge/</id>
+<updated>2011-02-07T05:29:19Z</updated>
+<link rel="alternate" type="text/html" href="http://go.theregister.com/feed/www.theregister.co.uk/2011/02/07/revolution_r_sas_challenge/"/>
+<title type="html">'Red Hat for stats' goes toe-to-toe with SAS</title>
+<summary type="html" xml:base="http://www.theregister.co.uk/">&lt;h4&gt;Analyze this&lt;/h4&gt; &lt;p&gt;Revolution Analytics – the company that &lt;a href="http://www.theregister.co.uk/2010/05/06/revolution_commercial_r/"&gt;launched&lt;/a&gt; last year to be the "Red Hat for stats", providing an extended version of the open source R programming language and runtime – is going directly after analytics juggernaut SAS Institute with its latest release: R Enterprise 4.2.…&lt;/p&gt;</summary>
+</entry>
+<entry>
+<id>tag:theregister.co.uk,2005:story/2011/02/07/egyptian_pm_says_google_exec_will_be_released_on_monday/</id>
+<updated>2011-02-07T05:24:23Z</updated>
+<link rel="alternate" type="text/html" href="http://go.theregister.com/feed/www.theregister.co.uk/2011/02/07/egyptian_pm_says_google_exec_will_be_released_on_monday/"/>
+<title type="html">Egypt to release 'missing' Google exec on Monday</title>
+<summary type="html" xml:base="http://www.theregister.co.uk/">&lt;h4&gt;Ghonim (apparently) under government custody&lt;/h4&gt; &lt;p&gt;Egyptian Prime Minister Ahmed Shafiq has said that "missing" Google exec Wael Ghonim will released on Monday, according to a report citing Egyptian state television. Ghonim – Google's head of marketing for the Middle East and North Africa – has been missing since January 27, and he was apparently arrested after joining protests against the Egyptian government.…&lt;/p&gt;</summary>
+</entry>
+<entry>
+<id>tag:theregister.co.uk,2005:story/2011/02/07/tivo_hits_pause_button_in_oz/</id>
+<updated>2011-02-07T04:42:54Z</updated>
+<link rel="alternate" type="text/html" href="http://go.theregister.com/feed/www.theregister.co.uk/2011/02/07/tivo_hits_pause_button_in_oz/"/>
+<title type="html">TiVo hits pause button in Australia</title>
+<summary type="html" xml:base="http://www.theregister.co.uk/">&lt;h4&gt;Staff shed in restructure, Fetch TV a buyer?&lt;/h4&gt; &lt;p&gt;Just over a week after a much-publicised kick-off in New Zealand, it has emerged TiVo's A/NZ partner Hybrid TV has wound back operations to a skeleton staff. Sources have told &lt;i&gt;The Register&lt;/i&gt; an asset sale for the video-on-demand platform could be on the cards.…&lt;/p&gt; &lt;p&gt;&lt;p&gt;&lt;strong&gt;&lt;small&gt;&lt;a href="http://whitepapers.theregister.co.uk/paper/view/1340/?ftd=rss"&gt;Reg Guide to Improving Systems Agility - Free Download!&lt;/a&gt;&lt;/small&gt;&lt;/strong&gt;&lt;/p&gt;&lt;/p&gt;</summary>
+</entry>
+<entry>
+<id>tag:theregister.co.uk,2005:story/2011/02/06/cpt_global_goes_postale/</id>
+<updated>2011-02-06T22:21:03Z</updated>
+<link rel="alternate" type="text/html" href="http://go.theregister.com/feed/www.theregister.co.uk/2011/02/06/cpt_global_goes_postale/"/>
+<title type="html">CPT Global goes Postale</title>
+<summary type="html" xml:base="http://www.theregister.co.uk/">&lt;h4&gt;French bank signs Melbourne consultant&lt;/h4&gt; &lt;p&gt;Melbourne-based CPT Global Limited has announced a contract with La Banque Postale.…&lt;/p&gt;</summary>
+</entry>
+<entry>
+<id>tag:theregister.co.uk,2005:story/2011/02/06/tnz_voda_win_rbi_contract/</id>
+<updated>2011-02-06T21:38:30Z</updated>
+<link rel="alternate" type="text/html" href="http://go.theregister.com/feed/www.theregister.co.uk/2011/02/06/tnz_voda_win_rbi_contract/"/>
+<title type="html">TNZ and Voda in Kiwi broadband win</title>
+<summary type="html" xml:base="http://www.theregister.co.uk/">&lt;h4&gt;Negotiations begin for $NZ300M project&lt;/h4&gt; &lt;p&gt;The New Zealand government has begun commercial negotiations with Telecom New Zealand and Vodafone for its $NZ300 million Rural Broadband Initiative (RBI).…&lt;/p&gt;</summary>
+</entry>
+<entry>
+<id>tag:theregister.co.uk,2005:story/2011/02/06/mobile_phone_car_ban_australia/</id>
+<updated>2011-02-06T20:37:55Z</updated>
+<link rel="alternate" type="text/html" href="http://go.theregister.com/feed/www.theregister.co.uk/2011/02/06/mobile_phone_car_ban_australia/"/>
+<title type="html">Oz road safety strategy moots mobile phone ban</title>
+<summary type="html" xml:base="http://www.theregister.co.uk/">&lt;h4&gt;It’s in there somewhere&lt;/h4&gt; &lt;p&gt;An Australian road safety strategy draft released by the Standing Committee on Transport in the federal Department of Infrastructure and Transport has mooted a total ban on mobile phone use by drivers, at some indeterminate point.…&lt;/p&gt;</summary>
+</entry>
+<entry>
+<id>tag:theregister.co.uk,2005:story/2011/02/06/android_takes_top_spot/</id>
+<updated>2011-02-06T09:00:03Z</updated>
+<link rel="alternate" type="text/html" href="http://go.theregister.com/feed/www.theregister.co.uk/2011/02/06/android_takes_top_spot/"/>
+<title type="html">Android's on top – will Nokia and RIM let it in?</title>
+<summary type="html" xml:base="http://www.theregister.co.uk/">&lt;h4&gt;More likely that Nokia will go for WP7&lt;/h4&gt; &lt;p&gt;Android has overtaken Symbian to become the number one mobile operating system – a feat never achieved by Apple iOS – and now the new Honeycomb release should enable Google's platform to eat into the iPad's tablet market share too.…&lt;/p&gt;</summary>
+</entry>
+<entry>
+<id>tag:theregister.co.uk,2005:story/2011/02/05/reghardware_reviews_digest/</id>
+<updated>2011-02-05T09:00:02Z</updated>
+<link rel="alternate" type="text/html" href="http://go.theregister.com/feed/www.theregister.co.uk/2011/02/05/reghardware_reviews_digest/"/>
+<title type="html">Reg Hardware Reviews Digest</title>
+<summary type="html" xml:base="http://www.theregister.co.uk/">&lt;h4&gt;The weekly taste of tech&lt;/h4&gt; &lt;p&gt;Over the past seven days, &lt;em&gt;Reg Hardware&lt;/em&gt; has looked at products from the worlds of consumer electronics, mobile communications, photography and gaming.…&lt;/p&gt; &lt;p&gt;&lt;p&gt;&lt;strong&gt;&lt;small&gt;&lt;a href="http://whitepapers.theregister.co.uk/paper/view/1472/?td=rss"&gt;Reg Guide to Enterprise Virtualization - Free Download!&lt;/a&gt;&lt;/small&gt;&lt;/strong&gt;&lt;/p&gt;&lt;/p&gt;</summary>
+</entry>
+<entry>
+<id>tag:theregister.co.uk,2005:story/2011/02/05/metal_thieves_disrupt_rail_comms_electric/</id>
+<updated>2011-02-05T08:00:02Z</updated>
+<link rel="alternate" type="text/html" href="http://go.theregister.com/feed/www.theregister.co.uk/2011/02/05/metal_thieves_disrupt_rail_comms_electric/"/>
+<title type="html">Bold as brass metal thieves disrupt rail, comms, electric</title>
+<summary type="html" xml:base="http://www.theregister.co.uk/">&lt;h4&gt;Authorities get heavy with metal thieves&lt;/h4&gt; &lt;p&gt;The growing threat from metal theft – and the no-nonsense response by authorities determined to stamp it out – were &lt;a href="http://www.bbc.co.uk/news/uk-england-nottinghamshire-12356764"&gt;highlighted yesterday&lt;/a&gt; as jail sentences of three years apiece were handed down to two Newark men convicted of stealing 25 metres of copper cabling worth just £44.…&lt;/p&gt;</summary>
+</entry>
+<entry>
+<id>tag:theregister.co.uk,2005:story/2011/02/05/review_equinux_tizi_ios4_tv_tuner/</id>
+<updated>2011-02-05T08:00:02Z</updated>
+<link rel="alternate" type="text/html" href="http://go.theregister.com/feed/www.reghardware.com/2011/02/05/review_equinux_tizi_ios4_tv_tuner/"/>
+<title type="html">Equinux Tizi iPhone TV tuner</title>
+<summary type="html" xml:base="http://www.theregister.co.uk/">&lt;h4&gt;Aerial views over iOS4 displays&lt;/h4&gt; &lt;p&gt;&lt;strong&gt;Review&lt;/strong&gt;  There’s no shortage of TV tuners available these days, ranging from cheap and cheerful USB gadgets to more expensive network-enabled devices such as the &lt;a href="http://www.reghardware.com/2010/11/13/review_media_streamer_sling_media_slingbox_pro_hd/"&gt;Slingbox&lt;/a&gt; range or &lt;a href="http://www.reghardware.com/2010/04/05/review_peripherals_elgato_netstream_dtt/"&gt;Elgato’s Netstream&lt;/a&gt;. However, the Tizi is the first TV tuner I’ve seen that is exclusively designed for the iOS platform.…&lt;/p&gt;</summary>
+</entry>
+</feed>

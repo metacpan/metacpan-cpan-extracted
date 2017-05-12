@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Schema definition for the source element specification -->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+   <xsd:include schemaLocation="packingList.xsd"/>
+   <xsd:include schemaLocation="path.xsd"/>
+   <xsd:element name="source" type="source"/>
+   <xsd:complexType name="source">
+      <xsd:sequence>
+         <xsd:element name="location" type="path"/>
+         <xsd:element name="packingList" type="packingList"/>
+      </xsd:sequence>
+   </xsd:complexType>
+</xsd:schema>

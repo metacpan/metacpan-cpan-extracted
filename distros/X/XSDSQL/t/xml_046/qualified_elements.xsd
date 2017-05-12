@@ -1,0 +1,30 @@
+<?xml version="1.0"?> 
+<xs:schema 
+	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	targetNamespace="http://www.book.org"
+	xmlns="http://www.book.org"
+>
+
+<!-- ROOT_SCHEMA -->
+
+	<xs:element name="name" type="xs:string"/>
+
+	  <xs:group name="character">
+		<xs:sequence>
+		  <xs:element ref="name"/>
+		  <xs:element name="born" type="xs:date"/>
+		   <xs:element name="title" type="xs:string"/>
+		</xs:sequence>
+	  </xs:group>
+
+	<xs:attribute name="id" type="xs:integer"/>
+		         
+	<xs:element name="character">
+	  <xs:complexType>
+		<xs:group ref="character"/>
+		<xs:attribute ref="id"/>
+		<xs:attribute name="id1"  type="xs:integer"/>
+	  </xs:complexType>
+	</xs:element>
+</xs:schema>
+

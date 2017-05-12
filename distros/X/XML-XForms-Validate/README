@@ -1,0 +1,30 @@
+XML::XForms::Validate
+=====================
+
+This module is designed for validation of XForms submissions. Detailed description
+is available as perldoc, including all validation procedures and inherent limitations.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  XML::LibXML 1.63 (may work with older versions, but is untested)
+  XML::Schema 0.07
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 by Jörg Walter <info@syntax-k.de>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl version 5.8.0.
+
+

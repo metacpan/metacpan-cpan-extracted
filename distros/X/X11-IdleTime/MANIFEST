@@ -1,0 +1,10 @@
+inc/Devel/CheckLib.pm
+Changes
+IdleTime.pm
+Makefile.PL
+MANIFEST
+README
+t/1.t
+t/pod.t
+t/pod-coverage.t
+META.yml                                 Module meta-data (added by MakeMaker)

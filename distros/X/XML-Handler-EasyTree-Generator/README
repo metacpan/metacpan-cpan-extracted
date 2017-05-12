@@ -1,0 +1,31 @@
+XML-Handler-EasyTree-Generator version 0.03
+===========================================
+
+This module provides a method for creating EasyTree structures with an interface similar to CGI.pm.
+
+The module is plain Perl and strictly speaking it has no dependencies, though you're not liable to do much useful without an EasyTree module like XML::Parser::EasyTree, XML::Handler::Trees, or the potentially forthcoming XML::Handler::EasyTree::Searchable::Extended.
+
+0.03 -- updated author contact info
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module doesn't require other modules or libraries.
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2004~2006 by wren ng thornton.
+All rights reserved.
+
+This library is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself, either Perl
+version 5.8.3 or, at your option, any later version of Perl 5
+you may have available.

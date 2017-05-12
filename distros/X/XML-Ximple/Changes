@@ -1,0 +1,11 @@
+Revision history for Perl extension XML::Ximple.
+
+1.02  Mon Nov  4 15:41:38 2002
+  - make xmlize() return unless the text passed to it is defined,
+    thanks to Anton Drukh <adrukh@netvision.net.il>
+1.01  Wed Jul 17 12:00:00 2002
+  - no newline after opening tags
+1.00  Fri Jun 28 21:57:21 2002
+	- original version; created by h2xs 1.20 with options
+		-X XML::Ximple
+

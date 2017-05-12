@@ -1,0 +1,32 @@
+<stx:transform version="1.0" 
+  xmlns:stx="http://stx.sourceforge.net/2002/ns"
+  strip-space="yes">
+
+  <stx:variable name="nodes" select="()"/>
+  <stx:variable name="var1" select="'a'"/>
+
+  <stx:template match="/root">
+    <root>
+      <stx:variable name="var2" select="'b'"/>
+      <stx:process-children/>
+
+      <stx:for-each-item name="x" select="$nodes">
+	<stx:variable name="var3" select="'c'"/>
+	<i>
+	  <stx:value-of select="$var1"/>
+	  <stx:value-of select="$var2"/>
+	  <stx:value-of select="$var3"/>
+	  <stx:value-of select="$x"/>
+	</i>
+      </stx:for-each-item>
+
+    </root>
+  </stx:template>
+
+  
+  <stx:template match="node">
+    <stx:assign name="nodes" select="($nodes, .)"/>
+  </stx:template>
+
+
+</stx:transform>

@@ -1,0 +1,8 @@
+MANIFEST
+Makefile.PL
+lib/XML/LibXML/Enhanced.pm
+lib/XML/LibXML/Pipeline.pm
+lib/XML/LibXML/Transformer.pm
+t/enhanced.t
+t/transformer.t
+META.yml                                 Module meta-data (added by MakeMaker)

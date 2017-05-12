@@ -1,0 +1,76 @@
+<?xml version="1.0"?>
+<!DOCTYPE RTML SYSTEM "http://astro.livjm.ac.uk/HaGS/rtml2.1.dtd" >
+<RTML version="2.1" type="score">
+    <Contact PI="true">
+        <User>je</User>
+	<Name>Jason Etherton</Name>
+	<Institution>
+	    Liverpool John Moores University
+	</Institution>
+	<Email>
+	    je@astro.livjm.ac.uk
+	</Email>
+    </Contact>
+    <IntelligentAgent host="ltobs5.livjm.ac.uk" port="1234">
+        IATEST0001:CT1:0013
+    </IntelligentAgent>
+    <Project>
+        <Title>
+	    Demonstration RTML document.
+        </Title>
+	<Abstract>
+	    This project is designed to test the RTML parsing modules.
+	</Abstract>
+    </Project>
+    <Observation status="ok">
+	<Target type="normal" ident="Observation">
+	    <TargetName>
+	        Observable target
+	    </TargetName>
+	    <Coordinates type="equatorial">
+	        <RightAscension format="hh mm ss.s" units="hms">
+		    06 00 00.0
+	        </RightAscension>
+		<Declination format="sdd mm ss.s" units="dms">		
+		    +45 00 00.0
+		</Declination>
+		<Equinox>
+		    J2000
+		</Equinox>
+	    </Coordinates>
+	    <Flux type="continuum" units="mag" wavelength="v">
+	         15.0
+	    </Flux>
+	</Target>
+
+	<Schedule priority="3">
+	    <Exposure type="snr">
+	        5.0
+	    </Exposure>
+
+	    <TimeConstraint>
+	        <StartDateTime>
+		    2001-10-31T23:00:00
+	        </StartDateTime>
+	        <EndDateTime>
+		    2002-11-30T23:00:00
+	        </EndDateTime>
+	    </TimeConstraint>
+
+	</Schedule>
+
+	<Calibration>
+	    <Bias correct="false" overscan="true" mean="true" />
+
+	    <DarkCurrent correct="false" />
+
+	    <BadPixels correct="false" />
+
+	    <FlatField correct="false" sky="true" dome="true" />
+
+	    <Fringing correct="false" />
+
+	    <CosmicRays correct="false" />
+	</Calibration>
+    </Observation>
+</RTML>

@@ -1,0 +1,34 @@
+<module name="XML::Schema::Type::List">
+
+  <about>
+    This module implements the XML Schema list type.
+  </about>
+
+  <synopsis>
+<perl>
+use XML::Schema::Type;
+
+# an object to represent the base type
+my $float = XML::Schema::Type::float->new();
+
+# create a list type of the base type
+my $list = XML::Schema::Type::List->new( itemType => $float );
+
+# instantiate a validated list
+my $items = $list->instance('3.14  2.718');
+
+# add constraints to list
+$list->constrain( maxLength => 4 );		# max 3 items
+
+$item = $list->instance('1.2 3.4 5.6');	# OK
+$item = $list->instance('1.2 3.4 5.6 7.8'); # not OK - 4 items
+$item = $list->instance('hello');		# not OK - not a float
+</perl>
+  </synopsis>
+</module>
+
+
+
+
+
+

@@ -1,0 +1,51 @@
+{
+   "abstract" : "Persistant XML RSS Encapsulation",
+   "author" : [
+      "Jeff Bisbee <jbisbee@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.7, CPAN::Meta::Converter version 2.131560",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "XML-RSS-Feed",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Clone" : "0",
+            "Digest::MD5" : "0",
+            "Encode" : "0",
+            "HTML::Entities" : "0",
+            "Storable" : "0",
+            "Test::More" : "0",
+            "Time::HiRes" : "0",
+            "URI" : "0",
+            "URI::Escape" : "0",
+            "XML::RSS" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "2.4"
+}

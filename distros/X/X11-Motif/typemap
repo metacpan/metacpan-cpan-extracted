@@ -1,0 +1,340 @@
+# --------------------------------------------------------------------------------
+# X
+
+XID					T_X_ID
+Window					T_X_ID
+Drawable				T_X_ID
+Font					T_X_ID
+Pixmap					T_X_ID
+Cursor					T_X_ID
+Colormap				T_X_ID
+GContext				T_X_ID
+KeySym					T_X_ID
+EventMask				T_X_ID
+
+Atom					T_X_ID
+VisualID				T_X_ID
+Time					T_X_ID
+KeyCode					T_X_ID
+XContext				T_X_ID
+Pixel					T_X_ID
+
+XrmQuark				T_X_ID
+XrmName					T_X_ID
+XrmClass				T_X_ID
+XrmRepresentation			T_X_ID
+XrmString				T_X_PTR
+XrmDatabase				T_X_PTR
+XrmOptionDescRec *			T_X_PTR
+XrmValue *				T_X_PTR
+XrmValuePtr				T_X_PTR
+
+Cardinal				T_IV
+Dimension				T_IV
+Position				T_IV
+String					T_PV
+
+# these are all structure pointers (used as input)
+
+Display *				T_X_PTR
+GC					T_X_PTR
+Screen *				T_X_PTR
+Visual *				T_X_PTR
+XColor *				T_X_PTR
+XGCValues *				T_X_PTR
+XHostAddress *				T_X_PTR
+XImage *				T_X_PTR
+XArc *					T_X_PTR
+XChar2b *				T_X_PTR
+XCharStruct *				T_X_PTR
+XFontSet				T_X_PTR
+XFontSetExtents *			T_X_PTR
+XFontStruct *				T_X_PTR
+XKeyboardControl *			T_X_PTR
+XKeyboardState *			T_X_PTR
+XModifierKeymap *			T_X_PTR
+XPixmapFormatValues *			T_X_PTR
+XPoint *				T_X_PTR
+XRectangle *				T_X_PTR
+XSegment *				T_X_PTR
+XSetWindowAttributes *			T_X_PTR
+XTextItem *				T_X_PTR
+XTextItem16 *				T_X_PTR
+XTimeCoord *				T_X_PTR
+XWindowAttributes *			T_X_PTR
+XWindowChanges *			T_X_PTR
+Region					T_X_PTR
+XClassHint *				T_X_PTR
+XComposeStatus *			T_X_PTR
+XIconSize *				T_X_PTR
+XSizeHints *				T_X_PTR
+XStandardColormap *			T_X_PTR
+XTextProperty *				T_X_PTR
+XVisualInfo *				T_X_PTR
+XWMHints *				T_X_PTR
+
+XEvent *				T_X_EVENT_PTR
+XKeyEvent *				T_X_PTR
+XMappingEvent *				T_X_PTR
+XButtonPressedEvent *			T_X_PTR
+XSelectionRequestEvent *		T_X_PTR
+
+# these are all structure pointers (used as input/output)
+
+XrmDatabase *				T_DUMMY
+
+# This next section contains (all? mostly?) output types.  They
+# will certainly require special handling.  They way they're
+# defined right now will probably cause a core dump if used.
+
+Atom *					T_DUMMY
+Atom **					T_DUMMY
+Colormap *				T_DUMMY
+KeySym *				T_DUMMY
+Pixmap *				T_DUMMY
+Window *				T_DUMMY
+Window **				T_DUMMY
+XFontStruct **				T_DUMMY
+XFontStruct ***				T_DUMMY
+XStandardColormap **			T_DUMMY
+XIconSize **				T_DUMMY
+XPointer *				T_DUMMY
+
+XrmBindingList				T_DUMMY
+XrmClassList				T_DUMMY
+XrmNameList				T_DUMMY
+XrmOptionDescList			T_DUMMY
+XrmQuarkList				T_DUMMY
+XrmRepresentation *			T_DUMMY
+
+char **					T_DUMMY
+char ***				T_DUMMY
+int *					T_DUMMY
+long *					T_DUMMY
+unsigned char **			T_DUMMY
+unsigned int *				T_DUMMY
+int **					T_DUMMY
+unsigned short *			T_DUMMY
+
+# --------------------------------------------------------------------------------
+# Xt
+
+XtAppContext				T_X_PTR
+WidgetClass				T_X_PTR
+Widget					T_X_PTR
+XtInArg					T_X_PTR
+XtOutArg				T_X_PTR
+
+Modifiers				T_X_ID
+XtAccelerators				T_X_PTR
+XtTranslations				T_X_PTR
+XtWidgetGeometry *			T_X_PTR
+
+XtActionHookId				T_X_ID
+XtInputId				T_X_ID
+XtIntervalId				T_X_ID
+XtRequestId				T_X_ID
+XtWorkProcId				T_X_ID
+
+XtGCMask				T_IV
+XtValueMask				T_IV
+XtListPosition				T_IV
+XtInputMask				T_IV
+XtCallbackStatus			T_IV
+XtGeometryResult			T_IV
+XtGrabKind				T_IV
+XtCacheType				T_IV
+
+XtPointer				T_DUMMY
+
+XtResourceList				T_DUMMY
+XtActionList				T_DUMMY
+XtConvertArgList			T_DUMMY
+XtCallbackList				T_DUMMY
+
+KeyCode *				T_DUMMY
+XtActionHookProc			T_DUMMY
+XtActionProc				T_DUMMY
+XtCallbackProc				T_DUMMY
+XtCancelConvertSelectionProc		T_DUMMY
+XtCaseProc				T_DUMMY
+XtConvertSelectionIncrProc		T_DUMMY
+XtConvertSelectionProc			T_DUMMY
+XtDestructor				T_DUMMY
+XtErrorHandler				T_DUMMY
+XtErrorMsgHandler			T_DUMMY
+XtEventHandler				T_DUMMY
+XtFilePredicate				T_DUMMY
+XtInputCallbackProc			T_DUMMY
+XtKeyProc				T_DUMMY
+XtLanguageProc				T_DUMMY
+XtLoseSelectionIncrProc			T_DUMMY
+XtLoseSelectionProc			T_DUMMY
+XtSelectionCallbackProc			T_DUMMY
+XtSelectionDoneIncrProc			T_DUMMY
+XtSelectionDoneProc			T_DUMMY
+XtTimerCallbackProc			T_DUMMY
+XtTypeConverter				T_DUMMY
+XtWorkProc				T_DUMMY
+
+XtCacheRef *				T_DUMMY
+XtAppContext *				T_DUMMY
+Boolean *				T_DUMMY
+Cardinal *				T_DUMMY
+Dimension *				T_DUMMY
+Dimension **				T_DUMMY
+KeyCode **				T_DUMMY
+Modifiers *				T_DUMMY
+Pixel *					T_DUMMY
+Position *				T_DUMMY
+String *				T_DUMMY
+Substitution				T_DUMMY
+Time *					T_DUMMY
+Widget *				T_DUMMY
+WidgetList				T_DUMMY
+XtPointer *				T_DUMMY
+
+# --------------------------------------------------------------------------------
+# Motif
+
+XmString				T_XMSTRING_PTR
+XmFontList				T_X_PTR
+XmAnyCallbackStruct *			T_X_PTR
+XmArrowButtonCallbackStruct *		T_X_PTR
+XmDrawingAreaCallbackStruct *		T_X_PTR
+XmDrawnButtonCallbackStruct *		T_X_PTR
+XmPushButtonCallbackStruct *		T_X_PTR
+XmRowColumnCallbackStruct *		T_X_PTR
+XmScrollBarCallbackStruct *		T_X_PTR
+XmToggleButtonCallbackStruct *		T_X_PTR
+XmListCallbackStruct *			T_X_PTR
+XmSelectionBoxCallbackStruct *		T_X_PTR
+XmCommandCallbackStruct *		T_X_PTR
+XmFileSelectionBoxCallbackStruct *	T_X_PTR
+XmScaleCallbackStruct *			T_X_PTR
+XmTextVerifyCallbackStruct *		T_X_PTR
+XmTraverseObscuredCallbackStruct *	T_X_PTR
+
+XmFontContext				T_X_PTR
+XmFontListEntry				T_X_PTR
+XmFontType				T_X_PTR
+XmStringCharSet				T_X_PTR
+XmTextSource				T_X_PTR
+XmStringContext				T_X_PTR
+
+# the handling of wide strings is totally screwed up
+# right now.  there ought to be automatic casting to/from
+# perl strings.  most of the X/Xt implementation of
+# multi-byte character sets and locales has also been
+# removed.  hopefully we'll add this stuff in some time
+# soon, but I'm in a tough position to test it because
+# I only work with ISO latin fonts.  (The standard
+# Perl typemap for wchar_t is also screwed up.)
+
+wchar_t *				T_X_PTR
+
+XmStringComponentType			T_IV
+XmHighlightMode				T_IV
+XmTextDirection				T_IV
+XmTextPosition				T_IV
+XmTraversalDirection			T_IV
+XmVisibility				T_IV
+
+XmColorProc				T_DUMMY
+
+XmFontContext *				T_DUMMY
+XmFontListEntry *			T_DUMMY
+XmFontType *				T_DUMMY
+XmOffsetPtr *				T_DUMMY
+XmSecondaryResourceData **		T_DUMMY
+XmString *				T_DUMMY
+XmStringCharSet *			T_DUMMY
+XmStringComponentType *			T_DUMMY
+XmStringContext *			T_DUMMY
+XmStringDirection *			T_DUMMY
+XmTextPosition *			T_DUMMY
+
+# --------------------------------------------------------------------------------
+# Xbae
+
+XbaeAnyCallbackStruct *			T_X_PTR
+XbaeRowColumnCallbackStruct *		T_X_PTR
+XbaeMatrixDefaultActionCallbackStruct *	T_X_PTR
+XbaeMatrixEnterCellCallbackStruct *	T_X_PTR
+XbaeMatrixLeaveCellCallbackStruct *	T_X_PTR
+
+# --------------------------------------------------------------------------------
+# XRT
+
+XrtTextHandle				T_X_PTR
+XrtDataHandle				T_X_PTR
+
+XrtAnyCallbackStruct *			T_X_PTR
+XrtAnyGearCallbackStruct *		T_X_PTR
+XrtGenericContainerCallbackStruct *	T_X_PTR
+XrtGearNodeFolderStateCallbackStruct *	T_X_PTR
+XrtGearSelectCallbackStruct *		T_X_PTR
+XrtGearNodeActivateCallbackStruct *	T_X_PTR
+
+Xrt_perl_GearString			T_X_PTR
+Xrt_perl_GearList			T_X_PTR
+Xrt_perl_DataStyle			T_X_PTR
+Xrt_perl_DataStyles			T_X_PTR
+Xrt_perl_Strings			T_X_PTR
+Xrt_perl_Float				T_X_PTR
+
+# ================================================================================
+# The input/output type conversions follow.  The converters should
+# be quite generic and widely useful, even for non-X data types.
+# ================================================================================
+
+OUTPUT
+T_X_ID
+	sv_setref_iv($arg, ${ntype}_Package, (IV)$var);
+T_X_PTR
+	sv_setref_pv($arg, ${ntype}_Package, (void *)$var);
+T_XMSTRING_PTR
+	sv_setref_pv($arg, XmString_Package, (void *)$var);
+T_DUMMY
+	sv_setref_pv($arg, \"DUMMY_${ntype}\", (void *)$var);
+T_X_EVENT_PTR
+	sv_setref_pv($arg, XEventPtr_Package($var->type), (void *)$var);
+
+INPUT
+T_X_ID
+	if (sv_derived_from($arg, ${ntype}_Package)) {
+	    $var = ($type)SvIV((SV*)SvRV($arg));
+	}
+	else
+	    croak(\"$var is not of type %s\", ${ntype}_Package)
+T_X_PTR
+	if (sv_derived_from($arg, ${ntype}_Package)) {
+	    IV tmp_ = SvIV((SV*)SvRV($arg));
+	    $var = ($type)tmp_;
+	}
+	else
+	    croak(\"$var is not of type %s\", ${ntype}_Package)
+T_XMSTRING_PTR
+	if (sv_derived_from($arg, XmString_Package)) {
+	    IV tmp_ = SvIV((SV*)SvRV($arg));
+	    $var = (XmString)tmp_;
+	}
+	else {
+	    SV *tmp_ = sv_newmortal();
+	    $var = XmStringCreateSimple(SvPV($arg, na));
+	    sv_setref_pv(tmp_, XmString_Package, (void *)$var);
+	}
+T_DUMMY
+	if (sv_derived_from($arg, \"DUMMY_${ntype}\")) {
+	    IV tmp_ = SvIV((SV*)SvRV($arg));
+	    $var = ($type)tmp_;
+	}
+	else
+	    croak(\"$var is not of type %s\", \"DUMMY_${ntype}\")
+T_X_EVENT_PTR
+	if (sv_derived_from($arg, \"X::Event\")) {
+	    IV tmp_ = SvIV((SV*)SvRV($arg));
+	    $var = ($type)tmp_;
+	}
+	else
+	    croak(\"$var is not of type X::Event\")

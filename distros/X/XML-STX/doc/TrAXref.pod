@@ -1,0 +1,299 @@
+=head1 TrAX-like API for XML::STX
+
+Transformation API for XML (TrAX) is a generic Java API for performing 
+a transformation from source to a result. See the links below for more
+details:
+
+=for html <a href="http://xml.apache.org/xalan-j/trax.html">Apache TrAX Page</a><br>
+
+=for html <a href="http://java.sun.com/j2se/1.4.1/docs/api/javax/xml/transform/package-summary.html"> Java 2 SDK SE TrAX Reference</a>
+
+This document describes a simple TrAX-like Perl API that has been developed
+for purposes of XML::STX transformation engine.
+
+=head2 Objects
+
+B<General rules and conventions:>
+There are no set/get methods to access to properties. All properties can
+be passed to new() and set directly in the object.
+Objects and properties are all mixed case with initial upper-case.
+Method names have been converted to lower-case with underscores. 
+
+=over
+
+=item L<TransformerFactory|transformerfactory>
+
+=item L<Templates|templates>
+
+=item L<Transformer|transformer>
+
+=item L<SAXSource|saxsource>
+
+=item L<SAXResult|saxresult>
+
+=item L<URIResolver|uriresolver>
+
+=item L<ErrorListener|errorlistener>
+
+=back
+
+=head2 TransformerFactory
+
+A factory for Templates objects, a direct factory for Transformer objects.
+Can also serve as factory for other objects (e.g. SAXSource, SAXResult).
+This class is used as a base class for the processor.
+
+METHODS:
+
+=over
+
+=item new_templates(L<SAXSource|saxsource>) as L<Templates|templates>
+
+Returns a new instance of Templates. 
+The source can also be provided as L<InputSource|inputsource> or I<uri>, 
+which is turned into L<SAXSource|saxsource> object automatically
+using a default L<XML reader|xmlreader>.
+
+=item new_transformer(L<SAXSource|saxsource>) as L<Transformer|transformer>
+
+Returns a new instance of Transformer.
+The source can also be provided as L<InputSource|inputsource> or I<uri>, 
+which is turned into L<SAXSource|saxsource> object automatically
+using a default L<XML reader|xmlreader>.
+
+This is a shortcut method that provides a default transformation context for
+a Templates object directly.
+
+=item new_source(I<uri>, L<XMLReader|xmlreader>?) as L<SAXSource|saxsource>
+
+Returns a new instance of SAXSource.
+The second argument is optional; an instance of L<XML reader|xmlreader> is 
+created automatically if it's missing.
+
+=item new_result(L<Handler|handler>?) as L<SAXResult|saxresult>
+
+Returns a new instance of SAXResult. The argument is optional; 
+an instance of L<handler|handler> is created automatically if it's missing.
+
+=back
+
+PROPERTIES:
+
+=over
+
+=item ErrorListener as L<ErrorListener|errorlistener>
+
+Error listener that is in use when parsing templates.
+
+=item URIResolver as L<URIResolver|uriresolver>
+
+URI resolver that is in use when parsing templates.
+
+=back
+
+=head2 Templates
+
+A runtime representation of the transformation instructions.
+A data bag for transformation instructions; act as a factory for Transformers.
+
+METHODS:
+
+=over
+
+=item new_transformer( ) as L<Transformer|transformer>
+
+Returns a new instance of Transformer.
+
+=back
+
+=head2 Transformer
+
+An execution context for transformations, it serves as an interface for 
+performing the transformation.
+
+METHODS:
+
+=over
+
+=item transform(L<SAXSource|saxsource>, L<SAXResult|saxresult>?) as I<result>
+
+Performs the transformation.
+The source can also be provided as L<InputSource|inputsource> or I<uri>, 
+which is turned into L<SAXSource|saxsource> object automatically
+using a default L<XML reader|xmlreader>.
+The second argument is optional; an instance of L<SAXResult|saxresult> 
+is created automatically if it's missing.
+
+=item clear_parameters( )
+
+Clears all parameters set for this transformer.
+
+=back
+
+PROPERTIES:
+
+=over
+
+=item Parameters as I<hashref>
+
+Parameters is a hash keyed by parameter names in JClark's namespace notation. 
+The keys are of the form C<{NamespaceURI}LocalName>. If a parameter has no 
+NamespaceURI, then it is simply C<LocalName>.
+Values of the hash are scalar values of parameters.
+
+=item ErrorListener as L<ErrorListener|errorlistener>
+
+Error listener that is in use during the transformation.
+
+=item URIResolver as L<URIResolver|uriresolver>
+
+URI resolver that is in use during the transformation.
+
+=back
+
+=head2 SAXSource
+
+A data holder for SAX input streams. 
+
+This object implements an interface called B<Source> representing 
+multiple types of input. Other implementations include DOMSource 
+and StreamSource, none of them implemented by XML::STX.
+
+PROPERTIES:
+
+=over
+
+=item SystemId as I<uri>
+
+System identifier for the source (optional).
+
+=item XMLReader as L<XMLReader|xmlreader>
+
+XML reader for the source.
+
+=item InputSource as L<InputSource|inputsource>
+
+SAX InputSource for the source.
+
+=back
+
+=head2 SAXResult
+
+A data holder for SAX output streams.
+
+This object implements an interface called B<Result> representing 
+multiple types of output. Other implementations include DOMResult 
+and StreamResult, none of them implemented by XML::STX.
+
+PROPERTIES:
+
+=over
+
+=item SystemId as I<uri>
+
+System identifier for the result (optional).
+
+=item Handler as L<Handler|handler>
+
+Content handler for the result.
+
+=back
+
+=head2 URIResolver
+
+An object that can be called by the processor to turn URIs used in 
+transformations into L<SAXSource|saxsource> objects.
+
+METHODS:
+
+=over
+
+=item resolve(I<uri>, I<uri>) as L<SAXSource|saxsource>
+
+Parameters are URI to be resolved and optional base URI. The function
+returns a SAXSource object or undef if the URI cannot be resolved.
+
+=back
+
+PROPERTIES:
+
+=over
+
+=item Sources as I<hashref>
+
+Sources is a hash keyed by URIs. Values of the hash are 
+L<SAXSource|saxsource> objects. These URI-Source pairs are used when 
+trying to resolve an input URI before standard resolution mechanisms 
+take place. 
+
+=item Results as I<hashref>
+
+Results is a hash keyed by URIs. Values of the hash are 
+L<SAXResult|saxresult> objects. These URI-Result pairs are used when 
+trying to resolve an output URI before standard resolution mechanisms 
+take place. 
+
+=back
+
+=head2 ErrorListener
+
+This interface is used by L<TransformerFactory|transformerfactory> and 
+L<Transformer|transformer> to report all errors and warnings. 
+The ErrorListener property of these objects is used to register an instance 
+of this object.
+
+METHODS:
+
+=over
+
+=item warning(L<Exception|exception>)
+
+Receives notification of a warning.
+
+=item error(L<Exception|exception>)
+
+Receives notification of a recoverable error.
+
+=item fatal_error(L<Exception|exception>)
+
+Receives notification of a non-recoverable error.
+
+=back
+
+=head2 Other definitions
+
+=for html Some terms referred in this document are defined in <a href="http://perl-xml.sourceforge.net/sax/">Perl SAX</a>. These terms include:
+
+=head3 XMLReader
+
+An implementation of Parser interface.
+
+=for html See <a href="http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/*checkout*/perl-xml/libxml-perl/doc/sax-2.0.html">Perl SAX 2.0 Binding</a>.
+
+The B<default XML reader> is chosen from compliant SAX2 parsers installed 
+in system; XML::SAX::PurePerl being the fall-back.
+
+=head3 InputSource
+
+A hash representing input source.
+
+=for html See <a href="http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/*checkout*/perl-xml/libxml-perl/doc/sax-2.0-adv.html#InputSources">Advanced SAX</a>.
+
+=head3 Handler
+
+A content handler.
+
+=for html See <a href="http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/*checkout*/perl-xml/libxml-perl/doc/sax-2.0-adv.html#Handlers">Advanced SAX</a>.
+
+The B<default handler> is chosen from compliant SAX2 writers installed 
+in system; XML::STX::Writer being the fall-back.
+
+=head3 Exception
+
+A (blessed) hash representing a Perl exception.
+
+=for html See <a href="http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/*checkout*/perl-xml/libxml-perl/doc/sax-2.0.html#Exceptions">Perl SAX 2.0 Binding</a>.
+
+I<$Id: TrAXref.pod,v 1.9 2003/05/29 08:42:04 cvspetr Exp $>
+
+=cut

@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<rdf:RDF 
+         xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+         xmlns="http://purl.org/rss/1.0/"
+         xmlns:mn="http://usefulinc.com/rss/manifest/"
+         xmlns:dc="http://purl.org/dc/elements/1.1/"
+ >
+
+  <channel rdf:about="http://xmlhack.com/rss10.php">
+      <title>XMLhack</title>
+      <link>http://xmlhack.com/</link>
+      <dc:source rdf:resource="http://xmlhack.com/" />
+      <description>
+         Developer news from the XML community
+      </description>
+      <dc:language>en-us</dc:language>
+      <dc:publisher>Edd Dumbill (mailto:webmaster@xmlhack.com)</dc:publisher>
+      <dc:creator>Edd Dumbill (mailto:editor@xmlhack.com)</dc:creator>
+      <dc:rights>Copyright 1999-2001, xmlhack team.</dc:rights>
+
+      <image rdf:resource="http://xmlhack.com/images/mynetscape88.gif" />
+
+      <items>
+          <rdf:Seq>
+            <rdf:li rdf:resource="http://xmlhack.com/read.php?item=2168" />
+            <rdf:li rdf:resource="http://xmlhack.com/read.php?item=2167" />
+            <rdf:li rdf:resource="http://xmlhack.com/read.php?item=2164" />
+            <rdf:li rdf:resource="http://xmlhack.com/read.php?item=2160" />
+            <rdf:li rdf:resource="http://xmlhack.com/read.php?item=2154" />
+            <rdf:li rdf:resource="http://xmlhack.com/read.php?item=2148" />
+            <rdf:li rdf:resource="http://xmlhack.com/read.php?item=2131" />
+            <rdf:li rdf:resource="http://xmlhack.com/read.php?item=2129" />
+          </rdf:Seq>
+      </items>
+
+  </channel>
+
+  <image rdf:about="http://xmlhack.com/images/mynetscape88.gif">
+    <title>xmlhack</title>
+    <url>http://xmlhack.com/images/mynetscape88.gif</url>
+    <link>http://xmlhack.com</link>
+    <dc:description>News, opinions, tips and issues concerning XML development</dc:description>
+  </image>
+
+    <item rdf:about="http://xmlhack.com/read.php?item=2168">
+        <title>RNV: C-based Relax NG validator</title>
+        <link>http://xmlhack.com/read.php?item=2168</link>
+        <dc:description>RNV
+    is a command-line tool for validating XML documents against
+    schemas written in Relax NG compact syntax. Developed by David Tolpin and written
+    in portable ANSI C, it's fast, lightweight, and provides very good
+    reporting about validity errors in documents.</dc:description>
+        <dc:subject>Tools</dc:subject>
+        <dc:subject>Schemas</dc:subject>
+    </item>
+
+    <item rdf:about="http://xmlhack.com/read.php?item=2167">
+        <title>libxml 2.6.7 and libxslt 1.1.3 released</title>
+        <link>http://xmlhack.com/read.php?item=2167</link>
+        <dc:description>Daniel Veillard has recently released updated versions of
+      libxml
+      and libxslt. An important security fix is included, along
+      with some improvements and optimizations and bug fixes.</dc:description>
+        <dc:subject>Tools</dc:subject>
+    </item>
+
+    <item rdf:about="http://xmlhack.com/read.php?item=2164">
+        <title>XML and Databases article translated</title>
+        <link>http://xmlhack.com/read.php?item=2164</link>
+        <dc:description>The article "XML and Databases", by Ronald Bourret, has recently been translated into French and Chinese.</dc:description>
+        <dc:subject>Databases</dc:subject>
+    </item>
+
+    <item rdf:about="http://xmlhack.com/read.php?item=2160">
+        <title>Why XML 1.1?</title>
+        <link>http://xmlhack.com/read.php?item=2160</link>
+        <dc:description>The W3C has published XML 1.1 and namespaces in
+
+    XML 1.1, two recommendations which don't change that many things but
+    may have an important impact for XML applications, unless they are ignored
+    by a vast majority.</dc:description>
+        <dc:subject>W3C</dc:subject>
+        <dc:subject>XML</dc:subject>
+    </item>
+
+    <item rdf:about="http://xmlhack.com/read.php?item=2154">
+        <title>xmlformat: Consistently format XML files</title>
+        <link>http://xmlhack.com/read.php?item=2154</link>
+        <dc:description>xmlformat is a REX-based script (take your pick from Perl or Ruby
+    versions) for consistently reformatting XML files; that is,
+    "canonizing" and normalizing whitespace, indenting,
+    line-wrapping, and placement of line breaks. It works as
+    advertised, handling mixed content and "verbatim" content
+    correctly.</dc:description>
+        <dc:subject>Tools</dc:subject>
+    </item>
+
+    <item rdf:about="http://xmlhack.com/read.php?item=2148">
+        <title>XML data formats take center stage in the Financial Services industry</title>
+        <link>http://xmlhack.com/read.php?item=2148</link>
+        <dc:description>A conference focusing on XML in the Financial Services industry casts doubt on the conventional wisdom about Web services and the role of tightly-coupled middleware in real-world XML developments.</dc:description>
+        <dc:subject>Community</dc:subject>
+    </item>
+
+    <item rdf:about="http://xmlhack.com/read.php?item=2131">
+        <title>Extreme Markup Languages 2004</title>
+        <link>http://xmlhack.com/read.php?item=2131</link>
+        <dc:description>Originally announced at XML 2003, the Call for Participation for Extreme Markup 2004 is now open.  The conference will be held from 3-6 August in Montréal, Canada.</dc:description>
+        <dc:subject>Community</dc:subject>
+    </item>
+
+    <item rdf:about="http://xmlhack.com/read.php?item=2129">
+        <title>Reminder of XML Europe 2004 Call for Participation</title>
+        <link>http://xmlhack.com/read.php?item=2129</link>
+        <dc:description>The deadline for submissions to XML Europe 2004 is imminent -- January 5, 2004. The conference will take place from April 18-21 2004 in Amsterdam.</dc:description>
+        <dc:subject>Community</dc:subject>
+    </item>
+
+    <rdf:Description ID="manifest">
+      <mn:channels>
+      <rdf:Seq>
+        <rdf:li rdf:resource="http://xmlhack.com/rss10.php" />
+      </rdf:Seq>
+      </mn:channels>
+    </rdf:Description>
+
+</rdf:RDF>

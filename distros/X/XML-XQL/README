@@ -1,0 +1,29 @@
+			Perl module: XML-XQL
+
+Copyright (c) 1999,2000 Enno Derksen
+All rights reserved.
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself. 
+
+The XML::XQL module is alpha code.
+
+For bug reports or suggestions send email to tjmather@tjmather.com
+
+============= XML::XQL =========================================================
+
+This is a Perl extension that allows you to perform XQL queries on XML
+object trees. Currently only the XML::DOM module is supported, but
+other implementations, like XML::Grove, may soon follow.
+
+See the XML::XQL and XML::XQL::Tutorial man pages that come with this 
+distribution. See the XQL specification for more details,
+it's at: http://www.w3.org/TandS/QL/QL98/pp/xql.html
+Look at the test cases in the 't' directory for examples.
+
+Check out xql.pl, which is a nice command line utility for performing XQL 
+queries on XML documents and formatting the results in several ways.
+
+XML::XQL needs the following modules to be installed: XML::DOM, XML::Parser,
+Parse::Yapp (I use 0.16) and Date::Manip (I use 5.33). All can be found at CPAN.
+
+See the To-do list at the top of XQL.pm for all open issues. 

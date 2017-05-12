@@ -1,0 +1,26 @@
+Revision history for Perl extension XML::Filter::NSNormalise.
+
+0.04  Fri Oct 11
+	- added dependency on XML::SAX 0.11
+	- added dependency on XML::SAX::Writer 0.44
+	- changed tests to take advantage of Test::More's diagnostics
+
+0.03  Fri Oct 11
+	- added dependency on XML::NamespaceSupport 1.08
+	- skip tests which rely on XML::SAX if it doesn't work
+
+0.02  Thu Oct 10
+	- added xmlnsnorm command-line utility
+	- fixed fatal error on mapping to the same prefix the document already uses
+	- fixed typo in sample code
+	- added extra examples/clarifcations in POD
+
+0.01  Wed Oct  9
+	- first release to CPAN
+	- added tests
+	- added POD
+	- added support for mapping prefixes on attributes
+	- fixed end_element handler not mapping 'Name'
+	- original version; created by h2xs 1.21 with options
+		-AX -n XML::Filter::NSNormalise
+

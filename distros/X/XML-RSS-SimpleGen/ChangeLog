@@ -1,0 +1,35 @@
+Revision history for Perl extension XML::RSS::SimpleGen
+                                        Time-stamp: "2004-02-06 21:20:30 AST"
+
+2004-02-06  Sean M. Burke  sburke@cpan.org
+	* Release 11.11
+	
+	* Added some DWIM logic so that when you feed items to a feed that
+	you've declared a history file for, but where that history file
+	doesn't exist on disc yet (or exists but is 0-length), then items
+	you feed it get their date-stamps fiddled with so that the first
+	things you feed it look like the most recent, and so are the first
+	things to appear in the output RSS file.
+
+	This doesn't affect feeds with no history files, nor does it
+	affect feeds that already have contentful history files.  It just
+	makes things work nicer when setting up new feeds with history
+	files.
+	
+2004-01-31  Sean M. Burke  sburke@cpna.org
+	* Release 11.10
+	* Previous version failed to correct decimal-entities for Win-lame
+	characters.  (E.g., "&#146;" wasn't getting corrected to
+	"&#8217;", atho its hex version, "&#x93;", was.)
+	Fixed.
+	And added tests to 10_html2xmltext.t for this.
+	
+2004-01-24  Sean M. Burke  sburke@cpan.org
+	* Release 11.09
+	* Previous version generated incorrect ttl figures for rss_daily,
+	rss_twice_daily, rss_thrice_daily, and rss_weekly.  Fixed.
+
+2004-01-17  Sean M. Burke  sburke@cpan.org
+	* Release 11.08
+	* After many many development versions, this is the first
+	public release.

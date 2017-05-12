@@ -1,0 +1,1455 @@
+# protocol.rnc:  RELAX NG schema for NZ Shared Registry System Protocol
+# 
+# Author:     Mostly Steven Craig, based on the original protocol.dtd
+# Version:    Release version __SRSVERMAJOR__.__SRSVERMINOR__
+# Revised:    SRS Development Team
+# 
+# Based on a prototype written by Ewen McNeill, 2002/03/05
+
+# The NZ SRS registrar/registry protocol consists of an (externally)
+#  signed XML request document containing a series of actions to be
+#  performed on the register (updating it, or extracting information
+#  from it), which is answered by an (externally) signed XML response
+#  document containing answers to each of those actions, or an overall
+#  error message.
+# 
+#  Each action has its own element to specify that action, and there
+#  is also a response element which is used to enclose each response
+#  to an action.
+# 
+#  Each update-type action has an id number which is the registrar's
+#  identification for the action, which must be unique in all requests
+#  made to the register by that registrar.  The status of each action
+#  with an id number can be queried with the "getmsg" action.
+# 
+#  The registrar internally is the effective registrar of the
+#  transaction.  This must normally match the registrar UID specified
+#  externally.  However the registry may set this to a specific
+#  registrar other than its own "psuedo registrar" to perform actions
+#  "as if" it was that registrar, eg filter by that registrar.
+# 
+#  It is also included to assist debugging (by allowing network streams
+#  to be more directly linked to the registrar).
+# 
+#  ====================================================================
+# 
+# Copyright 2002-2009 NZ Registry Services
+# 
+# This file is part of the Shared Registry System
+# 
+# The Shared Registry System is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+# 
+# The Shared Registry System is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with the Shared Registry System; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307  USA
+#
+
+namespace a = "http://relaxng.org/ns/compatibility/annotations/1.0"
+
+# == Common entities ====================================================
+
+# Simple data types
+
+Number = xsd:nonNegativeInteger
+Dollars = xsd:decimal { fractionDigits = "2" }
+True = "1"
+False = "0"
+Boolean = False | True
+
+# Valid date
+Date =
+  attribute Year { Number },
+  attribute Month { Number },
+  attribute Day { Number }
+# Valid time.
+# If TimeZoneOffset omitted, NZ local time assumed. The mandatory format is
+# (+/-)HH:MM (the sign is mandatory!), although (+/-)HHMM will be accepted
+# with the ':' silently added.
+# If Second is omitted, it defaults to 0
+Time =
+  attribute Hour { Number },
+  attribute Minute { Number },
+  attribute Second { Number }?,
+  attribute TimeZoneOffset { text }?
+  
+TimeStamp = Date, Time
+
+# Valid domain name
+DomainName = string
+
+# Valid DomainName details - for registering IDN
+DomainNameUnicode = string
+DomainNameUnicodeHex = string
+DomainNameLanguage = string
+
+# Valid unique identifier ?
+UID = string
+
+# Valid term
+Term = xsd:positiveInteger
+
+RegistrarId = xsd:positiveInteger
+
+RegistrarIdOrOTHERS = RegistrarId | "OTHERS"
+
+# Complex data types/definitions
+ActionResponse =
+  element.Error
+  | element.Domain*
+  | element.UDAIValid
+  | element.DomainTransfer
+  | element.BillingTrans*
+  | element.DeferredRegistrarIncome*
+  | element.Registrar*
+  | element.SysParam*
+  | element.RunLog*
+  | element.Schedule*
+  | element.AccessControlList*
+  | (element.RawRequest, element.RawResponse)
+  | element.BillingAmount*
+  | element.Handle*
+  | element.Message*
+
+RegDomainStatus = "Active" | "PendingRelease"
+DomainStatus = RegDomainStatus | "Available"
+BillStatus = "PendingConfirmation" | "Confirmed"
+
+Contact =
+  element.PostalAddress?,
+  element.Phone?,
+  element.Fax?
+
+ContactAttr =
+  attribute HandleId { text }?,
+  attribute Name { text }?,
+  attribute Email { text }?,
+  attribute ActionId { text }?
+
+ContactFilter =
+  element.PostalAddressFilter?,
+  element.Phone?,
+  element.Fax?
+
+ContactAttrFilter =
+  attribute HandleId { text }?,
+  attribute Name { text }?,
+  attribute Email { text }?,
+  attribute ActionId { text }?
+
+PhoneAttr =
+  attribute CountryCode { text }?,
+  attribute AreaCode { text }?,
+  attribute LocalNumber { text }?
+
+Role =
+  "Registrar"
+  | "Registry"
+  | "Whois"
+  | "Query"
+  | "CreateDomain"
+  | "UpdateDomain"
+  | "TransferDomain"
+  | "CancelDomain"
+  | "UncancelDomain"
+  | "UpdateRegistrar"
+  | "Administer"
+  | "Supervisor"
+  | "Connect"
+  | "ReleaseDomain"
+  | "QueryACL"
+  | "UpdateACL"
+
+ScheduledJob =
+  "BuildDnsZoneFiles"
+  | "ReleaseDomains"
+  | "RenewDomains"
+  | "GenerateDomainReport"
+  | "GenerateStatsReport"
+
+DateRange =
+  element.From?,
+  element.To?
+
+AccountingAction = "Credit" | "Debit"
+
+# == Root element =======================================================
+
+element.NZSRSRequest =
+  element NZSRSRequest {
+    attribute VerMajor { Number },
+    attribute VerMinor { Number },
+    attribute RegistrarId { RegistrarId }?,
+    (element.DomainCreate
+     | element.DomainUpdate
+     | element.HandleCreate
+     | element.HandleUpdate
+     | element.HandleDetailsQry
+     | element.Whois
+     | element.DomainDetailsQry
+     | element.ActionDetailsQry
+     | element.UDAIValidQry
+     | element.RegistrarCreate
+     | element.RegistrarUpdate
+     | element.RegistrarDetailsQry
+     | element.RegistrarAccountQry
+     | element.GetMessages
+     | element.AckMessage
+     | element.SysParamsCreate
+     | element.SysParamsUpdate
+     | element.SysParamsQry
+     | element.RunLogCreate
+     | element.RunLogQry
+     | element.ScheduleCreate
+     | element.ScheduleCancel
+     | element.ScheduleQry
+     | element.ScheduleUpdate
+     | element.BillingAmountUpdate
+     | element.BillingAmountQry
+     | element.DeferredIncomeSummaryQry
+     | element.DeferredIncomeDetailQry
+     | element.BilledUntilAdjustment
+     | element.BuildDnsZoneFiles
+     | element.GenerateDomainReport
+     | element.AdjustRegistrarAccount
+     | element.AccessControlListQry
+     | element.AccessControlListAdd
+     | element.AccessControlListRemove)+
+  }
+
+element.NZSRSResponse =
+  element NZSRSResponse {
+    attribute VerMajor { Number },
+    attribute VerMinor { Number },
+    attribute RegistrarId { RegistrarId }?,
+    (element.Response+ | element.Error)
+  }
+
+# == Request actions ====================================================
+
+# ++ Domain details update actions ++++++++++++++++++++++++++++++++++++++
+
+# Create new domain name (record)
+# ActionResponse: (Domain|Error)
+element.DomainCreate =
+  element DomainCreate {
+    attribute ActionId { UID },
+    attribute DomainName { DomainName },
+    attribute DomainNameUnicode { DomainNameUnicode }?,
+    attribute DomainNameLanguage { DomainNameLanguage }?,
+    attribute RegistrantRef { UID }?,
+    attribute Term { Term },
+    [ a:defaultValue = "1" ] attribute Delegate { Boolean }?,
+    element.RegistrantContact,
+    element.AdminContact?,
+    element.TechnicalContact?,
+    element.NameServers?,
+    element.AuditText?
+  }
+
+# Update domain record
+# Usage:
+#   - update all domain records that match DomainNameFilter
+#     pattern (? replaces a single character, * replaces a group of characters);
+#     not all updates are possible (sensible)
+#   Following actions are invoked by setting corresponding attribute
+#   to %True; or opposite actions when set to %False; - ommition of
+#   the attribute means no action:
+#   - newUDAI - force a new authentication UID to be generated
+#   - renew
+#   - cancel
+#   - lock
+#   Transfer to another registrar is an implied operation - if non-owner
+#   registrar is doing an update, the domain is transferred to the new
+#   registrar. For this operation UDAI is required, and the
+#   DomainNameFilter must be a simple domain name (no wildcards!)
+# ActionResponse: (Domain+|Error)
+element.DomainUpdate =
+  element DomainUpdate {
+    attribute ActionId { UID },
+    attribute UDAI { UID }?,
+    attribute NewUDAI { Boolean }?,
+    attribute RegistrantRef { UID }?,
+    attribute Term { Term }?,
+    attribute Delegate { Boolean }?,
+    attribute Renew { Boolean }?,
+    attribute NoAutoRenew { Boolean }?,
+    attribute Lock { Boolean }?,
+    attribute Cancel { Boolean }?,
+    attribute Release { Boolean }?,
+    [ a:defaultValue = "1" ] attribute FullResult { Boolean }?,
+    element.DomainNameFilter+,
+    element.RegistrantContact?,
+    element.AdminContact?,
+    element.TechnicalContact?,
+    element.NameServers?,
+    element.AuditText?
+  }
+
+element.HandleCreate =
+  element HandleCreate {
+    attribute ActionId { UID },
+    attribute HandleId { UID },
+    ContactAttr,
+    Contact,
+    element.AuditText?
+  }
+
+element.HandleUpdate =
+  element HandleUpdate {
+    attribute ActionId { UID },
+    attribute HandleId { UID },
+    attribute Delete { Boolean }?,
+    ContactAttr,
+    Contact,
+    element.AuditText?
+  }
+
+element.HandleDetailsQry =
+  element HandleDetailsQry {
+    attribute MaxResults { Number }?,
+    attribute SkipResults { Number }?,
+    [ a:defaultValue = "0" ] attribute CountResults { Boolean }?,
+    element.HandleIdFilter*,
+    element.SearchDateRange?,
+    element.ChangedInDateRange?,
+    element.ContactFilter?
+  }
+
+element.DomainNameFilter =
+  element DomainNameFilter {
+    text
+  }
+
+# ++ Domain details query actions  ++++++++++++++++++++++++++++++++++++++
+
+# Whois  (retrieve details of DomainName)
+# ActionResponse: (Domain|Error)
+element.Whois =
+  element Whois {
+    attribute QryId { UID }?,
+    [ a:defaultValue = "1" ] attribute FullResult { Boolean }?,
+    attribute SourceIP { text }?,
+    attribute DomainName { DomainName },
+    empty
+  }
+
+# UDAIValidQry - enquire if the UDAI for a domain is correct
+# ActionResponse: (UDAIValid)
+element.UDAIValidQry =
+  element UDAIValidQry {
+    attribute QryId { UID }?,
+    attribute DomainName { DomainName },
+    attribute UDAI { UID },
+    empty
+  }
+
+# General register query
+# ActionResponse: (Domain*|Error)
+element.DomainDetailsQry =
+  element DomainDetailsQry {
+    attribute QryId { UID }?,
+    attribute Status { RegDomainStatus }?,
+    attribute Delegate { Boolean }?,
+    attribute Term { Term }?,
+    attribute RegistrantRef { UID }?,
+    attribute MaxResults { Number }?,
+    attribute SkipResults { Number }?,
+    [ a:defaultValue = "0" ] attribute CountResults { Boolean }?,
+    element.DomainNameFilter*,
+    element.NameServerFilter?,
+    element.RegistrantContactFilter?,
+    element.AdminContactFilter?,
+    element.TechnicalContactFilter?,
+    element.ResultDateRange?,
+    element.SearchDateRange?,
+    element.ChangedInDateRange?,
+    element.RegisteredDateRange?,
+    element.LockedDateRange?,
+    element.CancelledDateRange?,
+    element.BilledUntilDateRange?,
+    element.AuditTextFilter?,
+    element.ActionIdFilter?,
+    element.FieldList?
+  }
+
+element.AuditTextFilter =
+  element AuditTextFilter {
+    text
+  }
+
+element.ActionIdFilter =
+  element ActionIdFilter {
+    text
+  }
+
+# Query request - returns request-response pair
+# ActionResponse: ((RawRequest,RawResponse)|Error)
+element.ActionDetailsQry =
+  element ActionDetailsQry {
+    attribute QryId { UID }?,
+    attribute ActionId { UID },
+    attribute OriginatingRegistrarId { UID }?,
+    empty
+  }
+
+# ++ Registar details update actions ++++++++++++++++++++++++++++++++++++
+# ActionResponse: (Registrar|Error)
+element.RegistrarCreate =
+  element RegistrarCreate {
+    attribute ActionId { UID },
+    attribute Name { text },
+    attribute AccRef { text },
+    attribute RegistrarId { RegistrarId },
+    attribute URL { text }?,
+    element.RegistrarPublicContact,
+    element.RegistrarSRSContact,
+    element.DefaultTechnicalContact,
+    element.EncryptKeys,
+    element.EPPAuth?,
+    element.Allowed2LDs?,
+    element.Roles?,
+    element.AuditText?
+  }
+
+element.RegistrarUpdate =
+  element RegistrarUpdate {
+    attribute ActionId { UID },
+    attribute Name { text }?,
+    attribute AccRef { text }?,
+    attribute URL { text }?,
+    element.RegistrarPublicContact?,
+    element.RegistrarSRSContact?,
+    element.DefaultTechnicalContact?,
+    element.EncryptKeys?,
+    element.EPPAuth?,
+    element.Allowed2LDs?,
+    element.Roles?,
+    element.AuditText?
+  }
+
+# ++ Registar details query actions +++++++++++++++++++++++++++++++++++++
+
+# ActionResponse: (Registrar*|Error)
+element.RegistrarDetailsQry =
+  element RegistrarDetailsQry {
+    attribute QryId { UID }?,
+    attribute RegistrarId { RegistrarId }?,
+    attribute NameFilter { text }?,
+    element.ResultDateRange?
+  }
+
+# RegistrarAccountQry (obtain billing records)
+# ActionResponse: (BillingTrans*|Error)
+element.RegistrarAccountQry =
+  element RegistrarAccountQry {
+    attribute QryId { UID }?,
+    attribute RegistrantRef { UID }?,
+    attribute DomainName { DomainName }?,
+    attribute InvoiceId { UID }?,
+    attribute MaxResults { Number }?,
+    attribute SkipResults { Number }?,
+    attribute TransStatus { BillStatus }?,
+    [ a:defaultValue = "0" ] attribute CountResults { Boolean }?,
+    element.TransDateRange?,
+    element.InvoiceDateRange?
+  }
+
+# BillingAmount Transactions
+# (To set the monthly charge for Billing)
+# ActionResponse: (BillingAmount*|Error)
+element.BillingAmountUpdate =
+  element BillingAmountUpdate {
+    attribute ActionId { UID },
+    element.BillingAmount
+  }
+
+element.BillingAmountQry =
+  element BillingAmountQry {
+    attribute QryId { UID }?,
+    empty
+  }
+
+element.BillingAmount =
+  element BillingAmount {
+    attribute Amount { Dollars },
+    element.EffectiveDate?
+  }
+
+element.EffectiveDate =
+  element EffectiveDate {
+    TimeStamp,
+    empty
+  }
+
+# ++ Query date ranges ++++++++++++++++++++++++++++++++++++++++++++++++++
+
+element.ResultDateRange =
+  element ResultDateRange {
+    DateRange
+  }
+
+element.SearchDateRange =
+  element SearchDateRange {
+    DateRange
+  }
+
+element.ChangedInDateRange =
+  element ChangedInDateRange {
+    DateRange
+  }
+
+element.RegisteredDateRange =
+  element RegisteredDateRange {
+    DateRange
+  }
+
+element.CancelledDateRange =
+  element CancelledDateRange {
+    DateRange
+  }
+
+element.LockedDateRange =
+  element LockedDateRange {
+    DateRange
+  }
+
+element.BilledUntilDateRange =
+  element BilledUntilDateRange {
+    DateRange
+  }
+
+element.InvoiceDateRange =
+  element InvoiceDateRange {
+    DateRange
+  }
+
+element.TransDateRange =
+  element TransDateRange {
+    DateRange
+  }
+
+# ++ Query field list +++++++++++++++++++++++++++++++++++++++++++++++++++
+
+element.FieldList =
+  element FieldList {
+    attribute Status { Boolean }?,
+    attribute NameServers { Boolean }?,
+    attribute RegistrantContact { Boolean }?,
+    attribute RegisteredDate { Boolean }?,
+    attribute AdminContact { Boolean }?,
+    attribute TechnicalContact { Boolean }?,
+    attribute LockedDate { Boolean }?,
+    attribute Delegate { Boolean }?,
+    attribute RegistrarId { Boolean }?,
+    attribute RegistrarName { Boolean }?,
+    attribute RegistrantRef { Boolean }?,
+    attribute LastActionId { Boolean }?,
+    attribute ChangedByRegistrarId { Boolean }?,
+    attribute Term { Boolean }?,
+    attribute BilledUntil { Boolean }?,
+    attribute CancelledDate { Boolean }?,
+    attribute AuditText { Boolean }?,
+    attribute EffectiveFrom { Boolean }?,
+    empty
+  }
+
+# ++ Registry actions +++++++++++++++++++++++++++++++++++++++++++++++++++
+
+# ActionResponse: (SysParam*|Error)
+element.SysParamsCreate =
+  element SysParamsCreate {
+    attribute ActionId { UID },
+    element.SysParam+,
+    element.AuditText?
+  }
+
+element.SysParamsUpdate =
+  element SysParamsUpdate {
+    attribute ActionId { UID },
+    element.SysParam+,
+    element.AuditText?
+  }
+
+element.SysParamsQry =
+  element SysParamsQry {
+    attribute QryId { UID }?,
+    empty
+  }
+
+# ActionResponse: (RunLog|Error)
+element.RunLogCreate =
+  element RunLogCreate {
+    attribute ActionId { UID },
+    element.FirstRunDate,
+    element.RunLog
+  }
+
+# ActionResponse: (RunLog*|Error)
+element.RunLogQry =
+  element RunLogQry {
+    attribute QryId { UID }?,
+    attribute ProcessName { text }?,
+    attribute Parameters { text }?,
+    element.LogDateRange?
+  }
+
+element.LogDateRange =
+  element LogDateRange {
+    DateRange,
+    empty
+  }
+
+# ActionResponse: (Schedule|Error)
+element.ScheduleCreate =
+  element ScheduleCreate {
+    attribute ProcessName { ScheduledJob },
+    attribute Frequency { text },
+    attribute Parameters { text }?,
+    attribute ActionId { UID },
+    element.FirstRunDate,
+    element.FinalRunDate?,
+    element.AuditText?
+  }
+
+element.ScheduleCancel =
+  element ScheduleCancel {
+    attribute ActionId { UID },
+    attribute ProcessName { ScheduledJob },
+    attribute Parameters { text }?,
+    element.FirstRunDate,
+    element.AuditText?
+  }
+
+element.ScheduleUpdate =
+  element ScheduleUpdate {
+    attribute ActionId { UID },
+    attribute Parameters { text }?,
+    attribute Frequency { text }?,
+    attribute ProcessName { ScheduledJob },
+    element.FirstRunDate,
+    element.LastRunDate?,
+    element.AuditText?
+  }
+
+element.FinalRunDate =
+  element FinalRunDate {
+    TimeStamp,
+    empty
+  }
+
+element.ScheduleQry =
+  element ScheduleQry {
+    attribute QryId { UID }?,
+    attribute ProcessName { text }?,
+    attribute Parameters { text }?, 
+    element.ActiveOn?,
+    element.FirstRunDate?
+  }
+
+element.ActiveOn =
+  element ActiveOn {
+    TimeStamp
+  }
+
+element.DeferredIncomeSummaryQry =
+  element DeferredIncomeSummaryQry {
+    attribute BaseMonth { text },
+    attribute BaseYear { text },
+    attribute IncomeMonth { text },
+    attribute IncomeYear { text },
+    attribute QryId { UID }?,
+    empty
+  }
+
+element.DeferredRegistrarIncome =
+  element DeferredRegistrarIncome {
+    attribute BaseMonth { text },
+    attribute BaseYear { text },
+    attribute IncomeMonth { text },
+    attribute IncomeYear { text },
+    attribute RegistrarId { RegistrarId },
+    attribute BilledAmount { Dollars },
+    attribute BilledCount { Number },
+    empty
+  }
+
+element.DeferredIncomeDetailQry =
+  element DeferredIncomeDetailQry {
+    attribute BaseMonth { text },
+    attribute BaseYear { text },
+    attribute IncomeMonth { text },
+    attribute IncomeYear { text },
+    attribute QryId { UID }?,
+    empty
+  }
+
+element.BilledUntilAdjustment =
+  element BilledUntilAdjustment {
+    attribute DomainName { DomainName },
+    attribute ActionId { UID },
+    element.NewBilledUntilDate,
+    element.AuditText
+  }
+
+element.NewBilledUntilDate =
+  element NewBilledUntilDate {
+    TimeStamp,
+    empty
+  }
+
+element.BuildDnsZoneFiles =
+  element BuildDnsZoneFiles {
+    attribute ActionId { UID },
+    element.RunDate
+  }
+
+element.GenerateDomainReport =
+  element GenerateDomainReport {
+    attribute ActionId { UID },
+    element.RunDate
+  }
+
+element.RunDate =
+  element RunDate {
+    TimeStamp,
+    empty
+  }
+
+element.AdjustRegistrarAccount =
+  element AdjustRegistrarAccount {
+    attribute RegistrarId { RegistrarId },
+    attribute DomainName { DomainName },
+    attribute ActionId { UID },
+    attribute Months { Number },
+    attribute ActionType { AccountingAction },
+    element.TransactionDate,
+    element.BillPeriodStart,
+    element.BillPeriodEnd,
+    element.AuditText
+  }
+
+element.TransactionDate =
+  element TransactionDate {
+    TimeStamp,
+    empty
+  }
+
+element.AccessControlListQry =
+  element AccessControlListQry {
+    attribute Resource { text }?,
+    attribute List { text }?,
+    attribute Type { text }?,
+    [ a:defaultValue = "0" ] attribute FullResult { Boolean }?,
+    AccessControlListContentFilter*
+  }
+
+AccessControlListContentFilter =
+  element.DomainNameFilter
+  | element.RegistrarIdFilter
+  | element.AddressFilter
+
+element.RegistrarIdFilter =
+  element RegistrarIdFilter {
+    text
+  }
+
+element.AddressFilter =
+  element AddressFilter {
+    text
+  }
+
+element.AccessControlListRemove =
+  element AccessControlListRemove {
+    attribute Resource { text },
+    attribute List { text },
+    attribute ActionId { UID },
+    [ a:defaultValue = "1" ] attribute FullResult { Boolean }?,
+    element.AccessControlListEntry*,
+    element.AuditText
+  }
+
+element.AccessControlListAdd =
+  element AccessControlListAdd {
+    attribute Resource { text },
+    attribute List { text },
+    attribute ActionId { UID },
+    [ a:defaultValue = "1" ] attribute FullResult { Boolean }?,
+    element.AccessControlListEntry+,
+    element.AuditText
+  }
+
+element.AccessControlList =
+  element AccessControlList {
+    attribute Resource { text },
+    attribute List { text },
+    ( attribute Size { Number }
+      | attribute SizeChange { Number } ),
+    attribute Type { text }?,
+    element.AccessControlListEntry*
+  }
+
+element.AccessControlListEntry =
+  element AccessControlListEntry {
+    attribute Address { text }?,
+    attribute DomainName { text }?,
+    attribute RegistrarId { RegistrarId }?,
+    attribute Comment { text }?,
+    element.EffectiveDate?
+  }
+
+# == GetMessages ========================================================
+
+# Get message by UID, or messages since date/time for the Effective registrar
+# Non-DTD enforced compliance:
+#   - either UID or date range must be supplied
+# ActionResponses: (Response|Error)
+element.GetMessages =
+  element GetMessages {
+    attribute QryId { UID }?,
+    attribute OriginatingRegistrarId { RegistrarIdOrOTHERS }?,
+    attribute ActionId { UID }?,
+    attribute RecipientRegistrarId { RegistrarId }?,
+    attribute MaxResults { Number }?,
+    attribute SkipResults { Number }?,
+    [ a:defaultValue = "0" ] attribute CountResults { Boolean }?,
+    [ a:defaultValue = "0" ] attribute QueueMode { Boolean }?,   
+    element.TransDateRange?,
+    element.AuditTextFilter?,
+    element.TypeFilter*
+  }
+
+GetMessagesTypes = "third-party" | "server-generated-data"
+
+element.TypeFilter =
+  element TypeFilter {
+    attribute Type { GetMessagesTypes }
+  }
+
+# == AckMessage ========================================================
+
+# ACK message by originating RegistrarId/UID
+# ActionResponse: (Response|Error)
+element.AckMessage =
+  element AckMessage {
+    attribute ActionId { UID },
+    attribute OriginatingRegistrarId { RegistrarId },
+    attribute TransId { UID }
+  }
+
+# == ActionResponse =====================================================
+
+# ++ Response +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# This is a "one size fits all" response, which
+# can contain any type of response.  Errors to individual actions
+# can be specified within the response (errors in parsing the total
+# request are handled by the error ELEMENT).  The response may
+# contain multiple domain records (eg, for queries), and may contain
+# a complete history of the domain.
+# The registrar and id will match those passed in for most requests,
+# but will be present to uniquely identify a getmsg response.
+# Most requests will result in a single response; but getmsg requests
+# for messages since a date/time will result in one response per
+# response found.
+# The DomainTransfer differs from the rest in that it is not a direct
+# response to an action, but a message for the registrar generated by
+# an action of another registrar. It may be returned in response to a
+# GetMessages action.
+DomainWriteAction =
+  "DomainCreate"
+  | "DomainUpdate"
+
+DomainQueryAction =
+  "Whois"
+  | "DomainDetailsQry"
+  | "ActionDetailsQry"
+  | "UDAIValidQry"
+
+HandleWriteAction = 
+  "HandleCreate"
+  | "HandleUpdate"
+
+HandleQueryAction = 
+  "HandleDetailsQry"
+
+RegistrarWriteAction =
+  "RegistrarCreate"
+  | "RegistrarUpdate"
+
+RegistrarQueryAction =
+  "RegistrarDetailsQry"
+  | "RegistrarAccountQry"
+  | "GetMessages"
+
+RegistryAction =
+  "SysParamsUpdate"
+  | "SysParamsCreate"
+  | "SysParamsQry"
+  | "RunLogCreate"
+  | "RunLogQry"
+  | "ScheduleCreate"
+  | "ScheduleCancel"
+  | "ScheduleQry"
+  | "ScheduleUpdate"
+  | "BillingExtract"
+  | "SetBillingAmount"
+  | "BillingAmountQry"
+  | "DeferredIncomeSummaryQry"
+  | "DeferredIncomeDetailQry"
+  | "BilledUntilAdjustment"
+  | "BuildDnsZoneFiles"
+  | "GenerateDomainReport"
+  | "AdjustRegistrarAccount"
+  | "AccessControlListQry"
+  | "AccessControlListAdd"
+  | "AccessControlListRemove"
+  | "BillingAmountUpdate"
+
+Action =
+  DomainWriteAction
+  | DomainQueryAction
+  | HandleWriteAction
+  | HandleQueryAction
+  | RegistrarWriteAction
+  | RegistrarQueryAction
+  | RegistryAction
+
+ActionEtc = 
+  Action
+  | "UnknownTransaction"
+  | "DomainTransfer"
+  | "AckMessage"
+
+element.Response =
+  element Response {
+    attribute Action { ActionEtc },
+    attribute FeId { Number },
+    attribute FeSeq { Number },
+    attribute OrigRegistrarId { RegistrarId },
+    attribute TransId { UID }?,
+    attribute Rows { Number }?,
+    attribute Count { Number }?,
+    attribute MoreRowsAvailable { Boolean }?,
+    attribute RecipientRegistrarId { RegistrarId }?,
+    element.FeTimeStamp,
+    (element.Response* | ActionResponse | element.AckResponse)?
+  }
+
+element.AckResponse =
+  element AckResponse {
+    attribute OriginatingRegistrarId { RegistrarId },
+    attribute TransId { UID },
+    attribute Remaining { Number }
+  }
+
+
+# ++ Error ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# Errors can be either specific to a requested action, or generic
+# to the whole request.  A globally unique errorid identifies the
+# error that occured, and a human-readable string describing the
+# error is enclosed.
+# The errorids are assigned like HTTP, where there are three digits
+# to identify the error.  The first digit indicates approximately
+# the status (success, failure, etc); the second is a subcategory of
+# that, and the third is used for fine detail indications.
+# The exact list of errors is in SRS::Error module.
+element.Error =
+  element Error {
+    attribute ErrorId { UID },
+    attribute Severity { Number },
+    attribute Hint { UID },
+    element.Description,
+    element.ErrorDetails*
+  }
+
+element.Description =
+  element Description {
+    text
+  }
+
+element.ErrorDetails =
+  element ErrorDetails {
+    text
+  }
+
+element.FeTimeStamp =
+  element FeTimeStamp {
+    TimeStamp,
+    empty
+  }
+
+# == Lower level elements ===============================================
+
+# Zone information: fields held in the register, that can be obtained
+# through the registrar/registry protocol.
+# and/or maintainable through the registry protocol.
+
+# ++ Domain details +++++++++++++++++++++++++++++++++++++++++++++++++++++
+# NOTE: the domain authid (UDAI) is sent ONLY if it has been newly
+# generated; otherwise it is assumed that the registrar has the
+# previous value cached.
+element.Domain =
+  element Domain {
+    attribute DomainName { DomainName },
+    attribute DomainNameUnicode { DomainNameUnicode }?,
+    attribute DomainNameUnicodeHex { DomainNameUnicodeHex }?,
+    attribute DomainNameLanguage { DomainNameLanguage }?,
+    attribute RegistrantRef { UID }?,
+    attribute RegistrarName { text }?,
+    attribute Status { DomainStatus }?,
+    attribute Delegate { Boolean }?,
+    attribute Term { Term }?,
+    attribute RegistrarId { RegistrarId }?,
+    attribute UDAI { UID }?,
+    element.NameServers?,
+    element.RegistrantContact?,
+    element.RegistrarPublicContact?,
+    element.AdminContact?,
+    element.TechnicalContact?,
+    element.BilledUntil?,
+    element.RegisteredDate?,
+    element.CancelledDate?,
+    element.LockedDate?,
+    element.AuditDetails?
+  }
+
+element.BilledUntil =
+  element BilledUntil {
+    TimeStamp,
+    empty
+  }
+
+element.LockedDate =
+  element LockedDate {
+    TimeStamp,
+    empty
+  }
+
+element.RegisteredDate =
+  element RegisteredDate {
+    TimeStamp,
+    empty
+  }
+
+element.CancelledDate =
+  element CancelledDate {
+    TimeStamp,
+    empty
+  }
+
+element.DomainTransfer =
+  element DomainTransfer {
+    attribute RegistrarName { text },
+    TimeStamp,
+    element.TransferredDomain+
+  }
+
+element.TransferredDomain =
+  element TransferredDomain {
+    text
+  }
+
+element.UDAIValid =
+  element UDAIValid {
+    attribute Valid { Boolean },
+    empty
+  }
+
+# Name servers
+# The IP address should be included if and only if the fqdn is within
+# the zone that it is associated with 
+# the IP6Addr may be in any of the formats specified by RFC 2373, ie.
+#     1.  X:X:X:X:X:X:X:X         (Fully Specified)
+#     2.  X:X:X::X                ('::' denotes compressed zeroes )
+#     3.  X:X:X:X:X:X:d.d.d.d     ('d.d.d.d' denotes an IP4 Address)
+element.NameServers =
+  element NameServers {
+    element.Server*
+  }
+
+element.Server =
+  element Server {
+    attribute FQDN { text },
+    attribute IP4Addr { text }?,
+    attribute IP6Addr { text }?,
+    empty
+  }
+
+# Name server Filter
+# As above, but a filter for a search
+element.NameServerFilter =
+  element NameServerFilter {
+    element.ServerFilter+
+  }
+
+element.ServerFilter =
+  element ServerFilter {
+    attribute FQDN { text }?,
+    attribute IP4Addr { text }?,
+    attribute IP6Addr { text }?,
+    empty
+  }
+
+# ++ Registrar details ++++++++++++++++++++++++++++++++++++++++++++++++++
+
+element.Registrar =
+  element Registrar {
+    attribute RegistrarId { RegistrarId },
+    attribute Name { text },
+    attribute AccRef { text },
+    attribute URL { text }?,
+    element.RegistrarPublicContact,
+    element.RegistrarSRSContact,
+    element.DefaultTechnicalContact,
+    element.EncryptKeys,
+    element.EPPAuth?,
+    element.Allowed2LDs?,
+    element.Roles?,
+    element.AuditDetails?
+  }
+
+element.Allowed2LDs =
+  element Allowed2LDs {
+    element.SecondLD*
+  }
+
+element.SecondLD =
+  element SecondLD {
+    attribute DomainName { DomainName },
+    empty
+  }
+
+element.Roles =
+  element Roles {
+    element.Role*
+  }
+
+element.Role =
+  element Role {
+    attribute RoleName { Role },
+    empty
+  }
+
+element.EncryptKeys =
+  element EncryptKeys {
+    element.EncryptKey*
+  }
+
+element.EncryptKey =
+  element EncryptKey {
+    text
+  }
+
+element.EPPAuth =
+  element EPPAuth {
+    attribute Password { text }
+  }
+
+# ++ Billing transaction ++++++++++++++++++++++++++++++++++++++++++++++++
+
+element.BillingTrans =
+  element BillingTrans {
+    attribute RegistrarId { RegistrarId },
+    attribute Type { text },
+    attribute TransStatus { BillStatus },
+    attribute DomainName { DomainName },
+    attribute RegistrantRef { UID }?,
+    attribute BillingTerm { Term },
+    attribute InvoiceId { UID }?,
+    attribute Amount { Dollars },
+    element.InvoiceDate?,
+    element.TransDate,
+    element.BillPeriodStart,
+    element.BillPeriodEnd
+  }
+
+element.InvoiceDate =
+  element InvoiceDate {
+    TimeStamp,
+    empty
+  }
+
+element.TransDate =
+  element TransDate {
+    TimeStamp,
+    empty
+  }
+
+element.BillPeriodStart =
+  element BillPeriodStart {
+    TimeStamp,
+    empty
+  }
+
+element.BillPeriodEnd =
+  element BillPeriodEnd {
+    TimeStamp,
+    empty
+  }
+
+# ++ Contact information: for registrant, admin, technical ++++++++++++++
+
+element.RegistrantContact =
+  element RegistrantContact {
+    ContactAttr,
+    Contact
+  }
+
+element.RegistrantContactFilter =
+  element RegistrantContactFilter {
+    ContactAttrFilter,
+    ContactFilter
+  }
+
+element.AdminContact =
+  element AdminContact {
+    ContactAttr,
+    Contact
+  }
+
+element.AdminContactFilter =
+  element AdminContactFilter {
+    ContactAttrFilter,
+    ContactFilter
+  }
+
+element.TechnicalContact =
+  element TechnicalContact {
+    ContactAttr,
+    Contact
+  }
+
+element.TechnicalContactFilter =
+  element TechnicalContactFilter {
+    ContactAttrFilter,
+    ContactFilter
+  }
+
+element.ChangedDomains =
+  element ChangedDomains {
+     element.Domain*
+  }
+
+element.Handle =
+  element Handle {
+    attribute RegistrarId { RegistrarId },
+    ContactAttr,
+    Contact,
+    element.AuditDetails?,
+    element.ChangedDomains?
+  }
+
+
+element.Message =
+  element Message {
+  	element.Response,
+  	attribute Remaining { Number }?
+  }
+
+element.HandleIdFilter =
+  element HandleIdFilter {
+    text
+  }
+
+element.ContactFilter =
+  element ContactFilter {
+    ContactAttrFilter,
+    ContactFilter
+  }
+
+element.RegistrarPublicContact =
+  element RegistrarPublicContact {
+    ContactAttr,
+    Contact
+  }
+
+element.DefaultTechnicalContact =
+  element DefaultTechnicalContact {
+    ContactAttr,
+    Contact
+  }
+
+element.RegistrarSRSContact =
+  element RegistrarSRSContact {
+    ContactAttr,
+    Contact
+  }
+
+# Country is an ISO 3166-1 country code
+element.PostalAddress =
+  element PostalAddress {
+    attribute Address1 { text }?,
+    attribute Address2 { text }?,
+    attribute City { text }?,
+    attribute Province { text }?,
+    attribute CountryCode { text }?,
+    attribute PostalCode { text }?,
+    empty
+  }
+
+element.PostalAddressFilter =
+  element PostalAddressFilter {
+    attribute Address1 { text }?,
+    attribute Address2 { text }?,
+    attribute City { text }?,
+    attribute Province { text }?,
+    attribute CountryCode { text }?,
+    attribute PostalCode { text }?,
+    empty
+  }
+
+element.Phone =
+  element Phone {
+    PhoneAttr,
+    empty
+  }
+
+element.Fax =
+  element Fax {
+    PhoneAttr,
+    empty
+  }
+
+# ++ Raw responses ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+element.RawRequest =
+  element RawRequest {
+    element.XML,
+    element.Signature
+  }
+
+element.RawResponse =
+  element RawResponse {
+    element.XML,
+    element.Signature
+  }
+
+element.XML =
+  element XML {
+    text
+  }
+
+element.Signature =
+  element Signature {
+    text
+  }
+
+# ++ System Parameters ++++++++++++++++++++++++++++++++++++++++++++++++++
+
+element.SysParam =
+  element SysParam {
+    attribute Name { text },
+    element.ParamValue,
+    element.AuditDetails?
+  }
+
+element.ParamValue =
+  element ParamValue {
+    text
+  }
+
+# ++ Run Log ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+element.RunLog =
+  element RunLog {
+    attribute ProcessName { text },
+    attribute Parameters { text }?,
+    attribute ActionStatus { text },
+    attribute Control { text }?,
+    element.RunLogTimeStamp,
+    element.RunLogDetails?
+  }
+
+element.RunLogDetails =
+  element RunLogDetails {
+    text
+  }
+
+element.RunLogTimeStamp =
+  element RunLogTimeStamp {
+    TimeStamp,
+    empty
+  }
+
+# ++ Schedule +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+# Frequency in ?
+element.Schedule =
+  element Schedule {
+    attribute ProcessName { ScheduledJob },
+    attribute Frequency { text },
+    attribute Parameters { text }?,
+    attribute CreateByRegistrarId { UID },
+    attribute CreateActionId { UID },
+    attribute CancelByRegistrarId { UID }?,
+    attribute CancelActionId { UID }?,
+    element.FirstRunDate,
+    element.FinalRunDate?,
+    element.CreateAuditText?,
+    element.CancelAuditText?
+  }
+
+element.FirstRunDate =
+  element FirstRunDate {
+    TimeStamp,
+    empty
+  }
+
+element.LastRunDate =
+  element LastRunDate {
+    TimeStamp,
+    empty
+  }
+
+element.CreateAuditText =
+  element CreateAuditText {
+    text
+  }
+
+element.CancelAuditText =
+  element CancelAuditText {
+    text
+  }
+
+# ++ Audit details ++++++++++++++++++++++++++++++++++++++++++
+
+element.AuditDetails =
+  element AuditDetails {
+    attribute RegistrarId { text }?,
+    attribute ActionId { UID }?,
+    element.AuditTime?,
+    element.AuditText?
+  }
+
+element.AuditTime =
+  element AuditTime {
+    DateRange
+  }
+
+element.AuditText =
+  element AuditText {
+    text
+  }
+
+# == Various ============================================================
+
+element.From =
+  element From {
+    TimeStamp,
+    empty
+  }
+
+element.To =
+  element To {
+    TimeStamp,
+    empty
+  }
+
+start = element.NZSRSRequest | element.NZSRSResponse

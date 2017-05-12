@@ -1,0 +1,37 @@
+#$Id: README 233 2007-11-28 11:57:58Z zag $
+
+XML::Handler::ExtOn 
+========================
+
+XML::Handler::ExtOn - The handler for expansion of Perl SAX by objects.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires  Perl 5.005 or greater and libraries:
+
+* XML::SAX
+* Tie::UnionHash
+
+
+AUTHOR
+
+Zahatski Aliaksandr
+zag@cpan.org
+
+COPYRIGHT AND LICENCE
+
+
+Copyright (C) 2007 Zahatski Aliaksandr
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

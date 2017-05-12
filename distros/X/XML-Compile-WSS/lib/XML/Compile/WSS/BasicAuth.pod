@@ -1,0 +1,210 @@
+=encoding utf8
+
+=head1 NAME
+
+XML::Compile::WSS::BasicAuth - username/password security
+
+=head1 INHERITANCE
+
+ XML::Compile::WSS::BasicAuth
+   is a XML::Compile::WSS
+
+=head1 SYNOPSIS
+
+ # you need a few constants
+ use XML::Compile::WSS::Util  qw/:utp11/;
+
+ # used in combination with any other XML schema
+ my $auth = XML::Compile::WSS::BasicAuth->new
+   ( schema   => $anything
+   , username => $user
+   , password => $password
+   );
+
+ # connects itself to a WSDL
+ my $wss  = XML::Compile::SOAP::WSS->new;
+ my $wsdl = XML::Compile::WSDL11->new($wsdlfn);
+ my $auth = $wss->basicAuth
+   ( ... same params, except 'schema'
+   );
+
+=head1 DESCRIPTION
+
+The generic Web Service Security protocol is implemented by the super
+class L<XML::Compile::WSS|XML::Compile::WSS>.  This extension implements "basic authentication",
+i.e. username/password validation.
+
+You can best use digested passwords (UTP11_PDIGEST)  In that case,
+a timestamp, a nonce and SHA1 hashing will keep the password a secret.
+
+Extends L<"DESCRIPTION" in XML::Compile::WSS|XML::Compile::WSS/"DESCRIPTION">.
+ 
+=head1 METHODS
+
+Extends L<"METHODS" in XML::Compile::WSS|XML::Compile::WSS/"METHODS">.
+ 
+=head2 Constructors
+
+Extends L<"Constructors" in XML::Compile::WSS|XML::Compile::WSS/"Constructors">.
+ 
+=over 4
+
+=item XML::Compile::WSS::BasicAuth-E<gt>B<new>(%options)
+
+ -Option     --Defined in       --Default
+  created                         undef
+  nonce                           'RANDOM'
+  password                        <required>
+  prepare      XML::Compile::WSS  'ALL'
+  pwformat                        UTP11_PTEXT
+  schema       XML::Compile::WSS  undef
+  username                        <required>
+  version      XML::Compile::WSS  undef
+  wss_version  XML::Compile::WSS  '1.1'
+  wsu_Id                          undef
+
+=over 2
+
+=item created => DATETIME
+
+See L<XML::Compile::WSS::dateTime()|XML::Compile::WSS/"Helpers"> for choices of DATETIME.
+
+[1.10] The caller of the operation may also pass a C<wsu_Created>
+parameter, with the same formatting power.
+
+=item nonce => STRING|CODE|'RANDOM'|undef
+
+Only used then the password is passed as digest.  This will cause the
+C<wsse:Nonce> element.
+
+[1.10] You may add C<wsse_Nonce> to each operation call,
+to overrule the global setting.
+
+When you pass a CODE, it will get called for each message to produce a
+STRING. The constant text 'RANDOM' will have a random nonce generator
+being called at each message.
+
+=item password => STRING
+
+The password in plain text.  Use pwformat digest to send it encrypted
+over the network.
+
+=item prepare => 'READER'|'WRITER'|'ALL'|'NONE'
+
+=item pwformat => UTP11_PTEXT|UTP11_PDIGEST
+
+With C<UTP11_PTEXT>, the plain-text version of the password is shown.
+If PTWTYPE IS C<UTP11_PDIGEST>, the plain-text password will be
+encrypted with SHA1.  The %options can be used to salt the digest
+with "nonce" and/or "created" information before the encryption.
+
+=item schema => an L<XML::Compile::Cache|XML::Compile::Cache> object
+
+=item username => STRING
+
+=item version => STRING
+
+=item wss_version => '1.1'|MODULE
+
+=item wsu_Id => STRING
+
+Adds a C<wsu:Id> attribute to the created element.
+
+=back
+
+=back
+
+=head2 Attributes
+
+Extends L<"Attributes" in XML::Compile::WSS|XML::Compile::WSS/"Attributes">.
+ 
+=over 4
+
+=item $obj-E<gt>B<created>()
+
+=item $obj-E<gt>B<nonce>()
+
+=item $obj-E<gt>B<password>()
+
+=item $obj-E<gt>B<schema>()
+
+Inherited, see L<XML::Compile::WSS/"Attributes">
+
+=item $obj-E<gt>B<username>()
+
+=item $obj-E<gt>B<wssVersion>()
+
+Inherited, see L<XML::Compile::WSS/"Attributes">
+
+=item $obj-E<gt>B<wsuId>()
+
+=back
+
+=head2 Apply
+
+Extends L<"Apply" in XML::Compile::WSS|XML::Compile::WSS/"Apply">.
+ 
+=over 4
+
+=item $obj-E<gt>B<check>($security)
+
+Inherited, see L<XML::Compile::WSS/"Apply">
+
+=item $obj-E<gt>B<create>($doc, $security, $data)
+
+Inherited, see L<XML::Compile::WSS/"Apply">
+
+=back
+
+=head2 Helpers
+
+Extends L<"Helpers" in XML::Compile::WSS|XML::Compile::WSS/"Helpers">.
+ 
+=over 4
+
+=item $obj-E<gt>B<dateTime>($time|$string|HASH)
+
+Inherited, see L<XML::Compile::WSS/"Helpers">
+
+=back
+
+=head2 Internals
+
+Extends L<"Internals" in XML::Compile::WSS|XML::Compile::WSS/"Internals">.
+ 
+=over 4
+
+=item $obj-E<gt>B<loadSchemas>($schema, $version)
+
+=item XML::Compile::WSS::BasicAuth-E<gt>B<loadSchemas>($schema, $version)
+
+Inherited, see L<XML::Compile::WSS/"Internals">
+
+=item $obj-E<gt>B<writerHookWsuId>($type)
+
+Inherited, see L<XML::Compile::WSS/"Internals">
+
+=back
+
+=head1 DETAILS
+
+Extends L<"DETAILS" in XML::Compile::WSS|XML::Compile::WSS/"DETAILS">.
+ 
+=head1 SEE ALSO
+
+This module is part of XML-Compile-WSS distribution version 1.14,
+built on May 08, 2017. Website: F<http://perl.overmeer.net/xml-compile/>
+
+Please post questions or ideas to the mailinglist at
+F<http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/xml-compile> .
+For live contact with other developers, visit the C<#xml-compile> channel
+on C<irc.perl.org>.
+
+=head1 LICENSE
+
+Copyrights 2011-2017 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the Artistic license.
+See F<http://dev.perl.org/licenses/artistic.html>
+

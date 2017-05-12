@@ -1,0 +1,222 @@
+
+	XML::EP - A framework for publishing XML documents
+		  in the style of Cocoon
+
+
+Why use XML for publishing documents?
+=====================================
+
+EmbPerl, PHP, ASP, JSP and so on are there, and they are all working
+fine. Why should one like to use something else?
+
+There are two major concerns, that can be solved by an XML based
+framework:
+
+  * Embedded HTML (EHTML) systems like the above do not support
+    a separation between logic and design. In contrary, they mix
+    up both. However, such a separation is important for large
+    scaled applications. For example, you might like to resuse the
+    logic for WAP handys, for another client, but change the
+    design. With EHTML systems you have almost the same work
+    twice.
+
+  * EHTML systems do not support the creation of components.
+    They get an HTML file as input, they produce HTML as output.
+    There's no possibility of splitting them into pieces and
+    reusing the pieces, other than creating a separate library.
+
+
+What is it?
+===========
+
+When publishing XML documents to the web, you have to care for a lot
+of things, including
+
+	1.) The XML parser
+	2.) The stylesheet processor
+	3.) The formatter, that converts your document into HTML, WML,
+	    or whatever.
+
+Experience shows, that is is not so difficult, to do this in a single
+component (Servlet, CGI binary, modperl handler or whatever), but it
+is clumsy, tedious and error prone, to repeat this all the time.
+
+For that reason the Apache/Java community has created a thing called
+Cocoon. Cocoon is an integrated framework for all of the above.
+See
+
+	http://xml.apache.org/cocoon/
+
+for details on Cocoon.
+
+XML::EP attempts to follow the Cocoon ideas and principles, but in a
+Perl environment. That is, XML::EP is a framework for the following
+components:
+
+
+
+
+                       +-------------+
+                       |  Controller |
+                       +-------------+
+                      /     |         \
+                     /      |          \
+                    /       |           \
+                   /        |            \
+                  /         |             \
+                 /          |              \
+  +------------+  XML  +-------------+  XML  +------------+      WML
+  |  Producer  |  -->  |  Processor  |  -->  |  Formatter |  --> HTML
+  +------------+ (DOM) +-------------+ (DOM) +------------+      Whatever
+
+
+- The controller is an abstract class, that selects the components
+  being used for creating the HTML page. The components are a
+  producer, an arbitrary number of processors and a formatter.
+  
+- The producer is responsible for creating an XML DOM tree. It receives
+  no input. (That's the difference between a producer and a processor.)
+  For example, a typical producer might read an XML file from the hard
+  drive. Another producer might read an XML document from a Tamino
+  database engine. Yet another producer might read an LDAP tree and
+  convert this into an XML document.
+
+- The processors task is quite comparable to a traditional EHTML
+  system. It takes an XML DOM tree as input and modifies it. For
+  example, an SQL processor might replace an XML subtree like
+
+	<SQL:SELECT>
+	  SELECT * FROM mytable
+	<SQL:SELECT>
+
+  with another XML tree, created by executing the given query.
+  A Tamino processor might read XML documents from a Tamino database
+  engine. An LDAP processor might read LDAP trees and insert them
+  here. And so on ...
+
+  An important thing are processors like Cocoons XSP: They do read
+  and interpret something like
+
+	<PERL>
+	  # Perl code being executed here; the result text will
+	  # be embedded into the XML document as a text node,
+	  # replacing the PERL element.
+	</PERL>
+
+  or, better,
+
+	<XSP:STRUCTURE>
+	  # Perl code creating a DOM subtree; the DOM subtree
+	  # will be embedded into the XML document; replacing
+	  # the XSP:STRUCTURE element.
+	<XSP:STRUCTURE>
+
+  A special and very important processor is the Stylesheet processor.
+
+- Formatters finally convert the XML DOM tree into something readable:
+  HTML, WML, whatever you like.
+
+
+So, why does this solve the things introduced above?
+====================================================
+
+The processors give you the same abilities, that EHTML systems have.
+The difference is, that you can now mix up a lot of processors.
+You do not have to choose between EmbPerl, Mason, Apache::ASP, SSI
+and so on; if someone creates a corresponding processor, you can
+order them all in a pipeline.
+
+And due to the use of stylesheet processors and formatters, you still
+have a separation of logic and design.
+
+
+That sounds good, but is it usable?
+===================================
+
+No, not really. The main problems are:
+
+  - It currently does not include caching mechanisms. That's a question
+    of time and work that something has to spend. The EmbPerl processor
+    is designed for being cacheable quite well.
+
+  - The current version is implemented as a CGI binary. Making a mod_perl
+    handler from it, should be two hours work and it should even fit well
+    into a threaded architecture. But this has not been done yet.
+
+  - The stylesheet processor, based on the XML::XSLT by Geert Josten and
+    Egon Willighagen is far away from being complete.
+
+  - And, most important, noone has ever really used it.
+
+This document is for dropping a note to the Perl community in the hope
+that we find other interested people that are willing to share the work.
+
+
+Where is it available?
+======================
+
+It is available from my CPAN directory:
+
+  ftp://ftp.funet.fi/pub/CPAN/languages/perl/authors/id/JWIED
+
+The distribution includes a source archive and PPM binaries.
+
+
+How to install it?
+==================
+
+Just like any other Perl package, do a
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+or you may use automatic installation via the CPAN module:
+
+	perl -MCPAN -e shell
+	install XML::EP
+
+With ActivePerl on Windows, you may try using PPM:
+
+	ppm
+	install <cpan>authors/id/JWIED/XML-EP-<version>.ppd
+
+where <cpan> is any CPAN URL, for example
+
+	ftp://ftp.funet.fi/pub/languages/perl/CPAN
+
+and <version> is the current version of the module (0.01 as of this
+writing).
+
+
+You have to configure your webserver. With Apache, you may like to
+use the following for assigning the extension .xep to XML::EP:
+
+
+	AddType x-xml-ep-script .xep
+	Action x-xml-ep-script /cgi-bin/xmlep
+	ScriptAlias /cgi-bin/xmlep /usr/bin/xmlep
+
+Be sure that the path /usr/bin/xmlep matches your Perl installation and
+that the ScriptAlias directive is *the first* ScriptAlias directive in
+your httpd.conf. And don't forget to restart Apache.
+
+
+How do I test my installation?
+==============================
+
+The examples directory contains two files: hello.xep and hello.xsl.
+Copy them into your html directory and request
+
+	http://<yourserver>/<yourdir>/hello.xep
+
+where <yourserver> is the host name you are using for accessing the
+web server and <yourdir> is the directory, where you stored the
+files. If you see my name, all worked fine.
+
+
+Whom do I contact for more?
+===========================
+
+Me. Jochen Wiedmann, joe@ispsoft.de

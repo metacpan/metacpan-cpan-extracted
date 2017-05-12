@@ -1,0 +1,54 @@
+[%#                                                 -%]
+[%#  File: table.tt                                 -%]
+[%#  Date: 01-Jun-2014                              -%]
+[%#  By  : Kevin Esteb                              -%]
+[%#                                                 -%]
+[%# Invoke with INCLUDE table.tt table = <variable> -%]
+[%#                                                 -%]
+[%# USE dumper(ident=>0, pad=>"<br>") %]
+  <table class="bordertable">
+    <caption>[% table.overheading %]</caption>
+    <thead>
+      <tr>
+      [% FOREACH heading IN table.headings %]
+        <th>[% heading %]</th>
+      [% END -%]
+      </tr>
+    </thead>
+    <tbody>
+      [% FOREACH row IN table.rows %]
+      [% count = loop.count %]
+      <tr>
+        [% FOREACH field IN row.fields %]
+          [% IF field == '_links' %]
+        <td>
+          [%- IF row.$field.self %]
+          <a href="[% row.$field.self.href %]" class="ym-button ym-xsmall">[% row.$field.self.title %]</a> 
+          [% END -%]
+          [%- IF row.$field.update %]
+          <a href="[% row.$field.update.href %]" class="ym-button ym-xsmall putlink">[% row.$field.update.title %]</a>
+          [% END -%]
+          [%- IF row.$field.delete %]
+          <a href="[% row.$field.delete.href %]" class="ym-button ym-xsmall deletelink">[% row.$field.delete.title %]</a> 
+          [% END -%]
+        </td>
+          [% ELSE %]
+        <td>[% row.$field %]</td>
+          [% END -%]
+        [% END -%]
+      </tr>
+    [% END -%]
+    [% IF table.rows == '' %]
+      <tr><td">No Data</td></tr>
+    [% END -%]
+    </tbody>
+    [% IF count > 25 %]
+    <tfoot>
+      <tr>
+      [% FOREACH heading IN table.headings %]
+        <th>[% heading %]</th>
+      [% END -%]
+      </tr>
+    </tfoot>
+    [% END -%]
+  </table>

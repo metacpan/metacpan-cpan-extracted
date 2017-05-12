@@ -1,0 +1,144 @@
+=head1 NAME
+
+XSConfig - Fast XS drop-in replacement for Config.pm with perfect hashing.
+
+=head1 VERSION
+
+Version 6.21
+
+=head1 SYNOPSIS
+
+The Config.pm included by default with Perl is pure Perl.  Nearly all Perl apps
+will load Config.pm.  For a number of reasons, of speed and memory space,
+reimplement the P5P shipped Config.pm as an XS library, shareable between
+processes as read-only memory, and with a hash that is better optimized than
+Perl hashes, courtesy of gperf tool which generates collision-free perfect
+hashes.
+
+This module is a drop-in replacement for Config.pm. All code that does
+
+    use Config;
+
+will use the XS implementation after installing this module.  To revert to the
+original pure perl Config.pm, go and delete the following 3 files that will be
+next to each other in /site, Config.pm, Config_mini.pl, Config_xs_heavy.pl, and
+the Config shared library in /auto, after deleting the /site files, the original
+pure perl Config.pm in /lib will be loaded.
+
+Since XS Config is a compiled C shared library, it can not be edited with a text
+editor after it is built.  To change the values in the XS Config module,
+edit the pure perl Config_heavy.pl file with a text editor and rebuild XS
+Config.
+
+IT IS HIGHLY RECOMMENDED THAT YOU HAVE GPERF TOOL INSTALLED AND RUNNABLE FROM
+YOUR PATH BEFORE INSTALLING XS CONFIG.
+
+=head1 BENCHMARKS
+
+    perl -MXSLoader -MConfig -E"say $Config{ccflags}; sleep 1000"
+
+    Memory Usage KB	Total	Image Committed	Image Private	Heap Private
+    With PP Config	34,468	8,020		204		1120
+    With XS Config	33,564	8,120		212		652
+
+Using XSConfig 6.13, with a VC 2013 32 bit threaded perl, you save 468 KB of per
+process memory, in exchange for 92 KB of shared between process, memory mapped
+(Config.dll) memory. Even if you have just a single perl process ever running
+on the machine at a time, you will still save 376 KB.
+
+The total size of Config.dll in memory is 100 KB, with 8 KB of
+unshareable memory, the rest is shared. The smallest (no XSUBs except boot)
+Win32 XS DLL without taking special measures is 24 KB, with 8 KB of unshareable
+memory. So around ~24 KB is the overhead of a Visual C 2013 DLL with all the
+C compiler specific hidden static linked functions inside the DLL (these can
+be removed, but it is "special measures" that aren't typical on Win32 Perls).
+
+Onto performance, to slurp the entire tied %Config hash into a non-tied hash,
+with XS Config is %36 faster than with PP Config. To read 1 key in the tied
+%Config hash is 15% faster than with PP Config.
+
+Raw data with XS Config
+
+    C:\sources>timeit -f t.dat perl -MXSLoader -MConfig -e"print
+    $Config::VERSION.\"\n\";my %h; %h = %Config for 0..1000"
+    6.13
+    
+    Version Number:   Windows NT 6.1 (Build 7601)
+    Exit Time:        2:32 pm, Tuesday, February 2 2016
+    Elapsed Time:     0:00:06.285
+    Process Time:     0:00:06.271
+    System Calls:     19974
+    Context Switches: 4317
+    Page Faults:      2334
+    Bytes Read:       73084
+    Bytes Written:    0
+    Bytes Other:      8528
+    
+    C:\sources>timeit -f t.dat perl -MXSLoader -MConfig -e"print
+    $Config::VERSION.\"\n\";my $v; $v = $Config{'ccflags'} for 0..1000000;print
+    $v"
+    6.13
+    -nologo -GF -W3 -O1 -MD -Zi -DNDEBUG -GL -DWIN32 -D_CONSOLE -DNO_STRICT -D_CRT_S
+    ECURE_NO_DEPRECATE -D_CRT_NONSTDC_NO_DEPRECATE  -DPERL_TEXTMODE_SCRIPTS -DPERL_I
+    MPLICIT_CONTEXT -DPERL_IMPLICIT_SYS -DWIN32_NO_REGISTRY
+    Version Number:   Windows NT 6.1 (Build 7601)
+    Exit Time:        2:33 pm, Tuesday, February 2 2016
+    Elapsed Time:     0:00:03.168
+    Process Time:     0:00:03.151
+    System Calls:     11223
+    Context Switches: 2482
+    Page Faults:      2070
+    Bytes Read:       77180
+    Bytes Written:    0
+    Bytes Other:      7318
+
+With PP Config
+
+    
+    C:\sources>timeit -f t.dat perl -MXSLoader -MConfig -e"print
+    $Config::VERSION.\"\n\";my %h; %h = %Config for 0..1000"
+    5.023008
+    
+    Version Number:   Windows NT 6.1 (Build 7601)
+    Exit Time:        2:34 pm, Tuesday, February 2 2016
+    Elapsed Time:     0:00:09.907
+    Process Time:     0:00:09.843
+    System Calls:     39114
+    Context Switches: 7145
+    Page Faults:      3426
+    Bytes Read:       118536
+    Bytes Written:    0
+    Bytes Other:      13446
+    
+    C:\sources>timeit -f t.dat perl -MXSLoader -MConfig -e"print
+    $Config::VERSION.\"\n\";my $v; $v = $Config{'ccflags'} for 0..1000000;print
+    $v"
+    5.023008
+    -nologo -GF -W3 -O1 -MD -Zi -DNDEBUG -GL -DWIN32 -D_CONSOLE -DNO_STRICT -D_CRT_S
+    ECURE_NO_DEPRECATE -D_CRT_NONSTDC_NO_DEPRECATE  -DPERL_TEXTMODE_SCRIPTS -DPERL_I
+    MPLICIT_CONTEXT -DPERL_IMPLICIT_SYS -DWIN32_NO_REGISTRY
+    Version Number:   Windows NT 6.1 (Build 7601)
+    Exit Time:        2:35 pm, Tuesday, February 2 2016
+    Elapsed Time:     0:00:03.755
+    Process Time:     0:00:03.744
+    System Calls:     12721
+    Context Switches: 3152
+    Page Faults:      1392
+    Bytes Read:       113612
+    Bytes Written:    0
+    Bytes Other:      6674
+
+=head1 AUTHOR
+
+Daniel Dragan C<< <BULKDD at cpan.org> >>
+Reini Urban C<< <rurban at cpanel.net> >>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2015, Daniel Dragan
+Copyright (C) 2015, cPanel Inc
+ 
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

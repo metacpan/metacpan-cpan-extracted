@@ -1,0 +1,15 @@
+Revision history for Perl extension XML::TiePYX.
+
+0.01  Tue May  9 08:49:43 2000
+	- original version; created by h2xs 1.19
+0.02  Wed May 10 23:30:00 2000
+	- made condensation of consecutive text optional
+0.03  Sat Sep  2 01:00:00 2000
+	- fixed minor bugs
+0.04  Thu Sep 21 09:20:00 2000
+	- added Latin output mode
+	- added write mode
+	- added catalog option
+0.05  Fri Jun 1 06:00:00 2001
+        - Latin output now applies to tag and attribute names (bug fix)
+

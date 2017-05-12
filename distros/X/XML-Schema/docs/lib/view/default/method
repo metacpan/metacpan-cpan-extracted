@@ -1,0 +1,18 @@
+[%# <method>foo()</method>	         => #method_foo
+  # <method refid="foo">blah</method>    => #method_foo
+  # <method method="foo">blah</method>   => #method_foo
+  # <method class="Template::Stash">foo()</method>
+  #         => classlink("Template::Stash")#method_foo
+  # <method refid="foo" class="Template::Stash">blah</method>
+  #         => classlink("Template::Stash")#method_foo
+  # <method method="foo" class="Template::Stash">blah</method>
+  #         => classlink("Template::Stash")#method_foo
+-%]
+[%- prefix  = item.class ? classurl(item.class) : '';
+    method  = item.refid or item.method or item.content(site.view.text);
+    method  = method.replace('\(.*\)', '') ;
+    content = BLOCK; item.content(view) | trim; END;
+    UNLESS (item.refid or item.method);
+	content = "<code><b>$content</b></code>";
+    END;
+-%]<a href="[% prefix %]#method_[% method %]">[% content %]</a>

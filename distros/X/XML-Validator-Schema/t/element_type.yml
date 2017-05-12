@@ -1,0 +1,58 @@
+# test element types
+
+--- |
+  <?xml version="1.0" encoding="UTF-8"?>
+  <schema xmlns="http://www.w3.org/2001/XMLSchema">
+    <element name="foo">
+      <complexType>
+        <sequence>
+          <element name="no_type" minOccurs="0" />
+          <element name="int" type="int" minOccurs="0" />
+          <element name="integer" type="integer" minOccurs="0" />
+          <element name="name" type="NMTOKEN" minOccurs="0"  />
+          <element name="string" type="string" minOccurs="0" />
+          <element name="bool" type="boolean" minOccurs="0" />
+          <element name="date" type="dateTime" minOccurs="0" />
+        </sequence>
+      </complexType>
+    </element>
+  </schema>
+
+--- |
+  <foo>
+    <no_type/>
+  </foo>
+--- >
+PASS
+
+--- |
+  <foo>
+     <int>1</int>
+     <integer>1</integer>
+     <name>foo</name>
+     <string>...</string>
+     <bool>true</bool>
+     <date>1977-08-02T20:02:00</date>
+  </foo>
+--- >
+PASS
+
+--- |
+  <foo>
+     <int>what are you looking at?</int>
+  </foo>
+--- >
+FAIL /[Ii]llegal value/
+
+--- |
+  <foo>
+     foo!!!
+     <int>1</int>
+     <integer>1</integer>
+     <name>foo</name>
+     <string>...</string>
+     <bool>true</bool>
+     <date>1977-08-02T20:02:00</date>
+  </foo>
+--- >
+FAIL

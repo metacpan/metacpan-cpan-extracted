@@ -1,0 +1,32 @@
+
+XML::Sig -- a module for creating and verifying XML Digital Signatures
+
+	Copyright (c) 2009 Byrne Reese. All rights reserved.
+	This program is free software; you can redistribute it and/or
+	modify it under the same terms as Perl itself.
+
+	This module borrows heavily from Google::SAML::Response 
+        (c) 2009 Manni Heumann.
+
+To install this module, please run:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+For more information on the module, please see the POD documentation
+inside Sig.pm. ("perldoc XML::Sig", once it is installed.)
+
+EXAMPLE 
+
+my $sig = XML::Sig->new();
+if ($sig->verify($saml)) {
+    print "SAML document is VALID.\n"
+} else {
+    print "Ug. SAML document is NOT valid.\n"
+}
+
+LICENSE
+
+This software is licensed under the same terms as Perl itself.

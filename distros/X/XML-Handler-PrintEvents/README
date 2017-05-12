@@ -1,0 +1,23 @@
+XML::Handler::PrintEvents version 0.01
+======================================
+
+DESCRIPTION
+
+This PerlSAX handler prints the PerlSAX events it receives to STDOUT. It can be useful when debugging PerlSAX
+filters. It supports all PerlSAX handler including ignorable_whitespace. 
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 1999,2000 Enno Derksen
+All rights reserved.
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

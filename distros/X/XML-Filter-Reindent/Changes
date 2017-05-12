@@ -1,0 +1,12 @@
+Revision history for Perl extension XML::Filter::Reindent.
+
+0.03  Fri Apr 5th
+	- Added bin/pretty.pl from old XML-DOM distribution
+
+0.02  Fri Dec 14 17:27:57 2001
+	- fixed bug with end_document result code not being passed back
+		(Barrie Slaymaker contributed patch and test cases)
+
+0.01  Sun Aug 26 10:59:06 2001
+	- moved from XML-DOM to separate distribution
+

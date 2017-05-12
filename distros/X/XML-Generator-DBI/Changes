@@ -1,0 +1,22 @@
+Revision history for Perl extension XML::Generator::DBI.
+
+1.00
+    - Ported to SAX2 API
+    - Added GroupBy support, which implements group functionality based
+      on a changing column value
+    - Added ByColumnName support, which allows you to create arbitrary
+      XML structures using "col as 'a/b/c'" aliases (see docs for more details).
+    - Major refactoring
+
+0.03
+    - Fixed bug where if Indent was on, newline got
+      sent after the last close tag, which is invalid in XML
+
+0.02
+    - Converted to use XML::SAX::Base
+    - Performance tweaks
+    - Indent is off by default
+    
+0.01  Thu Aug  2 17:47:34 2001
+	- original version; created by h2xs 1.19
+

@@ -1,0 +1,26 @@
+---
+name: XS-Writer
+version: 0.02
+author:
+  - 'Michael G Schwern E<lt>schwern@pobox.comE<gt>'
+abstract: Module to write some XS for you
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Carp: 0
+  Moose: 0.4
+  Moose::Autobox: 0.06
+build_requires:
+  Test::Differences: 0
+  Test::More: 0.62
+provides:
+  StringWithWhitespace:
+    file: lib/XS/Writer.pm
+  XS::Writer:
+    file: lib/XS/Writer.pm
+    version: 0.02
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

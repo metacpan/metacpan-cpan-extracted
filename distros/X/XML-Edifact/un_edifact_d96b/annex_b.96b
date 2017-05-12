@@ -1,0 +1,356 @@
+This is a mungled version of D422_D.96B.
+
+I have included the orginal file. The content is the same, but
+it was neccessary to reformat it, to parse it by add_annex_b.pl
+
+- Kraehe@Copyleft.de
+
+==================================================================
+ANNEX B (Normative)
+
+SERVICE SEGMENTS SPECIFICATIONS
+
+The full description of the data elements in the service
+segments is part of ISO 7372 Trade Data Elements Directory
+(UNTDED).
+
+Legend:
+
+Ref.   The numeric reference tag for the data element as
+       stated in ISO 7372/UNTDED and, when preceded by S,
+       reference for a composite data element used in service
+       segments
+
+Name   Name of COMPOSITE DATA ELEMENT in capital letters
+       Name of DATA ELEMENT in capital letters
+       Name of Component data element in small letters
+
+Repr.  Data value representation:
+       a       alphabetic characters
+       n       numeric characters
+       an      alpha-numeric characters
+       a3      3 alphabetic characters, fixed length
+       n3      3 numeric characters, fixed length
+       an3     3 alpha-numeric characters, fixed length
+       a..3    up to 3 alphabetic characters
+       n..3    up to 3 numeric characters
+       an..3   up to 3 alpha-numeric characters
+
+       M       Mandatory element
+       C       Conditional element.
+
+       Note that a mandatory component data element in a
+       conditional composite data element must appear when the
+       composite data element is used
+
+Remarks IA    Interchange Agreement between interchanging
+              partners
+
+====================================================================
+
+ UNA, Service String advice
+
+ Function: To define the characters selected for use
+           as delimiters and indicators in the rest of the
+           interchange that follows:
+
+ The specifications in the Service string advice take
+ precedence over the specifications for delimiters etc. in
+ segment UNB.  See clause 4.
+
+ When transmitted, the Service string advice must appear
+ immediately before the Interchange Header (UNB) segment and
+ begin with the upper case characters UNA immediately followed
+ by the six characters selected by the sender to indicate, in
+ sequence, the following functions:
+
+
+ Repr.        Name                   Remarks
+
+ an1    M     COMPONENT DATA
+              ELEMENT SEPARATOR
+ an1    M     DATA ELEMENT SEPARATOR
+ an1    M     DECIMAL NOTATION       Comma or full stop
+ an1    M     RELEASE INDICATOR      If not used, insert
+                                     space character
+ an1    M     Reserved for future    Insert space character
+              use
+ an1    M     SEGMENT TERMINATOR
+.123456789.123456789.123456789.123456789.123456789.123456789
+===============================================================
+
+Segment: UNB, Interchange Header
+
+ Function: To start, identify and specify an interchange
+
+ Ref.   Repr.       Name                      Remarks
+
+ S001           M   SYNTAX IDENTIFIER
+ 0001   a4      M   Syntax identifier
+                    a3, upper case Controlling Agency (e.g. UNO=UN/ECE)
+                    and a1 stating level (e.g. A)  (which together give UNOA)
+ 0002   n1      M   Syntax version number
+                    Increments 1 for each new version. Shall be 2 to
+                    indicate this version
+ ___________________________________________________________________
+
+ S002           M   INTERCHANGE SENDER
+ 0004   an..35  M   Sender identification
+                    Code or name as specified in IA
+ 0007   an..4   C   Partner identification code qualifier
+                    Used with sender identification code
+ 0008   an..14  C   Address for reverse routing
+ ___________________________________________________________________
+
+ S003           M   INTERCHANGE RECIPIENT
+ 0010   an..35  M   Recipient Identification
+                    Code or name as specified in IA
+ 0007   an..4   C   Partner identification code qualifier
+                    Used with recipient identification code
+ 0014   an..14  C   Routing address
+                    If used, normally coded sub-address for
+                    onward routing
+ ___________________________________________________________________
+
+ S004           M   DATE/TIME OF PREPARATION
+ 0017   n6      M   Date
+                    YYMMDD
+ 0019   n4      M   Time
+                    HHMM
+ ___________________________________________________________________
+
+ 0020   an..14  M   INTERCHANGE CONTROL REFERENCE
+                    Unique reference assigned by sender
+ ___________________________________________________________________
+
+ S005           C   RECIPIENTS REFERENCE PASSWORD
+ 0022   an..14  M   Recipients reference password
+                    As specified in IA. May be password to recipient's
+                    system or to third party network
+ 0025   an2     C   Recipients reference password qualifier
+                    If specified in IA
+ ___________________________________________________________________
+
+ 0026   an..14  C   APPLICATION REFERENCE
+                    Optionally message identification if the
+                    interchange contains only one type of message
+ ___________________________________________________________________
+
+ 0029   a1      C   PROCESSING PRIORITY CODE
+                    Used if specified in IA
+ ___________________________________________________________________
+
+ 0031   n1      C   ACKNOWLEDGEMENT REQUEST
+                    Set = 1 if sender requests acknowledgement, i.e.
+                    UNB and UNZ segments received and identified
+ ___________________________________________________________________
+
+ 0032   an..35  C   COMMUNICATIONS AGREEMENT ID
+                    If used, to identify type of communication
+                    agreement controlling the interchange,
+                    e.g. Customs or ECE agreement. Code or
+                    name as specified in IA
+ ___________________________________________________________________
+
+ 0035   n1      C   TEST INDICATOR
+                    Set = 1 if the interchange is a test.
+                    Otherwise not used used
+
+================================================================
+
+Segment: UNZ, Interchange Trailer
+
+ Function: To end and check the completeness of an interchange
+
+ Ref.   Repr.       Name                      Remarks
+
+ 0036   n..6    M   INTERCHANGE CONTROL COUNT
+                    The count of the number of messages or, if
+                    used, the number of functional groups in
+                    the interchange.  One of these counts
+                    shall appear.
+ ___________________________________________________________________
+
+ 0020   an..14  M   INTERCHANGE CONTROL REFERENCE
+                    Shall be identical to 0020 in UNB
+
+================================================================
+
+Segment: UNG, Functional Group Header
+
+ Function: To head, identify and specify a Functional Group
+
+ Ref.   Repr.       Name                      Remarks
+
+ 0038   an..6   M   FUNCTIONAL GROUP IDENTIFICATION
+                    Identifies the one message type in the
+                    functional group
+ ___________________________________________________________________
+
+ S006           M   APPLICATION SENDERS IDENTIFICATION
+ 0040   an..35  M   Application senders identification
+                    Code or name identifying the division, department
+                    etc. within the originating sender's organization
+ 0007   an..4   C   Partner identification code qualifier
+                    May be used if sender identification is a code
+ ___________________________________________________________________
+
+ S007           M   APPLICATION RECIPIENTS IDENTIFICATION
+ 0044   an..35  M   Recipients identification
+                    Code or name identifying the division,department
+                    etc. within the recipients organization for which
+                    the group of messages is intended
+ 0007   an..4   C   Recipients identification qualifer
+                    May be used if recipient identification is a code
+ ___________________________________________________________________
+
+ S004           M   DATE/TIME OF PREPARATION
+ 0017   n6      M   Date
+                    YYMMDD
+ 0019   n4      M   Time
+                    HHMM
+ ___________________________________________________________________
+
+ 0048   an..14  M   FUNCTIONAL GROUP REFERENCE NUMBER
+                    Unique reference number assigned by sender's
+                    division, department etc.
+ ___________________________________________________________________
+
+ 0051   an..2   M   CONTROLLING AGENCY
+                    Code to identify the agency controlling the
+                    specification, maintenance and publication of the
+                    message type
+ ___________________________________________________________________
+
+ S008           M   MESSAGE VERSION
+ 0052   an..3   M   Message version number
+                    Version number of the message type the functional group
+ 0054   an..3   M   Message release number
+                    Release number within current version number
+ 0057   an..6   C   Association assigned Code
+                    A code assigned by the association responsible for the
+                    design and maintenance of the type of message concerned
+ ___________________________________________________________________
+
+ 0058   an..14  C   APPLICATION PASSWORD
+                    Password to recepient's division, department or
+                    sectional system (if required)
+
+================================================================
+
+Segment: UNE, Functional Group Trailer
+
+ Function: To end and check the completeness of a Functional Group
+
+ Ref.   Repr.       Name                      Remarks
+
+ 0060   n..6    M   NUMBER OF MESSAGES
+                    The count of the number of messages in the
+                    functional group
+ ___________________________________________________________________
+
+ 0048   an..14  M   FUNCTIONAL GROUP REFERENCE NUMBER
+                    Shall be identical to 0048 in UNG
+
+================================================================
+
+Segment: UNH, Message Header
+
+ Function: To head, identify and specify a Message
+
+ Ref.   Repr.       Name                      Remarks
+
+ 0062   an..14  M   MESSAGE REFERENCE NUMBER
+                    A sender's unique message reference
+ ___________________________________________________________________
+
+ S009           M   MESSAGE IDENTIFIER
+ 0065   an..6   M   Message type
+                    Type of message being transmitted
+ 0052   an..3   M   Message version number
+                    Version number of the message type. If UNG is
+                    used, 0052 shall be identical
+ 0054   an..3   M   Message release number
+                    Release number within current version number
+ 0051   an..2   M   Controlling agency
+                    Code to identify the agency controlling the
+                    specification, maintenance and publication of the
+                    message type
+ 0057   an..6   C   Association assigned code
+                    A code assigned by the association responsible for the
+                    design and maintenance of the message type
+ ___________________________________________________________________
+
+ 0068   an..35  C   COMMON ACCESS REFERENCE
+                    Key to relate all subsequent transfers of
+                    data to the same business case of file.
+                    Within the 35 characters the IA may specify
+                    component elements
+ ___________________________________________________________________
+
+ S010           C   STATUS OF THE TRANSFER
+ 0070   n..2    M   Sequence of transfers
+                    Starts at 1 and is incremented by 1 for each transfer
+ 0073   a1      C   First and last transfer
+                    C = Creation, must be present for first transfer
+                        if more than one foreseen
+                    F = Final, must be present for last transfer
+
+ *) Not required if provided in UNG
+
+==================================================================
+
+Segment: UNT, Message Trailer
+
+ Function: To end and check the completeness of a Message
+
+ Ref.   Repr.       Name                      Remarks
+
+ 0074   n..6    M   NUMBER OF SEGMENTS IN THE MESSAGE
+                    Control count including UNH and UNT
+ ___________________________________________________________________
+
+ 0062   an..14  M   MESSAGE REFERENCE NUMBER
+                    Shall be identical to 0062 in UNH
+
+================================================================
+
+Segment: TXT, Text
+ Function: To give information in addition to that in other segments
+ in the service message, as required
+
+ NOTE: Can not be machine processed. Should be avoided if not
+ necessarily required. Normally a conditional segment. It may repeat
+ up to the number of times indicated in the message specification
+ which may not be higher than 5.
+
+ Ref.   Repr.       Name                      Remarks
+
+ 0077   an3     C   TEXT REFERENCE CODE
+                    Qualifies and identifies the purpose and function
+                    of the segment if indicated in the message specification
+ ___________________________________________________________________
+
+ 0078   an..70  M   FREE FORM TEXT
+                    Not machine-processable information
+
+=================================================================
+
+Segment: UNS, Section Control
+
+ Function: To separate Header, Detail and Summary sections of a
+           message
+
+ NOTE:   To be used by message designers when required to avoid
+ ambiguities. Mandatory only if specified for the type of message
+ concerned.
+
+ Ref.   Repr.       Name                      Remarks
+
+ 0081   a1      M   SECTION IDENTIFICATION
+                    Separates sections in a message by one of
+                    the following codes:
+                    D separates the header and detail sections
+                    S separates the detail and summary sections
+
+==================================================================

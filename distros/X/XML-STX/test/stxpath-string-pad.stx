@@ -1,0 +1,15 @@
+<stx:transform version="1.0" 
+  xmlns:stx="http://stx.sourceforge.net/2002/ns"
+  strip-space="yes">
+
+  <stx:template match="/root">
+    <root>
+      <stx:value-of select="string-pad('XMLQuery', 2)"/>
+      <stx:text>-</stx:text>
+      <stx:value-of select="string-pad('a', 4)"/>
+      <stx:text>-</stx:text>
+      <stx:value-of select="string-pad('b', 0)"/>
+    </root>
+  </stx:template>
+
+</stx:transform>

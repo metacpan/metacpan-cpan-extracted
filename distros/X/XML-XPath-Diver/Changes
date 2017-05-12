@@ -1,0 +1,9 @@
+Revision history for Perl extension XML-XPath-Diver
+
+0.02 2013-09-02T05:06:38Z
+    - add parent.pm as a dependency
+
+0.01 2013-08-28T02:21:42Z
+
+    - original version
+

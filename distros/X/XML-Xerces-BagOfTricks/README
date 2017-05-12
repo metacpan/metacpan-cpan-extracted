@@ -1,0 +1,36 @@
+XML-Xerces-BagOfTricks version 0.03
+===================================
+
+This module is designed to provide a bag of tricks for users of
+XML::Xerces DOM API. It provides some useful variables for
+looking up xerces-c enum values.
+
+It also provides functions that make dealing with, creating and
+printing DOM objects much easier.
+
+getTextContents() from 'Effective XML processing with DOM and XPath in Perl'
+by Parand Tony Darugar, IBM Developerworks Oct 1st 2001
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  XML::Xerces
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 by Aaron Trevena, Surrey Technologies, Ltd
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.1 or,
+at your option, any later version of Perl 5 you may have available.
+

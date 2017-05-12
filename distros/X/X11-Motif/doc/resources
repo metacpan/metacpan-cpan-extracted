@@ -1,0 +1,1271 @@
+
+Widget Class Listing:
+
+    ApplicationShell
+    OverrideShell
+    TopLevelShell
+    TransientShell
+    VendorShell
+    WMShell
+    XbaeCaption
+    XbaeMatrix
+    XmArrowButton
+    XmBulletinBoard
+    XmCascadeButton
+    XmCommand
+    XmDialogShell
+    XmDrawingArea
+    XmDrawnButton
+    XmFileSelectionBox
+    XmForm
+    XmFrame
+    XmLabel
+    XmList
+    XmMainWindow
+    XmMenuShell
+    XmMessageBox
+    XmPanedWindow
+    XmPushButton
+    XmRowColumn
+    XmScale
+    XmScrollBar
+    XmScrolledWindow
+    XmSelectionBox
+    XmSeparator
+    XmText
+    XmTextField
+    XmToggleButton
+    XmXrtColumn
+    XmXrtNode
+    XmXrtNodeFolder
+    XmXrtNodeStyle
+    XmXrtOutliner
+    XmXrtToggleButton
+    XtXrtGraph
+
+Resource Class Listing By Type:
+
+  4 AcceleratorTable                         Accelerators
+  1 Alignment                                Alignment
+  4 AlignmentArray                           Alignments
+  1 ArrowDirection                           ArrowDirection
+  4 Atom                                     IconNameEncoding
+                                             TitleEncoding
+  4 Bitmap                                   IconMask
+                                             IconPixmap
+  4 Bool                                     Input
+  1 Boolean                                  AdjustLast
+                                             AdjustMargin
+                                             AllowOverlap
+                                             AllowShellResize
+                                             AutoShowCursorPosition
+                                             AutoUnmanage
+                                             AutomaticSelection
+                                             BoldLabels
+                                             Boolean
+                                             ButtonLabels
+                                             ColumnResize
+                                             CursorPositionVisible
+                                             DefaultPosition
+                                             DirectoryValid
+                                             Editable
+                                             Fill
+                                             FillOnArm
+                                             FillOnSelect
+                                             HighlightOnEnter
+                                             Iconic
+                                             IndicatorOn
+                                             IsAligned
+                                             IsHomogeneous
+                                             IsInitial
+                                             ListUpdated
+                                             MappedWhenManaged
+                                             MinimizeButtons
+                                             MustMatch
+                                             NoResize
+                                             OverrideRedirect
+                                             PendingDelete
+                                             PopupEnabled
+                                             PushButtonEnabled
+                                             RadioAlwaysOne
+                                             RadioBehavior
+                                             RecomputeSize
+                                             ResizeHeight
+                                             ResizeWidth
+                                             ReverseSelect
+                                             RubberPositioning
+                                             SaveUnder
+                                             Scroll
+                                             ScrollSide
+                                             SelectScrollVisible
+                                             Sensitive
+                                             SeparatorOn
+                                             Set
+                                             ShowArrows
+                                             ShowSeparator
+                                             ShowValue
+                                             Transient
+                                             TraversalOn
+                                             TraverseFixedCells
+                                             VerifyBell
+                                             VisibleWhenOff
+                                             Waitforwm
+                                             WordWrap
+                                             XrtAxisBoundsUseDefault
+                                             XrtAxisLogarithmic
+                                             XrtAxisParams
+                                             XrtAxisParamsUseDefault
+                                             XrtAxisReversed
+                                             XrtAxisShow
+                                             XrtCandleOption
+                                             XrtDataStylesUseDefault
+                                             XrtDebug
+                                             XrtDimensionUseDefault
+                                             XrtDoubleBuffer
+                                             XrtDrawOption
+                                             XrtGearAutoSort
+                                             XrtGearColumnLabelsShow
+                                             XrtGearColumnMoveAllow
+                                             XrtGearCursorTracking
+                                             XrtGearDoubleBuffer
+                                             XrtGearInitialized
+                                             XrtGearRepaint
+                                             XrtGearSelected
+                                             XrtGraphMarginUseDefault
+                                             XrtGraphOption
+                                             XrtGridUseDefault
+                                             XrtHiLoOption
+                                             XrtMarkerShow
+                                             XrtPolarOption
+                                             XrtPositionUseDefault
+                                             XrtPrecisionUseDefault
+                                             XrtRepaint
+                                             XrtTimeFormatUseDefault
+  4 BooleanArray                             ButtonLabels
+  2 BooleanDimension                         ShowAsDefault
+  4 BooleanTable                             SelectedCells
+  4 BottomShadowPixmap                       BottomShadowPixmap
+  4 Callback                                 ArmCallback
+                                             Callback
+                                             DisarmCallback
+                                             ValueChangedCallback
+                                             XrtGearColumnMoveCallback
+                                             XrtGearColumnSelectionCallback
+  4 Cardinal                                 ReadOnly
+  4 CellTable                                Cells
+  1 Char                                     XrtGearWidthChar
+  1 ChildPlacement                           ChildPlacement
+  4 Colormap                                 Colormap
+  1 CommandWindowLocation                    CommandWindowLocation
+  4 Cursor                                   Cursor
+  1 DefaultButtonType                        DefaultButtonType
+  1 DialogStyle                              DialogStyle
+  1 DialogType                               DialogType
+  2 Dimension                                BorderWidth
+                                             Dimension
+                                             FixedColumns
+                                             FixedRows
+                                             Height
+                                             HighlightThickness
+                                             ShadowThickness
+                                             TextShadowThickness
+                                             TrailingFixedColumns
+                                             TrailingFixedRows
+                                             VisibleColumns
+                                             VisibleRows
+                                             Width
+                                             XrtBorderWidth
+                                             XrtGearLineWidth
+                                             XrtGearMarginHeight
+                                             XrtGearMarginLeft
+                                             XrtGearMarginRight
+                                             XrtGearMarginWidth
+                                             XrtGearNodeHeight
+                                             XrtGearNodeSpacing
+                                             XrtGearShadowThickness
+                                             XrtGearWidthMaximum
+                                             XrtGearWidthMinimum
+  4 EditMode                                 EditMode
+  1 FileTypeMask                             FileTypeMask
+  4 Float                                    XrtAxisBounds
+                                             XrtAxisConst
+                                             XrtAxisMult
+                                             XrtAxisParams
+                                             XrtGrid
+                                             XrtMarker
+                                             XrtPieThresholdValue
+  4 FontList                                 ButtonFontList
+                                             DefaultFontList
+                                             FontList
+                                             LabelFontList
+                                             TextFontList
+                                             XrtGearFontListSelected
+  4 Function                                 CreatePopupChildProc
+                                             InputCreate
+                                             InsertPosition
+                                             OutputCreate
+  1 GearAlignment                            XrtGearAlignment
+  1 GearBorderLocation                       XrtGearBorderLocation
+  1 GearBorderType                           XrtGearBorderType
+  4 GearColumn                               XrtGearColumnSelected
+  4 GearColumnList                           XrtGearColumnList
+  1 GearColumnResizePolicy                   XrtGearWidthResizePolicy
+  1 GearDisplayPolicy                        XrtGearScrollBarHorizDisplayPolicy
+                                             XrtGearScrollBarVertDisplayPolicy
+  1 GearFolderState                          XrtGearFolderState
+  4 GearFolderStateMask                      XrtGearFolderStateMask
+  8 GearIcon                                 XrtGearIcon
+  1 GearImportPolicy                         XrtGearNodeImportPolicy
+  1 GearIndicator                            XrtGearIndicator
+  4 GearIndicatorMaskList                    XrtGearIndicatorMaskList
+  4 GearIndicatorPixmapList                  XrtGearIndicatorPixmapList
+  4 GearLabel                                XrtGearLabel
+  1 GearLineStyle                            XrtGearLineStyle
+  4 GearList                                 XrtGearColumnList
+                                             XrtGearNodeVisibleList
+                                             XrtGearSelectedNodeList
+  1 GearMovePolicy                           XrtGearNodeMovePolicy
+  4 GearNodeChildList                        XrtGearNodeChildList
+  4 GearNodeCompareProc                      XrtGearNodeCompareProc
+  4 GearNodeStyle                            XrtGearNodeStyle
+  4 GearNodeStyleList                        XrtGearNodeStyleList
+  4 GearPSFontMapList                        XrtGearPSFontMapList
+  1 GearSelectionPolicy                      XrtGearSelectionPolicy
+  1 GearSelectionRestrictions                XrtGearSelectionRestrictions
+  1 GearSizingPolicy                         XrtGearHeightSizingPolicy
+                                             XrtGearWidthSizingPolicy
+  4 GearState                                XrtGearState
+  4 GearString                               XrtGearString
+  1 GearTextHorizClipPolicy                  XrtGearTextHorizClipPolicy
+  4 GearWidget                               XrtGearNodeCurrent
+                                             XrtGearNodeScrollBarHoriz
+                                             XrtGearNodeTop
+                                             XrtGearScrollBarVert
+  1 GearWidgetResizePolicy                   XrtGearHeightResizePolicy
+                                             XrtGearWidthResizePolicy
+  1 GridType                                 GridType
+  4 HighlightPixmap                          HighlightPixmap
+  4 HighlightTable                           HighlightedCells
+  2 HorizontalDimension                      BorderWidth
+                                             DefaultButtonShadowThickness
+                                             Dimension
+                                             EntryBorder
+                                             HighlightThickness
+                                             ListMarginWidth
+                                             MainWindowMarginWidth
+                                             Margin
+                                             MarginLeft
+                                             MarginRight
+                                             MarginWidth
+                                             SashWidth
+                                             ScaleWidth
+                                             ScrolledWindowMarginWidth
+                                             ShadowThickness
+                                             Space
+                                             Spacing
+  4 HorizontalInt                            BaseWidth
+                                             IconX
+                                             MaxAspectX
+                                             MaxWidth
+                                             MinAspectX
+                                             MinWidth
+                                             WidthInc
+  2 HorizontalPosition                       Position
+                                             SashIndent
+  1 IndicatorType                            IndicatorType
+  4 InitialState                             InitialState
+  4 Int                                      AltRowCount
+                                             Argc
+                                             BaseHeight
+                                             BaseWidth
+                                             BlinkRate
+                                             Columns
+                                             Depth
+                                             DirListItemCount
+                                             DoubleClickInterval
+                                             GearKey
+                                             GearLock
+                                             HeightInc
+                                             IconX
+                                             IconY
+                                             Increment
+                                             InitialDelay
+                                             ItemCount
+                                             LabelOffset
+                                             LeftColumn
+                                             MappingDelay
+                                             MaxAspectX
+                                             MaxAspectY
+                                             MaxHeight
+                                             MaxItems
+                                             MaxLength
+                                             MaxValue
+                                             MaxWidth
+                                             Maximum
+                                             MinAspectX
+                                             MinAspectY
+                                             MinHeight
+                                             MinWidth
+                                             Minimum
+                                             PageIncrement
+                                             PostFromCount
+                                             RepeatDelay
+                                             Rows
+                                             ScaleMultiple
+                                             SelectThreshold
+                                             SelectedItemCount
+                                             SelectionArrayCount
+                                             SliderSize
+                                             TopRow
+                                             Value
+                                             VisibleItemCount
+                                             WidthInc
+                                             WinGravity
+                                             WmTimeout
+                                             XrtBarClusterOverlap
+                                             XrtBarClusterWidth
+                                             XrtDataset
+                                             XrtGearHeightPreferredCount
+                                             XrtGearHeightVirtual
+                                             XrtGearNodeIndent
+                                             XrtGearNumStates
+                                             XrtGearWidthPreferredCount
+                                             XrtGearWidthVirtual
+                                             XrtGraphDepth
+                                             XrtGraphInclination
+                                             XrtGraphRotation
+                                             XrtMarkerPoint
+                                             XrtMarkerSet
+                                             XrtPieMinSlices
+                                             XrtPrecision
+  4 KeySym                                   Mnemonic
+  4 LabelAlignment                           LabelAlignment
+  4 LabelPosition                            LabelPosition
+  1 LabelType                                LabelType
+  1 ListSizePolicy                           ListSizePolicy
+  4 Long                                     XrtTimeBase
+  4 ManBottomShadowPixmap                    BottomShadowPixmap
+  4 ManForegroundPixmap                      LabelPixmap
+                                             Pixmap
+  4 ManHighlightPixmap                       HighlightPixmap
+  4 ManTopShadowPixmap                       TopShadowPixmap
+  1 MatrixScrollBarDisplayPolicy             MatrixScrollBarDisplayPolicy
+  4 MaxLengthArray                           ColumnMaxLengths
+  4 MenuWidget                               MenuWidget
+  1 MultiClick                               MultiClick
+  1 NavigationType                           NavigationType
+  1 Orientation                              Orientation
+  1 Packing                                  Packing
+  4 Pixel                                    ArmColor
+                                             Background
+                                             BorderColor
+                                             BottomShadowColor
+                                             Color
+                                             Foreground
+                                             HighlightColor
+                                             SelectColor
+                                             TextBackground
+                                             TopShadowColor
+                                             TroughColor
+                                             XrtGearBackgroundSelected
+                                             XrtGearForegroundSelected
+                                             XrtGearLineColor
+                                             XrtGearSelectColor
+                                             XrtGearUnselectColor
+  4 PixelTable                               Colors
+  4 Pixmap                                   IconPixmap
+                                             Pixmap
+  4 Pointer                                  SelectionArray
+                                             Source
+                                             UserData
+  2 Position                                 Position
+  4 PrimForegroundPixmap                     ArmPixmap
+                                             LabelInsensitivePixmap
+                                             LabelPixmap
+                                             Pixmap
+                                             SelectInsensitivePixmap
+                                             SelectPixmap
+  4 Proc                                     DirSearchProc
+                                             FileSearchProc
+                                             QualifySearchDataProc
+  1 ProcessingDirection                      ProcessingDirection
+  1 ResizePolicy                             ResizePolicy
+  1 RowColumnType                            RowColumnType
+  4 Screen                                   Screen
+  1 ScrollBarDisplayPolicy                   ScrollBarDisplayPolicy
+  1 ScrollBarPlacement                       ScrollBarPlacement
+  1 ScrollingPolicy                          ScrollingPolicy
+  1 SelectionPolicy                          SelectionPolicy
+  1 SelectionType                            DialogType
+  1 SeparatorType                            SeparatorType
+  1 ShadowType                               ShadowType
+  4 ShadowTypeArray                          ShadowTypes
+  4 ShadowTypeTable                          CellShadowTypes
+  2 ShellHorizDim                            BorderWidth
+                                             Dimension
+  2 ShellHorizPos                            Position
+  2 ShellVertDim                             Dimension
+  2 ShellVertPos                             Position
+  2 Short                                    Columns
+                                             DecimalPoints
+                                             NumColumns
+                                             RowLabelWidth
+                                             Rows
+                                             XrtDimension
+                                             XrtGraphMargin
+                                             XrtPosition
+  4 String                                   Accelerator
+                                             Accelerators
+                                             Geometry
+                                             IconName
+                                             MenuPost
+                                             MnemonicCharSet
+                                             String
+                                             Title
+                                             Value
+  4 StringArray                              Argv
+                                             Labels
+  1 StringDirection                          StringDirection
+  1 TearOffModel                             TearOffModel
+  4 TextPosition                             CursorPosition
+                                             TopCharacter
+  4 TopItemPosition                          TopItemPosition
+  4 TopShadowPixmap                          TopShadowPixmap
+  4 TranslationTable                         Translations
+  1 UnitType                                 UnitType
+  4 UserDataArray                            UserDatas
+  4 UserDataTable                            CellUserData
+  4 ValueWcs                                 ValueWcs
+  1 VerticalAlignment                        VerticalAlignment
+  2 VerticalDimension                        Dimension
+                                             IndicatorSize
+                                             ListMarginHeight
+                                             ListSpacing
+                                             MainWindowMarginHeight
+                                             MarginBottom
+                                             MarginHeight
+                                             MarginTop
+                                             SashHeight
+                                             ScaleHeight
+                                             ScrolledWindowMarginHeight
+                                             Spacing
+  4 VerticalInt                              BaseHeight
+                                             HeightInc
+                                             IconY
+                                             MaxAspectY
+                                             MaxHeight
+                                             MinAspectY
+                                             MinHeight
+  2 VerticalPosition                         Position
+  4 Visual                                   Visual
+  1 VisualPolicy                             VisualPolicy
+  4 WhichButton                              WhichButton
+  4 Widget                                   ClipWindow
+                                             CommandWindow
+                                             HorizontalScrollBar
+                                             InitialFocus
+                                             MenuBar
+                                             MessageWindow
+                                             TextField
+                                             TransientFor
+                                             VerticalScrollBar
+                                             Widget
+                                             WorkWindow
+  4 WidgetClass                              EntryClass
+  4 WidgetList                               PostFromList
+                                             ReadOnly
+  4 WidthArray                               ColumnWidths
+  4 Window                                   IconWindow
+                                             WindowGroup
+  4 XmBackgroundPixmap                       Pixmap
+  4 XmString                                 AcceleratorText
+                                             ApplyLabelString
+                                             CancelLabelString
+                                             DialogTitle
+                                             DirListLabelString
+                                             DirMask
+                                             DirSpec
+                                             Directory
+                                             FileListLabelString
+                                             FilterLabelString
+                                             HelpLabelString
+                                             ListLabelString
+                                             NoMatchString
+                                             OkLabelString
+                                             Pattern
+                                             PromptString
+                                             SelectionLabelString
+                                             TextString
+                                             TitleString
+                                             XmString
+  4 XmStringTable                            DirListItems
+                                             Items
+                                             SelectedItems
+  4 XrtAdjust                                XrtAdjust
+  4 XrtAlign                                 XrtAlign
+  4 XrtAnchor                                XrtAnchor
+  4 XrtAngleUnit                             XrtAngleUnit
+  4 XrtAnnoPlacement                         XrtAnnoPlacement
+  4 XrtAnnotationMethod                      XrtAnnotationMethod
+  4 XrtBorder                                XrtBorder
+  4 XrtData                                  XrtData
+  4 XrtDataStyle                             XrtDataStyle
+  4 XrtDataStyles                            XrtDataStyles
+  4 XrtMarkerMethod                          XrtMarkerMethod
+  4 XrtNumMethod                             XrtNumMethod
+  4 XrtOriginPlacement                       XrtOriginPlacement
+  4 XrtPieOrder                              XrtPieOrder
+  4 XrtPieThresholdMethod                    XrtPieThresholdMethod
+  4 XrtRotate                                XrtRotation
+  4 XrtShading                               XrtGraph3dShading
+  4 XrtString                                XrtAxisLabelFormat
+                                             XrtBackgroundColor
+                                             XrtForegroundColor
+                                             XrtOtherLabel
+                                             XrtTimeFormat
+                                             XrtTitle
+  4 XrtStrings                               XrtPointLabels
+                                             XrtSetLabels
+                                             XrtStrings
+  4 XrtTimeUnit                              XrtTimeUnit
+  4 XrtType                                  XrtType
+  4 XrtValueLabels                           XrtValueLabels
+
+
+Resource Name Listing By Class:
+
+    Accelerator                              accelerator
+    AcceleratorText                          acceleratorText
+    Accelerators                             accelerators
+                                             menuAccelerator
+                                             textAccelerators
+    AdjustLast                               adjustLast
+    AdjustMargin                             adjustMargin
+    Alignment                                alignment
+                                             entryAlignment
+                                             labelTextAlignment
+                                             messageAlignment
+                                             rowLabelAlignment
+    Alignments                               columnAlignments
+                                             columnLabelAlignments
+    AllowOverlap                             allowOverlap
+    AllowShellResize                         allowShellResize
+    AltRowCount                              altRowCount
+    ApplyLabelString                         applyLabelString
+    Argc                                     argc
+    Argv                                     argv
+    ArmCallback                              armCallback
+    ArmColor                                 armColor
+    ArmPixmap                                armPixmap
+    ArrowDirection                           arrowDirection
+    AutoShowCursorPosition                   autoShowCursorPosition
+    AutoUnmanage                             autoUnmanage
+    AutomaticSelection                       automaticSelection
+    Background                               background
+                                             evenRowBackground
+                                             oddRowBackground
+    BaseHeight                               baseHeight
+    BaseWidth                                baseWidth
+    BlinkRate                                blinkRate
+    BoldLabels                               boldLabels
+    Boolean                                  Initialized
+                                             refigureMode
+                                             xrtGearShortcutShow
+    BorderColor                              borderColor
+    BorderWidth                              borderWidth
+    BottomShadowColor                        bottomShadowColor
+    BottomShadowPixmap                       bottomShadowPixmap
+    ButtonFontList                           buttonFontList
+    ButtonLabels                             buttonLabels
+                                             columnButtonLabels
+                                             rowButtonLabels
+    Callback                                 XrtGearNodeMoveCallback
+                                             activateCallback
+                                             applyCallback
+                                             armCallback
+                                             browseSelectionCallback
+                                             cancelCallback
+                                             cascadingCallback
+                                             commandChangedCallback
+                                             commandEnteredCallback
+                                             decrementCallback
+                                             defaultActionCallback
+                                             destroyCallback
+                                             disarmCallback
+                                             dragCallback
+                                             drawCellCallback
+                                             enterCellCallback
+                                             entryCallback
+                                             exposeCallback
+                                             extendedSelectionCallback
+                                             focusCallback
+                                             gainPrimaryCallback
+                                             helpCallback
+                                             incrementCallback
+                                             inputCallback
+                                             labelActivateCallback
+                                             leaveCellCallback
+                                             losePrimaryCallback
+                                             losingFocusCallback
+                                             mapCallback
+                                             modifyVerifyCallback
+                                             modifyVerifyCallbackWcs
+                                             motionVerifyCallback
+                                             multipleSelectionCallback
+                                             noMatchCallback
+                                             okCallback
+                                             pageDecrementCallback
+                                             pageIncrementCallback
+                                             popdownCallback
+                                             popupCallback
+                                             processDragCallback
+                                             resizeCallback
+                                             resizeColumnCallback
+                                             selectCellCallback
+                                             singleSelectionCallback
+                                             tearOffMenuActivateCallback
+                                             tearOffMenuDeactivateCallback
+                                             toBottomCallback
+                                             toTopCallback
+                                             traverseCellCallback
+                                             traverseObscuredCallback
+                                             unmapCallback
+                                             valueChangedCallback
+                                             writeCellCallback
+                                             xrtExposeCallback
+                                             xrtGearActivateCallback
+                                             xrtGearCursorTrackingCallback
+                                             xrtGearFolderStateCallback
+                                             xrtGearImportCallback
+                                             xrtGearNodeCreateCallback
+                                             xrtGearNodeCurrentChangedCallback
+                                             xrtGearPrintCallback
+                                             xrtGearResizeCallback
+                                             xrtGearSelectionCallback
+                                             xrtGearStateChangedCallback
+                                             xrtMapCallback
+                                             xrtModifyCallback
+                                             xrtPickCallback
+                                             xrtResizeCallback
+                                             xrtRotateCallback
+                                             xrtTransformCallback
+                                             xrtZoomAxisCallback
+    CancelLabelString                        cancelLabelString
+    CellShadowTypes                          cellShadowTypes
+    CellUserData                             cellUserData
+    Cells                                    cells
+    ChildPlacement                           childPlacement
+    ClipWindow                               clipWindow
+    Color                                    buttonLabelBackground
+                                             columnLabelColor
+                                             gridLineColor
+                                             rowLabelColor
+                                             selectedBackground
+                                             selectedForeground
+    Colormap                                 colormap
+    Colors                                   cellBackgrounds
+                                             colors
+    ColumnMaxLengths                         columnMaxLengths
+    ColumnResize                             allowColumnResize
+    ColumnWidths                             columnWidths
+    Columns                                  columns
+                                             textColumns
+    CommandWindow                            commandWindow
+    CommandWindowLocation                    commandWindowLocation
+    CreatePopupChildProc                     createPopupChildProc
+    Cursor                                   xrtGearCursor
+                                             xrtGearCursorResizeWidth
+    CursorPosition                           cursorPosition
+    CursorPositionVisible                    cursorPositionVisible
+    DecimalPoints                            decimalPoints
+    DefaultButtonShadowThickness             defaultButtonShadowThickness
+    DefaultButtonType                        defaultButtonType
+    DefaultFontList                          defaultFontList
+    DefaultPosition                          defaultPosition
+    Depth                                    depth
+    DialogStyle                              dialogStyle
+    DialogTitle                              dialogTitle
+    DialogType                               dialogType
+    Dimension                                height
+                                             width
+                                             xrtGearLayoutSpacing
+                                             xrtGearShortcutSize
+    DirListItemCount                         dirListItemCount
+    DirListItems                             dirListItems
+    DirListLabelString                       dirListLabelString
+    DirMask                                  dirMask
+    DirSearchProc                            dirSearchProc
+    DirSpec                                  dirSpec
+    Directory                                directory
+    DirectoryValid                           directoryValid
+    DisarmCallback                           disarmCallback
+    DoubleClickInterval                      doubleClickInterval
+    EditMode                                 editMode
+    Editable                                 editable
+    EntryBorder                              entryBorder
+    EntryClass                               entryClass
+    FileListLabelString                      fileListLabelString
+    FileSearchProc                           fileSearchProc
+    FileTypeMask                             fileTypeMask
+    Fill                                     fill
+    FillOnArm                                fillOnArm
+    FillOnSelect                             fillOnSelect
+    FilterLabelString                        filterLabelString
+    FixedColumns                             fixedColumns
+    FixedRows                                fixedRows
+    FontList                                 fontList
+                                             labelFont
+                                             xrtAxisFont
+                                             xrtFooterFont
+                                             xrtHeaderFont
+                                             xrtLegendFont
+    Foreground                               foreground
+    GearKey                                  xrtGearKey
+    GearLock                                 xrtGearLock
+    Geometry                                 geometry
+    GridType                                 gridType
+    Height                                   height
+    HeightInc                                heightInc
+    HelpLabelString                          helpLabelString
+    HighlightColor                           highlightColor
+    HighlightOnEnter                         highlightOnEnter
+    HighlightPixmap                          highlightPixmap
+    HighlightThickness                       cellHighlightThickness
+                                             highlightThickness
+    HighlightedCells                         highlightedCells
+    HorizontalScrollBar                      horizontalScrollBar
+    IconMask                                 iconMask
+    IconName                                 iconName
+    IconNameEncoding                         iconNameEncoding
+    IconPixmap                               iconPixmap
+    IconWindow                               iconWindow
+    IconX                                    iconX
+    IconY                                    iconY
+    Iconic                                   iconic
+    Increment                                increment
+    IndicatorOn                              indicatorOn
+    IndicatorSize                            indicatorSize
+    IndicatorType                            indicatorType
+    InitialDelay                             initialDelay
+    InitialFocus                             initialFocus
+    InitialState                             initialState
+    Input                                    input
+    InputCreate                              inputCreate
+    InsertPosition                           insertPosition
+    IsAligned                                isAligned
+    IsHomogeneous                            isHomogeneous
+    IsInitial                                isInitial
+    ItemCount                                fileListItemCount
+                                             historyItemCount
+                                             itemCount
+                                             listItemCount
+    Items                                    fileListItems
+                                             historyItems
+                                             items
+                                             listItems
+    LabelAlignment                           labelAlignment
+    LabelFontList                            labelFontList
+    LabelInsensitivePixmap                   labelInsensitivePixmap
+    LabelOffset                              labelOffset
+    LabelPixmap                              labelPixmap
+    LabelPosition                            labelPosition
+    LabelType                                labelType
+    Labels                                   columnLabels
+                                             rowLabels
+    LeftColumn                               leftColumn
+    ListLabelString                          listLabelString
+    ListMarginHeight                         listMarginHeight
+    ListMarginWidth                          listMarginWidth
+    ListSizePolicy                           listSizePolicy
+    ListSpacing                              listSpacing
+    ListUpdated                              listUpdated
+    MainWindowMarginHeight                   mainWindowMarginHeight
+    MainWindowMarginWidth                    mainWindowMarginWidth
+    MappedWhenManaged                        mappedWhenManaged
+    MappingDelay                             mappingDelay
+    Margin                                   margin
+    MarginBottom                             marginBottom
+    MarginHeight                             cellMarginHeight
+                                             marginHeight
+    MarginLeft                               marginLeft
+    MarginRight                              marginRight
+    MarginTop                                marginTop
+    MarginWidth                              cellMarginWidth
+                                             marginWidth
+    MatrixScrollBarDisplayPolicy             horizontalScrollBarDisplayPolicy
+                                             verticalScrollBarDisplayPolicy
+    MaxAspectX                               maxAspectX
+    MaxAspectY                               maxAspectY
+    MaxHeight                                maxHeight
+    MaxItems                                 historyMaxItems
+    MaxLength                                maxLength
+    MaxValue                                 fractionBase
+    MaxWidth                                 maxWidth
+    Maximum                                  maximum
+    MenuBar                                  menuBar
+    MenuPost                                 menuPost
+    MenuWidget                               menuHelpWidget
+                                             menuHistory
+                                             subMenuId
+    MessageWindow                            messageWindow
+    MinAspectX                               minAspectX
+    MinAspectY                               minAspectY
+    MinHeight                                minHeight
+    MinWidth                                 minWidth
+    MinimizeButtons                          minimizeButtons
+    Minimum                                  minimum
+    Mnemonic                                 mnemonic
+    MnemonicCharSet                          mnemonicCharSet
+    MultiClick                               multiClick
+    MustMatch                                mustMatch
+    NavigationType                           navigationType
+    NoMatchString                            noMatchString
+    NoResize                                 noResize
+    NumColumns                               numColumns
+    OkLabelString                            okLabelString
+    Orientation                              orientation
+    OutputCreate                             outputCreate
+    OverrideRedirect                         overrideRedirect
+    Packing                                  packing
+    PageIncrement                            pageIncrement
+    Pattern                                  pattern
+    PendingDelete                            pendingDelete
+    Pixmap                                   backgroundPixmap
+                                             borderPixmap
+                                             cascadePixmap
+                                             symbolPixmap
+    PopupEnabled                             popupEnabled
+    Position                                 x
+                                             y
+    PostFromCount                            postFromCount
+    PostFromList                             postFromList
+    ProcessingDirection                      processingDirection
+    PromptString                             promptString
+    PushButtonEnabled                        pushButtonEnabled
+    QualifySearchDataProc                    qualifySearchDataProc
+    RadioAlwaysOne                           radioAlwaysOne
+    RadioBehavior                            radioBehavior
+    ReadOnly                                 children
+                                             numChildren
+    RecomputeSize                            recomputeSize
+    RepeatDelay                              repeatDelay
+    ResizeHeight                             resizeHeight
+    ResizePolicy                             resizePolicy
+    ResizeWidth                              resizeWidth
+    ReverseSelect                            reverseSelect
+    RowColumnType                            rowColumnType
+    RowLabelWidth                            rowLabelWidth
+    Rows                                     rows
+    RubberPositioning                        rubberPositioning
+    SashHeight                               sashHeight
+    SashIndent                               sashIndent
+    SashWidth                                sashWidth
+    SaveUnder                                saveUnder
+    ScaleHeight                              scaleHeight
+    ScaleMultiple                            scaleMultiple
+    ScaleWidth                               scaleWidth
+    Screen                                   screen
+    Scroll                                   scrollHorizontal
+                                             scrollVertical
+    ScrollBarDisplayPolicy                   scrollBarDisplayPolicy
+    ScrollBarPlacement                       scrollBarPlacement
+    ScrollSide                               scrollLeftSide
+                                             scrollTopSide
+    ScrolledWindowMarginHeight               scrolledWindowMarginHeight
+    ScrolledWindowMarginWidth                scrolledWindowMarginWidth
+    ScrollingPolicy                          scrollingPolicy
+    SelectColor                              selectColor
+    SelectInsensitivePixmap                  selectInsensitivePixmap
+    SelectPixmap                             selectPixmap
+    SelectScrollVisible                      selectScrollVisible
+    SelectThreshold                          selectThreshold
+    SelectedCells                            selectedCells
+    SelectedItemCount                        selectedItemCount
+    SelectedItems                            selectedItems
+    SelectionArray                           selectionArray
+    SelectionArrayCount                      selectionArrayCount
+    SelectionLabelString                     selectionLabelString
+    SelectionPolicy                          selectionPolicy
+    Sensitive                                ancestorSensitive
+                                             sensitive
+    SeparatorOn                              separatorOn
+    SeparatorType                            separatorType
+    Set                                      set
+    ShadowThickness                          cellShadowThickness
+                                             sashShadowThickness
+                                             shadowThickness
+    ShadowType                               cellShadowType
+                                             shadowType
+    ShadowTypes                              columnShadowTypes
+                                             rowShadowTypes
+    ShowArrows                               showArrows
+    ShowAsDefault                            showAsDefault
+    ShowSeparator                            showSeparator
+    ShowValue                                showValue
+    SliderSize                               sliderSize
+    Source                                   source
+    Space                                    space
+    Spacing                                  horizontalSpacing
+                                             spacing
+                                             verticalSpacing
+    String                                   xrtGearTreeData
+    StringDirection                          stringDirection
+    TearOffModel                             tearOffModel
+    TextBackground                           textBackground
+    TextField                                textField
+    TextFontList                             textFontList
+    TextShadowThickness                      textShadowThickness
+    TextString                               command
+                                             textString
+    Title                                    title
+    TitleEncoding                            titleEncoding
+    TitleString                              titleString
+    TopCharacter                             topCharacter
+    TopItemPosition                          topItemPosition
+    TopRow                                   topRow
+    TopShadowColor                           topShadowColor
+    TopShadowPixmap                          topShadowPixmap
+    TrailingFixedColumns                     trailingFixedColumns
+    TrailingFixedRows                        trailingFixedRows
+    Transient                                transient
+    TransientFor                             transientFor
+    Translations                             textTranslations
+                                             translations
+    TraversalOn                              traversalOn
+    TraverseFixedCells                       traverseFixedCells
+    TroughColor                              troughColor
+    UnitType                                 unitType
+    UserData                                 userData
+    UserDatas                                columnUserData
+                                             rowUserData
+    Value                                    value
+    ValueChangedCallback                     valueChangedCallback
+    ValueWcs                                 valueWcs
+    VerifyBell                               verifyBell
+    VerticalAlignment                        entryVerticalAlignment
+    VerticalScrollBar                        verticalScrollBar
+    VisibleColumns                           visibleColumns
+    VisibleItemCount                         historyVisibleItemCount
+                                             listVisibleItemCount
+                                             visibleItemCount
+    VisibleRows                              visibleRows
+    VisibleWhenOff                           visibleWhenOff
+    Visual                                   visual
+    VisualPolicy                             visualPolicy
+    Waitforwm                                waitforwm
+    WhichButton                              whichButton
+    Widget                                   cancelButton
+                                             defaultButton
+    Width                                    width
+    WidthInc                                 widthInc
+    WinGravity                               winGravity
+    WindowGroup                              windowGroup
+    WmTimeout                                wmTimeout
+    WordWrap                                 wordWrap
+    WorkWindow                               workWindow
+    XmString                                 cancelLabelString
+                                             helpLabelString
+                                             labelString
+                                             messageString
+                                             okLabelString
+    XrtAdjust                                xrtFooterAdjust
+                                             xrtHeaderAdjust
+    XrtAlign                                 xrtLegendOrientation
+    XrtAnchor                                xrtLegendAnchor
+    XrtAngleUnit                             xrtAngleUnit
+    XrtAnnoPlacement                         xrtXAnnoPlacement
+                                             xrtY2AnnoPlacement
+                                             xrtYAnnoPlacement
+    XrtAnnotationMethod                      xrtXAnnotationMethod
+                                             xrtY2AnnotationMethod
+                                             xrtYAnnotationMethod
+    XrtAxisBounds                            xrtXAxisMax
+                                             xrtXAxisMin
+                                             xrtXMax
+                                             xrtXMin
+                                             xrtY2AxisMax
+                                             xrtY2AxisMin
+                                             xrtY2Max
+                                             xrtY2Min
+                                             xrtYAxisMax
+                                             xrtYAxisMin
+                                             xrtYMax
+                                             xrtYMin
+    XrtAxisBoundsUseDefault                  xrtXAxisMaxUseDefault
+                                             xrtXAxisMinUseDefault
+                                             xrtXMaxUseDefault
+                                             xrtXMinUseDefault
+                                             xrtY2AxisMaxUseDefault
+                                             xrtY2AxisMinUseDefault
+                                             xrtY2MaxUseDefault
+                                             xrtY2MinUseDefault
+                                             xrtY2TickUseDefault
+                                             xrtYAxisMaxUseDefault
+                                             xrtYAxisMinUseDefault
+                                             xrtYMaxUseDefault
+                                             xrtYMinUseDefault
+    XrtAxisConst                             xrtYAxisConst
+    XrtAxisLabelFormat                       xrtXAxisLabelFormat
+                                             xrtY2AxisLabelFormat
+                                             xrtYAxisLabelFormat
+    XrtAxisLogarithmic                       xrtXAxisLogarithmic
+                                             xrtY2AxisLogarithmic
+                                             xrtYAxisLogarithmic
+    XrtAxisMult                              xrtYAxisMult
+    XrtAxisParams                            xrtXNum
+                                             xrtXOrigin
+                                             xrtXOriginBase
+                                             xrtXTick
+                                             xrtY2AnnotationAngle
+                                             xrtY2Axis100Percent
+                                             xrtY2Num
+                                             xrtY2Origin
+                                             xrtY2Tick
+                                             xrtYAnnotationAngle
+                                             xrtYAxis100Percent
+                                             xrtYNum
+                                             xrtYOrigin
+                                             xrtYTick
+    XrtAxisParamsUseDefault                  xrtXNumUseDefault
+                                             xrtXOriginUseDefault
+                                             xrtXTickUseDefault
+                                             xrtY2AnnotationAngleUseDefault
+                                             xrtY2NumUseDefault
+                                             xrtY2OriginUseDefault
+                                             xrtYAnnotationAngleUseDefault
+                                             xrtYNumUseDefault
+                                             xrtYOriginUseDefault
+                                             xrtYTickUseDefault
+    XrtAxisReversed                          xrtXAxisReversed
+                                             xrtY2AxisReversed
+                                             xrtYAxisReversed
+    XrtAxisShow                              xrtXAxisShow
+                                             xrtY2AxisShow
+                                             xrtYAxisShow
+    XrtBackgroundColor                       xrtBackgroundColor
+                                             xrtDataAreaBackgroundColor
+                                             xrtFooterBackgroundColor
+                                             xrtGraphBackgroundColor
+                                             xrtHeaderBackgroundColor
+                                             xrtLegendBackgroundColor
+    XrtBarClusterOverlap                     xrtBarClusterOverlap
+    XrtBarClusterWidth                       xrtBarClusterWidth
+    XrtBorder                                xrtBorder
+                                             xrtFooterBorder
+                                             xrtGraphBorder
+                                             xrtHeaderBorder
+                                             xrtLegendBorder
+    XrtBorderWidth                           xrtFooterBorderWidth
+                                             xrtGraphBorderWidth
+                                             xrtHeaderBorderWidth
+                                             xrtLegendBorderWidth
+    XrtCandleOption                          xrtCandleComplex
+    XrtData                                  xrtData
+                                             xrtData2
+    XrtDataStyle                             xrtMarkerDataStyle
+                                             xrtOtherDataStyle
+                                             xrtXGridDataStyle
+                                             xrtXMarkerDataStyle
+                                             xrtY2GridDataStyle
+                                             xrtYGridDataStyle
+                                             xrtYMarkerDataStyle
+    XrtDataStyles                            xrtDataStyles
+                                             xrtDataStyles2
+    XrtDataStylesUseDefault                  xrtDataStyles2UseDefault
+                                             xrtDataStylesUseDefault
+                                             xrtMarkerDataStyleUseDefault
+                                             xrtOtherDataStyleUseDefault
+                                             xrtXGridDataStyleUseDefault
+                                             xrtXMarkerDataStyleUseDefault
+                                             xrtY2GridDataStyleUseDefault
+                                             xrtYGridDataStyleUseDefault
+                                             xrtYMarkerDataStyleUseDefault
+    XrtDataset                               xrtFrontDataset
+                                             xrtMarkerDataset
+    XrtDebug                                 xrtDebug
+    XrtDimension                             xrtFooterHeight
+                                             xrtFooterWidth
+                                             xrtGraphHeight
+                                             xrtGraphWidth
+                                             xrtHeaderHeight
+                                             xrtHeaderWidth
+                                             xrtLegendHeight
+                                             xrtLegendWidth
+    XrtDimensionUseDefault                   xrtGraphHeightUseDefault
+                                             xrtGraphWidthUseDefault
+    XrtDoubleBuffer                          xrtDoubleBuffer
+    XrtDrawOption                            xrtAxisBoundingBox
+                                             xrtInvertOrientation
+                                             xrtLegendShow
+    XrtForegroundColor                       xrtDataAreaForegroundColor
+                                             xrtFooterForegroundColor
+                                             xrtForegroundColor
+                                             xrtGraphForegroundColor
+                                             xrtHeaderForegroundColor
+                                             xrtLegendForegroundColor
+    XrtGearAlignment                         xrtGearLabelAlignment
+                                             xrtGearNodeAlignment
+    XrtGearAutoSort                          xrtGearAutoSort
+    XrtGearBackgroundSelected                xrtGearBackgroundSelected
+    XrtGearBorderLocation                    xrtGearBorderLocation
+    XrtGearBorderType                        xrtGearBorderType
+    XrtGearColumnLabelsShow                  xrtGearColumnLabelsShow
+    XrtGearColumnList                        xrtGearColumnList
+                                             xrtGearColumnOrderList
+    XrtGearColumnMoveAllow                   xrtGearColumnMoveAllow
+    XrtGearColumnMoveCallback                xrtGearColumnMoveCallback
+    XrtGearColumnSelected                    xrtGearColumnSelected
+    XrtGearColumnSelectionCallback           xrtGearColumnSelectionCallback
+    XrtGearCursorTracking                    xrtGearCursorTracking
+    XrtGearDoubleBuffer                      xrtGearDoubleBuffer
+    XrtGearFolderState                       xrtGearFolderState
+    XrtGearFolderStateMask                   xrtGearFolderStateMask
+    XrtGearFontListSelected                  xrtGearFontListSelected
+    XrtGearForegroundSelected                xrtGearForegroundSelected
+    XrtGearHeightPreferredCount              xrtGearHeightPreferredCount
+    XrtGearHeightResizePolicy                xrtGearHeightResizePolicy
+    XrtGearHeightSizingPolicy                xrtGearHeightSizingPolicy
+    XrtGearHeightVirtual                     xrtGearHeightVirtual
+    XrtGearIcon                              xrtGearIconClosed
+                                             xrtGearIconClosedSelected
+                                             xrtGearIconItem
+                                             xrtGearIconItemSelected
+                                             xrtGearIconOpen
+                                             xrtGearIconOpenSelected
+    XrtGearIndicator                         xrtGearIndicator
+    XrtGearIndicatorMaskList                 xrtGearIndicatorMaskList
+    XrtGearIndicatorPixmapList               xrtGearIndicatorPixmapList
+    XrtGearInitialized                       xrtGearInitialized
+    XrtGearLabel                             xrtGearLabel
+    XrtGearLineColor                         xrtGearLineColor
+    XrtGearLineStyle                         xrtGearLineStyle
+    XrtGearLineWidth                         xrtGearLineWidth
+    XrtGearMarginHeight                      xrtGearMarginHeight
+    XrtGearMarginLeft                        xrtGearMarginLeft
+    XrtGearMarginRight                       xrtGearMarginRight
+    XrtGearMarginWidth                       xrtGearMarginWidth
+    XrtGearNodeChildList                     xrtGearNodeChildList
+    XrtGearNodeCompareProc                   xrtGearNodeCompareProc
+    XrtGearNodeCurrent                       xrtGearNodeCurrent
+    XrtGearNodeHeight                        xrtGearNodeHeight
+    XrtGearNodeImportPolicy                  xrtGearNodeImportPolicy
+    XrtGearNodeIndent                        xrtGearNodeIndent
+    XrtGearNodeMovePolicy                    xrtGearNodeMovePolicy
+    XrtGearNodeScrollBarHoriz                xrtGearScrollBarHoriz 
+    XrtGearNodeSpacing                       xrtGearNodeSpacing
+    XrtGearNodeStyle                         xrtGearNodeStyle
+                                             xrtGearNodeStyleDefault
+    XrtGearNodeStyleList                     xrtGearNodeStyleList
+    XrtGearNodeTop                           xrtGearNodeTop
+    XrtGearNodeVisibleList                   xrtGearNodeVisibleList
+    XrtGearNumStates                         xrtGearNumStates
+    XrtGearPSFontMapList                     xrtGearPSFontMapList
+    XrtGearRepaint                           xrtGearRepaint
+    XrtGearScrollBarHorizDisplayPolicy       xrtGearScrollBarHorizDisplayPolicy
+    XrtGearScrollBarVert                     xrtGearScrollBarVert
+    XrtGearScrollBarVertDisplayPolicy        xrtGearScrollBarVertDisplayPolicy
+    XrtGearSelectColor                       xrtGearSelectColor
+    XrtGearSelected                          xrtGearSelected
+    XrtGearSelectedNodeList                  xrtGearSelectedNodeList
+    XrtGearSelectionPolicy                   xrtGearSelectionPolicy
+    XrtGearSelectionRestrictions             xrtGearSelectionRestrictions
+    XrtGearShadowThickness                   xrtGearShadowThickness
+    XrtGearState                             xrtGearState
+    XrtGearString                            xrtGearLabel
+    XrtGearTextHorizClipPolicy               xrtGearTextHorizClipPolicy
+    XrtGearUnselectColor                     xrtGearUnselectColor
+    XrtGearWidthChar                         xrtGearWidthChar
+    XrtGearWidthMaximum                      xrtGearWidthMaximum
+    XrtGearWidthMinimum                      xrtGearWidthMinimum
+    XrtGearWidthPreferredCount               xrtGearWidthPreferredCount
+    XrtGearWidthResizePolicy                 xrtGearWidthResizePolicy
+    XrtGearWidthSizingPolicy                 xrtGearWidthSizingPolicy
+    XrtGearWidthVirtual                      xrtGearWidthVirtual
+    XrtGraph3dShading                        xrtGraph3dShading
+    XrtGraphDepth                            xrtGraphDepth
+    XrtGraphInclination                      xrtGraphInclination
+    XrtGraphMargin                           xrtGraphMarginBottom
+                                             xrtGraphMarginLeft
+                                             xrtGraphMarginRight
+                                             xrtGraphMarginTop
+    XrtGraphMarginUseDefault                 xrtGraphMarginBottomUseDefault
+                                             xrtGraphMarginLeftUseDefault
+                                             xrtGraphMarginRightUseDefault
+                                             xrtGraphMarginTopUseDefault
+    XrtGraphOption                           xrtGraphShowOutlines
+    XrtGraphRotation                         xrtGraphRotation
+    XrtGrid                                  xrtXGrid
+                                             xrtY2Grid
+                                             xrtYGrid
+    XrtGridUseDefault                        xrtXGridUseDefault
+                                             xrtY2GridUseDefault
+                                             xrtYGridUseDefault
+    XrtHiLoOption                            xrtHiLoCloseShow
+                                             xrtHiLoOpenCloseFullWidth
+                                             xrtHiLoOpenShow
+    XrtMarker                                xrtXMarker
+                                             xrtYMarker
+    XrtMarkerMethod                          xrtXMarkerMethod
+    XrtMarkerPoint                           xrtXMarkerPoint
+    XrtMarkerSet                             xrtXMarkerSet
+    XrtMarkerShow                            xrtXMarkerShow
+                                             xrtYMarkerShow
+    XrtNumMethod                             xrtXNumMethod
+                                             xrtY2NumMethod
+                                             xrtYNumMethod
+    XrtOriginPlacement                       xrtXOriginPlacement
+                                             xrtY2OriginPlacement
+                                             xrtYOriginPlacement
+    XrtOtherLabel                            xrtOtherLabel
+    XrtPieMinSlices                          xrtPieMinSlices
+    XrtPieOrder                              xrtPieOrder
+    XrtPieThresholdMethod                    xrtPieThresholdMethod
+    XrtPieThresholdValue                     xrtPieThresholdValue
+    XrtPointLabels                           xrtPointLabels
+                                             xrtPointLabels2
+    XrtPolarOption                           xrtPolarHalfRange
+    XrtPosition                              xrtFooterX
+                                             xrtFooterY
+                                             xrtGraphX
+                                             xrtGraphY
+                                             xrtHeaderX
+                                             xrtHeaderY
+                                             xrtLegendX
+                                             xrtLegendY
+    XrtPositionUseDefault                    xrtFooterXUseDefault
+                                             xrtFooterYUseDefault
+                                             xrtGraphXUseDefault
+                                             xrtGraphYUseDefault
+                                             xrtHeaderXUseDefault
+                                             xrtHeaderYUseDefault
+                                             xrtLegendXUseDefault
+                                             xrtLegendYUseDefault
+    XrtPrecision                             xrtXPrecision
+                                             xrtY2Precision
+                                             xrtYPrecision
+    XrtPrecisionUseDefault                   xrtXPrecisionUseDefault
+                                             xrtY2PrecisionUseDefault
+                                             xrtYPrecisionUseDefault
+    XrtRepaint                               xrtRepaint
+    XrtRotation                              xrtXAnnotationRotation
+                                             xrtXTitleRotation
+                                             xrtY2AnnotationRotation
+                                             xrtY2TitleRotation
+                                             xrtYAnnotationRotation
+                                             xrtYTitleRotation
+    XrtSetLabels                             xrtSetLabels
+                                             xrtSetLabels2
+    XrtStrings                               xrtFooterStrings
+                                             xrtHeaderStrings
+    XrtTimeBase                              xrtTimeBase
+    XrtTimeFormat                            xrtTimeFormat
+    XrtTimeFormatUseDefault                  xrtTimeFormatUseDefault
+    XrtTimeUnit                              xrtTimeUnit
+    XrtTitle                                 xrtXTitle
+                                             xrtY2Title
+                                             xrtYTitle
+    XrtType                                  xrtType
+                                             xrtType2
+    XrtValueLabels                           xrtXLabels
+                                             xrtY2Labels
+                                             xrtYLabels

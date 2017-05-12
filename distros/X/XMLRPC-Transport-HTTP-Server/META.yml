@@ -1,0 +1,31 @@
+--- #YAML:1.0
+name:               XMLRPC-Transport-HTTP-Server
+version:            0.14
+abstract:           XMLRPC::Lite HTTP Server
+author:
+    - Jerry Lundström <lundstrom.jerry@gmail.com>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    SOAP::Transport::HTTP:  0.71
+    Test::More:           0
+    XMLRPC::Lite:         0.71
+    XMLRPC::Transport::HTTP:  0.71
+requires:
+    SOAP::Transport::HTTP:  0.71
+    XMLRPC::Lite:         0.71
+    XMLRPC::Transport::HTTP:  0.71
+resources:
+    bugtracker:  http://github.com/jelu/xmlrpc-transport-http-server/issues
+    homepage:    http://github.com/jelu/xmlrpc-transport-http-server/wiki
+    repository:  http://github.com/jelu/xmlrpc-transport-http-server
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.57_05
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

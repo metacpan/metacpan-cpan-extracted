@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+lib/XML/Filter/NSNormalise.pm
+bin/xmlnsnorm
+README
+t/1_basic.t
+t/2_more.t

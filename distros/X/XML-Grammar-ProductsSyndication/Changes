@@ -1,0 +1,57 @@
+Revision history for XML::Grammar::ProductsSyndication
+
+0.0404  2015-05-31
+        - Add repository link to META.yml / META.json .
+
+0.0403  2014-02-01
+        - Add minimal version of perl (CPANTS).
+        - Add LICENSE file (CPANTS).
+
+0.0402  2012-03-24
+        - Add more used modules to the 'requires'.
+        - Now we have a "use File::Spec;" in the main module (because it
+        makes use of it).
+
+0.0401  2012-01-01
+        - Convert t/03-dload-imgs.t to use File::Temp's tempdir() instead
+        of a directory under t to solve some test failures.
+
+0.0400  2010-08-27
+        - Add support for amazon_sak (Secret Access Key).
+
+0.0303  2009-03-11
+        - Updated XML::Grammar::Builder to 0.0101 (from XML-Grammar-Screenplay)
+        so it will install all the files properly upon ./Build install.
+
+0.0302  2009-03-03
+        - Corrected the Module::Build-derived class in Build.PL from
+        Test::Run::Builder to XML::Grammar::Builder. This was an oversight
+        that resulted in the module files not being installed.
+
+0.0301  2009-03-03
+        - Adapted the Build.PL to properly install files in case we
+        don't install under /usr . We are currently using the
+        install_destination("lib") to determine a suitable place.
+            - To do: extract that logic into a separate class.
+        - Extracted the extradata installation logic into a separate class
+        under inc/XML/Grammar/Builder.pm for easy encapsulation and
+        sharing among the different XML::Grammar::* projects.
+        - Fixed the tests' failures due to the fact that blib/extradata
+        is no longer generated.
+
+0.03    2008-06-17
+        - Added the "disable" attribute to the "isbn" tag, and added
+        support for it everywhere.
+        - Converted from Moose to Class::Accessor, because Moose does not
+        install cleanly on cygwin and is an overkill for our needs.
+        - Added support for the <rellink /> tag that creates a relevant
+        link (such as wikipedia page, IMDB link, etc.)
+        - Added the support for the "appendtoc" tag to append a
+        table-of-contents.
+
+0.02    2006-09-09
+        - Added the ability to download Amazon.com images.
+
+0.01    2006-09-08
+        - Created the skeleton of the module using module-starter.
+        - Implemented the basic XSLT + DTD functionality.

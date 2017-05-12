@@ -1,0 +1,14 @@
+#!/usr/bin/env perl
+
+use warnings;
+use strict;
+use TAP::Harness;
+
+my $h=TAP::Harness
+  ->new({verbosity => 1,
+	lib       => [qw[lib]],
+	color     => 1,
+       });
+
+$h->runtests(<t/*.t>);
+

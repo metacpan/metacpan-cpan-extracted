@@ -1,0 +1,64 @@
+<?xml version="1.0"?>
+<?mso-application progid="Excel.Sheet"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:o="urn:schemas-microsoft-com:office:office"
+ xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"
+>
+ <DocumentProperties xmlns="urn:schemas-microsoft-com:office:office">
+  <LastAuthor>me</LastAuthor>
+  <Created>1996-10-14T23:33:28Z</Created>
+  <LastSaved>2006-10-29T19:42:06Z</LastSaved>
+  <Version>11.6360</Version>
+ </DocumentProperties>
+ <ExcelWorkbook xmlns="urn:schemas-microsoft-com:office:excel">
+  <AcceptLabelsInFormulas/>
+  <ProtectStructure>False</ProtectStructure>
+  <ProtectWindows>False</ProtectWindows>
+ </ExcelWorkbook>
+ <Styles>
+  <Style ss:ID="Default" ss:Name="Normal">
+   <Alignment ss:Vertical="Bottom"/>
+  </Style>
+  <Style ss:ID="s21" xmlns:html="http://www.w3.org/TR/REC-html40">
+   <Alignment ss:Horizontal="Center" ss:Vertical="Bottom"/>
+   <Font ss:Size="8" ss:Italic="1"/>
+  </Style>
+ </Styles>
+ <Worksheet ss:Name="Sheet1" xmlns:x="urn:schemas-microsoft-com:office:excel">
+  <Table ss:ExpandedColumnCount="3" ss:ExpandedRowCount="354" x:FullColumns="1"
+   x:FullRows="1">
+   <Row>
+    <Cell ss:StyleID="s21"/>
+    <Cell ss:StyleID="s22"/>
+    <Cell ss:StyleID="s23"/>
+   </Row>
+   <Row ss:Height="13.5">
+    <Cell ss:StyleID="s30"/>
+    <Cell ss:StyleID="s31"><Data ss:Type="String">Company Name</Data></Cell>
+    <Cell ss:StyleID="s31"><Data ss:Type="String">Ticker</Data></Cell>
+   </Row>
+   <Row>
+    <Cell ss:StyleID="s36"/>
+    <Cell ss:StyleID="s36"/>
+    <Cell ss:StyleID="s37"/>
+   </Row>
+   <Row>
+    <Cell ss:StyleID="s21"><Data ss:Type="Number">1</Data></Cell>
+    <Cell ss:StyleID="s22"><Data ss:Type="String">Aecon Group Inc.&#160;(ARE)</Data></Cell>
+    <Cell ss:StyleID="s23"><Data ss:Type="String">are</Data></Cell>
+   </Row>
+  </Table>
+  <empty xmlns="urn:schemas-microsoft-com:office:excel"/>
+  <WorksheetOptions xmlns="urn:schemas-microsoft-com:office:excel">
+   <Selected/>
+   <Panes>
+    <Pane>
+     <Number>3</Number>
+     <RangeSelection>R1C1:R354C3</RangeSelection>
+    </Pane>
+   </Panes>
+   <ProtectObjects>False</ProtectObjects>
+   <ProtectScenarios>False</ProtectScenarios>
+  </WorksheetOptions>
+ </Worksheet>
+</Workbook>

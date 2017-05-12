@@ -1,0 +1,73 @@
+{
+   "abstract" : "get debugging information from XML::LibXML nodes",
+   "author" : [
+      "Toby Inkster <tobyink@cpan.org>",
+      "TOBYINK <tobyink@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Moose::Meta::Class::__ANON__::SERIAL::9 version , CPAN::Meta::Converter version 2.140640",
+   "keywords" : [
+      "Debugging",
+      "XML"
+   ],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "XML-LibXML-Debugging",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "optional_features" : {},
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTML::HTML5::Entities" : "0",
+            "XML::LibXML" : "0",
+            "parent" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.61"
+         }
+      }
+   },
+   "provides" : {
+      "XML::LibXML::Debugging" : {
+         "file" : "lib/XML/LibXML/Debugging.pm",
+         "version" : "0.103"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "X_identifier" : "http://purl.org/NET/cpan-uri/dist/XML-LibXML-Debugging/project",
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Dist/Display.html?Queue=XML-LibXML-Debugging"
+      },
+      "homepage" : "https://metacpan.org/release/XML-LibXML-Debugging",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/tobyink/p5-xml-libxml-debugging.git",
+         "web" : "https://github.com/tobyink/p5-xml-libxml-debugging"
+      }
+   },
+   "version" : "0.103"
+}

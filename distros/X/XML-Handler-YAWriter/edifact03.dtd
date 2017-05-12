@@ -1,0 +1,3396 @@
+<!-- XML DTD for cooked EDI to reflect raw UN/EDIFACT -->
+<!-- edifact03.dtd (c) '98 Kraehe@Bakunin.North.De -->
+
+<!-- I should warn you that badly written validating XML
+     parsers may have problems by running out of memory.
+
+     Its quite large, I know, but it's not yet complete!
+
+     My first attempt on an automatic generated edifact03.dtd
+     failed with massive "content model is ambiguous" errors.
+     So I deceided to use a mixed content model to simplify work
+     for XML parsers and also for me.
+
+     Goal of Edicooked03.dtd is that any wellformed EDI message
+     can be translated into a valid Edicooked message.
+
+     The revers is NOT true, however!
+
+     Edicooked does'nt constrain anything about segment groups, and not
+     even about the sequence of elements within a segment or composite.
+
+     XML DTDs do not provide the fine granularity for defining
+     valid UN/EDIFACT. Use an external checker - write one based
+     on top of DOM, and you are granted a virtual Beck's beer.
+  -->
+
+<!ELEMENT edifact:message (
+	  trsd:address
+	| trsd:agreement.identification
+	| trsd:adjustment.details
+	| trsd:allowance.or.charge
+	| trsd:additional.information
+	| trsd:additional.price.information
+	| trsd:amounts.relationship.details
+	| trsd:array.information
+	| trsd:array.structure.identification
+	| trsd:attribute
+	| trsd:authentication.result
+	| trsd:beginning.of.message
+	| trsd:structure.identification
+	| trsd:business.function
+	| trsd:characteristic.value
+	| trsd:credit.cover.details
+	| trsd:characteristic.class.id
+	| trsd:physical.or.logical.state
+	| trsd:code.set.identification
+	| trsd:code.value.definition
+	| trsd:computer.environment.details
+	| trsd:clinical.information
+	| trsd:clinical.intervention
+	| trsd:composite.data.element.identification
+	| trsd:consignment.information
+	| trsd:control.total
+	| trsd:component.details
+	| trsd:communication.contact
+	| trsd:contribution.details
+	| trsd:charge.payment.instructions
+	| trsd:consignment.packing.sequence
+	| trsd:customs.status.of.goods
+	| trsd:contact.information
+	| trsd:currencies
+	| trsd:damage
+	| trsd:dangerous.goods
+	| trsd:directory.identification
+	| trsd:dimensions
+	| trsd:document.line.identification
+	| trsd:delivery.limitations
+	| trsd:document.message.summary
+	| trsd:document.message.details
+	| trsd:dosage.administration
+	| trsd:data.set.identification
+	| trsd:date.time.period
+	| trsd:external.file.link.identification
+	| trsd:simple.data.element.details
+	| trsd:data.element.usage.details
+	| trsd:employment.details
+	| trsd:attached.equipment
+	| trsd:equipment.details
+	| trsd:number.of.units
+	| trsd:application.error.information
+	| trsd:error.point.details
+	| trsd:financial.charges.allocation
+	| trsd:financial.institution.information
+	| trsd:footnote.set
+	| trsd:footnote
+	| trsd:free.text
+	| trsd:nature.of.cargo
+	| trsd:goods.item.details
+	| trsd:goods.identity.number
+	| trsd:related.identification.numbers
+	| trsd:general.indicator
+	| trsd:governmental.requirements
+	| trsd:segment.group.usage.details
+	| trsd:handling.instructions
+	| trsd:hierarchy.information
+	| trsd:insurance.cover.description
+	| trsd:identity
+	| trsd:person.characteristic
+	| trsd:item.description
+	| trsd:index.details
+	| trsd:parties.to.instruction
+	| trsd:inventory.management.related.details
+	| trsd:information.required
+	| trsd:language
+	| trsd:line.item
+	| trsd:place.location.identification
+	| trsd:measurements
+	| trsd:membership.details
+	| trsd:market.sales.channel.information
+	| trsd:monetary.amount
+	| trsd:message.type.identification
+	| trsd:name.and.address
+	| trsd:nationality
+	| trsd:package
+	| trsd:payment.instructions
+	| trsd:attendance
+	| trsd:payment.terms.basis
+	| trsd:percentage.details
+	| trsd:package.identification
+	| trsd:person.demographic.information
+	| trsd:product.group.information
+	| trsd:additional.product.id
+	| trsd:price.item.line
+	| trsd:party.name
+	| trsd:process.identification
+	| trsd:price.details
+	| trsd:physical.sample.description
+	| trsd:priority
+	| trsd:quantity
+	| trsd:qualification
+	| trsd:quantity.variances
+	| trsd:requirements.and.conditions
+	| trsd:relationship
+	| trsd:reference
+	| trsd:range.details
+	| trsd:result
+	| trsd:rate.details
+	| trsd:remuneration.type.identification
+	| trsd:scheduling.conditions
+	| trsd:structure.component.definition
+	| trsd:segment.identification
+	| trsd:seal.number
+	| trsd:sequence.details
+	| trsd:safety.information
+	| trsd:split.goods.placement
+	| trsd:segment.usage.details
+	| trsd:organisation.classification.details
+	| trsd:sampling.parameters.for.summary.statistics
+	| trsd:statistics
+	| trsd:statistical.concept
+	| trsd:stages
+	| trsd:status
+	| trsd:duty.tax.fee.details
+	| trsd:transport.charge.rate.calculations
+	| trsd:details.of.transport
+	| trsd:test.method
+	| trsd:transport.movement.details
+	| trsd:temperature
+	| trsd:terms.of.delivery.or.transport
+	| trsd:transport.placement
+	| trsd:technical.rules
+	| trsd:transport.service.requirements
+	| anxs:text
+	| anxs:interchange.header
+	| anxs:functional.group.trailer
+	| anxs:functional.group.header
+	| anxs:message.header
+	| anxs:section.control
+	| anxs:message.trailer
+	| anxs:interchange.trailer
+	| trsd:value.list.identification
+	)* >
+<!ATTLIST edifact:message
+	xmlns:edifact CDATA #IMPLIED
+	xmlns:trsd CDATA #IMPLIED
+	xmlns:trcd CDATA #IMPLIED
+	xmlns:tred CDATA #IMPLIED
+	xmlns:uncl CDATA #IMPLIED
+	xmlns:anxs CDATA #IMPLIED
+	xmlns:anxc CDATA #IMPLIED
+	xmlns:anxe CDATA #IMPLIED
+	xmlns:unsl CDATA #IMPLIED
+	xmlns:unknown CDATA #IMPLIED >
+
+
+<!-- Segment: ADR ADDRESS -->
+<!ELEMENT trsd:address (
+	  tred:city.name
+	| tred:country.coded
+	| tred:postcode.identification
+	| trcd:address.details
+	| trcd:location.identification
+	| trcd:address.usage
+	| trcd:country.sub.entity.details
+	)* >
+
+<!-- Segment: AGR AGREEMENT IDENTIFICATION -->
+<!ELEMENT trsd:agreement.identification (
+	  tred:service.layer.coded
+	| trcd:agreement.type.identification
+	)* >
+
+<!-- Segment: AJT ADJUSTMENT DETAILS -->
+<!ELEMENT trsd:adjustment.details (
+	  tred:line.item.number
+	| tred:adjustment.reason.coded
+	)* >
+
+<!-- Segment: ALC ALLOWANCE OR CHARGE -->
+<!ELEMENT trsd:allowance.or.charge (
+	  tred:calculation.sequence.indicator.coded
+	| tred:settlement.coded
+	| tred:allowance.or.charge.qualifier
+	| trcd:special.services.identification
+	| trcd:allowance.charge.information
+	)* >
+
+<!-- Segment: ALI ADDITIONAL INFORMATION -->
+<!ELEMENT trsd:additional.information (
+	  tred:country.of.origin.coded
+	| tred:special.conditions.coded
+	| tred:type.of.duty.regime.coded
+	)* >
+
+<!-- Segment: APR ADDITIONAL PRICE INFORMATION -->
+<!ELEMENT trsd:additional.price.information (
+	  tred:class.of.trade.coded
+	| trcd:price.multiplier.information
+	| trcd:reason.for.change
+	)* >
+
+<!-- Segment: ARD AMOUNTS RELATIONSHIP DETAILS -->
+<!ELEMENT trsd:amounts.relationship.details (
+	  trcd:monetary.function
+	)* >
+
+<!-- Segment: ARR ARRAY INFORMATION -->
+<!ELEMENT trsd:array.information (
+	  trcd:array.cell.details
+	| trcd:position.identification
+	)* >
+
+<!-- Segment: ASI ARRAY STRUCTURE IDENTIFICATION -->
+<!ELEMENT trsd:array.structure.identification (
+	  tred:status.coded
+	| tred:maintenance.operation.coded
+	| trcd:party.identification.details
+	| trcd:array.structure.identification
+	)* >
+
+<!-- Segment: ATT ATTRIBUTE -->
+<!ELEMENT trsd:attribute (
+	  tred:attribute.function.qualifier
+	| trcd:attribute.type
+	| trcd:attribute.details
+	)* >
+
+<!-- Segment: AUT AUTHENTICATION RESULT -->
+<!ELEMENT trsd:authentication.result (
+	  tred:validation.result
+	| tred:validation.key.identification
+	)* >
+
+<!-- Segment: BGM BEGINNING OF MESSAGE -->
+<!ELEMENT trsd:beginning.of.message (
+	  tred:message.function.coded
+	| tred:response.type.coded
+	| trcd:document.message.name
+	| trcd:document.message.identification
+	)* >
+
+<!-- Segment: BII STRUCTURE IDENTIFICATION -->
+<!ELEMENT trsd:structure.identification (
+	  tred:item.number
+	| tred:indexing.structure.qualifier
+	| trcd:bill.level.identification
+	)* >
+
+<!-- Segment: BUS BUSINESS FUNCTION -->
+<!ELEMENT trsd:business.function (
+	  tred:geographic.environment.coded
+	| tred:intra.company.payment.coded
+	| tred:type.of.financial.transaction.coded
+	| trcd:business.function
+	| trcd:bank.operation
+	)* >
+
+<!-- Segment: CAV CHARACTERISTIC VALUE -->
+<!ELEMENT trsd:characteristic.value (
+	  trcd:characteristic.value
+	)* >
+
+<!-- Segment: CCD CREDIT COVER DETAILS -->
+<!ELEMENT trsd:credit.cover.details (
+	  tred:credit.cover.request.coded
+	| tred:credit.cover.response.coded
+	| tred:credit.cover.reason.coded
+	)* >
+
+<!-- Segment: CCI CHARACTERISTIC/CLASS ID -->
+<!ELEMENT trsd:characteristic.class.id (
+	  tred:characteristic.relevance.coded
+	| tred:property.class.coded
+	| trcd:product.characteristic
+	| trcd:measurement.details
+	)* >
+
+<!-- Segment: CDI PHYSICAL OR LOGICAL STATE -->
+<!ELEMENT trsd:physical.or.logical.state (
+	  tred:physical.or.logical.state.qualifier
+	| trcd:physical.or.logical.state.information
+	)* >
+
+<!-- Segment: CDS CODE SET IDENTIFICATION -->
+<!ELEMENT trsd:code.set.identification (
+	  tred:class.designator.coded
+	| tred:maintenance.operation.coded
+	| trcd:code.set.identification
+	)* >
+
+<!-- Segment: CDV CODE VALUE DEFINITION -->
+<!ELEMENT trsd:code.value.definition (
+	  tred:maintenance.operation.coded
+	| tred:code.value
+	| tred:code.name
+	)* >
+
+<!-- Segment: CED COMPUTER ENVIRONMENT DETAILS -->
+<!ELEMENT trsd:computer.environment.details (
+	  tred:computer.environment.details.qualifier
+	| trcd:computer.environment.identification
+	)* >
+
+<!-- Segment: CIN CLINICAL INFORMATION -->
+<!ELEMENT trsd:clinical.information (
+	  tred:clinical.information.qualifier
+	| trcd:clinical.information.details
+	| trcd:certainty.details
+	)* >
+
+<!-- Segment: CLI CLINICAL INTERVENTION -->
+<!ELEMENT trsd:clinical.intervention (
+	  tred:clinical.intervention.qualifier
+	| trcd:clinical.intervention.details
+	)* >
+
+<!-- Segment: CMP COMPOSITE DATA ELEMENT IDENTIFICATION -->
+<!ELEMENT trsd:composite.data.element.identification (
+	  tred:class.designator.coded
+	| tred:maintenance.operation.coded
+	| tred:composite.data.element.tag
+	)* >
+
+<!-- Segment: CNI CONSIGNMENT INFORMATION -->
+<!ELEMENT trsd:consignment.information (
+	  tred:consignment.load.sequence.number
+	| tred:consolidation.item.number
+	| trcd:document.message.details
+	)* >
+
+<!-- Segment: CNT CONTROL TOTAL -->
+<!ELEMENT trsd:control.total (
+	  trcd:control
+	)* >
+
+<!-- Segment: COD COMPONENT DETAILS -->
+<!ELEMENT trsd:component.details (
+	  trcd:type.of.unit.component
+	| trcd:component.material
+	)* >
+
+<!-- Segment: COM COMMUNICATION CONTACT -->
+<!ELEMENT trsd:communication.contact (
+	  trcd:communication.contact
+	)* >
+
+<!-- Segment: COT CONTRIBUTION DETAILS -->
+<!ELEMENT trsd:contribution.details (
+	  tred:contribution.qualifier
+	| trcd:rate.tariff.class
+	| trcd:instruction
+	| trcd:contribution.type
+	| trcd:reason.for.change
+	)* >
+
+<!-- Segment: CPI CHARGE PAYMENT INSTRUCTIONS -->
+<!ELEMENT trsd:charge.payment.instructions (
+	  tred:prepaid.collect.indicator.coded
+	| trcd:charge.category
+	| trcd:method.of.payment
+	)* >
+
+<!-- Segment: CPS CONSIGNMENT PACKING SEQUENCE -->
+<!ELEMENT trsd:consignment.packing.sequence (
+	  tred:packaging.level.coded
+	| tred:hierarchical.id.number
+	| tred:hierarchical.parent.id
+	)* >
+
+<!-- Segment: CST CUSTOMS STATUS OF GOODS -->
+<!ELEMENT trsd:customs.status.of.goods (
+	  tred:goods.item.number
+	| trcd:customs.identity.codes
+	)* >
+
+<!-- Segment: CTA CONTACT INFORMATION -->
+<!ELEMENT trsd:contact.information (
+	  tred:contact.function.coded
+	| trcd:department.or.employee.details
+	)* >
+
+<!-- Segment: CUX CURRENCIES -->
+<!ELEMENT trsd:currencies (
+	  tred:rate.of.exchange
+	| tred:currency.market.exchange.coded
+	| trcd:currency.details
+	)* >
+
+<!-- Segment: DAM DAMAGE -->
+<!ELEMENT trsd:damage (
+	  tred:damage.details.qualifier
+	| trcd:type.of.damage
+	| trcd:damage.area
+	| trcd:damage.severity
+	| trcd:action
+	)* >
+
+<!-- Segment: DGS DANGEROUS GOODS -->
+<!ELEMENT trsd:dangerous.goods (
+	  tred:trem.card.number
+	| tred:permission.for.transport.coded
+	| tred:packing.instruction.coded
+	| tred:dangerous.goods.regulations.coded
+	| tred:category.of.means.of.transport.coded
+	| tred:packing.group.coded
+	| tred:ems.number
+	| tred:mfag
+	| trcd:hazard.code
+	| trcd:dangerous.goods.shipment.flashpoint
+	| trcd:undg.information
+	| trcd:hazard.identification
+	| trcd:dangerous.goods.label
+	)* >
+
+<!-- Segment: DII DIRECTORY IDENTIFICATION -->
+<!ELEMENT trsd:directory.identification (
+	  tred:version
+	| tred:release
+	| tred:control.agency
+	| tred:language.coded
+	| tred:maintenance.operation.coded
+	| tred:directory.status
+	)* >
+
+<!-- Segment: DIM DIMENSIONS -->
+<!ELEMENT trsd:dimensions (
+	  tred:dimension.qualifier
+	| trcd:dimensions
+	)* >
+
+<!-- Segment: DLI DOCUMENT LINE IDENTIFICATION -->
+<!ELEMENT trsd:document.line.identification (
+	  tred:document.line.indicator.coded
+	| tred:line.item.number
+	)* >
+
+<!-- Segment: DLM DELIVERY LIMITATIONS -->
+<!ELEMENT trsd:delivery.limitations (
+	  tred:back.order.coded
+	| tred:product.service.substitution.coded
+	| trcd:special.services.identification
+	| trcd:instruction
+	)* >
+
+<!-- Segment: DMS DOCUMENT/MESSAGE SUMMARY -->
+<!ELEMENT trsd:document.message.summary (
+	  tred:document.message.name.coded
+	| tred:document.message.number
+	| tred:total.number.of.items
+	)* >
+
+<!-- Segment: DOC DOCUMENT/MESSAGE DETAILS -->
+<!ELEMENT trsd:document.message.details (
+	  tred:number.of.originals.of.document.required
+	| tred:number.of.copies.of.document.required
+	| tred:communication.channel.identifier.coded
+	| trcd:document.message.name
+	| trcd:document.message.details
+	)* >
+
+<!-- Segment: DSG DOSAGE ADMINISTRATION -->
+<!ELEMENT trsd:dosage.administration (
+	  tred:dosage.administration.qualifier
+	| trcd:dosage.details
+	)* >
+
+<!-- Segment: DSI DATA SET IDENTIFICATION -->
+<!ELEMENT trsd:data.set.identification (
+	  tred:revision.number
+	| tred:status.coded
+	| trcd:party.identification.details
+	| trcd:sequence.information
+	| trcd:data.set.identification
+	)* >
+
+<!-- Segment: DTM DATE/TIME/PERIOD -->
+<!ELEMENT trsd:date.time.period (
+	  trcd:date.time.period
+	)* >
+
+<!-- Segment: EFI EXTERNAL FILE LINK IDENTIFICATION -->
+<!ELEMENT trsd:external.file.link.identification (
+	  tred:sequence.number
+	| trcd:file.identification
+	| trcd:file.details
+	)* >
+
+<!-- Segment: ELM SIMPLE DATA ELEMENT DETAILS -->
+<!ELEMENT trsd:simple.data.element.details (
+	  tred:class.designator.coded
+	| tred:maintenance.operation.coded
+	| tred:simple.data.element.tag
+	| tred:simple.data.element.character.representation.coded
+	| tred:simple.data.element.length.type.coded
+	| tred:simple.data.element.maximum.length
+	| tred:simple.data.element.minimum.length
+	| tred:code.set.indicator.coded
+	)* >
+
+<!-- Segment: ELU DATA ELEMENT USAGE DETAILS -->
+<!ELEMENT trsd:data.element.usage.details (
+	  tred:sequence.number
+	| tred:maintenance.operation.coded
+	| tred:requirement.designator.coded
+	| tred:data.element.tag
+	)* >
+
+<!-- Segment: EMP EMPLOYMENT DETAILS -->
+<!ELEMENT trsd:employment.details (
+	  tred:job.title
+	| tred:employment.qualifier
+	| tred:qualification.area.coded
+	| trcd:employment.category
+	| trcd:qualification.classification
+	| trcd:occupation
+	)* >
+
+<!-- Segment: EQA ATTACHED EQUIPMENT -->
+<!ELEMENT trsd:attached.equipment (
+	  tred:equipment.qualifier
+	| trcd:equipment.identification
+	)* >
+
+<!-- Segment: EQD EQUIPMENT DETAILS -->
+<!ELEMENT trsd:equipment.details (
+	  tred:equipment.qualifier
+	| tred:equipment.supplier.coded
+	| tred:full.empty.indicator.coded
+	| tred:equipment.status.coded
+	| trcd:equipment.size.and.type
+	| trcd:equipment.identification
+	)* >
+
+<!-- Segment: EQN NUMBER OF UNITS -->
+<!ELEMENT trsd:number.of.units (
+	  trcd:number.of.unit.details
+	)* >
+
+<!-- Segment: ERC APPLICATION ERROR INFORMATION -->
+<!ELEMENT trsd:application.error.information (
+	  trcd:application.error.detail
+	)* >
+
+<!-- Segment: ERP ERROR POINT DETAILS -->
+<!ELEMENT trsd:error.point.details (
+	  trcd:error.point.details
+	| trcd:error.segment.point.details
+	)* >
+
+<!-- Segment: FCA FINANCIAL CHARGES ALLOCATION -->
+<!ELEMENT trsd:financial.charges.allocation (
+	  tred:settlement.coded
+	| trcd:charge.allowance.account
+	)* >
+
+<!-- Segment: FII FINANCIAL INSTITUTION INFORMATION -->
+<!ELEMENT trsd:financial.institution.information (
+	  tred:party.qualifier
+	| tred:country.coded
+	| trcd:account.identification
+	| trcd:institution.identification
+	)* >
+
+<!-- Segment: FNS FOOTNOTE SET -->
+<!ELEMENT trsd:footnote.set (
+	  tred:status.coded
+	| tred:maintenance.operation.coded
+	| trcd:party.identification.details
+	| trcd:footnote.set.identification
+	)* >
+
+<!-- Segment: FNT FOOTNOTE -->
+<!ELEMENT trsd:footnote (
+	  tred:status.coded
+	| tred:maintenance.operation.coded
+	| trcd:party.identification.details
+	| trcd:footnote.identification
+	)* >
+
+<!-- Segment: FTX FREE TEXT -->
+<!ELEMENT trsd:free.text (
+	  tred:language.coded
+	| tred:text.subject.qualifier
+	| tred:text.function.coded
+	| trcd:text.reference
+	| trcd:text.literal
+	)* >
+
+<!-- Segment: GDS NATURE OF CARGO -->
+<!ELEMENT trsd:nature.of.cargo (
+	  trcd:nature.of.cargo
+	)* >
+
+<!-- Segment: GID GOODS ITEM DETAILS -->
+<!ELEMENT trsd:goods.item.details (
+	  tred:goods.item.number
+	| trcd:number.and.type.of.packages
+	)* >
+
+<!-- Segment: GIN GOODS IDENTITY NUMBER -->
+<!ELEMENT trsd:goods.identity.number (
+	  tred:identity.number.qualifier
+	| trcd:identity.number.range
+	)* >
+
+<!-- Segment: GIR RELATED IDENTIFICATION NUMBERS -->
+<!ELEMENT trsd:related.identification.numbers (
+	  tred:set.identification.qualifier
+	| trcd:identification.number
+	)* >
+
+<!-- Segment: GIS GENERAL INDICATOR -->
+<!ELEMENT trsd:general.indicator (
+	  trcd:processing.indicator
+	)* >
+
+<!-- Segment: GOR GOVERNMENTAL REQUIREMENTS -->
+<!ELEMENT trsd:governmental.requirements (
+	  tred:transport.movement.coded
+	| trcd:government.action
+	)* >
+
+<!-- Segment: GRU SEGMENT GROUP USAGE DETAILS -->
+<!ELEMENT trsd:segment.group.usage.details (
+	  tred:sequence.number
+	| tred:maintenance.operation.coded
+	| tred:maximum.number.of.occurrences
+	| tred:requirement.designator.coded
+	| tred:group.identification
+	)* >
+
+<!-- Segment: HAN HANDLING INSTRUCTIONS -->
+<!ELEMENT trsd:handling.instructions (
+	  trcd:hazardous.material
+	| trcd:handling.instructions
+	)* >
+
+<!-- Segment: HYN HIERARCHY INFORMATION -->
+<!ELEMENT trsd:hierarchy.information (
+	  tred:action.request.notification.coded
+	| tred:hierarchical.level.coded
+	| tred:hierarchy.object.qualifier
+	| trcd:item.number.identification
+	)* >
+
+<!-- Segment: ICD INSURANCE COVER DESCRIPTION -->
+<!ELEMENT trsd:insurance.cover.description (
+	  trcd:insurance.cover.type
+	| trcd:insurance.cover.details
+	)* >
+
+<!-- Segment: IDE IDENTITY -->
+<!ELEMENT trsd:identity (
+	  tred:configuration.level
+	| tred:status.coded
+	| tred:identification.qualifier
+	| trcd:party.identification.details
+	| trcd:identification.number
+	| trcd:product.characteristic
+	| trcd:position.identification
+	)* >
+
+<!-- Segment: IHC PERSON CHARACTERISTIC -->
+<!ELEMENT trsd:person.characteristic (
+	  tred:person.characteristic.qualifier
+	| trcd:person.inherited.characteristic.details
+	)* >
+
+<!-- Segment: IMD ITEM DESCRIPTION -->
+<!ELEMENT trsd:item.description (
+	  tred:item.description.type.coded
+	| tred:item.characteristic.coded
+	| tred:surface.layer.indicator.coded
+	| trcd:item.description
+	)* >
+
+<!-- Segment: IND INDEX DETAILS -->
+<!ELEMENT trsd:index.details (
+	  trcd:index.identification
+	| trcd:index.value
+	)* >
+
+<!-- Segment: INP PARTIES TO INSTRUCTION -->
+<!ELEMENT trsd:parties.to.instruction (
+	  tred:action.request.notification.coded
+	| trcd:instruction
+	| trcd:parties.to.instruction
+	| trcd:status.of.instruction
+	)* >
+
+<!-- Segment: INV INVENTORY MANAGEMENT RELATED DETAILS -->
+<!ELEMENT trsd:inventory.management.related.details (
+	  tred:reason.for.inventory.movement.coded
+	| tred:inventory.movement.direction.coded
+	| tred:inventory.balance.method.coded
+	| tred:type.of.inventory.affected.coded
+	| trcd:instruction
+	)* >
+
+<!-- Segment: IRQ INFORMATION REQUIRED -->
+<!ELEMENT trsd:information.required (
+	  trcd:information.request
+	)* >
+
+<!-- Segment: LAN LANGUAGE -->
+<!ELEMENT trsd:language (
+	  tred:language.qualifier
+	| trcd:language.details
+	)* >
+
+<!-- Segment: LIN LINE ITEM -->
+<!ELEMENT trsd:line.item (
+	  tred:line.item.number
+	| tred:configuration.level
+	| tred:action.request.notification.coded
+	| tred:configuration.coded
+	| trcd:item.number.identification
+	| trcd:sub.line.information
+	)* >
+
+<!-- Segment: LOC PLACE/LOCATION IDENTIFICATION -->
+<!ELEMENT trsd:place.location.identification (
+	  tred:place.location.qualifier
+	| tred:relation.coded
+	| trcd:location.identification
+	| trcd:related.location.one.identification
+	| trcd:related.location.two.identification
+	)* >
+
+<!-- Segment: MEA MEASUREMENTS -->
+<!ELEMENT trsd:measurements (
+	  tred:measurement.application.qualifier
+	| tred:surface.layer.indicator.coded
+	| trcd:value.range
+	| trcd:measurement.details
+	)* >
+
+<!-- Segment: MEM MEMBERSHIP DETAILS -->
+<!ELEMENT trsd:membership.details (
+	  tred:membership.qualifier
+	| trcd:rate.tariff.class
+	| trcd:membership.category
+	| trcd:membership.status
+	| trcd:membership.level
+	| trcd:reason.for.change
+	)* >
+
+<!-- Segment: MKS MARKET/SALES CHANNEL INFORMATION -->
+<!ELEMENT trsd:market.sales.channel.information (
+	  tred:action.request.notification.coded
+	| tred:sector.subject.identification.qualifier
+	| trcd:sales.channel.identification
+	)* >
+
+<!-- Segment: MOA MONETARY AMOUNT -->
+<!ELEMENT trsd:monetary.amount (
+	  trcd:monetary.amount
+	)* >
+
+<!-- Segment: MSG MESSAGE TYPE IDENTIFICATION -->
+<!ELEMENT trsd:message.type.identification (
+	  tred:class.designator.coded
+	| tred:maintenance.operation.coded
+	| trcd:message.identifier
+	)* >
+
+<!-- Segment: NAD NAME AND ADDRESS -->
+<!ELEMENT trsd:name.and.address (
+	  tred:party.qualifier
+	| tred:city.name
+	| tred:country.coded
+	| tred:country.sub.entity.identification
+	| tred:postcode.identification
+	| trcd:name.and.address
+	| trcd:street
+	| trcd:party.name
+	| trcd:party.identification.details
+	)* >
+
+<!-- Segment: NAT NATIONALITY -->
+<!ELEMENT trsd:nationality (
+	  tred:nationality.qualifier
+	| trcd:nationality.details
+	)* >
+
+<!-- Segment: PAC PACKAGE -->
+<!ELEMENT trsd:package (
+	  tred:number.of.packages
+	| trcd:package.type
+	| trcd:package.type.identification
+	| trcd:packaging.details
+	| trcd:returnable.package.details
+	)* >
+
+<!-- Segment: PAI PAYMENT INSTRUCTIONS -->
+<!ELEMENT trsd:payment.instructions (
+	  trcd:payment.instruction.details
+	)* >
+
+<!-- Segment: PAS ATTENDANCE -->
+<!ELEMENT trsd:attendance (
+	  tred:attendance.qualifier
+	| trcd:attendee.category
+	| trcd:attendance.admission.details
+	| trcd:attendance.discharge.details
+	)* >
+
+<!-- Segment: PAT PAYMENT TERMS BASIS -->
+<!ELEMENT trsd:payment.terms.basis (
+	  tred:payment.terms.type.qualifier
+	| trcd:payment.terms
+	| trcd:terms.time.information
+	)* >
+
+<!-- Segment: PCD PERCENTAGE DETAILS -->
+<!ELEMENT trsd:percentage.details (
+	  trcd:percentage.details
+	)* >
+
+<!-- Segment: PCI PACKAGE IDENTIFICATION -->
+<!ELEMENT trsd:package.identification (
+	  tred:marking.instructions.coded
+	| tred:container.package.status.coded
+	| trcd:marks.labels
+	| trcd:type.of.marking
+	)* >
+
+<!-- Segment: PDI PERSON DEMOGRAPHIC INFORMATION -->
+<!ELEMENT trsd:person.demographic.information (
+	  tred:sex.coded
+	| trcd:marital.status.details
+	| trcd:religion.details
+	)* >
+
+<!-- Segment: PGI PRODUCT GROUP INFORMATION -->
+<!ELEMENT trsd:product.group.information (
+	  tred:product.group.type.coded
+	| trcd:product.group
+	)* >
+
+<!-- Segment: PIA ADDITIONAL PRODUCT ID -->
+<!ELEMENT trsd:additional.product.id (
+	  tred:product.id.function.qualifier
+	| trcd:item.number.identification
+	)* >
+
+<!-- Segment: PIT PRICE ITEM LINE -->
+<!ELEMENT trsd:price.item.line (
+	  tred:line.item.number
+	| tred:configuration.level
+	| tred:action.request.notification.coded
+	| tred:sub.line.indicator.coded
+	| tred:article.availability.coded
+	| tred:configuration.coded
+	| trcd:price.change.information
+	)* >
+
+<!-- Segment: PNA PARTY NAME -->
+<!ELEMENT trsd:party.name (
+	  tred:party.qualifier
+	| tred:name.status.coded
+	| tred:name.type.coded
+	| trcd:party.identification.details
+	| trcd:identification.number
+	| trcd:name.component.details
+	)* >
+
+<!-- Segment: PRC PROCESS IDENTIFICATION -->
+<!ELEMENT trsd:process.identification (
+	  trcd:process.type.and.description
+	| trcd:process.identification.details
+	)* >
+
+<!-- Segment: PRI PRICE DETAILS -->
+<!ELEMENT trsd:price.details (
+	  tred:sub.line.price.change.coded
+	| trcd:price.information
+	)* >
+
+<!-- Segment: PSD PHYSICAL SAMPLE DESCRIPTION -->
+<!ELEMENT trsd:physical.sample.description (
+	  tred:sample.process.status.coded
+	| tred:sample.selection.method.coded
+	| tred:sample.description.coded
+	| tred:sample.direction.coded
+	| trcd:sample.location.details
+	| trcd:frequency.details
+	)* >
+
+<!-- Segment: PTY PRIORITY -->
+<!ELEMENT trsd:priority (
+	  tred:priority.qualifier
+	| trcd:priority.details
+	)* >
+
+<!-- Segment: QTY QUANTITY -->
+<!ELEMENT trsd:quantity (
+	  trcd:quantity.details
+	)* >
+
+<!-- Segment: QUA QUALIFICATION -->
+<!ELEMENT trsd:qualification (
+	  tred:qualification.qualifier
+	| trcd:qualification.classification
+	)* >
+
+<!-- Segment: QVR QUANTITY VARIANCES -->
+<!ELEMENT trsd:quantity.variances (
+	  tred:discrepancy.coded
+	| trcd:quantity.difference.information
+	| trcd:reason.for.change
+	)* >
+
+<!-- Segment: RCS REQUIREMENTS AND CONDITIONS -->
+<!ELEMENT trsd:requirements.and.conditions (
+	  tred:action.request.notification.coded
+	| tred:sector.subject.identification.qualifier
+	| trcd:requirement.condition.identification
+	)* >
+
+<!-- Segment: REL RELATIONSHIP -->
+<!ELEMENT trsd:relationship (
+	  tred:relationship.qualifier
+	| trcd:relationship
+	)* >
+
+<!-- Segment: RFF REFERENCE -->
+<!ELEMENT trsd:reference (
+	  trcd:reference
+	)* >
+
+<!-- Segment: RNG RANGE DETAILS -->
+<!ELEMENT trsd:range.details (
+	  tred:range.type.qualifier
+	| trcd:range
+	)* >
+
+<!-- Segment: RSL RESULT -->
+<!ELEMENT trsd:result (
+	  tred:result.type.coded
+	| tred:result.normalcy.indicator.coded
+	| tred:result.qualifier
+	| trcd:result.details
+	| trcd:measurement.unit.details
+	)* >
+
+<!-- Segment: RTE RATE DETAILS -->
+<!ELEMENT trsd:rate.details (
+	  trcd:rate.details
+	)* >
+
+<!-- Segment: SAL REMUNERATION TYPE IDENTIFICATION -->
+<!ELEMENT trsd:remuneration.type.identification (
+	  trcd:remuneration.type.identification
+	)* >
+
+<!-- Segment: SCC SCHEDULING CONDITIONS -->
+<!ELEMENT trsd:scheduling.conditions (
+	  tred:delivery.plan.status.indicator.coded
+	| tred:delivery.requirements.coded
+	| trcd:pattern.description
+	)* >
+
+<!-- Segment: SCD STRUCTURE COMPONENT DEFINITION -->
+<!ELEMENT trsd:structure.component.definition (
+	  tred:configuration.level
+	| tred:status.coded
+	| tred:component.function.qualifier
+	| trcd:party.identification.details
+	| trcd:product.characteristic
+	| trcd:position.identification
+	| trcd:structure.component.identification
+	)* >
+
+<!-- Segment: SEG SEGMENT IDENTIFICATION -->
+<!ELEMENT trsd:segment.identification (
+	  tred:class.designator.coded
+	| tred:maintenance.operation.coded
+	| tred:segment.tag
+	)* >
+
+<!-- Segment: SEL SEAL NUMBER -->
+<!ELEMENT trsd:seal.number (
+	  tred:seal.condition.coded
+	| tred:seal.number
+	| trcd:seal.issuer
+	)* >
+
+<!-- Segment: SEQ SEQUENCE DETAILS -->
+<!ELEMENT trsd:sequence.details (
+	  tred:status.indicator.coded
+	| trcd:sequence.information
+	)* >
+
+<!-- Segment: SFI SAFETY INFORMATION -->
+<!ELEMENT trsd:safety.information (
+	  tred:maintenance.operation.coded
+	| tred:hierarchical.id.number
+	| trcd:safety.section
+	| trcd:additional.safety.information
+	)* >
+
+<!-- Segment: SGP SPLIT GOODS PLACEMENT -->
+<!ELEMENT trsd:split.goods.placement (
+	  tred:number.of.packages
+	| trcd:equipment.identification
+	)* >
+
+<!-- Segment: SGU SEGMENT USAGE DETAILS -->
+<!ELEMENT trsd:segment.usage.details (
+	  tred:message.section.coded
+	| tred:sequence.number
+	| tred:maintenance.operation.coded
+	| tred:maximum.number.of.occurrences
+	| tred:level.number
+	| tred:requirement.designator.coded
+	| tred:segment.tag
+	)* >
+
+<!-- Segment: SPR ORGANISATION CLASSIFICATION DETAILS -->
+<!ELEMENT trsd:organisation.classification.details (
+	  tred:organisation.classification.coded
+	| tred:sector.subject.identification.qualifier
+	| trcd:organisation.classification.detail
+	)* >
+
+<!-- Segment: SPS SAMPLING PARAMETERS FOR SUMMARY STATISTICS -->
+<!ELEMENT trsd:sampling.parameters.for.summary.statistics (
+	  tred:confidence.limit
+	| trcd:size.details
+	| trcd:frequency.details
+	)* >
+
+<!-- Segment: STA STATISTICS -->
+<!ELEMENT trsd:statistics (
+	  tred:statistic.type.coded
+	| trcd:statistical.details
+	)* >
+
+<!-- Segment: STC STATISTICAL CONCEPT -->
+<!ELEMENT trsd:statistical.concept (
+	  tred:status.coded
+	| tred:maintenance.operation.coded
+	| trcd:party.identification.details
+	| trcd:statistical.concept.identification
+	)* >
+
+<!-- Segment: STG STAGES -->
+<!ELEMENT trsd:stages (
+	  tred:number.of.stages
+	| tred:actual.stage.count
+	| tred:stages.qualifier
+	)* >
+
+<!-- Segment: STS STATUS -->
+<!ELEMENT trsd:status (
+	  trcd:status.event
+	| trcd:status.reason
+	| trcd:status.type
+	)* >
+
+<!-- Segment: TAX DUTY/TAX/FEE DETAILS -->
+<!ELEMENT trsd:duty.tax.fee.details (
+	  tred:party.tax.identification.number
+	| tred:duty.tax.fee.function.qualifier
+	| tred:duty.tax.fee.assessment.basis
+	| tred:duty.tax.fee.category.coded
+	| trcd:duty.tax.fee.type
+	| trcd:duty.tax.fee.detail
+	| trcd:duty.tax.fee.account.detail
+	)* >
+
+<!-- Segment: TCC TRANSPORT CHARGE/RATE CALCULATIONS -->
+<!ELEMENT trsd:transport.charge.rate.calculations (
+	  trcd:charge
+	| trcd:rate.tariff.class
+	| trcd:commodity.rate.detail
+	| trcd:rate.tariff.class.detail
+	)* >
+
+<!-- Segment: TDT DETAILS OF TRANSPORT -->
+<!ELEMENT trsd:details.of.transport (
+	  tred:conveyance.reference.number
+	| tred:transport.stage.qualifier
+	| tred:transit.direction.coded
+	| tred:transport.ownership.coded
+	| trcd:carrier
+	| trcd:mode.of.transport
+	| trcd:transport.identification
+	| trcd:transport.means
+	| trcd:excess.transportation.information
+	)* >
+
+<!-- Segment: TEM TEST METHOD -->
+<!ELEMENT trsd:test.method (
+	  tred:test.media.coded
+	| tred:test.route.of.administering.coded
+	| tred:measurement.application.qualifier
+	| tred:test.revision.number
+	| trcd:test.method
+	| trcd:test.reason
+	)* >
+
+<!-- Segment: TMD TRANSPORT MOVEMENT DETAILS -->
+<!ELEMENT trsd:transport.movement.details (
+	  tred:equipment.plan
+	| tred:haulage.arrangements.coded
+	| trcd:movement.type
+	)* >
+
+<!-- Segment: TMP TEMPERATURE -->
+<!ELEMENT trsd:temperature (
+	  tred:temperature.qualifier
+	| trcd:temperature.setting
+	)* >
+
+<!-- Segment: TOD TERMS OF DELIVERY OR TRANSPORT -->
+<!ELEMENT trsd:terms.of.delivery.or.transport (
+	  tred:terms.of.delivery.or.transport.function.coded
+	| tred:transport.charges.method.of.payment.coded
+	| trcd:terms.of.delivery.or.transport
+	)* >
+
+<!-- Segment: TPL TRANSPORT PLACEMENT -->
+<!ELEMENT trsd:transport.placement (
+	  trcd:transport.identification
+	)* >
+
+<!-- Segment: TRU TECHNICAL RULES -->
+<!ELEMENT trsd:technical.rules (
+	  tred:version
+	| tred:release
+	| tred:code.list.responsible.agency.coded
+	| tred:rule.part.identification
+	| tred:identity.number
+	)* >
+
+<!-- Segment: TSR TRANSPORT SERVICE REQUIREMENTS -->
+<!ELEMENT trsd:transport.service.requirements (
+	  trcd:service
+	| trcd:contract.and.carriage.condition
+	| trcd:transport.priority
+	| trcd:nature.of.cargo
+	)* >
+
+<!-- Segment: TXT Text -->
+<!ELEMENT anxs:text (
+	  anxe:text.reference.code
+	| anxe:free.form.text
+	)* >
+
+<!-- Segment: UNB Interchange Header -->
+<!ELEMENT anxs:interchange.header (
+	  anxe:interchange.control.reference
+	| anxe:application.reference
+	| anxe:processing.priority.code
+	| anxe:acknowledgement.request
+	| anxe:communications.agreement.id
+	| anxe:test.indicator
+	| anxc:syntax.identifier
+	| anxc:interchange.sender
+	| anxc:interchange.recipient
+	| anxc:date.time.of.preparation
+	| anxc:recipients.reference.password
+	)* >
+
+<!-- Segment: UNE Functional Group Trailer -->
+<!ELEMENT anxs:functional.group.trailer (
+	  anxe:functional.group.reference.number
+	| anxe:number.of.messages
+	)* >
+
+<!-- Segment: UNG Functional Group Header -->
+<!ELEMENT anxs:functional.group.header (
+	  anxe:functional.group.identification
+	| anxe:functional.group.reference.number
+	| anxe:controlling.agency
+	| anxe:application.password
+	| anxc:date.time.of.preparation
+	| anxc:application.senders.identification
+	| anxc:application.recipients.identification
+	| anxc:message.version
+	)* >
+
+<!-- Segment: UNH Message Header -->
+<!ELEMENT anxs:message.header (
+	  anxe:message.reference.number
+	| anxe:common.access.reference
+	| anxc:message.identifier
+	| anxc:status.of.the.transfer
+	)* >
+
+<!-- Segment: UNS Section Control -->
+<!ELEMENT anxs:section.control (
+	  anxe:section.identification
+	)* >
+
+<!-- Segment: UNT Message Trailer -->
+<!ELEMENT anxs:message.trailer (
+	  anxe:message.reference.number
+	| anxe:number.of.segments.in.the.message
+	)* >
+
+<!-- Segment: UNZ Interchange Trailer -->
+<!ELEMENT anxs:interchange.trailer (
+	  anxe:interchange.control.reference
+	| anxe:interchange.control.count
+	)* >
+
+<!-- Segment: VLI VALUE LIST IDENTIFICATION -->
+<!ELEMENT trsd:value.list.identification (
+	  tred:value.list.type.coded
+	| tred:class.designator.coded
+	| tred:value.list.name
+	| tred:status.coded
+	| tred:maintenance.operation.coded
+	| trcd:party.identification.details
+	| trcd:product.characteristic
+	| trcd:value.list.identification
+	)* >
+
+<!-- Composite: C002 DOCUMENT/MESSAGE NAME -->
+<!ELEMENT trcd:document.message.name (
+	  tred:document.message.name
+	| tred:document.message.name.coded
+	| tred:code.list.qualifier
+	| tred:code.list.responsible.agency.coded
+	)* >
+
+<!-- Composite: C040 CARRIER -->
+<!ELEMENT trcd:carrier (
+	  tred:code.list.qualifier
+	| tred:code.list.responsible.agency.coded
+	| tred:carrier.identification
+	| tred:carrier.name
+	)* >
+
+<!-- Composite: C042 NATIONALITY DETAILS -->
+<!ELEMENT trcd:nationality.details (
+	  tred:code.list.qualifier
+	| tred:code.list.responsible.agency.coded
+	| tred:nationality
+	| tred:nationality.coded
+	)* >
+
+<!-- Composite: C045 BILL LEVEL IDENTIFICATION -->
+<!ELEMENT trcd:bill.level.identification (
+	  tred:level.one.id
+	| tred:level.two.id
+	| tred:level.three.id
+	| tred:level.four.id
+	| tred:level.five.id
+	| tred:level.six.id
+	)* >
+
+<!-- Composite: C049 REMUNERATION TYPE IDENTIFICATION -->
+<!ELEMENT trcd:remuneration.type.identification (
+	  tred:code.list.qualifier
+	| tred:code.list.responsible.agency.coded
+	| tred:remuneration.type
+	| tred:remuneration.type.coded
+	)* >
+
+<!-- Composite: C056 DEPARTMENT OR EMPLOYEE DETAILS -->
+<!ELEMENT trcd:department.or.employee.details (
+	  tred:department.or.employee
+	| tred:department.or.employee.identification
+	)* >
+
+<!-- Composite: C058 NAME AND ADDRESS -->
+<!ELEMENT trcd:name.and.address (
+	  tred:name.and.address.line
+	)* >
+
+<!-- Composite: C059 STREET -->
+<!ELEMENT trcd:street (
+	  tred:street.and.number.p.o.box
+	)* >
+
+<!-- Composite: C076 COMMUNICATION CONTACT -->
+<!ELEMENT trcd:communication.contact (
+	  tred:communication.number
+	| tred:communication.channel.qualifier
+	)* >
+
+<!-- Composite: C077 FILE IDENTIFICATION -->
+<!ELEMENT trcd:file.identification (
+	  tred:file.name
+	| tred:item.description
+	)* >
+
+<!-- Composite: C078 ACCOUNT IDENTIFICATION -->
+<!ELEMENT trcd:account.identification (
+	  tred:account.holder.name
+	| tred:account.holder.number
+	| tred:currency.coded
+	)* >
+
+<!-- Composite: C079 COMPUTER ENVIRONMENT IDENTIFICATION -->
+<!ELEMENT trcd:computer.environment.identification (
+	  tred:version
+	| tred:release
+	| tred:code.list.qualifier
+	| tred:computer.environment
+	| tred:computer.environment.coded
+	| tred:code.list.responsible.agency.coded
+	| tred:identity.number
+	)* >
+
+<!-- Composite: C080 PARTY NAME -->
+<!ELEMENT trcd:party.name (
+	  tred:party.name
+	| tred:party.name.format.coded
+	)* >
+
+<!-- Composite: C082 PARTY IDENTIFICATION DETAILS -->
+<!ELEMENT trcd:party.identification.details (
+	  tred:code.list.qualifier
+	| tred:party.id.identification
+	| tred:code.list.responsible.agency.coded
+	)* >
+
+<!-- Composite: C085 MARITAL STATUS DETAILS -->
+<!ELEMENT trcd:marital.status.details (
+	  tred:code.list.qualifier
+	| tred:code.list.responsible.agency.coded
+	| tred:marital.status
+	| tred:marital.status.coded
+	)* >
+
+<!-- Composite: C088 INSTITUTION IDENTIFICATION -->
+<!ELEMENT trcd:institution.identification (
+	  tred:code.list.qualifier
+	| tred:code.list.responsible.agency.coded
+	| tred:institution.name
+	| tred:institution.name.identification
+	| tred:institution.branch.number
+	| tred:institution.branch.place
+	)* >
+
+<!-- Composite: C090 ADDRESS DETAILS -->
+<!ELEMENT trcd:address.details (
+	  tred:address.component
+	| tred:address.format.coded
+	)* >
+
+<!-- Composite: C099 FILE DETAILS -->
+<!ELEMENT trcd:file.details (
+	  tred:version
+	| tred:data.format
+	| tred:data.format.coded
+	| tred:file.format
+	)* >
+
+<!-- Composite: C100 TERMS OF DELIVERY OR TRANSPORT -->
+<!ELEMENT trcd:terms.of.delivery.or.transport (
+	  tred:code.list.qualifier
+	| tred:code.list.responsible.agency.coded
+	| tred:terms.of.delivery.or.transport
+	| tred:terms.of.delivery.or.transport.coded
+	)* >
+
+<!-- Composite: C101 RELIGION DETAILS -->
+<!ELEMENT trcd:religion.details (
+	  tred:code.list.qualifier
+	| tred:code.list.responsible.agency.coded
+	| tred:religion
+	| tred:religion.coded
+	)* >
+
+<!-- Composite: C106 DOCUMENT/MESSAGE IDENTIFICATION -->
+<!ELEMENT trcd:document.message.identification (
+	  tred:document.message.number
+	| tred:version
+	| tred:revision.number
+	)* >
+
+<!-- Composite: C107 TEXT REFERENCE -->
+<!ELEMENT trcd:text.reference (
+	  tred:code.list.qualifier
+	| tred:code.list.responsible.agency.coded
+	| tred:free.text.identification
+	)* >
+
+<!-- Composite: C108 TEXT LITERAL -->
+<!ELEMENT trcd:text.literal (
+	  tred:free.text
+	)* >
+
+<!-- Composite: C110 PAYMENT TERMS -->
+<!ELEMENT trcd:payment.terms (
+	  tred:code.list.qualifier
+	| tred:code.list.responsible.agency.coded
+	| tred:terms.of.payment
+	| tred:terms.of.payment.identification
+	)* >
+
+<!-- Composite: C112 TERMS/TIME INFORMATION -->
+<!ELEMENT trcd:terms.time.information (
+	  tred:time.relation.coded
+	| tred:type.of.period.coded
+	| tred:number.of.periods
+	| tred:payment.time.reference.coded
+	)* >
+
+<!-- Composite: C128 RATE DETAILS -->
+<!ELEMENT trcd:rate.details (
+	  tred:unit.price.basis
+	| tred:rate.type.qualifier
+	| tred:rate.per.unit
+	| tred:measure.unit.qualifier
+	)* >
+
+<!-- Composite: C138 PRICE MULTIPLIER INFORMATION -->
+<!ELEMENT trcd:price.multiplier.information (
+	  tred:price.multiplier.qualifier
+	| tred:price.multiplier
+	)* >
+
+<!-- Composite: C174 VALUE/RANGE -->
+<!ELEMENT trcd:value.range (
+	  tred:range.maximum
+	| tred:range.minimum
+	| tred:measurement.value
+	| tred:measure.unit.qualifier
+	| tred:significant.digits
+	)* >
+
+<!-- Composite: C186 QUANTITY DETAILS -->
+<!ELEMENT trcd:quantity.details (
+	  tred:quantity
+	| tred:quantity.qualifier
+	| tred:measure.unit.qualifier
+	)* >
+
+<!-- Composite: C200 CHARGE -->
+<!ELEMENT trcd:charge (
+	  tred:code.list.qualifier
+	| tred:code.list.responsible.agency.coded
+	| tred:prepaid.collect.indicator.coded
+	| tred:item.number
+	| tred:freight.and.charges
+	| tred:freight.and.charges.identification
+	)* >
+
+<!-- Composite: C202 PACKAGE TYPE -->
+<!ELEMENT trcd:package.type (
+	  tred:code.list.qualifier
+	| tred:code.list.responsible.agency.coded
+	| tred:type.of.packages
+	| tred:type.of.packages.identification
+	)* >
+
+<!-- Composite: C203 RATE/TARIFF CLASS -->
+<!ELEMENT trcd:rate.tariff.class (
+	  tred:code.list.qualifier
+	| tred:code.list.responsible.agency.coded
+	| tred:rate.tariff.class
+	| tred:rate.tariff.class.identification
+	| tred:supplementary.rate.tariff.basis.identification
+	)* >
+
+<!-- Composite: C205 HAZARD CODE -->
+<!ELEMENT trcd:hazard.code (
+	  tred:hazard.substance.item.page.number
+	| tred:hazard.code.version.number
+	| tred:hazard.code.identification
+	)* >
+
+<!-- Composite: C206 IDENTIFICATION NUMBER -->
+<!ELEMENT trcd:identification.number (
+	  tred:status.coded
+	| tred:identity.number
+	| tred:identity.number.qualifier
+	)* >
+
+<!-- Composite: C208 IDENTITY NUMBER RANGE -->
+<!ELEMENT trcd:identity.number.range (
+	  tred:identity.number
+	)* >
+
+<!-- Composite: C210 MARKS & LABELS -->
+<!ELEMENT trcd:marks.labels (
+	  tred:shipping.marks
+	)* >
+
+<!-- Composite: C211 DIMENSIONS -->
+<!ELEMENT trcd:dimensions (
+	  tred:height.dimension
+	| tred:width.dimension
+	| tred:length.dimension
+	| tred:measure.unit.qualifier
+	)* >
+
+<!-- Composite: C212 ITEM NUMBER IDENTIFICATION -->
+<!ELEMENT trcd:item.number.identification (
+	  tred:code.list.qualifier
+	| tred:code.list.responsible.agency.coded
+	| tred:item.number
+	| tred:item.number.type.coded
+	)* >
+
+<!-- Composite: C213 NUMBER AND TYPE OF PACKAGES -->
+<!ELEMENT trcd:number.and.type.of.packages (
+	  tred:code.list.qualifier
+	| tred:code.list.responsible.agency.coded
+	| tred:type.of.packages
+	| tred:type.of.packages.identification
+	| tred:number.of.packages
+	)* >
+
+<!-- Composite: C214 SPECIAL SERVICES IDENTIFICATION -->
+<!ELEMENT trcd:special.services.identification (
+	  tred:code.list.qualifier
+	| tred:code.list.responsible.agency.coded
+	| tred:special.service
+	| tred:special.services.coded
+	)* >
+
+<!-- Composite: C215 SEAL ISSUER -->
+<!ELEMENT trcd:seal.issuer (
+	  tred:code.list.qualifier
+	| tred:code.list.responsible.agency.coded
+	| tred:sealing.party
+	| tred:sealing.party.coded
+	)* >
+
+<!-- Composite: C218 HAZARDOUS MATERIAL -->
+<!ELEMENT trcd:hazardous.material (
+	  tred:code.list.qualifier
+	| tred:code.list.responsible.agency.coded
+	| tred:hazardous.material.class
+	| tred:hazardous.material.class.code.identification
+	)* >
+
+<!-- Composite: C219 MOVEMENT TYPE -->
+<!ELEMENT trcd:movement.type (
+	  tred:movement.type
+	| tred:movement.type.coded
+	)* >
+
+<!-- Composite: C220 MODE OF TRANSPORT -->
+<!ELEMENT trcd:mode.of.transport (
+	  tred:mode.of.transport
+	| tred:mode.of.transport.coded
+	)* >
+
+<!-- Composite: C222 TRANSPORT IDENTIFICATION -->
+<!ELEMENT trcd:transport.identification (
+	  tred:code.list.qualifier
+	| tred:code.list.responsible.agency.coded
+	| tred:id.of.the.means.of.transport
+	| tred:id.of.means.of.transport.identification
+	| tred:nationality.of.means.of.transport.coded
+	)* >
+
+<!-- Composite: C223 DANGEROUS GOODS SHIPMENT FLASHPOINT -->
+<!ELEMENT trcd:dangerous.goods.shipment.flashpoint (
+	  tred:measure.unit.qualifier
+	| tred:shipment.flashpoint
+	)* >
+
+<!-- Composite: C224 EQUIPMENT SIZE AND TYPE -->
+<!ELEMENT trcd:equipment.size.and.type (
+	  tred:code.list.qualifier
+	| tred:code.list.responsible.agency.coded
+	| tred:equipment.size.and.type
+	| tred:equipment.size.and.type.identification
+	)* >
+
+<!-- Composite: C228 TRANSPORT MEANS -->
+<!ELEMENT trcd:transport.means (
+	  tred:type.of.means.of.transport
+	| tred:type.of.means.of.transport.identification
+	)* >
+
+<!-- Composite: C229 CHARGE CATEGORY -->
+<!ELEMENT trcd:charge.category (
+	  tred:code.list.qualifier
+	| tred:code.list.responsible.agency.coded
+	| tred:charge.category.coded
+	)* >
+
+<!-- Composite: C231 METHOD OF PAYMENT -->
+<!ELEMENT trcd:method.of.payment (
+	  tred:code.list.qualifier
+	| tred:code.list.responsible.agency.coded
+	| tred:transport.charges.method.of.payment.coded
+	)* >
+
+<!-- Composite: C232 GOVERNMENT ACTION -->
+<!ELEMENT trcd:government.action (
+	  tred:government.procedure.coded
+	| tred:government.involvement.coded
+	| tred:government.agency.coded
+	| tred:government.action.coded
+	)* >
+
+<!-- Composite: C233 SERVICE -->
+<!ELEMENT trcd:service (
+	  tred:code.list.qualifier
+	| tred:code.list.responsible.agency.coded
+	| tred:service.requirement.coded
+	)* >
+
+<!-- Composite: C234 UNDG INFORMATION -->
+<!ELEMENT trcd:undg.information (
+	  tred:dangerous.goods.flashpoint
+	| tred:undg.number
+	)* >
+
+<!-- Composite: C235 HAZARD IDENTIFICATION -->
+<!ELEMENT trcd:hazard.identification (
+	  tred:hazard.identification.number.upper.part
+	| tred:substance.identification.number.lower.part
+	)* >
+
+<!-- Composite: C236 DANGEROUS GOODS LABEL -->
+<!ELEMENT trcd:dangerous.goods.label (
+	  tred:dangerous.goods.label.marking
+	)* >
+
+<!-- Composite: C237 EQUIPMENT IDENTIFICATION -->
+<!ELEMENT trcd:equipment.identification (
+	  tred:code.list.qualifier
+	| tred:code.list.responsible.agency.coded
+	| tred:country.coded
+	| tred:equipment.identification.number
+	)* >
+
+<!-- Composite: C239 TEMPERATURE SETTING -->
+<!ELEMENT trcd:temperature.setting (
+	  tred:temperature.setting
+	| tred:measure.unit.qualifier
+	)* >
+
+<!-- Composite: C240 PRODUCT CHARACTERISTIC -->
+<!ELEMENT trcd:product.characteristic (
+	  tred:code.list.qualifier
+	| tred:code.list.responsible.agency.coded
+	| tred:characteristic
+	| tred:characteristic.identification
+	)* >
+
+<!-- Composite: C241 DUTY/TAX/FEE TYPE -->
+<!ELEMENT trcd:duty.tax.fee.type (
+	  tred:code.list.qualifier
+	| tred:code.list.responsible.agency.coded
+	| tred:duty.tax.fee.type
+	| tred:duty.tax.fee.type.coded
+	)* >
+
+<!-- Composite: C242 PROCESS TYPE AND DESCRIPTION -->
+<!ELEMENT trcd:process.type.and.description (
+	  tred:code.list.qualifier
+	| tred:code.list.responsible.agency.coded
+	| tred:process.type
+	| tred:process.type.identification
+	)* >
+
+<!-- Composite: C243 DUTY/TAX/FEE DETAIL -->
+<!ELEMENT trcd:duty.tax.fee.detail (
+	  tred:code.list.qualifier
+	| tred:code.list.responsible.agency.coded
+	| tred:duty.tax.fee.rate.basis.identification
+	| tred:duty.tax.fee.rate
+	| tred:duty.tax.fee.rate.identification
+	)* >
+
+<!-- Composite: C244 TEST METHOD -->
+<!ELEMENT trcd:test.method (
+	  tred:code.list.qualifier
+	| tred:code.list.responsible.agency.coded
+	| tred:test.method.identification
+	| tred:test.description
+	)* >
+
+<!-- Composite: C246 CUSTOMS IDENTITY CODES -->
+<!ELEMENT trcd:customs.identity.codes (
+	  tred:code.list.qualifier
+	| tred:code.list.responsible.agency.coded
+	| tred:customs.code.identification
+	)* >
+
+<!-- Composite: C270 CONTROL -->
+<!ELEMENT trcd:control (
+	  tred:control.value
+	| tred:control.qualifier
+	| tred:measure.unit.qualifier
+	)* >
+
+<!-- Composite: C273 ITEM DESCRIPTION -->
+<!ELEMENT trcd:item.description (
+	  tred:code.list.qualifier
+	| tred:code.list.responsible.agency.coded
+	| tred:language.coded
+	| tred:item.description
+	| tred:item.description.identification
+	)* >
+
+<!-- Composite: C279 QUANTITY DIFFERENCE INFORMATION -->
+<!ELEMENT trcd:quantity.difference.information (
+	  tred:quantity.qualifier
+	| tred:quantity.difference
+	)* >
+
+<!-- Composite: C280 RANGE -->
+<!ELEMENT trcd:range (
+	  tred:range.maximum
+	| tred:range.minimum
+	| tred:measure.unit.qualifier
+	)* >
+
+<!-- Composite: C286 SEQUENCE INFORMATION -->
+<!ELEMENT trcd:sequence.information (
+	  tred:sequence.number
+	| tred:code.list.qualifier
+	| tred:sequence.number.source.coded
+	| tred:code.list.responsible.agency.coded
+	)* >
+
+<!-- Composite: C288 PRODUCT GROUP -->
+<!ELEMENT trcd:product.group (
+	  tred:code.list.qualifier
+	| tred:code.list.responsible.agency.coded
+	| tred:product.group
+	| tred:product.group.coded
+	)* >
+
+<!-- Composite: C292 PRICE CHANGE INFORMATION -->
+<!ELEMENT trcd:price.change.information (
+	  tred:code.list.qualifier
+	| tred:code.list.responsible.agency.coded
+	| tred:price.change.indicator.coded
+	)* >
+
+<!-- Composite: C329 PATTERN DESCRIPTION -->
+<!ELEMENT trcd:pattern.description (
+	  tred:frequency.coded
+	| tred:despatch.pattern.coded
+	| tred:despatch.pattern.timing.coded
+	)* >
+
+<!-- Composite: C330 INSURANCE COVER TYPE -->
+<!ELEMENT trcd:insurance.cover.type (
+	  tred:code.list.qualifier
+	| tred:code.list.responsible.agency.coded
+	| tred:insurance.cover.type.coded
+	)* >
+
+<!-- Composite: C331 INSURANCE COVER DETAILS -->
+<!ELEMENT trcd:insurance.cover.details (
+	  tred:code.list.qualifier
+	| tred:code.list.responsible.agency.coded
+	| tred:insurance.cover
+	| tred:insurance.cover.identification
+	)* >
+
+<!-- Composite: C332 SALES CHANNEL IDENTIFICATION -->
+<!ELEMENT trcd:sales.channel.identification (
+	  tred:code.list.qualifier
+	| tred:code.list.responsible.agency.coded
+	| tred:sales.channel.identifier
+	)* >
+
+<!-- Composite: C333 INFORMATION REQUEST -->
+<!ELEMENT trcd:information.request (
+	  tred:code.list.qualifier
+	| tred:code.list.responsible.agency.coded
+	| tred:requested.information
+	| tred:requested.information.coded
+	)* >
+
+<!-- Composite: C401 EXCESS TRANSPORTATION INFORMATION -->
+<!ELEMENT trcd:excess.transportation.information (
+	  tred:customer.authorization.number
+	| tred:excess.transportation.reason.coded
+	| tred:excess.transportation.responsibility.coded
+	)* >
+
+<!-- Composite: C402 PACKAGE TYPE IDENTIFICATION -->
+<!ELEMENT trcd:package.type.identification (
+	  tred:type.of.packages
+	| tred:item.description.type.coded
+	| tred:item.number.type.coded
+	)* >
+
+<!-- Composite: C501 PERCENTAGE DETAILS -->
+<!ELEMENT trcd:percentage.details (
+	  tred:code.list.qualifier
+	| tred:code.list.responsible.agency.coded
+	| tred:percentage.qualifier
+	| tred:percentage.basis.coded
+	| tred:percentage
+	)* >
+
+<!-- Composite: C502 MEASUREMENT DETAILS -->
+<!ELEMENT trcd:measurement.details (
+	  tred:measurement.attribute
+	| tred:measurement.attribute.identification
+	| tred:measurement.dimension.coded
+	| tred:measurement.significance.coded
+	)* >
+
+<!-- Composite: C503 DOCUMENT/MESSAGE DETAILS -->
+<!ELEMENT trcd:document.message.details (
+	  tred:document.message.number
+	| tred:document.message.source
+	| tred:document.message.status.coded
+	| tred:language.coded
+	)* >
+
+<!-- Composite: C504 CURRENCY DETAILS -->
+<!ELEMENT trcd:currency.details (
+	  tred:currency.qualifier
+	| tred:currency.coded
+	| tred:currency.details.qualifier
+	| tred:currency.rate.base
+	)* >
+
+<!-- Composite: C506 REFERENCE -->
+<!ELEMENT trcd:reference (
+	  tred:reference.qualifier
+	| tred:reference.number
+	| tred:line.number
+	| tred:reference.version.number
+	)* >
+
+<!-- Composite: C507 DATE/TIME/PERIOD -->
+<!ELEMENT trcd:date.time.period (
+	  tred:date.time.period.qualifier
+	| tred:date.time.period.format.qualifier
+	| tred:date.time.period
+	)* >
+
+<!-- Composite: C508 LANGUAGE DETAILS -->
+<!ELEMENT trcd:language.details (
+	  tred:language
+	| tred:language.coded
+	)* >
+
+<!-- Composite: C509 PRICE INFORMATION -->
+<!ELEMENT trcd:price.information (
+	  tred:price
+	| tred:price.qualifier
+	| tred:unit.price.basis
+	| tred:price.type.coded
+	| tred:price.type.qualifier
+	| tred:measure.unit.qualifier
+	)* >
+
+<!-- Composite: C512 SIZE DETAILS -->
+<!ELEMENT trcd:size.details (
+	  tred:size.qualifier
+	| tred:size
+	)* >
+
+<!-- Composite: C514 SAMPLE LOCATION DETAILS -->
+<!ELEMENT trcd:sample.location.details (
+	  tred:sample.location
+	| tred:sample.location.coded
+	)* >
+
+<!-- Composite: C515 TEST REASON -->
+<!ELEMENT trcd:test.reason (
+	  tred:code.list.qualifier
+	| tred:code.list.responsible.agency.coded
+	| tred:test.reason
+	| tred:test.reason.identification
+	)* >
+
+<!-- Composite: C516 MONETARY AMOUNT -->
+<!ELEMENT trcd:monetary.amount (
+	  tred:status.coded
+	| tred:monetary.amount
+	| tred:monetary.amount.type.qualifier
+	| tred:currency.qualifier
+	| tred:currency.coded
+	)* >
+
+<!-- Composite: C517 LOCATION IDENTIFICATION -->
+<!ELEMENT trcd:location.identification (
+	  tred:code.list.qualifier
+	| tred:code.list.responsible.agency.coded
+	| tred:place.location
+	| tred:place.location.identification
+	)* >
+
+<!-- Composite: C519 RELATED LOCATION ONE IDENTIFICATION -->
+<!ELEMENT trcd:related.location.one.identification (
+	  tred:code.list.qualifier
+	| tred:code.list.responsible.agency.coded
+	| tred:related.place.location.one
+	| tred:related.place.location.one.identification
+	)* >
+
+<!-- Composite: C521 BUSINESS FUNCTION -->
+<!ELEMENT trcd:business.function (
+	  tred:code.list.qualifier
+	| tred:code.list.responsible.agency.coded
+	| tred:business.description
+	| tred:business.function.coded
+	| tred:business.function.qualifier
+	)* >
+
+<!-- Composite: C522 INSTRUCTION -->
+<!ELEMENT trcd:instruction (
+	  tred:code.list.qualifier
+	| tred:code.list.responsible.agency.coded
+	| tred:instruction
+	| tred:instruction.coded
+	| tred:instruction.qualifier
+	)* >
+
+<!-- Composite: C523 NUMBER OF UNIT DETAILS -->
+<!ELEMENT trcd:number.of.unit.details (
+	  tred:number.of.units
+	| tred:number.of.units.qualifier
+	)* >
+
+<!-- Composite: C524 HANDLING INSTRUCTIONS -->
+<!ELEMENT trcd:handling.instructions (
+	  tred:code.list.qualifier
+	| tred:code.list.responsible.agency.coded
+	| tred:handling.instructions
+	| tred:handling.instructions.coded
+	)* >
+
+<!-- Composite: C526 FREQUENCY DETAILS -->
+<!ELEMENT trcd:frequency.details (
+	  tred:frequency.qualifier
+	| tred:frequency.value
+	| tred:measure.unit.qualifier
+	)* >
+
+<!-- Composite: C527 STATISTICAL DETAILS -->
+<!ELEMENT trcd:statistical.details (
+	  tred:measurement.dimension.coded
+	| tred:measurement.value
+	| tred:measurement.significance.coded
+	| tred:measure.unit.qualifier
+	)* >
+
+<!-- Composite: C528 COMMODITY/RATE DETAIL -->
+<!ELEMENT trcd:commodity.rate.detail (
+	  tred:code.list.qualifier
+	| tred:code.list.responsible.agency.coded
+	| tred:commodity.rate.identification
+	)* >
+
+<!-- Composite: C529 PROCESSING INDICATOR -->
+<!ELEMENT trcd:processing.indicator (
+	  tred:code.list.qualifier
+	| tred:code.list.responsible.agency.coded
+	| tred:process.type.identification
+	| tred:processing.indicator.coded
+	)* >
+
+<!-- Composite: C531 PACKAGING DETAILS -->
+<!ELEMENT trcd:packaging.details (
+	  tred:packaging.terms.and.conditions.coded
+	| tred:packaging.level.coded
+	| tred:packaging.related.information.coded
+	)* >
+
+<!-- Composite: C532 RETURNABLE PACKAGE DETAILS -->
+<!ELEMENT trcd:returnable.package.details (
+	  tred:returnable.package.load.contents.coded
+	| tred:returnable.package.freight.payment.responsibility.coded
+	)* >
+
+<!-- Composite: C533 DUTY/TAX/FEE ACCOUNT DETAIL -->
+<!ELEMENT trcd:duty.tax.fee.account.detail (
+	  tred:code.list.qualifier
+	| tred:code.list.responsible.agency.coded
+	| tred:duty.tax.fee.account.identification
+	)* >
+
+<!-- Composite: C534 PAYMENT INSTRUCTION DETAILS -->
+<!ELEMENT trcd:payment.instruction.details (
+	  tred:code.list.qualifier
+	| tred:code.list.responsible.agency.coded
+	| tred:payment.guarantee.coded
+	| tred:payment.channel.coded
+	| tred:payment.conditions.coded
+	| tred:payment.means.coded
+	)* >
+
+<!-- Composite: C536 CONTRACT AND CARRIAGE CONDITION -->
+<!ELEMENT trcd:contract.and.carriage.condition (
+	  tred:code.list.qualifier
+	| tred:code.list.responsible.agency.coded
+	| tred:contract.and.carriage.condition.coded
+	)* >
+
+<!-- Composite: C537 TRANSPORT PRIORITY -->
+<!ELEMENT trcd:transport.priority (
+	  tred:code.list.qualifier
+	| tred:code.list.responsible.agency.coded
+	| tred:transport.priority.coded
+	)* >
+
+<!-- Composite: C543 AGREEMENT TYPE IDENTIFICATION -->
+<!ELEMENT trcd:agreement.type.identification (
+	  tred:code.list.qualifier
+	| tred:code.list.responsible.agency.coded
+	| tred:agreement.type.qualifier
+	| tred:agreement.type.coded
+	| tred:agreement.type.description
+	)* >
+
+<!-- Composite: C545 INDEX IDENTIFICATION -->
+<!ELEMENT trcd:index.identification (
+	  tred:code.list.qualifier
+	| tred:code.list.responsible.agency.coded
+	| tred:index.qualifier
+	| tred:index.type.coded
+	)* >
+
+<!-- Composite: C546 INDEX VALUE -->
+<!ELEMENT trcd:index.value (
+	  tred:index.value
+	| tred:index.value.representation.coded
+	)* >
+
+<!-- Composite: C549 MONETARY FUNCTION -->
+<!ELEMENT trcd:monetary.function (
+	  tred:code.list.qualifier
+	| tred:code.list.responsible.agency.coded
+	| tred:monetary.function.coded
+	)* >
+
+<!-- Composite: C550 REQUIREMENT/CONDITION IDENTIFICATION -->
+<!ELEMENT trcd:requirement.condition.identification (
+	  tred:code.list.qualifier
+	| tred:code.list.responsible.agency.coded
+	| tred:requirement.or.condition
+	| tred:requirement.condition.identification
+	)* >
+
+<!-- Composite: C551 BANK OPERATION -->
+<!ELEMENT trcd:bank.operation (
+	  tred:code.list.qualifier
+	| tred:code.list.responsible.agency.coded
+	| tred:bank.operation.coded
+	)* >
+
+<!-- Composite: C552 ALLOWANCE/CHARGE INFORMATION -->
+<!ELEMENT trcd:allowance.charge.information (
+	  tred:allowance.or.charge.number
+	| tred:charge.allowance.description.coded
+	)* >
+
+<!-- Composite: C553 RELATED LOCATION TWO IDENTIFICATION -->
+<!ELEMENT trcd:related.location.two.identification (
+	  tred:code.list.qualifier
+	| tred:code.list.responsible.agency.coded
+	| tred:related.place.location.two
+	| tred:related.place.location.two.identification
+	)* >
+
+<!-- Composite: C554 RATE/TARIFF CLASS DETAIL -->
+<!ELEMENT trcd:rate.tariff.class.detail (
+	  tred:code.list.qualifier
+	| tred:code.list.responsible.agency.coded
+	| tred:rate.tariff.class.identification
+	)* >
+
+<!-- Composite: C555 STATUS EVENT -->
+<!ELEMENT trcd:status.event (
+	  tred:code.list.qualifier
+	| tred:code.list.responsible.agency.coded
+	| tred:status.event
+	| tred:status.event.coded
+	)* >
+
+<!-- Composite: C556 STATUS REASON -->
+<!ELEMENT trcd:status.reason (
+	  tred:code.list.qualifier
+	| tred:code.list.responsible.agency.coded
+	| tred:status.reason
+	| tred:status.reason.coded
+	)* >
+
+<!-- Composite: C564 PHYSICAL OR LOGICAL STATE INFORMATION -->
+<!ELEMENT trcd:physical.or.logical.state.information (
+	  tred:code.list.qualifier
+	| tred:code.list.responsible.agency.coded
+	| tred:physical.or.logical.state
+	| tred:physical.or.logical.state.coded
+	)* >
+
+<!-- Composite: C585 PRIORITY DETAILS -->
+<!ELEMENT trcd:priority.details (
+	  tred:code.list.qualifier
+	| tred:code.list.responsible.agency.coded
+	| tred:priority
+	| tred:priority.coded
+	)* >
+
+<!-- Composite: C601 STATUS TYPE -->
+<!ELEMENT trcd:status.type (
+	  tred:code.list.qualifier
+	| tred:code.list.responsible.agency.coded
+	| tred:status.type.coded
+	)* >
+
+<!-- Composite: C701 ERROR POINT DETAILS -->
+<!ELEMENT trcd:error.point.details (
+	  tred:message.section.coded
+	| tred:message.item.number
+	| tred:message.sub.item.number
+	)* >
+
+<!-- Composite: C702 CODE SET IDENTIFICATION -->
+<!ELEMENT trcd:code.set.identification (
+	  tred:code.list.qualifier
+	| tred:code.list.responsible.agency.coded
+	| tred:simple.data.element.tag
+	)* >
+
+<!-- Composite: C703 NATURE OF CARGO -->
+<!ELEMENT trcd:nature.of.cargo (
+	  tred:code.list.qualifier
+	| tred:code.list.responsible.agency.coded
+	| tred:nature.of.cargo.coded
+	)* >
+
+<!-- Composite: C709 MESSAGE IDENTIFIER -->
+<!ELEMENT trcd:message.identifier (
+	  tred:version
+	| tred:release
+	| tred:revision.number
+	| tred:message.type.identifier
+	| tred:control.agency
+	| tred:association.assigned.identification
+	)* >
+
+<!-- Composite: C770 ARRAY CELL DETAILS -->
+<!ELEMENT trcd:array.cell.details (
+	  tred:array.cell.information
+	)* >
+
+<!-- Composite: C778 POSITION IDENTIFICATION -->
+<!ELEMENT trcd:position.identification (
+	  tred:sequence.number
+	| tred:hierarchical.id.number
+	)* >
+
+<!-- Composite: C779 ARRAY STRUCTURE IDENTIFICATION -->
+<!ELEMENT trcd:array.structure.identification (
+	  tred:identity.number.qualifier
+	| tred:array.structure.identifier
+	)* >
+
+<!-- Composite: C780 VALUE LIST IDENTIFICATION -->
+<!ELEMENT trcd:value.list.identification (
+	  tred:value.list.identifier
+	| tred:identity.number.qualifier
+	)* >
+
+<!-- Composite: C782 DATA SET IDENTIFICATION -->
+<!ELEMENT trcd:data.set.identification (
+	  tred:data.set.identifier
+	| tred:identity.number.qualifier
+	)* >
+
+<!-- Composite: C783 FOOTNOTE SET IDENTIFICATION -->
+<!ELEMENT trcd:footnote.set.identification (
+	  tred:identity.number.qualifier
+	| tred:footnote.set.identifier
+	)* >
+
+<!-- Composite: C784 FOOTNOTE IDENTIFICATION -->
+<!ELEMENT trcd:footnote.identification (
+	  tred:identity.number.qualifier
+	| tred:footnote.identifier
+	)* >
+
+<!-- Composite: C785 STATISTICAL CONCEPT IDENTIFICATION -->
+<!ELEMENT trcd:statistical.concept.identification (
+	  tred:statistical.concept.identifier
+	| tred:identity.number.qualifier
+	)* >
+
+<!-- Composite: C786 STRUCTURE COMPONENT IDENTIFICATION -->
+<!ELEMENT trcd:structure.component.identification (
+	  tred:identity.number.qualifier
+	| tred:structure.component.identifier
+	)* >
+
+<!-- Composite: C814 SAFETY SECTION -->
+<!ELEMENT trcd:safety.section (
+	  tred:safety.section.name
+	| tred:safety.section
+	)* >
+
+<!-- Composite: C815 ADDITIONAL SAFETY INFORMATION -->
+<!ELEMENT trcd:additional.safety.information (
+	  tred:code.list.qualifier
+	| tred:code.list.responsible.agency.coded
+	| tred:additional.safety.information
+	| tred:additional.safety.information.coded
+	)* >
+
+<!-- Composite: C816 NAME COMPONENT DETAILS -->
+<!ELEMENT trcd:name.component.details (
+	  tred:name.component.original.representation.coded
+	| tred:name.component
+	| tred:name.component.status.coded
+	| tred:name.component.qualifier
+	)* >
+
+<!-- Composite: C817 ADDRESS USAGE -->
+<!ELEMENT trcd:address.usage (
+	  tred:address.type.coded
+	| tred:address.purpose.coded
+	| tred:address.status.coded
+	)* >
+
+<!-- Composite: C818 PERSON INHERITED CHARACTERISTIC DETAILS -->
+<!ELEMENT trcd:person.inherited.characteristic.details (
+	  tred:code.list.qualifier
+	| tred:code.list.responsible.agency.coded
+	| tred:person.inherited.characteristic
+	| tred:person.inherited.characteristic.identification
+	)* >
+
+<!-- Composite: C819 COUNTRY SUB-ENTITY DETAILS -->
+<!ELEMENT trcd:country.sub.entity.details (
+	  tred:code.list.qualifier
+	| tred:code.list.responsible.agency.coded
+	| tred:country.sub.entity
+	| tred:country.sub.entity.identification
+	)* >
+
+<!-- Composite: C821 TYPE OF DAMAGE -->
+<!ELEMENT trcd:type.of.damage (
+	  tred:code.list.qualifier
+	| tred:code.list.responsible.agency.coded
+	| tred:type.of.damage
+	| tred:type.of.damage.coded
+	)* >
+
+<!-- Composite: C822 DAMAGE AREA -->
+<!ELEMENT trcd:damage.area (
+	  tred:code.list.qualifier
+	| tred:code.list.responsible.agency.coded
+	| tred:damage.area
+	| tred:damage.area.identification
+	)* >
+
+<!-- Composite: C823 TYPE OF UNIT/COMPONENT -->
+<!ELEMENT trcd:type.of.unit.component (
+	  tred:code.list.qualifier
+	| tred:code.list.responsible.agency.coded
+	| tred:type.of.unit.component
+	| tred:type.of.unit.component.coded
+	)* >
+
+<!-- Composite: C824 COMPONENT MATERIAL -->
+<!ELEMENT trcd:component.material (
+	  tred:code.list.qualifier
+	| tred:code.list.responsible.agency.coded
+	| tred:component.material
+	| tred:component.material.coded
+	)* >
+
+<!-- Composite: C825 DAMAGE SEVERITY -->
+<!ELEMENT trcd:damage.severity (
+	  tred:code.list.qualifier
+	| tred:code.list.responsible.agency.coded
+	| tred:damage.severity
+	| tred:damage.severity.coded
+	)* >
+
+<!-- Composite: C826 ACTION -->
+<!ELEMENT trcd:action (
+	  tred:code.list.qualifier
+	| tred:action.request.notification
+	| tred:action.request.notification.coded
+	| tred:code.list.responsible.agency.coded
+	)* >
+
+<!-- Composite: C827 TYPE OF MARKING -->
+<!ELEMENT trcd:type.of.marking (
+	  tred:code.list.qualifier
+	| tred:code.list.responsible.agency.coded
+	| tred:type.of.marking.coded
+	)* >
+
+<!-- Composite: C828 CLINICAL INTERVENTION DETAILS -->
+<!ELEMENT trcd:clinical.intervention.details (
+	  tred:code.list.qualifier
+	| tred:code.list.responsible.agency.coded
+	| tred:clinical.intervention
+	| tred:clinical.intervention.identification
+	)* >
+
+<!-- Composite: C829 SUB-LINE INFORMATION -->
+<!ELEMENT trcd:sub.line.information (
+	  tred:line.item.number
+	| tred:sub.line.indicator.coded
+	)* >
+
+<!-- Composite: C830 PROCESS IDENTIFICATION DETAILS -->
+<!ELEMENT trcd:process.identification.details (
+	  tred:code.list.qualifier
+	| tred:code.list.responsible.agency.coded
+	| tred:process
+	| tred:process.identification
+	)* >
+
+<!-- Composite: C831 RESULT DETAILS -->
+<!ELEMENT trcd:result.details (
+	  tred:code.list.qualifier
+	| tred:code.list.responsible.agency.coded
+	| tred:measurement.attribute
+	| tred:measurement.attribute.identification
+	| tred:measurement.value
+	| tred:measurement.significance.coded
+	)* >
+
+<!-- Composite: C836 CLINICAL INFORMATION DETAILS -->
+<!ELEMENT trcd:clinical.information.details (
+	  tred:code.list.qualifier
+	| tred:code.list.responsible.agency.coded
+	| tred:clinical.information
+	| tred:clinical.information.identification
+	)* >
+
+<!-- Composite: C837 CERTAINTY DETAILS -->
+<!ELEMENT trcd:certainty.details (
+	  tred:code.list.qualifier
+	| tred:code.list.responsible.agency.coded
+	| tred:certainty
+	| tred:certainty.coded
+	)* >
+
+<!-- Composite: C838 DOSAGE DETAILS -->
+<!ELEMENT trcd:dosage.details (
+	  tred:code.list.qualifier
+	| tred:code.list.responsible.agency.coded
+	| tred:dosage
+	| tred:dosage.identification
+	)* >
+
+<!-- Composite: C839 ATTENDEE CATEGORY -->
+<!ELEMENT trcd:attendee.category (
+	  tred:code.list.qualifier
+	| tred:code.list.responsible.agency.coded
+	| tred:attendee.category
+	| tred:attendee.category.coded
+	)* >
+
+<!-- Composite: C840 ATTENDANCE ADMISSION DETAILS -->
+<!ELEMENT trcd:attendance.admission.details (
+	  tred:code.list.qualifier
+	| tred:code.list.responsible.agency.coded
+	| tred:admission.type
+	| tred:admission.type.coded
+	)* >
+
+<!-- Composite: C841 ATTENDANCE DISCHARGE DETAILS -->
+<!ELEMENT trcd:attendance.discharge.details (
+	  tred:code.list.qualifier
+	| tred:code.list.responsible.agency.coded
+	| tred:discharge.type
+	| tred:discharge.type.coded
+	)* >
+
+<!-- Composite: C844 ORGANISATION CLASSIFICATION DETAIL -->
+<!ELEMENT trcd:organisation.classification.detail (
+	  tred:code.list.qualifier
+	| tred:code.list.responsible.agency.coded
+	| tred:organisational.class
+	| tred:organisational.class.identification
+	)* >
+
+<!-- Composite: C848 MEASUREMENT UNIT DETAILS -->
+<!ELEMENT trcd:measurement.unit.details (
+	  tred:code.list.qualifier
+	| tred:code.list.responsible.agency.coded
+	| tred:measurement.unit
+	| tred:measurement.unit.identification
+	)* >
+
+<!-- Composite: C849 PARTIES TO INSTRUCTION -->
+<!ELEMENT trcd:parties.to.instruction (
+	  tred:recipient.of.the.instruction.identification
+	| tred:party.enacting.instruction.identification
+	)* >
+
+<!-- Composite: C850 STATUS OF INSTRUCTION -->
+<!ELEMENT trcd:status.of.instruction (
+	  tred:party.name
+	| tred:status.coded
+	)* >
+
+<!-- Composite: C853 ERROR SEGMENT POINT DETAILS -->
+<!ELEMENT trcd:error.segment.point.details (
+	  tred:sequence.number
+	| tred:sequence.number.source.coded
+	| tred:segment.tag
+	)* >
+
+<!-- Composite: C878 CHARGE/ALLOWANCE ACCOUNT -->
+<!ELEMENT trcd:charge.allowance.account (
+	  tred:code.list.qualifier
+	| tred:code.list.responsible.agency.coded
+	| tred:account.holder.number
+	| tred:institution.branch.number
+	| tred:currency.coded
+	)* >
+
+<!-- Composite: C889 CHARACTERISTIC VALUE -->
+<!ELEMENT trcd:characteristic.value (
+	  tred:code.list.qualifier
+	| tred:code.list.responsible.agency.coded
+	| tred:characteristic.value
+	| tred:characteristic.value.coded
+	)* >
+
+<!-- Composite: C901 APPLICATION ERROR DETAIL -->
+<!ELEMENT trcd:application.error.detail (
+	  tred:code.list.qualifier
+	| tred:code.list.responsible.agency.coded
+	| tred:application.error.identification
+	)* >
+
+<!-- Composite: C941 RELATIONSHIP -->
+<!ELEMENT trcd:relationship (
+	  tred:code.list.qualifier
+	| tred:code.list.responsible.agency.coded
+	| tred:relationship
+	| tred:relationship.coded
+	)* >
+
+<!-- Composite: C942 MEMBERSHIP CATEGORY -->
+<!ELEMENT trcd:membership.category (
+	  tred:code.list.qualifier
+	| tred:code.list.responsible.agency.coded
+	| tred:membership.category
+	| tred:membership.category.identification
+	)* >
+
+<!-- Composite: C944 MEMBERSHIP STATUS -->
+<!ELEMENT trcd:membership.status (
+	  tred:code.list.qualifier
+	| tred:code.list.responsible.agency.coded
+	| tred:membership.status
+	| tred:membership.status.coded
+	)* >
+
+<!-- Composite: C945 MEMBERSHIP LEVEL -->
+<!ELEMENT trcd:membership.level (
+	  tred:code.list.qualifier
+	| tred:code.list.responsible.agency.coded
+	| tred:membership.level.qualifier
+	| tred:membership.level
+	| tred:membership.level.identification
+	)* >
+
+<!-- Composite: C948 EMPLOYMENT CATEGORY -->
+<!ELEMENT trcd:employment.category (
+	  tred:code.list.qualifier
+	| tred:code.list.responsible.agency.coded
+	| tred:employment.category
+	| tred:employment.category.coded
+	)* >
+
+<!-- Composite: C950 QUALIFICATION CLASSIFICATION -->
+<!ELEMENT trcd:qualification.classification (
+	  tred:code.list.qualifier
+	| tred:code.list.responsible.agency.coded
+	| tred:qualification.classification
+	| tred:qualification.classification.coded
+	)* >
+
+<!-- Composite: C951 OCCUPATION -->
+<!ELEMENT trcd:occupation (
+	  tred:code.list.qualifier
+	| tred:code.list.responsible.agency.coded
+	| tred:occupation
+	| tred:occupation.coded
+	)* >
+
+<!-- Composite: C953 CONTRIBUTION TYPE -->
+<!ELEMENT trcd:contribution.type (
+	  tred:code.list.qualifier
+	| tred:code.list.responsible.agency.coded
+	| tred:contribution.type
+	| tred:contribution.type.coded
+	)* >
+
+<!-- Composite: C955 ATTRIBUTE TYPE -->
+<!ELEMENT trcd:attribute.type (
+	  tred:code.list.qualifier
+	| tred:code.list.responsible.agency.coded
+	| tred:attribute.type.coded
+	)* >
+
+<!-- Composite: C956 ATTRIBUTE DETAILS -->
+<!ELEMENT trcd:attribute.details (
+	  tred:code.list.qualifier
+	| tred:code.list.responsible.agency.coded
+	| tred:attribute
+	| tred:attribute.coded
+	)* >
+
+<!-- Composite: C960 REASON FOR CHANGE -->
+<!ELEMENT trcd:reason.for.change (
+	  tred:code.list.qualifier
+	| tred:code.list.responsible.agency.coded
+	| tred:change.reason
+	| tred:change.reason.coded
+	)* >
+
+<!-- Composite: S001 SYNTAX IDENTIFIER -->
+<!ELEMENT anxc:syntax.identifier (
+	  anxe:syntax.identifier
+	| anxe:syntax.version.number
+	)* >
+
+<!-- Composite: S002 INTERCHANGE SENDER -->
+<!ELEMENT anxc:interchange.sender (
+	  anxe:sender.identification
+	| anxe:recipients.identification.qualifer
+	| anxe:address.for.reverse.routing
+	)* >
+
+<!-- Composite: S003 INTERCHANGE RECIPIENT -->
+<!ELEMENT anxc:interchange.recipient (
+	  anxe:recipients.identification.qualifer
+	| anxe:recipient.identification
+	| anxe:routing.address
+	)* >
+
+<!-- Composite: S004 DATE/TIME OF PREPARATION -->
+<!ELEMENT anxc:date.time.of.preparation (
+	  anxe:date
+	| anxe:time
+	)* >
+
+<!-- Composite: S005 RECIPIENTS REFERENCE PASSWORD -->
+<!ELEMENT anxc:recipients.reference.password (
+	  anxe:recipients.reference.password
+	| anxe:recipients.reference.password.qualifier
+	)* >
+
+<!-- Composite: S006 APPLICATION SENDERS IDENTIFICATION -->
+<!ELEMENT anxc:application.senders.identification (
+	  anxe:recipients.identification.qualifer
+	| anxe:application.senders.identification
+	)* >
+
+<!-- Composite: S007 APPLICATION RECIPIENTS IDENTIFICATION -->
+<!ELEMENT anxc:application.recipients.identification (
+	  anxe:recipients.identification.qualifer
+	| anxe:recipients.identification
+	)* >
+
+<!-- Composite: S008 MESSAGE VERSION -->
+<!ELEMENT anxc:message.version (
+	  anxe:message.version.number
+	| anxe:message.release.number
+	| anxe:association.assigned.code
+	)* >
+
+<!-- Composite: S009 MESSAGE IDENTIFIER -->
+<!ELEMENT anxc:message.identifier (
+	  anxe:controlling.agency
+	| anxe:message.version.number
+	| anxe:message.release.number
+	| anxe:association.assigned.code
+	| anxe:message.type
+	)* >
+
+<!-- Composite: S010 STATUS OF THE TRANSFER -->
+<!ELEMENT anxc:status.of.the.transfer (
+	  anxe:sequence.of.transfers
+	| anxe:first.and.last.transfer
+	)* >
+<!ELEMENT anxe:syntax.identifier (#PCDATA) >
+<!ATTLIST anxe:syntax.identifier unsl:code CDATA #REQUIRED >
+<!ELEMENT anxe:syntax.version.number (#PCDATA) >
+<!ELEMENT anxe:sender.identification (#PCDATA) >
+<!ELEMENT anxe:recipients.identification.qualifer (#PCDATA) >
+<!ATTLIST anxe:recipients.identification.qualifer unsl:code CDATA #REQUIRED >
+<!ELEMENT anxe:address.for.reverse.routing (#PCDATA) >
+<!ELEMENT anxe:recipient.identification (#PCDATA) >
+<!ELEMENT anxe:routing.address (#PCDATA) >
+<!ELEMENT anxe:date (#PCDATA) >
+<!ELEMENT anxe:time (#PCDATA) >
+<!ELEMENT anxe:interchange.control.reference (#PCDATA) >
+<!ELEMENT anxe:recipients.reference.password (#PCDATA) >
+<!ELEMENT anxe:recipients.reference.password.qualifier (#PCDATA) >
+<!ATTLIST anxe:recipients.reference.password.qualifier unsl:code CDATA #REQUIRED >
+<!ELEMENT anxe:application.reference (#PCDATA) >
+<!ELEMENT anxe:processing.priority.code (#PCDATA) >
+<!ATTLIST anxe:processing.priority.code unsl:code CDATA #REQUIRED >
+<!ELEMENT anxe:acknowledgement.request (#PCDATA) >
+<!ATTLIST anxe:acknowledgement.request unsl:code CDATA #REQUIRED >
+<!ELEMENT anxe:communications.agreement.id (#PCDATA) >
+<!ELEMENT anxe:test.indicator (#PCDATA) >
+<!ATTLIST anxe:test.indicator unsl:code CDATA #REQUIRED >
+<!ELEMENT anxe:interchange.control.count (#PCDATA) >
+<!ELEMENT anxe:functional.group.identification (#PCDATA) >
+<!ELEMENT anxe:application.senders.identification (#PCDATA) >
+<!ELEMENT anxe:recipients.identification (#PCDATA) >
+<!ELEMENT anxe:functional.group.reference.number (#PCDATA) >
+<!ELEMENT anxe:controlling.agency (#PCDATA) >
+<!ATTLIST anxe:controlling.agency unsl:code CDATA #REQUIRED >
+<!ELEMENT anxe:message.version.number (#PCDATA) >
+<!ELEMENT anxe:message.release.number (#PCDATA) >
+<!ELEMENT anxe:association.assigned.code (#PCDATA) >
+<!ATTLIST anxe:association.assigned.code unsl:code CDATA #REQUIRED >
+<!ELEMENT anxe:application.password (#PCDATA) >
+<!ELEMENT anxe:number.of.messages (#PCDATA) >
+<!ELEMENT anxe:message.reference.number (#PCDATA) >
+<!ELEMENT anxe:message.type (#PCDATA) >
+<!ATTLIST anxe:message.type unsl:code CDATA #REQUIRED >
+<!ELEMENT anxe:common.access.reference (#PCDATA) >
+<!ELEMENT anxe:sequence.of.transfers (#PCDATA) >
+<!ELEMENT anxe:first.and.last.transfer (#PCDATA) >
+<!ATTLIST anxe:first.and.last.transfer unsl:code CDATA #REQUIRED >
+<!ELEMENT anxe:number.of.segments.in.the.message (#PCDATA) >
+<!ELEMENT anxe:text.reference.code (#PCDATA) >
+<!ELEMENT anxe:free.form.text (#PCDATA) >
+<!ELEMENT anxe:section.identification (#PCDATA) >
+<!ATTLIST anxe:section.identification unsl:code CDATA #REQUIRED >
+<!ELEMENT action.coded (#PCDATA) >
+<!ATTLIST action.coded unsl:code CDATA #REQUIRED >
+<!ELEMENT syntax.error.coded (#PCDATA) >
+<!ATTLIST syntax.error.coded unsl:code CDATA #REQUIRED >
+<!ELEMENT tred:document.message.name (#PCDATA) >
+<!ELEMENT tred:document.message.name.coded (#PCDATA) >
+<!ATTLIST tred:document.message.name.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:document.message.number (#PCDATA) >
+<!ELEMENT tred:message.section.coded (#PCDATA) >
+<!ATTLIST tred:message.section.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:sequence.number (#PCDATA) >
+<!ELEMENT tred:message.item.number (#PCDATA) >
+<!ELEMENT tred:message.sub.item.number (#PCDATA) >
+<!ELEMENT tred:version (#PCDATA) >
+<!ELEMENT tred:release (#PCDATA) >
+<!ELEMENT tred:revision.number (#PCDATA) >
+<!ELEMENT tred:document.line.indicator.coded (#PCDATA) >
+<!ATTLIST tred:document.line.indicator.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:line.item.number (#PCDATA) >
+<!ELEMENT tred:code.list.qualifier (#PCDATA) >
+<!ATTLIST tred:code.list.qualifier uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:reference.qualifier (#PCDATA) >
+<!ATTLIST tred:reference.qualifier uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:reference.number (#PCDATA) >
+<!ELEMENT tred:line.number (#PCDATA) >
+<!ELEMENT tred:sequence.number.source.coded (#PCDATA) >
+<!ATTLIST tred:sequence.number.source.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:number.of.originals.of.document.required (#PCDATA) >
+<!ELEMENT tred:number.of.copies.of.document.required (#PCDATA) >
+<!ELEMENT tred:configuration.level (#PCDATA) >
+<!ELEMENT tred:message.function.coded (#PCDATA) >
+<!ATTLIST tred:message.function.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:calculation.sequence.indicator.coded (#PCDATA) >
+<!ATTLIST tred:calculation.sequence.indicator.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:action.request.notification (#PCDATA) >
+<!ELEMENT tred:action.request.notification.coded (#PCDATA) >
+<!ATTLIST tred:action.request.notification.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:allowance.or.charge.number (#PCDATA) >
+<!ELEMENT tred:status.indicator.coded (#PCDATA) >
+<!ATTLIST tred:status.indicator.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:consignment.load.sequence.number (#PCDATA) >
+<!ELEMENT tred:document.message.source (#PCDATA) >
+<!ELEMENT tred:document.message.status.coded (#PCDATA) >
+<!ATTLIST tred:document.message.status.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:message.type.identifier (#PCDATA) >
+<!ELEMENT tred:control.agency (#PCDATA) >
+<!ELEMENT tred:consolidation.item.number (#PCDATA) >
+<!ELEMENT tred:goods.item.number (#PCDATA) >
+<!ELEMENT tred:computer.environment.details.qualifier (#PCDATA) >
+<!ATTLIST tred:computer.environment.details.qualifier uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:data.format (#PCDATA) >
+<!ELEMENT tred:data.format.coded (#PCDATA) >
+<!ATTLIST tred:data.format.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:value.list.type.coded (#PCDATA) >
+<!ATTLIST tred:value.list.type.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:class.designator.coded (#PCDATA) >
+<!ATTLIST tred:class.designator.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:file.name (#PCDATA) >
+<!ELEMENT tred:computer.environment (#PCDATA) >
+<!ELEMENT tred:computer.environment.coded (#PCDATA) >
+<!ELEMENT tred:value.list.name (#PCDATA) >
+<!ELEMENT tred:file.format (#PCDATA) >
+<!ELEMENT tred:value.list.identifier (#PCDATA) >
+<!ELEMENT tred:data.set.identifier (#PCDATA) >
+<!ELEMENT tred:association.assigned.identification (#PCDATA) >
+<!ELEMENT tred:date.time.period.qualifier (#PCDATA) >
+<!ATTLIST tred:date.time.period.qualifier uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:time.relation.coded (#PCDATA) >
+<!ATTLIST tred:time.relation.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:frequency.coded (#PCDATA) >
+<!ATTLIST tred:frequency.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:despatch.pattern.coded (#PCDATA) >
+<!ATTLIST tred:despatch.pattern.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:despatch.pattern.timing.coded (#PCDATA) >
+<!ATTLIST tred:despatch.pattern.timing.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:type.of.period.coded (#PCDATA) >
+<!ATTLIST tred:type.of.period.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:number.of.periods (#PCDATA) >
+<!ELEMENT charge.period.type.coded (#PCDATA) >
+<!ATTLIST charge.period.type.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:date.time.period.format.qualifier (#PCDATA) >
+<!ATTLIST tred:date.time.period.format.qualifier uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:date.time.period (#PCDATA) >
+<!ELEMENT tred:payment.time.reference.coded (#PCDATA) >
+<!ATTLIST tred:payment.time.reference.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:party.qualifier (#PCDATA) >
+<!ATTLIST tred:party.qualifier uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:party.name (#PCDATA) >
+<!ELEMENT tred:party.id.identification (#PCDATA) >
+<!ELEMENT tred:street.and.number.p.o.box (#PCDATA) >
+<!ELEMENT tred:party.name.format.coded (#PCDATA) >
+<!ATTLIST tred:party.name.format.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:code.list.responsible.agency.coded (#PCDATA) >
+<!ATTLIST tred:code.list.responsible.agency.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:test.media.coded (#PCDATA) >
+<!ATTLIST tred:test.media.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:organisation.classification.coded (#PCDATA) >
+<!ATTLIST tred:organisation.classification.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:organisational.class (#PCDATA) >
+<!ELEMENT tred:organisational.class.identification (#PCDATA) >
+<!ELEMENT tred:name.and.address.line (#PCDATA) >
+<!ELEMENT tred:carrier.identification (#PCDATA) >
+<!ELEMENT tred:carrier.name (#PCDATA) >
+<!ELEMENT tred:address.type.coded (#PCDATA) >
+<!ATTLIST tred:address.type.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:contact.function.coded (#PCDATA) >
+<!ATTLIST tred:contact.function.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:communication.number (#PCDATA) >
+<!ELEMENT tred:communication.channel.identifier.coded (#PCDATA) >
+<!ATTLIST tred:communication.channel.identifier.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:communication.channel.qualifier (#PCDATA) >
+<!ATTLIST tred:communication.channel.qualifier uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:city.name (#PCDATA) >
+<!ELEMENT tred:account.holder.name (#PCDATA) >
+<!ELEMENT tred:account.holder.number (#PCDATA) >
+<!ELEMENT tred:country.coded (#PCDATA) >
+<!ELEMENT tred:related.place.location.one (#PCDATA) >
+<!ELEMENT tred:related.place.location.one.identification (#PCDATA) >
+<!ELEMENT tred:place.location (#PCDATA) >
+<!ELEMENT tred:place.location.identification (#PCDATA) >
+<!ELEMENT tred:place.location.qualifier (#PCDATA) >
+<!ATTLIST tred:place.location.qualifier uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:country.sub.entity (#PCDATA) >
+<!ELEMENT tred:country.sub.entity.identification (#PCDATA) >
+<!ELEMENT tred:related.place.location.two (#PCDATA) >
+<!ELEMENT tred:related.place.location.two.identification (#PCDATA) >
+<!ELEMENT tred:sample.location (#PCDATA) >
+<!ELEMENT tred:sample.location.coded (#PCDATA) >
+<!ATTLIST tred:sample.location.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:country.of.origin.coded (#PCDATA) >
+<!ELEMENT tred:postcode.identification (#PCDATA) >
+<!ELEMENT tred:geographic.environment.coded (#PCDATA) >
+<!ATTLIST tred:geographic.environment.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:recipient.of.the.instruction.identification (#PCDATA) >
+<!ATTLIST tred:recipient.of.the.instruction.identification uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:address.component (#PCDATA) >
+<!ELEMENT tred:person.characteristic.qualifier (#PCDATA) >
+<!ATTLIST tred:person.characteristic.qualifier uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:nationality (#PCDATA) >
+<!ELEMENT tred:nationality.coded (#PCDATA) >
+<!ELEMENT tred:name.component.original.representation.coded (#PCDATA) >
+<!ATTLIST tred:name.component.original.representation.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:address.purpose.coded (#PCDATA) >
+<!ATTLIST tred:address.purpose.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:party.enacting.instruction.identification (#PCDATA) >
+<!ATTLIST tred:party.enacting.instruction.identification uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:person.inherited.characteristic (#PCDATA) >
+<!ELEMENT tred:person.inherited.characteristic.identification (#PCDATA) >
+<!ELEMENT tred:name.status.coded (#PCDATA) >
+<!ATTLIST tred:name.status.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:name.component (#PCDATA) >
+<!ELEMENT tred:name.component.status.coded (#PCDATA) >
+<!ATTLIST tred:name.component.status.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:name.type.coded (#PCDATA) >
+<!ATTLIST tred:name.type.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:name.component.qualifier (#PCDATA) >
+<!ATTLIST tred:name.component.qualifier uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:department.or.employee (#PCDATA) >
+<!ELEMENT tred:department.or.employee.identification (#PCDATA) >
+<!ELEMENT tred:institution.name (#PCDATA) >
+<!ELEMENT tred:institution.name.identification (#PCDATA) >
+<!ELEMENT tred:institution.branch.number (#PCDATA) >
+<!ELEMENT tred:institution.branch.place (#PCDATA) >
+<!ELEMENT tred:party.tax.identification.number (#PCDATA) >
+<!ELEMENT tred:language (#PCDATA) >
+<!ELEMENT tred:language.coded (#PCDATA) >
+<!ELEMENT tred:language.qualifier (#PCDATA) >
+<!ATTLIST tred:language.qualifier uncl:code CDATA #REQUIRED >
+<!ELEMENT originator.type.coded (#PCDATA) >
+<!ATTLIST originator.type.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:address.status.coded (#PCDATA) >
+<!ATTLIST tred:address.status.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:address.format.coded (#PCDATA) >
+<!ATTLIST tred:address.format.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:marital.status (#PCDATA) >
+<!ELEMENT tred:marital.status.coded (#PCDATA) >
+<!ATTLIST tred:marital.status.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:religion (#PCDATA) >
+<!ELEMENT tred:religion.coded (#PCDATA) >
+<!ELEMENT tred:nationality.qualifier (#PCDATA) >
+<!ATTLIST tred:nationality.qualifier uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:job.title (#PCDATA) >
+<!ELEMENT tred:sales.channel.identifier (#PCDATA) >
+<!ELEMENT tred:sex.coded (#PCDATA) >
+<!ELEMENT tred:reference.version.number (#PCDATA) >
+<!ELEMENT tred:delivery.plan.status.indicator.coded (#PCDATA) >
+<!ATTLIST tred:delivery.plan.status.indicator.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:business.description (#PCDATA) >
+<!ELEMENT tred:business.function.coded (#PCDATA) >
+<!ATTLIST tred:business.function.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:business.function.qualifier (#PCDATA) >
+<!ATTLIST tred:business.function.qualifier uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:priority.qualifier (#PCDATA) >
+<!ATTLIST tred:priority.qualifier uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:priority (#PCDATA) >
+<!ELEMENT tred:priority.coded (#PCDATA) >
+<!ELEMENT tred:additional.safety.information (#PCDATA) >
+<!ELEMENT tred:additional.safety.information.coded (#PCDATA) >
+<!ELEMENT tred:class.of.trade.coded (#PCDATA) >
+<!ATTLIST tred:class.of.trade.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:safety.section.name (#PCDATA) >
+<!ELEMENT tred:safety.section (#PCDATA) >
+<!ELEMENT tred:certainty (#PCDATA) >
+<!ELEMENT tred:certainty.coded (#PCDATA) >
+<!ELEMENT tred:characteristic.relevance.coded (#PCDATA) >
+<!ATTLIST tred:characteristic.relevance.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:terms.of.delivery.or.transport (#PCDATA) >
+<!ELEMENT tred:terms.of.delivery.or.transport.coded (#PCDATA) >
+<!ELEMENT tred:terms.of.delivery.or.transport.function.coded (#PCDATA) >
+<!ATTLIST tred:terms.of.delivery.or.transport.function.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:contract.and.carriage.condition.coded (#PCDATA) >
+<!ATTLIST tred:contract.and.carriage.condition.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:handling.instructions (#PCDATA) >
+<!ELEMENT tred:handling.instructions.coded (#PCDATA) >
+<!ELEMENT tred:special.conditions.coded (#PCDATA) >
+<!ATTLIST tred:special.conditions.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:transport.charges.method.of.payment.coded (#PCDATA) >
+<!ATTLIST tred:transport.charges.method.of.payment.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:transport.priority.coded (#PCDATA) >
+<!ATTLIST tred:transport.priority.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:discrepancy.coded (#PCDATA) >
+<!ATTLIST tred:discrepancy.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:marking.instructions.coded (#PCDATA) >
+<!ATTLIST tred:marking.instructions.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:prepaid.collect.indicator.coded (#PCDATA) >
+<!ATTLIST tred:prepaid.collect.indicator.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:terms.of.payment (#PCDATA) >
+<!ELEMENT tred:terms.of.payment.identification (#PCDATA) >
+<!ATTLIST tred:terms.of.payment.identification uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:payment.terms.type.qualifier (#PCDATA) >
+<!ATTLIST tred:payment.terms.type.qualifier uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:change.reason (#PCDATA) >
+<!ELEMENT tred:change.reason.coded (#PCDATA) >
+<!ATTLIST tred:change.reason.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:response.type.coded (#PCDATA) >
+<!ATTLIST tred:response.type.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:product.id.function.qualifier (#PCDATA) >
+<!ATTLIST tred:product.id.function.qualifier uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:bank.operation.coded (#PCDATA) >
+<!ATTLIST tred:bank.operation.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:instruction (#PCDATA) >
+<!ELEMENT tred:instruction.coded (#PCDATA) >
+<!ATTLIST tred:instruction.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:instruction.qualifier (#PCDATA) >
+<!ATTLIST tred:instruction.qualifier uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:status.coded (#PCDATA) >
+<!ATTLIST tred:status.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:sample.process.status.coded (#PCDATA) >
+<!ATTLIST tred:sample.process.status.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:test.method.identification (#PCDATA) >
+<!ELEMENT tred:test.description (#PCDATA) >
+<!ELEMENT tred:test.route.of.administering.coded (#PCDATA) >
+<!ATTLIST tred:test.route.of.administering.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:test.reason (#PCDATA) >
+<!ELEMENT tred:test.reason.identification (#PCDATA) >
+<!ELEMENT tred:payment.guarantee.coded (#PCDATA) >
+<!ATTLIST tred:payment.guarantee.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:payment.channel.coded (#PCDATA) >
+<!ATTLIST tred:payment.channel.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:payment.conditions.coded (#PCDATA) >
+<!ATTLIST tred:payment.conditions.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:free.text (#PCDATA) >
+<!ELEMENT tred:free.text.identification (#PCDATA) >
+<!ELEMENT tred:text.subject.qualifier (#PCDATA) >
+<!ATTLIST tred:text.subject.qualifier uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:text.function.coded (#PCDATA) >
+<!ATTLIST tred:text.function.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:back.order.coded (#PCDATA) >
+<!ATTLIST tred:back.order.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:product.service.substitution.coded (#PCDATA) >
+<!ATTLIST tred:product.service.substitution.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:payment.means.coded (#PCDATA) >
+<!ATTLIST tred:payment.means.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:intra.company.payment.coded (#PCDATA) >
+<!ATTLIST tred:intra.company.payment.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:adjustment.reason.coded (#PCDATA) >
+<!ATTLIST tred:adjustment.reason.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:settlement.coded (#PCDATA) >
+<!ATTLIST tred:settlement.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:type.of.financial.transaction.coded (#PCDATA) >
+<!ATTLIST tred:type.of.financial.transaction.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:delivery.requirements.coded (#PCDATA) >
+<!ATTLIST tred:delivery.requirements.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:insurance.cover (#PCDATA) >
+<!ELEMENT tred:insurance.cover.identification (#PCDATA) >
+<!ELEMENT tred:insurance.cover.type.coded (#PCDATA) >
+<!ELEMENT tred:reason.for.inventory.movement.coded (#PCDATA) >
+<!ATTLIST tred:reason.for.inventory.movement.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:inventory.movement.direction.coded (#PCDATA) >
+<!ATTLIST tred:inventory.movement.direction.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:inventory.balance.method.coded (#PCDATA) >
+<!ATTLIST tred:inventory.balance.method.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:credit.cover.request.coded (#PCDATA) >
+<!ATTLIST tred:credit.cover.request.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:credit.cover.response.coded (#PCDATA) >
+<!ATTLIST tred:credit.cover.response.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:credit.cover.reason.coded (#PCDATA) >
+<!ATTLIST tred:credit.cover.reason.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:requested.information (#PCDATA) >
+<!ELEMENT tred:requested.information.coded (#PCDATA) >
+<!ATTLIST tred:requested.information.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:maintenance.operation.coded (#PCDATA) >
+<!ATTLIST tred:maintenance.operation.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:seal.condition.coded (#PCDATA) >
+<!ATTLIST tred:seal.condition.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:monetary.amount (#PCDATA) >
+<!ELEMENT tred:monetary.function.coded (#PCDATA) >
+<!ATTLIST tred:monetary.function.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:index.qualifier (#PCDATA) >
+<!ATTLIST tred:index.qualifier uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:monetary.amount.type.qualifier (#PCDATA) >
+<!ATTLIST tred:monetary.amount.type.qualifier uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:index.type.coded (#PCDATA) >
+<!ATTLIST tred:index.type.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:index.value (#PCDATA) >
+<!ELEMENT tred:index.value.representation.coded (#PCDATA) >
+<!ATTLIST tred:index.value.representation.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:contribution.qualifier (#PCDATA) >
+<!ATTLIST tred:contribution.qualifier uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:contribution.type (#PCDATA) >
+<!ELEMENT tred:contribution.type.coded (#PCDATA) >
+<!ATTLIST tred:contribution.type.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:price (#PCDATA) >
+<!ELEMENT tred:price.qualifier (#PCDATA) >
+<!ATTLIST tred:price.qualifier uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:duty.tax.fee.type (#PCDATA) >
+<!ELEMENT tred:duty.tax.fee.type.coded (#PCDATA) >
+<!ATTLIST tred:duty.tax.fee.type.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:charge.allowance.description.coded (#PCDATA) >
+<!ATTLIST tred:charge.allowance.description.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:sub.line.price.change.coded (#PCDATA) >
+<!ATTLIST tred:sub.line.price.change.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:charge.category.coded (#PCDATA) >
+<!ATTLIST tred:charge.category.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:rate.tariff.class (#PCDATA) >
+<!ELEMENT tred:rate.tariff.class.identification (#PCDATA) >
+<!ATTLIST tred:rate.tariff.class.identification uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:percentage.qualifier (#PCDATA) >
+<!ATTLIST tred:percentage.qualifier uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:percentage.basis.coded (#PCDATA) >
+<!ATTLIST tred:percentage.basis.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT charge.unit.coded (#PCDATA) >
+<!ATTLIST charge.unit.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT service.to.be.paid.coded (#PCDATA) >
+<!ATTLIST service.to.be.paid.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:duty.tax.fee.rate.basis.identification (#PCDATA) >
+<!ATTLIST tred:duty.tax.fee.rate.basis.identification uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:supplementary.rate.tariff.basis.identification (#PCDATA) >
+<!ELEMENT tred:duty.tax.fee.rate (#PCDATA) >
+<!ELEMENT tred:duty.tax.fee.rate.identification (#PCDATA) >
+<!ELEMENT tred:duty.tax.fee.function.qualifier (#PCDATA) >
+<!ATTLIST tred:duty.tax.fee.function.qualifier uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:unit.price.basis (#PCDATA) >
+<!ELEMENT tred:duty.tax.fee.assessment.basis (#PCDATA) >
+<!ELEMENT tred:duty.tax.fee.account.identification (#PCDATA) >
+<!ELEMENT tred:duty.tax.fee.category.coded (#PCDATA) >
+<!ATTLIST tred:duty.tax.fee.category.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:remuneration.type (#PCDATA) >
+<!ELEMENT tred:remuneration.type.coded (#PCDATA) >
+<!ATTLIST tred:remuneration.type.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:price.type.coded (#PCDATA) >
+<!ATTLIST tred:price.type.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:price.change.indicator.coded (#PCDATA) >
+<!ELEMENT tred:product.group.type.coded (#PCDATA) >
+<!ATTLIST tred:product.group.type.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:price.type.qualifier (#PCDATA) >
+<!ATTLIST tred:price.type.qualifier uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:product.group (#PCDATA) >
+<!ELEMENT tred:product.group.coded (#PCDATA) >
+<!ELEMENT tred:price.multiplier.qualifier (#PCDATA) >
+<!ATTLIST tred:price.multiplier.qualifier uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:price.multiplier (#PCDATA) >
+<!ELEMENT tred:rate.of.exchange (#PCDATA) >
+<!ELEMENT tred:rate.type.qualifier (#PCDATA) >
+<!ATTLIST tred:rate.type.qualifier uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:rate.per.unit (#PCDATA) >
+<!ELEMENT tred:allowance.or.charge.qualifier (#PCDATA) >
+<!ATTLIST tred:allowance.or.charge.qualifier uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:relation.coded (#PCDATA) >
+<!ELEMENT tred:percentage (#PCDATA) >
+<!ELEMENT tred:sub.line.indicator.coded (#PCDATA) >
+<!ATTLIST tred:sub.line.indicator.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT rate.plan.coded (#PCDATA) >
+<!ATTLIST rate.plan.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:height.dimension (#PCDATA) >
+<!ELEMENT tred:quantity (#PCDATA) >
+<!ELEMENT tred:quantity.qualifier (#PCDATA) >
+<!ATTLIST tred:quantity.qualifier uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:quantity.difference (#PCDATA) >
+<!ELEMENT tred:control.value (#PCDATA) >
+<!ELEMENT tred:control.qualifier (#PCDATA) >
+<!ATTLIST tred:control.qualifier uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:frequency.qualifier (#PCDATA) >
+<!ATTLIST tred:frequency.qualifier uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:frequency.value (#PCDATA) >
+<!ELEMENT tred:confidence.limit (#PCDATA) >
+<!ELEMENT tred:result.type.coded (#PCDATA) >
+<!ATTLIST tred:result.type.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:result.normalcy.indicator.coded (#PCDATA) >
+<!ATTLIST tred:result.normalcy.indicator.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:dosage (#PCDATA) >
+<!ELEMENT tred:dosage.identification (#PCDATA) >
+<!ELEMENT tred:dosage.administration.qualifier (#PCDATA) >
+<!ATTLIST tred:dosage.administration.qualifier uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:result.qualifier (#PCDATA) >
+<!ATTLIST tred:result.qualifier uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:width.dimension (#PCDATA) >
+<!ELEMENT tred:dimension.qualifier (#PCDATA) >
+<!ATTLIST tred:dimension.qualifier uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:range.maximum (#PCDATA) >
+<!ELEMENT tred:measurement.attribute (#PCDATA) >
+<!ELEMENT tred:measurement.attribute.identification (#PCDATA) >
+<!ATTLIST tred:measurement.attribute.identification uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:range.minimum (#PCDATA) >
+<!ELEMENT tred:range.type.qualifier (#PCDATA) >
+<!ATTLIST tred:range.type.qualifier uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:length.dimension (#PCDATA) >
+<!ELEMENT tred:size.qualifier (#PCDATA) >
+<!ATTLIST tred:size.qualifier uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:size (#PCDATA) >
+<!ELEMENT tred:maximum.number.of.occurrences (#PCDATA) >
+<!ELEMENT tred:temperature.qualifier (#PCDATA) >
+<!ATTLIST tred:temperature.qualifier uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:temperature.setting (#PCDATA) >
+<!ELEMENT tred:measurement.application.qualifier (#PCDATA) >
+<!ATTLIST tred:measurement.application.qualifier uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:measurement.dimension.coded (#PCDATA) >
+<!ATTLIST tred:measurement.dimension.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:measurement.value (#PCDATA) >
+<!ELEMENT tred:measurement.significance.coded (#PCDATA) >
+<!ATTLIST tred:measurement.significance.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:statistic.type.coded (#PCDATA) >
+<!ATTLIST tred:statistic.type.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:currency.market.exchange.coded (#PCDATA) >
+<!ATTLIST tred:currency.market.exchange.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:currency.qualifier (#PCDATA) >
+<!ATTLIST tred:currency.qualifier uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:currency.coded (#PCDATA) >
+<!ELEMENT tred:currency.details.qualifier (#PCDATA) >
+<!ATTLIST tred:currency.details.qualifier uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:currency.rate.base (#PCDATA) >
+<!ELEMENT tred:number.of.units (#PCDATA) >
+<!ELEMENT tred:number.of.units.qualifier (#PCDATA) >
+<!ATTLIST tred:number.of.units.qualifier uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:measure.unit.qualifier (#PCDATA) >
+<!ELEMENT tred:clinical.information (#PCDATA) >
+<!ELEMENT tred:clinical.information.identification (#PCDATA) >
+<!ELEMENT tred:clinical.information.qualifier (#PCDATA) >
+<!ATTLIST tred:clinical.information.qualifier uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:measurement.unit (#PCDATA) >
+<!ELEMENT tred:measurement.unit.identification (#PCDATA) >
+<!ELEMENT tred:number.of.stages (#PCDATA) >
+<!ELEMENT tred:actual.stage.count (#PCDATA) >
+<!ELEMENT tred:significant.digits (#PCDATA) >
+<!ELEMENT tred:statistical.concept.identifier (#PCDATA) >
+<!ELEMENT tred:physical.or.logical.state.qualifier (#PCDATA) >
+<!ATTLIST tred:physical.or.logical.state.qualifier uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:physical.or.logical.state (#PCDATA) >
+<!ELEMENT tred:physical.or.logical.state.coded (#PCDATA) >
+<!ATTLIST tred:physical.or.logical.state.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:item.description (#PCDATA) >
+<!ELEMENT tred:item.description.identification (#PCDATA) >
+<!ELEMENT tred:article.availability.coded (#PCDATA) >
+<!ATTLIST tred:article.availability.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:characteristic (#PCDATA) >
+<!ELEMENT tred:characteristic.identification (#PCDATA) >
+<!ELEMENT tred:sample.selection.method.coded (#PCDATA) >
+<!ATTLIST tred:sample.selection.method.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:sample.description.coded (#PCDATA) >
+<!ATTLIST tred:sample.description.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:sample.direction.coded (#PCDATA) >
+<!ATTLIST tred:sample.direction.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:property.class.coded (#PCDATA) >
+<!ATTLIST tred:property.class.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:type.of.packages (#PCDATA) >
+<!ELEMENT tred:type.of.packages.identification (#PCDATA) >
+<!ELEMENT tred:packaging.terms.and.conditions.coded (#PCDATA) >
+<!ATTLIST tred:packaging.terms.and.conditions.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:packaging.level.coded (#PCDATA) >
+<!ATTLIST tred:packaging.level.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:item.description.type.coded (#PCDATA) >
+<!ATTLIST tred:item.description.type.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:item.characteristic.coded (#PCDATA) >
+<!ATTLIST tred:item.characteristic.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:configuration.coded (#PCDATA) >
+<!ATTLIST tred:configuration.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:nature.of.cargo.coded (#PCDATA) >
+<!ATTLIST tred:nature.of.cargo.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:dangerous.goods.flashpoint (#PCDATA) >
+<!ELEMENT tred:shipping.marks (#PCDATA) >
+<!ELEMENT tred:shipment.flashpoint (#PCDATA) >
+<!ELEMENT tred:characteristic.value (#PCDATA) >
+<!ELEMENT tred:characteristic.value.coded (#PCDATA) >
+<!ELEMENT tred:undg.number (#PCDATA) >
+<!ELEMENT tred:customer.authorization.number (#PCDATA) >
+<!ELEMENT product.details.qualifier (#PCDATA) >
+<!ATTLIST product.details.qualifier uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:item.number (#PCDATA) >
+<!ELEMENT tred:item.number.type.coded (#PCDATA) >
+<!ATTLIST tred:item.number.type.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:special.service (#PCDATA) >
+<!ELEMENT tred:special.services.coded (#PCDATA) >
+<!ATTLIST tred:special.services.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:hierarchical.id.number (#PCDATA) >
+<!ELEMENT tred:hierarchical.parent.id (#PCDATA) >
+<!ELEMENT tred:level.number (#PCDATA) >
+<!ELEMENT tred:hierarchical.level.coded (#PCDATA) >
+<!ATTLIST tred:hierarchical.level.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:hierarchy.object.qualifier (#PCDATA) >
+<!ATTLIST tred:hierarchy.object.qualifier uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:rule.part.identification (#PCDATA) >
+<!ELEMENT tred:process.type (#PCDATA) >
+<!ELEMENT tred:process.type.identification (#PCDATA) >
+<!ATTLIST tred:process.type.identification uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:test.revision.number (#PCDATA) >
+<!ELEMENT tred:process (#PCDATA) >
+<!ELEMENT tred:process.identification (#PCDATA) >
+<!ELEMENT tred:number.of.packages (#PCDATA) >
+<!ELEMENT tred:packaging.related.information.coded (#PCDATA) >
+<!ATTLIST tred:packaging.related.information.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:total.number.of.items (#PCDATA) >
+<!ELEMENT tred:service.requirement.coded (#PCDATA) >
+<!ATTLIST tred:service.requirement.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:sector.subject.identification.qualifier (#PCDATA) >
+<!ATTLIST tred:sector.subject.identification.qualifier uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:requirement.or.condition (#PCDATA) >
+<!ELEMENT tred:requirement.condition.identification (#PCDATA) >
+<!ELEMENT tred:set.identification.qualifier (#PCDATA) >
+<!ATTLIST tred:set.identification.qualifier uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:requirement.designator.coded (#PCDATA) >
+<!ATTLIST tred:requirement.designator.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:commodity.rate.identification (#PCDATA) >
+<!ELEMENT tred:customs.code.identification (#PCDATA) >
+<!ELEMENT tred:processing.indicator.coded (#PCDATA) >
+<!ATTLIST tred:processing.indicator.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:surface.layer.indicator.coded (#PCDATA) >
+<!ATTLIST tred:surface.layer.indicator.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:identity.number (#PCDATA) >
+<!ELEMENT tred:identity.number.qualifier (#PCDATA) >
+<!ATTLIST tred:identity.number.qualifier uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:hazardous.material.class (#PCDATA) >
+<!ELEMENT tred:hazardous.material.class.code.identification (#PCDATA) >
+<!ELEMENT tred:indexing.structure.qualifier (#PCDATA) >
+<!ATTLIST tred:indexing.structure.qualifier uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:agreement.type.qualifier (#PCDATA) >
+<!ATTLIST tred:agreement.type.qualifier uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:agreement.type.coded (#PCDATA) >
+<!ATTLIST tred:agreement.type.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:agreement.type.description (#PCDATA) >
+<!ELEMENT tred:level.one.id (#PCDATA) >
+<!ELEMENT tred:level.two.id (#PCDATA) >
+<!ELEMENT tred:level.three.id (#PCDATA) >
+<!ELEMENT tred:level.four.id (#PCDATA) >
+<!ELEMENT tred:level.five.id (#PCDATA) >
+<!ELEMENT tred:level.six.id (#PCDATA) >
+<!ELEMENT tred:membership.qualifier (#PCDATA) >
+<!ATTLIST tred:membership.qualifier uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:membership.category (#PCDATA) >
+<!ELEMENT tred:membership.category.identification (#PCDATA) >
+<!ATTLIST tred:membership.category.identification uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:membership.status (#PCDATA) >
+<!ELEMENT tred:membership.status.coded (#PCDATA) >
+<!ELEMENT tred:membership.level.qualifier (#PCDATA) >
+<!ATTLIST tred:membership.level.qualifier uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:membership.level (#PCDATA) >
+<!ELEMENT tred:membership.level.identification (#PCDATA) >
+<!ELEMENT tred:attendee.category (#PCDATA) >
+<!ELEMENT tred:attendee.category.coded (#PCDATA) >
+<!ELEMENT tred:type.of.inventory.affected.coded (#PCDATA) >
+<!ATTLIST tred:type.of.inventory.affected.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:damage.details.qualifier (#PCDATA) >
+<!ATTLIST tred:damage.details.qualifier uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:identification.qualifier (#PCDATA) >
+<!ATTLIST tred:identification.qualifier uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:component.function.qualifier (#PCDATA) >
+<!ATTLIST tred:component.function.qualifier uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:type.of.damage (#PCDATA) >
+<!ELEMENT tred:type.of.damage.coded (#PCDATA) >
+<!ELEMENT tred:damage.area (#PCDATA) >
+<!ELEMENT tred:damage.area.identification (#PCDATA) >
+<!ELEMENT tred:type.of.unit.component (#PCDATA) >
+<!ELEMENT tred:type.of.unit.component.coded (#PCDATA) >
+<!ELEMENT tred:component.material (#PCDATA) >
+<!ELEMENT tred:component.material.coded (#PCDATA) >
+<!ELEMENT tred:damage.severity (#PCDATA) >
+<!ELEMENT tred:damage.severity.coded (#PCDATA) >
+<!ELEMENT tred:type.of.marking.coded (#PCDATA) >
+<!ELEMENT tred:structure.component.identifier (#PCDATA) >
+<!ELEMENT tred:freight.and.charges (#PCDATA) >
+<!ELEMENT tred:freight.and.charges.identification (#PCDATA) >
+<!ELEMENT tred:conveyance.reference.number (#PCDATA) >
+<!ELEMENT tred:transport.stage.qualifier (#PCDATA) >
+<!ATTLIST tred:transport.stage.qualifier uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:equipment.qualifier (#PCDATA) >
+<!ATTLIST tred:equipment.qualifier uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:mode.of.transport (#PCDATA) >
+<!ELEMENT tred:mode.of.transport.coded (#PCDATA) >
+<!ELEMENT tred:equipment.supplier.coded (#PCDATA) >
+<!ATTLIST tred:equipment.supplier.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:hazard.substance.item.page.number (#PCDATA) >
+<!ELEMENT tred:hazard.code.version.number (#PCDATA) >
+<!ELEMENT tred:transit.direction.coded (#PCDATA) >
+<!ATTLIST tred:transit.direction.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:trem.card.number (#PCDATA) >
+<!ELEMENT tred:equipment.size.and.type (#PCDATA) >
+<!ELEMENT tred:equipment.size.and.type.identification (#PCDATA) >
+<!ATTLIST tred:equipment.size.and.type.identification uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:hazard.identification.number.upper.part (#PCDATA) >
+<!ELEMENT tred:full.empty.indicator.coded (#PCDATA) >
+<!ATTLIST tred:full.empty.indicator.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:type.of.means.of.transport (#PCDATA) >
+<!ELEMENT tred:type.of.means.of.transport.identification (#PCDATA) >
+<!ATTLIST tred:type.of.means.of.transport.identification uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:substance.identification.number.lower.part (#PCDATA) >
+<!ELEMENT tred:permission.for.transport.coded (#PCDATA) >
+<!ELEMENT tred:id.of.the.means.of.transport (#PCDATA) >
+<!ELEMENT tred:id.of.means.of.transport.identification (#PCDATA) >
+<!ELEMENT tred:dangerous.goods.label.marking (#PCDATA) >
+<!ELEMENT tred:equipment.status.coded (#PCDATA) >
+<!ATTLIST tred:equipment.status.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:packing.instruction.coded (#PCDATA) >
+<!ELEMENT tred:equipment.identification.number (#PCDATA) >
+<!ELEMENT tred:dangerous.goods.regulations.coded (#PCDATA) >
+<!ATTLIST tred:dangerous.goods.regulations.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:container.package.status.coded (#PCDATA) >
+<!ATTLIST tred:container.package.status.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:transport.ownership.coded (#PCDATA) >
+<!ATTLIST tred:transport.ownership.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:transport.movement.coded (#PCDATA) >
+<!ATTLIST tred:transport.movement.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:category.of.means.of.transport.coded (#PCDATA) >
+<!ATTLIST tred:category.of.means.of.transport.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:equipment.plan (#PCDATA) >
+<!ELEMENT tred:movement.type (#PCDATA) >
+<!ELEMENT tred:movement.type.coded (#PCDATA) >
+<!ATTLIST tred:movement.type.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:packing.group.coded (#PCDATA) >
+<!ATTLIST tred:packing.group.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:haulage.arrangements.coded (#PCDATA) >
+<!ATTLIST tred:haulage.arrangements.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:hazard.code.identification (#PCDATA) >
+<!ELEMENT tred:ems.number (#PCDATA) >
+<!ELEMENT tred:returnable.package.load.contents.coded (#PCDATA) >
+<!ATTLIST tred:returnable.package.load.contents.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:returnable.package.freight.payment.responsibility.coded (#PCDATA) >
+<!ATTLIST tred:returnable.package.freight.payment.responsibility.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:mfag (#PCDATA) >
+<!ELEMENT tred:nationality.of.means.of.transport.coded (#PCDATA) >
+<!ELEMENT tred:excess.transportation.reason.coded (#PCDATA) >
+<!ATTLIST tred:excess.transportation.reason.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:excess.transportation.responsibility.coded (#PCDATA) >
+<!ATTLIST tred:excess.transportation.responsibility.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:employment.qualifier (#PCDATA) >
+<!ATTLIST tred:employment.qualifier uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:employment.category (#PCDATA) >
+<!ELEMENT tred:employment.category.coded (#PCDATA) >
+<!ELEMENT tred:qualification.classification (#PCDATA) >
+<!ELEMENT tred:qualification.classification.coded (#PCDATA) >
+<!ELEMENT tred:occupation (#PCDATA) >
+<!ELEMENT tred:occupation.coded (#PCDATA) >
+<!ELEMENT tred:status.event (#PCDATA) >
+<!ELEMENT tred:status.event.coded (#PCDATA) >
+<!ATTLIST tred:status.event.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:status.reason (#PCDATA) >
+<!ELEMENT tred:status.reason.coded (#PCDATA) >
+<!ATTLIST tred:status.reason.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:status.type.coded (#PCDATA) >
+<!ATTLIST tred:status.type.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:attribute.function.qualifier (#PCDATA) >
+<!ATTLIST tred:attribute.function.qualifier uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:attribute (#PCDATA) >
+<!ELEMENT tred:attribute.coded (#PCDATA) >
+<!ELEMENT tred:attribute.type.coded (#PCDATA) >
+<!ELEMENT tred:qualification.area.coded (#PCDATA) >
+<!ATTLIST tred:qualification.area.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:qualification.qualifier (#PCDATA) >
+<!ATTLIST tred:qualification.qualifier uncl:code CDATA #REQUIRED >
+<!ELEMENT facility.type.coded (#PCDATA) >
+<!ATTLIST facility.type.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT reservation.control.number.qualifier (#PCDATA) >
+<!ATTLIST reservation.control.number.qualifier uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:relationship.qualifier (#PCDATA) >
+<!ATTLIST tred:relationship.qualifier uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:relationship (#PCDATA) >
+<!ELEMENT tred:relationship.coded (#PCDATA) >
+<!ELEMENT tred:composite.data.element.tag (#PCDATA) >
+<!ELEMENT tred:directory.status (#PCDATA) >
+<!ELEMENT tred:simple.data.element.tag (#PCDATA) >
+<!ELEMENT tred:simple.data.element.character.representation.coded (#PCDATA) >
+<!ATTLIST tred:simple.data.element.character.representation.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:simple.data.element.length.type.coded (#PCDATA) >
+<!ATTLIST tred:simple.data.element.length.type.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:simple.data.element.maximum.length (#PCDATA) >
+<!ELEMENT tred:simple.data.element.minimum.length (#PCDATA) >
+<!ELEMENT tred:code.set.indicator.coded (#PCDATA) >
+<!ATTLIST tred:code.set.indicator.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:data.element.tag (#PCDATA) >
+<!ELEMENT tred:group.identification (#PCDATA) >
+<!ELEMENT tred:segment.tag (#PCDATA) >
+<!ELEMENT tred:type.of.duty.regime.coded (#PCDATA) >
+<!ATTLIST tred:type.of.duty.regime.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:validation.result (#PCDATA) >
+<!ELEMENT tred:validation.key.identification (#PCDATA) >
+<!ELEMENT tred:sealing.party (#PCDATA) >
+<!ELEMENT tred:sealing.party.coded (#PCDATA) >
+<!ATTLIST tred:sealing.party.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:seal.number (#PCDATA) >
+<!ELEMENT tred:application.error.identification (#PCDATA) >
+<!ELEMENT tred:government.procedure.coded (#PCDATA) >
+<!ATTLIST tred:government.procedure.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:government.involvement.coded (#PCDATA) >
+<!ATTLIST tred:government.involvement.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:government.agency.coded (#PCDATA) >
+<!ATTLIST tred:government.agency.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:government.action.coded (#PCDATA) >
+<!ATTLIST tred:government.action.coded uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:service.layer.coded (#PCDATA) >
+<!ELEMENT tred:stages.qualifier (#PCDATA) >
+<!ATTLIST tred:stages.qualifier uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:array.cell.information (#PCDATA) >
+<!ELEMENT tred:code.value (#PCDATA) >
+<!ELEMENT tred:array.structure.identifier (#PCDATA) >
+<!ELEMENT tred:footnote.set.identifier (#PCDATA) >
+<!ELEMENT tred:footnote.identifier (#PCDATA) >
+<!ELEMENT tred:code.name (#PCDATA) >
+<!ELEMENT tred:clinical.intervention (#PCDATA) >
+<!ELEMENT tred:clinical.intervention.identification (#PCDATA) >
+<!ELEMENT tred:clinical.intervention.qualifier (#PCDATA) >
+<!ATTLIST tred:clinical.intervention.qualifier uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:attendance.qualifier (#PCDATA) >
+<!ATTLIST tred:attendance.qualifier uncl:code CDATA #REQUIRED >
+<!ELEMENT tred:admission.type (#PCDATA) >
+<!ELEMENT tred:admission.type.coded (#PCDATA) >
+<!ELEMENT tred:discharge.type (#PCDATA) >
+<!ELEMENT tred:discharge.type.coded (#PCDATA) >

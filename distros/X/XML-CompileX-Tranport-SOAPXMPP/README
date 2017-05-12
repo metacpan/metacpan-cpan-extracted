@@ -1,0 +1,132 @@
+NAME
+    XML::Compile::Transport::SOAPXMPP - Send SOAP messages through XMPP
+
+INHERITANCE
+      XML::Compile::Transport::SOAPXMPP
+        is a XML::Compile::Transport
+
+SYNOPSIS
+      use XML::Compile::Transport::SOAPXMPP;
+
+      my $trans = XML::Compile::Transport::SOAPXMPP->new()
+      $send = $trans->compileClient();
+
+      my $call = $wsdl->compileClient(
+        operation => 'foo',
+        transport => $send);
+
+      # later on...
+
+      $trans->set_connection($net_xmpp2_connection_object);
+      $call->(...);
+
+DESCRIPTION
+    This module serves as the transport layer for the XML::Compile::SOAP
+    suite. It provides XMPP acccess to srevices, but it doesn't deal with
+    the parsing of the message or of the wsdl in any way, it is simply used
+    to send and receive XML data.
+
+METHODS
+    XML::Compile::Transport::SOAPXMPP->new(OPTIONS)
+        This method creates a new transport object. Unlike the HTTP
+        transport this object does not represent a connection by itself.
+        This object represents a connection manager, that will allow you to
+        set the Net::XMPP2 object to use when doing the actual requests.
+
+        This is a important feature because XMPP implies a context of who in
+        sending the message, unlike HTTP, and in most cases, you might want
+        to reuse the result from Compile Client to do the same call using
+        different sender identifications.
+
+        OPTIONS can be (see below for details):
+
+        connection
+            Allows you to set the initial connection to be used. It's not
+            required if you set it later, but there must be a set connection
+            before a message can be sent.
+
+        force_stanza_type
+            See below.
+
+        wait_iq_reply
+            See below.
+
+    $trans->connection($net_xmpp2_connection_object)
+        This method sets the connection to be used by the calls that were
+        compiled with this transport manager. This is mostly like setting a
+        global variable, but it is limited to the scope of the clients
+        compiled with this transport.
+
+    $trans->force_stanza_type('iq'|'message'|undef)
+        By default, request/response messages will be sent using 'iq'
+        stanzas and request-only messages will be sent using 'message'. You
+        can force one of both, or set it to the default behaviour.
+
+        It is important to realise that in order to maintain a coherent
+        interface with XML::Compile::SOAP, 'iq' messages will, by default,
+        block the current execution until the iq reply is received.
+
+    $trans->wait_iq_reply(1|0)
+        This method can be used to override the default behaviour of holding
+        the execution until the iq reply is received. It's important to
+        realise that this is not really blocking the process, but simply
+        getting into the main loop while the iq reply is received. This is
+        done using AnyEvent->condvar. Please take a look at AnyEvent
+        documentation.
+
+    $trans->last_sent_message_id()
+        Id of the last message sent.
+
+    $trans->last_sent_iq_id()
+        Id of the last iq sent.
+
+    $trans->iq_replies()
+        Returns a hashref of all currently stored iq replies.
+
+    $trans->consume_iq_reply(id)
+        When an iq reply is received, it is stored in this object using the
+        id as a key. This method allows you to fetch that response. It will
+        return undef if there is no reply for that id, which can mean that
+        either the reply didn't arrive or it was already consumed.
+
+        The return of this method is the Net::XMPP2::Node object of the iq
+        reply.
+
+SEND BUFFER
+    Net::XMPP2 is completely asynchronous. This means that even when you ask
+    it to send a message, the message might not be sent yet, because if the
+    write would block, Net::XMPP2 will return immediatly and wait for a next
+    event loop iteraction to continue the send process. This might not be
+    desirable when dealing with SOAP services.
+
+    On the other hand, Net::XMPP2 also provides an option for waiting until
+    the buffer is empty before returning from send_message and send_iq.
+    Please take a look at Net::XMPP2::Connection documentation for details
+    on that.
+
+ERROR HANDLING
+    It's important to realise that XMPP is, by definition, an async
+    protocol. When using request-only messages, the only way to know that
+    something went wrong is to wait for errors. If the error is not
+    transport-related, it won't even be reported as an error, but as a
+    normal message with a fault in the body.
+
+    This is the basic reason for mapping request/response messages as iq
+    stanzas.
+
+    This module, at this moment, won't expect for fault messages. If you're
+    using request-only, you should register callbacks in the xmpp connection
+    to receive them. You can introspect into the WSDL Operation to compile
+    and parse the fault messages.
+
+SEE ALSO
+    XML::Compile::SOAP, XML::Compile::Transport::SOAPHTTP,
+    Net::XMPP2::Connection, AnyEvent
+
+LICENSE
+    Copyright 2008 by Daniel Ruoso. For other contributors see ChangeLog.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself. See
+    http://www.perl.com/perl/misc/Artistic.html
+

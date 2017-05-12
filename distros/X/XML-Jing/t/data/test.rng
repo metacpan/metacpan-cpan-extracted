@@ -1,0 +1,11 @@
+<element name="team" xmlns="http://relaxng.org/ns/structure/1.0" >
+    <element name="name"> <text /> </element>
+    <element name="manager"> <text /> </element>
+    <element name="players">
+        <oneOrMore>
+            <element name="player">
+                <attribute name="name" />
+            </element>
+        </oneOrMore>
+    </element>
+</element>

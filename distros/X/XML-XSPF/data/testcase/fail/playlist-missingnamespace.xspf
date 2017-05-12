@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  Description: Missing namespace
+  Expect:      MissingNamespace{element:playlist}
+-->
+
+<playlist version="1">
+
+  <trackList>
+  </trackList>
+
+</playlist>

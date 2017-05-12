@@ -1,0 +1,126 @@
+NAME
+    XML::RSS::JavaScript - serialize your RSS as JavaScript
+
+SYNOPSIS
+        use XML::RSS::JavaScript;
+        my $rss = XML::RSS::JavaScript->new();
+        $rss->channel(
+        title        => 'My Channel',
+        link        => 'http://my.url.com',
+        description => 'My RSS Feed.'
+        );
+
+        $rss->add_item(
+        title        => 'My item #1',
+        link        => 'http://my.item.com#1',
+        description => 'My first news item.'
+        );
+
+        $rss->add_item( 
+        title        => 'My item #2',
+        link        => 'http://my.item.com#2',
+        description => 'My second news item.'
+        );
+
+        # save rss 
+        $rss->save( '/usr/local/apache/htdocs/myfeed.xml' );
+
+        # save identical content as javascript
+        $rss->save_javascript( '/usr/local/apache/htdocs/myfeed.js');
+
+DESCRIPTION
+    Perhaps you use XML::RSS to generate RSS for consumption by RSS parsers.
+    Perhaps you also get requests for how to use the RSS feed by people who
+    have no idea how to parse XML, or write Perl programs for that matter.
+
+    Enter XML::RSS::JavaScript, a simple subclass of XML::RSS which writes
+    your RSS feed as a sequence of JavaScript print statements. This means
+    you can then write the JavaScript to disk, and a users HTML can simply
+    *include* it like so:
+
+        <script language="JavaScript" src="/myfeed.js"></script>
+
+    What's more the javascript emits HTML that can be fully styled with CSS.
+    See the CSS examples included with the distribution in the css
+    directory.
+
+        <html>
+        <head>
+        <link rel="stylesheet" type="text/css" href="/css/rollover1.css">
+        </head>
+        <body>
+        Your content here...
+        <script language="JavaScript" src="http://my.feed.com//myfeed.js"></script>
+        </body>
+        </html>
+
+INSTALLATION
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+METHODS
+  save_javascript()
+    Pass in the path to a file you wish to write your javascript in.
+    Optionally you can pass in the maximum amount of items to include from
+    the feed and a boolean value to switch descriptions on or off (default:
+    on).
+
+        # save all the content 
+        save_javascript( '/usr/local/apache/htdocs/rss/myfeed.js' );
+
+        # no more than 10 items:
+        save_javascript( '/usr/local/apache/htdocs/rss/myfeed.js', 10 );
+
+        # save all items without descriptions:
+        save_javascript( '/usr/local/apache/htdocs/rss/myfeed.js', undef, 0 );
+
+  as_javascript()
+    as_javascript will return a string containing javascript suitable for
+    generating text for your RSS object. You can pass in the maximum amount
+    of items to include by passing in an integer as an argument and a
+    boolean value to switch descriptions on or off (default: on). If you
+    pass in no argument you will get the contents of the entire object.
+
+        $js = $rss->as_javascript();
+
+  save_json( )
+    Pass in the path to a file you wish to write your javascript in.
+    Optionally you can pass in any options that would normally get passed to
+    "as_json".
+
+  as_json( )
+    as_json will return a string containing json suitable for generating
+    text for your RSS object. You can pass in the maximum amount of items to
+    include by passing in an integer as an argument. If you pass in no
+    argument you will get the contents of the entire object. You can also
+    pass in the name of the JSON object (default: RSSJSON).
+
+MORE EXAMPLES
+    Perhaps you want to get an existing RSS feed, suck it in, and write it
+    out as JavaScript for easy consumption.
+
+        use XML::RSS::JavaScript;
+        use LWP::Simple;
+
+        my $xml = get( 'http://slashdot.org/slashdot.rss' );
+        my $rss = XML::RSS::JavaScript->new();
+    
+        $rss->parse( $xml );
+        print $rss->as_javascript();
+
+SEE ALSO
+    *   XML::RSS
+
+AUTHORS
+    Brian Cassidy <bricas@cpan.org>
+
+    Ed Summers <ehs@pobox.com>
+
+COPYRIGHT AND LICENSE
+    Copyright 2003-2013 by Brian Cassidy and Ed Summers
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

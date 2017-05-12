@@ -1,0 +1,6 @@
+% layout 'default';
+% title 'Server Error';
+
+<p class="alert alert-extra-danger"><i class="glyphicon glyphicon-exclamation-sign"></i> A server error has occured. Please try again later
+    or report the issue to the website administrator.</p>
+

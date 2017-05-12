@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<dm3:diff xmlns:dm3="http://www.locus.cz/diffmark">
+  <dm:new xmlns:dm="http://www.deadmouse.com/" dm3:update="dm:old">
+    <dm3:copy count="1"/>
+  </dm:new>
+</dm3:diff>

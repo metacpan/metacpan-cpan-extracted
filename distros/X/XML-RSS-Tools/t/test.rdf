@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!-- $Id: test.rdf 56 2008-06-23 16:54:31Z adam $ -->
+
+<rdf:RDF
+ xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+ xmlns="http://purl.org/rss/1.0/"
+ xmlns:dc="http://purl.org/dc/elements/1.1/"
+ xmlns:taxo="http://purl.org/rss/1.0/modules/taxonomy/"
+ xmlns:syn="http://purl.org/rss/1.0/modules/syndication/"
+>
+
+<channel rdf:about="http://use.perl.org/">
+<title>use Perl: All The Perl That's P7L to E5T and R4T</title>
+<link>http://use.perl.org/</link>
+<description>All The Perl That's P7L to E5T and R4T</description>
+<items>
+ <rdf:Seq>
+  <rdf:li rdf:resource="http://use.perl.org/article.pl?sid=02/05/06/179233" />
+  <rdf:li rdf:resource="http://use.perl.org/article.pl?sid=02/05/02/1841221" />
+  <rdf:li rdf:resource="http://use.perl.org/article.pl?sid=02/05/02/0233204" />
+  <rdf:li rdf:resource="http://use.perl.org/article.pl?sid=02/05/01/2021233" />
+  <rdf:li rdf:resource="http://use.perl.org/article.pl?sid=02/04/30/199221" />
+  <rdf:li rdf:resource="http://use.perl.org/article.pl?sid=02/04/30/1612255" />
+  <rdf:li rdf:resource="http://use.perl.org/article.pl?sid=02/04/30/1530252" />
+  <rdf:li rdf:resource="http://use.perl.org/article.pl?sid=02/04/30/024257" />
+  <rdf:li rdf:resource="http://use.perl.org/article.pl?sid=02/04/29/1911226" />
+  <rdf:li rdf:resource="http://use.perl.org/article.pl?sid=02/04/29/1749200" />
+ </rdf:Seq>
+</items>
+<image rdf:resource="http://use.perl.org/images/topics/useperl.gif" />
+<textinput rdf:resource="http://use.perl.org/search.pl" />
+</channel>
+
+<image rdf:about="http://use.perl.org/images/topics/useperl.gif">
+<title>use Perl: All The Perl That's P7L to E5T and R4T</title>
+<url>http://use.perl.org/images/topics/useperl.gif</url>
+<link>http://use.perl.org/</link>
+</image>
+
+<item rdf:about="http://use.perl.org/article.pl?sid=02/05/06/179233">
+<title>The Parrot Answers</title>
+<link>http://use.perl.org/article.pl?sid=02/05/06/179233</link>
+</item>
+
+<item rdf:about="http://use.perl.org/article.pl?sid=02/05/02/1841221">
+<title>Perl and XML Book Out</title>
+<link>http://use.perl.org/article.pl?sid=02/05/02/1841221</link>
+</item>
+
+<item rdf:about="http://use.perl.org/article.pl?sid=02/05/02/0233204">
+<title>May Issue of The Perl Review</title>
+<link>http://use.perl.org/article.pl?sid=02/05/02/0233204</link>
+</item>
+
+<item rdf:about="http://use.perl.org/article.pl?sid=02/05/01/2021233">
+<title>nms Releases sendmail Replacement</title>
+<link>http://use.perl.org/article.pl?sid=02/05/01/2021233</link>
+</item>
+
+<item rdf:about="http://use.perl.org/article.pl?sid=02/04/30/199221">
+<title>Smoking CPAN with CPANPLUS 0.033</title>
+<link>http://use.perl.org/article.pl?sid=02/04/30/199221</link>
+</item>
+
+<item rdf:about="http://use.perl.org/article.pl?sid=02/04/30/1612255">
+<title>YAPC::NA Submission Deadline Midnight May 1st</title>
+<link>http://use.perl.org/article.pl?sid=02/04/30/1612255</link>
+</item>
+
+<item rdf:about="http://use.perl.org/article.pl?sid=02/04/30/1530252">
+<title>Prizes, Teams Added to Perl Golf</title>
+<link>http://use.perl.org/article.pl?sid=02/04/30/1530252</link>
+</item>
+
+<item rdf:about="http://use.perl.org/article.pl?sid=02/04/30/024257">
+<title>ActiveState Webcast: Visual Perl Introduction</title>
+<link>http://use.perl.org/article.pl?sid=02/04/30/024257</link>
+</item>
+
+<item rdf:about="http://use.perl.org/article.pl?sid=02/04/29/1911226">
+<title>Wireless Poll for YAPC::NA</title>
+<link>http://use.perl.org/article.pl?sid=02/04/29/1911226</link>
+</item>
+
+<item rdf:about="http://use.perl.org/article.pl?sid=02/04/29/1749200">
+<title>Ask The Parrot</title>
+<link>http://use.perl.org/article.pl?sid=02/04/29/1749200</link>
+</item>
+
+<textinput rdf:about="http://use.perl.org/search.pl">
+<title>Search use Perl</title>
+<description>Search use Perl stories</description>
+<name>query</name>
+<link>http://use.perl.org/search.pl</link>
+</textinput>
+
+</rdf:RDF>

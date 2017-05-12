@@ -1,0 +1,59 @@
+NAME
+    XT::Util - utility functions for test scripts
+
+SYNOPSIS
+    In xt/02pod_coverage.t:
+
+      use Test::More;
+      use Test::Pod::Coverage;
+      use XT::Util;
+  
+      my @modules = @{ __CONFIG__->{modules} || [] };
+      pod_coverage_ok($_, "$_ is covered")
+        foreach @modules;
+      done_testing(scalar @modules);
+
+    In xt/02pod_coverage.config:
+
+      { "modules": ["Local::MyModule1", "Local::MyModule2"] }
+
+DESCRIPTION
+    These utilities are aimed at making test cases easier to reuse.
+
+    They do not directly help you write test cases or output TAP.
+
+  "__CONFIG__($testfile)"
+    Where $testfile is a filename like "foo.t", will strip ".t" from the end
+    of the file name, add ".config", slurp the contents and parse them as
+    JSON, returning the result.
+
+    If $testfile is omitted, then uses the caller's filename.
+
+    By moving project-specific information (e.g. file names, package names,
+    etc) into config files, the test file itself can be shared between
+    projects.
+
+    If no appropriate config file is found, an empty hashref is returned.
+    This is by design.
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=XT-Util>.
+
+SEE ALSO
+    XT::Manager.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2012 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

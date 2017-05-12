@@ -1,0 +1,52 @@
+Changes
+Makefile.PL
+MANIFEST
+lib/XML/XQL.pm
+lib/XML/XQL/DOM.pm
+lib/XML/XQL/Date.pm             Adds date() method to XML::XQL
+lib/XML/XQL/Debug.pm
+lib/XML/XQL/DirXQL.pm
+lib/XML/XQL/Plus.pm
+lib/XML/XQL/Query.pod
+lib/XML/XQL/Strict.pm
+lib/XML/XQL/Tutorial.pod        XML::XQL::Tutorial manual page
+t/xql_Strict.t
+t/xql_attr.t
+t/xql_big.t
+t/xql_comment.t
+t/xql_cos.t
+t/xql_date.t
+t/xql_document.t
+t/xql_eval.t
+t/xql_immed_precedes.t
+t/xql_index.t
+t/xql_index2.t
+t/xql_map.t
+t/xql_new.t
+t/xql_once.t
+t/xql_parent.t
+t/xql_precedes.t
+t/xql_recurse.t
+t/xql_recurse2.t
+t/xql_sin2.t
+t/xql_subscript.t
+t/xql_subscript2.t
+t/xql_subst.t
+t/xql_template.t
+t/xql_test.t
+t/xql_test_DATA_CKL.t
+t/xql_text.t
+t/xql_union.t
+t/xql_union2.t
+t/attr2.xml
+t/attr3.xml
+XQLParser/Parser.yp             YAPP input that produces XQLParser/Parser.pm
+XQLParser/Makefile.PL
+XQLParser/Parser.pm             Parser for XML::XQL expressions
+bin/xql.pl
+bin/README.txt
+bin/testRules.pl
+bin/filterInsignifWS.pl
+samples/REC-xml-19980210.xml
+samples/bookstore.xml
+README

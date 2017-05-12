@@ -1,0 +1,42 @@
+Copyright (c) 1998 Jonathan Eisenzopf. All rights reserved.
+
+This package is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+NAME
+XML::Registry Version 0.02
+
+ACKNOWLEDGEMENTS
+Larry Wall wrote the original XML::Parser which uses
+James Clark's expat XML parser. Clark Cooper is the present
+maintainer of the XML::Parser module, and has been a
+great help.
+
+DESCRIPTION
+This is a simple little package I whipped up for an article
+for TPJ. Its purpose is to experiment with converting Perl
+data structures to XML and converting XML to perl data 
+structures. 
+
+The idea is to convert XML to Perl and back again using
+a specific XML syntax; in this case, a kind of registry.
+
+Feel free to contact me at eisen@pobox.com if you have 
+problems and/or suggestions.
+
+REQUIREMENTS
+This module requires the XML::Parser module. The latest
+version should be available at:
+http://www.netheaven.com/~coopercc/xmlparser/intro.html
+
+
+INSTALLATION
+perl Makefile.PL
+make
+make install
+
+EXAMPLES
+There are examples in the examples/ directory. Get it?
+
+HISTORY
+

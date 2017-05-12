@@ -1,0 +1,39 @@
+DESCRIPTION
+
+  X11::Terminal
+    A module to provide an object-oriented interface to launching X terminal
+    windows.
+
+  X11::Terminal::Xterm
+    A subclass of X11::Terminal which will launch xterm terminals
+
+  X11::Terminal::GnomeTerminal
+    A subclass of X11::Terminal which will launch gnome-terminal terminals
+
+  X11::Terminal::Konsole
+    A subclass of X11::Terminal which will launch konsole terminals
+
+
+PREREQUISITES
+
+  X11::Terminal requires at least perl 5.6.0 and these other modules and libraries:
+
+    Moose
+
+
+INSTALLATION
+
+    Standard process for building & installing modules:
+
+      perl Build.PL
+      ./Build
+      ./Build test
+      ./Build install
+
+
+COPYRIGHT AND LICENCE
+
+  Copyright 2010 Evan Giles <egiles@cpan.org>.
+
+  This program is free software; you can redistribute it
+  and/or modify it under the same terms as Perl itself.

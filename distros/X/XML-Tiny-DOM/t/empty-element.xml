@@ -1,0 +1,6 @@
+<xml>
+  <notempty><foo /></notempty>
+  <textplustag>bar<foo /></textplustag>
+  <tagplustext>bar<foo /></tagplustext>
+  <empty></empty>
+</xml>

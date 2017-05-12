@@ -1,0 +1,4 @@
+XML::Checker ERROR-115: ELEMENT [b] already defined
+	Context: Element b, line 3, column 21, byte 58
+XML::Checker ERROR-101: undefined ELEMENT [root]
+	Context: line 5, column 0, byte 64

@@ -1,0 +1,9 @@
+[%# <module>XML::Schema</module>
+  # <module refid="XML::Schema">blah</module>
+  # <module class="XML::Schema">blah</module>
+-%]
+[%- class = item.refid or item.class or item.content(site.view.text);
+    classlink(class, item.anchor);
+    item.content(view) | trim;
+    '</a>';
+-%]

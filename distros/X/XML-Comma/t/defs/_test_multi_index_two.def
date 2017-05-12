@@ -1,0 +1,34 @@
+<DocumentDefinition>
+
+  <name>_test_multi_index_two</name>
+
+  <element><name>foo</name></element>
+  <element><name>bar</name></element>
+
+  <store>
+    <name>one</name>
+    <base>test/multi_two_one</base>
+    <location>Sequential_file:'max',100,'extension','.multi_second'</location>
+    <index_on_store>one</index_on_store>
+    <index_on_store>_test_multi_index_one:all</index_on_store>
+  </store>
+
+  <store>
+    <name>two</name>
+    <base>test/multi_two_two</base>
+    <location>Sequential_file:'max',100,'extension','.multi_second'</location>
+    <index_on_store>two</index_on_store>
+    <index_on_store>_test_multi_index_one:all</index_on_store>
+  </store>
+
+  <index>
+    <name>one</name>
+    <field><name>foo</name></field>
+  </index>
+
+  <index>
+    <name>two</name>
+    <field><name>bar</name></field>
+  </index>
+
+</DocumentDefinition>

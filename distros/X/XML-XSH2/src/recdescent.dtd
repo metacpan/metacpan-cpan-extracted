@@ -1,0 +1,273 @@
+<?xml version='1.0' encoding='utf-8'?>
+
+<!-- ============================================================= -->
+<!--                    RecDescent grammar definition DTD          -->
+<!-- ============================================================= -->
+
+<!--                    Paragraph Content                          -->
+<!--                    Content allowed inside paragraphs          -->
+<!ENTITY % paracont    "#PCDATA | xref | ulink | link | typeref 
+                        | emphasis | literal">
+
+<!ENTITY % textblock   "para | code |enumerate | example">
+
+
+<!--                    RecDescent                                 -->
+<!--                    RecDescent grammar and documentation
+                        definition                                 -->
+<!ELEMENT  recdescent-xml (doc?, preamb?, postamb?, rules+)  >
+
+<!--                    documentation                              -->
+<!--                    Global documentation is stored here        -->
+<!ELEMENT  doc          (title?, shortdesc?, description?, section*) >
+
+<!--                    Section                                    -->
+<!ELEMENT  section      (title, (%textblock;)*, section*)  >
+<!--         id         section identifier                         -->
+<!ATTLIST  section
+             id         ID                                 #REQUIRED >
+
+<!--                    Preambule                                  -->
+<!--                    Code to be inserted before the grammar.    -->
+<!ELEMENT  preamb       (#PCDATA)                                    >
+
+<!--                    Postambule                                 -->
+<!--                    Code to be inserted after the grammar.     -->
+<!ELEMENT  postamb      (#PCDATA)                                    >
+
+
+<!--                    Rules                                      -->
+<!ELEMENT  rules        (rule)*                                      >
+
+
+
+<!--                    Rule                                       -->
+<!--                    RecDescent grammar rule, its action and,
+                        optionally, documentation                  -->
+<!ELEMENT  rule        (aliases?, (command|(production|ruleref)*), comment?, documentation?) >
+<!--         id         rule identificator
+             type       rule type (you may categorize your rules)
+             name       rule/command descriptive name             
+             regexp     (optional) formal way to match the command
+             inline     if yes, do not create recdescent top-level
+                        rule                                       -->
+<!ATTLIST  rule                                                      
+             id         ID                                 #REQUIRED
+             type       CDATA                              #IMPLIED
+             name       CDATA                              #IMPLIED
+             regexp     CDATA                              #IMPLIED
+             inline     (yes|no)                              'no'  >
+
+
+<!--                    Aliases                                    -->
+<!--                    Command name aliases                       -->
+<!ELEMENT  aliases      (alias+)                                     >
+<!--                    Alias                                      -->
+<!--                    Command name alias                         -->
+<!ELEMENT  alias        EMPTY                                        >
+<!--         regexp     (optional) formal way to match the command
+                         name                                      -->
+<!ATTLIST  alias
+             name       CDATA                              #REQUIRED
+             regexp     CDATA                              #IMPLIED  >
+
+
+<!--                    Production                                 -->
+<!--                    The rule production                        -->
+<!ELEMENT  production   (selfref | paramlist | group | regexp | directive | ruleref | string | lookahead | action )*    >
+
+<!--                    XSH command                                -->
+<!ELEMENT  command      (param)*                                     >
+<!ATTLIST  command
+             minargs    CDATA                              #IMPLIED
+             maxargs    CDATA                              #IMPLIED
+             func       CDATA                              #REQUIRED
+             extraargs  CDATA                              #IMPLIED  >
+
+<!--                    paramlist                                  -->
+<!ELEMENT  paramlist    (param)*                                     >
+
+<!--                    param                                      -->
+<!ELEMENT  param        EMPTY                                        >
+<!ATTLIST  param
+             name       CDATA                              #REQUIRED
+             short      CDATA                              #IMPLIED
+             prefix     CDATA                              '--'
+             shortprefix  CDATA                            ':'
+             repeatable (yes|no)                           'no'
+             type       CDATA                              #IMPLIED
+             argument   IDREF                              #IMPLIED  >
+
+<!--                    lookahead                                  -->
+<!ELEMENT  lookahead    EMPTY                                        >
+<!ATTLIST  lookahead
+             negative   (yes|no)                           'no'      >
+
+
+<!--                    RegExp                                     -->
+<!--                    Token matched by a regular expression      -->
+<!ELEMENT  regexp       (#PCDATA)                                    >
+<!--         mod        modifier                                   -->
+<!ATTLIST  regexp
+             mod        CDATA                              #IMPLIED  >
+
+
+
+<!--                    RecDescent directive                       -->
+<!ELEMENT  directive    (#PCDATA)                                    >
+<!--         type       Directive type                             -->
+<!ATTLIST  directive
+             type
+                        (commit|uncommit|reject|score|autoscore|skip|resync|error|error-if-committed|rulevar|matchrule|leftop|rightop|defer|nocheck|perl_quotelike|perl_codeblock|perl_variable|token)
+
+
+                                                           #REQUIRED >
+<!--                    Sub-Rule                                   -->
+<!--                    Ruleref reference                          -->
+<!ELEMENT  ruleref      EMPTY                                        >
+<!--         rep        repetition suffix                          -->
+<!--         sepre      leftop separator regexp                    -->
+<!ATTLIST  ruleref
+             ref        IDREF                              #REQUIRED
+             rep        CDATA                              #IMPLIED  
+             arguments  CDATA                              ""        >
+
+<!--                    String                                    -->
+<!--                    String value                              -->
+<!ELEMENT  string      (#PCDATA)                                    >
+
+
+
+
+<!--                    Action                                     -->
+<!--                    Perl code which is evaluated on successful
+                        production                                 -->
+<!ELEMENT  action       (#PCDATA | lineinfo)*                                    >
+
+
+
+<!--                    Documentation                              -->
+<!--                    Rule documentation                         -->
+<!ELEMENT  documentation (title?, usage*, shortdesc?, 
+                          description?, see-also?)                   >
+
+<!--                    shortdesc                                  -->
+<!ELEMENT  shortdesc    (#PCDATA | xref | link | ulink | emphasis)*             >
+
+<!ATTLIST  documentation
+             sections   IDREFS                              #IMPLIED  >
+
+
+
+<!--                    Usage                                      -->
+<!--                    Usage description                          -->
+<!ELEMENT  usage        (%paracont;)*                                >
+
+
+
+<!--                    Description                                -->
+<!--                    Command description                        -->
+<!ELEMENT  description  (%textblock;)*                     >
+
+
+<!--                    See-also                                   -->
+<!--                    List of related rules/commands             -->
+<!ELEMENT  see-also     (ruleref+)                                   >
+
+
+
+<!--                    Comment                                    -->
+<!--                    A comment                                  -->
+<!ELEMENT  comment      (#PCDATA)                                    >
+
+<!--                    emphasis                                   -->
+<!--                    Emphasized text                            -->
+<!ELEMENT  emphasis     (#PCDATA)                                    >
+
+<!--                    literal                                    -->
+<!--                    Literal string                             -->
+<!ELEMENT  literal      (#PCDATA | xref | link | ulink)*             >
+
+<!--                    Xref                                       -->
+<!--                    Automatic cross-reference                  -->
+<!ELEMENT  xref         EMPTY                                        >
+<!ATTLIST  xref
+             linkend    IDREF                              #REQUIRED >
+
+<!--                    URL Link                                   -->
+<!--                    External cross-reference                   -->
+<!ELEMENT  ulink        (#PCDATA)                                    >
+<!ATTLIST  ulink
+             url        CDATA                              #REQUIRED >
+
+
+<!--                    TypeRef                                    -->
+<!--                    Reference to all rules of a given type     -->
+<!ELEMENT  typeref      EMPTY                                        >
+<!--         types      space separated list of target types       -->
+<!ATTLIST  typeref
+             types      CDATA                              #REQUIRED >
+
+
+<!--                    Link                                       -->
+<!--                    Textual cross-reference                    -->
+<!ELEMENT  link         (#PCDATA)                                    >
+<!ATTLIST  link
+             linkend    IDREF                              #REQUIRED >
+
+
+<!--                    Paragraph                                  -->
+<!ELEMENT  para         (%paracont;)*                                >
+
+<!--                    Title                                      -->
+<!--                    Rule documentation/example title           -->
+<!ELEMENT  title        (#PCDATA)                                    >
+
+
+<!--                    Group                                      -->
+<!--                    Group of alternative productions           -->
+<!ELEMENT  group        (production+)                                >
+<!--         sepre      leftop separator regexp                    -->
+<!ATTLIST  group
+             rep        CDATA                               #IMPLIED >
+
+
+<!--                    SelfRef                                    -->
+<!--                    Inserts a production item which is matched
+                        by command name or any alias               -->
+<!ELEMENT  selfref      EMPTY                                        >
+<!--         sep        require whitespace to separate arguments   -->
+<!ATTLIST  selfref
+             sep        (yes|no)                           'yes'     >
+
+
+
+<!--                    Example                                    -->
+<!--                    Example in command or rule description     -->
+<!ELEMENT  example      (title?,code+)                               >
+
+<!--                    Code                                       -->
+<!--                    A block of formatted programming code      -->
+<!ELEMENT  code         (#PCDATA | tab | userinput)*                 >
+
+<!--                    indent                                     -->
+<!ELEMENT  tab          EMPTY                                        >
+<!ATTLIST  tab
+             count      CDATA                              "1"       >
+
+<!--                    userinput                                  -->
+<!ELEMENT  userinput    (#PCDATA | tab)*                             >
+
+
+<!ELEMENT  lineinfo     EMPTY                                        >
+
+<!--                    enumerate                                  -->
+<!--                    numbered list in documentation             -->
+<!ELEMENT  enumerate    (listitem+)                                  >
+<!--                    listitem                                   -->
+<!--                    list item in a numbered                    -->
+<!ELEMENT  listitem     (%textblock;)*                               >
+
+<!-- ============================================================= -->
+<!--                    End of RecDescent command definition DTD   -->
+<!-- ============================================================= -->

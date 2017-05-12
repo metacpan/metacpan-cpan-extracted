@@ -1,0 +1,9 @@
+0.10
+	Namespace support
+	Tests for supported types.
+	  Verify compliance with RDF and RSS specificatons
+0.08
+	Fix missing title bug
+	RSS 0.92 compliance
+	Tests for supported types.
+	Check specs for things like RDF proper whose implementation seems to vary

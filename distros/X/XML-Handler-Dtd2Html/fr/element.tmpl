@@ -1,0 +1,84 @@
+<!-- TMPL_INCLUDE NAME='_header.tmpl' -->
+<h1>El&eacute;ment <!-- TMPL_VAR NAME="name" --></h1>
+<h2>Nom</h2>
+<p>
+<!-- TMPL_VAR NAME="name" -->
+<!-- TMPL_IF NAME="brief" -->
+ -- <!-- TMPL_VAR NAME="brief" -->
+<!-- /TMPL_IF -->
+</p>
+<h2>Synopsis</h2>
+<table class='synopsis' border='1' cellspacing='0' cellpadding='4'>
+  <colgroup><col width='33%'/><col width='34%'/><col width='33%'/></colgroup>
+  <tr>
+    <td class='title' colspan='3'>
+    <!-- TMPL_IF NAME="is_mixed" -->
+        Contenu mixte
+    <!-- TMPL_ELSE -->
+      <!-- TMPL_IF NAME="is_element" -->
+        Contenu &eacute;l&eacute;mentaire pur
+      <!-- TMPL_ELSE -->
+        Contenu
+      <!-- /TMPL_IF -->
+    <!-- /TMPL_IF -->
+    </td>
+  </tr>
+  <tr>
+    <td colspan='3'><pre><!-- TMPL_VAR NAME="name" --> ::=
+<!-- TMPL_VAR NAME="f_model" --></pre></td>
+  </tr>
+  <tr>
+    <td class='title' colspan='3'>Attributs</td>
+  </tr>
+<!-- TMPL_IF NAME="attrs" -->
+  <tr>
+    <td class='title'>Nom</td>
+    <td class='title'>Type</td>
+    <td class='title'>D&eacute;faut</td>
+  </tr>
+  <!-- TMPL_LOOP NAME="attrs" -->
+  <tr valign='top'>
+    <td><!-- TMPL_VAR NAME="attr_name" --></td>
+    <td>
+      <!-- TMPL_IF NAME="is_enum" -->
+          <em>Enum&eacute;ration:</em>
+          <!-- TMPL_LOOP NAME="enum" -->
+            <br /><!-- TMPL_VAR NAME="val" -->
+          <!-- /TMPL_LOOP -->
+      <!-- TMPL_ELSE -->
+        <!-- TMPL_IF NAME="is_notation" -->
+          <em>Notation &eacute;num&eacute;r&eacute;e:</em>
+          <!-- TMPL_LOOP NAME="enum" -->
+            <br /><!-- TMPL_VAR NAME="val" -->
+          <!-- /TMPL_LOOP -->
+        <!-- TMPL_ELSE -->
+          <!-- TMPL_VAR NAME="type" -->
+        <!-- /TMPL_IF -->
+      <!-- /TMPL_IF -->
+    </td>
+    <td><!-- TMPL_VAR NAME="value_default" --></td>
+  </tr>
+  <!-- /TMPL_LOOP -->
+<!-- TMPL_ELSE -->
+  <tr>
+    <td colspan='3'>Aucun</td>
+  </tr>
+<!-- /TMPL_IF -->
+</table>
+<!-- TMPL_INCLUDE NAME='_desc.tmpl' -->
+<!-- TMPL_IF NAME="parents" -->
+<h3>Parents</h3>
+<p>Les &eacute;l&eacute;ments suivant peuvent contenir <!-- TMPL_VAR NAME="name" -->:
+  <!-- TMPL_LOOP NAME="parents" --><!-- TMPL_UNLESS NAME="__FIRST__" -->, <!-- /TMPL_UNLESS --><!-- TMPL_VAR NAME="a" --><!-- /TMPL_LOOP -->
+.
+</p>
+<!-- /TMPL_IF -->
+<!-- TMPL_IF NAME="childs" -->
+<h3>Fils</h3>
+<p>Les &eacute;l&eacute;ments suivant peuvent &ecirc;tre contenus dans <!-- TMPL_VAR NAME="name" -->:
+  <!-- TMPL_LOOP NAME="childs" --><!-- TMPL_UNLESS NAME="__FIRST__" -->, <!-- /TMPL_UNLESS --><!-- TMPL_VAR NAME="a" --><!-- /TMPL_LOOP -->
+.
+</p>
+<!-- /TMPL_IF -->
+<!-- TMPL_INCLUDE NAME='_footer.tmpl' -->
+

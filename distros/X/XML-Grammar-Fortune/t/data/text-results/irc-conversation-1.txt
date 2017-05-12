@@ -1,0 +1,8 @@
+ <rindolf>  LeoNerd: I need to get a life.
+ <LeoNerd>  They can be quite useful, but they do have a crazy amount of
+            dependencies..
+ <LeoNerd>  And sometimes they can be a bit unstable - I think they're
+            still beta-testing
+
+    -- Geek Humour
+    -- #perl, Freenode

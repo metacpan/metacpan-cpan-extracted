@@ -1,0 +1,76 @@
+
+New Widgets
+
+   * add tree support
+   * add popup support
+
+Widget Features
+
+   * support multiple selection
+   * support more than one window
+   * color picker will not fire events if type is set to button
+   * support sorting and filtering on client
+   * support lazy loading and server-side models for text, tabs, decks,
+     list/tree data, RDF templates?
+   * support mixed content (Hello <b>world</b>)
+   * support client-side-only events
+   * use Coro continuations for modal dialog boxes
+   * support calling XUL methods with more than one param
+   * use Want module in XUL::Node for lvalue support on attributes
+   * add_listener $button => Click => sub { print 'clicked!' };
+     should be:
+     add_listener $button => Click { print 'clicked!' };
+
+
+Server Features
+
+   * play nicely with POE- allow user code to get POE events
+   * add Node attribute: refresh- number of ms till client should send
+     one refresh event, or just go ahead and go the Comet way
+   * add session kill method for user code
+   * add package reload to server, Apache::Reload style
+   * add another HTTP connection, for server initiated messages
+   * add something like Apache2 perl-script handler, so you don't have to
+     implement start() or an application class, just write a script
+   * better cleanup required after user code exceptions
+   * performance: stop flushing all nodes for each event
+   * test performance
+   * clean up weak nodes from event manager when destroyed
+   * figure out some way to throw away, on server side, widgets that
+     never change or recieve events, so we can free memory
+   * allow some async events
+   * support event bundling, compression, message store caching
+
+Testing
+
+   * improve unit tests, investigate coverage
+   * create acceptance tests by automating Firefox, selenium
+   * assert only one event is sent over the wire per high-level event
+   * AbstractNodeTest to inherit from when testing your widget- a percolator
+
+Refactorings
+
+   * refactor support code out of node: attribute handling, compositing
+   * refactor all exporting code out of node and MVC into XUL::Node::Exporter
+   * probably change Click event in Perl to Command
+   * refactor session timer out of server using aspects
+   * replace conditionals in Runner.js and Application.js with polymorphism
+     using node prototypes
+   * auto convert XBL files to some schema so we can check method calls on
+     server
+
+Documentation
+
+   * add MVC docs
+   * add subclassing XUL::Node docs
+   * add writing your own pair of half-objects docs
+   * provide a XUL reference in POD for Perl XUL::Node users
+
+Other
+
+   * create real demo applications
+   * construct a high-level MVC framework on top of low-level widgets
+   * a command line launcher that launches firefox and a server
+   * a new project wizard like in Maypole
+
+

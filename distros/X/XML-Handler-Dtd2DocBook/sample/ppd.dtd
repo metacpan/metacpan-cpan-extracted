@@ -1,0 +1,122 @@
+ <!-- @BRIEF : root element of a description of a software package -->
+ <!-- It's the root element of a description of a software package, in Perl
+   Package Distribution (PPD) format which is an XML application. -->
+ <!-- @HISTORY : v0.1 - Initial release -->
+ <!-- @SEE ALSO : OSD Specification http://www.microsoft.com/standards/osd/ -->
+ <!ELEMENT SOFTPKG   (ABSTRACT | AUTHOR | IMPLEMENTATION | LICENSE | TITLE)*>
+ <!-- Name of the package (e.g. ``Foobar''). -->
+ <!ATTLIST SOFTPKG   NAME    CDATA #REQUIRED>
+ <!-- Version number of the package, in comma-delimited format (e.g. ``1,0,0,0'').  -->
+ <!ATTLIST SOFTPKG   VERSION CDATA #IMPLIED>
+
+ <!-- @BRIEF : state the title of the Perl Package -->
+ <!-- Used to state the title of the Perl Package. Only one instance should be present. -->
+ <!ELEMENT TITLE     (#PCDATA)>
+
+ <!-- Used to provide a short description outlining the nature and purpose of
+  the Perl Package. Only one instance should be present. -->
+ <!ELEMENT ABSTRACT  (#PCDATA)>
+
+ <!-- Used to provide information about the author(s) of the Perl Package.
+  Multiple instances are valid. -->
+ <!ELEMENT AUTHOR    (#PCDATA)>
+
+ <!-- Indicating the location of the appropriate license agreement or copyright
+  notice for the Perl Package. Only one instance should be present. -->
+ <!ELEMENT LICENSE   EMPTY>
+ <!-- Required attribute. A reference to the location of the license agreement
+  or copyright notice for this package. -->
+ <!ATTLIST LICENSE   HREF     CDATA #REQUIRED>
+
+ <!-- @BRIEF : describe a particular implementation of the Perl Package -->
+ <!-- Used to describe a particular implementation of the Perl Package. Multiple
+  instances are valid, and should be used to describe different implementations/ports
+  for different operating systems or architectures. -->
+ <!ELEMENT IMPLEMENTATION    (CODEBASE | DEPENDENCY | LANGUAGE | OS |
+                              OSVERSION | PERLCORE | PROCESSOR | INSTALL |
+                              UNINSTALL )*  >
+
+ <!-- Indicating a location where an archive of the Perl Package can be retrieved.
+  Multiple instances are valid, and can be used to indicate multiple possible
+  locations where the same version of the Perl Package can be retrieved. -->
+ <!ELEMENT CODEBASE  EMPTY>
+ <!-- ??? -->
+ <!ATTLIST CODEBASE  FILENAME CDATA #IMPLIED>
+ <!-- A reference to the location of the Perl Package distribution. -->
+ <!ATTLIST CODEBASE  HREF     CDATA #REQUIRED>
+
+ <!-- Used to indicate a dependency this Perl Package has on another Perl Package.
+  Multiple instances are valid. -->
+ <!ELEMENT DEPENDENCY EMPTY>
+ <!-- Version number of the dependency, in comma-delimited format (e.g. ``1,0,0,0''). -->
+ <!ATTLIST DEPENDENCY VERSION CDATA #IMPLIED>
+ <!-- Name of the package that this implementation is dependant upon. -->
+ <!ATTLIST DEPENDENCY NAME CDATA #REQUIRED>
+
+ <!-- Used to specify the language used within the given implementation of the
+  Perl Package. Only one instance should be present. -->
+ <!ELEMENT LANGUAGE  EMPTY>
+ <!ATTLIST LANGUAGE  VALUE CDATA #REQUIRED>
+
+ <!-- @BRIEF : the operating system required for this implementation -->
+ <!-- Used to outline the operating system required for this implementation of
+  the Perl Package. Multiple instances are valid. Valid values can be taken
+  from the OSD Specification and it's OS element. -->
+ <!ELEMENT OS        EMPTY>
+ <!-- The name of the operating system required for this implementation of the
+  Perl Package. This value should be obtained from Config.pm as 'osname'. -->
+ <!ATTLIST OS        VALUE CDATA #REQUIRED>
+
+ <!-- @BRIEF : the required version of the operating system -->
+ <!-- Used to outline the required version of the operating system required for
+  this implementation of the Perl Package. Only one instance should be present. -->
+ <!ELEMENT OSVERSION EMPTY>
+ <!-- The version of the operating system required for installation of this
+  implementation of the package, in a comma-delimited format (e.g. ``3,1,0,0''). -->
+ <!ATTLIST OSVERSION VALUE CDATA #REQUIRED>
+
+ <!-- @BRIEF : the minimum version of the Perl core distribution -->
+ <!-- Used to specify the minimum version of the Perl core distribution that
+  this Perl Package is to be used with. Only one instance should be present. -->
+ <!ELEMENT PERLCORE  EMPTY>
+ <!-- Version of the Perl core that is required for this implementation of the
+  Perl Package. -->
+ <!ATTLIST PERLCORE  VERSION CDATA #REQUIRED>
+
+ <!-- Outlining the cpu required for this implementation of the Perl Package.
+  Only one instance should be present. -->
+ <!ELEMENT PROCESSOR EMPTY>
+ <!-- CPU required for the installation of this implementation of the Perl Package.
+  The following values are all valid according to the OSD Specification:
+   x86 alpha mips sparc 680x0 -->
+ <!ATTLIST PROCESSOR VALUE CDATA #REQUIRED>
+
+ <!-- @BRIEF : provide either a reference to an installation script -->
+ <!-- Used to provide either a reference to an installation script or a series
+  of commands which can be used to install the Perl Package once it has been
+  retrieved. If the EXEC attribute is not specified, the value is assumed to be
+  one or more commands, separated by `;;'. Each such command will be executed
+  by the Perl `system()'function. Only one instance should be present. -->
+ <!ELEMENT INSTALL   (#PCDATA)>
+ <!-- Reference to an external script which should be retrieved and run as part of
+  the installation process. Both filenames and URLs should be considered valid. -->
+ <!ATTLIST INSTALL   HREF  CDATA #IMPLIED>
+ <!-- Name of interpreter/shell used to execute the installation script. If the
+  value of EXEC is `PPM_PERL', the copy of Perl that is executing PPM itself ($^X)
+  is used to execute the install script. -->
+ <!ATTLIST INSTALL   EXEC  CDATA #IMPLIED>
+
+ <!-- @BRIEF : provide either a reference to an uninstallation script -->
+ <!-- Used to provide either a reference to an uninstallation script or a raw
+  Perl script which can be used to uninstall the Perl Package at a later point.
+  Only one instance should be present. -->
+ <!ELEMENT UNINSTALL (#PCDATA)>
+ <!-- Reference to an external script which should be retrieved and run as part
+  of the removal process. Both filenames and URLs should be considered valid. -->
+ <!ATTLIST UNINSTALL HREF  CDATA #IMPLIED>
+ <!-- Name of interpreter/shell used to execute the uninstallation script. If the
+  value of EXEC is `PPM_PERL', the copy of Perl that is executing PPM itself ($^X)
+  is used to execute the install script. -->
+ <!ATTLIST UNINSTALL EXEC  CDATA #IMPLIED>
+
+

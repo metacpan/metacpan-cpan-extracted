@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+Win32OLETypeLib.pm
+t/00basic.t
+t/01yawriter.t

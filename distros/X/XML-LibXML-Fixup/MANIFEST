@@ -1,0 +1,11 @@
+Changes
+Fixup.pm
+Makefile.PL
+MANIFEST
+README
+test.pl
+TODO
+sampleXML/badfootballlatestnews.xml
+sampleXML/badfootballnews.xml
+sampleXML/footballlatestnews.xml
+sampleXML/footballnews.xml

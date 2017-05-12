@@ -1,0 +1,10 @@
+Revision history for XML-DT-Sequence
+
+0.02    2014-09-21
+        - Added metadata for metacpan;
+
+0.01    2012-06-25
+        First version, released on an unsuspecting world.
+        - Supports -tag, -head, -body and -foot
+        - Supports breaking the process
+

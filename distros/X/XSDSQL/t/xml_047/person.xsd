@@ -1,0 +1,21 @@
+<?xml version="1.0"?> 
+<xs:schema 
+	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+>
+
+	<xs:include schemaLocation="types.xsd"/>
+
+	<xs:complexType name="person">
+		<xs:complexContent>
+			<xs:extension base="elementWithID">
+				<xs:sequence>
+					<xs:element ref="name"/>
+					<xs:element ref="born"/>
+					<xs:element ref="dead" minOccurs="0" maxOccurs="1"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+</xs:schema>
+

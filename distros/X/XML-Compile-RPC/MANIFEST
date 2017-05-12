@@ -1,0 +1,19 @@
+ChangeLog
+MANIFEST
+Makefile.PL
+README
+lib/XML/Compile/RPC.pm
+lib/XML/Compile/RPC.pod
+lib/XML/Compile/RPC/Client.pm
+lib/XML/Compile/RPC/Client.pod
+lib/XML/Compile/RPC/Util.pm
+lib/XML/Compile/RPC/Util.pod
+lib/XML/Compile/RPC/xml-rpc.xsd
+t/01use.t
+t/10create.t
+t/11string.t
+t/12date.t
+t/20util.t
+xt/99pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

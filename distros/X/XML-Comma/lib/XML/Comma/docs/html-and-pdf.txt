@@ -1,0 +1,2 @@
+# htmldoc --book -f guide.pdf guide.html
+# pod2html faq.pod > faq.html

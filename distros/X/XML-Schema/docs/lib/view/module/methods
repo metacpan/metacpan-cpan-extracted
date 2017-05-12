@@ -1,0 +1,11 @@
+[% IF (methods = item.getElementsByTagName('method', 0)) -%]
+[% section('Methods') UNLESS item.notitle %]
+[% IF item.subtitle %]
+<b>[% item.subtitle %]</b>
+[% END %]
+<ul>
+[% FOREACH meth = methods -%]
+<li>[% view.print(meth) -%]
+[% END %]
+</ul>
+[% END %]

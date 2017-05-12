@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/XML-ApacheFOP.t
+lib/XML/ApacheFOP.pm
+META.yml                                 Module meta-data (added by MakeMaker)

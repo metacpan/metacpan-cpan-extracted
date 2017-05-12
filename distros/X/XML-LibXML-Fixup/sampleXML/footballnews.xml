@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE feed SYSTEM "http://dtd.rivalsdm.com/footballNews/1.0">
+
+<feed vendorName="RIVALSDM" id="RDM_sports_football_news" status="NORMAL">
+<!--for internal rivals use -->
+<feed-info comp-id="" event-type="" gen-date=""/>
+    <content.item id="RDM_football_news_20011029">
+        <content.meta>
+            <author>RivalsDM</author>
+            <category>Sports</category>
+            <copyright>RivalsDM</copyright>
+            <vendor>RivalsDM</vendor>
+        </content.meta>
+        <content.head>
+            <title>Football365 News</title>
+            <dateline>29/10/2001 20:23 +0100</dateline>
+            <competition>
+                <comp_name>English Premiership</comp_name>
+                <comp_code>EN_PR</comp_code>
+            </competition>
+            <team>
+                <team_name>Liverpool</team_name>
+                <team_code>LPL</team_code>
+            </team>
+        </content.head>
+        <content.body>
+            <article>
+                <FullVersion>
+                    <FullHeadline>Thompson Fears For Houllier</FullHeadline>
+                    <FullStrapline>Caretaker Boss Hopes Houllier Will Take His Time</FullStrapline>
+                    <FullBodytext>
+                        <Para>LIVERPOOL'S caretaker manager Phil Thompson has revealed he is worried Gerard Houllier will return to the club too soon</Para>
+                        <Para>The Frenchman is recovering from life-saving heart surgery and Thompson claimed that he received six phone calls from Houllier on Saturday morning before Liverpool's game against Charlton.</Para>
+                        <Para>Thompson told BBC Sport: "The positive note is that he's getting better</Para>
+                        <Para>"The results are helping because there will be no stress or pressure on him</Para>
+                        <Para>"He'll be more than happy and he should be coming out of hospital quite soon."</Para>
+                        <Para>Liverpool's form since Houllier's illness has been superb and their 2-0 win at the Valley thanks to goals from Jamie Redknapp and Michael Owen back from injury, moved them to within two points of leaders Aston Villa.</Para>
+                        <Para>A draw against Borussia Dortmund on Tuesday will ensure the Reds advance into the second phase of the Champions League.</Para>
+                        <Para>But Thompson warned: "The hard part will be keeping Gerard away.</Para>
+                        <Para>"He loves football and we're going to have to make sure we all do it in the correct manner."</Para>
+                    </FullBodytext>
+                </FullVersion>
+
+                <ShortVersion>
+                    <ShortHeadline>Thompson Fears For Houllier</ShortHeadline>
+                    <ShortBodytext>
+                        <Para>LIVERPOOL'S caretaker manager Phil Thompson has revealed he is worried Gerard Houllier will return to the club too soon.</Para>
+                        <Para>The Frenchman is recovering from life-saving heart surgery and Thompson claimed that he received six phone calls from Houllier on Saturday morning before Liverpool's game against Charlton.</Para>
+                        <Para>Thompson told BBC Sport: "The positive note is that he's getting better.</Para>
+                        <Para>"The results are helping because there will be no stress or pressure on him.</Para>
+                        <Para>"He'll be more than happy and he should be coming out of hospital quite soon."</Para>
+                        <Para />
+                    </ShortBodytext>
+                </ShortVersion>
+		     <XShortVersion>
+			<XShortHeadline></XShortHeadline>
+			<XShortBodytext>Thompson fears Houllier will return to work too soon</XShortBodytext>
+</XShortVersion>
+            </article>
+        </content.body>
+    </content.item>
+</feed>

@@ -1,0 +1,66 @@
+CHANGES
+LICENSE
+README
+TODO
+ ------------------------------------------------------------- Framework
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+META.yml
+FS.pm
+test.pl
+sample.pl
+ ------------------------------------------------------------- Docs
+doc/README
+doc/design.txt
+doc/x-collection.txt
+doc/x-glue.txt
+doc/x-hash.txt
+doc/x-list.txt
+doc/x-mysql-dbi.txt
+ ------------------------------------------------------------- Scripts
+scripts/xao-fs
+ ------------------------------------------------------------- Classes
+lib/XAO/DO/Data/Customer.pm
+lib/XAO/DO/Data/Order.pm
+lib/XAO/DO/Data/Product.pm
+lib/XAO/DO/Data/Level0.pm
+lib/XAO/DO/Data/Level1.pm
+lib/XAO/DO/FS/Collection.pm
+lib/XAO/DO/FS/Config.pm
+lib/XAO/DO/FS/Global.pm
+lib/XAO/DO/FS/Glue/Base.pm
+lib/XAO/DO/FS/Glue/Base_MySQL.pm
+lib/XAO/DO/FS/Glue/Connect_SQL.pm
+lib/XAO/DO/FS/Glue/Connect_DBI.pm
+lib/XAO/DO/FS/Glue/MySQL_DBI.pm
+lib/XAO/DO/FS/Glue.pm
+lib/XAO/DO/FS/Hash.pm
+lib/XAO/DO/FS/List.pm
+ ------------------------------------------------------------- Test Cases
+lib/XAO/testcases/FS/base.pm
+lib/XAO/testcases/FS/basic.pm
+lib/XAO/testcases/FS/blobs.pm
+lib/XAO/testcases/FS/charsets.pm
+lib/XAO/testcases/FS/collection.pm
+lib/XAO/testcases/FS/config.pm
+lib/XAO/testcases/FS/fields.pm
+lib/XAO/testcases/FS/index.pm
+lib/XAO/testcases/FS/linkage.pm
+lib/XAO/testcases/FS/lists.pm
+lib/XAO/testcases/FS/placeholders.pm
+lib/XAO/testcases/FS/qstart.pm
+lib/XAO/testcases/FS/search.pm
+lib/XAO/testcases/FS/transact.pm
+ ------------------------------------------------------------- Benchmarking
+bench/bench.pl
+bench/results-20020701-am-workstation.txt
+bench/results-20020701-dell.txt
+bench/results-20020701-dual-p-dell.txt
+bench/results-20020702-am-workstation.txt
+bench/results-20020705-am-workstation-c.txt
+bench/results-20020705-dual-p-dell-c.txt
+bench/results-20030128-dual-p-dell-c.txt
+bench/results-20040506-dual-p4-28-c.txt
+bench/results-20060609-workstation-p4-28-c.txt
+META.json                                Module JSON meta-data (added by MakeMaker)

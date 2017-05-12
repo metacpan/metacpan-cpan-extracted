@@ -1,0 +1,39 @@
+# @(#) $Id: typemap 1187 2006-06-07 21:45:41Z dom $
+
+# T_PTROBJ_SPECIAL definition derived from the example in perlxs(1).
+
+XML_Genx		T_PTROBJ_SPECIAL
+XML_Genx_Namespace	T_PTROBJ_SPECIAL
+XML_Genx_Element	T_PTROBJ_SPECIAL
+XML_Genx_Attribute	T_PTROBJ_SPECIAL
+genxStatus		T_ENUM
+utf8			T_UTF8PV
+constUtf8		T_UTF8PV
+
+INPUT
+T_UTF8PV
+	/* Convert the bytes to UTF-8, whilst leaving the original SV alone. */
+	if (!SvUTF8($arg)) {
+		/* Make a mortal copy in order so that we don't leak memory. */
+		SV *tmp = sv_mortalcopy($arg);
+		(void)sv_utf8_upgrade(tmp);
+		$var = ($type)SvPV_nolen(tmp);
+	} else {
+		$var = ($type)SvPV_nolen($arg);
+	}
+T_PTROBJ_SPECIAL
+	if (!SvOK($arg)) {
+	    $var = ($type) NULL;
+	} else if (sv_derived_from($arg, \"${(my $ntt=$ntype)=~s/_/::/g;\$ntt}\")) {
+	    IV tmp = SvIV((SV*)SvRV($arg));
+	    $var = INT2PTR($type, tmp);
+	} else {
+	    croak(\"$var is not undef or of type ${(my $ntt=$ntype)=~s/_/::/g;\$ntt}\");
+	}
+
+OUTPUT
+T_UTF8PV
+	sv_setpv((SV*)$arg, (const char *)$var);
+	SvUTF8_on($arg);
+T_PTROBJ_SPECIAL
+	sv_setref_pv($arg, \"${(my $ntt=$ntype)=~s/_/::/g;\$ntt}\",(void*)$var);

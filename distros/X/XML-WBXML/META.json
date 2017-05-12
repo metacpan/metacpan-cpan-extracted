@@ -1,0 +1,38 @@
+{
+   "abstract" : "Convert between XML and WBXML using libwbxml2",
+   "author" : [
+      "David Glasser <glasser@bestpractical.com>",
+      "Mikhail Ivanov <m.ivanych@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "XML-WBXML",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ivanych/XML-WBXML/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/ivanych/XML-WBXML.git",
+         "web" : "https://github.com/ivanych/XML-WBXML"
+      }
+   },
+   "version" : "0.09"
+}

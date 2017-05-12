@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE etc_network_interfaces [
+<!ELEMENT etc_network_interfaces (COMMENT | auto | iface | mapping | br)*>
+<!ELEMENT COMMENT (#PCDATA)>
+<!ELEMENT auto (#PCDATA)>
+<!ATTLIST auto _indent CDATA "">
+<!ATTLIST auto _alias CDATA #IMPLIED>
+<!ELEMENT iface (up | down | pre-up | post-down | br | COMMENT)*>
+<!ATTLIST iface name CDATA #REQUIRED>
+<!ATTLIST iface opts CDATA #REQUIRED>
+<!ATTLIST iface _indent CDATA "">
+<!ATTLIST iface _childindent CDATA "    ">
+<!ATTLIST iface _alias CDATA #IMPLIED>
+<!ATTLIST iface address CDATA #IMPLIED>
+<!ATTLIST iface network CDATA #IMPLIED>
+<!ATTLIST iface broadcast CDATA #IMPLIED>
+<!ATTLIST iface gateway CDATA #IMPLIED>
+<!ATTLIST iface dns-nameservers CDATA #IMPLIED>
+<!ATTLIST iface netmask CDATA #IMPLIED>
+<!ATTLIST iface ttl CDATA #IMPLIED>
+<!ATTLIST iface local CDATA #IMPLIED>
+<!ATTLIST iface remote CDATA #IMPLIED>
+<!ATTLIST iface mtu CDATA #IMPLIED>
+<!ATTLIST iface endpoint CDATA #IMPLIED>
+<!ELEMENT mapping (map | br | COMMENT)*>
+<!ATTLIST mapping name CDATA #REQUIRED>
+<!ATTLIST mapping opts CDATA #REQUIRED>
+<!ATTLIST mapping script CDATA #REQUIRED>
+<!ATTLIST mapping _indent CDATA "">
+<!ATTLIST mapping _alias CDATA #IMPLIED>
+<!ATTLIST mapping _childindent CDATA "    ">
+<!ELEMENT map (#PCDATA)>
+<!ATTLIST map _indent CDATA "    ">
+<!ELEMENT up (#PCDATA)>
+<!ATTLIST up _indent CDATA "    ">
+<!ATTLIST up _alias CDATA #IMPLIED>
+<!ELEMENT pre-up (#PCDATA)>
+<!ATTLIST pre-up _indent CDATA "    ">
+<!ELEMENT down (#PCDATA)>
+<!ATTLIST down _indent CDATA "    ">
+<!ATTLIST down _alias CDATA #IMPLIED>
+<!ELEMENT post-down (#PCDATA)>
+<!ATTLIST post-down _indent CDATA "    ">
+<!ELEMENT br EMPTY>
+]>
+<etc_network_interfaces>
+  <COMMENT>######################################################################</COMMENT>
+  <COMMENT># /etc/network/interfaces -- configuration file for ifup(8), ifdown(8)</COMMENT>
+  <COMMENT>#</COMMENT>
+  <COMMENT># A "#" character in the very first column makes the rest of the line</COMMENT>
+  <COMMENT># be ignored. Blank lines are ignored. Lines may be indented freely.</COMMENT>
+  <COMMENT># A "\" character at the very end of the line indicates the next line</COMMENT>
+  <COMMENT># should be treated as a continuation of the current one.</COMMENT>
+  <COMMENT>#</COMMENT>
+  <COMMENT># The "pre-up", "up", "down" and "post-down" options are valid for all </COMMENT>
+  <COMMENT># interfaces, and may be specified multiple times. All other options</COMMENT>
+  <COMMENT># may only be specified once.</COMMENT>
+  <COMMENT>#</COMMENT>
+  <COMMENT># See the interfaces(5) manpage for information on what options are </COMMENT>
+  <COMMENT># available.</COMMENT>
+  <COMMENT>######################################################################</COMMENT>
+  <br/>
+  <COMMENT># We always want the loopback interface.</COMMENT>
+  <COMMENT>#</COMMENT>
+  <auto _indent="">lo</auto>
+  <iface name="lo" opts="inet loopback" _indent="">
+    <br/>
+    <COMMENT># An example ethernet card setup: (broadcast and gateway are optional)</COMMENT>
+    <COMMENT>#</COMMENT>
+  </iface>
+  <auto _indent="&#9;&#32;&#32;">eth0</auto>
+  <iface name="eth0" opts="inet static" _indent="" _childindent="&#32;&#32;&#32;&#32;" address="192.168.0.42" network="192.168.0.0" netmask="255.255.255.0" broadcast="192.168.0.255" gateway="192.168.0.1">
+    <br/>
+    <COMMENT># A more complicated ethernet setup, with a less common netmask, and a downright</COMMENT>
+    <COMMENT># weird broadcast address: (the "up" lines are executed verbatim when the </COMMENT>
+    <COMMENT># interface is brought up, the "down" lines when it's brought down)</COMMENT>
+    <COMMENT>#</COMMENT>
+  </iface>
+  <auto _indent="&#32;&#32;">eth0</auto>
+  <iface name="eth0" opts="inet static" _indent="" _childindent="&#32;&#32;&#32;&#32;" address="192.168.1.42" network="192.168.1.0" netmask="255.255.255.128" broadcast="192.168.1.0">
+    <up _indent="&#32;&#32;&#32;&#32;">route add -net 192.168.1.128 netmask 255.255.255.128 gw 192.168.1.2</up>
+    <up _indent="&#32;&#32;&#32;&#32;">route add default gw 192.168.1.200</up>
+    <down _indent="&#32;&#32;&#32;&#32;">route del default gw 192.168.1.200</down>
+    <down _indent="&#32;&#32;&#32;&#32;">route del -net 192.168.1.128 netmask 255.255.255.128 gw 192.168.1.2</down>
+    <br/>
+    <COMMENT># A more complicated ethernet setup with a single ethernet card with</COMMENT>
+    <COMMENT># two interfaces.</COMMENT>
+    <COMMENT># Note: This happens to work since ifconfig handles it that way, not because</COMMENT>
+    <COMMENT># ifup/down handles the ':' any differently.</COMMENT>
+    <COMMENT># Warning: There is a known bug if you do this, since the state will not</COMMENT>
+    <COMMENT># be properly defined if you try to 'ifdown eth0' when both interfaces</COMMENT>
+    <COMMENT># are up. The ifconfig program will not remove eth0 but it will be</COMMENT>
+    <COMMENT># removed from the interfaces state so you will see it up until you execute:</COMMENT>
+    <COMMENT># 'ifdown eth0:1 ; ifup eth0; ifdown eth0'</COMMENT>
+    <COMMENT># BTW, this is "bug" #193679 (it's not really a bug, it's more of a </COMMENT>
+    <COMMENT># limitation)</COMMENT>
+    <COMMENT>#</COMMENT>
+  </iface>
+  <auto _indent="">eth0 eth0:1</auto>
+  <iface name="eth0" opts="inet static" _indent="" _childindent="&#32;&#32;&#32;&#32;" address="192.168.0.100" network="192.168.0.0" netmask="255.255.255.0" broadcast="192.168.0.255" gateway="192.168.0.1"/>
+  <iface name="eth0:1" opts="inet static" _indent="" _childindent="&#32;&#32;&#32;&#32;" address="192.168.0.200" network="192.168.0.0" netmask="255.255.255.0">
+    <br/>
+    <COMMENT># "pre-up" and "post-down" commands are also available. In addition, the</COMMENT>
+    <COMMENT># exit status of these commands are checked, and if any fail, configuration</COMMENT>
+    <COMMENT># (or deconfiguration) is aborted. So:</COMMENT>
+    <COMMENT>#</COMMENT>
+  </iface>
+  <auto _indent="">eth0</auto>
+  <iface name="eth0" opts="inet dhcp" _indent="">
+    <pre-up _indent="&#32;&#32;&#32;&#32;">[ -f /etc/network/local-network-ok ]</pre-up>
+    <COMMENT>#</COMMENT>
+    <COMMENT># will allow you to only have eth0 brought up when the file </COMMENT>
+    <COMMENT># /etc/network/local-network-ok exists.</COMMENT>
+    <br/>
+    <COMMENT># Two ethernet interfaces, one connected to a trusted LAN, the other to</COMMENT>
+    <COMMENT># the untrusted Internet. If their MAC addresses get swapped (because an</COMMENT>
+    <COMMENT># updated kernel uses a different order when probing for network cards,</COMMENT>
+    <COMMENT># say), then they don't get brought up at all.</COMMENT>
+    <COMMENT>#</COMMENT>
+  </iface>
+  <auto _indent="">eth0 eth1</auto>
+  <iface name="eth0" opts="inet static" _indent="" _childindent="&#32;&#32;&#32;&#32;" address="192.168.42.1" netmask="255.255.255.0">
+    <pre-up _indent="&#32;&#32;&#32;&#32;">/path/to/check-mac-address.sh eth0 11:22:33:44:55:66</pre-up>
+    <pre-up _indent="&#32;&#32;&#32;&#32;">/usr/local/sbin/enable-masq</pre-up>
+  </iface>
+  <iface name="eth1" opts="inet dhcp" _indent="">
+    <pre-up _indent="&#32;&#32;&#32;&#32;">/path/to/check-mac-address.sh eth1 AA:BB:CC:DD:EE:FF</pre-up>
+    <pre-up _indent="&#32;&#32;&#32;&#32;">/usr/local/sbin/firewall</pre-up>
+    <br/>
+    <COMMENT># Two ethernet interfaces, one connected to a trusted LAN, the other to</COMMENT>
+    <COMMENT># the untrusted Internet, identified by MAC address rather than interface</COMMENT>
+    <COMMENT># name:</COMMENT>
+    <COMMENT>#</COMMENT>
+  </iface>
+  <auto _indent="">eth0 eth1</auto>
+  <mapping name="eth0" opts="eth1" _indent="" _childindent="&#32;&#32;&#32;&#32;" script="/path/to/get-mac-address.sh">
+    <map _indent="&#32;&#32;&#32;&#32;">11:22:33:44:55:66 lan</map>
+    <map _indent="&#32;&#32;&#32;&#32;">AA:BB:CC:DD:EE:FF internet</map>
+  </mapping>
+  <iface name="lan" opts="inet static" _indent="" _childindent="&#32;&#32;&#32;&#32;" address="192.168.42.1" netmask="255.255.255.0">
+    <pre-up _indent="&#32;&#32;&#32;&#32;">/usr/local/sbin/enable-masq $IFACE</pre-up>
+  </iface>
+  <iface name="internet" opts="inet dhcp" _indent="">
+    <pre-up _indent="&#32;&#32;&#32;&#32;">/usr/local/sbin/firewall $IFACE</pre-up>
+    <br/>
+    <COMMENT># A PCMCIA interface for a laptop that is used in different locations:</COMMENT>
+    <COMMENT># (note the lack of an "auto" line for any of these)</COMMENT>
+    <COMMENT>#</COMMENT>
+  </iface>
+  <mapping name="eth0" opts="" _indent="" _childindent="&#32;&#32;&#32;" script="/path/to/pcmcia-compat.sh">
+    <map _indent="&#32;&#32;&#32;">home,*,*,*                  home</map>
+    <map _indent="&#32;&#32;&#32;">work,*,*,00:11:22:33:44:55  work-wireless</map>
+    <map _indent="&#32;&#32;&#32;">work,*,*,01:12:23:34:45:50  work-static</map>
+    <br/>
+  </mapping>
+  <iface name="home" opts="inet dhcp" _indent=""/>
+  <iface name="work-wireless" opts="bootp" _indent=""/>
+  <iface name="work-static" opts="static" _indent="" _childindent="&#32;&#32;&#32;&#32;" address="10.15.43.23" netmask="255.255.255.0" gateway="10.15.43.1">
+    <COMMENT>#</COMMENT>
+    <COMMENT># Note, this won't work unless you specifically change the file</COMMENT>
+    <COMMENT># /etc/pcmcia/network to look more like:</COMMENT>
+    <COMMENT>#</COMMENT>
+    <COMMENT>#     if [ -r ./shared ] ; then . ./shared ; else . /etc/pcmcia/shared ; fi</COMMENT>
+    <COMMENT>#     get_info $DEVICE</COMMENT>
+    <COMMENT>#     case "$ACTION" in</COMMENT>
+    <COMMENT>#         'start')</COMMENT>
+    <COMMENT>#             /sbin/ifup $DEVICE</COMMENT>
+    <COMMENT>#             ;;</COMMENT>
+    <COMMENT>#         'stop')</COMMENT>
+    <COMMENT>#             /sbin/ifdown $DEVICE</COMMENT>
+    <COMMENT>#             ;;</COMMENT>
+    <COMMENT>#     esac</COMMENT>
+    <COMMENT>#     exit 0</COMMENT>
+    <br/>
+    <COMMENT># An alternate way of doing the same thing: (in this case identifying</COMMENT>
+    <COMMENT># where the laptop is is done by configuring the interface as various</COMMENT>
+    <COMMENT># options, and seeing if a computer that is known to be on each particular</COMMENT>
+    <COMMENT># network will respond to pings. The various numbers here need to be chosen</COMMENT>
+    <COMMENT># with a great deal of care.)</COMMENT>
+    <COMMENT>#</COMMENT>
+  </iface>
+  <mapping name="eth0" opts="" _indent="" _childindent="&#32;&#32;&#32;" script="/path/to/ping-places.sh">
+    <map _indent="&#32;&#32;&#32;">192.168.42.254/24 192.168.42.1 home</map>
+    <map _indent="&#32;&#32;&#32;">10.15.43.254/24 10.15.43.1 work-wireless</map>
+    <map _indent="&#32;&#32;&#32;">10.15.43.23/24 10.15.43.1 work-static</map>
+    <br/>
+  </mapping>
+  <iface name="home" opts="inet dhcp" _indent=""/>
+  <iface name="work-wireless" opts="bootp" _indent=""/>
+  <iface name="work-static" opts="static" _indent="" _childindent="&#32;&#32;&#32;&#32;" address="10.15.43.23" netmask="255.255.255.0" gateway="10.15.43.1">
+    <COMMENT>#</COMMENT>
+    <COMMENT># Note that the ping-places script requires the iproute package installed,</COMMENT>
+    <COMMENT># and the same changes to /etc/pcmcia/network are required for this as for</COMMENT>
+    <COMMENT># the previous example.</COMMENT>
+    <br/>
+    <br/>
+    <COMMENT># Set up an interface to read all the traffic on the network. This </COMMENT>
+    <COMMENT># configuration can be useful to setup Network Intrusion Detection</COMMENT>
+    <COMMENT># sensors in 'stealth'-type configuration. This prevents the NIDS</COMMENT>
+    <COMMENT># system to be a direct target in a hostile network since they have</COMMENT>
+    <COMMENT># no IP address on the network. Notice, however, that there have been</COMMENT>
+    <COMMENT># known bugs over time in sensors part of NIDS (for example see </COMMENT>
+    <COMMENT># DSA-297 related to Snort) and remote buffer overflows might even be</COMMENT>
+    <COMMENT># triggered by network packet processing.</COMMENT>
+    <COMMENT># </COMMENT>
+  </iface>
+  <auto _indent="">eth0</auto>
+  <iface name="eth0" opts="inet manual" _indent="">
+    <up _indent="&#9;">ifconfig $IFACE 0.0.0.0 up</up>
+    <up _indent="&#32;&#32;&#32;&#32;&#32;&#32;">ip link set $IFACE promisc on</up>
+    <down _indent="&#32;&#32;&#32;&#32;&#32;&#32;">ip link set $IFACE promisc off</down>
+    <down _indent="&#32;&#32;&#32;&#32;&#32;&#32;">ifconfig $IFACE down</down>
+    <br/>
+    <COMMENT># Set up an interface which will not be allocated an IP address by</COMMENT>
+    <COMMENT># ifupdown but will be configured through external programs. This</COMMENT>
+    <COMMENT># can be useful to setup interfaces configured through other programs,</COMMENT>
+    <COMMENT># like, for example, PPPOE scripts.</COMMENT>
+    <COMMENT>#</COMMENT>
+  </iface>
+  <auto _indent="">eth0</auto>
+  <iface name="eth0" opts="inet manual" _indent="">
+    <up _indent="&#32;&#32;&#32;&#32;&#32;&#32;">ifconfig $IFACE 0.0.0.0 up</up>
+    <up _indent="&#32;&#32;&#32;&#32;&#32;&#32;">/usr/local/bin/myconfigscript</up>
+    <down _indent="&#32;&#32;&#32;&#32;&#32;&#32;">ifconfig $IFACE down</down>
+  </iface>
+</etc_network_interfaces>

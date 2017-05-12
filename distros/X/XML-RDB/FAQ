@@ -1,0 +1,20 @@
+FAQ:
+---
+
+Q: Why doent it recognise the relation in the data?
+A: The data isn't analysed, only the XML structures.
+
+Q: Why doesn't the generated select statements bring back data?
+A: The DDL is analysed to produce the select statements,
+   the data may have mutually inclusive joins, or there isn't data
+   in the fields. Additionally, the table may be called twice in
+   the same statement.
+
+Q: Why does it take so long to create the database?
+A: XML::RDB is based on XML::DOM::Parser loading the XML tree structure
+   from file into memory before any other work is commenced. There are
+   a couple of passes through the tree which analyse and build the 
+   DDL.  Loads the DDL, then extracts and loads the XML data an 
+   element at a time.
+   
+   

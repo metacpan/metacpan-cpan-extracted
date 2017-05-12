@@ -1,0 +1,45 @@
+{
+   "abstract" : "SOAP with Mojolicious",
+   "author" : [
+      "Heiko Jansen/Mark Overmeer"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120630",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "XML-Compile-SOAP-Mojolicious",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTTP::Message" : "6.06",
+            "Log::Report" : "1.05",
+            "Mojolicious" : "6.00",
+            "Time::HiRes" : "0",
+            "XML::Compile::SOAP" : "3.16"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.02"
+}

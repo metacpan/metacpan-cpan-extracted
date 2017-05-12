@@ -1,0 +1,102 @@
+<?xml version='1.0'?>
+<!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook V3.1//EN">
+<article id="index">
+<artheader>
+  <author><firstname>Chang</><surname>Liu</></author>
+  <pubdate>Nov 1999</pubdate>
+  <title>Perl Module XML::Node</title>
+  <revhistory>
+     <revision>
+        <revnumber>0.09</revnumber>
+        <date>15 Nov 1999</date>
+        <revremark>--Add support to attributes</revremark>
+     </revision>
+     <revision>
+        <revnumber>0.06</revnumber>
+        <date>4 Nov 1999</date>
+        <revremark>--Change to an object class</revremark>
+     </revision>
+     <revision>
+        <revnumber>0.04</revnumber>
+        <date>20 Oct 1999</date>
+        <revremark>--The first version that's submitted to CPAN.</revremark>
+     </revision>
+  </revhistory>
+</artheader>
+
+<sect1>
+<title>XML::Node</title>
+<sect2 id="overview">
+<title>Overview</title>
+<para>
+XML::Node is for those who use Perl to process XML files. XML::Node is built on top of XML::Parser and provides a simplified programming interface. XML::Node users can register callback sub-routines or variables to specific type of XML nodes. The values of the specified XML nodes are automatically copied to the corresponding variables. When specified XML tags are found, registered callback sub-routines are called. XML::Node is a shortcut to XML::Parser if you don't care much about details of XML files.
+</para>
+
+<para>
+Here is an example. This XML file contains order information:
+
+<example id="xml">
+<title>orders.xml</title>
+<programlisting role="XML">
+<![CDATA[
+<Orders>
+  <Order>
+    <Item>A Book</Item>
+    <Quantity>1</Quantity>
+    <TagsThatIDontCare>Something</TagsThatIDontCare>
+   </Order>
+   <TagsThatIDontCare>Blah Blah</TagsThatIDontCare>
+</Orders>
+]]>
+</programlisting>
+</example>
+
+This simple Perl script can parse the XML file and print out all the orders. 
+
+<example id="perl" label="perl">
+<title>parse_orders.pl</title>
+<programlisting role="Perl">
+<![CDATA[
+use XML::Node;
+
+my $item = "";
+my $quantity = "";
+
+$p = XML::Node->new();
+
+$p->register(">Orders>Order>Item","char" => \$item);
+$p->register(">Orders>Order>Quantity","char" => \$quantity);
+$p->register(">Orders>Order","end" => \&handle_order_end);
+
+print "Processing file [orders.xml]...\n";
+$p->parsefile("orders.xml");
+
+sub handle_order_end
+{
+    print "Found order -- Item: [$item] Quantity: [$quantity]\n";
+    $item = "";
+    $quantity = "";
+}
+]]>
+</programlisting>
+</example>
+
+</para>
+</sect2>
+
+<sect2 id="download">
+<title>Download</title>
+<para>
+The XML::Node module can be found at <ulink url="http://belmont-shores.ics.uci.edu/pub">http://belmont-shores.ics.uci.edu/pub</ulink>, 
+<ulink url="ftp://belmont-shores.ics.uci.edu/pub">ftp://belmont-shores.ics.uci.edu/pub</ulink>, or <ulink url="http://www.perl.com/CPAN">Perl CPAN</ulink>.
+</para>
+</sect2>
+
+<sect2 id="bugreport">
+<title>Bug Report</title>
+<para>Please submit any related bugs, issues, suggestions, or comments to <ulink url="http://belmont-shores.ics.uci.edu/bugzilla">http://belmont-shores.ics.uci.edu/bugzilla</ulink>.</para>
+</sect2>
+</sect1>
+
+</article>
+

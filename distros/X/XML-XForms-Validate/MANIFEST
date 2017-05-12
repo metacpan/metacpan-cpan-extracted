@@ -1,0 +1,27 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/01-module.t
+t/02-normalize.t
+t/03-parser.t
+t/04-model.t
+t/05-binds.t
+t/06-refs-nodesets.t
+t/07-instances.t
+t/08-submission.t
+t/09-schema.t
+t/10-validate-basics.t
+t/11-validate-tree.t
+t/12-validate-readonly.t
+t/13-validate-calculate.t
+t/14-validate-required.t
+t/15-validate-constraint.t
+t/16-validate-type.t
+t/17-validate-schema.t
+t/20-xpath-functions.t
+t/abc.xsd
+t/model.xforms
+t/xxx.xsd
+lib/XML/XForms/Validate.pm
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,32 @@
+---
+abstract: 'Represent XML as data structure preserving element order'
+author:
+  - 'Jakob Voß'
+build_requires: {}
+configure_requires:
+  Module::Build::Tiny: '0.039'
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.15, Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: XML-Struct
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  Moo: '1.0'
+  XML::LibXML: '2.0'
+resources:
+  bugtracker: https://github.com/nichtich/XML-Struct/issues
+  homepage: https://github.com/nichtich/XML-Struct
+  repository: https://github.com/nichtich/XML-Struct.git
+version: '0.26'
+x_contributors:
+  - 'Jakob Voss <voss@gbv.de>'

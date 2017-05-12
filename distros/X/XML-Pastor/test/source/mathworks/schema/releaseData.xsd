@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Schema definition for the release data -->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+   <xsd:include schemaLocation="platformList.xsd"/>
+   <xsd:element name="releaseData" type="releaseData"/>
+   <xsd:annotation>
+      <xsd:documentation>The releasedata is data in the current control file outside the scope of any individual product.  It is required in otder to generate valid media kits and is used to support XSLT transformations to generate the control_file from the XML schema definitions.</xsd:documentation>
+   </xsd:annotation>
+   <xsd:complexType name="releaseData">
+      <xsd:sequence>
+         <xsd:element name="volumeName" type="xsd:string">
+            <xsd:annotation>
+               <xsd:documentation>FCS in control_file</xsd:documentation>
+            </xsd:annotation>
+         </xsd:element>
+         <xsd:element name="volumeNumber" type="xsd:integer">
+            <xsd:annotation>
+               <xsd:documentation>CDVOL in control_file</xsd:documentation>
+            </xsd:annotation>
+         </xsd:element>
+         <xsd:element name="volumeDescription" type="xsd:string">
+            <xsd:annotation>
+               <xsd:documentation>CONTENTS_RELSTR in control_file</xsd:documentation>
+            </xsd:annotation>
+         </xsd:element>
+         <xsd:element name="unixPlatforms" type="platformList">
+            <xsd:annotation>
+               <xsd:documentation>AllPlatforms is the union of the unix and the windows platforms</xsd:documentation>
+            </xsd:annotation>
+         </xsd:element>
+         <xsd:element name="windowsPlatforms" type="platformList"/>
+      </xsd:sequence>
+   </xsd:complexType>
+</xsd:schema>

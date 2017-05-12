@@ -1,0 +1,12 @@
+
+# XML-XSS CONTRIBUTORS #
+
+This is the (likely incomplete) list of people who have helped
+make this distribution what it is, either via code contributions, 
+patches, bug reports, help with troubleshooting, etc. A huge
+thank to all of them.
+
+	* Alexandr Ciornii <chorny@cpan.org>
+	* Dave Rolsky <autarch@urth.org>
+	* Karen Etheridge <ether@cpan.org>
+	* Reini Urban <rurban@cpan.org>

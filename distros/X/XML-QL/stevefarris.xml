@@ -1,0 +1,22 @@
+<?xml version='1.0'?>
+<topic_last_alteration>
+<bill_topic id='10000'>AGRICULTURE</bill_topic>
+<tla>
+        <billkey>
+                <state>CA</state>
+                <session_id>1999000</session_id>
+                <legtype>A</legtype>
+                <bill_number>47</bill_number>
+        </billkey>
+        <last_alteration>19990317</last_alteration>
+</tla>
+<tla>
+        <billkey>
+                <state>CA</state>
+                <session_id>1999000</session_id>
+                <legtype>A</legtype>
+                <bill_number>61</bill_number>
+        </billkey>
+        <last_alteration>19990111</last_alteration>
+</tla>
+</topic_last_alteration>

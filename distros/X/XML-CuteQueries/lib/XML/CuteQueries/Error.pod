@@ -1,0 +1,120 @@
+=head1 NAME
+
+XML::CuteQueries::Error - a simple exception class for CQ
+
+=head1 SYNOPSIS
+
+    use strict;
+    use warnings;
+    use XML::CuteQueries;
+
+    my $twig = XML::CuteQueries->new;
+       $twig->parsefile("something.xml");
+
+    unless( eval { $twig->cute_query(...) } ) {
+        die "something bad happened: $@";
+    }
+
+    # or
+
+    unless( eval { $twig->cute_query(...) } ) {
+        if( $@->query_error ) {
+            die "dude, query error: " . $@->text;
+        }
+
+        elsif( $@->data_error ) {
+            die "dude, the XML doesn't seem to contain the data you asked for: " . $@->text;
+        }
+
+        else {
+            die "hrm: $@";
+        }
+    }
+
+=head1 METHODS
+
+=over 4
+
+=item B<new()>
+
+New takes a few arguments describing the error.
+
+=over 4
+
+=item B<type>
+
+This is a numeric argument describing the error type.  The only valid choices
+so far are B<DATA_ERROR>s and B<QUERY_ERROR>s.  The symbols aren't exported, so
+you'd invoke them like this:
+
+    XML::CuteQueries::Error->new(
+        type => XML::CuteQueries::Error::QUERY_ERROR(),
+
+    )->throw;
+
+Arguably sloppy, but this interface isn't I<really> intended for end users.
+This can also be set with L</type()> below.
+
+=item B<text>
+
+This is a textual description of the error.
+
+    XML::CuteQueries::Error->new(
+        type => XML::CuteQueries::Error::QUERY_ERROR(),
+        text => "that query makes no sense because of the Ten Commandments",
+
+    )->throw;
+
+Arguably sloppy, but this interface isn't I<really> intended for end users.
+This can also be set with L</text()> below.
+
+=back
+
+=item B<type()>
+
+An I<accessor> for the L</type> of the error.
+
+    warn "type: " . $@->type;
+    my $e = XML::CuteQueries::Error->new;
+       $e->type( XML::CuteQueries::Error::DATA_ERROR() );
+
+=item B<text()>
+
+An I<accessor> for the L</text> of the error.
+
+    warn "type: " . $@->type;
+    my $e = XML::CuteQueries::Error->new;
+       $e->text( "haha, error.  You == fail." );
+
+=item B<query_error()>
+
+Returns true if the error type is a query error.
+
+=item B<data_error()>
+
+Returns true if the error type is a data error.
+
+=item B<throw()>
+
+Croak the error, setting L<$@|perlvar/$@> to the error object.
+
+=back
+
+=head1 AUTHOR
+
+Paul Miller C<< <jettero@cpan.org> >>
+
+I am using this software in my own projects...  If you find bugs, please
+please please let me know.  Actually, let me know if you find it handy at
+all.  Half the fun of releasing this stuff is knowing that people use it.
+
+If you see anything wrong with the callbacks, the docs, or anything:  Definitely
+let me know!  rt.cpan, irc, email, whatever.  Just let me know.
+
+=head1 COPYRIGHT
+
+Copyright (c) 2009 Paul Miller
+
+=head1 SEE ALSO
+
+perl(1), L<XML::Twig>, L<XML::CuteQueries>

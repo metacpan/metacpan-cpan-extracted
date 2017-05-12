@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  Description: All legal root-level items
+  Expect:      !Error
+-->
+
+<playlist version="1" xmlns="http://xspf.org/ns/0/">
+
+  <!-- A human-readable title for the playlist. xspf:playlist elements MAY contain exactly one. -->
+  <title>My playlist</title>
+
+  <!-- Human-readable name of the entity (author, authors, group, company, etc) that authored the playlist. xspf:playlist elements MAY contain exactly one.  -->
+  <creator>Jane Doe</creator>
+
+  <!-- A human-readable comment on the playlist. This is character data, not HTML, and it may not contain markup. xspf:playlist elements MAY contain exactly one. -->
+  <annotation>My favorite songs</annotation>
+
+  <!-- URL of a web page to find out more about this playlist. Likely to be homepage of the author, and would be used to find out more about the author and to find more playlists by the author. xspf:playlist elements MAY contain exactly one. -->
+  <info>http://example.com/myplaylists</info>
+
+  <!-- Source URL for this playlist. xspf:playlist elements MAY contain exactly one. -->
+  <location>http://example.com/myplaylists/myplaylist</location>
+
+  <!-- Canonical ID for this playlist. Likely to be a hash or other location-independent name. MUST be a legal URI.  xspf:playlist elements MAY contain exactly one. -->
+  <identifier>magnet:?xt=urn:sha1:YNCKHTQCWBTRNJIV4WNAE52SJUQCZO5C</identifier>
+
+  <!-- URL of an image to display in the absence of a //playlist/trackList/image element. xspf:playlist elements MAY contain exactly one. -->
+  <image>http://example.com/img/mypicture</image>
+
+  <!-- Creation date (not last-modified date) of the playlist, formatted as a XML schema dateTime. xspf:playlist elements MAY contain exactly one. -->
+  <date>2005-01-08T17:10:47-05:00</date>
+  
+  <!-- URL of a resource that describes the license under which this playlist was released.  xspf:playlist elements may contain zero or one license element. -->
+  <license>http://creativecommons.org/licenses/by/1.0/</license>
+
+  <!-- An ordered list of URIs.  xspf:playlist elements MAY contain exactly one xspf:attribution element.  xspf:attribution elements may contain 0 or N children.  Children must be an xspf:location element or an xspf:identifier element. -->
+  <attribution>
+    <identifier>http://bar.com/secondderived.xspf</identifier>
+    <location>http://foo.com/original.xspf</location>
+  </attribution>
+
+  <!-- URI of a resource associated with this playlist, with relationship to this document named in rel attribute.  xspf:playlist elements MAY contain zero or more link elements. -->
+  <link rel="http://foaf.example.org/namespace/version1">http://socialnetwork.example.org/foaf/mary.rdfs</link>
+
+  <!-- The meta element allows non-XSPF metadata to be included in XSPF documents without breaking XSPF validation. xspf:playlist elements MAY contain zero or more meta elements. -->
+  <meta rel="http://example.org/key">value</meta>
+
+  <!-- The extension element allows non-XSPF XML to be included in XSPF documents without breaking XSPF validation. The purpose is to allow nested XML, which the meta and link elements do not. xspf:playlist elements MAY contain zero or more extension elements. -->
+  <extension application="http://example.com">
+    <clip start="25000" end="34500"/>
+  </extension>
+
+  <trackList>
+  </trackList>
+
+</playlist>

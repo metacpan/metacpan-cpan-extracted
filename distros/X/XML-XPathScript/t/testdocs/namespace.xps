@@ -1,0 +1,6 @@
+<%
+    $template->namespace( 'http://blah' )->set( 'baz' => { pre => 'in foo' } );
+    $template->namespace( 'http://bleh' )->set( 'baz' => { pre => 'in bar' } );
+    $template->set( 'baz' => { pre => 'in nothing' } );
+%>
+<%= apply_templates() %>

@@ -1,0 +1,30 @@
+<stx:transform version="1.0" 
+  xmlns:stx="http://stx.sourceforge.net/2002/ns"
+  strip-space="yes">
+
+  <stx:buffer name="b1"/>
+
+  <stx:template match="/root">
+    <stx:copy>
+      <stx:result-buffer name="b1">
+	<e/>
+      </stx:result-buffer>
+      <stx:text>:</stx:text>
+      <stx:process-buffer name="b1"/>
+      <stx:process-children/>
+    </stx:copy>
+  </stx:template>
+
+  <stx:template match="e">
+    <stx:copy>foo</stx:copy>
+  </stx:template>
+
+  <stx:template match="node">
+    <n>
+      <stx:attribute name="a">
+	<stx:value-of select="position()"/>
+      </stx:attribute>
+    </n>
+  </stx:template>
+  
+</stx:transform>

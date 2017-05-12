@@ -1,0 +1,18 @@
+root
+/row/#id	/row/@bla	/row/col/@name	/row/col/subcol/#id	/row/col/subcol/@name1	/row/col/subcol/@name2	/row/col/subcol/asd/#id	/row/col/subcol/asd	/row/col/subcol/asd/sdf	/sdf/#id	/sdf	/sdf/@dfsdf	/sdf/ertert	/sdf/ertert/bla
+1			1	subcolname1	subcolname2	1		ert					
+1			1	subcolname1	subcolname2	1		rtz					
+1			1	subcolname1	subcolname2	2	xcv2						
+2			2	subcolname1									
+3		colname	3			3	xcv1						
+3		colname	3			4	xcv2						
+3		colname	3			5	xcv3						
+3		colname	4			6	xcv3						
+3		colname	4			7	xcv4						
+3		colname	4			8	xcv5						
+4	sdfsdf												
+									1	wwerw	asdasd	dfsdf	
+									2	dgfg		ert	
+									3	vbcvb			hallo
+									4			test	
+

@@ -1,0 +1,254 @@
+=encoding utf8
+
+=head1 NAME
+
+XML::Compile::WSS - OASIS Web Services Security
+
+=head1 INHERITANCE
+
+ XML::Compile::WSS is extended by
+   XML::Compile::WSS::BasicAuth
+   XML::Compile::WSS::Signature
+   XML::Compile::WSS::Timestamp
+
+=head1 SYNOPSIS
+
+ # This modules can be used "stand-alone" ==>
+ my $schema = XML::Compile::Cache->new(...);
+ my $auth   = XML::Compile::WSS::BasicAuth->new
+   (schema => $schema, username => $user, ...);
+ my $elem   = $auth->create($doc, $data);
+
+ # ==> or as SOAP client
+ my $wss    = XML::Compile::SOAP::WSS->new;
+ my $wsdl   = XML::Compile::WSDL11->new($wsdlfn);
+ my $auth   = $wss->basicAuth(username => $user, ...);  # once!
+
+ # SOAP call, compile on demand
+ my $answer = $wsdl->call($operation, wsse_Security => $auth, %data);
+ # same, because "all" defined is default, $auth is in 'all'
+ my $answer = $wsdl->call($operation, %data);
+
+ # or SOAP call, explicit compile
+ my $call   = $wsdl->compileClient($operation);
+ my $answer = $call->(%data);
+
+=head1 DESCRIPTION
+
+The Web Services Security working group of W3C develops a set of
+standards which add signatures and encryption to XML.
+
+This module implements features in the C<Security> header.  One header
+may contain more than one of these features:
+
+=over 4
+
+=item * timestamps in L<XML::Compile::WSS::Timestamp|XML::Compile::WSS::Timestamp>
+
+=item * username/password authentication in L<XML::Compile::WSS::BasicAuth|XML::Compile::WSS::BasicAuth>
+
+=item * signing of the body in L<XML::Compile::WSS::Signature|XML::Compile::WSS::Signature>
+
+=item * encryption is not yet supported.  Please hire me to get it implemented.
+
+=back
+
+Furthermore
+
+=over 4
+
+=item * you will certainly need the constants from L<XML::Compile::WSS::Util|XML::Compile::WSS::Util>.
+
+=item * for SOAP use L<XML::Compile::SOAP::WSS|XML::Compile::SOAP::WSS> to create above features.
+
+=back
+
+=head1 METHODS
+
+=head2 Constructors
+
+=over 4
+
+=item XML::Compile::WSS-E<gt>B<new>(%options)
+
+ -Option     --Default
+  prepare      'ALL'
+  schema       undef
+  version      undef
+  wss_version  <required>
+
+=over 2
+
+=item prepare => 'READER'|'WRITER'|'ALL'|'NONE'
+
+=item schema => an L<XML::Compile::Cache|XML::Compile::Cache> object
+
+Add the WSS extension information to the provided schema.  If not provided
+at instantiation, you have to call L<loadSchemas()|XML::Compile::WSS/"Internals"> before compiling
+readers and writers.
+
+=item version => STRING
+
+Alternative for C<wss_version>, but not always as clear.
+
+=item wss_version => '1.1'|MODULE
+
+[1.0] Explicitly state which version WSS needs to be produced.
+You may use a version number. You may also use the MODULE
+name, which is a namespace constant, provided via C<::Util>.
+The only option is currently C<WSS11MODULE>.
+
+=back
+
+=back
+
+=head2 Attributes
+
+=over 4
+
+=item $obj-E<gt>B<schema>()
+
+Returns the schema used to implement this feature.
+
+=item $obj-E<gt>B<wssVersion>()
+
+Returns the version number.
+
+=back
+
+=head2 Apply
+
+=over 4
+
+=item $obj-E<gt>B<check>($security)
+
+Check whether received $security information is correct.  Each active
+WSS feature must check whether it finds information for it.
+
+=item $obj-E<gt>B<create>($doc, $security, $data)
+
+Adds some WSS element to $security.  The $data is the structure which
+is passed to some writer (for instance, the $data which the user
+passes to the SOAP call).  There is quite some flexibility in that
+structure, so should not be used, in general.
+
+=back
+
+=head2 Helpers
+
+=over 4
+
+=item $obj-E<gt>B<dateTime>($time|$string|HASH)
+
+Returns a structure which can be used as timestamp, for instance in
+C<Created> and C<Expires> fields.  This helper function will help you
+use these timestamp fields correctly.
+
+The WSU10 specification defines a free format timestamp.  Of course,
+that is very impractical.  Typically a "design by committee" decission.
+Also, the standard does not describe the ValueType field, which is often
+used to cover this design mistake.
+
+example: 
+
+  # Both will get ValueType="$xsd/dateTime"
+  Created => time()                 # will get formatted
+  Created => '2012-10-14T22:26:21Z' # autodected ValueType
+
+  # Explicit formatting
+  Created => { _ => 'this Christmas'
+             , ValueType => 'http://per6.org/releasedates'
+             };
+
+  # No ValueType added
+  Created => '2012-11-01'
+
+=back
+
+=head2 Internals
+
+=over 4
+
+=item $obj-E<gt>B<loadSchemas>($schema, $version)
+
+=item XML::Compile::WSS-E<gt>B<loadSchemas>($schema, $version)
+
+$schema must extend L<XML::Compile::Cache|XML::Compile::Cache>.
+
+The $schema settings will may changed a little. For one, the
+C<allow_undeclared> flag will be set. Also, C<any_element> will be set to
+'ATTEMPT' and C<mixed_elements> to 'STRUCTURAL'.
+
+You can not mix multiple versions of WSS inside one $schema, because
+there will be too much confusion about prefixes.
+
+=item $obj-E<gt>B<writerHookWsuId>($type)
+
+Creates a hook for an XML producer (writer), to understand wsu:Id on
+elements of $type.
+
+=back
+
+=head1 DETAILS
+
+=head2 Specifications
+
+A huge number of specifications act in this field.  Every self respecting
+company has contributed its own implementation into the field.  A lot of
+this is B<not supported>, but the list of constants should be complete
+in L<XML::Compile::WSS::Util|XML::Compile::WSS::Util>.
+
+=over 4
+
+=item * XML Security Generic Hybrid Ciphers
+
+F<http://www.w3.org/TR/2011/CR-xmlsec-generic-hybrid-20110303/>, 3 March 2011
+
+=item * XML Signature Properties
+
+F<http://www.w3.org/TR/2011/CR-xmldsig-properties-20110303/>, 3 March 2011
+
+=item * XML Signature Syntax and Processing Version 1.1
+
+F<http://www.w3.org/TR/2011/CR-xmldsig-core1-20110303/>, 3 March 2011
+
+=item * SOAP message security
+
+F<http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0.pdf>, March 2004
+
+=item * XML Signature Syntax and Processing (Second Edition)
+
+F<http://www.w3.org/TR/2008/REC-xmldsig-core-20080610/>, 10 June 2008
+
+=item * RFC4050 Using the ECDSA for XML Digital Signatures
+
+F<http://www.ietf.org/rfc/rfc4050.txt>, april 2005
+
+=item * RFC4051 Additional XML Security Uniform Resource Identifiers (URIs)
+
+F<http://www.ietf.org/rfc/rfc4051.txt>, april 2005
+
+=item * XML Encryption Syntax and Processing
+
+F<http://www.w3.org/TR/2002/REC-xmlenc-core-20021210/>, 10 December 2002
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of XML-Compile-WSS distribution version 1.14,
+built on May 08, 2017. Website: F<http://perl.overmeer.net/xml-compile/>
+
+Please post questions or ideas to the mailinglist at
+F<http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/xml-compile> .
+For live contact with other developers, visit the C<#xml-compile> channel
+on C<irc.perl.org>.
+
+=head1 LICENSE
+
+Copyrights 2011-2017 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the Artistic license.
+See F<http://dev.perl.org/licenses/artistic.html>
+

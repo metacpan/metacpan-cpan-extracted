@@ -1,0 +1,20 @@
+Revision history for Perl extension XML::XMetaL.
+
+0.01  Thu Jan 23 19:42:41 2003
+	- original version; created by h2xs 1.22 with options
+		-XAn XML::XMetaL
+
+0.50  Sun Aug 03 16:45:00 2003
+    - First CPAN release version. Still in alpha state.
+    
+0.51 
+    - gmcr.pl now generates On_Macro_File_Load() call
+      without trying to pass the active document as an argument.
+      This is necessary because when the macro is called, the
+      active document has not yet been opened.
+      
+    - XML::XMetaL::Base AUTOLOAD method used to generate
+      default handlers that opened a dialog box when called.
+      The dialog has been replaced with a status text message.
+      This ensures that default events can be called without
+      blocking normal XMetaL operation.

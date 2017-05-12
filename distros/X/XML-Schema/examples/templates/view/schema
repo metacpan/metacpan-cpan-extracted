@@ -1,0 +1,3 @@
+my $schema = XML::Schema->new();
+
+[% view.print(t.value, name => t.key) FOREACH t = item.types %]

@@ -1,0 +1,3 @@
+<!DOCTYPE test [
+ <!ELEMENT tester (#pcdata)>
+]>

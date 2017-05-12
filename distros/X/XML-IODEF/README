@@ -1,0 +1,85 @@
+DESCRIPTION
+
+  XML::IODEF - A perl module for easily creating/parsing IODEF Documents
+
+  IODEF module is a wrapper around XML::Simple, providing an interface
+  designed to simplify the parsing and creation of IODEF documents . IODEF
+  is an XML based standard for the exchange of information related toi
+  computer security incidents typically exchanged between collaborating
+  Computer Security Incident Response Teams (CSIRTs)
+
+  The interface provided by XML::IODEF is designed to make it very simple
+  to build an IODEF document.
+
+  XML::IODEF is an modified version of XML::IDMEF.
+
+  ******* WARNING ******* WARNING ******* WARNING ******* WARNING *******
+
+   You'd hence better check that using this version of the module
+   does not break anything in your code.
+
+   And of course: this is a beta release and has not been thoroughly
+   tested. Please try it out if you can and report success/failure to
+   the project: http://code.google.com/p/perl-xml-iodef/issues/list 
+
+   Use in production systems is at your own risks.
+
+  ******* WARNING ******* WARNING ******* WARNING ******* WARNING *******
+
+
+
+
+PREREQUISITES
+
+  Requires XML::DOM and a XML::Parser.
+
+
+BUILDING/INSTALLING
+
+  Once the archive is unpacked, use these commands:
+
+      perl Makefile.PL
+      make
+      make test
+      make install
+
+  If for some reason, you can't run these commands, you can simple copy 
+  the IODEF.pm file to your lib/XML directory. To find out which paths
+  perl uses to locate modules, do 
+  'perl -e "print join(\"\n\", @INC), \"\n\";"'
+
+
+STATUS
+
+  This version is a beta release, and has not yet been thoroughly
+  tested in production environment. It has been succesfully run on both
+  linux and openbsd. 
+  If you encounter any problems installing or running this release, please
+  email the author and provide him as much information as possible on the
+  bug and its context.
+
+  Please send any feedback to the project: http://code.google.com/p/perl-xml-iodef/issues/list
+
+
+NEW IN THIS RELEASE
+
+  The API is now compliant with the current draft of IODEF available
+  from http://tools.ietf.org/html/rfc5070.
+
+  See 'Changes' for a detailed history.
+
+
+BUGS
+  
+  XML::IODEF uses internally a simplified version of the IODEF DTD, which makes
+  that this module will fail to create some very specific IODEF documents. 
+
+
+COPYRIGHT
+
+  Copyright 2002 Erwan Lemonnier.
+  Copyright 2003 John Green
+  Copyright 2010 Wes Young (wes@barely3am.com)
+
+  This module is free software under BSD license.
+

@@ -1,0 +1,49 @@
+# test a schema with a recursive definition
+
+--- |
+ <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:element name="category">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="element" type="element_type"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="element_type">
+        <xs:sequence>
+            <xs:element name="data" type="xs:string"/>
+            <xs:element name="element" type="element_type" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+ </xs:schema>
+
+--- |
+  <category>
+    <element>
+      <data>foo</data>
+      <element>
+        <data>bar</data>
+      </element>
+    </element>
+  </category>
+--- >
+PASS
+
+--- |
+  <category>
+    <element>
+      <data>foo</data>
+      <element>
+        <data>bar</data>
+        <element>
+          <data>bar</data>
+          <element>
+            <data>bar</data>
+          </element>
+        </element>  
+      </element>
+    </element>
+  </category>
+--- >
+PASS
+

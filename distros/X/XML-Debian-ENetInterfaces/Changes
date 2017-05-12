@@ -1,0 +1,92 @@
+Revision history for XML-Debian-ENetInterfaces
+
+0.07	Sat Jun 11 18:34:09 CDT 2011
+====================================
+	Learning new things all the time, made use of eval in tests.
+	Added no warnings where appropriate in perl tests.
+	Reworked over the perl tests.
+	Use qr to quote regexes in arrays for perl tests.
+	Code for when where undef was part of an array was split
+	  into another when clause to be more compatible with
+	  various perl versions.
+
+	Version 0.08 comming soon with addition to XML schema,
+	  adding attributes after and before parent attributes.
+
+0.06	Thu Jun  9 18:41:03 CDT 2011
+====================================
+	Forgot to add time stamp to Changes for 0.05.
+
+0.05	Thu Jun  9 18:36:32 CDT 2011
+====================================
+	Removed a comment in t/01-run.t that was for my brain.
+	Corrected some documentation s/IO::[^ ]*/IO::Handle/g
+	  per XML-Parser-2.41,
+	    libxml-perl-0.08(XML::Parser::PerlSAX)'s back-end.
+	Increased documentation regarding this.
+	Spell-check.
+	Added test case for ARRAY implementation of ~~.
+	Implemented hack/workaround regarding the following
+	  warning.  The warning is not obsolete, this version
+	  should run with any version post 5.10.
+
+	NOTE NOTE !!UPDATE WARNING!! NOTE NOTE
+	THIS NO LONGER APPLIES TO _THIS_ VERSION.
+	This message exists for the sake of complete documentation.
+	Works from v5.10.0 to v5.13.7.
+	v5.13.8 is unknown/untested.
+	v5.13.9 to v5.14.0 is known not to work!
+	Upgrading to following SVN Commit is one solution.
+	  v5.15 (f6a9f8a45e0553298d2b10c734f5826f1ba7730f)
+	No way to express the above constraint(s).
+
+	I pray v5.14.1 has a fix for this issue.
+
+	More information, this has something TODO with the
+	ARRAY implementation of ~~ with regard to undefined
+	and regex-es.  This effects give/when blocks used by
+	this module.
+
+0.04	Wed Jun  8 19:01:10 CDT 2011
+====================================
+	Add __ prefix to private function identattr.
+	Fixed bug regarding files with varying indent.
+	Changed included dataset to test for this.
+	Corrected 2 problems with Makefile.PL
+	  $ExtUtils::MakeMaker::VERSION is not yet numeric.
+	  Make use of proper way to express min perl version.
+
+	!!WARNING!! - This effects every previous version of this module.
+	Works from v5.10.0 to v5.13.7.
+	From v5.13.8 to v5.13.10 is unknown/untested.
+	v5.13.11 to v5.14.0 is known not to work!
+	Upgrading to following SVN Commit is one solution.
+	  v5.15 (f6a9f8a45e0553298d2b10c734f5826f1ba7730f)
+	No way to express the above constraint(s).
+
+	I pray v5.14.1 has a fix for this issue.
+
+0.03	Tue Jun  7 00:24:12 CDT 2011
+====================================
+	We all mess up some times.
+	This is the just because I made a mistake with 0.02
+	The Changes file has a date/time now.
+
+0.02	Tue Jun  7 00:10:15 CDT 2011
+====================================
+	Incorporated comments from uri, rewt, Somni from IRC.
+	    ... Though I'm likely unable to fully comprehend
+		there advice it's still welcome.
+	  Don't use shift to get sub args.
+	  What is passed to new isn't a type.
+	  Don't use q{}.
+	  Redo retech, my own words.
+	  Use spell check.
+
+	Made test output more readable.
+	Fixed indent in writes POD.
+
+0.01    Mon Jun  6 19:26:08 CDT 2011
+====================================
+        First version, released on an unsuspecting world.
+

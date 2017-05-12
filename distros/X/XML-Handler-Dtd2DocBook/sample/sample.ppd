@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<!DOCTYPE SOFTPKG SYSTEM "ppd.dtd">
+<!-- The following is a sample PPD file describing the Math-MatrixBool module. 
+     Note that this may not be a current/proper description of this module 
+     and is for sample purposes only.
+-->
+ <SOFTPKG NAME="Math-MatrixBool" VERSION="4,2,0,0">
+     <TITLE>Math-MatrixBool</TITLE>
+     <ABSTRACT>Easy manipulation of matrices of booleans (Boolean Algebra)</ABSTRACT>
+     <AUTHOR>Steffen Beyer (sb@sdm.de)</AUTHOR>
+     <LICENSE HREF="http://www.ActiveState.com/packages/Math-MatrixBool/license.html" />
+     <IMPLEMENTATION>
+         <OS VALUE="WinNT" />
+         <OS VALUE="Win95" />
+         <PROCESSOR VALUE="x86" />
+         <CODEBASE HREF="http://www.ActiveState.com/packages/Math-MatrixBool/Math-MatrixBool-4.2-bin-1-Win32.tar.gz" />
+         <DEPENDENCY NAME="Bit-Vector" />
+         <INSTALL>
+         </INSTALL>
+         <UNINSTALL>
+         </UNINSTALL>
+     </IMPLEMENTATION>
+
+     <IMPLEMENTATION>
+         <DEPENDENCY NAME="Bit-Vector" />
+         <CODEBASE HREF="&amp;CPAN;/CPAN/modules/by-module/Math/Math-MatrixBool-4.2.tar.gz" />
+         <INSTALL>
+             system("make"); ;;
+             system("make test"); ;;
+             system("make install"); ;;
+         </INSTALL>
+     </IMPLEMENTATION>
+ </SOFTPKG>

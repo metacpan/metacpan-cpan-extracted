@@ -1,0 +1,59 @@
+Revision history for XML-Entities
+
+1.0002  2015-08-17 14:46
+        - Replaced curly brackets with parentheses in variable expansion in
+        Makefile.PL.
+        Fixes RT106483; Credits: Daniel Macks <dmacks@netspace.org>
+        - make clean no longer wipes out entities data
+
+1.0001  2012-08-03 13:32
+        Added docs about encoding entities.
+
+1.0000  2010-08-24 19:24
+        Abandoned the download-on-build policy. Entities are now shipped with
+        the module itself.
+        Minor speed tweak: Using chomp instead of s/// in char2entity.
+
+0.0307  2008-11-26 08:06
+        Removed the underscore from version number to let the indexer see the module
+
+0.03_06 2008-11-25 15:44
+        META.yml: Removed the "..." which is not supported by the PAUSE
+
+0.03_05 2008-11-25 15:30
+        Added META.yml
+
+0.03_04 2008-09-30 17:41
+        download-entities.pl:
+        - Every download creates its own LWP::UserAgent object.
+        Other ways seemed to lose the timeout setting on subsequent downloads
+        in some configurations. (requested by Guillaume Protet)
+        - Dependencies in Makefile now honor the transition from LWP::Simple to LWP::UserAgent;
+        LWP::UserAgent's now call env_proxy to obey ENV proxy settings. (by Lloyd Parkes)
+
+0.03_03 2008-07-23 11:52
+        download-entities.pl:
+        Switched from LWP::Simple to LWP::UserAgent (patch by Guillaume Protet).
+        Enabled timeout control.
+
+0.03_02 2008-07-15 14:20
+        download-entities.pl:
+        Bareword -i converted to quoted string.
+        Documented the environment-variable trigger of interactivity.
+
+0.03_01 2008-07-14 10:26
+        download-entities.pl:
+        Enabled interactive download to deal with optional problems with download.
+
+0.03    2008-04-09 14:12
+        Lifted the dependency from HTML::Parser, providing a regexp-based fallback.
+        Semicolon-terminated entity names no longer added to the maps.
+        2008-04-04 10:14
+        Added the numify function.
+
+0.02    2007-12-16 15:25
+        Corrected the example in documentation to actually work.
+
+0.01    2007-11-22 00:11
+        First version, released on an unsuspecting world.
+

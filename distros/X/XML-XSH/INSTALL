@@ -1,0 +1,92 @@
+xsh - an XML Editing Shell
+--------------------------
+Copyright (c) 2002 Petr Pajas
+
+To install xsh, first install all required modules as described below.
+Then install xsh either 
+
+automatically (highly recommended):
+-----------------------------------
+
+From CPAN:
+
+$ perl -MCPAN -e shell
+cpan> install XML::XSH
+
+From tar-ball
+
+$ unzip xsh-1.??.tar.gz
+$ cd xsh-1.??
+$ perl Makefile.PL  
+$ make
+$ make install
+
+you may use `perl Makefile.PL PREFIX=<prefix>' to install to a
+directory tree different from /usr
+
+or 
+
+manually:
+--------
+
+1) copy xsh to some location in your PATH 
+2) copy lib/XSH subdirectory and its content into one of the following
+locations:
+
+- a directory in Perl's @INC search path
+- the directory where you placed xsh
+- a lib/ directory in the parent directory of the directory
+  where xsh is located 
+- a lib/ sub-directory in the directory where xsh is located
+
+For example:
+  cp xsh /usr/local/bin
+  cp -R XSH/ /usr/local/lib
+  chmod 775 /usr/local/bin/xsh  # if your tar did not preserve this
+
+
+Requirements:
+-------------
+
+o Unix/BSD/Linux or similar operating system
+o Perl version 5.6 (may work with earlier Perl5, but wasn't tested)
+o The following modules, available at CPAN http://www.cpan.org:
+
+  Parse::RecDescent          (>=1.80)
+  Text::Iconv                (>=1.2)
+  XML::LibXML                (>=1.31)
+  XML::LibXSLT               (>=1.31)
+  Term::ReadLine::Perl
+
+A bundle of all this modules and below mentioned libraries may be
+downloaded from author's homepage at: http://www.matfyz.cz/pajas
+
+Other Dependencies:
+-------------------
+
+Modules XML::LibXML and XML::LibXSLT require the following libraries
+available at http://www.xmlsoft.org:
+
+  libxml2
+  libxslt 
+
+and also seem to depend on the following Perl modules (avalable at
+CPAN http://www.cpan.org):
+
+  XML::SAX::Base             (>=1.00)
+  XML::SAX                   (>=0.02)
+
+Installing modules from CPAN
+----------------------------
+
+If you have a direct internet connection, you may install Perl modules
+from CPAN by typing
+
+  $ perl -MCPAN -e shell
+
+answering few initial questions and installing the modules one by one with
+
+  cpan> install <module-name>
+
+where <module-name> is one of the modules mentioned above.
+

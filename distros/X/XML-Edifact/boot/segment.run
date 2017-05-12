@@ -1,0 +1,114 @@
+#!/usr/local/bin/perl
+# 
+# Copyright (c) 1998 Michael Koehne <kraehe@copyleft.de>
+# 
+# XML::Edifact is free software. You can redistribute and/or
+# modify this copy under terms of GNU General Public License.
+#------------------------------------------------------------------------------#
+
+=head1 NAME
+
+create_segment - read trsd to create segment data
+
+=head1 SYNOPSIS
+
+./bin/create_segment.pl
+
+=head1 DESCRIPTION
+
+Parse un_edifact/trsd to create segment.{txt,dat.*,rev.*}
+for further processing in XML::Edifact.pm.
+
+The hash is filled in the following form:
+
+  SEGMT{$segment_tag}=
+  	"$list_of_codes\t$mand_cond_flags\t".\
+  	"$name_space:$cooked_name\t$canon_name";
+
+Codes are seperated by blank, and a "MCCCCCCCC" in NAD is not a
+roman number, but related to the codes and has to tell if a
+composite or element is mandantory or conditional.
+
+The name is stored twice, once translated ready to use, and once
+in the orginal form. A revers index is also build as:
+
+  SEGMR{"$name_space:$cooked_name"}=$segment_tag;
+
+This hash is also available as a tab seperated text file, called
+segment.txt. A segment.xml can serve as a xml representation of
+the trsd contents.
+
+=cut
+
+#------------------------------------------------------------------------------#
+
+use strict;
+
+use vars qw($segment_tag $list_of_codes $mand_cond_flags);
+use vars qw($name_space $cooked_name $canon_name);
+use vars qw($s $f3 $f5 $f7 $f9);
+
+#------------------------------------------------------------------------------#
+
+open (INFILE, "un_edifact_d96b/trsd.96b") || die "can not open trsd.96b for reading";
+open (TXTFILE, ">".File::Spec->catdir("html","LIB","xml-edifact-03","segment.txt") ) || die "can not open segment.txt for writing";
+# open (XMLFILE, ">".File::Spec->catdir("html","LIB","xml-edifact-03","segment.xml") ) || die "can not open segment.xml for writing";
+
+print STDERR "reading trsd.96b\n";
+# print XMLFILE $XML::Edifact::SEGMENT_SPECIFICATION_HEADER;
+
+while (<INFILE>) {
+    chop;					# strip record separator
+    if (!($. % 64)) {				# please hold the line
+	printf STDERR '.';
+    }
+    						# ugly gawk shows here ,-)
+    $f3 = substr($_,6,4);
+    $f5 = substr($_,12,46);
+    $f7 = substr($_,59,1);
+    $f9 = substr($_,62,7);
+
+    if ($_ =~ '^   [+*#|X -][+*#|X -] [A-Z][A-Z][A-Z]   ') {
+        flush_segment();
+	$segment_tag = $f3;
+	$s = " \$", $segment_tag =~ s/$s//;
+	$canon_name = $f5;
+	$s = '^ *', $canon_name =~ s/$s//;
+	$s = " *\$", $canon_name =~ s/$s//;
+	$name_space="trsd";
+	$cooked_name=XML::Edifact::recode_mark($canon_name);
+    }
+
+    if ($_ =~ '^[0-9][0-9][0-9] [+*#|X -] ') {
+	$list_of_codes .= $f3." ";
+	$mand_cond_flags .= $f7;
+    }
+}
+
+flush_segment();
+
+close(INFILE);
+close(TXTFILE);
+# close(XMLFILE);
+
+print STDERR "\n";
+
+#------------------------------------------------------------------------------#
+sub flush_segment() {
+    if ($segment_tag ne "") {
+    	chop $list_of_codes			 unless $list_of_codes eq "";
+
+	$XML::Edifact::SEGMT{$segment_tag}="$list_of_codes\t$mand_cond_flags\t$name_space:$cooked_name\t$canon_name";
+	$XML::Edifact::SEGMR{"$name_space:$cooked_name"}=$segment_tag;
+	print TXTFILE "$segment_tag\t$list_of_codes\t$mand_cond_flags\t$name_space:$cooked_name\t$canon_name\n";
+
+	$segment_tag="";
+	$list_of_codes="";
+	$mand_cond_flags="";
+	$name_space="";
+	$cooked_name="";
+	$canon_name="";
+    }
+}
+#------------------------------------------------------------------------------#
+1;

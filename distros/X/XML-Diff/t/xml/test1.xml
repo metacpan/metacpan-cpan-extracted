@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<root>
+  <block>
+    <title>The Title</title>
+    <para>Some text here. With some <b>bolding</b> and <i>italics</i>.</para>
+  </block>
+  <block>
+    <title>A list block</title>
+    <para>This is a block containing a list</para>
+    <list>
+      <item>Item 1 - qwerty</item>
+      <item>Item 2 - asdfgh</item>
+      <item>Item 3 - zxcvbn</item>
+    </list>
+  </block>
+  <block>
+    <title>Unchanged</title>
+  </block>
+  <block>
+    <special>1234</special>
+  </block>
+  <block>
+    <att_tag this="3434" tag="sddfd" has="dsfdsf" attributes="dsfe">
+      And there is data too
+    </att_tag>
+  </block>
+</root>
+      

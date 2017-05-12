@@ -1,0 +1,38 @@
+<stx:transform version="1.0" 
+  xmlns:stx="http://stx.sourceforge.net/2002/ns"
+  strip-space="yes">
+
+  <stx:buffer name="b1"/>
+
+  <stx:template match="/root">
+    <stx:copy>
+      <stx:result-buffer name="b1">
+	<e/>
+      </stx:result-buffer>
+      <stx:text>:</stx:text>
+      <stx:process-buffer name="b1" group="G2"/>
+      <stx:process-buffer name="b1" group="G1"/>
+    </stx:copy>
+  </stx:template>
+
+  <stx:template match="e">
+    <stx:copy>boo</stx:copy>
+  </stx:template>
+
+  <stx:group name="G1">
+
+    <stx:template match="e">
+      <stx:copy>foo</stx:copy>
+    </stx:template>
+
+  </stx:group>
+
+  <stx:group name="G2">
+
+    <stx:template match="e">
+      <stx:copy>hoo</stx:copy>
+    </stx:template>
+
+  </stx:group>
+
+</stx:transform>

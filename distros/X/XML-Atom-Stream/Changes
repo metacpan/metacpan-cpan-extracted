@@ -1,0 +1,48 @@
+Revision history for Perl extension XML::Atom::Stream
+
+0.11  Wed Jan  9 11:01:56 PST 2008
+        - Fixed a bug where xml:lang is transformed into unknown:lang.
+          (Thanks to David Recordon)
+
+0.10  Mon Oct  2 13:36:16 JST 2006
+        - Fixded memory leaks problem (Thanks to Jay A Patel)
+
+0.09  Sun Aug 13 17:57:32 JST 2006
+        - Now when your callback function throws an exception, the
+          connection will be lost. This is now the official way to
+          disconnect from the Atom stream explicitly.
+        - Added POD document for METHODS
+        - Fixed code to get the number of youreTooSlow
+        - Added timeout option to new, which defaults to 15
+
+0.08  Sat Aug 12 18:15:37 JST 2006
+        - Removed $DEBUG and make it $self->{debug}
+        - Added 'reconnect' option to automatically reconnect to the stream when disconnected
+
+0.07  Fri Aug 11 00:46:24 JST 2006
+        - Wrap callback in eval again not to die
+
+0.06  Fri Aug 11 00:17:36 JST 2006
+        - Don't die if youreTooSlow
+
+0.05  Thu Aug 10 23:33:00 JST 2006
+        - Fixed $VERSION gotcha
+        - Added handling for <sorryTooSlow>
+
+0.04  Thu Aug 10 22:58:07 JST 2006
+        - Update XML::SAX::ParserFactory ParserPackage to use XML::LibXML::SAX::Better
+          which is an extended SAX handler by Djabberd project. Now
+          this module actually works.
+
+0.03  Thu Jun 15 08:23:42 JST 2006
+        - Support extra xmlns attributes declaration (Thanks to Byrne Reese)
+        - Don't die even if parsing fails
+        - Update eg/stream-client
+
+0.02  Fri Aug 26 00:20:10 UTC 2005
+        - Don't use HTML::Entities because of &hearts; problem
+        - API change so callback now gets XML::Atom::Feed object
+          instead of XML string
+
+0.01  Wed Aug 17 02:03:11 2005
+	- original version

@@ -1,0 +1,102 @@
+<?xml version="1.0"?>
+<!DOCTYPE NZSRSResponse SYSTEM "protocol.dtd">
+<NZSRSResponse VerMajor="3" VerMinor="99" RegistrarId="90">
+  <Response Action="RegistrarDetailsQry" FeId="8" FeSeq="4020284" OrigRegistrarId="90" RecipientRegistrarId="90" Rows="1">
+    <FeTimeStamp Day="11" Hour="12" Minute="23" Month="12" Second="13" TimeZoneOffset="+13:00" Year="2009" />
+    <Registrar AccRef="SRS" Name="Test Registrar" RegistrarId="90" URL="www.srs.net.nz">
+      <RegistrarPublicContact Name="PublicName" Email="PublicEmail@srs.net.nz">
+        <PostalAddress Address1="PublicAddress1" City="PublicCity" CountryCode="NZ" />
+        <Phone AreaCode="4" CountryCode="64" LocalNumber="PublicPhone" />
+      </RegistrarPublicContact>
+      <RegistrarSRSContact Name="SRSName" Email="SRSEmail@srs.net.nz">
+        <PostalAddress Address1="SRSAddress1" City="SRSCity" CountryCode="NZ" />
+        <Phone AreaCode="4" CountryCode="64" LocalNumber="SRSPhone" />
+      </RegistrarSRSContact>
+      <DefaultTechnicalContact Name="DefaultName" Email="DefaultEmail@srs.net.nz">
+        <PostalAddress Address1="DefaultAddress1" City="DefaultCity" CountryCode="NZ" />
+        <Phone AreaCode="4" CountryCode="64" LocalNumber="DefaultPhone" />
+      </DefaultTechnicalContact>
+      <EncryptKeys>
+        <EncryptKey>-----BEGIN PGP PUBLIC KEY BLOCK-----
+Version: GnuPG v1.0.6 (GNU/Linux)
+Comment: For info see http://www.gnupg.org
+
+mQGiBD2mASURBAC8ELfHNMeFkoOeaH9AeiB8gdnYfD0vl55tcUsIEdN6TbqLmxyE
+R6+hn+JprHiZ8eVxa7BwnCjc31inN5dB2/KtOxGVbmyXihl3P3Mgc/cY2D9ufVDx
+aai3RNDweiObreDL1+3sSp1DDC+Jmm9jnLlt26ZeAsIZSlQom65GvCIcowCgkeFq
+oRtrWDyQexFw5/gar30EoY0D/3AH88M+5k36isrXEZHjUgi4QO6wAJNkzSwRCKB3
+ug0nDlD1sB0Z3coRlfXBjDlvrAYlDeh2DJQa2dLHXBriTY6qI8PmluGy7nsnxLNf
+/5yYgiQZrzKz90lYFHXtxuYplcI0lsVvIlRehw2iHkiTrciMdSRxKNTDnuhlTJyn
+wrpLA/9JsSeGgKZFdjFemGccZYhYazpu76xGLXLPzMgBjtZxzgk0ZAJBYTyiE6N/
+cdPTdVndzIxrsYID2VS/HlCNrQEhBd3oJP+tsUXLdM1Ay1iCu8/vGnUhgPzlI8Ie
+ASFlPvtdj35Crk76qeNYgcdNxEewLGLDBpMXo+ss3ugMAtN6CLQUTlogUmVnaXN0
+cnkgU2VydmljZXOIVwQTEQIAFwUCPaYBJQULBwoDBAMVAwIDFgIBAheAAAoJECvU
+c6XZCUibUhcAoI88lZDCNvMLa0Ogk0eyzN7wGJfNAJ93B7O1FWDCpD0uTpIsqKlL
+tRm/aLkBDQQ9pgEoEAQAknWw2O7LVY0fk6+8PyLEEARvY0fLwn4+JA76srWUkWLY
+8CZ8MiuXiPWf0FwhxQUKsnhfnNL0NvndwDc2k+7doEbUOkNtNT2sS2ZkL1unC6ZO
+DBJJtMJjzmR0LLBqouvVSk1DsDzT291tKFb48qxCo3KOPG6+zeeUEtoRSiq9GKMA
+AwUD/jij4RZ4jBD9ToAYq8qoHMOHMQTngtSlW2wwg3r3kbbvr1AJHGOaDhPkGk2x
+ZBt+S49F+Y1zWM1UGDtSE+AZQ0gApCg5O7D6H9pE4bZyzcCgd05AD7lDhnGHzvd2
+k2w/UjBXMIk09d8c5kdZoO16TZ45wm6Qf799KtCul6lQ+IhniEYEGBECAAYFAj2m
+ASgACgkQK9RzpdkJSJsyjQCdHeSieOyL7LuNnTu8f1yvYlwfC40An2C3RcynllKX
+nxX1TYFMCXdHHLiq
+=JbX9
+-----END PGP PUBLIC KEY BLOCK-----</EncryptKey>
+      </EncryptKeys>
+      <EPPAuth Password="$5$7Gmg!lyu$b3g0yHlQKVw472CsJ1Rc/KPuWIQibgCkGz3/IvgQeI0" />
+      <Allowed2LDs>
+        <SecondLD DomainName="ac.nz" />
+        <SecondLD DomainName="bank.nz" />
+        <SecondLD DomainName="co.nz" />
+        <SecondLD DomainName="cri.nz" />
+        <SecondLD DomainName="geek.nz" />
+        <SecondLD DomainName="gen.nz" />
+        <SecondLD DomainName="govt.nz" />
+        <SecondLD DomainName="health.nz" />
+        <SecondLD DomainName="iwi.nz" />
+        <SecondLD DomainName="maori.nz" />
+        <SecondLD DomainName="mil.nz" />
+        <SecondLD DomainName="net.nz" />
+        <SecondLD DomainName="org.nz" />
+        <SecondLD DomainName="parliament.nz" />
+        <SecondLD DomainName="school.nz" />
+      </Allowed2LDs>
+      <Roles>
+        <Role RoleName="CancelDomain" />
+        <Role RoleName="Connect" />
+        <Role RoleName="CreateDomain" />
+        <Role RoleName="Query" />
+        <Role RoleName="Registrar" />
+        <Role RoleName="TransferDomain" />
+        <Role RoleName="UncancelDomain" />
+        <Role RoleName="UpdateDomain" />
+        <Role RoleName="UpdateRegistrar" />
+        <Role RoleName="Whois" />
+      </Roles>
+      <AuditDetails ActionId="InitialiseRegistrar90" RegistrarId="50">
+        <AuditTime>
+          <From Day="11" Hour="07" Minute="12" Month="12" Second="16" TimeZoneOffset="+13:00" Year="2009" />
+        </AuditTime>
+        <AuditText>Set up Registrar 90 for testing</AuditText>
+      </AuditDetails>
+    </Registrar>
+  </Response>
+  <Response Action="AccessControlListQry" FeId="8" FeSeq="4020284" OrigRegistrarId="90" RecipientRegistrarId="90" Rows="1">
+    <FeTimeStamp Day="11" Hour="12" Minute="23" Month="12" Second="13" TimeZoneOffset="+13:00" Year="2009" />
+    <AccessControlList List="allow" Resource="epp_connect" Size="1" Type="registrar_ip">
+      <AccessControlListEntry Address="101.1.5.0/24" RegistrarId="90" Comment="Test Registrar Netblock">
+         <EffectiveDate Day="20" Hour="17" Minute="45" Month="3" Second="50" TimeZoneOffset="-05:00" Year="2009"/>
+      </AccessControlListEntry>
+    </AccessControlList>
+  </Response>
+  <Response Action="AccessControlListQry" FeId="8" FeSeq="4020284" OrigRegistrarId="90" RecipientRegistrarId="90" Rows="1">
+    <FeTimeStamp Day="11" Hour="12" Minute="23" Month="12" Second="13" TimeZoneOffset="+13:00" Year="2009" />
+    <AccessControlList List="allow" Resource="epp_client_certs" Size="1" Type="registrar_domain">
+      <AccessControlListEntry DomainName="*.client.cert.example.com" RegistrarId="90" Comment="Test Registrar Key">
+         <EffectiveDate Day="20" Hour="17" Minute="46" Month="3" Second="17" TimeZoneOffset="-05:00" Year="2009"/>
+      </AccessControlListEntry>
+    </AccessControlList>
+  </Response>
+</NZSRSResponse>
+
+

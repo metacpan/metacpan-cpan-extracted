@@ -1,0 +1,181 @@
+SYNOPSIS
+     #/usr/bin/perl -w
+
+     use XML::Maker;
+
+     my $root   = new XML::Maker("root");
+     my $person = $root->subtag("person", name => 'Vadim',
+                                          age => 22);
+     my $info   = $person->subtag("info");
+     $info->text("Perl programmer");
+
+     print $root->make(0);
+
+FEATURES
+     * Easy and compact generation of XML
+     * A function receiving an object can't change the parent.
+     * It's impossible to make more than one root element
+     * It's impossible to leave an element unclosed
+     * Can print indented XML
+
+DESCRIPTION
+    This module has been written to provide easy and safe generation of XML.
+    Unlike other modules, this one does not produce output as soon as it
+    can, but only when calling the make() function. This is intentionally
+    done to make sure that it will always output well formatted XML.
+
+    One disadvantage of using this module is that everything is kept in
+    memory until you destroy the object. If your program needs to generate a
+    large amount of XML you should use another module, for example see
+    XML::Writer.
+
+    Another intended feature is safety. If you pass a XML::Maker object to a
+    function it will be able to do whatever it wants with it, but will not
+    have access to its parent. This should make it easier to find which part
+    of the program is generating bad output, but again, may not suit your
+    needs.
+
+    For ease of use, XML closing tags are generated automatically. If the
+    resulting XML element contains a CDATA area, then the output will
+    contain opening and closing tags:
+
+      <element key="value">text</element>
+
+    However, if there is no text, then an empty tag will be generated:
+
+      <element key="value"/>
+
+    Due to the design of this module, child objects will not go out of scope
+    as you might expect, see "remove()" for an explanation of this.
+
+GET/SET METHODS
+    All the methods in this package that modify values provide "get" and
+    "set" functions at the same time. If passed a value other than undef
+    they will set the value to the passed one.They will also return the old
+    value of the parameter. For example:
+
+      # Set separator to |, and save the old one
+      my $old_separator = $obj->separator("|");
+
+      # (code)
+
+      # Restore old separator
+      $obj->separator( $old_separator );
+
+METHODS
+  new($name, [%attributes])
+    Create a new XML::Maker object. It is mandatory to pass a $name argument
+    to indicate the name of this tag. "new" isnormally used to create the
+    root element.
+
+    Optionally, you can pass a hash containing the attribute names and
+    values. The order in which they will be generated in the resulting XML
+    is undefined.
+
+  make([$tabs])
+    Build a text representation of the object in the form of a XML tree.The
+    process will start at the object this is called on, and extend to all of
+    its children.
+
+    If $tabs is defined, then the output will be indented, starting with the
+    specified number of tabs. You probably want to use 0 here.
+
+  subtag($name, [%attributes])
+    Create a child XML::Maker object. It works exactly the same as new(),
+    except that the new object will be linked to its parent, instead of
+    being independent.
+
+    Creating a new object with new, and then using attach() on it has the
+    same effect.
+
+  attach($tag)
+    Attach a XML::Maker object to another. The object attached will become a
+    child of the object being attached to. If the child was a child of a
+    XML::Maker object, then it will stop being the child of that object.
+
+  detach($tag)
+    Detach a XML::Maker object. This only works if the object being detached
+    is a child of the object this method is called on. The child object will
+    then become independent from its parent.
+
+  remove()
+    Empties the XML::Maker object, and calls to the parent to remove its
+    internal reference. This is done to completely destroy a child object.
+    For example, suppose this code:
+
+      my $root = new XML::Maker('root');
+      add_info( $root );
+      print $root->make();
+
+      sub add_info {
+            my $obj = shift;
+            my $tag = $obj->subtag('info', 'foo' => 'bar');
+      }
+
+    Here, even though $tag goes out of scope, it *does not disappear*,
+    because $root has an internal reference to it. In order to make it
+    vanish you need to call "$tag->remove()", or "$obj->detach($tag )"
+    inside the "add_info" function. In the second case, $tag will continue
+    to exist until it goes out of scope.
+
+  separator([$value])
+    Gets/sets the separator. The separator is used by the "merge"method, and
+    by default is ", ".
+
+  name([$name])
+    Gets/sets the name of the element.
+
+  attribute($name, [$value])
+    Gets/sets an attribute of the element. This can't be used to remove an
+    attribute, use the "del_attribute()" method for that.
+
+  del_attribute($name)
+    Removes an attribute.
+
+  merge($name, $value)
+    Appends the separator, then string to an attribute. For example:
+
+      $obj->attribute('meta', 'foo'); # Sets 'meta' to 'foo'
+      $obj->merge('meta', 'bar');     # 'meta' is now 'foo, bar'
+
+  text([$text])
+    Gets/sets the text of the current element. If you want to remove the
+    text simply pass an empty string ("")
+
+  addtext($text)
+    Adds a string to the text of the element.
+
+  count_children()
+    Returns the number of children this object has. Only counts how many
+    children this specific object has, that is, it does not count
+    recursively.
+
+    A recursive count is not yet implemented.
+
+NOTES
+    This module is not yet complete. Many XML features are missing, for
+    example:
+
+     * Namespaces
+     * DOCTYPE declarations
+     * XML type declarations
+     * Comments
+
+    I'm interested in feedback about this module, and comments about new
+    features,improvements or bug reports are welcome.
+
+AUTHOR
+    Vadim Trochinsky (vadim_t at teleline dot es)
+
+SEE ALSO
+    XML::Writer
+
+COPYRIGHT
+    XML::Maker - A Perl module for generating XML Copyright (C) 2003 Vadim
+    Trochinsky
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by the
+    Free Software Foundation; either version 2 of the License, or(at your
+    option) any later version.
+

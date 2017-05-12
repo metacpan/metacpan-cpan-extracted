@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE spotlights [
+  <!ELEMENT spotlights (spotgroup+)>
+  <!ELEMENT spotgroup (spotlight+)>
+  <!ATTLIST spotgroup date CDATA #REQUIRED>
+  <!ELEMENT spotlight (title, url, img?, alttag?, seealso*, text)>
+  <!ELEMENT title  (#PCDATA)>
+  <!ELEMENT url    (#PCDATA)>
+  <!ELEMENT alttag (#PCDATA)>
+  <!ELEMENT img    (#PCDATA)>
+  <!ELEMENT text   (#PCDATA)>
+  <!ELEMENT seealso (text?, url?)>
+  <!ATTLIST seealso catid CDATA #IMPLIED>
+]>
+<spotlights>
+
+  <spotgroup date="2003-01">
+    <spotlight>
+      <title>This Friday</title>
+      <url>http://example.com/abd/</url>
+      <img>../images/spotlight/drag.jpg</img>
+      <alttag>Artists Behind the Desk</alttag>
+      <seealso catid="arts"></seealso>
+
+      <text>The Artists Behind the Desk Committee proudly presents
+        a Visual Arts Exhibition featuring works in a variety of media
+        from over 30 artists who divide their time between creating
+        art and working.</text>
+    </spotlight>
+  </spotgroup>
+
+  <spotgroup date="2003-03">
+    <spotlight>
+      <title>Sports and Fitness Center</title>
+      <url>http://example.com/projects/zesiger/</url>
+      <img>../images/spotlight/center.jpg</img>
+      <seealso>
+	<text>Athletics</text>
+	<url>http://example.com/athletics/</url>
+      </seealso>
+      <seealso>
+	<text>Campus Projects</text>
+	<url>http://example.com/projects/</url>
+      </seealso>
+      <text>Check out the new Sports and Fitness Center!</text>
+    </spotlight>
+  </spotgroup>
+</spotlights>

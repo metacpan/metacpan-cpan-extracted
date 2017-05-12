@@ -1,0 +1,8 @@
+Revision history for Perl extension XML::SAX::RTF.
+
+0.2  2010-04-25 (Co-maintainer upload by Grant McLean)
+        - patched to not register as XML parser
+
+0.1  Mon Aug 26 14:34:25 2002
+	- original version; created by h2xs 1.19
+

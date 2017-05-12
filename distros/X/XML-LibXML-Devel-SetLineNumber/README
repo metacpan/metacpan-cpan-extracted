@@ -1,0 +1,59 @@
+NAME
+    XML::LibXML::Devel::SetLineNumber - set the line number for an
+    XML::LibXML::Node
+
+SYNOPSIS
+      use XML::LibXML::Devel::SetLineNumber;
+  
+      my $node = $document->getElementsByTagName('foo')->get_node(1);
+      set_line_number($node, 8);
+      say $node->line_number;  # says "8"
+
+DESCRIPTION
+    This module exports one function:
+
+    `set_line_number($node, $number)`
+        Sets a node's line number.
+
+    Why in name of all that is good and holy would you want to do that?
+    Frankly, you probably don't. And you probably shouldn't.
+
+    There's just about one sitution where it makes sense. If you are, say,
+    writing a parser for a non-XML format that happens to have an XML-like
+    data model, then you might wish to parse your format into an XML::LibXML
+    document with elements, attributes and so on. And you might want all those
+    nodes to return the correct line numbers when the `line_number` method is
+    called on them. Say, for instance that you're working on
+    HTML::HTML5::Parser.
+
+THIS MODULE IS WELL DODGY
+    And you're a fool if you use it.
+
+    If you do feel you really must use this module, it's probably best to load
+    it like this:
+
+     eval {
+       require XML::LibXML::Devel::SetLineNumber;
+       import XML::LibXML::Devel::SetLineNumber;
+       1;
+     } or *set_line_number = sub { 1 };
+
+    Instead of the normal `use XML::LibXML::Devel::SetLineNumber`.
+
+SEE ALSO
+    XML::LibXML, XML::LibXML::Devel, XML::LibXML::Node.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    Copyright (C) 2012 by Toby Inkster
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

@@ -1,0 +1,29 @@
+XMail/Ctrl version 1.2
+=======================
+
+The XMail::Ctrl module is for use with the XMail server
+and allows for interaction with the Ctrl process provided
+by the XMail server.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  IO::Socket
+ (should be included in a stock Perl install, but you
+     never know )
+
+COPYRIGHT AND LICENCE
+
+Artistic same as Perl
+
+Copyright (C) 2001 Aaron Johnson <solution@gina.net>

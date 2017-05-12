@@ -1,0 +1,58 @@
+NAME
+    XML::RSS::FromAtom - create a XML::RSS object out of an Atom feed
+
+SYNOPSIS
+        require XML::RSS::FromAtom;
+        use LWP::Simple;
+    
+        my $atom2rss = new XML::RSS::FromAtom;
+        my $data = get 'http://ntess.blogspot.com/atom.xml';
+
+        my $rss = $atom2rss->parse($data);
+        #$rss->isa('XML::RSS');
+
+        # - OR -
+        require XML::Atom::Syndication;
+        my $atomic = XML::Atom::Syndication->instance;
+        my $doc = $atomic->get('http://www.timaoutloud.org/xml/atom.xml');
+
+        my $rss2 = $atom2rss->atom_to_rss($doc);
+        #$rss2->isa('XML::RSS');
+
+DESCRIPTION
+    XML::RSS::FromAtom converts a Atom style feed into an XML::RSS object.
+
+METHODS
+    new( )
+        Instanciates a new XML::RSS::FromAtom object
+
+    parse( $string )
+        Parses contents of $string as an Atom feed (using
+        XML::Atom::Syncdication) and returns it as an XML::RSS object.
+
+    atom_to_rss ( $object )
+        Converts an XML::Atom::Syndication::Element as returned by
+        XML::Atom::Syndication get into an XML::RSS object.
+
+AUTHOR
+    Marcus Thiesen, "<marcus@thiesen.org>"
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-xml-rss-fromatom@rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=XML-RSS-FromAtom>. I
+    will be notified, and then you'll automatically be notified of progress
+    on your bug as I make changes.
+
+SEE ALSO
+    XML::RSS XML::Atom::Syndication
+
+COPYRIGHT & LICENSE
+    Copyright 2005 Marcus Thiesen, All Rights Reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+CVS
+    $Id: FromAtom.pm,v 1.1 2005/03/18 17:04:44 marcus Exp $
+

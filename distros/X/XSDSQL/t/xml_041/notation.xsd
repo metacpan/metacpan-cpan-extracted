@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+
+
+	<xsd:notation name="gif" public="image/gif" system="view.exe"/>
+	<xsd:notation name="jpeg" public="image/jpeg" system="view.exe"/>
+	<xsd:notation name="companyLogo" system="com/company/graphics/companyLogo" public="http://www.company.com/graphics/companyLogo" id="notation.companyLogo">
+		<xsd:annotation>
+		    <xsd:documentation xml:lang="en">
+		        Location of the corporate logo.
+		    </xsd:documentation>
+		</xsd:annotation>
+  </xsd:notation>
+
+	<xsd:element name="image">
+		<xsd:simpleType>
+		    <xsd:restriction base="xsd:NOTATION">
+		        <xsd:enumeration value="gif"/>
+		        <xsd:enumeration value="jpeg"/>
+		    </xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
+
+</xsd:schema>
+

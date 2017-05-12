@@ -1,0 +1,17 @@
+<!DOCTYPE encmap [
+<!ENTITY yen-sign  "<ch byte='x5c' uni='x00a5'/>">
+<!ENTITY overline  "<ch byte='x7e' uni='x203e'/>">
+<!ENTITY X815C     "<ch byte='x5c' uni='x2014'/>">
+<!ENTITY X815F     "<ch byte='x5f' uni='x005c'/>">
+<!ENTITY X8160     "<ch byte='x60' uni='x301c'/>">
+<!ENTITY X8161     "<ch byte='x61' uni='x2016'/>">
+<!ENTITY X817C     "<ch byte='x7c' uni='x2212'/>">
+<!ENTITY X8191-2   "<range byte='x91' len='2' uni='x00a2'/>">
+<!ENTITY X81CA     "<ch byte='xca' uni='x00ac'/>">
+<!ENTITY kana-and-kanji    SYSTEM "kana-and-kanji.ent">
+]>
+<encmap name='x-sjis-jisx0221' expat='yes'>
+  &yen-sign;
+  &overline;
+  &kana-and-kanji;
+</encmap>

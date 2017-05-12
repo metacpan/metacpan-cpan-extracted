@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<NZSRSRequest VerMinor="11" VerMajor="3">
+
+    <DomainUpdate
+       ActionId="DomainUpdate-001"
+       >
+
+      <DomainNameFilter>example.org.nz</DomainNameFilter>
+
+      <!-- optional -->
+
+      <RegistrantContact
+         Name="John Smith"
+         Email="j.smith@mydomain.example.org.nz"
+         >
+        <PostalAddress
+           Address1="14 Rural Street"
+           Address2="Suburbia"
+           City="Wellington"
+           CountryCode="NZ"
+           PostalCode="6135"
+           />
+        <Phone
+           AreaCode="4"
+           CountryCode="64"
+           LocalNumber="111234"
+           />
+        <Fax
+           AreaCode="4"
+           CountryCode="64"
+           LocalNumber="111235"
+           />
+      </RegistrantContact>
+
+      <AdminContact
+         Name="ISP Administrator"
+         Email="admin@myisp.example.org.nz"
+         >
+        <PostalAddress
+           Address1="1 Main Road"
+           Address2="Central"
+           City="Wellington"
+           CountryCode="NZ"
+           PostalCode="6001"
+           />
+        <Phone
+           AreaCode="4"
+           CountryCode="64"
+           LocalNumber="111123"
+           />
+        <Fax
+           AreaCode="4"
+           CountryCode="64"
+           LocalNumber="111124"
+           />
+      </AdminContact>
+
+      <TechnicalContact
+         Name="ISP Technician"
+         Email="tech@myisp.example.org.nz"
+         >
+        <PostalAddress
+           Address1="1 Main Road"
+           Address2="Central"
+           City="Wellington"
+           CountryCode="NZ"
+           PostalCode="6001"
+           />
+        <Phone
+           AreaCode="4"
+           CountryCode="64"
+           LocalNumber="111125"
+           />
+        <Fax
+           AreaCode="4"
+           CountryCode="64"
+           LocalNumber="111126"
+           />
+      </TechnicalContact>
+
+      <NameServers>
+        <Server
+           FQDN="ns1.example.com"
+           />
+        <Server
+           FQDN="ns2.example.com"
+           />
+      </NameServers>
+
+      <AuditText>Domain updated for John Doe, RS8974</AuditText>
+
+    </DomainUpdate>
+
+</NZSRSRequest>
+

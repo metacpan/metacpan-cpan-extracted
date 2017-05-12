@@ -1,0 +1,149 @@
+# NAME
+
+XML::Feed::Aggregator
+
+# VERSION
+
+version 0.0401
+
+# SYNOPSIS
+
+    use XML::Feed::Aggregator;
+
+    my $syndicator = XML::Feed::Aggregator->new(
+        sources => [
+            "http://blogs.perl.org/atom.xml",
+            "http://news.ycombinator.com/"
+        ],
+        feeds => [ XML::Feed->parse('./slashdot.rss') ]
+    
+
+    )->fetch->aggregate->deduplicate->sort_by_date;
+
+    $syndicator->grep_entries(sub {
+        $_->author ne 'James'
+    })->deduplicate;
+
+    say $syndicator->map_entries(sub { $_->title } );
+
+# DESCRIPTION
+
+This module aggregates feeds from different sources for easy filtering and sorting.
+
+# NAME
+
+XML::Feed::Aggregator - Simple feed aggregator
+
+# ATTRIBUTES
+
+## sources
+
+Sources to be fetched and loaded into the feeds attribute.
+
+Coerces to an ArrayRef of URI objects.
+
+## feeds
+
+An ArrayRef of XML::Feed objects.
+
+## entries
+
+List of XML::Feed::Entry objects obtained from each feed
+
+# METHODS
+
+## fetch
+
+Convert each source into an XML::Feed object, via XML::Feed->parse()
+
+For a remote address this involves a http request.
+
+## aggregate
+
+Combine all feed entries into a single 'entries' attribute
+
+## to_feed
+
+Export aggregated feed to a single XML::Feed object. 
+
+All parameters passed to [XML::Feed](http://search.cpan.org/perldoc?XML::Feed) constructor.
+
+# FEED METHODS
+
+Methods relating to the 'feeds' attribute
+
+## add_feed
+
+Add a new feed to the 'feeds' attribute.
+
+## all_feeds
+
+Return all feeds as an Array.
+
+## feed_count
+
+Number of feeds.
+
+# ENTRY METHODS
+
+Methods relating to the 'entries' attribute
+
+## sort_entries
+
+See [XML::Feed::Aggregator::Sort](http://search.cpan.org/perldoc?XML::Feed::Aggregator::Sort)
+
+## map_entries
+
+Loop over all entries using $_ within a CodeRef.
+
+## grep_entries
+
+Grep through entries using $_ within a CodeRef.
+
+## add_entry
+
+Add a new entry to the aggregated feed.
+
+## entry_count
+
+Number of entries.
+
+## all_entries
+
+Returns all entries as an array
+
+# ROLES
+
+This class consumes the following roles for sorting and deduplication.
+
+[XML::Feed::Aggregator::Deduper](http://search.cpan.org/perldoc?XML::Feed::Aggregator::Deduper)
+[XML::Feed::Aggregator::Sort](http://search.cpan.org/perldoc?XML::Feed::Aggregator::Sort)
+
+# ERROR HANDLING
+
+## error_count
+
+Number of errors occured.
+
+## errors
+
+An ArrayRef of errors whilst fetching / parsing feeds.
+
+# SEE ALSO
+
+[XML::Feed::Aggregator::Deduper](http://search.cpan.org/perldoc?XML::Feed::Aggregator::Deduper)
+
+[XML::Feed::Aggregator::Sort](http://search.cpan.org/perldoc?XML::Feed::Aggregator::Sort)
+
+[App::Syndicator](http://search.cpan.org/perldoc?App::Syndicator) [Perlanet](http://search.cpan.org/perldoc?Perlanet) [XML::Feed](http://search.cpan.org/perldoc?XML::Feed) [Feed::Find](http://search.cpan.org/perldoc?Feed::Find)
+
+# AUTHOR
+
+Robin Edwards <robin.ge@gmail.com>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2011 by Robin Edwards.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

@@ -1,0 +1,82 @@
+#--------------------------------#
+# README file for XML::STX       #
+#--------------------------------#
+
+1. Description
+2. License
+3. Prerequisites
+4. Build and Install
+5. Utilities
+6. Authors
+
+
+1. Description
+==============
+
+XML::STX is a pure Perl implementation of STX processor. Streaming 
+Transformations for XML (STX) is a one-pass transformation language for 
+XML documents that builds on the Simple API for XML (SAX). See 
+http://stx.sourceforge.net/ for more details.
+
+
+2. License
+==========
+
+Copyright (c) 2002-2003 Ginger Alliance. All rights reserved. This program is 
+free software; you can redistribute it and/or modify it under the same terms as 
+Perl itself.
+
+
+3. Prerequisites
+================
+
+- XML::SAX
+- XML::NamespaceSupport
+- Clone
+
+
+4. Build and Install
+====================
+
+The module builds and installs in a standard way:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+To install on Windows (with ActivePerl), just replace "make" with "nmake".
+
+
+5. Utilities
+============
+
+stxcmd.pl
+---------
+	command line interface to XML::STX
+
+	USAGE:
+	  stxcmd.pl [OPTIONS] <transform> <data> [PARAMS]
+
+	OPTIONS:
+          -m : measures and displays duration of transformation
+          -h : displays this help info
+          -v : displays versions of XML::STX and parser/writer to be used
+ 
+	PARAMS:
+          name=value pairs separated by a space
+ 
+	EXAMPLE:
+          stxcmd.pl -m stylesheet.stx data.xml p1=5 p2=yes
+
+stxview.pl
+----------
+	GUI (Gtk+) viewer of STX transformation sheets
+	
+	USAGE: 
+	  stxview.pl
+
+6. Author
+==========
+
+Petr Cimprich <petr@gingerall.cz>, Ginger Alliance

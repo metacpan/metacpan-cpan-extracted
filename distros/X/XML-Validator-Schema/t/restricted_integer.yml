@@ -1,0 +1,32 @@
+# test an integer restricted to within -2 and 5
+
+--- |
+ <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="int" type="myInteger"/>
+  <xs:simpleType name="myInteger">
+    <xs:restriction base="xs:integer">
+      <xs:minInclusive value="-2"/>
+      <xs:maxExclusive value="5"/>
+    </xs:restriction>
+  </xs:simpleType>
+ </xs:schema>
+
+--- |
+  <int>3</int>
+--- >
+PASS
+
+--- |
+  <int>-3</int>
+--- >
+FAIL
+
+--- |
+  <int>-2</int>
+--- >
+PASS
+
+--- |
+  <int>5</int>
+--- >
+FAIL

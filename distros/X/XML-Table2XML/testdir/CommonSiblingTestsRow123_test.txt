@@ -1,0 +1,11 @@
+root
+/x	/x/@z	/y	/y/@z	/a/z	/a/z/@x	/a/b/c
+testX	testAttX	testY	testAttY	TestZ	TestB	TestA1
+testX	testAttX	testY	testAttY	TestZ	TestB	TestA2
+testX	testAttX	testY	testAttY	TestZ	TestB	TestA3
+testX	testAttX	testY	testAttY	TestZ	TestB	TestA4
+testX	testAttX	testY	testAttY	TestZ1	TestB1	TestA4
+testX	testAttX	testY	testAttY	TestZ1	TestB1	TestA3
+testX	testAttX	testY	testAttY	TestZ1	TestB1	TestA4
+testX	testAttX	testY	testAttY	TestZ1	TestB1	TestA3
+

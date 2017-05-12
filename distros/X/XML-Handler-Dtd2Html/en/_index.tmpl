@@ -1,0 +1,33 @@
+<h2>Elements index.</h2>
+<!-- TMPL_IF NAME="nb_element" -->
+  <dl>
+    <!-- TMPL_LOOP NAME="a_elements" -->
+    <dt><!-- TMPL_VAR NAME="a" --></dt>
+    <!-- /TMPL_LOOP -->
+  </dl>
+<!-- /TMPL_IF -->
+<h2>Entities index.</h2>
+<!-- TMPL_IF NAME="nb_entity" -->
+  <dl>
+    <!-- TMPL_LOOP NAME="a_entities" -->
+    <dt><!-- TMPL_VAR NAME="a" --></dt>
+    <!-- /TMPL_LOOP -->
+  </dl>
+<!-- /TMPL_IF -->
+<h2>Notations index.</h2>
+<!-- TMPL_IF NAME="nb_notation" -->
+  <dl>
+    <!-- TMPL_LOOP NAME="a_notations" -->
+    <dt><!-- TMPL_VAR NAME="a" --></dt>
+    <!-- /TMPL_LOOP -->
+  </dl>
+<!-- /TMPL_IF -->
+<h2>Examples list.</h2>
+<!-- TMPL_IF NAME="nb_example" -->
+  <dl>
+    <!-- TMPL_LOOP NAME="a_examples" -->
+    <dt><!-- TMPL_VAR NAME="a" --></dt>
+    <!-- /TMPL_LOOP -->
+  </dl>
+<!-- /TMPL_IF -->
+

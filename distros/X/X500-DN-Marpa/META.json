@@ -1,0 +1,64 @@
+{
+   "abstract" : "Parse X.500 DNs",
+   "author" : [
+      "Ron Savage (ron@savage.net.au)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.06, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "X500-DN-Marpa",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Const::Exporter" : "v0.2.3",
+            "Marpa::R2" : "2.096",
+            "Moo" : "1.006",
+            "Set::Array" : "0.3",
+            "Test::More" : "1.001014",
+            "Test::Pod" : "1.48",
+            "Try::Tiny" : "0.09",
+            "Types::Standard" : "1.000004",
+            "Want" : "0.25",
+            "parent" : "0",
+            "strict" : "0",
+            "utf8" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://opensource.org/licenses/Artistic-2.0"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/ronsavage/X500-DN-Marpa.git",
+         "web" : "https://github.com/ronsavage/X500-DN-Marpa"
+      }
+   },
+   "version" : "1.00"
+}
+

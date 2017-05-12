@@ -1,0 +1,28 @@
+<stx:transform version="1.0" 
+	       xmlns:stx="http://stx.sourceforge.net/2002/ns">
+
+  <stx:template match="/root">
+    <root>
+      <stx:process-children/>
+    </root>
+  </stx:template>
+  
+  <stx:group>
+
+    <stx:template match="node" public="yes">
+      <stx:text>(</stx:text>
+      <stx:choose>
+	<stx:when test="@id=1">
+	  <stx:value-of select="concat('1:',.)"/>
+	</stx:when>
+	<stx:when test="@id=2">
+	  <stx:value-of select="concat('2:',.)"/>
+	</stx:when>
+	<stx:otherwise>other</stx:otherwise>
+      </stx:choose>
+      <stx:text>)</stx:text>
+    </stx:template>
+    
+  </stx:group>
+
+</stx:transform>

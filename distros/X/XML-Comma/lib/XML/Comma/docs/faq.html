@@ -1,0 +1,288 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>FAQ - frequently asked questions about XML::Comma</title>
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body style="background-color: white">
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#basic_information">BASIC INFORMATION</a></li>
+	<ul>
+
+		<li><a href="#how_is_xml__comma_licensed_and_distributed">How is XML::Comma licensed and distributed?</a></li>
+		<li><a href="#is_there_an_xml__comma_web_site">Is there an XML::Comma web site?</a></li>
+		<li><a href="#is_there_an_xml__comma_mailing_list">Is there an XML::Comma mailing list?</a></li>
+		<li><a href="#what_documentation_is_available">What documentation is available?</a></li>
+	</ul>
+
+	<li><a href="#configuration_questions">CONFIGURATION QUESTIONS</a></li>
+	<ul>
+
+		<li><a href="#some_indexing_t_tests_are_failing_on_a_new_xml__comma_install_using_mysql__what_s_going_on">Some indexing.t tests are failing on a new XML::Comma install using MySQL; what's going on?</a></li>
+		<li><a href="#i_m_trying_to_use_the_simplec_parser__why_am_i_getting_all_of_these_begin_failedcompilation_aborted_error_messages_when_i_try_to_start_apache">I'm trying to use the SimpleC parser.  Why am I getting all of these ``BEGIN failed-compilation aborted'' error messages when I try to start Apache?</a></li>
+	</ul>
+
+	<li><a href="#code_questions">CODE QUESTIONS</a></li>
+	<ul>
+
+		<li><a href="#what_s_the_difference_between__foo_bar___and__foo_element__bar___get__">What's the difference between $foo-&gt;<code>bar()</code> and $foo-&gt;element('bar')-&gt;get()?</a></li>
+		<li><a href="#how_do_i_tell_how_many_instances_of_a_given_plural_element_exist">How do I tell how many instances of a given plural element exist?</a></li>
+		<li><a href="#how_do_i_check_whether_a_given_element_exists__without_autocreating_it">How do I check whether a given element exists, without auto-creating it?</a></li>
+		<li><a href="#what_does_the_bad_content_error_that_talks_about____found_that_isn_t_part_of_an_entity_reference__mean">What does the BAD_CONTENT error that talks about '&amp; found that isn't part of an entity reference' mean?</a></li>
+		<li><a href="#what_s_wrong_with__while__iterator_______">What's wrong with 'while($iterator++){}' ?</a></li>
+		<li><a href="#what_does_an_error_that_ends__sh___tmp_log_comma__permission_denied__mean">What does an error that ends 'sh: /tmp/log.comma: Permission denied' mean?</a></li>
+	</ul>
+
+	<li><a href="#performance">PERFORMANCE</a></li>
+	<ul>
+
+		<li><a href="#is_xml__comma_fast">Is XML::Comma fast?</a></li>
+	</ul>
+
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>XML::Comma FAQ - frequently asked questions about XML::Comma</p>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>XML::Comma is an information management platform. It was designed to
+be used as a core tool for developing Very Large Websites. Comma
+specifies an XML-based document definition format, encourages Perl
+code to be embedded in these definitions, and specifies an API for
+manipulating documents and document collections. Comma includes
+functionality to store sets of documents in ordered, extensible ways,
+and integrates with a relational database to index, sort and retrieve
+collections of documents.</p>
+<p>
+</p>
+<hr />
+<h1><a name="basic_information">BASIC INFORMATION</a></h1>
+<p>
+</p>
+<h2><a name="how_is_xml__comma_licensed_and_distributed">How is XML::Comma licensed and distributed?</a></h2>
+<p>XML::Comma is Free Software released under the GNU General Public
+License. For more information about the license, please see
+<a href="http://www.fsf.org/licenses/gpl.html">http://www.fsf.org/licenses/gpl.html</a></p>
+<p>Comma is distributed as a Perl module. The most recent version is
+always available at <a href="http://xml-comma.org/download/">http://xml-comma.org/download/</a></p>
+<p>
+</p>
+<h2><a name="is_there_an_xml__comma_web_site">Is there an XML::Comma web site?</a></h2>
+<p>Yes. <a href="http://xml-comma.org/">http://xml-comma.org/</a></p>
+<p>
+</p>
+<h2><a name="is_there_an_xml__comma_mailing_list">Is there an XML::Comma mailing list?</a></h2>
+<p>Yes. Please see <a href="http://xml-comma.org/mailing-list.html">http://xml-comma.org/mailing-list.html</a></p>
+<p>
+</p>
+<h2><a name="what_documentation_is_available">What documentation is available?</a></h2>
+<p>The <strong>XML::Comma User's Guide</strong> describes the Comma API in detail. It
+is available in HTML and PDF. The Guide can be found in the <code>Comma/docs</code>
+directory of the distribution, or at:</p>
+<pre>
+  <a href="http://xml-comma.org/guide-filter.html">http://xml-comma.org/guide-filter.html</a>
+  <a href="http://xml-comma.org/guide.pdf">http://xml-comma.org/guide.pdf</a></pre>
+<p>
+</p>
+<hr />
+<h1><a name="configuration_questions">CONFIGURATION QUESTIONS</a></h1>
+<p>
+</p>
+<h2><a name="some_indexing_t_tests_are_failing_on_a_new_xml__comma_install_using_mysql__what_s_going_on">Some indexing.t tests are failing on a new XML::Comma install using MySQL; what's going on?</a></h2>
+<p>Comma relies on MySQL's ``USE DATA LOCAL'' function, which has been
+disabled by default in MySQL versions 3.23.48 and greater. This change
+to MySQL breaks a few of the indexing tests. MySQL can be recompiled
+with the option ``--enable-local-infile'' to turn back on the LOCAL
+functionality. Or mysqld can be started with the argument
+``--local-infile=1''. See the following piece of MySQL documentation:</p>
+<pre>
+  <a href="http://www.mysql.com/doc/en/LOAD_DATA_LOCAL.html">http://www.mysql.com/doc/en/LOAD_DATA_LOCAL.html</a></pre>
+<p>You may also need to pass 'mysql_local_infile=1' as an argument in the
+data source name you use to connect (via the DBI modules) to
+MySQL. The dsn is specified in the Comma/Configuration.pm file.</p>
+<p>
+</p>
+<h2><a name="i_m_trying_to_use_the_simplec_parser__why_am_i_getting_all_of_these_begin_failedcompilation_aborted_error_messages_when_i_try_to_start_apache">I'm trying to use the SimpleC parser.  Why am I getting all of these ``BEGIN failed--compilation aborted'' error messages when I try to start Apache?</a></h2>
+<p>As stated in mod_perl documentation at
+<a href="http://perl.apache.org/docs/1.0/guide/troubleshooting.html#foo_____at__dev_null_line_0,">http://perl.apache.org/docs/1.0/guide/troubleshooting.html#foo_____at__dev_null_line_0,</a>
+there is no file associated with a handler from mod_perl's
+perspective, so $0 is set to <code>/dev/null</code>.</p>
+<p>If a pre-compiled version of the SimpleC parser is not found by
+Inline, Inline tries (using the FindBin module) to figure out its
+``current working directory.'' FindBin croaks when $0 is set to
+<code>/dev/null</code>, which causes Apache to abort the startup process.</p>
+<p>You can get a compiled version of the parser in the right spot by
+simply invoking</p>
+<pre>
+  perl -MXML::Comma -e ''</pre>
+<p>from a command line. Comma asks Inline to install its compiled files
+below <code>XML::Comma-&gt;tmp_directory</code>.</p>
+<p>If you are worried about your pre-compiled parser being clobbered
+between apache restarts (for example because your tmp_directory is
+<code>/tmp</code>), you can add a</p>
+<pre>
+  BEGIN { $0 = &quot;/path/to/handler&quot; }</pre>
+<p>block to your handler script, which will prevent FindBin from
+croaking, and allow Inline's compilation step to proceed normally.</p>
+<p>
+</p>
+<hr />
+<h1><a name="code_questions">CODE QUESTIONS</a></h1>
+<p>
+</p>
+<h2><a name="what_s_the_difference_between__foo_bar___and__foo_element__bar___get__">What's the difference between $foo-&gt;<code>bar()</code> and $foo-&gt;element('bar')-&gt;get()?</a></h2>
+<p>This is really a question about Comma's ``shortcut'' syntax, which
+defines a mapping between method calls and the elements of a given
+container.</p>
+<p>There is a section on the shortcut syntax in the guide that goes into
+more detail, but here is a quick list of the seven possible ways a
+shortcut can can be resolved.</p>
+<pre>
+  $x-&gt;foo ( [@args] )                  # becomes:
+  $x-&gt;method('foo, @args)              # if there is a method &quot;foo&quot;
+  $x-&gt;element('foo')                   # singular, nested
+  $x-&gt;elements('foo')                  # plural, nested
+  $x-&gt;element('foo')-&gt;get()            # singular, non-nested, no @args 
+  $x-&gt;element('foo')-&gt;set(@args)       # singular, non-nested, with @args
+  $x-&gt;elements_group_get('foo')        # plural, nested, no @args
+  $x-&gt;elements_group_set('foo', @args) # plural, nested, with @args</pre>
+<p>
+</p>
+<h2><a name="how_do_i_tell_how_many_instances_of_a_given_plural_element_exist">How do I tell how many instances of a given plural element exist?</a></h2>
+<p>Because the <code>elements()</code> method always tries to return a ``list'' of
+elements -- which means that it returns an array in list context and a
+reference to an array in scalar context -- you have to do a bit of
+extra work to determine how many instances of a plural element
+exist. The most concise (and the recommended) way to do this is:</p>
+<pre>
+  my $how_many_foos = scalar ( @{$doc-&gt;elements('foo')} );</pre>
+<p>
+</p>
+<h2><a name="how_do_i_check_whether_a_given_element_exists__without_autocreating_it">How do I check whether a given element exists, without auto-creating it?</a></h2>
+<p>Comma elements automatically get created when you ask for them. So the
+following code first makes a new Doc, then (behind the scenes) makes a
+new Element object for you:</p>
+<pre>
+  XML::Comma::Doc-&gt;new ( type=&gt;'Some_Def' )-&gt;element ( &quot;foo&quot; );</pre>
+<p>This automatic creation (auto-vivication, in Perl lingo) is almost
+always what you want. But there are cases where you need to check
+whether an Element already exists before you try to manipulate it. For
+example, you might have a nested element that has some required
+children -- and you probably only want to create that element when
+you're sure you're ready to populate it fully.</p>
+<p>The idiom to do this turns out to be almost the same as the idiom to
+check how many instances of a plural element exist, given above:</p>
+<pre>
+  if ( @{$doc-&gt;elements('foo')} ) {
+    $doc-&gt;foo()-&gt;child ( 'some value' );
+  }</pre>
+<p>
+</p>
+<h2><a name="what_does_the_bad_content_error_that_talks_about____found_that_isn_t_part_of_an_entity_reference__mean">What does the BAD_CONTENT error that talks about '&amp; found that isn't part of an entity reference' mean?</a></h2>
+<p>You have a problem that boils down to something along these lines:</p>
+<pre>
+  $doc-&gt;element('some_element')-&gt;set ( &quot;foo &amp; bar&quot; );</pre>
+<p>Element content must be legal XML -- so no &amp;lt;, &amp;gt;, or &amp;amp;
+characters are allowed. These special characters must be ``escaped'' by
+replacing them with their entity codes (respectively &amp;amp;lt;,
+&amp;amp;gt;, or &amp;amp;amp;). The <code>Comma::Util::XML_basic_escape()</code> and
+<code>Comma::Util::XML_basic_unescape()</code> methods are available, as are
+shortcut flags for the element <code>set()</code> and <code>get()</code> methods:</p>
+<pre>
+  $doc-&gt;element('some_element()-&gt;set ( &quot;foo &amp; bar&quot;, escape=&gt;1 );
+  $doc-&gt;element('some_element')-&gt;get ( unescape=&gt;1 );
+  $doc-&gt;some_element ( &quot;foo &amp; bar&quot;, escape=&gt;1 );</pre>
+<p>Note that there is no way to pass the <code>unescape</code> flag in the
+shortcut-get syntax (so there are three examples above, rather than
+four). It is fair to construe this as a problem with the API.</p>
+<p>
+</p>
+<h2><a name="what_s_wrong_with__while__iterator_______">What's wrong with 'while($iterator++){}' ?</a></h2>
+<p>There is a bug in Perl (both versions 5.6.1 and 5.8.0) that leads to a
+memory leak in Comma code like this:</p>
+<pre>
+  my $iterator = $index-&gt;iterator();
+  while ( $iterator++ ) {
+    ...
+  }</pre>
+<p>or:</p>
+<pre>
+  if ( $iterator++ ) {
+  }</pre>
+<p>If you use the 'while($iterator++){}' or 'if($iterator++){}', then
+your Iterators objects won't ever get garbage-collected. This is very
+often not a problem; any stand-alone script will be fine, the
+Iterators will get properly DESTROYed when the script exits. But code
+like the above running inside, for example, a web application, can be
+a problem.</p>
+<p>This works fine:</p>
+<pre>
+  my $iterator = $index-&gt;iterator();
+  while ( ++$iterator ) {
+    ...
+  }
+  
+The pre-increment may seem a little counter-intuitive, but the
+Iterator class is written to Do The Right Thing for this very common
+case. And the pre-increment doesn't trigger the memory leak. And this
+is fine, too:</pre>
+<pre>
+  my $iterator = $index-&gt;iterator();
+  while ( $iterator ) {
+    ...
+    $iterator++;
+  }</pre>
+<p>
+</p>
+<h2><a name="what_does_an_error_that_ends__sh___tmp_log_comma__permission_denied__mean">What does an error that ends 'sh: /tmp/log.comma: Permission denied' mean?</a></h2>
+<p>Comma writes a line about all un-caught errors to a log file. The
+location of the log file is controlled by a setting in Comma.pm -- the
+default is <code>/tmp/log.comma/</code>. This file probably needs to be writable
+by any processes that use the Comma framework. In most installations,
+the file is made world-writable (which should tell you that the Comma
+log system isn't intended to be used as part of any security auditing
+or similar framework -- you should write additional code to handle any
+secure reporting that an application might need.)</p>
+<p>
+</p>
+<hr />
+<h1><a name="performance">PERFORMANCE</a></h1>
+<p>
+</p>
+<h2><a name="is_xml__comma_fast">Is XML::Comma fast?</a></h2>
+<p>Sure. We don't know of any faster way to develop (or to add new
+features to) large-scale applications that manipulate collections of
+hundreds of thousands of pieces of messy-but-structured
+information. We use it every day, and so do many, many people who
+access the web sites we build.</p>
+<p>Oh, wait: you meant, ``does it run fast?'' Well, that's in the eye of
+the beholder. Comma's bottleneck is the parsing and object-ifying of
+XML files. The power and flexibility that the API gives you comes at
+some cost -- a hand-coded, special-purpose implementation could well
+be faster for any single usage.</p>
+<p>However, we've worked hard to make Comma fast enough to be really,
+really, useful. For example, Comma's ``Inline'' parser is about twice as
+fast as the general-use XML parsers against which we've benchmarked it
+(because Comma documents aren't allowed to make use of all parts of
+the XML specification). An experienced designer of large-scale
+internet systems will easily be able to structure and tune a
+Comma-based system to serve hundreds of thousands of dynamic pages a
+day on mid-range x86 boxes.</p>
+
+</body>
+
+</html>

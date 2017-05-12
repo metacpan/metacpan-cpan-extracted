@@ -1,0 +1,97 @@
+blx::xsdsql
+==========================
+
+The README is used to introduce the module and provide instructions on
+how to install the module, any machine dependencies it may have (for
+example C compilers and installed libraries) and any other information
+that should be provided before the module is installed.
+
+A README file is required for CPAN modules since CPAN extracts the
+README file from a module distribution so that people browsing the
+archive can use it get an idea of the modules uses. It is usually a
+good idea to provide version information here so that people can
+decide whether fixes for the module are worth downloading.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL [PREFIX=<dir>]
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other perl modules and external programs
+
+    XML::Parser             => '1.21' 
+    XML::Writer             => '0.600'
+    DBI                     => '1.58'
+    Carp::Assert            => '0.20'
+    Attribute::Constant     => '0.06'
+    DBD::DBM                => '0.06' (if it's use DBM or run the test suite with default database)
+    MLDBM                   => '2.05' (if it's use DBM or run the test suite with default database)
+    SQL::Statement          => '1.33' (if it's use DBM or run the test suite with default database)
+    DBD::mysql              => '4.0.20' (if it's use mysql)
+    DBD::Oracle             => '1.44'   (if it's use oracle)
+    DBD::Pg                 => '2.19.0' (if it's use postgresql)
+    xmllint                     if run the testsuite
+    xmldiff                     if run the testsuite
+    
+The database supported is oracle,postgresql,mysql and DBM 
+Other databases is possible in future versions
+
+The minimum perl version supported is 5.10 
+
+After the installation the directory $PREFIX/bin contain the programs:
+    xml_repo.pl for manage repository,schemas and xml
+    xsd2sql.pl - for drop or construct repository and schema catalog manually
+                 this program produce a sql files to run with the appropriate database client
+                 or alternatively with the isql.pl in tools directory
+                 
+    
+
+
+Test with other databases:
+if you want a complete tests with one or more databases the steps are:
+  install the DBD driver of the appropriate database
+  set the enviroment variable XSDSQL_<dbname> with <dbname>::= DBM|ORA|PG|MYSQL and export it
+  exec testall.pl in t directory 
+  
+  
+  this examples are for the bash shell:
+  
+  postgres: export XSDSQL_PG='sql::pg:myuser/mypwd@mydb:127.0.0.1:5432;RaiseError => 1,AutoCommit => 0,pg_enable_utf8 => 1'
+  mysql:    export XSDSQL_MYSQL='sql::mysql:myuser/mypwd@mydb:127.0.0.1:3306;RaiseError => 1,AutoCommit => 0,mysql_enable_utf8 => 1'
+  dbm:      export XSDSQL_DBM='sql::DBM:dbm_mldbm=Storable;RaiseError => 1,f_dir=> q(/tmp)'
+  oracle:   export XSDSQL_ORA='sql::oracle:myuser/mypwd@orcl:127.0.0.1:1522;RaiseError => 1,AutoCommit => 0'
+            export NLS_LANG='AMERICAN_AMERICA.AL32UTF8' # set the utf8 on the client
+
+  WARNING: the databases must support utf8 
+  
+  
+  The format of connection string is:
+   [<output_namespace>::]<dbtype>:<user>/<password>@<dbname>[:hostname[:port]][;<attribute>[,<attribute>...]]
+   
+         <output_namespace>::=  sql  (this is the default)
+         <dbtype>::= pg|mysql|oracle|DBM
+         <user>::=  username 
+         <pwd>::=   password
+         <dbname> ::= database name
+         <hostname>:: socket remote hostname or ipaddress - the default is 127.0.0.1
+         <port>    :: socket remote port - the default is the database port default 
+         <attribute> :: extra attribute - see the manual of DBI, section connect 
+         
+    example of run in bash shell:
+         cd t && ./testall.pl > logfile.log 2>&1
+  
+COPYRIGHT AND LICENCE
+ 
+Copyright (C) 2010 by  lorenzo bellotti
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+

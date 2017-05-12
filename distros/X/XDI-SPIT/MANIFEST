@@ -1,0 +1,9 @@
+ChangeLog
+Makefile.PL
+MANIFEST
+README
+cgi/idbroker.pl
+cgi/login.pl
+cgi/registry.pl
+SPIT.pm
+t/spit.t

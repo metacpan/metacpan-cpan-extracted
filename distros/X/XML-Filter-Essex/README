@@ -1,0 +1,238 @@
+README for the XML::Essex library distribution
+==============================================
+
+    APLHA CODE ALERT: This document promises a bit more than XML::Essex
+    delivers at the moment, but not much.  XML::Essex passes about 150
+    tests covering all the basics (including thread support, if you have
+    a threaded perl) other than that shown in Example 3.
+
+XML::Essex is a combined push/pull XML processing environment.  It
+implements 3 SAX processors and a scripting environment:
+
+ XML::Generator::Essex    Generate XML using shorthand sub
+ XML::Handler::Essex      Handle XML using pull and matching APIs
+ XML::Filter::Essex       Process XML; it's Handler + Generator
+
+ XML::Essex               Write a simple script that uses
+                          XML::Filter::Essex under the hood.
+
+These four modules provide:
+
+    - Shorthand event constructors like "start_elt()", "elt()"
+    - EventPath (an XPath superset) matching of incoming events
+    - Rule based processing: $event_path_expr => sub { ... }
+    - Procedural processing: put get while 1;
+    - A very perlish SAX oriented DOM
+    - Support for large documents using perl threads
+
+Before getting in to the details, here are a couple of examples.  The
+first two work; the third should work one day soon.
+
+Example 1: Ad hoc filters
+=========================
+
+Here's how to write an ad-hoc filter to count the number of elements
+in a file:
+
+    use XML::Handler::Essex;
+
+    my $count = 0;
+
+    my $h =  XML::Handler::Essex->new(
+
+        Main => sub {                     ## the main filter
+            while (1) {                   ##
+                get "start-element::*";   ##
+                ++$count;                 ##
+            }                             ##
+        },                                ##
+
+    );
+
+    ... feed a document to $h ...
+
+    print $count, "\n";
+
+The incoming SAX stream is consumed by the while(1) loop.  get() reads
+only the start_element SAX events, which we ignore, other than to count
+them.  When get() runs out of SAX events, it throws an exception that
+causes the main filter sub to be exited.  This exception is silently
+caught and the SAX pipeline exits normally.
+
+Here it is in an actual script (see the example/ directory):
+
+    use XML::Handler::Essex;
+    use XML::SAX::Machines qw( Pipeline );
+
+    my $count = 0;
+
+    Pipeline(
+
+        XML::Handler::Essex->new(
+
+            Main => sub {                     ## the main filter
+                while (1) {                   ##
+                    get "start-element::*";   ##
+                    ++$count;                 ##
+                }                             ##
+            },                                ##
+
+        ),
+
+    )->parse_file( \*STDIN );
+
+    print $count, "\n";
+
+
+Example 2: Subclassing.  Oh, and rule based processing.
+=======================================================
+
+Here's how to write the above filter as a subclass and also how to use
+rule based processing to handle the same task (these two demonstrations
+are independant; we could have used rule based processing in Example 1):
+
+
+    package My::Counter;
+
+    use base 'XML::Filter::Essex';
+    use XML::Filter::Essex;  ## Import some helpful items.
+
+    sub main {
+        my $count = 0;
+
+        on(
+            "start-element::*" => sub { ++$count },
+            "end-document::*"  => sub { put [ "count" => $count ] }
+        );
+
+        get while 1;
+    }
+
+    1;
+
+This can be used like so:
+
+    use My::Counter;
+    use XML::SAX::Machines qw( Pipeline );
+
+    Pipeline( My::Counter => \*STDOUT )->parse_file( \*STDIN );
+
+
+Example 3: As a standalone script
+=================================
+
+NOTE: Still working on this.
+
+Here's how to write the above as a standalone script:
+
+
+    use XML::Essex;
+
+    my $count = 0;
+
+    while (1) {
+        get "start_element::*";
+        ++$count;
+    }
+
+    print $count;
+
+and here's how to do it with rules:
+
+
+    use XML::Essex;
+
+    my $count = 0;
+
+    on "start-element::*" => sub { ++$count },
+       "end-document::*"  => sub { print $count, "\n" };
+
+    get while 1;
+
+
+The Problem
+===========
+
+XML::Essex aims to provide a combined procedural and pattern matching
+scripting and SAX programming environments for XML processing.  It uses
+SAX as its infrastructure so that Essex may be used in conjunction with
+other processing technologies like XSLT, Perl, XML::Generator::PerlData,
+XMLDriver::Excel, etc.  This also enables large document support,
+although that can require Essex to cache the document or use Perl's
+threading support.
+
+One of the difficulties in using SAX to process documents is keeping
+state.  In other words, if you want to work with chunks of the document
+that aren't right next to each other in the document, you need wait
+until the first desirable chunk floats down the SAX stream and save some
+kind of value in $self and until the next desirable chunk happens to
+float down the event stream.  Lather, rinse, and repeat until all the
+desirable chunks have floated by; and you might have to wait for an
+end_element or end_document event to be sure you've seen all the
+desirable chunks.
+
+Basically, because SAX is totally event driven, you need to catch the
+correct events, test them to figure out what they are, and react to them
+by modifying some data member in your filter.  XML::Essex lets you keep
+state in plain old variables, like $count, above.
+
+Essex also helps you recognize the desirable chunks using EventPath in
+on( pattern => action ) rules, also shown above.  And you can mix the
+two styles as necessary using closures.
+
+You can also keep some state in $self if need be.
+
+
+The DOM
+=======
+
+To support all this environments, a SAX oriented DOM (XML::Essex::Model)
+is provided that encapsulates SAX events and composite SAX events like
+elements in objects that provide terse access to data in them.
+
+For instance:
+
+    my $start_elt = get "start_element::*";
+    my $elt       = get "*";
+
+    print $start_elt->{$attr_name}, "\n";
+    print $elt->{$attr_name}, "\n";
+    print $elt->[$node_number], "\n";
+
+prints the named attribute or the content node referred to by
+$node_number.
+
+    (This part of Essex is likely to change.  In particular, some
+    support for EventPath in place of $elt->{$attr_name}, so
+    something like $elt->{"@$attr_name"} might be used instead).
+
+
+Large Document Support: caching and threading support
+=====================================================
+
+For small documents, where small is in relation to a system's available
+memory, it's acceptable to let XML::Essex buffer all the events in memory
+and then call the main filter when it sees the end_document event.
+
+For larger documents, you can run in a threaded perl and
+
+    use threads;
+
+early on in the main program/script.  XML::Essex will shift gears and
+put the main filter in a thread.  For now, all downstream filters also
+go in a thread, but this limitation will be addressed.
+
+In the future, XML::Essex will try to use XML::LibXML's push parser
+to handle large documents.  This will only be available to XML::Essex
+scripts (see Example 3 above) and to XML::Essex::Filter and
+XML::Essex::Handler objects that are the first ones in a SAX chain.
+
+Also in the future, XML::Essex will be able to cache large documents on
+disk instead of threading.  This approach is needed for two reasons.
+The first is that it's unnecesarily limiting to require threading just
+to handle large documents.
+
+The second is that Perl's threading support is not designed to handle
+this use case efficiently and does a lot of extra work, slowing
+XML::Essex down.
+

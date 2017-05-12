@@ -1,0 +1,65 @@
+Revision history for Perl extension XML::SAXDriver::vCard
+
+0.05	 Tue Feb 18 2003
+
+	 - Added $regexp_type and &_munge_type() for parsing TYPE 
+	   param/value lists.
+
+	 - Fixed a bug parsing ADR where locality was being set
+           incorrectly (props to Leo Lapworth for the pointer)
+
+	 - Renamed _render_vcard() as _saxify() because it sounds 
+	   more exciting.
+
+	 - Updated 001-parse.t to test for list TYPE widgets and
+           multiple addresses.
+
+	 - Removed 004-parse-list-types
+
+	 - Updated Changes doc to make note of non-existent 0.03 
+	   release.
+
+	 - Updated POD
+
+0.04	 Mon Feb 17 2003
+
+	 - Updated to make checks on names case-insenstive (props
+	   to Leo Lapworth for the slap upside the head :-)
+
+	 - Updated tests to check for 'get_handle' method for $parser
+
+	 - Added 004-parse-list-types.t which will actually do
+           something in version 0.05
+
+	 - Better error handling for $pkg->parse_uri
+
+	 - Added hooks to capture SOURCE property
+
+	 - Updated license to be "same terms as Perl itself"; this also applies
+	   to versions < 0.03. Sorry about that.
+
+	 - Updated POD
+
+0.03	 
+
+	 - What, you mean 0.02 + 0.01 isn't 0.04?
+
+0.02	 Tue Nov 05 2002
+
+	 - Added support for the AGENT property
+
+	 - Added a variety of private _parse_* methods
+	 
+	 - Moved (start|end)_document stuff out of _vcard method
+
+	 - Fixed a bug in &_media where extref URI was set as PCDATA rather
+	   than as an attribute (duh)
+
+	 - Updated *.t files not to bother trying to load XML::Simple if
+	   XML::SAX::Writer is not available
+
+0.01	 Mon Nov 04 2002
+	 
+	 - Initial public release
+
+# $Id: Changes,v 1.9 2003/02/18 23:04:42 asc Exp $

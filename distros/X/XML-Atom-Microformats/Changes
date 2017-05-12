@@ -1,0 +1,43 @@
+XML-Atom-Microformats
+=====================
+
+Created:      2010-04-14
+Home page:    <https://metacpan.org/release/XML-Atom-Microformats>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=XML-Atom-Microformats>
+Maintainer:   Toby Inkster <mailto:tobyink@cpan.org>
+
+0.004  2012-07-07
+
+ - (Documentation) Correct module name in SYNOPSIS.
+ - (Packaging) Minor changes to dependencies.
+
+0.003  2011-11-03  # hLong hTime hNo hSee
+
+ - (Documentation) entry_* methods are separate list items in the pod.
+ - (Packaging) Module::Package::RDF
+ - (Update) use RDF::RDFa::Parser 1.096
+ - (Update) use RDF::Trine 0.135
+
+0.002  2010-12-22
+
+ - (Bugfix) Remove spurious 'use RDF::TrineShortcuts'.
+
+0.001  2010-12-21  # First stable release
+
+ - (Packaging) Improve test cases.
+ - (Update) use HTML::Microformats 0.100.
+ - (Update) use RDF::Query 2.900.
+ - (Update) use XML::Atom::OWL 0.100.
+
+0.00_02  2010-04-29
+
+ - (Bugfix) List correct dependencies in Makefile.PL.
+
+0.00_01  2010-04-29
+
+ - Take advantage of new XML-Atom-OWL and HTML-Microformats features for
+   better base/document URI handling.
+
+0.00_00  2010-04-28  # Initial preview
+
+

@@ -1,0 +1,97 @@
+<?xml version="1.0"?>
+<?xml-stylesheet title="CSS_formatting" type="text/css" href="./rss.css"?>
+<rss version="2.0"
+  xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+><channel>
+<!-- Generated with Perl's XML::RSS::SimpleGen v11.11 -->
+
+<link>http://www.somethingawful.com</link>
+<title>Something Awful</title>
+<description>Something Awful -- The Internet Makes You Stupid</description>
+<language>en-US</language>
+<lastBuildDate>Tue, 09 Mar 2004 08:57:10 GMT</lastBuildDate>
+<skipHours><hour>0</hour><hour>2</hour><hour>4</hour><hour>6</hour><hour>8</hour><hour>10</hour><hour>12</hour><hour>14</hour><hour>16</hour><hour>18</hour><hour>20</hour><hour>22</hour></skipHours>
+<sy:updateFrequency>12</sy:updateFrequency>
+<sy:updatePeriod>daily</sy:updatePeriod>
+<sy:updateBase>1970-01-01T01:00+00:00</sy:updateBase>
+<ttl>120</ttl>
+<webMaster>sburke@cpan.org</webMaster>
+<docs>http://www.interglacial.com/rss/about.html</docs>
+
+<item>
+  <title>Comedy Goldmine: Musical Artists Gone Insane!</title>
+  <link>http://www.somethingawful.com/articles.php?a=2023</link>
+</item>
+
+<item>
+  <title>Reviews [Games]: "Nitro Family" (Demo)</title>
+  <link>http://www.somethingawful.com/articles.php?a=2021</link>
+</item>
+
+<item>
+  <title>Weekend Web: CBBC Newsground</title>
+  <link>http://www.somethingawful.com/articles.php?a=2018</link>
+</item>
+
+<item>
+  <title>Photoshop Phriday: Advertisements of the Christ</title>
+  <link>http://www.somethingawful.com/articles.php?a=2015</link>
+</item>
+
+<item>
+  <title>Horrors of Porn: "Lesbian Commando (Super Sexy Unit)"</title>
+  <link>http://www.somethingawful.com/articles.php?a=2013</link>
+</item>
+
+<item>
+  <title>Reviews [Games]: Completely Libelous Review of "Universal Combat"</title>
+  <link>http://www.somethingawful.com/articles.php?a=2010</link>
+</item>
+
+<item>
+  <title>Comedy Goldmine: SkyMall Catalogue Jamboree</title>
+  <link>http://www.somethingawful.com/articles.php?a=2008</link>
+</item>
+
+<item>
+  <title>Your Band Sucks: Terrible Covers</title>
+  <link>http://www.somethingawful.com/articles.php?a=2006</link>
+</item>
+
+<item>
+  <title>Weekend Web: Internet Movie Database and Talk Sex</title>
+  <link>http://www.somethingawful.com/articles.php?a=2004</link>
+</item>
+
+<item>
+  <title>Photoshop Phriday: Safety War</title>
+  <link>http://www.somethingawful.com/articles.php?a=1999</link>
+</item>
+
+<item>
+  <title>Untitled Document: Chapter One</title>
+  <link>http://www.somethingawful.com/articles.php?a=1997</link>
+</item>
+
+<item>
+  <title>Reviews [Movies]: "Syngenor"</title>
+  <link>http://www.somethingawful.com/articles.php?a=1995</link>
+</item>
+
+<item>
+  <title>Comedy Goldmine: Yahoo Personals Part 2</title>
+  <link>http://www.somethingawful.com/articles.php?a=1993</link>
+</item>
+
+<item>
+  <title>Reviews [Games]: "Rebels: Prison Escape"</title>
+  <link>http://www.somethingawful.com/articles.php?a=1991</link>
+</item>
+
+<item>
+  <title>Weekend Web: vTeen and Other Random Idiots</title>
+  <link>http://www.somethingawful.com/articles.php?a=1988</link>
+</item>
+
+
+</channel></rss>

@@ -1,0 +1,24 @@
+Revision history for Perl extension XML::XSPF.
+
+0.7   Sat Nov  8 15:46:07 PST 2008
+	- Fix http://rt.cpan.org/Ticket/Display.html?id=36778
+
+0.6   Mon May  8 10:29:46 PDT 2006
+
+	- Pass & Fail all testcases from
+	  http://svn.xiph.org/trunk/xspf/testcase/
+
+	  except the extension specific cases which are not yet supported.
+
+0.5.1 Thu May  4 15:39:22 PDT 2006
+
+	- Removed INIT blocks - they were causing dynamic loading to fail.
+
+0.5   Thu May  4 10:52:04 PDT 2006
+
+	- Initial CPAN release - implements parsing & serialization for XSPF Version 1 Spec.
+
+0.01  Wed May  3 14:51:42 2006
+	- original version; created by h2xs 1.23 with options
+		-A -X --use-new-tests --skip-exporter -skip-autoloader -n XML::XSPF
+

@@ -1,0 +1,17 @@
+[Desktop Entry]
+Version=1.0
+Name=Xacobeo
+GenericName=XPath visualizer
+GenericName[de]=Darstellung von XPath
+GenericName[es]=Interfaz XPath
+GenericName[fr]=Visualiseur XPath
+Comment=Build and execute XPath queries
+Comment[de]=XPath-Abfragen erstellen und ausführen
+Comment[es]=Construir y ejecutar XPath busquedas
+Comment[fr]=Contruire et éxécuter des requêtes XPath 
+Exec=xacobeo
+Icon=xacobeo
+Terminal=false
+Type=Application
+Categories=GNOME;GTK;Development;
+Keywords=xpath;visualization;gui;

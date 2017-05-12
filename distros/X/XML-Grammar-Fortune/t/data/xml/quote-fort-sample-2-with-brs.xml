@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<collection>
+    <head />
+    <list>
+        <fortune id="the-american-lottery">
+            <meta>
+                <title>I/O, I/O</title>
+            </meta>
+            <quote>
+                <body>
+                    <p>I/O, I/O,<br/>
+It's off to disk I go.</p>
+                </body>
+            <info>
+                <author>Shlomi Fish</author>
+                <work href="http://www.shlomifish.org/humour.html">Aphorisms List</work>
+                <!-- TODO: Add copyrights, licence, year, etc. -->
+            </info>
+            </quote>
+        </fortune>
+    </list>
+</collection>

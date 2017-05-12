@@ -1,0 +1,49 @@
+XML/Generator/RSS10/egms version 0.02
+=====================================
+
+This module extends Dave Rolsky's XML::Generator::RSS10 to
+provide support for the UK e-Government Metadata Standard (egms)
+RSS 1.0 specfication.
+
+For UK government RSS feeds, much of the mandatory eGMS
+metadata is provided through the standard Dublin Core
+module. However, the subject category metadata is mandatory,
+and uses rather more complicated RDF XML notation than
+regular Dublin Core, principally because you're encouraged
+to pass more than one category for each item.
+
+I've taken the specification for using eGMS metadata in RSS
+feeds from the LAWS Syndication Guidelines, at:
+
+   http://www.esd-toolkit.org/laws/
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+DEPENDENCIES
+
+This module requires:
+
+   XML::Generator::RSS10
+   XML::Generator::RSS10::gcl
+   XML::Generator::RSS10::lgcl
+   XML::Generator::RSS10::ipsv
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004-2006 Andrew Green, andrew@article7.co.uk
+
+Sponsored by Woking Borough Council, http://www.woking.gov.uk/
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

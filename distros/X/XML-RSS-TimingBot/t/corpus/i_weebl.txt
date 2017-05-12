@@ -1,0 +1,4 @@
+updatePeriod=daily
+updateFrequency=1
+updateBase=2002-01-01T12:33
+

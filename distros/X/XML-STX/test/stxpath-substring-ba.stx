@@ -1,0 +1,29 @@
+<stx:transform version="1.0" 
+  xmlns:stx="http://stx.sourceforge.net/2002/ns"
+  strip-space="yes">
+
+  <stx:template match="/*">
+    <root>
+      <stx:value-of select="substring-before('kokomato', 'o')"/>
+      <stx:text>:</stx:text>
+      <stx:value-of select="substring-before('kokomato', 'ko')"/>
+      <stx:text>:</stx:text>
+      <stx:value-of select="substring-before('kokomato', 'ato')"/>
+      <stx:text>:</stx:text>
+      <stx:value-of select="substring-before('kokomato', 'huhu')"/>
+      <stx:text>:</stx:text>
+      <stx:value-of select="substring-before('kokomato', '')"/>
+      <stx:text>/</stx:text>
+      <stx:value-of select="substring-after('kokomato', 'o')"/>
+      <stx:text>:</stx:text>
+      <stx:value-of select="substring-after('kokomato', 'kom')"/>
+      <stx:text>:</stx:text>
+      <stx:value-of select="substring-after('kokomato', 'ato')"/>
+      <stx:text>:</stx:text>
+      <stx:value-of select="substring-after('kokomato', 'huhu')"/>
+      <stx:text>:</stx:text>
+      <stx:value-of select="substring-after('kokomato', '')"/>
+    </root>
+  </stx:template>
+  
+</stx:transform>

@@ -1,0 +1,25 @@
+Build.PL
+Changes
+example/xml-api.cgi
+lib/XML/API.pm
+lib/XML/API/Cache.pm
+lib/XML/API/RSS.pm
+lib/XML/API/XHTML.pm
+MANIFEST			This list of files
+t/01-Element.t
+t/02-langs.t
+t/03-XML-API.t
+t/04-parse.t
+t/attributes.t
+t/benchmark.pl
+t/cache.t
+t/hyphens.t
+t/oddball.t
+t/pod-coverage.t
+t/pod.t
+t/synopsis.t
+Makefile.PL
+README
+LICENSE
+META.yml
+META.json

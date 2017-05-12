@@ -1,0 +1,66 @@
+{
+   "abstract" : "A simple-to-use XML module, for parsing and creating XML documents",
+   "author" : [
+      "Alexander Karelas <karjala@karjala.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.006, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "XML-MyXML",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Encode" : "0",
+            "Exporter" : "0",
+            "Scalar::Util" : "0",
+            "perl" : "5.008",
+            "strict" : "0",
+            "utf8" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Temp" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "XML::MyXML" : {
+         "file" : "lib/XML/MyXML.pm",
+         "version" : "0.9407"
+      },
+      "XML::MyXML::Object" : {
+         "file" : "lib/XML/MyXML.pm",
+         "version" : "0.9407"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/akarelas/xml-myxml/issues"
+      },
+      "homepage" : "https://github.com/akarelas/xml-myxml",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/akarelas/xml-myxml.git",
+         "web" : "https://github.com/akarelas/xml-myxml"
+      }
+   },
+   "version" : "0.9407",
+   "x_serialization_backend" : "JSON::XS version 2.34"
+}
+

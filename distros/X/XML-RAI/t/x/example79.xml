@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0">
+  <channel>
+    <title>my little example feed</title>
+    <link>http://www.example.com/</link>
+    <description>example tagline</description>
+    <language>en</language>
+  <item>
+    <title>First post</title>
+    <link>http://www.example.com/archives/1</link>
+    <description>First post!</description>
+    <category>ENTRY SUBJECT</category>
+    <source>ENTRY SOURCE</source>
+    <expirationDate>2000-01-01T12:00:00+0000</expirationDate>
+  </item>
+  </channel>
+</rss>

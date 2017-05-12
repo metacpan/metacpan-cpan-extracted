@@ -1,0 +1,187 @@
+NAME
+    XML::Records - Perlish record-oriented interface to XML
+
+SYNOPSIS
+      use XML::Records;
+      my $p=XML::Records->new('data.lst');
+      $p->set_records('credit','debit');
+      my ($t,$r)
+      while ( (($t,$r)=$p->get_record()) && $t) {
+        my $amt=$r->{Amount};
+        if ($t eq 'debit') {
+          ...
+        }
+      }
+
+DESCRIPTION
+    XML::Records provides a single interface for processing XML data on a
+    stream-oriented, tree-oriented, or record-oriented basis. A subclass of
+    XML::TokeParser, it adds methods to read "records" and tree fragments
+    from XML documents.
+
+    In many documents, the immediate children of the root element form a
+    sequence of identically-named and independent elements such as log
+    entries, transactions, etc., each of which consists of "field" child
+    elements or attributes. You can access each such "record" as a simple
+    Perl hash.
+
+    You can also read any element and its children into a lightweight tree
+    implemented as a Perl hash, or feed the contents of any element and its
+    children into a SAX handler (making it possible to process "records"
+    with modules like XML::DOM or XML::XPath).
+
+METHODS
+    $parser=XML::Records->new(source, [options]);
+        Creates a new parser object
+
+        *source* and *options* are the same as for XML::TokeParser. *source*
+        is either a reference to a string containing the XML, the name of a
+        file containing the XML, or an open IO::Handle or filehandle glob
+        reference from which the XML can be read.
+
+    $parser->set_records(name [,name]*);
+        Specifies what XML element-type names enclose records. If a name is
+        prefixed with '-' then the reader will treat a start-tag for that
+        name as indicating the end of a record.
+
+    ($type,$record)=$parser->get_record([{options}] [name [,name]*]);
+        Retrieves the next record from the input, skipping through the XML
+        input until it encounters a start tag for one of the elements that
+        enclose records. If the first argument is a hash reference and the
+        value of the key 'here' is set to a non-zero value, then non-comment
+        tokens will not be skipped and the method will return (undef,undef)
+        if the next token is not a start tag for a record-enclosing element
+        (the token will be pushed back in this case). If arguments are
+        given, they will temporarily replace the set of record-enclosing
+        elements. The method will return a list consisting of the name of
+        the record's enclosing element and a reference to a hash whose keys
+        are the names of the record's child elements ("fields") and whose
+        values are the fields' contents (if called in scalar context, the
+        return value will be the hash reference). Both elements of the list
+        will be undef if no record can be found.
+
+        If a field's content is plain text, its value will be that text.
+
+        If a field's content contains another element (e.g. a <customer>
+        record contains an <address> field that in turn contains other
+        fields), its value will be a reference to another hash containing
+        the "sub-record"'s fields.
+
+        If a record includes repeated fields, the hash entry for that
+        field's name will be a reference to an array of field values.
+
+        Attributes of record or sub-record elements are treated as if they
+        were fields. Attributes of field elements are ignored. Mixed content
+        (fields with both non-whitespace text and sub-elements) will lead to
+        unpredictable results.
+
+        Records do not actually need to be immediately below the document
+        root. If a <customers> document consists of a sequence of <customer>
+        elements which in turn contain <address> elements that include
+        further elements, then calling get_record with the record type set
+        to "address" will return the contents of each <address> element.
+
+    $tree=$parser->get_simple_tree([{options}] [name [,name]*]);
+        Returns a lightweight tree rooted at the next element whose name is
+        listed in the arguments, or at the next start-tag token if no
+        arguments are given, skipping over any intermediate tokens unless
+        the 'here' option is set as in get_record().
+
+        The return value is a hash reference to the root node of the tree.
+        Each node is a hash with a 'type' key whose value is the node's
+        type: 'e' for elements, 't' for text, and 'p' for processing
+        instructions; and a 'content' key whose value is a reference to an
+        array of the element's child nodes for element nodes, the string
+        value for text nodes, and the data value for processing instruction
+        nodes. Element nodes also have an 'attrib' key whose value is a
+        reference to a hash of attribute names and values. Processing
+        instructions also have a 'target' key whose value is the PI's
+        target.
+
+    $result=$parser->drive_SAX(handler, [{options},[name [,name]*]);
+        Skips to the next element whose names is listed in the arguments, or
+        the next element if no arguments are given, and generates PerlSAX
+        events which are sent to the SAX handler object in handler as if the
+        element were an entire document. The return value is whatever the
+        handler returned in response to the end_document event. If the
+        'here' option is set, returns undef without generating any SAX
+        events if the next non-comment token is not a start tag for a
+        record-enclosing element. If the 'wrap' option is set to 0, does not
+        generate start_document or end_document events and returns 1.
+
+EXAMPLES
+  Print a list of package names from a (rather out-of-date) list of XML modules:
+
+     #!perl -w
+     use strict;
+     use XML::Records;
+ 
+     my $p=XML::Records->new('modules.xml') or die "$!";
+     $p->set_records('module');
+     while (my $record=$p->get_record()) {
+       my $pkg=$record->{package};
+       if (ref $pkg eq 'ARRAY') {
+         for my $subpkg (@$pkg) {
+           print $subpkg->{name},"\n";
+         }
+       }
+       else {
+         print $pkg->{name},"\n";
+       }
+     }
+
+  Extract interesting items from an RSS 0.91 file
+
+     #!perl -w
+     use strict;
+     use XML::Records;
+     use XML::Handler::YAWriter;
+
+     my $r=XML::Records->new('messages.rss');
+     $r->set_records('item');
+     my $h=XML::Handler::YAWriter->new(AsString=>1);
+     $h->start_document({});
+     $h->start_element({Name=>'items'});
+     while (my $t=$r->get_tag('item')) {
+       $r->unget_token($t);
+       $r->begin_saving();
+       my $text=$r->get_text('/item');
+       if ($text=~/perl/i) {
+         $r->restore_saved();
+         $r->drive_SAX($h,{wrap=>0,here=>1});
+       }
+     }
+     $h->end_element({Name=>'items'});
+     print $h->end_document({});
+
+RATIONALE
+    XML::RAX, which implements the proposed RAX standard for record-oriented
+    XML access, does much of what XML::Records does but its interface is not
+    very Perlish (due to the fact that RAX is a language-independent
+    interface), it cannot cope with fields that have sub-structure (because
+    RAX itself doesn't address the issue), and it doesn't allow mixing
+    record- oriented and non-record-oriented operations.
+
+    XML::Twig allows access to tree fragments, but only on a "push"
+    (callback- driven) basis, and does not allow mixed tree- and token-level
+    access.
+
+PREREQUISITES
+    XML::TokeParser (version 0.03 or higher), XML::Parser.
+
+AUTHOR
+    Eric Bohlman (ebohlman@earthlink.net, ebohlman@omsdev.com)
+
+COPYRIGHT
+    Copyright 2001 Eric Bohlman. All rights reserved.
+
+    This program is free software; you can use/modify/redistribute it under
+    the same terms as Perl itself.
+
+SEE ALSO
+      XML::TokeParser
+      XML::RAX
+      XML::Twig
+      XML::Parser::PerlSAX
+      perl(1).
+

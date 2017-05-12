@@ -1,0 +1,74 @@
+Revision history for Perl extension XML::DOM::XPath.
+
+$Id: Changes,v 1.8 2005/10/18 08:39:04 mrodrigu Exp $
+
+0.14
+  - upgraded dependency to XML::XPathEngine 1.10
+  - added the findnodes_as_strings method, that returns a list of 
+    strings, one for each matching node 
+  - fixed RT #29423, test failing on Debian
+    see http://rt.cpan.org/Ticket/Display.html?id=29423
+  - added tests for bugs fixed in XML::XPathEngine 1.10
+
+0.13
+
+  - removed dependency on XML::XPath in tests (spotted by
+    Sendu Bala)
+
+  - added warning for test failure due to using XML::Parser
+    and XML::DOM from a previous version of perl, compiled
+    with different options (spotted by Tony Awtrey)
+
+0.12
+
+  - changed dependency from XML::XPath (which does not
+    seem to be actively maintained) to XML::XPathEngine 
+    (which I maintain)
+
+  - fixed bug in sorting attributes
+
+0.11
+
+  - fixed bugs when using a query with //@*, or with
+    //comment(), spotted by Ben Hsing (RT #20884). 
+
+0.10
+  - added pod tests and tests with utf-8 characters
+
+0.09
+  - allow XML::XPath to be also used (the sort method checks
+    on which type of object it is called), fixes bug RT 11772
+
+0.08
+  - fixed a bug with XPath expressions using numerical comparison
+    (added the to_number method to XML::DOM::Node) (RT #11648)
+
+  - tests whether XML::XPath still show the comparison operator
+    bug ( http://rt.cpan.org/NoAuth/Bug.html?id=6363 ) and warn
+    about it in that case.
+
+0.07
+  -  fixed a bug which prevented calling XPath methods on an 
+     XML::DOM::Document before the parse (RT #8977) found by 
+     Ben Hsing
+
+  
+0.06
+  - fixed a bug in that prevented toString to work on a document
+    (RT #8167) found by Ben Hsing
+
+0.05
+  - fixed a bug in getAttributes, when an element does not have an 
+    attribute. Thanks to Harry Moreau for the bug report and the
+    patch.
+
+0.04
+  - fixed docs
+
+0.02 
+  - added namespace support
+
+0.01  Thu Dec  4 14:53:15 2003
+	- original version; created by h2xs 1.22 with options
+		-A -X -nXML::DOM::XPath --use-new-tests --skip-exporter --skip-autoloader
+

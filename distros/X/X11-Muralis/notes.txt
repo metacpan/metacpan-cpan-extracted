@@ -1,0 +1,34 @@
+Display plugins
+===============
+
+X11::Muralis::Display::Foo
+
+Muralis should
+- have a base list of capabilities (options)
+such as fullscreen, tiled etc
+- be able to choose which backend to use
+  - be able to determine which backends are (a) installed (b) active
+
+Plugins should have methods for
+- saying what capabilities they support
+- saying whether they are active (if their backend program is available)
+- display the given image with the given options
+
+Capabilities:
+- centre
+- colours*
+- fullscreen
+- rotate*
+- smooth*
+- tile
+- zoom
+- stretch**
+- window+
+- mirror++
+
+* not available from many backends
+** stretch is an option that needs to be added; some backends can only
+do stretch or fullscreen, others can do both
++ window needs to be added, so this can be used with window managers
+that make their own fake root
+++ mirror isn't available from any backend, but I would like it to be

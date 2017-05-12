@@ -1,0 +1,13 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         XML-XUpdate-LibXML
+version:      0.6.0
+version_from: lib/XML/XUpdate/LibXML.pm
+installdirs:  site
+requires:
+    XML::LibXML:                   1.54
+    XML::LibXML::Iterator:         0
+    XML::LibXML::XPathContext:     0.04
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

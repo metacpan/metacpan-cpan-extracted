@@ -1,0 +1,46 @@
+# test elements with simpleContent and attributes
+
+--- |
+  <?xml version="1.0" encoding="UTF-8"?>
+  <schema xmlns="http://www.w3.org/2001/XMLSchema">
+    <element name="foo">
+      <complexType>
+        <sequence>
+          <element name="integer" maxOccurs="unbounded">
+             <complexType>
+               <simpleContent>
+                  <extension base="integer">
+                     <attribute name="color" type="string" use="required"/>
+                     <attribute name="flavor" type="string" use="optional"/>
+                  </extension>
+               </simpleContent>
+             </complexType>
+          </element>
+        </sequence>
+      </complexType>
+    </element>
+  </schema>
+
+--- |
+  <foo>
+    <integer color="blue">10</integer>
+    <integer color="red" flavor="hot">-1000</integer>
+  </foo>
+--- >
+PASS
+
+--- |
+  <foo>
+    <integer color="blue">aaa</integer>
+    <integer color="red" flavor="hot">-1000</integer>
+  </foo>
+--- >
+FAIL /[iI]llegal value/
+
+--- |
+  <foo>
+    <integer>10</integer>
+    <integer color="red" flavor="hot">-1000</integer>
+  </foo>
+--- >
+FAIL /[mM]issing required/

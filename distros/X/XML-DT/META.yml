@@ -1,0 +1,31 @@
+---
+abstract: 'a package for down translation of XML files'
+author:
+  - 'Jose Joao <jj@di.uminho.pt>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: XML-DT
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  ExtUtils::MakeMaker: '6.17'
+  LWP::Simple: '1.35'
+  Scalar::Util: '0'
+  Test::More: '0.40'
+  XML::DTDParser: '2.00'
+  XML::LibXML: '1.54'
+  parent: '0'
+resources:
+  repository: https://natura.di.uminho.pt/svn/main/xml/XML-DT
+version: '0.68'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

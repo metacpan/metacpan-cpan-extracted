@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<collection>
+<head />
+<list>
+<fortune id="david-and-goliath-1">
+<meta>
+<title>David and Goliath - 1</title>
+</meta>
+<screenplay>
+<body>
+<description>
+<para>
+David and
+<ulink url="http://en.wikipedia.org/wiki/Goliath">Goliath</ulink>
+are standing by each other.
+</para>
+</description>
+<saying character="David">
+<para>
+I will kill you even if it's the last thing I do, because I like killing giants whose name start with a "G" and who are philistines.
+</para>
+</saying>
+<saying character="Goliath">
+<para>
+No way, you little idiot!
+</para>
+</saying>
+</body>
+<info>
+<author>Shlomi Fish</author>
+<work href="http://www.shlomifish.org/">David and Goliath Skit</work>
+</info>
+</screenplay>
+</fortune>
+</list>
+</collection>

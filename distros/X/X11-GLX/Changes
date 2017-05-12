@@ -1,0 +1,6 @@
+Version 0.02 - 2017-04-07
+ - Corrrected "configure requires" prereqs in META & Makefile.PL
+
+Version 0.01 - 2017-04-07
+ - Initial release, supporting basic glX and import_context extension
+ - DWIM module for "making it go" with minimal effort.

@@ -1,0 +1,18 @@
+--- #YAML:1.0
+name: XML-Generator-vCard
+version: 1.3
+author:
+  - Aaron Straup Cope E<lt>ascope@cpan.orgE<gt>
+abstract: generate SAX2 events for vCard 3.0
+license: perl
+requires:
+  Encode: '>= 1.09'
+  Text::vCard: '>= 1.9'
+  XML::Generator::vCard::Base: '>= 1.0'
+build_requires:
+  Test::Simple: '>= 0.47'
+provides:
+  XML::Generator::vCard:
+    file: lib/XML/Generator/vCard.pm
+    version: 1.3
+generated_by: Module::Build version 0.2604

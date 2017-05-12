@@ -1,0 +1,82 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+# PODNAME: dump_xml_structure
+# ABSTRACT: Dumps the XPath structure of an XML file
+
+use XML::LibXML 1.70;
+use Scalar::Util qw(blessed);
+
+binmode STDOUT, ':encoding(UTF-8)';
+
+my $dom = XML::LibXML->load_xml(
+    location => $ARGV[0],
+);
+my $root = $dom->documentElement();
+
+my $node_map = {};
+dump_node($root, $node_map);
+foreach my $name ( sort keys %$node_map ) {
+    print $node_map->{$name} . ": " . $name . "\n";
+}
+
+foreach my $ns ( $root->getNamespaces ) {
+    print "Namespace: " . ( $ns->declaredPrefix || 'x' ) . "=" . $ns->declaredURI . "\n";
+}
+
+sub dump_node {
+    my ($node, $map) = @_;
+    return unless $node;
+    unless ( $node->isa('XML::LibXML::Text') ) {
+        if ( $node->namespaceURI() ) {
+            unless ( $node->lookupNamespacePrefix( $node->namespaceURI() ) ) {
+                $node->setNamespace( $node->namespaceURI(), "x", 1 );
+            }
+        }
+    }
+    $map->{ trim_node_path( $node->nodePath() ) } = 'node';
+    foreach my $attr ( $node->attributes() ) {
+        next unless blessed($attr);
+        next if $attr->isa('XML::LibXML::Namespace'); # Doesn't support nodePath()
+        $map->{ trim_node_path( $attr->nodePath() ) } = 'attr';
+    }
+    foreach my $child_node ( $node->childNodes() ) {
+        dump_node( $child_node, $map );
+    }
+    return 1;
+}
+
+sub trim_node_path {
+    my ($node_path) = @_;
+    $node_path =~ s/\[\d+\]//xmsg; # Strip explicit count number
+    return $node_path;
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+dump_xml_structure - Dumps the XPath structure of an XML file
+
+=head1 VERSION
+
+version 0.4.1
+
+=head1 AUTHOR
+
+Robin Smidsrød <robin@smidsrod.no>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Robin Smidsrød.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

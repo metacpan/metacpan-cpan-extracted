@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="t/xsl/test3.xsl"?>
+<page>
+    <manifest>
+        <title>Test XML Doc 4</title>
+    </manifest>
+    <content>
+        <empty/>
+    </content>
+</page>

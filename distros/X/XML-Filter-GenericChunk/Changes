@@ -1,0 +1,20 @@
+Revision history for Perl extension XML::Filter::GenericChunk.
+
+0.07 (Sat 23 Jun 2007)
+    - fixed parsing across tag boundaries 
+    - added DropElement feature
+    - more and cleaner testing
+    - added a license statement
+
+0.06
+    - optional warnings for XML::Filter::CharacterChunk
+    - more documentation
+
+0.05 
+    - added XML::Filter::CharacterChunk
+    - reduced warnings
+    - extended tests
+0.01
+    initial version
+
+

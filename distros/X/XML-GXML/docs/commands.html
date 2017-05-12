@@ -1,0 +1,286 @@
+
+
+<head><title>Using GXML: Commands</title></head>
+
+<h2>Using GXML: Commands</h2>
+by Josh Carter &lt; josh@multipart-mixed.com &gt;<br>
+May 10, 2001<br>
+
+<hr>
+
+
+
+
+<br clear="all">
+<h2>Commands Overview</h2>
+
+
+
+<p>
+Commands are special XML elements that affect your output depending on
+certain other elements. They are most often used in templates to add,
+remove, or repeat parts of the template depending on what's in the
+data file. Here's a quick overview of the commands available:
+</p>
+
+<ul>
+  <li><b>ifexists:</b> If a given attribute exists, or combination of
+  attributes, then the stuff contained in the ifexists block will be
+  included in the output.</li>
+  <li><b>ifequals:</b> If a given attribute's value equals the value
+  specified in ifequals, the block will be included in the output.</li>
+  <li><b>foreach:</b> For each peer instance of an attribute, the
+  block contained by foreach will be run, and variables asking for the
+  attribute will get the current iteration's value.</li>
+</ul>
+
+<p>
+Let's go through each command and demonstrate some ways to use it.
+</p>
+
+
+
+
+
+
+<br clear="all">
+<h2>ifexists</h2>
+
+
+
+<p>
+ifexists is the most straightforward: "if a given attribute exists,
+regardless of its value, include my stuff in the output." Syntax is:
+</p>
+
+<pre>
+    &lt;gxml:ifexists expr="attribute"&gt;
+
+    (stuff contained will only go into your output if the 
+    attribute exists.)
+
+    &lt;/gxml:ifexists&gt;
+</pre>
+
+<p>
+Here's an example:
+</p>
+
+<pre>
+    # In your source XML:
+    
+    &lt;quote author="Robert T. Mann"&gt;
+    If I were a dog, would gnawing on shoes hold
+    the same appeal it holds for me now?
+    &lt;/quote&gt;
+    
+    # In your quote.xml template:
+    
+    &lt;quote&gt;
+    &#37;&#37;&#37;_BODY_&#37;&#37;&#37;
+    &lt;gxml:ifexists expr="author"&gt;(&lt;i&gt;by &#37;&#37;&#37;author&#37;&#37;&#37;&lt;/i&gt;)&lt;/gxml:ifexists&gt;
+    &lt;/quote&gt;
+</pre>
+
+<p>
+Thus, if the quote has an author, it will get (<i>by author</i>)
+appended to it.</p>
+
+
+
+
+
+<br clear="all">
+<h2>A Detour to Boolean Expressions</h2>
+
+
+
+<p>
+Don't be terrified if you're not a programmer. "Boolean expressions"
+is just a complicated way of saying that you can combine attributes in
+your ifexists command, as such:
+</p>
+
+<pre>
+    &lt;gxml:ifexists expr="author AND page"&gt; . . . &lt;gxml:ifexists&gt;
+    &lt;gxml:ifexists expr="author OR book"&gt; . . . &lt;gxml:ifexists&gt;
+    &lt;gxml:ifexists expr="book AND NOT page"&gt; . . . &lt;gxml:ifexists&gt;
+</pre>
+
+<p>
+You can use AND, OR, and NOT freely in your expressions.
+</p>
+
+
+
+
+
+<br clear="all">
+<h2>ifequals</h2>
+
+
+
+<p>
+This is the same principle as ifexists, but the given attribute must
+exist and equal a given value. Syntax follows:
+</p>
+
+<pre>
+    &lt;gxml:ifequals expr="attribute" equalto="value"&gt;
+
+    (stuff contained will only go into your output if
+    attribute equals the value.)
+
+    &lt;/gxml:ifequals&gt;
+</pre>
+
+<p>
+For an example, let's redo the dynamic template switching we saw in
+the "Templates" chapter, section "Variables Within Template Names,"
+this time using ifequals:
+</p>
+
+<pre>
+    # document source file:
+
+    &lt;document
+        name   = "Semi-annual Worm Preservation Report"
+        author = "Bob the Man"
+
+        photo-align  = "right"
+        photo-source = "worms.jpg"
+    &gt;
+
+    (document body text here)
+
+    &lt;/document&gt;
+
+    # document.xml template file:
+
+    &lt;document
+        name-default   = "Untitled Document"
+        author-default = "Unknown Author"
+
+        photo-align-default  = "none"
+    &gt;
+
+    <b>
+    &lt;gxml:ifequals expr="photo-align" equalto="right"&gt;
+    (formatting for right-aligned photo goes here)
+    &lt;/gxml:ifequals&gt;
+    &lt;gxml:ifequals expr="photo-align" equalto="center"&gt;
+    (formatting for center-aligned photo goes here)
+    &lt;/gxml:ifequals&gt;
+    &lt;gxml:ifequals expr="photo-align" equalto="none"&gt;
+    (formatting for no photo goes here)
+    &lt;/gxml:ifequals&gt;
+    </b>
+
+    &#37;&#37;&#37;_BODY_&#37;&#37;&#37;
+
+    &lt;/document&gt;
+</pre>
+
+<p>
+It's arguable that we didn't actually improve things with this change;
+it was simpler the way it was done before. But I'm sure there are some
+good uses for ifequals regardless.
+</p>
+
+
+
+
+
+<br clear="all">
+<h2>foreach</h2>
+
+
+
+<p>
+foreach is the most complicated command, and potentially the most
+useful. It lets you iterate over multiple values of an attribute.
+Here's the syntax:
+</p>
+
+<pre>
+    &lt;gxml:foreach expr="attribute"&gt;
+
+    (this block will get run once for each value of attribute.
+    Variables in here calling &#37;&#37;&#37;attribute&#37;&#37;&#37; will get the proper
+    value in each iteration.)
+
+    &lt;/gxml:foreach&gt;
+</pre>
+
+<p>
+Note that "multiple values" of an attribute implies the attribute must
+be specified as its own element -- not one defined in a start tag --
+since that's the only way you can have attributes that are peers with
+multiple values. It's easiest to see in an example:
+</p>
+
+<pre>
+    &lt;number&gt;1&lt;/number&gt;
+    &lt;number&gt;2&lt;/number&gt;
+    &lt;number&gt;3&lt;/number&gt;
+
+    &lt;gxml:foreach expr="number"&gt;
+    I see number &#37;&#37;&#37;number&#37;&#37;&#37;
+    &lt;/gxml:foreach&gt;
+</pre>
+
+<p>
+This will print the "I see" block three times, with &#37;&#37;&#37;number&#37;&#37;&#37;
+being 1, 2, and 3. Notice that all the numbers are peers of each
+other. If there are numbers somewhere else in the source file, e.g. in
+a higher-level element, they won't be noticed. The "expr" will look for
+the <i>closest</i> match to itself.
+</p>
+
+<p>
+Now let's do a more complicated example:
+</p>
+
+<pre>
+    &lt;person&gt;
+        &lt;name&gt;Bob&lt;/name&gt;
+        &lt;age&gt;42&lt;/age&gt;
+    &lt;/person&gt;
+	
+    &lt;person&gt;
+        &lt;name&gt;Ned&lt;/name&gt;
+        &lt;age&gt;24&lt;/age&gt;
+    &lt;/person&gt;
+
+    &lt;gxml:foreach expr="person"&gt;
+    I see a person named &#37;&#37;&#37;person:name&#37;&#37;&#37;, age &#37;&#37;&#37;person:age&#37;&#37;&#37;
+    &lt;/gxml:foreach&gt;
+</pre>
+
+<p>
+This time we use the "drill down" syntax for accessing member
+attributes of the person elements. We'll get "Bob, 42" the first time
+the foreach block runs, and "Ned, 24" the second.
+</p>
+
+<p>
+<b><a href="other.html">On to Other Features!</a></b>
+</p>
+
+<p>
+<b><a href="gxml-guide.html">Back to the GXML Guide</a></b>
+</p>
+
+<p>
+<b><a href="gxml2html-guide.html">Back to the gxml2html Guide</a></b>
+</p>
+
+
+
+
+
+
+<hr>
+<font size="-1"><i>Copyright (c) 2001-2002 Josh Carter</i></font>
+
+<!-- end of Using GXML: Commands -->

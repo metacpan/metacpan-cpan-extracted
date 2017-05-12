@@ -1,0 +1,211 @@
+<document
+	title	= "Using GXML: Templates"
+	author	= "Josh Carter"
+	email	= "josh@multipart-mixed.com"
+	date	= "May 10, 2001"
+>
+
+<section name="Template Basics">
+
+<p>
+Templates allow you to transform an element in your source file into
+something else in your output. The most common use is to apply
+formatting; thus your input file in raw data and our output is nicely
+formatted data.
+</p>
+
+<p>
+Templates are kept in a separate directory from your other files, and
+the name of the template file indicates the tag that it'll map to.
+Thus, if you want to template all "person" elements, you create a file
+called "<tt>person.xml</tt>" in your templates directory. The
+<tt>person.xml</tt> file will most likely take attributes from the
+person element in your data file by using variables.
+</p>
+
+<p>
+Let's demonstrate. Say we have a data file as follows, and a
+<tt>person.xml</tt> file I'll list afterward:
+</p>
+
+<pre>
+    &lt;data-file&gt;
+        &lt;person&gt;
+            <t tag="name">Bob</t>
+            <t tag="age">42</t>
+        &lt;/person&gt;
+
+        &lt;person&gt;
+            <t tag="name">Ned</t>
+            <t tag="age">24</t>
+        &lt;/person&gt;
+    &lt;/data-file&gt;
+</pre>
+
+<p>
+<tt>person.xml</tt> in your template directory contains:
+</p>
+
+<pre>
+    &lt;person&gt;
+        <t tag="p">Person name is: <v>name</v>, age is <v>age</v></t>
+    &lt;/person&gt;
+</pre>
+
+<p>
+The output of running GXML over the data file will be:
+</p>
+
+<pre>
+    &lt;data-file&gt;
+        &lt;person&gt;
+        <t tag="p">Person name is: Bob, age is 42</t>
+        &lt;/person&gt;
+
+        &lt;person&gt;
+        <t tag="p">Person name is: Ned, age is 24</t>
+        &lt;/person&gt;
+    &lt;/data-file&gt;
+</pre>
+
+<p>
+(Give or take some white space in the final output.) If you have HTML
+translation turned on, the enclosing tags for the document and
+templates will be stripped, producing:
+</p>
+
+<pre>
+    <t tag="p">Person name is: Bob, age is 42</t>
+
+    <t tag="p">Person name is: Ned, age is 24</t>
+</pre>
+
+<p>
+And now we have something useful. However your data files are created,
+you can create formatting templates which will produce output that
+looks the way you want. If you decide to change the data, no problem,
+just run GXML over it again and the output will be updated. Ditto
+changing a template. This gives you a great deal of flexibility.
+</p>
+
+</section>
+<section name="Nested Templates">
+
+<p>
+GXML fully supports nested templates. That is, a template can contain
+elements which will get mapped into other templates. It won't take
+long before your project(s) get complex to need this. For example, say
+you have a "document" template, and a "link" template that you use for
+hrefs to other pages/sites. Then you add a "photo" template, and you
+want the caption to link to something. Go ahead and use your "link"
+template within the "photo" one. It'll work like you expect.
+</p>
+
+</section>
+<section name="Variable Rules With Templates">
+
+<p>
+The scoping rules for variables still apply with templates, and the
+concept of "enclosing" attributes can span multiple templates. In the
+example of nested document/photo/link templates, the "link" template
+could have variables whose value is up in the document. No problem;
+the variable matching engine works seamlessly across templates.
+</p>
+
+</section>
+<section name="Variables Within Template Names">
+
+<p>
+This gets a little twisted. Let's say you have three templates for the
+header of your document, one for if you have a lead photo on the left,
+another with a lead photo centered, and another with no lead photo.
+(This is what I do on multipart/mixed, actually.) You can select which
+header template you want to use by using a variable as all or part of
+your template name. Here's an example, assuming you have header
+templates named "header-right" and "header-none":
+</p>
+
+<pre>
+    # document source file:
+
+    &lt;document
+        name   = "Semi-annual Worm Preservation Report"
+        author = "Bob the Man"
+
+        photo-align  = "right"
+        photo-source = "worms.jpg"
+    &gt;
+
+    (document body text here)
+
+    &lt;/document&gt;
+
+    # document.xml template file:
+
+    &lt;document
+        name-default   = "Untitled Document"
+        author-default = "Unknown Author"
+
+        photo-align-default  = "none"
+    &gt;
+
+    <b>
+    &lt;header-<v>photo-align</v>/&gt;
+    </b>
+
+    <v>_BODY_</v>
+
+    &lt;/document&gt;
+</pre>
+
+<p>
+Now the header template will be selected based on the "photo-align"
+attribute of your document, defaulting to "header-none." There are
+other ways to do this; you'll see that in the next section on GXML
+commands. Also note that defining default attribute values in your
+templates can be very useful.
+</p>
+
+</section>
+<section name="The Special _BODY_ Variable">
+
+You may have noticed I used a weird looking variable in that last
+example. There's a special variable for the text enclosed by an
+element: <tt>_BODY_</tt>. In the example above, using <tt>_BODY_</tt>
+in the document template meant "give me all the content of the
+'document' element." Let's take a simpler example. Say we want the
+concept of a hyperlink with description, written in our document as
+follows:
+
+<pre>
+    &lt;linkitem name="Bob's Worm Land" href="http://worms.bob/"&gt;
+    This site tells you everything you'd ever want to know about
+    worms.
+    &lt;/linkitem&gt;
+</pre>
+
+<p>
+Your <tt>linkitem.xml</tt> template could look like this:
+</p>
+
+<pre>
+    &lt;linkitem&gt;
+    &lt;p&gt;&lt;b&gt;&lt;a href="<v>href</v>"&gt;<v>name</v>&lt;/a&gt;:&lt;/b&gt; <v>_BODY_</v>&lt;/p&gt;
+    &lt;/linkitem&gt;
+</pre>
+
+</section>
+
+<p>
+<b><a href="commands.html">On to Commands!</a></b>
+</p>
+
+<p>
+<b><a href="gxml-guide.html">Back to the GXML Guide</a></b>
+</p>
+
+<p>
+<b><a href="gxml2html-guide.html">Back to the gxml2html Guide</a></b>
+</p>
+
+</document>

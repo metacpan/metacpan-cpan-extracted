@@ -1,0 +1,42 @@
+release 0.3
+-------------
+- changes to versioning for compatibility with CPAN
+
+release 0.2.1
+-------------
+- added dummy.pm so correct CPAN entries will be made by autoindexing
+  software
+
+release 0.2
+-----------
+- ported to AIX 3.2.5, AIX 4.2, HPUX 10.10
+
+- Wcl-2.7.2 is a separate tar file, no more Wcl patches included in
+  this package
+
+- added support for Xt*Proc() functions; examples for XtAppAddInput
+  and XtAppAddTimeout included
+
+- added standard mainloop routine, configured via passed-in named
+  parameters
+
+- toplevel resources now processed via #if/#else/#endif preprocessing,
+  similar to cpp
+
+- callback function signature changes/improvements
+
+- xscm examples merged into a single "xscm", using preprocessing to
+  detect presence of Motif 2.0; added scm support script for use with
+  it
+
+- added support for Wcl 2.7.2 libMisc (contains hierarchical tree
+  widget used by xscm on Motif 1.x systems)
+
+- added support for editres
+
+- header file list all in one place, in Wcl-i, to make it easier to
+  port to other Xt toolkits
+
+release 0.1
+-----------
+This is the initial release.

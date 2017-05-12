@@ -1,0 +1,7 @@
+<tag_1>
+	<tag_2 attr_2_name = "attr_2_value">tag_value_2</tag_2>
+	<tag_3>tag_value_3
+		<tag_4 attr_4_name_1 = "attr_4_value_1" attr_4_name_2 = "attr_4_value_2">tag_value_4</tag_4>
+	</tag_3>
+	<tag_5 attr_5_name = "attr_5_value"></tag_5>
+</tag_1>

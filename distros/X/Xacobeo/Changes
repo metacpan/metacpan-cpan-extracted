@@ -1,0 +1,170 @@
+Changelog for Xacobeo.
+
+0.15 Mon Aug 26 22:43:25 CEST 2013
+	- RT 88132: Don't use qw() without parenthesis (support perl 5.18).
+	- RT 88131: Add Keywords to the .desktop file.
+
+
+0.14 Wed Apr 14 20:33:05 CEST 2010
+	- Issue 49 in xacobeo: syntax and spelling Pod fixes.
+
+
+0.13 Sun Dec 27 15:55:39 CET 2009
+	- Issue 47: Double clicking on a DomView node can fail to select the right
+	  node.
+	- Issue 40: create XPath expression from DOM.
+	- Issue 36: l10n of strings Prefix and URI missing.
+	- Issue 37: l10n es fr wrong for msgid 12 "Document node is missing".
+	- Issue 34: l10n of desktop entry.
+	- Fix a warning when an element resets the namespace declaration to the
+	  default namespace (xmlns="").
+	- Core objects are now descendents of Glib::Objects.
+
+
+0.12 Sun Dec 13 23:49:03 CET 2009
+	- GUI rewritten by hand, no more glade.
+	- Less dependencies: Englis, Gtk2::GladeXML, Class::Accessor::Fast.
+	- Add an experimental plugin system with a sample plugin.
+	- The default namespace for namesapces without a prefix is now 'ns'.
+	- More text translated.
+
+
+0.11 Mon Nov 23 20:57:30 CET 2009
+	- Expand the first level by default
+	- Unit test fixes: error messages changed in libxml 2.7.3 (patch by Jozef Kutej).
+
+
+0.10 Tue Nov 17 22:08:35 CET 2009
+	- Issue 10: Link the DOM tree with the XML source.
+	- Issue 39: link DOM tree with text view (duplicate of 10).
+	- Using Gtk2::SourceView2.
+
+
+0.09 Sun Nov 15 20:13:16 CET 2009
+	- Merged most of the perl critic branch.
+	- Added the files AUTHORS and HACKING.
+
+
+0.08 Thu Apr 16 21:20:01 CEST 2009
+	- New release with all the changes from the 0.08_XX releases.
+
+
+0.08_01 Sat Apr 11 14:33:14 CEST 2009
+	- Added support for HTML documents (command line only).
+	- The default namespace (xmlns="") is no longer registered.
+	- Namespaces are found in the right order (affects default, default1, etc).
+	- German translation by Lars Dieckow.
+	- Fixed the build dependencies (patch by Lars Dieckow).
+
+
+0.07 Thu Feb 19 20:20:00 CET 2009
+	- New release with all the changes from the 0.07_XX releases.
+
+
+0.07_02 Mon Feb 16 09:26:49 CET 2009
+	- Corrected a typo in the French translation.
+
+
+0.07_01 Sun Feb 15 13:58:14 CET 2009
+	- Issue 30: Crashes when reading non XML files.
+	- Issue 20: Clear the XPath results when loading a new document.
+
+
+0.06 Wed Feb 11 19:45:58 CET 2009
+	-  New release with all the changes from the 0.06_XX releases.
+
+
+0.06_03 Tue Feb 10 22:18:29 CET 2009
+	- Issue 23: Results view loses the syntax highlighting.
+	- Issue 26: Tests require File::Slurp.
+	- Issue 29: Results view is editable.
+	- Updated the translations.
+	- Build.PL is using both configure_requires and build_requires.
+
+
+0.06_02 Sat Feb  7 11:57:57 CET 2009
+	- Issue 19: Add a version number to the about dialog.
+	- Issue 25: Internationalize the application.
+
+
+0.06_01 Sun Jan 18 20:21:11 CET 2009
+	- Issue 21: XML display has no line numbers.
+
+
+0.05 Mon Jan  5 19:13:00 CET 2009
+	-  New release with all the changes from the 0.05_XX releases.
+
+
+0.05_02 Sun Jan  4 08:49:28 CET 2009
+	- The XPath entry has a default text when empty.
+
+
+0.05_01 Sat Jan  3 13:04:55 CET 2009
+	- Issue 14: Performance issues.
+	- The program uses now XS for speeding up the slow parts.
+	- Updated the syntax highlighting styles.
+	- Added the namespace XML http://www.w3.org/XML/1998/namespace to all results.
+
+
+0.04 Mon Dec  1 10:04:26 CET 2008
+	- New release with all the changes from the 0.04_XX releases.
+
+
+0.04_02 Fri Nov 28 20:44:39 CET 2008
+	- Issue 15: In the README it says perl Makefile.PL but there is only Build.PL.
+	- Issue 16: SVG icons are not supported by all installations of GTK.
+
+
+0.04_01 Thu Nov 27 21:19:11 CET 2008
+	- Speed improvement: the namespaces are found through XPath.
+	- RT #41178: notify user that the xpath is not correct (patch by Jozef Kutej).
+	- RT #41180: show tree element in results text view (patch by Jozef Kutej).
+	- RT #41187: include filename in application title (patch by Jozef Kutej).
+
+
+0.03 Sat Nov 22 10:23:26 CET 2008
+	- New release with all the changes from the 0.03_XX releases.
+
+
+0.03_03  Fri Nov 21 22:10:46 CET 2008
+	- Issue 13: No support for namespaces in the XML source view.
+
+
+0.03_02  Mon Nov 17 15:24:27 CET 2008
+	- Added the XML declaration to the source view.
+	- Can evaluate XPath expressions that return a boolean, a number or a literal.
+	- The XML declaration has an encoding even if the original document is missing
+	  one.
+	- Added support for CDATA sections.
+	- Issue 12: Escape XML reserved characters within text elements.
+
+
+0.03_01  Mon Nov 17 14:13:12 CET 2008
+	- Fixed Issue 1: dh-make-perl doesn't generate a proper debian/rules file.
+	- Fixed Issue 2: Document source view doesn't has broken UTF-8.
+	- Fixed Issue 9: Add syntax highlighting to the source view editor.
+
+
+0.02  Wed Nov 12 21:59:40 CET 2008
+	- New release with changes from 0.02_01 and 0.02_02.
+
+
+0.02_02  Wed Nov 12 10:42:47 CET 2008
+	- Fixed the path to the Glade file.
+
+
+0.02_01  Tue Nov 11 22:11:28 CET 2008
+	- Using Module::Build which provides a better installation path.
+	- Added a menu item and icon in the Desktop's main menu.
+	- Added an application menu.
+	- Can load new a different file at runtime.
+	- The results tab is shown automatically when a search is performed.
+
+
+0.01  Fri Oct 24 20:59:27 CET 2008
+	- First official release.
+
+
+0.01_01  Thu Oct 23 22:12:56 CET 2008
+	- First release.
+

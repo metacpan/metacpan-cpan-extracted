@@ -1,0 +1,19 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         XUL-Node
+version:      0.06
+version_from: lib/XUL/Node.pm
+installdirs:  site
+requires:
+    Aspect:                             0.12
+    Digest::MD5:                        2.3
+    LWP:                                5.75
+    MIME::Types:                        1.13
+    POE:                                0.2802
+    POE::Component::Server::HTTPServer: 0.9
+    Scalar::Util:                       1.13
+    XML::Parser:                        2.34
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17
+

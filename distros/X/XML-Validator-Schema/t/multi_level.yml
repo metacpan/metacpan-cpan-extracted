@@ -1,0 +1,65 @@
+# multi_level.yml - a simple schema with some depth
+
+--- |
+  <?xml version="1.0" encoding="UTF-8"?>
+  <schema xmlns="http://www.w3.org/2001/XMLSchema">
+    <element name="foo">
+      <complexType>
+        <sequence>
+          <element name="bar" maxOccurs="unbounded">
+            <complexType>
+              <sequence>
+                 <element name="leaf1" minOccurs="0" maxOccurs="unbounded" />
+                 <element name="leaf2" minOccurs="0" maxOccurs="unbounded" />
+              </sequence>
+            </complexType>
+          </element>
+          <element name="baz" minOccurs="0" />
+        </sequence>
+      </complexType>
+    </element>
+  </schema>
+
+--- |
+  <?xml version="1.0" encoding="UTF-8"?>
+  <foo>
+    <bar/>
+  </foo>
+--- >
+PASS
+
+--- |
+  <?xml version="1.0" encoding="UTF-8"?>
+  <foo>
+    <bar>
+      <leaf1/>
+      <leaf2/>
+    </bar>
+    <bar>
+      <leaf1/>
+      <leaf1/>
+      <leaf1/>
+    </bar>
+    <baz/>
+  </foo>
+--- >
+PASS
+
+--- |
+  <?xml version="1.0" encoding="UTF-8"?>
+  <foo>
+    <bar>
+      <leaf1/>
+      <leaf2/>
+    </bar>
+    <baz/>
+    <bar>
+      <leaf1/>
+      <leaf1/>
+      <leaf1/>
+    </bar>
+  </foo>
+--- >
+FAIL /does not match/
+
+

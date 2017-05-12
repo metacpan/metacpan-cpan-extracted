@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<rss version="2.0"
+ xmlns:blogChannel="http://backend.userland.com/blogChannelModule"
+ xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#"
+ xmlns:content="http://purl.org/rss/1.0/modules/content/"
+ xmlns:atom="http://www.w3.org/2005/Atom"
+ xmlns:dcterms="http://purl.org/dc/terms/"
+>
+
+<channel>
+<title></title>
+<link></link>
+<description></description>
+
+<item>
+<title>Curtis Jewell: Progress...</title>
+<link>http://csjewell.dreamwidth.org/18344.html</link>
+<author>Curtis Jewell</author>
+<guid isPermaLink="true">http://csjewell.dreamwidth.org/18344.html</guid>
+<content:encoded>Built 5.10.1 successfully again (hit a bug that made me surprised it ever built before) and 5.12.3 built through perl, at least, before it broke. (ran into the fact that I forgot to specify where pari for 5.12.3 lives.) I fixed that, and I&#x27;m doing a [...]
+</content:encoded>
+<dcterms:modified>2011-02-13T03:20:45Z</dcterms:modified>
+</item>
+<item>
+<title>Michael Rasmussen (mikeraz): Weekly Meme Roundup: 2011-02-12</title>
+<link>http://www.jamhome.us/2011/02/weekly-meme-roundup-2011-02-12/</link>
+<author>Michael Rasmussen (mikeraz)</author>
+<guid isPermaLink="true">http://www.jamhome.us/2011/02/weekly-meme-roundup-2011-02-12/</guid>
+<content:encoded>The North American lottery industry is bigger than movie tickets, music, and porn combined. http://bit.ly/fvjXDX # RT @wikileaks RT: @JPBarlow &#x22;We have reached a point in our history where lies are protected speech and the truth is criminal.&#x22; # Happy [...]
+</content:encoded>
+<dcterms:modified>2011-02-12T20:02:00Z</dcterms:modified>
+</item>
+<item>
+<title>Michael Rasmussen (mikeraz): Memes from 2011-02-12</title>
+<link>http://www.jamhome.us/2011/02/memes-from-2011-02-12/</link>
+<author>Michael Rasmussen (mikeraz)</author>
+<guid isPermaLink="true">http://www.jamhome.us/2011/02/memes-from-2011-02-12/</guid>
+<content:encoded>And how many of them laughed over Bobby Tables? http://xkcd.com/859/ # RT @OvidPerl Re: the Nokia/Microsoft partnership, isn&#x27;t mutually assisted suicide illegal? # RT @worldbiking: Just got a big shake: 7.0 #earthquake epicenter just 200 kilometers f [...]
+</content:encoded>
+<dcterms:modified>2011-02-12T15:55:00Z</dcterms:modified>
+</item>
+<item>
+<title>Goro Fuji (GFUJI):  Perl&#xE3;&#x81;&#xAE;&#xE6;&#xAD;&#xA3;&#xE8;&#xA6;&#x8F;&#xE8;&#xA1;&#xA8;&#xE7;&#x8F;&#xBE;&#xE3;&#x81;&#xAE;&#xE9;&#x99;&#x90;&#xE7;&#x95;&#x8C;&#xE3;&#x82;&#x92;&#xE7;&#xAA;&#x81;&#xE7;&#xA0;&#xB4;&#xE3;&#x81;&#x99;&#xE3;&#x82;&#x8B;</title>
+<link>http://d.hatena.ne.jp/gfx/20110212/1297512479</link>
+<author>Goro Fuji (GFUJI)</author>
+<guid isPermaLink="true">http://d.hatena.ne.jp/gfx/20110212/1297512479</guid>
+<content:encoded>Perler&#xE3;&#x81;&#xAA;&#xE3;&#x82;&#x89;&#xE8;&#xAA;&#xB0;&#xE3;&#x81;&#x97;&#xE3;&#x82;&#x82;&#xE4;&#xB8;&#x80;&#xE5;&#xBA;&#xA6;&#xE3;&#x81;&#xAF;&#xE3;&#x81;&#x8A;&#xE4;&#xB8;&#x96;&#xE8;&#xA9;&#xB1;&#xE3;&#x81;&#xAB;&#xE3;&#x81;&#xAA;&#xE3;&#x81;&#xA3;&#xE3;&#x81;&#x9F;&#xE3;&#x81;&#x93;&#xE3;&#x81;&#xA8;&#xE3;&#x81;&#xAE;&#xE3;&#x81;&#x82;&#xE3;&#x82;&#x8B;&#xE3;&#x81;&#xA7;&#xE3;&#x81;&#x82;&#xE3;&#x82;&#x8D;&#xE3;&#x81;&#x86;&#xE3;&#x80;&#x81;&#xE5;&#xA4;&#xA7;&#xE5;&#xB4;&#x8E;&#xE6;&#xB0;&#x8F;&#xE3;&#x81;&#xAE;Perl&#xE3;&#x83;&#xA1;&#xE3;&#x83;&#xA2;&#xE3;&#x81;&#xA8;&#xE3;&#x81;&#x84;&#xE3;&#x81;&#x86;&#xE3;&#x82;&#xB5;&#xE3;&#x82;&#xA4;&#xE3;&#x83;&#x88;&#xE3;&#x81;&#x8C;&#xE3;&#x81;&#x82;&#xE3;&#x82;&#x8A;&#xE3;&#x81;&#xBE;&#xE3;&#x81;&#x99;&#xE3;&#x80;&#x82; Perl&#xE3;&#x83;&#xA1;&#xE3;&#x83;&#xA2; &#xE3;&#x81;&#x93;&#xE3;&#x81;&#x93;&#xE3;&#x81;&#xA7;&#xE7;&#xB4;&#xB9;&#xE4;&#xBB;&#x8B;&#xE3;&#x81;&#x95;&#xE3;&#x82;&#x8C;&#xE3;&#x81;&#xA6;&#xE3;&#x81;&#x84;&#xE3;&#x82;&#x8B;HTML&#xE3;&#x82;&#xBF;&#xE3;&#x82;&#xB0;&#xE3;&#x81;&#xAE;&#xE6;&#xAD;&#xA3;&#xE8;&#xA6;&#x8F;&#xE8;&#xA1;&#xA8;&#xE7;&#x8F;&#xBE;&#xE3;&#x81;&#xAF;&#xE6;&#xAD;&#xA3;&#xE8;&#xA6;&#x8F;&#xE8;&#xA1;&#xA8;&#xE7;&#x8F;&#xBE;&#xE3;&#x81;&#xAE;&#xE5;&#x8F;&#xA1;&#xE6;&#x99;&#xBA;&#xE3;&#x81;&#x8C;&#xE8;&#xA9;&#xB0;&#xE3;&#x82;&#x81;&#xE8;&#xBE;&#xBC;&#xE3;&#x81;&#xBE;&#xE3;&#x82;&#x8C;&#xE3;&#x81;&#x9F;&#xE3;&#x81;&#x99;&#xE3;&#x81;&#xB0;&#xE3;&#x82;&#x89;&#xE3;&#x81;&#x97;&#xE3;&#x81;&#x84;&#xE3;&#x82;&#x82;&#xE3;&#x81;&#xAE;&#xE3;&#x81;&#xA7;&#xE3;&#x81;&#x99;&#xE3;&#x81;&#x8C;&#xE3;&#x80;&#x81;Perl&#xE3;&#x81;&#xA7;&#xE3;&#x81;&#xAF;&#xE3;&#x81;&#x93;&#xE3;&#x82;&#x8C;&#xE3;&#x81;&#xA7;&#xE3;&#x81;&#x82;&#xE3;&#x82;&#x8B;&#xE7;&#x89;&#xB9;&#xE5;&#xAE;&#x9A;&#xE3;&#x81;&#xAE;&#xE6;&#x96;&#x87;&#xE5;&#xAD;&#x97;&#xE5;&#x88;&#x97;&#xE7;&#xB3;&#xBB;&#xE3;&#x81;&#xAB;&#xE5;&#xAF;&#xBE;&#xE3;&#x81;&#x97;&#xE3;&#x81;&#xA6;&#xE3;&#x83;&#x9E;&#xE3;&#x83;&#x83;&#xE3;&#x83;&#x81;&#xE3;&#x82;&#x92;&#xE8;&#xA1;&#x8C;&#xE3;&#x81;&#x86;&#xE3;&#x81;&#xA8;&#xE3;&#x80;&#x81;&#xE3;&#x81;&#x86;&#xE3;&#x81;&#xBE;&#xE3;&#x81;&#x8F;&#xE5;&#x8B;&#x95;&#xE3;&#x81;&#x8D;&#xE3;&#x81;&#xBE;&#xE3;&#x81;&#x9B;&#xE3;&#x82;&#x93;&#xE3;&#x80;&#x82;&#xE5;&#x85;&#xB7;&#xE4;&#xBD;&#x93;&#xE7;&#x9A;&#x84;&#xE3;&#x81;&#xAB;&#xE3;&#x81;&#xAF;&#xE3;&#x80;&#x81;Perl 5.8&#xE7;&#xB3;&#xBB;&#xE3;&#x81;&#xA7;&#xE3;&#x81;&#xAF;SEGV&#xE3;&#x81;&#x97;&#xE3;&#x80;&#x81;5.10&#xE4;&#xBB;&#xA5;&#xE4;&#xB8;&#x8A;&#xE3;&#x81;&#xA0;&#xE3;&#x81;&#xA8;&#xE8;&#xAD;&#xA6;&#xE5;&#x91;&#x8A;&#xE3;&#x81;&#x8C;&#xE5;&#x87;&#xBA;&#xE3;&#x81;&#x9F;&#xE4;&#xB8;&#x8A;&#xE3;&#x81;&#xA7;&#xE3;&#x80;&#x81;&#xE6;&#x9C;&#xAC;&#xE6;&#x9D;&#xA5;&#xE6;&#x88;&#x90;&#xE5;&#x8A;&#x9F;&#xE3;&#x81;&#x99;&#xE3;&#x82;&#x8B;&#xE3;&#x81;&#xAF;&#xE3;&#x81;&#x9A;&#xE3;&#x81;&#xAE;&#xE3;&#x83;&#x9E;&#xE3;&#x83;&#x83;&#xE3;&#x83;&#x81;&#xE3;&#x81;&#xAB;&#xE5;&#xA4;&#xB1;&#xE6;&#x95;&#x97;&#xE3;&#x81;&#x97;&#xE3;&#x81;&#xBE;&#xE3;&#x81;&#x99;&#xE3;&#x80;&#x82;&#xE3;&#x82;&#x82;&#xE3;&#x81;&#xA3;&#xE3;&#x81;&#xA8;&#xE3;&#x82;&#x82;&#xE3;&#x80;&#x81;&#xE3;&#x81;&#x93;&#xE3;&#x82;&#x8C;&#xE3;&#x81;&#xAF;&#xE3;&#x81;&#x93;&#xE3;&#x81;&#xAE;&#xE6;&#xAD;&#xA3;&#xE8;&#xA6;&#x8F;&#xE8;&#xA1;&#xA8;&#xE7;&#x8F;&#xBE;&#xE3;&#x81;&#xAB;&#xE5;&#x95;&#x8F;&#xE9;&#xA1;&#x8C;&#xE3;&#x81;&#x8C;&#xE3;&#x81;&#x82;&#xE3;&#x82;&#x8B;&#xE3;&#x81;&#xAE;&#xE3;&#x81;&#xA7;&#xE3;&#x81;&#xAF;&#xE3;&#x81;&#xAA;&#xE3;&#x81;&#x8F;&#xE3;&#x80;&#x81;Perl&#xE3;&#x81;&#xAE;&#xE6;&#xAD;&#xA3;&#xE8;&#xA6;&#x8F;&#xE8;&#xA1;&#xA8;&#xE7;&#x8F;&#xBE;&#xE3;&#x82;&#xA8;&#xE3;&#x83;&#xB3;&#xE3;&#x82;&#xB8;&#xE3;&#x83;&#xB3;&#xE3;&#x81;&#xAE;&#xE9;&#x99;&#x90;&#xE7;&#x95;&#x8C;&#xE3;&#x81;&#xA7;&#xE3;&#x81;&#x99; [...]
+</content:encoded>
+<dcterms:modified>2011-02-12T12:07:59Z</dcterms:modified>
+</item>
+<item>
+<title>Cosimo Streppone (cosimo): 
+    How to convert Opera contacts file to Mutt aliases format
+  </title>
+<link>http://my.opera.com/cstrep/blog/show.dml/25911061</link>
+<author>Cosimo Streppone (cosimo)</author>
+<guid isPermaLink="true">http://my.opera.com/cstrep/blog/show.dml/25911061</guid>
+<content:encoded>&#x3C;p&#x3E;Recently I&#x27;ve been looking more and more into &#x3C;a href=&#x22;http://www.mutt.org/&#x22;&#x3E;mutt, the email client&#x3C;/a&#x3E;. I&#x27;ve been a very happy &#x3C;a href=&#x22;http://www.opera.com/mail/&#x22;&#x3E;M2&#x3C;/a&#x3E; (Opera built-in email client) user for almost 3 years now. But still I felt I was missing something if I didn&#x27;t try out mutt. I&#x27;ve been a &#x3C;b&#x3E;pine&#x3C;/b&#x3E; user as wel [...]&#x3C;/p&#x3E;
+
+</content:encoded>
+<dcterms:modified>2011-02-12T10:21:27Z</dcterms:modified>
+</item>
+<item>
+<title>Tokuhiro Matsuno: git &#xE3;&#x81;&#xA7; perl &#xE3;&#x81;&#xAE;&#xE3;&#x83;&#x89;&#xE3;&#x82;&#xAD;&#xE3;&#x83;&#xA5;&#xE3;&#x83;&#xA1;&#xE3;&#x83;&#xB3;&#xE3;&#x83;&#x88;&#xE3;&#x82;&#x92;&#xE7;&#xBF;&#xBB;&#xE8;&#xA8;&#xB3;&#xE3;&#x81;&#x97;&#xE3;&#x81;&#x9F;&#xE3;&#x83;&#x87;&#xE3;&#x83;&#xBC;&#xE3;&#x82;&#xBF;&#xE3;&#x82;&#x92;&#xE3;&#x81;&#x8A;&#xE3;&#x81;&#x8F;&#xE5;&#xA0;&#xB4;&#xE6;&#x89;&#x80;&#xE3;&#x81;&#xA4;&#xE3;&#x81;&#x8F;&#xE3;&#x81;&#xA3;&#xE3;&#x81;&#xA6;&#xE3;&#x81;&#xBF;&#xE3;&#x81;&#x9F;</title>
+<link>http://d.hatena.ne.jp/tokuhirom/20110212/1297481457</link>
+<author>Tokuhiro Matsuno</author>
+<guid isPermaLink="true">http://d.hatena.ne.jp/tokuhirom/20110212/1297481457</guid>
+<content:encoded>https://github.com/perldoc-jp/module-pod-jp &#xE3;&#x81;&#x93;&#xE3;&#x81;&#x93;&#xE3;&#x81;&#xAB;&#xE3;&#x81;&#xA4;&#xE3;&#x81;&#x8F;&#xE3;&#x81;&#xA3;&#xE3;&#x81;&#xA6;&#xE3;&#x81;&#xBF;&#xE3;&#x81;&#x9F;&#xE3;&#x80;&#x82; &#xE3;&#x80;&#x8C;Japanized Perl Resources Project &#xE3;&#x81;&#xAF; CVS &#xE3;&#x81;&#xA0;&#xE3;&#x81;&#x8B;&#xE3;&#x82;&#x89;&#xE9;&#x9D;&#xA2;&#xE5;&#x80;&#x92;&#xE3;&#x81;&#xA0;&#xE3;&#x80;&#x8D;&#xE3;&#x80;&#x8C;sourceforge.jp &#xE3;&#x81;&#xAE;&#xE3;&#x82;&#xA2;&#xE3;&#x82;&#xAB;&#xE3;&#x82;&#xA6;&#xE3;&#x83;&#xB3;&#xE3;&#x83;&#x88;&#xE3;&#x81;&#xA4;&#xE3;&#x81;&#x8F;&#xE3;&#x82;&#x8B;&#xE3;&#x81;&#xAE;&#xE3;&#x82;&#x81;&#xE3;&#x82;&#x93;&#xE3;&#x81;&#xA9;&#xE3;&#x81;&#x8F;&#xE3;&#x81;&#x95;&#xE3;&#x81;&#x84;&#xE3;&#x80;&#x8D;&#xE3;&#x81;&#xAA;&#xE3;&#x81;&#xA9;&#xE3;&#x81;&#xA8;&#xE3;&#x81;&#x84;&#xE3;&#x81;&#xA3;&#xE3;&#x81;&#x9F;&#xE3;&#x81;&#x93;&#xE3;&#x81;&#xA8;&#xE3;&#x82;&#x92;&#xE8;&#xA8;&#x80;&#xE3;&#x81;&#x86;&#xE4;&#xBA;&#xBA;&#xE3;&#x81;&#x8C;&#xE3;&#x81;&#x8A;&#xE3;&#x81;&#x8A;&#xE3;&#x81;&#x84;&#xE3;&#x81;&#xAE;&#xE3;&#x81;&#xA7;&#xE3;&#x80;&#x81;github &#xE3;&#x81;&#xAB;&#xE3;&#x81;&#x8A;&#xE3;&#x81;&#x8D;&#xE3;&#x81;&#xB0;&#xE3;&#x82;&#x92;&#xE3;&#x81;&#xA4;&#xE3;&#x81;&#x8F;&#xE3;&#x81;&#xA3;&#xE3;&#x81;&#xA6;&#xE3;&#x81;&#xBF;&#xE3;&#x81;&#x9F;&#xE3;&#x80;&#x82; &#xE3;&#x81;&#x93;&#xE3;&#x81;&#x93;&#xE3;&#x81;&#xAB;&#xE3;&#x81;&#x84;&#xE3;&#x82;&#x8C;&#xE3;&#x82;&#x8C;&#xE3;&#x81;&#xB0;&#xE8;&#x87;&#xAA;&#xE5;&#x8B;&#x95;&#xE7;&#x9A;&#x84;&#xE3;&#x81;&#xAB; perldoc.jp &#xE3;&#x81;&#xAB;&#xE8;&#xA1;&#xA8;&#xE7;&#xA4;&#xBA;&#xE3;&#x81;&#x95;&#xE3;&#x82;&#x8C;&#xE3;&#x82;&#x8B;&#xE3;&#x82;&#x88;&#xE3;&#x81;&#x86;&#xE3;&#x81;&#xAB;&#xE3;&#x81;&#xAA;&#xE3;&#x82;&#x8A;&#xE3;&#x81;&#xBE;&#xE3;&#x81;&#x99;(&#xE7;&#x8F;&#xBE;&#xE7;&#x8A;&#xB6;&#xE3;&#x80;&#x81;10&#xE5;&#x88;&#x86;&#xE3;&#x81;&#xAB;&#xE4;&#xB8;&#x80;&#xE5;&#xBA;&#xA6;&#xE5;&#x90;&#x8C;&#xE6;&#x9C;&#x9F;&#xE3;&#x81;&#x97;&#xE3;&#x81;&#xA6;&#xE3;&#x81;&#xBE;&#xE3;&#x81;&#x99;)&#xE3;&#x80;&#x82; &#xE3;&#x82;&#xB3;&#xE3;&#x83;&#x9F;&#xE3;&#x83;&#x83;&#xE3;&#x83;&#x88;&#xE6;&#xA8;&#xA9;&#xE9;&#x99;&#x90;&#xE3;&#x81;&#xAF; https://githu [...]
+</content:encoded>
+<dcterms:modified>2011-02-12T03:30:57Z</dcterms:modified>
+</item>
+<item>
+<title>Tokuhiro Matsuno: perldoc.jp &#xE3;&#x81;&#xAE;&#xE3;&#x82;&#x82;&#xE3;&#x82;&#x8D;&#xE3;&#x82;&#x82;&#xE3;&#x82;&#x8D;&#xE3;&#x81;&#xAE;&#xE6;&#x94;&#xB9;&#xE4;&#xBF;&#xAE;&#xE3;&#x81;&#x8C;&#xE4;&#xB8;&#x80;&#xE6;&#xAE;&#xB5;&#xE8;&#x90;&#xBD;&#xE3;&#x81;&#x97;&#xE3;&#x81;&#x9F;</title>
+<link>http://d.hatena.ne.jp/tokuhirom/20110212/1297479145</link>
+<author>Tokuhiro Matsuno</author>
+<guid isPermaLink="true">http://d.hatena.ne.jp/tokuhirom/20110212/1297479145</guid>
+<content:encoded>&#xE7;&#x99;&#xBD;&#xE6;&#x96;&#xB9;&#xE3;&#x81;&#x95;&#xE3;&#x82;&#x93;&#xE7;&#xBF;&#xBB;&#xE8;&#xA8;&#xB3;&#xE5;&#x88;&#x86;&#xE3;&#x81;&#xAB;&#xE3;&#x81;&#x8A;&#xE3;&#x81;&#x91;&#xE3;&#x82;&#x8B; Pod::L10N &#xE3;&#x82;&#xB9;&#xE3;&#x82;&#xBF;&#xE3;&#x82;&#xA4;&#xE3;&#x83;&#xAB;&#xE3;&#x81;&#xAE;&#xE7;&#x9B;&#xAE;&#xE6;&#xAC;&#xA1;&#xE3;&#x81;&#xAE;&#xE6;&#x97;&#xA5;&#xE6;&#x9C;&#xAC;&#xE8;&#xAA;&#x9E;&#xE8;&#xA8;&#xB3;&#xE5;&#xBD;&#xA2;&#xE5;&#xBC;&#x8F;&#xE3;&#x81;&#xB8;&#xE3;&#x81;&#xAE;&#xE5;&#xAF;&#xBE;&#xE5;&#xBF;&#x9C; &#xE3;&#x83;&#x87;&#xE3;&#x82;&#xA3;&#xE3;&#x82;&#xB9;&#xE3;&#x83;&#x88;&#xE3;&#x83;&#xAA;&#xE3;&#x83;&#x93;&#xE3;&#x83;&#xA5;&#xE3;&#x83;&#xBC;&#xE3;&#x82;&#xB7;&#xE3;&#x83;&#xA7;&#xE3;&#x83;&#xB3;&#xE3;&#x83;&#x9A;&#xE3;&#x83;&#xBC;&#xE3;&#x82;&#xB8;&#xE3;&#x81;&#xAE;&#xE6;&#x95;&#xB4;&#xE5;&#xBD;&#xA2; &#xE7;&#xBF;&#xBB;&#xE8;&#xA8;&#xB3;&#xE3;&#x83;&#x87;&#xE3;&#x83;&#xBC;&#xE3;&#x82;&#xBF;&#xE3;&#x82;&#x92;&#xE3;&#x81;&#x8A;&#xE3;&#x81;&#x8F;&#xE3;&#x81;&#x9F;&#xE3;&#x82;&#x81;&#xE3;&#x81;&#xAE; git repository &#xE3;&#x82;&#x92;&#xE8;&#xBF;&#xBD;&#xE5;&#x8A;&#xA0; Scss &#xE3;&#x81;&#xAE;&#xE6;&#x8E;&#xA1;&#xE7;&#x94;&#xA8; iphone &#xE3;&#x81;&#xA7;&#xE3;&#x81;&#xBF;&#xE3;&#x81;&#xA6;&#xE3;&#x82;&#x82;&#xE3;&#x81;&#x9D;&#xE3;&#x82;&#x8C;&#xE3;&#x81;&#xAA;&#xE3;&#x82;&#x8A;&#xE3;&#x81;&#xAB;&#xE3;&#x81;&#xBF;&#xE3;&#x81;&#x88;&#xE3;&#x82;&#x8B;&#xE3;&#x82;&#x88;&#xE3;&#x81;&#x86;&#xE3;&#x81;&#xAB;&#xE8;&#xAA;&#xBF;&#xE6;&#x95;&#xB4; google &#xE6;&#xA4;&#x9C;&#xE7;&#xB4;&#xA2;&#xE3;&#x81;&#xB8;&#xE3;&#x81;&#xAE;&#xE5;&#xAF;&#xBE;&#xE5;&#xBF;&#x9C; s &#xE3;&#x82;&#x84; qw &#xE3;&#x81;&#xAA;&#xE3;&#x81;&#xA9;&#xE3;&#x81;&#x8C;&#xE8;&#xA1;&#xA8;&#xE7;&#xA4;&#xBA;&#xE3;&#x81;&#xA7;&#xE3;&#x81;&#x8D;&#xE3;&#x82;&#x8B;&#xE3;&#x82;&#x88;&#xE3;&#x81;&#x86;&#xE3;&#x81;&#xAB;(reported by @akiym) &#xE3;&#x83;&#xA2;&#xE3;&#x82;&#xB8;&#xE3;&#x83;&#xA5;&#xE3;&#x83;&#xBC;&#xE3;&#x83;&#xAB;&#xE4;&#xB8;&#x80;&#xE8;&#xA6;&#xA7;&#xE3;&#x81;&#xAB;&#xE6;&#x9C;&#x80;&#xE6;&#x96;&#xB0;&#xE3;&#x81;&#xAE;&#xE3;&#x83;&#x90;&#xE3;&#x83;&#xBC;&#xE3;&#x82;&#xB8;&#xE3;&#x83;&#xA7;&#xE3;&#x83;&#xB3;&#xE3;&#x81;&#x8C;&#xE3;&#x81;&#x84;&#xE3;&#x81;&#x8F;&#xE3;&#x81;&#xA4;&#xE3;&#x81;&#x8B;&#xE3;&#x82;&#x92;&#xE8;&#xA1;&#xA8;&#xE7;&#xA4;&#xBA;&#xE3;&#x81;&#x99;&#xE3;&#x82;&#x8B;&#xE3;&#x82;&#x88;&#xE3;&#x81;&#x86;&#xE3;&#x81;&#xAB; &#xE3;&#x83;&#xA2;&#xE3;&#x82;&#xB8;&#xE3;&#x83;&#xA5;&#xE3;&#x83;&#xBC;&#xE3;&#x83;&#xAB;&#xE4;&#xB8;&#x80;&#xE8;&#xA6;&#xA7;&#xE3;&#x81;&#xA7;&#xE5;&#x90;&#x8C;&#xE3;&#x81;&#x98;&#xE3;&#x83;&#xA2;&#xE3;&#x82;&#xB8;&#xE3;&#x83;&#xA5;&#xE3;&#x83;&#xBC;&#xE3;&#x83;&#xAB;&#xE3;&#x81;&#x8C;&#xE3;&#x81;&#x84;&#xE3;&#x81;&#x8F;&#xE3;&#x81;&#xA4;&#xE3;&#x82;&#x82;&#xE3;&#x81;&#x82;&#xE3;&#x82;&#x8B;&#xE5;&#xA0;&#xB4;&#xE5;&#x90;&#x88;&#xE3;&#x81;&#xAB;&#xE3;&#x81;&#xAF;&#xE3;&#x81;&#xBE;&#xE3;&#x81;&#xA8;&#xE3;&#x82;&#x81;&#xE3;&#x82;&#x8B;&#xE3;&#x82;&#x88;&#xE3;&#x81;&#x86;&#xE3;&#x81;&#xAB;(by ktat [...]
+</content:encoded>
+<dcterms:modified>2011-02-12T02:52:25Z</dcterms:modified>
+</item>
+<item>
+<title>Mateu X Hunter: Baby Benchmark of PSGI Frameworks</title>
+<link>http://www.catalyzed.org/2011/02/baby-benchmark-of-psgi-frameworks.html</link>
+<author>Mateu X Hunter</author>
+<guid isPermaLink="true">http://www.catalyzed.org/2011/02/baby-benchmark-of-psgi-frameworks.html</guid>
+<content:encoded>This papers discusses the topic of benchmarks in the context of PSGI application frameworks. It is not meant to incite violence over the results as they are to be taken with a heavy dose of medication. The reason being that...
+</content:encoded>
+<dcterms:modified>2011-02-11T23:57:06Z</dcterms:modified>
+</item>
+<item>
+<title>chromatic: Share the Modern Perl ePub</title>
+<link>http://www.modernperlbooks.com/mt/2011/02/share-the-modern-perl-epub.html</link>
+<author>chromatic</author>
+<guid isPermaLink="true">http://www.modernperlbooks.com/mt/2011/02/share-the-modern-perl-epub.html</guid>
+<content:encoded>You asked, and we (eventually) delivered. Modern Perl, the book, is now available in ePub format as well as A4- and letter-sized PDFs. There is no DRM and there are no special licensing terms. Please redistribute this book far and...
+</content:encoded>
+<dcterms:modified>2011-02-11T21:02:47Z</dcterms:modified>
+</item>
+<item>
+<title>Mike Doherty (doherty): The death of tribal knowledge</title>
+<link>http://hashbang.ca/190/the-death-of-tribal-knowledge</link>
+<author>Mike Doherty (doherty)</author>
+<guid isPermaLink="true">http://hashbang.ca/190/the-death-of-tribal-knowledge</guid>
+<content:encoded>Michael Schwern talks about Perl5&#xE2;&#x80;&#xB2;s shortcomings, and explains how perl5i can overcome many of them &#xE2;&#x80;&#x93; it is a pragma to fix as much of Perl 5 as possible all at once. While I haven&#xE2;&#x80;&#x99;t worked with perl5i much, I wanted to talk about s [...]
+</content:encoded>
+<dcterms:modified>2011-02-11T17:03:32Z</dcterms:modified>
+</item>
+<item>
+<title>Clinton Gormley (PerlDr): Lazyweb: ElasticSearch proxy </title>
+<link>http://blogs.perl.org/users/clinton_gormley/2011/02/lazyweb-elasticsearch-proxy.html</link>
+<author>Clinton Gormley (PerlDr)</author>
+<guid isPermaLink="true">http://blogs.perl.org/users/clinton_gormley/2011/02/lazyweb-elasticsearch-proxy.html</guid>
+<content:encoded>Hi all We get a lot of people who want to use javascript to talk to their ElasticSearch server, directly from the browser. This poses a problem, as ElasticSearch doesn&#x27;t offer any authentication, or request filtering. I&#x27;d like to write...
+</content:encoded>
+<dcterms:modified>2011-02-11T11:51:49Z</dcterms:modified>
+</item>
+<item>
+<title>Goro Fuji (GFUJI):  Xslate 1.0006 released!</title>
+<link>http://d.hatena.ne.jp/gfx/20110211/1297410013</link>
+<author>Goro Fuji (GFUJI)</author>
+<guid isPermaLink="true">http://d.hatena.ne.jp/gfx/20110211/1297410013</guid>
+<content:encoded>&#xE3;&#x83;&#xAA;&#xE3;&#x83;&#xAA;&#xE3;&#x83;&#xBC;&#xE3;&#x82;&#xB9;&#xE3;&#x81;&#x97;&#xE3;&#x81;&#xBE;&#xE3;&#x81;&#x97;&#xE3;&#x81;&#x9F;&#xE3;&#x80;&#x82; 1.0001&#xE3;&#x81;&#x8B;&#xE3;&#x82;&#x89;1.0006&#xE3;&#x81;&#xAE;&#xE9;&#x96;&#x93;&#xE3;&#x81;&#xAB;&#xE3;&#x81;&#xAF;&#xE5;&#xBE;&#x8C;&#xE6;&#x96;&#xB9;&#xE4;&#xBA;&#x92;&#xE6;&#x8F;&#x9B;&#xE6;&#x80;&#xA7;&#xE3;&#x82;&#x92;&#xE7;&#xA0;&#xB4;&#xE5;&#xA3;&#x8A;&#xE3;&#x81;&#x99;&#xE3;&#x82;&#x8B;&#xE5;&#xA4;&#x89;&#xE6;&#x9B;&#xB4;&#xE3;&#x81;&#xAF;&#xE3;&#x81;&#xAA;&#xE3;&#x81;&#x8F;&#xE3;&#x80;&#x81;&#xE3;&#x83;&#x90;&#xE3;&#x82;&#xB0;&#xE3;&#x83;&#x95;&#xE3;&#x82;&#xA3;&#xE3;&#x82;&#xAF;&#xE3;&#x82;&#xB9;&#xE3;&#x81;&#xA8;&#xE5;&#xB0;&#x8F;&#xE3;&#x81;&#x95;&#xE3;&#x81;&#xAA;&#xE6;&#xA9;&#x9F;&#xE8;&#x83;&#xBD;&#xE8;&#xBF;&#xBD;&#xE5;&#x8A;&#xA0;&#xE3;&#x81;&#xAE;&#xE3;&#x81;&#xBF;&#xE3;&#x81;&#xA7;&#xE3;&#x81;&#x99;&#xE3;&#x80;&#x82;SEGV&#xE3;&#x82;&#x92;&#xE8;&#xB5;&#xB7;&#xE3;&#x81;&#x93;&#xE3;&#x81;&#x99;&#xE3;&#x83;&#x90;&#xE3;&#x82;&#xB0;&#xE3;&#x82;&#x84;&#xE9;&#x9D;&#x9E;&#xE5;&#xB8;&#xB8;&#xE3;&#x81;&#xAB;&#xE5;&#x88;&#x86;&#xE3;&#x81;&#x8B;&#xE3;&#x82;&#x8A;&#xE3;&#x81;&#xAB;&#xE3;&#x81;&#x8F;&#xE3;&#x81;&#x84;&#xE3;&#x82;&#xA8;&#xE3;&#x83;&#xA9;&#xE3;&#x83;&#xBC;&#xE3;&#x83;&#xA1;&#xE3;&#x83;&#x83;&#xE3;&#x82;&#xBB;&#xE3;&#x83;&#xBC;&#xE3;&#x82;&#xB8;&#xE3;&#x82;&#x92;&#xE5;&#x90;&#x90;&#xE3;&#x81;&#x8F;&#xE3;&#x83;&#x90;&#xE3;&#x82;&#xB0;&#xE3;&#x82;&#x82;&#xE4;&#xBF;&#xAE;&#xE6;&#xAD;&#xA3;&#xE3;&#x81;&#x95;&#xE3;&#x82;&#x8C;&#xE3;&#x81;&#xA6;&#xE3;&#x81;&#x84;&#xE3;&#x82;&#x8B;&#xE3;&#x81;&#xAE;&#xE3;&#x81;&#xA7;&#xE3;&#x82;&#xA2;&#xE3;&#x83;&#x83;&#xE3;&#x83;&#x97;&#xE3;&#x83;&#x87;&#xE3;&#x83;&#xBC;&#xE3;&#x83;&#x88;&#xE3;&#x82;&#x92;&#xE3;&#x81;&#x8A;&#xE5;&#x8B;&#xA7;&#xE3;&#x82;&#x81;&#xE3;&#x81;&#x97;&#xE3;&#x81;&#xBE;&#xE3;&#x81;&#x99;&#xE3;&#x80;&#x82; &#xE3;&#x81;&#xBE;&#xE3;&#x81;&#x9F;&#xE3;&#x80;&#x81;1.0006&#xE3;&#x81;&#x8B;&#xE3;&#x82;&#x89;&#xE8;&#xBF;&#xBD;&#xE5;&#x8A;&#xA0;&#xE3;&#x81;&#x95;&#xE3;&#x82;&#x8C;&#xE3;&#x81;&#x9F;Text::Xslate-&#x26;gt;print()&#xE3;&#x83;&#xA1;&#xE3;&#x82;&#xBD;&#xE3;&#x83;&#x83;&#xE3;&#x83;&#x89;&#xE3;&#x82;&#x92;&#xE4;&#xBD;&#xBF;&#xE3;&#x81;&#x86;&#xE3;&#x81;&#xA8;&#xE3;&#x80;&#x81;&#xE3;&#x82;&#xA8;&#xE3;&#x83;&#xA9;&#xE3;&#x83;&#xBC;&#xE3;&#x83;&#xA1;&#xE3;&#x83;&#x83;&#xE3;&#x82;&#xBB;&#xE3;&#x83;&#xBC;&#xE3;&#x82;&#xB8;&#xE3;&#x82;&#x92;&#xE3;&#x83;&#x86;&#xE3;&#x83;&#xB3;&#xE3;&#x83;&#x97;&#xE3;&#x83;&#xAC;&#xE3;&#x83;&#xBC;&#xE3;&#x83;&#x88;&#xE5;&#x86;&#x85;&#xE3;&#x81;&#xAB;&#xE5;&#x87;&#xBA;&#xE5;&#x8A;&#x9B;&#xE3;&#x81;&#x99;&#xE3;&#x82;&#x8B;&#xE3;&#x81;&#x93;&#xE3;&#x81;&#xA8;&#xE3;&#x81;&#x8C;&#xE3;&#x81;&#xA7;&#xE3;&#x81;&#x8D;&#xE3;&#x81;&#xBE;&#xE3;&#x81;&#x99;&#xE3;&#x80;&#x82;&#xE3;&#x81;&#xAA;&#xE3;&#x81;&#x8A;&#xE3;&#x80;&#x81;&#xE3;&#x81;&#x93;&#xE3;&#x81;&#xAE;print()&#xE3;&#x81;&#xAF;&#xE3;&#x83;&#x86;&#xE3;&#x83;&#xB3;&#xE3;&#x83;&#x97;&#xE3;&#x83;&#xAC;&#xE3;&#x83;&#xBC;&#xE3;&#x83;&#x88;&#xE5;&#x86;&#x85;&#xE9;&#x83;&#xA8;&#xE3;&#x81;&#xAE;&#xE5;&#x87;&#xBA;&#xE5;&#x8A;&#x9B;&#xE5;&#x90;&#x8C;&#xE6;&#xA7;&#x98;&#xE3;&#x80;&#x81;&#xE3;&#x82;&#xB9;&#xE3;&#x83;&#x9E;&#xE3;&#x83;&#xBC;&#xE3;&#x83;&#x88;&#xE3;&#x82;&#xA8;&#xE3;&#x82;&#xB9;&#xE3;&#x82;&#xB1;&#xE3;&#x83;&#xBC;&#xE3;&#x83;&#x97;&#xE3;&#x81;&#x8C;&#xE9;&#x81;&#xA9;&#xE7;&#x94;&#xA8;&#xE3;&#x81;&#x95;&#xE3;&#x82;&#x8C;&#xE3;&#x81;&#xBE;&#xE3;&#x81;&#x99;&#xE3;&#x80;&#x82; #!perl -w [...]
+</content:encoded>
+<dcterms:modified>2011-02-11T07:40:13Z</dcterms:modified>
+</item>
+<item>
+<title>Olaf Alders: How to set up your own PerlMongers web service in 10 minutes or less</title>
+<link>http://blogs.perl.org/users/olaf_alders/2011/02/how-to-set-up-your-own-perlmongers-web-service-in-10-minutes-or-less.html</link>
+<author>Olaf Alders</author>
+<guid isPermaLink="true">http://blogs.perl.org/users/olaf_alders/2011/02/how-to-set-up-your-own-perlmongers-web-service-in-10-minutes-or-less.html</guid>
+<content:encoded>I&#x27;ve been working with ElasticSearch over the past months as part of the MetaCPAN project. Using ElasticSearch as our back end has worked out really well so far. The reason is that, out of the box, it provides a REST...
+</content:encoded>
+<dcterms:modified>2011-02-11T06:11:36Z</dcterms:modified>
+</item>
+<item>
+<title>Zbigniew Lukasiak: Are Newables/Injectables a fundamental distinction?</title>
+<link>http://perlalchemy.blogspot.com/2011/02/are-newablesinjectables-fundamental_7105.html</link>
+<author>Zbigniew Lukasiak</author>
+<guid isPermaLink="true">http://perlalchemy.blogspot.com/2011/02/are-newablesinjectables-fundamental_7105.html</guid>
+<content:encoded>In &#x3C;a href=&#x22;http://misko.hevery.com/2008/09/30/to-new-or-not-to-new/&#x22;&#x3E;To &#xE2;&#x80;&#x9C;new&#xE2;&#x80;&#x9D; or not to &#xE2;&#x80;&#x9C;new&#xE2;&#x80;&#x9D;&#xE2;&#x80;&#xA6;&#x3C;/a&#x3E; Misko Hevery advices us to divide object classes into Injectables and Newables. Newables are objects that cannot be injected with DI frameworks (that is by one type of DI frameworks), Injectables are those that can. The p [...]
+</content:encoded>
+<dcterms:modified>2011-02-10T20:11:00Z</dcterms:modified>
+</item>
+<item>
+<title>Zbigniew Lukasiak: Are Newables/Injectables a fundamental distinction?</title>
+<link>http://perlalchemy.blogspot.com/2011/02/are-newablesinjectables-fundamental_10.html</link>
+<author>Zbigniew Lukasiak</author>
+<guid isPermaLink="true">http://perlalchemy.blogspot.com/2011/02/are-newablesinjectables-fundamental_10.html</guid>
+<content:encoded>In &#x3C;a href=&#x22;http://misko.hevery.com/2008/09/30/to-new-or-not-to-new/&#x22;&#x3E;To &#xE2;&#x80;&#x9C;new&#xE2;&#x80;&#x9D; or not to &#xE2;&#x80;&#x9C;new&#xE2;&#x80;&#x9D;&#xE2;&#x80;&#xA6;&#x3C;/a&#x3E; Misko Hevery advices us to divide object classes into Injectables and Newables. Newables are objects that cannot be injected with DI frameworks (that is by one type of DI frameworks), Injectables are those that can. The p [...]
+</content:encoded>
+<dcterms:modified>2011-02-10T20:11:00Z</dcterms:modified>
+</item>
+<item>
+<title>Zbigniew Lukasiak: Are Newables/Injectables a fundamental distinction?</title>
+<link>http://perlalchemy.blogspot.com/2011/02/are-newablesinjectables-fundamental.html</link>
+<author>Zbigniew Lukasiak</author>
+<guid isPermaLink="true">http://perlalchemy.blogspot.com/2011/02/are-newablesinjectables-fundamental.html</guid>
+<content:encoded>In &#x3C;a href=&#x22;http://misko.hevery.com/2008/09/30/to-new-or-not-to-new/&#x22;&#x3E;To &#xE2;&#x80;&#x9C;new&#xE2;&#x80;&#x9D; or not to &#xE2;&#x80;&#x9C;new&#xE2;&#x80;&#x9D;&#xE2;&#x80;&#xA6;&#x3C;/a&#x3E; Misko Hevery advices us to divide object classes into Injectables and Newables. Newables are objects that cannot be injected with DI frameworks (that is by one type of DI framework), Injectables are those that can. The po [...]
+</content:encoded>
+<dcterms:modified>2011-02-10T20:11:00Z</dcterms:modified>
+</item>
+<item>
+<title>Active State: Buy vs Build: Delivering Better, Faster Software with Best of Breed Solutions</title>
+<link>http://feedproxy.google.com/~r/activestate/blog/~3/88EYcgAClts/buy-vs-build-delivering-better-faster-software-best-breed-solutions</link>
+<author>Active State</author>
+<guid isPermaLink="true">http://feedproxy.google.com/~r/activestate/blog/~3/88EYcgAClts/buy-vs-build-delivering-better-faster-software-best-breed-solutions</guid>
+<content:encoded>&#x3C;p&#x3E;&#x3C;img alt=&#x22;&#x22; /&#x3E;One of the most highly publicized software development project failures belongs to the Federal Bureau of Investigation (FBI). Before 2000, many of the agency&#x26;rsquo;s records were paper-based, preventing collaboration and analysis enabled by modern-da [...]&#x3C;/p&#x3E;
+
+</content:encoded>
+<dcterms:modified>2011-02-10T19:27:07Z</dcterms:modified>
+</item>
+<item>
+<title>Jerome Quelin: new magpie command: update</title>
+<link>http://jquelin.blogspot.com/2011/02/new-magpie-command-update.html</link>
+<author>Jerome Quelin</author>
+<guid isPermaLink="true">http://jquelin.blogspot.com/2011/02/new-magpie-command-update.html</guid>
+<content:encoded>i&#x27;m happy to report yet another &#x3C;a href=&#x22;http://search.cpan.org/dist/App-Magpie&#x22;&#x3E;magpie&#x3C;/a&#x3E; release, version 1.110410&#x3C;br/&#x3E;
+&#x3C;br/&#x3E;
+this release brings a new subcommand: update (aka refresh)&#x3C;br/&#x3E;
+&#x3C;br/&#x3E;
+it will automatically update a perl module package being checked out to the latest version, update buildrequires (with &#x3C;a href=&#x22;http://jquelin.blogspot.com/2011/02/new-magpie-command-fixspec.html&#x22;&#x3E;fixspec&#x3C;/a&#x3E; [...]
+</content:encoded>
+<dcterms:modified>2011-02-10T13:46:00Z</dcterms:modified>
+</item>
+<item>
+<title>Shlomi Fish (rindolf): Solving &#x22;ABC Path&#x22; Using Perl</title>
+<link>http://community.livejournal.com/shlomif_tech/56749.html</link>
+<author>Shlomi Fish (rindolf)</author>
+<guid isPermaLink="true">http://community.livejournal.com/shlomif_tech/56749.html</guid>
+<content:encoded>Recently, I haven&#x27;t been blogging too much, but instead focusing more on writing code as well as other Internet mediums such as IRC (Internet Relay Chat), Instant Messaging, and E-mail/mailing lists. But what good is your code if no one knows about i [...]
+</content:encoded>
+<dcterms:modified>2011-02-10T13:07:50Z</dcterms:modified>
+</item>
+<item>
+<title>f00li5h: Strangers Have The Best Candy: Delicious DBIx::Class::Candy</title>
+<link>http://feedproxy.google.com/~r/PatchPublishOrPaw/~3/dCmTPZAe2Fc/Strangers-Have-The-Best-Candy:-Delicious-DBIx::Class::Candy.html</link>
+<author>f00li5h</author>
+<guid isPermaLink="true">http://feedproxy.google.com/~r/PatchPublishOrPaw/~3/dCmTPZAe2Fc/Strangers-Have-The-Best-Candy:-Delicious-DBIx::Class::Candy.html</guid>
+<content:encoded>&#x3C;p&#x3E;&#x3C;strong&#x3E;Strangers:&#x3C;/strong&#x3E; they have the best candy - Taste the delicious DBIx::Class::Candy that &#x3C;code&#x3E;Arthur Axel &#x22;fREW&#x22; Schmidt&#x3C;/code&#x3E; has on offer!&#x3C;/p&#x3E;
+&#x3C;h2&#x3E;
+  &#x3C;a name=&#x22;your__contact_us__is_important_to_us__and_has_been_placed_in_a_queue_&#x22; id=&#x22;your__contact_us__is_important_to_us__and_has_been_placed_in_a_queue_&#x22;&#x3E;Your &#x27;Contact Us&#x27; is important to us, and has been placed in a queue.&#x3C;/a&#x3E;
+&#x3C;/h2&#x3E;
+&#x3C;p&#x3E;If you have a website, odds are that you have a page called [...]&#x3C;/p&#x3E;
+
+</content:encoded>
+<dcterms:modified>2011-02-10T12:21:12Z</dcterms:modified>
+</item>
+<item>
+<title>Goro Fuji (GFUJI):  What does call_sv() return?</title>
+<link>http://d.hatena.ne.jp/gfx/20110210/1297302384</link>
+<author>Goro Fuji (GFUJI)</author>
+<guid isPermaLink="true">http://d.hatena.ne.jp/gfx/20110210/1297302384</guid>
+<content:encoded>call_sv()&#xE3;&#x81;&#xAE;&#xE6;&#x88;&#xBB;&#xE3;&#x82;&#x8A;&#xE5;&#x80;&#xA4;&#xE3;&#x82;&#x92;&#xE6;&#xAD;&#xA3;&#xE7;&#xA2;&#xBA;&#xE3;&#x81;&#xAB;&#xE6;&#x8A;&#x8A;&#xE6;&#x8F;&#xA1;&#xE3;&#x81;&#x97;&#xE3;&#x81;&#xA6;&#xE3;&#x81;&#x84;&#xE3;&#x81;&#xAA;&#xE3;&#x81;&#x84;&#xE3;&#x81;&#x8C;&#xE3;&#x81;&#x9F;&#xE3;&#x82;&#x81;&#xE3;&#x81;&#xAB;&#xE3;&#x80;&#x81;Xslate &#xE3;&#x81;&#xA7;&#xE5;&#x8E;&#x84;&#xE4;&#xBB;&#x8B;&#xE3;&#x81;&#xAA;&#xE3;&#x83;&#x90;&#xE3;&#x82;&#xB0;&#xE3;&#x82;&#x92;&#xE5;&#xBC;&#x95;&#xE3;&#x81;&#x8D;&#xE8;&#xB5;&#xB7;&#xE3;&#x81;&#x93;&#xE3;&#x81;&#x97;&#xE3;&#x81;&#xA6;&#xE3;&#x81;&#x97;&#xE3;&#x81;&#xBE;&#xE3;&#x81;&#xA3;&#xE3;&#x81;&#x9F;*1&#xE3;&#x80;&#x82;&#xE5;&#x85;&#xB7;&#xE4;&#xBD;&#x93;&#xE7;&#x9A;&#x84;&#xE3;&#x81;&#xAB;&#xE3;&#x81;&#xAF;&#xE3;&#x80;&#x81;call_sv()&#xE3;&#x81;&#xA7;G_VOID&#xE3;&#x82;&#x92;&#xE6;&#x8C;&#x87;&#xE5;&#xAE;&#x9A;&#xE3;&#x81;&#x99;&#xE3;&#x82;&#x8B;&#xE3;&#x81;&#xA8;&#xE5;&#xB8;&#xB8;&#xE3;&#x81;&#xAB;1&#xE3;&#x82;&#x92;&#xE8;&#xBF;&#x94;&#xE3;&#x81;&#x99;&#xE3;&#x81;&#xA8;&#xE6;&#x80;&#x9D;&#xE3;&#x81;&#x84;&#xE8;&#xBE;&#xBC;&#xE3;&#x82;&#x93;&#xE3;&#x81;&#xA7;&#xE3;&#x81;&#x84;&#xE3;&#x81;&#x9F;&#xE3;&#x80;&#x82;&#xE3;&#x81;&#x97;&#xE3;&#x81;&#x8B;&#xE3;&#x81;&#x97;&#xE3;&#x80;&#x81;&#xE3;&#x81;&#x9D;&#xE3;&#x82;&#x8C;&#xE3;&#x81;&#xAF;&#xE9;&#x96;&#x93;&#xE9;&#x81;&#x95;&#xE3;&#x81;&#x84;&#xE3;&#x81;&#xA0;&#xE3;&#x81;&#xA3;&#xE3;&#x81;&#x9F;&#xE3;&#x80;&#x82; &#xE6;&#xA4;&#x9C;&#xE8;&#xA8;&#xBC;&#xEF;&#xBC;&#x9A; https://github.com/gfx/p5-XS-CallSV #!perl -w use strict; use Test::More; use B qw(/^G_/); use XS::SvCallTest; sub empty_pp { } sub [...]
+</content:encoded>
+<dcterms:modified>2011-02-10T01:46:24Z</dcterms:modified>
+</item>
+</channel>
+</rss>

@@ -1,0 +1,40 @@
+<article page-bgcolor-default="#ffffff">
+<head>
+<!-- we must use "html:title" here so we don't conflict with the title
+     declared in our source document. the html: part will get stripped
+     automatically by gxml2html. -->
+<html:title>%%%title%%%</html:title>
+</head>
+
+<!-- ditto on the body tag -->
+<html:body bgcolor="%%%page-bgcolor%%%">
+
+<!-- make a page header -->
+<table border="0" align="center">
+<tr>
+  <td colspan="2"><img src="images/title.gif"/></td>
+</tr>
+<tr>
+  <td align="left"><smalltype>Online Edition</smalltype></td>
+  <td align="right"><smalltype>%%%date%%%</smalltype></td>
+</tr>
+</table>
+
+<!-- now for the article body -->
+<table width="90%" align="center" border="0">
+<tr>
+  <td valign="top">
+    <linkbar/>
+  </td>
+  <td width="20">&#160;</td>
+  <td valign="top">
+    %%%body%%%
+	<br clear="all"/>
+	<hr/>
+  </td>
+</tr>
+</table>
+
+</html:body>
+
+</article>

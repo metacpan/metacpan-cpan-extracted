@@ -1,0 +1,15 @@
+Revision history for XDI::SPIT.
+
+1.11 -- August 3, 2004
+        - Uses the updated "i-name" SPIT API.
+        - Modified test to use @blueoxen namespace, as @pw namespace will
+          be going away.
+        
+1.1 -- July 2, 2004
+        - Exception handling on calls to XRI.
+        - Fixed bug in the directory structure.
+
+1.0 -- June 4, 2004
+        - First released release.
+
+$Id: ChangeLog,v 1.4 2004/08/03 21:05:36 eekim Exp $

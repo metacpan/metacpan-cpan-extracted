@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+
+	<xs:simpleType name="Max30">
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="30"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:group name="g1">
+		<xs:sequence>
+			<xs:element name="g1_el1" minOccurs="0" maxOccurs="1" type="Max30"/>
+			<xs:element name="g1_el2" minOccurs="0" maxOccurs="3" type="Max30"/>
+			<xs:element name="g1_el3" minOccurs="0" maxOccurs="1" type="Max30"/>
+		</xs:sequence>
+	</xs:group>
+
+	<xs:group name="g0">
+		<xs:sequence>
+			<xs:element name="g0_el0" minOccurs="0" maxOccurs="1" type="Max30"/>
+			<xs:element name="g0_el1" minOccurs="0" maxOccurs="3" type="Max30"/>
+			<xs:group ref="g1" minOccurs="0" maxOccurs="3"/>
+			<xs:element name="g0_el2" minOccurs="0" maxOccurs="3" type="Max30"/>
+			<xs:element name="g0_el3" minOccurs="0" maxOccurs="1" type="Max30"/>
+		</xs:sequence>
+	</xs:group>
+
+	<xs:complexType name="ct0">
+		<xs:sequence minOccurs="1" maxOccurs="1">
+			<xs:element name="el0" minOccurs="0" maxOccurs="1" type="Max30"/>
+			<xs:group ref="g0" minOccurs="0" maxOccurs="3"/>
+			<xs:element name="el1" type="Max30"  minOccurs="0" maxOccurs="1"/>
+			<xs:element name="el2" type="Max30"  minOccurs="0" maxOccurs="3"/>
+			<xs:element name="el3" type="Max30"  minOccurs="0" maxOccurs="1"/>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:element name="complexType">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="c" type="ct0" minOccurs="0" maxOccurs="1"/>
+	<!--			<xs:element name="d" type="ct0" minOccurs="0" maxOccurs="1"/> -->
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>
+

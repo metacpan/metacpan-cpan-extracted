@@ -1,0 +1,219 @@
+Revision history for Perl extension XML::DT.
+
+0.68  Sep 29, 2015
+       - Minor fix in MANIFEST to make Kwalittee happy.
+
+0.67  Mar 15, 2015
+       - Link to public SVN repo (thanks Gabor Szabo for pushing)
+
+0.66  Aug 15, 2014
+       - fix part of the fix that wasn't fixed (Debian community)
+
+0.65  Aug 1, 2014
+       - fix the fix
+         Thanks to Olly Betts (Debian community)
+
+0.64  Jul 31, 2014
+       - fix the way temporary files are created.
+         Thanks to Damyan Ivanov (Debian community)
+
+0.63  Mar 25, 2013
+       - mkdtskel now uses strict/warnings
+
+0.62  Jul 25, 2012
+       - Add the -userdata option.
+       - Document -userdata, -html and -recover.
+
+0.61  Jul 25, 2012
+        - Handle undef elements when parsing wrong formed XML.
+
+0.60  Jul 25, 2012
+        - Add -recover option to parse XML (not just HTML).
+
+0.59  Jun 5, 2012
+        - Fix POD encodings.
+
+0.58  Apr 9, 2012
+        - Adding missing pre-requisite (parent).
+
+0.57  Apr 7, 2012
+        - Let CDATA and PCDATA be processed in a different way.
+
+0.56  Feb 12, 2011
+        - Removed debug message :-/
+
+0.55  Feb 12, 2011
+        - Process correctly entities (I think)
+
+0.54  Nov 19, 2010
+        - require 5.8.6
+        - minor changes;        
+
+0.53  Jan 18, 2009
+	- added 'inpath' function.
+
+0.52  Oct 22, 2008
+        - fixed bug on whitepc function.
+
+0.51  Feb 22, 2008
+	- tohtml function with better handle of specific HTML tags
+
+0.50  Feb 21, 2008
+	- Fixed a problem with HFS+ extended attributes
+
+0.49  Feb 21, 2008
+	- Fixed a typo
+
+0.48  Feb 21, 2008
+	- added tohtml function. Does the same as toxml, but does not 
+          create empty tags.
+	- use -tohtml=>1 in a handler to use tohtml instead of toxml
+
+0.47  Nov 23, 2006
+	- finally, XML::Parser backend was removed.
+	- Added father, gfather, ggfather and root acessing method.
+
+0.46  Nov  3, 2006
+	- mkdtskel for a HTML adds -html flag
+	- XML::LibXML is used by default.
+
+0.45  May 16, 2006
+	- Added use strict for XML::Parser backend
+
+0.44  May 15, 2006
+	- Remove the use of $' and $` which makes regular expressions
+	  a lot slower
+
+0.43  May 15, 2006 (bad release)
+
+0.42  Sep 18, 2005
+	- Added use strict;
+
+0.41  Jul 20, 2005
+	- Removed warning from HTML parsing;
+
+0.40  Apr 06, 2005
+	- Added default type directive
+	- Added tests for type-based XML processing;
+	- Fixed recursive toxml;
+
+0.39  Mar 22, 2005
+	- Added open '-ignorecase' to look to tag names and attributes
+	  as the same although they differ in case
+	- toxml creates empty tag if $c equals to ""
+
+0.38  Dec 24, 2004
+	- MERRY CHRISTMAS
+	- Removed Test::Pod and Test::Pod::Coverage from Makefile.PL
+	- Turned off all validation from XML::LibXML -- this way the
+	  DTD does not gets loaded and processing becomes faster
+
+0.37  Nov 21, 2004
+	- Parse correctly CDATA sections using XML::LibXML;
+
+0.36  Nov 19, 2004
+	- Added support for bad HTML documents;
+	- Added test for -dtd support of mkdtskel;
+	- Moved mkdtskel code to main module;
+	- Changed default format for mkdtskel;
+
+0.35  Nov 15, 2004
+	- Added -dtd support to mkdtskel (now we need XML::DTDParser)
+
+0.34  Oct 30, 2004
+	- corrected '@dtattributes' instead of '@dtatributes'
+	  NOTICE: we will keep back compatibility for limited time.
+	- Renamed ID type to THE_CHILD
+	- Created LAST_CHILD type
+
+0.33  Oct 03, 2004
+	- Added ID type;
+
+0.32  Sep 20, 2004
+	- Added missing documentation;
+	- Added pod and pod-coverage tests;
+
+0.31  Aug 09, 2004
+        - Added documentation to @dtattributes
+
+0.30  Jan 22, 2004
+	- Bugs corrected with encodings in attributes
+	- Corrected encoding with utf8 locale -- we hope :-(;
+
+0.29  Jan 07, 2004
+	- Corrected bug with encodings.
+	- Added test for dtstring and encoding;
+
+0.28  Dec 16, 2003
+	- Corrected bug when outputing a data structure.
+
+0.27  Nov 14, 2003
+	- Added -declr switch. When added, dt will add the <?xml?>
+	- Added global variable $PARSER with info about what parser
+	  is being used (XML::Parser or XML::LibXML);
+	- Require a recent ExtUtils::MakeMaker. This will fix the
+	  problem with PM_FILTER syntax change (I hope)
+
+0.26  Oct 12, 2003
+	- Corrected makefile so that it detects if it should use perl
+	  5.8.0 or 5.8.1 PM_FILTER syntax;
+	- Fixed bug with tags with only a '0' inside;
+
+0.25  Oct 08, 2003
+	- Thanks to Martin Mokrejs, detected too many bugs with perl 5.8.1.
+
+0.24.1 Jun 17, 2003
+	- corrected problem when using a prefix on Makefile.PL 
+
+0.24  Fev 20, 2003
+	- added documentation to mkdtskel and mkdtdskel;
+	- ispell'ed README, Changes and DT.pm(pod) files;
+	- added ExtUtils::MakeMaker version request;
+	- added tests (basic functions, xpath, string processing);
+	- added code to support html parsing using libxml2 html parser;
+	- added XPath tests; Added 'toxml' tests;
+	- added dturl and pathdturl method;
+	- added mkdtskel -html;
+	- added mkdtskel -dtd (dirty solution);
+
+0.23  Dec 23, 2002
+	- removed a lot of code on Makefile.PL. Now
+	  ExtUtils::MakeMaker takes care of the full task.
+
+0.22  Dec 20, 2002
+	- added mkdtdskel as an installed script;
+	- added DT.pm as distribution file, for cpan indexing;
+
+0.21  May 27, 2002
+	- let the user choose between XML::Parser or XML::LibXML;
+
+0.20  Fev 20, 2001
+	- installs mkdtskel shell script to be used quickly
+	- removed HTML files from package. User can do that with
+          pod2html
+
+0.19  Nov 30, 2000
+        - better pathdt functions with '//aaa[@att='asdasd']'
+
+0.18  Nov 18, 2000
+        - Bug fixed in dtd generator function: mkdtdskel
+        - possibility of passing parameters do toxml:
+              toxml(tag, {...attributes...}, contents)
+        - XPath functions to use paths instead of tags;
+
+0.17  Oct 30, 2000
+        - added a -type => ZERO that don't processes its sub-elements
+	  and return "". It is good to avoid visiting certain parts of
+          the document, and for better performance.
+
+0.16  Oct 16, 2000
+	- problems with the changes on UNICODE
+        - 0.15 does not work with Perl 5.005;
+          Solution: "use bytes" if we find it.
+          eval("use bytes") if ($inc{bytes.pm}) { require and import...}  
+
+0.15  Sep 16, 2000
+        - Corrected bug in pod;
+	- problems with the changes on UNICODE;
+
+...

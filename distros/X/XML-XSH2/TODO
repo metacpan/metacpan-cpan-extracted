@@ -1,0 +1,56 @@
+TODO XSH2:
+
+- ls --no-out  ... return the serialization rather than printing it
+
+- split [after|before] ...
+- split text on a given character???
+
+- more tests
+- support DTD modification (isn't that obsolete in the 21st century?)
+
+- add various examples of working with namespaces, e.g.
+
+	if the ttt prefix is aready declared in the context of . or
+	registered, one may simply do
+
+		add element ttt:para into . 
+
+	and the new element ttt:para will be bound to that namespace so
+	doing
+
+		ls //ttt:para;
+		ls//*[local-name()='ttt' and
+		      namespace-uri()='http://myuri.com'];
+
+	should both list it.
+
+	       add --namespace http://myuri.com element "ttt:para" into .
+
+	is intended for adding a new element together with a
+	xmlns declaration of its prefix and the given namespace.
+
+INFO COMMANDS AS XML:
+
+xsh$ ls &{doc-info --xml}
+<doc-info>
+  <version>1.0</version>
+  <encoding>utf-8</encoding>
+  <standalone>-1</standalone>
+  <compression>-1</compression>
+  <URI>sample/sample5.a.gz</URI>
+</doc-info>
+
+and the same for more info commands
+
+USER-LEVEL IMPLEMENTABLE
+
+- reload document
+- untag/split element                
+- comment-out node (?? uncomment ??) 
+- swap nodes command or more generally, reorder {[2,1,3,4]} //foo
+  currently doable either with a sort:
+    $neword = {my $i=0; { map { $i => $_ } (2,1,3,4)} };
+    xmove &{ sort :k {$neword{position()}} //foo } replace //foo;
+  or, even simpler way, using variables:
+    $match = //foo;
+    move { @$match[1,0,2,3] } replace //foo;

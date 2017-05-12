@@ -1,0 +1,104 @@
+NAME
+    X::Osd - Perl extension to the X On Screen Display library (xosd)
+
+SYNOPSIS
+      use X::Osd;
+      my $osd = X::Osd->new(NULL, 2);
+      $osd->set_font("-*-lucidatypewriter-medium-r-normal-*-*-25-*-*-*-*-*-*");
+      $osd->set_colour("Green");
+      $osd->set_timeout(3);
+      $osd->set_pos(XOSD_top);
+      $osd->set_align(XOSD_right);
+      $osd->set_horizontal_offset(0);
+      $osd->set_vertical_offset(10);
+      $osd->set_shadow_offset(2);
+
+      $osd->string(0,'Hello World!');
+      $osd->percentage(0,56);
+      $osd->slider(0,34);
+
+DESCRIPTION
+    XOSD displays text on your screen, sounds simple right? The difference
+    is it is unmanaged and shaped, so it appears transparent. This gives the
+    effect of an On Screen Display, like your TV/VCR etc..
+
+    It currently supports 3 type of writes, string for simple text, printf
+    formatted text, slider and percentage display.
+
+    You need to have libxosd installed. You can get it from
+    http://www.ignavus.net/software.html
+
+  EXPORT
+    None by default.
+
+  Exported constants
+      XOSD_top
+      XOSD_middle
+      XOSD_bottom
+      XOSD_left
+      XOSD_center
+      XOSD_right
+
+  Exportable functions
+    * create(disp, number_lines);
+    * string(line,string)
+    * printf(line, string)
+    * percentage(line,percentage)
+                where percentage is between 0 and 100
+
+    * slider(line,percentage)
+                where percentage is between 0 and 100
+
+    * get_colour(red,green,blue)
+    * get_shadow_colour(red,green,blue)
+    * get_outline_colour(red,green,blue)
+    * hide()
+    * show()
+    * set_bar_length(osd, lenght)
+    * set_colour(color)
+    * set_shadow_colour(shadow_colour)
+    * set_outline_colour(outline_colour)
+    * set_font(font)
+    * set_vertical_offset(offset)
+    * set_horizontal_offset(offset)
+    * set_pos(pos)
+        where pos is one of (XOSD_top, XOSD_middle, XOSD_bottom)
+
+    * set_align(align)
+        where align is one of (XOSD_left, XOSD_center, XOSD_right)
+
+    * set_shadow_offset(shadow_offset)
+    * set_outline_offset(outline_offset)
+    * set_timeout(timeout)
+    * is_onscreen()
+    * wait_until_no_display()
+    * scroll(lines)
+    * get_number_lines()
+
+AUTHOR
+    Philippe M. Chiasson <gozer@cpan.org>
+
+CREDITS
+     Bjorn Bringert E<lt>bjorn@bringert.netE<gt> xosd-1.0.x fixes
+     Etan Reisner E<lt>deryni@eden.rutgers.eduE<gt> provided a patch for new xosd faatures
+
+VERSION
+    This is revision $Id: Osd.pm,v 1.17 2003/07/01 12:52:19 gozer Exp $
+
+CVS
+The CVS repository of X::Osd is avaliabe thru anoncvs at:
+     $> cvs -d :pserver:anoncvs@cvs.ectoplasm.org:/home/anoncvs login
+     password: anoncvs
+     $> cvs -d :pserver:anoncvs@cvs.ectoplasm.org:/home/anoncvs co X-Osd
+
+COPYRIGHT
+    Copyright (c) 2002-2003 Philippe M. Chiasson. All rights reserved. This
+    program is free software, you can redistribute it and/or modify it under
+    the same terms as Perl itself.
+
+SEE ALSO
+    *perl*
+
+    Home & Author of XOSD http://www.ignavus.net/software.html
+    <spoonboy@ignavus.net>
+

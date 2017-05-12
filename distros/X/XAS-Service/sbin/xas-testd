@@ -1,0 +1,157 @@
+#!/usr/bin/perl
+# ============================================================================
+#             Copyright (c) 2014 Kevin L. Esteb All Rights Reserved
+#
+#
+# TITLE:       xas-testd
+#
+# FACILITY:    XAS
+#
+# ABSTRACT:    This procedure runs a test service daemon 
+#
+# ENVIRONMENT: XAS Operations Environment
+#
+# PARAMETERS:
+#              --logtype   the type of log file (default console)
+#              --logfile   the name of the log file
+#              --cfgfile   the configuratio file to use
+#              --daemon    detach and run in the background
+#              --install   install as a service on Windows
+#              --deinstall deinstall as a service on Windows
+#              --help      prints out a helpful help message
+#              --manual    prints out the procedures manual
+#              --version   prints out the procedures version
+#              --debug     toggles debug output
+#              --alerts    toggles alert notification
+#
+# RETURNS:
+#              0 - success
+#              1 - failure
+#
+# Version      Author                                              Date
+# -------      ----------------------------------------------      -----------
+# 0.01         Kevin Esteb                                         23-Aug-2016
+#
+# ============================================================================
+#
+
+use lib '/home/kevin/dev/XAS-Service/trunk/lib';
+
+use XAS::Apps::Service::Testd;
+
+main: {
+
+    my $app = XAS::Apps::Service::Testd->new(
+        -throws => 'xas-testd',
+    );
+
+    exit $app->run();
+
+}
+
+__END__
+
+=head1 NAME
+
+xas-testd - a simple example micro service
+
+=head1 SYNOPSIS
+
+xas-testd [--help] [--debug] [--manual] [--version]
+
+ options:
+   --help         outputs simple help text
+   --debug        toogles debugging output
+   --alerts       toogles alert notifications
+   --manual       outputs the procedures manual
+   --version      outputs the apps version
+   --facility     change the alerts facility
+   --priority     change the alerts priority
+   --log-file     name of the log file 
+   --log-type     toggles the log type
+   --log-facility changes the log facility
+
+=head1 DESCRIPTION
+
+This procedure is a simple example for micro services.
+
+=head1 CONFIGURATION
+
+Please refer to L<XAS::Apps::Service::Testd|XAS::Apps::Service::Testd> for 
+configuration file information.
+
+=head1 OPTIONS AND ARGUMENTS
+
+=over 4
+
+=item B<--help>
+
+Displays a simple help message.
+
+=item B<--debug>
+
+Turns on debbuging.
+
+=item B<--alerts>
+
+Togggles alert notification.
+
+=item B<--manual>
+
+The complete documentation.
+
+=item B<--version>
+
+Prints out the apps version
+
+=item B<--facility>
+
+This changs the alerts facility, It overrides the defaults.
+
+=item B<--priority>
+
+This changes the alerts priority. It overrides the defaults.
+
+=item B<--log-type>
+
+Toggles the log type. Defaults to 'console'. Can be 'console', 'file', 
+'json' or 'syslog'. 
+
+=item B<--log-file>
+
+Optional logfile. When specified the log type is set to 'file'.
+
+=item B<--log-facility>
+
+Toggles the log facilty. Defaults to 'local6'. This follows syslog
+convention.
+
+=back
+
+=head1 EXIT CODES
+
+ 0 - success
+ 1 - failure
+ 2 - already running
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<XAS|XAS>
+
+=back
+
+=head1 AUTHOR
+
+Kevin L. Esteb, E<lt>kevin@kesteb.usE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2012-2016 Kevin L. Esteb
+
+This is free software; you can redistribute it and/or modify it under
+the terms of the Artistic License 2.0. For details, see the full text
+of the license at http://www.perlfoundation.org/artistic_license_2_0.
+
+=cut

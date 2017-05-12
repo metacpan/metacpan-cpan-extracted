@@ -1,0 +1,7 @@
+<!--  An Atom feed with namespace declarations  -->
+<feed xmlns="http://www.w3.org/2005/Atom" xmlns:ext="http://www.example.com/feed-extension">
+<title>Feed Title</title>
+<ext:example>true</ext:example>
+<ext2:definitely-an-example xmlns:ext2="http://www.example.com/feed-extension-2">true</ext2:definitely-an-example>
+<__NS1:most-definitely-an-example xmlns:__NS1="http://www.example.com/feed-extension-3">true</__NS1:most-definitely-an-example>
+</feed>

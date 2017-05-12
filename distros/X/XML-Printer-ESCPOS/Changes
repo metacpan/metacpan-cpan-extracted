@@ -1,0 +1,18 @@
+Revision history for XML-Printer-ESCPOS
+
+0.05    2017-04-24
+    - Added repeat tag.
+    - Added tags set and unset for defining global defaults.
+    - Added justify tag.
+    - Added hr tag.
+    - Improved image tag to not only allow png, but also jpeg and gif. Added tests.
+
+0.03    2017-02-15
+    - Added automatic word wrapping for simple <text> and for <utf8ImagedText>.
+
+0.02    2017-02-13
+    - Improved synopsis.
+
+0.01    2017-02-12
+    - First version, released on an unsuspecting world.
+

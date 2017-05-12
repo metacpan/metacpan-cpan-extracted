@@ -1,0 +1,49 @@
+NAME
+    XML::PYX - XML to PYX generator
+
+SYNOPSIS
+      use XML::PYX;
+      my $parser = XML::PYX::Parser->new;
+      my $string = $parser->parsefile($filename);
+
+DESCRIPTION
+    After reading about PYX on XML.com, I thought it was a pretty
+    cool idea, so I built this, to generate PYX from XML using perl.
+    See http://www.xml.com/pub/2000/03/15/feature/index.html for an
+    excellent introduction.
+
+    The package contains 2 usable packages, and 3 utilities that are
+    probably currently more use than the module:
+
+            pyx - a XML to PYX converter using XML::Parser
+            pyxv - a Validating XML to PYX converter using XML::Checker::Parser
+            pyxw - a PYX to XML converter
+            pyxhtml - an HTML to PYX converter using HTML::TreeBuilder
+
+    All these utilities can be pipelined together, so you can have:
+
+            pyx test.xml | grep -v "^-" | pyxw > new.xml
+
+    Which should remove all text from an XML file (leaving only
+    tags).
+
+    The 2 packages are XML::PYX::Parser and XML::PYX::Parser::ToCSF.
+    The former is a direct subclass of XML::Parser that simply
+    returns a PYX string on a call to parse or parsefile. The latter
+    stands for To Currently Selected Filehandle. Instead of
+    returning a string, it sends output directly to the currently
+    selected filehandle. This is much better for pipelined utilities
+    for obvious reasons.
+
+    There's a special variable: $XML::PYX::Lame. Set it to 1 to use
+    a "Lame" parser that simply uses regexps. This is useful, for
+    example, if you are changing the input to invalid XML for some
+    reason. You can then use $XML::PYX::Lame = 1 to enable the non-
+    xml parser. It does check for some things, like balanced tags,
+    but otherwise it's pretty lame :)
+
+    Lame mode is enabled for pyx and pyxw with the -l option.
+
+AUTHOR
+    Matt Sergeant, matt@sergeant.org
+

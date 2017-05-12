@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<complexType>
+	<c>
+    	<el0>el0</el0>
+    	<g0_el0>g0_el0</g0_el0>
+    	<g0_el1>G0_el1</g0_el1>
+    	<g1_el2>G1_el2_0</g1_el2>
+    	<g1_el2>G1_el2_1</g1_el2>
+    	<g1_el3>G1_el3</g1_el3>
+	</c>
+</complexType>

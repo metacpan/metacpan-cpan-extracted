@@ -1,0 +1,62 @@
+=head1 NAME
+
+  XML::GDOME::XPath::Result - Interface XPathResult implementation.
+
+=head1 SYNOPSIS
+
+  $int  = $xpresult->getResultType();
+  $bool = $xpresult->getBooleanValue();
+  $num  = $xpresult->getNumberValue();
+  $str  = $xpresult->getStringValue();
+  $node = $xpresult->getSingleNodeValue();
+  $node = $xpresult->iterateNext();
+
+=head1 METHODS
+
+=over 4
+
+
+=item $int = $xpresult->getResultType();
+
+
+
+I<Returns>: a code representing the type of this result, as defined by the type constants.
+
+
+=item $bool = $xpresult->getBooleanValue();
+
+
+
+I<Returns>: the value of this boolean result.
+
+
+=item $num = $xpresult->getNumberValue();
+
+
+
+I<Returns>: the value of this number result.
+
+
+=item $str = $xpresult->getStringValue();
+
+
+
+I<Returns>: the value of this GdomeDOMString result.
+
+
+=item $node = $xpresult->getSingleNodeValue();
+
+
+
+I<Returns>: The value of this single node result, which may be undef. This result is not          guaranteed to be the first node in document order where the expression          evaluates to multiple nodes.
+
+
+=item $node = $xpresult->iterateNext();
+
+Iterates and returns the next node from the node set or undef if there are no more nodes. 
+
+I<Returns>: the next node.
+
+
+=back
+

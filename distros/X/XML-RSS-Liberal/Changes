@@ -1,0 +1,17 @@
+Changes
+=======
+
+0.04 2013-04-26T05:04:55Z
+    - No code changes
+    - Import from CPAN, repackage so we can remove Module::Install
+
+0.03 - 08 May 2007
+  - Work with XML::RSS::LibXML 0.30.
+
+0.02 - 01 Feb 2007
+  * Not much interesting changes, no need to update.
+  - Minor documentation fixes.
+  - Use Module::Install.
+
+0.01 - 06 Mar 2006
+  - Released unto the unsuspecting world. 

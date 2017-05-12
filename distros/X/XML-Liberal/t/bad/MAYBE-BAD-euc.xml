@@ -1,0 +1,442 @@
+<?xml version="1.0" encoding="EUC-JP" ?>
+<rdf:RDF 
+  xmlns="http://purl.org/rss/1.0/"
+  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns:dc="http://purl.org/dc/elements/1.1/"
+  xmlns:content="http://purl.org/rss/1.0/modules/content/"
+  xmlns:trackback="http://madskills.com/public/xml/rss/module/trackback/"
+  xml:lang="ja">
+
+ <channel rdf:about="http://1470.net/mm/mylist.html/82?mode=xml">
+  <title>MM - HSBTのメモ</title>
+  <link>http://1470.net/mm/mylist.html/82/</link>
+  <description></description>
+  <dc:date>2006-05-30T19:56:38+09:00</dc:date>
+  <items>
+   <rdf:Seq>
+		    <rdf:li rdf:resource="http://d.hatena.ne.jp/naoya/20060529/1148911079" /> 
+		    <rdf:li rdf:resource="http://ameblo.jp/lapeace-dream/entry-10012769494.html" /> 
+		    <rdf:li rdf:resource="http://piro.sakura.ne.jp/latest/blosxom.cgi/topics/2006-05-30_niku.htm" /> 
+		    <rdf:li rdf:resource="http://www.jmuk.org/d/?path=2006/05#d29t01" /> 
+		    <rdf:li rdf:resource="http://takekuma.cocolog-nifty.com/blog/2006/05/post_92b9.html" /> 
+		    <rdf:li rdf:resource="http://www.rubyist.net/~matz/20060523.html#p01" /> 
+		    <rdf:li rdf:resource="http://tdiary.ishinao.net/20060529.html#p01" /> 
+		    <rdf:li rdf:resource="http://d.hatena.ne.jp/jkondolife/20060529#1148834309" /> 
+		    <rdf:li rdf:resource="http://blog-tech.rikunabi-next.yahoo.co.jp/blog/tada/74" /> 
+		    <rdf:li rdf:resource="http://kamikita.cocolog-nifty.com/kia/2006/05/post_cc28.html" /> 
+		    <rdf:li rdf:resource="http://www.famitsu.com/game/news/2006/05/24/103,1148439204,53714,0,0.html" /> 
+		    <rdf:li rdf:resource="http://d.hatena.ne.jp/babie/20060528/p1" /> 
+		    <rdf:li rdf:resource="http://serennz.cool.ne.jp/sblog/log/eid221.html" /> 
+		    <rdf:li rdf:resource="http://saikyoline.jp/weblog/archives/2005/10/subversion_2.html" /> 
+		    <rdf:li rdf:resource="http://weekbuild.sakura.ne.jp/trac/wiki/TracDoc/SakuraInternet" /> 
+		    <rdf:li rdf:resource="http://dkiroku.com/2006-05-28-3.html" /> 
+		    <rdf:li rdf:resource="http://www.genbu.net/zatu/zatu014.htm" /> 
+		    <rdf:li rdf:resource="http://nais.to/~yto/clog/2006-05-27-2.html" /> 
+		    <rdf:li rdf:resource="http://dev.ariel-networks.com/Members/inoue/culture-shock" /> 
+		    <rdf:li rdf:resource="https://addons.mozilla.org/firefox/1843/" /> 
+		    <rdf:li rdf:resource="http://unknownplace.org/memo/2006/02/08#e005" /> 
+		    <rdf:li rdf:resource="http://espion.just-size.jp/archives/06/146170147.html" /> 
+		    <rdf:li rdf:resource="http://www.cocomment.com/teamblog/?p=21" /> 
+		    <rdf:li rdf:resource="http://materia.jp/diary/20060526.html#p02" /> 
+		    <rdf:li rdf:resource="http://d.hatena.ne.jp/otsune/20060526/hatetDiaryRSS" /> 
+		    <rdf:li rdf:resource="http://slashdot.jp/article.pl?sid=06/05/25/1526251" /> 
+		    <rdf:li rdf:resource="http://journal.mycom.co.jp/news/2006/05/25/343.html" /> 
+		    <rdf:li rdf:resource="http://www.otsune.com/diary/2006/05/24/1.html#200605241" /> 
+		    <rdf:li rdf:resource="http://blog.livedoor.jp/dankogai/archives/50508350.html" /> 
+		    <rdf:li rdf:resource="http://itoshi.tv/d/?date=20060519#p04" /> 
+		    <rdf:li rdf:resource="http://itoshi.tv/d/?date=20060525#p01" /> 
+		    <rdf:li rdf:resource="http://www.baldanders.info/spiegel/log/200605.html#d26_t1" /> 
+		    <rdf:li rdf:resource="http://blog.bulknews.net/mt/archives/002044.html" /> 
+		    <rdf:li rdf:resource="http://inamode6.tokuhirom.dnsalias.org/show/3302" /> 
+		    <rdf:li rdf:resource="http://yossy.blognikki.com/2006/05/nifty_e641.html" /> 
+		    <rdf:li rdf:resource="http://www.watch.impress.co.jp/game/docs/20060525/ninten.htm" /> 
+		    <rdf:li rdf:resource="http://d.hatena.ne.jp/fbis/20060524/1148449927" /> 
+		    <rdf:li rdf:resource="http://d.hatena.ne.jp/fuba/20060524/1148482989" /> 
+		    <rdf:li rdf:resource="http://www.baldanders.info/spiegel/log/200605.html#d24_t1" /> 
+		    <rdf:li rdf:resource="http://haro.jp/wiki/index.cgi?page=%A5%D6%A5%E9%A5%D1%A5%C1%C6%FC%B5%AD%2F2006%2D5%2D24#p0" /> 
+		    <rdf:li rdf:resource="http://naoya.g.hatena.ne.jp/naoya/20060524/1148444140" /> 
+		    <rdf:li rdf:resource="http://www.smallstyle.com/20060523.html#p01" /> 
+		    <rdf:li rdf:resource="http://d.hatena.ne.jp/antipop/20060523/1148390636" /> 
+		    <rdf:li rdf:resource="http://blog.bulknews.net/mt/archives/002043.html" /> 
+		    <rdf:li rdf:resource="http://tuneari.fc2web.com/radio/ijyu060515.html" /> 
+		    <rdf:li rdf:resource="http://d.hatena.ne.jp/hiboma/20060523/1148360444" /> 
+		    <rdf:li rdf:resource="http://subtech.g.hatena.ne.jp/yappo/20060523/1148393629" /> 
+		    <rdf:li rdf:resource="http://www.ipa.go.jp/security/awareness/vendor/programming/a02_01_main.html" /> 
+		    <rdf:li rdf:resource="http://script.aculo.us/" /> 
+		    <rdf:li rdf:resource="http://xcezx.net/blog/linux/plagger-on-naked-etch.html" /> 
+   </rdf:Seq>
+  </items>
+ </channel>
+		 <item rdf:about="http://d.hatena.ne.jp/naoya/20060529/1148911079">
+  <title>『naoyaのはてなダイアリー - (PRです) 負荷分散、サーバー/ネットワーク構築運用エンジニア募集中』</title> 
+  <link>http://d.hatena.ne.jp/naoya/20060529/1148911079</link>
+  <dc:creator>HSBTのメモ</dc:creator>
+  <dc:date>2006-05-30T18:34:03+09:00</dc:date>
+  <dc:subject>hatena</dc:subject>
+    <description>応募してみる?</description>
+   </item>
+		 <item rdf:about="http://ameblo.jp/lapeace-dream/entry-10012769494.html">
+  <title>『パーティーで起こった事件について。|六本木ではたらく社長のblog』</title> 
+  <link>http://ameblo.jp/lapeace-dream/entry-10012769494.html</link>
+  <dc:creator>HSBTのメモ</dc:creator>
+  <dc:date>2006-05-30T08:18:07+09:00</dc:date>
+    <description>女が荷物が無くなったと言ってきて全額弁償しろとシノギが登場してうだうだという話
+おもしろ。</description>
+   </item>
+		 <item rdf:about="http://piro.sakura.ne.jp/latest/blosxom.cgi/topics/2006-05-30_niku.htm">
+  <title>『Latest topics &gt; 肉の宴 - outsider reflex』</title> 
+  <link>http://piro.sakura.ne.jp/latest/blosxom.cgi/topics/2006-05-30_niku.htm</link>
+  <dc:creator>HSBTのメモ</dc:creator>
+  <dc:date>2006-05-30T07:50:03+09:00</dc:date>
+    <description>悪のりプログラマーの宴。というかメールを出すのがcommitなんだ。</description>
+   </item>
+		 <item rdf:about="http://www.jmuk.org/d/?path=2006/05#d29t01">
+  <title>『昨日の問題のつづき』</title> 
+  <link>http://www.jmuk.org/d/?path=2006/05#d29t01</link>
+  <dc:creator>HSBTのメモ</dc:creator>
+  <dc:date>2006-05-30T07:49:25+09:00</dc:date>
+  <dc:subject>math, puzzle</dc:subject>
+    <description>前者の解はすぐに出てきたけど、後者についてはあとで。</description>
+   </item>
+		 <item rdf:about="http://takekuma.cocolog-nifty.com/blog/2006/05/post_92b9.html">
+  <title>『たけくまメモ: 「盗作」と「合法的盗作」』</title> 
+  <link>http://takekuma.cocolog-nifty.com/blog/2006/05/post_92b9.html</link>
+  <dc:creator>HSBTのメモ</dc:creator>
+  <dc:date>2006-05-30T07:47:11+09:00</dc:date>
+  <dc:subject>art</dc:subject>
+    <description>&gt;今回のこういうのを、正真正銘の盗作というんです。
+うはは。</description>
+   </item>
+		 <item rdf:about="http://www.rubyist.net/~matz/20060523.html#p01">
+  <title>『Matzにっき(2006-05-23)』</title> 
+  <link>http://www.rubyist.net/~matz/20060523.html#p01</link>
+  <dc:creator>HSBTのメモ</dc:creator>
+  <dc:date>2006-05-29T19:11:12+09:00</dc:date>
+    <description>&gt; すでに引き受けてくださった人にはBrian Kernighan, Guy Steele, Diomidis Spinellisなどがいます。
+うひょ。</description>
+   </item>
+		 <item rdf:about="http://tdiary.ishinao.net/20060529.html#p01">
+  <title>『[1470.net][MM/Memo][Hyper Estraier] SBMをシードにした検索エンジン』</title> 
+  <link>http://tdiary.ishinao.net/20060529.html#p01</link>
+  <dc:creator>HSBTのメモ</dc:creator>
+  <dc:date>2006-05-29T19:10:46+09:00</dc:date>
+  <dc:subject>SBM, 1470.net, HyperEstraier</dc:subject>
+    <description>wktk!</description>
+   </item>
+		 <item rdf:about="http://d.hatena.ne.jp/jkondolife/20060529#1148834309">
+  <title>『川o´-`)&lt;jknd life』</title> 
+  <link>http://d.hatena.ne.jp/jkondolife/20060529#1148834309</link>
+  <dc:creator>HSBTのメモ</dc:creator>
+  <dc:date>2006-05-29T08:16:05+09:00</dc:date>
+  <dc:subject>PHP, XSS, Security</dc:subject>
+    <description>これはひどい。</description>
+   </item>
+		 <item rdf:about="http://blog-tech.rikunabi-next.yahoo.co.jp/blog/tada/74">
+  <title>『ただただし@「ただのにっき」のエンジニアいとをかし/Tech総研:適切なデフォルト』</title> 
+  <link>http://blog-tech.rikunabi-next.yahoo.co.jp/blog/tada/74</link>
+  <dc:creator>HSBTのメモ</dc:creator>
+  <dc:date>2006-05-29T07:35:39+09:00</dc:date>
+  <dc:subject>default, winny, setting</dc:subject>
+   </item>
+		 <item rdf:about="http://kamikita.cocolog-nifty.com/kia/2006/05/post_cc28.html">
+  <title>『神北情報局: 旅行記とJR東日本にヒドい目に合わされた話だぞ』</title> 
+  <link>http://kamikita.cocolog-nifty.com/kia/2006/05/post_cc28.html</link>
+  <dc:creator>HSBTのメモ</dc:creator>
+  <dc:date>2006-05-29T07:33:13+09:00</dc:date>
+  <dc:subject>JR, Suica</dc:subject>
+    <description>ああ、帰る時に忘れずに払い戻ししておかないとな。</description>
+   </item>
+		 <item rdf:about="http://www.famitsu.com/game/news/2006/05/24/103,1148439204,53714,0,0.html">
+  <title>『 『ペルソナ3』予約特典が決定!!』</title> 
+  <link>http://www.famitsu.com/game/news/2006/05/24/103,1148439204,53714,0,0.html</link>
+  <dc:creator>HSBTのメモ</dc:creator>
+  <dc:date>2006-05-29T07:25:29+09:00</dc:date>
+  <dc:subject>game, ps2</dc:subject>
+   </item>
+		 <item rdf:about="http://d.hatena.ne.jp/babie/20060528/p1">
+  <title>『ξ;゜��゜)ξ { 遅レス。 - 開放的・閉鎖的』</title> 
+  <link>http://d.hatena.ne.jp/babie/20060528/p1</link>
+  <dc:creator>HSBTのメモ</dc:creator>
+  <dc:date>2006-05-30T19:56:00+09:00</dc:date>
+  <dc:subject>web, community</dc:subject>
+   </item>
+		 <item rdf:about="http://serennz.cool.ne.jp/sblog/log/eid221.html">
+  <title>『sb開発研究所 | お詫び』</title> 
+  <link>http://serennz.cool.ne.jp/sblog/log/eid221.html</link>
+  <dc:creator>HSBTのメモ</dc:creator>
+  <dc:date>2006-05-28T23:01:56+09:00</dc:date>
+  <dc:subject>sb, security</dc:subject>
+   </item>
+		 <item rdf:about="http://saikyoline.jp/weblog/archives/2005/10/subversion_2.html">
+  <title>『SaikyoLine.jp: さくらインターネットでSubversion』</title> 
+  <link>http://saikyoline.jp/weblog/archives/2005/10/subversion_2.html</link>
+  <dc:creator>HSBTのメモ</dc:creator>
+  <dc:date>2006-05-28T22:13:26+09:00</dc:date>
+  <dc:subject>Subversion, sakura</dc:subject>
+   </item>
+		 <item rdf:about="http://weekbuild.sakura.ne.jp/trac/wiki/TracDoc/SakuraInternet">
+  <title>『WeekbuildのHack倉庫 - Trac』</title> 
+  <link>http://weekbuild.sakura.ne.jp/trac/wiki/TracDoc/SakuraInternet</link>
+  <dc:creator>HSBTのメモ</dc:creator>
+  <dc:date>2006-05-28T22:13:04+09:00</dc:date>
+  <dc:subject>sakura, trac</dc:subject>
+    <description>さくらはtracが動くのか….</description>
+   </item>
+		 <item rdf:about="http://dkiroku.com/2006-05-28-3.html">
+  <title>『就職活動で見た凄い奴まとめサイト - まとめ01』</title> 
+  <link>http://dkiroku.com/2006-05-28-3.html</link>
+  <dc:creator>HSBTのメモ</dc:creator>
+  <dc:date>2006-05-28T20:18:08+09:00</dc:date>
+    <description>&gt;シナジーとかキャズムとかその手のキモオタワード
+うはは。</description>
+   </item>
+		 <item rdf:about="http://www.genbu.net/zatu/zatu014.htm">
+  <title>『御朱印帳』</title> 
+  <link>http://www.genbu.net/zatu/zatu014.htm</link>
+  <dc:creator>HSBTのメモ</dc:creator>
+  <dc:date>2006-05-28T20:17:31+09:00</dc:date>
+    <description>全国でこんなにあるのかー。はまりそうだ。</description>
+   </item>
+		 <item rdf:about="http://nais.to/~yto/clog/2006-05-27-2.html">
+  <title>『[を] Perl の特殊変数のうちときどき使うもの』</title> 
+  <link>http://nais.to/~yto/clog/2006-05-27-2.html</link>
+  <dc:creator>HSBTのメモ</dc:creator>
+  <dc:date>2006-05-28T07:47:09+09:00</dc:date>
+  <dc:subject>perl</dc:subject>
+   </item>
+		 <item rdf:about="http://dev.ariel-networks.com/Members/inoue/culture-shock">
+  <title>『カルチャーショック &amp;mdash; ありえるえりあ』</title> 
+  <link>http://dev.ariel-networks.com/Members/inoue/culture-shock</link>
+  <dc:creator>HSBTのメモ</dc:creator>
+  <dc:date>2006-05-27T23:00:00+09:00</dc:date>
+  <dc:subject>hack, work</dc:subject>
+    <description>興味深い。</description>
+   </item>
+		 <item rdf:about="https://addons.mozilla.org/firefox/1843/">
+  <title>『FireBug』</title> 
+  <link>https://addons.mozilla.org/firefox/1843/</link>
+  <dc:creator>HSBTのメモ</dc:creator>
+  <dc:date>2006-05-27T15:52:00+09:00</dc:date>
+  <dc:subject>firefox, extension, debugger</dc:subject>
+   </item>
+		 <item rdf:about="http://unknownplace.org/memo/2006/02/08#e005">
+  <title>『coComment に対応』</title> 
+  <link>http://unknownplace.org/memo/2006/02/08#e005</link>
+  <dc:creator>HSBTのメモ</dc:creator>
+  <dc:date>2006-05-27T15:21:45+09:00</dc:date>
+  <dc:subject>coComment, CLON</dc:subject>
+   </item>
+		 <item rdf:about="http://espion.just-size.jp/archives/06/146170147.html">
+  <title>『Debian/Sarge でメールサーバ構築』</title> 
+  <link>http://espion.just-size.jp/archives/06/146170147.html</link>
+  <dc:creator>HSBTのメモ</dc:creator>
+  <dc:date>2006-05-27T15:21:19+09:00</dc:date>
+  <dc:subject>mail, postfix, courier</dc:subject>
+   </item>
+		 <item rdf:about="http://www.cocomment.com/teamblog/?p=21">
+  <title>『coComment blog  Blog Archive  Standard Blogs』</title> 
+  <link>http://www.cocomment.com/teamblog/?p=21</link>
+  <dc:creator>HSBTのメモ</dc:creator>
+  <dc:date>2006-05-27T09:22:46+09:00</dc:date>
+  <dc:subject>coComment</dc:subject>
+    <description>plugin作ってみる?</description>
+   </item>
+		 <item rdf:about="http://materia.jp/diary/20060526.html#p02">
+  <title>『prima materia diary - 個人情報保護 ≒ プライバシー保護, but 個人情報保護 ≠ プライバシー保護』</title> 
+  <link>http://materia.jp/diary/20060526.html#p02</link>
+  <dc:creator>HSBTのメモ</dc:creator>
+  <dc:date>2006-05-27T08:37:49+09:00</dc:date>
+   </item>
+		 <item rdf:about="http://d.hatena.ne.jp/otsune/20060526/hatetDiaryRSS">
+  <title>『tDiaryのツッコミspamを放置する管理者はホント勘弁してほしい……』</title> 
+  <link>http://d.hatena.ne.jp/otsune/20060526/hatetDiaryRSS</link>
+  <dc:creator>HSBTのメモ</dc:creator>
+  <dc:date>2006-05-27T00:34:45+09:00</dc:date>
+  <dc:subject>tDiary, plugin, spam, filter, comment</dc:subject>
+   </item>
+		 <item rdf:about="http://slashdot.jp/article.pl?sid=06/05/25/1526251">
+  <title>『スラッシュドット ジャパン | TeXパッケージ「teTeX」の開発が終了』</title> 
+  <link>http://slashdot.jp/article.pl?sid=06/05/25/1526251</link>
+  <dc:creator>HSBTのメモ</dc:creator>
+  <dc:date>2006-05-26T07:42:10+09:00</dc:date>
+  <dc:subject>teTeX</dc:subject>
+   </item>
+		 <item rdf:about="http://journal.mycom.co.jp/news/2006/05/25/343.html">
+  <title>『TeXニシャン御用達の「teTeX」、新規リリースを停止 --誰が後を継ぐ? (MYCOMジャーナル)』</title> 
+  <link>http://journal.mycom.co.jp/news/2006/05/25/343.html</link>
+  <dc:creator>HSBTのメモ</dc:creator>
+  <dc:date>2006-05-26T07:42:09+09:00</dc:date>
+  <dc:subject>teTeX</dc:subject>
+    <description>うは。</description>
+   </item>
+		 <item rdf:about="http://www.otsune.com/diary/2006/05/24/1.html#200605241">
+  <title>『void GraphicWizardsLair( void ); // コメント投稿のメールアドレス欄は「本当は必要ないがズボラな人を避けるためにあえて記入してもらっている」という選択肢だってあってもいい』</title> 
+  <link>http://www.otsune.com/diary/2006/05/24/1.html#200605241</link>
+  <dc:creator>HSBTのメモ</dc:creator>
+  <dc:date>2006-05-26T07:40:50+09:00</dc:date>
+  <dc:subject>blog, comment, mail</dc:subject>
+   </item>
+		 <item rdf:about="http://blog.livedoor.jp/dankogai/archives/50508350.html">
+  <title>『たった一つの冴えたMicrosoft製品』</title> 
+  <link>http://blog.livedoor.jp/dankogai/archives/50508350.html</link>
+  <dc:creator>HSBTのメモ</dc:creator>
+  <dc:date>2006-05-26T07:39:51+09:00</dc:date>
+  <dc:subject>excel</dc:subject>
+   </item>
+		 <item rdf:about="http://itoshi.tv/d/?date=20060519#p04">
+  <title>『[Ruby] RoRをWebrickからlighttpdに移行する。』</title> 
+  <link>http://itoshi.tv/d/?date=20060519#p04</link>
+  <dc:creator>HSBTのメモ</dc:creator>
+  <dc:date>2006-05-26T07:39:08+09:00</dc:date>
+  <dc:subject>Webrick, lighttpd, rails, ruby</dc:subject>
+   </item>
+		 <item rdf:about="http://itoshi.tv/d/?date=20060525#p01">
+  <title>『[Ruby] Rails本、イイ!』</title> 
+  <link>http://itoshi.tv/d/?date=20060525#p01</link>
+  <dc:creator>HSBTのメモ</dc:creator>
+  <dc:date>2006-05-26T07:38:52+09:00</dc:date>
+  <dc:subject>rails, ruby, book</dc:subject>
+    <description>確かにあの本はセキュリティ周りがしっかりしているのがオススメのポイントだなー。</description>
+   </item>
+		 <item rdf:about="http://www.baldanders.info/spiegel/log/200605.html#d26_t1">
+  <title>『今見れないのなら』</title> 
+  <link>http://www.baldanders.info/spiegel/log/200605.html#d26_t1</link>
+  <dc:creator>HSBTのメモ</dc:creator>
+  <dc:date>2006-05-26T07:37:58+09:00</dc:date>
+    <description>今見るわけがないものを後でみるわけがないという話。</description>
+   </item>
+		 <item rdf:about="http://blog.bulknews.net/mt/archives/002044.html">
+  <title>『ソースコード検索の ack がよさげな件: blog.bulknews.net』</title> 
+  <link>http://blog.bulknews.net/mt/archives/002044.html</link>
+  <dc:creator>HSBTのメモ</dc:creator>
+  <dc:date>2006-05-26T07:35:54+09:00</dc:date>
+  <dc:subject>ack, tool</dc:subject>
+   </item>
+		 <item rdf:about="http://inamode6.tokuhirom.dnsalias.org/show/3302">
+  <title>『inamode6 cosmetic』</title> 
+  <link>http://inamode6.tokuhirom.dnsalias.org/show/3302</link>
+  <dc:creator>HSBTのメモ</dc:creator>
+  <dc:date>2006-05-26T07:09:37+09:00</dc:date>
+  <dc:subject>web, netwatch</dc:subject>
+    <description>Barという人が面白いという話</description>
+   </item>
+		 <item rdf:about="http://yossy.blognikki.com/2006/05/nifty_e641.html">
+  <title>『元社長日記: 富士通さんとNifty訴訟の件で話をしてみました』</title> 
+  <link>http://yossy.blognikki.com/2006/05/nifty_e641.html</link>
+  <dc:creator>HSBTのメモ</dc:creator>
+  <dc:date>2006-05-25T22:14:22+09:00</dc:date>
+  <dc:subject>nifty, blog</dc:subject>
+    <description>なにこれ。</description>
+   </item>
+		 <item rdf:about="http://www.watch.impress.co.jp/game/docs/20060525/ninten.htm">
+  <title>『任天堂、平成18年3月期の連結決算短針を発表Wiiの価格は「25,000円以上は考えていない」と回答』</title> 
+  <link>http://www.watch.impress.co.jp/game/docs/20060525/ninten.htm</link>
+  <dc:creator>HSBTのメモ</dc:creator>
+  <dc:date>2006-05-25T22:14:04+09:00</dc:date>
+  <dc:subject>wii, nintendo, game</dc:subject>
+    <description>25000円以下なら即決。</description>
+   </item>
+		 <item rdf:about="http://d.hatena.ne.jp/fbis/20060524/1148449927">
+  <title>『[Perl][PHP]PHPがどうにも好きになれない理由』</title> 
+  <link>http://d.hatena.ne.jp/fbis/20060524/1148449927</link>
+  <dc:creator>HSBTのメモ</dc:creator>
+  <dc:date>2006-05-25T08:04:27+09:00</dc:date>
+  <dc:subject>PHP, Perl</dc:subject>
+   </item>
+		 <item rdf:about="http://d.hatena.ne.jp/fuba/20060524/1148482989">
+  <title>『fubaはてな - AntiAmazonAssociate.pm is obsoleted』</title> 
+  <link>http://d.hatena.ne.jp/fuba/20060524/1148482989</link>
+  <dc:creator>HSBTのメモ</dc:creator>
+  <dc:date>2006-05-25T07:39:51+09:00</dc:date>
+  <dc:subject>Plagger, Amazon</dc:subject>
+    <description>対応させた。</description>
+   </item>
+		 <item rdf:about="http://www.baldanders.info/spiegel/log/200605.html#d24_t1">
+  <title>『「信頼」とは』</title> 
+  <link>http://www.baldanders.info/spiegel/log/200605.html#d24_t1</link>
+  <dc:creator>HSBTのメモ</dc:creator>
+  <dc:date>2006-05-25T07:35:35+09:00</dc:date>
+  <dc:subject>Winny, risk management</dc:subject>
+   </item>
+		 <item rdf:about="http://haro.jp/wiki/index.cgi?page=%A5%D6%A5%E9%A5%D1%A5%C1%C6%FC%B5%AD%2F2006%2D5%2D24#p0">
+  <title>『 HikiDoc.pm 公開』</title> 
+  <link>http://haro.jp/wiki/index.cgi?page=%A5%D6%A5%E9%A5%D1%A5%C1%C6%FC%B5%AD%2F2006%2D5%2D24#p0</link>
+  <dc:creator>HSBTのメモ</dc:creator>
+  <dc:date>2006-05-25T07:30:27+09:00</dc:date>
+  <dc:subject>hikidoc, wiki, hiki</dc:subject>
+    <description>おや</description>
+   </item>
+		 <item rdf:about="http://naoya.g.hatena.ne.jp/naoya/20060524/1148444140">
+  <title>『naoyaグループ - naoyaの日記 - 中の人と自社サービス』</title> 
+  <link>http://naoya.g.hatena.ne.jp/naoya/20060524/1148444140</link>
+  <dc:creator>HSBTのメモ</dc:creator>
+  <dc:date>2006-05-25T01:02:16+09:00</dc:date>
+    <description>後で反応する(かも)。</description>
+   </item>
+		 <item rdf:about="http://www.smallstyle.com/20060523.html#p01">
+  <title>『SmallStyle - category プラグインを利用した タグクラウド 表示プラグイン』</title> 
+  <link>http://www.smallstyle.com/20060523.html#p01</link>
+  <dc:creator>HSBTのメモ</dc:creator>
+  <dc:date>2006-05-25T00:30:56+09:00</dc:date>
+  <dc:subject>tagcroud, tdiary, plugin</dc:subject>
+    <description>cool!</description>
+   </item>
+		 <item rdf:about="http://d.hatena.ne.jp/antipop/20060523/1148390636">
+  <title>『antipop - mixi ミュージック送信 Perl モジュールを作ってみたよ!』</title> 
+  <link>http://d.hatena.ne.jp/antipop/20060523/1148390636</link>
+  <dc:creator>HSBTのメモ</dc:creator>
+  <dc:date>2006-05-24T07:30:33+09:00</dc:date>
+  <dc:subject>mixi, Plagger, neta</dc:subject>
+   </item>
+		 <item rdf:about="http://blog.bulknews.net/mt/archives/002043.html">
+  <title>『Plagger World Tour: blog.bulknews.net』</title> 
+  <link>http://blog.bulknews.net/mt/archives/002043.html</link>
+  <dc:creator>HSBTのメモ</dc:creator>
+  <dc:date>2006-05-24T07:30:23+09:00</dc:date>
+  <dc:subject>Plagger</dc:subject>
+   </item>
+		 <item rdf:about="http://tuneari.fc2web.com/radio/ijyu060515.html">
+  <title>『伊集院光深夜の馬鹿力-2006年5月15日(月)放送分』</title> 
+  <link>http://tuneari.fc2web.com/radio/ijyu060515.html</link>
+  <dc:creator>HSBTのメモ</dc:creator>
+  <dc:date>2006-05-24T07:23:58+09:00</dc:date>
+  <dc:subject>game, ps3, wii</dc:subject>
+   </item>
+		 <item rdf:about="http://d.hatena.ne.jp/hiboma/20060523/1148360444">
+  <title>『[Javascript]はまちやリバースエンジニアリング』</title> 
+  <link>http://d.hatena.ne.jp/hiboma/20060523/1148360444</link>
+  <dc:creator>HSBTのメモ</dc:creator>
+  <dc:date>2006-05-23T23:52:02+09:00</dc:date>
+  <dc:subject>mixi</dc:subject>
+    <description>膨大ないたずらが実行されたらとか考えたりしないのだろうか</description>
+   </item>
+		 <item rdf:about="http://subtech.g.hatena.ne.jp/yappo/20060523/1148393629">
+  <title>『subtechグループ - Yappo::Hatena::Group::Subtech - リファクタリングしたよ!』</title> 
+  <link>http://subtech.g.hatena.ne.jp/yappo/20060523/1148393629</link>
+  <dc:creator>HSBTのメモ</dc:creator>
+  <dc:date>2006-05-23T23:43:46+09:00</dc:date>
+  <dc:subject>mixi, Plagger, neta</dc:subject>
+   </item>
+		 <item rdf:about="http://www.ipa.go.jp/security/awareness/vendor/programming/a02_01_main.html">
+  <title>『2-1. SQL組み立て時の引数チェック』</title> 
+  <link>http://www.ipa.go.jp/security/awareness/vendor/programming/a02_01_main.html</link>
+  <dc:creator>HSBTのメモ</dc:creator>
+  <dc:date>2006-05-23T23:27:08+09:00</dc:date>
+  <dc:subject>SQL, Security</dc:subject>
+   </item>
+		 <item rdf:about="http://script.aculo.us/">
+  <title>『script.aculo.us - web 2.0 javascript』</title> 
+  <link>http://script.aculo.us/</link>
+  <dc:creator>HSBTのメモ</dc:creator>
+  <dc:date>2006-05-23T07:28:15+09:00</dc:date>
+  <dc:subject>script.aculo.us, javascript</dc:subject>
+   </item>
+		 <item rdf:about="http://xcezx.net/blog/linux/plagger-on-naked-etch.html">
+  <title>『Piece of a Puzzle - Weblog - 素 etch で plagger を動かすためのメモ』</title> 
+  <link>http://xcezx.net/blog/linux/plagger-on-naked-etch.html</link>
+  <dc:creator>HSBTのメモ</dc:creator>
+  <dc:date>2006-05-23T07:19:35+09:00</dc:date>
+  <dc:subject>Plagger, CPAN</dc:subject>
+    <description>Encode::Detectはcpanから出て野良ビルドすればよいという話</description>
+   </item>
+</rdf:RDF>

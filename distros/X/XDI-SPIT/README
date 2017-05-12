@@ -1,0 +1,54 @@
+IDCommons version 0.1
+=====================
+
+Perl implementation of the XDI Service Provider Interface Toolkit
+(SPIT) for authentication and data sharing.
+
+INSTALLATION
+
+To install this module, type the following:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+To install the sample client app:
+
+  1. Install the module (using the directions above) if you haven't
+     already.
+
+  2. Copy cgi/login.pl to your web server's cgi-bin directory.
+
+  3. login.pl is the login program that would run on a service
+     provider site.  Edit $returnUrl so that it is correct for your
+     system.
+
+You're all set.
+
+Note that idbroker.pl and registry.pl are toy broker apps that no
+longer work.  They are there for your reference only.
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  LWP::Simple
+  XRI
+  URI::Escape
+
+REFERENCES
+
+See:
+
+  http://wiki.idcommons.net/moin.cgi/SSO
+
+  http://wiki.idcommons.net/moin.cgi/SPIT
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) Blue Oxen Associates 2004.  All rights reserved.
+
+See COPYING for licensing terms.
+
+$Id: README,v 1.1.1.1 2004/06/01 04:18:02 eekim Exp $

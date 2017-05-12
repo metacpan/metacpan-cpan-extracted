@@ -1,0 +1,127 @@
+Revision history for XML::Genx.
+
+0.22  Sun Oct  8 18:16:58 BST 2006
+        - Check that everything works correctly on win32, thanks to the
+          excellent Strawberry Perl.
+
+0.21  Wed Jun  7 07:45:55 BST 2006
+        - Add a missing definition in the header file in order to avoid
+          a warning under -Wall.
+        - Cope with non-UTF8 strings on input.  If we see something that
+          doesn't have the UTF-8 flag set, convert to UTF-8 before passing
+          to genx.
+
+0.20  Fri Feb  3 20:41:13 GMT 2006
+	- Fix compile warnings under gcc 4.  Thanks to Daniel Jalkut for
+	  showing me the way to go.
+
+0.19  Sun Oct 16 22:47:27 BST 2005
+        - Allow namespace objects to be passed in to
+          StartElementLiteral() and AddAttributeLiteral().  This makes
+          it much easier to put things into the default namespace.
+        - Add a missing "static" declaration to some XS helper
+          functions.
+        - Allow multiple different default namespaces inside
+          XML::Genx::SAXWriter.  Previously you would get a "Duplicate
+          Prefix" error.  Bug spotted by Aristotle Pagaltzis.
+        - Make the tests work in perl 5.6.1.  Not sure when I broke
+          this..
+
+0.18  Mon Oct  3 22:56:09 BST 2005
+        - Add test for astral characters.
+        - Test non-xml characters.
+
+0.17  Fri Sep  2 20:34:46 BST 2005
+        - Correct MANIFEST.
+        - Add POD coverage tests.  And POD to XML::Genx::SAXWriter to
+          satisfy them.
+        - Fix a bug whereby an uninitialized status code would be used
+          if you attempted to register the same element / namespace /
+          attribute twice.
+
+0.16  Wed Aug 31 20:55:45 BST 2005
+        - Add POD checking test.
+
+0.15  Sun Jul 31 00:57:05 BST 2005
+        - Obfuscate my email address in an attempt to curtail spam.
+
+0.14  Wed Mar 16 22:12:34 GMT 2005
+        - Correctly test for undef values.
+        - Implement XML::Genx::SAXWriter, to enable genx to be used at
+          the end of a SAX chain.
+
+0.13  Wed Mar  2 09:52:44 GMT 2005
+        - [INCOMPATIBLE CHANGE] Return genx's status directly instead of
+          storing it after the last error.  Now it can only be relied
+          upon until the next method call.
+        - Ensure that Namespace, Element and Attribute objects report
+          their errors correctly.
+        - Warn about unknown build status under Win32.
+
+0.12  Tue Mar  1 20:53:18 GMT 2005
+        - [INCOMPATIBLE CHANGE] Get rid of the dual valued scalar
+          exception idea.  The way it was implemented meant that you
+          didn't get the line number information about where the exception
+          actually happened.  Instead, add a LastErrorCode() call.
+        - Allude to Win32 compiler problems in README.
+        - Remove some compiler warnings.
+        - Cope with either a glob or a reference to a glob in
+          StartDocFile().
+
+0.11  Sat Feb 19 18:17:12 GMT 2005
+        - Add ScrubText() wrapping.  Thanks to A. Pagaltzis for
+          requesting this feature.
+        - Internal reorganisation to avoid global variables.
+
+0.10  Thu Feb 17 20:40:03 GMT 2005
+        - Add a small benchmark.
+        - Implement StartDocString() for the common case of outputting
+          to a string.  Thanks to A. Pagaltzis for suggesting this.
+
+0.09  Tue Dec 14 22:51:25 GMT 2004
+        - Ensure that we take a reference to the filehandle being
+          passed in to StartDocFile() so that it doesn't get closed
+          behind our backs.
+
+0.08  Sat Dec  4 22:52:56 GMT 2004
+        - Implement XML::Genx::Constants.
+        - Make the thrown exceptionn be a dual valued scalar.
+        - Cleanup declared attributes in XML::Genx::Simple.
+
+0.07  Sat Dec  4 19:19:59 GMT 2004
+        - Add XML::Genx::Simple.
+        - Make Declare*() die as well.
+        - Make the sub-objects die correctly as well.
+
+0.06  Fri Dec  3 14:10:35 GMT 2004
+        - On Windows, require the next version of Module::Build, which
+          has a bug fix that we need in it.  Unfortunately, that means
+          that we won't be available on Windows until that's released.
+        - Make a missing or undef prefix argument mean auto-create a
+          prefix instead.
+        - Add missing AddNamespace() on to namespace object.
+
+0.05  Thu Dec  2 01:13:22 GMT 2004
+        - Fix the tests on systems where we get back a filehandle with
+          an invalid file descriptor instead of NULL from the T_STDIO input
+          typemap.
+
+0.04  Tue Nov 30 23:14:44 GMT 2004
+        - Added example directory, and small demo script.
+        - Make namespace optional on Declare{Element,Attribute}().
+        - Fix up the docs to mention AddAttributeLiteral().
+        - Make the namespace parameter in StartElementLiteral()
+          optional.  Ditto for AddAttributeLiteral().
+
+0.03  Tue Nov 30 13:44:28 GMT 2004
+        - Everything now dies by default instead of returning a status
+          code.
+
+0.02  Tue Nov 30 08:49:13 GMT 2004
+        - Added StartDocSender(), so you don't always have to output
+          to a filehandle.
+        - Fixed compilation warnings about "cast to pointer from
+          integer of different size".
+
+0.01  Sat Nov 27 09:03:47 GMT 2004
+        - Original version.

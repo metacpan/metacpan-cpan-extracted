@@ -1,0 +1,48 @@
+# two_level.yml - a simple schema with one level of children, both optional
+
+--- |
+  <?xml version="1.0" encoding="UTF-8"?>
+  <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:element name="foo" type="foo_type"/>
+    <xs:complexType name="foo_type">
+        <xs:sequence>
+          <xs:element name="bar" minOccurs="0" />
+          <xs:element name="baz" minOccurs="0" />
+        </xs:sequence>
+    </xs:complexType>
+  </xs:schema>
+
+--- |
+  <?xml version="1.0" encoding="UTF-8"?>
+  <foo>
+    <bar/>
+  </foo>
+--- >
+PASS
+
+--- |
+  <?xml version="1.0" encoding="UTF-8"?>
+  <foo>
+    <bif/>
+  </foo>
+--- >
+FAIL /unexpected <bif>/
+
+--- |
+  <?xml version="1.0" encoding="UTF-8"?>
+  <foo>
+    <bar/>
+    <baz/>
+  </foo>
+--- >
+PASS
+
+--- |
+  <?xml version="1.0" encoding="UTF-8"?>
+  <foo>
+    <baz/>
+    <bar/>
+  </foo>
+--- >
+FAIL /does not match/
+

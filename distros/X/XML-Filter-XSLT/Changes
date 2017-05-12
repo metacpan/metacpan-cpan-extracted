@@ -1,0 +1,9 @@
+
+0.03
+    - Add set_stylesheet_uri (Kip Hampton)
+
+0.02
+    - Added set_handler for SAX::Machines compatibility
+
+0.01 
+    - Initial release

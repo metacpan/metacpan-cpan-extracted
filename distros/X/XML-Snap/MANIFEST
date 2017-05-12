@@ -1,0 +1,23 @@
+Changes
+lib/XML/Snap.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/01-self.t
+t/02-parent.t
+t/03-attributes.t
+t/04-write.t
+t/05-search.t
+t/06-text.t
+t/07-copying.t
+t/08-scratch.t
+t/09-loc.t
+t/10-strings.t
+t/11-templating.t
+t/12-walk.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,41 @@
+XML-LibXML-Debugging
+====================
+
+Created:      2010-04-26
+Home page:    <https://metacpan.org/release/XML-LibXML-Debugging>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=XML-LibXML-Debugging>
+Maintainer:   Toby Inkster <tobyink@cpan.org>
+
+0.103	2014-09-11
+
+ [ Packaging ]
+ - Switch to Dist::Inkt.
+
+0.102	2011-12-04
+
+ [ Bug Fixes ]
+ - Newer version of Module::Package::RDF.
+
+0.101	2011-11-26
+
+ [ Packaging ]
+ - Include small example script.
+ - Module::Package::RDF
+
+ [ Other ]
+ - Slightly different output for @xmlns in Clark notation.
+ - Switch from HTML::Entities to HTML::HTML5::Entities.
+
+0.100	2011-02-09	We're not dead yet!
+
+ [ Documentation ]
+ - Copyright 2011.
+
+ [ Other ]
+ - Minor refactoring.
+
+0.04	2010-04-28	Fork from HTML-HTML5-Sanity.
+
+ - Make functions into object methods.
+ - Split the to_hashref and to_clarkml functions out into a separate
+   distribution.

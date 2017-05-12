@@ -1,0 +1,44 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 33317486c4fa2cf7fec85bf92ed38ac0f64233a0 CONTRIBUTING
+SHA1 5bf85f778edd77e0e4abac72ed7b9170f14127a0 COPYRIGHT
+SHA1 6bd7b17d81be63d08d4efa6cb80106e72887842c CREDITS
+SHA1 91aeb112b017cf1c3d2e7801b21d5f258f0e2504 Changes
+SHA1 d7013928bcded77da58571dc5d9f1620fb997a77 INSTALL
+SHA1 34f5e12514b91055de4b164a1f2327ef5c30ba53 LICENSE
+SHA1 8bdd852a1b7a32ec9a70673057536210202272e3 MANIFEST
+SHA1 ede02011d64148fde6e8374dd14a5f435e92e4a8 META.json
+SHA1 18fe44e6be683335696586372a67fc3b2f85a07f META.yml
+SHA1 d9b4e53cc11eaf04c11059e89911cd2b08786dd6 Makefile.PL
+SHA1 ead2c2e965147953a43db190595d785b2c444197 README
+SHA1 8095577ca0e847a99190be4114ee73218f18735b SetLineNumber.xs
+SHA1 88324e8c4dc6cf634c67bc6183d15e9f71d519dd dist.ini
+SHA1 0af3b5c3e666c404b51724cacad9afac1d59468b doap.ttl
+SHA1 219686c169c575ee60590606080355c78d066cda lib/XML/LibXML/Devel/SetLineNumber.pm
+SHA1 aa56ff0ab4d79dcff68f66d03880e53dc16c4d31 libxml.c
+SHA1 57f361ac9551fc9abd0aba5609374fcb5199718f libxml.h
+SHA1 847ddd74867e960646b4c166ab42047db4f9a1c4 ppport.h
+SHA1 73e41f4e30576c52bb837db69bf32604616103b5 t/01basic.t
+SHA1 9c39f622c3fc63aaaeff527bcdbf644cfefbe993 t/02working.t
+SHA1 40f84d4035df8d99f4250c8d6e99df581fdc2428 typemap
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlQYjqgACgkQzr+BKGoqfTmcvQCeIPUQ0Y7qOxFabvM+k6OBzGR4
+7vYAnjYTPaYjdqcZZkb1+Ez62Jsy6rL3
+=W5rX
+-----END PGP SIGNATURE-----

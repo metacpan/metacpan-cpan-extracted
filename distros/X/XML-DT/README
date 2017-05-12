@@ -1,0 +1,242 @@
+=head1 XML::DT a Perl XML down translate module
+
+With XML::DT, I think that:
+
+   . it is simple to do simple XML processing tasks :)
+   . it is simple to have the XML processor stored in a single variable
+       (see example 4)
+   . it is simple to translate XML -> Perl user controlled complex structure 
+       with a compact "-type" definition  (see last section)
+
+Feedback welcome -> jj@di.uminho.pt
+
+=head1 XML::DT a Perl XML down translate module
+
+This document is also available in HTML (pod2html'ized):
+http://www.di.uminho.pt/~jj/perl/XML/XML-DT.readme.html
+
+ . design to do simple and compact translation/processing of XML document
+ . it includes some features of omnimark and sgmls.pm; functional approach
+ . it includes functions to automatic build user controlled complex Perl 
+       structures (see "working with structures" section)
+ . it was build to show my NLP Perl students that it is easy to work with XML
+ . home page and download:  http://www.di.uminho.pt/~jj/perl/XML/DT.html
+
+=head1 HOW IT WORKS:
+
+ . the user must define a handler and call the basic function : 
+      dt($filename,%handler) or dtstring($string,%handler)
+ . the handler is a HASH mapping element names to functions. Handlers can 
+      have a "-default" function , and a "-end" function
+ . in order to make it smaller each function receives 3 args as global variables
+      $c - contents
+      $q - element name
+      %v - attribute values
+ . the default "-default" function is the identity. The function "toxml" makes
+      the original XML text based on $c, $q and %v values.
+ . see some advanced features in the last examples
+
+=head1 SOME simple (naive) examples:
+
+  INDEX:
+  1. change to lowercase attribute named "a" in element "e"
+  2. better solution 
+  3. make some statistics and output results in HTML (using side effects)
+  4. In a HTML like XML document, substitute <contents/>...<contents> by the 
+      real table of contents (a dirty solution...)
+  5. a more realistic example: from XML gcapaper DTD to latex
+
+  WORKING WITH STRUCTURES INSTEAD OF STRINGS...
+
+  6. Build the natural Perl structure of the following document (ARRAY,HASH)
+  7. Multi map on...
+
+=head2 1. change to lowercase the contents of the attribute named "a" in element "e" 
+
+  use XML::DT ;
+  my $filename = shift;
+  
+  print dt($filename,
+           ( e => sub{ "<e a='". lc($v{a}). "'>$c</e>" }));
+
+=head2 2. A better solution of the previous example
+
+Ex.1 wouldn't work if we have more attributes in element e. 
+A better solution is
+
+  print dt($filename, 
+           ( e => sub{ $v{a} = lc($v{a}); 
+                       toxml();}));
+
+=head2 3. make some statistics and output results in HTML (using side effects)
+
+  use XML::DT ;
+  my $filename = shift;
+
+  %handler=( -default => sub{$elem_counter++;
+                             $elem_table{$q}++;"";} # $q -> element name
+  );
+
+  dt($filename,%handler);
+
+  print "<H3>We have found $elem_counter elements in document</H3>";
+  print "<TABLE><TH>ELEMENT<TH>OCCURS\n";
+  foreach $elem (sort keys %elem_table)
+     {print "<TR><TD>$elem<TD>$elem_table{$elem}\n";}
+  print "</TABLE>";
+
+=head2 4. In a HTML like XML document, substitute <contents/>...<contents> by the real table of contents (a dirty solution...)
+
+  %handler=( h1 => sub{ $index .= "\n$c";     toxml();},
+             h2 => sub{ $index .= "\n\t$c";   toxml();},
+             h3 => sub{ $index .= "\n\t\t$c"; toxml();},
+             contents => sub{ $c="__CLEAN__"; toxml();},
+             -end => sub{ $c =~ s/__CLEAN__/$index/; $c});
+
+  print dt($filename,%handler)
+
+=head2 5. a more realistic example: from XML gcapaper DTD to latex
+
+notes:
+
+  . "TITLE" is processed in context dependent way!
+  . output in ISOLATIN1 (this is dirty but my LaTeX doesn't support UNICODE)
+  . a stack of authors was necessary because LaTeX structure was different
+      from input structure...
+  . this example was partially created by the function mkdtskel 
+        Perl -MXML::DT -e 'mkdtskel "f.xml"' > f.pl
+      and took me about one hour to tune to real LaTeX/XML example.
+
+NAME gcapaper2tex.pl - a Perl script to translate XML gcapaper DTD to latex
+
+SYNOPSIS gcapaper2tex.pl mypaper.xml > mupaper.tex
+
+  use XML::DT ;
+  my $filename = shift;
+  my $beginLatex = '\documentclass{article} \begin{document} ';
+  my $endLatex = '\end{document}';
+  
+  %handler=(
+      '-outputenc' => 'ISO-8859-1',
+      '-default'   => sub{"$c"},
+       'RANDLIST' => sub{"\\begin{itemize}$c\\end{itemize}"},
+       'AFFIL' => sub{""},                              # delete affiliation
+       'TITLE' => sub{
+                    if(inctxt('SECTION')){"\\section{$c}"}
+                 elsif(inctxt('SUBSEC1')){"\\subsection{$c}"}
+                 else                    {"\\title{$c}"}
+              },
+       'GCAPAPER' => sub{"$beginLatex $c $endLatex"},
+       'PARA' => sub{"$c\n\n"},
+       'ADDRESS' => sub{"\\thanks{$c}"},
+       'PUB' => sub{"} $c"},
+       'EMAIL' => sub{"(\\texttt{$c}) "},
+       'FRONT' => sub{"$c\n"},
+       'AUTHOR' => sub{ push @aut, $c ; ""},
+       'ABSTRACT' => sub{
+          sprintf('\author{%s}\maketitle\begin{abstract}%s\end{abstract}',
+                  join ('\and', @aut) ,
+                  $c) },
+       'CODE.BLOCK' => sub{"\\begin{verbatim}\n$c\\end{verbatim}\n"},
+       'XREF' => sub{"\\cite{$v{REFLOC}}"},
+       'LI' => sub{"\\item $c"},
+       'BIBLIOG' =>sub{"\\begin{thebibliography}{1}$c\\end{thebibliography}\n"},
+       'HIGHLIGHT' => sub{" \\emph{$c} "},
+       'BIO' => sub{""},                                  #delete biography
+       'SURNAME' => sub{" $c "},
+       'CODE' => sub{"\\verb!$c!"},
+       'BIBITEM' => sub{"\n\\bibitem{$c"},
+  );
+  print dt($filename,%handler); 
+
+=head1 WORKING WITH STRUCTURES INSTEAD OF STRINGS...
+
+  the "-type" definition defines the way to build structures in each case:
+
+   . "HASH" or "MAP" -> make an hash with the sub-elements;
+        keys are the sub-element names; warn on repetitions;
+        returns the hash reference.
+   . "ARRAY" or "SEQ" -> make an ARRAY with the sub-elements
+        returns an array reference.
+   . "MULTIMAP" -> makes an HASH of ARRAY; keys are the sub-element
+   . MMAPON(name1, ...) -> similar to HASH but accepts repetitions of
+        the sub-elements "name1"... (and makes an array with them)
+   . STR  ->(DEFAULT) concatenates all the sub-elements returned values
+        all the sub-element should return strings to be concatenated
+
+
+=head2 6. Build the natural Perl structure of the following document
+
+  <institution>
+    <id>U.M.</id>
+    <name>University of Minho</name>
+    <tels>
+      <item>1111</item> 
+      <item>1112</item>
+      <item>1113</item>
+    </tels>
+    <where>Portugal</where>
+    <contacts>J.Joao; J.Rocha; J.Ramalho</contacts>
+  </institution>
+
+  use XML::DT;
+  %handler = ( -default => sub{$c},
+               -type    => { institution => 'HASH',
+                             tels        => 'ARRAY' },
+               contacts => sub{ [ split(";",$c)] },
+             );
+  
+  $a = dt("ex10.2.xml", %handler);
+
+
+$a is a reference to an HASH:
+
+  { 'tels' => [ 1111, 1112, 1113 ],
+    'name' => 'University of Minho',
+    'where' => 'Portugal',
+    'id' => 'U.M.',
+    'contacts' => [ 'J.Joao', ' J.Rocha', ' J.Ramalho' ] };
+
+=head2 7. Christmas card...
+
+We have the following address book:
+
+  <people>
+    <person>
+        <name> name0 </name>
+        <address> address00 </address>    
+        <address> address01 </address>
+    </person>
+    <person>
+        <name> name1 </name>
+        <address> address10 </address>    
+        <address> address11 </address>
+    </person>
+  </people>
+
+Now we are going to build a structure to store the address book and write a 
+Christmas card to the first address of everyone
+
+  #!/usr/bin/perl
+  use XML::DT;
+  %handler = ( -default => sub{$c},
+               person   => sub{ mkchristmascard($c); $c},
+               -type    => { people => 'ARRAY',
+                             person => MMAPON('address')});
+  
+  $people = dt("ex11.1.xml", %handler);
+  
+  print $people->[0]{address}[1];     # prints  address01
+
+  sub mkchristmascard{ my $x=shift;
+    open(A,"|lpr") or die;
+    print A <<".";
+    $x->{name} 
+    $x->{address}[0]
+    
+    Dear $x->{name}
+      Merry Christmas from Braga Perl mongers\n
+  .
+
+  close A;
+  }

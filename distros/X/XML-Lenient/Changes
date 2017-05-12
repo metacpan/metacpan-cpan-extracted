@@ -1,0 +1,11 @@
+Revision history for Perl module XML::Lenient
+
+1.0.1 2016-11-11
+
+  * Removed some conditions identified by Devel::Cover and tests as unnecessary
+  * Improved documentation of index following feedback from Amsterdam PM
+  * Fixed bug in nested tagvals
+
+1.0.0 2016-05-15
+
+  * First release to CPAN.

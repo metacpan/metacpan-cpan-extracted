@@ -1,0 +1,115 @@
+#!/bin/ksh
+#
+# source code manager simulator for use by xscm
+#
+# commands:
+#
+# scm projects
+#	lists valid projects
+# scm -p project branches
+#	lists valid branches for given product
+# scm -p project filesall
+#	lists all files for given project main branch
+# scm -p project@branch filesall
+#	lists all files for given project given branch
+#
+
+while [ $# -gt 0 ]; do case "$1" in
+-p)
+	shift
+	PROJECT="$1"
+	shift
+	;;
+projects)
+	shift
+	cat <<-\!
+		project_one
+		project_two
+		project_three
+	!
+	;;
+branches)
+	shift
+	case "$PROJECT" in
+	project_one)
+		cat <<-\!
+			1.000
+			1.001
+		!
+		;;
+	project_two)
+		cat <<-\!
+			2.000
+			2.001
+		!
+		;;
+	project_three)
+		cat <<-\!
+			3.000
+			3.001
+		!
+		;;
+	esac
+	;;
+filesall)
+	shift
+	case "$PROJECT" in
+	project_one)
+		cat <<-\!
+			a/file_one
+			a/file_two
+			z/file_one
+			z/file_two
+		!
+		;;
+	project_one@1.000)
+		cat <<-\!
+			a0/file_one
+			a0/file_two
+		!
+		;;
+	project_one@1.001)
+		cat <<-\!
+			a1/file_one
+			a1/file_two
+		!
+		;;
+	project_two)
+		cat <<-\!
+			b/file_one
+			b/file_two
+		!
+		;;
+	project_two@2.000)
+		cat <<-\!
+			b0/file_one
+			b0/file_two
+		!
+		;;
+	project_two@2.001)
+		cat <<-\!
+			b1/file_one
+			b1/file_two
+		!
+		;;
+	project_three)
+		cat <<-\!
+			c/file_one
+			c/file_two
+		!
+		;;
+	project_three@3.000)
+		cat <<-\!
+			c0/file_one
+			c0/file_two
+		!
+		;;
+	project_three@3.001)
+		cat <<-\!
+			c1/file_one
+			c1/file_two
+		!
+		;;
+	esac
+	;;
+esac; done

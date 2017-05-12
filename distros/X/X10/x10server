@@ -1,0 +1,97 @@
+#!/usr/local/bin/perl
+
+# Copyright (c) 1999-2017 Rob Fugina <robf@fugina.com>
+# Distributed under the terms of the GNU Public License, Version 3.0
+
+=head1 NAME
+
+x10server - creates a server used to receive events from an x10 client 
+
+=head1 USAGE
+
+Usage:
+
+    x10server [options]
+     
+Where options are:
+
+    1 - turn debug output on
+    0 - turn debug output off
+
+=head1 DESCRIPTION
+
+When called, x10server will fork into the background unless the debug flag is
+set. By default the server looks for a TwoWay controller at /dev/twoway. It
+looks for a file called macros.config for macro definitions, a file called 
+scheduler.config for scheduler definitions, and a file called devices.x10 for
+a list of x10 devices.
+
+=head1 AUTHOR
+
+Rob Fugina <robf@fugina.com>
+
+=cut
+
+use strict;
+
+use X10;
+
+my $debug = @ARGV ? 1 : 0;
+
+my $x10 = new X10(
+	controller_type => 'X10::TwoWay',
+	controller_port => '/dev/twoway',
+	server_port => 0,		# use default
+	macroconfig => 'macros.config',
+	schedulerconfig => 'scheduler.config',
+	devices => 'devices.x10',
+	debug => $debug,
+	# verbose => 1,
+	);
+
+if ($x10)
+{
+   &daemonize unless $debug;
+   $x10->run;
+}
+else
+{
+   print STDERR "Error configuring X10\n";
+}
+
+exit;
+
+use Carp;
+use POSIX;
+
+sub daemonize
+{
+   ## Fork and exit parent
+   exit 0 if (fork);
+
+   ## Detach ourselves from the terminal
+   croak "Cannot detach from controlling terminal"
+       unless POSIX::setsid();
+
+   ## Prevent possibility of acquiring a controling terminal
+   $SIG{'HUP'} = 'IGNORE';
+   exit 0 if (fork);
+
+   ## Change working directory
+   chdir "/";
+
+   ## Clear file creation mask
+   umask 0;
+
+   ## Close open file descriptors
+   # foreach my $i (0 .. OpenMax) { POSIX::close($i); }
+
+   ## Reopen stderr, stdout, stdin to /dev/null
+   open(STDIN,  "+>/dev/null");
+   open(STDOUT, "+>&STDIN");
+   open(STDERR, "+>&STDIN");
+
+   0;
+}
+
+

@@ -1,0 +1,78 @@
+#!/usr/bin/perl
+
+use strict;
+use Getopt::Long 2.24; # OO style
+use XTerm::Conf qw(xterm_conf xterm_conf_string);
+
+my $f;
+my $p = Getopt::Long::Parser->new;
+$p->configure('pass_through');
+$p->getoptions("f|force!" => \$f,
+	       "is-supported" => sub {
+		   if (XTerm::Conf::terminal_is_supported()) {
+		       print "Terminal '$ENV{TERM}' is supported.\n";
+		       exit 0;
+		   } else {
+		       print "Terminal '$ENV{TERM}' is not supported.\n";
+		       exit 1;
+		   }
+	       },
+	       "version" => sub {
+		   print "XTerm::Conf version $XTerm::Conf::VERSION\n";
+	       },
+	      );
+
+if ($f) {
+    print xterm_conf_string(@ARGV);
+} else {
+    xterm_conf(@ARGV);
+}
+
+=head1 NAME
+
+xterm-conf - change configuration of a running xterm
+
+=head1 SYNOPSIS
+
+    xterm-conf [-f|-force] [options]
+    xterm-conf [-is-supported]
+
+=head1 DESCRIPTION
+
+Change configuration of a running C<xterm> and compatible terminal
+emulators (e.g. C<rxvt>).
+
+See L<XTerm::Conf> for a complete option list.
+
+Additionaly, B<xterm-conf> supports the B<-f> option to force a
+terminal configuration change without checking the C<TERM> environment
+variable before. This is useful e.g. when running in a C<screen> or
+C<tmux> session within an C<xterm>.
+
+If C<xterm-conf> is called on an unsupported terminal, then nothing
+happens.
+
+C<xterm-conf --is-supported> can be used to check if a terminal is
+support, if so, a true exit value (exit code = 0) is returned,
+otherwise a false exit value (exit code = 1).
+
+=head2 EXAMPLES
+
+Change the title, foreground and background colors of the running xterm:
+
+    xterm-conf --title "The new xterm title" --fg black --bg white
+
+If running a C<screen> or C<tmux> in an C<xterm>, then the C<--force>
+switch has to be used because of the different C<TERM> value:
+
+    xterm-conf --force --title "The new xterm title" --fg black --bg white
+
+=head1 AUTHOR
+
+Slaven ReziE<0x0107>
+
+=head1 SEE ALSO
+
+L<XTerm::Conf>.
+
+=cut

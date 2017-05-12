@@ -1,0 +1,5 @@
+lib/XML/Structured.pm
+Makefile.PL
+MANIFEST
+README
+META.yml                                 Module meta-data (added by MakeMaker)

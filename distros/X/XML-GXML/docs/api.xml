@@ -1,0 +1,103 @@
+<document
+    title   = "Using GXML: Object API"
+    author  = "Josh Carter"
+    email   = "josh@multipart-mixed.com"
+    date    = "May 10, 2001"
+>
+
+<section name="Basics">
+
+<p>
+First, install GXML. See the README document in your distribution.
+</p>
+
+<p>
+Here's a simple, but typical, example of using GXML:
+</p>
+
+<pre>
+    use GXML;
+    
+    # Create new object    
+    my $gxml = new XML::GXML();
+    
+    # Process a file, return a scalar containing new stuff
+    print $gxml->ProcessFile('my-xml-file.xml');
+</pre>
+
+<p>
+You can pass parameters to the GXML new() method using a hash. The
+parameters it takes are:
+</p>
+
+<ul>
+  <li><b>templateDir:</b> directory to find templates in. Defaults to
+  "./templates".</li>
+  <li><b>remappings:</b> hash reference containing tag remappings. See
+  the "other features" page for more info on using remappings.</li>
+  <li><b>addlTemplate:</b> subroutine ref to code you provide which
+  will serve extra templates. (This is an esoteric feature which most
+  people won't use.)</li>
+  <li><b>addlTemplateExists:</b> subroutine ref to code you provide
+  which tells GXML if you will serve a given template.</li>
+  <li><b>callbacks:</b> hash ref to callbacks table. See "other
+  features."</li>
+  <li><b>html:</b> converts output into HTML syntax instead of XML
+  syntax. Set to "on" to enable. See "other features."</li>
+  <li><b>dashConvert:</b> converts double-dash in source to 
+  emdashes. Set to "on" to enable. </li>
+</ul>
+
+<p>
+Here's an example of creating a GXML object with some parameters:
+</p>
+
+<pre>
+use GXML;
+
+my $gxml = new XML::GXML({'templateDir' => '/my/path/to/templates/',
+                          'html'         => 'on',
+                          'dashConvert'  => 'on'});
+</pre>
+
+</section>
+<section name="Processing stuff">
+
+<p>
+You can feed XML data to GXML using a scalar or a file. It can return
+the processed stuff in either way, too. Here are examples:
+</p>
+
+<pre>
+    use GXML;
+
+    my $gxml = new XML::GXML();
+
+    # Take a scalar, return a scalar
+    my $xml = '<t tag="basetag">hi there</t>';
+    my $new = $gxml->Process($xml);
+
+    # Take a file, return a scalar
+    print $gxml->ProcessFile('my-xml-file.xml');
+
+    # Take a file, output to another file
+    $gxml->ProcessFile('source.xml', 'dest.xml');
+</pre>
+
+<p>
+That's all there is to it! The more advanced API features will be
+covered later. Now let's go to what the "processing" does, starting
+with attributes and variables.
+</p>
+
+<p>
+<b><a href="variables.html">On to Variables!</a></b>
+</p>
+
+<p>
+<b><a href="gxml-guide.html">Back to the GXML Guide</a></b>
+</p>
+
+</section>
+</document>
+

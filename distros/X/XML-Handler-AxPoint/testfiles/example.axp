@@ -1,0 +1,274 @@
+<?xml version="1.0"?>
+<slideshow>
+
+  <title>AxKit</title>
+  <metadata>
+     <speaker>Matt Sergeant</speaker>
+     <email>matt@axkit.com</email>
+     <organisation>AxKit.com Ltd</organisation>
+     <link>http://axkit.com/</link>
+     <logo scale="12em*1.5line">ax_logo.png</logo>
+     <background scale="1.1page">redbg.png</background>
+     <total-slides>35</total-slides>
+  </metadata>
+
+  <slide transition="dissolve">
+    <title href="http://www.xml.com/">Introduction</title>
+    <point level="1" href="http://xmlperl.com">Perl's XML Capabilities</point>
+    <point level="1">A long bullet point line for testing the line wrapping capabilities which should make this look OK</point>
+    <point level="1">AxKit static sites</point>
+    <point level="1">AxKit dynamic sites (XSP)</point>
+    <point level="1">Advanced <colour name="red">AxKit</colour></point>
+    <source_code>
+<color name="blue">Foo!</color>
+    </source_code>
+  </slide>
+
+  <slide default-transition="replace">
+    <title>Table Example</title>
+    <table>
+        <row>
+            <col width="40%">
+                <source-code>
+Some code;
+in the
+
+++ first; # column
+
+that {
+  maybe we
+  want to comment();
+  on...
+}
+                </source-code>
+                <point>and a point here...</point>
+                <source-code>followed by more code</source-code>
+                <point>and another point</point>
+            </col>
+            <col width="60%">
+                <point>Notice how we did this...</point>
+                <point>And how we can add stuff over here!</point>
+                <source-code>include &lt;ing.h> //code</source-code>
+            </col>
+        </row>
+    </table>
+    <!-- Now some SVG! -->
+    <rect x="100" y="100" width="50" height="100" style="stroke: black"/>
+    <circle cx="50" cy="50" r="240"/>
+    <ellipse cx="100" cy="50" rx="30" ry="60" style="fill: aqua; stroke: red; stroke-width: 5"/>
+    <text x="200" y="200" style="stroke: black; fill: none; font: italic 24pt serif">A Cat</text>
+  </slide>
+
+  <slideset>
+     <title>XML with Perl Introduction</title>
+
+     <slide>
+        <title>A very long <i>title that</i> should show how word <i>wrapping in the title</i> tag hopefully works properly today</title>
+        <point level="1">SAX-like API</point>
+        <point level="1">register callback handler methods</point>
+        <point level="2">start tag</point>
+        <point level="2">end tag</point>
+        <point level="2">characters</point>
+        <point level="2">comments</point>
+        <point level="2">processing instructions</point>
+        <source_code>
+&lt;?pi here?>
+        </source_code>
+        <point level="2">... and more</point>
+        <point level="1">Non validating XML parser</point>
+        <point level="1">dies (throws an exception) on bad XML</point>
+     </slide>
+     
+     <slide>
+        <title>XML::Parser code</title>
+        <source_code>
+my $p = XML::Parser->new(
+<i>    Handlers => { 
+        Start => \&amp;start_tag, 
+        End => \&amp;end_tag,
+        # add more handlers here
+        });
+    </i>
+$p->parsefile("foo.xml");
+
+<color name="green">exit(0);</color>
+
+sub start_tag {
+  my ($expat, $tag, %attribs) = @_;
+  print "Start tag: $tag\n";
+}
+
+sub end_tag {
+  my ($expat, $tag) = @_;
+  print "End tag: $tag\n";
+}
+        </source_code>
+     </slide>
+     
+     <slide>
+     <title>XML::XPath Implementation</title>
+     <point level="1">XML::Parser and SAX parsers build an in-memory tree</point>
+     <point level="1">Hand-built parser for XPath syntax (rather than YACC based parser)</point>
+     <point level="1">Garbage Collection yet still has circular references (and works on Perl 5.005)</point>
+     <image>pointers.png</image>
+     </slide>
+     
+  </slideset>
+  
+  <slide>
+  <title>Conclusions</title>
+  <point level="1" transition="dissolve">Perl and XML are a powerful combination</point>
+  <point level="1" transition="replace">XPath and XSLT add to the mix...</point>
+  <point level="1" transition="glitter">AxKit can reduce your long term costs</point>
+  <point level="2" transition="dissolve">In site re-design</point>
+  <point level="2" transition="box">and in content re-purposing</point>
+  <point level="1" transition="wipe">Open Source equal to commercial alternatives</point>
+  <image transition="dissolve">world_map-960.png</image>
+  </slide>
+  
+  <slide>
+  <title>Resources and contact</title>
+  <point level="1">AxKit: http://axkit.org/</point>
+  <point level="1">CPAN: http://search.cpan.org</point>
+  <point level="1">libxml and libxslt: http://www.xmlsoft.org</point>
+  <point level="1">Sablotron: http://www.gingerall.com</point>
+  <point level="1">XPath and XSLT Tutorials: http://zvon.org</point>
+  </slide>
+
+  <slide>
+    <title>SVG stuff</title>
+    <path style="stroke: black; stroke-width: 3;" d="M125,125 a100,50, 30 0,0 100,50"/>
+    <path style="stroke: red; stroke-width: 3;"   d="M125,125 a100,50, 30 1,0 100,50"/>
+    <path style="stroke: blue; stroke-width: 3;"  d="M125,125 a100,50, 0 0,1 100,50"/>
+    <path style="stroke: green; stroke-width: 2;" d="M125,125 a100,50, 0 1,1 100,50"/>
+
+    <path style="stroke: black; stroke-width: 5;"  d="M425,175 a100,50, 30 0,0 100,-50"/>
+    <path style="stroke: red; stroke-width: 4;" d="M425,175 a100,50, 30 1,0 100,-50"/>
+    <path style="stroke: blue; stroke-width: 3;"  d="M425,175 a100,50, 0 0,1 100,-50"/>
+    <path style="stroke: green; stroke-width: 2;" d="M425,175 a100,50, 0 1,1 100,-50"/>
+
+    <path d="M 280 230 l 200 0 l -100 200 z"
+        style="fill:red; stroke:blue; stroke-width:3"/>
+
+    <path d="M100,420 l 50,-25 
+           a25,25 -30 0,1 50,-25 l 50,-25 
+           a25,50 -30 0,1 50,-25 l 50,-25 
+           a25,75 -30 0,1 50,-25 l 50,-25 
+           a25,100 -30 0,1 50,-25 l 50,-25"
+        style="stroke:yellow;stroke-width:5"  />
+  </slide>
+
+  <metadata>
+     <bullet level="1">n</bullet>
+     <bullet level="2">l</bullet>
+     <bullet level="3">u</bullet>
+     <bullet level="4">F</bullet>
+     <numbers level="2">$i)</numbers>
+     <numbers level="3">item#$1 -</numbers>
+     <numbers level="4">$a$1:</numbers>
+  </metadata>
+
+<slideset>
+  <title>Chapter: Latest tests</title>
+  <slide>
+    <title>Mixing...</title>
+    <point>slides and slidesets is perfectly possible</point>
+    <!-- Image should be near bottom edge of screen -->
+    <image y="400" xlink:href="ax_logo.png"
+           scale=".5" xmlns:xlink="http://www.w3.org/1999/xlink"/>
+
+    <image y="10" x="10" xlink:href="ax_logo.png"
+           scale=".5" xmlns:xlink="http://www.w3.org/1999/xlink"/>
+    <path style="fill:none; stroke:#D90000; stroke-width:10" d="M50,190 C0,190 0,130 50,130 L150,130 C200,130 200,190 150,190 z"/> 
+    <path style="fill:#D90000" d="M60,180 C30,180 30,140 60,140 L140,140 C170,140 170,180 140,180 z"/> 
+    <g style="fill:#FFFFFF; stroke:black; font-size:45; font-family:sans-serif"> 
+      <text x="52" y="176">SVG</text> 
+    </g>
+    <path d="M400,300 h-150 a150,150 0 1,0 150,-150 z"
+        style="fill: red; stroke: blue; stroke-width: 5" />
+    <path d="M375,275 v-150 a150,150 0 0,0 -150,150 z"
+        style="fill: yellow; stroke: blue; stroke-width: 5" />
+
+  </slide>
+  <slideset>
+    <title>Section: Sections work now</title>
+    <slideset>
+      <title>Subsection: no limit on nesting</title>
+      <slide>
+        <title>Table test</title>
+        <table title="A Table with Title..." caption="... and caption">
+          <row>
+            <col width="40%">
+              <point>left...</point>
+              <image title="Scale test:" scale="50pt*50pt">test.png</image>
+              <image scale="50px*50px">test.png</image>
+              <image scale=".1page*.1page">test.png</image>
+            </col>
+            <col width="60%">
+              <point>right...</point>
+              <image title="More scale tests:" scale="5em*5em">test.png</image>
+              <image scale="5ex*5ex" caption="Image XY: scale test 5">test.png</image>
+              <image scale=".99line*1line" caption="Image XY: scale test 6">test.png</image>
+            </col>
+          </row>
+        </table>
+      </slide>
+      <slide>
+        <title>Bugs and new Features</title>
+        <plain>Text outside of a list</plain>
+        <point>abc <colour name="red">Long text <b>to boldly create a word wrap, and test the table wraparound color bug. bug. bug. bug. bug. bug. bug. bug. bug. bug. bug.</b> bag.</colour> big.</point>
+        <point><colour name="blue">Short text as reference.</colour></point>
+        <plain>Text outside of a list</plain>
+        <list title="Some points:" caption="List 1: the first list">
+          <point>Entities: lt: &lt;, !: &#33;, "": &#x22;, Euro-Sign: &#x20ac;</point>
+          <list>
+            <point>subpoint</point>
+            <list>
+              <point>subsubpoint</point>
+              <list>
+                <point>subsubsubpoint</point>
+              </list>
+            </list>
+          </list>
+          <point>Text
+          <span style="font-family:serif">Serif</span>
+          <span style="font-style:italic">Italic</span>
+          <span style="font-size:10pt">small</span>
+          <span style="font-weight:bold">bold</span>
+          <span style="color:#abcdef">coloured</span> <span style="font-size:20pt;stroke-width:1;font-weight: bold;stroke:#abcdef;fill:#fedcba">coloured</span>
+          <u>under</u><span style="text-decoration:underline">lined</span>
+        </point>
+        </list>
+      </slide>
+      <slide>
+        <title><value type="current-slideset"/> Bugs and new Features 2</title>
+        <box x="450" y="250" width="150" height="200">
+          <plain>This is an item at the right center</plain>
+        </box>
+        <list title="Ordered lists:" ordered="ordered">
+          <point>slideshow-title: <value type="slideshow-title"/></point>
+          <point>slide-title: <value type="slide-title"/></point>
+          <point>logo: [<value type="logo"/>]</point>
+          <list ordered="ordered">
+            <point>today: <value type="today"/></point>
+            <point>today: <value type="today" format="%d.%m.%Y %H:%M"/></point>
+            <point>current-slide: <value type="current-slide"/></point>
+            <point>total-slides: <value type="total-slides"/></point>
+            <list ordered="ordered">
+              <point>current-slideset: <value type="current-slideset"/></point>
+              <point>speaker: <value type="speaker"/></point>
+              <point>organisation: <value type="organisation"/></point>
+              <list ordered="ordered">
+                <point>email: <value type="email"/></point>
+                <point>link: <value type="link"/></point>
+              </list>
+            </list>
+          </list>
+        </list>
+      </slide>
+    </slideset>
+  </slideset>
+</slideset>
+  
+</slideshow>
+

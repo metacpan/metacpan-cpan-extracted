@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+
+<xmlrpc>
+    <result>OK</result>
+    <field-of-interest1>data</field-of-interest1>
+    <field-of-interest2>data</field-of-interest2>
+    <field-of-interest3>data</field-of-interest3>
+    <field-of-interest4>data</field-of-interest4>
+    <field-of-interest5>data</field-of-interest5>
+    <field-of-interest6>data</field-of-interest6>
+    <field-of-interest7>data</field-of-interest7>
+    <field-of-interest8>data</field-of-interest8>
+    <field-of-interest9>
+        <more-fields>
+           <a>a</a>
+           <b>a</b>
+           <c>a</c>
+           <d>a</d>
+        </more-fields>
+    </field-of-interest9>
+    <field-of-interest10>data</field-of-interest10>
+    <field-of-interest11>data</field-of-interest11>
+    <field-of-interest12>data</field-of-interest12>
+    <field-of-interest13>data</field-of-interest13>
+    <field-of-interest14>data</field-of-interest14>
+    <field-of-interest15>
+        <more-fields>
+           <a>a</a>
+           <b>a</b>
+           <c>a</c>
+           <d>a</d>
+        </more-fields>
+    </field-of-interest15>
+</xmlrpc>

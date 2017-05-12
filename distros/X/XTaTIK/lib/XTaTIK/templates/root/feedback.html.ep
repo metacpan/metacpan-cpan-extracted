@@ -1,0 +1,53 @@
+% layout 'default';
+% title 'Site Feedback';
+% stash active_page => 'feedback';
+
+% if ( form_checker_ok() ) {
+  <p class="alert alert-success"><i class="glyphicon glyphicon-ok"></i>
+    Your feedback was successfully sent. Thank you very much!</p>
+% } else {
+
+<div class="panel panel-default">
+  <div class="row panel-body valign"
+    ><div class="col-md-6">
+      %= form_for '/feedback' => (method => 'POST') => begin
+
+        <%== form_checker_error_wrapped %>
+
+        <ul>
+          <li class="form-group"
+            ><label for="email">Email <small>(specify only if you'd be
+            OK with us contacting you on this matter, if
+              necessary)</small>:</label>
+            <%= email_field 'email', class => 'form-control' %></li>
+          <li class="form-group"><label for="feedback"
+              class="textarea_label">*Feedback:</label
+            ><%= text_area 'feedback', cols => 40, rows => 5,
+              class => 'form-control'  %>
+          </li>
+        </ul>
+        %= submit_button 'Send feedback', class => 'btn btn-primary'
+      % end
+    </div
+    ><div class="col-md-6" id="feedback_ideas_to_submit">
+      <div class="panel panel-info">
+        <div class="panel-heading">
+        <h3 class="panel-title">Ideas to Submit</h3>
+        </div>
+        <div class="panel-body">
+        <ul>
+          <li>What would you add to the website?</li>
+          <li>What would you change?</li>
+          <li>Is anything difficult
+            or annoying to use?</li>
+          <li>Is anything broken or unappealing?
+            <br><small>(specify what browser you're using, if you
+              can)</small>
+          </li>
+        </ul>
+        </div>
+      </div>
+    </div
+  ></div>
+</div>
+% }

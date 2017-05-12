@@ -1,0 +1,18 @@
+TYPEMAP
+XEvent *	T_XEvent
+Display *	T_PTR
+KeySym		T_IV
+KeyCode		T_U_CHAR
+#############################################################################
+INPUT
+T_XEvent
+	if (sv_isa($arg, \"X11::XEvent\")) {
+	    IV tmp = SvIV((SV*)SvRV($arg));
+	    $var = ($type) tmp;
+	}
+	else
+	    croak(\"$var is not of type X11::XEvent\")	
+#############################################################################
+OUTPUT
+T_XEvent
+	sv_setref_pv($arg, \"X11::XEvent\", (void*)$var);

@@ -1,0 +1,13 @@
+Revision history for Perl extension XML::Atom::Lifeblog
+
+0.03  Wed Jul  6 14:43:23 PDT 2005
+        * Support explicit Content-Type and title with Media object
+
+0.02  Thu Mar 31 20:29:05 JST 2005
+	* Added non-image files like video/3gpp post
+	(Thanks to Ben Trott)
+	- Depreciated scalarref post: No way to figure out magic of 3gpp
+
+
+0.01  Tue Mar 29 14:35:16 2005
+	- original version

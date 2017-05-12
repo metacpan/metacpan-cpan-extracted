@@ -1,0 +1,611 @@
+
+Still need to merge this in with the other doc's
+
+XML/RDB version 1.0
+====================
+
+Automatically create relational DB schema & then populate those
+schemas directly from an XML file!  Works with either a 'plain'
+XML file or an XML Schema.  Once your RDB is populated with data
+from your XML file(s) - you can then 'unpopulate' back into XML!
+All you need is an XML file or XML Schema, and MySQL or PostgreSQL.
+
+Needs MySQL or PostgreSQL as well as their DBD's and a database
+named 'test' - for the 'make test' right out of the box the DB
+needs to be running on localhost & have no username/password.
+You can edit mysql_test_config or pg_test_config to match your
+configuration otherwise in the 't' directory.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    'XML::DOM' => '1.29',
+    'DBIx::DBSchema' => '.16',
+    'DBIx::Recordset' => '.23',
+    'DBIx::Sequence' => '.04',
+    'URI::Escape' => '3.16',
+    'IO::File' => '1.08',
+
+COPYRIGHT AND LICENCE
+
+#####
+#
+# COPYRIGHT AND LICENSE
+# Copyright (c) 2003, Juniper Networks, Inc.
+# All rights reserved.
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are
+# met:
+# 	1.	Redistributions of source code must retain the above
+# copyright notice, this list of conditions and the following
+# disclaimer. 
+# 	2.	Redistributions in binary form must reproduce the above
+# copyright notice, this list of conditions and the following disclaimer
+# in the documentation and/or other materials provided with the
+# distribution. 
+# 	3.	The name of the copyright owner may not be used to 
+# endorse or promote products derived from this software without specific 
+# prior written permission. 
+# THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+# IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT,
+# INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+# HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+# STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+# IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGE.
+#
+#####
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+
+
+A long-arse how-to & explanation:
+
+    An XML document is an ideal transport for data between heterogeneous 
+systems.  XML documents are also an ideal way to represent hierarchical 
+data generically.  Yet when it comes time to store, query, compare, edit, 
+delete, and even create these data-centric documents, few mature XML tools 
+exist.
+    Fortunately, there is an older technology that has been successfully
+handling these tasks for years.  It also has (fairly) standard syntax
+and a standard query language (in fact it has _the_ Standard Query Language 
+(1)).  Everyone's got one - your pal and mine - the Relational Database 
+Management System (RDBMS).  
+    While native XML Databases are best suited for storing document-centric 
+data like XHTML files, data-centric documents, like a Juniper Network's(tm)
+router configuration, are best stored within a RDBMS, a system which is tuned
+for data storage and manipulation (2).
+    By bringing these two technologies together, we can leverage each
+system's strengths, minimize their weaknesses, and learn that by using Perl, 
+two seemingly opposed technologies can become friends.
+    An example of hierarchical data is a router's configuration.
+Using a Perl module, an XML-ified version of a Juniper router's
+configuration can be retrieved easily.  Almost any bit of router information
+can be requested and received in XML using Juniper Network's JUNOScript (3)
+technology.  Using a standard set of XML libraries, these XML documents are 
+easily manipulated at a low level.  Unfortunately, higher-level tools to 
+manipulate XML are either immature, unproven, unknown, or simply non-existent.
+But by putting XML documents into a RDBMS we have access to all of the robust, 
+mature data manipulation tools we need.
+    The ability to map XML to RDBMSs (and then back into XML) plays to
+both system's strengths:  XML provides self-describing data transport, 
+and the RDBMS provides data managing and manipulating tools. 
+    But how should we put an XML document into a RDBMS?  The quick and dirty 
+answer is to store the entire XML document in a RDBMS as a Binary 
+Large Object (BLOB) or Character Large Object (CLOB) - but these approaches 
+solve very little and certainly do not take full advantage of the RDBMS.  Other
+existing tools force you to pre-create your RDBMS schema to match your XML
+Documents, or require you to create either an XML or proprietary template to
+define the mapping between your XML documents and your RDBMS table sets.  But
+I thought XML was self-describing - why should we have to describe our data
+twice?  Fortunately we don't have to.  Using the self-describing nature of
+XML documents, and Perl, there is a better way.
+
+Relationships
+
+    The key to transforming XML into a RDBMS is analyzing the relationships
+in an XML document and then mapping those relationships into a RDBMS.
+Let's examine the kinds of relationships utilized by a RDBMS - there are 
+three:
+
+    1. 1 to 1 relationship (1:1)
+        We are only interested in the simplest case - the primary entity
+        must participate in the relationship but the secondary entity may not.
+        e.g. I own 1 car but my 1 car does not own me (or does it????)
+        This relationship is modeled by storing the secondary entity's
+            primary key as a foreign key in the primary entity's table.
+    2. 1 to N relationship (1:N)
+        There is only one case for our purposes - the primary entity may
+        possess multiple secondary entities.
+        e.g. I own zero or more books.
+        This relationship is modeled by storing the primary entity's (the '1')
+            primary key as a foreign key in the secondary entity's (the 'N') 
+            table.
+    3. N to N relationship (N:N)
+        For the purposes of transforming XML we do not need these!
+        e.g. the relationship between students and classes - each student
+            can have multiple classes and each class can have multiple 
+            students.
+        This relationship is modeled by creating a new table whose rows hold
+            the primary key from each foreign table.
+
+    XML documents can be distilled into just the first two kinds of RDBMS
+relationships.  Let's look at some XML:
+
+<address-book>
+    <name>My Address Book</name>
+    <entry>
+        <name type="Person">Mark</name>
+        <street>Perl Place</street>
+    </entry>
+    <entry>
+        <name>Bob</name>
+        <street>Heck Ave.</street>
+        <state>FL</state>
+    </entry>
+</address-book>
+
+    Here <address-book> is the 'root' entity in this XML fragment and has
+two sub-entities, <name> and <entry>.  <address-book> and <name> form a
+1:1 relationship and <address-book> and <entry> form a 1:N relationship.
+Similarly there are 1:1 relationships between <entity> and <name>, <street>,
+and <state>.  That's all we need to know!
+    Without further ado, let's put Perl to work.
+
+Module #1 - MakeTables
+
+    Our first Perl script does exactly what we just did - it analyzes the 
+relationships between the entities in an XML document and outputs those 
+relationships as a set of RDB tables.  It takes one command-line argument - 
+the XML file you want to analyze.  Here's the generated table that 
+corresponds to the <address-book> entity:
+
+CREATE TABLE gen_address_book (
+  gen_name_id integer NULL,
+  id integer NOT NULL,
+  PRIMARY KEY (id)
+);
+
+    Lots to note here - first, all table names are prefixed by a user-supplied
+string - in this case 'gen' (for 'generated').  Also, some characters that
+offend RDBMSs are transformed into underscores (don't worry, the real names
+are also stored in the database for exporting back to XML).  Finally, a
+generated primary key column is added to each table (named 'id').
+
+    One to one relationships
+
+    So what we've got is a table that contains a reference to a row in
+the 'gen_name' table to model our 1:1 relationship between <address-book>
+and <name>.  The primary key of a 'gen_name' row (the 'id' value) becomes 
+a foreign key in a 'gen_address_book' row (the 'gen_name_id' value).
+
+    One to many relationships
+
+    But what about the 1:N relationship between <address-book> and <entry>?
+As good RDBMS design tells us, it is modeled by placing the primary key
+of the '1' part of the relationship as a foreign key in the 'N' part of the
+relationship.  Let's look at the table generated for the <entry> entity:
+
+CREATE TABLE gen_entry (
+  gen_address_book_fk integer NOT NULL,
+  gen_name_id integer NULL,
+  gen_state_id integer NULL,
+  gen_street_id integer NULL,
+  id integer NOT NULL,
+  PRIMARY KEY (id)
+);
+
+    The interesting bit is the 'gen_address_book_fk' column.  This column
+will contain the primary key of a gen_address_book row that contains this 
+<entry>.  The other columns you will recognize as parts of a 1:1
+relationship between <entry> and <name>, <state>, and <street>.  And of
+course the generated primary key column 'id'.
+
+    Plain old text
+
+    Let's now look at the gen_name table:
+
+CREATE TABLE gen_name (
+  gen_name_type_attribute text NULL,
+  gen_name_value text NULL,
+  id integer NOT NULL,
+  PRIMARY KEY (id)
+);
+
+    The column 'gen_name_value' holds the text associated with this entity.
+The column 'gen_name_type_attribute' holds the text associated with the
+attribute 'type' in the entity <name>.  Again, there is a generated table
+that contains the mappings between RDBMS column and table names and XML
+names.
+    The other tables gen_state and gen_street simply consist of a '_value'
+column and a generated primary key.  Note we did not have to do anything
+to generate these tables!  We simply fed our XML document to MakeTables.
+
+    Meta tables
+
+    To help keep track of everything,  MakeTables creates four extra
+tables to hold meta-information about this XML document.  These tables are
+only used internally, so you do not have to worry about them.  
+    Two of the tables are used to create primary keys in a generic, 
+database-independent fashion and are not very interesting for our purposes.  
+    The table 'gen_element_names' contains the mappings between table and 
+column names to XML names - this is table we alluded to earlier.  It looks 
+like this:
+
+CREATE TABLE gen_element_names (
+  db_name text NOT NULL  ,
+  xml_name text NOT NULL  
+);
+
+    Every time MakeTables has to generate a RDBMS equivalent name for an 
+XML tag (every tag and attribute name must be converted), another row gets 
+added to this table.  Here are the rows that get inserted into this table 
+from our example (generated by MakeTables of course):
+
+INSERT INTO gen_element_names VALUES ('gen_street','street');
+INSERT INTO gen_element_names VALUES ('gen_address_book','address-book');
+INSERT INTO gen_element_names VALUES ('gen_name_type_attribute','type');
+INSERT INTO gen_element_names VALUES ('gen_entry','entry');
+INSERT INTO gen_element_names VALUES ('gen_name','name');
+INSERT INTO gen_element_names VALUES ('gen_state','state');
+
+    Using this table we can accurately re-create our XML document.  
+    The final generated meta table is called 'gen_link_tables'.  This table
+contains a list of all of the 1:N relationships in the XML document.  Like
+the 'gen_element_names' table it is only used internally for bookkeeping.
+Here's what it looks like:
+
+CREATE TABLE gen_link_tables (
+  one_table text NOT NULL  ,
+  many_table text NOT NULL  
+);
+    
+    And here's the row that gets inserted into it using our example:
+
+INSERT INTO gen_link_tables VALUES ('gen_address_book','entry');
+
+    There is only one 1:N relationship in our XML document, so there's only
+one row in this table.  This table is used by later scripts to 
+populate and unpopulate the data into and out of our RDBMS.
+    Now that our tables have been generated, it's time to import them into
+our database and populate them.  The output of MakeTables is a bunch of
+'CREATE TABLE' and 'INSERT' statements.  Each RDBMS has its own way to
+import these statements - check your documentation.  Later we'll see an
+real live example using MySQL (10).
+
+Module #2 - PopulateTables
+
+    Once our tables exist in our database we need to actually pull the
+data out of our XML document and put it into our RDBMS.  Remember, 
+MakeTables only analyzes the relationships between elements in an XML
+document - the actual data is ignored.  The actual data parsing is the
+job of module #2, PopulateTables.  It takes only one argument,
+the name of the XML document that was passed to MakeTables.
+The data contained within that XML document will be transformed and stored 
+into your RDBMS.  Let's take a look at our RDBMS after we've run
+PopulateTables. (using MySQL) using our example:
+
+mysql> select * from gen_address_book;
++-------------+----+
+| gen_name_id | id |
++-------------+----+
+|           1 |  1 |
++-------------+----+
+
+    Ok, not too exciting.  Let's see the 'gen_name' table:
+
+mysql> select * from gen_name;           
++-------------------------+-----------------+----+
+| gen_name_type_attribute | gen_name_value  | id |
++-------------------------+-----------------+----+
+| NULL                    | My Address Book |  1 |
+| Person                  | Mark            |  2 |
+| NULL                    | Bob             |  3 |
++-------------------------+-----------------+----+
+
+    Now things get a little more interesting!  We see our 1:1 relationship
+between <address-book> and <name> via the 'gen_name_id' in the gen_address_book
+table matching the 'id' in the gen_name table, and sure enough its value is
+our <address-book>'s name, 'My Address Book'.  You'll notice that the
+'gen_name_type_attribute' column is null for the two <name>'s that don't
+possess this attribute and is set to 'Person' for the <name> that does.
+    Let's see the 1:N relationships in the 'gen_entry' table:
+
+mysql> select * from gen_entry;
++---------------------+-------------+--------------+---------------+----+
+| gen_address_book_fk | gen_name_id | gen_state_id | gen_street_id | id |
++---------------------+-------------+--------------+---------------+----+
+|                   1 |           2 |         NULL |             1 |  1 |
+|                   1 |           3 |            1 |             2 |  2 |
++---------------------+-------------+--------------+---------------+----+
+
+    The two <entry>'s associated with this <address-book> are linked by
+the foreign key column.  The 'gen_address_book_fk' column matches the
+'id' column in our gen_address_book row.  You can also see the 1:1 
+relationship between each entry and its name (via the 'gen_name_id' column).  
+The state and street 1:1 relationships are similar.
+ 
+    It's in!  We've transformed our XML document into our RDBMS.  At
+this point we can take a break, sip some coffee, and rest assured that our
+RDBMS has our data under its watchful eye.  We can use any
+of the mature RDBMS utilities and tools to massage, view, change, add, backup,
+and delete our information.  For some people this could indeed be the end
+of the line - but not for us!
+
+Modules #3 - UnpopulateTables
+
+    Our XML is in our RDBMS - now we want to get it out!  We've put our data
+through the RDBMS tool's ringer, doing all the zany things to it we wanted - 
+but now we want our XML back.  Say hello to module #3, UnpopulateTables.  But
+before we get too acquainted there is one piece about script #2,
+PopulateTables that I have not yet mentioned, that makes our life easier.  
+After PopulateTables finishes populating our tables, it returns a handy 2
+element array containing the root table name & a primary key uniquely
+identifying a row in that table that corresponds to the XML file we just
+inserted into our DB.
+    It has told us all we need to know to re-create the XML we just RDBMS-ized.
+UnpopulateTables takes that very same two element array - the name of the 'root'
+table and the generated primary key for the row we're interested in.  I'll
+discuss what that second bit of output is later.  In our example the root 
+table is 'gen_address_book', and since it's the first one we added to our 
+database its primary key is one.  This tells UnpopulateTables where to start 
+unwinding from our RDBMS back into XML.  If you knew the table name and 
+primary key of any other row you could create just a fragment of your XML 
+by specifying those values to UnpopulateTables (all easily gleaned from your 
+RDBMS).  And out goes your XML.
+
+Bonus Module #4 - UnpopulateSchema
+
+    We've come full circle.  What a not-so-long-but-definitely strange trip
+it's been.  We've gone from an XML document into a RDBMS and back out again.
+Yet something is still missing.  The problem lies with not-fully-specified XML
+documents.  What if another <address-book> document had a <zip-code> tag within
+the <entry> tag?  Two different table sets would be generated.  That 
+makes it impossible to put two different-yet-related XML documents into the
+same set of tables.  What is needed, when generating RDBMS tables from 
+MakeTables, is a 'fully-specified' XML document containing all possible
+tags and attributes in all possible configurations.  Then all 1:1 and 1:N
+relationships could be correctly identified and all attributes could be
+accounted for.  But how can we get a 'fully-specified' XML document?  
+We can generate one using XML Schema (4).  Written in XML themselves, 
+XML Schemas fully specify what may be contained within a conforming XML 
+document.  The bonus fourth script - UnpopulateSchema - will 'unpopulate' an 
+XML Schema stored in your RDBMS as a fully-specified XML document.  This XML 
+document can then be fed to MakeTables to generate fully-specified RDBMS 
+tables.  
+    Now that's quite a mouthful, but if you have an XML Schema for your 
+documents, you can use that, and not a specific instantiation of
+that Schema (which might not have all of the allowed entities in all possible
+configurations) to create your RDBMS tables.  Then all conforming XML 
+documents can be fed to PopulateTables to populate your RDBMS without worrying 
+about table mismatch.
+    The secret is that XML Schemas are well-formed XML documents themselves.  
+Running MakeTables on your Schema itself and then importing those tables 
+into your RDBMS gets the ball rolling.  Then you populate your RDBMS the
+usual way by running PopulateTables with the XML Schema as the supplied XML
+Document.  Finally running UnpopulateSchema instead of UnpopulateTables against 
+that data will output a fully-specified XML document, instead of just your 
+XML Schema back again.  Since all XML Schemas must follow strict guidelines, 
+UnpopulateSchema only needs to know the primary key of the XML Schema in your 
+RDBMS.  This is the second bit of information output by PopulateTables.
+    XML Schema is a very complicated specification.  Not all of the nooks
+and crannies of the specification are supported by UnpopulateSchema - which
+is by far the longest and most complicated for the four scripts.
+
+    Here's what's supported - the numbers in parentheses correspond to sections
+in the XML Schema Primer (5): 
+
+        Named Simple and Complex types (2.2 & 2.3)
+        Simple type restrictions and enumerations (2.3)
+        List types (2.3.1)
+        Unions types (2.3.2)
+        Anonymous Type Definitions and choices (2.4)
+        Complex Types from Simple Types (simpleContent) (2.5.1)
+        Mixed content (2.5.2)
+        Empty content (2.5.3)
+        Choice and Sequence groups (including xsd:group) (2.7)
+        'All' group (2.7)
+        Attribute groups (2.8)
+        Nil Values (2.9)
+        Deriving Types by Extension (4.2)
+        Deriving Complex Types by Restriction (4.4)
+        Abstract Elements & Types (partially) (4.7)
+
+    Here's what's not:
+
+        anyType (2.5.4) (not applicable)
+        Target Namespaces & Unqualified locals (3.1)
+        Qualified locals (3.2)
+        Importing & Multiple documents (4.1)
+        Redefining Types & Groups (4.5)
+        Substitution Groups (4.6)
+        Abstract Elements & Types (partially) (4.7)
+        Controlling the Creation & Use of Derived Types (4.8) (not applicable)
+        Specifying Uniqueness (5.1) (not applicable)
+        Defining Keys & their References (5.2) (not applicable)
+        Importing Types (5.4)
+        Any Element, Any Attribute (5.5) (not applicable)
+        Schema Location (5.6)
+
+    The namespace and importing can be handled by collecting all referenced
+Schemas by hand and creating one large document from them.  This list is
+subject to change - especially the namespace and importing functions.
+
+Now Things Get Interesting!
+
+    Let your mind go!  Not only can _any_ XML document be stored in your
+RDBMS, but you don't even have to have a XML document to start with.  All
+you need is an XML Schema.  Use that to create your table set.  You don't
+have to use PopulateTables to populate the database - use whatever tool you 
+want.  When you're ready, use UnpopulateTables and you've magically got
+well-formed, valid XML to pass on to whomever you choose.  Any XML document--
+SOAP (6), SVG (7), XSLT (8), whatever, can easily be intelligently imported 
+into your RDBMS.  Once XML Schema really gets going and all XML documents 
+are defined using it, you've got a ready-made RDBMS system just waiting for 
+conforming XML documents.
+
+What You Need To Make It Work
+
+  In your constructor call to XML::RDB you provide the path to your
+configuration file.  The format of the file is key/values pairs - one per
+line - delimited by '='.  See 'config.test' in the base directory for
+all of the options.
+
+the most important (& only) variable you must set is 'DSN':
+
+  DSN=DBI:mysql:database=TEST
+
+    This is a MySQL DSN - alter it to fit your needs.  You can also change the
+prefix of each generated table by altering this line:
+
+# All tables names will being with this string
+  TABLE_PREFIX=gen
+
+    The _only_ thing you need to change is the DSN, after that you are ready
+to rumble.
+
+Module Dependencies
+
+    As Sir Isaac Newton stood on the shoulders of giants, so have I.  These
+scripts could not function without these great modules available from the 
+CPAN (9):
+
+    DBI and DBD::<your RDBMS>
+        You need these to talk to your RDBMS at a low level.
+    DBIx::Recordset
+        The scripts use this awesome module to talk to your RDBMS as a
+            higher level.
+    DBIx::Sequence
+        This module provides RDBMS-independent unique primary key generation.
+    DBIx::DBSchema
+        This module provides MakeTables with a RDBMS-independent way to
+            generate tables.
+    XML::DOM
+        The workhorse - parses all the XML so I don't have to!
+    URI::Escape
+        Only used by UnpopulateTables to keep the XML clean.
+
+Tested platforms
+
+    The scripts were developed using Perl 5.6.0 and also run under 5.6.1.  
+There's no reason why the scripts should not run on any recent Perl5 
+distribution.  Both MySQL and PostgreSQL(11) have been tested - MySQL on 
+FreeBSD 4.2 and Linux (RedHat 7.1) and PostgreSQL on Linux (RedHat 7.1).  
+Note column lengths can get long, and PostgreSQL is by default limited 
+to 31-character long columns.  I had to recompile PostgreSQL with a 
+more reasonable 64-character length limit to keep everything happy.
+
+A Sample Run using MySQL
+ 
+  use XML::RDB;
+
+  # Give our DB's DSN & username/password
+  my $rdb = new XML::RDB(config_file => 'db_config');
+
+  # Generate RDB Schema
+  $rdb->make_tables("my_xml_file.xml", "db_schema_output_file");
+
+  #
+  # Now import the generated 'db_schema_output_file' into your DB
+  #   (see t/1.t for an automated way to do this)
+  #
+  
+  # Now populate our RDB
+  my($root_table_name, $primary_key) = $rdb->populate_tables("my_xml_file.xml");
+
+  #
+  # Your XML file is now in your RDB!!!!  Play as desired & when ready....
+  #
+  $rdb->unpopulate_tables($root_table_name, $primary_key, 'new_xml_file.xml'); 
+
+
+  #
+  # That's all fine & dandy but what if you've got an XML Schema???
+  #
+  # the first 2 calls are the same:
+  $rdb->make_tables("my_xsd_file.xsd", "db_schema_output_file");
+
+  #
+  # don't forget to put 'db_schema_output_file' into your DB!
+  # then:
+  my($root_table_name, $primary_key) = $rdb->populate_tables("my_xsd_file.xsd");
+
+  # note we only need the primary key for this next call
+  $rdb->unpopulate_schema($primary_key, 'fully_formed.xml'); 
+
+  #
+  # Now you've got 'fully_formed.xml' - pass THAT to make_tables & yer golden:
+  #
+  
+  $rdb->make_tables("fully_formed.xml", "REAL_RDB_schema");
+
+  #
+  # Now insert REAL_RDB_schema into yer DB & now any XML documents conforming
+  #   to your original XML Schema ('my_xsd_file.xsd') can be imported into
+  #   your schema:
+  my ($rt, $pk)=$rdb->populate_tables("xml_doc_conforming_to_my_xsd_file.xml");
+   
+Limitations and Future Directions
+
+    There is a program written in Java that generates XML Schemas from DTDs.
+This provides a clear migration path.  However, DTDs do not provide as much
+information as XML Schemas do, so it would be wise not to count on automated
+tools to do the complete conversion for you.
+    Also, once XML Schema parsers become readily available, UnpopulateSchema
+should take advantage of them, since the current 'parsing' it does is pretty 
+basic.  Finally, all XML Schemas must pass through your RDBMS, which is not 
+optimal.
+    Some XML documents rely on the order of the entities, but after under-
+going into an RDBMS and back out again the order is lost.  A 'nice' way to
+preserve entity order would be a grand addition.
+    Both UnpopulateTables and UnpopulateSchema utilize the same intermediary
+format from going from a RDBMS to XML.  The modularization of these scripts
+allow XML stored in a RDBMS to be extracted to any other format, such as
+HTML.  Future work in this area will produce very interesting transformations.
+Also, using something like XML::Writer (10) to output XML would probably be 
+cleaner and lead to further benefits down the road.
+    Finally, both MakeTables and PopulateTables use XML::DOM, which loads the
+entire XML document tree into memory.  Investigation into using the Simple API
+for XML (SAX) (12) to reduce memory consumption could prove very fruitful.  
+Also both UnpopulateTables and UnpopulateSchema load the entire RDB into memory 
+before outputting their transformations, so investigations into lowering the
+memory footprint of these scripts will yield beneficial results.
+
+Acknowledgments
+
+    Rob Enns and Phil Shafer for having the foresight to use XML in our 
+routers that eventually led to these scripts, and Cynthia Tham, fellow
+member of the Juniper JUNOScript team!
+
+References
+
+1.  Standard SQL ISO/IEC 9075:1992, "Information Technology --- Database Languages --- SQL" 
+2. For a discussion of XML and RDBMSs see "XML Database Products" by Ronald Bourret, http://www.rpbourret.com/xml/XMLDatabaseProds.htm
+3. JUNOScript Guide http://www.juniper.net/techpubs/software/junos44/junoscript44-guide/html/junoscript44-guideTOC.html
+4. XML Schema http://www.w3.org/XML/Schema
+5. XML Schema Primer http://www.w3.org/TR/xmlschema-0
+6. SOAP http://www.w3.org/TR/soap12/
+7. SVG http://www.w3.org/Graphics/SVG/Overview.htm8
+8. XSL and XSLT http://www.w3.org/Style/XSL/
+9. CPAN http://www.cpan.org
+10. MySQL http://www.mysql.com
+11. PostgreSQL http://www.postgresql.org/
+12. SAX http://www.megginson.com/SAX/
+
+Juniper Networks is a registered trademark of Juniper Networks, Inc. Internet Processor, Internet Processor II, JUNOS, JUNOScript, M5, M10, M20, M40, and M160 are trademarks of Juniper Networks, Inc. All other trademarks, service marks, registered trademarks, or registered service marks may be the property of their respective owners. All specifications are subject to change without notice.  Copyright © 2001, Juniper Networks, Inc.  All rights reserved.

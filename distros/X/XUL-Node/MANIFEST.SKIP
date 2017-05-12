@@ -1,0 +1,16 @@
+CVS/.*
+\.bak$
+\.old$
+\.tar$
+\.tgz$
+\.tmp$
+\.pmc$
+\.log$
+\.tar\.gz$
+^tmp/
+^blib/
+^Makefile$
+^Makefile\.[a-z]+$
+^pm_to_blib$
+\.err$
+perl\.exe\.stackdump$

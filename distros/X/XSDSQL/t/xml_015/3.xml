@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<choice_test>
+	<begin>begin</begin>
+	<c>
+		<elc>1</elc>
+	</c>
+	<d>
+		<eld>2</eld>
+	</d>
+	<d>
+		<eld>3</eld>
+	</d>
+	<c>
+		<elc>4</elc>
+	</c>
+	<end>end</end>
+</choice_test>

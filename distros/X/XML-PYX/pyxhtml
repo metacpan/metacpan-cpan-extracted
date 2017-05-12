@@ -1,0 +1,35 @@
+#!/usr/bin/perl
+
+use HTML::TreeBuilder;
+
+my $tree = HTML::TreeBuilder->new;
+
+if (@ARGV) {
+	$tree->parse_file($ARGV[0]);
+}
+else {
+	$tree->parse(\*STDIN);
+}
+
+output($tree);
+
+sub output {
+	my @tags = @_;
+	foreach my $tag (@tags) {
+		if (ref($tag)) {
+			print "(", $tag->tag, "\n";
+			my @attrs = $tag->all_attr();
+			while(@attrs) {
+				my ($key, $val) = (shift(@attrs), shift(@attrs));
+				next if substr($key, 0, 1) eq '_';
+				print "A$key $val\n";
+			}
+			output($tag->content_list);
+			print ")", $tag->tag, "\n";
+		}
+		else {
+			$tag =~ s/\r?\n/\\n/g;
+			print "-", $tag, "\n";
+		}
+	}
+}

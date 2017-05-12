@@ -1,0 +1,83 @@
+XML::XMetaL version 0.52
+========================
+
+*  XML::XMetaL::Utilities::Iterator fix again. This time it should work!
+
+XML::XMetaL version 0.51
+========================
+
+* Bug fixes in the XML::XMetaL::Utilities::Iterator class
+
+  The iterator could sometimes break off before all nodes were
+  traversed.
+  
+* Added mock DOM classes to emulate XMetaL DOM trees. Useful for debugging
+  the iterator.
+
+
+XML/XMetaL version 0.51
+=======================
+
+XML::XMetaL is a framework for object oriented XMetaL development using Perl.
+The framework makes it easy to write Perl classes that customize XMetaL.
+The advantages of using the framework are:
+
+* Object oriented development.
+
+  Object oriented XMetaL application development, with nearly all code
+  moved from XMetaL .mcr and .ctm files to Perl modules.
+
+  In addition to the advantages of object oriented development, this
+  makes it possible to use any editor for XMetaL development, not just
+  Visual Studio (XMetaL 4+), or the built in editor (XMetaL 1.0 - 3.1).
+
+* Better control over shared functions and code reuse.
+
+  There is no longer any need to use global customization files, such as
+  xmetal.mcr to share functionality over several customization packages.
+  Instead, common functionality is factored out into Perl modules and
+  reused only by those customizations that need them.
+
+  This reduces the risk of conflicts between different customizations
+  installed on the same XMetaL client.
+
+* Automated unit and function testing.
+
+  Using the framework it is possible to write automated unit and function
+  tests for XMetaL applications using Test::More and other test frameworks.
+
+* Utility functions.
+
+  Useful utility functions, including a word counter, id generator,
+  common XMetaL constants, node iterator, and more.
+
+
+The object oriented development features, and the support for automated
+unit and function testing makes the XML::XMetaL framework especially
+useful when using Extreme Programming and other test driven development
+methodologies.
+
+This version is still in alpha state. Future versions may have changes
+that are not fully backwards compatible.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires that the Corel XMetaL XML editor is installed.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 Henrik Martensson
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

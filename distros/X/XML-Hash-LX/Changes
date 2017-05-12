@@ -1,0 +1,33 @@
+Revision history for XML-Hash-LX
+
+TODO: make hash2xml faster
+
+0.0603  2011-08-19
+        - Fix tests
+
+0.0602  2011-08-18
+        - Merge encoding patch from ~gugu
+
+0.06_01 2011-06-16
+        - Fix when attribute/cdata/comment value is empty/undef
+        - Cleanup tests (move qualitee tests to xt/*)
+        - add bt/* - benchmark testing draft
+
+0.06    2009-09-15
+        Fix dist: remove cpants.pl from install
+
+0.05    2009-09-03
+        Fix: work with earlier versions of XML::LibXML (for ex 1.58)
+        Remove Catalyst stuff from distribution, make it separate
+
+0.04    2009-08-27
+        Fight for kwalitee. No major changes in code
+
+0.03    2009-08-26
+        Fix deps on Catalyst::Action
+
+0.02    2009-08-26
+        Optimize work with text in hash2xml
+
+0.01    2009-08-12
+        First version

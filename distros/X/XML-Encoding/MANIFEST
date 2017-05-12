@@ -1,0 +1,52 @@
+Changes                                  Change log
+MANIFEST                                 This file
+Makefile.PL                              ExtUtils::MakeMaker script
+README                                   A brief overview of the distribution
+bin/compile_encoding                     script to make foo.enc from foo.xml
+bin/make_encmap                          script to generate foo.xml
+encoding.h                               Header file describing foo.enc format
+lib/XML/Encoding.pm                      XML::Encoding module
+maps/IANA-assigned-character-sets        The name describes it
+maps/Japanese_Encodings.msg              Message about Japanese encodings
+maps/README                              A word about how maps were generated
+maps/big5.xml                            Big5 encoding map
+maps/encmap.dtd                          Doctype declaration for encmap
+maps/iso-8859-1.xml                      ISO-8859-1 encoding map
+maps/iso-8859-2.xml                      ISO-8859-2 encoding map
+maps/iso-8859-3.xml                      ISO-8859-3 encoding map
+maps/iso-8859-4.xml                      ISO-8859-4 encoding map
+maps/iso-8859-5.xml                      ISO-8859-5 encoding map
+maps/iso-8859-6.xml                      ISO-8859-6 encoding map
+maps/iso-8859-7.xml                      ISO-8859-7 encoding map
+maps/iso-8859-8.xml                      ISO-8859-8 encoding map
+maps/iso-8859-9.xml                      ISO-8859-9 encoding map
+maps/iso-8859-10.xml                     ISO-8859-10 encoding map
+maps/iso-8859-11.xml                     ISO-8859-11 encoding map
+maps/iso-8859-13.xml                     ISO-8859-13 encoding map
+maps/iso-8859-14.xml                     ISO-8859-14 encoding map
+maps/iso-8859-15.xml                     ISO-8859-15 encoding map
+maps/iso-8859-16.xml                     ISO-8859-16 encoding map
+maps/kana-and-kanji.ent                  external entity used by x-sjis-*.xml
+maps/oem.ent                             external entity used by x-sjis-*.xml
+maps/windows-1250.xml                    windows-1250 encoding map
+maps/windows-1251.xml                    windows-1251 encoding map
+maps/windows-1252.xml                    windows-1252 encoding map
+maps/windows-1253.xml                    windows-1253 encoding map
+maps/windows-1254.xml                    windows-1254 encoding map
+maps/windows-1255.xml                    windows-1255 encoding map
+maps/windows-1256.xml                    windows-1256 encoding map
+maps/windows-1257.xml                    windows-1257 encoding map
+maps/windows-1258.xml                    windows-1258 encoding map
+maps/x-euc-jp-jisx0221.xml               x-euc-jp-jisx0221 encoding map
+maps/x-euc-jp-part1.ent                  external entity used by x-euc-jp-*.xml
+maps/x-euc-jp-part2.ent                  external entity used by x-euc-jp-*.xml
+maps/x-euc-jp-part3.ent                  external entity used by x-euc-jp-*.xml
+maps/x-euc-jp-part4.ent                  external entity used by x-euc-jp-*.xml
+maps/x-euc-jp-unicode.xml                x-euc-jp-unicode encoding map
+maps/x-sjis-cp932.xml                    x-sjis-cp932 encoding map
+maps/x-sjis-jdk117.xml                   x-sjis-jdk117 encoding map
+maps/x-sjis-jisx0221.xml                 x-sjis-jisx0221 encoding map
+maps/x-sjis-unicode.xml                  x-sjis-unicode encoding map
+t/test.t                                 Test script
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

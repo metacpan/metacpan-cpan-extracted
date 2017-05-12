@@ -1,0 +1,37 @@
+--- #YAML:1.0
+name: XPlanner
+version: 0.01
+author:
+  - Michael G Schwern <schwern@pobox.com>
+abstract: an interface to XPlanner (www.xplanner.org)
+license: perl
+requires:
+  Module::Build: 0
+  SOAP::Lite: 0
+  Test::Harness: 2
+  Test::More: 0
+  URI: 0
+  YAML: 0
+provides:
+  IterationData:
+    file: lib/XPlanner/Iteration.pm
+  PersonData:
+    file: lib/XPlanner/Person.pm
+  ProjectData:
+    file: lib/XPlanner/Project.pm
+  UserStoryData:
+    file: lib/XPlanner/Story.pm
+  XPlanner:
+    file: lib/XPlanner.pm
+    version: 0.01
+  XPlanner::Iteration:
+    file: lib/XPlanner/Iteration.pm
+  XPlanner::Object:
+    file: lib/XPlanner/Object.pm
+  XPlanner::Person:
+    file: lib/XPlanner/Person.pm
+  XPlanner::Project:
+    file: lib/XPlanner/Project.pm
+  XPlanner::Story:
+    file: lib/XPlanner/Story.pm
+generated_by: Module::Build version 0.25

@@ -1,0 +1,16 @@
+Merge.pm
+LICENSE
+MANIFEST
+MANIFEST.SKIP
+META.yml
+META.json
+README
+Changes
+Build.PL
+Makefile.PL
+t/00pod.t
+t/01podc.t
+t/02basic.t
+t/03text.t
+t/04keep.t
+ex/synopsis.pl

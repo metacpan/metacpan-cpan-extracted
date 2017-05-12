@@ -1,0 +1,34 @@
+  ==================================================================
+  XML::SimpleObject
+  Copyright 2001-2003 by Dan Brian.
+
+  This program is free software; you can redistribute it and/or modify
+  it under the same terms as Perl itself.
+  ==================================================================
+
+DESCRIPTION
+
+This is a small and simple package that takes the output of an XML parser
+and gives simple methods for accessing the structure of an XML document. It 
+is very lightweight, but provides the simplest access to an XML document 
+possible. It does not subclass XML::Parser or XML::LibXML; rather, it is meant 
+to serve purely as an object struct for an outgoing tree.
+
+I originally wrote the module as an example of parsing without handlers.
+
+REQUIREMENTS
+
+You need either XML::Parser (for XML::SimpleObject) or XML::LibXML (for 
+XML::SimpleObject::LibXML).
+
+Tested on Linux, FreeBSD, and Win32 under perl5.6.0 and perl5.6.1.
+
+INSTALLATION
+
+  (cd LibXML/; if installing the LibXML version)
+  perl Makefile.PL
+  make 
+  make install
+
+Then look at ex.pl. That pretty much sums up the functionality.
+

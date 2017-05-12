@@ -1,0 +1,130 @@
+XML-ApacheFOP version 0.03
+==========================
+
+XML::ApacheFOP allows you to use the Apache foundation's
+FOP implementation with Perl.
+
+Since FOP is written in Java, this module relies on Java.pm.
+You will need to have FOP, Java2, and Java.pm
+installed before installing this module. This README
+provides some guidance for meeting each of those requirements.
+
+This module has only been tested with Unix and its variants
+(Linux, Solaris, etc.) If you get this module working with
+Windows I would love to hear about it (along with how you did it.)
+
+
+JAVA2 INSTALLATION
+
+If you do not already have Java2 installed,
+you can download it here:
+http://java.sun.com/j2se/
+
+See the Sun documentation for installation details.
+
+This module has been tested with
+Java2 (Standard Edition) version 1.4.x.
+
+
+FOP INSTALLATION
+
+You can download FOP at the following link:
+http://xmlgraphics.apache.org/fop/
+
+See the FOP documentation for installation details.
+
+
+JAVA.PM INSTALLATION
+
+You can download and/or read the docs for Java.pm at:
+http://search.cpan.org/perldoc?Java
+
+In my experience, Java.pm must be installed manually
+and not from CPAN. If you must install it via CPAN
+you will need to enter "force install Java" in the
+CPAN shell. This will install the module even if the
+tests fail (which they usually do).
+
+You may also have to do a force install of Java.pm
+if you are installing the module remotely. The tests
+try to popup GUI windows that will simply
+not work when installing remotely.
+
+If you want to get Java.pm to pass all of the
+installation tests, you will need to install
+the module manually.
+
+After downloading the module, you will find a file
+called JavaServer.jar. Note the location of the module,
+then start the JavaServer with the following command:
+/path/to/java -classpath /path/to/JavaServer.jar \
+com.zzo.javaserver.JavaServer
+
+Once the JavaServer is running you can proceed to
+install Java.pm.
+
+There is also a SourceForge page for JavaServer at:
+http://sourceforge.net/projects/javaserver/
+
+
+XML::ApacheFOP INSTALLATION
+
+XML::ApacheFOP can be installed via CPAN or
+by building it manually using the standard commands:
+
+perl Makefile.PL
+make
+make test
+make install
+
+
+JavaServer SETUP
+
+To use XML::ApacheFOP you will need to include the FOP jar
+files in the classpath of the JavaServer startup command.
+
+The -classpath will need to be tailored to suit your system.
+Hopefully the following example will help you get it right though.
+
+Here is the command I use:
+
+/path/to/java -classpath \
+/path/to/JavaServer.jar\
+:/usr/local/xml-fop/build/fop.jar\
+:/usr/local/xml-fop/lib/avalon-framework-cvs-20020806.jar\
+:/usr/local/xml-fop/lib/batik.jar\
+:/usr/local/xml-fop/lib/xalan-2.4.1.jar\
+:/usr/local/xml-fop/lib/xercesImpl-2.2.1.jar \
+com.zzo.javaserver.JavaServer
+
+Once the JavaServer is running you will be ready to start using XML::ApacheFOP.
+See the pod documentation for details on the interface usage.
+
+DEBIAN INSTALLATION
+
+Ken Neighbors has created Debian packages for Java.pm/JavaServer and XML::ApacheFOP.
+This greatly eases the installation for the Debian platform.
+
+You can get them at:
+http://www.nsds.com/software/
+
+SECURITY
+
+JavaServer runs on port 2000 by default.
+I highly recommend you firewall off this port from outside access.
+
+It is also a good idea to use the authfile and allowed_paths options.
+See the pod for details on how to do this.
+
+
+AUTHOR
+
+Ken Prows (perl@xev.net)
+
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2005 Online-Rewards. All rights reserved.
+
+This module is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

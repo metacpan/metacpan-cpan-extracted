@@ -1,0 +1,11 @@
+Changes
+Enclosure.pm
+GPL
+INSTALL
+Makefile.PL
+MANIFEST
+META.yml
+README
+t/01_module.t
+t/02_pod.t
+t/03_pod_coverage.t

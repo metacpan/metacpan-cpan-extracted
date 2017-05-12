@@ -1,0 +1,12 @@
+Revision history for XAS-Spooler
+
+0.01    Kevin L. Esteb
+        First version, released on an unsuspecting world.
+
+0.02    26-Aug-2016 Kevin L. Esteb
+        released to cpan
+
+0.03    31-Aug-2016 Kevin L. Esteb
+        fixed a dependence issue
+        thanks cpantesters
+

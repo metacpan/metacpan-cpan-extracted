@@ -1,0 +1,26 @@
+ChangeLog
+MANIFEST
+Makefile.PL
+README
+lib/XML/eXistDB.pm
+lib/XML/eXistDB.pod
+lib/XML/eXistDB/RPC.pm
+lib/XML/eXistDB/RPC.pod
+lib/XML/eXistDB/Util.pm
+lib/XML/eXistDB/Util.pod
+lib/XML/eXistDB/xsd-exist/collection.xconf.xsd
+lib/XML/eXistDB/xsd-exist/conf.xsd
+lib/XML/eXistDB/xsd-exist/descriptor.xsd
+lib/XML/eXistDB/xsd-exist/existdb.xsd
+lib/XML/eXistDB/xsd-exist/mime-types.xsd
+lib/XML/eXistDB/xsd-exist/server.xsd
+lib/XML/eXistDB/xsd-exist/users.xsd
+t/01use.t
+t/20collections.t
+t/21resources.t
+t/22perms.t
+t/23query.t
+t/99pod.t
+template/collection.xconf
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

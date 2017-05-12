@@ -1,0 +1,8 @@
+Xcalibur::Rawfile - Making use of the Xcalibur XDK
+
+To install the module:
+
+    perl Makefile.PL;
+    make;
+    make test;
+    make install;

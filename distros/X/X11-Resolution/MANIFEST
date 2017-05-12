@@ -1,0 +1,8 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/X11/Resolution.pm
+t/00-load.t
+t/pod-coverage.t
+t/pod.t

@@ -1,0 +1,31 @@
+<stx:transform version="1.0" 
+  xmlns:stx="http://stx.sourceforge.net/2002/ns"
+  strip-space="yes">
+
+  <stx:template match="/root">
+    <node>
+      <stx:variable name="seq1" select="('a', 'b', 'c', 'd', 'e')"/>
+
+      <stx:variable name="seq2" select="subsequence($seq1, 3)"/>
+      <stx:value-of select="count($seq1)"/>
+      <stx:text>;</stx:text>
+      <stx:value-of select="count($seq2)"/>
+      <stx:text>:</stx:text>
+      <stx:value-of select="item-at($seq2, 1)"/>
+      <stx:text>-</stx:text>
+      <stx:value-of select="item-at($seq2, count($seq2))"/>
+
+      <stx:text> </stx:text>
+
+      <stx:variable name="seq3" select="subsequence($seq1, 2, 2)"/>
+      <stx:value-of select="count($seq1)"/>
+      <stx:text>;</stx:text>
+      <stx:value-of select="count($seq3)"/>
+      <stx:text>:</stx:text>
+      <stx:value-of select="item-at($seq3, 1)"/>
+      <stx:text>-</stx:text>
+      <stx:value-of select="item-at($seq3, count($seq3))"/>
+    </node>
+  </stx:template>
+
+</stx:transform>

@@ -1,0 +1,6 @@
+Revision history for Perl extension X::Osd.
+
+0.01  Fri Apr 27 02:45:11 2001
+	- original version; created by h2xs 1.20 with options
+		-O -n X::Osd -x -a -pxosd_ /usr/local/include/xosd.h
+

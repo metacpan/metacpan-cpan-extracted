@@ -1,0 +1,84 @@
+<rsnapshot configversion='2.0'>
+  <snapshotroot nocreateroot='1'>
+    /.snapshots/
+  </snapshotroot>
+  <externalprograms>
+    <!-- cp doesn't have to be GNU cp any more.  If you don't have GNU cp
+         we'll fall back to the slower pure-perl method -->
+    <cp    binary='/bin/cp' />
+    <rsync binary='/usr/bin/rsync'>
+      <shortargs>
+        <arg>-a</arg>
+      </shortargs>
+      <longargs>
+        <arg>--delete</arg>
+	<arg>--numeric-ids</arg>
+	<arg>--relative</arg>
+	<arg>--delete-excluded</arg>
+      </longargs>
+    </rsync>
+    <ssh   binary='/usr/bin/ssh'>
+      <arg>-p 22</arg>
+    </ssh>
+    <du    binary='/usr/bin/du'>
+      <arg>-csh</arg>
+    </du>
+    <rsnapshotdiff binary='/usr/local/bin/rsnapshotdiff' />
+    <!-- uncomment 'logger' to enable syslog -->
+    <!-- <logger binary='/usr/bin/logger' /> -->
+    <!-- path to a script (and any optional arguments) to run right
+         before rsnapshot syncs files -->
+    <!-- <preexec binary='...'>
+      <arg>...</arg>
+      <arg>...</arg>
+    </preexec> -->
+    <!-- path to a script (and any optional arguments) to run right
+         after rsnapshot syncs files -->
+    <!-- <postexec binary='...'>
+      <arg>...</arg>
+      <arg>...</arg>
+    </postexec> -->
+  </externalprograms>
+  <intervals>
+    <interval name='alpha' retain='6' /> <!-- order is important! -->
+    <interval name='beta'  retain='7' />
+    <interval name='gamma' retain='4' />
+    <interval name='delta' retain='3' />
+  </intervals>
+  <globaloptions>
+    <!-- 
+      Verbose level, 1 through 5.
+      1     Quiet           Print fatal errors only
+      2     Default         Print errors and warnings only
+      3     Verbose         Show equivalent shell commands being executed
+      4     Extra Verbose   Show extra verbose information
+      5     Debug mode      Everything
+    -->
+    <verbose      level='2' />
+    <logverbose   level='3' />
+    <logfile      file='/var/log/rsnapshot' />
+    <lockfile     file='/var/run/rsnapshot.pid' />
+    <onefs        value='0' />
+    <lazydeletes  value='1' />
+    <rsyncretries value='0' />
+  </globaloptions>
+  <backuppoints>
+    <backup from='rsync://rsync.samba.org/rsyncftp/' to='rsync.samba.org/rsyncftp/' /> <!-- use native rsync protocol -->
+    <backup from='/home/' to='localhost-homedirs/' /> <!-- local filesystem -->
+    <backup from='/etc/'  to='localhost-etc/'>
+      <onefs value='0' />
+      <rsyncshortargs> <!-- This *replaces* the default rsync short args.
+                            Use extrarsyncshortargs to add to them.
+                            Likewise for the long args - see below
+                       -->
+        <arg>-urltvpog</arg>
+      </rsyncshortargs>
+    </backup>
+    <backup from='ssh://root@example.com/' to='example.com/'> <!-- use ssh -->
+      <extrarsynclongargs>
+        <arg>--bwlimit=16</arg>
+	<arg>--exclude=core</arg>
+      </extrarsynclongargs>
+    </backup>
+  </backuppoints>
+</rsnapshot>

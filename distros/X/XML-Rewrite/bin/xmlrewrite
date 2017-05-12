@@ -1,0 +1,361 @@
+#!/usr/bin/perl
+use warnings;
+use strict;
+
+use Log::Report 'xml-rewrite', syntax => 'SHORT';
+#use Log::Report mode => 3;
+use Getopt::Long  qw/GetOptions :config gnu_compat bundling/;
+
+my ($mode_repair, $mode_transform);
+my ($input_fn, $root_type, @schemas, $output_fn, $plugin);
+my ($elem_form, $attr_form, @prefixes, @remove_elems);
+my ($comments, $annotations, $constraints) = (1, 1, 1);
+my $default_values = 'IGNORE';
+my $blanks_before  = 'CONTAINERS';
+my (%output_opt, %schema_opt, %change_opt);
+
+GetOptions
+  # input/output
+    'output|o=s'       => \$output_fn
+  , 'plugin|p=s'       => \$plugin
+  , 'schema|s=s'       => \@schemas
+  , 'type|t=s'         => \$root_type
+  , 'xml|x=s'          => \$input_fn
+ 
+  # mode
+  , 'repair'           => \$mode_repair
+  , 'transform'        => \$mode_transform
+
+  # namespaces
+  , 'xmlns=s@'         => \@prefixes
+  , 'use-default-ns'   => \$change_opt{use_default_ns}
+
+  # changes
+# , 'rm-elements=s@'   => \@remove_elems   # not yet implemented
+  , 'default-values=s' => \$default_values
+  , 'comments!'        => \$comments
+
+  # output options
+  , 'encoding|c=s'     => \$output_opt{output_encoding}
+  , 'compress=i'       => \$output_opt{output_compress}
+  , 'standalone!'      => \$output_opt{output_standalone}
+  , 'version|v=s'      => \$output_opt{output_version}
+  , 'blanks-before=s'  => \$blanks_before
+ 
+  # Schema options
+  , 'element-form=s'   => \$schema_opt{element_form}
+  , 'attribute-form=s' => \$schema_opt{attribute_form}
+  , 'target-ns=s'      => \$schema_opt{target_namespace}
+  , 'annotations!'     => \$annotations
+  , 'id-constraints!'  => \$schema_opt{remove_id_constraints}
+  , 'expand-includes!' => \$schema_opt{expand_includes}
+  or exit 1;
+
+$input_fn  = '-' if @schemas && !defined $input_fn;
+$output_fn = '-' unless defined $output_fn;
+
+if(@ARGV)
+{   die "ERROR: either use options or no options, not mixed\n"
+        if defined $input_fn && @ARGV;
+    ($input_fn, @schemas) = @ARGV;
+}
+
+defined $input_fn
+    or die "ERROR: input message source not specified\n";
+
+$plugin || @schemas
+    or die "ERROR: schema's or plugin required\n";
+
+my @xsd = map {split /\,/} @schemas;
+
+$input_fn = \*STDIN
+    if $input_fn eq '-';
+
+my $class
+  = !defined $plugin        ? 'XML::Rewrite'
+  : $plugin eq 'schema2001' ? 'XML::Rewrite::Schema'
+  : $plugin;
+
+error __x"option {opts} can only be used on schemas"
+    if $class->isa('XML::Rewrite::Schema') && %schema_opt;
+
+eval "require $class";
+error "Plugin $plugin failed:\n $@" if $@;
+
+my %prefixes;
+foreach (map {split /\,/} @prefixes)
+{   my ($prefix, $uri) = split /\=/, $_, 2;
+    $prefixes{$uri} = $prefix;
+}
+
+$output_opt{blanks_before}   = uc $blanks_before;
+$change_opt{remove_elems}    = [ map { split /\,/ } @remove_elems ];
+$change_opt{defaults_writer} = uc $default_values;
+$change_opt{comments}        = $comments ? 'KEEP' : 'REMOVE';
+$change_opt{remove_annotations} = not $annotations;
+$change_opt{remove_identity_constraints} = not $constraints;
+
+my $mode = $mode_repair ? 'REPAIR' : 'TRANSFORM';
+
+my $rewriter = $class->new
+  ( \@xsd
+  , change                => $mode
+  , prefixes              => \%prefixes   # collect prefixes
+  , %output_opt
+  , %schema_opt
+  , %change_opt
+  );
+
+my ($type, $data) = $rewriter->process($input_fn, type => $root_type);
+
+#use Data::Dumper;
+#$Data::Dumper::Indent = 1;
+#warn "PREFIXES = ", Dumper \%prefixes;
+#warn "TYPE = $type\n";
+#warn "DATA = ",Dumper $data;
+
+my $doc = $rewriter->buildDOM($type => $data);
+
+if($output_fn eq '-')
+{   binmode \*STDOUT, ':raw';
+    print $doc->toString(1);
+}
+else
+{   open OUT, ">:raw", $output_fn
+        or die "ERROR: cannot write to $output_fn: $!\n";
+
+    print OUT $doc->toString(2);
+    close OUT
+        or die "ERROR: write error for $output_fn: $!\n";
+}
+
+exit 0;
+
+__END__
+
+=head1 NAME
+
+xmlrewrite - cleanup XML based on schemas
+
+=head1 SYNOPSIS
+
+ # EXPERIMENTAL!
+
+ xmlrewrite infile.xml schema-files >outfile.xml
+
+ xmlrewrite -x infile.xml -s schema-files -o outfile.xml
+
+ cat x.xml | xmlrewrite - schemas/*.xsd | lpr
+
+ xmlrewrite -p schema2001 file.xml
+
+ xmlrewrite --repair in.xml --xmlns =http://somens
+
+=head1 DESCRIPTION
+
+Convert an XML message into an XML with the same information. A schema
+is required to enforce the correct information: for instance whitespace
+removal is only allowed when the type definition permits it.
+
+The command has TWO MODES:
+
+=over 4
+
+=item --transform (default)
+
+The input message is processed as is, and then some transformations are
+made on that message.  All options will be used to change the output.
+
+=item --repair
+
+The input message is corrupted.  First, it will be read.  Then the options
+will be used to change the input XML.  After this, no transformations
+will be applied: the corrected message is written.  Many xml generators
+(especially schema editing tools) are broken: their results can be fixed
+in this mode.
+
+=back
+
+=head2 CURRENT LIMITATIONS
+
+This is the first release of rewrite.  It still lacks most of the more
+interesting features which I have in mind.  There are also a few real
+limitiations in the current version:
+
+=over 4
+
+=item Comments and processing instructions are lost
+
+=item The result is not seriously tested
+
+=back
+
+=head2 Message options
+
+You can either specify an XML message filename and one or more
+schema filenames as arguments, or use the options.
+
+=over 4
+
+=item --repair | --transform
+
+The execution mode.  The effect of many options will change according to
+the mode: be careful.
+
+=item --xml|-x filename
+
+The file which contains the xml message.  A single dash (-) means "stdin".
+
+=item --plugin|-p <pre-defined or CLASS>
+
+Plugins add transformations to the available options.  You can either
+specify a pre-defined name, or the name of a CLASS which will be loaded
+and then used.  The CLASS must extend L<XML::Rewrite>.
+
+Pre-defined plugins:
+
+  schema2001       Schema version 2001
+
+These plugins will load the required schema's automatically, so you only
+need to provide your own.
+
+  xmlrewrite -p schema2001 myschema.xsd >clean.xsd
+
+=item --schema|-s filename(s)
+
+This option can be repeated, or the filenames separated by comma's, if
+you have more than one schema file to parse.  All imported and included
+schema components have to be provided explicitly, except schema-2001 which
+is always loaded.
+
+=item --type|-t TYPE
+
+The type of the root element, required if the XML is not namespaceo
+qualified, although the schema is.  If not specified, the root element
+is automatically inspected.
+
+The TYPE notation is C<{namespace}localname>.  Be warned to use quoting
+on the UNIX command-line, because curly braces have a special meaning
+for the shell.
+
+=item --output|-o filename
+
+By default (or when the filename is a '-'), the output is printed to
+stdout.
+
+=item --blanks-before all|containers|none
+
+Put a blank line before (the comments before) each element, only
+containers (element with childs) or never.
+
+=back
+
+=head2 Namespaces
+
+=over 4
+
+=item --xmlns PREFIX=NAMESPACE[,PREFIX=NS]
+
+PREFIX and NAMESPACE combination, to be used in the output.  You may
+use this option more than once, and seperate a few definitions in one
+string with commas.
+
+   abc=http://myns  # prefix abc
+   =http://myns     # default namespace
+
+=back
+
+=head2 General Options
+
+=over 4
+
+=item --encoding|-c <character-set>
+The character-set of the document.  If not specified and not in the
+source document, then C<UTF-8> will be used.  It is not possible to
+fix erroneous encoding information while reading.
+
+=item --version|-v <string>
+Overrule the XML version indicator of the document.  If not specified
+and not in the source document, then C<1.0> will be used.
+
+=item --compress -1|0..8
+Set output compression level.  A value of C<-1> means that there should
+be no compression.  By default, the compression level of the input
+document is used.
+
+=item --standalone | --no-standalone
+If specified, it will overrule the value found in the source document.
+If not provided, the value from the source document will be used, but
+only when present.
+
+=back
+
+=head2 Change Options
+
+=over 4
+
+=item --rm-elements NAME[,NAME]
+Remove all appearances of the NAMEd (name-space qualified) elements.
+This option can appear more than once.
+
+  --rm-elements xs:annotation
+  --rm-elements '{http://myns}mytype'
+
+=item --comments | --no-comments
+
+Controls whether to keep or remove comments.  Comments are interpreted
+as being related to the element which follow them.  Comments at the end
+of blocks will also relate to the last element before it.
+
+=back
+
+=head3 Schema Change Options
+
+Behavior is different between repair mode and transformation mode.
+
+=over 4
+
+=item --element-form   qualified|unqualified
+
+=item --attribute-form qualified|unqualified
+
+=item --target-ns URI
+Change the target namespace of the output schema.  All elements and
+types defined by the schema are in this name-space from now on.
+
+=item --annotations | --no-annotations
+
+=item --default-values extend|ignore|minimal
+
+The default is C<ignore>, which means that the output message will not
+add or remove elements and attributes based on their known defaults.
+With C<extend>, the defaults will be made explicit in the output.  With
+C<minimal>, elements and attributes which have the default value will
+get removed.
+
+=item --id-constraints | --no-id-constraints
+
+Remove C<key>, C<keyref>, and C<unique> elements from the schema.  They
+are used for optimizing XML database queries.
+
+=item --expand-includes | --no-expand-includes
+(default is not to expand)  Take the content of include files, and
+merge that with the schema at hand.  The includes defined in the
+included files will be consumed as well.  Include statements of files
+which are not found are left in, without error message.
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of Perl's XML-Compile distribution.
+Website: F<http://perl.overmeer.net/xml-compile/>
+
+=head1 LICENSE
+
+Copyrights 2008 by Mark Overmeer. For other contributors
+see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>

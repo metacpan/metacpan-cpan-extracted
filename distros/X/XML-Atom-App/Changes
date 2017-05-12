@@ -1,0 +1,23 @@
+Revision history for XML-Atom-App
+
+0.0.5  Fri Jan 23 14:15:18 2009
+    Applied GWADEJ's patch to
+      - Add Support for the contributor element.
+      - Separate out create_entry_from_atomic_structure
+      - Add Support for the source element.
+      - resolve rt 38053
+    Thanks Wade!
+    bumped version && updated MANIFEST for patch as well
+   
+0.0.4  Wed Jan  2 12:10:01 2008
+      clear_particles() handle when XML::Simple parses into HASH ref, test name misspelling, tiny POD addition about validating the feed
+
+0.0.3  Mon Dec 31 23:06:35 2007
+      add default link rel=self, fix clear_particles
+
+0.0.2  Mon Dec 31 10:59:06 2007
+      update POD to reflect need for hashref to new() and more sane updated vs. created key use
+
+0.0.1  Mon Dec 24 14:42:03 2007
+       Initial release.
+

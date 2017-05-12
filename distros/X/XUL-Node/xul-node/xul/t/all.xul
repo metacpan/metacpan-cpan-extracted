@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+<window
+    xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+    xmlns:html="http://www.w3.org/1999/xhtml"	
+    onload="Go()"
+><script src="../lib/JSAN.js"></script><script><![CDATA[function Go () {
+
+
+
+JSAN.includePath = ["lib", "../lib"];
+JSAN.use("Test.Runner");
+
+var runner = new Test.Runner();
+runner.start("t.All");
+
+
+/*
+
+or if you want just a specific test:
+
+runner.start("FooPackage.BarPackage.tests.BazClass");
+
+examples:
+
+runner.start("Client.t.ServerProxy");
+runner.start("Test.t.AllTests");
+
+NOTE: you will only see test results if you open FireBug.
+
+*/
+
+
+
+}]]></script><label value="XUL-Node Javascript unit tests, run with FireBug"/></window>

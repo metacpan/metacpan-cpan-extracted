@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tmx version="1.4">
+  <header adminlang="en" creationdate="20120331T211355Z" creationid="foobar" creationtool="XML::TMX::Writer" creationtoolversion="0.23" datatype="plaintext" o-tmf="plain text" segtype="sentence" srclang="en">
+    <prop type="prop1">val11</prop>
+    <prop type="prop2">val22</prop>
+    <prop type="prop3">val3</prop>
+    <prop type="prop4">val4</prop>
+    <note>note1</note>
+    <note>note2</note>
+    <note>note3</note>
+    <note>note4</note>
+    <note>note5</note>
+    <note>note6</note>
+  </header>
+  <body>
+
+    <tu srclang="en">
+      <prop type="sprop1">sval1</prop>
+      <prop type="sprop2">sval2</prop>
+      <note>snote1</note>
+      <note>snote2</note>
+      <note>snote3</note>
+      <tuv xml:lang="pt">
+        <seg>algum texto</seg>
+      </tuv>
+      <tuv xml:lang="en">
+        <prop type="a">b</prop>
+        <prop type="c">d</prop>
+        <note>a</note>
+        <note>b</note>
+        <note>c</note>
+        <note>d</note>
+        <seg>some text</seg>
+      </tuv>
+    </tu>
+
+    <tu srclang="en">
+      <prop type="spropA">svalA</prop>
+      <prop type="spropB">svalB</prop>
+      <note>snoteA</note>
+      <note>snoteB</note>
+      <note>snoteC</note>
+      <tuv xml:lang="pt">
+        <seg>Hello World</seg>
+      </tuv>
+      <tuv xml:lang="en">
+        <prop type="1">2</prop>
+        <prop type="3">4</prop>
+        <note>1</note>
+        <note>2</note>
+        <note>3</note>
+        <note>4</note>
+        <seg>olá mundo</seg>
+      </tuv>
+    </tu>
+
+  </body>
+</tmx>

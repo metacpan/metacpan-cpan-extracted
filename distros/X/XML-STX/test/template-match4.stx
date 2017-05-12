@@ -1,0 +1,46 @@
+<stx:transform version="1.0" 
+  xmlns:stx="http://stx.sourceforge.net/2002/ns"
+  strip-space="yes">
+
+  <stx:template match="processing-instruction()"
+    visibility="local">
+    <stx:text>FAILED1</stx:text>
+  </stx:template>
+
+  <stx:template match="node[1]"
+    visibility="group">
+    <stx:text>OK2</stx:text>
+  </stx:template>
+
+  <stx:template match="node[2]"
+    visibility="group">
+    <stx:text>FAILED3</stx:text>
+  </stx:template>
+
+  <stx:group>
+
+    <stx:template match="/root" public="yes">
+      <stx:process-children/>
+    </stx:template>
+
+    <stx:template match="node[2]">
+      <stx:text>OK3</stx:text>
+    </stx:template>
+
+  </stx:group>
+
+  <stx:group>
+
+    <stx:template match="processing-instruction()"
+      visibility="global">
+      <stx:text>OK1</stx:text>
+    </stx:template>
+
+    <stx:template match="node[1]"
+      visibility="global">
+      <stx:text>FAILED2</stx:text>
+    </stx:template>
+    
+  </stx:group>
+  
+</stx:transform>

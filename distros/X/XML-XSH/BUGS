@@ -1,0 +1,11 @@
+KNOWN BUGS
+
+- there are some know issues concerning 
+  combination XML::LibXML and XML::LibXSLT which
+  may affect XSH when using xslt command, but in most
+  cases, xslt works fine.
+
+- it is not possible to perform XPath searches on namespace
+  nodes (it's a limitation of libxml2)
+
+

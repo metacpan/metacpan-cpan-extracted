@@ -1,0 +1,6 @@
+Revision history for Perl extension XML::Crawler.
+
+0.01  Tue Aug  3 01:24:53 2010
+	- original version; created by h2xs 1.23 with options
+		-XA -n XML::Crawler
+

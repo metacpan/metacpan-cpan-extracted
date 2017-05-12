@@ -1,0 +1,18 @@
+# This file provides instructions for packaging.
+
+`XML-GRDDL`
+	perl_version_from m`XML::GRDDL`;
+	version_from      m`XML::GRDDL`;
+	readme_from       m`XML::GRDDL`;
+	requires          p`CSS 0`;
+	requires          p`CSS::Parse::PRDGrammar 0`;
+	requires          p`Data::UUID 0`;
+	requires          p`RDF::RDFa::Parser 1.097`;
+	requires          p`RDF::Trine 0.135`;
+	test_requires     p`Test::More 0.61`;
+	requires          p`URI 1.30`;
+	requires          p`URI::Escape 0`;
+	requires          p`XML::LibXML 1.60`;
+	requires          p`XML::LibXSLT 0`;
+	recommends        p`XML::Saxon::XSLT2 0.003`;
+.

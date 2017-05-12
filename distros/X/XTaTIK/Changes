@@ -1,0 +1,80 @@
+Revision history for Perl extension XTaTIK.
+
+0.005002 2015-09-29
+    [Miscellaneous]
+        - Add category titles to page titles when browsing categories (#163)
+        - Add group_desc into page titles on product pages (#162)
+        - Perl 5.20 is now in prereqs (#164)
+        - Add <meta> description (#161)
+
+0.005001 2015-09-13
+    [PayPal cart plugin]
+        - Added option to specify custom fields
+        - Added option to include arbitrary param()s in PayPal's custom field
+    [Miscellaneous]
+        - Made footer addresses look good for 1–6 locations (#129)
+        - Made it possible to specify shoutout art for the animation
+        - Added "after-shoutout" template fragment
+    [Bug fixes]
+        - Remove a product from Sites Products now actually removes it
+        - Removed uninitialized warnings during cat page viewing
+        - When auto-finding pictures, disallowed path chars in
+            product numbers now get substituted to underscores
+        - 'hypnotoad' config var is now respected in silos
+        - Fix default map not displaying for unidentified locations
+        - Fix zero-shipping-charge when free shipping mode is not used
+
+0.004001 2015-09-12
+    [Breaking Changes]
+        - XTaTIK SASS variables without xtatik- prefix have been renamed (#146)
+        - 'Add to quote' feature is now enabled by setting price to -1 dollars.
+            Prices set to 0 now trigger "FREE" products instead (#149)
+    [PayPal cart plugin]
+        - Prevent accidental checkouts by following a URL from history (#152)
+        - Fix formatting issues and markup errors on 'order' emails (#151)
+        - Added 'free shipping for purchases above X-dollars' feature (#154)
+    [Miscellaneous]
+        - Fix formatting on Site Feedback and Quicknote emails (#150)
+        - Added support for multiple product images, including auto-find (#105)
+
+0.003001 2015-09-07
+    [Breaking Changes]
+        - Restructured cart plugin system
+        - checkout_system config var now must be an arrayref
+    [Bug fixes]
+        - Fixed alignment on shoutout when thin logos are used
+        - Removed use of experimental autoderef to be
+            compatible with newest perls (#147)
+
+0.002001 2015-09-06
+    [Breaking Changes]
+        - Pricing is now per-site and not global (#133)
+        - Allow setting per-region GeoIP pricing
+    [Bug fixes]
+        - nopic.png is now properly displayed on search results and checkout
+            page for products without pics (#144)
+        - Empty categories now result in 404s (#143)
+        - Checking out while setting all quantities to zero
+            is no longer possible (#145)
+        - Fixed rendering bug on checkout progress bar (#136)
+    [Miscellaneous]
+        - Made default favicon prettier (#62)
+        - Made all existing tests pass (must set XTATIK_TESTING env to run)
+            (#119)
+        - Added .cat, .subcat, and .prod classes on category list page
+        - Added XTATIK_BLOG_SRC env var
+        - White setting prices, you can now use an optional dollar sign (#134)
+    [Docs]
+        - Wrote Appendix::StaticFiles
+        - Wrote Appendix::SASSVariables
+
+0.001002 2015-09-04
+    - Mobile and IE8 fixes
+    - Layout adjustments
+    - Fixed 404 on checkout page terms and conditions
+    - Added missing prereqs (#132)
+    - Fixed distro packaging to include proper Issues/Repo URLs (#131)
+    - Fixed incorrect lookup of "fake" site/company sass bootstrap vars files (#138)
+
+0.001001 2015-08-30
+    - First DEMO release

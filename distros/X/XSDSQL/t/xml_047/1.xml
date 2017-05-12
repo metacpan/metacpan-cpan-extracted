@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<bp:person 
+	xmlns:bp="http://www.site.org/bookperson"
+	xmlns:p="http://www.site.org/person"
+>
+	<p:name>name</p:name>
+	<p:born>1990-01-01</p:born>
+</bp:person>
+

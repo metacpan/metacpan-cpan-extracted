@@ -1,0 +1,5 @@
+GXML test suite
+by Josh Carter <josh@multipart-mixed.com>
+
+These files are for testing the GXML.pm engine. Run each .pl file and
+observe the results. If any of them break, please send me an email!

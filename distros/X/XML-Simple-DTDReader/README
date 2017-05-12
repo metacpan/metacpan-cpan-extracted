@@ -1,0 +1,29 @@
+DESCRIPTION
+
+XML::Simple::DTDReader -- Simple XML file reading based on their DTDs
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+DEPENDENCIES
+
+XML::Simple::DTDReader requires XML::Parser version 2.28 or higher.
+While it is based on the same aims as XML::Simple, it does not require
+XML::Simple in any way.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 Alex Vandiver <alexmv@mit.edu>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

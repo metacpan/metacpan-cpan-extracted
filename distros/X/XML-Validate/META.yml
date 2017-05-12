@@ -1,0 +1,13 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         XML-Validate
+version:      1.025
+version_from: lib/XML/Validate.pm
+installdirs:  site
+requires:
+    Log::Trace:                    0
+    Test::Assertions:              0
+    Test::More:                    0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

@@ -1,0 +1,12 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+LICENSE
+t/XML-ASCX12.t
+lib/XML/ASCX12.pm
+lib/XML/ASCX12/Catalogs.pm
+lib/XML/ASCX12/Segments.pm
+examples/INV.110.SAMPLE
+examples/test1.pl
+META.yml                                 Module meta-data (added by MakeMaker)

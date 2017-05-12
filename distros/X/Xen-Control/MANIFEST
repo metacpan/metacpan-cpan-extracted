@@ -1,0 +1,16 @@
+Build.PL
+Changes
+lib/Xen/Control.pm
+lib/Xen/Domain.pm
+Makefile.PL
+MANIFEST
+META.yml
+README
+script/xmc
+t/01_Xen-Domain.t
+t/02_Xen-Control.t
+t/dumps/01_xm-ls.txt
+t/dumps/01_xm-ls_2.txt
+t/pod-coverage.t
+t/pod.t
+SIGNATURE    Added here by Module::Build

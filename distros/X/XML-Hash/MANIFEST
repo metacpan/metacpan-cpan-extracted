@@ -1,0 +1,12 @@
+Changes
+MANIFEST
+LICENSE
+Makefile.PL
+README
+lib/XML/Hash.pm
+t/00-load.t
+t/01-apitest.t
+t/pod-coverage.t
+t/pod.t
+
+META.yml                                 Module meta-data (added by MakeMaker)

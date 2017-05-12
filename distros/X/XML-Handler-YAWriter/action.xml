@@ -1,0 +1,10 @@
+<ACTION
+  DESCRIPTION="blah..."
+  METHOD="doSomething"
+  NAME="someAction"
+  WIDGET="theWidget"
+><ARGUMENT NAME="anArgument"
+>0</ARGUMENT
+><ARGUMENT NAME="anotherArgument"
+>1</ARGUMENT
+></ACTION> 

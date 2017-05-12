@@ -1,0 +1,51 @@
+NAME
+    XML::Namespace - Simple support for XML Namespaces
+
+SYNOPSIS
+     Example 1: using XML::Namespace objects
+
+        use XML::Namespace;
+
+        my $xsd = XML::Namespace->new('http://www.w3.org/2001/XMLSchema#');
+
+        # explicit access via the uri() method
+        print $xsd->uri();           # http://www.w3.org/2001/XMLSchema#
+        print $xsd->uri('integer');  # http://www.w3.org/2001/XMLSchema#integer
+
+        # implicit access through AUTOLOAD method
+        print $xsd->integer;         # http://www.w3.org/2001/XMLSchema#integer
+
+     Example 2: importing XML::Namespace objects
+
+        use XML::Namespace
+            xsd => 'http://www.w3.org/2001/XMLSchema#',
+            rdf => 'http://www.w3.org/1999/02/22-rdf-syntax-ns#';
+
+        # xsd and rdf are imported subroutines that return
+        # XML::Namespace objects which can be used as above
+
+        print xsd->uri('integer');   # http://www.w3.org/2001/XMLSchema#integer
+        print xsd->integer;          # http://www.w3.org/2001/XMLSchema#integer
+
+DESCRIPTION
+    This module implements a simple object for representing XML Namespaces
+    in Perl. It provides little more than some syntactic sugar for your Perl
+    programs, saving you the bother of typing lots of long-winded URIs. It
+    was inspired by the Class::RDF::NS module distributed as part of
+    Class::RDF.
+
+    For further details, please see the documentation accompanying the module.
+
+AUTHOR
+    Andy Wardley <mailto:abw@cpan.org>
+
+VERSION
+
+    This is version 0.02 of XML::Namespace.
+
+COPYRIGHT
+    Copyright (C) 2005 Andy Wardley. All Rights Reserved.
+
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

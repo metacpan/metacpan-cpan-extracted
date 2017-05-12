@@ -1,0 +1,189 @@
+#!/usr/bin/perl
+
+# $Id: xupdate,v 1.18 2003/12/03 12:01:54 pajas Exp $
+
+use FindBin;
+use lib ("$FindBin::RealBin", "$FindBin::RealBin/../lib",
+         "$FindBin::Bin","$FindBin::Bin/../lib",
+	 "$FindBin::Bin/lib", "$FindBin::RealBin/lib",
+	 "$FindBin::Bin/../lib/site_perl"
+	);
+
+use strict;
+use Getopt::Long;
+use Pod::Usage;
+
+use vars qw($VERSION $REVISION $keep_ws $strip_ws $print_version $help $usage $indent $extra_indent @prefixmap);
+
+
+use XML::LibXML;
+use XML::XUpdate::LibXML;
+use XML::Normalize::LibXML qw(xml_strip_element);
+
+BEGIN {
+  Getopt::Long::Configure ("bundling");
+  GetOptions('-help|h' => \$help,
+	     '-version|V' => \$print_version,
+	     '-keep-ws|k' => \$keep_ws,
+	     '-strip-ws|s' => \$strip_ws,
+	     '-indent|i' => \$indent,
+	     '-extra-indent|j' => \$extra_indent,
+	     '-namespace|n=s' => \@prefixmap,
+	     '-usage|u' => \$usage,
+	     '-debug|D' => \$XML::XUpdate::LibXML::debug,
+	    ) || die "Wrong command-line arguments\n";
+  $VERSION='0.4';
+  $REVISION='$Revision: 1.18 $';
+}
+
+if ($print_version) {
+  print "Current version is $VERSION ($REVISION)\n";
+  print "Current version of XML::XUpdate::LibXML is $XML::XUpdate::LibXML::VERSION\n";
+  exit 1;
+}
+pod2usage(-exitstatus => 0, -verbose => 2) if $help;
+pod2usage() if ($usage or @ARGV<2);
+
+my $parser  = XML::LibXML->new();
+my $xupdate = XML::XUpdate::LibXML->new();
+
+foreach (@prefixmap) {
+  my ($prefix,$uri)= split /\s*=\s*/,$_;
+  if ($prefix ne '' and $uri ne '') {
+    $xupdate->registerNs($prefix,$uri);
+  }
+}
+
+if ($extra_indent||$strip_ws) {
+  $parser->keep_blanks(0);
+} else {
+  $parser->keep_blanks(1);
+}
+my $dom = $parser->parse_file($ARGV[1]);
+
+if ($keep_ws) {
+  $parser->keep_blanks(1);
+} else {
+  $parser->keep_blanks(0);
+}
+my $actions = $parser->parse_file($ARGV[0]);
+
+unless ($keep_ws) {
+  my $command=$actions->getDocumentElement->firstChild;
+  while ($command) {
+    xml_strip_element($command);
+    $command = $command->nextSibling();
+  }
+}
+
+$xupdate->process($dom->getDocumentElement(), $actions);
+
+print $dom->toString(0+($indent||$extra_indent)+$extra_indent);
+
+1;
+
+__END__
+
+
+=head1 xupdate
+
+xupdate - Process XUpdate commands over an XML document
+
+=head1 SYNOPSIS
+
+xupdate [options] <xupdate-file> <input-file>
+
+ Options:
+   -u | --usage        print brief help on usage
+   -h | --help         print documentation
+
+   -n | --namespace prefix=namespace-uri
+                       associate a namespace with a prefix for use
+                       in XPath selections in XUpdate file
+                       (this option may occur several times)
+
+   -k | --keep-ws      preserve whitespace in the XUpdate file
+   -s | --strip-ws     strip ignorable whitespace from the input file
+   -V | --version      print current version and revision
+   -i | --indent       indent the output XML
+   -j | --extra-indent like -i, but also adds a leading and a trailing
+                       linebreak to every text node.
+
+ but also put an extra newline after
+ every start-tag and before every end-tag
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<--usage>
+
+Print a brief help message on usage and exits.
+
+=item B<--help>
+
+Prints the manual page and exits.
+
+=item B<--namespace> prefix=namespace-uri
+
+Associate a namespace with a prefix. The prefix may be used in the
+XPath selections in the XUpdate file to address nodes of the source
+document that belong to the given namespace.  This is especially
+useful for mapping the default namespace to a prefix because XPath by
+definition doesn't honour default namespaces. This option may occur
+several times.
+
+=item B<--keep-ws>
+
+Preserves any whitespace in XUpdate file. The default behaviour is to
+remove all ignorable whitespace and any leading or trailing whitespace
+in all XUpdate command elements in the XUpdate file.
+
+=item B<--strip-ws>
+
+Remove "ignorable" whitespace from the input file. The default
+behaviour is to keep any whitespace unless the --extra-indent (-j)
+option is used. Note that the whitespace being present or not may
+affect results returned by some XPath expressions (such as
+/foo/bar/text()[2]).
+
+=item B<--version>
+
+Print version and revision number of B<This program> command and
+version number of XML::XUpdate library used.
+
+=item B<--indent>
+
+Indent the resulting document on output.
+
+=item B<--extra-indent>
+
+Indent the resulting document on output as --indent, but also add a
+leading and a trailing linebreak to every text node.
+
+=item B<--debug>
+
+Print some debugging information about commands being applied.
+
+=back
+
+
+=head1 DESCRIPTION
+
+B<This program> will parse the given XUpdate file and the input file
+and print the input file updated accordingly. XUpdate file format is
+described in XUpdate Working Draft from 2000-09-14
+(http://www.xmldb.org/xupdate/xupdate-wd.html).
+
+=cut
+
+=head1 AUTHOR
+
+Petr Pajas, pajas@matfyz.cz
+
+=head1 COPYRIGHT
+
+Copyright 2002-2003 Petr Pajas, All rights reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

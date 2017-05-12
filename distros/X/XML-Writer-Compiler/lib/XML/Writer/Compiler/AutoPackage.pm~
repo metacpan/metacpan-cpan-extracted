@@ -1,0 +1,67 @@
+package XML::Writer::Compiler::AutoPackage;
+
+# ABSTRACT: methods that are used by compiler-generated packages
+
+use Moose::Role;
+
+sub BUILD {
+  my($self)=@_;
+
+  my $s = XML::Writer::String->new();
+  my $writer = XML::Writer->new( OUTPUT => $s );
+
+  $self->string($s);
+  $self->writer($writer);
+}
+
+
+sub DIVE {
+my ($self,$root,@keys)=@_;
+   my $ref = Dive(@_);
+    my $ret;
+   warn "DIVEROOT: " . Dumper($root);
+   warn "DIVEKEYS: @keys";
+    if (ref $ref eq 'ARRAY') {
+      $ret = $ref;
+    } elsif (ref $ref eq 'HASH') {
+      $ret = '';
+    } elsif (not defined $ref) {
+      $ret = '';
+    } else {
+      $ret = $ref;
+    }
+    warn "DIVERET: $ret";
+    $ret;
+
+
+}
+
+sub EXTRACT {
+my($self,$scalar)=@_;
+
+my @ret;
+
+if (ref $scalar eq 'ARRAY') {
+  @ret = @$scalar;
+} elsif (ref $scalar eq 'HASH') {
+  @ret = ( [], '' ) ;
+} else {
+  @ret = ( [], $scalar);
+}
+
+warn "EXTRACTRET: " . Dumper(\@ret);
+@ret;
+
+}
+
+sub maybe_morph {
+  my($self)=@_;
+  if ($self->can('morph')) {
+    warn "MORPHING";
+    $self->morph;
+  }
+}
+
+
+1;
+

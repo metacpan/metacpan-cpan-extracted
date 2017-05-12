@@ -1,0 +1,3 @@
+XML::Checker ERROR-157: unexpected Element [d]
+	Context: ChildElementIndex 0
+XML::Checker ERROR-101: undefined ELEMENT [d]

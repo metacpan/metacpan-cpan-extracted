@@ -1,0 +1,5 @@
+\.svn
+\.cmd
+\.bak
+\.gz
+fixWorldWritable.pl

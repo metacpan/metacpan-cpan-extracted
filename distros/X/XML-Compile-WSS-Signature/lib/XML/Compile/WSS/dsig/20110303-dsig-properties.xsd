@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+        xmlns:dsp="http://www.w3.org/2009/xmldsig-properties"
+        targetNamespace="http://www.w3.org/2009/xmldsig-properties"
+        version="0.1" elementFormDefault="qualified">
+
+  <element name="Profile" type="dsp:ProfileType"/> 
+  <complexType name="ProfileType">
+    <attribute name="URI" type="anyURI"/>
+  </complexType>
+
+  <element name="Role" type="dsp:RoleType"/> 
+  <complexType name="RoleType">
+    <attribute name="URI" type="anyURI"/>
+  </complexType>
+
+  <element name="Identifier" type="string"/>
+
+  <element name="Created" type="dateTime"/>
+
+  <element name="Expires" type="dateTime"/>
+
+  <element name="ReplayProtect" type="dsp:ReplayProtectType"/>
+  <complexType name="ReplayProtectType" >
+    <sequence>
+      <element name="timestamp" type="dateTime"/>
+      <element name="nonce" type="dsp:NonceValueType"/>
+    </sequence>
+  </complexType>
+
+  <complexType name="NonceValueType">
+    <simpleContent>
+      <extension base="string">
+        <attribute name="EncodingType" type="anyURI"/>
+      </extension>
+    </simpleContent>
+  </complexType>
+
+</schema>

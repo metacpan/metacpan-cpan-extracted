@@ -1,0 +1,55 @@
+<?xml version='1.0' encoding='ISO-8859-1'?>
+<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3.org/1999/xhtml'>
+
+  <head>
+    <meta http-equiv='Content-Type' content='text/html; charset=ISO-8859-1' />
+    <meta name='generator' content='<TMPL_VAR NAME=generator>' />
+    <!-- TMPL_IF NAME="date" --><meta name='date' content='<TMPL_VAR NAME=date>' /><!-- /TMPL_IF -->
+    <title><!-- TMPL_VAR NAME="page_title" --></title>
+    <!-- TMPL_IF NAME="css" -->
+    <link href='<TMPL_VAR NAME=css>.css' rel='stylesheet' type='text/css'/>
+    <!-- TMPL_ELSE -->
+    <style type='text/css'>
+      a.index {font-weight: bold}
+      hr {text-align: center}
+      table.synopsis {background-color: #DCDCDC}
+      td.title {font-style: italic}
+    </style>
+    <!-- /TMPL_IF -->
+    <!-- TMPL_IF NAME="href_prev" -->
+    <link rel='Prev' href='<TMPL_VAR NAME=href_prev>'/>
+    <!-- /TMPL_IF -->
+    <!-- TMPL_IF NAME="href_next" -->
+    <link rel='Next' href='<TMPL_VAR NAME=href_next>'/>
+    <!-- /TMPL_IF -->
+  </head>
+
+  <body>
+    <div class='navheader'>
+      <table summary='Header navigation table' width='100%' border='0' cellpadding='0' cellspacing='0'>
+        <colgroup><col width='20%'/><col width='60%'/><col width='20%'/></colgroup>
+        <tr>
+          <th colspan='3' align='center'><!-- TMPL_VAR NAME="book_title" --></th>
+        </tr>
+        <tr valign='bottom'>
+          <td align='left'>
+            <!-- TMPL_IF NAME="href_prev" -->
+              <a href='<TMPL_VAR NAME=href_prev>' accesskey='P'><img src='prev.png' alt='Precedent' border='0'/></a>
+            <!-- TMPL_ELSE -->
+              &nbsp;
+            <!-- /TMPL_IF -->
+          </td>
+          <td align='center'>&nbsp;</td>
+          <td align='right'>
+            <!-- TMPL_IF NAME="href_next" -->
+              <a href='<TMPL_VAR NAME=href_next>' accesskey='S'><img src='next.png' alt='Suivant' border='0'/></a>
+            <!-- TMPL_ELSE -->
+              &nbsp;
+            <!-- /TMPL_IF -->
+          </td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+

@@ -1,0 +1,178 @@
+<schema targetNamespace="http://www.bea.com/wli/sb/context"
+        xmlns:mc="http://www.bea.com/wli/sb/context"
+        xmlns="http://www.w3.org/2001/XMLSchema"
+        elementFormDefault="qualified"
+        attributeFormDefault="unqualified">
+    <!--============================================================== -->
+
+    <!-- The context variable 'fault' is an instance of this element -->
+    <element name="fault" type="mc:FaultType"/>
+
+    <!-- The context variables 'inbound' and 'outbound' are instances of this element -->
+    <element name="endpoint" type="mc:EndpointType"/>
+
+    <!-- The three sub-elements within the 'inbound' and 'outbound' variables -->
+    <element name="service" type="mc:ServiceType"/>
+    <element name="transport" type="mc:TransportType"/>
+    <element name="security" type="mc:SecurityType"/>
+
+    <!-- The context variable 'attachments' is an instance of this element -->
+    <element name="attachments" type="mc:AttachmentsType"/>
+
+    <!-- Each attachment in the 'attachments' variable is represented by an instance of this element -->
+    <element name="attachment" type="mc:AttachmentType"/>
+
+    <!-- Element used to represent binary payloads and pass-by reference content -->
+    <element name="binary-content" type="mc:BinaryContentType"/>
+
+    <!-- =================================================================== -->
+
+    <!-- The schema type for  -->
+    <complexType name="AttachmentsType">
+        <sequence>
+            <!-- the 'attachments' variable is just a series of attachment elements -->
+            <element ref="mc:attachment" minOccurs="0" maxOccurs="unbounded"/>
+        </sequence>
+    </complexType>
+    
+    <complexType name="AttachmentType">
+        <all>
+            <!-- Set of MIME headers associated with attachment -->
+            <element name="Content-ID" type="string" minOccurs="0"/>
+            <element name="Content-Type" type="string" minOccurs="0"/>
+            <element name="Content-Transfer-Encoding" type="string" minOccurs="0"/>
+            <element name="Content-Description" type="string" minOccurs="0"/>
+            <element name="Content-Location" type="string" minOccurs="0"/>
+            <element name="Content-Disposition" type="string" minOccurs="0"/>
+
+            <!-- Contains the attachment content itself, either in-lined or as <binary-content/> -->
+            <element name="body" type="anyType"/>
+        </all>
+    </complexType>
+
+    <complexType name="BinaryContentType">
+        <!-- URI reference to the binary or pass-by-reference payload -->
+        <attribute name="ref" type="anyURI" use="required"/>
+    </complexType>
+
+    <!-- =================================================================== -->
+
+    <complexType name="EndpointType">
+        <all>
+            <!-- Sub-elements holding service, transport, and security details for the endpoint -->
+            <element ref="mc:service" minOccurs="0" />
+            <element ref="mc:transport" minOccurs="0" />
+            <element ref="mc:security" minOccurs="0" />
+        </all>
+
+        <!-- Fully-qualified name of the service represented by this endpoint -->
+        <attribute name="name" type="string" use="required"/>
+    </complexType>
+
+    <!-- =================================================================== -->
+
+    <complexType name="ServiceType">
+        <all>
+            <!-- name of service provider -->
+            <element name="providerName" type="string" minOccurs="0"/>
+
+            <!-- the service operation being invoked -->
+            <element name="operation" type="string" minOccurs="0"/>
+        </all>
+    </complexType>
+
+    <!-- =================================================================== -->
+
+    <complexType name="TransportType">
+        <all>
+            <!-- URI of endpoint -->
+            <element name="uri" type="anyURI" minOccurs="0" />
+
+            <!-- Transport-specific metadata for request and response (includes transport headers) -->
+            <element name="request" type="anyType" minOccurs="0"/>
+            <element name="response" type="anyType" minOccurs="0" />
+
+            <!-- Indicates one-way (request only) or bi-directional (request/response) communication -->
+            <element name="mode" type="mc:ModeType" minOccurs="0" />
+
+            <!-- Specifies the quality of service -->
+            <element name="qualityOfService" type="mc:QoSType" minOccurs="0" />
+
+            <!-- Retry values (outbound only) -->
+            <element name="retryInterval" type="integer" minOccurs="0" />
+            <element name="retryCount" type="integer" minOccurs="0" />
+        </all>
+    </complexType>
+
+    <simpleType name="ModeType">
+        <restriction base="string">
+            <enumeration value="request"/>
+            <enumeration value="request-response"/>
+        </restriction>
+    </simpleType>
+
+    <simpleType name="QoSType">
+        <restriction base="string">
+            <enumeration value="best-effort"/>
+            <enumeration value="exactly-once"/>
+        </restriction>
+    </simpleType>
+
+    <!-- =================================================================== -->
+
+    <complexType name="SecurityType">
+        <all>
+            <!-- Transport-level client information (inbound only) -->
+            <element name="transportClient" type="mc:SubjectType" minOccurs="0"/>
+
+            <!-- Message-level client information (inbound only) -->
+            <element name="messageLevelClient" type="mc:SubjectType" minOccurs="0"/>
+            
+            <!-- Boolean flag used to disable outbound WSS processing (outbound only) -->
+            <element name="doOutboundWss" type="boolean" minOccurs="0"/>
+        </all>
+    </complexType>
+
+    <complexType name="SubjectType">
+        <all>
+            <!-- User name associated with this tranport- or message-level subject -->
+            <element name="username" type="string"/>
+        </all>
+    </complexType>
+
+    <!-- =================================================================== -->
+
+    <complexType name="FaultType">
+        <all>
+            <!-- A short string identifying the error (e.g. BEA38229) -->
+            <element name="errorCode" type="string"/>
+
+            <!-- Descriptive text explaining the reason for the error -->
+            <element name="reason" type="string" minOccurs="0" />
+
+            <!-- Any additional details about the error  -->
+            <element name="details" type="anyType" minOccurs="0" />
+
+            <!-- Information about where the error occured in the proxy -->
+            <element name="location" type="mc:LocationType" minOccurs="0" />
+        </all>
+    </complexType>
+
+    <complexType name="LocationType">
+        <all>
+            <!-- Name of the Pipeline/Branch/Route node where error occured -->
+            <element name="node" type="string" minOccurs="0" />
+
+            <!-- Name of the Pipeline where error occured (if applicable) -->
+            <element name="pipeline" type="string" minOccurs="0" />
+
+            <!-- Name of the Stage where error occured (if applicable) -->
+            <element name="stage" type="string" minOccurs="0" />
+
+            <!-- Indicates if error occured from inside an error handler -->
+            <element name="error-handler" type="boolean" minOccurs="0" />
+        </all>
+    </complexType>
+    <!-- Encapsulates any stack-traces that may be added to a fault <details> -->
+    <element name="stack-trace" type="string"/>
+</schema>

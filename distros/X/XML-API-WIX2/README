@@ -1,0 +1,29 @@
+This is the README file for XML::API::WIX2
+
+INSTALLATION
+XML::API::WIX2 uses the standard perl module install process
+This module requires
+XML::API
+WiX (Windows Installer XML) version 2
+
+perl Makefile.PL
+make
+make test [TEST_VERBOSE=1] (optional but recommended)
+make install
+
+DESCRIPTION
+################################################################################
+XML::API::WIX2 extends XML::API providing the ability to create Windows
+Installer XML source files for use with Version 2 of WiX
+
+The WiX (Windows Installer XML) Toolset can be obtained from
+http://wix.sourceforge.net
+
+AUTHOR
+R Bernard Davison <rbdavison@cpan.org>
+
+COPYRIGHT
+Copyright (c) 2001 R Bernard Davison. All rights reserved.
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+

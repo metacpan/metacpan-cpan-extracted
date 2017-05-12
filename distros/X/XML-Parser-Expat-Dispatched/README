@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution XML-Parser-Expat-Dispatched,
+version 0.952:
+
+  Automagically dispatches subs to XML::Parser::Expat handlers
+
+This software is copyright (c) 2013 by Patrick Seebauer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

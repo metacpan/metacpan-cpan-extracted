@@ -1,0 +1,19 @@
+This are some notes and possible additions about these
+tests.
+
+The example Atom files used in these tests where acquired
+from http://feedparser.org/tests/wellformed/atom10/ on Jan
+29 2006. Supplimental example files were added. These files
+are prefixed with 'x-'. Not all files are used as some were
+no applicable to the scope and interface of this package. In
+general the following were NOT tested:
+
+* No mappings.
+* Relative links. 
+* ID normalization.
+
+Also Atom 0.3 elements that have been deprecated are not
+tested.
+
+Some deeper tests of the source element and Writer module
+output are probably needed.

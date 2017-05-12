@@ -1,0 +1,38 @@
+<todo version="0.1.19">
+    <note priority="high" time="1246846232" done="1246877202">
+        finish eraticating the scalar results in favor of KLIST/LIST only results
+    </note>
+    <note priority="medium" time="1246846239" done="1246986715">
+        finish the docs
+        <note priority="medium" time="1246846256" done="0">
+            make sure the queries are a lot more clear than they are now
+        </note>
+        <note priority="medium" time="1246846314" done="1246918129">
+            make sure the wantarray vs return $matches[0] thing is really clear, because the behavior will be unexpected
+        </note>
+    </note>
+    <note priority="medium" time="1246846281" done="1246918121">
+        create a cute_query_klist() or klist_query() or something
+    </note>
+    <note priority="medium" time="1247192228">
+        we need some way to handle real life queries like the tda-login xml (nda, don't ask) ...
+        <note priority="medium" time="1247192239" done="1247223927">
+            so I need some kind of example xml to show what I mean
+        </note>
+        <note priority="medium" time="1247192254" done="1247517489">
+            some way to handle "all the tags except this one" that's actually intuative and usable
+            <comment>
+                this is automatic using re and nre
+            </comment>
+        </note>
+        <note priority="medium" time="1247192348" done="1247517467">
+            some way to handle the ambiguity of 'blarg' =&gt; { '*' =&gt; '', something =&gt; '', something_else =&gt; '' } ... does the '*' crush the specific queries?  UNDEFINED!  It depends on the ordering of the hash keys, which is essentially random
+            <comment>
+                I don't think this is fixable in a meaningful way
+            </comment>
+        </note>
+        <note priority="medium" time="1247517513">
+            make tests for the new example2.xml
+        </note>
+    </note>
+</todo>

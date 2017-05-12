@@ -1,0 +1,21 @@
+X86::Udis86		T_PTROBJ
+X86::Udis86::Operand	T_PTROBJ
+const X86::Udis86::Operand T_PTROBJ
+const X86::Udis86::Operand* T_PTROBJ
+ud_operand_t	*	T_PTROBJ
+const ud_operand_t	*	T_PTROBJ
+enum ud_type		T_IV
+enum ud_mnemonic_code		T_IV
+union ud_lval		T_IV
+
+translator	*	T_PTROBJ
+
+uint8_t			T_U_CHAR
+uint16_t		T_UV
+uint32_t		T_UV
+uint64_t		T_U_LONG
+
+int8_t			T_CHAR
+int16_t			T_IV
+int32_t			T_IV
+int64_t			T_IV

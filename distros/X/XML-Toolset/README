@@ -1,0 +1,49 @@
+XML::Toolset v1.025
+
+This software started life as XML::Validate. Therefore it includes the BBC
+Copyright.
+(c) BBC 2005. This program is free software; you can redistribute it and/or
+modify it under the GNU GPL.
+
+I have modified it dramatically, so it also carries my copyright.
+(c) Stephen Adkins 2007. This program is still free software; you can redistribute it and/or
+modify it under the GNU GPL.
+
+See the file COPYING in this distribution, or http://www.gnu.org/licenses/gpl.txt
+
+QUICK START:
+
+Install XML::Toolset by unpacking the tarball and running the following
+commands in the source directory:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+    Then delete the source directory tree since it's no longer needed.
+
+    run 'perldoc XML::Toolset' to read the full documentation.
+
+PHILOSOPHY:
+
+A lot of applications may require some XML processing (i.e via an XML Toolset).
+However I want to be able to make these applications work regardless the 
+XML toolset that you are using.  That is where XML::Toolset comes in.
+
+XML::Toolset builds on the Service abstraction of the App-Context framework
+(which I also wrote).
+
+AVAILABLE BACKENDS:
+
+NOTE: Although the goal is to support all three backends and more, I am going to
+start by getting the Xerces backend working first.  When that happens, any
+volunteers are welcomed to help get the others working.
+
+Backends for the following validators are included with this distribution:
+
+    LibXML (& you'll need XML::LibXML)
+    Xerces (& you'll need XML::Xerces)
+    MSXML  (for Win32 platforms, needs Win32::OLE)
+
+The default order of preference if all 3 are available is: Xerces, MSXML, LibXML
+

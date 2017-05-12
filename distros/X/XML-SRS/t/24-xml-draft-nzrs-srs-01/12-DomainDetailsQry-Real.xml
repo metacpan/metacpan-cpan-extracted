@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<NZSRSRequest VerMinor="11" VerMajor="3">
+  <DomainDetailsQry MaxResults="20" SkipResults="0">
+    <DomainNameFilter><![CDATA[x.geek.nz]]></DomainNameFilter>
+    <ResultDateRange>
+      <From
+         Day="01"
+         Hour="0"
+         Minute="0"
+         Month="1"
+         Second="00"
+         Year="1990"
+         />
+    </ResultDateRange>
+    <SearchDateRange>
+      <From
+         Day="01"
+         Hour="0"
+         Minute="0"
+         Month="1"
+         Second="00"
+         Year="1990"
+         />
+    </SearchDateRange>
+    <FieldList
+       Status="1"
+       NameServers="1"
+       RegistrantContact="1"
+       RegisteredDate="1"
+       AdminContact="1"
+       TechnicalContact="1"
+       LockedDate="1"
+       Delegate="1"
+       RegistrarId="1"
+       RegistrarName="1"
+       RegistrantRef="1"
+       LastActionId="1"
+       ChangedByRegistrarId="1"
+       Term="1"
+       BilledUntil="1"
+       CancelledDate="1"
+       AuditText="1"
+       EffectiveFrom="1"
+       />
+  </DomainDetailsQry>
+</NZSRSRequest>

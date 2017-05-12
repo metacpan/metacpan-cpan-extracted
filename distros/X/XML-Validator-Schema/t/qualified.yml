@@ -1,0 +1,12 @@
+# test bad attribute type
+
+--- |
+  <?xml version="1.0" encoding="UTF-8"?>
+  <schema elementFormDefault="qualified" xmlns="http://www.w3.org/2001/XMLSchema">
+    <element name="foo"/>
+  </schema>
+
+--- |
+  <foo />
+--- >
+FAIL /not.*?supported/

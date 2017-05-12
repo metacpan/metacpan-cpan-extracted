@@ -1,0 +1,7 @@
+Revision history for Perl extension XML::Atom::Ext::Threading
+
+0.02    Mon Dec 11 00:22:33 JST 2007
+        - added 'inc' directory
+
+0.01    Sat Dec  8 13:18:05 2007
+        - original version

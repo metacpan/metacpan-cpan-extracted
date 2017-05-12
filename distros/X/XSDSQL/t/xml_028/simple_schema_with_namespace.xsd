@@ -1,0 +1,11 @@
+﻿<?xml version="1.0"?>
+<xs:schema xmlns:ns1="namespace1" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="namespace1" elementFormDefault="qualified">
+	<xs:element name="simple_schema"> 
+			<xs:complexType>
+				<xs:sequence minOccurs="1" maxOccurs="1">
+					<xs:element name="el0" type="xs:string" minOccurs="0" maxOccurs="1"/>
+				</xs:sequence>
+			</xs:complexType>
+	</xs:element>
+</xs:schema>
+

@@ -1,0 +1,10 @@
+ChangeLog
+MANIFEST
+Makefile.PL
+README
+lib/XML/Compile/Tester.pm
+lib/XML/Compile/Tester.pod
+t/01use.t
+t/99pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

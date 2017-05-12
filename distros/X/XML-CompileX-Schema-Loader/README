@@ -1,0 +1,184 @@
+NAME
+
+    XML::CompileX::Schema::Loader - Load a web service and its dependencies
+    for XML::Compile::WSDL11
+
+VERSION
+
+    version 0.006
+
+SYNOPSIS
+
+        use XML::Compile::WSDL11;
+        use XML::Compile::SOAP11;
+        use XML::Compile::Transport::SOAPHTTP;
+        use XML::CompileX::Schema::Loader;
+    
+        my $wsdl   = XML::Compile::WSDL11->new;
+        my $loader = XML::CompileX::Schema::Loader->new(
+            wsdl => $wsdl,
+            uris => 'http://example.com/foo.wsdl',
+        );
+        $loader->collect_imports;
+        $wsdl->compileCalls;
+        my ( $answer, $trace ) = $wsdl->call( hello => {name => 'Joe'} );
+
+DESCRIPTION
+
+    From the description of XML::Compile::WSDL11:
+
+      When the [WSDL] definitions are spread over multiple files you will
+      need to use addWSDL() (wsdl) or importDefinitions() (additional
+      schema's) explicitly. Usually, interreferences between those files
+      are broken. Often they reference over networks (you should never
+      trust). So, on purpose you must explicitly load the files you need
+      from local disk! (of course, it is simple to find one-liners as
+      work-arounds, but I will to tell you how!)
+
+    This module implements that work-around, recursively parsing and
+    compiling a WSDL specification and any imported definitions and
+    schemas. The wrapped WSDL is available as a wsdl attribute.
+
+    You may also provide your own LWP::UserAgent (sub)class instance,
+    possibly to correct on-the-fly any broken interreferences between files
+    as warned above. You can also provide a caching layer, as with
+    WWW::Mechanize::Cached which is a sub-class of WWW::Mechanize and
+    LWP::UserAgent.
+
+    Please see the distribution's eg directory for sample scripts that use
+    this module to save schemas from a URL to the filesystem and then
+    reload them again.
+
+ATTRIBUTES
+
+ wsdl
+
+    An XML::Compile::WSDL11 instance. If you do not set this, a generic
+    instance will be created with the XML from the URIs in uris added. If
+    there are problems retrieving any files, an HTTP::Exception is thrown
+    with the details.
+
+ uris
+
+    Required string or URI object, or a reference to an array of the same,
+    that points to WSDL file(s) to compile.
+
+ user_agent
+
+    Optional instance of an LWP::UserAgent that will be used to get all
+    WSDL and XSD content.
+
+METHODS
+
+ collect_imports
+
+    Loops through all uris, adding them as WSDL documents to wsdl and then
+    importing all definitions, schemas, included and imported definition
+    and schema locations. You should call this before calling any of the
+    compilers in XML::Compile::WSDL11 to ensure that any dependencies have
+    been imported.
+
+SUPPORT
+
+ Perldoc
+
+    You can find documentation for this module with the perldoc command.
+
+      perldoc XML::CompileX::Schema::Loader
+
+ Websites
+
+    The following websites have more information about this module, and may
+    be of help to you. As always, in addition to those websites please use
+    your favorite search engine to discover more resources.
+
+      * MetaCPAN
+
+      A modern, open-source CPAN search engine, useful to view POD in HTML
+      format.
+
+      http://metacpan.org/release/XML-CompileX-Schema-Loader
+
+      * Search CPAN
+
+      The default CPAN search engine, useful to view POD in HTML format.
+
+      http://search.cpan.org/dist/XML-CompileX-Schema-Loader
+
+      * AnnoCPAN
+
+      The AnnoCPAN is a website that allows community annotations of Perl
+      module documentation.
+
+      http://annocpan.org/dist/XML-CompileX-Schema-Loader
+
+      * CPAN Ratings
+
+      The CPAN Ratings is a website that allows community ratings and
+      reviews of Perl modules.
+
+      http://cpanratings.perl.org/d/XML-CompileX-Schema-Loader
+
+      * CPAN Forum
+
+      The CPAN Forum is a web forum for discussing Perl modules.
+
+      http://cpanforum.com/dist/XML-CompileX-Schema-Loader
+
+      * CPANTS
+
+      The CPANTS is a website that analyzes the Kwalitee ( code metrics )
+      of a distribution.
+
+      http://cpants.cpanauthors.org/dist/XML-CompileX-Schema-Loader
+
+      * CPAN Testers
+
+      The CPAN Testers is a network of smokers who run automated tests on
+      uploaded CPAN distributions.
+
+      http://www.cpantesters.org/distro/X/XML-CompileX-Schema-Loader
+
+      * CPAN Testers Matrix
+
+      The CPAN Testers Matrix is a website that provides a visual overview
+      of the test results for a distribution on various Perls/platforms.
+
+      http://matrix.cpantesters.org/?dist=XML-CompileX-Schema-Loader
+
+      * CPAN Testers Dependencies
+
+      The CPAN Testers Dependencies is a website that shows a chart of the
+      test results of all dependencies for a distribution.
+
+      http://deps.cpantesters.org/?module=XML::CompileX::Schema::Loader
+
+ Bugs / Feature Requests
+
+    Please report any bugs or feature requests through the web interface at
+    https://github.com/mjgardner/xml-compilex-schema-loader/issues. You
+    will be automatically notified of any progress on the request by the
+    system.
+
+ Source Code
+
+    The code is open to the world, and available for you to hack on. Please
+    feel free to browse it and play with it, or whatever. If you want to
+    contribute patches, please send me a diff or prod me to pull from your
+    repository :)
+
+    https://github.com/mjgardner/xml-compilex-schema-loader
+
+      git clone git://github.com/mjgardner/xml-compilex-schema-loader.git
+
+AUTHOR
+
+    Mark Gardner <mjgardner@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2015 by ZipRecruiter.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

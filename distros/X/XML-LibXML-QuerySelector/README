@@ -1,0 +1,73 @@
+NAME
+    XML::LibXML::QuerySelector - add querySelector and querySelectorAll
+    methods to XML::LibXML nodes
+
+SYNOPSIS
+      use XML::LibXML::QuerySelector;
+  
+      my $document = XML::LibXML->load_xml(location => 'my.xhtml');
+      my $warning  = $document->querySelector('p.warning strong');
+      print $warning->toString if defined $warning;
+
+DESCRIPTION
+    This module defines a class (it has no constructor so perhaps closer to an
+    abstract class or a role) XML::LibXML::QuerySelector, and sets itself up
+    as a superclass (not a subclass) of XML::LibXML::Document,
+    XML::LibXML::DocumentFragment and XML::LibXML::Element, thus making its
+    methods available to objects of those classes.
+
+    Yes, this is effectively monkey-patching, but it's performed in a
+    *relatively* safe manner.
+
+  Methods
+    The methods provided by this module are defined in the W3C Recomendation
+    "Selectors API Level 1" <http://www.w3.org/TR/selectors-api/>.
+
+    `querySelector($selector)`
+        Given a CSS selector, returns the first match or undef if there are no
+        matches.
+
+    `querySelectorAll($selector)`
+        Given a CSS selector, returns all matches as a list, or if called in
+        scalar context, as an XML::LibXML::NodeList.
+
+CAVEATS
+    *   When called on an element, `querySelectorAll` returns a static node
+        list; not a live node list. (Called on a document or document
+        fragment, it will return a live node list as specified in the W3C
+        Recommendation.)
+
+    *   Use on mixed-namespace documents is largely untested. The module is
+        mostly intended for use with XHTML and HTML documents.
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=XML-LibXML-QuerySelector>.
+
+TODO
+    *   Consider adding HTML5 DOM traversal methods including
+        `getElementsByClassName`.
+
+SEE ALSO
+    HTML::Selector::XPath, XML::LibXML.
+
+    <http://www.w3.org/TR/selectors-api/>.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+THANKS
+    Tatsuhiko Miyagawa and Max Maischein, for HTML::Selector::XPath, and for
+    resolving <https://rt.cpan.org/Ticket/Display.html?id=73719> quickly.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2012-2013 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

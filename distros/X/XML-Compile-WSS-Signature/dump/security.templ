@@ -1,0 +1,21 @@
+# Describing complex wsse:Security
+#     {http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd}Security
+#
+# Produced by XML::Compile::Translate::Template version undef
+#          on Sat Jul 16 01:30:09 2016
+#
+# BE WARNED: in most cases, the example below cannot be used without
+# interpretation.  The comments will guide you.
+#
+# xmlns:wsse      http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd
+# xmlns:xsd       http://www.w3.org/2001/XMLSchema
+
+# is a wsse:SecurityHeaderType
+{ # any attribute not in wsse:
+  ANYATTR => "AnySimple",
+
+  # sequence of ANY
+
+  # any element in any namespace
+  # occurs any number of times
+  ANY => [ "Anything", ], }

@@ -1,0 +1,110 @@
+#!/usr/local/bin/perl
+# 
+# Copyright (c) 1998 Michael Koehne <kraehe@copyleft.de>
+# 
+# XML::Edifact is free software. You can redistribute and/or
+# modify this copy under terms of GNU General Public License.
+
+=head1 NAME
+
+annex_b - read Annex B from D422 to patch segment and composite data
+
+=head1 SYNOPSIS
+
+./boot/annex_b.pl
+
+=head1 DESCRIPTION
+
+This script has to run after create_{segment,composite,codes}.pl
+but before create_dtd.pl to add segments and composites from Annex B.
+
+You wont normaly find a file called Annex_B in the
+EDIFACT documentation. Its part of D422, but as this file was'nt
+parseable I took the work to reformat Annex B into a new file,
+powerd by vi because I needed natural intelligence to prepare
+the artificial stupidity of this script.
+
+Most of the work wont be neccessary, if they've written XML.
+
+=cut
+
+use strict;
+
+use vars qw($segment_tag $segment_list_of_codes $segment_mand_cond_flags);
+use vars qw($segment_cooked_name $segment_canon_name);
+use vars qw($composite_tag $composite_list_of_codes $composite_mand_cond_flags);
+use vars qw($composite_cooked_name $composite_canon_name);
+use vars qw($element_tag $element_cooked_name $element_canon_name);
+
+open (INFILE, "un_edifact_d96b/annex_b.96b")	|| die "can not open annex_b.96b for reading";
+open (SEGFILE, ">".File::Spec->catdir("html","LIB","xml-edifact-03","segment.add") )		|| die "can not open segment.add for writing";
+open (COMFILE, ">".File::Spec->catdir("html","LIB","xml-edifact-03","composite.add") )		|| die "can not open composite.add for writing";
+open (ELEFILE, ">".File::Spec->catdir("html","LIB","xml-edifact-03","element.add") )		|| die "can not open element.add for writing";
+
+printf STDERR "reading Annex B\n";
+
+while (<INFILE>) {
+    chop;	# strip record separator
+    if (!($. % 64)) {
+	printf STDERR '.';
+    }
+    if (/^Segment: ..., /) {
+	$segment_tag                = substr($_,9,3);
+	$segment_canon_name         = substr($_,14);
+	$segment_cooked_name        = XML::Edifact::recode_mark($segment_canon_name);
+	$segment_list_of_codes      = "";
+	$segment_mand_cond_flags    = "";
+    }
+    if (/^ S[0-9][0-9][0-9] /) {
+	$composite_tag              = substr($_,1,4);
+	$composite_canon_name       = substr($_,20);
+	$composite_cooked_name      = XML::Edifact::recode_mark($composite_canon_name);
+	$composite_list_of_codes    = "";
+	$composite_mand_cond_flags  = "";
+	$segment_list_of_codes     .= substr($_,1,4)." ";
+	$segment_mand_cond_flags   .= substr($_,16,1);
+        }
+    if (/^ [0-9][0-9][0-9][0-9] /) {
+	$element_tag                = substr($_,1,4);
+	$element_canon_name         = substr($_,20);
+	$element_cooked_name        = XML::Edifact::recode_mark($element_canon_name);
+	if ($composite_tag) {
+		$composite_list_of_codes   .= substr($_,1,4)." ";
+		$composite_mand_cond_flags .= substr($_,16,1);
+	} else {
+		$segment_list_of_codes     .= substr($_,1,4)." ";
+		$segment_mand_cond_flags   .= substr($_,16,1);
+	}
+	$XML::Edifact::ELEMT{$element_tag}="anxe:".$element_cooked_name;
+	printf ELEFILE "%s\tanxe:%s\n", $element_tag, $element_cooked_name;
+    }
+  
+    if ((/^[ =_-]+$/) && ($composite_tag)) {
+    	    chop $composite_list_of_codes unless $composite_list_of_codes eq "";
+
+	    $XML::Edifact::COMPT{$composite_tag}="$composite_list_of_codes\t$composite_mand_cond_flags\tanxc:$composite_cooked_name\t$composite_canon_name";
+	    print COMFILE "$composite_tag\t$composite_list_of_codes\t$composite_mand_cond_flags\tanxc:$composite_cooked_name\t$composite_canon_name\n";
+
+	    $composite_tag="";
+	    $composite_canon_name="";
+	    $composite_cooked_name="";
+	    $composite_list_of_codes="";
+	    $composite_mand_cond_flags="";
+    }
+    if ((/^[ =]+$/) && ($segment_tag)) {
+    	    chop $segment_list_of_codes unless $segment_list_of_codes eq "";
+
+	    $XML::Edifact::SEGMT{$segment_tag}="$segment_list_of_codes\t$segment_mand_cond_flags\tanxs:$segment_cooked_name\t$segment_canon_name";
+	    $XML::Edifact::SEGMR{"anxs:$segment_cooked_name"}=$segment_tag;
+	    print SEGFILE "$segment_tag\t$segment_list_of_codes\t$segment_mand_cond_flags\tanxs:$segment_cooked_name\t$segment_canon_name\n";
+
+    	    $segment_list_of_codes .= " ";
+    }
+}
+
+close(INFILE);
+close(SEGFILE);
+close(COMFILE);
+
+print STDERR "\n";
+1;

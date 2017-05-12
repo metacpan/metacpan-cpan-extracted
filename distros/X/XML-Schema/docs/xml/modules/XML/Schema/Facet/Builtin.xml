@@ -1,0 +1,117 @@
+<module name="XML::Schema::Facet::Builtin">
+
+  <about>
+    The XML::Schema::Facet::Builtin module defines facets which are
+    built in to XML Schema.
+  </about>
+
+  <synopsis>
+<perl>
+use XML::Schema::Facet::Builtin;
+
+my $facet = XML::Schema::Facet::length->new(value => 22);
+</perl>
+  </synopsis>
+
+  <section id="facets" title="Facet Modules">
+    The <module>XML::Schema::Facet::Builtin</module> module defines
+    the following facets:
+
+    <list>
+      <item title="XML::Schema::Facet::Fixable">
+	Adds the optional '<perlcode>fixed</perlcode>' attribute
+        to facets derived from it and the <perlcode>fixed()</perlcode>
+        method to return a flag indicating if the object is fixed
+        (e.g. immutable).
+      </item>
+
+      <item title="XML::Schema::Facet::length">
+	This facet uses <cfgvar class="XML::Schema::Facet">value</cfgvar>
+	to specify a particular length of a list (in elements) or string
+        (in characters).
+      </item>
+
+      <item title="XML::Schema::Facet::minLength">
+	This facet uses <cfgvar class="XML::Schema::Facet">value</cfgvar>
+	to specify the minimum length of a list (in elements) or string
+        (in characters).
+      </item>
+
+      <item title="XML::Schema::Facet::maxLength">
+	This facet uses <cfgvar class="XML::Schema::Facet">value</cfgvar>
+	to specify the maximum length of a list (in elements) or string
+        (in characters).
+      </item>
+
+      <item title="XML::Schema::Facet::pattern">
+	This facet uses <cfgvar class="XML::Schema::Facet">value</cfgvar>
+	to specify a regular expression which a string should match.
+      </item>
+
+      <item title="XML::Schema::Facet::enumeration">
+	This facet uses <cfgvar class="XML::Schema::Facet">value</cfgvar>
+	to specify a reference to list of permitted values.
+      </item>
+
+      <item title="XML::Schema::Facet::whitespace">
+	This facet uses <cfgvar
+	class="XML::Schema::Facet">value</cfgvar> to specify if and
+	what whitespace should be performed on the string.  A value of
+	'preserve' leaves all whitespace intact.  A value of 'replace'
+	replaces newlines, carriage returns and tabs with spaces.  A
+	value of 'collapse' additionally collapses sequences of
+	multiple whitespace into a single space and strips any leading
+        or trailing whitespace.
+      </item>
+
+      <item title="XML::Schema::Facet::maxInclusive">
+	This facet uses <cfgvar class="XML::Schema::Facet">value</cfgvar>
+	to constrain a numerical value to an inclusive upper bound.
+      </item>
+
+      <item title="XML::Schema::Facet::maxExclusive">
+	This facet uses <cfgvar class="XML::Schema::Facet">value</cfgvar>
+	to constrain a numerical value to an exclusive upper bound.
+      </item>
+
+      <item title="XML::Schema::Facet::minInclusive">
+	This facet uses <cfgvar class="XML::Schema::Facet">value</cfgvar>
+	to constrain a numerical value to an inclusive lower bound.
+      </item>
+
+      <item title="XML::Schema::Facet::minExclusive">
+	This facet uses <cfgvar class="XML::Schema::Facet">value</cfgvar>
+	to constrain a numerical value to an exclusive lower bound.
+      </item>
+
+      <item title="XML::Schema::Facet::precision">
+	This facet uses <cfgvar class="XML::Schema::Facet">value</cfgvar>
+	to constrain the precision of a floating point number to a particular
+        limit.
+      </item>
+
+      <item title="XML::Schema::Facet::scale">
+	This facet uses <cfgvar class="XML::Schema::Facet">value</cfgvar>
+	to constrain the scale of a floating point number to a particular
+        limit.
+      </item>
+
+      <item title="XML::Schema::Facet::encoding">
+	This facet uses <cfgvar class="XML::Schema::Facet">value</cfgvar>
+	to specify a particular encoding for binary data, one of the values
+        '<perlcode>hex</perlcode>' or '<perlcode>base64</perlcode>'.
+        limit.
+      </item>
+
+      <item title="XML::Schema::Facet::duration">
+	This facet uses <cfgvar class="XML::Schema::Facet">value</cfgvar>
+	to specify a particular fixed time duration.
+      </item>
+
+      <item title="XML::Schema::Facet::period">
+	This facet uses <cfgvar class="XML::Schema::Facet">value</cfgvar>
+	to specify a particular fixed time period.
+      </item>
+    </list>
+  </section>
+</module>

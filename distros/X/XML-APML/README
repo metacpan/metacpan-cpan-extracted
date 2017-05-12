@@ -1,0 +1,193 @@
+NAME
+    XML::APML - APML parser/builder
+
+SYNOPSIS
+        # parse APML
+
+        use XML::APML;
+        use Perl6::Say;
+        use DateTime;
+        use DateTime::Format::W3CDTF;
+
+        my $path = "/path/to/apml.xml";
+        my $apml = XML::APML->parse_file($path);
+
+        my $fh = IO::File->open($path);
+        my $apml = XML::APML->parse_fh($fh);
+
+        my $str = "<APML version='0.6'>...</APML>";
+        my $apml = XML::APML->parse_string($str);
+
+        foreach my $profile ($apml->profiles) {
+
+            my $implicit = $profile->implicit_data;
+
+            foreach my $concept ($implicit->concepts) {
+                say $concept->key;
+                say $concept->value;
+                say $concept->from;
+                say DateTime::Format::W3CDTF->new->parse_datetime($concept->updated);
+            }
+
+            foreach my $source ($implicit->sources) {
+
+                say $source->key;
+                say $source->value;
+                say $source->name;
+                say $source->type;
+
+                foreach my $author ($source->authors) {
+                    say $author->key;
+                    say $author->value;
+                    say $author->from;
+                    say DateTime::Format::W3CDTF->new->parse_datetime($author->updated);
+                }
+            }
+
+            my $explicit = $profile->explicit_data;
+            # my $explicit = $profile->explicit;
+
+            foreach my $concept ($explicit->concepts) {
+                my $key   = $concept->key;
+                my $value = $concept->value;
+            }
+
+            foreach my $source ($explicit->sources) {
+
+                $source->key;
+                $source->value;
+                $source->name;
+                $source->type;
+
+                foreach my $author ($source->authors) {
+                    $author->key;
+                    $author->value;
+                }
+
+            }
+        }
+
+        foreach my $application ($apml->applications) {
+            $application->name;
+            $application->elem;
+        }
+
+        # build apml
+
+        my $apml = XML::APML->new;
+        $apml->title('My Attention Profile');
+        $apml->generator('My Application');
+        $apml->user_email('example@example.com');
+        $apml->date_created( DateTime::Format::W3CDTF->new->format_datetime( DateTime->now ) );
+        $apml->defaultprofile("Home");
+
+        # or you can set them at once
+        my $apml = XML::APML->new(
+            title          => 'My Attention Profile', 
+            generator      => 'My Application',
+            user_email     => 'example@example.org',
+            date_created   => DateTime::Format::W3CDTF->new->format_datetime( DateTime->now ),
+            defaultprofile => 'Home',
+        );
+
+        my $profile = XML::APML::Profile->new;
+        $profile->name("Home");
+
+        $profile->explicit->add_concept( XML::APML::Concept->new(
+            key   => 'music',
+            value => 0.5,
+        ) );
+        $profile->explicit->add_concept( XML::APML::Concept->new(
+            key   => 'sports',
+            value => 0.9,
+        ) );
+
+        $profile->explicit->add_source( XML::APML::Source->new(
+            key   => 'http://feeds.feedburner.com/TechCrunch',
+            value => 0.4,
+            name  => 'Techchunch',
+            type  => 'application/rss+xml',
+        ) );
+
+        $profile->implicit->add_concept( XML::APML::Concept->new(
+            key     => 'business',
+            value   => 0.93,
+            from    => 'GatheringTool.com',
+            updated => '2007-03-11T01:55:00Z',
+        ) );
+
+        $profile->implicit->add_source( XML::APML::Source->new(
+            key     => 'http://feeds.feedburner.com/apmlspec',
+            value   => 1.00,
+            from    => 'GatheringTool.com',
+            updated => '2007-03-11T01:55:00Z',
+            name    => 'APML.org',
+            type    => 'application/rss+xml',
+        ) );
+
+        my $source = XML::APML::Source->new(
+            key   => 'http://feeds.feeedburner.com/TechCrunch',
+            value => 0.4,
+            name  => 'Techchunch',
+            type  => 'application/rss+xml',
+        );
+
+        $source->add_author( XML::APML::Author->new(
+            key     => 'Sample',
+            value   => 0.5,
+            from    => 'GatheringTool.com',
+            updated => '2007-03-11T01:55:00Z',
+        ) );
+
+        $profile->implicit->add_source($source);
+
+        $apml->add_profile($profile);
+
+        my $application = XML::APML::Application->new;
+        $application->name("MyApplication");
+        $apml->add_application($application);
+
+        print $apml->as_xml;
+
+DESCRIPTION
+    APML (Attention Profiling Mark-up Language) Parser / Builder
+
+    This module allows you to parse or build XML strings according to APML
+    specification. Now this supports version 0.6 of APML.
+
+    See http://www.apml.org/
+
+METHODS
+  new
+
+  parse_string
+
+  parse_file
+
+  parse_fh
+
+  add_profile
+
+  profiles
+
+  add_application
+
+  applications
+
+  as_xml
+
+    Build XML from object and returns it as string.
+
+        my $apml = XML::APML->new;
+        $apml->title(...);
+        $apml->user_email(...);
+        ...
+        $apml->as_xml;
+
+AUTHOR
+    Lyo Kato, `lyo.kato at gmail.com'
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

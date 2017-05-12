@@ -1,0 +1,24 @@
+<?xml version='1.0' encoding='utf-8'?>
+<document xmlns="http://web-cpan.berlios.de/modules/XML-Grammar-Fortune/fiction-xml-0.2/" version="0.2">
+    <head>
+    </head>
+    <body xml:id="index">
+    <title>David vs. Goliath - Part I</title>
+    <section xml:id="top">
+    <title>The Top Section</title>
+    <p>
+        &amp;&#32;David and Goliath were standing by each other.
+        &lt;foo&gt;
+    </p>
+    <section xml:id="goliath">
+    <title>Goliath's Response</title>
+    <p>
+    Goliath was not amused.
+    </p>
+    <p>
+    He said to David: "Oh, really".
+    </p>
+    </section>
+    </section>
+</body>
+</document>

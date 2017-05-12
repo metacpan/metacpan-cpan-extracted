@@ -1,0 +1,9 @@
+[Xacobeo Plugin]
+Name=Clipboard Load
+Package=Xacobeo::Ex::ClipboardLoad
+Description=Loads a new XML document from the contents of the clipboard
+Icon=gtk-paste
+Authors=Emmanuel Rodriguez <potyl@cpan.org>
+Copyright=Copyright © 2009 Emmanuel Rodriguez
+Website=http://search.cpan.org/perldoc?Xacobeo
+

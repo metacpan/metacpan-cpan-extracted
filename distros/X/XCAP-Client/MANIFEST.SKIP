@@ -1,0 +1,7 @@
+\bRCS\b
+^MANIFEST\.
+(?i)^makefile$
+~$
+^blib/
+^MakeMaker-\d
+^.git

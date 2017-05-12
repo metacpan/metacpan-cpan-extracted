@@ -1,0 +1,5 @@
+<complexType name="[% item.name %]">
+[% PROCESS attrdefs %]
+[% PROCESS typedefs %]
+</complexType>
+

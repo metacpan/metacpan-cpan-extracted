@@ -1,0 +1,59 @@
+Revision history for PXB
+
+0.15    02/15/2011 mpg
+        added sql mapping with multiple conditional operators - example 'if' => ['type:ipv4','type:ipv6']
+	backward compatible with previous decalration - 'if' =>'type:ipv4'
+
+0.14    3/18/2009 mpg
+        allowed to set See Also in the footer
+
+0.13    1/23/2009 mpg
+        removed inc/.author directory
+	updated SYNOPSIS
+	changed test names to avoid 
+	complications under Windows
+	bugs fixed: 40463,40464
+	
+
+0.12    9/3/2008 mpg
+        added expand_xinclude to provide support for XIncludes
+
+0.11    9/2/2008 mpg
+        fixed bug with wrong accessor 
+
+0.10    8/13/2008 mpg
+        fixed major bug with undeclared call in the buildSQL
+
+0.09    7/24/2008 mpg
+        fixed several bugs, added package_root option 
+	changed interface to the buildAPI
+        added real life examples with callbacks by closure means
+	
+0.08    7/16/2008 mpg
+        added automated namespace registration ( namespaces will pop-up into the
+	top element decalration)
+	added example with schema extension pattern
+
+0.07    6/16/2008 mpg
+        fixed some glitches with uneven formatting of the generated code
+
+0.06    6/11/2008 mpg
+        specified more exact perlcritic policies and set of themes
+
+0.05    6/10/2008 mpg
+        added Test::Perl::Critic for test suit, added dependencies checks
+	to avoid failing tests
+
+0.04    6/9/2008 mpg
+        moved back to ExtUtils::Makemaker for makefile
+
+0.03    6/9/2008 mpg
+        Removed external dependence on xml2-config executable
+	added pre-req to have XML::LibXML v1.61 or better
+
+0.02    6/6/2008 mpg
+        Fixed white noise in pods, added pre-req checks
+	
+0.01    6/4/2008 mpg
+        First version, released on an unsuspecting world.
+

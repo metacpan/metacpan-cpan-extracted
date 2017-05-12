@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<NZSRSRequest VerMinor="11" VerMajor="3">
+
+    <!-- ActionID and HandleId seem to be in protocol.rnc twice, under HandleCreate and ContactAttr -->
+    <HandleCreate
+       ActionId="xx101"
+       HandleId="xx101"
+       Name="A Person"
+       Email="a@example.com"
+       >
+      <PostalAddress
+         Address1="1 Acacia Ave"
+         City="Wellington"
+         CountryCode="NZ"
+         PostalCode="6011"
+         />
+      <Phone
+         AreaCode="4"
+         CountryCode="64"
+         LocalNumber="Registrant phone s1c1"
+         />
+    </HandleCreate>
+
+</NZSRSRequest>

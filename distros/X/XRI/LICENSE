@@ -1,0 +1,23 @@
+Copyright (c) 2004 Identity Commons.
+All rights reserved.
+
+All Identity Commons software is dual licensed under both the GNU
+General Public License and the (modified) Berkeley Software
+Distribution License.  Before using any Identity Commons software,
+please read and choose one of the following documents:
+
+    * LICENSE_BSD
+    * LICENSE_GPL
+
+You must choose a license which you feel is most appropriate for use
+of this software.  Dual licensing is common practice in Open Source
+projects such as Perl and Mozilla.  Through the combined use of the
+GPL and BSD licenses, a high degree of freedom, compatibility and
+interoperability with other projects will be preserved.
+
+Further, some Identity Commons products may contain libraries licensed
+under the Apache Software License (ASL).  The following statement is
+therefore included to be in compliance with the ASL:
+
+        This product includes software developed by the
+        Apache Software Foundation (http://www.apache.org/).

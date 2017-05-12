@@ -1,0 +1,187 @@
+
+
+
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+<head>
+<title>Modules Index</title>
+</head>
+
+<body bgcolor="#ffffff">
+<table border="0" width="100%">
+<tr>
+<td align="left"><a href="index.html"><img src="images/canon.gif" border="0"></a></td>
+<td align="right"><img src="images/canre.gif"></td>
+</tr>
+</table>
+<div align="right">
+<small><a href="index.html">XML Schema Home</a></small>
+</div>
+
+
+<h1>Modules</h1>
+
+<!-- table -->
+<table border="0" cellpadding="4" cellspacing="1" 
+       bgcolor="#000044">
+<!-- table content -->
+<tr bgcolor="#ccccff">
+<td><b><small>Modules</b></td><td><b><small>Architecture</b></td></tr>
+
+<tr bgcolor="#eeeeff" valign="top">
+<td>
+
+<p>
+There are 18 documents for your inspection:
+<ul>
+<li><a href="modules/XML/Schema.html">XML::Schema</a>
+<li><a href="modules/XML/Schema/Attribute.html">XML::Schema::Attribute</a>
+<li><a href="modules/XML/Schema/Attribute/Group.html">XML::Schema::Attribute::Group</a>
+<li><a href="modules/XML/Schema/Base.html">XML::Schema::Base</a>
+<li><a href="modules/XML/Schema/Exception.html">XML::Schema::Exception</a>
+<li><a href="modules/XML/Schema/Facet.html">XML::Schema::Facet</a>
+<li><a href="modules/XML/Schema/Facet/Builtin.html">XML::Schema::Facet::Builtin</a>
+<li><a href="modules/XML/Schema/Factory.html">XML::Schema::Factory</a>
+<li><a href="modules/XML/Schema/Handler.html">XML::Schema::Handler</a>
+<li><a href="modules/XML/Schema/Handler/Simple.html">XML::Schema::Handler::Simple</a>
+<li><a href="modules/XML/Schema/Test.html">XML::Schema::Test</a>
+<li><a href="modules/XML/Schema/Type.html">XML::Schema::Type</a>
+<li><a href="modules/XML/Schema/Type/Builtin.html">XML::Schema::Type::Builtin</a>
+<li><a href="modules/XML/Schema/Type/Complex.html">XML::Schema::Type::Complex</a>
+<li><a href="modules/XML/Schema/Type/List.html">XML::Schema::Type::List</a>
+<li><a href="modules/XML/Schema/Type/Simple.html">XML::Schema::Type::Simple</a>
+<li><a href="modules/XML/Schema/Type/Union.html">XML::Schema::Type::Union</a>
+<li><a href="modules/XML/Schema/Wildcard.html">XML::Schema::Wildcard</a>
+</ul><p>
+</td>
+<td>
+
+<p>
+  At the very bottom of everything lies <a href="modules/XML/Schema/Base.html#HASH(0x87fd42c)">XML::Schema::Base</a>,
+  the base class module from which everything else is derived.  It
+  defines a bunch of useful methods that are common to the other modules.
+</p>
+
+<p> 
+  The <a href="modules/XML/Schema/Type.html#HASH(0x87e3170)">XML::Schema::Type</a> defines a base class for
+  representing types.  From this <a href="modules/XML/Schema/Type/Simple.html#HASH(0x84a8740)">XML::Schema::Type::Simple</a>  and <a href="modules/XML/Schema/Type/Complex.html#HASH(0x87e02f4)">XML::Schema::Type::Complex</a> are derived to represent
+  simple and complex types, respectively.
+</p>
+
+<p> 
+  A simple type is one which describes a single value.  These are
+  used to represent attribute values (e.g. '<code>baz</code>' in
+  <code>&lt;foo bar="baz"/&gt;</code>) and also simple elements that
+  have no attributes and only simple character content
+  (e.g. '<code>baz</code>' in <code>&lt;foo&gt;baz&lt;/foo&gt;</code>).
+  There are over 40 simple types built in to XML Schema to represent
+  values like string, integer, float, date, time, year, month, etc.
+  These are defined in <a href="modules/XML/Schema/Type/Builtin.html#HASH(0x87f2178)">XML::Schema::Type::Builtin</a>.  You 
+  can also define lists and unions of different simple types with 
+  the <a href="modules/XML/Schema/Type/List.html#HASH(0x880635c)">XML::Schema::Type::List</a> and 
+  <a href="modules/XML/Schema/Type/Union.html#HASH(0x87ddfb0)">XML::Schema::Type::Union</a> modules.
+<p>
+
+<p>
+  Starting from an existing simple type you can create your own custom
+  types by applying additional validation facets.  A facet is essentially
+  a constraint which you can apply to a type to specify, for example,
+  that the value should match a regular expression, be numerically 
+  greater or less than a certain value, and so on.  In fact, many of
+  the inbuilt simple types are layered on top of each other by applying
+  additional facets (e.g. <code>positiveInteger</code> is based on 
+  <code>integer</code> with the facet <code>minInclusive =&gt; 1</code>
+  applied). The  <a href="modules/XML/Schema/Facet.html#HASH(0x877d6f8)">XML::Schema::Facet</a> module defines a base 
+  class for facets and <a href="modules/XML/Schema/Facet/Builtin.html#HASH(0x87d1310)">XML::Schema::Facet::Builtin</a> defines 
+  numerous facets built in to XML Schema.
+</p>
+
+<p> Complex types are... more complex.  They are used to represent
+  elements that contain attributes and/or have non-character content,
+  e.g. child-elements.  You define your own complex types, specifying
+  the permitted attributes and the content model, including
+  definitions of child elements, mixed/empty flags, and so on.
+  We'll come back to this later.
+</p>
+
+<p> User defined simple and complex types are defined within a schema
+  and remain local to the containing complex type in which they are
+  defined or the schema as a whole if defined outside any complex
+  type.  In other words, they are lexically scoped.  The <a href="modules/XML/Schema/Scope.html#HASH(0x84a7d3c)">XML::Schema::Scope</a> module implements a mixin class which
+  various other modules such as <a href="modules/XML/Schema/Type/Complex.html#HASH(0x87d11cc)">XML::Schema::Type::Complex</a>  are derived from, to implement methods for registering and
+  retrieving information about types as well as various other XML
+  Schema components like element and attribute groups.
+</p>
+
+<p>
+  Complimentary to that is the <a href="modules/XML/Schema/Scoped.html#HASH(0x87b4738)">XML::Schema::Scoped</a> module
+  which also implements a mixin class but this time for the purpose of
+  accessing type (and other information) from a scope. 
+</p>
+
+<p> This might all become a little clearer when we start to consider
+  the <a href="modules/XML/Schema/Attribute.html#HASH(0x877b59c)">XML::Schema::Attribute</a> module.  Objects of this
+  class are used to represent XML element attributes and define at
+  least two items: their name and their type.  
+</p>
+<p>
+  The type item may reference an <a href="modules/XML/Schema/Type/Simple.html#HASH(0x84a883c)">XML::Schema::Type::Simple</a>  object directly or, more frequently, it will contain the name of one
+  of the 45 or so simple types inbuilt to XML Schema (e.g. integer,
+  string, month) or the name of a user-defined simple type defined
+  elsewhere.  When an attribute needs to fetch its type object, say to
+  validate attributes provided in an instance document, it calls its
+  type() method which is inherited from <a href="modules/XML/Schema/Scoped.html#HASH(0x877ecb0)">XML::Schema::Scoped</a>.
+  This delegates the request to the scope to which it is bound, which in
+  the case of an attribute, will be the complex type or attribute group
+  in which it is defined.  The request may be delegated upwards and 
+  outwards until the outermost scope of the schema document is reached.
+  If the request cannot be serviced by that point then the name 
+  specified does not match any defined simple type visible to the 
+  attribute.
+</p>
+<p> 
+  The benefits of this are twofold.  Firstly, you have the
+  convenience of referencing types by names, rather than having to
+  rely on passing references to type objects around.  Secondly, and
+  perhaps more significantly, it means that you can use types before
+  you define them, something which the XML Schema specification
+  explicitly permits.  
+</p>
+<p> 
+  Moving upwards from attributes, we have the 
+  <a href="modules/XML/Schema/Attribute/Group.html#HASH(0x84a88f0)">XML::Schema::Attribute::Group</a> module which acts as a
+  container for attributes.  Complex types use an attribute group
+  to define their attributes.  They are also used to represent
+  free-standing collections of attributes which can be relocated 
+  into numerous different complex type definitions.
+</p>
+<p>
+  The <a href="modules/XML/Schema/Type/Complex.html#HASH(0x87de208)">XML::Schema::Type::Complex</a> module implements the 
+  complex types.  A complex type has an attribute group which defines
+  the permitted attributes for the element and a content model which 
+  specifies what other elements and/or character content the element
+  may contain.  Complex types can nest indefinately within complex
+  type.
+</p>
+<p>
+  With a schema defined in terms of the above objects, a parser
+  can be constructed as an object of the <a href="modules/XML/Schema/Parser.html#HASH(0x87f5ec0)">XML::Schema::Parser</a>  class which receives XML parse events from an expat XML parser
+  instance and consults the schema to ensure that the document 
+  being parser conforms to the structure permitted by the schema.
+  In addition, the schema can be annotated with events that define
+  a schedule of actions to be performed when instance documents are 
+  parsed.  These are implemented by the <a href="modules/XML/Schema/Schedule.html#HASH(0x8793644)">XML::Schema::Schedule</a>  module.
+</p>
+
+
+</td>
+</tr>
+<!-- end of table content -->
+</table>
+
+<div align="center">
+<small><b>Perl XML::Schema Documentation</b></small>
+</div>
+</body>
+</html>

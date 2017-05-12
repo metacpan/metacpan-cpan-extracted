@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+	<xs:simpleType name="length20">
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="20"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="length30">
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="30"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:complexType name="c">
+		<xs:attribute name="attr_c" type="length20"/>
+	</xs:complexType>
+
+	<xs:complexType name="d">
+		<xs:sequence>
+			<xs:element name="el1" type="length30"/>
+		</xs:sequence>
+		<xs:attribute name="attr_d" type="length20"/>
+		<xs:attribute name="attr_withdef" type="length20"  default="defaultstr"/>
+		<xs:attribute name="attr_mandatory" type="length20"  fixed="yes"/>
+		<xs:attribute name="attr_inctype">
+			<xs:simpleType>
+				<xs:restriction base="length20">
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:complexType>
+
+	<xs:element name="root">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="c1" type="c"/>
+				<xs:element name="d1" type="d" minOccurs="0" maxOccurs="1"/>
+				<xs:element name="d2" type="d" minOccurs="0" maxOccurs="10" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+</xs:schema>
+
+
+

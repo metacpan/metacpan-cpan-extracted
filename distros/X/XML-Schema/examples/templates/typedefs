@@ -1,0 +1,3 @@
+[% FOREACH type = item.types.values -%]
+[% view.print(type) %]
+[% END -%]

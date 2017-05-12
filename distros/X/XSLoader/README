@@ -1,0 +1,43 @@
+NAME
+
+    XSLoader - Dynamically load C libraries into Perl code
+
+
+DESCRIPTION
+
+    This module defines a standard simplified interface to the dynamic
+    linking mechanisms available on many platforms. Its primary purpose
+    is to implement cheap automatic dynamic loading of Perl modules.
+    For a more complicated interface, see DynaLoader. 
+
+
+INSTALLATION
+
+    Install this module using the usual mantra: 
+
+        $ perl Makefile.PL
+        $ make
+        $ make test
+        $ make install
+
+    To install the extension in a private directory, you can use the PREFIX 
+    option when executing Makefile.PL.
+
+
+AUTHORS
+
+    Ilya Zakharevich originally extracted XSLoader from DynaLoader.
+
+    CPAN version originally created by Michael G Schwern <schwern@pobox.com>
+
+    This program is maintained by the Perl 5 Porters.
+    CPAN version is currently maintained by Sebastien Aperghis-Tramoni
+    <sebastien@aperghis.net>
+
+
+COPYRIGHT AND LICENCE
+
+    Copyright (C) 1990-2011 by Larry Wall and others.
+
+    This program is free software; you can redistribute it and/or modify
+    it under the same terms as Perl itself.

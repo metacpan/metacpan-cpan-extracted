@@ -1,0 +1,212 @@
+<?xml version='1.0'?>
+<!DOCTYPE resume SYSTEM "file:///home/matt/resume.dtd">
+<resume>
+	<person>
+		<persname>
+			<title>Mr</title>
+			<forename>Matt</forename>
+			<middlename>David</middlename>
+			<surname>Sergeant</surname>
+		</persname>
+		<address>
+			<line>30 Garnet Road</line>
+			<line>Bordon</line>
+			<line>Hants</line>
+			<postcode>GU35 0XW</postcode>
+			<country>England</country>
+		</address>
+		<phone Type="Home">01420 476 800</phone>
+		<phone Type="Mobile">0802 413021</phone>
+		<phone Type="Fax">01420 476 800</phone>
+		<email>msergeant@ndirect.co.uk</email>
+		<web_site>http://www.fastnetltd.ndirect.co.uk/</web_site>
+		<dob>1974/04/01</dob>
+	</person>
+
+	<skills>
+		<area name="Languages">
+			<item>Perl 5</item>
+			<item>XML</item>
+			<item>Java (JDK 1.2, Visual J++)</item>
+			<item>JavaScript</item>
+			<item>ASP</item>
+			<item>HTML</item>
+			<item>(Visual) C++ (all versions)</item>
+		</area>
+		<area name="Protocols">
+			<item>HTTP</item>
+			<item>CGI</item>
+			<item>DCOM</item>
+			<item>SMTP</item>
+			<item>TCP/IP</item>
+		</area>
+		<area name="Software">
+			<item>NT (all versions)</item>
+			<item>Linux (all versions)</item>
+			<item>IIS (3 &amp; 4)</item>
+			<item>Apache (1.3)</item>
+		</area>
+		<area name="Databases">
+			<item>Oracle 7</item>
+			<item>Sybase 10 and 11</item>
+			<item>SQL Server 6.5</item>
+			<item>MySQL</item>
+			<item>PostgreSQL</item>
+			<item>Access</item>
+		</area>
+	</skills>
+
+	<education>
+		<establishment>
+			<name>University of Durham, St Cuthbert's Society</name>
+			<address>
+				<line>12 South Bailey</line>
+				<line>Durham</line>
+				<postcode>DH1 3EE</postcode>
+				<country>England</country>
+			</address>
+			<datefrom>1992/09</datefrom>
+			<dateto>1996/06</dateto>
+			<qualification>
+				<name>BSc Computer Science</name>
+				<grade>2nd Class, Level 2</grade>
+			</qualification>
+		</establishment>
+		<establishment>
+			<name>Huntington Comprehensive School</name>
+			<address>
+				<line>Huntington</line>
+				<line>York</line>
+				<postcode></postcode>
+				<country>England</country>
+			</address>
+			<datefrom></datefrom>
+			<dateto></dateto>
+			<qualification>
+				<name>A Level Maths</name>
+				<grade>A</grade>
+			</qualification>
+			<qualification>
+				<name>A Level Physics</name>
+				<grade>A</grade>
+			</qualification>
+			<qualification>
+				<name>A Level Economics</name>
+				<grade>D</grade>
+			</qualification>
+		</establishment>
+	</education>
+
+	<experience>
+		<employee>
+			<name>O'Reilly and Associates</name>
+			<address>
+				<line>90 Sherman Street</line>
+				<line>Cambridge</line>
+				<line>MA</line>
+				<postcode>02140</postcode>
+				<country>United States of America</country>
+			</address>
+			<datefrom>1998/12</datefrom>
+			<dateto>Present</dateto>
+			<role>Author</role>
+			<details>
+				Co-Authoring a new O'Reilly book called "Perl and XML". This will detail ways to use
+				perl to process and generate XML. It will included details on XML::Parser, and the
+				many modules that use it. Details of my CGI to XML gateway, are also included and
+				some of my other XML modules. Release date is set for 3Q 1999. This work is in my
+				"spare" time!
+			</details>
+		</employee>
+		<employee>
+			<name>Ericsson Mobile Communications (UK) Limited</name>
+			<address>
+				<line>The Keytech Centre</line>
+				<line>Ashwood Way</line>
+				<line>Basingstoke</line>
+				<line>Hants</line>
+				<postcode>RG23 8BG</postcode>
+				<country>England</country>
+			</address>
+			<datefrom>1998/04/06</datefrom>
+			<dateto>Present</dateto>
+			<role>Contract Developer</role>
+			<details>
+				Initially I was contracted to design an MMI for a product called the MTU (a little
+				black box that monitors signal strength and other variables of radio transmitters).
+				This involved writing a Java application to set parameters on the MTU, and read
+				values back out again. Following on from that I joined Development IT which
+				develops all the intranet applications at Basingstoke. First I designed and implemented
+				a small library system to keep track of publications and books in the internal
+				library. Then I worked on a Resource Model. This allows managers to plan and track
+				resource allocations on projects over a 2 year period. Currently I'm developing a
+				timesheet application. This involves developing new methods of working with XML, such
+				as the new CGI to XML gateway that is to be integrated into perl's core CGI module.
+			</details>
+		</employee>
+		<employee>
+			<name>Integrated Sales Systems Limited</name>
+			<address>
+				<line>Regal House</line>
+				<line>70 London Road</line>
+				<line>Twickenham</line>
+				<postcode>TW1 3QS</postcode>
+				<country>England</country>
+			</address>
+			<datefrom>1996/06/05</datefrom>
+			<dateto>1998/04/01</dateto>
+			<role>Software Engineer, Senior Software Engineer, Team Leader, Project Leader</role>
+			<details>
+				Employeed again as a graduate I rapidly rose through the company, taking on
+				projects such as a major upgrade for Searle Pharmaceuticals, Designing and
+				implementing Comms security over RAS, Internationalisation in the Oxygen
+				application, performance improvements and internal tools. While working in
+				Client Development I worked both on and off site for major corporations including
+				Monsanto Searle Pharmaceuticals, Schering Plough, Lombard Business Finance, Astra
+				Pharmaceuticals and Royal &amp; Sun Alliance. A major project
+				while at ISS was developing their intranet. This rapidly grew from a project
+				running on my own workstation, into a dedicated web server, serving up thousands
+				of documents, and running some of the core infrastructure at the company.
+			</details>
+		</employee>
+		<employee>
+			<name>Integrated Sales Systems Limited</name>
+			<address>
+				<line>Regal House</line>
+				<line>70 London Road</line>
+				<line>Twickenham</line>
+				<postcode>TW1 3QS</postcode>
+				<country>England</country>
+			</address>
+			<datefrom>1995/06/01</datefrom>
+			<dateto>1995/09/01</dateto>
+			<role>Junior Software Engineer</role>
+			<details>
+				Working over the summer at this lively new software house. I worked in small
+				teams helping to realise their first Windows version of their aging DOS
+				application. I worked in C++ and SQL, working on core parts of the code, and
+				designing and optimising large queries. I also designed a database consolidation
+				routine called "Behemoth" which took gigabyte databases and distilled the data
+				for reporting purposes.
+			</details>
+		</employee>
+	</experience>
+	
+	<training>
+		<course>
+			<name>Oracle Performance Tuning</name>
+			<date></date>
+			<trainee>Oracle Training</trainee>
+		</course>
+		<course>
+			<name>Oracle Advanced SQL</name>
+			<date></date>
+			<trainee>Oracle Training</trainee>
+		</course>
+		<course>
+			<name>Object Oriented Design</name>
+			<date></date>
+			<trainee>QA Training</trainee>
+		</course>
+	</training>
+</resume>

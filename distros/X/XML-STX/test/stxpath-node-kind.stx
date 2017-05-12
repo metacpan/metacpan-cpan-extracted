@@ -1,0 +1,15 @@
+<stx:transform version="1.0" 
+  xmlns:stx="http://stx.sourceforge.net/2002/ns"
+  strip-space="yes">
+
+  <stx:template match="node()">
+    <stx:element name="{node-kind()}">
+    <stx:attribute select="name()" name="nm"/>
+      <stx:process-children/>
+      <stx:if test="@a1">
+        <stx:value-of select="node-kind(@a0)"/>
+      </stx:if>
+    </stx:element>
+  </stx:template>
+
+</stx:transform>

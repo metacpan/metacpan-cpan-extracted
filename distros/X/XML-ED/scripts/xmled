@@ -1,0 +1,48 @@
+#!/usr/bin/perl
+
+use XML::ED::Bare qw/xmlin/;
+
+sub attributes
+{
+   my $object = shift;
+
+   my @keys = grep {!/^_/} keys %$object;
+
+   return @keys ? ' ' . join(' ', map({ sprintf(qq($_="%s"), $object->{$_}->{value}) } sort @keys)) : '';
+}
+
+sub render
+{
+    my $object = shift;
+
+    my @data = ();
+    for my $obj (@$object) {
+        if ($obj->{_type} == 0) {
+	    push @data, render($obj->{_data}); 
+        } elsif ($obj->{_type} == 1) {
+	    if ($obj->{_data}) {
+		push @data, (sprintf("<%s%s>",  $obj->{_name}, attributes( $obj )), render($obj->{_data}), sprintf("</%s%s>",  $obj->{_name})); 
+	    } else {
+		push @data, sprintf("<%s%s/>",  $obj->{_name}, attributes( $obj )); 
+	    }
+	} elsif ($obj->{_type} == 5) {
+	    push @data, $obj->{_value};
+	} elsif ($obj->{_type} == 12) {
+	    push @data, sprintf("<!--%s-->",  $obj->{_value}); 
+	} elsif ($obj->{_type} == 10) {
+	    push @data, sprintf("<!%s>",  $obj->{_value}); 
+	} elsif ($obj->{_type} == 2) {
+	    push @data, sprintf("<?%s%s?>",  $obj->{_name}, attributes( $obj )); 
+	} else {
+	    push @data, $obj->{_type};
+	}
+    }
+    return @data;
+}
+
+my ( $xml, $root ) = XML::ED::Bare->new( text => $text );
+
+print "-----";
+print join '', render( [ $root ] );
+
+

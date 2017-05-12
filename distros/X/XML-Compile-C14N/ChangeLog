@@ -1,0 +1,46 @@
+==== version history of XML::Compile::C14N
+
+version 0.94: Tue Feb 18 11:10:19 CET 2014
+
+	Fixes:
+	- Digest::SHA >5.74 downgrades utf8 strings, which mutulizes the
+	  output of toStringC14N.  Until XML::LibXML has a toBytesC14N,
+	  we switch-off the utf8 flag by force.  Bug found by [Achim Adam]
+
+	Improvements:
+	- show libxml2 version during test
+	- change documentation style
+
+version 0.93: Wed Oct  2 10:48:48 CEST 2013
+
+	Improvements:
+	- added ::Util::is_canon_constant(), tests in t/20util.t
+
+version 0.92: Sat Aug 10 00:18:13 CEST 2013
+
+	Fixes:
+	- correct prefix loading.
+
+	Improvements:
+	- weaken schema reference to avoid cyclic ref-count
+	- use ::Cache::addPrefixes()
+	- add ::C14N::new(for)
+
+version 0.91: Mon Nov 26 09:32:05 CET 2012
+
+	Fixes:
+	- require newer Test::More for TODO block.
+
+	Improvements:
+	- listing of XML::LibXML dependency.  The version is important
+	  to find formatting bugs [cpantesters]
+
+version 0.90: Mon Nov  5 14:33:57 CET 2012
+
+	Improvements:
+	- add t/01use.t
+	- add information about C14N version 2.0
+	- add normalize()
+
+version 0.10: Tue Apr 26 23:40:56 CEST 2011
+	- initial version

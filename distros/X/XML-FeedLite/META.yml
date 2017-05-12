@@ -1,0 +1,36 @@
+---
+name: XML-FeedLite
+version: 2.000
+author:
+  - 'Roger M Pettett <rpettett@cpan.org>'
+abstract: 'XML::FeedLite - A simple RSS & Atom feed processor'
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+build_requires:
+  Test::Distribution: 0
+  Test::More: 0.8
+  Test::Perl::Critic: 0
+requires:
+  HTML::Entities: 1.35
+  HTTP::Headers: 1.64
+  HTTP::Request: 1.40
+  MIME::Base64: 3.07_01
+  Readonly: 1.03
+  WWW::Curl::Simple: 0.100181
+configure_requires:
+  Module::Build: 0.35
+provides:
+  XML::FeedLite:
+    file: lib/XML/FeedLite.pm
+    version: 2.000
+  XML::FeedLite::File:
+    file: lib/XML/FeedLite/File.pm
+    version: 1.003
+  XML::FeedLite::Normalised:
+    file: lib/XML/FeedLite/Normalised.pm
+    version: 1.004
+generated_by: Module::Build version 0.35
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

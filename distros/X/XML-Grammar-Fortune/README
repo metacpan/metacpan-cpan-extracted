@@ -1,0 +1,49 @@
+XML-Grammar-Fortune
+
+This is a module to implement an XML grammar for Unix-like fortune cookies.
+See:
+
+* http://www.shlomifish.org/humour/fortunes/
+
+* http://en.wikipedia.org/wiki/Fortune_(program)
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc XML::Grammar::Fortune
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=XML-Grammar-Fortune
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/XML-Grammar-Fortune
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/XML-Grammar-Fortune
+
+    Search CPAN
+        http://search.cpan.org/dist/XML-Grammar-Fortune
+
+    Subversion repository
+        http://svn.berlios.de/svnroot/repos/web-cpan/XML-Grammar-Fortune/trunk/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 Shlomi Fish
+
+This program is released under the following license: MIT X11.
+

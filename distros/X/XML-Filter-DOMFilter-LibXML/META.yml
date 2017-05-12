@@ -1,0 +1,23 @@
+---
+abstract: 'SAX Filter allowing DOM processing of selected subtrees'
+author:
+  - 'Petr Pajas <pajas@ufal.ms.mff.cuni.cz>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  XML::SAX::Writer: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.143240'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: XML-Filter-DOMFilter-LibXML
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  XML::LibXML: '1.53'
+version: '0.04'

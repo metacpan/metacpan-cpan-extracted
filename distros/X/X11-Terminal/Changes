@@ -1,0 +1,16 @@
+Revision history for Perl extension X11::Terminal.
+
+1.0.0  2013/05/06 Semantic versioning (www.semver.org)
+                  Use more "standard" filenames
+                  Changes to allow building under newer OS
+
+0.4    2011/06/24 Update Documentation
+                  Convert to Module::Build
+
+0.3    2010/06/27 Include version in every .pm file
+
+0.2    2010/06/27 Add scrollback option (for XTerm)
+                  Add support for Konsole
+                  Documentation corrections
+
+0.01   2010/05/27 Original version.

@@ -1,0 +1,30 @@
+---
+abstract: 'ExistDB interface over XML-RPC'
+author:
+  - 'Mark Overmeer'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120630'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: XML-ExistDB
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  LWP::UserAgent: 0
+  Log::Report: 0.26
+  MIME::Base64: 0
+  Test::More: 0.54
+  Test::Pod: 1.00
+  Time::HiRes: 0
+  XML::Compile: 1.08
+  XML::Compile::Cache: 0.995
+  XML::Compile::RPC: 0.13
+version: 0.14

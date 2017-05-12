@@ -1,0 +1,63 @@
+TODO
+ * move context/input into property of the token
+ * change context info (positions/count) into a stack on the context object, for nested predicates
+ * implement the missing functions
+ * tests for all functions ops
+ * increase test coverage (currently 78.4%)
+ * remove all the Data::Dumper use's
+
+0.22 - 2009-07-31
+ * updated license for fedora
+
+0.21 - 2009-04-10
+ * added basic docs for main module
+ * more tests
+ * made it work correctly with the newer  XML-Parser-Lite-Tree syntax
+
+0.20 - 2008-08-13
+ * moved to string types
+ * fixed attribute axis
+ * enabled all zvon tests
+ * started on function tests
+
+0.19 - 2006-03-26
+ * cleanup
+ * code coverage
+ * split out axis parser
+
+0.18
+ * more eval engine work - 1-22
+ * function map
+ * arg validation
+ * axis handlers
+
+0.17
+ * more eval engine work - 7,8,9
+ * function arg validation
+
+0.16
+ * more eval engine work - 6 and some of 7
+ * ret type coersion
+
+0.15
+ * more eval engine work
+ * zvon examples 3,4,5 and some of 6
+
+0.14
+ * started on the eval engine
+ * zvon examples 1 and 2 eval correctly (t/05_zvon0[12].t)
+
+0.12
+ * tree builder can tree all zvon examples correctly (t/04_tree2.t)
+
+0.11
+ * tree builder started
+
+0.10
+ * tokener finished
+
+0.02 - 2005-05-06
+ * first CPAN release
+
+0.01
+ * first checkpoint

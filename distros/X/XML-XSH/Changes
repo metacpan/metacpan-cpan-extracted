@@ -1,0 +1,147 @@
+Release 1.8.2:
+
+Changes since 1.8 (CVS)
+------------------
+Incompatible changes:
+   - xsh now uses UTF8 as the default encoding and query-encoding.
+     You may change it to your prefered charset by adding 
+     lines 
+       encoding <charset>;
+       query-encoding <charset>;
+     into your ~/.xshrc.
+
+New features:
+   - new xsh option --format to start with indent 1 and keep_blanks 0
+   - new xsh options --input (-I), --output (-O), and --process (-P) to
+     automatically open given file (as a default document called _ - underscore)
+     and save it after the processing
+   - external DTD validation support (valid, validate)
+   - RelaxNG and XSD validation support for valid and validate
+     (may require CVS LibXML)
+   - conditional variant of include (ifinclude) added
+   - new commands set-enc and set-standalone allow changing the
+     values in document's XML decl
+   - new option commands affecting serialization: empty-tags ($EMPTY_TAGS) and 
+     skip-dtd ($SKIP_DTD)
+
+Support:
+   - new Perl module: Inline::XSH to simplify inclusion of inline XSH
+     code in Perl programs
+
+Bug fixes:
+   - fixed broken XPath extension functions (xsh:grep, xsh:matches, ...)
+   - encoding related fix for Perl 5.8 (now using Encode in Perl 5.8)
+   - serialization now doesn't force utf-8 encoding on files with no
+     encoding specified
+   - fixed @ARGV passing
+   - documentation fixes
+   - bug fixes
+
+
+Release 1.8:
+
+Changes since 1.7 (CVS)
+------------------
+New features:
+
+* User Interface: 
+
+  - Major TAB-completion improvements: XPath-completion (can be disabled
+    for large documents), improved filename, command, variable and
+    keyword completion. 
+  - xsh without arguments starts in interactive shell mode if run from a
+    terminal
+  - xsh -p for easier pipe-line XML processing.
+  - xsh now defines long variants for command-line options.
+  - xsh --man displays nice manual page.
+ 
+* Language: 
+  - register-namespace (regns) command for registering a namespace
+    prefix to be used in XPath queries.
+  - register-function (regfunc) command allowing writing a custom
+    XPath extension functions (in Perl) - EXPERIMENTAL
+  - XPath extensions functions xsh:doc,xsh:matches,xsh:grep,xsh:same
+    (check xsh help xpath or the on-line documentation here).
+  - undef command to undefine existing XSH subroutines allowing
+    include-scripts to be reloaded - EXPERIMENTAL
+  - stream command for processing huge documents, that do not fit into
+    memory - EXPERIMENTAL
+  - rename command similar to map but working on node's name rather
+    than content.
+  - Some document-oriented commands (such as save) no longer require
+    arguments (assuming current document's ID by default)
+ 
+  * Support: 
+  - Improved documentation: manpages (xsh(1) and XSH(3)), and
+    command-line help xsh --help, xsh --man.
+  - xsh now uses long options.
+  - Simplified Windows installation based on PPM.
+  - Disabled GDOME support
+  - Bug fixes.
+  - Updated bundle of requred modules
+
+Changes since 1.7 (CVS)
+-----------------------
+
+  - bug fixes.
+  - new try {...} catch [[local] $var] {...} syntactic construction
+    allows to catch and handle parsing and other errors.
+  - new throw command (aka perl { die "...\n" })
+  - new Perl/PHP-like last, next, redo, return loop and subroutine 
+    interruption commands
+  - new strip command for stripping whitespace
+  - new normalize command for puting adjacent text nodes together
+  - new catalog command makes the XML parser use a given catalog file
+  - new experimental iterate command
+  - changed sort command syntax (you've been warned)
+  - completion improvements (now little more context sensitive and
+    completes variable, subroutine and help chapter names)
+  - new Perl support function type to check node types
+  - Perl support functions now return lists in array context
+  - added -w command-line option to turn all DTD related stuff off
+  - added -a command-line option to pass command line arguments to a
+    XSH script via Perl's @ARGV added -l command-line option to pass
+    script name 
+  - access to all configuration flags/options (such as validation)
+    through variables to allow making changes local (read `help flag'
+    or run var to see a list) and some more...
+
+Changes since 1.5
+------------------
+Requires:
+  - XML::LibXML 1.54
+
+New features:
+  - local (temporary) variables
+  - subroutine may take parameters
+  - forward defs (with no body) allow recursion
+  - call strongly checks argument types
+  - new location keywords: append, prepend
+  - new location semantics (mostly clean-up)
+  - perl-code result substitution in expressions using ${{{ ... }}}
+  - string xpath result substitution in expressions using ${( ... )}
+  - new Perl functions: literal, xml_list and count
+  - new switch-to-new-documents flag (allows to disable selecting
+  - simplified and more general open/save commands
+  - support document level node insertion
+  - improved error reporting from XSH grammar parser
+  - docbook loading support
+  - pipeline redirection may follow statements
+  - grammar optimizations (some more speed-up achieved)
+
+Other changes:
+  - XSH now starts with validation 0
+  - new xsh option -v allows starting with validation on
+  - obsolete xsh -c flag removed
+  - documentation enhancements
+
+Bug fixes:
+  - indentation fixes
+  - fixed ReadLine::Gnu completion support
+  - ~/.xsh_history works for Term::ReadLine::Gnu now
+  - fixed doubled history entries
+  - double/single quoting fixed in expressions
+  - experimental support for entity reference insertion
+  - fixed error catching
+  - fixed and improved Ctrl+C handling
+  - some more bug-fixes

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="unqualified" attributeFormDefault="unqualified">
+	<xs:simpleType name="CityCodeIATA">
+		<xs:restriction base="xs:string">
+			<xs:length value="3"/>
+			<xs:minLength value="1"/>
+			<xs:maxLength value="5"/>
+			<xs:enumeration value=""/>
+			<xs:enumeration value="IST"/>
+			<xs:enumeration value="PAR"/>
+			<xs:enumeration value="NYC"/>
+			<xs:enumeration value="LON"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="CountryCodeISO3166">
+		<xs:restriction base="xs:string">
+			<xs:length value="2"/>
+			<xs:whiteSpace value="collapse"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="LanguageCodeISO639">
+		<xs:restriction base="xs:string">
+			<xs:length value="2"/>
+			<xs:whiteSpace value="collapse"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="StateCodeCompleteIATA">
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="6"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="StateCodeIATA">
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="3"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="SystemID">
+		<xs:restriction base="xs:string"/>
+	</xs:simpleType>
+	<xs:simpleType name="UNLoCode">
+		<xs:restriction base="xs:string">
+			<xs:minLength value="2"/>
+			<xs:maxLength value="6"/>
+			<xs:whiteSpace value="collapse"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="UNLoCodeSub">
+		<xs:restriction base="xs:string">
+			<xs:length value="3"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="LocationCode">
+		<xs:union memberTypes="CountryCodeISO3166 StateCodeCompleteIATA">
+			<xs:simpleType>
+				<xs:union memberTypes="CityCodeIATA UNLoCode UNLoCodeSub">
+					<xs:simpleType>
+						<xs:list itemType="StateCodeIATA"/>
+					</xs:simpleType>
+				</xs:union>
+			</xs:simpleType>
+		</xs:union>
+	</xs:simpleType>
+	<xs:element name="image" type="Image"/>
+	<xs:complexType name="Image">
+		<xs:attribute name="url" type="xs:string" use="optional"/>
+		<xs:attribute name="title" type="xs:string" use="optional"/>
+	</xs:complexType>
+</xs:schema>

@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<aaa id="a">
+ <bbb>
+  Texto dentro de /aaa/bbb
+ </bbb>
+  Texto dentro de /aaa
+ <bbb id="z">
+  <ddd>
+   <eee>Texto dentro de /aaa/bbb/ddd/eee</eee>
+   <bbb>Texto dentro de /aaa/bbb/ddd/bbb</bbb>
+  </ddd>
+ </bbb>
+</aaa>
+   

@@ -1,0 +1,11 @@
+Changes
+lib/XML/RSS/PicLens.pm
+Makefile.PL
+MANIFEST
+README
+t/00.load.t
+t/feed.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

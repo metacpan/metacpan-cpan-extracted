@@ -1,0 +1,3 @@
+<!ELEMENT xx (yy, zz)>
+<!ELEMENT yy (#PCDATA)>
+<!ELEMENT zz (#PCDATA)>

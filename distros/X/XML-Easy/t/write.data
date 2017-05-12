@@ -1,0 +1,1952 @@
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    ""
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a/>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    "foo"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>foo</a>
+###e
+bless( [
+  "aa",
+  {},
+  bless( [ [
+    "foo"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<aa>foo</aa>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    "foo",
+    bless( [
+      "b",
+      {},
+      bless( [ [
+        ""
+      ] ], 'XML::Easy::Content' )
+    ], 'XML::Easy::Element' ),
+    "bar"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>foo<b/>bar</a>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    "foo",
+    bless( [
+      "b",
+      {},
+      bless( [ [
+        "q"
+      ] ], 'XML::Easy::Content' )
+    ], 'XML::Easy::Element' ),
+    "bar"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>foo<b>q</b>bar</a>
+###e
+bless( [
+  "a",
+  {
+    "foo" => "bar"
+  },
+  bless( [ [
+    ""
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a foo="bar"/>
+###e
+bless( [
+  "a",
+  {
+    "foo" => "ba'r"
+  },
+  bless( [ [
+    ""
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a foo="ba'r"/>
+###e
+bless( [
+  "a",
+  {
+    "foo" => "ba\"r"
+  },
+  bless( [ [
+    ""
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a foo="ba&#x22;r"/>
+###e
+bless( [
+  "a",
+  {
+    "baz" => "quux",
+    "foo" => "bar"
+  },
+  bless( [ [
+    ""
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a baz="quux" foo="bar"/>
+###e
+bless( [
+  "a",
+  {
+    "alfa" => "A",
+    "bravo" => "B",
+    "charlie" => "C",
+    "delta" => "D",
+    "echo" => "E",
+    "foxtrot" => "F",
+    "golf" => "G",
+    "hotel" => "H",
+    "india" => "I",
+    "juliett" => "J",
+    "kilo" => "K",
+    "lima" => "L",
+    "mike" => "M",
+    "november" => "N",
+    "oscar" => "O",
+    "papa" => "P",
+    "quebec" => "Q",
+    "romeo" => "R",
+    "sierra" => "S",
+    "tango" => "T",
+    "uniform" => "U",
+    "victor" => "V",
+    "whiskey" => "W",
+    "x-ray" => "X",
+    "yankee" => "Y",
+    "zulu" => "Z"
+  },
+  bless( [ [
+    ""
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a alfa="A" bravo="B" charlie="C" delta="D" echo="E" foxtrot="F" golf="G" hotel="H" india="I" juliett="J" kilo="K" lima="L" mike="M" november="N" oscar="O" papa="P" quebec="Q" romeo="R" sierra="S" tango="T" uniform="U" victor="V" whiskey="W" x-ray="X" yankee="Y" zulu="Z"/>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    "foobar"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>foobar</a>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    "<x&y>"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>&#x3c;x&#x26;y></a>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    "foo<x&y>bar"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>foo&#x3c;x&#x26;y>bar</a>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    "foo]>bar"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>foo]>bar</a>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    "foo]]bar"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>foo]]bar</a>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    "foo>bar"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>foo>bar</a>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    "foo]bar"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>foo]bar</a>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    "]>bar"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>]>bar</a>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    "]]bar"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>]]bar</a>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    ">bar"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>>bar</a>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    "]bar"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>]bar</a>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    "foo]>"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>foo]></a>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    "foo]]"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>foo]]</a>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    "foo>"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>foo></a>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    "foo]"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>foo]</a>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    "]>"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>]></a>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    "]]"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>]]</a>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    ">"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>></a>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    "]"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>]</a>
+###e
+bless( [
+  "a",
+  {
+    "x" => "foo]]>bar"
+  },
+  bless( [ [
+    ""
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a x="foo]]>bar"/>
+###e
+bless( [
+  "a",
+  {
+    "x" => "]]>bar"
+  },
+  bless( [ [
+    ""
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a x="]]>bar"/>
+###e
+bless( [
+  "a",
+  {
+    "x" => "foo]]>"
+  },
+  bless( [ [
+    ""
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a x="foo]]>"/>
+###e
+bless( [
+  "a",
+  {
+    "x" => "]]>"
+  },
+  bless( [ [
+    ""
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a x="]]>"/>
+###e
+bless( [
+  "x\x{b7}y",
+  {},
+  bless( [ [
+    ""
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<x·y/>
+###e
+bless( [
+  "a",
+  {
+    "x\x{b7}y" => "z"
+  },
+  bless( [ [
+    ""
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a x·y="z"/>
+###e
+bless( [
+  "a",
+  {
+    "z" => "x\x{b7}y"
+  },
+  bless( [ [
+    ""
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a z="x·y"/>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    "x\x{b7}y"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>x·y</a>
+###e
+bless( [
+  "x\x{137}y",
+  {},
+  bless( [ [
+    ""
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<xķy/>
+###e
+bless( [
+  "a",
+  {
+    "x\x{137}y" => "z"
+  },
+  bless( [ [
+    ""
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a xķy="z"/>
+###e
+bless( [
+  "a",
+  {
+    "z" => "x\x{137}y"
+  },
+  bless( [ [
+    ""
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a z="xķy"/>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    "x\x{137}y"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>xķy</a>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    "foo bar"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>foo bar</a>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    "foo\tbar"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>foo	bar</a>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    "foo\nbar"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>foo
+bar</a>
+###e
+bless( [
+  "a",
+  {
+    "x" => "foo bar"
+  },
+  bless( [ [
+    ""
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a x="foo bar"/>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    "x<y"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>x&#x3c;y</a>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    "x>y"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>x>y</a>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    "x&y"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>x&#x26;y</a>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    "x\"y"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>x"y</a>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    "x'y"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>x'y</a>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    "x\ty"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>x	y</a>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    "x\ny"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>x
+y</a>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    "x\ry"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>x&#x0d;y</a>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    "x y"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>x y</a>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    "x:y"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>x:y</a>
+###e
+bless( [
+  "a",
+  {
+    "z" => "x<y"
+  },
+  bless( [ [
+    ""
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a z="x&#x3c;y"/>
+###e
+bless( [
+  "a",
+  {
+    "z" => "x>y"
+  },
+  bless( [ [
+    ""
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a z="x>y"/>
+###e
+bless( [
+  "a",
+  {
+    "z" => "x&y"
+  },
+  bless( [ [
+    ""
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a z="x&#x26;y"/>
+###e
+bless( [
+  "a",
+  {
+    "z" => "x\"y"
+  },
+  bless( [ [
+    ""
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a z="x&#x22;y"/>
+###e
+bless( [
+  "a",
+  {
+    "z" => "x'y"
+  },
+  bless( [ [
+    ""
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a z="x'y"/>
+###e
+bless( [
+  "a",
+  {
+    "z" => "x\ty"
+  },
+  bless( [ [
+    ""
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a z="x&#x09;y"/>
+###e
+bless( [
+  "a",
+  {
+    "z" => "x\ny"
+  },
+  bless( [ [
+    ""
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a z="x&#x0a;y"/>
+###e
+bless( [
+  "a",
+  {
+    "z" => "x\ry"
+  },
+  bless( [ [
+    ""
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a z="x&#x0d;y"/>
+###e
+bless( [
+  "a",
+  {
+    "z" => "x y"
+  },
+  bless( [ [
+    ""
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a z="x y"/>
+###e
+bless( [
+  "a",
+  {
+    "z" => "x:y"
+  },
+  bless( [ [
+    ""
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a z="x:y"/>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    "foo'bar"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>foo'bar</a>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    "foo\"bar"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>foo"bar</a>
+###e
+bless( [
+  "para",
+  {},
+  bless( [ [
+    "Lorem ipsum dolor sit amet, consectetur adipisicing elit,\nsed do eiusmod tempor incididunt ut labore et dolore magna aliqua.\n",
+    bless( [
+      "b",
+      {
+        "tag" => "thing"
+      },
+      bless( [ [
+        "Ut enim ad minim veniam, quis nostrud exercitation\nullamco laboris nisi ut aliquip ex ea commodo consequat."
+      ] ], 'XML::Easy::Content' )
+    ], 'XML::Easy::Element' ),
+    "  Duis aute\nirure dolor in reprehenderit in voluptate velit esse cillum dolore eu\nfugiat nulla pariatur.  ",
+    bless( [
+      "word",
+      {},
+      bless( [ [
+        "Excepteur"
+      ] ], 'XML::Easy::Content' )
+    ], 'XML::Easy::Element' ),
+    " sint occaecat cupidatat\nnon proident, sunt in culpa qui officia deserunt mollit anim id est\nlaborum."
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<para>Lorem ipsum dolor sit amet, consectetur adipisicing elit,
+sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+<b tag="thing">Ut enim ad minim veniam, quis nostrud exercitation
+ullamco laboris nisi ut aliquip ex ea commodo consequat.</b>  Duis aute
+irure dolor in reprehenderit in voluptate velit esse cillum dolore eu
+fugiat nulla pariatur.  <word>Excepteur</word> sint occaecat cupidatat
+non proident, sunt in culpa qui officia deserunt mollit anim id est
+laborum.</para>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    "\x{137}"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>ķ</a>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    "xy"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>xy</a>
+###c
+bless( [ [
+  "",
+  bless( [
+    "a",
+    {},
+    bless( [ [
+      ""
+    ] ], 'XML::Easy::Content' )
+  ], 'XML::Easy::Element' ),
+  "\n"
+] ], 'XML::Easy::Content' )
+#
+<a/>
+
+###c
+bless( [ [
+  "\n",
+  bless( [
+    "a",
+    {},
+    bless( [ [
+      ""
+    ] ], 'XML::Easy::Content' )
+  ], 'XML::Easy::Element' ),
+  ""
+] ], 'XML::Easy::Content' )
+#
+
+<a/>
+###c
+bless( [ [
+  "a",
+  bless( [
+    "a",
+    {},
+    bless( [ [
+      ""
+    ] ], 'XML::Easy::Content' )
+  ], 'XML::Easy::Element' ),
+  ""
+] ], 'XML::Easy::Content' )
+#
+a<a/>
+###c
+bless( [ [
+  "",
+  bless( [
+    "a",
+    {},
+    bless( [ [
+      ""
+    ] ], 'XML::Easy::Content' )
+  ], 'XML::Easy::Element' ),
+  "a"
+] ], 'XML::Easy::Content' )
+#
+<a/>a
+###c
+bless( [ [
+  "a!"
+] ], 'XML::Easy::Content' )
+#
+a!
+###c
+bless( [ [
+  "",
+  bless( [
+    "a",
+    {},
+    bless( [ [
+      ""
+    ] ], 'XML::Easy::Content' )
+  ], 'XML::Easy::Element' ),
+  ""
+] ], 'XML::Easy::Content' )
+#
+<a/>
+###c
+bless( [ [
+  ""
+] ], 'XML::Easy::Content' )
+#
+
+###c
+bless( [ [
+  "foo",
+  bless( [
+    "a",
+    {},
+    bless( [ [
+      ""
+    ] ], 'XML::Easy::Content' )
+  ], 'XML::Easy::Element' ),
+  "bar",
+  bless( [
+    "b",
+    {},
+    bless( [ [
+      ""
+    ] ], 'XML::Easy::Content' )
+  ], 'XML::Easy::Element' ),
+  ""
+] ], 'XML::Easy::Content' )
+#
+foo<a/>bar<b/>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    "z"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>z</a>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    "\n"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>
+</a>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    "<"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>&#x3c;</a>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    "yz"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>yz</a>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    "y\n"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>y
+</a>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    "y<"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>y&#x3c;</a>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    "\nz"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>
+z</a>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    "\n\n"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>
+
+</a>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    "\n<"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>
+&#x3c;</a>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    ">z"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>>z</a>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    ">\n"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>>
+</a>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    "><"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>>&#x3c;</a>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    "xyz"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>xyz</a>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    "xy\n"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>xy
+</a>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    "xy<"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>xy&#x3c;</a>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    "x\nz"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>x
+z</a>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    "x\n\n"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>x
+
+</a>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    "x\n<"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>x
+&#x3c;</a>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    "x>z"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>x>z</a>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    "x>\n"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>x>
+</a>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    "x><"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>x>&#x3c;</a>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    "\nyz"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>
+yz</a>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    "\ny\n"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>
+y
+</a>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    "\ny<"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>
+y&#x3c;</a>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    "\n\nz"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>
+
+z</a>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    "\n\n\n"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>
+
+
+</a>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    "\n\n<"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>
+
+&#x3c;</a>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    "\n>z"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>
+>z</a>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    "\n>\n"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>
+>
+</a>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    "\n><"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>
+>&#x3c;</a>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    "&yz"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>&#x26;yz</a>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    "&y\n"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>&#x26;y
+</a>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    "&y<"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>&#x26;y&#x3c;</a>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    "&\nz"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>&#x26;
+z</a>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    "&\n\n"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>&#x26;
+
+</a>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    "&\n<"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>&#x26;
+&#x3c;</a>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    "&>z"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>&#x26;>z</a>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    "&>\n"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>&#x26;>
+</a>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    "&><"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>&#x26;>&#x3c;</a>
+###e
+bless( [
+  "a",
+  {
+    "x" => " "
+  },
+  bless( [ [
+    ""
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a x=" "/>
+###e
+bless( [
+  "a",
+  {
+    "x" => (" "x32764)."]]>"
+  },
+  bless( [ [
+    ""
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a x="${ }]]>"/>
+###e
+bless( [
+  "a",
+  {
+    "x" => (" "x32765)."]]>"
+  },
+  bless( [ [
+    ""
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a x="${ } ]]>"/>
+###e
+bless( [
+  "a",
+  {
+    "x" => (" "x32766)."]]>"
+  },
+  bless( [ [
+    ""
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a x="${ }  ]]>"/>
+###e
+bless( [
+  "a",
+  {
+    "x" => (" "x32767)."]]>"
+  },
+  bless( [ [
+    ""
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a x="${ }   ]]>"/>
+###e
+bless( [
+  "a",
+  {
+    "x".("\x{137}"x40000)."y" => "z"
+  },
+  bless( [ [
+    ""
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a x$(ķ)y="z"/>
+###e
+bless( [
+  "a",
+  {
+    "x".("\x{b7}"x40000)."y" => "z"
+  },
+  bless( [ [
+    ""
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a x$(·)y="z"/>
+###e
+bless( [
+  "a",
+  {
+    "x".("a"x40000)."y" => "z"
+  },
+  bless( [ [
+    ""
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a x$(a)y="z"/>
+###e
+bless( [
+  "a",
+  {
+    "z" => "x".(" "x40000)."y"
+  },
+  bless( [ [
+    ""
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a z="x$( )y"/>
+###e
+bless( [
+  "a",
+  {
+    "z" => "x".("'"x40000)."y"
+  },
+  bless( [ [
+    ""
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a z="x$(')y"/>
+###e
+bless( [
+  "a",
+  {
+    "z" => "x".("<"x40000)."y"
+  },
+  bless( [ [
+    ""
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a z="x$(&#x3c;)y"/>
+###e
+bless( [
+  "a",
+  {
+    "z" => "x".("\x{137}"x40000)."y"
+  },
+  bless( [ [
+    ""
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a z="x$(ķ)y"/>
+###e
+bless( [
+  "a",
+  {
+    "z" => "x".("\x{b7}"x40000)."y"
+  },
+  bless( [ [
+    ""
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a z="x$(·)y"/>
+###e
+bless( [
+  "a",
+  {
+    "z" => "x".("a"x40000)."y"
+  },
+  bless( [ [
+    ""
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a z="x$(a)y"/>
+###e
+bless( [
+  "a",
+  {
+    "z" => "xX".(" "x40000)."y"
+  },
+  bless( [ [
+    ""
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a z="xX$( )y"/>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    " "
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a> </a>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    "\t"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>	</a>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    "foo",
+    bless( [
+      "b",
+      {},
+      bless( [ [
+        "q"
+      ] ], 'XML::Easy::Content' )
+    ], 'XML::Easy::Element' ),
+    ((
+      "",
+      bless( [
+        "b",
+        {},
+        bless( [ [
+          "q"
+        ] ], 'XML::Easy::Content' )
+      ], 'XML::Easy::Element' ),
+    ) x 39999),
+    "bar"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>foo$(<b>q</b>)bar</a>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    "foox",
+    bless( [
+      "b",
+      {},
+      bless( [ [
+        "q"
+      ] ], 'XML::Easy::Content' )
+    ], 'XML::Easy::Element' ),
+    ((
+      "x",
+      bless( [
+        "b",
+        {},
+        bless( [ [
+          "q"
+        ] ], 'XML::Easy::Content' )
+      ], 'XML::Easy::Element' ),
+    ) x 39999),
+    "bar"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>foo$(x<b>q</b>)bar</a>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    "x".("'"x40000)."y"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>x$(')y</a>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    "x".("<"x40000)."y"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>x$(&#x3c;)y</a>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    "x".("\n"x40000)."y"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>x$(
+)y</a>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    "x".("\x{137}"x40000)."y"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>x$(ķ)y</a>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    "x".("\x{b7}"x40000)."y"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>x$(·)y</a>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    "x".("a"x40000)."y"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>x$(a)y</a>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    "xX".("\n"x40000)."y"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>xX$(
+)y</a>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    (" "x32764).">"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>${ }></a>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    (" "x32764)."]"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>${ }]</a>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    (" "x32764)."]>"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>${ }]></a>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    (" "x32764)."]]"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>${ }]]</a>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    (" "x32764)."]]>"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>${ }]]&#x3e;</a>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    (" "x32765).">"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>${ } ></a>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    (" "x32765)."]"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>${ } ]</a>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    (" "x32765)."]>"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>${ } ]></a>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    (" "x32765)."]]"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>${ } ]]</a>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    (" "x32765)."]]>"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>${ } ]]&#x3e;</a>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    (" "x32766).">"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>${ }  ></a>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    (" "x32766)."]"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>${ }  ]</a>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    (" "x32766)."]>"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>${ }  ]></a>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    (" "x32766)."]]"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>${ }  ]]</a>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    (" "x32766)."]]>"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>${ }  ]]&#x3e;</a>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    (" "x32767).">"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>${ }   ></a>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    (" "x32767)."]"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>${ }   ]</a>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    (" "x32767)."]>"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>${ }   ]></a>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    (" "x32767)."]]"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>${ }   ]]</a>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    (" "x32767)."]]>"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>${ }   ]]&#x3e;</a>
+###e
+bless( [
+  "a",
+  {},
+  bless( [ [
+    ("foo"x40000)."bar"
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<a>$(foo)bar</a>
+###e
+bless( [
+  "x".("\x{137}"x40000)."y",
+  {},
+  bless( [ [
+    ""
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<x$(ķ)y/>
+###e
+bless( [
+  "x".("\x{b7}"x40000)."y",
+  {},
+  bless( [ [
+    ""
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<x$(·)y/>
+###e
+bless( [
+  "x".("a"x40000)."y",
+  {},
+  bless( [ [
+    ""
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<x$(a)y/>
+###d
+bless( [
+  "a",
+  {},
+  bless( [ [
+    ""
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<?xml version="1.0" standalone="yes"?>
+<a/>
+
+###d "UTF-8"
+bless( [
+  "a",
+  {},
+  bless( [ [
+    ""
+  ] ], 'XML::Easy::Content' )
+], 'XML::Easy::Element' )
+#
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<a/>
+
+###x
+bless( [ [
+  "a!"
+] ], 'XML::Easy::Content' )
+#
+a!
+###x "UTF-8"
+bless( [ [
+  "a!"
+] ], 'XML::Easy::Content' )
+#
+<?xml encoding="UTF-8"?>a!
+###

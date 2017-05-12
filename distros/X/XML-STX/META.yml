@@ -1,0 +1,14 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         XML-STX
+version:      0.43
+version_from: STX.pm
+installdirs:  site
+requires:
+    Clone:                         0.13
+    POSIX:                         1
+    XML::NamespaceSupport:         1.07
+    XML::SAX:                      0.1
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

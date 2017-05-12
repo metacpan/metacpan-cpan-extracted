@@ -1,0 +1,35 @@
+# XML::RPC Changes
+
+2009/01/01  (0.9) (by Alexandr Ciornii)
+    * better Makefile.PL
+    * 2 tests added
+
+2008/04/16  (0.8)
+    * Fixed 'each()' bug iterating over hashref.
+    * Added xml_in() and xml_out() methods.
+    * Fixed $faultCode warning (thanks JW).
+    * Fixed some pod.
+
+2008/02/07  (0.7)
+    * Removed debugging warning.
+
+2008/02/07  (0.6)
+    * Added support for custom types.
+    * faultCode is forced as int.
+
+2007/11/07  (0.5)
+    * No more strict refs.
+
+2007/10/12  (0.4)
+    * Fixed some more ref tests.
+    * String values are now always CDATA enclosed.
+
+2007/09/14  (0.3)
+    * Fixed a ref test for updated XML::TreePP.
+
+2007/04/25  (0.2)
+    * Fixed empty hashrefs on returning values
+    * Single result values are no longer returned as list.
+
+2007/03/01  (0.1)
+    * first release.

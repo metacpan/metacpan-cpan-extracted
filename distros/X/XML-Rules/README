@@ -1,0 +1,53 @@
+XML-Rules
+
+This is yet another XML module built on top of XML::Parser:Expat.
+
+It allows you to specify "rules", subroutines to be run once a tag
+is fully parsed and either process the data from the tag itself
+and its children or specify what parts of the data and how to add
+to the data structure being built for the parent tag.
+
+You may look at this either as a XML::Simple on steroids, a way
+to build a more customized datastructure out of your XML or as yet
+another even based XML parser that differs from the rest in that it
+handles building the structure(s) containing the needed data for you,
+simplifying the callbacks.
+
+Please see http://www.perlmonks.org/?node_id=581313 for discussion.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the perldoc command.
+
+    perldoc XML::Rules
+
+You can also look for information at:
+
+    Search CPAN
+        http://search.cpan.org/dist/XML-Rules
+
+    CPAN Request Tracker:
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=XML-Rules
+
+    AnnoCPAN, annotated CPAN documentation:
+        http://annocpan.org/dist/XML-Rules
+
+    CPAN Ratings:
+        http://cpanratings.perl.org/d/XML-Rules
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006-2012 Jan Krynicky
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

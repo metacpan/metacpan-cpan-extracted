@@ -1,0 +1,21 @@
+XML::Filter::EzPod
+==================
+
+A SAX filter to chain after Pod::SAX for turning some simple text constructs
+into Pod.
+
+The following new constructs can be used:
+
+* bullet
+* points
+** With
+** Multiple
+* levels
+
+# ordered
+# lists
+## With
+## Multiple
+# levels
+
+

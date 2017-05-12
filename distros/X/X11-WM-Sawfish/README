@@ -1,0 +1,34 @@
+X11/WM/Sawfish version 0.03
+===========================
+
+This module implements the two methods for remotely evaluating LISP forms in
+the Sawfish window manager for X11.  X11::WM::Sawfish::UNIX implements the UNIX
+domain sockets method, and X11::WM::Sawfish::XProp implements the X server
+window properties method.  Both are derived from X11::WM::Sawfish, and the 'new'
+method of the base class creates one of the two derived classes depending on
+which can connect to the server.  The UNIX domain socket method is attempted
+first, with the X properties method as the fallback.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+X11::Protocol
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2003 Craig B. Agricola
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

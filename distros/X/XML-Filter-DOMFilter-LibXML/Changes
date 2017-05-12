@@ -1,0 +1,15 @@
+Revision history for Perl extension XML::Filter::DOMFilter::LibXML.
+
+0.04  Thu Nov  5 01:33:21 CET 2015
+        - test requires added
+
+0.03  Wed Nov  4 00:50:19 CET 2015
+        - fixed bug in end_element when no Handler defined
+
+0.02  Fri Sep 12 12:18:48 2003
+	- fixed bug in start_element when no Handler defined
+
+0.01  Thu Apr  3 10:48:00 2003
+	- original version; created by h2xs 1.21 with options
+		-Afn XML::Filter::DOMFilter::LibXML
+

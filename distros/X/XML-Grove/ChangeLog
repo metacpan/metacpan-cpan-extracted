@@ -1,0 +1,126 @@
+1999-09-03  Ken MacLeod  <ken@jess>
+
+	* t/factory.t: added
+
+	* lib/XML/Grove/Factory.pm: added
+
+1999-09-01  Ken MacLeod  <ken@bitsko.slc.ut.us>
+
+	* lib/XML/Grove/Sub.pm (visit_document): changed $grove to
+	$document
+
+1999-08-24  Ken MacLeod  <ken@bitsko.slc.ut.us>
+
+	* lib/XML/Grove/AsString.pm (attr_as_string): missing =over/=back
+
+	* release 0.45alpha
+
+	* lib/XML/Grove/Subst.pm (subst_hash): typo in POD
+
+1999-08-17  Ken MacLeod  <ken@bitsko.slc.ut.us>
+
+	* lib/XML/Grove/Subst.pm: add POD, add subst() and subst_hash()
+	methods to XML::Grove::Document and XML::Grove::Element
+
+	* lib/XML/Grove/XPointer.pm: deprecated, add POD
+
+	* lib/XML/Grove/Sub.pm, lib/XML/Grove/Path.pm: add POD
+
+1999-08-16  Ken MacLeod  <ken@bitsko.slc.ut.us>
+
+	* lib/XML/Grove/Builder.pm, lib/XML/Grove/IDs.pm: add POD
+
+	* lib/XML/Grove/AsString.pm: converted to mixed-case options
+	(new): accept key, value pairs or hash
+	(entity_map_filter, entity_map_options, entity_map, filter): removed
+
+	* lib/XML/Grove/AsCanonXML.pm: converted to mixed-case options
+	(new): accept key, value pairs or hash
+	(comments): removed
+
+1999-08-11  Ken MacLeod  <ken@bitsko.slc.ut.us>
+
+	* examples/xml2eml/*: deleted, was dependent on
+	XML::Grove::ToObjects
+
+1999-08-10  Ken MacLeod  <ken@bitsko.slc.ut.us>
+
+	* lib/XML/Grove/ToObjects.pm: deleted, replaced by
+	XML::PatAct::ToObjects
+
+	* lib/XML/Grove/PerlSAX.pm (parse): major changes to bring up to
+	spec
+
+1999-05-26  Ken MacLeod  <ken@bitsko.slc.ut.us>
+
+	* MANIFEST, XML-Grove.spec: updated for moved alpha modules
+
+	* DOM-ecmascript.pod: updated, removed references to Parent
+
+	* alpha: removed; moved examples to `examples/' and modules to
+	lib/XML/Grove
+
+	* DOM: updated, added GetElementsByTagName and Normalize
+
+	* lib/XML/Grove/Builder.pm (end_document): remove call to
+	add_magic
+
+	* lib/XML/Grove.pm: major doc update, remove emphasis on
+	Data::Grove::Parent
+
+	* DOM-ecmascript.pod: renamed occurrences of Perl SAX to PerlSAX
+
+	* lib/XML/Grove/SAX.pm: rename to PerlSAX.pm
+
+	* README: major update, move alpha modules here
+
+	* alpha/xml2eml/xml2eml.pl: update to PerlSAX
+
+	* alpha/lib/XML/Grove/Subst.pm (visit_element): return Characters
+	object if substitute value is a scalar
+
+1999-05-06  Ken MacLeod  <kmacleod@serpentina.terrapinlabs.com>
+
+	* lib/XML/Grove.pm, t/grove.t: rename SAXPerl to PerlSAX
+
+	* lib/XML/Grove.pm: add $type_name class var to all classes
+
+	* examples/grove.pl, examples/my-html.pl, examples/visitor.pl:
+	convert to PerlSAX/Grove::Builder
+
+1999-04-30  Ken MacLeod  <kmacleod@serpentina.terrapinlabs.com>
+
+	* Makefile.PL: added a PREREQ_PM for XML::Parser
+
+1999-02-17  Ken MacLeod  <kmacleod@outlaw.cycletime.com>
+
+	* lib/XML/Grove.pm: moved property set methods to
+	libxml/lib/Data/Grove.pm
+
+	* lib/XML/Grove/Node.pm: moved to libxml/lib/Data/Grove/Tied.pm
+
+	* lib/XML/Grove/Visitor.pm: moved to
+	libxml/lib/Data/Grove/Visitor.pm
+
+	* lib/XML/Grove/Visitor.pm: dynamically check visitor to see if
+	will accept callbacks
+
+1999-02-16  Ken MacLeod  <kmacleod@outlaw.cycletime.com>
+
+	* DOM-ecmascript.pod: added
+
+	* lib/XML/Grove.pm: reformatted using better lists
+
+1999-02-15  Ken MacLeod  <kmacleod@outlaw.cycletime.com>
+
+	* lib/XML/Grove/Builder.pm: fix several bugs found with
+	ESISParser; move Entities, Notations, AppInfo, and Conforming into
+	XML::Grove::Document object
+
+	* lib/XML/Grove.pm: minor doc fixes
+
+1999-02-10  Ken MacLeod  <kmacleod@outlaw.cycletime.com>
+
+	* lib/XML/Grove/Builder.pm (subdoc_start): fix typo in $contents
+	assignment
+

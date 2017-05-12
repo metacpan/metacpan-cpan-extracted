@@ -1,0 +1,23 @@
+Revision history for XML-Atom-Filter
+
+0.07    26 November 2008
+        Access XML::Atom::Feed's underlying document in the modern (0.20+)
+        way.
+0.06    28 February 2006
+        Make work with Atom 1.0 feeds (XML::Atom 0.13_01 and later).
+        More documentation fixes.
+        Die instead of silently ignoring when the feed to filter cannot be
+        created.
+0.05    13 June 2005
+        Enable real filtering by using return values from entry methods.
+        Fix atompost.pl example's documentation.
+0.04    4 June 2005
+        Fixed some documentation bugs.
+        Added example scripts.
+0.03    31 May 2005
+        Fixed LIBXML invocation bug.
+0.02    8 April 2005
+        Added support for XML::XPath instead of XML::LibXML.
+0.01    6 April 2005
+        First public version.
+

@@ -1,0 +1,133 @@
+[%  site = {
+	title = 'Perl XML::Schema Documentation'
+    }
+    dir = {
+	root = root
+	pod  = "$root/pod"
+	xml  = "$root/xml"
+    }
+    file = {
+	overview  = "$dir.pod/overview.pod"
+    }
+    url = {
+	modules = 'modules'
+    }
+    http = {
+	xmlschema = 'http://www.cre.canon.co.uk/perl/XML-Schema/'
+    }
+    col = {
+	table = {
+	    border => '#000044',
+	    header => '#ccccff'
+	    cells  => '#eeeeff',
+	}
+    }
+    docset = [ 
+	{ url = 'overview.html',  title = 'Overview' }
+	{ url = 'modules.html',   title = 'Modules' }
+    ]
+    modules = [
+	'XML::Schema'
+	'XML::Schema::Attribute'
+	'XML::Schema::Attribute::Group'
+	'XML::Schema::Base'
+	'XML::Schema::Exception'
+	'XML::Schema::Facet'
+	'XML::Schema::Facet::Builtin'
+	'XML::Schema::Factory'
+	'XML::Schema::Handler'
+	'XML::Schema::Handler::Simple'
+	'XML::Schema::Test'
+	'XML::Schema::Type'
+	'XML::Schema::Type::Builtin'
+	'XML::Schema::Type::Complex'
+	'XML::Schema::Type::List'
+	'XML::Schema::Type::Simple'
+	'XML::Schema::Type::Union'
+	'XML::Schema::Wildcard'
+    ]
+    ;
+
+    VIEW site.view.default
+	 prefix   = 'view/default/'
+	 notfound = 'xmlstring'
+	 ;
+    END;
+
+    VIEW site.view.text
+	 prefix   = 'view/text/' 
+	 notfound = 'xmlstring'
+	 ;
+    END;
+
+    VIEW site.view.module
+	 prefix   = 'view/module/'
+	 notfound = 'xmlstring'
+	 name     = 'module'
+	 base     = site.view.default
+	 ;
+    END;
+
+    VIEW site.view.modargs
+	 prefix = 'view/modargs/'
+	 name   = 'modargs'
+	 base   = site.view.module
+	 ;
+    END;
+    VIEW site.view.modval
+	 prefix = 'view/modval/'
+	 name   = 'modval'
+	 base   = site.view.module
+	 ;
+    END;
+
+
+    MACRO classurl(class, anchor) BLOCK;
+	class = class.replace('::', '/'); 
+        "$uplink/" IF uplink;
+        "${url.modules}/${class}.html"; 
+        "#$anchor" IF anchor;
+    END;
+
+    MACRO classlink(class, anchor) BLOCK;
+	class = classurl(class, anchor);
+        "<a href=\"$class\">";
+    END;
+
+    MACRO cl(class) BLOCK;
+	classlink(class uplink=''); class; '</a>';
+    END;
+
+    MACRO section(title) BLOCK;
+        id = title.replace('\W+', '_');
+	id = "section_$id";
+	sectoc = { id => id, title => title, subs => [ ] };
+	toc.push(sectoc);
+	PROCESS bar;
+        "<a name=\"$id\"><h2>$title</h2></a>";
+    END;
+
+    MACRO subsection(title, id) BLOCK;
+        UNLESS id;
+            id = title.replace('\W+', '_');
+	    id = "subsection_$id";
+        END;
+	sectoc = { id => id, title => title };
+	toc.last.subs.push(sectoc);
+        "<a name=\"$prefix$id\"><h3>$title</h3></a>";
+    END;
+
+    MACRO subtoc(title, id) BLOCK;
+        UNLESS id;
+            id = title.replace('\W+', '_');
+	    id = "subsection_$id";
+        END;
+	sectoc = { id => id, title => title };
+	toc.last.subs.push(sectoc);
+    END;
+
+-%]
+
+
+
+

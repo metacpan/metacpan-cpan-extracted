@@ -1,0 +1,1 @@
+simple schema with iteration on simple types

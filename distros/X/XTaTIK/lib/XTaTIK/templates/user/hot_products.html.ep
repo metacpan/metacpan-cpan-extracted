@@ -1,0 +1,34 @@
+% layout 'default';
+% title 'Hot Products';
+
+<ol class="breadcrumb">
+  <li><a href="/user/">User Main</a></li>
+  <li class="active">Hot Products</li>
+</ol>
+
+
+<div class="panel panel-primary">
+  <div class="panel-heading">
+    <h3 class="panel-title">Update Hot Products</h3>
+  </div>
+  <div class="panel-body">
+    % if ( stash 'update_success' ) {
+      <p class="alert alert-success"><i
+          class="glyphicon glyphicon-info-sign"></i>
+          Hot products have been successfully updated.</p>
+    % } else {
+      <p class="alert alert-info"><i class="glyphicon glyphicon-info-sign"
+          ></i> Separate multiple product numbers with whitespace.</p>
+
+      %= form_for '/user/hot-products' => method => 'POST' => begin
+        %= csrf_field
+        <div class="form-group">
+          <%= text_area 'hot_products' => cols => 40, rows => 3,
+            class => 'form-control' %>
+        </div>
+        <%= submit_button 'Update hot products',
+            class => 'btn btn-primary' %>
+      %= end
+    % }
+  </div>
+</div>

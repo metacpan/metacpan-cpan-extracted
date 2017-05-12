@@ -1,0 +1,4 @@
+<?xml version="1.0"?>
+<dm:diff xmlns:dm="http://www.locus.cz/diffmark">
+  <dm:changename from="some" to="other"/>
+</dm:diff>

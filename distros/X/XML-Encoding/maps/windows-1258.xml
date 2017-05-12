@@ -1,0 +1,48 @@
+<encmap name='windows-1258' expat='yes'>
+  <ch byte='x80' uni='x20ac'/>
+  <ch byte='x82' uni='x201a'/>
+  <ch byte='x83' uni='x0192'/>
+  <ch byte='x84' uni='x201e'/>
+  <ch byte='x85' uni='x2026'/>
+  <range byte='x86' len='2' uni='x2020'/>
+  <ch byte='x88' uni='x02c6'/>
+  <ch byte='x89' uni='x2030'/>
+  <ch byte='x8b' uni='x2039'/>
+  <ch byte='x8c' uni='x0152'/>
+  <range byte='x91' len='2' uni='x2018'/>
+  <range byte='x93' len='2' uni='x201c'/>
+  <ch byte='x95' uni='x2022'/>
+  <range byte='x96' len='2' uni='x2013'/>
+  <ch byte='x98' uni='x02dc'/>
+  <ch byte='x99' uni='x2122'/>
+  <ch byte='x9b' uni='x203a'/>
+  <ch byte='x9c' uni='x0153'/>
+  <ch byte='x9f' uni='x0178'/>
+  <range byte='xa0' len='35' uni='x00a0'/>
+  <ch byte='xc3' uni='x0102'/>
+  <range byte='xc4' len='8' uni='x00c4'/>
+  <ch byte='xcc' uni='x0300'/>
+  <range byte='xcd' len='3' uni='x00cd'/>
+  <ch byte='xd0' uni='x0110'/>
+  <ch byte='xd1' uni='x00d1'/>
+  <ch byte='xd2' uni='x0309'/>
+  <range byte='xd3' len='2' uni='x00d3'/>
+  <ch byte='xd5' uni='x01a0'/>
+  <range byte='xd6' len='7' uni='x00d6'/>
+  <ch byte='xdd' uni='x01af'/>
+  <ch byte='xde' uni='x0303'/>
+  <range byte='xdf' len='4' uni='x00df'/>
+  <ch byte='xe3' uni='x0103'/>
+  <range byte='xe4' len='8' uni='x00e4'/>
+  <ch byte='xec' uni='x0301'/>
+  <range byte='xed' len='3' uni='x00ed'/>
+  <ch byte='xf0' uni='x0111'/>
+  <ch byte='xf1' uni='x00f1'/>
+  <ch byte='xf2' uni='x0323'/>
+  <range byte='xf3' len='2' uni='x00f3'/>
+  <ch byte='xf5' uni='x01a1'/>
+  <range byte='xf6' len='7' uni='x00f6'/>
+  <ch byte='xfd' uni='x01b0'/>
+  <ch byte='xfe' uni='x20ab'/>
+  <ch byte='xff' uni='x00ff'/>
+</encmap>

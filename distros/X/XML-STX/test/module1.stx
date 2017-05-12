@@ -1,0 +1,22 @@
+<stx:transform version="1.0" 
+  xmlns:stx="http://stx.sourceforge.net/2002/ns"
+  strip-space="yes">
+
+  <stx:template match="node">
+    <stx:text>Node</stx:text>
+    <stx:process-attributes/>
+  </stx:template>
+  
+  <stx:group>
+
+    <stx:template match="node[1]" visibility="global">
+      <stx:text>FAILED1</stx:text>
+    </stx:template>
+
+    <stx:template match="@*" public="yes">
+      <stx:value-of select="concat('[',name(),'=',.,']')"/>
+    </stx:template>
+    
+  </stx:group>
+
+</stx:transform>

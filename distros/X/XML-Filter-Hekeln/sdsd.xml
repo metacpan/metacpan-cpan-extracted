@@ -1,0 +1,421 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE repository
+	SYSTEM "repository03.dtd"
+>
+<repository
+	agency="UN/ECE/TRADE/WP.4"
+	code="sdsd"
+	desc="based on UN/EDIFACT D422.TXT"
+	name="Service Segment Directory"
+	version="99A"
+><segment
+	code="UNB"
+	desc="To start, identify and specify an interchange"
+	name="Interchange Header"
+><composite
+	code="S001"
+	flag="M"
+	name="SYNTAX IDENTIFIER"
+	pos="010"
+><element
+	code="0001"
+	flag="M"
+	name="Syntax identifier"
+	pos="010"
+	repr="a4"
+/><element
+	code="0002"
+	flag="M"
+	name="Syntax version number"
+	pos="020"
+	repr="n1"
+/></composite
+><composite
+	code="S002"
+	flag="M"
+	name="INTERCHANGE SENDER"
+	pos="020"
+><element
+	code="0004"
+	flag="M"
+	name="Sender identification"
+	pos="010"
+	repr="an..35"
+/><element
+	code="0007"
+	flag="C"
+	name="Partner identification code qualifier"
+	pos="020"
+	repr="an..4"
+/><element
+	code="0008"
+	flag="C"
+	name="Address for reverse routing"
+	pos="030"
+	repr="an..14"
+/></composite
+><composite
+	code="S003"
+	flag="M"
+	name="INTERCHANGE RECIPIENT"
+	pos="030"
+><element
+	code="0010"
+	flag="M"
+	name="Recipient Identification"
+	pos="010"
+	repr="an..35"
+/><element
+	code="0007"
+	flag="C"
+	name="Partner identification code qualifier"
+	pos="020"
+	repr="an..4"
+/><element
+	code="0014"
+	flag="C"
+	name="Routing address"
+	pos="030"
+	repr="an..14"
+/></composite
+><composite
+	code="S004"
+	flag="M"
+	name="DATE/TIME OF PREPARATION"
+	pos="040"
+><element
+	code="0017"
+	flag="M"
+	name="Date"
+	pos="010"
+	repr="n6"
+/><element
+	code="0019"
+	flag="M"
+	name="Time"
+	pos="020"
+	repr="n4"
+/></composite
+><element
+	code="0020"
+	flag="M"
+	name="INTERCHANGE CONTROL REFERENCE"
+	pos="050"
+	repr="an..14"
+/><composite
+	code="S005"
+	flag="C"
+	name="RECIPIENTS REFERENCE PASSWORD"
+	pos="060"
+><element
+	code="0022"
+	flag="M"
+	name="Recipients reference password"
+	pos="010"
+	repr="an..14"
+/><element
+	code="0025"
+	flag="C"
+	name="Recipients reference password qualifier"
+	pos="020"
+	repr="an2"
+/></composite
+><element
+	code="0026"
+	flag="C"
+	name="APPLICATION REFERENCE"
+	pos="070"
+	repr="an..14"
+/><element
+	code="0029"
+	flag="C"
+	name="PROCESSING PRIORITY CODE"
+	pos="080"
+	repr="a1"
+/><element
+	code="0031"
+	flag="C"
+	name="ACKNOWLEDGEMENT REQUEST"
+	pos="090"
+	repr="n1"
+/><element
+	code="0032"
+	flag="C"
+	name="COMMUNICATIONS AGREEMENT ID"
+	pos="100"
+	repr="an..35"
+/><element
+	code="0035"
+	flag="C"
+	name="TEST INDICATOR"
+	pos="110"
+	repr="n1"
+/></segment
+><segment
+	code="UNZ"
+	desc="To end and check the completeness of an interchange"
+	name="Interchange Trailer"
+><element
+	code="0036"
+	flag="M"
+	name="INTERCHANGE CONTROL COUNT"
+	pos="010"
+	repr="n..6"
+/><element
+	code="0020"
+	flag="M"
+	name="INTERCHANGE CONTROL REFERENCE"
+	pos="020"
+	repr="an..14"
+/></segment
+><segment
+	code="UNG"
+	desc="To head, identify and specify a Functional Group"
+	name="Functional Group Header"
+><element
+	code="0038"
+	flag="M"
+	name="FUNCTIONAL GROUP IDENTIFICATION"
+	pos="010"
+	repr="an..6"
+/><composite
+	code="S006"
+	flag="M"
+	name="APPLICATION SENDERS IDENTIFICATION"
+	pos="020"
+><element
+	code="0040"
+	flag="M"
+	name="Application senders identification"
+	pos="010"
+	repr="an..35"
+/><element
+	code="0007"
+	flag="C"
+	name="Partner identification code qualifier"
+	pos="020"
+	repr="an..4"
+/></composite
+><composite
+	code="S007"
+	flag="M"
+	name="APPLICATION RECIPIENTS IDENTIFICATION"
+	pos="030"
+><element
+	code="0044"
+	flag="M"
+	name="Recipients identification"
+	pos="010"
+	repr="an..35"
+/><element
+	code="0007"
+	flag="C"
+	name="Recipients identification qualifer"
+	pos="020"
+	repr="an..4"
+/></composite
+><composite
+	code="S004"
+	flag="M"
+	name="DATE/TIME OF PREPARATION"
+	pos="040"
+><element
+	code="0017"
+	flag="M"
+	name="Date"
+	pos="010"
+	repr="n6"
+/><element
+	code="0019"
+	flag="M"
+	name="Time"
+	pos="020"
+	repr="n4"
+/></composite
+><element
+	code="0048"
+	flag="M"
+	name="FUNCTIONAL GROUP REFERENCE NUMBER"
+	pos="050"
+	repr="an..14"
+/><element
+	code="0051"
+	flag="M"
+	name="CONTROLLING AGENCY"
+	pos="060"
+	repr="an..2"
+/><composite
+	code="S008"
+	flag="M"
+	name="MESSAGE VERSION"
+	pos="070"
+><element
+	code="0052"
+	flag="M"
+	name="Message version number"
+	pos="010"
+	repr="an..3"
+/><element
+	code="0054"
+	flag="M"
+	name="Message release number"
+	pos="020"
+	repr="an..3"
+/><element
+	code="0057"
+	flag="C"
+	name="Association assigned Code"
+	pos="030"
+	repr="an..6"
+/></composite
+><element
+	code="0058"
+	flag="C"
+	name="APPLICATION PASSWORD"
+	pos="080"
+	repr="an..14"
+/></segment
+><segment
+	code="UNE"
+	desc="To end and check the completeness of a Functional Group"
+	name="Functional Group Trailer"
+><element
+	code="0060"
+	flag="M"
+	name="NUMBER OF MESSAGES"
+	pos="010"
+	repr="n..6"
+/><element
+	code="0048"
+	flag="M"
+	name="FUNCTIONAL GROUP REFERENCE NUMBER"
+	pos="020"
+	repr="an..14"
+/></segment
+><segment
+	code="UNH"
+	desc="To head, identify and specify a Message"
+	name="Message Header"
+><element
+	code="0062"
+	flag="M"
+	name="MESSAGE REFERENCE NUMBER"
+	pos="010"
+	repr="an..14"
+/><composite
+	code="S009"
+	flag="M"
+	name="MESSAGE IDENTIFIER"
+	pos="020"
+><element
+	code="0065"
+	flag="M"
+	name="Message type"
+	pos="010"
+	repr="an..6"
+/><element
+	code="0052"
+	flag="M"
+	name="Message version number"
+	pos="020"
+	repr="an..3"
+/><element
+	code="0054"
+	flag="M"
+	name="Message release number"
+	pos="030"
+	repr="an..3"
+/><element
+	code="0051"
+	flag="M"
+	name="Controlling agency"
+	pos="040"
+	repr="an..2"
+/><element
+	code="0057"
+	flag="C"
+	name="Association assigned code"
+	pos="050"
+	repr="an..6"
+/></composite
+><element
+	code="0068"
+	flag="C"
+	name="COMMON ACCESS REFERENCE"
+	pos="030"
+	repr="an..35"
+/><composite
+	code="S010"
+	flag="C"
+	name="STATUS OF THE TRANSFER"
+	pos="040"
+><element
+	code="0070"
+	flag="M"
+	name="Sequence of transfers"
+	pos="010"
+	repr="n..2"
+/><element
+	code="0073"
+	flag="C"
+	name="First and last transfer"
+	pos="020"
+	repr="a1"
+/></composite
+></segment
+><segment
+	code="UNT"
+	desc="To end and check the completeness of a Message"
+	name="Message Trailer"
+><element
+	code="0074"
+	flag="M"
+	name="NUMBER OF SEGMENTS IN THE MESSAGE"
+	pos="010"
+	repr="n..6"
+/><element
+	code="0062"
+	flag="M"
+	name="MESSAGE REFERENCE NUMBER"
+	pos="020"
+	repr="an..14"
+/></segment
+><segment
+	code="TXT"
+	desc="To give information in addition to that in other segments in the service message, as required"
+	name="Text"
+	note="Can not be machine processed. Should be avoided if not necessarily required. Normally a conditional segment. It may repeat up to the number of times indicated in the message specification which may not be higher than 5."
+><element
+	code="0077"
+	flag="C"
+	name="TEXT REFERENCE CODE"
+	pos="010"
+	repr="an3"
+/><element
+	code="0078"
+	flag="M"
+	name="FREE FORM TEXT"
+	pos="020"
+	repr="an..70"
+/></segment
+><segment
+	code="UNS"
+	desc="To separate Header, Detail and Summary sections of a message"
+	name="Section Control"
+	note="To be used by message designers when required to avoid ambiguities. Mandatory only if specified for the type of message concerned."
+><element
+	code="0081"
+	flag="M"
+	name="SECTION IDENTIFICATION"
+	pos="010"
+	repr="a1"
+/></segment
+>
+<chartest
+>some characters and more</chartest
+>
+<cdatatest
+><![CDATA[some cdata characters and more]]></cdatatest
+>
+></repository
+>

@@ -1,0 +1,12 @@
+<p>
+[% WRAPPER table %]
+<tr bgcolor="[% col.table.header %]">
+[% PROCESS my_hdr FOREACH val = [ 'Name', 'Typical Values', 'Description' ] %]
+</tr>
+[% item.content(site.view.modval) %]
+[% END %]
+</p>
+
+[% BLOCK my_hdr -%]
+<td><b><small>[% val %]</b></td>
+[%- END %]

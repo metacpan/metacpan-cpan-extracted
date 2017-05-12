@@ -1,0 +1,40 @@
+---
+abstract: 'XAO Web templating system'
+author:
+  - 'Andrew Maltsev, http://ejelta.com/xao/'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  XAO::Base: '1.13'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: XAO-Web
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  CGI: '4.14'
+  CGI::Cookie: '4.14'
+  Crypt::Rijndael: '1.13'
+  Data::Entropy::Algorithms: '0.007'
+  Digest::Bcrypt: '1.203'
+  Digest::MD5: '2.13'
+  Digest::SHA: '5.63'
+  Error: '0.15'
+  HTML::Entities: '3.69'
+  HTTP::Response: '6.04'
+  JSON: '2.26'
+  MIME::Base64: '3.14'
+  MIME::Lite: '2.117'
+  POSIX: '1.16'
+  Text::FormatTable: '0.01'
+  Time::HiRes: '1.9719'
+  XAO::Base: '1.13'
+  XAO::FS: '1.06'
+version: '1.47'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,144 @@
+=encoding utf8
+
+=head1 NAME
+
+XML::Compile::WSS::SecToken - Base for WSS Security Tokens
+
+=head1 INHERITANCE
+
+ XML::Compile::WSS::SecToken is extended by
+   XML::Compile::WSS::SecToken::EncrKey
+   XML::Compile::WSS::SecToken::X509v3
+
+=head1 SYNOPSIS
+
+  # either
+  use XML::Compile::WSS::Util qw/XTP10_X509v3/;
+  my $token = XML::Compile::WSS::SecToken->new(type => XTP10_X509v3, ...);
+
+  # or
+  use XML::Compile::WSS::SecToken::X509v3;
+  my $token = XML::Compile::WSS::SecToken::X509v3->new(...);
+
+=head1 DESCRIPTION
+
+=head2 Supported token types
+
+=over 4
+
+=item * X509v3, see L<XML::Compile::WSS::SecToken::X509v3|XML::Compile::WSS::SecToken::X509v3>
+
+=item * An encrypted key, for instance to be used for hmac-rsa, implemented in L<XML::Compile::WSS::SecToken::EncrKey|XML::Compile::WSS::SecToken::EncrKey>
+
+=back
+
+=head2 Not supporter (yet)
+
+Other token types, found in the documentation, but not (yet) supported:
+
+=over 4
+
+=item * LTPA: Lightweight Third Party Authentication (version 1)
+
+=item * LTPAv2: Lightweight Third Party Authentication version 2
+
+=back
+
+Hire me to implement these!
+
+=head1 METHODS
+
+=head2 Constructors
+
+=over 4
+
+=item XML::Compile::WSS::SecToken-E<gt>B<fromConfig>($config, %options)
+
+Try to be very flexible.  $config can be a HASH, which could also be
+passed to L<new()|XML::Compile::WSS::SecToken/"Constructors"> directly.  But it can also be various kinds of
+objects.
+
+ -Option--Default
+  type    XTP10_X509v3
+
+=over 2
+
+=item type => CONSTANT
+
+[1.07] the type of the security token.
+
+=back
+
+=item XML::Compile::WSS::SecToken-E<gt>B<new>(%options)
+
+ -Option     --Default
+  binary       undef
+  encoding     WSM10_BASE64
+  fingerprint  undef
+  id           'my-token'
+  type         XTP10_X509v3
+  uri          <unique>
+
+=over 2
+
+=item binary => BYTES
+
+=item encoding => WSM10*
+
+=item fingerprint => STRING
+
+STRING format like C<C8:AE:B1:25:  :24:00:7A:82:F2>.  A bit weird that
+this gets base64 encoded as well.
+
+=item id => wsu::Id
+
+=item type => TOKENTYPE
+
+=item uri => NAME
+
+=back
+
+=back
+
+=head2 Attributes
+
+=over 4
+
+=item $obj-E<gt>B<encoding>()
+
+=item $obj-E<gt>B<fingerprint>()
+
+=item $obj-E<gt>B<id>()
+
+=item $obj-E<gt>B<type>()
+
+=back
+
+=head2 Handlers
+
+=over 4
+
+=item $obj-E<gt>B<asBinary>()
+
+If implemented, this token can be included as "BinarySecurityToken"
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of XML-Compile-WSS-Signature distribution version 2.02,
+built on July 16, 2016. Website: F<http://perl.overmeer.net/xml-compile/>
+
+Please post questions or ideas to the mailinglist at
+F<http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/xml-compile> .
+For live contact with other developers, visit the C<#xml-compile> channel
+on C<irc.perl.org>.
+
+=head1 LICENSE
+
+Copyrights 2012-2016 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

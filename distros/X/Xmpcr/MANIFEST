@@ -1,0 +1,14 @@
+Xmpcr/Serial.pm
+Xmpcr/Network.pm
+Xmpcr.pm
+Makefile.PL
+bin/xmpcrd
+bin/xmripper
+bin/xmfinder
+web/templates/index.tmpl
+web/templates/nodaemon.tmpl
+web/ball.green.gif
+web/index.cgi
+t/1.t
+README
+MANIFEST

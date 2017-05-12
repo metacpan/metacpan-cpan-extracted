@@ -1,0 +1,8 @@
+root
+//a/c/c	//c/c/c	/r
+test0	testa	1
+test0	testa	2
+test0	testa	3
+test0	testa	4
+test0	testa	5
+

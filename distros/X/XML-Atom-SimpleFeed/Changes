@@ -1,0 +1,159 @@
+Release history for XML-Atom-SimpleFeed
+
+0.900 Tue 22 Sep 2015
+	- Support for arbitrary XML encodings
+
+	[INCOMPATIBLE CHANGE]
+	- Removal of ->no_generator method.
+
+	  To suppress the default generator tag, specify an undef generator.
+
+0.863 Thu 10 Sep 2015
+	[INCOMPATIBLE CHANGE]
+	- Datetime object support now via ->epoch method instead of ->strftime.
+
+	  Despite the fact that this is an incompatible change, it should actually
+	  be a non-event for almost all users, because every datetime module with
+	  a ->strftime method that I could find on CPAN also has an ->epoch method
+	  (as well as vice versa).
+
+	  However, the ->strftime methods of many modules are (subtly or badly)
+	  broken in the face of timezones, even as their ->epoch methods work right
+	  (or else are broken subtly enough to escape notice).
+
+	  But if you have written your own datetime class, and it has a ->strftime
+	  method but not an ->epoch method, and you pass an instance of your class
+	  to an instance of this module, then the feeds you generate that way will
+	  now be broken.
+
+	  On balance, I believe that this change will unbreak vastly more code than
+	  it breaks. Therefore I decided to switch.
+
+0.862 Tue 08 Sep 2015
+	- Correct RFC 3339 formatting for datetime objects
+	  (Thanks, virii)
+
+0.861 Tue 06 Jan 2015
+	- Auto-formatting for recognised data types in date constructs
+	- Fixed CDATA flattener (was missing /s flag)
+	- Non-fatal warnings; mea maxima culpa
+	- Test suite cleanup
+	- Now uses Dist::Zilla
+
+0.86 Tue 23 Jun 2009
+	- Person constructs are properly escaped and encoded
+
+0.85 Tue 23 Jun 2009
+	- Used a less finicky implementation strategy for the CDATA
+	  flattener so hopefully it will not be buggy any more
+
+0.84 Tue 26 May 2009
+	- Added some basic XML writer tests, which uncovered a bug in the
+	  CDATA flattener, which is now fixed
+
+0.83 Mon 25 May 2009
+	- Thanks to JMASTROS for spotting another bug in the XML escaping
+	  function and contributing a test case
+
+0.82 Sat 21 Jun 2008
+	- I can't believe no one noticed in such a long time that the XML
+	  escaping function was broken. I need unit tests...
+	- Also, the date in the changelog entry for 0.81 was wrong.
+
+0.81 Sat 21 Jun 2008
+	- Put private functions in XML::Atom::SimpleFeed::YeWhoEnters and
+	  placed methods in XML::Atom::SimpleFeed explicitly. This gets rid
+	  of approximately 734 prefix underscores.
+	- It turns out Carp::Clan wasn't even necessary, Carp works
+	  that way by default. *blush*
+	- More big POD cleanups (converted lots of list items to subheadings
+	  so they're linkable and listed in the TOC).
+	- Throw out the pointless POD and POD coverage tests.
+	- Automatically escape the content of the `icon`, `id`, `logo`,
+	  `published`, and `updated` elements. Oops. (CPAN RT #36961)
+
+0.8 Sat 03 Jun 2006
+	- Multiple consecutive internal refactors; code structure is now
+	  actually satisfactory
+	- Handles multiple authors and contributors
+	- Support for icon and logo elements
+	- Big POD cleanup
+	- Use Carp::Clean to get rid of silly $Carp::CarpLevel juggling
+	- ***BACKWARDS INCOMPATIBLE API CHANGE***:
+	  Elements such as C<link> which may appear multiple times are no
+	  longer specified in an anonymous array, but simply given
+	  repeatedly.
+	- ***BACKWARDS INCOMPATIBLE API CHANGE***:
+	  Atom 0.3 element and attribute names are no longer supported. (No
+	  point keeping a lot of deprecation code around in the face of a
+	  change like the above.)
+	- ***BACKWARDS INCOMPATIBLE API CHANGE***:
+	  Suppress the default C<generator> element requires calling the
+	  C<no_generator> method instead of passing a C<generator> key to
+	  C<new> with an undefined value.
+	- ***BACKWARDS INCOMPATIBLE API CHANGE***:
+	  Well, since I'm at it, the C<save_file> method is no longer
+	  supported. C<print> now takes a handle, though.
+	- Cleaned up errors and warning messages and got rid of DIAGNOSTICS
+	  section in POD
+
+0.8_004 Wed 10 May 2006
+	- Brownbag upload: forgot to update ./Changes in 0.8_003
+
+0.8_003 Wed 10 May 2006
+	- Minor incremental progress; various bugfixes, some refactor.
+
+0.8_002 Sun 09 Apr 2006
+	- Use builtin XML writer instead of SAX for output. This
+	  eliminates huge amounts of redundancy.
+	- Big improvements in the distribution of responsibilities for
+	  deprecation and validation checks.
+	- Array-based implementation rather than inside-out objects.
+	- Internal structure is now more logical and consistent.
+
+0.8_001 Wed 28 Sep 2005
+	- Emit Atom 1.0. Documentation updated to reflect Atom 1.0.
+	  Usage according to Atom 0.3 will transparently generate 1.0
+	  elements but emit deprectation warnings.
+	- Remove _generate_entry_id and use HTTP URLs as IDs by default.
+	  Using tag: URIs is useful for generating the ID once, up
+	  front, so that it won't change even if the permalink does --
+	  if the ID is generated from the permalink, we might as well
+	  use the permalink directly.
+	- Use XML::SAX::Writer instead of XML::Simple for output.
+
+0.7 Fri 06 May 2005
+	- Fix the module prereq in Makefile.PL to actually do the proper
+	  dependency tests.  Oops.
+
+0.6 Wed 27 Apr 2005
+	- Use XML::Simple to generate the XML, instead of doing strings
+	  by hand.
+	- Make the module more robust: it now can handle multiple
+	  titles, links, etc. by passing in arrayrefs and hashrefs,
+	  while still allowing for simple use with strings.
+	- Many thanks to Aristotle Pagaltzis for the help.
+
+0.5 Wed 09 Mar 2005
+	- Add an as_string method to return the feed as a scalar.
+	- Escape any <![CDATA[ or ]]> strings that appear in the content
+	  CDATA section.
+	- Allow the save_file method to take either an open filehandle
+	  or a scalar containing a filename.
+	- These issues reported by Aristotle Pagaltzis.
+
+0.4 Tue 22 Feb 2005
+	- Rework the author code again to fixe more bugs that I probably
+	  should have caught before releasing 0.3.  Sigh.
+
+0.3 Tue 22 Feb 2005
+	- Fixed a bug in the entry author section where the author name
+	  was always showing up as "name". CPAN RT ID# 11620
+	- Fixed a similar bug in the feed-level author section.
+	- Happy Birthday, Holly!
+
+0.2 Sat 19 Feb 2005
+	- Adjust the XML encoding to produce valid feeds.
+
+0.1 Fri 18 Feb 2005
+	- Initial release.

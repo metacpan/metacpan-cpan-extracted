@@ -1,0 +1,10 @@
+-----
+0.04: 05 Jan 2017
+    - Minor Kwalitee fixes
+    - Remove // operator
+0.03: 31 Dec 2016
+    - Fixed to work with 5.8.9
+0.02: 30 Dec 2016
+    - Fix lib location
+0.01: 30 Dec 2016
+    - First release

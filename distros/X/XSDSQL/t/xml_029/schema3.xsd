@@ -1,0 +1,21 @@
+﻿<?xml version="1.0"?>
+<xs:schema 
+xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+targetNamespace="namespace3"
+xmlns:zz="namespace4"
+elementFormDefault="qualified"
+attributeFormDefault="qualified"
+>
+<xs:import namespace="namespace4"  schemaLocation="schema4.xsd"/>
+
+ <xs:element name="s1">
+		<xs:complexType>
+			<xs:sequence minOccurs="0" maxOccurs="1">
+				<xs:element name="el0" type="xs:string" minOccurs="0" maxOccurs="1"/>
+				<xs:element name="el1" type="xs:string" minOccurs="0" maxOccurs="1"/>
+				<xs:element name="el2" type="zz:ct0" minOccurs="0" maxOccurs="1"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>
+

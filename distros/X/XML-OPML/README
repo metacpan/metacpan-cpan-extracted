@@ -1,0 +1,30 @@
+XML/OPML version 0.26
+=====================
+
+Use this module in the standard way.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  XML::Parser
+  XML::SimpleObject
+
+If you have trouble installing XML::SimpleObject, it may be because XML::SimpleObject is bundled with XML::SimpleObject::LibXML. If you cannot install XML::SimpleObject::LibXML because of an incompatible LibXML version, the easiest thing to do would be to download the XML::SimpleObject tarball, gunzip and untar it, change to the directory that it created, and then type rm -rf LibXML/. This will remove the LibXML structure from the package and allow you to install XML::SimpleObject without a problem.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 michael szul <opml-dev@madghoul.com>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

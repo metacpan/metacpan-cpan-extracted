@@ -1,0 +1,35 @@
+---
+abstract: 'A tool-kit providing a wrapper around a HTTP client,'
+author:
+  - 'Adam Trickett, E<lt>atrickett@cpan.orgE<gt>'
+build_requires:
+  IO::Capture: '0.04'
+  Module::Build: '0.4'
+  Pod::Coverage: '0.21'
+  Test::Pod: '1.0'
+  Test::Warn: '0.09'
+  URI::file: '4.19'
+  YAML: '0.60'
+configure_requires:
+  Module::Build: '0.4'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.141170'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: XML-RSS-Tools
+provides:
+  XML::RSS::Tools:
+    file: lib/XML/RSS/Tools.pm
+    version: '0.34'
+requires:
+  LWP: '6.0'
+  URI: '1.58'
+  XML::LibXML: '1.70'
+  XML::LibXSLT: '1.70'
+  XML::RSS: '1.46'
+  perl: v5.10.0
+resources:
+  license: http://www.gnu.org/licenses/lgpl-3.0.txt
+version: '0.34'

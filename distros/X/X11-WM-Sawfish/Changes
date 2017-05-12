@@ -1,0 +1,13 @@
+Revision history for Perl extension X11::WM::Sawfish.
+
+0.02  Thu Oct 30 00:37:37 2003
+    - Split Sawfish.pm into Sawfish::UNIX and Sawfish::XProp with Sawfish
+      being the class that both are derived from
+
+0.01  Fri Oct 24 01:15:00 2003
+    - First functional version
+
+0.00  Thu Oct 23 16:30:35 2003
+    - original version; created by h2xs 1.22 with options
+        -X X11::WM::Sawfish
+

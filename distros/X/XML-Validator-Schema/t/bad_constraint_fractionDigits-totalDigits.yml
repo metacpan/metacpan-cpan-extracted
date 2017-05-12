@@ -1,0 +1,19 @@
+# test invalid Schema Component Constraints
+# only 1 test per file, as first test will always fail the whole file when the schema is parsed
+
+--- |
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="bad_fractionDigits-totalDigits" type="bad_fractionDigits-totalDigits"/>
+  <xs:simpleType name="bad_fractionDigits-totalDigits">
+    <xs:restriction base="xs:decimal">
+      <xs:totalDigits value="2"/>
+      <xs:fractionDigits value="3"/>
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>
+
+--- |
+  <bad_fractionDigits-totalDigits>12</bad_fractionDigits-totalDigits>
+--- >
+FAIL /is greater than facet <totalDigits>/
+

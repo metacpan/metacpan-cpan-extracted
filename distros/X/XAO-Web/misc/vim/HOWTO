@@ -1,0 +1,26 @@
+How To Enable Syntax Highlighting in VIM for XAO::Web Templates
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+1) Copy 'xaoweb.vim' into '~/.vim/syntax/' directory.
+
+2) Copy 'scripts.vim' into '~/.vim/' directory. If you already have a
+   customized 'scripts.vim' file then make appropriate changes manually
+   using supplied 'scripts.vim' as a guide.
+
+3) If you do not like colors (for instance if you use dark background)
+   then create a '~/.vim/after/syntax' directory and put a 'xaoweb.vim'
+   file there with the following content altering colors or attributes:
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""
+hi xaowebDKeyword       ctermfg=DarkBlue    guifg=DarkBlue      gui=bold
+hi xaowebDVariable      ctermfg=DarkGreen   guifg=DarkGreen     gui=bold
+hi xaowebDFlags         ctermfg=DarkCyan    guifg=DarkCyan      gui=bold
+
+hi xaowebVarAttr        ctermfg=DarkGreen   guifg=DarkGreen     gui=NONE
+hi xaowebAttr           ctermfg=DarkBlue    guifg=DarkCyan      gui=NONE
+""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+4) Enjoy colors in XAO::Web templates!
+
+--
+Andrew Maltsev <am@xao.com>

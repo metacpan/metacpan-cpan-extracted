@@ -1,0 +1,11 @@
+Changes
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+README
+examples/included.xml
+examples/xinclude.xml
+lib/XML/Filter/XInclude.pm
+t/00basic.t
+t/01xinclude.t
+xinclude.java

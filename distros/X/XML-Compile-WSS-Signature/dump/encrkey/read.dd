@@ -1,0 +1,29 @@
+$VAR1 = {
+  Id => 'EK',
+  xenc_EncryptionMethod => {
+    Algorithm => 'http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p'
+  },
+  ds_KeyInfo => {
+    cho_ds_KeyName => [
+      {
+        wsse_SecurityTokenReference => {
+          cho_any => [
+            {
+              wsse_KeyIdentifier => {
+                ValueType => 'http://docs.oasis-open.org/wss/oasis-wss-soap-message-security-1.1#ThumbprintSHA1',
+                EncodingType => 'http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#Base64Binary',
+                _ => 'Qzg6QUU6QjE6MjU6RDI6RkI6Rjk6MjA6RUE6RUU6NTM6NUM6NEQ6Mzk6OUU6MjQ6MDA6N0E6ODI6
+RjI=
+'
+              }
+            }
+          ]
+        }
+      }
+    ]
+  },
+  xenc_CipherData => {
+    xenc_CipherValue => '´é&‡Gú=±éG=#²z€ùYAôÙå†bëGˆy—µæãïóoEúrÓÓ§²%²†lÛ«^“5å8@?ÊíV[àÈÓ\\ºjJí‘{“U‚
+šƒ5Ë§Çîù]ÛÃ-mœ,¤‚°Ä›ŠãC»œ6Š¦Ü!úb«ÓQ»"á'
+  }
+};

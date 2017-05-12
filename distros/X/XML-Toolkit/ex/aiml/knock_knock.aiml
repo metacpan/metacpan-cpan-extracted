@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<aiml version="1.0">
+  <category>
+    <pattern>TELL ME A JOKE</pattern>
+    <template>
+      <random>
+        <li>Did you hear the one about the Mountain Goats in the Andes? It was
+        Ba a a a a a d. </li>
+        <li>I never forget a face, but in your case I'll make an
+        exception.</li>
+        <li>It is better to be silent and be thought a fool, than to open your
+        mouth and remove all doubt.</li>
+        <li>
+          <srai>TELL ME A KNOCK KNOCK JOKE</srai>
+        </li>
+      </random>
+    </template>
+  </category>
+  <category>
+    <pattern>TELL ME A KNOCK KNOCK JOKE</pattern>
+    <template>Knock Knock</template>
+  </category>
+  <category>
+    <pattern>WHO IS THERE</pattern>
+    <that>KNOCK KNOCK</that>
+    <template>
+      <random>
+        <li>Police</li>
+        <li>Doris</li>
+        <li>Norma Lee</li>
+      </random>
+    </template>
+  </category>
+  <category>
+    <pattern>POLICE WHO</pattern>
+    <that>POLICE</that>
+    <template>Police let us in; it's cold out here.</template>
+  </category>
+  <category>
+    <pattern>DORIS WHO</pattern>
+    <that>DORIS</that>
+    <template>Doris locked, that's why I had to knock!</template>
+  </category>
+  <category>
+    <pattern>NORMA LEE WHO</pattern>
+    <that>NORMA LEE</that>
+    <template>Normaly I don't go around knocking on doors, but do you want to
+    buy a set of encyclopedias?</template>
+  </category>
+</aiml>

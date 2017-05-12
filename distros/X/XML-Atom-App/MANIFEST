@@ -1,0 +1,17 @@
+Build.PL
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/XML/Atom/App.pm
+t/00.load.t
+t/01.new.t
+t/02.alert_cant.t
+t/03.rfc3339.t
+t/04.particles.t
+t/05.contributor.t
+t/06.source.t
+t/perlcritic.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,36 @@
+---
+abstract: 'X11 OpenGL API, and DWIM utility object'
+author:
+  - 'Michael Conrad <mike@nrdvana.net>'
+build_requires:
+  Log::Any::Adapter: '0'
+  Log::Any::Adapter::TAP: '0'
+  Test::More: '0'
+configure_requires:
+  Devel::CheckLib: '1.03'
+  ExtUtils::Depends: '0.405'
+  ExtUtils::MakeMaker: '0'
+  X11::Xlib: '0.12'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: X11-GLX
+requires:
+  Carp: '0'
+  Exporter: '0'
+  Log::Any: '0'
+  Moo: '0'
+  OpenGL: '0'
+  X11::Xlib: '0.11'
+  X11::Xlib::Pixmap: '0'
+  XSLoader: '0'
+  parent: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/nrdvana/perl-X11-GLX/issues
+  repository: https://github.com/nrdvana/perl-X11-GLX.git
+version: '0.02'

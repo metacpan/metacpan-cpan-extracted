@@ -1,0 +1,247 @@
+=encoding utf8
+
+=head1 NAME
+
+XML::Compile::Translate::Writer - translate HASH to XML
+
+=head1 INHERITANCE
+
+ XML::Compile::Translate::Writer
+   is a XML::Compile::Translate
+
+=head1 SYNOPSIS
+
+ my $schema = XML::Compile::Schema->new(...);
+ my $code   = $schema->compile(WRITER => ...);
+
+=head1 DESCRIPTION
+
+The translator understands schemas, but does not encode that into
+actions.  This module implements those actions to translate from
+a (nested) Perl HASH structure onto XML.
+
+Extends L<"DESCRIPTION" in XML::Compile::Translate|XML::Compile::Translate/"DESCRIPTION">.
+ 
+=head1 METHODS
+
+Extends L<"METHODS" in XML::Compile::Translate|XML::Compile::Translate/"METHODS">.
+ 
+=head1 DETAILS
+
+Extends L<"DETAILS" in XML::Compile::Translate|XML::Compile::Translate/"DETAILS">.
+ 
+=head2 Translator options
+
+Extends L<"Translator options" in XML::Compile::Translate|XML::Compile::Translate/"Translator options">.
+ 
+=head2 Processing Wildcards
+
+Complex elements can define C<any> (element) and C<anyAttribute> components,
+with unpredictable content.  In this case, you are quite on your own in
+processing those constructs.  The use of both schema components should
+be avoided: please specify your data-structures explicit by clean type
+extensions.
+
+The procedure for the WRITER is simple: add key-value pairs to your
+hash, in which the value is a fully prepared XML::LibXML::Attr
+or XML::LibXML::Element.  The keys have the form C<{namespace}type>.
+The I<namespace> component is important, because only spec conformant
+namespaces will be used. The elements and attributes are added in
+random order.
+
+=head2 Mixed elements
+
+[0.79] ComplexType and ComplexContent components can be declared with the
+C<<mixed="true">> attribute.
+
+XML::Compile does not have a way to express these mixtures of information
+and text as Perl data-structures; the only way you can use those to the
+full extend, is by juggling with XML::LibXML nodes yourself.
+
+You may provide a XML::LibXML::Element, which is complete, or a
+HASH which contains attributes values and an XML node with key '_'.
+When '_' contains a string, it will be translated into an XML text
+node.
+
+L<XML::Compile::Schema::compile(mixed_elements)|XML::Compile::Schema/"Compilers"> can be set to
+
+=over 4
+
+=item ATTRIBUTES (default)
+
+Add attributes to the provided node.  When you provide a HASH, it is
+taken as node content with attributes.  The content has to be stored
+with key '_'.  When it is not a HASH, the data is node content.
+
+There are various ways you can specify content.  Up to [1.51], you
+could only pass a matching XML::LibXML::Element.  Release [1.51] added
+strings to the spectrum.  If the string does not contain encoded entities
+or E<lt> and E<gt>, then it is assumed to be a real perl string.  When
+the string contains an XML fragment which has the same localname as to be
+created, that will be used.  When the XML fragment is not wrapped in the
+expected node, this is created for you.
+
+In any case, attributes provided with the content will get added to the
+content data.
+
+=item STRUCTURAL
+
+[0.89] behaves as if the attribute is not there: a data-structure can be
+used or an XML node.
+
+=back
+
+=head2 Schema hooks
+
+All writer hooks behave differently.  Be warned that the user values
+can be a SCALAR or a HASH, dependent on the type.  You can intervene
+on higher data-structure levels, to repair lower levels, if you want
+to.
+
+[1.48] The hooks get a long list of parameters.  The C<$fulltype>
+indicates the type of object which is being processed, which is
+especially useful with the 'extends' selector.
+
+=head3 hooks executed before normal processing
+
+The C<before> hook gives you the opportunity to fix the user
+supplied data structure.  The XML generator will complain about
+missing, superfluous, and erroneous values which you probably
+want to avoid.
+
+The C<before> hook returns new values.  Just must not interfere
+with the user provided data.  When C<undef> is returned, the whole
+node will be cancelled.
+
+On the moment, the only predefined C<before> hook is C<PRINT_PATH>.
+
+=head3 hooks replacing the usual XML node generation
+
+Only one C<replace> hook can be defined.  It must return a
+XML::LibXML::Node or C<undef>.  The hook must use the
+C<XML::LibXML::Document> node (which is provided as first
+argument) to create a node.
+
+As parameters, the called replace function will receive the
+document, user-provided values, location in the data tree (for
+error messages), the tag of the node with prefix attached, and
+a reference to the code which would be executed if the replace
+hook had not been active.
+
+On the moment, the only predefined C<replace> hook is C<SKIP>.
+
+=head3 hooks executed after the node was created
+
+The C<after> hooks, will each get a chance to modify the
+produced XML node, for instance to encapsulate it.  Each time,
+the new XML node has to be returned.
+
+On the moment, the only predefined C<after> hook is C<PRINT_PATH>.
+
+=head3 fixing bad schemas
+
+When a schema makes a mess out of things, we can fix that with hooks.
+Also, when you need things that XML::Compile does not support (yet).
+
+=head2 Typemaps
+
+In a typemap, a relation between an XML element type and a Perl class (or
+object) is made.  Each translator back-end will implement this a little
+differently.  This section is about how the writer handles typemaps.
+
+=head3 Typemap to Class
+
+Usually, an XML type will be mapped on a Perl class.  The Perl class
+implements the C<toXML> method as serializer.  That method should
+either return a data structure which fits that of the specific type,
+or an XML::LibXML::Element.
+
+When translating the data-structure to XML, the process may encounter
+objects.  Only if these objects appear at locations where a typemap
+is defined, they are treated smartly.  When some other data than an
+objects is found on a location which has a typemap definition, it will
+be used as such; objects are optional.
+
+The object (if present) will be checked to be of the expected class.
+It will be a compile-time error when the class does not implement the
+C<toXML> method.
+
+ $schema->typemap($sometype => 'My::Perl::Class');
+
+ package My::Perl::Class;
+ ...
+ sub toXML
+ {   my ($self, $xmltype, $doc) = @_;
+     ...
+     { a => { b => 42 }, c => 'aaa' };
+ }
+
+The C<$self> is the object found in the data-structure provided by the
+user.  C<$doc> can be used to create your own XML::LibXML::Element.
+It is possible to use the same object on locations for different types:
+in this case, the toXML method can distiguisk what kind of data to return
+based on the C<$xmltype>.
+
+=head3 Typemap to Object
+
+In this case, some helper object arranges the serialization of the
+provided object.  This is especially useful when the provided object
+does not have the toXML implemented, for instance because it is an
+implementation not under your control.  The helper object works like
+an interface.
+
+ my $object = My::Perl::Class->new(...);
+ $schema->typemap($sometype => $object);
+
+ package My::Perl::Class;
+ sub toXML
+ {   my ($self, $object, $xmltype, $doc) = @_;
+     ...
+ }
+
+The toXML will only be called then C<$object> is blessed.  If you wish
+to have access to some data-type in any case, then use a simple "before"
+hook.
+
+=head3 Typemap to CODE
+
+The light version of an interface object uses CODE references.  The CODE
+reference is only called if a blessed value is found in the user provided
+data.  It cannot be checked automatically whether it is blessed according
+to the expectation.
+
+ $schema->typemap($t1 => \&myhandler);
+
+ sub myhandler
+ {   my ($backend, $object, $xmltype, $doc) = @_;
+     ...
+ }
+
+=head3 Typemap implementation
+
+The typemap for the writer is implemented as a 'before' hook: just before
+the writer wants to start.
+
+Of course, it could have been implemented by accepting an object anywhere
+in the input data.  However, this would mean that all the (many) internal
+parser constructs would need to be extended.  That would slow-down the
+writer considerably.
+
+=head1 SEE ALSO
+
+This module is part of XML-Compile distribution version 1.56,
+built on March 30, 2017. Website: F<http://perl.overmeer.net/xml-compile/>
+
+Please post questions or ideas to the mailinglist at
+F<http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/xml-compile> .
+For live contact with other developers, visit the C<#xml-compile> channel
+on C<irc.perl.org>.
+
+=head1 LICENSE
+
+Copyrights 2006-2017 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the Artistic license.
+See F<http://dev.perl.org/licenses/artistic.html>
+

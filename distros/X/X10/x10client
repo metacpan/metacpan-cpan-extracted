@@ -1,0 +1,50 @@
+#!/usr/local/bin/perl
+
+# Copyright (c) 1999-2017 Rob Fugina <robf@fugina.com>
+# Distributed under the terms of the GNU Public License, Version 3.0
+
+=head1 NAME
+
+x10client - use to send a list of x10 events to an x10 server 
+
+=head1 USAGE
+
+Usage:
+
+    x10client event1 event2 event3 ...
+     
+Where event1, event2, event3, etc. each represent an x10 event
+
+=head1 DESCRIPTION
+
+Sends x10 events to an x10 server
+
+=head1 AUTHOR
+
+Rob Fugina <robf@fugina.com>
+
+=cut
+
+use File::Basename;
+
+# this works as long as it's not called through a symlink...
+use lib (dirname $0);
+
+use X10::EventList;
+use X10::Network;
+
+die "No events given\n" unless @ARGV;
+
+my $eventlist = new X10::EventList(@ARGV);
+
+my $x10 = new X10::Network( server => 'x10' );
+
+unless ($x10)
+{
+   warn "Couldn't connect to X10 controller";
+   exit;
+}
+
+$x10->send( $eventlist );
+
+

@@ -1,0 +1,21 @@
+<stx:transform version="1.0" 
+  xmlns:stx="http://stx.sourceforge.net/2002/ns"
+  strip-space="yes">
+
+  <stx:template match="/*">
+    <root>
+      <stx:value-of select="starts-with('auto','au')"/>
+      <stx:text>:</stx:text>
+      <stx:value-of select="starts-with('auto','ut')"/>
+      <stx:text>:</stx:text>
+      <stx:value-of select="starts-with('moto',concat('mo','to'))"/>
+      <stx:text>:</stx:text>
+      <stx:value-of select="starts-with('moto','')"/>
+      <stx:text>:</stx:text>
+      <stx:value-of select="starts-with('','to')"/>
+      <stx:text>:</stx:text>
+      <stx:value-of select="starts-with('','')"/>
+    </root>
+  </stx:template>
+  
+</stx:transform>

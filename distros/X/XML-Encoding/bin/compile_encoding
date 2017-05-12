@@ -1,0 +1,339 @@
+#!perl -w
+#
+# compile_encoding
+#
+# Version 1.x Copyright 1998 Clark Cooper <coopercc@netheaven.com>
+# Changes in Version 2.00 onwards Copyright (C) 2007 Steve Hay
+# All rights reserved.
+#
+# This program is free software; you may redistribute it and/or
+# modify it under the same terms as Perl itself.
+
+
+use 5.008001;
+
+my $Usage=<<'End_of_Usage;';
+Usage is:
+   compile_encoding [-h] [-o output_file] input_file
+
+Compiles the input XML encmap file into a binary encoding file usable
+by XML::Parser.
+
+  -h			Print this message.
+
+  -o output_file	Put compiled binary into given output file. By
+			default, a file that has the same basename as
+			the input file, but with an extension of .enc
+			is the output.
+End_of_Usage;
+
+package Pfxmap;
+use fields qw(min max map explen);
+
+sub new {
+  my $class = shift;
+  no strict 'refs';
+  my $pfxmap = fields::new($class);
+
+  while (@_) {
+    my $key = shift;
+    $pfxmap->{$key} = shift;
+  }
+
+  $pfxmap;
+}
+
+package main;
+
+use XML::Encoding;
+use integer;
+
+use strict;
+
+################################################################
+# See the encoding.h file in the top level XML::Encoding directory
+# to see the format of generated file
+
+my $magic = 0xfeebface;
+my $namelength = 40;
+
+my $ofile;
+
+while (defined($ARGV[0]) and $ARGV[0] =~ /^-/) {
+  my $opt = shift;
+
+  if ($opt eq '-o') {
+    $ofile = shift;
+  }
+  elsif ($opt eq '-h') {
+    print $Usage;
+    exit;
+  }
+  else {
+    die "Unrecognized option: $opt\n$Usage";
+  }
+}
+
+my $infile = shift;
+
+die "Encmap XML file not provided\n$Usage" unless defined($infile);
+
+unless (defined($ofile)) {
+  my $base = $infile;
+  $base =~ s!^.*/!!;
+
+  if ($base =~ /(.*)\.xml$/i) {
+    $base = $1;
+  }
+
+  $ofile = $base . '.enc';
+}
+
+# Do initializations
+
+my @firstbyte;
+$#firstbyte = 255;
+
+my $pfxcount = 0;
+my $totcount = 0;
+my @stack = ();
+my $pfxlenref;
+
+my $currmap = new Pfxmap(min => 255, max => 0, map => \@firstbyte);
+
+my $p = new XML::Encoding(ErrorContext  => 2,
+			  ExpatRequired => 1,
+			  PushPrefixFcn => \&push_prefix,
+			  PopPrefixFcn  => \&pop_prefix,
+			  RangeSetFcn   => \&range_set
+			  );
+
+my $name = $p->parsefile($infile);
+
+die "Encoding name too long (> $namelength)\n"
+  if length($name) > $namelength;
+
+my @prefixes;
+my $maplen = 0;
+my $pflen = 0;
+
+if ($pfxcount) {
+  push(@prefixes, $currmap);
+  $currmap->{map} = [];
+  $maplen = $totcount + $currmap->{max} - $currmap->{min} + 1;
+  $pflen = $pfxcount + 1;
+}
+
+my $i;
+for ($i = 0; $i < 256; $i++) {
+  if (defined($firstbyte[$i])) {
+    if ($pfxcount) {
+      $currmap->{map}->[$i] = $firstbyte[$i];
+      $firstbyte[$i] = - ($firstbyte[$i]->{explen} + 1)
+	if ref($firstbyte[$i]);
+    }
+  }
+  else {
+    $firstbyte[$i] = $i < 128 ? $i : -1;
+  }
+}
+
+open(ENC, ">$ofile") or die "Couldn't open $ofile for writing:\n$!\n";
+binmode(ENC);
+
+#Note the use of network order packings
+
+print ENC pack("Na${namelength}nnN256",
+	       $magic, $name, $pflen, $maplen, @firstbyte);
+
+my @map = ();
+my $head = 0;
+
+while (@prefixes) {
+  my $pfxmap = shift @prefixes;
+  $head++;
+
+  my $len = $pfxmap->{max} - $pfxmap->{min} + 1;
+  my $mapstart = @map;
+  my $ispfx = '';
+  vec($ispfx, 255, 1) = 0;
+  my $ischar = '';
+  vec($ischar, 255, 1) = 0;
+
+  for ($i = $pfxmap->{min}; $i <= $pfxmap->{max}; $i++) {
+    my $entry = $pfxmap->{map}->[$i];
+
+    if (defined($entry)) {
+      if (ref($entry)) {
+	my $pfxent = $entry;
+	$entry = $head + @prefixes;
+	push(@prefixes, $pfxent);
+	vec($ispfx, $i, 1) = 1;
+      }
+      else {
+	vec($ischar, $i, 1) = 1;
+      }
+    }
+    else {
+      $entry = 0xFFFF;
+    }
+
+    push(@map, $entry);
+  }
+
+  print ENC pack('CCn', $pfxmap->{min}, $len, $mapstart), $ispfx, $ischar;
+}
+
+if (@map) {
+  my $packlist = 'n' . int(@map);
+  print ENC pack($packlist, @map);
+}
+
+close(ENC);
+
+################
+## End main
+################
+
+sub push_prefix {
+  my ($byte) = @_;
+
+  return "Prefix too long"
+    if (@stack >= 3);
+
+  return "Different lengths for same first byte"
+    if (defined($pfxlenref)
+	and defined($$pfxlenref)
+	and $$pfxlenref < @stack);
+
+  my $pfxmap = $currmap->{map}->[$byte];
+
+  if (defined($pfxmap)) {
+    return "Prefix already mapped to a character"
+      unless ref($pfxmap);
+
+    # Remove what we've already added in for this prefix so we don't
+    # count it twice
+
+    $totcount -= $pfxmap->{max} - $pfxmap->{min} + 1;
+  }
+  else {
+    $pfxmap = new Pfxmap(min => 255, max => 0, map => []);
+    $currmap->{map}->[$byte] = $pfxmap;
+  }
+
+  unless (@stack) {
+    $pfxlenref = \$pfxmap->{explen};
+  }
+
+  $currmap->{min} = $byte
+    if $byte < $currmap->{min};
+
+  $currmap->{max} = $byte
+    if $byte > $currmap->{max};
+
+  $pfxcount++;
+
+  push(@stack, $currmap);
+  $currmap = $pfxmap;
+  return undef;
+}  # End push_prefix
+
+sub pop_prefix {
+  return "Attempt to pop un-pushed prefix"
+    unless (@stack);
+
+  my $count = $currmap->{max} - $currmap->{min} + 1;
+
+  return "Empty prefix not allowed"
+    unless $count > 0;
+
+  $totcount += $count;
+
+  $currmap = pop(@stack);
+  $pfxlenref = undef
+    unless @stack;
+  return undef;
+}  # End pop_prefix
+
+sub range_set {
+  my ($byte, $uni, $len) = @_;
+  my $limit = $byte + $len;
+
+  return "Range too long"
+    if $limit > 256;
+
+  if (defined($pfxlenref)) {
+    if (defined($$pfxlenref)) {
+      return "Different for same 1st byte"
+	unless $$pfxlenref == @stack;
+    }
+    else {
+      $$pfxlenref = @stack;
+    }
+  }
+
+  my $i;
+  for ($i = $byte; $i < $limit; $i++, $uni++) {
+    return "Byte already mapped"
+      if defined($currmap->{map}->[$i]);
+
+    $currmap->{map}->[$i] = $uni;
+  }
+
+  $currmap->{min} = $byte
+    if $byte < $currmap->{min};
+
+  $currmap->{max} = $limit - 1
+    if $limit >= $currmap->{max};
+
+  return undef;
+}  # End range_set
+
+__END__
+
+=head1 NAME
+
+compile_encoding - compile XML encmap into a binary encoded file for XML::Parser
+
+=head1 SYNOPSIS
+
+B<compile_encoding> [B<-h>] [B<-o> I<output_file>] I<input_file>
+
+=head1 DESCRIPTION
+
+B<compile_encoding> compiles an input XML encmap file into a binary encoded file
+usable by L<XML::Parser|XML::Parser(3pm)>.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-o> I<output_file>
+
+Put compiled binary into given output file. By default, a file that has the same
+basename as the input file, but with an extension of F<.enc> is output.
+
+=item B<-h>
+
+Print usage information.
+
+=back
+
+=head1 SEE ALSO
+
+L<make_encmap(1)>,
+L<XML::Encoding(3pm)>,
+L<XML::Parser(3pm)>
+
+=head1 AUTHORS
+
+This manual page was written by Daniel Leidert E<lt>daniel.leidert@wgdd.deE<gt>
+for the Debian project (but may be used by others).
+
+=cut
+
+# Tell Emacs that this is really a perl script
+# Local Variables:
+# mode:perl
+# End:

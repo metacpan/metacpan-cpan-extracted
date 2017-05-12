@@ -1,0 +1,23 @@
+ChangeLog
+MANIFEST
+Makefile.PL
+README
+README.ja.txt
+bin/dumpxbrl
+bin/timeseries
+bin/ts2xlsx
+lib/XBRL/JPFR.pm
+lib/XBRL/JPFR/Arc.pm
+lib/XBRL/JPFR/Branch.pm
+lib/XBRL/JPFR/Context.pm
+lib/XBRL/JPFR/Dimension.pm
+lib/XBRL/JPFR/Element.pm
+lib/XBRL/JPFR/Item.pm
+lib/XBRL/JPFR/Label.pm
+lib/XBRL/JPFR/Schema.pm
+lib/XBRL/JPFR/Taxonomy.pm
+lib/XBRL/JPFR/Unit.pm
+taxo/lab_ifrs-ja_2009-04-01.xml
+taxo/tse-qcedjpsm-2007-06-30-presentation-correction.xml
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

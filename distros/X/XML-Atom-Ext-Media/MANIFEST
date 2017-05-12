@@ -1,0 +1,16 @@
+LICENSE
+MANIFEST
+META.json
+Makefile.PL
+README
+dist.ini
+lib/XML/Atom/Ext/Media.pm
+lib/XML/Atom/Ext/Media/Base.pm
+lib/XML/Atom/Ext/Media/Content.pm
+lib/XML/Atom/Ext/Media/Group.pm
+lib/XML/Atom/Ext/Media/Thumbnail.pm
+t/00.use.t
+t/01.load.youtube.t
+t/feeds/atom_youtube.xml
+t/release-pod-coverage.t
+t/release-pod-syntax.t

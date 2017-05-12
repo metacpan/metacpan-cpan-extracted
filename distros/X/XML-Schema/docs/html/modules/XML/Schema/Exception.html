@@ -1,0 +1,146 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+<head>
+<title>Modules Index</title>
+</head>
+
+<body bgcolor="#ffffff">
+<table border="0" width="100%">
+<tr>
+<td align="left"><a href="../../../index.html"><img src="../../../images/canon.gif" border="0"></a></td>
+<td align="right"><img src="../../../images/canre.gif"></td>
+</tr>
+</table>
+<div align="right">
+<small><a href="../../../index.html">XML Schema Home</a></small>
+</div>
+
+<h1>XML::Schema::Exception</h1>
+
+<ul>
+
+    This module implements an exception class for XML::Schema.
+  </ul>
+
+<h2>Table of Contents</h2>
+<ul>
+<table border="0" cellpadding="2" cellspacing="0">
+<tr valign="top">
+<td>
+  <li><b><a href="#section_Synopsis">Synopsis</a></b>
+</td>
+
+<td>
+</td>
+
+<td>
+<td>
+
+</tr>
+<tr valign="top">
+<td>
+  <li><b><a href="#section_Description">Description</a></b>
+</td>
+
+<td>
+</td>
+
+<td>
+<td>
+
+</tr>
+<tr valign="top">
+<td>
+  <li><b><a href="#section_Methods">Methods</a></b>
+</td>
+
+<td>
+<b>:<b>
+</td>
+
+<td>
+<small><a href="#method_new">new()</a>,&nbsp; <a href="#method_type">type()</a>,&nbsp; <a href="#method_info">info()</a>,&nbsp; <a href="#method_text">text()</a></small>
+<td>
+
+</tr>
+</table>
+</ul>
+
+
+
+
+<hr width="100%" size="1" noshade="1"><a name="section_Synopsis"><h2>Synopsis</h2></a>
+<ul><pre><p>use XML::Schema::Exception;
+
+my $err = XML::Schema::Exception-&gt;new('type_x', 'info_y');
+
+print $err-&gt;type();	# type_x
+print $err-&gt;info();     # info_y
+print $err-&gt;text();     # [type_x] info_y
+print $err;             # [type_x] info_y
+
+die $err;</b></pre></ul>
+
+  
+<hr width="100%" size="1" noshade="1"><a name="section_Description"><h2>Description</h2></a>
+    <p>
+    This module implements a simple object for representing errors
+    thrown by various XML::Schema modules.
+    </p>
+
+  
+
+<hr width="100%" size="1" noshade="1"><a name="section_Methods"><h2>Methods</h2></a><ul>
+<li><p>
+<a name="method_new"><b>new( $type, $info )</b></a>
+<br>
+
+
+      <p>
+        Constructor method called to create a new exception object.
+	The first argument should be a simple string to identifying
+        the exception type.  The second can be a string containing
+        further information or a reference to any other data type.
+<ul><pre><p>die XML::Schema::Exception-&gt;new( parser =&gt; 'parse error at line 42' );</b></pre></ul>
+
+      </p>
+
+    </p><li><p>
+<a name="method_type"><b>type()</b></a>
+<br>
+
+
+	Returns the exception type.
+<ul><pre><p>my $e = XML::Schema::Exception-&gt;new( parser =&gt; 'parse error at line 42' );
+
+print $e-&gt;type();   # 'parser'</b></pre></ul>
+
+    </p><li><p>
+<a name="method_info"><b>info()</b></a>
+<br>
+
+
+	Returns the value of the additional information field.
+<ul><pre><p>print $e-&gt;info();   # 'parse error at line 42'</b></pre></ul>
+
+    </p><li><p>
+<a name="method_text"><b>text()</b></a>
+<br>
+
+
+	Returns a text string of the form "[$type] $info".
+<ul><pre><p>print $e-&gt;text();   # '[parser] parse error at line 42'</b></pre></ul>
+
+	This method is overloaded to the stringifiation operator.
+        In other words, printing an exception object will generate
+        the output returned from this method.
+<ul><pre><p>print $e;           # '[parser] parse error at line 42'</b></pre></ul>
+
+    </p></ul>
+
+
+<div align="center">
+<small><b>Perl XML::Schema Documentation</b></small>
+</div>
+</body>
+</html>

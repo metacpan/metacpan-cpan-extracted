@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+
+<group_test>
+	<el0>el0_0</el0>
+	<el2>
+		<ct0>ct0</ct0>
+	</el2>
+	<el2>
+		<ct0>ct1</ct0>
+	</el2>
+	<el0>el0_1</el0>
+</group_test>

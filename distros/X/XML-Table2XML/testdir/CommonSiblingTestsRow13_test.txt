@@ -1,0 +1,6 @@
+root
+/@id	/@name2	/a
+1	testNAme	testA
+1	testNAme	testB
+1	testNAme	testC
+

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="US-ASCII"?>
+<!DOCTYPE TEST
+
+[
+
+<!ELEMENT TEST (#PCDATA)>
+<!ATTLIST TEST NAME ID #REQUIRED>
+
+]>
+
+<TEST>This is a test</TEST>

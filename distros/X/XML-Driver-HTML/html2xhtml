@@ -1,0 +1,64 @@
+#!/usr/bin/perl
+#
+# Copyright (c) 2001 Michael Koehne <kraehe@copyleft.de>
+#
+# XML::Filter::HTML is free software. You can redistribute and/or modify
+# this copy under terms of the GNU General Public License.
+
+use strict;
+use XML::Handler::YAWriter;
+use XML::Driver::HTML;
+use IO::File;
+
+my $ya = new XML::Handler::YAWriter( 
+    'Output' => new IO::File ( ">-" ),
+    'Pretty' => {
+	'NoComments'=>1,
+	'AddHiddenNewline'=>1,
+	'AddHiddenAttrTab'=>1,
+	'CatchEmptyElement'=>1
+	}
+    );
+
+my $html = new XML::Driver::HTML(
+    'Handler' => $ya,
+    'Source' => {
+    	'ByteStream' => new IO::File ( "<-" ),
+	'Encoding' => 'Latin1'
+	}
+    );
+
+$html->parse();
+
+0;
+__END__
+
+=head1 NAME
+
+html2xhtml - dirty command line interface to XML::Driver::HTML
+
+=head1 SYNOPSIS
+
+  html2xhtml < filename.html > filename.xhtml
+
+=head1 DESCRIPTION
+
+B<html2xhtml> is a filter to convert html files to xhtml files.
+
+=head1 OPTIONS
+
+no options yet ;-( 
+
+I think that the set of options used in YAWriter are a good start,
+lets look what we additonal need for processing batches.
+
+=head1 AUTHOR
+
+  Michael Koehne, Kraehe@Copyleft.De
+  (c) 2000 GNU General Public License
+
+=head1 SEE ALSO
+
+L<XML::Parser::PerlSAX>  and L<XML::Driver::HTML>
+
+=cut

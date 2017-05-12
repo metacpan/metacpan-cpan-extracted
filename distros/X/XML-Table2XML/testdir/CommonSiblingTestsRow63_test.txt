@@ -1,0 +1,7 @@
+root
+/x	/x/@z	/a/b/c
+testX	testAttX	TestA1
+testX	testAttX	TestA2
+testX	testAttX	TestA3
+testX	testAttX	TestA4
+

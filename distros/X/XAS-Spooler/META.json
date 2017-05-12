@@ -1,0 +1,66 @@
+{
+   "abstract" : "A set of procedures and modules to implement a spooler",
+   "author" : [
+      "Kevin L. Esteb <kevin@kesteb.us>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4001, CPAN::Meta::Converter version 2.120351",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "XAS-Spooler",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "POE::Component::Cron" : "0.021",
+            "XAS" : "0.08",
+            "XAS::Model" : "0.01",
+            "perl" : "5.00808"
+         }
+      }
+   },
+   "provides" : {
+      "XAS::Apps::Spooler::Process" : {
+         "file" : "lib/XAS/Apps/Spooler/Process.pm",
+         "version" : "0.01"
+      },
+      "XAS::Docs::Spooler::Installation" : {
+         "file" : "lib/XAS/Docs/Spooler/Installation.pm",
+         "version" : "0.01"
+      },
+      "XAS::Spooler" : {
+         "file" : "lib/XAS/Spooler.pm",
+         "version" : "0.03"
+      },
+      "XAS::Spooler::Connector" : {
+         "file" : "lib/XAS/Spooler/Connector.pm",
+         "version" : "0.02"
+      },
+      "XAS::Spooler::Processor" : {
+         "file" : "lib/XAS/Spooler/Processor.pm",
+         "version" : "0.02"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://scm.kesteb.us/trac",
+      "repository" : {
+         "url" : "http://scm.kesteb.us/git/XAS-Spooler"
+      }
+   },
+   "version" : "0.03"
+}

@@ -1,0 +1,128 @@
+#!/usr/bin/perl
+#
+# $Id: xmltape,v 1.2 2005/09/01 08:19:27 patrick Exp $
+#
+# Patrick Hochstenbach <Patrick.Hochstenbach@UGent.be>
+#
+use XML::Tape qw(:all);
+use Getopt::Long;
+use POSIX qw(strftime);
+
+my $mode     = undef;
+my $verbose  = undef;
+my $tostdout = undef;
+
+GetOptions("O" => \$tostdout, "to-stdout" => \$tostdout);
+
+my $options  = shift;
+my $filename = shift;
+
+&parseOptions($options);
+
+unless ($mode && $filename) {
+    print STDERR <<EOF;
+usage: xmltape [option] [file]
+
+examples:
+    xmltape cvf archive.xml *.xml
+    xmltape tvf archive.xml
+    xmltape xvf archive.xml
+
+options:
+    -O, --to-stdout
+EOF
+    exit 1;
+}
+
+if ($mode eq 'c') {
+    &createArchive($filename);
+}
+elsif ($mode eq 't') {
+    &tocArchive($filename);
+}
+elsif ($mode eq 'x') {
+    &extractArchive($filename);
+}
+
+sub createArchive {
+    my $filename = shift;
+    $filename = '/dev/stdout' if ($filename eq '-');
+
+    die "refusing to create an empty archive" unless (@ARGV > 0);
+
+    my $tape = tapeopen($filename,"w");
+    die "can't create `$filename' : $!" unless $tape;
+
+    foreach my $f (@ARGV) {
+        my @stat = stat($f);
+        die "can't stat `$f': $!" unless ($#stat > 0);
+        my $f_id    = $f;
+        my $f_date  = strftime "%Y-%m-%dT%H:%M:%SZ" , gmtime $stat[9]; 
+        $tape->add_record( $f_id, $f_date, &readFile($f));
+        print STDERR "$f_id\n" if $verbose;
+    }
+
+    $tape->tapeclose();
+}
+
+sub tocArchive {
+    my $filename = shift;
+    $filename = '/dev/stdin' if ($filename eq '-');
+
+    my $tape = tapeopen($filename,"r");
+    die "can't create `$filename' : $!" unless $tape;
+
+    while (my $record = $tape->get_record) {
+        print $record->getDate , " " , $record->getIdentifier , " " , $record->getStartByte , " " , ($record->getEndByte - $record->getStartByte) , "\n";
+    }
+    
+    $tape->tapeclose;
+}
+
+sub extractArchive {
+    my $filename = shift;
+    $filename = '/dev/stdin' if ($filename eq '-');
+    
+    my $tape = tapeopen($filename,"r");
+    die "can't create `$filename' : $!" unless $tape;
+
+    local(*F);
+    while (my $record = $tape->get_record) {
+       my $f_id = $record->getIdentifier;
+
+       next if (@ARGV > 0 && grep(/^$f_id$/, @ARGV) == 0);
+
+       $f_id = '/dev/stdout' if $tostdout;
+       open(F,">$f_id") || die "can't create `$f_id' : $!";
+       print F "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
+       print F $record->getRecord;
+       close(F);
+
+       print STDERR $record->getIdentifier , "\n" if $verbose;
+    }
+
+    $tape->tapeclose();
+}
+
+sub parseOptions {
+    my $options = shift;
+
+    foreach (split(//,$options)) {
+        if ($_ eq 'c') { $mode = 'c'  }
+        elsif ($_ eq 'x') { $mode = 'x'  }
+        elsif ($_ eq 't') { $mode = 't'  }
+        elsif ($_ eq 'v') { $verbose = 1 }
+        elsif ($_ eq 'f') { }
+        else { die "unknown option '$_'"; }
+    }
+}
+
+sub readFile {
+    my $file = shift;
+    local(*F);
+    open(F,$file) || die "can't to open `$file' : $!";
+    my $t = $/; $/ = undef; my $xml = <F>; $/ = $t;
+    close(F);
+    $xml =~ s/<\?xml\s+[^?]+\?>//;
+    return $xml;
+}

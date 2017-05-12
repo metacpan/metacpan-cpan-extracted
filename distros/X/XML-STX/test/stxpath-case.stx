@@ -1,0 +1,14 @@
+<stx:transform version="1.0" 
+  xmlns:stx="http://stx.sourceforge.net/2002/ns"
+  strip-space="yes">
+
+  <stx:template match="/root">
+    <stx:variable name="s">abCd0</stx:variable>
+    <root>
+      <stx:value-of select="upper-case($s)"/>
+      <stx:text>-</stx:text>
+      <stx:value-of select="lower-case($s)"/>
+    </root>
+  </stx:template>
+
+</stx:transform>

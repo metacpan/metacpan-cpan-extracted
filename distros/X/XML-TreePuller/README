@@ -1,0 +1,159 @@
+XML-TreePuller
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+ABOUT
+
+This module implements a tree oriented XML pull processor using a combination of
+XML::LibXML::Reader and an object-oriented interface around the output of XML::CompactTree. 
+It provides a fast and convenient way to access the content of extremely large XML documents
+serially. 
+
+EXAMPLE
+
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use XML::TreePuller;
+
+sub gen_xml {
+  	return <<EOF
+  	
+<wiki version="0.3">
+
+<!-- schema says that there is always 1 siteinfo and zero or more page 
+  elements follow -->
+<siteinfo>
+  <sitename>ExamplePedia</sitename>
+  <url>http://example.pedia/</url>
+  <namespaces>
+    <namespace key="-1">Special</namespace>
+    <namespace key="0" />
+    <namespace key="1">Talk</namespace>
+  </namespaces>
+</siteinfo>
+
+<page>
+  <title>A good article</title>
+  <text>Some good content</text>
+</page>    
+
+<page>
+  <title>A bad article</title>
+  <text>Some bad content</text>
+</page>
+
+</wiki>
+  	  	
+EOF
+}
+
+sub element_example {
+	my $xml = XML::TreePuller->new(string => gen_xml());
+	
+	print "Printing namespace names using configuration style:\n";
+	
+	$xml->config('/wiki/siteinfo/namespaces/namespace' => 'short');
+	
+	while(defined(my $element = $xml->next)) {
+		print $element->attribute('key'), ": ", $element->text, "\n";
+	}
+	
+	print "End of namespace names\n";
+}
+
+sub subtree_example {
+	my $xml = XML::TreePuller->new(string => gen_xml());
+	
+	print "Printing titles using a subtree:\n";
+	
+	$xml->config('/wiki/page' => 'subtree');
+
+	while(defined(my $element = $xml->next)) {
+		print "Title: ", $element->get_elements('title')->text, "\n";
+	}	
+	
+	print "End of titles\n";
+}
+
+sub path_example {
+	my $xml = XML::TreePuller->new(string => gen_xml());
+	
+	print "Printing path example:\n";
+	
+	$xml->config('/wiki/siteinfo', 'subtree');
+	$xml->config('/wiki/page/title', 'short');
+	
+	while(my ($matched_path, $element) = $xml->next) {
+		print "Path: $matched_path\n";
+	}
+	
+	print "End path example\n";
+}
+
+
+element_example(); print "\n";
+subtree_example(); print "\n";
+path_example(); print "\n";
+
+__END__
+
+Printing namespace names using configuration style:
+-1: Special
+0: 
+1: Talk
+End of namespace names
+
+Printing titles using a subtree:
+Title: A good article
+Title: A bad article
+End of titles
+
+Printing path example:
+Path: /wiki/siteinfo
+Path: /wiki/page/title
+Path: /wiki/page/title
+End path example
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc XML::TreePuller
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=XML-TreePuller
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/XML-TreePuller
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/XML-TreePuller
+
+    Search CPAN
+        http://search.cpan.org/dist/XML-TreePuller/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010 "Tyler Riddle"
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

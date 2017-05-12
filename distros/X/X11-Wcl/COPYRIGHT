@@ -1,0 +1,9 @@
+There is no copyright on the portions of this software written by me.
+Other parts are as copyrighted by their owners.
+
+Be aware that since this is just a wrapper for Motif, you probably
+cannot distribute a binary copy of it with Motif linked in, without
+violating Motif licensing.
+
+Joe Buehler
+jhpb@sarto.gaithersburg.md.us

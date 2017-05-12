@@ -1,0 +1,31 @@
+http://rt.cpan.org/Public/Dist/Display.html?Name=XML-RSS
+
+
+--- before the next release-ish
+
+- wrong handling enclosure subelement of item
+  http://rt.cpan.org/Ticket/Display.html?id=21740
+
+--- soon-ish
+
+- Make all the date/time interfaces accept and emit DateTime dates (maybe unix
+  timestamps too?) instead of strings
+
+--- eventually
+
+- use a better / more liberal XML parser
+
+- fix skipHour and skipDay methods (bdf: what's wrong with them?)
+
+- rewrite for extendability (base class with a derived one for
+  each version)
+
+- auto encode text?
+
+- Investigate parsing multiple dc:items into an array reference when
+inside other elements besides an <item>:
+    - http://rt.cpan.org/Public/Bug/Display.html?id=6000
+
+- Add a way (and an option) to parse module items with duplicate keys into
+an array reference.
+    - check more edge cases with other than <image> elements.

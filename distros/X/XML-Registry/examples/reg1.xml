@@ -1,0 +1,23 @@
+<reg name="www.metashare.com">
+   <reg name="network">
+      <entry name="IPostname">www.metashare.com</entry>
+      <entry name="PrimaryDNS">0.0.0.0</entry>
+      <entry name="gateway">0.0.0.0</entry>
+   </reg>
+
+   <reg name="users">
+      <reg name="root">
+         <entry name="FirstName">Foo</entry>
+         <entry name="LastName">Bar</entry>
+         <entry name="login">root</entry>
+         <entry name="password">mysecret</entry>
+      </reg>
+      <reg name="eisen">
+         <entry name="FirstName">Jonathan</entry>
+         <entry name="LastName">Eisenzopf</entry>
+         <entry name="login">eisen</entry>
+         <entry name="password">mysecret</entry>
+      </reg>
+   </reg>
+
+</reg>

@@ -1,0 +1,20 @@
+XML::CommonNS
+
+0.06 2007-02-15
+    - change from creating exported variables at compile time, to when they're actually requested, 
+      which could be compile time
+
+0.05 2007-02-13
+    - fix pre-reqs in the dist 
+
+0.04 2007-02-12
+    - updated packaging to clean up the dist
+    - added a uri() method at kasei's request
+
+0.03 2007-01-17
+    - added FOAF, RSS1, DC_TERMS, COMMENT, SYN, and REL as seen in RDF::Helper::Constant
+    
+0.02 ???
+
+0.01  2003-06-29 16:46:34
+	- original version

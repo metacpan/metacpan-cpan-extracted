@@ -1,0 +1,13 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         XML-Toolset
+version:      0.50
+version_from: 
+installdirs:  site
+requires:
+    App::Context:                  0.01
+    App::Options:                  0.01
+    Test::More:                    0.01
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

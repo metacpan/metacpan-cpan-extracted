@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<NZSRSResponse VerMajor="5" VerMinor="0">
+  <Response Action="GetMessages" FeId="8" FeSeq="4790827" MoreRowsAvailable="1" OrigRegistrarId="90" RecipientRegistrarId="90" Rows="1">
+    <FeTimeStamp Day="5" Hour="15" Minute="19" Month="7" Second="38" TimeZoneOffset="+12:00" Year="2010" />
+    <Message Remaining="0">
+      <Response Action="DomainTransfer" FeId="8" FeSeq="4687089" OrigRegistrarId="1" RecipientRegistrarId="90">
+        <FeTimeStamp Day="9" Hour="12" Minute="30" Month="6" Second="21" TimeZoneOffset="+12:00" Year="2010" />
+        <DomainTransfer Day="9" Hour="12" Minute="30" Month="6" Second="21" TimeZoneOffset="+12:00" Year="2010" RegistrarName="TelstraClear Limited">
+          <TransferredDomain>
+       <![CDATA[test.co.te]]>
+       </TransferredDomain>
+        </DomainTransfer>
+      </Response>
+    </Message>
+  </Response>
+</NZSRSResponse>

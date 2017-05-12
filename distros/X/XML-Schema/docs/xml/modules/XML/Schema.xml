@@ -1,0 +1,245 @@
+<module name="XML::Schema">
+  <about>
+    This module implements an object class for representing XML Schemata.
+  </about>
+
+  <synopsis>
+<perl>
+use XML::Schema;
+
+# create a schema
+my $schema = XML::Schema-&gt;new();
+
+# define a 'person' complex type with 'id' attr and 'name' element
+my $person = $schema-&gt;complexType( name =&gt; 'personType' );
+my $id     = $person-&gt;attribute( name =&gt; 'id',  type =&gt; 'string' );
+my $name   = $person-&gt;element( name =&gt; 'name',  type =&gt; 'string' );
+my $email  = $person-&gt;element( name =&gt; 'email', type =&gt; 'string' );
+
+# define content model for person
+$Person-&gt;content(
+    sequence =&gt; [ 
+    {   element =&gt; $name,
+        min =&gt; 1,
+        max =&gt; 1,
+    }, 
+    {   element =&gt; $email,
+        min =&gt; 1, 
+        max =&gt; 10,
+    }],
+);
+
+# schedule action for end of person element
+$Person-&gt;schedule_end_element(sub {
+    my ($node, $infoset) = @_;
+    my $id = $infoset-&gt;{ attributes }-&gt;{ id };
+    my $content = $infoset-&gt;{ content };
+    my $name = shift @$content;
+    my $emails = join("\n  ", @$content);
+    $infoset-&gt;{ result } = "$name ($id)\n  $emails\n";
+});
+
+# add person element to schema
+$schema-&gt;element( name =&gt; 'person', type =&gt; 'personType' )
+    || die $schema-&gt;error();
+
+# generate parser
+my $parser = $schema-&gt;parser() 
+    || die $schema-&gt;error();
+
+# parse instance document
+my $result = $parser-&gt;parse(&lt;&lt;'EOF') || die $parser-&gt;error();
+<person id="abw">
+  <name>Andy Wardley</name>
+  <email>abw@wardley.org</email>
+  <email>abw@andywardley.com</email>
+  <email>abw@cre.canon.co.uk</email>
+</person>
+EOF
+
+print $result;
+
+# prints the following:
+# 
+# Andy Wardley (abw)
+#   abw@wardley.org
+#   abw@andywardley.com
+#   triksox@wardley.org
+
+</perl>
+  </synopsis>
+
+  <description>
+    <p>
+    The XML::Schema module set implements the necessary functionality to
+    construct, represent and utilise XML Schemata in Perl.  From a 
+    schema, an XML parser can be generated which is dedicated to parsing 
+    and validating XML instance documents according to that schema
+    specification.  In addition, the modules support a powerful 
+    extension mechanism to allow custom processing actions to be
+    scheduled for execution at different times during the parsing 
+    of instance documents, e.g. on a particular element, type, 
+    attribute, etc.  By this simple annotation of a schema with 
+    Perl callbacks, it is possible to build extremely flexible, 
+    powerful <i>and</i> efficient XML processing and manipulation 
+    applications.
+    </p>
+    
+    <p>
+    An XML Schema is essentially a formal specification of the
+    structure (i.e. elements and attributes) and the data types
+    (i.e. element content and attribute values) of a particular class
+    of XML document.  An XML document which conforms to a particular
+    schema is then said to be a valid instance document of that
+    schema.
+    </p>
+
+    <p>
+    A Document Type Definition (DTD) is one example of a simple
+    schema specification.  The W3C XML Schema specification is 
+    another example, boasting a far richer set of features and
+    the additional complexity that goes with it.  In fact there
+    are currently more than a dozen different published standards
+    for representing XML schemata, most of which are syntactic 
+    and semantic variations of the same theme.
+    </p>
+
+    <p>
+    The XML::Schema module set aims to implement a generic framework
+    for parsing XML documents according to a schema definition of 
+    some kind.  It is hoped that by providing the appropriate hooks
+    through which different schema "backends" can be attached, we can 
+    extend the basic framework to build schema representations and
+    parsers compatible with many of the different schema standards.
+    </p>
+
+    <p>
+    Much of the architecture is based around the W3C XML Schema
+    specification and conformance with this standard in particular
+    is a desired goal of the project.  The simple types supported
+    by these modules are a direct implementation of the W3C XML
+    Schema Datatypes (although some are currently incomplete or
+    not yet implemented).  This provides a rich and powerful set
+    of data types which, to the author's best knowledge, is a 
+    superset of the data types supported by other schema standards.
+    </p>
+
+    <p>
+    The schema structure is also based on that defined in the 
+    W3C XML Schema Structures specification although some of the
+    more advanced features are not yet implemented.  The modules
+    implement a fairly generic set of objects for representing
+    complex types, elements, attributes and content models.  These
+    can be extended through subclassing by implementations 
+    offering greater conformance to one or other schema standard
+    that requires a more specific or different implementation.
+    </p>
+
+    <p> There is currently no support for reading a schema
+    specification from an XML file ("full conformance" in W3C terms).
+    Schemata must be constructed "manually" by instantiating an
+    XML::Schema object and calling its various methods to define
+    types, elements, and so on.  ("minimal conformance" in W3C terms).
+    It is hoped that the modules will eventually implement sufficient
+    conformance with the W3C XML Schema standard to allow the schema
+    for W3C XML Schema documents to be encoded.  This will allow a 
+    parser to be automatically generated which can read W3C XML Schema
+    documents, validate them, and generate the approriate XML::Schema 
+    Perl objects to represent it.  Thus, the minimally conformant
+    parser should be able to bootstrap a fully conformant parser.
+    </p>
+
+    <p>
+    Once you have a schema representation in terms of Perl objects,
+    whether constructed manually or by an automatic code generator as
+    described above, the <method>parser()</method> method can be
+    called to generate a validating parser (an XML::Parser object) for
+    parsing and validating XML instance documents according to the
+    schema.
+    </p>
+
+    <p>
+    In addition to "trivial" XML::Schema validation (we use the term
+    lightly because such validation is anything but trivial), the
+    XML::Schema module set implements a powerful extension mechanism
+    by which the basic capability of the validating parser can be
+    enhanced.  We introduce the term "XML Schedule" to describe this
+    feature.  </p>
+
+    <p> An XML Schedule is a set of production rules which can be
+    associated with an XML Schema.  The rules specify what actions
+    should be taken after the parser has identified, parsed and
+    validated particular elements, attributes or character content
+    within an instance document.  In implementation terms, the rules
+    are simply Perl callbacks which annotate the schema and are called
+    either immediately before or after a particular item
+    is parsed.  </p>
+
+    <p> By this process, we can create the appropriate annotations to
+    a schema to perform additional validation or post-processing of
+    certain part(s) of the instance document.  A schedule is effectively
+    a "back-end" which sits behind the "front-end" parser.  The parser
+    parses an XML document, validates each attribute, element, etc.,
+    and then calls the schedule to perform any actions associated with
+    that item.  You can use this technique to annotation the schema
+    with your own XML processing actions that perform whatever
+    manipulation of the incoming data that you require.  You can
+    convert XML documents to different formats according to your own
+    stylesheet rules or transformations, marshal XML data into Perl
+    objects or database records, generate HTML pages, forms, and so
+    on.
+    </p>
+
+    <p> One of the good things about all this is that it happens in
+    "streaming" mode.  You don't have to build a big or complicated
+    model in memory and then navigate it to find the bits that you
+    want and throw away the rest.  Because you're parsing to a schema
+    which indicates a "known" document structure, you can specify in
+    advance what you want to do with different parts of it.
+    </p>
+
+    <p> As well as specifying what you want, you can also chose to
+    selectively ignore certain parts of a document, effectively
+    navigating only certain nodes of interest.  It should be possible,
+    for example, to implement an XPath facility (or rather a subset of
+    XPath) which annotes the nodes in the schema required to navigate
+    to the specified XPath and ignores all others. 
+    </p>
+
+    <p>
+    This is a stable alpha release of these modules. They are complete
+    in as much as they do what they advertise they can do.  However,
+    they are incomplete in places due to missing or inadequate
+    documentation, tests, examples, etc.  Also be advised that the
+    modules do not yet support some of the more obscure features
+    described in the W3C XML Schema specification.
+    </p>
+  </description>
+
+  <pkgvars>
+  <pkgvar name="$FACTORY">
+	The <pkgvar>$FACTORY</pkgvar> package variable specifies
+	the name of a class or contains a reference to a prototype
+	object against which methods can be called to generate
+	different components to represent schemata elements.
+	By using this indirection through a factory module, we 
+	allow different implementations to subclass the factory
+	module to generate subclassed objects to implement custom
+	functionality.
+  </pkgvar>
+  </pkgvars>
+
+  <methods>
+    <method name="new">
+	<args>\%config</args>
+	<args>key => value, key => value, ...</args>
+    </method>
+  </methods>
+
+</module>
+
+
+
+
+
+

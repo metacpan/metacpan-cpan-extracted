@@ -1,0 +1,13 @@
+Revision history for Perl extension XML::Handler::EasyTree::Generator.
+
+0.03  Mon Jan 16 02:40:00 2006
+	- trying to make that consistent for all the meta files
+
+0.02  Mon Jan 16 02:20:00 2006
+	- updated author contact info
+
+
+0.01  Mon Aug 23 13:50:36 2004
+	- original version; created by h2xs 1.23 with options
+		-XA -n XML::Handler::EasyTree::Generator
+

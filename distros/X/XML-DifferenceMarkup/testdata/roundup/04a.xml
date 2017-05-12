@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<textnode>
+<!-- with just a comment -->
+</textnode>
+<!-- note that the comment outside the top node is not preserved -->

@@ -1,0 +1,38 @@
+<stx:transform version="1.0" 
+  xmlns:gr="http://my_groups"
+  xmlns:stx="http://stx.sourceforge.net/2002/ns"
+  strip-space="yes" 
+  pass-through="none">
+
+  <stx:template match="/root">
+    <a>
+      <stx:call-procedure name="proc1"/>
+    </a>
+  </stx:template>
+
+  <stx:procedure name="proc1">
+    <b>
+      <stx:call-procedure name="gr:proc2"/>
+    </b>
+  </stx:procedure>
+
+  <stx:procedure name="gr:proc2">
+    <c>
+      <stx:call-procedure name="proc3" group="G1"/>
+      <stx:call-procedure name="proc3"/>
+    </c>
+  </stx:procedure>
+
+  <stx:procedure name="proc3">
+    <e>OK</e>
+  </stx:procedure>
+
+  <stx:group name="G1">
+
+    <stx:procedure name="proc3">
+      <d>OK</d>
+    </stx:procedure>
+
+  </stx:group>
+  
+</stx:transform>

@@ -1,0 +1,12 @@
+Changes
+lib/XML/LibXML/Iterator.pm
+lib/XML/LibXML/NodeList/Iterator.pm
+Makefile.PL
+MANIFEST
+LICENSE
+README
+t/01basic.t
+t/02tree.t
+t/03list.t
+test.pl
+META.yml                                 Module meta-data (added by MakeMaker)

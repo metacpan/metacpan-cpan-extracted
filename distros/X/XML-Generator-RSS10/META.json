@@ -1,0 +1,49 @@
+{
+   "abstract" : "Generate SAX events for RSS",
+   "author" : [
+      "Dave Rolsky <autarch@urth.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300000, CPAN::Meta::Converter version 2.110930",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "XML-Generator-RSS10",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Params::Validate" : 0,
+            "XML::Filter::BufferText" : "1.01",
+            "XML::SAX::Base" : 0
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-xml-generator-rss10@rt.cpan.org",
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=XML-Generator-RSS10"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://git.urth.org/XML-Generator-RSS10.git",
+         "web" : "http://git.urth.org/XML-Generator-RSS10.git"
+      }
+   },
+   "version" : "0.02"
+}
+

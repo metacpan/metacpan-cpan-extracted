@@ -1,0 +1,560 @@
+=head1 NAME
+
+XML::XPathScript::Stylesheet - XPathScript's Stylesheet Writer Guide
+
+=head1 STYLESHEET SYNTAX
+
+An XPathScript stylesheet is written in an ASP-like format;
+everything that is not enclosed within special delimiters are
+printed verbatim. 
+
+=head2 Delimiters
+
+=head3 <% %>
+
+Evaluates the code enclosed without printing anything.
+
+Example:
+
+    <% $template->set( 'foo' => { pre => 'bar' } ); %>
+
+=head3 <%=  %>
+
+Evaluates the code enclosed and prints out its result. 
+
+Example:
+
+    Author: <%= findvalue( '/doc/author@name' ) %>
+
+=head3 <%#  %>
+
+Comments out the code enclosed. The code will not be executed, nor
+show in the transformed document.
+
+=head3 <%~ %>
+
+A shorthand for <%= apply_templates(  ) %>
+
+Example:
+
+    Author: <%~ /doc/author %>
+
+=head3 <%@ %>
+
+A simplified way to set up the content attribute of a tag. The code
+
+    <%@ foo 
+        <h1><%= $title %></h1>
+        <%~ bar %>
+    %>
+
+is equivalent to 
+
+    <%
+        $template->set( foo => { content <<'END_CONTENT' } );
+            <h1><%= $title %></h1>
+            <%~ bar %>
+    END_CONTENT
+    %>
+
+
+=head3 <%- -%>, <%-= -%>, <%-~ -%>, <%-#  -%>, <%-@ -%>
+
+If a dash is added to a delimiter, all whitespaces (including carriage
+returns) predeceding or following the delimiter are removed from the 
+transformed document. This is useful to keep a stylesheet readable without
+generating transformed document with many whitespace gaps. The dash can be 
+added independently to the right and left delimiter.
+
+Example:
+
+    <h1>
+        <%-~ /doc/title -%>
+    </h1>
+
+=head3 <!--#include file="/path/to/file" -->
+
+Insert the content of the file into the stylesheet. The path is 
+relative to the stylesheet, not the processed document.
+
+=head1 PRE-DEFINED VARIABLES
+
+This section describes pre-defined variables accessible from within
+a XPathScript stylesheet. 
+
+=over 
+
+=item $template, $t, $XML::XPathScript::trans
+
+All three variables point to the stylesheet's template. See section
+L<TRANSFORMATION TEMPLATE>.
+
+=item $XML::XPathScript::xp
+
+The DOM of the xml document unto which the stylesheet is applied.
+
+=item $XML::XPathScript::current
+
+The XML::XPathScript object from which the stylesheet has been 
+invoked. See the L<XML::XPathScript> manpage for a list of 
+utility methods that can be called from within the stylesheet.
+
+=back
+
+=head1  TRANSFORMATION TEMPLATE
+
+The transformation template defines the modification that
+will automatically be brought on document elements when 
+'apply_templates' is called. 
+
+See the L<XML::XPathScript::Template> manpage for 
+details on how to configure the template.
+
+=head2 Special tags
+
+In addition to regular tag names, three special tags can be 
+used in the template: text() and comment(), that match the
+corresponding nodes in the document, and '*', a catch-all tag.
+
+
+=head3  text(), #text
+
+Matches text nodes.
+
+Note that text nodes can be assigned a special action.
+See section L</action> of this manpage. 
+
+Example:
+
+    <%
+        $template->set( 'text()' => { pre  => '\begin{comment}',
+                                      post => '\end{comment}',   );
+    %>
+
+=head3  comment()
+
+Matches comment nodes.
+
+=head3 '*'
+
+Matches any regular tag (that is, not comments nor text) that 
+isn't explicitly matched. 
+
+=head2 Tag Attributes
+
+The tags' attributes define how the associated nodes
+are transformed by the template. 
+
+=head3 pre, intro, prechildren, prechild, postchild, postchildren, extro, post
+
+Define the text to be printed around a node. All defined attributes
+are outputed in the following order:
+
+    pre
+    <tag>              # displayed if showtag == 1
+    intro   
+    prechildren        # displayed if <tag> has children
+    prechild           # displayed before each child
+    [ child node ]
+    postchild          # displayed after each child
+    postchildren       # displayed if <tag> has children
+    extro
+    </tag>             # displayed if showtag == 1
+    post
+
+If interpolation is enabled, XPath expressions delimited 
+by curly braces can be imbedded in any of these attributes. 
+
+    $template->set( 'movie' => { 
+        pre => 'title: {./@title}, year: {./year}' 
+    } );
+
+Interpolation is enabled via the XML::XPathScript object's method
+L<interpolation|XML::XPathScript/interpolation>.
+
+The expressions' delimiter can be modified 
+via the XML::XPathScript object's method 
+L<interpolation_regex|XML::XPathScript/interpolation_regex>.
+
+The value of those tag attributes can also
+be a reference to a subroutine, which return value will
+be taken as the text to display. The subroutine is invoked with
+the same parameters as 'testcode'.
+
+Example:
+
+    # turns <foo comment="blah"></foo> into <foo><!-- blah --></foo>
+    $template->set( 'foo' => {
+        pre  => '<foo>',
+        post => '</foo>',
+        intro => \&insert_comment,
+    } );
+
+    sub insert_comment {
+        my ( $node, $t, $params ) = @_;
+
+        if ( my $c = $node->findvalue( '@comment' ) ) {
+            return "<!-- $c -->";
+        }
+
+        return;
+    }
+
+=head3 showtag
+
+If set to true, the original tag is printed out.
+
+=head3 action
+
+Dictate how the node and its children are processed. 
+The allowed values are:
+
+=over
+
+=item $DO_SELF_AND_KIDS, DO_SELF_AND_KIDS
+
+Process the current node and its children.
+
+=item $DO_SELF_ONLY, DO_SELF_ONLY
+
+Process the current node, but not its children.
+
+=item $DO_NOT_PROCESS, DO_NOT_PROCESS
+
+Do not process either the current node or any of its children.
+
+=item $DO_TEXT_AS_CHILD, DO_TEXT_AS_CHILD
+
+Only meaningful for text nodes. When this value is given, 
+the processor pretends that the text is a child of the node, 
+which basically means that 
+C<< $t->{pre} >> and C<< $t->{post} >> will frame the text instead of
+replacing it.
+
+Example: 
+
+    $template->( 'text()' => { pre => 'replacement text' } );
+    # will transform <foo>blah</foo> 
+    # into <foo>replacement text</foo>
+
+    $template->( 'text()' => { action => $DO_TEXT_AS_CHILD,
+                               pre => 'text: '   } );
+    # will transform <foo>blah</foo> 
+    # into <foo>text: blah</foo>
+
+=item I<xpath expression>
+
+Process the current node and all its children that match the xpath expression.
+The XPath expression is anchored on the current node.
+
+Example:
+
+    # only do the children of 'foo' having their attribute 'process' 
+    # set to 'yes'
+    $template->set( 'foo' => { action => './*[@process = "yes"]' } );
+
+=back
+
+=head3 testcode
+
+A reference to a subroutine that will be executed upon visiting 
+the tag. When invoked, the subroutine is passed three parameters: the 
+current node's object, a tag object holding all the attributes 
+of the visited tag, and the reference to a hash of parameters given
+to B<apply_templates>. Modifications to the tag object only affect 
+the transformation of the current node. To change the transformation
+of all subsequent tag of the same type, use the stylesheet $template 
+instead.
+
+Also, the return value of the subroutine overrides the value of
+the 'action' attribute.
+
+Example:
+
+    <% 
+        $template->set( '*' => { testcode => \&uppercase_tag } );
+
+        sub uppercase_tag {
+            my( $n, $tag, $params ) = @_;
+            my $name = $params->{case} eq 'lower' ? lc $n->getName
+                     : $params->{case} eq 'upper' ? uc $n->getName
+                     :                              $n->getName
+                     ;
+            $tag->set({ pre => "<$name>",
+                        post => "</$name>", });
+    
+            return DO_SELF_AND_KIDS;
+        }
+    %>
+
+=head3 rename
+
+Renames the tag to the given value. Implicitly sets 'showtag' to 
+true.
+
+Example:
+
+    # change <foo abc="def">..</foo> to 
+    # <bar abc="def">...</bar>
+    <% $t->set( foo => { rename => 'bar' } ); %>
+
+=head3 content
+
+The I<content> attribute, if defined, trumps all (ie, no any
+other attribute will be taken into consideration). Its value will be taken
+as a sub-template that will be applied whenever the tag is encountered. 
+The sub-template is first interpolated (if interpolation is enabled) 
+before being evaluated. Within the sub-template, the root document 
+node is set to the node under transformation.
+
+Example:
+
+    $template->set( track => { content => <<'END_CONTENT' } );
+        <%-#  will turn
+
+                <track track_id="13">
+                    <title>White and Nerdy</title>
+                    <artist>Weird Al Yankovic</artist>
+                    <lyrics> ... </lyrics>
+                </track>
+
+                into (minus whitespace shenanigans) 
+                
+                <song title="White and Nerdy">
+                    <artist>Weird Al Yankovic</artists>
+                    <note>lyrics available</note>
+                <song>
+        -%>
+        <song title="{title/text()}">
+           <%~ artist %>
+           <% if ( findnodes( 'lyrics' ) { %>
+           <note>lyrics available</note>
+           <% } %>
+        </song>
+    END_CONTENT
+
+See also the stylesheet syntax <%@ %>.
+
+B<WARNING>: If you are to insert Perl code in a content, remember 
+that interpolation is enabled by default, and that the default
+interpolation demarcations are the curly braces. So something like
+
+
+    $template->set( foo => { content => <<'END_CONTENT' } );
+        <%= map { $_ x 2 } @something_or_other %>
+    END_CONTENT
+
+will try to interpolate I<{ $_ x 2 }>, with the obvious
+gruesome results. The best approach, if you want to use code
+extensively in contents, is to reconfigure the interpolation
+regex to something more benign. For example:
+
+    # using double-curlies 
+    $XML::XPathScript::current->interpolation_regex( qr/{{(.*?)}}/ )
+    
+
+=head3 insteadofchildren
+
+Is printed instead of the node's children. Does 
+nothing if the node has no children. 
+
+I<insteadofchildren> can be a scalar, or can be a a reference to
+a function. In the latter case, the return value of the 
+function is printed.
+
+Note that I<insteadofchildren> acts after I<action> and I<testcode>. 
+Which means that if I<testcode> 
+returns B<DO_SELF_ONLY>, B<DO_NOT_PROCESS>
+or an xpath expression matching none of the node's children,
+I<insteadofchildren> is not triggered.
+
+Example of use with a scalar:
+
+    <%
+        $template->set( foo => { 
+            showtag => 1,
+            insteadofchildren => '[ ... children ... ]',
+        } );
+    %>
+
+    <%~ //foo %>        # yields '<foo>[ ... children ... ]</foo>'
+                        # if the node had children, and
+                        # '<foo></foo>' if not
+
+
+Example if use with a function ref
+
+    <%
+        $template->set( foo => { 
+            showtag => 1,
+            insteadofchildren => \&count_children,
+        } );
+
+        sub count_children {
+            my( $n, $t, $params ) = @_;
+            my @children = $n->findnodes( 'child:*' );
+            return 'node has '.@children.' children';
+        }
+    %>
+
+    <%~ //foo %>        # yields '<foo>node has X children</foo>'
+                        # if the node has at least 1 child 
+
+
+
+=head1 STYLESHEET WRITING GUIDELINES
+
+Here are a few things to watch out for when coding stylesheets.
+
+=head2 XPath scalar return values considered harmful
+
+XML::XPath calls such as I<findvalue()> return objects in an object
+class designed to map one of the types mandated by the XPath spec (see
+L<XML::XPath> for details). This is often not what a Perl programmer
+comes to expect (e.g. strings and numbers cannot be treated the
+same). There are some work-arounds built in XML::XPath, using operator
+overloading: when using those objects as strings (by concatenating
+them, using them in regular expressions etc.), they become strings,
+through a transparent call to one of their methods such as 
+I< ->value() >. 
+However, we do not support this for a variety of reasons
+(from limitations in L</overload> to stylesheet compatibility between
+XML::XPath and XML::LibXML to Unicode considerations), and that is why
+our L</findvalue> and friends return a real Perl scalar, in violation
+of the XPath specification.
+
+On the other hand, L</findnodes> does return a list of objects in list
+context, and an I<XML::XPath::NodeSet> or I<XML::LibXML::NodeList>
+instance in scalar context, obeying the XPath specification in
+full. Therefore you most likely do not want to call I<findnodes()> in
+scalar context, ever: replace
+
+   my $attrnode = findnodes('@url',$xrefnode); # WRONG!
+
+with
+
+   my ($attrnode) = findnodes('@url',$xrefnode);
+
+
+=head2 Do not use DOM method calls, for they make stylesheets non-portable
+
+The I<findvalue()> such functions described in
+L<XML::XPathScript::Processor> are not the only way of extracting bits from
+the XML document. Objects passed as the first argument to the
+C<testcode> tag attribute and returned by I<findnodes()> in array
+context are of one of the I<XML::XPath::Node::*> or I<XML::LibXML::*>
+classes, and they
+feature some data extraction methods by themselves, conforming to the
+DOM specification.
+
+However, the names of those methods are not standardized even among
+DOM parsers (the accessor to the C<childNodes> property, for example,
+is named C<childNodes()> in I<XML::LibXML> and C<getChildNodes()> in
+I<XML::XPath>!). In order to write a stylesheet that is portable
+between L<XML::libXML> and L<XML::XPath> used as back-ends to
+L<XML::XPathScript>, one should refrain from doing that. The exact
+same data is available through appropriate XPath formulae, albeit more
+slowly, and there are also type-checking accessors such as
+C<is_element_node()> in L<XML::XPathScript::Processor>.
+
+=head1 THE UNICODE MESS
+
+Unicode is a balucitherian character numbering standard, that strives
+to be a superset of all character sets currently in use by humans and
+computers. Going Unicode is therefore the way of the future, as it
+will guarantee compatibility of your applications with every character
+set on planet Earth: for this reason, all XML-compliant APIs
+(XML::XPathScript being no exception) should return Unicode strings in
+all their calls, regardless of the charset used to encode the XML
+document to begin with.
+
+The gotcha is, the brave Unicode world sells itself in much the same
+way as XML when it promises that you'll still be able to read your
+data back in 30 years: that will probably turn out to be true, but
+until then, you can't :-)
+
+Therefore, you as a stylesheet author will more likely than not need
+to do some wrestling with Unicode in Perl, XML::XPathScript or
+not. Here is a primer on how.
+
+=head2 Unicode, UTF-8 and Perl
+
+Unicode is B<not> a text file format: UTF-8 is. Perl, when doing
+Unicode, prefers to use UTF-8 internally.
+
+Unicode is a character numbering standard: that is, an abstract
+registry that associates unique integer numbers to a cast of thousands
+of characters. For example the "smiling face" is character number
+0x263a, and the thin space is 0x2009 (there is a URL to a Unicode
+character table in L</SEE ALSO>). Of course, this means that the
+8-bits- (or even, Heaven forbid, 7-bits-?)-per-character idea goes
+through the window this instant. Coding every character on 16 bits in
+memory is an option (called UTF-16), but not as simple an idea as it
+sounds: one would have to rewrite nearly every piece of C code for
+starters, and even then the Chinese aren't quite happy with "only"
+65536 character code points.
+
+Introducing UTF-8, which is a way of encoding Unicode character
+numbers (of any size) in an ASCII- and C-friendly way: all 127 ASCII
+characters (such as "A" or or "/" or ".", but I<not> the ISO-8859-1
+8-bit extensions) have the same encoding in both ASCII and UTF-8,
+including the null character (which is good for strcpy() and
+friends). Of course, this means that the other characters are rendered
+using I<several> bytes, for example "é" is "Ã©" in UTF-8. The result
+is therefore vaguely intelligible for a Western reader.
+
+=head2 Output to UTF-8 with XPathScript
+
+The programmer- and C-friendly characteristics of UTF-8 have made it
+the choice for dealing with Unicode in Perl. The interpreter maintains
+an "UTF8-tainted" bit on every string scalar it handles (much like
+what L<perlsec> does for untrusted data). Every function in
+XML::XPathScript returns a string with such bit set to true:
+therefore, producing UTF-8 output is straightforward and one does not
+have to take any special precautions in XPathScript.
+
+=head2 Output to a non-UTF-8 character set with XPathScript
+
+When L</binmode> is invoked from the stylesheet body, it signals that
+the stylesheet output should I<not> be UTF-8, but instead some
+user-chosen character encoding that XML::XPathScript cannot and will
+not know or care about. Calling C< XML::XPathScript->current()->binmode() > 
+has the following consequences:
+
+=over 2
+
+=item *
+
+presence of this "UTF-8 taint" in the stylesheet output is now a fatal
+error. That is, whenever the result of a template evaluation is marked
+internally in Perl with the "this string is UTF-8" flag (as opposed to
+being treated by Perl as binary data without character meaning, see
+L</perlunicode>), L<XML::XPathScript::Processor/translate_node> will
+croak;
+
+=item *
+
+the stylesheet therefore needs to build an "unicode firewall". That
+is, C<testcode> blocks have to take input in UTF-8 (as per the XML
+standard, UTF-8 indeed is what will be returned by
+L<XML::XPathScript::Processor/findvalue> and such) and provide output in
+binary (in whatever character set is intended for the output), lest
+I<translate_node()> croaks as explained above. The L<Unicode::String>
+module comes in handy to the stylesheet writer to cast from UTF-8 to
+an 8-bit-per-character charset such as ISO 8859-1, while laundering
+Perl's internal UTF-8-string bit at the same time;
+
+=item *
+
+the appropriate voodoo is performed on the output filehandle(s) so
+that a spurious, final charset conversion will not happen at print()
+time under any locales, versions of Perl, or phases of moon.
+
+=back
+
+
+=head1 AUTHORS
+
+Yanick Champoux <yanick@cpan.org> 
+and Dominique Quatravaux <domq@cpan.org>
+

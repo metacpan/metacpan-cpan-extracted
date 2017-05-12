@@ -1,0 +1,8 @@
+<schema>
+<!-- root element -->
+[% view.print(item.element) -%]
+
+<!-- type definitions -->
+[% PROCESS typedefs %]
+
+</schema>

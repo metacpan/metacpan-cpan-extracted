@@ -1,0 +1,6 @@
+lib/XML/Simple/Sorted.pm
+Makefile.PL
+MANIFEST			This list of files
+t/use.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,10 @@
+use inc::Module::Install;
+name 'XML-APML';
+all_from 'lib/XML/APML.pm';
+perl_version '5.008001';
+build_requires 'Test::More';
+requires 'Class::Accessor'       => 0.31;
+requires 'Class::Data::Accessor' => 0.04001;
+requires 'XML::LibXML'           => 1.65;
+auto_include;
+WriteAll;

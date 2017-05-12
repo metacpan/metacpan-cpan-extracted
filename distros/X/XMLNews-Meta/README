@@ -1,0 +1,16 @@
+XMLNews::Meta, version 0.1
+
+This distribution contains a Perl module designed to read and write an
+XML-based news metadata format defined at
+
+  http://www.xmlnews.org/
+
+Detailed documentation is available in POD format in module itself.
+
+Since the XMLNews-Meta is RDF-based, this module should eventually be
+superceded by a general-purpose RDF processor, once one with
+acceptable performance and reliability is available.
+
+
+David Megginson, david@megginson.com
+1999-12-09

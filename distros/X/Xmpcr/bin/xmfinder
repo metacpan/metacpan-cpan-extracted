@@ -1,0 +1,147 @@
+#!/opt/links/perl -w
+
+# -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+#     xmfinder - A program to search channels for substrings that interest
+#                you. Hook up PCR as for xmripper. Also, you may run
+#                bladeenc (or other encoder) as in xmripper.
+#
+#                Pass in a comma-separated list of channels you want 
+#                to scan, and a comma-separated list of substrings to match.
+#                Only artist+song combinations that have all substrings
+#                will be recorded. Remember, channel changes are requested
+#                serially, and each channel takes about .5 second to update.
+#                If you specify 20 channels, that's 10 seconds, which 
+#                could result in audio loss of the beginning of the song.
+#                5 is a good number to start with. Example:
+#
+#                xmfinder 20,22,23,24,25 santana,game 
+#
+#                This program writes all songs to $spooldir
+#
+#                Unfortunately, we can't use the client API - there's 
+#                currently no asynchronous channel update mode. We need 
+#                to use the select call with the daemon to find out when 
+#                the channel data has been retrieved and is ready for 
+#                processing.
+#
+#                This application is subject to the same copyright as the
+#                Audio::Xmpcr module.
+# -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+#                                configuration
+my $spooldir="/burn/audio/xmdone";
+my $nethost="localhost";
+my $netport=32463;
+my $rate=44101;      # either 44100 or 44101; problem with some soundcards
+# -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+use strict;
+use bytes;
+use Audio::DSP;
+use Audio::Wav;
+use IO::Socket::INET;
+use Fcntl;
+die "usage: $0 station[,station...] substring[,substring...]\n" 
+													if scalar(@ARGV)!=2;
+my @stations=split(",",$ARGV[0]);
+my @substrings=split(",",$ARGV[1]);
+printf("Searching channels %s for %s\n",join(",",@stations),
+																					join(",",@substrings));
+
+# -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+#                        set up the audio dev and output file
+# -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+print "Opening sound card...\n";
+my $dsp = new Audio::DSP(
+	buffer   => 24000,
+  channels => 2,
+  format   => 16,
+  rate     => $rate,
+  mode 		 => O_RDONLY,
+) or die "Can't create a DSP object: $!";
+$dsp->init(mode => O_RDONLY) || die "failed to init dsp: " . $dsp->errstr();
+
+chdir($spooldir) || die "$spooldir doesn't exist!";
+my $radio=new IO::Socket::INET(PeerAddr => "$nethost:$netport") 
+										or die "Can't contact xmpcr daemon: $!";
+my $rin=""; vec($rin,fileno($radio),1)=1;
+print "Setting locker name...\n"; 
+print $radio "appname finder\n"; my($res)=readstr();
+die "Can't set locker name: (result '$res')\n" unless $res and $res eq "Ready";
+print $radio "on\n"; ($res)=readstr();
+die "Can't turn power on: (result '$res')\n" unless $res and $res eq "Ready";
+print "Ready to record... searching for applicable titles\n";
+
+# -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+#                            main loop
+# -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+my $wav=new Audio::Wav;
+my $details={ bits_sample => 16, sample_rate => 44100, channels => 2 };
+my($lastupd,$outfh,$outfn,$outch,%lastprog)=(time,undef,undef,undef); 
+my($curch,$outstanding,$rout)=(0,0);
+map { $lastprog{$_}="" } @stations;
+while(1) {
+
+	# are we currently recording a song?
+	$outfh->write_raw($dsp->dread) if $outfh; 
+
+	# any requests outstanding? if not, send one.
+	if (! $outstanding) {
+		print $radio "list $stations[$curch]\n";
+		$outstanding=1;
+	}
+	
+	# any results waiting? pick them up
+	if (select($rout=$rin,undef,undef,.01)) {
+		$curch++; $curch=0 if $curch>=scalar(@stations);
+		$outstanding=0;
+		my($res,$ready)=readstr();
+		die "Whoops! bad network communication?" if $ready ne "Ready";
+		my($num,$name,$cat,$song,$artist)=split("\t",$res);
+
+		next if $lastprog{$num} eq "$artist/$song";
+
+		# did the currently recording channel change?
+		if ($outfh and $num==$outch) {
+			print ">> Current recording complete... stopping...\n";
+			$outfh->finish();
+			$outfh=$outfn=$outch=undef;
+		}
+
+		print "> New Program: $num $artist/$song\n";
+		$lastprog{$num}="$artist/$song";
+
+		next if $outfh;  # no more to do here if we're recording
+	
+		my $newfn=($artist||"none") . "_-_" . ($song||"none");
+		$newfn =~ s/ /_/g;                   # chuck all spaces
+		1 while $newfn =~ s/__/_/g;          # double spaces to single
+		$newfn =~ s/^_+//;                   # toss leading underscores
+		$newfn .= "_" . time();
+	
+		my $ok=1;
+		map {
+			$ok=0 if $newfn !~ /$_/i;          # check each substr for a match
+		} @substrings;
+		if ($ok) {
+			print ">> Beginning recording $num $newfn\n";
+			print $radio "channel $num\n";
+			my($res)=readstr();
+			die "Can't change to channel $num: (result '$res')\n" unless $res and $res eq "Ready";
+
+			$outch=$num;
+			$outfn=$newfn;
+			$outfh=$wav->write($outfn . ".wav",$details);
+		}
+	}
+}
+print "Song '$outfn' interrupted while recording!\n" if $outfh;
+
+sub readstr {
+	my($buf,$ret);
+  while(1) {
+    sysread($radio,$buf,1024);
+    $ret .= $buf;
+    last if ! $buf or $ret =~ /Ready\n$/;
+  }
+	split("\n",$ret);
+}

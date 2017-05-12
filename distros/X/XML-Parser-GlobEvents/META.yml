@@ -1,0 +1,14 @@
+--- #YAML:1.0
+name:                XML-Parser-GlobEvents
+version:             0.400
+abstract:            event driven XML parser, filtered on tag
+license:             ~
+author:              
+    - Bart Lateur <bart.lateur@pandora.be>
+generated_by:        ExtUtils::MakeMaker version 6.4401
+distribution_type:   module
+requires:     
+    XML::Parser::Expat:            0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

@@ -1,0 +1,8 @@
+<doc>
+    <foo>
+        <a />
+        <b process="yes" />
+        <c/>
+        <d process="yes" />
+    </foo>
+</doc>

@@ -1,0 +1,456 @@
+<document
+	title	= "Using GXML: Other Features"
+	author	= "Josh Carter"
+	email	= "josh@multipart-mixed.com"
+	date	= "Feb 24, 2002"
+>
+
+<section name="Overview">
+
+<p>
+This page covers most of "those other features" in GXML. I put the
+features common to GXML and gxml2html at the top. I've also tried to
+rank them in rough order of usefulness, but since I have no idea what
+<em>your</em> particular needs may be, you should at least scan the
+headings on this page to see if you find something interesting.
+</p>
+
+</section>
+<section name="HTML Mode">
+
+<p>
+<st>NOTE: this is always on in gxml2html</st>
+</p>
+
+<p>
+GXML was originally used to convert XML to HTML, but later I decided
+it was useful for other generic XML transformations. Thus, in GXML the
+"convert to HTML" mode is off by default, but you can easily flip it
+on. HTML mode affects the output as follows:
+</p>
+
+<ul>
+<li>Tags which have templates are stripped, leaving the content of the
+template without the enclosing tag.</li>
+<li>Single-tag elements are changed to HTML syntax.</li>
+</ul>
+
+<p>
+As always, an example to demonstrate:
+</p>
+
+<pre>
+    # source XML:
+    
+    &lt;!-- Let's say "photo" has a template --&gt;
+    &lt;photo&gt;
+      &lt;source&gt;dog.jpg&lt;/source&gt;
+      &lt;caption&gt;Ugly Dog&lt;/caption&gt;
+    &lt;/photo&gt;
+    
+    &lt;!-- here's a single-tag element, in XML syntax --&gt;
+    &lt;hr/&gt;
+    
+    # output with HTML mode on:
+    
+    &lt;!-- (note that "photo" tag got stripped) --&gt;
+    &lt;p&gt;
+      &lt;img src="dog.jpg"&gt;&lt;br&gt;
+      Ugly Dog
+    &lt;/p&gt;
+    
+    &lt;!-- here's a single-tag element, (now in HTML) syntax --&gt;
+    &lt;hr&gt;
+</pre>
+
+</section>
+<section name="Tag Remappings">
+
+<p>
+Say you want to map &lt;heading&gt; in your source file to &lt;h2&gt;
+in the output (i.e. a standard HTML heading). You could do this via a
+trivial template, but you can do it easier via a remappings hash
+passed into GXML, or a gxml2html config file. First, for those using
+the module directly, here's the format:
+</p>
+
+<pre>
+    my %remappings = ( 'heading' =&gt; 'h2',
+                       'subhead' =&gt; 'h3' );
+
+    my $gxml = new XML::GXML({'remappings' =&gt; \%remappings});
+</pre>
+
+<p>
+The hash format is simply the source tag as key, remapped tag as
+value. You can provide as many remappings as you want. Now, if you're
+using gxml2html, you can do the following in your <tt>.gxml2html</tt>
+config file:
+</p>
+
+<pre>
+    # sample remaps in .gxml2html
+    &lt;heading&gt;    &lt;h2&gt;
+    &lt;subhead&gt;    &lt;h3&gt;
+</pre>
+
+<p>
+Note that remappings occur <em>before</em> template substitution, so
+if you provide both a template and a remapping for a given tag, the
+remap will run first and the template will therefore <em>not</em> be
+applied. Also note that if you remap a tag to something that does have
+a template -- e.g. if you had templates for h2 or h3 in the above code
+-- the template for the new tag will be applied. Finally, you can set
+the replacement to nothing, in which case the tag (and any enclosed
+content) is dropped.
+</p>
+
+</section>
+<section name="Attribute Collection">
+
+<p>
+<st>NOTE: All features from here down are only accessible from the
+GXML module; gxml2html does not have an interface for them.</st>
+</p>
+
+<p>
+I'm not sure if this feature is brilliant or totally gratuitous.
+(Maybe both?) There's a stripped-down class in GXML which just
+collects attributes using GXML's attribute engine. Given how XML
+allows you have two different styles of "attributes," i.e. real ones
+in element start tags and "logical" ones (for lack of a better term)
+which are sub-elements, I figured people may find a GXML-based
+attribute collector useful. If nothing else, I've found it useful.
+</p>
+
+<p>
+The concept is this: you specify the kind of element you're looking for
+(i.e. its tag), and the attributes you want to collect. GXML's
+AttributeCollector class returns a hash containing everything it
+found. The hash keys are an attribute you specify. For example, let's
+say you wanted to find all the "person" elements in the following XML
+file, get their quest and favorite color, and key the result hash by
+their name:
+</p>
+
+<pre>
+    &lt;person&gt;
+      &lt;name&gt;Bob&lt;/name&gt;
+      &lt;age&gt;42&lt;/age&gt;
+      &lt;quest&gt;turn the moon into green cheese&lt;/quest&gt;
+      &lt;color&gt;blue&lt;/color&gt;
+    &lt;/person&gt;
+    
+    &lt;person name="Ned"&gt;
+      &lt;quest&gt;make lots of money&lt;/quest&gt;
+      &lt;color&gt;purple&lt;/color&gt;
+      &lt;haircolor&gt;brown&lt;/haircolor&gt;
+    &lt;/person&gt;
+    
+    &lt;container quest-default="eat potatoes"&gt;
+      &lt;person color="red"&gt;
+      &lt;name&gt;Fred&lt;/name&gt;
+      &lt;/person&gt;
+    &lt;/container&gt;
+</pre>
+
+<p>
+The source code for using the collector would be:
+</p>
+
+<pre>
+    use XML::GXML;
+
+    # create a collector    
+    my $collector = new XML::GXML::AttributeCollector('person', 'name', 
+                                                     ['quest', 'color']);
+
+    # collect from a scalar
+    $collector-&gt;Collect($your-xml-here);
+
+    # ...or from a file
+    $collector-&gt;Clear(); # clear old data first
+    $collector-&gt;CollectFromFile('your-filename-here.xml');
+</pre>
+
+<p>
+The parameters, as above, are the element you're looking for, the key
+attribute, and a array ref to the other attributes you want. If you
+want to run the collector over several sources, call <tt>Clear()</tt>
+inbetween to clear out the previous data. (Your config settings will
+be preserved.)
+</p>
+
+<p>
+The resulting hash for the above XML and code would contain:
+</p>
+
+<pre>
+    Bob =&gt;
+      quest =&gt; turn the moon into green cheese
+      color =&gt; blue
+    Ned =&gt;
+      quest =&gt; make lots of money
+      color =&gt; purple
+    Fred =&gt;
+      quest =&gt; eat potatoes
+      color =&gt; red
+</pre>
+
+<p>
+As demonstrated, all features of GXML's attribute engine are
+supported. Both styles of attributes can be used in the same source,
+and you can use default attributes. Note that templates will
+<em>not</em> be applied by AttributeCollector. This class was designed
+to run fast, so it doesn't use the template engine. If you need to do
+this, I'd recommend using a callback on the end tag of the element
+you're looking for, then running GXML and calling Attribute() in the
+callback.
+</p>
+
+</section>
+<section name="Callbacks">
+
+<p>
+Callbacks allow you to run code at the start or end tag of any element
+you specify. The end tag callbacks also allow you to control some
+aspects of how GXML handles the element. Let's start with a simple
+example:
+</p>
+
+<pre>
+    my %callbacks = ( 'start:thing' =&gt; \&amp;thingStart,
+                      'end:thing'   =&gt; \&amp;thingEnd);
+    
+    my $gxml = new XML::GXML({'callbacks' =&gt; \%callbacks});
+</pre>
+
+<p>
+The above code would call the subroutines <tt>thingStart</tt> and
+<tt>thingEnd</tt> whenever it saw the respective start and end tags of
+<tt>thing</tt> elements. The format for specifying start and end tag
+is prepending "start:" and "end:" to the name of the tag.
+</p>
+
+<p>
+So what are callbacks good for? Start tag callbacks could be used to
+keep track of elements, e.g. counting the number of a given element.
+The end tag callbacks are somewhat more useful, since at that point
+GXML has parsed the content of the element, so you can call
+<tt>Attribute()</tt> to find attributes. End tag handlers can also
+do some neat tricks based on their return value.
+</p>
+
+<p>
+End tag handlers can return a combination of these values:
+</p>
+
+<ul>
+<li><b>discard</b>: Discards the element. This is how gxml:ifexists and
+ifequal are implemented; they return discard if their expression is
+not true.</li>
+
+<li><b>striptag</b>: Strips the element's tag from the output but keeps
+its content. The GXML commands return this if they don't return
+'discard,' since their tags shouldn't show up in the output.</li>
+
+<li><b>repeat</b>: Causes the end tag handler to run again. Your
+callback will also get called again. (Beware of infinite loops.) This
+is used by the gxml:foreach handler, but I'm not sure if anyone else
+will need it. If you're going to use 'repeat,' I strongly suggest
+studying <tt>ForEachStart</tt> and <tt>ForEachEnd</tt> in the GXML.pm
+source code.</li>
+</ul>
+
+<p>
+Since you can have return multiple commands, you need to return an
+array reference containing your values, even if you only return one
+thing in it. For example, let's say you want to add a callback for
+"thing" elements which only allows three instances of a "thing" in
+your output. You can easily do this with the following callback
+attached to "end:thing":
+</p>
+
+<pre>
+    sub OnlyTakeThree
+    {
+        if (XML::GXML::NumAttributes('thing') &gt; 3)
+        { return ['discard']; }
+    }
+</pre>
+
+<p>
+Callbacks are passed a reference to an empty hash they can store
+things in if needed. This is only useful if you're using the 'repeat'
+feature; it lets you save your current iteration state, for example.
+Again, you're getting into pretty heavy wizardry here, so study GXML's
+<tt>ForEachEnd</tt> closely.
+</p>
+
+</section>
+<section name="Dynamic Attributes (addlAttrs param)">
+
+<p>
+You can specify a callback for variables which GXML can't match. When
+GXML looks up a variable, it will search upwards through the attribute
+chain in your XML document, then call this handler if you specified
+one, and if the variable is still undefined, it will search for the
+"-default" value.
+</p>
+
+<p>
+The syntax is simple: you get passed the variable name, and if you
+know the value, you return it. For example:
+</p>
+
+<pre>
+    use XML::GXML;
+    
+    my $gxml = new XML::GXML({'addlAttrs' =&gt; \&amp;Boberize});
+    
+    [...mainline code here...]
+    
+    sub Boberize
+    {
+        my $attr = shift;
+    
+        if ($attr eq 'name')
+        { return 'Bob'; }
+    }
+</pre>
+
+<p>
+Now all <v>name</v> variables will be "Bob" if a name can't be found
+in the XML source.
+</p>
+
+</section>
+<section name="Dynamic Templates (addlTemplates param)">
+
+<p>
+Dynamic variables are neat, but you can also go crazy with dynamic
+templates. These are extremely handy if you have some data that
+doesn't change, but some data inside that does change. For example,
+you have a news page on your web site, and the overall layout is
+always the same, but the headlines are pulled from a database and
+constantly change. Using a dynamic template for the headlines list is a
+perfect solution.
+</p>
+
+<p>
+To add dynamic templates, simply pass in a hash that maps your dynamic
+template names to the subroutines that create the content. (The old
+style way of doing it, from GXML 2.0, is documented later.)
+</p>
+
+<p>
+Here's some sample code:
+</p>
+
+<pre>
+    use XML::GXML;
+    
+    my %templates = ('headline-list' =&gt; \&amp;HeadlineListTemplate);
+
+    my $gxml = new XML::GXML({'addlTemplates' =&gt; \%templates});
+    
+    [...mainline code here...]
+    
+    sub HeadlineListTemplate
+    {
+        my $template = '&lt;headlines&gt;'; # start with root tag
+
+        [...get headlines into @headlines array here...]
+
+        # create XML for each headline
+        foreach my $headline (@headlines)
+        {
+            # append headline to $template
+            $template .= sprintf('&lt;headline&gt;&lt;link&gt;%s&lt;/link&gt;' .
+                                 '&lt;title&gt;%s&lt;/title&gt;&lt;/headline&gt;',
+                                 $headline-&gt;{'link'},
+                                 $headline-&gt;{'title'});
+        }
+        
+        # close root tag of $template
+        $template .= '&lt;/headlines&gt;';
+        
+        # always return a scalar reference
+        return \$template;
+    }
+</pre>
+
+<p>
+Then of course you can make a normal (static) template for
+<tt>&lt;headline&gt;</tt> that formats the name and the link as you
+like it. Viola! -- now you have a dynamic, database-driven news page.
+</p>
+
+</section>
+<section name="Old-Style Dynamic Templates">
+
+<p>
+This style of dynamic templates was in GXML 2.0. It's still around in
+case anyone's already using it. This usually gets ugly if you have
+more than a couple dynamic templates, so I recommend using the new
+style (above) instead.
+</p>
+
+<p>
+There are two subroutines required: one to check if a given template
+exists, and another to get it. The check routine should be fast --
+it'll get called often -- but the other will only get called once per
+substitution where there isn't a template already on disk.
+</p>
+
+<p>
+Here's some sample code:
+</p>
+
+<pre>
+    use XML::GXML;
+    
+    my $gxml = new XML::GXML(
+            {'addlTempExists'  =&gt; \&amp;CheckAddlTemplate,
+             'addlTemplate'    =&gt; \&amp;AddlTemplate});
+    
+    [...mainline code here...]
+    
+    sub CheckAddlTemplate
+    {
+        my $name = shift;
+    
+        if ($name eq 'dyna-template') { return 1; }
+        else                          { return 0; }
+    }
+    
+    sub AddlTemplate
+    {
+        my $name = shift;
+    
+        if ($name eq 'dyna-template')
+            # return value is a reference
+            { return \'<t tag="p">hello there</t>'; }
+        else
+            { return undef; }
+    }
+</pre>
+
+<p>
+The theory here is that your <tt>AddlTemplate</tt> subroutine may be
+complicated; e.g. printing a bunch of hidden form data in a CGI app,
+where the data you print changes depending on your source XML. Thus
+addlTemplate is only called when strictly necessary.
+</p>
+
+</section>
+
+<p>
+<b><a href="gxml-guide.html">Back to the GXML Guide</a></b>
+</p>
+
+<p>
+<b><a href="gxml2html-guide.html">Back to the gxml2html Guide</a></b>
+</p>
+
+</document>

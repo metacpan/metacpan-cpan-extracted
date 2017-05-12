@@ -1,0 +1,15 @@
+ARTISTIC.txt
+CHANGES
+GPL2.txt
+Makefile.PL
+README
+lib/XML/Tiny/DOM.pm
+lib/XML/Tiny/DOM/Element.pm
+t/dom.t
+t/pod-coverage.t
+t/pod.t
+t/rsnapshot.conf.xml
+MANIFEST
+t/empty-element.t
+t/empty-element.xml
+META.yml                                 Module meta-data (added by MakeMaker)

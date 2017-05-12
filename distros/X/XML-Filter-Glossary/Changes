@@ -1,0 +1,13 @@
+Revision history for Perl extension XML::Filter::Glossary
+
+0.2	 Thu Sep 12 2002
+
+	 - Added support for namespace-defined keywords
+
+	 - Added Test::Simple and tests to /t
+
+	 - Updated POD
+
+0.1	 Tue Sep 10 2002
+
+	 - Initial revision

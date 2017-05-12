@@ -1,0 +1,5 @@
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+lib/XML/Handler/Machine2GraphViz.pm
+t/graphviz.t

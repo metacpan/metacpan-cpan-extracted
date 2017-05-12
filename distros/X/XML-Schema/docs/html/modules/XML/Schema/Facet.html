@@ -1,0 +1,286 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+<head>
+<title>Modules Index</title>
+</head>
+
+<body bgcolor="#ffffff">
+<table border="0" width="100%">
+<tr>
+<td align="left"><a href="../../../index.html"><img src="../../../images/canon.gif" border="0"></a></td>
+<td align="right"><img src="../../../images/canre.gif"></td>
+</tr>
+</table>
+<div align="right">
+<small><a href="../../../index.html">XML Schema Home</a></small>
+</div>
+
+<h1>XML::Schema::Facet</h1>
+
+<ul>
+
+    The module implements XML Schema facets for constraining
+    values of simple types.
+  </ul>
+
+<h2>Table of Contents</h2>
+<ul>
+<table border="0" cellpadding="2" cellspacing="0">
+<tr valign="top">
+<td>
+  <li><b><a href="#section_Synopsis">Synopsis</a></b>
+</td>
+
+<td>
+</td>
+
+<td>
+<td>
+
+</tr>
+<tr valign="top">
+<td>
+  <li><b><a href="#section_Description">Description</a></b>
+</td>
+
+<td>
+</td>
+
+<td>
+<td>
+
+</tr>
+<tr valign="top">
+<td>
+  <li><b><a href="#section_Methods">Methods</a></b>
+</td>
+
+<td>
+<b>:<b>
+</td>
+
+<td>
+<small><a href="#method_new">new()</a>,&nbsp; <a href="#method_init">init()</a>,&nbsp; <a href="#method_valid">valid()</a>,&nbsp; <a href="#method_invalid">invalid()</a>,&nbsp; <a href="#method_name">name()</a>,&nbsp; <a href="#method_value">value()</a>,&nbsp; <a href="#method_annotation">annotation()</a></small>
+<td>
+
+</tr>
+</table>
+</ul>
+
+
+
+
+<hr width="100%" size="1" noshade="1"><a name="section_Synopsis"><h2>Synopsis</h2></a>
+<ul><pre><p>package XML::Schema::Facet::MyFacet;
+use base qw( XML::Schema::Facet );
+
+sub valid {
+    my ($self, $instance, $type) = @_;
+    my $value = $instance-&gt;{ value };
+
+    # ..more code here...
+
+    return $some_condition ? 1 : 0;
+}
+
+package main;
+my $facet = XML::Schema::Facet::MyFacet-&gt;new(...);
+my $instance = {
+    value =&gt; 'some data value',
+};
+
+print $facet-&gt;valid($instance) ? &quot;valid&quot; : &quot;invalid&quot;;</b></pre></ul>
+
+  
+<hr width="100%" size="1" noshade="1"><a name="section_Description"><h2>Description</h2></a>
+    This modules implements a base class for objects representing XML
+    Schema facets.  A facet is a constraint which can be applied to a
+    simple type to ensure that its values match some criteria,
+    e.g. conform to a regular expression pattern, fall within a
+    particular numerical range, do not exceed a particular string
+    length, etc.
+  
+
+<hr width="100%" size="1" noshade="1"><a name="section_Methods"><h2>Methods</h2></a><ul>
+<li><p>
+<a name="method_new"><b>new()</b></a>
+<br>
+
+
+      <p>
+        Base class constructor method used to create a new facet
+        object or subclass thereof.  A list of 
+        '<code><b>key => value</b></code>
+' pairs can be
+        specified as command line arguments, or alternately, a hash
+        reference can be passed which contains these configuration
+        values.  The method returns a newly instantiated facet object on
+        success.  On error it returns undef and sets an internal error
+        message which can be retrieved by calling <a href="../../../modules/XML/Schema/Base.html#method_error"><code><b>error()</b></code></a> as a class method.
+<ul><pre><p># list of options
+my $facet = XML::Schema::Facet::MyFacet-&gt;new( value =&gt; 10 )
+     || die XML::Schema::Facet::MyFacet-&gt;error();
+
+# hash ref of options
+my $facet = XML::Schema::Facet::MyFacet-&gt;new( { value =&gt; 10 } )
+     || die XML::Schema::Facet::MyFacet-&gt;error();</b></pre></ul>
+
+      </p>
+
+      <p>
+        The following configuration options may be specifed:
+      </p>
+
+      <p>
+<!-- table -->
+<table border="0" cellpadding="4" cellspacing="1" 
+       bgcolor="#000044">
+<!-- table content -->
+<tr bgcolor="#ccccff">
+<td><b><small>Name</b></td><td><b><small>Typical Values</b></td><td><b><small>Description</b></td></tr>
+
+        <tr valign="top" bgcolor="#eeeeff">
+  <td>
+    <a name="config_value"><code><b>value</b></code></a>
+  </td>
+  <td>
+    <code><b>$value</b></code>
+  </td>
+  <td>
+
+	    The constraining value for the facet.  This item is mandatory
+            as all facets require at least one configuring value.  However,
+            subclassed facets may expect and interpet this value differently.
+          </td>
+</tr>
+
+        <tr valign="top" bgcolor="#eeeeff">
+  <td>
+    <a name="config_name"><code><b>name</b></code></a>
+  </td>
+  <td>
+    <code><b>'myfacet'</b></code>
+  </td>
+  <td>
+
+	    The name of the facet.  This item is optional and if not 
+            specified, will be taken as the last element of the package
+            name (e.g. <code><b>XML::Schema::Facet::minLength</b></code>
+
+            = '<code><b>minLength</b></code>
+'.
+          </td>
+</tr>
+
+        <tr valign="top" bgcolor="#eeeeff">
+  <td>
+    <a name="config_errmsg"><code><b>errmsg</b></code></a>
+  </td>
+  <td>
+    <code><b>'failed&nbsp;to&nbsp;match&nbsp;my&nbsp;criteria'</b></code>
+  </td>
+  <td>
+
+	    An optional error message to report when an instance of a
+            simple type constrained by this facet fails to meet the
+            required criteria.
+          </td>
+</tr>
+
+        <tr valign="top" bgcolor="#eeeeff">
+  <td>
+    <a name="config_annotation"><code><b>annotation</b></code></a>
+  </td>
+  <td>
+    <code><b>'...something&nbsp;interesting...</b></code>
+  </td>
+  <td>
+
+	    An optional annotation.  Feel free to add something useful
+            or just your favourite quote from Homer Simpson.
+          </td>
+</tr>
+
+      <!-- end of table content -->
+</table>
+</p>
+
+
+    </p><li><p>
+<a name="method_init"><b>init( \%config )</b></a>
+<br>
+
+
+	Initialisation method called by <a href="#method_new"><code><b>new()</b></code></a> passing 
+        a reference to a hash array of configuration arguments.  May be
+        redefined by subclasses to perform more specific per-object
+        initialisation.
+    </p><li><p>
+<a name="method_valid">
+<b>valid( $instance, <a href="../../../modules/XML/Schema/Type/Simple.html">$type</a> )</b>
+<br>
+</a>
+
+
+      <!-- ignore args -->
+      <p>
+      This method is used to validate a potential instance of a type against
+      the facet.  A reference to a hash array is passed as the first argument.
+      This contains the candidate value defined as the <code><b>value</b></code>
+ 
+      item and may also contain any other data contributed by other validation 
+      facets.  This can effectively be considered as a working scratchpad for
+      facets to share.
+      </p>
+
+      <p>
+      The second argument passed is a reference to the <a href="../../../modules/XML/Schema/Type/Simple.html">simple type object</a> which
+      is instantiating this value.
+      </p>
+
+      <p>
+      Subclassed facets are expected to redefine this method to perform
+      their own validation.
+      </p>
+
+    </p><li><p>
+<a name="method_invalid"><b>invalid( $msg )</b></a>
+<br>
+
+
+      This method can be called to indicate a validation failure and to 
+      generate an appropriate error message based on the custom 
+      <a href="#config_errmsg"><code><b>errmsg</b></code></a> value or a constructed message based on the
+      <code><b>$msg</b></code>
+ argument passed and the facet's name and
+      value (e.g. <code><b>"error message (required minLength: 10)"</b></code>
+).
+    </p><li><p>
+<a name="method_name"><b>name()</b></a>
+<br>
+
+
+	Returns the name of the facet as (optionally) supplied by the
+	<a href="#config_name"><code><b>name</b></code></a> configuration item.
+    </p><li><p>
+<a name="method_value"><b>value()</b></a>
+<br>
+
+
+	Returns the facet value as supplied by the
+	<a href="#config_value"><code><b>value</b></code></a> configuration item.
+    </p><li><p>
+<a name="method_annotation"><b>annotation()</b></a>
+<br>
+
+
+	Returns the annotation value as supplied by the
+	<a href="#config_annotation"><code><b>annotation</b></code></a> configuration item.
+    </p></ul>
+
+
+<div align="center">
+<small><b>Perl XML::Schema Documentation</b></small>
+</div>
+</body>
+</html>

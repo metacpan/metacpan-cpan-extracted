@@ -1,0 +1,35 @@
+Revision history for XML-TMX-CWB
+
+0.10    2015-04-29
+        Fix problem with attributes being lost
+
+0.09    2015-04-28
+        Fix problems with 0.08 non-annotated TMX handling
+
+0.08    2015-04-28
+	Rework to support new XML::TMX annotated format
+	Bug fixes to support annotated TMX files
+
+0.07    2014-09-12
+	Fix 0.06 upload.
+
+0.06    2014-09-12
+        Minor fixes.
+        Support monolingual TMX (yeah, I know. Crazy thing!)
+        
+0.05    2011-11-16
+        Minor POD fixes
+
+0.04    2011-11-03
+        Fixed bug introduced by me in Sylvain code.
+
+0.03    2011-11-03
+        Fixed encode process that did not honor registry path.
+        (reported by Sylvain Loiseau)
+
+0.02    2010-11-23
+        Added basic documentation to the two scripts.
+
+0.01    2010-11-18
+        First version, includes cwb2tmx and tmx2cwb working on simple cases.
+

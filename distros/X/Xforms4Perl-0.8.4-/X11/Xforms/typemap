@@ -1,0 +1,69 @@
+TYPEMAP
+FLForm *		T_FLFRM
+FLObject *		T_FLOBJ
+FLOpt *			T_FLOPT
+FDCmdlog *		T_FDCMD
+FDFselector *		T_FDSEL
+FLEditKeymap *		T_FLEKM
+XEvent *		T_XEvent
+XFontStruct *		T_XFont
+Display *		T_PTR
+Visual *		T_PTR
+XSetWindowAttributes *	T_PTR
+GC			T_PTR
+Window			T_IV
+Drawable        	T_IV
+Font            	T_IV
+Pixmap          	T_IV
+Cursor          	T_IV
+Colormap        	T_IV
+GContext        	T_IV
+GLXContext        	T_PTR
+KeySym          	T_IV
+FL_Coord          	T_IV
+FL_COLOR          	T_IV
+const char *		T_PV_C
+float			T_DOUBLE
+XVisualInfo *		T_PTR
+################################################################
+INPUT
+T_PV_C
+        $var = ($type)SvPV($arg,na)
+T_FLOBJ
+        $var = ($type)chk_bless($arg, X11XformsFLObject);
+T_FLFRM
+        $var = ($type)chk_bless($arg, X11XformsFLForm);
+T_FLOPT
+        $var = ($type)chk_bless($arg, X11XformsFLOpt);
+T_FDCMD
+        $var = ($type)chk_bless($arg, X11XformsFDCmdlog);
+T_FDSEL
+        $var = ($type)chk_bless($arg, X11XformsFDFselector);
+T_FLEKM
+        $var = ($type)chk_bless($arg, X11XformsFLEditKeymap);
+T_XEvent
+        $var = ($type)chk_bless($arg, X11XEvent);
+T_XFont
+        $var = ($type)chk_bless($arg, X11XFontStruct);
+################################################################
+OUTPUT
+T_PV_C
+        sv_setpv_c((SV*)$arg, $var);
+T_FLOBJ
+	bless_object($var);
+	$arg = get_object_data($var)->po;
+T_FLFRM
+	bless_form($var);
+	$arg = get_form_data($var)->po;
+T_FLOPT
+	sv_setref_pv($arg, object_name[X11XformsFLOpt], (void*)$var);
+T_FDCMD
+	sv_setref_pv($arg, object_name[X11XformsFDCmdlog], (void*)$var);
+T_FDSEL
+	sv_setref_pv($arg, object_name[X11XformsFDFselector], (void*)$var);
+T_FLEKM
+	sv_setref_pv($arg, object_name[X11XformsFLEditKeymap], (void*)$var);
+T_XEvent
+	sv_setref_pv($arg, object_name[X11XEvent], (void*)$var);
+T_XFont
+	sv_setref_pv($arg, object_name[X11XFontStruct], (void*)$var);

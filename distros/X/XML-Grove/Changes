@@ -1,0 +1,71 @@
+Revision history for Perl extension XML::Grove.
+
+Backwards incompatible changes are marked with a `*'.
+
+Changes in Version 1.0
+
+Version 1.0 is virtually a complete rewrite.  The summary below
+presents the changes as a bullet list, but you should probably reread
+the POD docs because they have been updated and should be much clearer
+than before (let me know if you don't think so!).
+
+
+ * XML::Grove REQUIRES Perl 5.005
+
+ * The class structure of XML::Grove changes somewhat.
+
+   * XML::Grove::Document now contains the document information where
+     XML::Grove itself used to hold that information.
+
+   * The class XML::Grove is now the common superclass of all classes
+     in the XML::Grove module, and XML::Grove isa Data::Grove (in
+     libxml-perl).
+
+   * Internal class XML::Grove::_Common is gone.
+
+     If you had created extensions to XML::Grove and added methods to
+     XML::Grove::_Common, you should move them to XML::Grove.
+
+ * You now access grove properties directly, i.e.
+
+       $element_name = $element->{Name};
+
+   instead of using methods to access the properties.
+
+ * XML::Grove objects all now appear to have Parent references.
+
+   * This is done using tied hashes and arrays, see Data::Grove::Tied
+     if you see any wierd problems.  Use
+
+         $real_object = $node->{Raw};
+
+     to get the real object behind the tied hash.
+
+ * No More XML::Grove::Iter!!
+
+ * all scalars are now XML::Grove::Characters objects, if you store a
+   scalar value into element content it will be converted to an
+   XML::Grove::Characters object.
+
+ * visit_grove is now visit_document.
+
+ * visit_scalar is now visit_characters.  The object you receive is an
+   XML::Grove::Characters object and $characters->{Data} gives you the
+   text.
+
+ * XML::Grove::Visitor is now Data::Grove::Visitor in libxml-perl
+
+ * Visitor now checks the visitor object for methods it supports and
+   silently ignores undefined methods.  If the visited object has a
+   `Contents' property, Visitor will call `children_accept' or
+   `children_accept_name' if there is no defined method.
+
+ * All properties are mixed case, see XML::Grove(3) and the
+   grove builder and parser man pages for attribute names.
+
+ * FIXME check all places where Iter, visit_scalar, and delegate occur.
+
+ * XML::Parser::Grove is replaced by by using XML::Parser::PerlSAX (in
+   libxml-perl) and XML::Grove::Builder.  See XML::Grove::Builder for usage.
+
+ * added more tests and a `t' directory

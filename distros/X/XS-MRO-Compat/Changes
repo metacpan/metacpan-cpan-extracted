@@ -1,0 +1,39 @@
+Revision history for Perl extension XS::MRO::Compat
+
+0.14 Tue Aug 25 16:45:10 2009
+	- no code changes
+	- re-packaging with Module::Install::XSUtil 0.12
+
+0.13 Tue Aug 11 17:06:13 2009
+	- re-packaging with Module::Install::XSUtil 0.07
+
+0.12 Wed Jul 29 11:49:27 2009
+	- use DynaLoader::bootstrap_inherit()
+	- use Module:Install::XSUtil 0.04
+
+0.11 Mon Jul 27 14:05:21 2009
+	- re-packaging with Module::Install::XSUtil 0.02
+
+0.10 Mon Jul 27 14:01:43 2009
+	- rename Devel::MRO into XS::MRO::Compat
+	- no ExtUtils::Depends, use Module::Install::XSUtil
+
+0.05 Mon Feb 16 12:54:44 2009
+	- fix tests for blead (5.11.0)
+	- include ExtUtils::Depends
+
+0.04 Wed Feb 11 11:06:55 2009
+	- add tests and benchmarks
+
+0.03 Tue Feb 10 13:06:36 2009
+	- re-packaging
+
+0.02 Tue Feb 10 12:33:02 2009
+	- ** The module interface has been changed **
+		- mro_compat.h is installed as a library
+		- see perldoc Devel::MRO for details
+	- use ExtUtils::Depends for Makefile.PL, advised by chocolateboy
+	- add a complete example, MyMRO distribution
+
+0.01 Wed Dec  3 12:18:10 2008
+	- original version; created by Module::Setup

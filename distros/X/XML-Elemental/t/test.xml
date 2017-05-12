@@ -1,0 +1,7 @@
+<foo xmlns:baz="http://www.example.com/">
+<baz:bar key="value">Some title</baz:bar>
+<fred xmlns="http://www.example.net/" baz:bat="1" key="value">
+    <quux key="value">foo</quux>
+</fred>
+<quuux/>
+</foo>

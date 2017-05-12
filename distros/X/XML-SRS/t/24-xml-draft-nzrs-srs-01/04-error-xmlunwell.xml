@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<!DOCTYPE NZSRSResponse SYSTEM "protocol.dtd">
+<NZSRSResponse VerMajor="3" VerMinor="99"><Error Hint="INVALID_REQUEST_ERROR" ErrorId="XML_PARSE_ERROR" Severity="err"><Description><![CDATA[XML parse error]]></Description><ErrorDetails><![CDATA[:4: element AccessControlListQry: validity error : No declaration for attribute List of element AccessControlListQry
+   <AccessControlListQry List="allow" Type="registrar_ip" Resource="epp_connect"
+                                                                               ^
+:5: element RegistrarIdFilter: validity error : No declaration for element RegistrarIdFilter
+        <RegistrarIdFilter>100</RegistrarIdFilter>
+                                                  ^
+:6: element AddressFilter: validity error : No declaration for element AddressFilter
+            <AddressFilter>101.1.5.17</AddressFilter>
+                                                     ^
+:7: element AccessControlListQry: validity error : Element AccessControlListQry was declared EMPTY this one has content
+              </AccessControlListQry>
+                                     ^
+:8: element AccessControlListQry: validity error : No declaration for attribute List of element AccessControlListQry
+sControlListQry List="allow" Type="registrar_domain" Resource="epp_client_certs"
+                                                                               ^
+:9: element RegistrarIdFilter: validity error : No declaration for element RegistrarIdFilter
+                    <RegistrarIdFilter>100</RegistrarIdFilter>
+                                                              ^
+:10: element AddressFilter: validity error : No declaration for element AddressFilter
+                       <AddressFilter>epp.client.cert.example.com</AddressFilter
+                                                                               ^
+:11: element AccessControlListQry: validity error : Element AccessControlListQry was declared EMPTY this one has content
+                          </AccessControlListQry>
+]]></ErrorDetails></Error></NZSRSResponse>

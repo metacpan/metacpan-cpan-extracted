@@ -1,0 +1,8 @@
+
+0.03 - Sat Jan  1 19:43:41 CST 2000
+	fixed date parsing problem when rescheduling over a year boundary
+
+0.02 - Tue Dec 14 11:46:33 CST 1999
+	added more guts to the README and TODO files
+	added Changes file
+

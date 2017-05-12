@@ -1,0 +1,2 @@
+Defect 1001
+document('') doesn't work - see t/07blankdoc.t

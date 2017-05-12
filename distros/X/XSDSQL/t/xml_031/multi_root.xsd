@@ -1,0 +1,21 @@
+﻿<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+	<xs:element name="element_ref">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element  name="el0" type="xs:string" minOccurs="1" maxOccurs="1"/>
+				<xs:element  name="el1" type="xs:string" minOccurs="0" maxOccurs="1"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="el0_r" type="xs:string"/>
+	<xs:element name="el1_r">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element  name="elc" type="xs:string"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>
+
+ 

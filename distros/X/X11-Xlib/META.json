@@ -1,0 +1,58 @@
+{
+   "abstract" : "Low-level access to the X11 library",
+   "author" : [
+      "Olivier Thauvin <nanardon@nanardon.zarb.org>",
+      "Michael Conrad <mike@nrdvana.net>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "X11-Xlib",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Devel::CheckLib" : "1.03",
+            "ExtUtils::Depends" : "0.405",
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Scalar::Util" : "0",
+            "Try::Tiny" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/nanardon/X11-Xlib/issues"
+      },
+      "repository" : {
+         "url" : "https://github.com/nanardon/X11-Xlib.git"
+      }
+   },
+   "version" : "0.14",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

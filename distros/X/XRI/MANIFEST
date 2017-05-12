@@ -1,0 +1,24 @@
+Changes
+LICENSE
+LICENSE_BSD
+LICENSE_GPL
+Makefile.PL
+MANIFEST
+README
+scripts/splitAuthLocal.pl
+scripts/xriresolve.pl
+t/basic.t
+t/descriptor.t
+t/escapeURI.t
+t/extract_bracketed.t
+t/nextSegment.t
+t/nextToken.t
+t/readRoots.t
+t/xri.t
+XRI.pm
+XRI/Parse.pm
+XRI/xriroots.xml
+XRI/Descriptor.pm
+XRI/Descriptor/LocalAccess.pm
+cgi/xri-resolve.cgi
+META.yml                                 Module meta-data (added by MakeMaker)

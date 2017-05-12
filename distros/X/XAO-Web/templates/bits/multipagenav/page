@@ -1,0 +1,21 @@
+<%SetArg
+  name='PARAMS'
+  value={<%Utility
+           mode='pass-cgi-params'
+           result='query'
+           params='*'
+           except='start_item'
+         %>}
+%><%SetArg
+  name="START_ITEM"
+  value={<%Condition
+           a.arg='PAGE_START_ITEM'
+           a.template={start_item=<$PAGE_START_ITEM$>&}
+         %>}
+%><%Condition
+    a.arg='PARAMS'
+    a.template={<A HREF="<%URL%>?<$START_ITEM$><$PARAMS$>">}
+    b.arg='PAGE_START_ITEM'
+    b.template={<A HREF="<%URL%>?start_item=<$PAGE_START_ITEM$>">}
+    default.template={<A HREF="<%URL%>">}
+%><$PAGE_NUMBER$></A>

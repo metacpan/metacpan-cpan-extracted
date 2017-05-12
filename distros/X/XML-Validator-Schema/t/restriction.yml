@@ -1,0 +1,275 @@
+# test some simpletype restrictions
+
+--- |
+ <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:element name="container">
+       <xs:complexType>
+          <xs:sequence>
+             <xs:element name="one" type="a_to_z" minOccurs="0" maxOccurs="unbounded"/>
+             <xs:element name="two" type="p_or_q" minOccurs="0" maxOccurs="unbounded"/>
+             <xs:element name="three" type="perl_bool" minOccurs="0" maxOccurs="unbounded"/>
+             <xs:element name="four" type="ten_chars" minOccurs="0" maxOccurs="unbounded"/>
+             <xs:element name="five" type="three_to_five_chars" minOccurs="0" maxOccurs="unbounded"/>
+             <xs:element name="six" type="ten_chars_ws" minOccurs="0" maxOccurs="unbounded"/>
+             <xs:element name="seven" type="multi_pattern" minOccurs="0" maxOccurs="unbounded"/>
+             <xs:element name="eight" type="ten_chars_normalized" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+       </xs:complexType>
+    </xs:element>     
+    <xs:simpleType name="a_to_z">
+        <xs:restriction base="xs:string">
+            <xs:pattern value="[a-z]+"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="ten_chars">
+        <xs:restriction base="xs:string">
+            <xs:length value="10"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="three_to_five_chars">
+        <xs:restriction base="xs:string">
+            <xs:minLength value="3"/>
+            <xs:maxLength value="5"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="p_or_q">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="p"/>
+            <xs:enumeration value="q"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="perl_bool">
+        <xs:restriction base="xs:boolean">
+            <xs:pattern value="[10]"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="ten_chars_ws">
+        <xs:restriction base="xs:token">
+            <xs:length value="10"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="multi_pattern">
+        <xs:restriction base="xs:string">
+            <xs:pattern value="foo\(\d+\)"/>
+            <xs:pattern value="bar\[\S+\]"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="ten_chars_normalized">
+        <xs:restriction base="xs:normalizedString">
+            <xs:length value="10" />
+        </xs:restriction>
+    </xs:simpleType>
+
+ </xs:schema>
+
+--- |
+ <container>
+  <one>aaaaabbbbcccc</one>
+ </container>
+--- >
+PASS
+
+--- |
+ <container>
+   <one>aaaaabbbbccccZZZZ</one>
+ </container>
+--- >
+FAIL
+
+--- |
+ <container>
+   <one>aaaaabbbbccccZZZZ</one>
+ </container>
+--- >
+FAIL
+ 
+--- |
+ <container>
+   <one></one>
+ </container>
+--- >
+FAIL
+
+--- |
+ <container>
+   <two>p</two>   
+   <two>q</two>
+ </container>
+--- >
+PASS
+
+--- |
+ <container>
+   <two>z</two> 
+ </container>
+--- >
+FAIL /[iI]llegal value/
+
+
+--- |
+ <container>
+   <three>true</three> 
+   <three>false</three> 
+ </container>
+--- >
+FAIL /[iI]llegal value/
+
+--- |
+ <container>
+   <three>1</three> 
+   <three>0</three> 
+ </container>
+--- >
+PASS
+
+
+--- |
+ <container>
+   <four>0123456789</four> 
+ </container>
+--- >
+PASS
+
+--- |
+ <container>
+   <four>01234567891</four> 
+ </container>
+--- >
+FAIL /[iI]llegal value/
+
+--- |
+ <container>
+   <four>012345678</four> 
+ </container>
+--- >
+FAIL /[iI]llegal value/
+
+--- |
+ <container>
+   <five>01</five> 
+ </container>
+--- >
+FAIL /[iI]llegal value/
+
+--- |
+ <container>
+   <five>012</five> 
+ </container>
+--- >
+PASS
+
+--- |
+ <container>
+   <five>0123</five> 
+ </container>
+--- >
+PASS
+
+--- |
+ <container>
+   <five>01234</five> 
+ </container>
+--- >
+PASS
+
+--- |
+ <container>
+   <five>012345</five> 
+ </container>
+--- >
+FAIL /[iI]llegal value/
+
+
+--- |
+ <container>
+   <six>  0123456789  </six> 
+ </container>
+--- >
+PASS
+
+--- |
+ <container>
+   <six>  01    345     789  </six> 
+ </container>
+--- >
+PASS
+
+--- |
+ <container>
+   <six>  
+
+
+          0123456789  
+
+
+   </six> 
+ </container>
+--- >
+PASS
+
+--- |
+ <container>
+   <six>01234567891</six> 
+ </container>
+--- >
+FAIL /[iI]llegal value/
+
+--- |
+ <container>
+   <six>012345678</six> 
+ </container>
+--- >
+FAIL /[iI]llegal value/
+
+--- |
+ <container>
+   <seven>foo(012345678)</seven> 
+ </container>
+--- >
+PASS
+
+--- |
+ <container>
+   <seven>bar[TENTHENTEN]</seven> 
+ </container>
+--- >
+PASS
+
+
+--- |
+ <container>
+   <seven>foo(10)bar[TENTHENTEN]</seven> 
+ </container>
+--- >
+FAIL /[iI]llegal value/
+
+
+--- |
+ <container>
+   <eight>0123456789</eight>
+ </container>
+--- >
+PASS
+
+--- |
+ <container>
+   <eight>012 45 78 </eight>
+ </container>
+--- >
+PASS
+
+
+--- |
+ <container>
+   <eight> 12 45 78 </eight>
+ </container>
+--- >
+PASS
+
+--- |
+ <container>
+   <eight> 0123456789 </eight>
+ </container>
+--- >
+FAIL /[iI]llegal value/
+

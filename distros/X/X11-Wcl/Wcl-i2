@@ -1,0 +1,36 @@
+/*
+** This file has some hand-written code wrapped by SWIG.
+**
+** These need to be at the end of the generated Wcl.i file, because
+** they need the various structure declarations ahead of them.
+*/
+
+%inline %{
+
+/*
+** PERL callbacks are all fed through this function, which sets up to
+** call _X11_Wcl_do_callback(), which knows how to call back into
+** PERL.
+*/
+void
+_X11_Wcl_register_callback(XtAppContext app_context, char *callback_name)
+{
+	/* call the Wcl function that does callback registration */
+	WcRegisterCallback(app_context,
+					   callback_name,
+					   (XtCallbackProc)_X11_Wcl_do_callback,
+					   (XtPointer)0);
+}
+
+void
+WcAddEditResSupportToShell(Widget shell)
+{
+	/* this is all you need to do to add editres support to a shell */
+	XtAddEventHandler(shell,
+					  (EventMask)0,
+					  True,
+					  (XtEventHandler)_XEditResCheckMessages,
+					  0);
+}
+
+%}

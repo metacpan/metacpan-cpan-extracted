@@ -1,0 +1,42 @@
+XT-Manager
+==========
+
+Created:      2012-02-07
+Home page:    <https://metacpan.org/release/XT-Manager>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=XT-Manager>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.006	2013-12-03
+
+ [ Packaging ]
+ - Bump required version of Syntax::Collector.
+
+0.005	2013-12-02
+
+ [ Bug Fixes ]
+ - Cope with changes to Syntax::Collector.
+   Fixes RT#90620.
+   Andreas J König++
+   <https://rt.cpan.org/Ticket/Display.html?id=90620>
+
+ [ Packaging ]
+ - use Dist::Inkt.
+
+0.004	2013-05-20	faster please!
+
+ - Moose -> Moo.
+ - MooseX::Types -> Type::Tiny.
+ - Path::Class -> Path::Tiny.
+ - smartmatch -> match::smart.
+
+0.003	2012-09-20
+
+ [ Bug Fixes ]
+ - Fix version number for XT::Manager::Command::push.
+
+0.002	2012-09-20
+
+ [ Packaging ]
+ - Declare dependency on Throwable.
+
+0.001	2012-09-20	Initial release

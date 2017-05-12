@@ -1,0 +1,21 @@
+<s id="top">
+
+<s id="david_and_goliath">
+
+[David and <a href="http://en.wikipedia.org/wiki/Goliath">Goliath</a> are
+standing by each other.]
+
+David: I will kill you.<br />
+I will kill you.<br />
+You will not survive.<br />
+I will kill you.<br />
+I will kill you.<br />
+Ask Jive.
+
+Goliath: no way, you little idiot!
+
+David: yes way!
+
+</s>
+
+</s>

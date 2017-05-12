@@ -1,0 +1,83 @@
+#!/usr/bin/perl -w
+
+use strict;
+use XML::Handler::Pdb;
+use XML::SAX;
+use IO::Handle;
+use Getopt::Long;
+use Pod::Usage;
+
+my ($Source, $Output, $Verbose, $Help);
+
+GetOptions(	"source=s"	=> \$Source,
+			"output=s"	=> \$Output,
+			"verbose"	=> \$Verbose,
+			"help"		=> \$Help
+			);
+
+pod2usage(-verbose => 2) if $Help;
+
+my $Method = 'parse_uri';
+unless (defined $Source) {
+	$Source = \*STDIN;
+	$Method = 'parse_file';
+}
+
+XML::SAX::ParserFactory->parser(
+	Handler => XML::Handler::Pdb->new(
+		Verbose => $Verbose,
+		Output => $Output
+		)
+	)->$Method($Source);
+
+exit(0);
+
+__END__
+
+=head1 NAME
+
+xmltopdb - Generate a Palm PDB from and XML description
+
+=head1 SYNOPSIS
+
+ xmltopdb --source=./input.xml --output=./out.pdb
+
+ cat input.xml | xmltopdb --output=./out.pdb
+
+ cat input.xml | xmltopdb > out.pdb
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--source>
+
+XML description of the PDB. An alternative is to use standard input.
+
+=item B<--output>
+
+The PDB file to write to. An alternative is to use standard output.
+
+=item B<--verbose>
+
+Print the structure of the XML description as we go.
+
+=item B<--help>
+
+What you are reading now.
+
+=back
+
+=head1 DESCRIPTION
+
+This tool generates a Palm database from an XML desription. The format of the XML description can be found in L<XML::Handler::Pdb>. The datatypes in the PDB are modeled for NSBasic, but you can use any other IDE on the Palm to write apps that use C<xmltopdb> for PDB creation.
+
+=head1 AUTHOR
+
+Johan Van den Brande <johan@vandenbrande.com>
+
+=head1 LICENSE
+
+This is free software, distributed underthe same terms as Perl itself.
+
+=cut

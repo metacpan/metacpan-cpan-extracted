@@ -1,0 +1,503 @@
+#!/ford/thishost/unix/div/ap/bin/perl -w
+
+# This script does a pretty good job at generating the initial
+# XS definitions for X, Xt and Xm.  It doesn't handle macros or
+# resource definitions.
+#
+# WARNING:  This script does *NOT* produce a finished XS file.
+#           Do *NOT* replace any of the XS files distributed with
+#           this package with the raw output of this script.
+
+use strict;
+
+my $tmp_file = "/tmp/tmp-x11-$$.c";
+my $cpp = "gcc -I/usr/dt/include -I/usr/openwin/include -ansi -E -P -C $tmp_file";
+
+my $module_wanted = $ARGV[0];
+
+if (!defined($module_wanted) ||
+    ($module_wanted ne "Lib" && $module_wanted ne "Toolkit" && $module_wanted ne "Motif")) {
+    die "Do you know what you're doing?\n";
+}
+
+open(C_SOURCE, "> $tmp_file") || die "Can't open temp file $tmp_file";
+
+if ($module_wanted eq "Lib") {
+    print C_SOURCE <<EOF;
+--X11::Lib
+#include <X11/Xlib.h>
+#include <X11/Xutil.h>
+#include <X11/Xresource.h>
+EOF
+}
+elsif ($module_wanted eq "Toolkit") {
+    print C_SOURCE <<EOF;
+--X11::Lib
+#include <X11/Xlib.h>
+#include <X11/Xutil.h>
+#include <X11/Xresource.h>
+
+--X11::Toolkit
+#include <X11/Intrinsic.h>
+#include <X11/IntrinsicP.h>
+#include <X11/Core.h>
+#include <X11/StringDefs.h>
+#include <X11/Shell.h>
+#include <X11/Vendor.h>
+EOF
+}
+elsif ($module_wanted eq "Motif") {
+    print C_SOURCE <<EOF;
+--X11::Lib
+#include <X11/Xlib.h>
+
+--X11::Toolkit
+#include <X11/Intrinsic.h>
+#include <X11/Core.h>
+#include <X11/StringDefs.h>
+#include <X11/Shell.h>
+#include <X11/Vendor.h>
+
+--X11::Motif
+#include <Xm/Xm.h>
+#include <Xm/ArrowB.h>
+#include <Xm/BulletinB.h>
+#include <Xm/CascadeB.h>
+#include <Xm/Command.h>
+#include <Xm/DialogS.h>
+#include <Xm/DrawingA.h>
+#include <Xm/DrawnB.h>
+#include <Xm/FileSB.h>
+#include <Xm/Form.h>
+#include <Xm/Frame.h>
+#include <Xm/Label.h>
+#include <Xm/List.h>
+#include <Xm/MainW.h>
+#include <Xm/MenuShell.h>
+#include <Xm/MessageB.h>
+#include <Xm/PanedW.h>
+#include <Xm/PushB.h>
+#include <Xm/RowColumn.h>
+#include <Xm/Scale.h>
+#include <Xm/Screen.h>
+#include <Xm/ScrollBar.h>
+#include <Xm/ScrolledW.h>
+#include <Xm/SelectioB.h>
+#include <Xm/Separator.h>
+#include <Xm/Text.h>
+#include <Xm/TextF.h>
+#include <Xm/ToggleB.h>
+EOF
+}
+else {
+    die "Don't know any module named $module_wanted";
+}
+
+close C_SOURCE;
+
+open(CPP, "$cpp |") || die "Can't run C pre-processor command";
+
+my @noXlibExtensions = qw(XAddToExtensionList XAddExtension
+			  XEHeadOfExtensionList XFindOnExtensionList
+			  XFreeExtensionList XInitExtension);
+
+my @noPredicates = qw(XCheckIfEvent XPeekIfEvent XIfEvent XSetAfterFunction
+		      XSynchronize XrmEnumerateDatabase
+		      XSetErrorHandler XSetIOErrorHandler);
+
+my @noLocaleStuff = qw(IM$ ^XGetIM IC$ ^XGetIC ^XSetIC ^XUnsetIC
+		       ^Xwc ^Xmb
+		       XSetLocaleModifiers XSupportsLocale
+		       ^XmIm);
+
+my @noAllocators = qw(XtFree XtMalloc XtRealloc XtCalloc XtNew XtNewString ^XFree ^Xpermalloc);
+
+my @noMisc = qw(^XVa XQueryKeymap XrmQGetSearchList XrmQGetSearchResource
+		^XtVa ^XmVa ^XtCvt ^XmCvt
+		XtParent XtAddCallback XtMergeArgLists
+		XmCvtXmStringToText XmCvtTextToXmString XmListYToPos
+		XtAppNextEvent XtAppPeekEvent);
+
+my @noGetValues = qw(XtGetActionList XtGetApplicationNameAndClass XtGetApplicationResources
+		     XtGetConstraintResourceList XtGetResourceList XtGetSubresources
+		     XtGetSubvalues XtGetValues
+		     XtSetSubvalues);
+
+
+my @no_SGI_Stuff = qw(OC OM IM ConnectionWatch XInternAtoms
+		      XReadBitmapFileData XConvertCase XContextualDrawing
+		      XDirectionalDependentDrawing XProcessInternalConnection
+		      XGetAtomNames XInternalConnectionNumbers XInitImage);
+
+my $code = "sub ignore_function { my(\$f) = \@_;\n";
+foreach my $pattern (@noXlibExtensions, @noPredicates, @noLocaleStuff,
+		     @noAllocators, @noMisc, @noGetValues, @no_SGI_Stuff)
+{
+    $code .= " return 1 if (\$f =~ m/$pattern/);\n";
+}
+$code .= " return 0;\n}";
+eval $code;
+
+my %symbols = ( "Lib" => { }, "Toolkit" => { }, "Motif" => { } );
+
+my $module = $module_wanted;
+my $line;
+my $type;
+my $function;
+my $args;
+
+my %delayed_output = ();
+
+if ($module_wanted eq "Toolkit") {
+    %delayed_output = ( "Widget" =>
+			    "MODULE = X11::Toolkit	PACKAGE = X::Toolkit::Widget\n\n",
+			"XtAppContext" =>
+			    "MODULE = X11::Toolkit	PACKAGE = X::Toolkit::Context\n\n" );
+}
+
+LINE: while(defined($line = <CPP>)){
+    chomp $line;
+
+    if ($line =~ /^--X11::(\w+)$/) {
+	$module = "$1";
+	next LINE;
+    }
+
+    if ($line =~ /\bextern\s+(.*)(\bX\w+)\s*\(\s*$/) {
+
+	$type = $1;
+	$function = $2;
+	$args = "";
+
+	while (defined($line = <CPP>)) {
+	    chomp $line;
+
+	    $args =~ s|\*/\s*/\*.*?\*/|*/|g;	# remove the comment after a comment
+	    $args =~ s|,\s*/\*.*?\*/|,|g;	# remove the comment after a comma
+
+	    $args .= $line;
+	    if ($line =~ /;/) {
+
+		$type = sanitize_type($type);
+		$type = "int" if ($type eq "");
+
+		$args = sanitize_args($args);
+		$args =~ s|^\(||;
+		$args =~ s|\)\s*;$||;
+
+		$args = "" if ($args eq "void");
+
+		if (!ignore_function($function)) {
+		    $symbols{$module}{$function} = [ $type, $args ];
+		}
+
+		next LINE;
+	    }
+	}
+    }
+}
+
+close CPP;
+unlink $tmp_file;
+
+    FUNCTION: foreach $function (sort keys %{$symbols{$module_wanted}}) {
+
+	my $info = $symbols{$module_wanted}{$function};
+
+	if ($info->[1] =~ /[()]/) {
+	    print STDERR $info->[0], "\n";
+	    print STDERR "$function(", $info->[1], ")\n";
+	    print STDERR "\t# argument list is too complex\n\n";
+	}
+	else {
+	    my @arg_list = ();
+	    my @arg_decl = ();
+	    my %args_seen = ();
+	    my @return_values = ();
+	    my $function_body = "";
+	    my $in_module;
+
+	    reset_arg();
+
+	    foreach my $raw_arg (split(m|,\s*|, $info->[1])) {
+		my($type, $arg) = figure_out_arg($raw_arg);
+		my $orig_arg = $arg;
+		my $count = 1;
+
+		while (exists $args_seen{$arg}) {
+		    $arg = $orig_arg . '_' . $count++;
+		}
+
+		$args_seen{$arg} = 1;
+		push @arg_list, $arg;
+
+		if (defined $type) {
+		    push @arg_decl, format_arg_decl($type, $arg);
+		}
+	    }
+
+	    if (scalar(@arg_decl) >= 2) {
+		if ($arg_decl[$#arg_decl]     =~ /^\tCardinal\s+/ &&
+		    ($arg_decl[$#arg_decl - 1] =~ /^\tArgList\s+/ ||
+		     $arg_decl[$#arg_decl - 1] =~ /^\tArg\s+\*\s+/))
+		{
+		    pop @arg_list;
+		    pop @arg_list;
+
+		    pop @arg_decl;
+		    pop @arg_decl;
+
+		    my $the_widget = "0";
+		    my $the_widgetclass = "0";
+
+		    foreach (@arg_decl) {
+			if (/^\tWidget\s+(\w+)/) {
+			    $the_widget = $1;
+			}
+			elsif (/^\tWidgetClass\s+(\w+)/) {
+			    $the_widgetclass = $1;
+			}
+		    }
+
+		    my $args = join(", ", @arg_list);
+		    my $arg_count = scalar(@arg_list);
+
+		    if ($the_widgetclass eq "0" && $the_widget ne "0" ) {
+			$the_widgetclass = "XtClass($the_widget)";
+		    }
+
+		    my $retval;
+		    if ($info->[0] eq "void") {
+			$retval = "";
+		    }
+		    else {
+			$retval = "RETVAL = ";
+			unshift @return_values, "RETVAL";
+		    }
+
+		    $function_body = <<"EOF";
+	PREINIT:
+	    ArgList arg_list = 0;
+	    Cardinal arg_list_len = 0;
+	CODE:
+	    arg_list_len = xt_build_input_arg_list($the_widget, $the_widgetclass, &arg_list, &ST($arg_count), items - $arg_count);
+	    $retval$function($args, arg_list, arg_list_len);
+	    if (arg_list) free(arg_list);
+EOF
+
+		    $function = "priv_$function";
+		    push @arg_list, "...";
+		}
+	    }
+
+	    if (scalar @arg_decl > 0) {
+		if ($arg_decl[0] =~ /^\t(\w+)\s/) {
+		    $in_module = $1;
+		}
+
+		for (my $i = 0; $i < scalar @arg_decl; ++$i) {
+		    if (matches_IN_OUT_argument($arg_decl[$i])) {
+			$arg_decl[$i] =~ s|\*| |;
+			$arg_decl[$i] =~ s|(\w+)$|&$1|;
+			push @return_values, $arg_list[$i],
+		    }
+		}
+	    }
+
+	## this is gross.  there needs to be a single routine to emit a
+	## function prototype.  then the output of that should be either
+	## printed or delayed.  FIXME
+
+	    if (defined $in_module && exists $delayed_output{$in_module}) {
+		$delayed_output{$in_module} .= $info->[0] . "\n";
+		$delayed_output{$in_module} .= "$function(" . join(", ", @arg_list) . ")\n";
+		$delayed_output{$in_module} .= join("\n", @arg_decl) . "\n";
+
+		$delayed_output{$in_module} .= $function_body;
+
+		if (@return_values) {
+		    if ($return_values[0] ne "RETVAL" && $info->[0] ne "void") {
+			unshift @return_values, "RETVAL";
+		    }
+		    $delayed_output{$in_module} .= "\tOUTPUT:\n\t    ";
+		    $delayed_output{$in_module} .= join("\n\t    ", @return_values) . "\n";
+		}
+
+		$delayed_output{$in_module} .= "\n";
+	    }
+	    else {
+		print $info->[0], "\n";
+		print "$function(", join(", ", @arg_list), ")\n";
+		print join("\n", @arg_decl), "\n";
+
+		print $function_body;
+
+		if (@return_values) {
+		    if ($return_values[0] ne "RETVAL" && $info->[0] ne "void") {
+			unshift @return_values, "RETVAL";
+		    }
+		    print "\tOUTPUT:\n\t    ";
+		    print join("\n\t    ", @return_values), "\n";
+		}
+
+		print "\n";
+	    }
+	}
+    }
+
+foreach (sort keys %delayed_output) {
+    print $delayed_output{$_};
+}
+
+exit 0;
+
+sub matches_IN_OUT_argument {
+    my($arg) = @_;
+
+    if (($arg =~ m|^\s*XrmDatabase\s+\*\s|) ||
+	($arg =~ m|^\s*Pixmap\s+\*\s| && $arg =~ m|return$|) ||
+	($arg =~ m|^\s*Window\s+\*\s| && $arg =~ m|return$|) ||
+	($arg =~ m|^\s*Atom\s+\*\s| && $arg =~ m|return$|) ||
+	($arg =~ m|^\s*int\s+\*\s| && $arg =~ m|return$|) ||
+	($arg =~ m|^\s*unsigned int\s+\*\s| && $arg =~ m|return$|) ||
+	($arg =~ m|^\s*long\s+\*\s| && $arg =~ m|return$|) ||
+	($arg =~ m|^\s*unsigned long\s+\*\s| && $arg =~ m|return$|))
+    {
+	1;
+    }
+}
+
+sub format_arg_decl {
+    my($type, $arg) = @_;
+
+    # const and register don't make any sense for perl XS subs
+
+    $type =~ s|\bconst\s+||g;
+    $type =~ s|\bregister\s+||g;
+
+    my $len = length($type);
+    my $extra = 8 - $len % 8;
+    if ($extra < 8) {
+	$type .= "\t";
+	$len += $extra;
+    }
+
+    my $tabs_needed = 3 - $len / 8;
+    if ($tabs_needed > 0) {
+	$type .= "\t" x $tabs_needed;
+    }
+
+    "\t$type$arg";
+}
+
+my $count;
+my @default_arg;
+
+sub reset_arg {
+    $count = 0;
+    if (!defined @default_arg) {
+	@default_arg = qw(a b c d e f g h i j k l m n o p q r s t u v w x y z);
+    }
+}
+
+sub figure_out_arg {
+    my($type) = @_;
+
+    # for common (special) types, generate a consistent
+    # default argument name
+
+    return ($type, "dpy")    if ($type eq "Display *");
+    return ($type, "win")    if ($type eq "Window");
+    return ($type, "cmap")   if ($type eq "Colormap");
+    return ($type, "gc")     if ($type eq "GC");
+
+    # if the prototype provides an argument name then use that
+
+    if ($type =~ /(\w.*)(\b\w+)$/) {
+	my $real_type = $1;
+	my $arg = $2;
+
+	$real_type =~ s|\s+$||;
+
+	if ($arg ne "int" &&
+	    $arg ne "long" &&
+	    $arg ne "short" &&
+	    $arg ne "char" &&
+	    $real_type ne "const")
+	{
+	    if ($arg eq "default") {
+		$arg = "def";
+	    }
+	    return ($real_type, $arg);
+	}
+    }
+
+    # for other common types, generate a reasonable
+    # default argument name
+
+    return ($type, "color")  if ($type eq "XColor *");
+    return ($type, "event")  if ($type eq "XEvent *");
+    return ($type, "win")    if ($type eq "Drawable");
+    return ($type, "pixmap") if ($type eq "Pixmap");
+    return ($type, "scr")    if ($type eq "Screen *");
+    return ($type, "w")	     if ($type eq "Widget");
+    return (undef, "...")    if ($type eq "...");
+
+    # if we get here there's no hope, so just pick the next
+    # generic name in the list
+
+    ($type, $default_arg[$count++])
+}
+
+sub strip_spaces (\$) {
+    my($str) = @_;
+
+    $$str =~ s|^\s+||g;
+    $$str =~ s|\s+$||g;
+    $$str =~ s|\s+| |g;
+}
+
+sub sanitize_type {
+    my($raw_type) = @_;
+
+    strip_spaces($raw_type);
+
+    $raw_type =~ s|\s*([()])\s*|$1|g;
+    $raw_type =~ s|\s*,\s*|, |g;
+    $raw_type =~ s|\s*\*\s*| *|g;
+    $raw_type =~ s|\*\s+\*|**|g;
+    $raw_type =~ s|\*\s+\*|**|g;
+    $raw_type =~ s|\*\s+\*|**|g;
+
+    $raw_type;
+}
+
+sub deduce_arg_from_comment {
+    my($comment) = @_;
+
+    strip_spaces($comment);
+
+    if ($comment =~ /\s/) {
+	return "";
+    }
+
+    $comment;
+}
+
+sub sanitize_args {
+    my($raw_args) = @_;
+
+    strip_spaces($raw_args);
+
+    $raw_args =~ s|\s*([()])\s*|$1|g;
+    $raw_args =~ s|\s*,\s*|, |g;
+
+    $raw_args =~ s|/\*(.*?)\*/|deduce_arg_from_comment($1)|ge;
+
+    $raw_args =~ s|\s*\*\s*| *|g;
+    $raw_args =~ s|\*\s+\*|**|g;
+    $raw_args =~ s|\*\s+\*|**|g;
+    $raw_args =~ s|\*\s+\*|**|g;
+
+    $raw_args;
+}

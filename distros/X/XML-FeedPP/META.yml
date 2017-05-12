@@ -1,0 +1,14 @@
+--- #YAML:1.0
+name:                XML-FeedPP
+version:             0.43
+abstract:            ~
+license:             perl
+author:              ~
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Test::More:                    0
+    XML::TreePP:                   0.39
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

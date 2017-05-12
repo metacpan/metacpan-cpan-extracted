@@ -1,0 +1,163 @@
+#!/usr/bin/perl -w
+##############################################################################
+# $Id: xmlsort,v 1.1.1.1 2002/06/14 20:40:12 grantm Exp $
+#
+# Title:    xmlsort
+#
+# Author:   Grant McLean <grantm@cpan.org>
+#
+# Script for sorting 'records' in XML files.  Use -h option for help.
+#
+
+use strict;
+
+use Getopt::Long;
+use Pod::Usage;
+
+use IO::File;
+use XML::SAX::ParserFactory;
+use XML::SAX::Writer;
+use XML::Filter::Sort;
+
+
+##############################################################################
+# Handle command line parameters
+#
+
+my %opt = ();
+
+GetOptions(\%opt, 'r=s', 'k=s', 'i', 's', 't=s', 'm=s', 'h') ||
+  pod2usage(0);
+
+pod2usage({-verbose => 2, -exitval => 0}) if($opt{h});
+
+pod2usage(0) unless($opt{r});
+
+my $filename = shift || '-';
+
+
+##############################################################################
+# Build up the list of options for constructing the sort filter object.
+#
+
+my %sort_opts = ( Record => $opt{r} );
+
+$sort_opts{Keys}              = $opt{k} if($opt{k});
+$sort_opts{IgnoreCase}        = 1       if($opt{i});
+$sort_opts{NormaliseKeySpace} = 1       if($opt{s});
+$sort_opts{TempDir}           = $opt{t} if($opt{t});
+$sort_opts{MaxMem}            = $opt{m} if($opt{m});
+
+
+##############################################################################
+# Create a filter pipeline and 'run' it
+#
+
+my $writer = XML::SAX::Writer->new( Output => \*STDOUT );
+my $sorter = XML::Filter::Sort->new( %sort_opts, Handler => $writer );
+my $parser = XML::SAX::ParserFactory->parser(Handler => $sorter);
+
+my $fd = IO::File->new("<$filename") || die "$!";
+
+$parser->parse_file($fd);
+
+print "\n";
+
+exit;
+
+__END__
+
+=head1 NAME
+
+xmlsort - sorts 'records' in XML files
+
+=head1 SYNOPSIS
+
+  xmlsort -r=<recordname> [ <other options> ] [ <filename> ]
+
+  Options:
+   -r <name>  name of the elements to be sorted
+   -k <keys>  child nodes to be used as sort keys
+   -i         ignore case when sorting
+   -s         normalise whitespace when comparing sort keys
+   -t <dir>   buffer records to named directory rather than in memory
+   -m <bytes> set memory chunk size for disk buffering
+   -h         help - display the full documentation
+
+  Example:
+   xmlsort -r 'person' -k 'lastname;firstname' -i -s in.xml >out.xml
+
+=head1 DESCRIPTION
+
+This script takes an XML document either on STDIN or from a named file and
+writes a sorted version of the file to STDOUT.  The C<-r> option should be used
+to identify 'records' in the document - the bits you want sorted.  Elements
+before and after the records will be unaffected by the sort.
+
+=head1 OPTIONS
+
+Here is a brief summary of the command line options (and the XML::Filter::Sort
+options which they correspond to).  For more details see L<XML::Filter::Sort>.
+
+=over 4
+
+=item -r <recordname> (Record)
+
+The name of the elements to be sorted.  This can be a simple element name like
+C<'person'> or a pathname like C<'employees/person'> (only person elements 
+contained directly within an employees element).
+
+=item -k <keys> (Keys)
+
+Semicolon separated list of elements (or attributes) within a record which 
+should be used as sort keys.  Each key can optionally be followed by 'alpha' or
+'num' to indicate alphanumeric of numeric sorting and 'asc' or 'desc' for
+ascending or descending order (eg: -k 'lastname;firstname;age,n,d').
+
+=item -i (IgnoreCase)
+
+This option makes sort comparisons case insensitive.
+
+=item -s (NormaliseKeySpace)
+
+By default all whitespace in the sort key elements is considered significant.
+Specifying -s will case leading and trailing whitespace to be stripped and
+internal whitespace runs to be collapsed to a single space.
+
+=item -t <directory> (TempDir)
+
+When sorting large documents, it may be prudent to use disk buffering rather
+than memory buffering.  This option allows you to specify where temporary
+files should be written.
+
+=item -m <bytes> (MaxMem)
+
+If you use the -t option to enable disk buffering, records will be collected
+in memory in 'chunks' of up to about 10 megabytes before being sorted and 
+spooled to temporary files.  This option allows you to specify a larger
+chunk size.  A suffix of K or M indicates kilobytes or megabytes respectively.  
+
+=back
+
+=head1 SEE ALSO
+
+This script uses the following modules:
+
+  XML::SAX::ParserFactory
+  XML::Filter::Sort
+  XML::SAX::Writer
+
+=head1 AUTHOR
+
+Grant McLean <grantm@cpan.org>
+
+=head1 COPYRIGHT
+
+Copyright (c) 2002 Grant McLean.  All rights reserved. This program is
+free software; you can redistribute it and/or modify it under the same terms
+as Perl itself.
+
+=cut
+
+
+

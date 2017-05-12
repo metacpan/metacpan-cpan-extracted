@@ -1,0 +1,4 @@
+* Tests for the namespace stuff
+* Tests for `root`
+* Check XML TR and add checks for valid char ranges and such in various places
+* Docs

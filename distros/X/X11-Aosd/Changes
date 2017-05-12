@@ -1,0 +1,24 @@
+$Id: Changes,v 1.4 2008/03/29 16:28:47 joern Exp $
+
+Revision history for Perl extension X11::Aosd.
+
+0.03 Sat Mar 29 2008 joern
+    - fixed Makefile.PL which crashed on missing ExtUtils::Depends
+      and/or ExtUtils::PkgConfig instead of reporting that these
+      modules are required
+    - cleaned up test planning in t/X11-Aosd.t
+    - minor documentation fixes
+    - removed unneeded aosd_destroy() binding
+
+0.02 Sun Mar 16 2008 joern
+    - first public CPAN release
+    - binds all functions from aosd.h
+    - fully documented
+    - thanks to Thorsten Schönfeld for supporting me
+      with the details of Cairo/Glib/Perl binding stuff.
+
+0.01 Sat Mar 15 2008 joern
+    - first internal skeleton release for discussion
+      on further implementation
+    - binds minimal stuff, in particular the
+      Cairo & Pango glue is missing for now

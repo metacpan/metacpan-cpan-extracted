@@ -1,0 +1,8 @@
+Sorry, there is no documentation yet, aside from source comments and
+the t/*.t test suite.
+
+I hope to have proper pod documentation and working examples soon, but
+right now I'm occupied with other things.  Feel free to write me if
+you want to contribute or learn more about Perl XDR.
+
+Gordon Matzigkeit <gord@fig.org>, 2001-02-28

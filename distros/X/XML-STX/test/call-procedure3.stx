@@ -1,0 +1,25 @@
+<stx:transform version="1.0" 
+  xmlns:gr="http://my_groups"
+  xmlns:stx="http://stx.sourceforge.net/2002/ns"
+  strip-space="yes" 
+  pass-through="none">
+
+  <stx:variable name="var" select="0"/>
+
+  <stx:template match="/root">
+    <a>
+      <stx:call-procedure name="proc1"/>
+      <stx:call-procedure name="proc1"/>
+      <stx:call-procedure name="proc1"/>
+      <r>
+	<stx:value-of select="$var"/>
+      </r>
+    </a>
+  </stx:template>
+
+  <stx:procedure name="proc1">
+    <b>p1</b>
+    <stx:assign name="var" select="$var + 1"/>
+  </stx:procedure>
+ 
+</stx:transform>

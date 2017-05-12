@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0">
+  <channel>
+    <title>Times Of Nigeria</title>
+    <link>http://www.thetimesofnigeria.com/</link>
+    <item>
+      <title>...</title>
+      <link>http://www.thetimesofnigeria.com/Article.aspx?id=61</link>
+    </item>
+  </channel>
+
+
+<html
+  xmlns="http://www.w3.org/1999/xhtml" >
+<head><title> Untitled Page </title></head>
+<body>
+    <form name="form1" method="post" action="RSS.aspx" id="form1">
+<input type="hidden" name="__VIEWSTATE" id="__VIEWSTATE" />
+    </form>
+</body>
+</html>
+</rss>

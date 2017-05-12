@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<?xml-stylesheet title="CSS_formatting" type="text/css" href="./rss.css"?>
+<rss version="2.0"
+  xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+><channel>
+<!-- Generated with Perl's XML::RSS::SimpleGen v11.11 -->
+
+<link>http://www.slowwave.com/</link>
+<title>Slow Wave</title>
+<description>Slow Wave is a collective dream diary authored by different people from around the world, and drawn as a comic strip by Jesse Reklaw.</description>
+<language>en-US</language>
+<lastBuildDate>Sat, 06 Mar 2004 08:55:03 GMT</lastBuildDate>
+<skipHours><hour>0</hour><hour>1</hour><hour>2</hour><hour>3</hour><hour>4</hour><hour>5</hour><hour>6</hour><hour>7</hour><hour>8</hour><hour>10</hour><hour>11</hour><hour>12</hour><hour>13</hour><hour>14</hour><hour>15</hour><hour>16</hour><hour>17</hour><hour>18</hour><hour>19</hour><hour>20</hour><hour>21</hour><hour>22</hour><hour>23</hour></skipHours>
+<sy:updateFrequency>1</sy:updateFrequency>
+<sy:updatePeriod>daily</sy:updatePeriod>
+<sy:updateBase>1970-01-01T09:00+00:00</sy:updateBase>
+<ttl>1440</ttl>
+<webMaster>sburke@cpan.org</webMaster>
+<docs>http://www.interglacial.com/rss/about.html</docs>
+
+<item>
+  <title>Mike Gigante: "toe tips"</title>
+  <link>http://www.slowwave.com/index.php?date=04-02-21</link>
+</item>
+
+<item>
+  <title>Anna Blandford: "hit man in the garden"</title>
+  <link>http://www.slowwave.com/index.php?date=04-02-14</link>
+</item>
+
+<item>
+  <title>Chris Mitchell: "Pre-Heaven"</title>
+  <link>http://www.slowwave.com/index.php?date=04-02-07</link>
+</item>
+
+<item>
+  <title>Carrie Johnson: "baby meal"</title>
+  <link>http://www.slowwave.com/index.php?date=04-01-31</link>
+</item>
+
+
+</channel></rss>

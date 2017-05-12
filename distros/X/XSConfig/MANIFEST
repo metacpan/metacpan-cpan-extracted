@@ -1,0 +1,20 @@
+Changes
+Config.pm
+Config_mini.pl.PL
+Config_xs.in
+Config_xs.out
+Config_xs.PL
+Config_xs_heavy.pl.PL
+Dummy.c
+gperftest.in
+Makefile.PL
+MANIFEST			This list of files
+README
+regen/regen_lib.pl
+t/Config.t
+t/XSConfig.t
+typemap
+xsc_test.pl
+XSConfig.pod
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

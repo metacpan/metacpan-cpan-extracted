@@ -1,0 +1,14 @@
+int *						T_PTROBJ
+xosd *						T_PTROBJ_XOSD
+
+INPUT
+T_PTROBJ_XOSD
+	if (sv_derived_from ($arg, \"X::Osd\"))
+        $var = (xosd *)(SvIV((SV *)SvRV($arg))) ;
+    else
+        croak (\"$var is not of type X::Osd\") ;
+		
+OUTPUT
+T_PTROBJ_XOSD
+	sv_setref_pv ($arg, \"X::Osd\", (void *)$var) ;
+

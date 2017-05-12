@@ -1,0 +1,547 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+<head>
+<title>Modules Index</title>
+</head>
+
+<body bgcolor="#ffffff">
+<table border="0" width="100%">
+<tr>
+<td align="left"><a href="../../../index.html"><img src="../../../images/canon.gif" border="0"></a></td>
+<td align="right"><img src="../../../images/canre.gif"></td>
+</tr>
+</table>
+<div align="right">
+<small><a href="../../../index.html">XML Schema Home</a></small>
+</div>
+
+<h1>XML::Schema::Attribute</h1>
+
+<ul>
+
+    The XML::Schema::Attribute module implements a class of objects
+    that represent XML Schema attributes.
+  </ul>
+
+<h2>Table of Contents</h2>
+<ul>
+<table border="0" cellpadding="2" cellspacing="0">
+<tr valign="top">
+<td>
+  <li><b><a href="#section_Synopsis">Synopsis</a></b>
+</td>
+
+<td>
+</td>
+
+<td>
+<td>
+
+</tr>
+<tr valign="top">
+<td>
+  <li><b><a href="#section_Description">Description</a></b>
+</td>
+
+<td>
+</td>
+
+<td>
+<td>
+
+</tr>
+<tr valign="top">
+<td>
+  <li><b><a href="#section_Methods">Methods</a></b>
+</td>
+
+<td>
+<b>:<b>
+</td>
+
+<td>
+<small><a href="#method_new">new()</a>,&nbsp; <a href="#method_name">name()</a>,&nbsp; <a href="#method_type">type()</a>,&nbsp; <a href="#method_namespace">namespace()</a>,&nbsp; <a href="#method_scope">scope()</a>,&nbsp; <a href="#method_constraint">constraint()</a>,&nbsp; <a href="#method_default">default()</a>,&nbsp; <a href="#method_fixed">fixed()</a>,&nbsp; <a href="#method_instance">instance()</a></small>
+<td>
+
+</tr>
+</table>
+</ul>
+
+
+
+
+<hr width="100%" size="1" noshade="1"><a name="section_Synopsis"><h2>Synopsis</h2></a>
+<ul><pre><p>use XML::Schema::Attribute;
+
+# list of arguments
+my $attr = XML::Schema::Attribute-&gt;new( name =&gt; 'foo', type =&gt; 'string' )
+    || die XML::Schema::Attribute-&gt;error();
+
+# hash ref of arguments
+my $attr = XML::Schema::Attribute-&gt;new( {
+    name      =&gt; 'bar', 
+    type      =&gt; XML::Schema::Type::string-&gt;new(),
+    scope     =&gt; $complex_type,
+    default   =&gt; 20,
+    namespace =&gt; 'http://tt2.org/XML/Example.xml',
+} ) || die XML::Schema::Attribute-&gt;error();</b></pre></ul>
+
+  
+<hr width="100%" size="1" noshade="1"><a name="section_Description"><h2>Description</h2></a>
+    <p>
+    This module implements an object class for representing XML
+    attributes with XML Schema.  An attribute is, of course, a
+    '<code><b>name=&quot;value&quot;</b></code>' pair within the starting tag of an
+    XML element.  In the following example, the attributes are named
+    '<code><b>id</b></code>' and '<code><b>name</b></code>'.
+    </p>
+
+
+<p>
+<ul>
+<b><pre>
+&lt;user id=&quot;lwall&quot; name=&quot;Larry Wall&quot;&gt;
+    ...
+&lt;/user&gt;
+</pre></b>
+</ul>
+</p>
+
+  
+    <p>
+    Attribute are defined as having a specific type which determines
+    what the acceptable values can be.  These types are implemented by
+    various objects derived from the
+    <a href="../../../modules/XML/Schema/Type/Simple.html">XML::Schema::Type::Simple</a> module.  There are over
+    30 inbuilt simple type, defined in the
+    <a href="../../../modules/XML/Schema/Type/Builtin.html">XML::Schema::Type::Builtin</a> module, and which
+    include things like string, integer, float, time, date, and so on.
+    Furthermore, you can extend these basic types to create your own
+    custom simple types by applying additional <a href="../../../modules/XML/Schema/Facet.html">validation facets</a>. 
+    </p>
+
+
+    <p>
+    An attribute can also define default and fixed values for itself.
+    A fixed constraint specifies a value that the attribute must have,
+    if present in a particular instance document.  A default value can 
+    be specified for attributes that are missing.
+    </p>
+
+
+    <p>
+    An attribute can be defined within a particular scope.  Usually,
+    it is within the definition of a <a href="../../../modules/XML/Schema/Type/Complex.html">complex type</a>, but can 
+    also exist within an <a href="../../../modules/XML/Schema/Attribute/Group.html">attribute group</a>.
+    The attribute communicates with its enclosing scope to resolve
+    its type name (e.g. 'string') with a type object.  This allows 
+    types to effectively be used before they are defined, and also 
+    for attributes to be relocated for use in different scope (e.g.
+    as part of an attribute group) and to resolve the correct type
+    in each location.
+    </p>
+
+    
+  
+
+<hr width="100%" size="1" noshade="1"><a name="section_Methods"><h2>Methods</h2></a><ul>
+<li><p>
+<a name="method_new"><b>new()</b></a>
+<br>
+
+
+      <p>
+        Constructor method called to create a new attribute object.  A
+        list of '<code><b>key => value</b></code>
+' pairs can be
+        specified as command line arguments, or alternately, a hash
+        reference can be passed which contains these configuration
+        values.  The method returns a newly instantiated object on
+        success.  On error it returns undef and sets an internal error
+        message which can be retrieved by calling <a href="../../../modules/XML/Schema/Base.html#method_error"><code><b>error()</b></code></a> as a class method.
+
+<ul><pre><p># list of options
+my $attr = XML::Schema::Attribute-&gt;new( name =&gt; 'foo', type =&gt; 'string' )
+    || die XML::Schema::Attribute-&gt;error();
+
+# hash ref of options
+my $attr = XML::Schema::Attribute-&gt;new( {
+    name =&gt; 'foo', 
+    type =&gt; 'string',
+} ) || die XML::Schema::Attribute-&gt;error();</b></pre></ul>
+
+      </p>
+
+
+      <p>
+        The following configuration options may be specifed:
+      </p>
+
+
+      <p>
+<!-- table -->
+<table border="0" cellpadding="4" cellspacing="1" 
+       bgcolor="#000044">
+<!-- table content -->
+<tr bgcolor="#ccccff">
+<td><b><small>Name</b></td><td><b><small>Typical Values</b></td><td><b><small>Description</b></td></tr>
+
+        <tr valign="top" bgcolor="#eeeeff">
+  <td>
+    <a name="config_name"><code><b>name</b></code></a>
+  </td>
+  <td>
+    <code><b>'myattr'</b></code>
+  </td>
+  <td>
+
+	    The name of the attribute.  In the XML fragment <code><b>&lt;foo bar=&quot;baz&quot;/&gt;</b></code>
+            the attribute name is '<code><b>bar</b></code>'.  This item is mandatory.
+          </td>
+</tr>
+
+
+        <tr valign="top" bgcolor="#eeeeff">
+  <td>
+    <a name="config_type"><code><b>type</b></code></a>
+  </td>
+  <td>
+    <code><b>'typename'</b></code>
+    <br>
+    <code><b><a&nbsp;href="../../../modules/XML/Schema/Type/Simple.html">$type</a></b></code>
+    <br>
+  </td>
+  <td>
+
+            <!-- ignore value -->
+            <!-- ignore value -->
+	    The simple type for this attribute specified either by name or as 
+	    as reference to an <a href="../../../modules/XML/Schema/Type/Simple.html">XML::Schema::Type::Simple</a> object
+	    or subclass thereof.  This item is also mandatory.  The remaining items
+	    are optional.
+          </td>
+</tr>
+
+
+        <tr valign="top" bgcolor="#eeeeff">
+  <td>
+    <a name="config_constraint"><code><b>constraint</b></code></a>
+  </td>
+  <td>
+    <code><b>[&nbsp;fixed&nbsp;=>&nbsp;3.14&nbsp;]</b></code>
+    <br>
+    <code><b>[&nbsp;default&nbsp;=>&nbsp;43&nbsp;]</b></code>
+    <br>
+  </td>
+  <td>
+
+            <!-- ignore value --> 
+            <!-- ignore value -->
+            This option can be used to specify a fixed
+            constraint for the attribute, asserting that any specified
+            instance value matches the fixed value.  The second use
+            shows how a default value can be specified which is used
+            when no specific instance value is provided.  Note that
+            '<code><b>constrain</b></code>
+' is a valid alias for
+            '<code><b>constraint</b></code>
+'.
+          </td>
+</tr>
+
+
+        <tr valign="top" bgcolor="#eeeeff">
+  <td>
+    <a name="config_fixed"><code><b>fixed</b></code></a>
+  </td>
+  <td>
+    <code><b>3.14</b></code>
+  </td>
+  <td>
+
+	    An alternate way to specify a fixed constraint for an attribute.
+	  </td>
+</tr>
+
+
+        <tr valign="top" bgcolor="#eeeeff">
+  <td>
+    <a name="config_default"><code><b>default</b></code></a>
+  </td>
+  <td>
+    <code><b>42</b></code>
+  </td>
+  <td>
+
+	    An alternate way to specify a default value for an attribute.
+	  </td>
+</tr>
+
+
+        <tr valign="top" bgcolor="#eeeeff">
+  <td>
+    <a name="config_scope"><code><b>scope</b></code></a>
+  </td>
+  <td>
+    <code><b><a&nbsp;href="../../../modules/XML/Schema/Scope.html">$scope</a></b></code>
+    <br>
+  </td>
+  <td>
+
+	    <!-- ignore value -->
+	    This configuration item can be used to bind the attribute to a 
+            particular lexical scope.  The attribute <a href="#method_type"><code><b>type()</b></code></a>
+            method is then able to retrieve type objects from type names via
+            the scope reference.
+	  </td>
+</tr>
+
+
+        <tr valign="top" bgcolor="#eeeeff">
+  <td>
+    <a name="config_namespace"><code><b>namespace</b></code></a>
+  </td>
+  <td>
+    <code><b>'http://tt2.org/XML/xyz.xml'</b></code>
+  </td>
+  <td>
+
+	    The optional XML namespace for the attribute.
+          </td>
+</tr>
+
+
+        <tr valign="top" bgcolor="#eeeeff">
+  <td>
+    <a name="config_annotation"><code><b>annotation</b></code></a>
+  </td>
+  <td>
+    <code><b>'...interesting&nbsp;note...'</b></code>
+  </td>
+  <td>
+
+	    An optional annotation for the attribute.  This is not yet
+	    fully supported.
+          </td>
+</tr>
+
+
+      <!-- end of table content -->
+</table>
+</p>
+
+
+    </p><li><p>
+<a name="method_name"><b>name()</b></a>
+<br>
+
+
+      Returns the attribute name.
+<ul><pre><p>my $name = $attribute-&gt;name();</b></pre></ul>
+
+
+    </p><li><p>
+<a name="method_type"><b>type()</b></a>
+<br>
+
+
+      Returns the attribute type, as a reference to an object derived
+      from <a href="../../../modules/XML/Schema/Type/Simple.html">XML::Schema::Type::Simple</a>.  If the
+      attribute type was specified as a name rather than a direct
+      reference to a type then the method will first attempt to 
+      fetch the type object matching that name.  It does this by
+      delegation to its enclosing lexical scope which can be specified
+      by the <a href="#config_scope"><code><b>scope</b></code></a> configuration item.
+<ul><pre><p>my $typeobj = $attribute-&gt;type();</b></pre></ul>
+
+    </p><li><p>
+<a name="method_namespace">
+<b>namespace(  )</b>
+<br>
+<b>namespace( $new_namespace )</b>
+<br>
+</a>
+
+
+      <!-- ignore args -->
+      <!-- ignore args -->
+      Returns the attribute namespace as optionally specified by the
+      <a href="#config_namespace"><code><b>namespace</b></code></a> configuration item.  Can also be 
+      called with a single argument to set a new namespace value.
+<ul><pre><p>my $ns = $attribute-&gt;namespace();
+
+$attribute-&gt;namespace('http://tt2.org/XML/Example.xml');</b></pre></ul>
+
+    </p><li><p>
+<a name="method_scope">
+<b>scope(  )</b>
+<br>
+<b>scope( $new_scope )</b>
+<br>
+</a>
+
+
+      <!-- ignore args -->
+      <!-- ignore args -->
+
+      Returns the current scope as specified in the
+      <a href="#config_scope"><code><b>scope</b></code></a> configuation item.  Can also be called
+      with a single argument to define a new scope for the attribute.
+      This should be a reference to an object which inherits from the
+      <a href="../../../modules/XML/Schema/Scope.html">XML::Schema::Scope</a> class.
+
+<ul><pre><p>my $scope = $attribute-&gt;scope();
+
+$attribute-&gt;scope($new_scope);</b></pre></ul>
+
+    </p><li><p>
+<a name="method_constraint">
+<b>constraint(  )</b>
+<br>
+<b>constraint( default => $value )</b>
+<br>
+<b>constraint( fixed => $value )</b>
+<br>
+</a>
+
+
+      <!-- ignore args -->
+      <!-- ignore args -->
+      <!-- ignore args -->
+      <p>
+        Accessor method which can be used to get or set the current
+        value constraints.  The value constraint is a pair consisting
+        of a constraint type, which must be one of
+        '<code><b>fixed</b></code>
+' or '<code><b>default</b></code>
+',
+        and a value.  Returns the pair <code><b>($type, $value)</b></code>
+
+        when called without any arguments.
+      </p>
+
+<ul><pre><p>my ($type, $value) = $attribute-&gt;constraint();</b></pre></ul>
+
+      <p>
+	When called with appropriate <code><b>($type, $value)</b></code>
+
+        arguments, the method sets the current
+	constraint by calling either the default() or fixed() methods.
+      </p>
+
+<ul><pre><p>$attribute-&gt;constraint( default =&gt; 42 );
+$attribute-&gt;constraint( fixed   =&gt; 84 );
+
+# equivalent to
+$attribute-&gt;default(42);
+$attribute-&gt;fixed(84);</b></pre></ul>
+
+
+      <p>
+      Note that <code><b>constrain()</b></code>
+ is a valid alias for
+      <code><b>constraint()</b></code>
+.
+      </p>
+
+
+<ul><pre><p># equivalent
+$attribute-&gt;constrain( fixed =&gt; 42 );
+$attribute-&gt;constraint( fixed =&gt; 42 );</b></pre></ul>
+
+
+    </p><li><p>
+<a name="method_default">
+<b>default(  )</b>
+<br>
+<b>default( $value )</b>
+<br>
+</a>
+
+
+      <!-- ignore args -->
+      <!-- ignore args -->
+      <p>
+        Accessor method which can be used to get or set the current
+        default value constraint.  When called with an argument, the
+        method will force the current value constraint to be 'default'
+        and set the value internally.
+      </p>
+
+<ul><pre><p>$attribute-&gt;default(42);</b></pre></ul>
+
+      <p>
+	Returns the current default value when called without any
+	arguments.
+      </p>
+
+<ul><pre><p>my $default = $attribute-&gt;default();</b></pre></ul>
+
+      <p>
+	If the current value constraint is not defined or is set to a
+	type other than 'default' (e.g. if a 'fixed' constraint has
+	been specified) then the method returns undef and sets an
+	internal error value which can be retrieved via the 
+	<a href="../../../modules/XML/Schema/Base.html#method_error"><code><b>error()</b></code></a>
+	method.
+      </p>
+
+<ul><pre><p>my $default = $attribute-&gt;default();
+die $attribute-&gt;error() unless defined $default;</b></pre></ul>
+
+    </p><li><p>
+<a name="method_fixed">
+<b>fixed(  )</b>
+<br>
+<b>fixed( $value )</b>
+<br>
+</a>
+
+
+      <!-- ignore args -->
+      <!-- ignore args -->
+      <p>
+	Accessor method which can be used to get or set the current
+	fixed value constraint.  As per <a href="#method_default"><code><b>default()</b></code></a>,
+	this method can be called with or without an argument and in
+	the latter case may return undef if a fixed constraint type
+	isn't defined.
+      </p>
+
+<ul><pre><p>$attribute-&gt;fixed(84);
+my $fixed = $attribute-&gt;fixed();
+die $attribute-&gt;error() unless defined $fixed;</b></pre></ul>
+
+    </p><li><p>
+<a name="method_instance">
+<b>instance( $value )</b>
+<br>
+</a>
+
+
+      <!-- ignore args -->
+      <p>
+	This method attempts to create an instance of the attribute.
+        The text value parsed from an instance document attribute is
+        passed to the method as an argument, <code><b>$value</b></code>
+.
+	This is then validated according to the underlying type of the 
+        attribute and checked against any <a href="#config_default"><code><b>default</b></code></a> or 
+        <a href="#config_fixed"><code><b>fixed</b></code></a> constraints.  If all is well then the 
+        attribute is "activated", by calling any actions scheduled 
+        against the type or attribute.  The method returns the result
+	after activation or the regular post-validation result if no
+	callbacks are scheduled.
+      </p>
+
+<ul><pre><p>my $val = $attribute-&gt;instance('hello world')
+    || die $attribute-&gt;error();</b></pre></ul>
+
+    </p></ul>
+
+
+<div align="center">
+<small><b>Perl XML::Schema Documentation</b></small>
+</div>
+</body>
+</html>

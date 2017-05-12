@@ -1,0 +1,15 @@
+ChangeLog
+lib/XML/RSS/Timing.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+t/000_about.t
+t/010_tz.t
+t/020_next.t
+t/025_misc.t
+t/030_skip.t
+t/040_next_skippy.t
+t/050_minmax.t
+t/090_date_conv.t
+META.yml                                 Module meta-data (added by MakeMaker)

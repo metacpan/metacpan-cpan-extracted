@@ -1,0 +1,9 @@
+my $complex_[% item.name %] = $schema->complexType(
+    name => '[% item.name %]',
+    attributes => {
+[% FOREACH attr = item.attributes -%]
+	[% attr.key %] => [% view.print(attr.value) %],
+[% END -%]
+    }
+);
+

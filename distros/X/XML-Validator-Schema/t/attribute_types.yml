@@ -1,0 +1,56 @@
+# test attribute types
+
+--- |
+  <?xml version="1.0" encoding="UTF-8"?>
+  <schema xmlns="http://www.w3.org/2001/XMLSchema">
+    <element name="foo">
+      <complexType>
+        <attribute name="no_type" use="optional" />
+        <attribute name="int" type="int" use="optional" />
+        <attribute name="integer" type="integer" use="optional" />
+        <attribute name="name" type="NMTOKEN" use="optional"  />
+        <attribute name="string" type="string" use="optional" />
+        <attribute name="bool" type="boolean" use="optional" />
+        <attribute name="date" type="dateTime" use="optional" />
+        <attribute name="foo_or_bar" use="optional">
+          <simpleType>
+            <restriction base="xsd:string">
+              <enumeration value="foo"/>
+              <enumeration value="bar"/>
+            </restriction>
+          </simpleType>
+        </attribute>
+      </complexType>
+    </element>
+  </schema>
+
+--- |
+  <foo no_type="foo"/>
+--- >
+PASS
+
+--- |
+  <foo int="1" integer="1" name="foo" string="..." bool="true" date="1977-08-02T20:02:00"/>
+--- >
+PASS
+
+--- |
+  <foo int="what are you looking at?" />
+--- >
+FAIL /[Ii]llegal value/
+
+--- |
+  <foo foo_or_bar="foo" />
+--- >
+PASS
+
+--- |
+  <foo foo_or_bar="bar" />
+--- >
+PASS
+
+--- |
+  <foo foo_or_bar="fooz" />
+--- >
+FAIL /[Ii]llegal value/
+

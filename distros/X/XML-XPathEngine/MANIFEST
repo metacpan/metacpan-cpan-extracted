@@ -1,0 +1,23 @@
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+lib/XML/XPathEngine.pm
+lib/XML/XPathEngine/Function.pm
+lib/XML/XPathEngine/LocationPath.pm
+lib/XML/XPathEngine/Variable.pm
+lib/XML/XPathEngine/Number.pm
+lib/XML/XPathEngine/Step.pm
+lib/XML/XPathEngine/Literal.pm
+lib/XML/XPathEngine/Expr.pm
+lib/XML/XPathEngine/Boolean.pm
+lib/XML/XPathEngine/NodeSet.pm
+lib/XML/XPathEngine/Root.pm
+t/pod-coverage.t
+t/pod.t
+t/00-load.t
+t/01_basic.t
+t/minidom.pm
+t/minitree.pm
+META.json                                Module JSON meta-data (added by MakeMaker)

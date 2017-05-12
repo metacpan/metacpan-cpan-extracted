@@ -1,0 +1,23 @@
+2003-04-06 07:16  cvsjohan
+
+	* example/example.xml, lib/XML/Handler/Pdb.pm: Added seconds to the
+	time type, updated example
+
+2003-03-31 16:33  cvsjohan
+
+	* lib/XML/Handler/Pdb.pm: ..
+
+2003-03-31 16:31  cvsjohan
+
+	* MANIFEST, MANIFEST.SKIP, Makefile.PL, example/example.xml,
+	lib/XML/Handler/Pdb.pm, palm/PerlDB.prc, palm/PerlDB.prj,
+	palm/PerlDBa.cod, palm/README, scripts/xmltopdb, t/01test.t:
+	Initial revision
+
+2003-03-31 16:31  cvsjohan
+
+	* MANIFEST, MANIFEST.SKIP, Makefile.PL, example/example.xml,
+	lib/XML/Handler/Pdb.pm, palm/PerlDB.prc, palm/PerlDB.prj,
+	palm/PerlDBa.cod, palm/README, scripts/xmltopdb, t/01test.t:
+	Imported sources
+

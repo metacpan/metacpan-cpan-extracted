@@ -1,0 +1,2 @@
+<?xml version="1.0"?>
+<TEST ATTR1=""><EL1 tns:ATTR2=""/><?sqlprocessor SELECT * FROM blah?><tns:EL2>&lt;Test&gt;Text Test&lt;/Test&gt;<![CDATA[<Test>Text Test</Test>]]><!--dududu dadada--></tns:EL2></TEST>

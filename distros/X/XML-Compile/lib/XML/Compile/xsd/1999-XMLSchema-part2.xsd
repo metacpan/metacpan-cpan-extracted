@@ -1,0 +1,1039 @@
+<?xml version='1.0'?>
+<!-- XML Schema schema for XML Schemas: Part 2: Datatypes -->
+<!-- Note this schema is NOT the normative datatypes schema - - the
+     prose copy in the datatypes REC is the normative version (which
+     shouldn't differ from this one except for this comment and entity
+     expansions, but just in case -->
+<!DOCTYPE schema PUBLIC "-//W3C//DTD XMLSCHEMA 19991216//EN" "XMLSchema.dtd" [
+<!ATTLIST element xmlns:x CDATA #IMPLIED><!-- keep this schema XML1.0 valid -->
+<!ELEMENT has-facet EMPTY>
+<!ATTLIST has-facet name NMTOKEN #REQUIRED>
+<!ELEMENT has-property EMPTY>
+<!ATTLIST has-property name NMTOKEN #REQUIRED
+                       value CDATA #REQUIRED>
+]>
+<schema xmlns="http://www.w3.org/1999/XMLSchema" targetNamespace="http://www.w3.org/1999/XMLSchema" version="$Id: part2.xsd,v 1.1 2000/10/22 11:53:38 ht Exp $">
+
+  <import namespace="http://www.w3.org/XML/1998/namespace"
+          schemaLocation="http://www.w3.org/2000/04/xml.xsd">
+   <annotation>
+    <documentation>Get access to the xml: attribute groups for xml:lang
+    </documentation>
+   </annotation>
+  </import>
+
+  <annotation>
+   <documentation>First the builtin primitive datatypes.
+                  These definitions are for information only, the
+                  real builtin definitions are magic.  Not in particular
+                  that there is no type named 'urType' -- the real
+                  urType is not available by name.</documentation>
+  </annotation>
+ 
+<simpleType name="string" base="urType">
+	<annotation>
+ 		<appinfo>
+			<has-facet name="length"/>
+ 			<has-facet name="minLength"/>
+ 			<has-facet name="maxLength"/>
+ 			<has-facet name="pattern"/>
+ 			<has-facet name="enumeration"/>
+	 		<has-facet name="maxInclusive"/>
+ 			<has-facet name="maxExclusive"/>
+ 			<has-facet name="minInclusive"/>
+	 		<has-facet name="minExclusive"/>
+			<has-property name="ordered" value="true"/>
+			<has-property name="bounded" value="false"/>
+			<has-property name="cardinality" value="countably infinite"/>
+			<has-property name="numeric" value="false"/>
+		</appinfo>
+ 	</annotation>
+ </simpleType>
+
+ <simpleType name="boolean" base="urType">
+  	<annotation>
+ 		<appinfo>
+			<has-facet name="pattern"/>
+			<has-property name="ordered" value="false"/>
+			<has-property name="bounded" value="false"/>
+			<has-property name="cardinality" value="finite"/>
+			<has-property name="numeric" value="false"/>
+		</appinfo>
+ 	</annotation>
+ </simpleType>
+ 
+ <simpleType name="float" base="urType">
+ 	<annotation>
+ 		<appinfo>
+			<has-facet name="pattern"/>
+ 			<has-facet name="enumeration"/>
+ 			<has-facet name="maxInclusive"/>
+ 			<has-facet name="maxExclusive"/>
+ 			<has-facet name="minInclusive"/>
+ 			<has-facet name="minExclusive"/>
+			<has-property name="ordered" value="true"/>
+			<has-property name="bounded" value="true"/>
+			<has-property name="cardinality" value="finite"/>
+			<has-property name="numeric" value="true"/>
+		</appinfo>
+ 	</annotation>
+ </simpleType>
+
+ <simpleType name="double" base="urType">
+  	<annotation>
+ 		<appinfo>
+			<has-facet name="pattern"/>
+ 			<has-facet name="enumeration"/>
+ 			<has-facet name="maxInclusive"/>
+ 			<has-facet name="maxExclusive"/>
+ 			<has-facet name="minInclusive"/>
+ 			<has-facet name="minExclusive"/>
+			<has-property name="ordered" value="true"/>
+			<has-property name="bounded" value="true"/>
+			<has-property name="cardinality" value="finite"/>
+			<has-property name="numeric" value="true"/>
+		</appinfo>
+	</annotation>
+ </simpleType>
+
+ <simpleType name="decimal" base="urType">
+  	<annotation>
+ 		<appinfo>
+			<has-facet name="precision"/>
+ 			<has-facet name="scale"/>
+ 			<has-facet name="pattern"/>
+ 			<has-facet name="enumeration"/>
+ 			<has-facet name="maxInclusive"/>
+ 			<has-facet name="maxExclusive"/>
+ 			<has-facet name="minInclusive"/>
+ 			<has-facet name="minExclusive"/>
+			<has-property name="ordered" value="true"/>
+			<has-property name="bounded" value="false"/>
+			<has-property name="cardinality" value="countably infinite"/>
+			<has-property name="numeric" value="true"/>
+		</appinfo>
+ 	</annotation>
+ </simpleType>
+
+ <simpleType name="timeDuration" base="urType">
+  	<annotation>
+ 		<appinfo>
+			<has-facet name="pattern"/>
+ 			<has-facet name="enumeration"/>
+ 			<has-facet name="maxInclusive"/>
+ 			<has-facet name="maxExclusive"/>
+ 			<has-facet name="minInclusive"/>
+ 			<has-facet name="minExclusive"/>
+			<has-property name="ordered" value="true"/>
+			<has-property name="bounded" value="false"/>
+			<has-property name="cardinality" value="countably infinite"/>
+			<has-property name="numeric" value="false"/>
+		</appinfo>
+ 	</annotation>
+ </simpleType>
+
+ <simpleType name="recurringDuration" base="urType">
+  	<annotation>
+ 		<appinfo>
+			<has-facet name="duration"/>
+ 			<has-facet name="period"/>
+            <has-facet name="pattern"/>
+ 			<has-facet name="enumeration"/>
+ 			<has-facet name="maxInclusive"/>
+ 			<has-facet name="maxExclusive"/>
+ 			<has-facet name="minInclusive"/>
+ 			<has-facet name="minExclusive"/>
+ 			<has-property name="ordered" value="false"/>
+			<has-property name="bounded" value="false"/>
+			<has-property name="cardinality" value="countably infinite"/>
+			<has-property name="numeric" value="false"/>
+		</appinfo>
+ 	</annotation>
+ </simpleType>
+
+ <simpleType name="binary" base="urType">
+  	<annotation>
+ 		<appinfo>
+			<has-facet name="encoding"/>
+ 			<has-facet name="length"/>
+ 			<has-facet name="minLength"/>
+ 			<has-facet name="maxLength"/>
+ 			<has-facet name="pattern"/>
+ 			<has-facet name="enumeration"/>
+			<has-property name="ordered" value="false"/>
+			<has-property name="bounded" value="false"/>
+			<has-property name="cardinality" value="countably infinite"/>
+			<has-property name="numeric" value="false"/>
+		</appinfo>
+ 	</annotation>
+ </simpleType>
+
+ <simpleType name="uriReference" base="urType">
+  	<annotation>
+		<appinfo>
+			<has-facet name="length"/>
+			<has-facet name="minLength"/>
+			<has-facet name="maxLength"/>
+			<has-facet name="pattern"/>
+			<has-facet name="enumeration"/>
+			<has-property name="ordered" value="false"/>
+			<has-property name="bounded" value="false"/>
+			<has-property name="cardinality" value="countably infinite"/>
+			<has-property name="numeric" value="false"/>
+		</appinfo>
+	</annotation>
+ </simpleType>
+
+ <simpleType name="ID" base="urType">
+ 	<annotation>
+		<appinfo>
+			<has-facet name="length"/>
+			<has-facet name="minLength"/>
+			<has-facet name="maxLength"/>
+			<has-facet name="pattern"/>
+			<has-facet name="enumeration"/>
+			<has-facet name="maxInclusive"/>
+			<has-facet name="maxExclusive"/>
+			<has-facet name="minInclusive"/>
+			<has-facet name="minExclusive"/>
+			<has-property name="ordered" value="true"/>
+			<has-property name="bounded" value="false"/>
+			<has-property name="cardinality" value="countably infinite"/>
+			<has-property name="numeric" value="false"/>
+		</appinfo>
+	</annotation>
+ </simpleType>
+
+ <simpleType name="IDREF" base="urType">
+ 	<annotation>
+		<appinfo>
+			<has-facet name="length"/>
+			<has-facet name="minLength"/>
+			<has-facet name="maxLength"/>
+			<has-facet name="pattern"/>
+			<has-facet name="enumeration"/>
+			<has-facet name="maxInclusive"/>
+			<has-facet name="maxExclusive"/>
+			<has-facet name="minInclusive"/>
+			<has-facet name="minExclusive"/>
+			<has-property name="ordered" value="true"/>
+			<has-property name="bounded" value="false"/>
+			<has-property name="cardinality" value="countably infinite"/>
+			<has-property name="numeric" value="false"/>
+		</appinfo>
+	</annotation>
+ </simpleType>
+
+ <simpleType name="ENTITY" base="urType">
+ 	<annotation>
+		<appinfo>
+			<has-facet name="length"/>
+			<has-facet name="minLength"/>
+			<has-facet name="maxLength"/>
+			<has-facet name="pattern"/>
+			<has-facet name="enumeration"/>
+			<has-facet name="maxInclusive"/>
+			<has-facet name="maxExclusive"/>
+			<has-facet name="minInclusive"/>
+			<has-facet name="minExclusive"/>
+			<has-property name="ordered" value="true"/>
+			<has-property name="bounded" value="false"/>
+			<has-property name="cardinality" value="countably infinite"/>
+			<has-property name="numeric" value="false"/>
+		</appinfo>
+	</annotation>
+ </simpleType>
+
+ <simpleType name="NOTATION" base="urType">
+ 	<annotation>
+		<appinfo>
+			<has-facet name="length"/>
+			<has-facet name="minLength"/>
+			<has-facet name="maxLength"/>
+			<has-facet name="pattern"/>
+			<has-facet name="enumeration"/>
+			<has-facet name="maxInclusive"/>
+			<has-facet name="maxExclusive"/>
+			<has-facet name="minInclusive"/>
+			<has-facet name="minExclusive"/>
+			<has-property name="ordered" value="true"/>
+			<has-property name="bounded" value="false"/>
+			<has-property name="cardinality" value="countably infinite"/>
+			<has-property name="numeric" value="false"/>
+		</appinfo>
+	</annotation>
+ </simpleType>
+
+ <simpleType name="QName" base="urType">
+     <annotation>
+	    <appinfo>
+			<has-facet name="length"/>
+			<has-facet name="minLength"/>
+			<has-facet name="maxLength"/>
+			<has-facet name="pattern"/>
+			<has-facet name="enumeration"/>
+			<has-facet name="maxInclusive"/>
+			<has-facet name="maxExclusive"/>
+			<has-facet name="minInclusive"/>
+			<has-facet name="minExclusive"/>
+			<has-property name="ordered" value="true"/>
+			<has-property name="bounded" value="false"/>
+			<has-property name="cardinality" value="countably infinite"/>
+			<has-property name="numeric" value="false"/>
+		</appinfo>
+      </annotation>
+  </simpleType>
+
+  <annotation>
+   <documentation>Now the derived primitive types</documentation>
+  </annotation>
+
+  <simpleType name="language" base="string">
+     <annotation>
+		<appinfo>
+			<has-facet name="length"/>
+			<has-facet name="minLength"/>
+			<has-facet name="maxLength"/>
+			<has-facet name="pattern"/>
+			<has-facet name="enumeration"/>
+			<has-facet name="maxInclusive"/>
+			<has-facet name="maxExclusive"/>
+			<has-facet name="minInclusive"/>
+			<has-facet name="minExclusive"/>
+			<has-property name="ordered" value="true"/>
+			<has-property name="bounded" value="false"/>
+			<has-property name="cardinality" value="countably infinite"/>
+			<has-property name="numeric" value="false"/>
+		</appinfo>
+      </annotation>
+    <pattern value="([a-zA-Z]{2}|[iI]-[a-zA-Z]+|[xX]-[a-zA-Z]+)(-[a-zA-Z]+)*">
+      <annotation>
+        <documentation source="http://www.w3.org/TR/REC-xml#NT-LanguageID">
+          pattern matches production 33 from the XML spec
+        </documentation>
+      </annotation>
+    </pattern>
+  </simpleType>
+  
+  <simpleType name="IDREFS" base="IDREF" derivedBy="list">
+ 	<annotation>
+		<appinfo>
+			<has-facet name="length"/>
+			<has-facet name="minLength"/>
+			<has-facet name="maxLength"/>
+			<has-facet name="enumeration"/>
+			<has-property name="ordered" value="false"/>
+			<has-property name="bounded" value="false"/>
+			<has-property name="cardinality" value="countably infinite"/>
+			<has-property name="numeric" value="false"/>
+		</appinfo>
+	</annotation>
+  </simpleType>
+
+  <simpleType name="ENTITIES" base="ENTITY" derivedBy="list">
+ 	<annotation>
+		<appinfo>
+			<has-facet name="length"/>
+			<has-facet name="minLength"/>
+			<has-facet name="maxLength"/>
+			<has-facet name="enumeration"/>
+			<has-property name="ordered" value="false"/>
+			<has-property name="bounded" value="false"/>
+			<has-property name="cardinality" value="countably infinite"/>
+			<has-property name="numeric" value="false"/>
+		</appinfo>
+	</annotation>
+  </simpleType>
+
+  <simpleType name="NMTOKEN" base="string">
+     <annotation>
+	    <appinfo>
+			<has-facet name="length"/>
+			<has-facet name="minLength"/>
+			<has-facet name="maxLength"/>
+			<has-facet name="pattern"/>
+			<has-facet name="enumeration"/>
+			<has-facet name="maxInclusive"/>
+			<has-facet name="maxExclusive"/>
+			<has-facet name="minInclusive"/>
+			<has-facet name="minExclusive"/>
+			<has-property name="ordered" value="true"/>
+			<has-property name="bounded" value="false"/>
+			<has-property name="cardinality" value="countably infinite"/>
+			<has-property name="numeric" value="false"/>
+		</appinfo>
+      </annotation>
+    <pattern value="\c+">
+      <annotation>
+        <documentation source="http://www.w3.org/TR/REC-xml#NT-Nmtoken">
+          pattern matches production 7 from the XML spec
+        </documentation>
+      </annotation>
+    </pattern>
+  </simpleType>
+  
+  <simpleType name="NMTOKENS" base="NMTOKEN" derivedBy="list">
+ 	<annotation>
+		<appinfo>
+			<has-facet name="length"/>
+			<has-facet name="minLength"/>
+			<has-facet name="maxLength"/>
+			<has-facet name="enumeration"/>
+			<has-property name="ordered" value="true"/>
+			<has-property name="bounded" value="false"/>
+			<has-property name="cardinality" value="countably infinite"/>
+			<has-property name="numeric" value="false"/>
+		</appinfo>
+	</annotation>
+  </simpleType>
+
+  <simpleType name="Name" base="string">
+     <annotation>
+		<appinfo>
+			<has-facet name="length"/>
+			<has-facet name="minLength"/>
+			<has-facet name="maxLength"/>
+			<has-facet name="pattern"/>
+			<has-facet name="enumeration"/>
+			<has-facet name="maxInclusive"/>
+			<has-facet name="maxExclusive"/>
+			<has-facet name="minInclusive"/>
+			<has-facet name="minExclusive"/>
+			<has-property name="ordered" value="true"/>
+			<has-property name="bounded" value="false"/>
+			<has-property name="cardinality" value="countably infinite"/>
+			<has-property name="numeric" value="false"/>
+		</appinfo>
+      </annotation>
+    <pattern value="\i\c*">
+      <annotation>
+        <documentation source="http://www.w3.org/TR/REC-xml#NT-Name">
+          pattern matches production 5 from the XML spec
+        </documentation>
+      </annotation>
+    </pattern>
+  </simpleType>
+
+  <simpleType name="NCName" base="Name">
+     <annotation>
+		<appinfo>
+			<has-facet name="length"/>
+			<has-facet name="minLength"/>
+			<has-facet name="maxLength"/>
+			<has-facet name="pattern"/>
+			<has-facet name="enumeration"/>
+			<has-facet name="maxInclusive"/>
+			<has-facet name="maxExclusive"/>
+			<has-facet name="minInclusive"/>
+			<has-facet name="minExclusive"/>
+			<has-property name="ordered" value="true"/>
+			<has-property name="bounded" value="false"/>
+			<has-property name="cardinality" value="countably infinite"/>
+			<has-property name="numeric" value="false"/>
+		</appinfo>
+	 </annotation>
+	<pattern value="[\i-[:]][\c-[:]]*">
+      <annotation>
+        <documentation source="http://www.w3.org/TR/REC-xml-names/#NT-NCName">
+          pattern matches production 4 from the Namespaces in XML spec
+        </documentation>
+     </annotation>
+    </pattern>
+  </simpleType>
+  
+  <simpleType name="integer" base="decimal">
+ 	<annotation>
+		<appinfo>
+			<has-facet name="precision"/>
+			<has-facet name="scale"/>
+			<has-facet name="pattern"/>
+			<has-facet name="enumeration"/>
+			<has-facet name="maxInclusive"/>
+			<has-facet name="maxExclusive"/>
+			<has-facet name="minInclusive"/>
+			<has-facet name="minExclusive"/>
+			<has-property name="ordered" value="true"/>
+			<has-property name="bounded" value="false"/>
+			<has-property name="cardinality" value="countably infinite"/>
+			<has-property name="numeric" value="true"/>
+		</appinfo>
+	</annotation>
+    <scale value="0"/>
+  </simpleType>
+        
+  <simpleType name="nonPositiveInteger" base="integer">
+ 	<annotation>
+		<appinfo>
+			<has-facet name="precision"/>
+			<has-facet name="scale"/>
+			<has-facet name="pattern"/>
+			<has-facet name="enumeration"/>
+			<has-facet name="maxInclusive"/>
+			<has-facet name="maxExclusive"/>
+			<has-facet name="minInclusive"/>
+			<has-facet name="minExclusive"/>
+			<has-property name="ordered" value="true"/>
+			<has-property name="bounded" value="false"/>
+			<has-property name="cardinality" value="countably infinite"/>
+			<has-property name="numeric" value="true"/>
+		</appinfo>
+	</annotation>
+    <maxInclusive value="0"/>
+  </simpleType>
+
+  <simpleType name="negativeInteger" base="nonPositiveInteger">
+ 	<annotation>
+		<appinfo>
+			<has-facet name="precision"/>
+			<has-facet name="scale"/>
+			<has-facet name="pattern"/>
+			<has-facet name="enumeration"/>
+			<has-facet name="maxInclusive"/>
+			<has-facet name="maxExclusive"/>
+			<has-facet name="minInclusive"/>
+			<has-facet name="minExclusive"/>
+			<has-property name="ordered" value="true"/>
+			<has-property name="bounded" value="false"/>
+			<has-property name="cardinality" value="countably infinite"/>
+			<has-property name="numeric" value="true"/>
+		</appinfo>
+	</annotation>
+    <maxInclusive value="-1"/>
+  </simpleType>
+
+  <simpleType name="long" base="integer">
+ 	<annotation>
+		<appinfo>
+			<has-facet name="precision"/>
+			<has-facet name="scale"/>
+			<has-facet name="pattern"/>
+			<has-facet name="enumeration"/>
+			<has-facet name="maxInclusive"/>
+			<has-facet name="maxExclusive"/>
+			<has-facet name="minInclusive"/>
+			<has-facet name="minExclusive"/>
+			<has-property name="ordered" value="true"/>
+			<has-property name="bounded" value="true"/>
+			<has-property name="cardinality" value="finite"/>
+			<has-property name="numeric" value="true"/>
+		</appinfo>
+	</annotation>
+    <minInclusive value="-9223372036854775808"/>
+    <maxInclusive value="9223372036854775807"/>
+  </simpleType>
+
+  <simpleType name="int" base="long">
+ 	<annotation>
+		<appinfo>
+			<has-facet name="precision"/>
+			<has-facet name="scale"/>
+			<has-facet name="pattern"/>
+			<has-facet name="enumeration"/>
+			<has-facet name="maxInclusive"/>
+			<has-facet name="maxExclusive"/>
+			<has-facet name="minInclusive"/>
+			<has-facet name="minExclusive"/>
+			<has-property name="ordered" value="true"/>
+			<has-property name="bounded" value="true"/>
+			<has-property name="cardinality" value="finite"/>
+			<has-property name="numeric" value="true"/>
+		</appinfo>
+	</annotation>
+    <minInclusive value="-2147483648"/>
+    <maxInclusive value="2147483647"/>
+  </simpleType>
+  
+  <simpleType name="short" base="int">
+ 	<annotation>
+		<appinfo>
+			<has-facet name="precision"/>
+			<has-facet name="scale"/>
+			<has-facet name="pattern"/>
+			<has-facet name="enumeration"/>
+			<has-facet name="maxInclusive"/>
+			<has-facet name="maxExclusive"/>
+			<has-facet name="minInclusive"/>
+			<has-facet name="minExclusive"/>
+			<has-property name="ordered" value="true"/>
+			<has-property name="bounded" value="true"/>
+			<has-property name="cardinality" value="finite"/>
+			<has-property name="numeric" value="true"/>
+		</appinfo>
+	</annotation>
+    <minInclusive value="-32768"/>
+    <maxInclusive value="32767"/>
+  </simpleType>
+  
+  <simpleType name="byte" base="short">
+ 	<annotation>
+		<appinfo>
+			<has-facet name="precision"/>
+			<has-facet name="scale"/>
+			<has-facet name="pattern"/>
+			<has-facet name="enumeration"/>
+			<has-facet name="maxInclusive"/>
+			<has-facet name="maxExclusive"/>
+			<has-facet name="minInclusive"/>
+			<has-facet name="minExclusive"/>
+			<has-property name="ordered" value="true"/>
+			<has-property name="bounded" value="true"/>
+			<has-property name="cardinality" value="finite"/>
+			<has-property name="numeric" value="true"/>
+		</appinfo>
+	</annotation>
+    <minInclusive value="-128"/>
+    <maxInclusive value="127"/>
+  </simpleType>
+  
+  <simpleType name="nonNegativeInteger" base="integer">
+ 	<annotation>
+		<appinfo>
+			<has-facet name="precision"/>
+			<has-facet name="scale"/>
+			<has-facet name="pattern"/>
+			<has-facet name="enumeration"/>
+			<has-facet name="maxInclusive"/>
+			<has-facet name="maxExclusive"/>
+			<has-facet name="minInclusive"/>
+			<has-facet name="minExclusive"/>
+			<has-property name="ordered" value="true"/>
+			<has-property name="bounded" value="true"/>
+			<has-property name="cardinality" value="finite"/>
+			<has-property name="numeric" value="true"/>
+		</appinfo>
+	</annotation>
+    <minInclusive value="0"/>
+  </simpleType>
+
+  <simpleType name="unsignedLong" base="nonNegativeInteger">
+ 	<annotation>
+		<appinfo>
+			<has-facet name="precision"/>
+			<has-facet name="scale"/>
+			<has-facet name="pattern"/>
+			<has-facet name="enumeration"/>
+			<has-facet name="maxInclusive"/>
+			<has-facet name="maxExclusive"/>
+			<has-facet name="minInclusive"/>
+			<has-facet name="minExclusive"/>
+			<has-property name="ordered" value="true"/>
+			<has-property name="bounded" value="true"/>
+			<has-property name="cardinality" value="finite"/>
+			<has-property name="numeric" value="true"/>
+		</appinfo>
+	</annotation>
+    <maxInclusive value="18446744073709551615"/>
+  </simpleType>
+  
+  <simpleType name="unsignedInt" base="unsignedLong">
+ 	<annotation>
+		<appinfo>
+			<has-facet name="precision"/>
+			<has-facet name="scale"/>
+			<has-facet name="pattern"/>
+			<has-facet name="enumeration"/>
+			<has-facet name="maxInclusive"/>
+			<has-facet name="maxExclusive"/>
+			<has-facet name="minInclusive"/>
+			<has-facet name="minExclusive"/>
+			<has-property name="ordered" value="true"/>
+			<has-property name="bounded" value="true"/>
+			<has-property name="cardinality" value="finite"/>
+			<has-property name="numeric" value="true"/>
+		</appinfo>
+	</annotation>
+    <maxInclusive value="4294967295"/>
+  </simpleType>
+  
+  <simpleType name="unsignedShort" base="unsignedInt">
+ 	<annotation>
+		<appinfo>
+			<has-facet name="precision"/>
+			<has-facet name="scale"/>
+			<has-facet name="pattern"/>
+			<has-facet name="enumeration"/>
+			<has-facet name="maxInclusive"/>
+			<has-facet name="maxExclusive"/>
+			<has-facet name="minInclusive"/>
+			<has-facet name="minExclusive"/>
+			<has-property name="ordered" value="true"/>
+			<has-property name="bounded" value="true"/>
+			<has-property name="cardinality" value="finite"/>
+			<has-property name="numeric" value="true"/>
+		</appinfo>
+	</annotation>
+    <maxInclusive value="65535"/>
+  </simpleType>
+  
+  <simpleType name="unsignedByte" base="unsignedShort">
+ 	<annotation>
+		<appinfo>
+			<has-facet name="precision"/>
+			<has-facet name="scale"/>
+			<has-facet name="pattern"/>
+			<has-facet name="enumeration"/>
+			<has-facet name="maxInclusive"/>
+			<has-facet name="maxExclusive"/>
+			<has-facet name="minInclusive"/>
+			<has-facet name="minExclusive"/>
+			<has-property name="ordered" value="true"/>
+			<has-property name="bounded" value="true"/>
+			<has-property name="cardinality" value="finite"/>
+			<has-property name="numeric" value="true"/>
+		</appinfo>
+	</annotation>
+    <maxInclusive value="255"/>
+  </simpleType>
+  
+  <simpleType name="positiveInteger" base="nonNegativeInteger">
+ 	<annotation>
+		<appinfo>
+			<has-facet name="precision"/>
+			<has-facet name="scale"/>
+			<has-facet name="pattern"/>
+			<has-facet name="enumeration"/>
+			<has-facet name="maxInclusive"/>
+			<has-facet name="maxExclusive"/>
+			<has-facet name="minInclusive"/>
+			<has-facet name="minExclusive"/>
+			<has-property name="ordered" value="true"/>
+			<has-property name="bounded" value="true"/>
+			<has-property name="cardinality" value="finite"/>
+			<has-property name="numeric" value="true"/>
+		</appinfo>
+	</annotation>
+    <minInclusive value="1"/>
+  </simpleType>
+
+  <simpleType name="timeInstant" base="recurringDuration">
+  	<annotation>
+ 		<appinfo>
+			<has-facet name="period"/>
+			<has-facet name="duration"/>		
+			<has-facet name="pattern"/>
+ 			<has-facet name="enumeration"/>
+ 			<has-facet name="maxInclusive"/>
+ 			<has-facet name="maxExclusive"/>
+ 			<has-facet name="minInclusive"/>
+ 			<has-facet name="minExclusive"/>
+			<has-property name="ordered" value="true"/>
+			<has-property name="bounded" value="false"/>
+			<has-property name="cardinality" value="countably infinite"/>
+			<has-property name="numeric" value="false"/>
+		</appinfo>
+ 	</annotation>
+	<duration value="P0Y"/>
+	<period value="P0Y"/>
+  </simpleType>
+
+  <simpleType name="time" base="recurringDuration">
+ 	<annotation>
+		<appinfo>
+			<has-facet name="pattern"/>
+			<has-facet name="period"/>
+			<has-facet name="duration"/>
+			<has-facet name="enumeration"/>
+			<has-facet name="maxInclusive"/>
+			<has-facet name="maxExclusive"/>
+			<has-facet name="minInclusive"/>
+			<has-facet name="minExclusive"/>
+			<has-property name="ordered" value="true"/>
+			<has-property name="bounded" value="false"/>
+			<has-property name="cardinality" value="countably infinite"/>
+			<has-property name="numeric" value="false"/>
+		</appinfo>
+	</annotation>
+    <period value="PT24H"/>
+	<duration value="P0Y"/>
+  </simpleType>
+
+  <simpleType name="timePeriod" base="recurringDuration">
+  	<annotation>
+ 		<appinfo>
+			<has-facet name="pattern"/>
+			<has-facet name="period"/>
+			<has-facet name="duration"/>
+ 			<has-facet name="enumeration"/>
+ 			<has-facet name="maxInclusive"/>
+ 			<has-facet name="maxExclusive"/>
+ 			<has-facet name="minInclusive"/>
+ 			<has-facet name="minExclusive"/>
+			<has-property name="ordered" value="true"/>
+			<has-property name="bounded" value="false"/>
+			<has-property name="cardinality" value="countably infinite"/>
+			<has-property name="numeric" value="false"/>
+		</appinfo>
+ 	</annotation>
+	<period value="P0Y"/>
+  </simpleType>
+
+  <simpleType name="date" base="timePeriod">
+ 	<annotation>
+		<appinfo>
+			<has-facet name="pattern"/>
+			<has-facet name="period"/>
+			<has-facet name="duration"/>
+			<has-facet name="enumeration"/>
+			<has-facet name="maxInclusive"/>
+			<has-facet name="maxExclusive"/>
+			<has-facet name="minInclusive"/>
+			<has-facet name="minExclusive"/>
+			<has-property name="ordered" value="true"/>
+			<has-property name="bounded" value="false"/>
+			<has-property name="cardinality" value="countably infinite"/>
+			<has-property name="numeric" value="false"/>
+		</appinfo>
+	</annotation>
+    <duration value="PT24"/>
+  </simpleType>
+
+  <simpleType name="month" base="timePeriod">
+ 	<annotation>
+		<appinfo>
+			<has-facet name="pattern"/>
+			<has-facet name="period"/>
+			<has-facet name="duration"/>
+			<has-facet name="enumeration"/>
+			<has-facet name="maxInclusive"/>
+			<has-facet name="maxExclusive"/>
+			<has-facet name="minInclusive"/>
+			<has-facet name="minExclusive"/>
+			<has-property name="ordered" value="true"/>
+			<has-property name="bounded" value="false"/>
+			<has-property name="cardinality" value="countably infinite"/>
+			<has-property name="numeric" value="false"/>
+		</appinfo>
+	</annotation>
+    <duration value="P1M"/>
+  </simpleType>
+
+  <simpleType name="year" base="timePeriod">
+ 	<annotation>
+		<appinfo>
+			<has-facet name="pattern"/>
+			<has-facet name="period"/>
+			<has-facet name="duration"/>
+			<has-facet name="enumeration"/>
+			<has-facet name="maxInclusive"/>
+			<has-facet name="maxExclusive"/>
+			<has-facet name="minInclusive"/>
+			<has-facet name="minExclusive"/>
+			<has-property name="ordered" value="true"/>
+			<has-property name="bounded" value="false"/>
+			<has-property name="cardinality" value="countably infinite"/>
+			<has-property name="numeric" value="false"/>
+		</appinfo>
+	</annotation>
+    <period value="P1Y"/>
+  </simpleType>
+
+  <simpleType name="century" base="timePeriod">
+ 	<annotation>
+		<appinfo>
+			<has-facet name="pattern"/>
+			<has-facet name="period"/>
+			<has-facet name="duration"/>
+			<has-facet name="enumeration"/>
+			<has-facet name="maxInclusive"/>
+			<has-facet name="maxExclusive"/>
+			<has-facet name="minInclusive"/>
+			<has-facet name="minExclusive"/>
+			<has-property name="ordered" value="true"/>
+			<has-property name="bounded" value="false"/>
+			<has-property name="cardinality" value="countably infinite"/>
+			<has-property name="numeric" value="false"/>
+		</appinfo>
+	</annotation>
+    <period value="P100Y"/>
+  </simpleType>
+
+  <simpleType name="recurringDate" base="recurringDuration">
+  	<annotation>
+ 		<appinfo>
+			<has-facet name="pattern"/>
+			<has-facet name="period"/>
+			<has-facet name="duration"/>
+ 			<has-facet name="enumeration"/>
+ 			<has-facet name="maxInclusive"/>
+ 			<has-facet name="maxExclusive"/>
+ 			<has-facet name="minInclusive"/>
+ 			<has-facet name="minExclusive"/>
+			<has-property name="ordered" value="true"/>
+			<has-property name="bounded" value="false"/>
+			<has-property name="cardinality" value="countably infinite"/>
+			<has-property name="numeric" value="false"/>
+		</appinfo>
+ 	</annotation>
+	<duration value="P24H"/>
+	<period value="P1Y"/>
+  </simpleType>
+
+  <simpleType name="recurringDay" base="recurringDuration">
+  	<annotation>
+ 		<appinfo>
+			<has-facet name="pattern"/>
+			<has-facet name="period"/>
+			<has-facet name="duration"/>
+ 			<has-facet name="enumeration"/>
+ 			<has-facet name="maxInclusive"/>
+ 			<has-facet name="maxExclusive"/>
+ 			<has-facet name="minInclusive"/>
+ 			<has-facet name="minExclusive"/>
+			<has-property name="ordered" value="true"/>
+			<has-property name="bounded" value="false"/>
+			<has-property name="cardinality" value="countably infinite"/>
+			<has-property name="numeric" value="false"/>
+		</appinfo>
+ 	</annotation>
+	<duration value="P24H"/>
+	<period value="P1M"/>
+  </simpleType>
+
+  <complexType name="openAttrs" content="empty">
+   <annotation>
+    <documentation>This type is extended by almost all schema types
+                   to allow attributes from other namespaces to be
+                   added to user schemas.</documentation>
+   </annotation>
+   <anyAttribute namespace="##other" processContents="lax"/>
+  </complexType>
+
+  <complexType name="annotated" base="openAttrs" derivedBy="extension" content="elementOnly">
+   <annotation>
+    <documentation>This type is extended by all types which allow annotation
+          other than &lt;schema> itself</documentation>
+   </annotation>
+   <element ref="annotation" minOccurs="0"/>
+   <attribute name="id" type="ID"/>
+  </complexType>
+
+  <complexType name="simpleType" base="annotated" derivedBy="extension" abstract="true">
+    <element ref="facet" minOccurs="0" maxOccurs="unbounded"/>
+    <attribute name="name" type="NCName">
+      <annotation>
+       <documentation>Can be restricted to required or forbidden</documentation>
+      </annotation>
+    </attribute>
+    <attribute name="base" type="QName" use="required"/>
+    <attribute name="derivedBy" use="default" value="restriction">
+     <simpleType base="NMTOKEN">
+      <enumeration value="list"/>
+      <enumeration value="restriction"/>
+     </simpleType>
+    </attribute>
+  </complexType>
+
+  <complexType name="topLevelSimpleType" base="simpleType" derivedBy="restriction">
+   <element ref="annotation" minOccurs="0"/>
+   <element ref="facet" minOccurs="0" maxOccurs="unbounded"/>
+   <attribute name="name" use="required" type="NCName">
+    <annotation><documentation>Required at the top level</documentation></annotation>
+   </attribute>   
+  </complexType>
+
+  <complexType name="localSimpleType" base="simpleType" derivedBy="restriction">
+   <element ref="annotation" minOccurs="0"/>
+   <element ref="facet" minOccurs="0" maxOccurs="unbounded"/>
+   <attribute name="name" use="prohibited">
+    <annotation><documentation>Forbidden when nested</documentation></annotation>
+   </attribute>   
+  </complexType>
+
+  <element name="simpleType" equivClass="schemaTop" type="topLevelSimpleType"/>
+
+  <complexType name="facet" base="annotated" derivedBy="extension">
+    <attribute name="value" use="required"/>
+  </complexType>
+
+  <element name="facet" type="facet" abstract="true"/>
+
+  <element name="minBound" abstract="true" equivClass="facet"/>
+
+  <element name="minExclusive" equivClass="minBound"/>
+  <element name="minInclusive" equivClass="minBound"/>
+
+  <element name="maxBound" abstract="true" equivClass="facet"/>
+
+  <element name="maxExclusive" equivClass="maxBound"/>
+  <element name="maxInclusive" equivClass="maxBound"/>
+
+  <complexType name="numFacet" base="facet" derivedBy="restriction">
+    <attribute name="value" type="nonNegativeInteger"/>
+  </complexType>
+
+  <element name="precision" type="numFacet" equivClass="facet"/>
+  <element name="scale" type="numFacet" equivClass="facet"/>
+
+  <element name="length" type="numFacet" equivClass="facet"/>
+  <element name="minLength" type="numFacet" equivClass="facet"/>
+  <element name="maxLength" type="numFacet" equivClass="facet"/>
+
+  <element name="encoding" equivClass="facet">
+   <complexType base="facet" derivedBy="restriction">
+     <attribute name="value">
+      <simpleType base="NMTOKEN">
+       <annotation>
+	<documentation>A utility type, not for public use</documentation>
+       </annotation>
+	<enumeration value="hex">
+	  <annotation>
+	    <documentation>each (8-bit) byte is encoded as a sequence
+		  of 2 hexidecimal digits</documentation>
+	  </annotation>
+	</enumeration>
+	<enumeration value="base64">
+	  <annotation>
+	    <documentation>value is encoded in Base64 as defined
+                           in the MIME RFC</documentation>
+	  </annotation>
+	</enumeration>
+      </simpleType>
+     </attribute>
+   </complexType>
+  </element>
+
+  <element name="period" equivClass="facet">
+   <complexType base="facet" derivedBy="restriction">
+     <attribute name="value" type="timeDuration"/>
+   </complexType>
+  </element>
+
+  <element name="duration" equivClass="facet">
+   <complexType base="facet" derivedBy="restriction">
+     <attribute name="value" type="timeDuration"/>
+   </complexType>
+  </element>
+  
+  <element name="enumeration" equivClass="facet"/>
+
+  <element name="pattern" equivClass="facet"/>
+
+  <element name="appinfo">
+    <complexType content="mixed">
+     <sequence minOccurs="0" maxOccurs="unbounded">
+      <any processContents="lax"/>
+     </sequence>
+     <attribute name="source" type="uriReference"/>
+    </complexType>
+  </element>
+
+  <element name="documentation" xmlns:x="http://www.w3.org/XML/1998/namespace">
+    <complexType content="mixed">
+     <sequence minOccurs="0" maxOccurs="unbounded">
+      <any processContents="lax"/>
+     </sequence>
+     <attribute name="source" type="uriReference"/>
+     <attribute ref="x:lang"/>
+    </complexType>
+  </element>
+
+  <element name="annotation">
+   <complexType>
+    <choice minOccurs="0" maxOccurs="unbounded">
+     <element ref="appinfo"/>
+     <element ref="documentation"/>
+    </choice>
+   </complexType>
+  </element>
+
+</schema>

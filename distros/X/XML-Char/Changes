@@ -1,0 +1,12 @@
+Revision history for UTF8-Char
+
+0.03    5 March 2015
+    - fixed distribtion tests and reuploaded to CPAN
+
+0.02    29 Jan 2010
+    - Char.xs rewrite by Aristotle Pagaltzis to handles the SvUTF8 flag properly
+        (http://use.perl.org/comments.pl?sid=44457&cid=71604)
+
+0.01    26 Jan 2010
+        First version, released on an unsuspecting world.
+

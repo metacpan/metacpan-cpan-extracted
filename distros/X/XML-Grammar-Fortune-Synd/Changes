@@ -1,0 +1,76 @@
+Revision history for XML-Grammar-Fortune-Synd
+
+0.0211  2014-02-01
+        - Add separate "LICENSE" file (CPANTS).
+        - Minimum version of perl in META.yml/etc. (CPANTS).
+        - Add a link to the version control repository to META.yml (CPANTS).
+
+0.0210  2013-06-17
+        - Fix test failures on some Windows machines.
+            - They were caused by File::Copy preserving the file's read-only
+            status.
+            - t/02-eliminate-old-ids.t
+
+0.0209  2013-05-31
+        - Made sure to make use of File::Spec instead of concatenating
+        pathnames with /s where appropriate - hopefully it will fix the
+        test failures on Windows.
+
+0.0208  2013-05-22
+        - Fix scripts/tag-release.pl for the Mercurial repository.
+
+0.0207  2013-05-22
+        - Add t/cpan-changes.t .
+        - Add scripts/bump-version-number.pl .
+        - Remove Makefile.PL - use Build.PL from now on.
+
+0.0206  2013-05-11
+        - Add the <id /> element to the Atom feed.
+            - Feed did not validate due to this.
+        - Convert from YAML::Syck to YAML::XS .
+            - YAML::Syck fails tests on perl-5.18.x, and seems
+            undermaintained.
+            - YAML::XS is in general better.
+        - Add tests and an assert for maximal number of feed entries.
+
+0.0204  2013-01-13
+        - Bump minimal dependency of XML::Grammar::Fortune to 0.0506.
+            - Required for passing tests.
+            - Thanks to Andreas Koenig for some help in diagnosing the
+            problem.
+
+0.0203  2011-05-28
+        - Convert the write-to directories in t/*.t to File::Temp's tempdir() ,
+        in order to get rid of Win32 (and other) test failures:
+            - http://www.cpantesters.org/cpan/report/2fabe6f4-9252-1014-9a4c-e9e71382d405
+
+0.0202  2011-04-02
+        - Eliminate old IDs in the YAML file if the fortune cookies were moved
+        or deleted.
+            - see t/02-eliminate-old-ids.t .
+
+0.0201  2010-10-26
+        - Reformat "Changes" (this file) - it had some long lines.
+        - Added MANIFEST.SKIP to the distribution. It's not functional yet,
+        but it keep getting auto-generated (we maintain the MANIFEST manually).
+        - Added a dependency on XML-Grammar-Fortune-0.0400 which was converted
+        to File-ShareDir, and so this module will now hopefully not fail the
+        tests.
+
+0.02    2010-10-08
+        - Add List::Util (which is core, but is still explicitly used) and
+        XML::RSS version 1.46 to the dependencies.
+        - Revamped lib/XML/Grammar/Fortune/Synd.pm - the RSS feed is now
+        generated side-by-side with the Atom feed instead of converted from
+        it. This makes sure that the RSS feed is now fixed and does not
+        contain weird base-64 encoded data. However, the Atom feed is still
+        broken, due to this bug in XML-Atom:
+            - https://rt.cpan.org/Public/Bug/Display.html?id=61637
+        - Test for the RSS correctness in t/01-run.t .
+        - Add the tag-release.pl script to tag release in the svn repository.
+
+0.01    2008-07-30
+        - First version, released on an unsuspecting world.
+        - Can syndicate to valid RSS and non-valid Atom.
+        - May require the XML-Feed customizations in:
+            - http://svn.berlios.de/svnroot/repos/web-cpan/XML-Feed/

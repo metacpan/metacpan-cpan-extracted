@@ -1,0 +1,23 @@
+# simple all test
+
+--- |
+  <?xml version="1.0" encoding="UTF-8"?>
+  <schema xmlns="http://www.w3.org/2001/XMLSchema">
+    <element name="foo">
+      <complexType>
+        <all>
+          <element name="this" />
+          <element name="other" maxOccurs="unbounded"/>
+          <element name="that" />
+        </all>
+      </complexType>
+    </element>
+  </schema>
+
+--- |
+  <foo>
+    <this/>
+    <that/>
+  </foo>
+--- >
+FAIL /maxOccurs/

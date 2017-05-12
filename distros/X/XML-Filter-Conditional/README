@@ -1,0 +1,104 @@
+NAME
+    "XML::Filter::Conditional" - an XML SAX filter for conditionally
+    ignoring XML content
+
+SYNOPSIS
+    CODE:
+
+     package My::XML::Filter;
+     use base qw( XML::Filter::Conditional );
+
+     sub store_switch
+     {
+        my $self = shift;
+        my ( $e ) = @_;
+
+        my $ename = $e->{Attributes}{'{}env'}{Value};
+        return $ENV{$ename};
+     }
+
+     sub eval_case
+     {
+        my $self = shift;
+        my ( $value, $e ) = @_;
+
+        return $value eq $e->{Attributes}{'{}value'}{Value};
+     }
+
+    XML:
+
+     <message>
+       <switch env="USER">
+         <case value="root">Hello there, root user</case>
+         <case value="mail">Hello there, mail user</case>
+         <otherwise>Hello, whoever you are</otherwise>
+       </switch>
+     </message>
+
+DESCRIPTION
+    This module provides an abstract base class to implement a PerlSAX
+    filter which conditionally ignores part of the XML content. The base
+    class provides the implememtation of actually surpressing SAX events for
+    filtering purposes, and delegates the evaluation of matches to the
+    subclassed instance.
+
+    The evaluation of the matches is performed by the abstract methods
+    "store_switch()" and "eval_case()"; see their detail below.
+
+CONSTRUCTOR
+  $filter = XML::Filter::Conditional->new( %opts )
+    Takes the following options:
+
+    Handler => OBJECT
+            The PerlSAX handler (or another filter) that will receive the
+            PerlSAX events from this filter.
+
+    SwitchTag => STRING or REGEXP
+    CaseTag => STRING or REGEXP
+    OtherwiseTag => STRING or REGEXP
+            Changes the tag names used for the "switch", "case" and
+            "otherwise" elements. Can be precompiled regexp values instead
+            of literal strings. The values will be matched against the local
+            name of the tag only, ignoring any namespace prefix.
+
+    NamespaceURI => STRING
+            If present, the tags will only be recognised if they are part of
+            the given namespace. Defaults to the empty string, meaning tags
+            will only be recognised if they do not have a namespace prefix,
+            and no default namespace was defined for the document.
+
+    MatchAll => BOOLEAN
+            Determines whether all of the matching "<case>" elements will be
+            used, or only the first one that matches. By default, only the
+            first matching one will be used.
+
+ABSTRACT METHODS
+    The following methods must be implemented by any instance of this class
+    which is constructed.
+
+  $value = $self->store_switch( $e )
+    This method is called when a "switch" element is entered. It is passed
+    the PerlSAX node in the $e parameter. The value it returns, in scalar
+    context, is stored by the object, to pass into any "eval_case()" methods
+    which may apply to this element.
+
+    This method helps to keep the case evaluations efficient, by allowing
+    the evaluation logic to precompute whatever values it might find useful
+    once, to be reused by the cases themselves. See the SYNOPSIS section for
+    an example.
+
+  $bool = $self->eval_case( $value, $e )
+    This method is called when a "case" element is found, to determine
+    whether it should be considered to match. It is passed whatever the
+    earlier "store_switch()" method returned as the $value parameter, and
+    the PerlSAX node as the $e parameter. It should return a value, whose
+    truth will be used to determine if the case matches.
+
+    See the SYNOPSIS section for an example.
+
+SEE ALSO
+    *   XML::SAX - Simple API for XML
+
+AUTHOR
+    Paul Evans <leonerd@leonerd.org.uk>
+

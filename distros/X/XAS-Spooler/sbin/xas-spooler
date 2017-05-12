@@ -1,0 +1,201 @@
+#!/usr/bin/perl
+# ============================================================================
+#             Copyright (c) 2012-2015 Kevin L. Esteb All Rights Reserved
+#
+#
+# TITLE:       wpm-spooler
+#
+# FACILITY:    XAS
+#
+# ABSTRACT:    This procedure will use a configuration file to determine
+#              which spool directories to process.
+#
+# ENVIRONMENT: XAS Environment
+#
+# PARAMETERS:
+#              --host         the host to attach too
+#              --port         the port to send too
+#              --log-file     the log file to use
+#              --log-type     the type of log file
+#              --log-facility the facility class of the log
+#              --pid-file     the pid file to use
+#              --cfg-file     the configuration file to use
+#              --install      install as a service on Windows
+#              --deinstall    deinstall as a service on Windows
+#              --help         prints out a helpful help message
+#              --manual       prints out the procedures manual
+#              --version      prints out the procedures version
+#              --debug        toggles debug output
+#              --daemon       wither to become a daemon
+#              --alerts       toggles alert notification
+#
+# RETURNS:
+#              0 - success
+#              1 - failure
+#              2 - already running
+#
+# Version      Author                                              Date
+# -------      ----------------------------------------------      -----------
+# 0.01         Kevin Esteb                                         02-Apr-2009
+#
+# 0.02         Kevin Esteb                                         10-Jul-2012
+#              Updated the help/version/manual switches to use
+#              pod for the output text.
+#
+# 0.03         Kevin Esteb                                         08-Aug-2012
+#              Changed over to the new app framework.
+#
+# ============================================================================
+#
+
+use lib "../lib";
+use XAS::Apps::Spooler::Process;
+
+main: {
+
+    my $app = XAS::Apps::Spooler::Process->new(
+        -throws => 'xas-spooler',
+    );
+
+    exit $app->run();
+
+}
+
+__END__
+
+=head1 NAME
+
+xas-spooler - monitor spool directories
+
+=head1 SYNOPSIS
+
+xas-spooler [--help] [--debug] [--manual] [--version]
+
+ options:
+    --host         the host to attach too
+    --port         the port to send too
+    --log-file     the log file to use
+    --log-type     the type of log file
+    --log-facility the facility class of the log
+    --pid-file     the pid file to use
+    --cfg-file     the configuration file to use
+    --install      install as a service on Windows
+    --deinstall    deinstall as a service on Windows
+    --help         prints out a helpful help message
+    --manual       prints out the procedures manual
+    --version      prints out the procedures version
+    --debug        toggles debug output
+    --daemon       wither to become a daemon
+    --alerts       toggles alert notification
+
+=head1 DESCRIPTION
+
+This procedure is a spool file processor. It scans directories and places
+items into queues on a message queue server. This is configuration file
+driven.
+
+=head1 CONFIGURATION
+
+Please refer to L<XAS::Apps::Spooler::Process|XAS::Apps::Spooler::Process>
+for configuration file information.
+
+=head1 OPTIONS AND ARGUMENTS
+
+=over 4
+
+=item B<--host>
+
+The host to attach too. Defaults to XAS_MQSERVER.
+
+=item B<--port>
+
+The port to send too. Defaults to XAS_MQPORT.
+
+=item B<--log-type>
+
+Toggles the log type. Defaults to 'console'. Can be 'console', 'file', 
+'json' or 'syslog'.
+
+=item B<--log-facility>
+
+Toggles the log facilty. Defaults to 'local6'. This follows syslog
+convention.
+
+=item B<--log-file>
+
+The log file to use.
+
+=item B<--pid-file>
+
+The pid file to use.
+
+=item B<--cfg-file>
+
+The configuration file to use.
+
+=item B<--install>
+
+On Windows this will install the procedure as a service.
+
+=item B<--deinstall>
+
+On Windows this will deinstall the procedure as a service.
+
+=item B<--help>
+
+Displays a simple help message.
+
+=item B<--debug>
+
+Turns on debbuging.
+
+=item B<--alerts>
+
+Togggles alert notification.
+
+=item B<--manual>
+
+The complete documentation.
+
+=item B<--version>
+
+Prints out the apps version.
+
+=item B<--daemon>
+
+Wither to become a daemon.
+
+=back
+
+=head1 EXIT CODES
+
+ 0 - success
+ 1 - failure
+ 2 - already running
+ 
+=head1 SEE ALSO
+
+=over 4
+
+
+=item L<XAS::Apps::Spooler::Process|XAS::Apps::Spooler::Process>
+
+=item L<XAS::Spooler|XAS::Spooler>
+
+=item L<XAS|XAS>
+
+=back
+
+=head1 AUTHOR
+
+Kevin L. Esteb, E<lt>kesteb@kesteb.usE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2012-2015 by Kevin L. Esteb
+
+This is free software; you can redistribute it and/or modify it under
+the terms of the Artistic License 2.0. For details, see the full text
+of the license at http://www.perlfoundation.org/artistic_license_2_0.
+
+=cut

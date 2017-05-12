@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<NZSRSRequest VerMinor="11" VerMajor="3" RegistrarId="100">
+   <DomainCreate Term="12" ActionId="1" Delegate="1"
+       DomainName="dnssec-1-key.co.te"
+       >
+       <RegistrantContact Name="Admin" Email="Admin.email@test.co.te">
+           <PostalAddress Address1="Address 1" City="City" CountryCode="NZ"/>
+           <Phone CountryCode="64" AreaCode="4" LocalNumber="Phone"/>
+      </RegistrantContact>
+      <NameServers>
+        <Server FQDN="ns1.catalyst.net.te" />
+        <Server FQDN="ns2.catalyst.net.te" />
+        <Server FQDN="ns3.catalyst.net.te" />
+      </NameServers>
+      <DNSSEC>
+        <DS KeyTag="42454" Algorithm="5" DigestType="1">
+          <Digest>3FC2FB591B6089F454B90A529C760E3F92F28399</Digest>
+        </DS>
+        <DS KeyTag="42454" Algorithm="5" DigestType="2">
+          <Digest>3A54F693DA1D3FC6073B3D065FEDFAC000610CE83C7D2A084DF883E0B308DCA6</Digest>
+        </DS>
+      </DNSSEC>
+    </DomainCreate> 
+ </NZSRSRequest>

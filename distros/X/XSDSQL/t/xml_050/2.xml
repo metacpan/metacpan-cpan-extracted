@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<letter1>
+  Dear Mr.<name>John Smith</name>
+ZZZZ
+YYYY<p>									
+		<name1>ppp</name1>
+		<orderid1>66</orderid1>
+		<shipdate1>2002-07-13</shipdate1>
+	</p>
+pre1032	<orderid>1032</orderid>
+pre1033  <orderid>1033</orderid>  
+pre1034 <orderid>1034</orderid>shipped on<shipdate>2001-07-13</shipdate>endshipdate
+</letter1> 
+
+											
+
+

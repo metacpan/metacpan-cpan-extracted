@@ -1,0 +1,4 @@
+<?xml version="1.0"?>
+<root xmlns:test="http://test_ns" xmlns="http://koko">
+  <test:node id="1">koko</test:node>
+</root>

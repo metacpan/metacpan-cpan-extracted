@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://my.netscape.com/rdf/simple/0.9/">
+  <channel>
+    <title>my little syndicated feed</title>
+    <link>http://www.example.com/</link>
+    <description>FEED SUMMARY</description>
+  </channel>
+  <item>
+    <title>first post</title>
+    <link>http://www.example.com/archives/1</link>
+    <description>First post!</description>
+  </item>
+</rdf:RDF>

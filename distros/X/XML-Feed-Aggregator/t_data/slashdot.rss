@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://purl.org/rss/1.0/" xmlns:slash="http://purl.org/rss/1.0/modules/slash/" xmlns:taxo="http://purl.org/rss/1.0/modules/taxonomy/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:syn="http://purl.org/rss/1.0/modules/syndication/" xmlns:admin="http://webns.net/mvcb/" xmlns:feedburner="http://rssnamespace.org/feedburner/ext/1.0">
+
+<channel rdf:about="http://slashdot.org/">
+<title>Slashdot</title>
+<link>http://slashdot.org/</link>
+<description>News for nerds, stuff that matters</description>
+<dc:language>en-us</dc:language>
+<dc:rights>Copyright 1997-2010, Geeknet, Inc.  All Rights Reserved.</dc:rights>
+<dc:date>2011-02-07T19:30:15+00:00</dc:date>
+<dc:publisher>Geeknet, Inc.</dc:publisher>
+<dc:creator>help@slashdot.org</dc:creator>
+<dc:subject>Technology</dc:subject>
+<syn:updatePeriod>hourly</syn:updatePeriod>
+<syn:updateFrequency>1</syn:updateFrequency>
+<syn:updateBase>1970-01-01T00:00+00:00</syn:updateBase>
+<items>
+ <rdf:Seq>
+  <rdf:li rdf:resource="http://books.slashdot.org/story/11/02/07/1335241/Book-Review-OSGi-and-Apache-Felix-30?from=rss" />
+  <rdf:li rdf:resource="http://hardware.slashdot.org/story/11/02/07/1820240/Alcatel-Lucent-Shrinks-Mobile-Cell-Tower-To-Small-Cube?from=rss" />
+  <rdf:li rdf:resource="http://linux.slashdot.org/story/11/02/07/1742246/USB-Autorun-Attacks-Against-Linux?from=rss" />
+  <rdf:li rdf:resource="http://it.slashdot.org/story/11/02/07/178259/New-Technique-For-Making-JPEG-Images-Copy-Evident?from=rss" />
+  <rdf:li rdf:resource="http://tech.slashdot.org/story/11/02/07/167244/Wikileaks-Assange-Begins-Extradition-Battle?from=rss" />
+  <rdf:li rdf:resource="http://science.slashdot.org/story/11/02/07/1537228/NASA-Releases-First-3D-Images-of-the-Sun?from=rss" />
+  <rdf:li rdf:resource="http://tech.slashdot.org/story/11/02/07/1436243/US-Has-Secret-Tools-To-Force-Internet-On-Dictatorships?from=rss" />
+  <rdf:li rdf:resource="http://tech.slashdot.org/story/11/02/07/1424213/HBGary-Federal-Hacked-By-Anonymous?from=rss" />
+  <rdf:li rdf:resource="http://news.slashdot.org/story/11/02/07/135244/AOL-To-Buy-Huffington-Post?from=rss" />
+  <rdf:li rdf:resource="http://games.slashdot.org/story/11/02/07/0430232/EA-Simulation-Correctly-Picked-Super-Bowl-Champs-in-September?from=rss" />
+  <rdf:li rdf:resource="http://science.slashdot.org/story/11/02/07/0317231/Aboriginal-Sundial-Pre-Dates-Stonehenge?from=rss" />
+  <rdf:li rdf:resource="http://mobile.slashdot.org/story/11/02/07/037259/Android-Tablets-Were-Born-Too-Soon?from=rss" />
+  <rdf:li rdf:resource="http://hardware.slashdot.org/story/11/02/07/0258208/emRoboEarthem-Teaches-Robots-to-Learn-From-Peers?from=rss" />
+  <rdf:li rdf:resource="http://yro.slashdot.org/story/11/02/07/014258/Internet-Is-Easy-Prey-For-Governments?from=rss" />
+  <rdf:li rdf:resource="http://news.slashdot.org/story/11/02/06/228245/Congresswoman-Writes-On-Broadband-Net-Neutrality?from=rss" />
+ </rdf:Seq>
+</items>
+<image rdf:resource="http://a.fsdn.com/sd/topics/topicslashdot.gif" />
+<textinput rdf:resource="http://slashdot.org/search.pl" />
+<atom10:link xmlns:atom10="http://www.w3.org/2005/Atom" rel="self" type="application/rdf+xml" href="http://rss.slashdot.org/Slashdot/slashdot" /><feedburner:info uri="slashdot/slashdot" /><atom10:link xmlns:atom10="http://www.w3.org/2005/Atom" rel="hub" href="http://pubsubhubbub.appspot.com/" /></channel>
+
+<image rdf:about="http://a.fsdn.com/sd/topics/topicslashdot.gif">
+<title>Slashdot</title>
+<url>http://a.fsdn.com/sd/topics/topicslashdot.gif</url>
+<link>http://slashdot.org/</link>
+</image>
+
+<item rdf:about="http://books.slashdot.org/story/11/02/07/1335241/Book-Review-OSGi-and-Apache-Felix-30?from=rss">
+<title>Book Review: OSGi and Apache Felix 3.0</title>
+<link>http://rss.slashdot.org/~r/Slashdot/slashdot/~3/JGbG1lD5Ovo/Book-Review-OSGi-and-Apache-Felix-30</link>
+<description>RickJWagner writes "OSGi is a Java framework that's designed to simplify application deployments in shared environments. It allows applications with differing dependencies to run side-by-side in the same container without any deployment time contortions. The end result is that your application that needs FooLib v2.2.2 can run right beside my application that needs FooLib v1.0, something not often possible in today's application servers." Keep reading for the rest of Rick's review.&lt;p&gt;&lt;a href="http://www.facebook.com/sharer.php?u=http%3A%2F%2Fbooks.slashdot.org%2Fstory%2F11%2F02%2F07%2F1335241%2FBook-Review-OSGi-and-Apache-Felix-30%3Ffrom%3Dfb" target="_blank" title="Share on Facebook"&gt;&lt;img src="http://a.fsdn.com/sd/facebook_icon_large.png"&gt;&lt;/a&gt;
+   
+      &lt;a href="http://twitter.com/home?status=Book+Review%3A+OSGi+and+Apache+Felix+3.0%3A+http%3A%2F%2Fbit.ly%2Fg5hBtY" target="_blank" title="Share on Twitter"&gt;&lt;img src="http://a.fsdn.com/sd/twitter_icon_large.png"&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href="http://books.slashdot.org/story/11/02/07/1335241/Book-Review-OSGi-and-Apache-Felix-30?from=rss"&gt;Read more of this story&lt;/a&gt; at Slashdot.&lt;/p&gt;&lt;iframe src="http://slashdot.org/slashdot-it.pl?op=discuss&amp;amp;id=1983890&amp;amp;smallembed=1" style="height: 300px; width: 100%; border: none;"&gt;&lt;/iframe&gt;
+&lt;p&gt;&lt;a href="http://feedads.g.doubleclick.net/~at/YTU2xZlCzyFeDv44-JjK17JqPCA/0/da"&gt;&lt;img src="http://feedads.g.doubleclick.net/~at/YTU2xZlCzyFeDv44-JjK17JqPCA/0/di" border="0" ismap="true"&gt;&lt;/img&gt;&lt;/a&gt;&lt;br/&gt;
+&lt;a href="http://feedads.g.doubleclick.net/~at/YTU2xZlCzyFeDv44-JjK17JqPCA/1/da"&gt;&lt;img src="http://feedads.g.doubleclick.net/~at/YTU2xZlCzyFeDv44-JjK17JqPCA/1/di" border="0" ismap="true"&gt;&lt;/img&gt;&lt;/a&gt;&lt;/p&gt;&lt;img src="http://feeds.feedburner.com/~r/Slashdot/slashdot/~4/JGbG1lD5Ovo" height="1" width="1"/&gt;</description>
+<dc:creator>samzenpus</dc:creator>
+<dc:date>2011-02-07T19:26:00+00:00</dc:date>
+<dc:subject>bookreview</dc:subject>
+<slash:department>read-all-about-it</slash:department>
+<slash:section>bookreview</slash:section>
+<slash:hit_parade>0,0,0,0,0,0,0</slash:hit_parade>
+<feedburner:origLink>http://books.slashdot.org/story/11/02/07/1335241/Book-Review-OSGi-and-Apache-Felix-30?from=rss</feedburner:origLink></item>
+
+<item rdf:about="http://hardware.slashdot.org/story/11/02/07/1820240/Alcatel-Lucent-Shrinks-Mobile-Cell-Tower-To-Small-Cube?from=rss">
+<title>Alcatel-Lucent Shrinks Mobile Cell Tower To Small Cube</title>
+<link>http://rss.slashdot.org/~r/Slashdot/slashdot/~3/QylN2j3BoIg/Alcatel-Lucent-Shrinks-Mobile-Cell-Tower-To-Small-Cube</link>
+<description>pbahra writes "French mobile telephone infrastructure manufacturer Alcatel-Lucent today unveiled technology that shrinks a mobile cell tower to a box the size of a Rubik's cube, potentially changing the structure of the cellular network, reducing greenhouse emissions and bringing mobile broadband into new areas. According to Wim Sweldens, president of wireless activities for Alcatel-Lucent, by reducing the technology from something the size of a filing cabinet, networks would reduce the total cost of ownership by half, as well as halving the global CO2 emissions from the mobile industry &amp;mdash; currently equivalent of 15 million cars a year."&lt;p&gt;&lt;a href="http://www.facebook.com/sharer.php?u=http%3A%2F%2Fhardware.slashdot.org%2Fstory%2F11%2F02%2F07%2F1820240%2FAlcatel-Lucent-Shrinks-Mobile-Cell-Tower-To-Small-Cube%3Ffrom%3Dfb" target="_blank" title="Share on Facebook"&gt;&lt;img src="http://a.fsdn.com/sd/facebook_icon_large.png"&gt;&lt;/a&gt;
+   
+      &lt;a href="http://twitter.com/home?status=Alcatel-Lucent+Shrinks+Mobile+Cell+Tower+To+Small+Cube%3A+http%3A%2F%2Fbit.ly%2Fedu23U" target="_blank" title="Share on Twitter"&gt;&lt;img src="http://a.fsdn.com/sd/twitter_icon_large.png"&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href="http://hardware.slashdot.org/story/11/02/07/1820240/Alcatel-Lucent-Shrinks-Mobile-Cell-Tower-To-Small-Cube?from=rss"&gt;Read more of this story&lt;/a&gt; at Slashdot.&lt;/p&gt;&lt;iframe src="http://slashdot.org/slashdot-it.pl?op=discuss&amp;amp;id=1984286&amp;amp;smallembed=1" style="height: 300px; width: 100%; border: none;"&gt;&lt;/iframe&gt;
+&lt;p&gt;&lt;a href="http://feedads.g.doubleclick.net/~at/Ym4GF1mA3SiSzmaXYphMkbbhsYo/0/da"&gt;&lt;img src="http://feedads.g.doubleclick.net/~at/Ym4GF1mA3SiSzmaXYphMkbbhsYo/0/di" border="0" ismap="true"&gt;&lt;/img&gt;&lt;/a&gt;&lt;br/&gt;
+&lt;a href="http://feedads.g.doubleclick.net/~at/Ym4GF1mA3SiSzmaXYphMkbbhsYo/1/da"&gt;&lt;img src="http://feedads.g.doubleclick.net/~at/Ym4GF1mA3SiSzmaXYphMkbbhsYo/1/di" border="0" ismap="true"&gt;&lt;/img&gt;&lt;/a&gt;&lt;/p&gt;&lt;img src="http://feeds.feedburner.com/~r/Slashdot/slashdot/~4/QylN2j3BoIg" height="1" width="1"/&gt;</description>
+<dc:creator>Soulskill</dc:creator>
+<dc:date>2011-02-07T18:44:00+00:00</dc:date>
+<dc:subject>cellphones</dc:subject>
+<slash:department>sprinkle-lightly-over-entire-country</slash:department>
+<slash:section>hardware</slash:section>
+<slash:hit_parade>0,0,0,0,0,0,0</slash:hit_parade>
+<feedburner:origLink>http://hardware.slashdot.org/story/11/02/07/1820240/Alcatel-Lucent-Shrinks-Mobile-Cell-Tower-To-Small-Cube?from=rss</feedburner:origLink></item>
+
+<item rdf:about="http://linux.slashdot.org/story/11/02/07/1742246/USB-Autorun-Attacks-Against-Linux?from=rss">
+<title>USB Autorun Attacks Against Linux</title>
+<link>http://rss.slashdot.org/~r/Slashdot/slashdot/~3/8Cy4IHwy2us/USB-Autorun-Attacks-Against-Linux</link>
+<description>Orome1 writes "Many people think that Linux is immune to the type of Autorun attacks that have plagued Windows systems with malware over the years. However, there have been many advances in the usability of Linux as a desktop OS &amp;mdash; including the addition of features that can allow Autorun attacks. This Shmoocon presentation by Jon Larimer from IBM X-Force starts off with a definition of autorun vulnerabilities and some examples from Windows, then jumps straight into the Linux side of things. Larimer explains how attackers can abuse these features to gain access to a live system by using a USB flash drive. He also shows how USB as an exploitation platform can allow for easy bypass of protection mechanisms like ASLR and how these attacks can provide a level of access that other physical attack methods do not." I've attached the video if you are curious. Skip the first 2 minutes if you don't care where the lost and found is.&lt;p&gt;&lt;a href="http://www.facebook.com/sharer.php?u=http%3A%2F%2Flinux.slashdot.org%2Fstory%2F11%2F02%2F07%2F1742246%2FUSB-Autorun-Attacks-Against-Linux%3Ffrom%3Dfb" target="_blank" title="Share on Facebook"&gt;&lt;img src="http://a.fsdn.com/sd/facebook_icon_large.png"&gt;&lt;/a&gt;
+   
+      &lt;a href="http://twitter.com/home?status=USB+Autorun+Attacks+Against+Linux%3A+http%3A%2F%2Fbit.ly%2FeexRFM" target="_blank" title="Share on Twitter"&gt;&lt;img src="http://a.fsdn.com/sd/twitter_icon_large.png"&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href="http://linux.slashdot.org/story/11/02/07/1742246/USB-Autorun-Attacks-Against-Linux?from=rss"&gt;Read more of this story&lt;/a&gt; at Slashdot.&lt;/p&gt;&lt;iframe src="http://slashdot.org/slashdot-it.pl?op=discuss&amp;amp;id=1984208&amp;amp;smallembed=1" style="height: 300px; width: 100%; border: none;"&gt;&lt;/iframe&gt;
+&lt;p&gt;&lt;a href="http://feedads.g.doubleclick.net/~at/08afsP823RtHpd1BSvaIPhniu6A/0/da"&gt;&lt;img src="http://feedads.g.doubleclick.net/~at/08afsP823RtHpd1BSvaIPhniu6A/0/di" border="0" ismap="true"&gt;&lt;/img&gt;&lt;/a&gt;&lt;br/&gt;
+&lt;a href="http://feedads.g.doubleclick.net/~at/08afsP823RtHpd1BSvaIPhniu6A/1/da"&gt;&lt;img src="http://feedads.g.doubleclick.net/~at/08afsP823RtHpd1BSvaIPhniu6A/1/di" border="0" ismap="true"&gt;&lt;/img&gt;&lt;/a&gt;&lt;/p&gt;&lt;img src="http://feeds.feedburner.com/~r/Slashdot/slashdot/~4/8Cy4IHwy2us" height="1" width="1"/&gt;</description>
+<dc:creator>CmdrTaco</dc:creator>
+<dc:date>2011-02-07T18:01:00+00:00</dc:date>
+<dc:subject>opensource</dc:subject>
+<slash:department>don't-put-strangers-in-there</slash:department>
+<slash:section>linux</slash:section>
+<slash:hit_parade>0,0,0,0,0,0,0</slash:hit_parade>
+<feedburner:origLink>http://linux.slashdot.org/story/11/02/07/1742246/USB-Autorun-Attacks-Against-Linux?from=rss</feedburner:origLink></item>
+
+<item rdf:about="http://it.slashdot.org/story/11/02/07/178259/New-Technique-For-Making-JPEG-Images-Copy-Evident?from=rss">
+<title>New Technique For Making JPEG Images Copy-Evident</title>
+<link>http://rss.slashdot.org/~r/Slashdot/slashdot/~3/ndqDfCP37e4/New-Technique-For-Making-JPEG-Images-Copy-Evident</link>
+<description>Gunkerty Jeb writes "The days of wondering whether those drunken sex party photos are indeed the Olsen Twins, or if they are just the Mary-Kate and Ashley's faces photo-shopped on the bodies of Lindsay Lohan and Amy Winehouse are OVER! A group of academic researchers at the University of Cambridge has developed a new technique for making JPEG images copy-evident, so that users can tell whether an image has been recompressed and copied."&lt;p&gt;&lt;a href="http://www.facebook.com/sharer.php?u=http%3A%2F%2Fit.slashdot.org%2Fstory%2F11%2F02%2F07%2F178259%2FNew-Technique-For-Making-JPEG-Images-Copy-Evident%3Ffrom%3Dfb" target="_blank" title="Share on Facebook"&gt;&lt;img src="http://a.fsdn.com/sd/facebook_icon_large.png"&gt;&lt;/a&gt;
+   
+      &lt;a href="http://twitter.com/home?status=New+Technique+For+Making+JPEG+Images+Copy-Evident%3A+http%3A%2F%2Fbit.ly%2FhqZEKj" target="_blank" title="Share on Twitter"&gt;&lt;img src="http://a.fsdn.com/sd/twitter_icon_large.png"&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href="http://it.slashdot.org/story/11/02/07/178259/New-Technique-For-Making-JPEG-Images-Copy-Evident?from=rss"&gt;Read more of this story&lt;/a&gt; at Slashdot.&lt;/p&gt;&lt;iframe src="http://slashdot.org/slashdot-it.pl?op=discuss&amp;amp;id=1984152&amp;amp;smallembed=1" style="height: 300px; width: 100%; border: none;"&gt;&lt;/iframe&gt;
+&lt;p&gt;&lt;a href="http://feedads.g.doubleclick.net/~at/do0DDwLKW8N1Wy225aNvFa3mKG0/0/da"&gt;&lt;img src="http://feedads.g.doubleclick.net/~at/do0DDwLKW8N1Wy225aNvFa3mKG0/0/di" border="0" ismap="true"&gt;&lt;/img&gt;&lt;/a&gt;&lt;br/&gt;
+&lt;a href="http://feedads.g.doubleclick.net/~at/do0DDwLKW8N1Wy225aNvFa3mKG0/1/da"&gt;&lt;img src="http://feedads.g.doubleclick.net/~at/do0DDwLKW8N1Wy225aNvFa3mKG0/1/di" border="0" ismap="true"&gt;&lt;/img&gt;&lt;/a&gt;&lt;/p&gt;&lt;img src="http://feeds.feedburner.com/~r/Slashdot/slashdot/~4/ndqDfCP37e4" height="1" width="1"/&gt;</description>
+<dc:creator>CmdrTaco</dc:creator>
+<dc:date>2011-02-07T17:18:00+00:00</dc:date>
+<dc:subject>graphics</dc:subject>
+<slash:department>believe-it-when-you-see-it</slash:department>
+<slash:section>it</slash:section>
+<slash:hit_parade>0,0,0,0,0,0,0</slash:hit_parade>
+<feedburner:origLink>http://it.slashdot.org/story/11/02/07/178259/New-Technique-For-Making-JPEG-Images-Copy-Evident?from=rss</feedburner:origLink></item>
+
+<item rdf:about="http://tech.slashdot.org/story/11/02/07/167244/Wikileaks-Assange-Begins-Extradition-Battle?from=rss">
+<title>Wikileaks' Assange Begins Extradition Battle</title>
+<link>http://rss.slashdot.org/~r/Slashdot/slashdot/~3/_pFp4W2AzYo/Wikileaks-Assange-Begins-Extradition-Battle</link>
+<description>arisvega writes "Wikileaks founder Julian Assange has begun his court battle against extradition from the UK to Sweden. He faces allegations of sexual assault against two women, which he denies. Mr Assange, 39, argues Swedish prosecutors had no right to issue a warrant for his arrest because he has not yet been charged with any offences. At the extradition hearing, in London's Belmarsh Magistrates' Court, his lawyers are also challenging the move on human rights grounds. Mr Assange's legal team, led by Geoffrey Robertson QC, argues that if their client is forced to return to Sweden he could be extradited to the US, or even Guantanamo Bay, to face separate charges relating to the publication of secret documents by Wikileaks."&lt;p&gt;&lt;a href="http://www.facebook.com/sharer.php?u=http%3A%2F%2Ftech.slashdot.org%2Fstory%2F11%2F02%2F07%2F167244%2FWikileaks-Assange-Begins-Extradition-Battle%3Ffrom%3Dfb" target="_blank" title="Share on Facebook"&gt;&lt;img src="http://a.fsdn.com/sd/facebook_icon_large.png"&gt;&lt;/a&gt;
+   
+      &lt;a href="http://twitter.com/home?status=Wikileaks'+Assange+Begins+Extradition+Battle%3A+http%3A%2F%2Fbit.ly%2FifDJc5" target="_blank" title="Share on Twitter"&gt;&lt;img src="http://a.fsdn.com/sd/twitter_icon_large.png"&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href="http://tech.slashdot.org/story/11/02/07/167244/Wikileaks-Assange-Begins-Extradition-Battle?from=rss"&gt;Read more of this story&lt;/a&gt; at Slashdot.&lt;/p&gt;&lt;iframe src="http://slashdot.org/slashdot-it.pl?op=discuss&amp;amp;id=1984062&amp;amp;smallembed=1" style="height: 300px; width: 100%; border: none;"&gt;&lt;/iframe&gt;
+&lt;p&gt;&lt;a href="http://feedads.g.doubleclick.net/~at/fSIySrOu71KVgnaIc9JIMBVPRA0/0/da"&gt;&lt;img src="http://feedads.g.doubleclick.net/~at/fSIySrOu71KVgnaIc9JIMBVPRA0/0/di" border="0" ismap="true"&gt;&lt;/img&gt;&lt;/a&gt;&lt;br/&gt;
+&lt;a href="http://feedads.g.doubleclick.net/~at/fSIySrOu71KVgnaIc9JIMBVPRA0/1/da"&gt;&lt;img src="http://feedads.g.doubleclick.net/~at/fSIySrOu71KVgnaIc9JIMBVPRA0/1/di" border="0" ismap="true"&gt;&lt;/img&gt;&lt;/a&gt;&lt;/p&gt;&lt;img src="http://feeds.feedburner.com/~r/Slashdot/slashdot/~4/_pFp4W2AzYo" height="1" width="1"/&gt;</description>
+<dc:creator>CmdrTaco</dc:creator>
+<dc:date>2011-02-07T16:26:00+00:00</dc:date>
+<dc:subject>internet</dc:subject>
+<slash:department>let-the-battle-begin</slash:department>
+<slash:section>technology</slash:section>
+<slash:hit_parade>0,0,0,0,0,0,0</slash:hit_parade>
+<feedburner:origLink>http://tech.slashdot.org/story/11/02/07/167244/Wikileaks-Assange-Begins-Extradition-Battle?from=rss</feedburner:origLink></item>
+
+<item rdf:about="http://science.slashdot.org/story/11/02/07/1537228/NASA-Releases-First-3D-Images-of-the-Sun?from=rss">
+<title>NASA Releases First 3D Images of the Sun</title>
+<link>http://rss.slashdot.org/~r/Slashdot/slashdot/~3/B9A_Je39Yms/NASA-Releases-First-3D-Images-of-the-Sun</link>
+<description>mvar writes "On Feb. 6th, NASA's twin STEREO probes moved into position on opposite sides of the sun, and they are now beaming back uninterrupted images of the entire star&amp;mdash;front and back. 'For the first time ever, we can watch solar activity in its full 3-dimensional glory,' says Angelos Vourlidas, a member of the STEREO science team at the Naval Research Lab in Washington, DC. NASA released a 'first light' 3D movie on, naturally, Super Bowl Sunday."&lt;p&gt;&lt;a href="http://www.facebook.com/sharer.php?u=http%3A%2F%2Fscience.slashdot.org%2Fstory%2F11%2F02%2F07%2F1537228%2FNASA-Releases-First-3D-Images-of-the-Sun%3Ffrom%3Dfb" target="_blank" title="Share on Facebook"&gt;&lt;img src="http://a.fsdn.com/sd/facebook_icon_large.png"&gt;&lt;/a&gt;
+   
+      &lt;a href="http://twitter.com/home?status=NASA+Releases+First+3D+Images+of+the+Sun%3A+http%3A%2F%2Fbit.ly%2Fi223Ia" target="_blank" title="Share on Twitter"&gt;&lt;img src="http://a.fsdn.com/sd/twitter_icon_large.png"&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href="http://science.slashdot.org/story/11/02/07/1537228/NASA-Releases-First-3D-Images-of-the-Sun?from=rss"&gt;Read more of this story&lt;/a&gt; at Slashdot.&lt;/p&gt;&lt;iframe src="http://slashdot.org/slashdot-it.pl?op=discuss&amp;amp;id=1984022&amp;amp;smallembed=1" style="height: 300px; width: 100%; border: none;"&gt;&lt;/iframe&gt;
+&lt;p&gt;&lt;a href="http://feedads.g.doubleclick.net/~at/fIwcwj6jAheEOndLaN0_Nadjtnk/0/da"&gt;&lt;img src="http://feedads.g.doubleclick.net/~at/fIwcwj6jAheEOndLaN0_Nadjtnk/0/di" border="0" ismap="true"&gt;&lt;/img&gt;&lt;/a&gt;&lt;br/&gt;
+&lt;a href="http://feedads.g.doubleclick.net/~at/fIwcwj6jAheEOndLaN0_Nadjtnk/1/da"&gt;&lt;img src="http://feedads.g.doubleclick.net/~at/fIwcwj6jAheEOndLaN0_Nadjtnk/1/di" border="0" ismap="true"&gt;&lt;/img&gt;&lt;/a&gt;&lt;/p&gt;&lt;img src="http://feeds.feedburner.com/~r/Slashdot/slashdot/~4/B9A_Je39Yms" height="1" width="1"/&gt;</description>
+<dc:creator>CmdrTaco</dc:creator>
+<dc:date>2011-02-07T15:47:00+00:00</dc:date>
+<dc:subject>nasa</dc:subject>
+<slash:department>break-out-the-glasses</slash:department>
+<slash:section>science</slash:section>
+<slash:hit_parade>0,0,0,0,0,0,0</slash:hit_parade>
+<feedburner:origLink>http://science.slashdot.org/story/11/02/07/1537228/NASA-Releases-First-3D-Images-of-the-Sun?from=rss</feedburner:origLink></item>
+
+<item rdf:about="http://tech.slashdot.org/story/11/02/07/1436243/US-Has-Secret-Tools-To-Force-Internet-On-Dictatorships?from=rss">
+<title>US Has Secret Tools To Force Internet On Dictatorships</title>
+<link>http://rss.slashdot.org/~r/Slashdot/slashdot/~3/yxobC3NNNkc/US-Has-Secret-Tools-To-Force-Internet-On-Dictatorships</link>
+<description>4phun found a Wired story that talks about the military options when a dictatorship decides to cut off internet access to its population.
+
+"The American military does have a second set of options if it ever wants to force connectivity on a country against its ruler&amp;rsquo;s wishes. There&amp;rsquo;s just one wrinkle. 'It could be considered an act of war.'"
+
+Hopefully the same options will be available for us when our government gets around to implementing our own kill switch.&lt;p&gt;&lt;a href="http://www.facebook.com/sharer.php?u=http%3A%2F%2Ftech.slashdot.org%2Fstory%2F11%2F02%2F07%2F1436243%2FUS-Has-Secret-Tools-To-Force-Internet-On-Dictatorships%3Ffrom%3Dfb" target="_blank" title="Share on Facebook"&gt;&lt;img src="http://a.fsdn.com/sd/facebook_icon_large.png"&gt;&lt;/a&gt;
+   
+      &lt;a href="http://twitter.com/home?status=US+Has+Secret+Tools+To+Force+Internet+On+Dictatorships%3A+http%3A%2F%2Fbit.ly%2FeFK0TQ" target="_blank" title="Share on Twitter"&gt;&lt;img src="http://a.fsdn.com/sd/twitter_icon_large.png"&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href="http://tech.slashdot.org/story/11/02/07/1436243/US-Has-Secret-Tools-To-Force-Internet-On-Dictatorships?from=rss"&gt;Read more of this story&lt;/a&gt; at Slashdot.&lt;/p&gt;&lt;iframe src="http://slashdot.org/slashdot-it.pl?op=discuss&amp;amp;id=1983954&amp;amp;smallembed=1" style="height: 300px; width: 100%; border: none;"&gt;&lt;/iframe&gt;
+&lt;p&gt;&lt;a href="http://feedads.g.doubleclick.net/~at/a_j5av18kvKdwd3fdSQdQjX4wQ0/0/da"&gt;&lt;img src="http://feedads.g.doubleclick.net/~at/a_j5av18kvKdwd3fdSQdQjX4wQ0/0/di" border="0" ismap="true"&gt;&lt;/img&gt;&lt;/a&gt;&lt;br/&gt;
+&lt;a href="http://feedads.g.doubleclick.net/~at/a_j5av18kvKdwd3fdSQdQjX4wQ0/1/da"&gt;&lt;img src="http://feedads.g.doubleclick.net/~at/a_j5av18kvKdwd3fdSQdQjX4wQ0/1/di" border="0" ismap="true"&gt;&lt;/img&gt;&lt;/a&gt;&lt;/p&gt;&lt;img src="http://feeds.feedburner.com/~r/Slashdot/slashdot/~4/yxobC3NNNkc" height="1" width="1"/&gt;</description>
+<dc:creator>CmdrTaco</dc:creator>
+<dc:date>2011-02-07T15:00:00+00:00</dc:date>
+<dc:subject>internet</dc:subject>
+<slash:department>information-is-power</slash:department>
+<slash:section>technology</slash:section>
+<slash:hit_parade>0,0,0,0,0,0,0</slash:hit_parade>
+<feedburner:origLink>http://tech.slashdot.org/story/11/02/07/1436243/US-Has-Secret-Tools-To-Force-Internet-On-Dictatorships?from=rss</feedburner:origLink></item>
+
+<item rdf:about="http://tech.slashdot.org/story/11/02/07/1424213/HBGary-Federal-Hacked-By-Anonymous?from=rss">
+<title>HBGary Federal Hacked By Anonymous</title>
+<link>http://rss.slashdot.org/~r/Slashdot/slashdot/~3/sNUWovxTWN8/HBGary-Federal-Hacked-By-Anonymous</link>
+<description>An anonymous reader writes "As the coin was tossed to kick off Superbowl XLV, Anonymous unleashed their anger at a security firm who had been investigating their membership. HBGary Federal had been working on unmasking their identities in cooperation with an FBI investigation into the attacks against companies who were cutting off WikiLeaks access and financing. Unlike the DDoS attacks for which Anonymous has made headlines in recent months, this incident involved true hacking skills."&lt;p&gt;&lt;a href="http://www.facebook.com/sharer.php?u=http%3A%2F%2Ftech.slashdot.org%2Fstory%2F11%2F02%2F07%2F1424213%2FHBGary-Federal-Hacked-By-Anonymous%3Ffrom%3Dfb" target="_blank" title="Share on Facebook"&gt;&lt;img src="http://a.fsdn.com/sd/facebook_icon_large.png"&gt;&lt;/a&gt;
+   
+      &lt;a href="http://twitter.com/home?status=HBGary+Federal+Hacked+By+Anonymous%3A+http%3A%2F%2Fbit.ly%2FdYGaVJ" target="_blank" title="Share on Twitter"&gt;&lt;img src="http://a.fsdn.com/sd/twitter_icon_large.png"&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href="http://tech.slashdot.org/story/11/02/07/1424213/HBGary-Federal-Hacked-By-Anonymous?from=rss"&gt;Read more of this story&lt;/a&gt; at Slashdot.&lt;/p&gt;&lt;iframe src="http://slashdot.org/slashdot-it.pl?op=discuss&amp;amp;id=1983934&amp;amp;smallembed=1" style="height: 300px; width: 100%; border: none;"&gt;&lt;/iframe&gt;
+&lt;p&gt;&lt;a href="http://feedads.g.doubleclick.net/~at/KQfJl5Q9-SZDTnUW1igjaJcaqMU/0/da"&gt;&lt;img src="http://feedads.g.doubleclick.net/~at/KQfJl5Q9-SZDTnUW1igjaJcaqMU/0/di" border="0" ismap="true"&gt;&lt;/img&gt;&lt;/a&gt;&lt;br/&gt;
+&lt;a href="http://feedads.g.doubleclick.net/~at/KQfJl5Q9-SZDTnUW1igjaJcaqMU/1/da"&gt;&lt;img src="http://feedads.g.doubleclick.net/~at/KQfJl5Q9-SZDTnUW1igjaJcaqMU/1/di" border="0" ismap="true"&gt;&lt;/img&gt;&lt;/a&gt;&lt;/p&gt;&lt;img src="http://feeds.feedburner.com/~r/Slashdot/slashdot/~4/sNUWovxTWN8" height="1" width="1"/&gt;</description>
+<dc:creator>CmdrTaco</dc:creator>
+<dc:date>2011-02-07T14:23:00+00:00</dc:date>
+<dc:subject>security</dc:subject>
+<slash:department>are-you-anonymous</slash:department>
+<slash:section>technology</slash:section>
+<slash:hit_parade>0,0,0,0,0,0,0</slash:hit_parade>
+<feedburner:origLink>http://tech.slashdot.org/story/11/02/07/1424213/HBGary-Federal-Hacked-By-Anonymous?from=rss</feedburner:origLink></item>
+
+<item rdf:about="http://news.slashdot.org/story/11/02/07/135244/AOL-To-Buy-Huffington-Post?from=rss">
+<title>AOL To Buy Huffington Post</title>
+<link>http://rss.slashdot.org/~r/Slashdot/slashdot/~3/8HaY5mBTHjQ/AOL-To-Buy-Huffington-Post</link>
+<description>Hugh Pickens writes writes "The La Times reports that AOL has agreed to purchase the Huffington Post for $315 million. The purchase will increase AOL's news portfolio as it competes against Yahoo's growing online news publication profile and Google's news efforts, as well as traditional media companies online. The purchase has yet to acquire government approvals, but the boards of directors of each company and shareholders of the Huffington Post have approved the transaction."&lt;p&gt;&lt;a href="http://www.facebook.com/sharer.php?u=http%3A%2F%2Fnews.slashdot.org%2Fstory%2F11%2F02%2F07%2F135244%2FAOL-To-Buy-Huffington-Post%3Ffrom%3Dfb" target="_blank" title="Share on Facebook"&gt;&lt;img src="http://a.fsdn.com/sd/facebook_icon_large.png"&gt;&lt;/a&gt;
+   
+      &lt;a href="http://twitter.com/home?status=AOL+To+Buy+Huffington+Post%3A+http%3A%2F%2Fbit.ly%2Fe5mWhT" target="_blank" title="Share on Twitter"&gt;&lt;img src="http://a.fsdn.com/sd/twitter_icon_large.png"&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href="http://news.slashdot.org/story/11/02/07/135244/AOL-To-Buy-Huffington-Post?from=rss"&gt;Read more of this story&lt;/a&gt; at Slashdot.&lt;/p&gt;&lt;iframe src="http://slashdot.org/slashdot-it.pl?op=discuss&amp;amp;id=1983846&amp;amp;smallembed=1" style="height: 300px; width: 100%; border: none;"&gt;&lt;/iframe&gt;
+&lt;p&gt;&lt;a href="http://feedads.g.doubleclick.net/~at/Uo3ZiPAGzYWaJKBZCJtvcax9FOI/0/da"&gt;&lt;img src="http://feedads.g.doubleclick.net/~at/Uo3ZiPAGzYWaJKBZCJtvcax9FOI/0/di" border="0" ismap="true"&gt;&lt;/img&gt;&lt;/a&gt;&lt;br/&gt;
+&lt;a href="http://feedads.g.doubleclick.net/~at/Uo3ZiPAGzYWaJKBZCJtvcax9FOI/1/da"&gt;&lt;img src="http://feedads.g.doubleclick.net/~at/Uo3ZiPAGzYWaJKBZCJtvcax9FOI/1/di" border="0" ismap="true"&gt;&lt;/img&gt;&lt;/a&gt;&lt;/p&gt;&lt;img src="http://feeds.feedburner.com/~r/Slashdot/slashdot/~4/8HaY5mBTHjQ" height="1" width="1"/&gt;</description>
+<dc:creator>CmdrTaco</dc:creator>
+<dc:date>2011-02-07T13:45:00+00:00</dc:date>
+<dc:subject>themedia</dc:subject>
+<slash:department>gobble-gobble-gobble</slash:department>
+<slash:section>news</slash:section>
+<slash:hit_parade>0,0,0,0,0,0,0</slash:hit_parade>
+<feedburner:origLink>http://news.slashdot.org/story/11/02/07/135244/AOL-To-Buy-Huffington-Post?from=rss</feedburner:origLink></item>
+
+<item rdf:about="http://games.slashdot.org/story/11/02/07/0430232/EA-Simulation-Correctly-Picked-Super-Bowl-Champs-in-September?from=rss">
+<title>EA Simulation Correctly Picked Super Bowl Champs in September</title>
+<link>http://rss.slashdot.org/~r/Slashdot/slashdot/~3/2O5FrlDJNL0/EA-Simulation-Correctly-Picked-Super-Bowl-Champs-in-September</link>
+<description>Just_Say_Duhhh writes "Before the NFL Season started, the guys at EA Sports simulated the entire season using Madden 2011. The sim told them the Packers would win the Super Bowl. If only we had listened. What's even more interesting is that according to the article, they've picked the winner 6 of the last 7 years. Make that 7 out of 8!"&lt;p&gt;&lt;a href="http://www.facebook.com/sharer.php?u=http%3A%2F%2Fgames.slashdot.org%2Fstory%2F11%2F02%2F07%2F0430232%2FEA-Simulation-Correctly-Picked-Super-Bowl-Champs-in-September%3Ffrom%3Dfb" target="_blank" title="Share on Facebook"&gt;&lt;img src="http://a.fsdn.com/sd/facebook_icon_large.png"&gt;&lt;/a&gt;
+   
+      &lt;a href="http://twitter.com/home?status=EA+Simulation+Correctly+Picked+Super+Bowl+Champs+in+September%3A+http%3A%2F%2Fbit.ly%2FhPhxGk" target="_blank" title="Share on Twitter"&gt;&lt;img src="http://a.fsdn.com/sd/twitter_icon_large.png"&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href="http://games.slashdot.org/story/11/02/07/0430232/EA-Simulation-Correctly-Picked-Super-Bowl-Champs-in-September?from=rss"&gt;Read more of this story&lt;/a&gt; at Slashdot.&lt;/p&gt;&lt;iframe src="http://slashdot.org/slashdot-it.pl?op=discuss&amp;amp;id=1983164&amp;amp;smallembed=1" style="height: 300px; width: 100%; border: none;"&gt;&lt;/iframe&gt;
+&lt;p&gt;&lt;a href="http://feedads.g.doubleclick.net/~at/hh1_l3WqY-OocBh43bsay2Hpz7g/0/da"&gt;&lt;img src="http://feedads.g.doubleclick.net/~at/hh1_l3WqY-OocBh43bsay2Hpz7g/0/di" border="0" ismap="true"&gt;&lt;/img&gt;&lt;/a&gt;&lt;br/&gt;
+&lt;a href="http://feedads.g.doubleclick.net/~at/hh1_l3WqY-OocBh43bsay2Hpz7g/1/da"&gt;&lt;img src="http://feedads.g.doubleclick.net/~at/hh1_l3WqY-OocBh43bsay2Hpz7g/1/di" border="0" ismap="true"&gt;&lt;/img&gt;&lt;/a&gt;&lt;/p&gt;&lt;img src="http://feeds.feedburner.com/~r/Slashdot/slashdot/~4/2O5FrlDJNL0" height="1" width="1"/&gt;</description>
+<dc:creator>samzenpus</dc:creator>
+<dc:date>2011-02-07T13:04:00+00:00</dc:date>
+<dc:subject>games</dc:subject>
+<slash:department>miracle-madden</slash:department>
+<slash:section>games</slash:section>
+<slash:hit_parade>0,0,0,0,0,0,0</slash:hit_parade>
+<feedburner:origLink>http://games.slashdot.org/story/11/02/07/0430232/EA-Simulation-Correctly-Picked-Super-Bowl-Champs-in-September?from=rss</feedburner:origLink></item>
+
+<item rdf:about="http://science.slashdot.org/story/11/02/07/0317231/Aboriginal-Sundial-Pre-Dates-Stonehenge?from=rss">
+<title>Aboriginal Sundial Pre-Dates Stonehenge</title>
+<link>http://rss.slashdot.org/~r/Slashdot/slashdot/~3/VzvOeAkKEEc/Aboriginal-Sundial-Pre-Dates-Stonehenge</link>
+<description>brindafella writes "Look out, Stonehenge, here come the Wurdi Youang rocks in the Australian state of Victoria. The semi-circle of stones has been examined by an astrophysicist from Australia's premier research group, the Commonwealth Scientific and Industrial Research Organization (CSIRO), who says this arrangement of rocks is a carefully aligned solar observatory that may be 10,000 years old. It would have been created by local Aborigines, the Wathaurong people, who have occupied the area for some 25,000 years."&lt;p&gt;&lt;a href="http://www.facebook.com/sharer.php?u=http%3A%2F%2Fscience.slashdot.org%2Fstory%2F11%2F02%2F07%2F0317231%2FAboriginal-Sundial-Pre-Dates-Stonehenge%3Ffrom%3Dfb" target="_blank" title="Share on Facebook"&gt;&lt;img src="http://a.fsdn.com/sd/facebook_icon_large.png"&gt;&lt;/a&gt;
+   
+      &lt;a href="http://twitter.com/home?status=Aboriginal+Sundial+Pre-Dates+Stonehenge%3A+http%3A%2F%2Fbit.ly%2FhZMiXL" target="_blank" title="Share on Twitter"&gt;&lt;img src="http://a.fsdn.com/sd/twitter_icon_large.png"&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href="http://science.slashdot.org/story/11/02/07/0317231/Aboriginal-Sundial-Pre-Dates-Stonehenge?from=rss"&gt;Read more of this story&lt;/a&gt; at Slashdot.&lt;/p&gt;&lt;iframe src="http://slashdot.org/slashdot-it.pl?op=discuss&amp;amp;id=1983118&amp;amp;smallembed=1" style="height: 300px; width: 100%; border: none;"&gt;&lt;/iframe&gt;
+&lt;p&gt;&lt;a href="http://feedads.g.doubleclick.net/~at/DTTOtTA2Mbro5EYxcwudvBwF3MU/0/da"&gt;&lt;img src="http://feedads.g.doubleclick.net/~at/DTTOtTA2Mbro5EYxcwudvBwF3MU/0/di" border="0" ismap="true"&gt;&lt;/img&gt;&lt;/a&gt;&lt;br/&gt;
+&lt;a href="http://feedads.g.doubleclick.net/~at/DTTOtTA2Mbro5EYxcwudvBwF3MU/1/da"&gt;&lt;img src="http://feedads.g.doubleclick.net/~at/DTTOtTA2Mbro5EYxcwudvBwF3MU/1/di" border="0" ismap="true"&gt;&lt;/img&gt;&lt;/a&gt;&lt;/p&gt;&lt;img src="http://feeds.feedburner.com/~r/Slashdot/slashdot/~4/VzvOeAkKEEc" height="1" width="1"/&gt;</description>
+<dc:creator>samzenpus</dc:creator>
+<dc:date>2011-02-07T10:01:00+00:00</dc:date>
+<dc:subject>science</dc:subject>
+<slash:department>back-in-the-day</slash:department>
+<slash:section>science</slash:section>
+<slash:hit_parade>0,0,0,0,0,0,0</slash:hit_parade>
+<feedburner:origLink>http://science.slashdot.org/story/11/02/07/0317231/Aboriginal-Sundial-Pre-Dates-Stonehenge?from=rss</feedburner:origLink></item>
+
+<item rdf:about="http://mobile.slashdot.org/story/11/02/07/037259/Android-Tablets-Were-Born-Too-Soon?from=rss">
+<title>Android Tablets Were Born Too Soon</title>
+<link>http://rss.slashdot.org/~r/Slashdot/slashdot/~3/wgDfn1DZ7YA/Android-Tablets-Were-Born-Too-Soon</link>
+<description>adeelarshad82 writes "When you look at the Apple iPad's sales figures, it's not hard to see why every technology company on the planet is jumping on the tablet bandwagon, a lot of which are Android tablets. Unfortunately though, some of these Android tablets were born way too early. They are haunted with a series of problems including flimsy hardware, low-quality resistive touch screens, serious display resolution issues, and old Android versions with limited or non-existent access to apps. Even the Samsung Galaxy Tab came well before its time. Even though it's fast, well-designed, and comes with a decent Android implementation, its functionality is limited to that of an Android smartphone. So here's to hoping that Honeycomb's functionality make up for the lost ground."&lt;p&gt;&lt;a href="http://www.facebook.com/sharer.php?u=http%3A%2F%2Fmobile.slashdot.org%2Fstory%2F11%2F02%2F07%2F037259%2FAndroid-Tablets-Were-Born-Too-Soon%3Ffrom%3Dfb" target="_blank" title="Share on Facebook"&gt;&lt;img src="http://a.fsdn.com/sd/facebook_icon_large.png"&gt;&lt;/a&gt;
+   
+      &lt;a href="http://twitter.com/home?status=Android+Tablets+Were+Born+Too+Soon%3A+http%3A%2F%2Fbit.ly%2FhNaBtd" target="_blank" title="Share on Twitter"&gt;&lt;img src="http://a.fsdn.com/sd/twitter_icon_large.png"&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href="http://mobile.slashdot.org/story/11/02/07/037259/Android-Tablets-Were-Born-Too-Soon?from=rss"&gt;Read more of this story&lt;/a&gt; at Slashdot.&lt;/p&gt;&lt;iframe src="http://slashdot.org/slashdot-it.pl?op=discuss&amp;amp;id=1983106&amp;amp;smallembed=1" style="height: 300px; width: 100%; border: none;"&gt;&lt;/iframe&gt;
+&lt;p&gt;&lt;a href="http://feedads.g.doubleclick.net/~at/M-tmjOu67fLk5cdg9suyyPFFzwo/0/da"&gt;&lt;img src="http://feedads.g.doubleclick.net/~at/M-tmjOu67fLk5cdg9suyyPFFzwo/0/di" border="0" ismap="true"&gt;&lt;/img&gt;&lt;/a&gt;&lt;br/&gt;
+&lt;a href="http://feedads.g.doubleclick.net/~at/M-tmjOu67fLk5cdg9suyyPFFzwo/1/da"&gt;&lt;img src="http://feedads.g.doubleclick.net/~at/M-tmjOu67fLk5cdg9suyyPFFzwo/1/di" border="0" ismap="true"&gt;&lt;/img&gt;&lt;/a&gt;&lt;/p&gt;&lt;img src="http://feeds.feedburner.com/~r/Slashdot/slashdot/~4/wgDfn1DZ7YA" height="1" width="1"/&gt;</description>
+<dc:creator>samzenpus</dc:creator>
+<dc:date>2011-02-07T08:08:00+00:00</dc:date>
+<dc:subject>android</dc:subject>
+<slash:department>before-there-time</slash:department>
+<slash:section>mobile</slash:section>
+<slash:hit_parade>0,0,0,0,0,0,0</slash:hit_parade>
+<feedburner:origLink>http://mobile.slashdot.org/story/11/02/07/037259/Android-Tablets-Were-Born-Too-Soon?from=rss</feedburner:origLink></item>
+
+<item rdf:about="http://hardware.slashdot.org/story/11/02/07/0258208/emRoboEarthem-Teaches-Robots-to-Learn-From-Peers?from=rss">
+<title>&lt;em&gt;RoboEarth&lt;/em&gt; Teaches Robots to Learn From Peers</title>
+<link>http://rss.slashdot.org/~r/Slashdot/slashdot/~3/0xXtI2UgEug/emRoboEarthem-Teaches-Robots-to-Learn-From-Peers</link>
+<description>mikejuk writes "A world wide web for robots? It sounds like a crazy idea, but it could mean that once a task is learned, any robot can find out how to do it just by asking RoboEarth. From the article: 'It's not quite war-ready, but a new Skynet-like initiative called RoboEarth could have you reaching for your guide to automaton Armageddon sooner than you think. The network, which is dubbed the "World Wide Web for robots," was designed by a team of European scientists and engineers to allow robots to learn from the experience of their peers, thus enabling them to take on tasks that they weren't necessarily programmed to perform. Using a database with intranet and internet functionality, the system collects and stores information about object recognition, navigation, and tasks and transmits the data to robots linked to the network. Basically, it teaches machines to learn without human intervention.'"&lt;p&gt;&lt;a href="http://www.facebook.com/sharer.php?u=http%3A%2F%2Fhardware.slashdot.org%2Fstory%2F11%2F02%2F07%2F0258208%2FRoboEarth-Teaches-Robots-to-Learn-From-Peers%3Ffrom%3Dfb" target="_blank" title="Share on Facebook"&gt;&lt;img src="http://a.fsdn.com/sd/facebook_icon_large.png"&gt;&lt;/a&gt;
+   
+      &lt;a href="http://twitter.com/home?status=RoboEarth+Teaches+Robots+to+Learn+From+Peers%3A+http%3A%2F%2Fbit.ly%2FgQvDJ2" target="_blank" title="Share on Twitter"&gt;&lt;img src="http://a.fsdn.com/sd/twitter_icon_large.png"&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href="http://hardware.slashdot.org/story/11/02/07/0258208/emRoboEarthem-Teaches-Robots-to-Learn-From-Peers?from=rss"&gt;Read more of this story&lt;/a&gt; at Slashdot.&lt;/p&gt;&lt;iframe src="http://slashdot.org/slashdot-it.pl?op=discuss&amp;amp;id=1983102&amp;amp;smallembed=1" style="height: 300px; width: 100%; border: none;"&gt;&lt;/iframe&gt;
+&lt;p&gt;&lt;a href="http://feedads.g.doubleclick.net/~at/AZriuQ0-7fo_UFWWVw14VW6oVoU/0/da"&gt;&lt;img src="http://feedads.g.doubleclick.net/~at/AZriuQ0-7fo_UFWWVw14VW6oVoU/0/di" border="0" ismap="true"&gt;&lt;/img&gt;&lt;/a&gt;&lt;br/&gt;
+&lt;a href="http://feedads.g.doubleclick.net/~at/AZriuQ0-7fo_UFWWVw14VW6oVoU/1/da"&gt;&lt;img src="http://feedads.g.doubleclick.net/~at/AZriuQ0-7fo_UFWWVw14VW6oVoU/1/di" border="0" ismap="true"&gt;&lt;/img&gt;&lt;/a&gt;&lt;/p&gt;&lt;img src="http://feeds.feedburner.com/~r/Slashdot/slashdot/~4/0xXtI2UgEug" height="1" width="1"/&gt;</description>
+<dc:creator>samzenpus</dc:creator>
+<dc:date>2011-02-07T05:05:00+00:00</dc:date>
+<dc:subject>ai</dc:subject>
+<slash:department>I'm-sorry-dave</slash:department>
+<slash:section>hardware</slash:section>
+<slash:hit_parade>0,0,0,0,0,0,0</slash:hit_parade>
+<feedburner:origLink>http://hardware.slashdot.org/story/11/02/07/0258208/emRoboEarthem-Teaches-Robots-to-Learn-From-Peers?from=rss</feedburner:origLink></item>
+
+<item rdf:about="http://yro.slashdot.org/story/11/02/07/014258/Internet-Is-Easy-Prey-For-Governments?from=rss">
+<title>Internet Is Easy Prey For Governments</title>
+<link>http://rss.slashdot.org/~r/Slashdot/slashdot/~3/auz79S8MpEQ/Internet-Is-Easy-Prey-For-Governments</link>
+<description>Hugh Pickens writes writes "Douglas Rushkoff writes on CNN that the revolution in Egypt starkly reveals the limits of our internet tools and the ease with which those holding power can take them away. 'Old media, such as terrestrial radio and television, were as distributed as the thousands of stations and antennae from which broadcast signals emanated, but all internet traffic must pass through government and corporate-owned choke points,' says Rushkoff adding that when push came to shove over WikiLeaks in the US the very same government authority was used to cut off "enemies of the state" from access and funding. Rushkoff suggests that we use the lessons of the internet to build a communications infrastructure that cannot be controlled from the top. Back before the internet, many early computer hobbyists networked on Fidonet, a simple peer-to-peer network and now digital activists propose reviving such ideas with mesh networking over Wi-Fi networks that could connect inhabitants of an entire city without anyone having an internet service provider. 'Until we choose to develop such alternative networks, our insistence on seeing the likes of Facebook and Twitter as the path toward freedom for all people will only serve to increase our dependence on corporations and government for the right to assemble and communicate.'"&lt;p&gt;&lt;a href="http://www.facebook.com/sharer.php?u=http%3A%2F%2Fyro.slashdot.org%2Fstory%2F11%2F02%2F07%2F014258%2FInternet-Is-Easy-Prey-For-Governments%3Ffrom%3Dfb" target="_blank" title="Share on Facebook"&gt;&lt;img src="http://a.fsdn.com/sd/facebook_icon_large.png"&gt;&lt;/a&gt;
+   
+      &lt;a href="http://twitter.com/home?status=Internet+Is+Easy+Prey+For+Governments%3A+http%3A%2F%2Fbit.ly%2FezDX18" target="_blank" title="Share on Twitter"&gt;&lt;img src="http://a.fsdn.com/sd/twitter_icon_large.png"&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href="http://yro.slashdot.org/story/11/02/07/014258/Internet-Is-Easy-Prey-For-Governments?from=rss"&gt;Read more of this story&lt;/a&gt; at Slashdot.&lt;/p&gt;&lt;iframe src="http://slashdot.org/slashdot-it.pl?op=discuss&amp;amp;id=1983048&amp;amp;smallembed=1" style="height: 300px; width: 100%; border: none;"&gt;&lt;/iframe&gt;
+&lt;p&gt;&lt;a href="http://feedads.g.doubleclick.net/~at/AbbYQetxMNAhC9owY0VUD_46e6I/0/da"&gt;&lt;img src="http://feedads.g.doubleclick.net/~at/AbbYQetxMNAhC9owY0VUD_46e6I/0/di" border="0" ismap="true"&gt;&lt;/img&gt;&lt;/a&gt;&lt;br/&gt;
+&lt;a href="http://feedads.g.doubleclick.net/~at/AbbYQetxMNAhC9owY0VUD_46e6I/1/da"&gt;&lt;img src="http://feedads.g.doubleclick.net/~at/AbbYQetxMNAhC9owY0VUD_46e6I/1/di" border="0" ismap="true"&gt;&lt;/img&gt;&lt;/a&gt;&lt;/p&gt;&lt;img src="http://feeds.feedburner.com/~r/Slashdot/slashdot/~4/auz79S8MpEQ" height="1" width="1"/&gt;</description>
+<dc:creator>samzenpus</dc:creator>
+<dc:date>2011-02-07T02:02:00+00:00</dc:date>
+<dc:subject>internet</dc:subject>
+<slash:department>all-your-tubes-are-belong-to-us</slash:department>
+<slash:section>yro</slash:section>
+<slash:hit_parade>0,0,0,0,0,0,0</slash:hit_parade>
+<feedburner:origLink>http://yro.slashdot.org/story/11/02/07/014258/Internet-Is-Easy-Prey-For-Governments?from=rss</feedburner:origLink></item>
+
+<item rdf:about="http://news.slashdot.org/story/11/02/06/228245/Congresswoman-Writes-On-Broadband-Net-Neutrality?from=rss">
+<title>Congresswoman Writes On Broadband, Net Neutrality</title>
+<link>http://rss.slashdot.org/~r/Slashdot/slashdot/~3/9Sc-PcFYZ2c/Congresswoman-Writes-On-Broadband-Net-Neutrality</link>
+<description>An anonymous reader writes "Anna G. Eshoo, a California Democrat representing parts of Silicon Valley, has written an op-ed defending net neutrality and pushing the administration to take more steps to speed up US broadband. From the article: 'A climate of openness and innovation has been the hallmark of the Internet. A decade ago, it's what allowed a startup named Google to compete with better-funded, less technologically advanced competitors. Today, Congress has the responsibility to preserve this climate for the next Google, and for the consumers and the economy that will benefit from its success.'"&lt;p&gt;&lt;a href="http://www.facebook.com/sharer.php?u=http%3A%2F%2Fnews.slashdot.org%2Fstory%2F11%2F02%2F06%2F228245%2FCongresswoman-Writes-On-Broadband-Net-Neutrality%3Ffrom%3Dfb" target="_blank" title="Share on Facebook"&gt;&lt;img src="http://a.fsdn.com/sd/facebook_icon_large.png"&gt;&lt;/a&gt;
+   
+      &lt;a href="http://twitter.com/home?status=Congresswoman+Writes+On+Broadband%2C+Net+Neutrality%3A+http%3A%2F%2Fbit.ly%2FhQaYRE" target="_blank" title="Share on Twitter"&gt;&lt;img src="http://a.fsdn.com/sd/twitter_icon_large.png"&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href="http://news.slashdot.org/story/11/02/06/228245/Congresswoman-Writes-On-Broadband-Net-Neutrality?from=rss"&gt;Read more of this story&lt;/a&gt; at Slashdot.&lt;/p&gt;&lt;iframe src="http://slashdot.org/slashdot-it.pl?op=discuss&amp;amp;id=1982978&amp;amp;smallembed=1" style="height: 300px; width: 100%; border: none;"&gt;&lt;/iframe&gt;
+&lt;p&gt;&lt;a href="http://feedads.g.doubleclick.net/~at/Ctg872gbTGNCAYM1IUDYSo5vy1M/0/da"&gt;&lt;img src="http://feedads.g.doubleclick.net/~at/Ctg872gbTGNCAYM1IUDYSo5vy1M/0/di" border="0" ismap="true"&gt;&lt;/img&gt;&lt;/a&gt;&lt;br/&gt;
+&lt;a href="http://feedads.g.doubleclick.net/~at/Ctg872gbTGNCAYM1IUDYSo5vy1M/1/da"&gt;&lt;img src="http://feedads.g.doubleclick.net/~at/Ctg872gbTGNCAYM1IUDYSo5vy1M/1/di" border="0" ismap="true"&gt;&lt;/img&gt;&lt;/a&gt;&lt;/p&gt;&lt;img src="http://feeds.feedburner.com/~r/Slashdot/slashdot/~4/9Sc-PcFYZ2c" height="1" width="1"/&gt;</description>
+<dc:creator>samzenpus</dc:creator>
+<dc:date>2011-02-06T23:52:00+00:00</dc:date>
+<dc:subject>usa</dc:subject>
+<slash:department>listen-to-the-lady</slash:department>
+<slash:section>news</slash:section>
+<slash:hit_parade>0,0,0,0,0,0,0</slash:hit_parade>
+<feedburner:origLink>http://news.slashdot.org/story/11/02/06/228245/Congresswoman-Writes-On-Broadband-Net-Neutrality?from=rss</feedburner:origLink></item>
+
+<textinput rdf:about="http://slashdot.org/search.pl">
+<title>Search Slashdot</title>
+<description>Search Slashdot stories</description>
+<name>query</name>
+<link>http://slashdot.org/search.pl</link>
+</textinput>
+
+</rdf:RDF>

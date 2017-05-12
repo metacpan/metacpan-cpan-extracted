@@ -1,0 +1,89 @@
+---
+abstract: 'XML stream support library for XMPP-like protocols'
+author:
+  - 'Darian Anthony Patrick <dapatrick@cpan.org>'
+build_requires:
+  Test::More: '0.92'
+configure_requires:
+  Module::Build: '0.360300'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4205, CPAN::Meta::Converter version 2.141170'
+license: lgpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: XML-Stream
+provides:
+  XML::Stream:
+    file: lib/XML/Stream.pm
+    version: '1.24'
+  XML::Stream::IO::Select::Win32:
+    file: lib/XML/Stream/IO/Select/Win32.pm
+    version: '1.24'
+  XML::Stream::Namespace:
+    file: lib/XML/Stream/Namespace.pm
+    version: '1.24'
+  XML::Stream::Node:
+    file: lib/XML/Stream/Node.pm
+    version: '1.24'
+  XML::Stream::Parser:
+    file: lib/XML/Stream/Parser.pm
+    version: '1.24'
+  XML::Stream::Parser::DTD:
+    file: lib/XML/Stream/Parser/DTD.pm
+    version: '1.24'
+  XML::Stream::Tools:
+    file: lib/XML/Stream/Tools.pm
+  XML::Stream::Tree:
+    file: lib/XML/Stream/Tree.pm
+    version: '1.24'
+  XML::Stream::XPath:
+    file: lib/XML/Stream/XPath.pm
+    version: '1.24'
+  XML::Stream::XPath::AllOp:
+    file: lib/XML/Stream/XPath/Op.pm
+  XML::Stream::XPath::AndOp:
+    file: lib/XML/Stream/XPath/Op.pm
+  XML::Stream::XPath::AttributeOp:
+    file: lib/XML/Stream/XPath/Op.pm
+  XML::Stream::XPath::ContextOp:
+    file: lib/XML/Stream/XPath/Op.pm
+  XML::Stream::XPath::EqualOp:
+    file: lib/XML/Stream/XPath/Op.pm
+  XML::Stream::XPath::FunctionOp:
+    file: lib/XML/Stream/XPath/Op.pm
+  XML::Stream::XPath::NodeOp:
+    file: lib/XML/Stream/XPath/Op.pm
+  XML::Stream::XPath::NotEqualOp:
+    file: lib/XML/Stream/XPath/Op.pm
+  XML::Stream::XPath::Op:
+    file: lib/XML/Stream/XPath/Op.pm
+    version: '1.24'
+  XML::Stream::XPath::OrOp:
+    file: lib/XML/Stream/XPath/Op.pm
+  XML::Stream::XPath::PositionOp:
+    file: lib/XML/Stream/XPath/Op.pm
+  XML::Stream::XPath::Query:
+    file: lib/XML/Stream/XPath/Query.pm
+    version: '1.24'
+  XML::Stream::XPath::Value:
+    file: lib/XML/Stream/XPath/Value.pm
+    version: '1.24'
+requires:
+  Authen::SASL: '0'
+  Carp: '0'
+  Encode: '0'
+  FileHandle: '0'
+  IO::Select: '0'
+  IO::Socket: '0'
+  MIME::Base64: '0'
+  POSIX: '0'
+  Scalar::Util: '0'
+  Sys::Hostname: '0'
+  perl: v5.8.0
+  utf8: '0'
+resources:
+  bugtracker: https://github.com/dap/XML-Stream/issues
+  license: http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt
+  repository: https://github.com/dap/XML-Stream
+version: '1.24'

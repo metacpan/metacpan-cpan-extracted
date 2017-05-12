@@ -1,0 +1,12 @@
+<people>
+  <person>
+      <name> name0 </name>
+      <address> address00 </address>    
+      <address> address01 </address>
+  </person>
+  <person>
+      <name> name1 </name>
+      <address> address10 </address>    
+      <address> address11 </address>
+  </person>
+</people>

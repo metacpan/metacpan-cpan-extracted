@@ -1,0 +1,10 @@
+Changes
+Diff.pm
+MANIFEST
+Makefile.PL
+README
+TODO
+t/1.t
+t/xml/test1.xml
+t/xml/test2.xml
+META.yml                                 Module meta-data (added by MakeMaker)

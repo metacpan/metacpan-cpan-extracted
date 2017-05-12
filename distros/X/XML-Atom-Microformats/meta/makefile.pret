@@ -1,0 +1,16 @@
+# This file provides instructions for packaging.
+
+`XML-Atom-Microformats`
+	perl_version_from  m`XML::Atom::Microformats`;
+	version_from       m`XML::Atom::Microformats`;
+	readme_from        m`XML::Atom::Microformats`;
+	test_requires      p`Test::More 0.61`;
+	recommends         p`RDF::RDFa::Parser 1.097`;
+	requires           p`HTML::Microformats 0.100`;
+	requires           p`JSON 2.00`;
+	requires           p`RDF::Trine 0.135`;
+	requires           p`RDF::Query 2.900`;
+	requires           p`XML::Atom::OWL 0.100`;
+	requires           p`XML::LibXML 1.62`;
+	requires           p`autodie`;
+	.

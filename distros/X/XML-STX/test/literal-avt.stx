@@ -1,0 +1,12 @@
+<stx:transform version="1.0" 
+  xmlns:stx="http://stx.sourceforge.net/2002/ns"
+  strip-space="yes">
+
+  <stx:template match="node[@id=1]">
+    <r avt="1+2">
+      <stx:attribute name="att-{name()}" select="10 - 9"/>
+      <lit a1="{1+2}" a2="1+2={1+2}" a3="{concat('a',1+1)}/b{position()}"/>
+    </r>
+  </stx:template>
+  
+</stx:transform>

@@ -1,0 +1,160 @@
+######################################################################
+    X10::Home 0.04
+######################################################################
+
+NAME
+    X10::Home - Configure X10 for your Home
+
+SYNOPSIS
+        # System-wide /etc/x10.conf Configuration File
+
+        module: ControlX10::CM11
+        device: /dev/ttyS0
+        receivers:  
+          - name: bedroom_lights
+            code: K15
+            desc: Bedroom Lights
+          - name: dsl_router
+            code: ...
+
+        # In your application:
+
+        use X10::Home;
+        my $x10 = X10::Home->new();
+          # Address services by name
+        $x10->send("bedroom_lights", "on");
+
+DESCRIPTION
+    "X10::Home" lets you set parameters of all your home X10 devices in a
+    single configuration file. After that's done, applications can access
+    them by name and without worrying about details like "house codes",
+    "unit codes", "serial ports", X10 commands and other low-level details.
+
+    "X10::Home" also maintains a status database to remember the assumed
+    status of cheap X10 devices without a feedback mechanism.
+
+  Usage
+    After a one-time setup of the "x10.conf" file, to switch the bedroom
+    lights on, simply use
+
+        use X10::Home;
+        my $x10->X10::Home->new();
+        $x10->send("bedroom_lights", "on");
+
+    and
+
+        $x10->send("bedroom_lights", "off");
+
+    to switch them off again.
+
+    "X10::Home" uses the "ControlX10::CM11" or "ControlX10::CM17" CPAN
+    modules under the hood to send actual X10 commands via the computer's
+    serial port.
+
+  Configuration File
+    Upon initialization, "X10::Home" will search a configuration file in the
+    following locations (in the order listed):
+
+    *   If "X10::Home::new()" gets called with the "conf_file" parameter
+        set, the configuration will be read from "conf_file".
+
+    *   "~/.x10.conf" (in the user's local home directory) if present
+
+    *   "/etc/x10.conf" if present
+
+    The configuration file is written in YAML format and looks like this:
+
+        # /etc/x10.conf Configuration File
+
+        module:   ControlX10::CM11
+        device:   /dev/ttyS0
+        baudrate: 4800
+
+        receivers:  
+          - name: bedroom_lights
+            code: K15
+            desc: Bedroom Lights
+          - name: dsl_router
+            code: K16
+            desc: DSL Router
+
+    The "module" parameter specifies which X10 low-level module to use,
+    "ControlX10::CM11" or "ControlX10::CM17", it defaults to
+    "ControlX10::CM11".
+
+    The "device" parameter specifies the device entry of the serial port to
+    use, it defaults to "/dev/ttyS0". This can be "/dev/ttyS4" or
+    "/dev/ttyS5" if a serial PCI card gets plugged into the computer.
+
+    The "baudrate" is the baud rate to be used to communicate over the
+    serial port. It defaults to 4800.
+
+    The "receivers" parameter specifies an array of receivers. The reason
+    why this is an array an not a hash is that certain applications like to
+    display all available receivers in a predefined order. Receivers are
+    hashed internally by "X10::Home" by their "name" entries for quick
+    lookups, though.
+
+  METHODS
+    "new()"
+        Constructor. Optional parameters are
+
+        "conf_file"
+            to specify the path to a special x10.conf file instead of the
+            natural search order of system x10.conf files.
+
+        "db_file"
+            to indicate that "X10::Home" should be maintaining a persistent
+            data store with assumed device status. Defaults to
+            "/tmp/x10.status". To check/manipulate the maintained status,
+            see "db_status" below.
+
+    "send($name, $action)"
+        Sends a message to the specified X10 receiver. Uses locking (see
+        "lock/unlock" below) internally to make sure that no other X10
+        commands are sent over the wire by this sender at the same time,
+        which would confuse the receivers.
+
+    "lock()"
+        Aquire an exclusive lock.
+
+    "unlock()"
+        Release the previously acquired exclusive lock.
+
+    "db_status($field, [$value])"
+        For persistent storage of assumed device status, "X10::Home"
+        maintains a file-based data store (if the constructor is called with
+        the "db_file" parameter set to a persistent datastore location). If
+        a device gets switched on or off, "X10::Home" will make a note of
+        that in the data store. To query the (assumed) status of a device,
+        use
+
+            my $x10 = X10::Home( db_file => "/tmp/x10.status" );
+
+            if( $x10->db_status("bedroom_lights") eq "on" ) {
+                print "Bedroom lights are on!\n";
+            }
+
+Sample Applications
+        The "eg" directory contains a command line application "x10" which
+        allows you to run X10 commands from the command line, e.g.
+
+            $ x10 office_lights on
+
+        or
+
+            $ x10 office_lights status
+            on
+
+        The "eg" directory also contains an AJAXed X10 web application,
+        check out "x10.cgi" and read the installation instructions at the
+        top of the file.
+
+LEGALESE
+    Copyright 2007 by Mike Schilli, all rights reserved. This program is
+    free software, you can redistribute it and/or modify it under the same
+    terms as Perl itself.
+
+AUTHOR
+    2007, Mike Schilli <m@perlmeister.com>
+

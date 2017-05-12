@@ -1,0 +1,16 @@
+Build.PL
+Changes
+lib/XML/Chain.pm
+lib/XML/Chain/Element.pm
+lib/XML/Chain/Selector.pm
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/01_basics.t
+t/02_namespaces.t
+t/03_auto-indent.t
+t/tdata/01_basics.xml
+xt/pod-coverage.t
+xt/pod-spell.t
+xt/pod.t

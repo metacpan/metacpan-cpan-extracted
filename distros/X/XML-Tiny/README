@@ -1,0 +1,10 @@
+This module is a minimalist parser for the useful bits of XML.  It has
+no dependencies other than those supplied with perl, and is designed
+to work on perl 5.004 and higher.  
+
+To install, do the usual dance:
+
+    perl Makefile.PL
+    make
+    make test
+    make install

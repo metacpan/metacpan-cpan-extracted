@@ -1,0 +1,35 @@
+<stx:transform version="1.0" 
+  xmlns:gr="http://my_groups"
+  xmlns:stx="http://stx.sourceforge.net/2002/ns"
+  strip-space="yes" 
+  pass-through="none">
+
+  <stx:template match="/root">
+    <a>
+      <stx:call-procedure name="proc1"/>
+    </a>
+  </stx:template>
+
+  <stx:procedure name="proc1">
+    <b>
+      <stx:process-children group="G1"/>
+    </b>
+  </stx:procedure>
+
+  <stx:group name="G1">
+
+    <stx:template match="node">
+      <c>
+	<stx:value-of select="position()"/>
+	<stx:call-procedure name="proc2"/>
+      </c>
+    </stx:template>
+
+    <stx:procedure name="proc2">
+      <stx:text>-</stx:text>
+      <stx:value-of select="."/>
+    </stx:procedure>
+
+  </stx:group>
+  
+</stx:transform>

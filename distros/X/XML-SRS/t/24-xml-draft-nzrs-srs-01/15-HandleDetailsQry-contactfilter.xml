@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<NZSRSRequest VerMinor="11" VerMajor="3">
+
+  <HandleDetailsQry MaxResults="100">
+    <ContactFilter Email="hello@world.com">
+      <PostalAddressFilter City="Wellington" />
+    </ContactFilter>
+  </HandleDetailsQry>
+
+</NZSRSRequest>

@@ -1,0 +1,36 @@
+Revision history for Perl module XML::Parser::Lite
+
+0.721 2015-05-26 PHRED
+    - Developer release (with PHRED's permission) to test changes
+    - Refactored t/37-mod_xmlrpc.t to make the modules it uses optional,
+      using Test::Requires. RT#91434
+    - Specified required versions of XMLRPC::Lite and XMLRPC::Test. GH#4
+    - Specified min perl version of 5.006 in Lite.pm and dist metadata
+    - Fixed RT#98635 - skip the planned number of tests
+    - Changed copyright to refer to XML::Parser::Lite rather than SOAP::Lite
+      (XML::Parser::Lite was forked from SOAP::Lite - see 0.717 below).
+      RT#92756
+    - Set PREREQ_PM, TEST_REQUIRES, and CONFIGURE_REQUIRES depending on
+      whether your version of ExtUtils::MakeMaker supports them.
+    - Doc tweaks: improved abstract, first paragraph of DESCRIPTION
+      and the SEE ALSO section.
+    - Added license type 'perl' to dist metadata, to match the doc.
+    - Updated this file (Changes) to follow CPAN::Changes::Spec
+
+0.720_01 2015-05-13 NEILB
+    - Developer release with all the changes subsequently released in 0.721.
+
+0.720 2014-09-15 PHRED
+    - RT 96206 - add README
+    - RT 96209 - add links to other parsers
+
+0.719 2013-12-02 PHRED
+    - RT 90873 - restore test suite
+
+0.718 2013-11-26 PHRED
+    - add skips for some dependencies
+    - https://rt.cpan.org/Ticket/Display.html?id=87604
+
+0.717 2013-05-16 PHRED
+	- forked from SOAP::Lite 0.716
+

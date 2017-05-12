@@ -1,0 +1,9 @@
+\.swp$
+^XML-Grammar-Fortune-v?\d
+^Build$
+^MANIFEST.bak$
+^MYMETA.yml$
+^MYMETA\.json$
+^_build/
+^blib/
+~$

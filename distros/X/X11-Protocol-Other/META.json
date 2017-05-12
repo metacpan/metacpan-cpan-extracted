@@ -1,0 +1,74 @@
+{
+   "abstract" : "Miscellaneous helpers for X11::Protocol connections.",
+   "author" : [
+      "Kevin Ryde <user42_kevin@yahoo.com.au>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "X11-Protocol-Other",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "devel",
+         "xt"
+      ]
+   },
+   "optional_features" : {
+      "maximum_interoperation" : {
+         "description" : "All the optional things which may be used.",
+         "prereqs" : {
+            "runtime" : {
+               "requires" : {
+                  "Encode" : "1",
+                  "Encode::HanExtra" : "0.06"
+               }
+            }
+         }
+      }
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "X11::Protocol" : "0",
+            "perl" : "5.004"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test" : "0"
+         },
+         "suggests" : {
+            "Encode" : "1",
+            "Encode::HanExtra" : "0.06",
+            "Module::Util" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://user42.tuxfamily.org/x11-protocol-other/index.html",
+      "license" : [
+         "http://www.gnu.org/licenses/gpl.html"
+      ]
+   },
+   "version" : "30",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+}

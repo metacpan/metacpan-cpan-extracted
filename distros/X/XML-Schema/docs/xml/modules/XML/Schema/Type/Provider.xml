@@ -1,0 +1,132 @@
+<module name="XML::Schema::Type::Provider">
+
+  <about>
+    This mixin module implements functionality for extending object classes
+    to provide type management facilities.
+  </about>
+
+  <synopsis>
+<perl>
+use XML::Schema::Type::Provider;
+
+my $provider = XML::Schema::Type::Provider->new();
+
+# store type
+$provider->type( typename => $typeobj );
+
+# fetch type
+my $typeobj = $provider->type('name')
+    || die $provider->error();
+
+# create and store simple type
+$provider->simpleType( name => $typename, base => $basetype, ... );
+
+
+# add attribute object
+$complex->attribute($attrib);        # calls $attrib->name() to get 'foo'
+
+# fetch attribute object
+my $acopy = $complex->attribute('foo');
+
+# add attribute by values
+$complex->attribute( name => 'bar', type => $string );
+</perl>
+  </synopsis>
+
+  <methods>
+    <method id="attribute">
+      <args>$name</args>
+      <args><module refid="XML::Schema::Attribute">$attr_obj</module></args>
+      <args>name => $name, type => <module refid="XML::Schema::Type::Simple">$type</module>, ...</args>
+
+      <p>
+	This method can be used to define and subsequently retrieve
+        attribute definitions for the complex type.
+     </p>
+     <p>
+	When called with a single non-reference 
+	argument, <code>$name</code>, the <class 
+	refid="XML::Schema::Attribute">attribute</class> corresponding to 
+	that name is returned.  If there is no attribute defined with that
+        name then <undef/> is returned and an appropriate error message
+	of the form <code>"no such attribute: $name"</code> is set 
+	internally for subsequent access via the <method>error()</method>
+	method.
+     </p>
+<perl>
+my $attr = $complex->attribute('lang')
+    || die $complex->error();
+</perl>
+    <p>
+	In all other cases, the arguments passed are used to create
+	and/or define a new attribute for the complex type.  If a
+	single argument is passed which is already a reference to an
+	<class>XML::Schema::Attribute</class> object (or appropriate
+	subclass or substitution class - see
+	<class>XML::Schema::Factory</class>) then its <method
+	class="XML::Schema::Attribute">name()</method> method is
+	called and a reference to the object is stored internally
+	against that name as an attribute for the complex type.
+    </p>
+<perl>
+my $attr = XML::Schema::Attribute->new( name => 'lang', type => 'language' );
+
+$complex->attribute($attr);
+</perl>
+    <p>
+	If a single argument is passed which is a reference to a hash
+	array then the values contained therein will be used to create
+	a new <class refid="XML::Schema::Attribute">attribute</class>
+	object which will be assigned to the complex type as above.
+	The hash array should contain <code>name</code> and
+	<code>type</code> elements as a minimum.
+    </p>
+<perl>
+$complex->attribute({ name => 'lang', type => 'language' });
+</perl>
+    <p>
+	If a list of arguments are passed then they will be automatically
+	folded into a hash reference and treated as above.
+    </p>
+<perl>
+$complex->attribute( name => 'lang', type => 'language' );
+</perl>
+    <p>
+	Attributes may define their <code>type</code> value in terms
+	of a reference to a <class
+	refid="XML::Schema::Type::Simple">type object</class> or a
+	string indicating the name of a <class
+	refid="XML::Schema::Type::Builtin">builtin simple type</class>
+	or one previously defined within the scope of the current
+	complex type via the <method>simpleType()</method> method.
+	The <method>attribute()</method> method calls the 
+	<method class="XML::Schema::Attribute">scope()</method> on 
+	each attribute it adopts or adds the <code>scope</code>
+	item to the hash reference used to create an attribute,
+	as appropriate.  In either case, the effect is to bind the 
+	attribute to the scope of the current complex type (<self/>)
+	so that it can resolve type names to real type objects when
+	an instance document is parsed.
+    </p>
+    <p>
+	The Good Thing about this is that you can generally define
+	types by their names and leave the objects to worry about 
+	resolving them to type objects at the right time.  The Bad
+	Thing about this is that you can't define an attribute once
+	and then use it in a dozen different places because it's 
+	<code>scope</code> item will get overwritten each time
+	you assign it to a complex type.  However, all is not lost
+	because W3C XML Schema defines Attribute Groups which are 
+	"Write Once, Reuse Many" attributes that Do The Right Thing
+	to bind themselves to a scope as necessary.  We'll be 
+	supporting something like that <rsn/>.
+    </p>
+    </method>
+  </methods>
+</module>
+
+
+
+
+
+

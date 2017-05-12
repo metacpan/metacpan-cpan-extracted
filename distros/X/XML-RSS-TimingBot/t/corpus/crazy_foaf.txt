@@ -1,0 +1,4 @@
+updatePeriod=hourly
+updateBase=2000-01-01T12:00+00:00
+updateFrequency=1
+

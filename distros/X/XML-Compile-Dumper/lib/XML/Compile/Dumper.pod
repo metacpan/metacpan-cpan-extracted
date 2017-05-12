@@ -1,0 +1,172 @@
+=encoding utf8
+
+=head1 NAME
+
+XML::Compile::Dumper - Remember precompiled XML processors
+
+=head1 SYNOPSIS
+
+ # create readers and writers or soap things
+ my $reader = $schema->compile(READER => '{myns}mytype');
+ my $writer = $schema->compile(WRITER => ...);
+
+ # then dump them into a package
+ my $dumper = XML::Compile::Dumper->new
+   (package => 'My::Package', filename => 'My/Package.pm');
+ $dumper->freeze(foo => $reader, bar => $writer);
+ $dumper->close;
+
+ # later, they can get recalled using
+ use My::Package;
+ my $hash = foo($xml);
+ my $doc  = bar($doc, $xml);
+
+=head1 DESCRIPTION
+
+This module simplifies the task of saving and loading pre-compiled
+translators.  Schema's can get huge, and when you are not creating a
+daemon to do the XML communication, you may end-up compiling and
+interpreting these large schemas often, just to be able to process
+simple data-structures.
+
+Based on the excellent module Data::Dump::Streamer, this module
+helps you create standard Perl packages which contain the reader
+and writer code references.
+
+WARNING: this feature was introduced in release 0.17.  Using perl
+5.8.8, libxml 2.6.26, XML::LibXML 2.60, and Data::Dump::Streamer
+2.03, Perl complains about C<"PmmREFCNT_dec: REFCNT decremented below
+0! during global destruction."> when the tests are run.  This bug
+can be anywhere. Therefore, these tests are disabled by default in
+t/TestTools.pm.  If you have time, could you please run the tests with
+C<$skip_dumper = 0;> and report the results to the author?
+
+=head1 METHODS
+
+=head2 Constructors
+
+=over 4
+
+=item $obj-E<gt>B<close>()
+
+Finalize the produced file.  This will be called automatically
+if the objects goes out-of-scope.
+
+=item XML::Compile::Dumper-E<gt>B<new>(%options)
+
+Create an object which will collect the information for the output
+file.  You have to specify either a C<filehandle> or a C<filename>.
+A filehandle will be closed after processing.
+
+ -Option    --Default
+  filehandle  undef
+  filename    undef
+  package     <required>
+
+=over 2
+
+=item filehandle => C<IO::Handle>
+
+=item filename => FILENAME
+
+The file will be written using utf8 encoding, using IO::File.  If
+you want something else, open your filehandle first, and provide that
+as argument.
+
+=item package => PACKAGE
+
+The name-space which will be used: it will produce a C<package>
+line in the output.
+
+=back
+
+=back
+
+=head2 Accessors
+
+=over 4
+
+=item $obj-E<gt>B<file>()
+
+Returns the output file-handle, which you may use to add extensions to
+the module.
+
+=back
+
+=head2 Producers
+
+=over 4
+
+=item $obj-E<gt>B<footer>($fh)
+
+=item $obj-E<gt>B<freeze>(PAIRS|HASH)
+
+Produce the dump for a group of code references, which will be
+made available under a normal subroutine name.  This method
+can only be called once.
+
+=item $obj-E<gt>B<header>($fh, $package)
+
+Prints the header text to the file.
+
+=back
+
+=head1 DIAGNOSTICS
+
+=over 4
+
+=item Error: either filename or filehandle required
+
+=item Error: freeze can only be called once
+
+The various closures may have related variables, and therefore
+need to be dumped in one go.
+
+=item Error: freeze needs PAIRS or a HASH
+
+=item Error: package name required
+
+The perl module which is produced is cleanly encapsulating the
+produced program text in a perl package name-space.  The name
+has to be provided.
+
+=item Error: value with $name is not a code reference
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of XML-Compile-Dumper distribution version 0.14,
+built on January 22, 2014. Website: F<http://perl.overmeer.net/xml-compile/>
+
+Other distributions in this suite:
+L<XML::Compile>,
+L<XML::Compile::SOAP>,
+L<XML::Compile::WSDL11>,
+L<XML::Compile::SOAP12>,
+L<XML::Compile::SOAP::Daemon>,
+L<XML::Compile::SOAP::WSA>,
+L<XML::Compile::C14N>,
+L<XML::Compile::WSS>,
+L<XML::Compile::WSS::Signature>,
+L<XML::Compile::Tester>,
+L<XML::Compile::Cache>,
+L<XML::Compile::Dumper>,
+L<XML::Compile::RPC>,
+L<XML::Rewrite>
+and
+L<XML::LibXML::Simple>.
+
+Please post questions or ideas to the mailinglist at
+F<http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/xml-compile> .
+For live contact with other developers, visit the C<#xml-compile> channel
+on C<irc.perl.org>.
+
+=head1 LICENSE
+
+Copyrights 2007-2014 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

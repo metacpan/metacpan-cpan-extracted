@@ -1,0 +1,145 @@
+<?xml version="1.0"?>
+<order>
+  <orig_order_id/>
+  <cart_id>4597</cart_id>
+  <metable_id/>
+  <order_id>4555</order_id>
+  <active>1</active>
+  <date_created>2009-12-15 12:37:25</date_created>
+  <identity_id>4823</identity_id>
+  <account_id/>
+  <legacy_id/>
+  <order_type_id>1</order_type_id>
+  <error>0</error>
+  <order_authorizations>
+    <order_authorization>
+      <metable_id/>
+      <limited>0</limited>
+      <date_created>2009-12-15 12:37:25</date_created>
+      <filtered>0</filtered>
+      <order_authorization_id>24131</order_authorization_id>
+      <address_id>4764</address_id>
+      <authorization_id>98061</authorization_id>
+      <duplicate>0</duplicate>
+      <address>
+        <name_last>Hampton</name_last>
+        <date_created>2009-12-15 11:54:38</date_created>
+        <mobile/>
+        <state>CA</state>
+        <address_id>4764</address_id>
+        <city>Los Angeles</city>
+        <fax/>
+        <company/>
+        <country>US</country>
+        <person_id>3054</person_id>
+        <active>1</active>
+        <phone/>
+        <account_id/>
+        <address2/>
+        <name_first>Kip</name_first>
+        <zip>90066</zip>
+        <title/>
+        <address1>11919 Courtleigh Dr.</address1>
+      </address>
+      <fulfilled>0</fulfilled>
+      <as400_idx/>
+      <rejected>0</rejected>
+      <qualified>0</qualified>
+      <cart_authorization_id>21917</cart_authorization_id>
+      <order_id>4555</order_id>
+      <quantity>1</quantity>
+      <active>1</active>
+      <bulk>0</bulk>
+      <picked>0</picked>
+      <gift_id/>
+      <orig_order_authorization_id/>
+      <renewal>0</renewal>
+    </order_authorization>
+    <order_authorization>
+      <metable_id/>
+      <limited>0</limited>
+      <date_created>2009-12-15 12:37:25</date_created>
+      <filtered>0</filtered>
+      <order_authorization_id>24132</order_authorization_id>
+      <address_id>4764</address_id>
+      <authorization_id>42057</authorization_id>
+      <duplicate>0</duplicate>
+      <address>
+        <name_last>Hampton</name_last>
+        <date_created>2009-12-15 11:54:38</date_created>
+        <mobile/>
+        <state>CA</state>
+        <address_id>4764</address_id>
+        <city>Los Angeles</city>
+        <fax/>
+        <company/>
+        <country>US</country>
+        <person_id>3054</person_id>
+        <active>1</active>
+        <phone/>
+        <account_id/>
+        <address2/>
+        <name_first>Kip</name_first>
+        <zip>90066</zip>
+        <title/>
+        <address1>11919 Courtleigh Dr.</address1>
+      </address>
+      <fulfilled>0</fulfilled>
+      <as400_idx/>
+      <rejected>0</rejected>
+      <qualified>0</qualified>
+      <cart_authorization_id>21918</cart_authorization_id>
+      <order_id>4555</order_id>
+      <quantity>1</quantity>
+      <active>1</active>
+      <bulk>0</bulk>
+      <picked>0</picked>
+      <gift_id/>
+      <orig_order_authorization_id/>
+      <renewal>0</renewal>
+    </order_authorization>
+    <order_authorization>
+      <metable_id/>
+      <limited>0</limited>
+      <date_created>2009-12-15 12:37:25</date_created>
+      <filtered>0</filtered>
+      <order_authorization_id>24133</order_authorization_id>
+      <address_id>4764</address_id>
+      <authorization_id>102161</authorization_id>
+      <duplicate>0</duplicate>
+      <address>
+        <name_last>Hampton</name_last>
+        <date_created>2009-12-15 11:54:38</date_created>
+        <mobile/>
+        <state>CA</state>
+        <address_id>4764</address_id>
+        <city>Los Angeles</city>
+        <fax/>
+        <company/>
+        <country>US</country>
+        <person_id>3054</person_id>
+        <active>1</active>
+        <phone/>
+        <account_id/>
+        <address2/>
+        <name_first>Kip</name_first>
+        <zip>90066</zip>
+        <title/>
+        <address1>11919 Courtleigh Dr.</address1>
+      </address>
+      <fulfilled>0</fulfilled>
+      <as400_idx/>
+      <rejected>0</rejected>
+      <qualified>0</qualified>
+      <cart_authorization_id>21919</cart_authorization_id>
+      <order_id>4555</order_id>
+      <quantity>1</quantity>
+      <active>1</active>
+      <bulk>0</bulk>
+      <picked>0</picked>
+      <gift_id/>
+      <orig_order_authorization_id/>
+      <renewal>0</renewal>
+    </order_authorization>
+  </order_authorizations>
+</order>

@@ -1,0 +1,16 @@
+Changes
+examples/id.pl
+examples/id.xml
+lib/XML/Traverse/ParseTree.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+perltidy.conf
+perltidy_glob.BAT
+README
+t/01base.t
+t/02dfs.t
+t/03getter.t
+t/04predicates.t
+t/99pod.t
+t/99pod_coverage.t

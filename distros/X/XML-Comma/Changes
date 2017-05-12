@@ -1,0 +1,541 @@
+Revision history for XML::Comma modules:
+
+-------------------------
+1.998  2007/04/12 r.1653
+-------------------------
+
+  - various indexing improvements
+
+  - first crack at def extension
+
+  - use Imager instead of GD for CSI.def
+
+  - all comma-*.pl accept an optional -module argument
+
+-------------------------
+1.997  2007/02/04 r.1563
+-------------------------
+
+  - fix embarrasing bug in comma-create-config.pl
+
+-------------------------
+1.996  2007/02/02 r.1557
+-------------------------
+
+  - build out of CPAN should work better now
+
+  - require 5.6.1
+
+  - silence a spurious warning from t/comma_standard_image.def
+
+
+-------------------------
+1.995  2007/01/30 r.1541
+-------------------------
+
+  - performance: use Proc::Exists instead of Proc::ProcessTable
+
+  - add get_leaf_nodes() and full_field_texts()
+
+  - removal of VirtualDoc and $it->as_array()
+
+-------------------------
+1.994  2007/04/30 r.1068
+-------------------------
+
+  - another small fix thanks to andreas - use $^X, not perl to call
+    a perl script so we get the "right" one
+
+-------------------------
+1.993  2007/04/30 r.1064
+-------------------------
+
+  - oops, 1.992 was broken
+
+-------------------------
+1.992  2007/04/30 r.1063
+-------------------------
+
+  - don't die from a Makefile.PL - pointed out by ANDK@cpan.org
+
+-------------------------
+1.991  2007/04/29 r.1061
+-------------------------
+
+  - more install process streamlining:
+
+    - change fallback db to mysql for ease of install
+
+    - don't invoke comma-create-config.pl if we're going to die
+      because of missing dependencies, it wastes the user's time
+
+-------------------------
+1.99  2007/04/22 r.1043
+-------------------------
+
+  - permissions cleanup in svn
+
+  - a few comma-create-config.pl enhancements (still mysql only, unfortunately)
+
+-------------------------
+1.98  2007/04/21 r.1028
+-------------------------
+
+  - add comma-load-and-store.sh, introspection tests to MANIFEST
+
+-------------------------
+1.97  2007/04/21 r.1026
+-------------------------
+
+  - thanks to kwin's help, find the root of the postgres/textsearches
+    issues. for now, we have a horrible hackish workaround (force the
+    developer not to use defer_textsearches => 1 with rebild)
+
+  - allow a required element to have a value of 0. this is
+    important for required booleans, else validate errors out
+
+  - add ->def() in DefModule.pm and docs that inherit fromwhence
+
+  - add introspection tests, fuller API expected in 2.1
+
+  - add usage of timestamp macro on element, only useful with
+    forthcoming introspection code.
+
+  - add {Store|Index}->def_name, $store->associated_indices()
+
+  - begin work on allowing postgres to be configured from Makefile.PL
+
+-------------------------
+1.96  2007/02/26 r.949
+-------------------------
+
+  - auto-instantiation shortcut methods for storage iterators
+
+  - in storage iterators, allow validate => [0,1] argument on read_doc,
+    next_read, and prev_read
+
+  - bugfix: if a storage iterator has no elements, return a false value
+    from _iterator_has_stuff()
+
+-------------------------
+1.95  2007/02/23 r.938
+-------------------------
+
+  - introduction of VirtualDoc and $it->as_array()
+
+-------------------------
+1.94  2007/02/22 r.927
+-------------------------
+
+  - more SQL (particularly Pg) bug fixes - ski
+
+  - use Test::More everywhere in t/ - ski
+
+  - introduce $XML::Comma::Log::warn_only, which, when set to
+    a true value, dumps Log::* messages to STDERR instead of
+    comma.log
+
+-------------------------
+1.93  2007/02/13 r.910
+-------------------------
+
+  - fix Pg support - khk
+
+  - fix some SQL bugs encountered in testing - ski
+
+-------------------------
+1.90  2007/02/01 r.889
+-------------------------
+
+  - note: branches/XML-Comma-DEVEL becomes trunk/XML-Comma again
+
+  - Changed inheritance structure of SQL::* modules.
+
+  - Allow operator overloading on storage iterators, ie:
+      while(++$sit) { my $doc = $sit->read_doc(); ... };
+
+  - Fix longstanding bug with storage iterators grabbing docs from the
+    wrong directory when a store spanned multiple top level directories
+
+  - add date_8 to unix_time macro
+
+  - add no_mtime optional argument to $doc->store()
+
+  - allow slashes in derived_file <location>s
+
+  - added better support for 'binary table' collection type, deprecated
+    'many tables' and 'stringified' collection types.
+
+  - add support for lazy doc evaluation from storage iterators, ie:
+      my $it = XML::Comma::Def->d->get_index("i")->iterator();
+      $it->indexed_field_one(); #fast
+      $it->indexed_field_two(); #fast
+      $it->unindexed_field();   #slow, but works
+
+  - add Timestamped_random locations for pseudo-random document
+    name keyed of system time.
+
+  - fix index_only storage to allow derive_from 
+
+  - add -module flags to comma-load-and-store-doc.pl, comma-drop-index.pl
+
+  - add $iterator->select_count() for efficiently determining the number
+    of elements in indexing iterators (mysql support only)
+
+  - fix race conditions in next_sequential_id pointed out by Bill
+    Herrin
+
+  - fix tmp blob copy/move bug
+
+-------------------------
+1.25  2007/01/31 r.869
+-------------------------
+
+  - Performance, correctness/security fix in XML::Comma::Log
+
+  - new(file => ...), new(block => ...), read(), and retrieve()
+    now validate by default, so you can't get an invalid doc.
+    override via validate => [0,1] argument or for system-wide
+    default, set validate_new in Configuration.pm
+
+  - added include_for_hash, which is like ignore_for_hash but
+    assumes the default is to exclude, not include an element
+    from the hash. handy for defs under active development, or
+    defs that must be "future-proofed"
+
+  - bugfix in HTTP_Transfer.pm with aborted transfers
+
+-------------------------
+1.21  2004/01/12
+-------------------------
+
+  - Added "mysql_local_infile=1" to the default mysql DSN.  Kindly 
+    suggested by Brian Szymanski when the FAQ workarounds didn't work
+    around.
+
+-------------------------
+1.20  2003/10/13
+-------------------------
+
+  - Fixed a textsearch bug (reported by Eric Folley) that allowed 
+    stale textsearch_temp_tables to stick around through 
+    iterator_refresh calls which caused the not so helpful "error 124"
+    in some versions of mysql.  The original fix introduced a new bug
+    (reported by Chuq Yang) that caused iterator() calls which used a 
+    textsearch that contained no matches to return an iterator full
+    of all the documents in the index queried (Dug).
+
+  - Fixed Index_Only store to throw a store error if its indexing
+    operation dies.
+
+-------------------------
+1.19  2003/05/22
+-------------------------
+
+  - Added doc_id to error messages in basic doc methods
+
+  - Made the internal calls to def-level escape_code and unescape_code
+    subs pass any set() or get() args, so that escape and unescape
+    routines can vary depending on application code arguments
+
+  - Fixed a read_only bug that made newly-created elements of
+    read-only docs NOT read-only
+
+  - Fixed textsearch bug wherein textsearch elements with the same
+    name in different indexes/defs became mixed up
+
+  - Added XML::Comma::Def-><name> shortcut method
+
+  - Added Indexing iterator method iterator_dispatch, decoupling the autoload 
+    from the the method/element fetch.
+
+  - Moved pnotes handling up an (OO) layer into AbstractElement, so
+    all parts of a doc or def can now have their own pnotes objects
+
+  - Proc::ProcessTable is now optional, used if available to try and
+    determine whether a (local) process that holds doc locks is still
+    alive.
+
+  - Comma/Pkg/Mason/ParResolver and ParComponent added to core
+    distribution. 
+
+  - Removed some stopwords from Comma/Pkg/Mason/Preprocessor_En that
+    never should have been there in the first place (like "internet").
+
+  - Added STDERR output to error notices from $index->rebuild()
+
+  - New utility bin/comma-load-and-index-doc.pl
+
+  - New Comma/Storage/Output module (that, confusingly, only does
+    input): MailMessageReader
+ 
+  - Made errors thrown during parsing conform to Log->err style, and
+    added $extra_text field to Error constructor. Now errors thrown
+    during def method parsing report the method name and have a more
+    specific heirarchy field.
+
+  - Removed date_8.macro's Date::Calc dependency (rewriting the
+    validate_hook in the process) and added a number of tests (Dug).
+
+  - Changed default Comma/Configuration file to use system directories
+    relative to the current directory under TEST/ for all test
+    scripts. Tried and failed to add a SQLite database driver so that
+    we can install (for example from CPAN) even on a vanilla system
+    and hae everything work without needing to configure an
+    RDBMS. SQLite presents various issues that will be difficult to
+    resolve without a large amount of rewritage.
+
+-------------------------
+1.18  2003/03/18
+-------------------------
+
+  - Fixed Sequential_dir and Sequential_file to pad with the 0th digit
+    rather than with '0'
+
+  - Added new bin/comma-load-and-store-doc.pl utility
+
+  - Improved some SimpleC error messages
+
+  - Removed about a dozen stopwords from the english stopwords list
+
+  - Added Storage::Util method to docs
+
+  - Fixed a bug in escape/unescape code that was producing strange character 
+    sequences
+
+  - Added experimental "collection field" features
+
+  - Added a pnotes functionality to elements -- a hash-keyed store for
+    any data that the element object would like to salt away for
+    itself. not shared in a class-like manner as def_pnotes
+    is. Changed the generic Comma.pm level def_pnotes lookup method to
+    be called def_pnotes rather than pnotes, to avoid confusion now
+    that both instance- and class-like pnotes calls exist.
+
+  - Made Proc::ProcessTable optional. Still need to write docs (and
+    perhaps a Makefile.PL notice) saying that its useful to have.
+
+-------------------------
+1.17  2003/03/04
+-------------------------
+
+  - Fixed missing file in MANIFEST
+
+  - ParResolver is working; added Comma/Pkg/test.par
+
+-------------------------
+1.10  2002/12/06
+-------------------------
+
+  - Fixed bug in textsearch code that prevented processes that hadn't
+    already "indexed" to "retrieve" based on textsearch stuff
+
+  - Added 'digits' argument to Sequential_file and
+    Sequential_dir. Modified FileUtil::current_sequential_id to use
+    the lockfile rather than listing the files in the directory (which
+    fixes the odd behavior Sherrard was complaining about that arises
+    if you drop unexpected stuff into directories). New dependency:
+    Math::BaseCalc.
+
+  - Made some changes to the core to support the new Index_Only
+    storage location module. This is the first location module that is
+    truly decoupled from the filesystem. There are some performance
+    and feature improvements still to be made, but it seems quite
+    usable.
+
+  - Added new <escapes> syntax to allow Def-defined escape/unescape
+    behavior
+
+  - Moved Configuration stuff into Comma/Configuration.pm -- a
+    separate file. This makes more sense from an architectural point
+    of view, and could make it easier to run more than one Comma
+    instance on a given machine, in the future.
+
+  - Added a "sys_directory" configuration variable; changed the
+    SimpleC parser to do its build in the sys directory. Changed
+    Comma.pm to create the comma_root, document_root, sys_directory
+    and tmp_directory dirs on startup, if they don't already exist.
+
+  - Rewrote BlobElement framework so that BlobElements act like other
+    elements: they are not written to permanent storage until a
+    store() is called, and there is no extra store() fanciness
+    required to make sure that the pointers are in sync. Under the
+    covers, blob elements are saved in files under the tmp_directory
+    until the doc they belong to is store()d.
+
+  - The content of an <erase_where_clause> now gets eval'ed before
+    being passed to the database *if* it begins with a '{'
+    character. This is useful for doing perl-ish calculations before
+    having to drop down into SQL.
+
+  - NON-BACKWARDS-COMPATIBLE CHANGE -- XML::Comma::Configuration.pm
+    now uses a much simpler syntax and a future-flexible approach,
+    inheriting from XML::Comma::Pkg::ModuleConfiguration.pm
+
+  - Added #include foo and #include {foo} <args list> to parsers
+
+  - Added PAR resolving functionality to DefManager
+
+-------------------------
+1.09  2002/11/27 12:36:38
+-------------------------
+
+  - Upgraded Pg-specific code for Postgres 7.3. Comma now REQUIRES Pg
+    7.3 -- which is fine, because Comma made poor assumptions pre-7.3
+    that didn't work so good. QUESTION: why is postgres so chatty, and
+    what can be done to keep it from printing out warnings when
+    indexes are created, and to stop errors that are caught with eval
+    from going to the log.
+
+-------------------------
+1.08  2002/07/26 12:40:45
+-------------------------
+
+  - Bug fixes or code cleanup in: method_names, _make_collection_spec,
+    Index->DESTROY, Element->method() and friends, boolean macro,
+    various tests, date_8 (code contributed by Chuck), macro section
+    in Bootstrap Def, bcollection tables, Index/Clean circular
+    references, Doc->store(), set(), decl_pos in various Location
+    modules, FileUtile make_directory permissions setting.
+
+  - DEPRECATED HTTP_Upload. The plan is to support HTTP_Transfer,
+    which is a cleaner architecture, instead. Be that as it may, fixed
+    some headers in HTTP_Upload_mod_perl module. Tests for
+    HTTP_Transfer are in t/transfer.manual.
+
+  - New date_8 macro methods "today" and "diff_today"
+
+  - Makefile.PL now respects existing Comma.pm installs -- prints out
+    message saying that it's not overwriting your Comma.pm if that's
+    the case. Also, moved VERSION into Bootstrap.pm, so that upgrades
+    show the right version even if Comma.pm doesn't change.
+
+  - Changed enum_choices() in enum macro to guarantee a specific
+    return order.
+
+  - Added integer macro.
+
+  - DEPRECATED the XML::Comma->lock_singlet() interface. It's close to
+    impossible to use this as intended, across differing database
+    architectures. Better to rip it out (advisorily, anyway, by
+    deprecating) and replace it with something better in the
+    future. In the meantime, added a MySQL-specific "disposable locks"
+    module in XML::Comma::Pkg::MySQL_Simple_Lock.
+
+  - Beefed up SQL::DBH_User _connect() routine (which is inherited by
+    all core code that needs db access). Sherrard wrote code to retry
+    and log failed attempts.
+
+  - TIB contributed new Location module SequentialCheck_file
+
+  - Fixed Blob class such that element_delete() deletes the backing
+    file.
+
+  - Big fixes to doc-level locking code. Old code was not
+    multi-machine safe. New code is, as long as the two (or more)
+    machines share a single database server. It is possible (though
+    unlikely -- requires bad perl interpreter exit) for a lock record
+    to hang around after process goes away. There is no probable fix
+    for this, but some utility scripts to print out info about comma
+    locks are on the todo list.
+
+  - Added a third passed argument to pre_ and post_store_hook code: a
+    hashref pointing to the original store() args. This allows hooks
+    to do arbritrarily complex iff'ing based on user-level args (which
+    are unconstrained, so this is a very open-ended mechanism).
+
+  - NON-BACKWARDS-COMPATIBLE CHANGE: Added a check for defined-ness
+    for the element names passed into $el->elements(). This might
+    break sloppy (or buggy) old code, but seemed like very much the
+    right thing to do. There's no good reason to be able to pass
+    non-existent element names to the elements() method.
+
+  - NON-BACKWARDS-COMPATIBLE CHANGE: Changed the third argument passed
+    to set_hook and set_from_file_hook to be a hash_ref, rather than
+    passing the whole hash. This might break some existing code
+    (although I don't think much code uses this feature, yet), but
+    it's the Right Thing (tm).
+
+  - NON-BACKWARDS-COMPATIBLE CHANGE: Changed the
+    Comma::Util::XML_basic_escape() method. This method used to try to
+    identify '&' characters that were part of an entity tag, and NOT
+    escape them. Because the logic was not symmetrical with
+    XML_basic_unescape(), confusing results resulted. New escape
+    method escapes all occurrences of '<', '>', and '&' in a string --
+    making it entirely symmetrical with the unescape code. Two new
+    methods were added, in case folks need the old functionality:
+    XML_smart_escape() and XML_bare_amp_escape().
+
+  - Added French Textsearch Preprocessor. Algorithm based on snowball
+    code from http://snowball.tartarus.org/french/stemmer.html
+
+  - Added 'erase_where_clause' capabilities to collection table
+    cleans.
+
+  - Error reporting on errors passed through DBI is much improved. All
+    do() statements in SQL/Base.pm where changed to prepare(), etc.
+
+  - Partial rewrite of Preprocessor code structure. Most importantly,
+    maximum word length is now tied to a global defined in the
+    Preprocessor abstract/template class, and the multi-preproc
+    switching code accomodates an "attribute" argument so the Iterator
+    can stem keyword arguments correctly. UPGRADE INFORMATION: if you
+    are upgrading from an earlier version of Comma, it is best to drop
+    all indexes that include <textsearch> fields, and rebuild them
+    after the upgrade.
+
+-------------------------
+1.01  2002/04/10 12:05:32
+-------------------------
+
+  - Changed Comma_Standard_Image.def to use hex (rather than b64)
+    digests, to eliminate the +/= characters that could cause problems
+    in urls.
+
+  - Added doc_id() method to Storage::Iterator. Returns the doc_id of
+    the currently-pointed-at doc.
+
+  - Improved $index->rebuild() code. Fixed bug in stop_rebuild_hook
+    handler, added parallelization ('workers=>n' arg). Added sig
+    handler to catch Ctrl-C and try to clean up, so as to not leave db
+    tables in a "marked" state.
+
+  - Added Methodable::method_names() method so that Def and Index
+    objects can return the names of the methods they define.
+  
+  - Added $def->index_names() and $def->store_names() methods.
+
+  - Fixed Index::Iterator bug found by TIB that was triggered by
+    trying to access columns from an empty iterator.
+
+  - Rewrote Index plurals code. Added a new type of storage
+    ('bcollection table'), and integrated 'sort' and 'collection'
+    types together. Rewrote SQL code generation and all t/indexing.t
+    tests. Added more boolean/notting and partial match capabilities
+    into the new collections framework.
+
+  - Added some cleanup code to Index->DESTROY to resolve circular
+    references that were causing occasional problems with global
+    destruction.
+
+-------------------------
+1.00  2002/01/28 03:46:15
+-------------------------
+  - boolean macro bugfix
+
+  - new features in HTTP_Transfer
+
+  - faster $index->count() SQL
+ 
+  - added iterator_select_returnval() method to Index Iterator class
+
+  - new boolean- (and grouping-) capable collection and sort
+    specs. implemented using Parse::RecDescent -- core code now
+    requires Parse::RecDescent to be available
+
+  - added validate() method to Element, NestedElement and BlobElement
+    classes. validate_structure() is now DEPRECATED. storage write
+    methods all call validate() and refuse to store Docs that fail to
+    pass all validity checks. it's now possible to define
+    validate_hooks for blob elements.
+

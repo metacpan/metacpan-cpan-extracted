@@ -1,0 +1,43 @@
+<stx:transform version="1.0" 
+  xmlns:stx="http://stx.sourceforge.net/2002/ns"
+  strip-space="yes">
+
+  <stx:procedure name="first" visibility="local">
+    <stx:text>FAILED1</stx:text>
+  </stx:procedure>
+
+  <stx:procedure name="second" visibility="group">
+    <stx:text>OK2</stx:text>
+  </stx:procedure>
+
+  <stx:procedure name="third" visibility="group">
+    <stx:text>FAILED3</stx:text>
+  </stx:procedure>
+
+  <stx:group>
+
+    <stx:template match="/root" public="yes">
+      <stx:call-procedure name="first"/>
+      <stx:call-procedure name="second"/>
+      <stx:call-procedure name="third"/>
+    </stx:template>
+
+    <stx:procedure name="third">
+      <stx:text>OK3</stx:text>
+    </stx:procedure>
+
+  </stx:group>
+
+  <stx:group>
+
+    <stx:procedure name="first" visibility="global">
+      <stx:text>OK1</stx:text>
+    </stx:procedure>
+
+    <stx:procedure name="second" visibility="global">
+      <stx:text>FAILED2</stx:text>
+    </stx:procedure>
+    
+  </stx:group>
+  
+</stx:transform>

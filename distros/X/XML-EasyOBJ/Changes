@@ -1,0 +1,20 @@
+Revision history for Perl extension XML::EasyOBJ.
+
+1.12  Sat Jul 27 12:00:00 2002
+	- create from XML string
+	- better documentation
+
+1.11  Fri Apr 19 12:00:00 2002
+	- ability to retrieve child elements without naming them
+
+1.10  Sat Mar  9 12:00:00 2002
+	- bug fix when adding elements to the tree.
+	- ability to remap function names created.
+	- ability to create new file from scratch
+	- ability to save XML doc
+	- ability to remove elements/attributes
+	- added some tests
+
+1.00  Sat Jul 29 12:00:00 2000
+	- original version
+

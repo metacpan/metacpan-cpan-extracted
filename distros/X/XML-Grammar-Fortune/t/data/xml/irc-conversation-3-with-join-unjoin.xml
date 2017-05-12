@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<collection>
+    <head />
+    <list>
+        <fortune id="Im-not-an-asshole">
+            <meta>
+                <title>I'm not an Asshole…</title>
+            </meta>
+            <irc>
+                <body>
+                    <saying who="rindolf">sussman: for the record, I think the
+                        build system is the ultimate proof that python code
+                        can be as bad as Perl one.</saying>
+                    <me_is who="clkao">giggles</me_is>
+                    <saying who="jackr">hehe</saying>
+                    <joins who="mofino">has joined #perlcafe</joins>
+                    <saying who="mofino">I'm not an asshole. I just play one
+                    on T.V.</saying>
+                    <leaves who="mofino">has left #perlcafe</leaves>
+                </body>
+                <info>
+                    <channel>#perlcafe</channel>
+                    <network>Freenode</network>
+                    <tagline>Discussing the Subversion Build System</tagline>
+                </info>
+            </irc>
+        </fortune>
+    </list>
+</collection>

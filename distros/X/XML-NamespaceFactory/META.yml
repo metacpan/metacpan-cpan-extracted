@@ -1,0 +1,45 @@
+---
+abstract: 'Simple factory objects for SAX namespaced names.'
+author:
+  - 'Robin Berjon <robin@knowscape.com>'
+  - 'Chris Prather <chris@prather.org>'
+build_requires:
+  Test: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.141520'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: XML-NamespaceFactory
+no_index:
+  directory:
+    - t
+    - xt
+    - examples
+    - corpus
+  package:
+    - DB
+provides:
+  XML::NamespaceFactory:
+    file: lib/XML/NamespaceFactory.pm
+    version: '1.02'
+  XML::NamespaceFactory::TiedHash:
+    file: lib/XML/NamespaceFactory.pm
+    version: '1.02'
+requires:
+  Carp: '0'
+  overload: '0'
+  perl: '5.006'
+  strict: '0'
+  vars: '0'
+resources:
+  bugtracker: https://github.com/perigrin/xml-namespacefactory/issues
+  homepage: https://github.com/perigrin/xml-namespacefactory
+  repository: https://github.com/perigrin/xml-namespacefactory.git
+version: '1.02'
+x_authority: cpan:PERIGRIN
+x_contributors:
+  - 'Kjetil Kjernsmo <kjetil@kjernsmo.net>'

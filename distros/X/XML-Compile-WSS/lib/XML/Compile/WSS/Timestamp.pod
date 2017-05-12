@@ -1,0 +1,187 @@
+=encoding utf8
+
+=head1 NAME
+
+XML::Compile::WSS::Timestamp - expiration
+
+=head1 INHERITANCE
+
+ XML::Compile::WSS::Timestamp
+   is a XML::Compile::WSS
+
+=head1 SYNOPSIS
+
+ # used in combination with any XML schema
+ my $wss = XML::Compile::WSS::Timestamp->new
+   ( ... parametes, some required
+   , schema => $anything
+   );
+
+ # connects itself to a WSDL
+ my $wss  = XML::Compile::SOAP::WSS->new;
+ my $wsdl = XML::Compile::WSDL11->new($wsdlfn);
+ my $ts   = $wss->timestamp
+   ( ... same params, never 'schema'
+   );
+
+=head1 DESCRIPTION
+
+The generic Web Service Security protocol is implemented by the super
+class L<XML::Compile::WSS|XML::Compile::WSS>.  This extension implements a timestamp
+record.
+
+Extends L<"DESCRIPTION" in XML::Compile::WSS|XML::Compile::WSS/"DESCRIPTION">.
+ 
+=head1 METHODS
+
+Extends L<"METHODS" in XML::Compile::WSS|XML::Compile::WSS/"METHODS">.
+ 
+=head2 Constructors
+
+Extends L<"Constructors" in XML::Compile::WSS|XML::Compile::WSS/"Constructors">.
+ 
+=over 4
+
+=item XML::Compile::WSS::Timestamp-E<gt>B<new>(%options)
+
+ -Option     --Defined in       --Default
+  created                         now
+  expires                         undef
+  lifetime                        undef
+  prepare      XML::Compile::WSS  'ALL'
+  schema       XML::Compile::WSS  undef
+  version      XML::Compile::WSS  undef
+  wss_version  XML::Compile::WSS  '1.1'
+  wsu_Id                          undef
+
+=over 2
+
+=item created => DATETIME
+
+By default, for each constructed message the current time is taken.
+See L<XML::Compile::WSS::dateTime()|XML::Compile::WSS/"Helpers"> for options on DATETIME.  If you
+specify an empty string, then the C<Created> node will be skipped.
+
+=item expires => DATETIME
+
+See L<XML::Compile::WSS::dateTime()|XML::Compile::WSS/"Helpers"> for options on DATETIME.  When
+not defined, the C<Expires> node will be skipped.
+
+=item lifetime => SECONDS
+
+When C<lifetime> is given and no C<expires>, then the expiration will
+be set to the C<created> time plus this lifetime.  In this case, the
+created time cannot be specified as formatted DATE.
+
+=item prepare => 'READER'|'WRITER'|'ALL'|'NONE'
+
+=item schema => an L<XML::Compile::Cache|XML::Compile::Cache> object
+
+=item version => STRING
+
+=item wss_version => '1.1'|MODULE
+
+=item wsu_Id => LABEL
+
+Adds a C<wsu:Id> attribute to the C<wsse:Timestamp>.
+
+=back
+
+=back
+
+=head2 Attributes
+
+Extends L<"Attributes" in XML::Compile::WSS|XML::Compile::WSS/"Attributes">.
+ 
+=over 4
+
+=item $obj-E<gt>B<created>()
+
+=item $obj-E<gt>B<expires>()
+
+=item $obj-E<gt>B<lifetime>()
+
+=item $obj-E<gt>B<schema>()
+
+Inherited, see L<XML::Compile::WSS/"Attributes">
+
+=item $obj-E<gt>B<timestamps>()
+
+Returns the "created" and "expires" timestamps.  Both may be undef.
+
+=item $obj-E<gt>B<wssVersion>()
+
+Inherited, see L<XML::Compile::WSS/"Attributes">
+
+=item $obj-E<gt>B<wsuId>()
+
+=back
+
+=head2 Apply
+
+Extends L<"Apply" in XML::Compile::WSS|XML::Compile::WSS/"Apply">.
+ 
+=over 4
+
+=item $obj-E<gt>B<check>($security)
+
+Inherited, see L<XML::Compile::WSS/"Apply">
+
+=item $obj-E<gt>B<create>($doc, $security, $data)
+
+Inherited, see L<XML::Compile::WSS/"Apply">
+
+=back
+
+=head2 Helpers
+
+Extends L<"Helpers" in XML::Compile::WSS|XML::Compile::WSS/"Helpers">.
+ 
+=over 4
+
+=item $obj-E<gt>B<dateTime>($time|$string|HASH)
+
+Inherited, see L<XML::Compile::WSS/"Helpers">
+
+=back
+
+=head2 Internals
+
+Extends L<"Internals" in XML::Compile::WSS|XML::Compile::WSS/"Internals">.
+ 
+=over 4
+
+=item $obj-E<gt>B<loadSchemas>($schema, $version)
+
+=item XML::Compile::WSS::Timestamp-E<gt>B<loadSchemas>($schema, $version)
+
+Inherited, see L<XML::Compile::WSS/"Internals">
+
+=item $obj-E<gt>B<writerHookWsuId>($type)
+
+Inherited, see L<XML::Compile::WSS/"Internals">
+
+=back
+
+=head1 DETAILS
+
+Extends L<"DETAILS" in XML::Compile::WSS|XML::Compile::WSS/"DETAILS">.
+ 
+=head1 SEE ALSO
+
+This module is part of XML-Compile-WSS distribution version 1.14,
+built on May 08, 2017. Website: F<http://perl.overmeer.net/xml-compile/>
+
+Please post questions or ideas to the mailinglist at
+F<http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/xml-compile> .
+For live contact with other developers, visit the C<#xml-compile> channel
+on C<irc.perl.org>.
+
+=head1 LICENSE
+
+Copyrights 2011-2017 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the Artistic license.
+See F<http://dev.perl.org/licenses/artistic.html>
+

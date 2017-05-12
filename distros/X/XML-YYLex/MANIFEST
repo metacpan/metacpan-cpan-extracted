@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+YYLex.pm
+t/1.t
+lib/XML/DOM/YYLex.pm
+lib/XML/Sablotron/DOM/YYLex.pm

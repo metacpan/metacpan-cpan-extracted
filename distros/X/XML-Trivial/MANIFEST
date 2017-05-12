@@ -1,0 +1,12 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/XML/Trivial.pm
+t/00-load.t
+t/01-parse.t
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t
+examples/example1.pl
+META.yml                                 Module meta-data (added by MakeMaker)

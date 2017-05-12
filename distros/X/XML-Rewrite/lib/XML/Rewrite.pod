@@ -1,0 +1,516 @@
+=head1 NAME
+
+XML::Rewrite - schema based XML cleanups
+
+=head1 INHERITANCE
+
+ XML::Rewrite
+   is a XML::Compile::Cache
+   is a XML::Compile::Schema
+   is a XML::Compile
+
+ XML::Rewrite is extended by
+   XML::Rewrite::Schema
+
+=head1 SYNOPSIS
+
+ my $rewriter = XML::Rewriter->new(...);
+ my ($type, $data) = $rewriter->process($file);
+ my $doc = $rewriter->buildDOM($type => $data);
+
+=head1 DESCRIPTION
+
+Often, XML messages and schemas are created by automatic tools.
+These tools may provide very nice user interfaces, but tend to produce
+horrible XML.  If you have to read these ugly products, you are in for
+pain.  The purpose of this module (and the script C<xmlrewrite> which
+is part of this distribution) is to be able to rewrite XML messages
+and Schema's into something maintainable.
+
+The main difference between this module and other beautifiers is that
+the clean-up is based on schema rules.  For instance, it is permitted to
+remove blanks around and inside integers, but not in strings. Beautifiers
+which do not look into the schema have only limited possibilities for
+cleanup, or may accidentally change the message content.
+
+Feel invited to contribute ideas of useful features.
+
+=head1 METHODS
+
+=head2 Constructors
+
+XML::Rewrite-E<gt>B<new>([SCHEMA], OPTIONS)
+
+=over 4
+
+The rewrite object is based on an L<XML::Compile::Cache|XML::Compile::Cache> object, which
+defines the message structures.  The processing instructions can only
+be specified at instance creation, because we need to be able to reuse
+the compiled translators when we wish to process B<multiple messages>.
+
+ Option               --Defined in     --Default
+ allow_undeclared       XML::Compile::Cache  <true>
+ any_attribute          XML::Compile::Cache  'ATTEMPT'
+ any_element            XML::Compile::Cache  'ATTEMPT'
+ blanks_before                           'NONE'
+ change                                  'TRANSFORM'
+ comments                                'KEEP'
+ defaults_writer                         'IGNORE'
+ hook                   XML::Compile::Schema  undef
+ hooks                  XML::Compile::Schema  []
+ ignore_unused_tags     XML::Compile::Schema  <false>
+ key_rewrite            XML::Compile::Schema  []
+ opts_readers           XML::Compile::Cache  []
+ opts_rw                XML::Compile::Cache  []
+ opts_writers           XML::Compile::Cache  []
+ output_compression                      <undef>
+ output_encoding                         <undef>
+ output_standalone                       <undef>
+ output_version                          <undef>
+ prefixes               XML::Compile::Cache  <smart>
+ remove_elements                         []
+ schema_dirs            XML::Compile     undef
+ typemap                XML::Compile::Schema  {}
+ use_default_namespace                   <false>
+
+. allow_undeclared => BOOLEAN
+
+. any_attribute => CODE|'TAKE_ALL'|'SKIP_ALL'|'ATTEMPT'
+
+. any_element => CODE|'TAKE_ALL'|'SKIP_ALL'|'ATTEMPT'
+
+. blanks_before => 'ALL'|'CONTAINERS'|'NONE'
+
+=over 4
+
+Automatically put a blank line before each child of the root element, for
+ALL childs, or only those which have childs themselves.  But _BLANK_LINE
+in the HASH output of the reader, to change the selection on specific
+locations.
+
+=back
+
+. change => 'REPAIR'|'TRANSFORM'
+
+=over 4
+
+How to behave: either overrule the message settings (repair broken
+messages), or to change the output.  If you wish both a correction and
+a transformation, you will need to call the rewrite twice (create to
+rewriter objects).
+
+=back
+
+. comments => 'REMOVE'|'KEEP'
+
+=over 4
+
+Comments found in the input may get translated in C<_COMMENT> and
+C<_COMMENT_AFTER> fields in the intermediate HASH.    You may add
+your own, before you reconstruct the DOM.  Comments are expected to
+be used just before the element they belong to.
+
+=back
+
+. defaults_writer => 'EXTEND'|'IGNORE'|'MINIMAL'
+
+=over 4
+
+See L<XML::Compile::Schema::compile(default_values)|XML::Compile::Schema/"Compilers">
+
+=back
+
+. hook => ARRAY-WITH-HOOKDATA | HOOK
+
+. hooks => ARRAY-OF-HOOK
+
+. ignore_unused_tags => BOOLEAN|REGEXP
+
+. key_rewrite => HASH|CODE|ARRAY-of-HASH-and-CODE
+
+. opts_readers => HASH|ARRAY-of-PAIRS
+
+. opts_rw => HASH|ARRAY-of-PAIRS
+
+. opts_writers => HASH|ARRAY-of-PAIRS
+
+. output_compression => -1, 0-8
+
+=over 4
+
+Set output compression level.  A value of C<-1> means that there should
+be no compression.  By default, the compression level of the input
+document is used.
+
+=back
+
+. output_encoding => CHARSET
+
+=over 4
+
+The character-set is usually copied from the source document, but
+you can overrule this.  If neither the rewriter object nor the document
+defined a encoding, then C<UTF-8> is used.
+
+=back
+
+. output_standalone => BOOLEAN|'yes'|'no'
+
+=over 4
+
+If specified, it will overrule the value found in the document.  If
+not provided, the value from the source document will be used, but only
+when present.
+
+=back
+
+. output_version => STRING
+
+=over 4
+
+The XML version for the document.  This overrules the version found
+in the document.  If neither is specified, then C<1.0> is used.
+
+=back
+
+. prefixes => HASH|ARRAY-of-PAIRS
+
+. remove_elements => ARRAY
+
+=over 4
+
+All the selected elements are removed.  However: you shall not remove
+elements which are required.
+
+=back
+
+. schema_dirs => DIRECTORY|ARRAY-OF-DIRECTORIES
+
+. typemap => HASH
+
+. use_default_namespace => BOOLEAN
+
+=over 4
+
+If true, the blank prefix will be used for the first name-space needed
+(usually the name-space of the top-level element).  Otherwise, the blank
+prefix will not be used unless already defined explicitly in the provided
+prefix table.
+
+=back
+
+=back
+
+=head2 Accessors
+
+$obj-E<gt>B<addHook>(HOOKDATA|HOOK|undef)
+
+=over 4
+
+See L<XML::Compile::Schema/"Accessors">
+
+=back
+
+$obj-E<gt>B<addHooks>(HOOK, [HOOK, ...])
+
+=over 4
+
+See L<XML::Compile::Schema/"Accessors">
+
+=back
+
+$obj-E<gt>B<addKeyRewrite>(CODE|HASH, CODE|HASH, ...)
+
+=over 4
+
+See L<XML::Compile::Schema/"Accessors">
+
+=back
+
+$obj-E<gt>B<addSchemaDirs>(DIRECTORIES|FILENAME)
+
+XML::Rewrite-E<gt>B<addSchemaDirs>(DIRECTORIES|FILENAME)
+
+=over 4
+
+See L<XML::Compile/"Accessors">
+
+=back
+
+$obj-E<gt>B<addSchemas>(XML, OPTIONS)
+
+=over 4
+
+See L<XML::Compile::Schema/"Accessors">
+
+=back
+
+$obj-E<gt>B<addTypemap>(PAIR)
+
+=over 4
+
+See L<XML::Compile::Schema/"Accessors">
+
+=back
+
+$obj-E<gt>B<addTypemaps>(PAIRS)
+
+=over 4
+
+See L<XML::Compile::Schema/"Accessors">
+
+=back
+
+$obj-E<gt>B<allowUndeclared>([BOOLEAN])
+
+=over 4
+
+See L<XML::Compile::Cache/"Accessors">
+
+=back
+
+$obj-E<gt>B<hooks>
+
+=over 4
+
+See L<XML::Compile::Schema/"Accessors">
+
+=back
+
+$obj-E<gt>B<prefixes>([PAIRS])
+
+=over 4
+
+See L<XML::Compile::Cache/"Accessors">
+
+=back
+
+=head2 Compilers
+
+$obj-E<gt>B<compile>(('READER'|'WRITER'), TYPE, OPTIONS)
+
+=over 4
+
+See L<XML::Compile::Schema/"Compilers">
+
+=back
+
+$obj-E<gt>B<compileAll>(['READER'|'WRITER'|'RW', [NAMESPACE]])
+
+=over 4
+
+See L<XML::Compile::Cache/"Compilers">
+
+=back
+
+$obj-E<gt>B<dataToXML>(NODE|REF-XML-STRING|XML-STRING|FILENAME|FILEHANDLE|KNOWN)
+
+=over 4
+
+See L<XML::Compile/"Compilers">
+
+=back
+
+$obj-E<gt>B<reader>(TYPE|NAME, OPTIONS)
+
+=over 4
+
+See L<XML::Compile::Cache/"Compilers">
+
+=back
+
+$obj-E<gt>B<template>('XML'|'PERL', TYPE, OPTIONS)
+
+=over 4
+
+See L<XML::Compile::Schema/"Compilers">
+
+=back
+
+$obj-E<gt>B<writer>(TYPE|NAME)
+
+=over 4
+
+See L<XML::Compile::Cache/"Compilers">
+
+=back
+
+=head2 Administration
+
+$obj-E<gt>B<declare>('READER'|'WRITER'|'RW', TYPE|ARRAY-of-TYPES, OPTIONS)
+
+=over 4
+
+See L<XML::Compile::Cache/"Administration">
+
+=back
+
+$obj-E<gt>B<elements>
+
+=over 4
+
+See L<XML::Compile::Schema/"Administration">
+
+=back
+
+$obj-E<gt>B<findName>(NAME)
+
+=over 4
+
+See L<XML::Compile::Cache/"Administration">
+
+=back
+
+$obj-E<gt>B<findSchemaFile>(FILENAME)
+
+=over 4
+
+See L<XML::Compile/"Administration">
+
+=back
+
+$obj-E<gt>B<importDefinitions>(XMLDATA, OPTIONS)
+
+=over 4
+
+See L<XML::Compile::Schema/"Administration">
+
+=back
+
+$obj-E<gt>B<knownNamespace>(NAMESPACE|PAIRS)
+
+XML::Rewrite-E<gt>B<knownNamespace>(NAMESPACE|PAIRS)
+
+=over 4
+
+See L<XML::Compile/"Administration">
+
+=back
+
+$obj-E<gt>B<namespaces>
+
+=over 4
+
+See L<XML::Compile::Schema/"Administration">
+
+=back
+
+$obj-E<gt>B<printIndex>([FILEHANDLE], OPTIONS)
+
+=over 4
+
+See L<XML::Compile::Cache/"Administration">
+
+=back
+
+$obj-E<gt>B<types>
+
+=over 4
+
+See L<XML::Compile::Schema/"Administration">
+
+=back
+
+$obj-E<gt>B<walkTree>(NODE, CODE)
+
+=over 4
+
+See L<XML::Compile/"Administration">
+
+=back
+
+=head2 Processing
+
+$obj-E<gt>B<buildDOM>(TYPE, DATA, OPTIONS)
+
+=over 4
+
+=back
+
+$obj-E<gt>B<process>(XMLDATA, OPTIONS)
+
+=over 4
+
+XMLDATA must be XML as accepted by L<dataToXML()|XML::Compile/"Compilers">.
+Returned is LIST of two: the type of the data-structure read, and the
+HASH representation of the contained data.
+
+ Option--Default
+ type    <from root element>
+
+. type => TYPE
+
+=over 4
+
+Explicit TYPE of the root element, required in case of namespace-less
+elements or other namespace problems.
+
+=back
+
+=back
+
+$obj-E<gt>B<repairXML>(TYPE, XML, DETAILS)
+
+=over 4
+
+The TYPE of the root element, the root XML element, and DETAILS about
+the xml origin.
+
+=back
+
+$obj-E<gt>B<transformData>(TYPE, DATA, DETAILS)
+
+=over 4
+
+The TYPE of the root element, the HASH representation of the DATA of the
+message, and DETAILS about the xml origin.
+
+=back
+
+=head1 DETAILS
+
+=head1 DIAGNOSTICS
+
+Error: cannot find pre-installed name-space files
+
+=over 4
+
+Use C<$ENV{SCHEMA_LOCATION}> or L<new(schema_dirs)|XML::Compile/"Constructors"> to express location
+of installed name-space files, which came with the L<XML::Compile|XML::Compile>
+distribution package.
+
+=back
+
+Error: don't known how to interpret XML data
+
+=over 4
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of XML-Rewrite distribution version 0.10,
+built on August 11, 2008. Website: F<http://perl.overmeer.net/xml-compile/>
+
+All modules in this suite:
+L<XML::Compile>,
+L<XML::Compile::SOAP>,
+L<XML::Compile::SOAP::Daemon>,
+L<XML::Compile::Tester>,
+L<XML::Compile::Cache>,
+L<XML::Rewrite>,
+L<XML::Compile::Dumper>.
+
+Please post questions or ideas to the mailinglist at
+F<http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/xml-compile>
+For life contact with other developers, visit the C<#xml-compile> channel
+on C<irc.perl.org>.
+
+=head1 LICENSE
+
+Copyrights 2008 by Mark Overmeer. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

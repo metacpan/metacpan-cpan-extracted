@@ -1,0 +1,26 @@
+NAME
+    XAO::DO::FS::Glue::MySQL_DBI - DBD::mysql driver for XAO::FS
+
+SYNOPSIS
+    Should not be used directly.
+
+DESCRIPTION
+    The module uses DBD/DBI interface; whenever possible it is recommended
+    to use direct MySQL module that works directly with database without
+    DBD/DBI layer in between.
+
+    This is the lowest level XAO::FS knows about.
+
+    See XAO::DO::FS::Glue::Base_DBI and XAO::DO::FS::Glue::Base_MySQL for
+    method details.
+
+AUTHORS
+    Copyright (c) 2005 Andrew Maltsev
+
+    Copyright (c) 2001-2004 Andrew Maltsev, XAO Inc.
+
+    <am@ejelta.com> -- http://ejelta.com/xao/
+
+SEE ALSO
+    Further reading: XAO::FS, XAO::DO::FS::Glue::SQL_DBI, XAO::DO::FS::Glue.
+

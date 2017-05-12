@@ -1,0 +1,39 @@
+--- #YAML:1.0
+name: XML-XBEL
+version: 1.4
+author:
+  - Aaron Straup Cope E<lt>ascope@cpan.orgE<gt>
+abstract: OOP for reading and writing XBEL documents.
+license: perl
+requires:
+  Date::Format: '>= 0'
+  XML::LibXML: '>= 1.58'
+build_requires:
+  Test::Simple: '>= 0.47'
+provides:
+  XML::XBEL:
+    file: lib/XML/XBEL.pm
+    version: 1.4
+  XML::XBEL::Alias:
+    file: lib/XML/XBEL/Alias.pm
+  XML::XBEL::Bookmark:
+    file: lib/XML/XBEL/Bookmark.pm
+  XML::XBEL::Folder:
+    file: lib/XML/XBEL/Folder.pm
+  XML::XBEL::Separator:
+    file: lib/XML/XBEL/Separator.pm
+  XML::XBEL::base:
+    file: lib/XML/XBEL/base.pm
+  XML::XBEL::container:
+    file: lib/XML/XBEL/container.pm
+  XML::XBEL::item:
+    file: lib/XML/XBEL/item.pm
+  XML::XBEL::node:
+    file: lib/XML/XBEL/node.pm
+  XML::XBEL::serialize:
+    file: lib/XML/XBEL/serialize.pm
+  XML::XBEL::thingy:
+    file: lib/XML/XBEL/thingy.pm
+  XML::XBEL::url:
+    file: lib/XML/XBEL/url.pm
+generated_by: Module::Build version 0.2604

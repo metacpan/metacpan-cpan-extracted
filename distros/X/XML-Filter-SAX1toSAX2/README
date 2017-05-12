@@ -1,0 +1,12 @@
+XML::Filter::SAX1toSAX2 and XML::Filter::SAX2toSAX1
+===================================================
+
+These two modules very simply convert SAX events from SAX1 <-> SAX2.
+
+LICENSE
+-------
+
+This is free software, you may use and distribute this module under
+the same terms as Perl itself.
+
+Copyright 2001 AxKit.com Ltd.

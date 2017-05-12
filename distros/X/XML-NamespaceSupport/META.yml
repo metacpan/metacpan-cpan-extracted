@@ -1,0 +1,48 @@
+---
+abstract: 'A simple generic namespace processor'
+author:
+  - 'Robin Berjon <robin@knowscape.com>'
+  - 'Chris Prather <chris@prather.org>'
+build_requires:
+  Test::More: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: XML-NamespaceSupport
+no_index:
+  directory:
+    - corpus
+    - examples
+    - t
+    - xt
+  package:
+    - DB
+provides:
+  XML::NamespaceSupport:
+    file: lib/XML/NamespaceSupport.pm
+    version: '1.12'
+requires:
+  constant: '0'
+  perl: '5.006'
+  strict: '0'
+  vars: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/perigrin/xml-namespacesupport/issues
+  homepage: https://github.com/perigrin/xml-namespacesupport
+  repository: https://github.com/perigrin/xml-namespacesupport.git
+version: '1.12'
+x_authority: cpan:PERIGRIN
+x_contributors:
+  - 'Chris Prather <cprather@hdpublishing.com>'
+  - 'David Steinbrunner <dsteinbrunner@pobox.com>'
+  - 'Paul Cochrane <paul@liekut.de>'
+  - 'Paulo Custodio <pauloscustodio@gmail.com>'
+x_serialization_backend: 'YAML::Tiny version 1.70'

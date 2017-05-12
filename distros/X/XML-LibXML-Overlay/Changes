@@ -1,0 +1,10 @@
+Revision history for Perl extension XML::LibXML::Overlay.
+
+0.2  Wed Dez 16 16:47:27 CET 2009
+	- require XML::LibXML 1.70
+	- minor documentation fixes
+	- use XML::LibXML::Overlay::Document in XML::LibXML::Overlay
+
+0.1  Mon Nov 30 13:54:34 CET 2009
+	- initial version
+

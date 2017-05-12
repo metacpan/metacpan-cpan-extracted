@@ -1,0 +1,47 @@
+{
+   "abstract" : "TMX tools",
+   "author" : [
+      "Projecto Natura"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "XML-TMX",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "0",
+            "Getopt::Long" : "0",
+            "Pod::Usage" : "0",
+            "Test::Pod" : "1.00",
+            "Test::Pod::Coverage" : "0.08",
+            "XML::DT" : "0.57"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.31",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

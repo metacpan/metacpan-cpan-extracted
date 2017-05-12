@@ -1,0 +1,168 @@
+NAME
+    XHTML::Instrumented - packages to control XHTML
+
+VERSION
+    Version 0.092
+
+DESCRIPTION
+    This package takes valid XHTML as input and outputs valid XHTML that may
+    be changed in several ways.
+
+SYNOPSIS
+     use XHTML::Instrumented;
+
+     my $dom = XHTML::Instrumented->new(
+        path => '/var/www/html',
+        type => 'nl',
+        default_type => 'en',
+        name => 'index',
+
+        cachepath => '/tmp/the_cache_path/',
+
+     # run time
+        replace_name => 'home',
+
+     # compile time
+
+        filter => sub {
+            my $tag = shift;
+            my $args = shift;
+            if (my $path = $args->{href}) {
+
+            }
+        },
+     };
+
+    This will load the file "/var/www/html/nl/index.html" or if that is not
+    found "/var/www/html/en/index.html" or an exception will be thrown.
+
+    You can also directly input html, although this is mainly used for
+    testing.
+
+     use XHTML::Instrumented;
+
+     my $dom = XHTML::Instrumented->new(
+        name => \"<html><head></head><body>hi</body></html>",
+     );
+
+    You can also directly give a complete filename.
+
+     use XHTML::Instrumented;
+
+     my $dom = XHTML::Instrumented->new(
+        filename => '/var/www/html/en/index.html',
+     );
+
+API
+  Constructor
+    new The new() constructor method instantiates a new "XHTML::Intrumented"
+        object. The template is either compiled or loaded as well.
+
+        The parameters to the constructor are describe in more detail in the
+        descriptions of the methods with the same name path() name() type()
+        default_type() extension() filename() cachepath() replace_name()
+
+        There is also a "filter" parameter: it is a call-back that allows
+        the arguments to "tags" to be modified at compile time.
+
+        Get a XHTML::Instrumented object.
+
+  Accessor Methods
+    filename
+        This the complete name (path and filename) of the file that was
+        compiled to create the object. If the input was not from a file this
+        will be undefined. This is either build up from the path, type or
+        default_type, name and extension values or is set directly by the
+        constructor.
+
+    path
+        This is the base path to the input file. It is set by an argument to
+        the constructor.
+
+    name
+        This is the base name of the input file. It is set by an argument to
+        the constructor.
+
+    type
+        This is the default type of the input file. This is really just an
+        extra element to the path. It is set by an argument to the
+        constructor.
+
+    default_type
+        If the file is not found using the "type" then this is tried.
+
+    extension
+        This is the extension to the file. It defaults to ".html' and can be
+        set by the constructor.
+
+    cachepath
+        This is the base directory where the *cache file* will be stored. It
+        is set by an argument to the constructor.
+
+    cachefilename
+        This is the full name of the *cache file*.
+
+    replace_name
+        This is the default name of the file that will be used by the
+        *:replace* operator.
+
+  Methods
+    output
+        This returns the modified xhtml.
+
+    head
+        This returns the html between the Head tags!
+
+    get_form
+        This returns a form object.
+
+    loop()
+        Get a "loop" control object.
+
+           headers => [array of headers]
+           data => [arrays of data]
+           default => default value for any undefined data
+           inclusive => include the tag that started the loop
+
+        inclusive is normally controlled in the template.
+
+    replace
+        This return a general control object. I can control 4 actions:
+
+        replace the arguments to a tag.
+        replace the content of a tag.
+        remove the tag it self.
+
+    args
+        "args" is a helper function. It is the same as:
+
+         replace(args => { @_ });
+
+  Functions
+    get_tag('tag')
+        Return a list of XHTML::Intramented::Entry objects that have type
+        'tag';
+
+  Functions
+    Both of these functions are used internally by the XHTML::Instrumented
+    and are only listed here for completeness.
+
+    parse(input)
+        This causes the input to be parsed.
+
+        if *input* is a string it is assumed to be a filename. If *input* is
+        a SCALAR is is treated as HTML;
+
+    instrument()
+        This function take the template and the control structure and
+        returns a block of XHTML.
+
+AUTHOR
+    "G. Allen Morris III" <gam3@gam3.net>
+
+COPYRIGHT & LICENSE
+    Copyright (C) 2007-2008 G. Allen Morris III, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<module name="XML::Writer::String">
+    <abstract>Capture output from XML::Writer</abstract>
+    <author>S. Oliver &lt;simon.oliver@umist.ac.uk&gt;</author>
+</module>

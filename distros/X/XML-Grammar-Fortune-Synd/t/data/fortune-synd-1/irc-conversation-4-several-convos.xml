@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<collection>
+    <head />
+    <list>
+        <fortune id="Im-not-an-asshole">
+            <meta>
+                <title>I'm not an Asshole…</title>
+            </meta>
+            <irc>
+                <body>
+                    <joins who="mofino">has joined #perlcafe</joins>
+                    <saying who="mofino">I'm not an asshole. I just play one on T.V.</saying>
+                    <leaves who="mofino">has left #perlcafe</leaves>
+                </body>
+                <info>
+                    <channel>#perlcafe</channel>
+                    <network>Freenode</network>
+                    <tagline>Discussing the Subversion Build System</tagline>
+                </info>
+            </irc>
+        </fortune>
+        <fortune id="the-only-language">
+            <meta>
+                <title>"The Only Language"</title>
+            </meta>
+            <irc>
+                <body>
+                    <saying who="rindolf">This reminds me of a fun discussion I had with my co-worker.</saying>
+                    <saying who="rindolf">He had a Firefox window open with an ActiveState page and I read "Perl, PHP, Python, Tcl, XSLT".</saying>
+                    <saying who="rindolf">So he said: "Heresy! C is the only language."</saying>
+                    <saying who="rindolf">So I thought for a moment and said "Intercal is the only language."</saying>
+                    <saying who="nanonyme">lol</saying>
+                    <saying who="rindolf">And then "Real men write in Intercal."</saying>
+                    <saying who="rindolf">"COME FROM" anyone?</saying>
+                </body>
+                <info>
+                    <channel>#perl</channel>
+                    <network>Freenode</network>
+                    <tagline>Shlomi Fish ("rindolf")</tagline>
+                </info>
+            </irc>
+        </fortune>
+        <fortune id="let-me-wikipedia-it">
+            <meta>
+                <title>(Human) Language Fun on Freenode's #perl</title>
+            </meta>
+            <irc>
+                <body>
+                    <saying who="rindolf">Let me wikipedia it.</saying>
+                    <saying who="f00li5h">so now wikipedia is a verb?</saying>
+                    <saying who="rindolf">f00li5h: it's gonna enter the OED.</saying>
+                    <saying who="rindolf">f00li5h: in English every verb can be nounified and every noun can be verbed</saying>
+                </body>
+                <info>
+                    <channel>#perl</channel>
+                    <network>Freenode</network>
+                    <tagline>(Human) Language Fun</tagline>
+                </info>
+            </irc>
+        </fortune>
+    </list>
+</collection>

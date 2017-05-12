@@ -1,0 +1,229 @@
+
+==== version history of XML::Compile::Cache
+
+version 1.05: Mon Sep 19 22:39:23 CEST 2016
+
+	Fixes:
+	- include examples
+
+version 1.04: Wed  9 Sep 14:16:47 CEST 2015
+
+	Improvements:
+	- merge option 'ignore_unused_tags'
+
+version 1.03: Mon Dec 22 08:41:12 CET 2014
+
+	Fixes:
+	- compileAll code-refs stored incorrectly.
+
+	Improvements:
+	- new method ::WSDL11::addNicePrefix()
+	- support new 'extends' hook.
+	- reader()/writer() add is_type option
+
+version 1.02: Wed May 28 09:28:08 CEST 2014
+	Changes:
+	- any_element default changed from 'SKIP_ALL' into 'ATTEMPT'
+	  Bug reported by [Andrew Kirkpatrick]
+
+	Improvements:
+	- change documentation style.
+
+version 1.01: Sun Jan  5 17:47:17 CET 2014
+	Changes:
+	- xsiType() renamed to addXsiType(), old name still available
+
+	Improvements:
+	- bit more docs on addPrefixes()
+
+version 1.00: Mon Oct 14 23:15:46 CEST 2013
+
+	Improvements:
+	- bump version numbers back into two-digits, because FreeBSD
+	  ports doesn't like it. [Patrick Powell]
+
+version 0.995: Sat Aug 10 00:16:59 CEST 2013
+
+	Fixes:
+	- ::new(prefixes) did not overrule the prefixes from the schema
+	  file.
+
+	Improvements:
+	- alias new ::addPrefixes() to ::prefixes() for more consistent
+	  naming.
+	- new ::Cache::byPrefixTable()
+
+version 0.994: Mon May 13 12:17:51 CEST 2013
+
+	Fixes:
+	- compileAll() used declared parameters twice.
+
+version 0.993: Fri May  3 15:11:16 CEST 2013
+
+	Improvements:
+	- spell-fix  rt.cpan.org#82952 [Joenio Marques da Costa]
+	- new learnPrefixes($node)
+	- prefixed() now also callable with separate ($ns, $local)
+
+version 0.992: Fri Aug 31 00:25:48 CEST 2012
+
+	Improvements:
+	- support xsiType() with 'AUTO', discovered by [Ciaran Deignan]
+	- remove dependency to Test::POD
+
+version 0.991: Fri May  6 10:09:18 CEST 2011
+
+	Fixes:
+	- prefix declaration list which starts with a default ('') prefix.
+
+version 0.99: Wed Apr 27 17:09:44 CEST 2011
+
+	Fixes:
+	- be able to use newly defined prefixes immediately in xsiTable.
+
+	Improvements:
+	- report missing action parameter to template(), common mistake
+	- add method addCompileOptions()
+	- add method anyElement()
+
+version 0.98: Wed Dec 22 16:39:52 CET 2010
+
+	Improvements:
+	- compileAll() now also knows of READERS/WRITERS as alternative
+	  (better readible) alternatives of READER/WRITER.
+	- new accessor typemap() to add typemaps nicer.
+	- new accessor xsiTypes() to add xsi_type definitions nicer.
+	- typemaps and xsi_types do now accept prefixed types.
+
+version 0.97: Thu Sep 30 17:09:34 CEST 2010
+
+	Fixes:
+	- template() merging options
+
+	Improvements:
+	- trace: declare includes why: READER/WRITER/RW
+	- prefixed() will return undef not error when there is no
+	  prefix defined for the namespace.
+
+version 0.96: Thu Jun 10 16:05:05 CEST 2010
+
+	Fixes:
+	- do not spit warnings when "allow_undeclared" and the parameter
+	  list contains undefined values. Reported by [Robin V.]
+	- memory leak, caused by rewrite of any_element
+	  rt.cpan.org#57943 [Jacob Bunk Nielsen]
+	- repair tests, to work with changed interface of Test::More.
+	  [cpantesters]
+	- fix docs: compileClient() does not accept parameters for
+	  compile() because those settings cannot be passed to elements
+	  which are magically understood via "any_element => 'ATTEMPT'"
+	  Problem reported by [Knut Arne Bjørndal]
+
+version 0.95: Thu Apr  1 11:36:42 CEST 2010
+
+	Changes:
+	- handling of compile() and mergeCompileOptions()
+
+	Improvements:
+	- support for compileType()
+
+version 0.94: Tue Mar  2 09:18:38 CET 2010
+
+	Fixes:
+	- default need for compileAll() not handled.
+	- merging of prefixes parameter.
+
+version 0.93: Fri Dec 25 01:05:59 CET 2009
+
+	Fixes:
+	- "super option" any_element other than ATTEMPT got ignored, although
+	  available as explicit reader/writer/rw options.
+	- template: use of key_rewrite
+
+	Improvements:
+	- add any_element choice "SLOPPY".  This required XML::LibXML::Simple
+	- some text improvements.
+
+version 0.92: Thu May 28 11:51:50 CEST 2009
+
+	Improvements:
+	- error if template() and compile() are called with too few parameters.
+	- trace when new prefixes get defined.
+	- new method prefixed()
+
+version 0.91: Thu Feb 12 11:27:40 CET 2009
+
+	Fixes:
+	- cleanup of multiple hooks was broken.
+	- do not use /bin/pwd in t/pod.t
+	- fix tests wrt changes in XML::Compile 1.01
+
+version 0.90: Wed Jan 21 11:03:19 CET 2009
+
+	Fixes:
+	- be more careful that opt_* flags may be passed as either ARRAY or
+	  HASH.
+
+	Improvements:
+	- template: accept prefixed types.
+	- accept prefixes in type-based hooks, for compile(),
+	  template() and addHook().
+	- prefixes() accepts HASH and ARRAY as well
+
+version 0.14: Mon Dec 29 10:59:22 CET 2008
+
+	Fixes:
+	- any_element ATTEMPT needs to follow keyRewrite rules
+	- _createReader() and _createWriter() missed type dependend options
+	  in merge.
+	- accept namespace-less names in findName()
+
+	Improvements:
+	- one namespace may have multiple prefixes, only the first is
+	  used in the output.
+	- type-based hooks can now also use prefixes.
+	- the options used for X::C::Schema::compile() are not merged
+	  in a very clever way.
+	- findName() can now also translates prefixes into namespaces,
+	  not only translate prefixed types.  Report available choices
+	  when an unknown prefix is used.
+	- findName() allows '-' in prefix.
+	- new method prefix() to lookup a prefix.  One namespace can have
+	  multiple prefixes, of which the first is used for the output.
+	- new method prefixFor() to lookup prefix for URI.
+	- support findName() with compile()
+	- when an undeclared reader or writer is produced with different
+	  options, then which will not produce an error but just avoids
+	  the use of the cached code.
+	- new method mergeCompileOptions()
+
+version 0.13: Fri Aug  1 13:21:09 CEST 2008
+
+	Changes:
+	- requires XML::Compile 0.91 for options to ::Schema::new(any_element)
+ 	  and any_attribute.
+	- rewrote prefix handling to be compatible with XML::Compile::Schema
+	  improvements.
+
+	Improvements:
+	- any_element and any_attribute READER option 'CONVERT'
+	- findName() accepts default name-space in search.
+
+version 0.12: Tue Jul  8 13:25:05 CEST 2008
+
+	Changes:
+	- require XML::Compile 0.87 for rename of option output_namespaces,
+	  replaces by 'prefixes'.
+
+	Improvements:
+	- merge prefixes with ::Schema base administration, to permit
+	  key_rewrite.
+
+version 0.11: Thu Jun 12 14:36:40 CEST 2008
+
+	Improvements
+	- include XML::Compile::Schema method in the docs.
+	- added more docs
+
+version 0.10: Fri Jun  6 16:01:16 CEST 2008
+	Initial version.

@@ -1,0 +1,36 @@
+XML-DifferenceMarkup version 1.x
+================================
+
+This module implements an XML diff producing XML output. Both input
+and output are DOM documents, as implemented by XML::LibXML. The
+output format is meant to be human-readable (i.e. simple, as opposed
+to short) - basically the diff is a subset of the input trees,
+annotated with instruction element nodes specifying how to convert the
+source tree to the target by inserting and deleting nodes.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires XML::LibXML and its dependencies (see the
+documentation of XML::LibXML for the full list) and also the
+libdiffmark library, available as part of the diffmark package from
+http://www.mangrove.cz/diffmark/ . Consequently, it's an XS module,
+whose compilation requires a C++ compiler. It's tested only with gcc
+on Linux; it might work on other unix-like platforms, but probably not
+on Windows.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006-2014 by Vaclav Barta
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.7 or,
+at your option, any later version of Perl 5 you may have available.

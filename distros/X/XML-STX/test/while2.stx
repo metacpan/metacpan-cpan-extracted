@@ -1,0 +1,25 @@
+<stx:transform version="1.0" 
+  xmlns:stx="http://stx.sourceforge.net/2002/ns"
+  strip-space="yes">
+
+  <stx:variable name="seq" select="('a','b')"/>
+
+  <stx:template match="/root">
+    <stx:variable name="n" select="0"/>
+    <root>
+      <stx:while test="$n &lt; 6">
+	<w>
+	  <stx:value-of select="$n"/>
+	  <stx:for-each-item name="x" select="$seq">
+	    <i>
+	      <stx:value-of select="$x"/>
+	      <stx:assign name="n" select="$n + 1"/>
+	      <stx:value-of select="$n"/>
+	    </i>
+	  </stx:for-each-item>
+	</w>
+      </stx:while>
+    </root>
+  </stx:template>
+
+</stx:transform>

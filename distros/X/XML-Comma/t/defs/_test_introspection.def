@@ -1,0 +1,29 @@
+<DocumentDefinition>
+	<name>_test_introspection</name>
+
+	<element><name>test_plain</name></element>
+	<element><name>test_enum</name><macro>enum: 2, 3, 5</macro></element>
+	<element><name>test_bool</name><macro>boolean</macro></element>
+	<element><name>test_range</name><macro>range: 1, 5</macro></element>
+	<element><name>test_ts</name><macro>timestamp</macro></element>
+	<blob_element><name>test_blob</name></blob_element>
+
+	<ignore_for_hash>qw ( test_bool test_ts )</ignore_for_hash>
+	<required>qw ( test_enum test_bool )</required>
+	<plural>qw ( test_plain )</plural>
+
+	<nested_element>
+		<name>test_nest</name>
+		<element><name>test_nest_ts</name><macro>timestamp</macro></element>
+		<element><name>baloney</name></element>
+	</nested_element>
+
+	<store>
+		<name>main</name>
+		<base>test_introspection</base>
+		<location>Sequential_file</location>
+	</store>
+
+	<macro>timestamp: [ 'main' ], 'created', 'last_modified'</macro>
+</DocumentDefinition>
+

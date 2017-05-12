@@ -1,0 +1,100 @@
+{
+   "abstract" : "Fast and modular implementation for an XML-RPC client and server",
+   "author" : [
+      "Mons Anderson, C<< <mons@cpan.org> >>",
+      "Mons Anderson <mons@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Install version 1.04, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "XML-RPC-Fast",
+   "no_index" : {
+      "directory" : [
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Encode" : 0,
+            "ExtUtils::MakeMaker" : "6.62",
+            "Test::More" : 0,
+            "Test::NoWarnings" : 0,
+            "lib::abs" : "0.90"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.62"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "AnyEvent" : "5.0",
+            "AnyEvent::HTTP" : 0,
+            "DateTime::Format::ISO8601" : 0,
+            "MIME::Base64" : 0,
+            "Sub::Name" : 0,
+            "WWW::Curl" : 0
+         },
+         "requires" : {
+            "HTTP::Headers" : 0,
+            "HTTP::Request" : 0,
+            "HTTP::Response" : 0,
+            "LWP::UserAgent" : 0,
+            "XML::Hash::LX" : "0.05",
+            "XML::LibXML" : "1.58",
+            "perl" : "5.008003"
+         }
+      }
+   },
+   "provides" : {
+      "XML::RPC::Enc" : {
+         "file" : "lib/XML/RPC/Enc.pm",
+         "version" : 0
+      },
+      "XML::RPC::Enc::LibXML" : {
+         "file" : "lib/XML/RPC/Enc/LibXML.pm",
+         "version" : 0
+      },
+      "XML::RPC::Fast" : {
+         "file" : "lib/XML/RPC/Fast.pm",
+         "version" : "0.8"
+      },
+      "XML::RPC::UA" : {
+         "file" : "lib/XML/RPC/UA.pm",
+         "version" : 0
+      },
+      "XML::RPC::UA::AnyEvent" : {
+         "file" : "lib/XML/RPC/UA/AnyEvent.pm",
+         "version" : 0
+      },
+      "XML::RPC::UA::AnyEventSync" : {
+         "file" : "lib/XML/RPC/UA/AnyEventSync.pm",
+         "version" : 0
+      },
+      "XML::RPC::UA::Curl" : {
+         "file" : "lib/XML/RPC/UA/Curl.pm",
+         "version" : 0
+      },
+      "XML::RPC::UA::LWP" : {
+         "file" : "lib/XML/RPC/UA/LWP.pm",
+         "version" : 0
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.8"
+}

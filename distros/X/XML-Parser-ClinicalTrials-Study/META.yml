@@ -1,0 +1,28 @@
+---
+abstract: 'XML parser/representation for ClinicalTrials.gov data'
+author:
+  - chromatic
+build_requires:
+  File::Slurper: '0'
+  Test::Most: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: XML-Parser-ClinicalTrials-Study
+requires:
+  DateTime::Format::Natural: '0'
+  XML::Rabbit: '0'
+  XML::Rabbit::Root: '0'
+  constant: '0'
+  perl: '5.010'
+  strict: '0'
+  warnings: '0'
+resources:
+  homepage: https://github.com/chromatic/XML-Parser-ClinicalTrials-Study
+  repository: https://github.com/chromatic/XML-Parser-ClinicalTrials-Study.git
+version: '1.20150818'

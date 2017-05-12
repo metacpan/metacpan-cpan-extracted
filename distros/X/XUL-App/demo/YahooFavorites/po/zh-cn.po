@@ -1,0 +1,84 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: lib/YahooFavorites/View/WebDigest.pm:109
+msgid "About Yahoo Favorites"
+msgstr "关于雅虎收藏＋"
+
+#: lib/YahooFavorites/View/About.pm:19
+msgid "About Yahoo! Favorites"
+msgstr "关于雅虎收藏＋"
+
+#: lib/YahooFavorites/View/WebDigest.pm:145
+msgid "Add the current link to Yahoo Favorites"
+msgstr "添加当前链接到雅虎收藏＋"
+
+#: lib/YahooFavorites/View/About.pm:82
+msgid "Close window"
+msgstr "关闭窗口"
+
+#: lib/YahooFavorites/View/About.pm:34
+msgid "Copyright (c) 2006, 2007, 2008."
+msgstr "版权所有 2006, 2007, 2008."
+
+#: lib/YahooFavorites/View/Options.pm:69
+msgid "Display Menu"
+msgstr "显示菜单"
+
+#: lib/YahooFavorites/View/Options.pm:76
+msgid "Hide Menu"
+msgstr "隐藏菜单"
+
+#: lib/YahooFavorites/View/About.pm:40
+msgid "Home Page"
+msgstr "主页"
+
+#: lib/YahooFavorites/View/WebDigest.pm:101
+msgid "Latest Digest"
+msgstr "最新收藏"
+
+#: lib/YahooFavorites/View/Options.pm:58
+msgid "Menu Option"
+msgstr "菜单选项"
+
+#: lib/YahooFavorites/View/WebDigest.pm:86
+msgid "My Web Digest"
+msgstr "我的收藏＋"
+
+#: lib/YahooFavorites/View/Options.pm:95
+msgid "OK"
+msgstr "确定"
+
+#: lib/YahooFavorites/View/Options.pm:17
+msgid "Options for Yahoo! Favorites"
+msgstr "雅虎收藏+ 选项"
+
+#: lib/YahooFavorites/View/WebDigest.pm:125 lib/YahooFavorites/View/WebDigest.pm:135 lib/YahooFavorites/View/WebDigest.pm:55 lib/YahooFavorites/View/WebDigest.pm:56 lib/YahooFavorites/View/WebDigest.pm:77
+msgid "Tag this page"
+msgstr "添加当前页面到雅虎收藏＋"
+
+#: lib/YahooFavorites/View/WebDigest.pm:94
+msgid "Top Digest"
+msgstr "最热收藏"
+
+#: lib/YahooFavorites/View/About.pm:27 lib/YahooFavorites/View/Options.pm:42 lib/YahooFavorites/View/WebDigest.pm:47 lib/YahooFavorites/View/WebDigest.pm:69
+msgid "Yahoo Favorites"
+msgstr "雅虎收藏＋"
+
+#: lib/YahooFavorites/View/About.pm:60
+msgid "Yahoo! China, Aliaba Inc."
+msgstr "阿里巴巴中国雅虎公司"

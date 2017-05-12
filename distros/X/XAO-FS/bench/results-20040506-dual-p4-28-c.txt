@@ -1,0 +1,115 @@
+============= /proc/cpuinfo
+processor	: 0
+vendor_id	: GenuineIntel
+cpu family	: 15
+model		: 2
+model name	: Intel(R) Xeon(TM) CPU 2.80GHz
+stepping	: 9
+cpu MHz		: 2786.806
+cache size	: 512 KB
+physical id	: 0
+siblings	: 2
+fdiv_bug	: no
+hlt_bug		: no
+f00f_bug	: no
+coma_bug	: no
+fpu		: yes
+fpu_exception	: yes
+cpuid level	: 2
+wp		: yes
+flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe cid
+bogomips	: 5505.02
+
+processor	: 1
+vendor_id	: GenuineIntel
+cpu family	: 15
+model		: 2
+model name	: Intel(R) Xeon(TM) CPU 2.80GHz
+stepping	: 9
+cpu MHz		: 2786.806
+cache size	: 512 KB
+physical id	: 0
+siblings	: 2
+fdiv_bug	: no
+hlt_bug		: no
+f00f_bug	: no
+coma_bug	: no
+fpu		: yes
+fpu_exception	: yes
+cpuid level	: 2
+wp		: yes
+flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe cid
+bogomips	: 5554.17
+
+processor	: 2
+vendor_id	: GenuineIntel
+cpu family	: 15
+model		: 2
+model name	: Intel(R) Xeon(TM) CPU 2.80GHz
+stepping	: 9
+cpu MHz		: 2786.806
+cache size	: 512 KB
+physical id	: 3
+siblings	: 2
+fdiv_bug	: no
+hlt_bug		: no
+f00f_bug	: no
+coma_bug	: no
+fpu		: yes
+fpu_exception	: yes
+cpuid level	: 2
+wp		: yes
+flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe cid
+bogomips	: 5554.17
+
+processor	: 3
+vendor_id	: GenuineIntel
+cpu family	: 15
+model		: 2
+model name	: Intel(R) Xeon(TM) CPU 2.80GHz
+stepping	: 9
+cpu MHz		: 2786.806
+cache size	: 512 KB
+physical id	: 3
+siblings	: 2
+fdiv_bug	: no
+hlt_bug		: no
+f00f_bug	: no
+coma_bug	: no
+fpu		: yes
+fpu_exception	: yes
+cpuid level	: 2
+wp		: yes
+flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe cid
+bogomips	: 5554.17
+
+============= uname -a
+Linux dino 2.6.6-rc1 #1 SMP Thu May 6 17:33:53 PDT 2004 i686 Intel(R) Xeon(TM) CPU 2.80GHz GenuineIntel GNU/Linux
+============= args
+bench.pl OS:MySQL:test_fs;table_type=MyISAM
+============= date
+Thu May  6 22:28:21 2004
+============= benchmark
+Benchmark: timing 50000 iterations of rd_i0, rd_i0_s, wr_i0, wr_i0_c, wr_i0_s...
+     rd_i0:  6 wallclock secs ( 2.52 usr +  1.03 sys =  3.55 CPU) @ 14084.51/s (n=50000)
+   rd_i0_s:  6 wallclock secs ( 2.95 usr +  1.02 sys =  3.97 CPU) @ 12594.46/s (n=50000)
+     wr_i0:  6 wallclock secs ( 3.07 usr +  0.72 sys =  3.79 CPU) @ 13192.61/s (n=50000)
+   wr_i0_c:  8 wallclock secs ( 2.64 usr +  0.63 sys =  3.27 CPU) @ 15290.52/s (n=50000)
+   wr_i0_s:  6 wallclock secs ( 2.93 usr +  0.72 sys =  3.65 CPU) @ 13698.63/s (n=50000)
+Benchmark: timing 10000 iterations of wr_l1_c, wr_l1_r, wr_l2_c, wr_l2_r, wr_l3_c, wr_l3_r...
+   wr_l1_c:  6 wallclock secs ( 2.59 usr +  0.67 sys =  3.26 CPU) @ 3067.48/s (n=10000)
+   wr_l1_r:  9 wallclock secs ( 3.35 usr +  0.68 sys =  4.03 CPU) @ 2481.39/s (n=10000)
+   wr_l2_c: 10 wallclock secs ( 2.59 usr +  0.72 sys =  3.31 CPU) @ 3021.15/s (n=10000)
+   wr_l2_r:  8 wallclock secs ( 3.39 usr +  0.67 sys =  4.06 CPU) @ 2463.05/s (n=10000)
+   wr_l3_c:  8 wallclock secs ( 2.69 usr +  0.70 sys =  3.39 CPU) @ 2949.85/s (n=10000)
+   wr_l3_r: 10 wallclock secs ( 4.03 usr +  0.68 sys =  4.71 CPU) @ 2123.14/s (n=10000)
+Benchmark: timing 10000 iterations of rd_l1_c, rd_l2_c, rd_l3_c...
+   rd_l1_c:  3 wallclock secs ( 1.70 usr +  0.26 sys =  1.96 CPU) @ 5102.04/s (n=10000)
+   rd_l2_c:  5 wallclock secs ( 2.30 usr +  0.27 sys =  2.57 CPU) @ 3891.05/s (n=10000)
+   rd_l3_c:  3 wallclock secs ( 1.78 usr +  0.29 sys =  2.07 CPU) @ 4830.92/s (n=10000)
+Benchmark: timing 2500 iterations of transact...
+  transact: 13 wallclock secs ( 5.98 usr +  0.84 sys =  6.82 CPU) @ 366.57/s (n=2500)
+Benchmark: timing 10000 iterations of rd_l1_v, rd_l2_v, rd_l3_v...
+   rd_l1_v:  6 wallclock secs ( 3.13 usr +  0.51 sys =  3.64 CPU) @ 2747.25/s (n=10000)
+   rd_l2_v:  6 wallclock secs ( 3.01 usr +  0.51 sys =  3.52 CPU) @ 2840.91/s (n=10000)
+   rd_l3_v:  6 wallclock secs ( 3.12 usr +  0.54 sys =  3.66 CPU) @ 2732.24/s (n=10000)

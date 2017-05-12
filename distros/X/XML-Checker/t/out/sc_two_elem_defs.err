@@ -1,0 +1,3 @@
+XML::Checker ERROR-115: ELEMENT [b] already defined
+	Context: Element b
+XML::Checker ERROR-101: undefined ELEMENT [root]

@@ -1,0 +1,120 @@
+XML-TreePP-XMLPath
+===============================
+
+A pure PERL module to compliment the pure PERL XML::TreePP module. XMLPath may
+be similar to XPath, and it does attempt to conform to the XPath standard when
+possible, but it is far from being fully XPath compliant.
+
+Its purpose is to implement an XPath-like accessor methodology to nodes in a
+XML::TreePP parsed XML Document. In contrast, XPath is an accessor methodology
+to nodes in an unparsed (or raw) XML Document.
+
+The advantage of using XML::TreePP::XMLPath over any other PERL implementation
+of XPath is that XML::TreePP::XMLPath is an accessor to XML::TreePP parsed
+XML Documents. If you are already using XML::TreePP to parse XML, you can use
+XML::TreePP::XMLPath to access nodes inside that parsed XML Document without
+having to convert it into a raw XML Document.
+
+As an additional side-benefit, any PERL HASH/ARRY reference data structure can
+be accessible via the XPath accessor method provided by this module. It does
+not have to a parsed XML structure.
+
+EXAMPLE
+
+    use XML::TreePP;
+    use XML::TreePP::XMLPath;
+    
+    my $tpp = XML::TreePP->new();
+    my $tppx = XML::TreePP::XMLPath->new();
+    
+    my $tree = { rss => { channel => { item => [ {
+        title   => "The Perl Directory",
+        link    => "http://www.perl.org/";,
+    }, {
+        title   => "The Comprehensive Perl Archive Network",
+        link    => "http://cpan.perl.org/";,
+    } ] } } };
+    my $xml = $tpp->write( $tree );
+
+Get a subtree of the XML tree:
+
+    my $xmlsub = $tppx->filterXMLDoc( $tree , q{rss/channel/item[title="The Comprehensive Perl Archive Network"]} );
+    print $xmlsub->{'link'};
+
+Iterate through all attributes and Elements of each <item> XML element:
+
+    my $xmlsub = $tppx->filterXMLDoc( $tree , q{rss/channel/item} );
+    my $h_attr = $tppx->getAttributes( $xmlsub );
+    my $h_elem = $tppx->getElements( $xmlsub );
+    foreach $attrHash ( @{ $h_attr } ) {
+        while my ( $attrKey, $attrVal ) = each ( %{$attrHash} ) {
+            ...
+        }
+    }
+    foreach $elemHash ( @{ $h_elem } ) {
+        while my ( $elemName, $elemVal ) = each ( %{$elemHash} ) {
+            ...
+        }
+    }
+
+EXAMPLE for using XML::TreePP::XMLPath to access a non-XML compliant tree of
+PERL referenced data.
+
+    use XML::TreePP::XMLPath;
+    
+    my $tppx = new XML::TreePP::XMLPath;
+    my $hashtree = {
+        config => {
+            nodes => {
+                "10.0.10.5" => {
+                    options => [ 'option1', 'option2' ],
+                    alerts => {
+                        email => 'someone@nowhere.org'
+                    }
+                }
+            }
+        }
+    };
+    print $tppx->filterXMLDoc($hashtree, '/config/nodes/10.0.10.5/alerts/email');
+    print "\n";
+    print $tppx->filterXMLDoc($hashtree, '/config/nodes/10.0.10.5/options')->[1];
+    print "\n";
+
+Result
+    
+    someone@nowhere.org
+    option2
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  XML::TreePP
+  Data::Dump
+
+
+SUPPORT AND DOCUMENTATION
+
+    http://www.codepin.org/project/perlmod/XML-TreePP-XMLPath
+
+
+COPYRIGHT AND LICENSE
+
+Copyright (c) 2008-2013 Russell E Glaue,
+Center for the Application of Information Technologies,
+Western	Illinois University.
+All rights reserved.
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

@@ -1,0 +1,43 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 d9545188b25da517b80ef57271d7c99d8acb7952 Changes
+SHA1 2490fd0bcd4ee7c5a75711dada9c5d0c925ea1e2 MANIFEST
+SHA1 939a476aeaeb74e1c35fac5fe2377447e4a0b02f META.yml
+SHA1 1d8f946551e3e2546e33e450b022e31187cdea41 Makefile.PL
+SHA1 00c25c159efd3012173c05b35e92d261091798f7 README
+SHA1 9b2f9d83bcf77860f53a0c07c90a4a59ad9f5df1 inc/Module/Install.pm
+SHA1 abe32855d75ab13747cf65765af9947b7a8c3057 inc/Module/Install/Base.pm
+SHA1 95b81d1e91bd634467bf633571eff4420e9c04eb inc/Module/Install/Can.pm
+SHA1 1fe98c63cf9d7271c8cb4183ba230f152df69e26 inc/Module/Install/Fetch.pm
+SHA1 0606a8b02a420600bc3e2b65ab82f70266784926 inc/Module/Install/Include.pm
+SHA1 2249171a2b72cd73ff2c0a06597d29f86e5df456 inc/Module/Install/Makefile.pm
+SHA1 381bb98ea3877bba49ae85e7a7ea130645fd3dbf inc/Module/Install/Metadata.pm
+SHA1 0c2118868ef82ac517eb6d9c3bd93e6eb9bbf83e inc/Module/Install/Win32.pm
+SHA1 e827d6d43771032fa3df35c0ad5e5698d0e54cda inc/Module/Install/WriteAll.pm
+SHA1 ae96dc4c051a202e5db3fa73133e6183ee4910b2 inc/Test/Builder.pm
+SHA1 a9037004a2c3096d77169a16da95743eeb813539 inc/Test/Builder/Module.pm
+SHA1 45d0149fee8d12082d0aa00fd9202f4b29126824 inc/Test/More.pm
+SHA1 e3ccbc21f5ea44e5e64f3d3d19a8850804d5c012 inc/ok.pm
+SHA1 cebf8c9f651af6a4a2ba01c52a8a202d433a1eae lib/XML/Literal.pm
+SHA1 7a2d6321db341cf66a8f522f02d65b642e9fff95 t/01-basic.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.3 (Darwin)
+
+iD8DBQFE7a74tLPdNzw1AaARAgfRAJ0enPN7KbmT6hs6jJx/7YeAsA3evwCeLdVE
+kYm58BjKvG4weLDLBOtSFfw=
+=TmTa
+-----END PGP SIGNATURE-----

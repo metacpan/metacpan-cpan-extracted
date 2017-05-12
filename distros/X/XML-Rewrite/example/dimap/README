@@ -1,0 +1,11 @@
+
+Last update: 2008/08/11
+
+This example contains a real-life set of schemas, but in a pre-release
+version.  This set is excellent in demonstrating the possibilities of
+rewrite.
+
+Have a look at the two steps taken in the 'norm' script.  I hope for
+you that you do not need the "repair" step, because in that case you
+need quite some understanding of schema's... at least more than the
+schema developers themselves.

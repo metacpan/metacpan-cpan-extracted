@@ -1,0 +1,93 @@
+Revision history for Perl extension XML::Handler::Dtd2Html.
+
+0.42  Mon Jul 16 11:30:00 2012
+	- fix for Perl 5.17.1
+	- some Perl Best Practices
+
+0.41  Wed Nov 12 12:30:00 2003
+	- add options : -h -v -D
+
+0.40  Mon Oct  6 12:30:00 2003
+	- base for XML::Handler::Dtd2DocBook
+	- option -C : re-works now
+
+0.34  Fri Sep  5 12:30:00 2003
+	- new formatting of content model (use Parse::RecDescent)
+	- don't overwrite CSS file if exists
+
+0.33  Mon Aug 25 12:30:00 2003
+	- add special tag : SAMPLE
+	- layout : some improvements
+	- _main.tmpl : no anchor for entity
+	- fix in PNG copy
+	- review of documentation (thank to Richard)
+
+0.32  Tue Jul 22 12:30:00 2003
+	- put style sheets with templates
+	- add special 2 tags : TITLE and HIDDEN
+	- now, special tags are case insensitive
+
+0.31  Tue Jul 15 12:30:00 2003
+	- use XML-SAX-Expat 0.37 that needs no patch
+	- modif fr/element.tmpl
+
+0.30  Tue Feb 11 12:30:00 2003
+	- refactoring with HTML::Template
+	- add -l option : select language of templates
+	- add -p option : select path of templates
+	- add graphic icons in book page (mk_icon.pl)
+	- rename generateHTML to GenerateHTML, and params are in a hash
+
+0.25  Mon Jan 13 08:30:00 2003
+	- move attribute target from <a> to <base> (frameset mode)
+
+0.24  Thu Nov 28 20:30:00 2002
+	- sorry for 0.23
+
+0.23  Tue Nov 26 08:30:00 2002
+	- spelling mistake 'Sypnopsis' (thank to Richard)
+
+0.22  Wed Oct 16 12:30:00 2002
+	- fix in patch Expat for XML-SAX-Base v1.04
+
+0.21  Mon Oct  7 12:30:00 2002
+	- better Expat patch
+	- add -d option : generate a clean DTD
+	- add @@TAG : force href generation
+
+0.20  Fri Sep 27 18:30:00 2002
+	- now use XML::SAX::Expat (SAX 2.0), remove use XML::PerlSAX
+	- add -H option : disable href generation in doc comment
+	- add special tag @BRIEF
+
+0.14  Mon Sep 16 08:30:00 2002
+	- add tag in XML comment, special tag @INCLUDE
+	- add -x option : include example files
+	- add targets in sample/makefile
+
+0.13  Thu Sep  5 20:30:00 2002
+	- suppress patch check
+	- bug in book mode : swap between children and parents
+	- add -s option : generate an external CSS file
+	- deals with not case sensitive file system (like Windows)
+
+0.12  Tue Sep  3 19:30:00 2002
+	- rename dtd2html to dtd2html.pl
+	- option -M don't work with attribute's comment
+	- check the extension .dtd
+	- check PerlSAX patch
+	- bug with frame mode and output in subdirectory
+	- add -b option : generation mode "Book"
+
+0.11  Wed Aug 14 18:30:00 2002
+	- add a sample
+	- add options : frame mode, comment filter, ...
+	- generate XHTML Strict
+
+0.10  Thu Jul 11 19:30:00 2002
+	- first release
+
+0.01  Mon Jun 24 14:50:50 2002
+	- original version; created by h2xs 1.20 with options
+		-XA -n XML::Handler::Dtd2Html
+

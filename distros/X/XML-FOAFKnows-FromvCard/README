@@ -1,0 +1,88 @@
+XML-FOAFKnows-FromvCard version 0.6
+===================================
+
+This module takes a vCard string parses it using L<Text::vCard> and
+attempts to make C<foaf:knows> records from it. It's scope is limited
+to that, it is not intended to be a full vCard to RDF conversion
+module, it just wants to make reasonable knows records of your
+contacts.
+
+It is also conservative in what it outputs. If a vCard contains a
+"CONFIDENTIAL" class, it will write nothing, and unless a there is a
+"PUBLIC" class, it will only output the SHA1-hashed mailbox, a nick if
+it exists and a homepage if it exists. A discussion of these issues
+will appear in this module later.
+
+The module also contains a script foafvcard. With that, you can
+produce a useful FOAF file from the command line with some
+parameters. It will install itself to your system's directory for
+executables and can be used directly after installation.
+
+The script takes a vCard file as primary input, but can also take
+other parameters:
+
+--seeAlso=URI
+	An URI to your, the author's FOAF file.
+
+--uri=URI
+	Your canonical URI, for example your own Person record.
+
+--email=your@email.address
+	Your email address, to be hashed and included as an Inverse
+	Functional Property, to identify you as a person.
+
+--attribute=VCARDATTRIBUTE
+	You may enter the name of an attribute that may contain
+	CONFIDENTIAL, PRIVATE or PUBLIC, and the amount of information
+	included in the resulting FOAF will depend on that
+	attribute. The default is CLASS, which is used by at least
+	KAddressbook.
+
+--privacy=PRIVATE|PUBLIC
+	You may set this to either PRIVATE or PUBLIC, or leave it
+	unset. In the case of PRIVATE, it will return only minimal
+	data for the person, in the case of PUBLIC, it will return
+	quite a lot of information. 
+
+See the module's POD for more details, there is also a longer
+discussion of the privacy issues.
+
+
+More information will appear here later.
+
+
+INSTALLATION
+
+To install this module use the CPAN or CPANPLUS tools or type the
+following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires Text::vCard and Digest::SHA1. There are known
+Segmentation fault problems with Text::vCard::Addressbook prior to
+1.96 with some files, so in case you experience segfaults, make sure
+you have at least this version.
+
+
+SUBVERSION REPOSITORY
+
+This module is currently maintained in a Subversion repository. The
+trunk can be checked out anonymously using e.g.:
+
+  svn checkout http://svn.kjernsmo.net/XML-FOAFKnows-FromvCard/trunk/ FOAFKnows
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 by Kjetil Kjernsmo
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.4 or,
+at your option, any later version of Perl 5 you may have available.
+
+

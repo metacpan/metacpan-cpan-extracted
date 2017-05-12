@@ -1,0 +1,185 @@
+#!/usr/bin/perl
+# ============================================================================
+#             Copyright (c) 2012-2015 Kevin L. Esteb All Rights Reserved
+#
+#
+# TITLE:       xas-supctl
+#
+# FACILITY:    XAS
+#
+# ABSTRACT:    The control program to manage process running under the
+#              supervisor.
+#
+# ENVIRONMENT: The XAS Middleware Environment
+#
+# PARAMETERS:
+#              --start        start a process
+#              --stop         stop a process
+#              --pause        pause a process
+#              --resume       resume a process
+#              --kill         kills a process
+#              --status       returns the status of a process
+#              --list         list processes
+#              --log-type     toggles the log type
+#              --log-facility changes the log facility to use
+#              --log-file     name of the log file
+#              --help         prints out a helpful help message
+#              --manual       prints out the procedures manual
+#              --version      prints out the procedures version
+#              --debug        toggles debug output
+#              --alerts       toggles alert notification
+#
+# RETURNS:
+#              0 - success
+#              1 - failure
+#
+# Version      Author                                              Date
+# -------      ----------------------------------------------      -----------
+# 0.01         Kevin Esteb                                         03-Dec-2015
+#
+# ============================================================================
+#
+
+use lib "../lib";
+use XAS::Apps::Supervisor::Client;
+
+main: {
+
+    my $app = XAS::Apps::Supervisor::Client->new(
+        -throws   => 'xas-supctl',
+    );
+
+    exit $app->run();
+
+}
+
+__END__
+
+=head1 NAME
+
+xas-supctl - the control program for XAS Supervisor
+
+=head1 SYNOPSIS
+
+xas-supctl [--help] [--debug] [--manual] [--version]
+
+ options:
+   --start        start a process
+   --stop         stop a process
+   --kill         kills a process
+   --pause        pause a process
+   --resume       resume a process
+   --status       returns the status of a process
+   --list         list processes
+   --help         outputs simple help text
+   --manual       outputs the procedures manual
+   --version      outputs the apps version
+   --debug        toogles debugging output
+   --alerts       toogles alert notifications
+   --log-file     name of the log file 
+   --log-type     toggles the log type
+   --log-facility changes the log facility
+
+=head1 DESCRIPTION
+
+This procedure is used to communicate with the XAS Supervisor. It allows you
+to start/stop/pause/resume and list the know processes with the supervisor.
+
+=head1 OPTIONS AND ARGUMENTS
+
+=over 4
+
+=item B<--start> <name>
+
+Starts the named process.
+
+=item B<--stop> <name>
+
+Stops the named process.
+
+=item B<--kill> <name>
+
+Kills the named process.
+
+=item B<--pause> <name>
+
+Pauses the named process.
+
+=item B<--resume> <name>
+
+Resumes the named process.
+
+=item B<--status> <name>
+
+Returns the status of the named process.
+
+=item B<--list>
+
+Lists all of the known processes on the supervisor.
+
+=item B<--help>
+
+Displays a simple help message.
+
+=item B<--debug>
+
+Turns on debbuging.
+
+=item B<--alerts>
+
+Togggles alert notification.
+
+=item B<--log-type>
+
+Toggles the log type. Defaults to 'console'. Can be 'console', 'file', 
+'json' or 'syslog'.
+
+=item B<--log-facility>
+
+Toggles the log facilty. Defaults to 'local6'. This follows syslog
+convention.
+
+=item B<--log-file>
+
+Optional logfile. When specified the log type is set to 'file'.
+
+=item B<--manual>
+
+The complete documentation.
+
+=item B<--version>
+
+Prints out the apps version
+
+=back
+
+=head1 EXIT CODES
+
+ 0 - success
+ 1 - failure
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<XAS::Apps::Supervisor::Client|XAS::Apps::Supervisor::Client>
+
+=item L<XAS::Supervisor|XAS::Superivsor>
+
+=item L<XAS|XAS>
+
+=back
+
+=head1 AUTHOR
+
+Kevin L. Esteb, E<lt>kevin@kesteb.usE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2012-2015 Kevin L. Esteb
+
+This is free software; you can redistribute it and/or modify it under
+the terms of the Artistic License 2.0. For details, see the full text
+of the license at http://www.perlfoundation.org/artistic_license_2_0.
+
+=cut

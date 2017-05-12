@@ -1,0 +1,36 @@
+<DocumentDefinition>
+  <name>_test_timestamp</name>
+
+  <element><name>foo</name></element>
+
+  <macro>timestamp: [ 'one', 'two' ], 'created', 'last_modified'</macro>
+
+  <store>
+    <name>one</name>
+    <base>test/timestamp_one</base>
+    <location>Sequential_file:'max',90,'extension','.timestamped'</location>
+  </store>
+
+  <store>
+    <name>two</name>
+    <base>test/timestamp_two</base>
+    <location>Sequential_file:'max',90,'extension','.timestamped'</location>
+  </store>
+
+  <store>
+    <name>other</name>
+    <base>test/timestamp_other</base>
+    <location>Sequential_file:'max',90,'extension','.timestamped'</location>
+  </store>
+
+  
+</DocumentDefinition>
+
+
+
+
+
+
+
+
+

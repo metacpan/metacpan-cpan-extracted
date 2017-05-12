@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<NZSRSRequest VerMinor="0" VerMajor="5">
+  <AckMessage ActionId="brause" TransId="12345aa" />
+</NZSRSRequest>

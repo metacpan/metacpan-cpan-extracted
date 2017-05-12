@@ -1,0 +1,17 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/XML/CAP.pm
+lib/XML/CAP/Geocode.pm
+lib/XML/CAP/Alert.pm
+lib/XML/CAP/Parser.pm
+lib/XML/CAP/Util.pm
+lib/XML/CAP/Info.pm
+lib/XML/CAP/Area.pm
+lib/XML/CAP/Resource.pm
+lib/XML/CAP/Base.pm
+t/00-load.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

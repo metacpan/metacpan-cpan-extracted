@@ -1,0 +1,13 @@
+- implement .bad tests
+- finish decimal support
+- finish dateTime support (hah)
+- memory leak testing
+- do work in check_contents to avoid printing gobs of content
+- XML::Validator::Schema::Simple
+- correct namespace processing
+- make sure empty content models work
+- enforce wierd <all> placement and container-ship rules
+- guard against <element><element/><element>
+- add Schema_Type field to SAX data-structures
+- groups, ugh
+- support more ways to find schema files (schemaLocation)

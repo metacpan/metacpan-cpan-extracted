@@ -1,0 +1,29 @@
+#!/usr/bin/env perl
+
+# PODNAME: XML::Writer::Compiler::xwc
+
+use strict;
+use warnings;
+
+use XML::TreeBuilder;
+use XML::Writer::Compiler;
+
+my $xmlfile = shift or die usage();
+my $perlpkg = shift;
+my $firstdepth = shift;
+my $prependlib = shift;
+my $fileheader = shift;
+
+
+
+my $builder = XML::Writer::Compiler->new;
+
+my $tree = XML::TreeBuilder->new({ 'NoExpand' => 0, 'ErrorContext' => 0 });
+$tree->parse_file($xmlfile);
+
+my $pkg = XML::Writer::Compiler->new->buildclass($perlpkg => $tree, $firstdepth, $prependlib, $fileheader);
+
+sub usage {
+  "$0 xmlfile perlpkg firstdiverdepth prependlib fileheader";
+}
+

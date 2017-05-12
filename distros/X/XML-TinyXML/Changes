@@ -1,0 +1,81 @@
+Revision history for Perl extension TinyXML.
+
+0.34  - The API is now 0-based (when dealing with arrays)
+      - fixed a bug in the parser triggered by extra spaces in start tags
+0.33  - allow to build even if iconv is missing. In which case encoding conversion functionalities will be disabled
+0.32  - fixed the 'Free to wrong pool' bug showing on multi-threaded perl when running on win32
+      - cleanings to suppress compiler warnings
+      - fixed compilation on some windows systems complaining about W32LockFile/W32UnlockFile redefinition
+      - fixed pod documentation for XML::TinyXML::Selector::XPath
+      - enforced 'use strict' and 'use warnings' on all perl modules
+0.31  - fixed a bug which caused the xpath selector to potentially return items 
+        in a random order when expanding a predicate (instead of returning them 
+        in the order of appearance in the document)
+0.30  - fixed an infinite loop introduced when adding the 'ignoreWhiteSpaces' flag
+      - expose a new accessor to directly construct an xml object from a file
+0.29  - reimplementing strcasestr() since it's not portable
+        (missing on solaris)
+      - fixed POD errors, warnings, formatting and a few doc typos
+0.28  - fixed testunits : added missing files to MANIFEST
+0.27  - fixed a namespace-related bug + minor cleanings
+0.26  - introduced 'ignoreBlanks' and 'ignoreWhiteSpaces' flags
+        (which affect both parsing and dumping behaviours)
+0.25  - reimplemented XmlDumpBranch optimizations through safer code
+0.24  - reverted XmlDumpBranch optimizations becuase 
+        memory corruption was caused by the new code
+0.23  - fixed a bug in hash-import routines
+        (0-values produced empty xml nodes)
+0.22  - introducing support for namespaces
+      - optimizations in the underlying C library
+0.21  - fixed a serious memory leak in the XS wrapper to XmlDump()
+      - updated more documentation
+0.20  - fixed a bug in Makefile.PL which was preventing it from being
+        properly built as port on freebsd
+0.19  - fixed MANIFEST to include encoding testunits
+      - setting doConversion when necessary also for generated documents
+        and not only when dumping an imported (and possibly modified) document
+      - documentation
+0.18  - fixed (hopefully) build on solaris
+0.17  - support encodings through iconv
+0.16  - bugfix in expression-parsing logic 
+        (used to parse nested boolean expressions within predicates)
+0.15  - full xpath support
+      - introducing XML::TinyXML::NodeAttribute API 
+        (as wrapper to the XmlNodeAttribute C structure)
+      - better testunits 
+0.14  - preliminary xpath (unabbreviated-only) implementation
+0.13  - switched to macro-based linklist implementation 
+0.12  - small improvements to the API (no changes...only extensions)
+      - more testunits (and started rearranging them in multiple files)
+      - by default, on export, empty nodes will use the shorter <node/> notation
+        (this should be made optionally deactivable through some flag,
+         as for defining encoding, whitespace handling and any other 
+         optional behaviour which makes sense to take into account when 
+         exporting)
+0.11  - fixed leaks in underlying XmlGetNode() and XmlSetNodePath()
+      - safety belt in XmlDumpBranch() to avoid accessing invalid memory
+        in some edge cases
+0.10  - forcing prerequisite for perl >= 5.8
+      - introducing XmlGetAttributeByName() in the underlying C implementation
+      - fixed direct dumping on a file: XmlSave() dumped on a file only if it
+        already existed (blindly trying to create a backup copy). It now 
+        creates the file if not there (and backup it if already present)
+0.09  - bugfix : xmlize() MUST ensure to null-terminate the escaped string
+        if the buffer had to be realloc'd
+0.08  - bugfix : dexml() now works properly so special characters are now
+        handled correctly when importing xml data
+      - testunits now include escaping/unescaping-related checks
+0.07  - correctly handle escaping/unescaping of xml special chars on 
+        import/export operations
+0.06  - bugfix: typo in XML::TinyXML::Node.pm:109
+0.05  - updated documentation and implemented XML::TinyXML::addChildNode()
+0.04  - allow the module to be built and used by perl interpreters < 5.8.8
+      - some more documentation regarding the XML::TinyXML::Node object
+0.03  - make the module to build properly on windows
+        (strtok_r doesn't exist on win32)
+      - added some documentation (more is still needed)
+0.02  - switching from flock to ftrylockfile/funlockfile 
+        to ensure solaris compatibility
+0.01  Fri May 23 00:39:52 2008
+      - original version; created by h2xs 1.23 with options
+        -Oxan TinyXML linklist.h txml.h

@@ -1,0 +1,305 @@
+NAME
+    XAO::Web - XAO Web Developer, dynamic content building suite
+
+DESCRIPTION
+    XAO::Web is a part of XAO open source web services suite. It allows to
+    build dynamic web content using data, templates and external input (for
+    an overview of the templating system please refer to XAO::DO::Web::Page
+    description).
+
+    The distinguishing feature of XAO::Web is in its modular design where
+    almost every aspect of functionality can be altered and alterations can
+    be re-used. No complex code is embedded in the templates which allows to
+    upgrade code and templates separately or maintain multiple visual
+    representations of the same functionality at the same time.
+
+    Aside from that most interesting features of XAO::Web are:
+
+    *   Perl code is not mixed with templates. Templates can be normal HTML
+        files if no processing is required.
+
+    *   A specific site can replace or modify standard XAO::Web objects if
+        required by overriding or extending their methods. You do not need
+        to re-implement entire object to make a site specific change.
+
+        In case of system object upgrade or bug fix there is no need to
+        alter site-specific changes normally.
+
+    *   Site can create any extension objects or embed third-party
+        extensions as well.
+
+    *   One server can serve arbitrary number of XAO::Web sites each with
+        however extended functionality without creating any conflicts. That
+        includes different modifications to the system objects for different
+        sites.
+
+    *   Not limited to Web environment, allows to build any dynamic content
+        -- content of mail messages or reports for instance.
+
+    *   Works with CGI or mod_perl (mod_perl is recommended for production
+        grade sites).
+
+    *   If used in mod_perl mode improves performance by using caching of
+        configuration, parsed templates, database handlers and so on.
+
+    *   XAO::Web is by default integrated with XAO::FS (see XAO::FS) as a
+        database layer, but this is not a requrement -- if for any reason a
+        different database must be used for a site it can be easily and
+        gracefully achieved.
+
+    *   Hosting providers can allow their customers to build very complex
+        sites without allowing them to execute arbitrary code, by allowing
+        to modify only templates.
+
+INSTALLATION
+    Download tarball from a CPAN server near you, from the master site
+    (<http://xao.com/>) or using links on <http://freshmeat.net/> and then
+    install it in the usual way, just say:
+
+      perl Makefile.PL
+      make
+      make test
+      sudo make install
+
+    Saying "install XAO::Web" from the CPAN shell is a good way too:
+
+      perl -MCPAN -eshell
+      install XAO::Web
+
+    Using CPAN shell is usually the best way because all dependencies will
+    be resolved automatically. If you do manual installation then XAO::Web
+    depends on at least the following modules (look into Makefile.PL or just
+    watch closely the output of `perl Makefile.PL' for additional
+    dependencies):
+
+      XAO::Base
+      XAO::FS
+      Digest::MD5
+      Error
+      MIME::Lite
+      Test::Unit
+
+    When you run "perl Makefile.PL" you will be asked for XAO::Web test
+    database. That database is only used when you do `make test' and it have
+    to exist. It does not matter what is inside the database, it will be
+    completely wiped out for each test case. Normally the database should be
+    the same that you have used for XAO::FS tests and in case of MySQL is
+    usually 'test' or 'test_fs'.
+
+    The directory where templates get installed is the same that you gave to
+    XAO::Base when you installed it. Normally that directory is
+    /usr/local/xao -- we will assume that for the rest of the document.
+
+FIRST-TIME RUNNING AND TESTING
+    You are almost there. Now is the time to try it!
+
+    In addition to reading this manual (or instead of reading it if you feel
+    too adventurous today) you can look at the generic site setup in the
+    misc/samplesite/ directory of the distribution archive. The sample site
+    also provides a very useful template to start any project with!
+
+    Configure your Apache server so that it would execute
+    /usr/local/xao/handlers/xao-apache.pl when someone types URL like
+    http://test.company.com/cgi-bin/xao-apache.pl. Here is an example of a
+    virtual host configuration for that (or you can simply sym-link
+    xao-apache.pl to your existing cgi-bin directory if you have one):
+
+     <VirtualHost 10.0.0.1:80>
+      ServerName   test.company.com
+      ScriptAlias  /cgi-bin/ /usr/local/xao/handlers/
+     </VirtualHost>
+
+    After you configure and re-start your web-server point your browser at
+    http://test.company.com/cgi-bin/xao-apache.pl/mysite/ -- you should be
+    able to see the default page template processed by XAO::Web. If you do
+    not see it -- you might want to look into apache error log, usually
+    there is some additional information there.
+
+    In the URL you used to look at the default page includes 'mysite' as a
+    site name. In this case it can be anything you want, nothing depends on
+    the name because your site does not yet have any specific templates,
+    objects or configuration. We will get back to customizing your site
+    later.
+
+    Now let us look into the URL - it does not look good, does it? It
+    includes cgi-bin, site name and generally looks ugly, we agree. The way
+    to deal with it currently is to use mod_rewrite to hide that into Apache
+    configuration. We are working on the real mod_perl module that will not
+    require mod_rewrite, you should expect it with the next release of
+    XAO::Web.
+
+    Here is how to configure Apache with mod_rewrite in the meantime:
+
+     <VirtualHost 10.0.0.1:80>
+      ServerName   test.company.com
+      ServerAlias  test.company.com
+ 
+      <Directory /usr/local/xao/handlers>
+       Options ExecCGI
+       SetHandler cgi-script
+      </Directory>
+
+      RewriteEngine on
+      RewriteRule   ^/images/(.*)$  \
+                    /usr/local/xao/projects/mysite/images/$1  \
+                    [L]
+      RewriteRule   ^/(.*)$  \
+                    /usr/local/xao/handlers/xao-apache.pl/mysite/$1  \
+                    [L]
+     </VirtualHost>
+
+    That leaves everything in /images/ to be processed by the web server in
+    the usual way and maps everything else to XAO::Web handler. Restart
+    Apache and try going to just http://test.company.com/ now -- you should
+    see the same default page as before.
+
+    And finally, here is an example of mod_perl configuration, you should
+    use it for production grade sites. The only difference is in <Directory>
+    block.
+
+     <VirtualHost 10.0.0.1:80>
+      ServerName   test.company.com
+      ServerAlias  test.company.com
+ 
+      <Directory /usr/local/xao/handlers>
+       Options ExecCGI
+       SetHandler perl-script
+       PerlHandler Apache::Registry
+       PerlSendHeader Off
+      </Directory>
+
+      RewriteEngine on
+      RewriteRule   ^/images/(.*)$  \
+                    /usr/local/xao/projects/mysite/images/$1  \
+                    [L]
+      RewriteRule   ^/(.*)$  \
+                    /usr/local/xao/handlers/xao-apache.pl/mysite/$1  \
+                    [L]
+     </VirtualHost>
+
+    That is it, if you got so far your installation of XAO::Web works fine
+    and you can move on to actually building a custom web site.
+
+SITE DEVELOPMENT
+    Before you go any further it is recommended that you keep cgi-bin
+    configuration sample from the examples above as opposed to mod_perl.
+    Mod_perl development has its own peculiarities related to caching of
+    modules and content and you can get back to that later. Cgi-bin based
+    configurations are usually much easier to develop and debug.
+
+    Here is a couple of steps to start the development of a new site.
+
+    1   Choose a name for your site. It have to start with a lowercase
+        letter and may contain letters, digits and underscore signs. Let's
+        assume you've chosen "mysite" as a name.
+
+    2   Create a sub-directory in /usr/local/xao/projects with the name of
+        your site (/usr/local/xao/projects/mysite in our case). This
+        directory is the home directory of your site. Everything else below
+        is relative to that directory. For simplicity you might want to
+        sym-link that directory into your home directory.
+
+    3   Create a sub-directory named 'objects'. Place a configuration file
+        called 'Config.pm' inside of it. There is a couple of requrements
+        for that file:
+
+        *   Package name have to be 'XAO::DO::Config'.
+
+        *   Usually it defines an init() method that will initialize site
+            configuration. In mod_perl environment that method will be
+            called only once when the site is initialized for the first
+            time. That means that init() is a good place to open connection
+            to a database and it is recommended to do that as most of XAO
+            modules require database connection to work properly.
+
+        Here is an example of configuration module Config.pm for "mysite"
+        site:
+
+         # Configuration for mysite
+         #
+         package XAO::DO::Config;
+         use strict;
+         use XAO::Objects;
+
+         # Inheritance from the system Config object
+         #
+         use base XAO::Objects->load(objname => 'Config', baseobj => 1);
+
+         # Site configuration values. A lot of stuff can be stored here for
+         # different modules, base_url is not required, but recommended.
+         #
+         my %data=(
+             base_url        => "http://test.company.com",
+             base_url_secure => "http://test.company.com",
+         );
+
+         ##
+         # Initializing configuration object for our site
+         #
+         sub init {
+             my $self=shift;
+
+             # Creating a database configuration object and embedding it into our
+             # configuration, see below for explanation
+             #
+             my $fsconfig = XAO::Objects->new(
+                    objname  => 'FS::Config',
+                    odb_args => {
+                        dsn       => 'OS:MySQL_DBI:test_fs',
+                        user      => 'test',
+                        password  => 'test',
+                    }
+                );
+             $self->embed(fs => $fsconfig);
+
+             # Storing configuration into embedded hash
+             #
+             $self->embedded('hash')->fill(\%data);
+
+             # And finally calling base class' init() method
+             #
+             $self->SUPER::init();
+         }
+
+         1;
+
+        For the more detailed description of `embedding' and initialization
+        process in general please refer to XAO::DO::Config.
+
+    4   At that point you should already be able to see your new site in
+        your browser. Just point it to
+        http://test.company.com/cgi-bin/xao-apache.pl/mysite/ or just
+        http://test.company.com/ depending on your Apache configuration.
+
+        But in order to do something useful you normally need to create one
+        more directory - 'templates'. That directory will contain all
+        templates of your site and unless you use some extended features of
+        XAO::Web the layout of files in this directory directly translates
+        into URIs.
+
+        Nothing else is used by XAO::Web and usually you would also create
+        directories like 'images' or 'static'; put your site to CVS version
+        control or make some kind of installation tools for it. It is all up
+        to you.
+
+    This is it. Try placing an index.html file into your 'templates'
+    directory and go to browser to check how it appears.
+
+AUTHORS
+    Copyright (c) 2005 Andrew Maltsev
+
+    Copyright (c) 2001-2004 Andrew Maltsev, XAO Inc.
+
+    <am@ejelta.com> -- http://ejelta.com/xao/
+
+    XAO::Web was created and is maintained by Andrew Maltsev. Creating of
+    XAO::Web would not be possible without valuable comments and ideas from
+    everybody on our team and especially from Marcos Alves, Bil Drury, Brian
+    Despain and Jason Shupe.
+
+SEE ALSO
+    Recommended reading: XAO::DO::Web::Page (for templates language),
+    XAO::Objects (for object loading details), XAO::DO::Config (for site
+    config details), XAO::FS (for OO database interface),
+    XAO::DO::FS::Config, XAO::Web.
+

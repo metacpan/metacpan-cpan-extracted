@@ -1,0 +1,134 @@
+    <h3>Prologue</h3>
+    <p>
+  <!-- TMPL_IF NAME="standalone" -->
+      &lt;?<span class='keyword1'>xml</span>
+      <!-- TMPL_IF NAME="version" -->
+        <span class='keyword1'>version</span>='<span class='keyword2'><!-- TMPL_VAR NAME="version" --></span>'
+      <!-- /TMPL_IF -->
+      <!-- TMPL_IF NAME="encoding" -->
+        <span class='keyword1'>encoding</span>='<!-- TMPL_VAR NAME="encoding" -->'
+      <!-- /TMPL_IF -->
+        <span class='keyword1'>standalone</span>='<span class='keyword2'>yes</span>' ?&gt;
+      <br />
+      &lt;<span class='keyword1'>!DOCTYPE</span> <!-- TMPL_VAR NAME="dtd" --> [
+<pre>
+	...
+]&gt;
+</pre>
+  <!-- TMPL_ELSE -->
+      &lt;<span class='keyword1'>!DOCTYPE</span> <!-- TMPL_VAR NAME="dtd" -->
+    <!-- TMPL_IF NAME="publicId" -->
+      <span class='keyword1'>PUBLIC</span> '<!-- TMPL_VAR NAME="publicId" -->' '<!-- TMPL_VAR NAME="systemId" -->'
+    <!-- TMPL_ELSE -->
+      <!-- TMPL_IF NAME="systemId" -->
+      <span class='keyword1'>SYSTEM</span> '<!-- TMPL_VAR NAME="systemId" -->'
+      <!-- /TMPL_IF -->
+    <!-- /TMPL_IF -->
+&gt;
+  <!-- /TMPL_IF -->
+    </p>
+
+    <!-- TMPL_LOOP NAME="doc" -->
+    <p class='comment'><!-- TMPL_VAR NAME="data" --></p>
+    <!-- /TMPL_LOOP -->
+    <!-- TMPL_LOOP NAME="tag" -->
+      <h4><!-- TMPL_VAR NAME="entry" --></h4>
+      <p class='comment'><!-- TMPL_VAR NAME="data" --></p>
+    <!-- /TMPL_LOOP -->
+
+    <hr />
+    <ul>
+    <!-- TMPL_LOOP NAME="decls" -->
+      <li>
+      <!-- TMPL_IF NAME="is_notation" -->
+        <!-- TMPL_VAR NAME="a" -->
+        <h3><!-- TMPL_VAR NAME="name" --></h3>
+        <p>&lt;<span class='keyword1'>!NOTATION</span> <!-- TMPL_VAR NAME="name" -->
+        <!-- TMPL_IF NAME="both_id" -->
+          <span class='keyword1'>PUBLIC</span> '<!-- TMPL_VAR NAME="publicId" -->' '<!-- TMPL_VAR NAME="systemId" -->'
+        <!-- TMPL_ELSE -->
+          <!-- TMPL_IF NAME="publicId" -->
+          <span class='keyword1'>PUBLIC</span> '<!-- TMPL_VAR NAME="publicId" -->'
+          <!-- /TMPL_IF -->
+          <!-- TMPL_IF NAME="systemId" -->
+          <span class='keyword1'>SYSTEM</span> '<!-- TMPL_VAR NAME="systemId" -->'
+          <!-- /TMPL_IF -->
+        <!-- /TMPL_IF -->
+      <!-- /TMPL_IF -->
+      <!-- TMPL_IF NAME="is_internal_entity" -->
+        <!-- TMPL_VAR NAME="a" -->
+        <h3><!-- TMPL_VAR NAME="name" --></h3>
+        <p>&lt;<span class='keyword1'>!ENTITY</span> <!-- TMPL_VAR NAME="name" --> '<!-- TMPL_VAR NAME="value" -->'
+        &gt;</p>
+      <!-- /TMPL_IF -->
+      <!-- TMPL_IF NAME="is_external_entity" -->
+        <!-- TMPL_VAR NAME="a" -->
+        <h3><!-- TMPL_VAR NAME="name" --></h3>
+        <p>&lt;<span class='keyword1'>!ENTITY</span> <!-- TMPL_VAR NAME="name" -->
+        <!-- TMPL_IF NAME="publicId" -->
+          <span class='keyword1'>PUBLIC</span> '<!-- TMPL_VAR NAME="publicId" -->' '<!-- TMPL_VAR NAME="systemId" -->'
+        <!-- TMPL_ELSE -->
+          <span class='keyword1'>SYSTEM</span> '<!-- TMPL_VAR NAME="systemId" -->'
+        <!-- /TMPL_IF -->
+        &gt;</p>
+      <!-- /TMPL_IF -->
+      <!-- TMPL_IF NAME="is_element" -->
+        <!-- TMPL_VAR NAME="a" -->
+        <h3><!-- TMPL_VAR NAME="name" --></h3>
+        <p>&lt;<span class='keyword1'>!ELEMENT</span> <!-- TMPL_VAR NAME="name" --> <!-- TMPL_VAR NAME="model" --> &gt;
+        <!-- TMPL_LOOP NAME="attrs" -->
+          <br />
+          &lt;<span class='keyword1'>!ATTLIST</span> <!-- TMPL_VAR NAME="name" --> <!-- TMPL_VAR NAME="attr_name" -->
+          <!-- TMPL_IF NAME="tokenized_type" -->
+            <span class='keyword1'><!-- TMPL_VAR NAME="type" --></span>
+          <!-- TMPL_ELSE -->
+            <!-- TMPL_VAR NAME="type" -->
+          <!-- /TMPL_IF -->
+          <!-- TMPL_IF NAME="value_default" -->
+            <span class='keyword2'><!-- TMPL_VAR NAME="value_default" --></span>
+          <!-- /TMPL_IF -->
+          <!-- TMPL_IF NAME="value" -->
+            <!-- TMPL_VAR NAME="value" -->
+          <!-- /TMPL_IF -->
+          &gt;
+        <!-- /TMPL_LOOP -->
+        </p>
+      <!-- /TMPL_IF -->
+
+      <!-- TMPL_LOOP NAME="doc" -->
+      <p class='comment'><!-- TMPL_VAR NAME="data" --></p>
+      <!-- /TMPL_LOOP -->
+      <!-- TMPL_LOOP NAME="tag" -->
+        <h4><!-- TMPL_VAR NAME="entry" --></h4>
+        <p class='comment'><!-- TMPL_VAR NAME="data" --></p>
+      <!-- /TMPL_LOOP -->
+      <!-- TMPL_IF NAME="doc_attrs" -->
+      <ul>
+      <!-- TMPL_LOOP NAME="doc_attrs" -->
+        <li><!-- TMPL_VAR NAME="name" --> : <span class='comment'>
+        <!-- TMPL_LOOP NAME="doc" -->
+          <p><!-- TMPL_VAR NAME="data" --></p>
+        <!-- /TMPL_LOOP --></span>
+        <!-- TMPL_LOOP NAME="tag" -->
+          <p><!-- TMPL_VAR NAME="entry" --> : <span class='comment'>
+          <!-- TMPL_VAR NAME="data" --></span></p>
+        <!-- /TMPL_LOOP -->
+        </li>
+      <!-- /TMPL_LOOP -->
+      </ul>
+      <!-- /TMPL_IF -->
+
+      </li>
+    <!-- /TMPL_LOOP -->
+    </ul>
+  <!-- TMPL_IF NAME="nb_example" -->
+    <hr />
+    <!-- TMPL_LOOP NAME="examples" -->
+    <!-- TMPL_VAR NAME="a" -->
+    <h3>Exemple <!-- TMPL_VAR NAME="filename" --> :</h3>
+    <pre><!-- TMPL_VAR NAME="text" --></pre>
+    <!-- /TMPL_LOOP -->
+  <!-- /TMPL_IF -->
+    <hr />
+    <div><cite>Page g&eacute;n&eacute;r&eacute;e par dtd2html</cite></div>
+

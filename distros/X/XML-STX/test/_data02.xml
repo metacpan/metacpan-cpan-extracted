@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<root>
+  <node id="1">koko</node>
+  <!-- comment -->
+  text
+  <![CDATA[<&>]]>
+  <?pi pi-content?>
+</root>

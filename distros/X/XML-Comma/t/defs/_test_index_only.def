@@ -1,0 +1,29 @@
+<DocumentDefinition>
+  <name>_test_index_only</name>
+
+  <element><name>time</name></element>
+  <element><name>string</name></element>
+
+  <store>
+    <name>main</name>
+    <location>Index_Only:'index_name','main'</location>
+  </store>
+
+  <store>
+    <name>second</name>
+    <location>Index_Only: ( index_name   => 'second', 
+                            derive_from  => 'string' ) </location>
+  </store>
+
+  <index>
+    <name>main</name>
+    <field><name>time</name></field>
+    <field><name>string</name></field>
+  </index>
+
+  <index>
+    <name>second</name>
+    <field><name>time</name></field>
+    <field><name>string</name></field>
+  </index>
+</DocumentDefinition>

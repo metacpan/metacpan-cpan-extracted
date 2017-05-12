@@ -1,0 +1,11 @@
+% layout 'email';
+% title 'Quicknote Message';
+
+<div class="unsemantic-list">
+  <p><strong>Sent on:</strong> <%= scalar(localtime) %></p>
+  <p><strong>Host:</strong> <%= stash 'visitor_ip' %></p>
+  <p><strong>Name:</strong> <%= param 'name' %></p>
+  <p><strong>Email:</strong> <%= param 'email' %></p>
+  <p><strong>Province:</strong> <%= param 'province' %></p>
+  <p><strong>Message:</strong><br><%== stash 'message' %></p>
+</div>

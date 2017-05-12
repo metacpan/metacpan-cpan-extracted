@@ -1,0 +1,34 @@
+@prefix : <http://usefulinc.com/ns/doap#>.
+
+`XML-Atom-Microformats`
+	:shortdesc      "parse microformats in Atom content"@en;
+	:programming-language  "Perl";
+	:homepage       <https://metacpan.org/release/XML-Atom-Microformats>;
+	:download-page  <https://metacpan.org/release/XML-Atom-Microformats>;
+	:bug-database   <http://rt.cpan.org/Dist/Display.html?Queue=XML-Atom-Microformats>;
+	:repository     [ a :HgRepository ; :browse <https://bitbucket.org/tobyink/p5-xml-atom-microformats> ];
+	:maintainer     cpan:tobyink;
+	:developer      cpan:tobyink;
+	:documenter     cpan:tobyink;
+	:tester         cpan:tobyink;
+	:created        2010-04-14 ;
+	:license        <http://dev.perl.org/licenses/>;
+	:category
+		[ rdfs:label "XML"@en ],
+		[ rdfs:label "Atom"@en ],
+		[ rdfs:label "Microformats"@en ],
+		[ rdfs:label "RDFa"@en ],
+		[ rdfs:label "RDF"@en ],
+		[ rdfs:label "SemWeb"@en ],
+		[ rdfs:label "HTML"@en ],
+		[ rdfs:label "XHTML"@en ],
+		[ rdfs:label "JSON"@en ],
+		[ rdfs:label "Semantic Web"@en ].
+
+cpan:tobyink
+	a               foaf:Person;
+	foaf:name       "Toby Inkster";
+	foaf:homepage   <http://tobyinkster.co.uk/>;
+	foaf:page       <https://metacpan.org/author/TOBYINK>;
+	foaf:mbox       <mailto:tobyink@cpan.org>;
+	owl:sameAs      <http://tobyinkster.co.uk/#i>.

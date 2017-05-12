@@ -1,0 +1,20 @@
+--- #YAML:1.0
+name: XML-Generator-vCard-Base
+version: 1.0
+author:
+  - Aaron Straup Cope E<lt>ascope@cpan.orgE<gt>
+abstract: |-
+  base class for generating SAX2 events for vCard data
+license: perl
+requires:
+  Encode: '>= 1.09'
+  Memoize: ''
+  URI: '>= 1.35'
+  XML::SAX::Base: '>= 1.04'
+build_requires:
+  Test::Simple: '>= 0.47'
+provides:
+  XML::Generator::vCard::Base:
+    file: lib/XML/Generator/vCard/Base.pm
+    version: 1.0
+generated_by: Module::Build version 0.2604

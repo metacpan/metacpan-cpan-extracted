@@ -1,0 +1,10 @@
+Release history for XMLRPC::Fast
+
+0.11 / 2016.01.20 / SAPER
+  - make the code compatible with Perl 5.8
+  - skip the tests against XMLRPC::Lite older than 0.712
+  - Kwalitee: add license information, specify minimum Perl version
+
+0.10 / 2015.08.15 / SAPER
+  - first release
+

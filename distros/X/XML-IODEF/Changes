@@ -1,0 +1,58 @@
+Revision history for Perl extension XML::IODEF
+
+0.11   2011-05-14
+    - cleaned up Makefile.PL
+    - added to_tree function which should deprecate to_hash
+    - fixed a few minor bugs in test.pl
+
+0.08   2010-06-05
+    - fixed missing Makefile.PL deps
+    - fixed minor test.pl (make test) bugs due to changes in RFC 5070 format
+
+0.07   2010-06-03
+    - added RFC 5070 (2007) compatability
+
+0.07_3 2010-04-06
+    - minor fix to xmlns decloration, version bump to _3
+    - merging with sep branch; removing to_hashref, should use LibXML for this sort of thing
+    - minor fix to the ->in() fcnt to remove un-needed DOCTYPE, etc
+
+0.07_2 2010-01-05
+	- Development Release
+	- added function: to_hashref() which provides a suppliment function of to_hash (XML::Simple-like).
+	- cleaned up some code formatting and some doc errors
+
+0.07_1 2010-01-01
+	- Development Release
+	- Updated to RFC 5070 compliance (2007 Release)
+	- Extracted BSD License to LICENSE file
+	- restructured classes to follow RFC document (lots of add's / removes adopted from newer RFC)
+	- deprecated create_ident function -- should be using local workflow system id
+	- ref: 
+		- http://code.google.com/p/perl-xml-iodef/source/detail?r=3
+
+0.06 2004/02/09	
+	- Removed extra RegistryHandle and Impact
+	- Made currency free text
+	- Added origin to Classification
+
+0.05 2004/02/05
+	- Fixed AdditionalData by adding restriction attribute
+
+0.04 2003/12/15
+	- Changed Reporttime to use 
+		    YYYY-MM-DDTHH:MM:SS[+|-]HHMM
+ 		     |    |  | ||  |  |      |
+    		     |    |  | T|  |  sec    |
+                     year |  day|  min       dif to GMT in hours and minutes
+         		month hour(0..23)
+
+0.03 2003/08
+	- Fixed Reporttime
+
+0.02 2003/07/31
+	- Changes to make more DTD correct, adds version="1.0" by default
+
+0.01 2003/07/24
+	- First release, modified from XML::IDMEF
+

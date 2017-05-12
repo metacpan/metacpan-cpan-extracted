@@ -1,0 +1,19 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+use XML::Atom::Stream;
+
+my $url = shift || "http://updates.sixapart.com/atom-stream.xml";
+
+my $client = XML::Atom::Stream->new(callback => \&callback, debug => 1, reconnect => 1);
+$client->connect($url);
+
+sub callback {
+    my $feed = shift;
+    my $entry = ($feed->entries)[0];
+    print $entry->title .
+        ($feed->author ? " (by " . $feed->author->name . ")" : '') . "\n",
+        "  ", $entry->link->href, "\n";
+    print "  (body: ", length($entry->content->body), " bytes)\n";
+}

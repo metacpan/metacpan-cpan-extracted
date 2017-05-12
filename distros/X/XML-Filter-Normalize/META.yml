@@ -1,0 +1,17 @@
+---
+name: XML-Filter-Normalize
+version: 0.01
+author: ~
+abstract: Clean up SAX event streams
+license: bsd
+requires:
+  XML::NamespaceSupport: 0
+  XML::SAX::Base: 0
+  perl: 5.6.1
+recommends:
+  Test::Pod: 0
+provides:
+  XML::Filter::Normalize:
+    file: lib/XML/Filter/Normalize.pm
+    version: 0.01
+generated_by: Module::Build version 0.2611

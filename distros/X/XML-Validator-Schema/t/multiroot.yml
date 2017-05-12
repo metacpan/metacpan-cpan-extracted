@@ -1,0 +1,33 @@
+# test a simple schema that allows multiple root elements
+
+--- |
+  <?xml version="1.0" encoding="UTF-8"?>
+  <schema xmlns="http://www.w3.org/2001/XMLSchema">
+    <element name="foo" />
+    <element name="bar" />
+  </schema>
+
+--- |
+  <?xml version="1.0" encoding="UTF-8"?>
+  <foo />
+--- >
+PASS
+
+--- |
+  <?xml version="1.0" encoding="UTF-8"?>
+  <bar />
+--- >
+PASS
+
+--- |
+  <?xml version="1.0" encoding="UTF-8"?>
+  <fooz />
+--- >
+FAIL /unexpected <fooz>/
+
+--- |
+  <fooz />
+--- >
+FAIL /unexpected <fooz>/
+
+

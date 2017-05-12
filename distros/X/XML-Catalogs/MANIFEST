@@ -1,0 +1,11 @@
+Build.PL
+Changes.txt
+LICENSE.txt
+MANIFEST
+README.txt
+lib/XML/Catalogs.pm
+t/00_load.t
+t/devel-pod-coverage.t
+t/pod.t
+META.yml
+META.json

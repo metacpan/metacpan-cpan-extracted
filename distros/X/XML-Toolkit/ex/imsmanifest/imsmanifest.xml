@@ -1,0 +1,1486 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<manifest identifier="imscpv1p1p4_manifest" xmlns="http://www.imsglobal.org/xsd/imscp_v1p1" xmlns:imsmd="http://www.imsglobal.org/xsd/imsmd_v1p2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.imsglobal.org/xsd/imscp_v1p1 imscp_v1p1.xsd 
+http://www.imsglobal.org/xsd/imsmd_v1p2 imsmd_v1p2p4.xsd" version="IMS CP 1.1.4">
+	<metadata>
+		<schema>IMS CONTENT</schema>
+		<schemaversion>1.1</schemaversion>
+		<imsmd:lom>
+			<imsmd:general>
+				<imsmd:title>
+					<imsmd:langstring xml:lang="en">IMS Content Packaging Specification</imsmd:langstring>
+					<imsmd:langstring xml:lang="es">Especificacion IMS de Empaquetado de Contenidos</imsmd:langstring>
+					<imsmd:langstring xml:lang="fr">Spécification pour l'Encapsulage de Contenu</imsmd:langstring>
+					<imsmd:langstring xml:lang="it">IMS Content Packaging Specification</imsmd:langstring>
+					<imsmd:langstring xml:lang="jp">IMSコンテンツパッケージ規格</imsmd:langstring>
+					<imsmd:langstring xml:lang="nl">IMS Content Packaging-specificatie</imsmd:langstring>
+				</imsmd:title>
+				<imsmd:language>en</imsmd:language>
+				<imsmd:language>es</imsmd:language>
+				<imsmd:language>fr</imsmd:language>
+				<imsmd:language>it</imsmd:language>
+				<imsmd:language>jp</imsmd:language>
+				<imsmd:language>nl</imsmd:language>
+				<imsmd:description>
+					<imsmd:langstring xml:lang="en">This package contains all of the documents that constitute the IMS Content Packaging V1.1.4 Specification. It includes all of the specification documents.</imsmd:langstring>
+					<imsmd:langstring xml:lang="es">Este paquete contiene todos los documentos que contituyen Especificacion IMS v1.1.4 de Empaquetado de Contenidos </imsmd:langstring>
+					<imsmd:langstring xml:lang="fr">Ce paquet contient tous les documents qui composent la Spécification IMS pour l'Encapsulage de Contenu</imsmd:langstring>
+					<imsmd:langstring xml:lang="it">This package contains all of the documents that constitute the IMS Content Packaging V1.1.4 Specification. It includes all of the specification documents.</imsmd:langstring>
+					<imsmd:langstring xml:lang="jp">このパッケージはIMSコンテンツパッケージv1.1.4規格を構成する全てのドキュメントを含む．</imsmd:langstring>
+					<imsmd:langstring xml:lang="nl">Dit pakket bevat de documenten die onderdeel zijn van de IMS-specificatie voor materiaalpakketten (Content Packaging) v1.1.4.</imsmd:langstring>
+				</imsmd:description>
+				<imsmd:keyword>
+					<imsmd:langstring xml:lang="en">IMS</imsmd:langstring>
+					<imsmd:langstring xml:lang="es">IMS</imsmd:langstring>
+					<imsmd:langstring xml:lang="fr">IMS</imsmd:langstring>
+					<imsmd:langstring xml:lang="it">IMS</imsmd:langstring>
+					<imsmd:langstring xml:lang="jp">IMS</imsmd:langstring>
+					<imsmd:langstring xml:lang="nl">IMS</imsmd:langstring>
+				</imsmd:keyword>
+				<imsmd:keyword>
+					<imsmd:langstring xml:lang="en">content packaging</imsmd:langstring>
+					<imsmd:langstring xml:lang="es">Empaquetado de contenido</imsmd:langstring>
+					<imsmd:langstring xml:lang="fr">l'encapsulage de contenu</imsmd:langstring>
+					<imsmd:langstring xml:lang="it">content packaging</imsmd:langstring>
+					<imsmd:langstring xml:lang="jp">コンテンツパッケージ</imsmd:langstring>
+					<imsmd:langstring xml:lang="nl">materiaalpakketten</imsmd:langstring>
+				</imsmd:keyword>
+				<imsmd:keyword>
+					<imsmd:langstring xml:lang="en">e-learning specification</imsmd:langstring>
+					<imsmd:langstring xml:lang="es">Especificación de aprendizaje</imsmd:langstring>
+					<imsmd:langstring xml:lang="fr">spécification format apprentissage en ligne</imsmd:langstring>
+					<imsmd:langstring xml:lang="it">e-learning specification</imsmd:langstring>
+					<imsmd:langstring xml:lang="jp">eラーニング規格</imsmd:langstring>
+					<imsmd:langstring xml:lang="nl">e-learning-specificatie</imsmd:langstring>
+				</imsmd:keyword>
+			</imsmd:general>
+			<imsmd:lifecycle>
+				<imsmd:version>
+					<imsmd:langstring xml:lang="en">Draft</imsmd:langstring>
+				</imsmd:version>
+				<imsmd:status>
+					<imsmd:source>
+						<imsmd:langstring xml:lang="x-none">LOMv1.0</imsmd:langstring>
+					</imsmd:source>
+					<imsmd:value>
+						<imsmd:langstring xml:lang="x-none">Final</imsmd:langstring>
+					</imsmd:value>
+				</imsmd:status>
+				<imsmd:contribute>
+					<imsmd:role>
+						<imsmd:source>
+							<imsmd:langstring xml:lang="x-none">LOMv1.0</imsmd:langstring>
+						</imsmd:source>
+						<imsmd:value>
+							<imsmd:langstring xml:lang="x-none">Creator</imsmd:langstring>
+						</imsmd:value>
+					</imsmd:role>
+					<imsmd:centity>
+						<imsmd:vcard>BEGIN:VCARD
+FN:Mark McKell
+END:VCARD
+</imsmd:vcard>
+					</imsmd:centity>
+				</imsmd:contribute>
+				<imsmd:contribute>
+					<imsmd:role>
+						<imsmd:source>
+							<imsmd:langstring xml:lang="x-none">LOMv1.0</imsmd:langstring>
+						</imsmd:source>
+						<imsmd:value>
+							<imsmd:langstring xml:lang="x-none">Publisher</imsmd:langstring>
+						</imsmd:value>
+					</imsmd:role>
+					<imsmd:centity>
+						<imsmd:vcard>BEGIN:VCARD
+FN:IMS Global Learning Consortium, Inc.
+END:VCARD</imsmd:vcard>
+					</imsmd:centity>
+					<imsmd:date>
+						<imsmd:datetime>2004-11-01</imsmd:datetime>
+						<imsmd:description>
+							<imsmd:langstring xml:lang="en"/>
+						</imsmd:description>
+					</imsmd:date>
+				</imsmd:contribute>
+			</imsmd:lifecycle>
+			<imsmd:technical>
+				<imsmd:format>IMS CP v1.1.4 Reader</imsmd:format>
+			</imsmd:technical>
+			<imsmd:educational>
+				<imsmd:learningresourcetype>
+					<imsmd:source>
+						<imsmd:langstring xml:lang="x-none">LOMv1.0</imsmd:langstring>
+					</imsmd:source>
+					<imsmd:value>
+						<imsmd:langstring xml:lang="x-none">IMS</imsmd:langstring>
+					</imsmd:value>
+				</imsmd:learningresourcetype>
+			</imsmd:educational>
+			<imsmd:rights>
+				<imsmd:cost>
+					<imsmd:source>
+						<imsmd:langstring xml:lang="x-none">LOMv1.0</imsmd:langstring>
+					</imsmd:source>
+					<imsmd:value>
+						<imsmd:langstring xml:lang="x-none">no</imsmd:langstring>
+					</imsmd:value>
+				</imsmd:cost>
+				<imsmd:copyrightandotherrestrictions>
+					<imsmd:source>
+						<imsmd:langstring xml:lang="x-none">LOMv1.0</imsmd:langstring>
+					</imsmd:source>
+					<imsmd:value>
+						<imsmd:langstring xml:lang="x-none">yes</imsmd:langstring>
+					</imsmd:value>
+				</imsmd:copyrightandotherrestrictions>
+				<imsmd:description>
+					<imsmd:langstring xml:lang="en">Copyright © 2004 IMS Global Learning Consortium, Inc. All Rights Reserved. The IMS Logo is a registered trademark of IMS Global Learning Consortium, Inc.</imsmd:langstring>
+					<imsmd:langstring xml:lang="es">Copyright © 2004 IMS Global Learning Consortium, Inc. Todos los derechos reservados. El Logo IMS es un marca comercial de IMS Global Learning Consortium, Inc.</imsmd:langstring>
+					<imsmd:langstring xml:lang="fr">Copyright © 2004 IMS Global Learning Consortium, Inc. All Rights Reserved. Le sigle IMS est une marque déposée d'IMS Global Learning Consortium, Inc.</imsmd:langstring>
+					<imsmd:langstring xml:lang="it">Copyright © 2004 IMS Global Learning Consortium, Inc. All Rights Reserved. The IMS Logo is a registered trademark  of IMS Global Learning Consortium, Inc.</imsmd:langstring>
+					<imsmd:langstring xml:lang="jp">Copyright © 2004 IMS Global Learning Consortium, Inc. All Rights Reserved. The IMS Logo is a registered trademark  of IMS Global Learning Consortium, Inc.</imsmd:langstring>
+					<imsmd:langstring xml:lang="nl">Copyright © 2004 IMS Global Learning Consortium, Inc. Alle rechten voorbehouden. Het IMS logo is een handelsmerk van het IMS Global Learning Consortium, Inc.</imsmd:langstring>
+				</imsmd:description>
+			</imsmd:rights>
+		</imsmd:lom>
+	</metadata>
+	<organizations default="imscpv1p1p4_en">
+		<organization identifier="imscpv1p1p4_en">
+			<title>IMS Content Packaging Specification v1.1.4</title>
+			<item identifier="itm_imscpv1p1p4_specsdocs_en" isvisible="1">
+				<title>Specification Documents</title>
+				<item identifier="itm_imscpv1p1p4_specsdocspdf_en" isvisible="1" parameters="">
+					<title>PDF Versions of the Specifications</title>
+					<item identifier="itm_imscpv1p1p4_infopdf_en" identifierref="res_imscpv1p1p4_infopdf_en" isvisible="1" parameters="">
+						<title>Information Model (PDF)</title>
+					</item>
+					<item identifier="itm_imscpv1p1p4_bindpdf_en" identifierref="res_imscpv1p1p4_bindpdf_en" isvisible="1" parameters="">
+						<title>XML Binding (PDF)</title>
+					</item>
+					<item identifier="itm_imscpv1p1p4_bestpdf_en" identifierref="res_imscpv1p1p4_bestpdf_en" isvisible="1" parameters="">
+						<title>Best Practice (PDF)</title>
+					</item>
+					<item identifier="itm_imscpv1p1p4_sumcpdf_en" identifierref="res_imscpv1p1p4_sumcpdf_en" isvisible="1" parameters="">
+						<title>Summary of Changes (PDF)</title>
+					</item>
+				</item>
+				<item identifier="itm_imscpv1p1p4_specsdocshtm_en" isvisible="1" parameters="">
+					<title>HTML Versions of the Specifications</title>
+					<item identifier="itm_imscpv1p1p4_infohtm_en" identifierref="res_imscpv1p1p4_infohtm_en" isvisible="1" parameters="">
+						<title>Information Model (HTML)</title>
+					</item>
+					<item identifier="itm_imscpv1p1p4_bindhtm_en" identifierref="res_imscpv1p1p4_bindhtm_en" isvisible="1" parameters="">
+						<title>XML Binding (HTML)</title>
+					</item>
+					<item identifier="itm_imscpv1p1p4_besthtm_en" identifierref="res_imscpv1p1p4_besthtm_en" isvisible="1" parameters="">
+						<title>Best Practice (HTML)</title>
+					</item>
+					<item identifier="itm_imscpv1p1p4_sumchtm_en" identifierref="res_imscpv1p1p4_sumchtm_en" isvisible="1" parameters="">
+						<title>Summary of Changes (HTML)</title>
+					</item>
+				</item>
+				<item identifier="itm_imscpv1p1p4_xsd_en" identifierref="res_imscpv1p1p4_xsd_en" isvisible="1" parameters="">
+					<title>XSD</title>
+				</item>
+				<item identifier="itm_imscpv1p1p4_examples_en" isvisible="1" parameters="">
+					<title>Examples</title>
+					<item identifier="itm_imscpv1p1p4_examples1_en" identifierref="res_imscpv1p1p4_examples1_en" isvisible="1" parameters="">
+						<title>All Elements</title>
+					</item>
+					<item identifier="itm_imscpv1p1p4_examples2_en" identifierref="res_imscpv1p1p4_examples2_en" isvisible="1" parameters="">
+						<title>QTI Example</title>
+					</item>
+					<item identifier="itm_imscpv1p1p4_examples3_en" identifierref="res_imscpv1p1p4_examples3_en" isvisible="1" parameters="">
+						<title>Full Meta-data</title>
+					</item>
+					<item identifier="itm_imscpv1p1p4_examples4_en" identifierref="res_imscpv1p1p4_examples4_en" isvisible="1" parameters="">
+						<title>Multiple Organizations</title>
+					</item>
+					<item identifier="itm_imscpv1p1p4_examples5_en" identifierref="res_imscpv1p1p4_examples5_en" isvisible="1" parameters="">
+						<title>Simple Manifest</title>
+					</item>
+					<item identifier="itm_imscpv1p1p4_examples6_en" identifierref="res_imscpv1p1p4_examples6_en" isvisible="1" parameters="">
+						<title>Sub Manifests</title>
+					</item>
+				</item>
+			</item>
+			<metadata>
+				<imsmd:lom>
+					<imsmd:general>
+						<imsmd:identifier>imscpv1p1p4_organization_id</imsmd:identifier>
+						<imsmd:title>
+							<imsmd:langstring xml:lang="en">IMS Content Packaging Specification v1.1.4 Table of Contents</imsmd:langstring>
+						</imsmd:title>
+						<imsmd:language>en</imsmd:language>
+						<imsmd:description>
+							<imsmd:langstring xml:lang="en">This is the table of contents for the IMS Content Packaging v1.1.4 documentation.</imsmd:langstring>
+						</imsmd:description>
+					</imsmd:general>
+					<imsmd:lifecycle>
+						<imsmd:version>
+							<imsmd:langstring>1.0</imsmd:langstring>
+						</imsmd:version>
+						<imsmd:status>
+							<imsmd:source>
+								<imsmd:langstring>LOMv1.0</imsmd:langstring>
+							</imsmd:source>
+							<imsmd:value>
+								<imsmd:langstring>Final</imsmd:langstring>
+							</imsmd:value>
+						</imsmd:status>
+						<imsmd:contribute>
+							<imsmd:role>
+								<imsmd:source>
+									<imsmd:langstring>LOMv1.0</imsmd:langstring>
+								</imsmd:source>
+								<imsmd:value>
+									<imsmd:langstring>Creator</imsmd:langstring>
+								</imsmd:value>
+							</imsmd:role>
+							<imsmd:centity>
+								<imsmd:vcard>begin: vcard
+							fn: Mark McKell
+							end: vcard
+								</imsmd:vcard>
+							</imsmd:centity>
+							<imsmd:date>
+								<imsmd:datetime>2004-11-01</imsmd:datetime>
+							</imsmd:date>
+						</imsmd:contribute>
+						<imsmd:contribute>
+							<imsmd:role>
+								<imsmd:source>
+									<imsmd:langstring>LOMv1.0</imsmd:langstring>
+								</imsmd:source>
+								<imsmd:value>
+									<imsmd:langstring>Publisher</imsmd:langstring>
+								</imsmd:value>
+							</imsmd:role>
+							<imsmd:centity>
+								<imsmd:vcard>begin: vcard
+							fn: IMS Global Learning Consortium Inc.
+							end: vcard
+								</imsmd:vcard>
+							</imsmd:centity>
+							<imsmd:date>
+								<imsmd:datetime>2004-11-01</imsmd:datetime>
+							</imsmd:date>
+						</imsmd:contribute>
+					</imsmd:lifecycle>
+					<imsmd:technical>
+						<imsmd:format>IMS CP v1.1.4 Reader</imsmd:format>
+					</imsmd:technical>
+					<imsmd:educational>
+						<imsmd:learningresourcetype>
+							<imsmd:source>
+								<imsmd:langstring>IMS</imsmd:langstring>
+							</imsmd:source>
+							<imsmd:value>
+								<imsmd:langstring>E-learning Interoperability Specification</imsmd:langstring>
+							</imsmd:value>
+						</imsmd:learningresourcetype>
+					</imsmd:educational>
+					<imsmd:rights>
+						<imsmd:cost>
+							<imsmd:source>
+								<imsmd:langstring>LOMv1.0</imsmd:langstring>
+							</imsmd:source>
+							<imsmd:value>
+								<imsmd:langstring>No</imsmd:langstring>
+							</imsmd:value>
+						</imsmd:cost>
+						<imsmd:copyrightandotherrestrictions>
+							<imsmd:source>
+								<imsmd:langstring>LOMv1.0</imsmd:langstring>
+							</imsmd:source>
+							<imsmd:value>
+								<imsmd:langstring>Yes</imsmd:langstring>
+							</imsmd:value>
+						</imsmd:copyrightandotherrestrictions>
+						<imsmd:description>
+							<imsmd:langstring xml:lang="en">Copyright © 2004 IMS Global Learning Consortium, Inc. All Rights Reserved. The IMS Logo is a registered trademark  of IMS Global Learning Consortium, Inc.</imsmd:langstring>
+						</imsmd:description>
+					</imsmd:rights>
+				</imsmd:lom>
+			</metadata>
+		</organization>
+	</organizations>
+	<resources>
+		<resource identifier="res_imscpv1p1p4_infopdf_en" type="webcontent" href="pdfdocs/imscp_infov1p1p4.pdf">
+			<metadata>
+				<imsmd:lom>
+					<imsmd:general>
+						<imsmd:identifier>imscpv1p1p4_infopdf_en_id</imsmd:identifier>
+						<imsmd:title>
+							<imsmd:langstring xml:lang="en">IMS Content Packaging Specification Information Model PDF</imsmd:langstring>
+						</imsmd:title>
+						<imsmd:language>en</imsmd:language>
+						<imsmd:description>
+							<imsmd:langstring xml:lang="en">This resource identifies the English version of the IMS Content Packaging v1.1.4 Specification Information Model PDF document.</imsmd:langstring>
+						</imsmd:description>
+						<imsmd:keyword>
+							<imsmd:langstring xml:lang="en">IMS</imsmd:langstring>
+						</imsmd:keyword>
+						<imsmd:keyword>
+							<imsmd:langstring xml:lang="en">content packaging</imsmd:langstring>
+						</imsmd:keyword>
+						<imsmd:keyword>
+							<imsmd:langstring xml:lang="en">e-learning specification</imsmd:langstring>
+						</imsmd:keyword>
+						<imsmd:keyword>
+							<imsmd:langstring xml:lang="en">information model</imsmd:langstring>
+						</imsmd:keyword>
+					</imsmd:general>
+					<imsmd:lifecycle>
+						<imsmd:version>
+							<imsmd:langstring>1.0</imsmd:langstring>
+						</imsmd:version>
+						<imsmd:status>
+							<imsmd:source>
+								<imsmd:langstring>LOMv1.0</imsmd:langstring>
+							</imsmd:source>
+							<imsmd:value>
+								<imsmd:langstring>Final</imsmd:langstring>
+							</imsmd:value>
+						</imsmd:status>
+						<imsmd:contribute>
+							<imsmd:role>
+								<imsmd:source>
+									<imsmd:langstring>LOMv1.0</imsmd:langstring>
+								</imsmd:source>
+								<imsmd:value>
+									<imsmd:langstring>Creator</imsmd:langstring>
+								</imsmd:value>
+							</imsmd:role>
+							<imsmd:centity>
+								<imsmd:vcard>begin: vcard
+							fn: Mark McKell
+							end: vcard
+								</imsmd:vcard>
+							</imsmd:centity>
+							<imsmd:date>
+								<imsmd:datetime>2004-11-01</imsmd:datetime>
+							</imsmd:date>
+						</imsmd:contribute>
+						<imsmd:contribute>
+							<imsmd:role>
+								<imsmd:source>
+									<imsmd:langstring>LOMv1.0</imsmd:langstring>
+								</imsmd:source>
+								<imsmd:value>
+									<imsmd:langstring>Publisher</imsmd:langstring>
+								</imsmd:value>
+							</imsmd:role>
+							<imsmd:centity>
+								<imsmd:vcard>begin: vcard
+							fn: IMS Global Learning Consortium Inc.
+							end: vcard
+								</imsmd:vcard>
+							</imsmd:centity>
+							<imsmd:date>
+								<imsmd:datetime>2003-11-01</imsmd:datetime>
+							</imsmd:date>
+						</imsmd:contribute>
+					</imsmd:lifecycle>
+					<imsmd:technical>
+						<imsmd:format>Acrobat PDF</imsmd:format>
+					</imsmd:technical>
+					<imsmd:educational>
+						<imsmd:learningresourcetype>
+							<imsmd:source>
+								<imsmd:langstring>IMS</imsmd:langstring>
+							</imsmd:source>
+							<imsmd:value>
+								<imsmd:langstring>E-learning Interoperability Specification</imsmd:langstring>
+							</imsmd:value>
+						</imsmd:learningresourcetype>
+					</imsmd:educational>
+					<imsmd:rights>
+						<imsmd:cost>
+							<imsmd:source>
+								<imsmd:langstring>LOMv1.0</imsmd:langstring>
+							</imsmd:source>
+							<imsmd:value>
+								<imsmd:langstring>No</imsmd:langstring>
+							</imsmd:value>
+						</imsmd:cost>
+						<imsmd:copyrightandotherrestrictions>
+							<imsmd:source>
+								<imsmd:langstring>LOMv1.0</imsmd:langstring>
+							</imsmd:source>
+							<imsmd:value>
+								<imsmd:langstring>Yes</imsmd:langstring>
+							</imsmd:value>
+						</imsmd:copyrightandotherrestrictions>
+						<imsmd:description>
+							<imsmd:langstring xml:lang="en">Copyright © 2004 IMS Global Learning Consortium, Inc. All Rights Reserved. The IMS Logo is a registered trademark  of IMS Global Learning Consortium, Inc.</imsmd:langstring>
+						</imsmd:description>
+					</imsmd:rights>
+				</imsmd:lom>
+			</metadata>
+			<file href="pdfdocs/imscp_infov1p1p4.pdf"/>
+		</resource>
+		<resource identifier="res_imscpv1p1p4_bindpdf_en" type="webcontent" href="pdfdocs/imscp_bindv1p1p4.pdf">
+			<metadata>
+				<imsmd:lom>
+					<imsmd:general>
+						<imsmd:identifier>imscpv1p1p4_bindpdf_en_id</imsmd:identifier>
+						<imsmd:title>
+							<imsmd:langstring xml:lang="en">IMS Content Packaging Specification XML Binding PDF</imsmd:langstring>
+						</imsmd:title>
+						<imsmd:language>en</imsmd:language>
+						<imsmd:description>
+							<imsmd:langstring xml:lang="en">This resource identifies the English version of the  IMS Content Packaging v1.1.4 Specification XML Binding PDF document.</imsmd:langstring>
+						</imsmd:description>
+						<imsmd:keyword>
+							<imsmd:langstring xml:lang="en">IMS</imsmd:langstring>
+						</imsmd:keyword>
+						<imsmd:keyword>
+							<imsmd:langstring xml:lang="en">content packaging</imsmd:langstring>
+						</imsmd:keyword>
+						<imsmd:keyword>
+							<imsmd:langstring xml:lang="en">e-learning specification</imsmd:langstring>
+						</imsmd:keyword>
+						<imsmd:keyword>
+							<imsmd:langstring xml:lang="en">xml binding</imsmd:langstring>
+						</imsmd:keyword>
+					</imsmd:general>
+					<imsmd:lifecycle>
+						<imsmd:version>
+							<imsmd:langstring>1.0</imsmd:langstring>
+						</imsmd:version>
+						<imsmd:status>
+							<imsmd:source>
+								<imsmd:langstring>LOMv1.0</imsmd:langstring>
+							</imsmd:source>
+							<imsmd:value>
+								<imsmd:langstring>Final</imsmd:langstring>
+							</imsmd:value>
+						</imsmd:status>
+						<imsmd:contribute>
+							<imsmd:role>
+								<imsmd:source>
+									<imsmd:langstring>LOMv1.0</imsmd:langstring>
+								</imsmd:source>
+								<imsmd:value>
+									<imsmd:langstring>Creator</imsmd:langstring>
+								</imsmd:value>
+							</imsmd:role>
+							<imsmd:centity>
+								<imsmd:vcard>begin: vcard
+							fn: Mark McKell
+							end: vcard
+								</imsmd:vcard>
+							</imsmd:centity>
+							<imsmd:date>
+								<imsmd:datetime>2004-11-01</imsmd:datetime>
+							</imsmd:date>
+						</imsmd:contribute>
+						<imsmd:contribute>
+							<imsmd:role>
+								<imsmd:source>
+									<imsmd:langstring>LOMv1.0</imsmd:langstring>
+								</imsmd:source>
+								<imsmd:value>
+									<imsmd:langstring>Publisher</imsmd:langstring>
+								</imsmd:value>
+							</imsmd:role>
+							<imsmd:centity>
+								<imsmd:vcard>begin: vcard
+							fn: IMS Global Learning Consortium Inc.
+							end: vcard
+								</imsmd:vcard>
+							</imsmd:centity>
+							<imsmd:date>
+								<imsmd:datetime>2004-11-01</imsmd:datetime>
+							</imsmd:date>
+						</imsmd:contribute>
+					</imsmd:lifecycle>
+					<imsmd:technical>
+						<imsmd:format>Acrobat PDF</imsmd:format>
+					</imsmd:technical>
+					<imsmd:educational>
+						<imsmd:learningresourcetype>
+							<imsmd:source>
+								<imsmd:langstring>IMS</imsmd:langstring>
+							</imsmd:source>
+							<imsmd:value>
+								<imsmd:langstring>E-learning Interoperability Specification</imsmd:langstring>
+							</imsmd:value>
+						</imsmd:learningresourcetype>
+					</imsmd:educational>
+					<imsmd:rights>
+						<imsmd:cost>
+							<imsmd:source>
+								<imsmd:langstring>LOMv1.0</imsmd:langstring>
+							</imsmd:source>
+							<imsmd:value>
+								<imsmd:langstring>No</imsmd:langstring>
+							</imsmd:value>
+						</imsmd:cost>
+						<imsmd:copyrightandotherrestrictions>
+							<imsmd:source>
+								<imsmd:langstring>LOMv1.0</imsmd:langstring>
+							</imsmd:source>
+							<imsmd:value>
+								<imsmd:langstring>Yes</imsmd:langstring>
+							</imsmd:value>
+						</imsmd:copyrightandotherrestrictions>
+						<imsmd:description>
+							<imsmd:langstring xml:lang="en">Copyright © 2004 IMS Global Learning Consortium, Inc. All Rights Reserved. The IMS Logo is a registered trademark  of IMS Global Learning Consortium, Inc.</imsmd:langstring>
+						</imsmd:description>
+					</imsmd:rights>
+				</imsmd:lom>
+			</metadata>
+			<file href="pdfdocs/imscp_bindv1p1p4.pdf"/>
+		</resource>
+		<resource identifier="res_imscpv1p1p4_bestpdf_en" type="webcontent" href="pdfdocs/imscp_bestv1p1p4.pdf">
+			<metadata>
+				<imsmd:lom>
+					<imsmd:general>
+						<imsmd:identifier>imscpv1p1p4_bestpdf_en_id</imsmd:identifier>
+						<imsmd:title>
+							<imsmd:langstring xml:lang="en">IMS Content Packaging Specification Best Practice &amp; Implementation Guide PDF</imsmd:langstring>
+						</imsmd:title>
+						<imsmd:language>en</imsmd:language>
+						<imsmd:description>
+							<imsmd:langstring xml:lang="en">This resource identifies the English version of the  IMS Content Packaging v1.1.4 Specification Best Practice &amp; Implementation Guide PDF document.</imsmd:langstring>
+						</imsmd:description>
+						<imsmd:keyword>
+							<imsmd:langstring xml:lang="en">IMS</imsmd:langstring>
+						</imsmd:keyword>
+						<imsmd:keyword>
+							<imsmd:langstring xml:lang="en">content packaging</imsmd:langstring>
+						</imsmd:keyword>
+						<imsmd:keyword>
+							<imsmd:langstring xml:lang="en">e-learning specification</imsmd:langstring>
+						</imsmd:keyword>
+						<imsmd:keyword>
+							<imsmd:langstring xml:lang="en">best practice &amp; implementation guide</imsmd:langstring>
+						</imsmd:keyword>
+					</imsmd:general>
+					<imsmd:lifecycle>
+						<imsmd:version>
+							<imsmd:langstring>1.0</imsmd:langstring>
+						</imsmd:version>
+						<imsmd:status>
+							<imsmd:source>
+								<imsmd:langstring>LOMv1.0</imsmd:langstring>
+							</imsmd:source>
+							<imsmd:value>
+								<imsmd:langstring>Final</imsmd:langstring>
+							</imsmd:value>
+						</imsmd:status>
+						<imsmd:contribute>
+							<imsmd:role>
+								<imsmd:source>
+									<imsmd:langstring>LOMv1.0</imsmd:langstring>
+								</imsmd:source>
+								<imsmd:value>
+									<imsmd:langstring>Creator</imsmd:langstring>
+								</imsmd:value>
+							</imsmd:role>
+							<imsmd:centity>
+								<imsmd:vcard>begin: vcard
+							fn: Mark McKell
+							end: vcard
+								</imsmd:vcard>
+							</imsmd:centity>
+							<imsmd:date>
+								<imsmd:datetime>2004-11-01</imsmd:datetime>
+							</imsmd:date>
+						</imsmd:contribute>
+						<imsmd:contribute>
+							<imsmd:role>
+								<imsmd:source>
+									<imsmd:langstring>LOMv1.0</imsmd:langstring>
+								</imsmd:source>
+								<imsmd:value>
+									<imsmd:langstring>Publisher</imsmd:langstring>
+								</imsmd:value>
+							</imsmd:role>
+							<imsmd:centity>
+								<imsmd:vcard>begin: vcard
+							fn: IMS Global Learning Consortium Inc.
+							end: vcard
+								</imsmd:vcard>
+							</imsmd:centity>
+							<imsmd:date>
+								<imsmd:datetime>2004-11-01</imsmd:datetime>
+							</imsmd:date>
+						</imsmd:contribute>
+					</imsmd:lifecycle>
+					<imsmd:technical>
+						<imsmd:format>Acrobat PDF</imsmd:format>
+					</imsmd:technical>
+					<imsmd:educational>
+						<imsmd:learningresourcetype>
+							<imsmd:source>
+								<imsmd:langstring>IMS</imsmd:langstring>
+							</imsmd:source>
+							<imsmd:value>
+								<imsmd:langstring>E-learning Interoperability Specification</imsmd:langstring>
+							</imsmd:value>
+						</imsmd:learningresourcetype>
+					</imsmd:educational>
+					<imsmd:rights>
+						<imsmd:cost>
+							<imsmd:source>
+								<imsmd:langstring>LOMv1.0</imsmd:langstring>
+							</imsmd:source>
+							<imsmd:value>
+								<imsmd:langstring>No</imsmd:langstring>
+							</imsmd:value>
+						</imsmd:cost>
+						<imsmd:copyrightandotherrestrictions>
+							<imsmd:source>
+								<imsmd:langstring>LOMv1.0</imsmd:langstring>
+							</imsmd:source>
+							<imsmd:value>
+								<imsmd:langstring>Yes</imsmd:langstring>
+							</imsmd:value>
+						</imsmd:copyrightandotherrestrictions>
+						<imsmd:description>
+							<imsmd:langstring xml:lang="en">Copyright © 2004 IMS Global Learning Consortium, Inc. All Rights Reserved. The IMS Logo is a registered trademark of IMS Global Learning Consortium, Inc.</imsmd:langstring>
+						</imsmd:description>
+					</imsmd:rights>
+				</imsmd:lom>
+			</metadata>
+			<file href="pdfdocs/imscp_bestv1p1p4.pdf"/>
+		</resource>
+		<resource identifier="res_imscpv1p1p4_sumcpdf_en" type="webcontent" href="pdfdocs/imscp_sumcv1p1p4.pdf">
+			<metadata>
+				<imsmd:lom>
+					<imsmd:general>
+						<imsmd:identifier>imscpv1p1p4_sumcpdf_en_id</imsmd:identifier>
+						<imsmd:title>
+							<imsmd:langstring xml:lang="en">IMS Content Packaging Specification Summary of Changes PDF</imsmd:langstring>
+						</imsmd:title>
+						<imsmd:language>en</imsmd:language>
+						<imsmd:description>
+							<imsmd:langstring xml:lang="en">This resource identifies the English version of the  IMS Content Packaging v1.1.4 Specification ummary of Chanages PDF document.</imsmd:langstring>
+						</imsmd:description>
+						<imsmd:keyword>
+							<imsmd:langstring xml:lang="en">IMS</imsmd:langstring>
+						</imsmd:keyword>
+						<imsmd:keyword>
+							<imsmd:langstring xml:lang="en">content packaging</imsmd:langstring>
+						</imsmd:keyword>
+						<imsmd:keyword>
+							<imsmd:langstring xml:lang="en">e-learning specification</imsmd:langstring>
+						</imsmd:keyword>
+						<imsmd:keyword>
+							<imsmd:langstring xml:lang="en">summary of changes</imsmd:langstring>
+						</imsmd:keyword>
+					</imsmd:general>
+					<imsmd:lifecycle>
+						<imsmd:version>
+							<imsmd:langstring>1.0</imsmd:langstring>
+						</imsmd:version>
+						<imsmd:status>
+							<imsmd:source>
+								<imsmd:langstring>LOMv1.0</imsmd:langstring>
+							</imsmd:source>
+							<imsmd:value>
+								<imsmd:langstring>Final</imsmd:langstring>
+							</imsmd:value>
+						</imsmd:status>
+						<imsmd:contribute>
+							<imsmd:role>
+								<imsmd:source>
+									<imsmd:langstring>LOMv1.0</imsmd:langstring>
+								</imsmd:source>
+								<imsmd:value>
+									<imsmd:langstring>Creator</imsmd:langstring>
+								</imsmd:value>
+							</imsmd:role>
+							<imsmd:centity>
+								<imsmd:vcard>begin: vcard
+							fn: Mark McKell
+							end: vcard
+								</imsmd:vcard>
+							</imsmd:centity>
+							<imsmd:date>
+								<imsmd:datetime>2004-11-01</imsmd:datetime>
+							</imsmd:date>
+						</imsmd:contribute>
+						<imsmd:contribute>
+							<imsmd:role>
+								<imsmd:source>
+									<imsmd:langstring>LOMv1.0</imsmd:langstring>
+								</imsmd:source>
+								<imsmd:value>
+									<imsmd:langstring>Publisher</imsmd:langstring>
+								</imsmd:value>
+							</imsmd:role>
+							<imsmd:centity>
+								<imsmd:vcard>begin: vcard
+							fn: IMS Global Learning Consortium Inc.
+							end: vcard
+								</imsmd:vcard>
+							</imsmd:centity>
+							<imsmd:date>
+								<imsmd:datetime>2004-11-01</imsmd:datetime>
+							</imsmd:date>
+						</imsmd:contribute>
+					</imsmd:lifecycle>
+					<imsmd:technical>
+						<imsmd:format>Acrobat PDF</imsmd:format>
+					</imsmd:technical>
+					<imsmd:educational>
+						<imsmd:learningresourcetype>
+							<imsmd:source>
+								<imsmd:langstring>IMS</imsmd:langstring>
+							</imsmd:source>
+							<imsmd:value>
+								<imsmd:langstring>E-learning Interoperability Specification</imsmd:langstring>
+							</imsmd:value>
+						</imsmd:learningresourcetype>
+					</imsmd:educational>
+					<imsmd:rights>
+						<imsmd:cost>
+							<imsmd:source>
+								<imsmd:langstring>LOMv1.0</imsmd:langstring>
+							</imsmd:source>
+							<imsmd:value>
+								<imsmd:langstring>No</imsmd:langstring>
+							</imsmd:value>
+						</imsmd:cost>
+						<imsmd:copyrightandotherrestrictions>
+							<imsmd:source>
+								<imsmd:langstring>LOMv1.0</imsmd:langstring>
+							</imsmd:source>
+							<imsmd:value>
+								<imsmd:langstring>Yes</imsmd:langstring>
+							</imsmd:value>
+						</imsmd:copyrightandotherrestrictions>
+						<imsmd:description>
+							<imsmd:langstring xml:lang="en">Copyright © 2004 IMS Global Learning Consortium, Inc. All Rights Reserved. The IMS Logo is a registered trademark of IMS Global Learning Consortium, Inc.</imsmd:langstring>
+						</imsmd:description>
+					</imsmd:rights>
+				</imsmd:lom>
+			</metadata>
+			<file href="pdfdocs/imscp_bestv1p1p4.pdf"/>
+		</resource>
+		<resource identifier="res_imscpv1p1p4_infohtm_en" type="webcontent" href="htmldocs/imscp_infov1p1p4.html">
+			<metadata>
+				<imsmd:lom>
+					<imsmd:general>
+						<imsmd:identifier>imscpv1p1p4_infohtm_en_id</imsmd:identifier>
+						<imsmd:title>
+							<imsmd:langstring xml:lang="en">IMS Content Packaging Specification Information Model HTML</imsmd:langstring>
+						</imsmd:title>
+						<imsmd:language>en</imsmd:language>
+						<imsmd:description>
+							<imsmd:langstring xml:lang="en">This resource identifies the English version of the  IMS Content Packaging v1.1.4 Specification Information Model HTML document.</imsmd:langstring>
+						</imsmd:description>
+						<imsmd:keyword>
+							<imsmd:langstring xml:lang="en">IMS</imsmd:langstring>
+						</imsmd:keyword>
+						<imsmd:keyword>
+							<imsmd:langstring xml:lang="en">content packaging</imsmd:langstring>
+						</imsmd:keyword>
+						<imsmd:keyword>
+							<imsmd:langstring xml:lang="en">e-learning specification</imsmd:langstring>
+						</imsmd:keyword>
+						<imsmd:keyword>
+							<imsmd:langstring xml:lang="en">information model</imsmd:langstring>
+						</imsmd:keyword>
+					</imsmd:general>
+					<imsmd:lifecycle>
+						<imsmd:version>
+							<imsmd:langstring>1.0</imsmd:langstring>
+						</imsmd:version>
+						<imsmd:status>
+							<imsmd:source>
+								<imsmd:langstring>LOMv1.0</imsmd:langstring>
+							</imsmd:source>
+							<imsmd:value>
+								<imsmd:langstring>Final</imsmd:langstring>
+							</imsmd:value>
+						</imsmd:status>
+						<imsmd:contribute>
+							<imsmd:role>
+								<imsmd:source>
+									<imsmd:langstring>LOMv1.0</imsmd:langstring>
+								</imsmd:source>
+								<imsmd:value>
+									<imsmd:langstring>Creator</imsmd:langstring>
+								</imsmd:value>
+							</imsmd:role>
+							<imsmd:centity>
+								<imsmd:vcard>begin: vcard
+							fn: Mark McKell
+							end: vcard
+								</imsmd:vcard>
+							</imsmd:centity>
+							<imsmd:date>
+								<imsmd:datetime>2004-11-01</imsmd:datetime>
+							</imsmd:date>
+						</imsmd:contribute>
+						<imsmd:contribute>
+							<imsmd:role>
+								<imsmd:source>
+									<imsmd:langstring>LOMv1.0</imsmd:langstring>
+								</imsmd:source>
+								<imsmd:value>
+									<imsmd:langstring>Publisher</imsmd:langstring>
+								</imsmd:value>
+							</imsmd:role>
+							<imsmd:centity>
+								<imsmd:vcard>begin: vcard
+							fn: IMS Global Learning Consortium Inc.
+							end: vcard
+								</imsmd:vcard>
+							</imsmd:centity>
+							<imsmd:date>
+								<imsmd:datetime>2004-11-01</imsmd:datetime>
+							</imsmd:date>
+						</imsmd:contribute>
+					</imsmd:lifecycle>
+					<imsmd:technical>
+						<imsmd:format>HTML</imsmd:format>
+					</imsmd:technical>
+					<imsmd:educational>
+						<imsmd:learningresourcetype>
+							<imsmd:source>
+								<imsmd:langstring>IMS</imsmd:langstring>
+							</imsmd:source>
+							<imsmd:value>
+								<imsmd:langstring>E-learning Interoperability Specification</imsmd:langstring>
+							</imsmd:value>
+						</imsmd:learningresourcetype>
+					</imsmd:educational>
+					<imsmd:rights>
+						<imsmd:cost>
+							<imsmd:source>
+								<imsmd:langstring>LOMv1.0</imsmd:langstring>
+							</imsmd:source>
+							<imsmd:value>
+								<imsmd:langstring>No</imsmd:langstring>
+							</imsmd:value>
+						</imsmd:cost>
+						<imsmd:copyrightandotherrestrictions>
+							<imsmd:source>
+								<imsmd:langstring>LOMv1.0</imsmd:langstring>
+							</imsmd:source>
+							<imsmd:value>
+								<imsmd:langstring>Yes</imsmd:langstring>
+							</imsmd:value>
+						</imsmd:copyrightandotherrestrictions>
+						<imsmd:description>
+							<imsmd:langstring xml:lang="en">Copyright © 2004 IMS Global Learning Consortium, Inc. All Rights Reserved. The IMS Logo is a registered trademark of IMS Global Learning Consortium, Inc.</imsmd:langstring>
+						</imsmd:description>
+					</imsmd:rights>
+				</imsmd:lom>
+			</metadata>
+			<file href="htmldocs/imscp_infov1p1p4.html"/>
+			<file href="htmldocs/images/specLogo.jpg"/>
+			<file href="htmldocs/images/Fig2p1Info.gif"/>
+			<file href="htmldocs/images/Fig2p1Info3.gif"/>
+			<file href="htmldocs/images/Fig4p1Info2.gif"/>
+			<file href="htmldocs/images/Fig4p2Info3.gif"/>
+			<file href="htmldocs/images/Fig4p3Info4.gif"/>
+			<file href="htmldocs/images/Fig4p4Info5.gif"/>
+		</resource>
+		<resource identifier="res_imscpv1p1p4_bindhtm_en" type="webcontent" href="htmldocs/imscp_bindv1p1p4.html">
+			<metadata>
+				<imsmd:lom>
+					<imsmd:general>
+						<imsmd:identifier>imscpv1p1p4_bindhtm_en_id</imsmd:identifier>
+						<imsmd:title>
+							<imsmd:langstring xml:lang="en">IMS Content Packaging Specification XML Binding HTML</imsmd:langstring>
+						</imsmd:title>
+						<imsmd:language>en</imsmd:language>
+						<imsmd:description>
+							<imsmd:langstring xml:lang="en">This resource identifies the English version of the  IMS Content Packaging v1.1.4 Specification XML Binding HTML document.</imsmd:langstring>
+						</imsmd:description>
+						<imsmd:keyword>
+							<imsmd:langstring xml:lang="en">IMS</imsmd:langstring>
+						</imsmd:keyword>
+						<imsmd:keyword>
+							<imsmd:langstring xml:lang="en">content packaging</imsmd:langstring>
+						</imsmd:keyword>
+						<imsmd:keyword>
+							<imsmd:langstring xml:lang="en">e-learning specification</imsmd:langstring>
+						</imsmd:keyword>
+						<imsmd:keyword>
+							<imsmd:langstring xml:lang="en">xml binding</imsmd:langstring>
+						</imsmd:keyword>
+					</imsmd:general>
+					<imsmd:lifecycle>
+						<imsmd:version>
+							<imsmd:langstring>1.0</imsmd:langstring>
+						</imsmd:version>
+						<imsmd:status>
+							<imsmd:source>
+								<imsmd:langstring>LOMv1.0</imsmd:langstring>
+							</imsmd:source>
+							<imsmd:value>
+								<imsmd:langstring>Final</imsmd:langstring>
+							</imsmd:value>
+						</imsmd:status>
+						<imsmd:contribute>
+							<imsmd:role>
+								<imsmd:source>
+									<imsmd:langstring>LOMv1.0</imsmd:langstring>
+								</imsmd:source>
+								<imsmd:value>
+									<imsmd:langstring>Creator</imsmd:langstring>
+								</imsmd:value>
+							</imsmd:role>
+							<imsmd:centity>
+								<imsmd:vcard>begin: vcard
+							fn: Mark McKell
+							end: vcard
+								</imsmd:vcard>
+							</imsmd:centity>
+							<imsmd:date>
+								<imsmd:datetime>2004-11-01</imsmd:datetime>
+							</imsmd:date>
+						</imsmd:contribute>
+						<imsmd:contribute>
+							<imsmd:role>
+								<imsmd:source>
+									<imsmd:langstring>LOMv1.0</imsmd:langstring>
+								</imsmd:source>
+								<imsmd:value>
+									<imsmd:langstring>Publisher</imsmd:langstring>
+								</imsmd:value>
+							</imsmd:role>
+							<imsmd:centity>
+								<imsmd:vcard>begin: vcard
+							fn: IMS Global Learning Consortium Inc.
+							end: vcard
+								</imsmd:vcard>
+							</imsmd:centity>
+							<imsmd:date>
+								<imsmd:datetime>2004-11-01</imsmd:datetime>
+							</imsmd:date>
+						</imsmd:contribute>
+					</imsmd:lifecycle>
+					<imsmd:technical>
+						<imsmd:format>HTML</imsmd:format>
+					</imsmd:technical>
+					<imsmd:educational>
+						<imsmd:learningresourcetype>
+							<imsmd:source>
+								<imsmd:langstring>IMS</imsmd:langstring>
+							</imsmd:source>
+							<imsmd:value>
+								<imsmd:langstring>E-learning Interoperability Specification</imsmd:langstring>
+							</imsmd:value>
+						</imsmd:learningresourcetype>
+					</imsmd:educational>
+					<imsmd:rights>
+						<imsmd:cost>
+							<imsmd:source>
+								<imsmd:langstring>LOMv1.0</imsmd:langstring>
+							</imsmd:source>
+							<imsmd:value>
+								<imsmd:langstring>No</imsmd:langstring>
+							</imsmd:value>
+						</imsmd:cost>
+						<imsmd:copyrightandotherrestrictions>
+							<imsmd:source>
+								<imsmd:langstring>LOMv1.0</imsmd:langstring>
+							</imsmd:source>
+							<imsmd:value>
+								<imsmd:langstring>Yes</imsmd:langstring>
+							</imsmd:value>
+						</imsmd:copyrightandotherrestrictions>
+						<imsmd:description>
+							<imsmd:langstring xml:lang="en">Copyright © 2004 IMS Global Learning Consortium, Inc. All Rights Reserved. The IMS Logo is a registered trademark of IMS Global Learning Consortium, Inc.</imsmd:langstring>
+						</imsmd:description>
+					</imsmd:rights>
+				</imsmd:lom>
+			</metadata>
+			<file href="htmldocs/imscp_bindv1p1p4.html"/>
+			<file href="htmldocs/images/specLogo.jpg"/>
+			<file href="htmldocs/images/Fig3p1Bind.gif"/>
+			<file href="htmldocs/images/Fig3p2Bind2.gif"/>
+			<file href="htmldocs/images/Fig3p3Bind3.gif"/>
+			<file href="htmldocs/images/Fig3p4Bind4.gif"/>
+		</resource>
+		<resource identifier="res_imscpv1p1p4_besthtm_en" type="webcontent" href="htmldocs/imscp_bestv1p1p4.html">
+			<metadata>
+				<imsmd:lom>
+					<imsmd:general>
+						<imsmd:identifier>imscpv1p1p4_besthtm_en_id</imsmd:identifier>
+						<imsmd:title>
+							<imsmd:langstring xml:lang="en">IMS Content Packaging Specification Best Practice &amp; Implementation Guide HTML</imsmd:langstring>
+						</imsmd:title>
+						<imsmd:language>en</imsmd:language>
+						<imsmd:description>
+							<imsmd:langstring xml:lang="en">This resource identifies the English version of the  IMS Content Packaging v1.1.4 specification Best Practice &amp; Implementation Guide HTML document.</imsmd:langstring>
+						</imsmd:description>
+						<imsmd:keyword>
+							<imsmd:langstring xml:lang="en">IMS</imsmd:langstring>
+						</imsmd:keyword>
+						<imsmd:keyword>
+							<imsmd:langstring xml:lang="en">content packaging</imsmd:langstring>
+						</imsmd:keyword>
+						<imsmd:keyword>
+							<imsmd:langstring xml:lang="en">e-learning specification</imsmd:langstring>
+						</imsmd:keyword>
+						<imsmd:keyword>
+							<imsmd:langstring xml:lang="en">best practice &amp; implementation guide</imsmd:langstring>
+						</imsmd:keyword>
+					</imsmd:general>
+					<imsmd:lifecycle>
+						<imsmd:version>
+							<imsmd:langstring>1.0</imsmd:langstring>
+						</imsmd:version>
+						<imsmd:status>
+							<imsmd:source>
+								<imsmd:langstring>LOMv1.0</imsmd:langstring>
+							</imsmd:source>
+							<imsmd:value>
+								<imsmd:langstring>Final</imsmd:langstring>
+							</imsmd:value>
+						</imsmd:status>
+						<imsmd:contribute>
+							<imsmd:role>
+								<imsmd:source>
+									<imsmd:langstring>LOMv1.0</imsmd:langstring>
+								</imsmd:source>
+								<imsmd:value>
+									<imsmd:langstring>Creator</imsmd:langstring>
+								</imsmd:value>
+							</imsmd:role>
+							<imsmd:centity>
+								<imsmd:vcard>begin: vcard
+							fn: Mark McKell
+							end: vcard
+								</imsmd:vcard>
+							</imsmd:centity>
+							<imsmd:date>
+								<imsmd:datetime>2004-11-01</imsmd:datetime>
+							</imsmd:date>
+						</imsmd:contribute>
+						<imsmd:contribute>
+							<imsmd:role>
+								<imsmd:source>
+									<imsmd:langstring>LOMv1.0</imsmd:langstring>
+								</imsmd:source>
+								<imsmd:value>
+									<imsmd:langstring>Publisher</imsmd:langstring>
+								</imsmd:value>
+							</imsmd:role>
+							<imsmd:centity>
+								<imsmd:vcard>begin: vcard
+							fn: IMS Global Learning Consortium Inc.
+							end: vcard
+								</imsmd:vcard>
+							</imsmd:centity>
+							<imsmd:date>
+								<imsmd:datetime>2004-11-01</imsmd:datetime>
+							</imsmd:date>
+						</imsmd:contribute>
+					</imsmd:lifecycle>
+					<imsmd:technical>
+						<imsmd:format>HTML</imsmd:format>
+					</imsmd:technical>
+					<imsmd:educational>
+						<imsmd:learningresourcetype>
+							<imsmd:source>
+								<imsmd:langstring>IMS</imsmd:langstring>
+							</imsmd:source>
+							<imsmd:value>
+								<imsmd:langstring>E-learning Interoperability Specification</imsmd:langstring>
+							</imsmd:value>
+						</imsmd:learningresourcetype>
+					</imsmd:educational>
+					<imsmd:rights>
+						<imsmd:cost>
+							<imsmd:source>
+								<imsmd:langstring>LOMv1.0</imsmd:langstring>
+							</imsmd:source>
+							<imsmd:value>
+								<imsmd:langstring>No</imsmd:langstring>
+							</imsmd:value>
+						</imsmd:cost>
+						<imsmd:copyrightandotherrestrictions>
+							<imsmd:source>
+								<imsmd:langstring>LOMv1.0</imsmd:langstring>
+							</imsmd:source>
+							<imsmd:value>
+								<imsmd:langstring>Yes</imsmd:langstring>
+							</imsmd:value>
+						</imsmd:copyrightandotherrestrictions>
+						<imsmd:description>
+							<imsmd:langstring xml:lang="en">Copyright © 2004 IMS Global Learning Consortium, Inc. All Rights Reserved. The IMS Logo is a registered trademark of IMS Global Learning Consortium, Inc.</imsmd:langstring>
+						</imsmd:description>
+					</imsmd:rights>
+				</imsmd:lom>
+			</metadata>
+			<file href="htmldocs/imscp_bestv1p1p4.html"/>
+			<file href="htmldocs/images/specLogo.jpg"/>
+			<file href="htmldocs/images/Fig1p1Best.gif"/>
+			<file href="htmldocs/images/Fig3p1Best2.gif"/>
+			<file href="htmldocs/images/Fig4p1Best4.gif"/>
+		</resource>
+		<resource identifier="res_imscpv1p1p4_sumchtm_en" type="webcontent" href="htmldocs/imscp_sumcv1p1p4.html">
+			<metadata>
+				<imsmd:lom>
+					<imsmd:general>
+						<imsmd:identifier>imscpv1p1p4_sumchtm_en_id</imsmd:identifier>
+						<imsmd:title>
+							<imsmd:langstring xml:lang="en">IMS Content Packaging Specification Summary of Changes HTML</imsmd:langstring>
+						</imsmd:title>
+						<imsmd:language>en</imsmd:language>
+						<imsmd:description>
+							<imsmd:langstring xml:lang="en">This resource identifies the English version of the  IMS Content Packaging v1.1.4 Specification Summary of Changes HTML document.</imsmd:langstring>
+						</imsmd:description>
+						<imsmd:keyword>
+							<imsmd:langstring xml:lang="en">IMS</imsmd:langstring>
+						</imsmd:keyword>
+						<imsmd:keyword>
+							<imsmd:langstring xml:lang="en">content packaging</imsmd:langstring>
+						</imsmd:keyword>
+						<imsmd:keyword>
+							<imsmd:langstring xml:lang="en">e-learning specification</imsmd:langstring>
+						</imsmd:keyword>
+						<imsmd:keyword>
+							<imsmd:langstring xml:lang="en">summary of changes</imsmd:langstring>
+						</imsmd:keyword>
+					</imsmd:general>
+					<imsmd:lifecycle>
+						<imsmd:version>
+							<imsmd:langstring>1.0</imsmd:langstring>
+						</imsmd:version>
+						<imsmd:status>
+							<imsmd:source>
+								<imsmd:langstring>LOMv1.0</imsmd:langstring>
+							</imsmd:source>
+							<imsmd:value>
+								<imsmd:langstring>Final</imsmd:langstring>
+							</imsmd:value>
+						</imsmd:status>
+						<imsmd:contribute>
+							<imsmd:role>
+								<imsmd:source>
+									<imsmd:langstring>LOMv1.0</imsmd:langstring>
+								</imsmd:source>
+								<imsmd:value>
+									<imsmd:langstring>Creator</imsmd:langstring>
+								</imsmd:value>
+							</imsmd:role>
+							<imsmd:centity>
+								<imsmd:vcard>begin: vcard
+							fn: Mark McKell
+							end: vcard
+								</imsmd:vcard>
+							</imsmd:centity>
+							<imsmd:date>
+								<imsmd:datetime>2004-11-01</imsmd:datetime>
+							</imsmd:date>
+						</imsmd:contribute>
+						<imsmd:contribute>
+							<imsmd:role>
+								<imsmd:source>
+									<imsmd:langstring>LOMv1.0</imsmd:langstring>
+								</imsmd:source>
+								<imsmd:value>
+									<imsmd:langstring>Publisher</imsmd:langstring>
+								</imsmd:value>
+							</imsmd:role>
+							<imsmd:centity>
+								<imsmd:vcard>begin: vcard
+							fn: IMS Global Learning Consortium Inc.
+							end: vcard
+								</imsmd:vcard>
+							</imsmd:centity>
+							<imsmd:date>
+								<imsmd:datetime>2004-11-01</imsmd:datetime>
+							</imsmd:date>
+						</imsmd:contribute>
+					</imsmd:lifecycle>
+					<imsmd:technical>
+						<imsmd:format>HTML</imsmd:format>
+					</imsmd:technical>
+					<imsmd:educational>
+						<imsmd:learningresourcetype>
+							<imsmd:source>
+								<imsmd:langstring>IMS</imsmd:langstring>
+							</imsmd:source>
+							<imsmd:value>
+								<imsmd:langstring>E-learning Interoperability Specification</imsmd:langstring>
+							</imsmd:value>
+						</imsmd:learningresourcetype>
+					</imsmd:educational>
+					<imsmd:rights>
+						<imsmd:cost>
+							<imsmd:source>
+								<imsmd:langstring>LOMv1.0</imsmd:langstring>
+							</imsmd:source>
+							<imsmd:value>
+								<imsmd:langstring>No</imsmd:langstring>
+							</imsmd:value>
+						</imsmd:cost>
+						<imsmd:copyrightandotherrestrictions>
+							<imsmd:source>
+								<imsmd:langstring>LOMv1.0</imsmd:langstring>
+							</imsmd:source>
+							<imsmd:value>
+								<imsmd:langstring>Yes</imsmd:langstring>
+							</imsmd:value>
+						</imsmd:copyrightandotherrestrictions>
+						<imsmd:description>
+							<imsmd:langstring xml:lang="en">Copyright © 2004 IMS Global Learning Consortium, Inc. All Rights Reserved. The IMS Logo is a registered trademark of IMS Global Learning Consortium, Inc.</imsmd:langstring>
+						</imsmd:description>
+					</imsmd:rights>
+				</imsmd:lom>
+			</metadata>
+			<file href="htmldocs/imscp_sumcv1p1p4.html"/>
+			<file href="htmldocs/images/specLogo.jpg"/>
+			<file href="htmldocs/images/sumcFig2p4p4isvisible.gif"/>
+		</resource>
+		<resource identifier="res_imscpv1p1p4_xsd_en" type="webcontent" href="xsddocs/imscp_v1p1.xsd">
+			<metadata>
+				<imsmd:lom>
+					<imsmd:general>
+						<imsmd:identifier>imscpv1p1p4_xsds_id</imsmd:identifier>
+						<imsmd:title>
+							<imsmd:langstring xml:lang="en">IMS Content Packaging Specification XSD</imsmd:langstring>
+						</imsmd:title>
+						<imsmd:language>en</imsmd:language>
+						<imsmd:description>
+							<imsmd:langstring xml:lang="en">This resource identifies the XSD for Content Packaging.</imsmd:langstring>
+						</imsmd:description>
+						<imsmd:keyword>
+							<imsmd:langstring xml:lang="en">IMS</imsmd:langstring>
+						</imsmd:keyword>
+						<imsmd:keyword>
+							<imsmd:langstring xml:lang="en">content packaging</imsmd:langstring>
+						</imsmd:keyword>
+						<imsmd:keyword>
+							<imsmd:langstring xml:lang="en">e-learning specification</imsmd:langstring>
+						</imsmd:keyword>
+						<imsmd:keyword>
+							<imsmd:langstring xml:lang="en">xsd</imsmd:langstring>
+						</imsmd:keyword>
+					</imsmd:general>
+					<imsmd:lifecycle>
+						<imsmd:version>
+							<imsmd:langstring>1.0</imsmd:langstring>
+						</imsmd:version>
+						<imsmd:status>
+							<imsmd:source>
+								<imsmd:langstring>LOMv1.0</imsmd:langstring>
+							</imsmd:source>
+							<imsmd:value>
+								<imsmd:langstring>Final</imsmd:langstring>
+							</imsmd:value>
+						</imsmd:status>
+						<imsmd:contribute>
+							<imsmd:role>
+								<imsmd:source>
+									<imsmd:langstring>LOMv1.0</imsmd:langstring>
+								</imsmd:source>
+								<imsmd:value>
+									<imsmd:langstring>Creator</imsmd:langstring>
+								</imsmd:value>
+							</imsmd:role>
+							<imsmd:centity>
+								<imsmd:vcard>begin: vcard
+							fn: Mark McKell
+							end: vcard
+								</imsmd:vcard>
+							</imsmd:centity>
+							<imsmd:date>
+								<imsmd:datetime>20034-11-01</imsmd:datetime>
+							</imsmd:date>
+						</imsmd:contribute>
+						<imsmd:contribute>
+							<imsmd:role>
+								<imsmd:source>
+									<imsmd:langstring>LOMv1.0</imsmd:langstring>
+								</imsmd:source>
+								<imsmd:value>
+									<imsmd:langstring>Publisher</imsmd:langstring>
+								</imsmd:value>
+							</imsmd:role>
+							<imsmd:centity>
+								<imsmd:vcard>begin: vcard
+							fn: IMS Global Learning Consortium Inc.
+							end: vcard
+								</imsmd:vcard>
+							</imsmd:centity>
+							<imsmd:date>
+								<imsmd:datetime>2004-11-01</imsmd:datetime>
+							</imsmd:date>
+						</imsmd:contribute>
+					</imsmd:lifecycle>
+					<imsmd:technical>
+						<imsmd:format>XSD</imsmd:format>
+					</imsmd:technical>
+					<imsmd:educational>
+						<imsmd:learningresourcetype>
+							<imsmd:source>
+								<imsmd:langstring>IMS</imsmd:langstring>
+							</imsmd:source>
+							<imsmd:value>
+								<imsmd:langstring>E-learning Interoperability Specification</imsmd:langstring>
+							</imsmd:value>
+						</imsmd:learningresourcetype>
+					</imsmd:educational>
+					<imsmd:rights>
+						<imsmd:cost>
+							<imsmd:source>
+								<imsmd:langstring>LOMv1.0</imsmd:langstring>
+							</imsmd:source>
+							<imsmd:value>
+								<imsmd:langstring>No</imsmd:langstring>
+							</imsmd:value>
+						</imsmd:cost>
+						<imsmd:copyrightandotherrestrictions>
+							<imsmd:source>
+								<imsmd:langstring>LOMv1.0</imsmd:langstring>
+							</imsmd:source>
+							<imsmd:value>
+								<imsmd:langstring>Yes</imsmd:langstring>
+							</imsmd:value>
+						</imsmd:copyrightandotherrestrictions>
+						<imsmd:description>
+							<imsmd:langstring xml:lang="en">Copyright © 2004 IMS Global Learning Consortium, Inc. All Rights Reserved. The IMS Logo is a registered trademark of IMS Global Learning Consortium, Inc.</imsmd:langstring>
+						</imsmd:description>
+					</imsmd:rights>
+				</imsmd:lom>
+			</metadata>
+			<file href="xsddocs/imscp_v1p1.xsd"/>
+		</resource>
+		<resource identifier="res_imscpv1p1p4_examples1_en" type="webcontent" href="exmpldocs/All_Elements/imsmanifest.xml">
+			<file href="exmpldocs/All_Elements/imsmanifest.xml"/>
+			<file href="exmpldocs/All_Elements/content1.htm"/>
+			<file href="exmpldocs/All_Elements/content2.htm"/>
+			<file href="exmpldocs/All_Elements/content3.htm"/>
+			<file href="exmpldocs/All_Elements/intro1.htm"/>
+			<file href="exmpldocs/All_Elements/intro2.htm"/>
+			<file href="exmpldocs/All_Elements/intro3.htm"/>
+			<file href="exmpldocs/All_Elements/lesson1.htm"/>
+			<file href="exmpldocs/All_Elements/lesson1fr.htm"/>
+			<file href="exmpldocs/All_Elements/lesson2.htm"/>
+			<file href="exmpldocs/All_Elements/lesson3.htm"/>
+			<file href="exmpldocs/All_Elements/summary1.htm"/>
+			<file href="exmpldocs/All_Elements/summary2.htm"/>
+			<file href="exmpldocs/All_Elements/summary3.htm"/>
+		</resource>
+		<resource identifier="res_imscpv1p1p4_examples2_en" type="webcontent" href="exmpldocs/QTI_Example/imsmanifest.xml">
+			<file href="exmpldocs/QTI_Example/imsmanifest.xml"/>
+			<file href="exmpldocs/QTI_Example/Examples/blueDoor.png"/>
+			<file href="exmpldocs/QTI_Example/Examples/greenDoor.png"/>
+			<file href="exmpldocs/QTI_Example/Examples/openDoor.png"/>
+			<file href="exmpldocs/QTI_Example/Examples/redDoor.png"/>
+			<file href="exmpldocs/QTI_Example/Examples/adaptive.xml"/>
+			<file href="exmpldocs/QTI_Example/Examples/choice.xml"/>
+			<file href="exmpldocs/QTI_Example/Examples/choiceMultiple.xml"/>
+			<file href="exmpldocs/QTI_Example/Examples/hotspot.xml"/>
+			<file href="exmpldocs/QTI_Example/Examples/ims_xml.xsd"/>
+			<file href="exmpldocs/QTI_Example/Examples/imscp_v1p1.xsd"/>
+			<file href="exmpldocs/QTI_Example/Examples/imsmd_v1p2p2.xsd"/>
+			<file href="exmpldocs/QTI_Example/RPTemplates/rpMapResponse.xml"/>
+			<file href="exmpldocs/QTI_Example/RPTemplates/rpMatchCorrect.xml"/>
+		</resource>
+		<resource identifier="res_imscpv1p1p4_examples3_en" type="webcontent" href="exmpldocs/Full_Metadata/imsmanifest.xml">
+			<file href="exmpldocs/Full_Metadata/imsmanifest.xml"/>
+			<file href="exmpldocs/Full_Metadata/content1.htm"/>
+			<file href="exmpldocs/Full_Metadata/content2.htm"/>
+			<file href="exmpldocs/Full_Metadata/content3.htm"/>
+			<file href="exmpldocs/Full_Metadata/intro1.htm"/>
+			<file href="exmpldocs/Full_Metadata/intro2.htm"/>
+			<file href="exmpldocs/Full_Metadata/intro3.htm"/>
+			<file href="exmpldocs/Full_Metadata/lesson1.htm"/>
+			<file href="exmpldocs/Full_Metadata/lesson2.htm"/>
+			<file href="exmpldocs/Full_Metadata/lesson3.htm"/>
+			<file href="exmpldocs/Full_Metadata/summary1.htm"/>
+			<file href="exmpldocs/Full_Metadata/summary2.htm"/>
+			<file href="exmpldocs/Full_Metadata/summary3.htm"/>
+		</resource>
+		<resource identifier="res_imscpv1p1p4_examples4_en" type="webcontent" href="exmpldocs/Multiple_Organization/imsmanifest.xml">
+			<file href="exmpldocs/Multiple_Organization/imsmanifest.xml"/>
+			<file href="exmpldocs/Multiple_Organization/content1.htm"/>
+			<file href="exmpldocs/Multiple_Organization/content2.htm"/>
+			<file href="exmpldocs/Multiple_Organization/content3.htm"/>
+			<file href="exmpldocs/Multiple_Organization/intro1.htm"/>
+			<file href="exmpldocs/Multiple_Organization/intro2.htm"/>
+			<file href="exmpldocs/Multiple_Organization/intro3.htm"/>
+			<file href="exmpldocs/Multiple_Organization/lesson1.htm"/>
+			<file href="exmpldocs/Multiple_Organization/lesson2.htm"/>
+			<file href="exmpldocs/Multiple_Organization/lesson3.htm"/>
+			<file href="exmpldocs/Multiple_Organization/summary1.htm"/>
+			<file href="exmpldocs/Multiple_Organization/summary2.htm"/>
+			<file href="exmpldocs/Multiple_Organization/summary3.htm"/>
+		</resource>
+		<resource identifier="res_imscpv1p1p4_examples5_en" type="webcontent" href="exmpldocs/Simple_Manifest/imsmanifest.xml">
+			<file href="exmpldocs/Simple_Manifest/imsmanifest.xml"/>
+			<file href="exmpldocs/Simple_Manifest/content1.htm"/>
+			<file href="exmpldocs/Simple_Manifest/content2.htm"/>
+			<file href="exmpldocs/Simple_Manifest/content3.htm"/>
+			<file href="exmpldocs/Simple_Manifest/intro1.htm"/>
+			<file href="exmpldocs/Simple_Manifest/intro2.htm"/>
+			<file href="exmpldocs/Simple_Manifest/intro3.htm"/>
+			<file href="exmpldocs/Simple_Manifest/lesson1.htm"/>
+			<file href="exmpldocs/Simple_Manifest/lesson2.htm"/>
+			<file href="exmpldocs/Simple_Manifest/lesson3.htm"/>
+			<file href="exmpldocs/Simple_Manifest/summary1.htm"/>
+			<file href="exmpldocs/Simple_Manifest/summary2.htm"/>
+			<file href="exmpldocs/Simple_Manifest/summary3.htm"/>
+		</resource>
+		<resource identifier="res_imscpv1p1p4_examples6_en" type="webcontent" href="exmpldocs/Sub_Manifests/imsmanifest.xml">
+			<file href="exmpldocs/Sub_Manifests/imsmanifest.xml"/>
+			<file href="exmpldocs/Sub_Manifests/content1.htm"/>
+			<file href="exmpldocs/Sub_Manifests/intro1.htm"/>
+			<file href="exmpldocs/Sub_Manifests/lesson1.htm"/>
+			<file href="exmpldocs/Sub_Manifests/summary1.htm"/>
+			<file href="exmpldocs/Sub_Manifests/many_o/content1.htm"/>
+			<file href="exmpldocs/Sub_Manifests/many_o/content2.htm"/>
+			<file href="exmpldocs/Sub_Manifests/many_o/content3.htm"/>
+			<file href="exmpldocs/Sub_Manifests/many_o/intro1.htm"/>
+			<file href="exmpldocs/Sub_Manifests/many_o/intro2.htm"/>
+			<file href="exmpldocs/Sub_Manifests/many_o/intro3.htm"/>
+			<file href="exmpldocs/Sub_Manifests/many_o/lesson1.htm"/>
+			<file href="exmpldocs/Sub_Manifests/many_o/lesson2.htm"/>
+			<file href="exmpldocs/Sub_Manifests/many_o/lesson3.htm"/>
+			<file href="exmpldocs/Sub_Manifests/many_o/summary1.htm"/>
+			<file href="exmpldocs/Sub_Manifests/many_o/summary2.htm"/>
+			<file href="exmpldocs/Sub_Manifests/many_o/summary3.htm"/>
+			<file href="exmpldocs/Sub_Manifests/many_r/content1.htm"/>
+			<file href="exmpldocs/Sub_Manifests/many_r/content2.htm"/>
+			<file href="exmpldocs/Sub_Manifests/many_r/content3.htm"/>
+			<file href="exmpldocs/Sub_Manifests/many_r/intro1.htm"/>
+			<file href="exmpldocs/Sub_Manifests/many_r/intro2.htm"/>
+			<file href="exmpldocs/Sub_Manifests/many_r/intro3.htm"/>
+			<file href="exmpldocs/Sub_Manifests/many_r/lesson1.htm"/>
+			<file href="exmpldocs/Sub_Manifests/many_r/lesson2.htm"/>
+			<file href="exmpldocs/Sub_Manifests/many_r/lesson3.htm"/>
+			<file href="exmpldocs/Sub_Manifests/many_r/summary1.htm"/>
+			<file href="exmpldocs/Sub_Manifests/many_r/summary2.htm"/>
+			<file href="exmpldocs/Sub_Manifests/many_r/summary3.htm"/>
+			<file href="exmpldocs/Sub_Manifests/single_o/content1.htm"/>
+			<file href="exmpldocs/Sub_Manifests/single_o/content2.htm"/>
+			<file href="exmpldocs/Sub_Manifests/single_o/content3.htm"/>
+			<file href="exmpldocs/Sub_Manifests/single_o/intro1.htm"/>
+			<file href="exmpldocs/Sub_Manifests/single_o/intro2.htm"/>
+			<file href="exmpldocs/Sub_Manifests/single_o/intro3.htm"/>
+			<file href="exmpldocs/Sub_Manifests/single_o/lesson1.htm"/>
+			<file href="exmpldocs/Sub_Manifests/single_o/lesson2.htm"/>
+			<file href="exmpldocs/Sub_Manifests/single_o/lesson3.htm"/>
+			<file href="exmpldocs/Sub_Manifests/single_o/summary1.htm"/>
+			<file href="exmpldocs/Sub_Manifests/single_o/summary2.htm"/>
+			<file href="exmpldocs/Sub_Manifests/single_o/summary3.htm"/>
+			<file href="exmpldocs/Sub_Manifests/single_r/content1.htm"/>
+			<file href="exmpldocs/Sub_Manifests/single_r/content2.htm"/>
+			<file href="exmpldocs/Sub_Manifests/single_r/content3.htm"/>
+			<file href="exmpldocs/Sub_Manifests/single_r/intro1.htm"/>
+			<file href="exmpldocs/Sub_Manifests/single_r/intro2.htm"/>
+			<file href="exmpldocs/Sub_Manifests/single_r/intro3.htm"/>
+			<file href="exmpldocs/Sub_Manifests/single_r/lesson1.htm"/>
+			<file href="exmpldocs/Sub_Manifests/single_r/lesson2.htm"/>
+			<file href="exmpldocs/Sub_Manifests/single_r/lesson3.htm"/>
+			<file href="exmpldocs/Sub_Manifests/single_r/summary1.htm"/>
+			<file href="exmpldocs/Sub_Manifests/single_r/summary2.htm"/>
+			<file href="exmpldocs/Sub_Manifests/single_r/summary3.htm"/>
+		</resource>
+	</resources>
+</manifest>

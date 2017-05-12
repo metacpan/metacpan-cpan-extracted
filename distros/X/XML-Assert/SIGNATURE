@@ -1,0 +1,59 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 5ebf20e77850b956f9f03833932a7005ba59f0d9 COPYING.txt
+SHA1 7d95fa33740d59913e77391027cd15e6ce2db4b1 MANIFEST
+SHA1 136cd19c4b2de33191b4cdc0db1df76671a573d2 MANIFEST.SKIP
+SHA1 2cdc026745e0b852671cdf4c03adeb2d0880df93 META.yml
+SHA1 8970479acff5d11f419b875b0e542115152d6dd7 Makefile.PL
+SHA1 e9d2e05a553f9a9437fb0a50459f8b7822ec236b README
+SHA1 603bb9de29fb8cba7f13409c546750972eff645d inc/Module/AutoInstall.pm
+SHA1 9ccd5cd71896a08c4452af712ecac132370213bb inc/Module/Install.pm
+SHA1 618530299a7dcb7e388b7e9bc0e21bf778b526da inc/Module/Install/AutoInstall.pm
+SHA1 c49e512ab6caf6bdfd980b42ed0b3d34901a9198 inc/Module/Install/Base.pm
+SHA1 2ce37a94ac7c7a418b99a839e8a5f1e6ef3efad6 inc/Module/Install/Can.pm
+SHA1 8f91ca53c12bb609d12dd2ce6fc63d4581e390a0 inc/Module/Install/Fetch.pm
+SHA1 50e09343884e666bd4c6ed03e58592761ba74516 inc/Module/Install/Include.pm
+SHA1 5cefb891354bdf6259227c56950272194fd58d1b inc/Module/Install/Makefile.pm
+SHA1 692c7572df94e8304ec61cd8d8e306df477fed0c inc/Module/Install/Metadata.pm
+SHA1 e3acd82e8b4cd43ca62dd2119402a66ad54460f0 inc/Module/Install/Win32.pm
+SHA1 49c8e7f52761eb5869618e065bb4b8e52697de36 inc/Module/Install/WriteAll.pm
+SHA1 e40850c8307fa37cba32afa3fc17ac1081a1b28d inc/Sub/Uplevel.pm
+SHA1 29ccdbe057fec4775456b275262881a6f79531d6 inc/Test/Exception.pm
+SHA1 18b1252e295cdab344a8c8ad60e4987744ac0216 lib/Test/XML/Assert.pm
+SHA1 6b16b35f5961e553c6a8d0ccbff55f42a631d296 lib/XML/Assert.pm
+SHA1 c8a6eb6d8355f398c43d4d6ed6b6c0cdcc2dd993 lib/XML/Assert/Changes.pod
+SHA1 eb40bbdd9965f22979509215092f90e381caf42f t/00-load.t
+SHA1 a9969b2a0d285fcb8c0830f06ccc6de6d806cbe0 t/01-xpath-count.t
+SHA1 c0fdaee8c30b03e6b24293784d1f3b1eb1b77495 t/02-xpath-count-with-ns.t
+SHA1 62b275286db84763bd354570ecf6fafcb922ca9d t/03-matches-strings.t
+SHA1 43239ef2230b3dde28d6c579d0b891c9e819d483 t/04-matches-regexs.t
+SHA1 55f077025732ab03fe797e44584d68ab126b2505 t/05-matched_attributes.t
+SHA1 ae353edb52cf93ecaaa408450b2ef7514fc4c86d t/06-many_matched_attributes.t
+SHA1 e85f16d4a9eff7058d674f0d60be2514f26c260b t/10-exceptions.t
+SHA1 91c3f64ef8a08ed9df8c9bc21a57cff5697c33eb t/50-load.t
+SHA1 45db1e36abcc0963f3c4af72e8df02fb02dacbbd t/51-run-tests.pm
+SHA1 8db57a7d5d8768d9f2ff0c72b8c70f2ca07d6377 t/52-test-xml-assert.pm
+SHA1 ce961a2e86f4db35296b48c5645d11c4ee94c53d t/data.pl
+SHA1 5ceed0a186cf455ca5ebb221e28982b42f64bc96 t/pod-coverage.t
+SHA1 16a4b768cfb53647b47bca0d9582b63814becd43 t/pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.9 (GNU/Linux)
+
+iEYEARECAAYFAkxDhIEACgkQ6WcJ5zlMZhF9ygCeO7ATt1i65BqOZkCQdyanuA4R
+a30Anj3SdeagyLs+XgWVzbTQ4c4FqfHs
+=9LnB
+-----END PGP SIGNATURE-----

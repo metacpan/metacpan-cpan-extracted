@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<!DOCTYPE p  [
+<!ENTITY % MY_ENTITIES SYSTEM "test.ent">
+%MY_ENTITIES;
+]>
+<p id="&id;">Here &amp;foo; There
+<![CDATA[
+&foo;
+]]>
+&foo;
+</p>
+

@@ -1,0 +1,282 @@
+1.24 2014-12-22
+====
+  - Roll-up of all 1.23_* changes
+  - Update bug tracker location
+
+1.23_07 2014-12-17
+====
+  - Correct incorrectly tagged 1.23_06 (errantly tagged as 1.24_06)
+
+1.23_06 2011-07-19
+====
+  - Eliminate another set of cyclic references (szabgab)
+  - Stylistic improvements in tests (szabgab)
+  - Refactor debug output to separate module (szabgab)
+  - Weaken scalar references to address additional memory leak (szabgab)
+  - Add additional tests for scalar references (szabgab)
+  - Documentation format corrections (szabgab)
+
+
+1.23_05 2011-06-23
+====
+  - RT#8834 unindented POD so that it reformats properly (szabgab)
+  - Weaken cyclic references in XML::Stream to eliminate memory leak (szabgab)
+  - Increase use of warnings and strictures in tests and code (szabgab)
+  - Replace indirect object notation with direct invocation notation (szabgab)
+  - Replace manual TAP output with Test::More (szabgab)
+
+1.23_04 2010-09-22
+====
+  - RT#57649 Set default value for _tls flag
+  - Module metadata changes
+
+1.23_03 2010-09-20
+====
+  - RT#57649 Prepare cert verification params when TLS connection is requested
+
+1.23_02 2010-09-18
+====
+  - Convert project to Module::Build, with ExtUtils::MakeMaker compatibility
+  - RT#57649 SSL cert verification, enabled by default
+  - RT#53315 Remove old, bundled Test::* libraries, now core
+  - RT#54880 Clarify license terms
+  - RT#54151 Disable network-based tests via environment variable (for Debian)
+  - RT#56574 Fix object construction causing problems on Perl 5.12.0
+
+1.23
+====
+  - New maintainer: DAPATRICK
+  - RT#17484 Handle servers which re-use stream ID 
+  - RT#18711 Update link to XML Streams doc 
+  - RT#12977 Require perl >= 5.8.0
+  - RT#19415 Use jabber.org for tests
+  - RT#21932 Fix authname for Google Talk SASL auth
+  - RT#39098 Make dependencies more explicit
+  - RT#24817 Merge and massage of toddr's SASL fix
+  - RT#36864 Fake select on filehandles on win32
+  - RT#31215 Test and fix for XML node copying issue
+  - RT#17325 Fix and test for infinite loop on quotes
+
+1.23_01
+====
+  * Version 1.23_01 was errantly published as a pre-release of 1.23
+
+1.22
+====
+  - Using Encode module to handle utf encoding and decoding.  I cannot
+    just put the socket into utf8 because IO::Socket::SSL does not
+    support binmode.  So I'm calling decode_utf8() before returning the
+    Read string, and encode_utf8() before writing the Send string.
+  - Fixed SASL PLAIN authentication.
+
+1.21
+====
+  - Sigh... Screwed up the CPAN release... again...
+
+1.20
+====
+  - Ok... dang it.  Another minor tweak to fix CPAN.
+
+1.19
+====
+  - Minor release bug.  Forgot to include the prereqs for Authen::SASL
+    and MIME::Base4.
+
+1.18
+====
+  - Added initial cut at XMPP 1.0 support.
+  - Fixed timeout for Connect().  It was horribly broken and in
+    efficient.  Thanks to Jesper Krogh.
+  - Added timeout to socket creation.
+
+1.17
+====
+  - Added patch to make the Process a little faster by putting the
+    sleeps into the can_read() calls so that you don't have to delay
+    even a few micro seconds when you get new XML.  (Evan Prodromou)
+  - Added SRV lookup support for Connect via Net::DNS.
+  - Changed the select calls when blocking to can_read calls so
+    that we can wake up when there is data, and not just after a
+    certain period of time.  Thanks to Evan Prodromou.
+  - Interesting bug with Broken Pipes.
+
+1.16
+====
+  - Upgraded the XPath engine to a more extensible and robust
+    design.
+  - To get tests to work 100% I have to get better determination
+    on the BuildXML functions.  So fomr this point on, all
+    attributes are printed in alphabetical order.
+  - Fixed bug in Parser with <![CDATA[...]]> not being supported.
+  - Changed BuildXML for Tree.  You have to pass it a ref
+    and not an array.  That was to make the rawXML thing
+    work better.
+  - Added the ability to add raw XML at the BuildXML call.
+  - Added remove_cdata method to Node.
+  - Added methods to Node to make calls easier (XPath, GetXML).
+
+1.15
+====
+  - Added XPath function and support for most of the abbreviated
+    xpaths.
+  - Added new XML::Stream::Node type.  This behaves more like a
+    you would think an XML node would behave.
+  - Added a NONBLOCKING variable to control if the parser blocks
+    or does not block.  This might cause some problems, but it also
+    might open some new doors.  We will see.
+  - Upped buffer size by 4x for second party fix.
+  - Added code to handle tracking the last activity.
+  - Fixed Disconnect bug where is would not clean up the environment
+    well enough.
+  - Added check for version of IO::Socket::SSL since it is not a
+    required module.
+  - Added check before trying to convert a socket to SSL.
+  - Removed some warnings about unintialized strings.
+  - Added tests for make test.
+
+1.14
+====
+  - Fixed slow execution due to a sleep where there shouldn't be
+    a sleep.
+  - Added OpenFile() way to parse a stream.  It takes the same kind of
+    arguments that open() takes, so you can parse the stream output from
+    a command or a file and pretend that it's a stream.  It will ignore
+    the outer most tag and pretend that it's a <stream:stream/> tag.
+  - Fixed documentation to reflect the SID.
+  - Get "value array" with attrib fetches the same attrib from the
+    macthing nodes.
+
+1.13
+====
+  - Fixed bug in Parser with entities getting split by reads and
+    not interpreted properly.
+  - Moved IO::Select requirement to 1.13 per a bug report from
+    datawrangler.
+  - Added XML2Config function to handle parsing config.xml files.
+  - Fixed bug in the Parser parse and parsefile functions.
+
+1.12
+====
+  - Fixed SSL bug.
+  - Added support for the new HTTP::ProxyAutoConfig from Netscape.
+  - Fixed logic for proxy servers.  (This is gonna break for someone...
+    I can just feel it.)
+  - Added SSL support in for both tcpip and http connections.
+  - Removed support for native Unicode under perl 5.6.  It was causing a
+    big memory leak that the Unicode::String module does not incur.
+    This means that the Unicode::String module is now a requirement for
+    XML::Stream.
+  - Added in support for connecting via HTTP.  This takes a special server
+    that can keep the connection alive as the HTTP connection is setup only
+    once and is kept opne while you send and receive.  This allows you to
+    connect through proxy servers.
+  - More tweaks for memory usage and speed ups.
+  - Added in a new XML sotrage format to try and save space.  It's
+    a hash representation of the entire XML document.  XML::Parser::Tree
+    uses arrays of arrays and arrays of hashes which can consume memory
+    in very short order.  It was a good starting point, but it's time to
+    move on.  Se the INFO doc for more info on the new format.  (Not
+    done yet.)
+  - Added GetXMLData, SetXMLData, BuildXML, and EscapeXML which was
+    originally written for the Net::Jabber modules but realized that
+    they made more sense in here. =P
+
+1.11
+====
+  - Added in a module for DTD parsing.  This will hopefully lead to
+    verification of XML Streams based off of DTD.
+  - Fixed bug in the Process function caused by the new way of handling
+    multiple connections with detecting a broken connection.
+  - Added code to handle listening for incoming connections on a port
+    for a namespace.  THIS IS STILL UNDER DEVELOPMENT!
+  - Added XML::Stream::Parser to replace XML::Parser.
+  - Fixed bug in the timeout code.
+
+1.10
+====
+  - Added SetCallBacks function to repleace OnNode and provide other
+    hooks for more functions.
+  - Fixed initial connect function and error handling.
+
+1.09
+====
+  - Updated Connect to handle changing the values of the to and from
+    attributes directly from the function call.  (Useful for proxying.)
+
+1.08
+====
+  - Added boiler plate comments for the LGPL.
+  - Added code to Send to check if the connection was lost.  This
+    fixes a Broken Pipe error that I was seeing when the program tried
+    to write to a socket that was closed.
+
+1.07
+====
+  - Added code to handle not only connecting over TCP/IP but over
+    STDIN/STDOUT (for the new Jabber server).
+  - Added code to handle keeping the connection alive over connections
+    that drop the connection after a period of inactivity.
+
+1.06
+====
+  - Fixed bug where Process(0) would still sleep for a short time and
+    cause those fast loops to take longer than they should.
+  - Added Unicode support.  When you build the tree, make sure that
+    it's latin 1 you are speaking.  It's then up to the sender to ensure
+    that the outgoing data is utf8.
+  - Added timestamp support to debug.
+  - STREAMERROR is now local to an object instantiaion instead of the 
+    namespace.  This helps when you get an error and then grab a new
+    object and want to connect again.
+
+1.05
+====
+  - Fixed sport where Stream would die if it could not resolve your full
+    hostname.  Now it just reverts back to the result of hostname() if
+    it can' look up the full name.
+  - Initialized some variables to get rid of warnings with perl -w.
+
+1.04
+====
+  - Changed version scheme to allow Perl to check for it.
+
+1.0c
+====
+  - I think I got the bug in ParseStream that removes the parse coming in
+    while a parse is already in progress.
+  - Fixed major bug in Process.  If you got a tag in the middle of the tag
+    it would cause an XML error.
+  - Also, if another parse came in during another parse, the second parse
+    tree would get built under the current parse tree and everything would
+    grind to a halt.
+
+1.0b
+====
+  - Improved error handling by creating GetErrorCode and SetErrorCode.
+    These functions allow the caller to get some information about why
+    Process or Connect returned undef.
+  - Added error checking if a <stream:error> is sent.  This will call
+    SetErrorCode and return undef.
+
+1.0a
+====
+  - Version bump.
+  - Changed method of handling timeouts in the Connect and Process block.
+    The timeout from the Connect is no longer remembered in the Process
+    and used.  This method has improved the speed of the module greatly.
+  - Fixed bug where the Process was not properly handling a connection 
+    breakdown.  It now returns undef, or "", when the server dies or the
+    connection is dropped.
+
+0.1b
+====
+  - Added XML::Stream::Namespace to make writting Perl modules for other
+    namepsaces possible.  (This is highly alpha...)
+  - Added Disconnect function to send closing tag and shut the stream down.
+  - Added documentation list of methods in Stream.pm.
+
+0.1a
+====
+  - First version.
+  - Supports connecting to a server, opening a stream, and receiving from that
+    stream.

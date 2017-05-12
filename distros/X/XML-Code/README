@@ -1,0 +1,47 @@
+XML::Code - Perl module for converting XML hash structures into plain text.
+
+/*
+   Description
+*/
+
+XML::Code module is designed to enable simple object-oriented procedure of creating XML data.
+As soon as a programmer realizes that XML and OOP are kindred and have sibling connections 
+he or she wants to use objects instead of plain text in the phase of producing XML files.
+XML::Code allows thinking of XML tags as of nested named objects and expects XML::Code::code()
+method be called to produce plain text XML.
+
+XML::Code only produce code: that means the module does not provide methods of random access
+(like XPath does) to the XML structure though tree elements are fully accessible as nested hashes.
+
+/*
+   Installation
+*/
+
+Standard way of installing:
+
+perl Makefile.PL
+make
+make install
+
+/*
+   Usage
+*/
+
+Information on using XML::Code is contained in Code.pm file ad pod parts.
+
+Full description of the latest release of XML::Code module is also available 
+in Russian at http://webcode.ru/cgi/xml-code/.
+
+/*
+   Author
+*/
+
+Andrew Shitov <andy@shitov.ru>
+
+Please feel free to contact me via e-mail.
+
+/*
+   Copyright
+*/
+
+XML::Code modude is a free software. You may redistribute and (or) modify it under the same terms as Perl.

@@ -1,0 +1,607 @@
+<?xml version = "1.0" ?>
+<!DOCTYPE xbel PUBLIC "+//IDN python.org//DTD XML Bookmark Exchange Language 1.0//EN//XML" "http://www.python.org/topics/xml/dtds/xbel-1.0.dtd">
+<xbel>
+<info>Web Development</info>
+<folder id = "Web Development"><title>Web Development</title>
+<folder id = "apache"><title>Apache</title>
+<bookmark href = "http://www.apachetoolbox.com/"><title>Apache Toolbox</title></bookmark>
+<bookmark href = "http://draal.physics.wisc.edu/FilterProxy/"><title>FilterProxy Home Page</title></bookmark>
+<folder id = "modules"><title>Modules</title>
+<bookmark href = "http://freshmeat.net/projects/improvedmod_frontpage/?highlight=microsoft"><title>Improved mod_frontpage</title></bookmark>
+<folder id = "mod_asp"><title>mod_asp</title>
+<bookmark href = "http://www.apache-asp.org/"><title>Apache  ASP</title></bookmark>
+<bookmark href = "http://www.mail-archive.com/modperl%40apache.org/msg11080.html"><title>reloading scripts and libraries</title></bookmark>
+</folder>
+<bookmark href = "http://www.asaban.com/programlibrary/"><title>mod_auth_ntdom</title></bookmark>
+<bookmark href = "http://pam.sourceforge.net/mod_auth_pam/"><title>mod_auth_pam.</title></bookmark>
+<bookmark href = "http://pam.sourceforge.net/mod_auth_pam/"><title>mod_auth_pam.c, pluggable authentication (PAM) for Apache</title></bookmark>
+<folder id = "mod_gzip"><title>mod_gzip</title>
+<bookmark href = "http://www.remotecommunications.com/apache/mod_gzip/"><title>RCI's mod_gzip for the Apache Web Server</title></bookmark>
+<bookmark href = "http://www.remotecommunications.com/apache/mod_gzip/mod_gzip_faq.htm"><title>mod_gzip FAQ </title></bookmark>
+</folder>
+<folder id = "mod_proxy"><title>mod_proxy</title>
+<bookmark href = "http://www.devshed.com/Books/ProApache/page4.html"><title>Proxy</title></bookmark>
+</folder>
+<bookmark href = "http://www.modpython.org/"><title>mod_python</title></bookmark>
+<bookmark href = "http://www.apache.org/docs/mod/mod_rewrite.html"><title>mod_rewrite</title></bookmark>
+<folder id = "mod_sll"><title>mod_sll</title>
+<bookmark href = "http://www.modssl.org/docs/2.5/ssl_faq.html"><title>mod_ssl F.A.Q.</title></bookmark>
+</folder>
+</folder>
+<bookmark href = "http://www.visca.com/clueless/perl_apache_win9x.html"><title>Running CGI Scripts With Perl, Apache and Win95-98</title></bookmark>
+<folder id = "ssi"><title>SSI</title>
+<bookmark href = "http://www.cclabs.missouri.edu/things/instruction/www/html/xssi.shtml"><title>Extended Server Side Includes</title></bookmark>
+<bookmark href = "http://www.jlk.net/apache/xssi.shtml"><title>eXtended SSI</title></bookmark>
+</folder>
+<folder id = "tomcat"><title>Tomcat</title>
+<bookmark href = "http://java.sun.com/aboutJava/communityprocess/first/jsr053/servlet23_PFD.pdf"><title>JavaTM Servlet 2.3 Specification</title></bookmark>
+<bookmark href = "http://www.oreillynet.com/lpt/a/671"><title>O'Reilly Network - Using Tomcat</title></bookmark>
+<bookmark href = "http://jakarta.apache.org/tomcat/jakarta-tomcat/src/doc/index.html"><title>Tomcat Documentation</title></bookmark>
+</folder>
+<bookmark href = "http://www.std.com/web/help/xssi-cookbook.shtml"><title>World Kiosk XSSI Cookbook</title></bookmark>
+</folder>
+<bookmark href = "http://developer.apple.com/internet/"><title>Apple Internet Developer</title></bookmark>
+<folder id = "bookmarks"><title>Bookmarks</title>
+<bookmark href = "http://www.bleb.org/software/bkmrkconv/"><title>bkmrkconv</title></bookmark>
+</folder>
+<folder id = "browsers"><title>Browsers</title>
+<folder id = "internet_explorer"><title>Internet Explorer</title>
+<bookmark href = "http://support.microsoft.com/support/kb/articles/Q208/4/27.ASP"><title>Maximum URL Length Is 2,083 Characters</title></bookmark>
+</folder>
+</folder>
+<folder id = "cms"><title>CMS</title>
+<folder id = "bookmarks"><title>Bookmarks</title>
+<bookmark href = "http://bk2site.sourceforge.net/"><title>bk2site</title></bookmark>
+</folder>
+<bookmark href = "http://msdn.microsoft.com/library/techart/DesignKMSols.htm"><title>Designing Knowledge Management Solutions with a Web Storage System</title></bookmark>
+<bookmark href = "http://home.freeuk.net/bigbrownbear/bruno/casebook/cms/evaluation/printable.html"><title>Dr. Bruno - Evaluating CMS for Bell Media</title></bookmark>
+<bookmark href = "http://www.salon.com/contact/staff/idk/"><title>Industrial Strength Publishing (The Salon CMS)</title></bookmark>
+<bookmark href = "http://mason-cm.sourceforge.net/manual/"><title>Mason Content Management</title></bookmark>
+<folder id = "workflow"><title>Workflow</title>
+<bookmark href = "http://acs40.arsdigita.com/doc/acs-workflow/"><title>ArsDigita Workflow Package Overview</title></bookmark>
+<bookmark href = "http://www.ics.uci.edu/~ietfswap/"><title>Welcome to SWAP WG Home Page</title></bookmark>
+</folder>
+</folder>
+<folder id = "css"><title>CSS</title>
+<bookmark href = "http://bluerobot.com/web/css/center2.html"><title>CSS Centering Negative Margin</title></bookmark>
+<folder id = "tutorials"><title>Tutorials</title>
+<bookmark href = "http://members.home.net/bigstripes/tutorial/css_3box_plus_topbox.html"><title>Box Lesson - 3 Column layouts</title></bookmark>
+<bookmark href = "http://rudeparrot.com/csscolumndemo.html"><title>CSS Column Demo - RudeParrot.com</title></bookmark>
+<bookmark href = "http://www.westciv.com/style_master/house/cookbook/index.html"><title>CSS Cookbook</title></bookmark>
+<bookmark href = "http://www.oreillynet.com/pub/a/javascript/2001/03/23/rollovers.html"><title>Roll Over, Rollovers -- CSS Style</title></bookmark>
+<bookmark href = "http://www.tijs.org/css/"><title>Stylesheet Overview</title></bookmark>
+</folder>
+<bookmark href = "http://www.glish.com/css/"><title>glish.com  CSS layout techniques</title></bookmark>
+</folder>
+<folder id = "css2"><title>CSS2</title>
+<bookmark href = "http://www.xs4all.nl/~ppk/css2tests/"><title>CSS 2 tests - index page</title></bookmark>
+<bookmark href = "http://www.w3.org/TR/REC-CSS1"><title>Cascading Style Sheets, level 1</title></bookmark>
+<folder id = "tutorials"><title>Tutorials</title>
+<bookmark href = "http://www.westciv.com/style_master/academy/positioning_tutorial/index.html"><title>Cascading Style Sheets Positioning with CSS2 Tutorial</title></bookmark>
+</folder>
+<bookmark href = "http://zvon.org/xxl/CSS2Reference/Output/index.html"><title>Zvon CSS2 reference</title></bookmark>
+</folder>
+<folder id = "dom"><title>DOM</title>
+<bookmark href = "http://xw2k.sdct.itl.nist.gov/dom/index.html"><title>The NIST DOM Test Suite</title></bookmark>
+</folder>
+<folder id = "docbook"><title>DocBook</title>
+<bookmark href = "http://www.oswg.org/oswg-nightly/oswg/en_US.ISO_8859-1/articles/DocBook-Intro/docbook-intro/index.html"><title>A Practical Introduction to DocBook</title></bookmark>
+<bookmark href = "http://nis-www.lanl.gov/~rosalia/mydocs/docbook-intro/docbook-intro.html"><title>Get Going With DocBook</title></bookmark>
+<bookmark href = "http://public.lst.de/~eric/crash-course/HTML/index.html"><title>Writing Documentation Using DocBook</title></bookmark>
+</folder>
+<folder id = "emacs"><title>Emacs</title>
+<bookmark href = "http://www.ucmb.ulb.ac.be/~chris/Emacs.shtml"><title>Emacs shortcuts</title></bookmark>
+<folder id = "modes"><title>Modes</title>
+<bookmark href = "http://www.lysator.liu.se/~lenst/about_psgml/"><title>PSGML - A GNU Emacs mode for SGML files</title></bookmark>
+<bookmark href = "http://www.menteith.com/xslide/"><title>xslide Emacs Major Mode for XSL stylesheets</title></bookmark>
+</folder>
+</folder>
+<folder id = "flash"><title>Flash</title>
+<folder id = "actionscript"><title>ActionScript</title>
+<bookmark href = "http://www.actionscripts.org/index.shtml"><title>Actionscripts.org </title></bookmark>
+<bookmark href = "http://www.macromedia.com/support/flash/action_scripts/"><title>Macromedia Flash - ActionScript dictionary</title></bookmark>
+<bookmark href = "http://www.moock.org/webdesign/flash/fscommand/index.html"><title>moock web flash fs command</title></bookmark>
+<bookmark href = "http://www.moock.org/asdg/"><title>moock.org actionscript the definitive guide</title></bookmark>
+</folder>
+<bookmark href = "http://www.flashgeek.com/"><title>flashgeek</title></bookmark>
+<bookmark href = "http://www.shovemedia.com/ioLib/"><title>ioLib</title></bookmark>
+</folder>
+<folder id = "fonts"><title>Fonts</title>
+<folder id = "free_fonts"><title>Free fonts</title>
+<bookmark href = "http://www.wantedfonts.com/"><title>wanted fonts</title></bookmark>
+</folder>
+</folder>
+<folder id = "frontier"><title>Frontier</title>
+<folder id = "docs"><title>Docs</title>
+<bookmark href = "http://www.ojai.net/matt/frontierDef/ch00.html#pgfId-139"><title>Matt Neuberg - Frontier, The Definitive Guide</title></bookmark>
+</folder>
+<folder id = "manila"><title>Manila</title>
+<bookmark href = "http://www.xmlrpc.com/stories/manilaRpc"><title>Manila-RPC interface</title></bookmark>
+</folder>
+<folder id = "radio_userland"><title>Radio Userland</title>
+<bookmark href = "http://drmatt.userland.com/newInterface.html"><title>Dr. Matt - The New Interface</title></bookmark>
+<bookmark href = "http://radiodiscuss.userland.com/developingTools"><title>Radio UserLand  Developing Tools</title></bookmark>
+<bookmark href = "http://radiodiscuss.userland.com/nodeTypes"><title>Radio UserLand  Nodetypes</title></bookmark>
+<bookmark href = "http://drmatt.userland.com/newInterfaceStuff/whatsaNode.html"><title>What Is a Node</title></bookmark>
+</folder>
+<folder id = "suites"><title>Suites</title>
+<bookmark href = "http://www.scripting.com/frontier/netScripting/newsPage.html"><title>Frontier NewsPage</title></bookmark>
+<bookmark href = "http://www.whump.com/www/frontier/linkManager.html"><title>SuitelinkManager</title></bookmark>
+<bookmark href = "http://users.erols.com/asg/user/html/fileWriters/ftp.html"><title>user.html.fileWriters.ftp</title></bookmark>
+</folder>
+<bookmark href = "http://inessential.com/tips/"><title>Tips for Frontier and Radio Developers</title></bookmark>
+</folder>
+<folder id = "graphics"><title>Graphics</title>
+<folder id = "photoshop"><title>PhotoShop</title>
+<bookmark href = "http://www.creativepro.com/printerfriendly/story/11242.html"><title>(Almost) Everything You Wanted to Know about Sharpening in Photoshop but Were Afraid to Ask</title></bookmark>
+</folder>
+</folder>
+<folder id = "groupware"><title>Groupware</title>
+<bookmark href = "http://www.gctp.org/index.html"><title>GCTP Group Calendaring Transport Protocol</title></bookmark>
+<bookmark href = "http://www.ogsproject.org/"><title>Open Groupware Project</title></bookmark>
+<bookmark href = "http://www.openflock.com/"><title>OpenFlock</title></bookmark>
+</folder>
+<folder id = "html"><title>HTML</title>
+<folder id = "colour"><title>Colour</title>
+<bookmark href = "http://www.webreference.com/html/reference/color/"><title>Web Color Reference</title></bookmark>
+<bookmark href = "http://www.coolstop.com/colorspeak/1/"><title>colorspeak</title></bookmark>
+</folder>
+<bookmark href = "http://www.w3.org/TR/html4/"><title>HTML 4.01 Specification</title></bookmark>
+<bookmark href = "http://www.webreference.com/html/reference/character/"><title>HTML Character Reference </title></bookmark>
+</folder>
+<folder id = "java"><title>Java</title>
+<bookmark href = "http://www.sulake.com/fuselight/"><title>FUSE Light Shockwave server</title></bookmark>
+</folder>
+<folder id = "javascript"><title>JavaScript</title>
+<folder id = "dhtml"><title>DHTML</title>
+<bookmark href = "http://www.siteexperts.com/paradise/getList.asp?res=Inside+Technique&amp;type=Task&amp;cid=39&amp;rname=Cross%2DBrowser+DHTML"><title>Cross-Browser DHTML</title></bookmark>
+<bookmark href = "http://www.siteexperts.com/tips/techniques/ts03/index.htm"><title>Cross-browser Expanding and Collapsing ToC Menu</title></bookmark>
+<bookmark href = "http://www.dynamicearth.com/samples/xdom/animations.htm"><title>DHTML Cropping</title></bookmark>
+<bookmark href = "http://dhtml.yaourts.com/"><title>DHTML Wysiwyg editor</title></bookmark>
+<bookmark href = "http://www.siteexperts.com/dhtmllib/demos/window/page1.asp"><title>DHTMLLib Windows</title></bookmark>
+<bookmark href = "http://www.geocities.com/Paris/LeftBank/2178/foldertree.html"><title>Folder Tree - A JavasScript DHTML outliner </title></bookmark>
+<bookmark href = "http://sourceforge.net/projects/dynapi/"><title>SourceForge Project Info - DynAPI 2</title></bookmark>
+<bookmark href = "http://cgi.din.or.jp/~hagi3/JavaScript/Mozilla/SampleList.cgi?fmt=html"><title>URL list of Mozilla's DOM Sample html</title></bookmark>
+<bookmark href = "http://webfx.eae.net/"><title>Welcome to WebFX</title></bookmark>
+</folder>
+<bookmark href = "http://cjandia.freehomepage.com/me/works/xml/espx/20010129.089/espx.htm"><title>ESPX - an ECMAScript Parser for (almost) XML; with TinyXSL application</title></bookmark>
+<bookmark href = "http://www.geocities.com/Paris/LeftBank/2178/foldertree.html"><title>Folder-Tree</title></bookmark>
+<bookmark href = "http://www.webreference.com/js/column72/"><title>Netscape 6, Part I Detection and Scripting </title></bookmark>
+<bookmark href = "http://www.smartnetworks.net/~rosso/xssi/samples/javascript.shtml"><title>The XSSI Library Browser Sniffer for Javascript</title></bookmark>
+<folder id = "tutorials"><title>Tutorials</title>
+<bookmark href = "http://www.devshed.com/Client_Side/JavaScript/Object/print.html"><title>DevShed.com - An Object Lesson in JavaScript</title></bookmark>
+<bookmark href = "http://www.oreillynet.com/pub/a/javascript/2001/03/30/essential_js.html"><title>Document Mathematics - Count Your Words </title></bookmark>
+</folder>
+<bookmark href = "http://webdevelopersjournal.com/articles/javascript_limitations.html"><title>What Does and Does Not Work With JavaScript</title></bookmark>
+<bookmark href = "http://www.essence.co.uk/essence/foldertree/document.htm"><title>http--www.essence.co.uk-essence-foldertree-document.htm</title></bookmark>
+<bookmark href = "http://www.moock.org/webdesign/javascript/index.html"><title>moock web javascript</title></bookmark>
+<bookmark href = "http://jason.artcomp-design.com/bookmarks/Bookmarklets/"><title>root's bookmarks Bookmarklets</title></bookmark>
+</folder>
+<folder id = "mysql"><title>MySQL</title>
+<bookmark href = "http://www.devshed.com/Server_Side/MySQL/Join/page1.html"><title>DevShed - MySQL Table Joins</title></bookmark>
+<bookmark href = "http://devshed.com/Server_Side/MySQL/ODBC/print.html"><title>MySQL and ODBC</title></bookmark>
+</folder>
+<folder id = "pdf"><title>PDF</title>
+<bookmark href = "http://www.activepdf.com/default.asp"><title>activePDF.com </title></bookmark>
+</folder>
+<folder id = "php"><title>PHP</title>
+<bookmark href = "http://www.batchlabs.com/php.asp"><title>BatchLabs - PHP</title></bookmark>
+<folder id = "classes"><title>Classes</title>
+<bookmark href = "http://phpclasses.upperdesign.com/browse.html/package/23"><title>Class CachedFastTemplate</title></bookmark>
+<bookmark href = "http://px.sklar.com/code-pretty.html?code_id=488"><title>Excel Generator</title></bookmark>
+<bookmark href = "http://www.thewebmasters.net/php/Htgroup.phtml"><title>Htgroup </title></bookmark>
+<bookmark href = "http://www.zend.com/codex.php?id=218&amp;single=1"><title>Image To HTML Text Converter</title></bookmark>
+<bookmark href = "http://www.phpinsider.com/php/code/Smarty/"><title>Index of -php-code-Smarty</title></bookmark>
+<bookmark href = "http://www.nomad.ch/php/sql2xml/"><title>PEAR-XML-sql2xml-Class</title></bookmark>
+<bookmark href = "http://phphtml.sourceforge.net/"><title>PHP-HTML</title></bookmark>
+<bookmark href = "http://phplib.netuse.de/documentation/documentation-4.html#ss4.2"><title>PHPLIB template docs</title></bookmark>
+<bookmark href = "http://www.northern.ca/projects/phpwidgets/"><title>PHPWidgets</title></bookmark>
+<bookmark href = "http://sourceforge.net/projects/snoopy/"><title>Snoopy</title></bookmark>
+<bookmark href = "http://www.mamasam.com/tutorials/en_html_table.html"><title>Table.php</title></bookmark>
+<bookmark href = "http://evil.inetarena.com/php/DBI.php3"><title>class.DBI</title></bookmark>
+<bookmark href = "http://www.thewebmasters.net/php/Htpasswd.phtml"><title>classHtpasswd </title></bookmark>
+<bookmark href = "http://0x00.org/php/phpApplication/"><title>phpApplication</title></bookmark>
+<bookmark href = "http://linux.gelrevision.nl/php/index.php"><title>phpChannel</title></bookmark>
+<bookmark href = "http://phpcodesite.phpedit.com/"><title>phpCodeSite</title></bookmark>
+<bookmark href = "http://devil.medialab.at/projects/phpdom/doc/phpDOM.html"><title>phpDOM</title></bookmark>
+<bookmark href = "http://www.phpxml.org/"><title>phpXML- -- plain php xml processing</title></bookmark>
+</folder>
+<folder id = "code"><title>Code</title>
+<bookmark href = "http://www.zend.com/codex.php?id=425&amp;single=1"><title>Query string to Barcode string</title></bookmark>
+<bookmark href = "http://www.zend.com/codex.php"><title>Zend - Code Gallery</title></bookmark>
+</folder>
+<bookmark href = "http://dx0.sourceforge.net/"><title>DX0 -- PHPDHTML!!</title></bookmark>
+<folder id = "docs"><title>Docs</title>
+<bookmark href = "http://utvikler.start.no/code/php_coding_standard.html"><title>PHP Coding Standard</title></bookmark>
+</folder>
+<bookmark href = "http://www.oreillynet.com/~rael/lang/php/oscon2k/meerkatphpxml/slide_intro.html"><title>Meerkat, PHP &amp; XML</title></bookmark>
+<bookmark href = "http://phplib.netuse.de/documentation/index.php3"><title>PHP Base Library</title></bookmark>
+<bookmark href = "http://www.sjgross.org/app/php_cgi/"><title>PHP CGI</title></bookmark>
+<bookmark href = "http://www.cascade.org.uk/software/php/calendar/"><title>PHP Calendar</title></bookmark>
+<bookmark href = "http://php.weblogs.com/"><title>PHP Everywhere</title></bookmark>
+<bookmark href = "http://www.faqts.com/knowledge-base/index.phtml/fid/51/"><title>PHP FAQTS </title></bookmark>
+<bookmark href = "http://www.php.net/manual/ref.domxml.php"><title>PHP Manual DOM XML functions</title></bookmark>
+<bookmark href = "http://www.php.net/manual/ref.xml.php"><title>PHP Manual XML parser functions</title></bookmark>
+<bookmark href = "http://php.socket7.net/"><title>PHP Script Exchange</title></bookmark>
+<bookmark href = "http://www.phpbuilder.com/columns/timuckun20001207.php3"><title>PHPBuilder.com - ODBC Socket Server</title></bookmark>
+<bookmark href = "http://prometheus.zerodivide.net/api/example_code/example_1/"><title>Prometheus Project</title></bookmark>
+<bookmark href = "http://www.hansanderson.com/php/xml/"><title>The Hans Anderson Corporation (TM) http--www.hansanderson.com-</title></bookmark>
+<bookmark href = "http://www.hansanderson.com/php/"><title>The Hans Anderson Corporation PHP Miscellany</title></bookmark>
+<bookmark href = "http://php.resourceindex.com/"><title>The PHP Resource Index</title></bookmark>
+<folder id = "tips"><title>Tips</title>
+<bookmark href = "http://www.phpbuilder.com/tips/item.php?id=134"><title>Resizing images on the fly</title></bookmark>
+</folder>
+<folder id = "tutorials"><title>Tutorials</title>
+<bookmark href = "http://www.zend.com/zend/tut/wap.php"><title>Building WML Applications Using PHP</title></bookmark>
+<bookmark href = "http://zez.org/article/articleprint/47/"><title>Communicating with (eZ) xmlrpc </title></bookmark>
+<bookmark href = "http://www.devshed.com/Server_Side/Administration/CREDIT/print.html"><title>DevShed.com - Script-based CC Interfaces</title></bookmark>
+<bookmark href = "http://www.phpbuilder.com/columns/mattern20010111.php3"><title>Graphing with Flash (SWF)</title></bookmark>
+<bookmark href = "http://www.phpbuilder.com/forum/archives/1/2000/08/4/102783"><title>How to build PHP with JPEG</title></bookmark>
+<bookmark href = "http://hit-or-miss.org/blogger_xml/"><title>How to manage your site with Blogger, PHP, and XML</title></bookmark>
+<bookmark href = "http://zez.org/article/articleprint/46/"><title>IPC in PHP</title></bookmark>
+<bookmark href = "http://www.phpbuilder.com/columns/david20000512.php3?page=4"><title>PHPBuilder.com - Templates, The PHPLIB Way</title></bookmark>
+</folder>
+<bookmark href = "http://www.thewebmasters.net/php/Validator.phtml"><title>Validator 1.2 - common data validation routines.</title></bookmark>
+<folder id = "web_apps"><title>Web Apps</title>
+<bookmark href = "http://freshmeat.net/projects/cbms/"><title>CBMS Client Billing Management System</title></bookmark>
+<bookmark href = "http://www.cccsoftware.org/"><title>CCC</title></bookmark>
+<bookmark href = "http://php.bilcag.net/htadmin/"><title>HTAdmin</title></bookmark>
+<bookmark href = "http://www.horde.org/jonah/"><title>Jonah portal</title></bookmark>
+<bookmark href = "http://jonroig.com/freecode/openrealty/"><title>OpenRealty</title></bookmark>
+<bookmark href = "http://www.phpbb.com/"><title>phpBB A forum that's free</title></bookmark>
+<bookmark href = "http://phpboard.thelinuxcommunity.org/"><title>phpBoard</title></bookmark>
+<bookmark href = "http://phpdocserv.cri74.org/welcome.html"><title>phpDocServ</title></bookmark>
+<bookmark href = "http://phpezedit.com/"><title>phpEZedit </title></bookmark>
+<bookmark href = "http://promanager.sourceforge.net/"><title>proManager - Homepage</title></bookmark>
+</folder>
+<bookmark href = "http://www.wirelessdevnet.com/articles/jun2000/xmlcast_php.html"><title>XML, RSS, and PHP</title></bookmark>
+<bookmark href = "http://www.phpwizard.net/"><title>phpWizard</title></bookmark>
+<bookmark href = "http://phphead.com/"><title>phphead.com</title></bookmark>
+<bookmark href = "http://freshmeat.net/projects/png2html.php/?highlight=PHP+HTML"><title>png2html.php</title></bookmark>
+<bookmark href = "http://www.helpermonkey.org/rsslib/"><title>rsslib 1.1</title></bookmark>
+</folder>
+<folder id = "perl"><title>Perl</title>
+<bookmark href = "http://www.adel.nursat.kz/apg/"><title>APG (Automated Pasword Generator) Home Page</title></bookmark>
+<bookmark href = "http://mailarchive.activestate.com/browse/perl-xml"><title>ActiveState - Support - Mailing List Archive - perl-xml</title></bookmark>
+<bookmark href = "http://www.saturn5.com/~jwb/dbi-performance.html"><title>Application Performance using DBI and mod_perl</title></bookmark>
+<bookmark href = "http://www.cpan.org/scripts/index.html"><title>CPAN Scripts Repository</title></bookmark>
+<bookmark href = "http://www.ddj.com/topics/perl/"><title>Dr. Dobb's Perl Resources</title></bookmark>
+<bookmark href = "http://www.rcpt.to/~james/programs/ecommerce/"><title>Ecommerce with Perl &amp; MySQL</title></bookmark>
+<bookmark href = "http://www.perlmonks.org/index.pl?node_id=37935&amp;lastnode_id=864"><title>Finding out if a scalar exists in a typeglob</title></bookmark>
+<bookmark href = "http://ids.sourceforge.net/"><title>Image Display System</title></bookmark>
+<bookmark href = "http://perl.plover.com/"><title>M-J. Dominus Perl Paraphernalia</title></bookmark>
+<folder id = "macperl"><title>MacPerl</title>
+<bookmark href = "http://www.macperl.com/depts/MacPerlFAQ.html"><title>MacPerl FAQ</title></bookmark>
+<bookmark href = "http://www.macperl.com/~fom/macperl/fom-serve/cache/1.html"><title>MacPerl Faq-O-Matic</title></bookmark>
+<bookmark href = "http://www.perlmonth.com/columns/mac_perl/mac_perl.html?issue=7"><title>PerlMonth - The MacPerl Development Environment</title></bookmark>
+<bookmark href = "http://www.perlmonth.com/columns/mac_perl/mac_perl.html?issue=6"><title>PerlMonth- Using Mac-Speech</title></bookmark>
+<bookmark href = "http://www.macperl.com/depts/Code/Tools/RuntimeBuilder/"><title>RuntimeBuilder</title></bookmark>
+</folder>
+<folder id = "mason"><title>Mason</title>
+<bookmark href = "http://www.masonhq.com/docs/manual/"><title>Mason HQ Documentation </title></bookmark>
+<bookmark href = "http://www.masonhq.com/"><title>Mason HQ Home</title></bookmark>
+</folder>
+<folder id = "modules"><title>Modules</title>
+<bookmark href = "http://search.cpan.org/search?dist=Apache-AuthenNIS"><title>Apache AuthenNIS</title></bookmark>
+<bookmark href = "http://theoryx5.uwinnipeg.ca/CPAN/data/Apache-PageKit/"><title>Apache-PageKit</title></bookmark>
+<bookmark href = "http://search.cpan.org/search?dist=Apache-Session"><title>Apache-Session</title></bookmark>
+<bookmark href = "http://www.edlund.org/hacks/averist/"><title>Averist</title></bookmark>
+<bookmark href = "http://search.cpan.org/doc/RSAVAGE/CGI-Explorer-1.00/Explorer.pm"><title>CGI-Explorer</title></bookmark>
+<bookmark href = "http://stein.cshl.org/WWW/software/CGI/"><title>CGI.pm</title></bookmark>
+<bookmark href = "file:///C:/Perl/html/site/lib/DBI.html"><title>DBI - local</title></bookmark>
+<bookmark href = "http://search.cpan.org/doc/ANDK/Devel-Symdump-2.01/lib/Devel/Symdump.pm"><title>Devel-Sysdump</title></bookmark>
+<bookmark href = "file:///C:/Perl/html/lib/File/Find.html"><title>File-Find local</title></bookmark>
+<bookmark href = "http://www.imagemagick.org/"><title>ImageMagick - Image Conversion and Manipulation Software</title></bookmark>
+<bookmark href = "http://www.sherohman.org/software/index.html#LowCal"><title>LowCal.pm</title></bookmark>
+<bookmark href = "http://dajoba.com/projects/netparsewhois/index.html?_of=,23,25,20"><title>Net-ParseWhois</title></bookmark>
+<bookmark href = "http://www.2shortplanks.com/flash/"><title>PerlFlash - Perl Flash manipulation modules</title></bookmark>
+<bookmark href = "http://xml.jrc.it/RDFStore/"><title>RDFStore</title></bookmark>
+<bookmark href = "file:///C:/Perl/html/site/lib/Text/Template.html"><title>TextTemplate - local</title></bookmark>
+</folder>
+<bookmark href = "http://ednet.gsfc.nasa.gov/Mathews/webtools/"><title>NASA WWW Developer Tools</title></bookmark>
+<bookmark href = "http://www.perlmonks.org/index.pl"><title>Perlmonks - Parsing XML in tree mode</title></bookmark>
+<folder id = "programs"><title>Programs</title>
+<bookmark href = "http://www.stonehenge.com/merlyn/WebTechniques/col41.html"><title>Randal Schwartz - mod_perl picture server</title></bookmark>
+<bookmark href = "http://www.egr.msu.edu/~dulimart/Snap/"><title>SnapSource Homepage</title></bookmark>
+<bookmark href = "http://www.fourmilab.ch/webtools/demoroniser/"><title>demoroniser - correct moronic and gratuitously incompatible Microsoft HTML</title></bookmark>
+</folder>
+<bookmark href = "http://www.template-toolkit.org/"><title>Template Toolkit Home Page</title></bookmark>
+<bookmark href = "http://standards.ieee.org/resources/spasystem/twig/"><title>The XMLTwig Page</title></bookmark>
+<folder id = "tutorials"><title>Tutorials</title>
+<bookmark href = "http://www.perlmonks.org/index.pl?node_id=47446&amp;lastnode_id=131"><title>(proposed)Scoping tutorial</title></bookmark>
+<bookmark href = "http://www.hut.fi/u/jkorpela/chars.html"><title>A tutorial on character code issues</title></bookmark>
+<bookmark href = "http://home.cnet.com/webbuilding/0-7704-8-4874769-1.html?tag=st.bl.3880.pro_g.7704-8-4874769-1"><title>An introduction to SOAP</title></bookmark>
+<bookmark href = "http://www-106.ibm.com/developerworks/library/ws-xpc1/?dwzone=ws"><title>Getting Started with XML-RPC in Perl</title></bookmark>
+<bookmark href = "http://www.fit.edu/lyris/help/HowdoIvalidateEmailaddressesinmyPerlprograms_.html"><title>How do I validate Email addresses in my Perl programs</title></bookmark>
+<bookmark href = "http://www.perldoc.com/modperl_slides/toc.html"><title>Introduction to mod_perl (slides)</title></bookmark>
+<bookmark href = "http://www.stonehenge.com/merlyn/WebTechniques/col53.html"><title>Randal Schwartz - Image Color to Text</title></bookmark>
+<bookmark href = "http://www.linuxgazette.com/issue63/nielsen2.html"><title>Securely Erasing a Hard Drive with Perl</title></bookmark>
+<bookmark href = "http://perl.plover.com/yak/hw1/Hardware-notes.html"><title>The Perl Hardware Store</title></bookmark>
+<bookmark href = "http://www.openp2p.com/lpt/a/653"><title>Using Perl and Jabber for Email Notification</title></bookmark>
+<bookmark href = "http://use.perl.org/article.pl?sid=01/02/05/1438258"><title>use Perl  Creating Web Services with XML-RPC</title></bookmark>
+<bookmark href = "http://www.perl.com/pub/2001/01/poe.html"><title>www.perl.com - A Beginner's Introduction to POE</title></bookmark>
+</folder>
+<bookmark href = "http://www.tdb.uu.se/~jan/html2psug.html"><title>Using html2ps</title></bookmark>
+<folder id = "web_apps"><title>Web Apps</title>
+<bookmark href = "http://dajoba.com/projects/mysqltool/index.html?_of=20,,23,25,26,20#SHOTS"><title>MySQL Tool</title></bookmark>
+</folder>
+<folder id = "windows"><title>Windows</title>
+<bookmark href = "http://www.mail-archive.com/perl-win32-gui@httptech.com/msg00411.html"><title>Re [perl-win32-gui] Install from Zip file, not just PPM</title></bookmark>
+<bookmark href = "http://www.adpc.purdue.edu/WebSvc/PerlDocs/lib/Win32/GUI/Tutorial/guitut1.html"><title>Win32GUI Tutorial - Part 1</title></bookmark>
+<bookmark href = "http://dada.perl.it/"><title>dada's perl lab</title></bookmark>
+<bookmark href = "http://www.perlmonks.org/index.pl?node_id=15641"><title>finddata.pl</title></bookmark>
+<bookmark href = "http://www.activestate.com/PPMPackages/5.6plus/"><title>www.activestate.com - -PPMPackages-5.6plus-</title></bookmark>
+</folder>
+<bookmark href = "http://www.rpbourret.com/xmldbms/readme.htm"><title>XML-DBMS, Version 1.01</title></bookmark>
+<bookmark href = "http://freshmeat.net/projects/fav2bmk/"><title>[fm] fav2bmk.pl</title></bookmark>
+<folder id = "modperl"><title>modperl</title>
+<bookmark href = "http://www.mail-archive.com/modperl%40apache.org/msg11515.html"><title>RE ActivePerl mod_perl ppd available</title></bookmark>
+<bookmark href = "http://modperl.sergeant.org/"><title>Take 23  - modperl.sergeant.org</title></bookmark>
+</folder>
+</folder>
+<folder id = "python"><title>Python</title>
+<bookmark href = "http://boa-constructor.sourceforge.net/"><title>Boa Constructor home</title></bookmark>
+<bookmark href = "http://www.valdyas.org/python/cgi.html"><title>CGI scripting and MySQL</title></bookmark>
+<folder id = "code"><title>Code</title>
+<bookmark href = "http://tor.dhs.org/~zephyrfalcon/snippets/html/snippets.html"><title>Python Snippets</title></bookmark>
+</folder>
+<folder id = "debugging"><title>Debugging</title>
+<bookmark href = "http://www.python.org/doc/current/lib/module-exceptions.html"><title>2.2 Built-in Exceptions</title></bookmark>
+<bookmark href = "http://www.python.org/doc/current/lib/module-pdb.html"><title>9. The Python Debugger</title></bookmark>
+</folder>
+<bookmark href = "http://diveintopython.org/"><title>Dive Into Python</title></bookmark>
+<folder id = "docs"><title>Docs</title>
+<bookmark href = "http://www.oreilly.com/catalog/pythonsl/chapter/ch05.html"><title>Python Standard Library Chapter 5 File Formats</title></bookmark>
+<bookmark href = "http://www.pythonware.com/people/fredrik/librarybook.htm"><title>The Standard Python Library</title></bookmark>
+<bookmark href = "http://www.pydoc.org/"><title>pydoc.org Python Documentation Online</title></bookmark>
+</folder>
+<bookmark href = "http://www-4.ibm.com/software/developer/library/l-sgml.html?dwzone=linux"><title>Installing and using SGMLtools-Lite</title></bookmark>
+<bookmark href = "http://www.mapit.de/mapit.en.html"><title>MapIt!</title></bookmark>
+<folder id = "modules"><title>Modules</title>
+<bookmark href = "http://linux.piter-press.ru/peepdb/"><title>PeepDB - Python module for working with PDB files</title></bookmark>
+<bookmark href = "http://www.daa.com.au/~james/pygimp/"><title>PyGimp</title></bookmark>
+<bookmark href = "http://www.pythonware.com/products/pil/"><title>Python Imaging Library</title></bookmark>
+<bookmark href = "http://www.reportlab.com/reference.pdf"><title>ReportLab Reference Manual</title></bookmark>
+<bookmark href = "http://www.reportlab.com/userguide.pdf"><title>ReportLab User Guide</title></bookmark>
+</folder>
+<bookmark href = "http://www.oreillynet.com/pub/a/python/2000/09/27/numerically.html"><title>O'Reilly Network Broadcasting With NumPy</title></bookmark>
+<bookmark href = "http://www.oreillynet.com/topics/python/tutorials"><title>O'Reilly Network Python Tutorials</title></bookmark>
+<bookmark href = "http://www.kuchling.com/bookstore/"><title>Python Bookstore</title></bookmark>
+<bookmark href = "file:///C:/Python16/Doc/lib/lib.html"><title>Python Library Reference (local)</title></bookmark>
+<bookmark href = "http://python.org/doc/current/tut/tut.html"><title>Python Tutorial</title></bookmark>
+<bookmark href = "http://python.scripting.com/stories/storyReader$59"><title>Python for uploading opml to Manila...</title></bookmark>
+<bookmark href = "http://www.pythonware.com/daily/"><title>The Daily Python-URL!</title></bookmark>
+<bookmark href = "http://www.vex.net/parnassus/"><title>The Vaults of Parnassus Python Resources</title></bookmark>
+<bookmark href = "http://www.networkcomputing.com/unixworld/tutorial/005/005.html"><title>The What, Why, Who, and Where of Python</title></bookmark>
+<folder id = "tutorials"><title>Tutorials</title>
+<bookmark href = "http://w1.132.telia.com/~u13208596/guides/python-objects.htm"><title>(the eff-bot guide to) Python Objects</title></bookmark>
+<bookmark href = "http://diveintopython.org/"><title>Dive Into Python</title></bookmark>
+<bookmark href = "http://python.scripting.com/discuss/msgReader$64?mode=day"><title>How to upload opml using a Python class</title></bookmark>
+<bookmark href = "http://www.phrantic.com/scoop/tocpyth.htm"><title>Richard G Baldwin - Python Tutorial</title></bookmark>
+<bookmark href = "http://www-106.ibm.com/developerworks/library/l-tkprg/?dwzone=linux"><title>TK programming in Python</title></bookmark>
+</folder>
+<bookmark href = "http://www.zope.org/Members/michel/MyWiki/TheDebuggerIsYourFriend"><title>Zope - The debugger is your friend</title></bookmark>
+<bookmark href = "http://dirssync.sourceforge.net/"><title>dirssync</title></bookmark>
+</folder>
+<folder id = "rfc"><title>RFC</title>
+<bookmark href = "ftp://ftp.isi.edu/in-notes/rfc2229.txt"><title>RFC 2229 - Dict Protocol</title></bookmark>
+</folder>
+<folder id = "soap"><title>SOAP</title>
+<bookmark href = "http://soapclient.com/SoapMsg.html"><title>SoapClient.com -- SOAP Tools -- WSDL Form</title></bookmark>
+</folder>
+<bookmark href = "http://developer.netscape.com/viewsource/krock_v5.html"><title>Updating Your JavaScript and CGI Scripts</title></bookmark>
+<folder id = "vxml"><title>VXML</title>
+<folder id = "tutorial"><title>Tutorial</title>
+<bookmark href = "http://www.arsdigita.com/asj/vxml/"><title>ArsDigita Systems Journal VoiceXML letting people talk to your HTTP server through the telephone</title></bookmark>
+</folder>
+</folder>
+<folder id = "w3c"><title>W3C</title>
+<bookmark href = "http://www.w3.org/2000/01/sw/"><title>Semantic Web Development at W3C</title></bookmark>
+</folder>
+<folder id = "web_apps"><title>Web Apps</title>
+<bookmark href = "http://www.openinteract.org/about"><title>About OpenInteract</title></bookmark>
+<bookmark href = "http://www.exceloncorp.com/objectstore/Whitepapers/buildWeb/webapps.htm"><title>Building Large-Scale Dynamic Web Applications</title></bookmark>
+<bookmark href = "http://webapparch.sourceforge.net/"><title>Unix Web Application Architectures</title></bookmark>
+<bookmark href = "http://xmlboard.hypermart.net/?about"><title>XMLBoard</title></bookmark>
+<bookmark href = "http://www.extropia.com/scripts/web_store.html"><title>eXtropia.com  WebStore</title></bookmark>
+</folder>
+<bookmark href = "http://web.wt.net/~rkremer/Bookmarks/gf129.html"><title>Web Mastering Bookmarks</title></bookmark>
+<bookmark href = "http://www.hyperorg.com/misc/metaphysics/index.html"><title>Web Metaphysics</title></bookmark>
+<folder id = "webdav"><title>WebDAV</title>
+<bookmark href = "http://www.webdav.org/mod_dav/install.html#apache"><title>Apache Installation and Configuration</title></bookmark>
+<bookmark href = "http://support.microsoft.com/support/kb/articles/Q195/8/51.ASP"><title>How to Install and Use Web Folders in Internet Explorer 5</title></bookmark>
+<bookmark href = "http://nestroy.wi-inf.uni-essen.de/Forschung/Publikationen/WETICE99/webdav-client-impl/"><title>How to implement Web-based Groupware Systems based on WebDAV</title></bookmark>
+<bookmark href = "http://msdn.microsoft.com/workshop/author/behaviors/overview/webfolder.asp"><title>MSDN - Web Folder Behaviors</title></bookmark>
+<bookmark href = "http://www.ics.uci.edu/~ejw/authoring/munich/overview/tsld001.htm"><title>WebDAV Design Overview</title></bookmark>
+</folder>
+<folder id = "xhtml"><title>XHTML</title>
+<bookmark href = "http://www.w3.org/TR/xhtml1/"><title>XHTML 1.0 </title></bookmark>
+</folder>
+<folder id = "xml"><title>XML</title>
+<folder id = "application"><title>Application</title>
+<folder id = "dsssl"><title>DSSSL</title>
+<bookmark href = "http://www.mulberrytech.com/dsssl/dssslist/"><title>DSSSList -- The DSSSL Users' Mailing List</title></bookmark>
+<bookmark href = "http://www.jclark.com/dsssl/"><title>James Clark DSSSL Page</title></bookmark>
+</folder>
+<folder id = "docbook"><title>DocBook</title>
+<bookmark href = "http://www.docbook.org/tdg/html/"><title>DocBook - The Definitive Guide</title></bookmark>
+<bookmark href = "http://www.sci.kun.nl/sigma/Persoonlijk/egonw/OSDG/source/osdg.html"><title>DocBook The OpenSource Guide</title></bookmark>
+<bookmark href = "http://www.nwalsh.com/docbook/xsl/doc/"><title>DocBook XSL Stylesheet Documentation</title></bookmark>
+<bookmark href = "http://www.nwalsh.com/docbook/xsl/doc/reference.html"><title>DocBook XSL Stylesheet Reference Documentation</title></bookmark>
+<bookmark href = "http://www.teledyn.com/products/#html2db"><title>HTML2DocBook</title></bookmark>
+<bookmark href = "http://linuxdoc.org/LDP/LDP-Author-Guide/writing-docbook.html"><title>LDP - Writing with DocBook elements</title></bookmark>
+<bookmark href = "http://linuxdoc.org/LDP/LDP-Author-Guide/"><title>LDP Author Guide</title></bookmark>
+<bookmark href = "http://www.linuxfocus.org/English/May2000/article152.shtml"><title>Making PDF documents with DocBook</title></bookmark>
+<bookmark href = "http://people.redhat.com/twaugh/docbook/selfdocbook/selfdocbook.html"><title>Selfdocbook</title></bookmark>
+<bookmark href = "http://www.opensource.apple.com/projects/documentation/howto/html/Darwin_Doc_HOWTO.html#choosing-an-xml-editor"><title>The Darwin Documentation HOWTO</title></bookmark>
+<bookmark href = "http://www.caldera.de/~eric/crash-course/HTML/"><title>Writing Documentation Using DocBook</title></bookmark>
+</folder>
+<folder id = "mcf"><title>MCF</title>
+<bookmark href = "http://www.textuality.com/mcf/MCF-tutorial.html#sec2."><title>An MCF Tutorial</title></bookmark>
+<bookmark href = "http://www.textuality.com/sgml-erb/w3c-mcf.html#sec4.3"><title>Meta Content Framework Using XML</title></bookmark>
+</folder>
+<folder id = "xbel"><title>XBEL</title>
+<bookmark href = "http://www.cs.ruu.nl/~joris/stuff.html"><title>XBEL Stylesheets</title></bookmark>
+</folder>
+<folder id = "xml_resume_library"><title>XML Resume Library</title>
+<bookmark href = "http://tecfa.unige.ch/guides/xml/dtd-library/hr-xml-resume/Resume%20Schema%20Description.htm"><title>HR-XML Consortium, Resume Schema</title></bookmark>
+<bookmark href = "http://ad1440.net/~kelly/sw/xml-resume/index.html"><title>XML Resume Library</title></bookmark>
+</folder>
+<folder id = "xtnd"><title>XTND</title>
+<bookmark href = "http://www.w3.org/TR/2000/NOTE-xtnd-20001121/"><title>XTND - XML Transition Network Definition</title></bookmark>
+</folder>
+</folder>
+<bookmark href = "http://www.ibiblio.org/xml/"><title>Cafe con Leche XML News, and Resources</title></bookmark>
+<folder id = "converters"><title>Converters</title>
+<bookmark href = "http://www.w3.org/2000/04/schema_hack/"><title>DTD2Schema</title></bookmark>
+<bookmark href = "http://www.xmeta.com/omlette/rtf2xml/"><title>RTF2XML</title></bookmark>
+<bookmark href = "http://www-uk.hpl.hp.com/people/fabgia/wh2fo/wh2fo.html"><title>Word HTML Output 2 Formatting Object</title></bookmark>
+<bookmark href = "http://arturo.directmail.org/filtersweb/#xls2xml"><title>XLS2XML</title></bookmark>
+</folder>
+<folder id = "docbook"><title>DocBook</title>
+<folder id = "tutorials"><title>Tutorials</title>
+<bookmark href = "http://www.usenix.org/publications/library/proceedings/als2000/mason.html"><title>DocBook, A Tutorial for Writers and Hackers</title></bookmark>
+</folder>
+</folder>
+<bookmark href = "http://www.netcrucible.com/xslt/opml.html"><title>OPML and XSLT</title></bookmark>
+<folder id = "rdf"><title>RDF</title>
+<bookmark href = "http://www.redland.opensource.ac.uk/notes/concepts.html"><title>Redland Notes - RDF Concepts Reference</title></bookmark>
+</folder>
+<bookmark href = "http://www.cs.sfu.ca/~cameron/REX.html"><title>REX XML Shallow Parsing with Regular Expressions</title></bookmark>
+<folder id = "rss"><title>RSS</title>
+<folder id = "rss_1.0"><title>RSS 1.0</title>
+<bookmark href = "http://www.egroups.com/files/rss-dev/specification.html"><title>RDF Site Summary (RSS) 1.0</title></bookmark>
+</folder>
+<bookmark href = "http://blogspace.com/rss/"><title>RSS Info Blog</title></bookmark>
+</folder>
+<folder id = "svg"><title>SVG</title>
+<bookmark href = "http://sis.cmis.csiro.au/svg/index.html"><title>SVG Toolkit -</title></bookmark>
+</folder>
+<bookmark href = "http://www.gingerall.com/charlie-bin/get/webGA/act/sablotron.act"><title>Sablotron</title></bookmark>
+<bookmark href = "http://www.ascc.net/xml/resource/schematron/"><title>Schematron - XML Validation Language</title></bookmark>
+<bookmark href = "http://www.thaiopensource.com/trex/"><title>TREX</title></bookmark>
+<folder id = "tutorials"><title>Tutorials</title>
+<bookmark href = "http://www-106.ibm.com/developerworks/xml/library/x-struct/"><title>XML Structures for Existing Databases</title></bookmark>
+</folder>
+<bookmark href = "http://schemas.soap-wrc.com/usbml/docs/ballotml.html"><title>US Ballot Markup Language Version 1.0</title></bookmark>
+<bookmark href = "http://www.uxn.nu/wraf/"><title>Web Resource Application Framework</title></bookmark>
+<bookmark href = "http://webns.net/"><title>WebNS.net - The SWAG Dictionary</title></bookmark>
+<bookmark href = "http://www.w3.org/TR/xmlschema-0/"><title>XML Schema Part 0 Primer</title></bookmark>
+<bookmark href = "http://www.topicmaps.org/xtm/1.0/xtm1-20001204.html"><title>XML Topic Maps (XTM) 1.0</title></bookmark>
+<bookmark href = "http://www.rpbourret.com/xml/XMLAndDatabases.htm"><title>XML and Databases</title></bookmark>
+<folder id = "xml-rpc"><title>XML-RPC</title>
+<bookmark href = "http://www.oreillynet.com/lpt/a/546"><title>O'Reilly Network XML-RPC It Works Both Ways</title></bookmark>
+<bookmark href = "http://www.oreillynet.com/pub/a/rss/2000/11/14/meerkat_xmlrpc.html"><title>The XML-RPC Meerkat Interface</title></bookmark>
+<bookmark href = "http://xmlrpc-c.sourceforge.net/xmlrpc-howto/xmlrpc-howto.html"><title>XML-RPC HOWTO</title></bookmark>
+<bookmark href = "http://xmlrpc.com/"><title>XML-RPC Home Page</title></bookmark>
+<bookmark href = "http://www.pipetree.com/jabber/XMLRPC/"><title>XMLRPC over Jabber</title></bookmark>
+</folder>
+<bookmark href = "http://www.xml.com/pub/2000/10/25/msie/index.html?wwwrrr_rss"><title>XML.com - Displaying XML in Internet Explorer</title></bookmark>
+<bookmark href = "http://www.xml.com/lpt/a/2001/02/07/openoffice.html"><title>XML.com Adventures with OpenOffice and XML</title></bookmark>
+<bookmark href = "http://www.xml.com/ArticlesbyTopic/#Programming"><title>XML.com Articles by Topic - Programming</title></bookmark>
+<bookmark href = "http://www.xmldb.org/"><title>XMLDB</title></bookmark>
+<bookmark href = "http://www.vbxml.com/xpl/"><title>XPL</title></bookmark>
+<folder id = "xpath"><title>XPath</title>
+<bookmark href = "http://www.xml.com/lpt/a/2000/07/05/xpathscript/index.html"><title>XPathScript - An Alternative To XSLT</title></bookmark>
+</folder>
+<folder id = "xsl"><title>XSL</title>
+<bookmark href = "http://www-106.ibm.com/developerworks/library/x-xslt5.html?dwzone=xml"><title>Improve your XSLT coding five ways</title></bookmark>
+<bookmark href = "http://msdn.microsoft.com/xml/XSLGuide/xsl-overview.asp"><title>MS Getting Started with XSL</title></bookmark>
+<bookmark href = "http://catcode.com/macxslt/index.html"><title>MacTransform Documentation</title></bookmark>
+<bookmark href = "http://www.xfront.com/rescuing-xslt.html"><title>Rescuing XSLT from Niche Status</title></bookmark>
+<bookmark href = "http://www.phrantic.com/scoop/temp/Xml00550.htm"><title>Richard G Baldwin - XSL and XSLT - Getting Started</title></bookmark>
+<bookmark href = "http://www.xml.com/lpt/a/2001/02/07/trxml9.html"><title>Setting and Using Variables and Parameters</title></bookmark>
+<bookmark href = "http://www.netcrucible.com/xslt/msxml-faq.htm"><title>Unofficial MSXML XSLT FAQ</title></bookmark>
+<bookmark href = "http://www.w3.org/Style/XSL/"><title>W3C - Extensible Stylesheet Language (XSL)</title></bookmark>
+<bookmark href = "http://www.netcrucible.com/xslt/xslt-tool.htm"><title>XSLT Test Tool</title></bookmark>
+<bookmark href = "http://www.zvon.org/xxl/XSLTutorial/Books/Book1/"><title>Zvon XSL Tutorial</title></bookmark>
+</folder>
+<bookmark href = "http://www-4.ibm.com/software/developer/library/x-abstract/?dwzone=xml"><title>developerWorks  XML  Abstracting the interface</title></bookmark>
+<bookmark href = "http://arturo.directmail.org/filtersweb/#xls2xml"><title>http--arturo.directmail.org-filtersweb-</title></bookmark>
+</folder>
+<folder id = "zope"><title>Zope</title>
+<bookmark href = "http://www.zope.org/Members/mcdonc/PDG/6-1-Security.stx"><title>6-1-Security.stx</title></bookmark>
+<bookmark href = "http://www.lightwerk.com/zope/logging"><title>Apache- and Zope logging </title></bookmark>
+<bookmark href = "http://www.zope.org/Members/mcdonc"><title>Chris McDonough</title></bookmark>
+<bookmark href = "http://www.devshed.com/cgi-bin/ubb/forumdisplay.cgi?action=topics&amp;number=10&amp;SUBMIT=Go"><title>DevShed Zope Discussion Forums</title></bookmark>
+<bookmark href = "http://www.dieter.handshake.de/pyprojects/zope/"><title>Dieter's Zope Projects</title></bookmark>
+<bookmark href = "http://www.zope.org/Members/mcdonc/Products/EventLogManager"><title>EventLogManager</title></bookmark>
+<bookmark href = "http://www.zope.org/Members/mcdonc/HowTos/transaction"><title>HOWTO Use ZODB Transactions</title></bookmark>
+<bookmark href = "http://www.zope.org/Members/tseaver/LoginManager_and_SMB"><title>Integrating LoginManager and SMB</title></bookmark>
+<bookmark href = "http://www.zope.org/Members/michel/Projects/Interfaces/Traversal"><title>Interfaces-Traversal</title></bookmark>
+<bookmark href = "http://zopefish.weblogs.com/"><title>Internet Cafes Rock</title></bookmark>
+<bookmark href = "http://jiz.editthispage.com/"><title>Journal de l'Integrateur Zope</title></bookmark>
+<bookmark href = "http://www.zope.org/Members/sspickle/MacOSXBHFS"><title>MacOSX Public Beta, Zope, HFS+</title></bookmark>
+<bookmark href = "http://www.zope.org/Members/hdw/Tip/wget"><title>Mirror Zope with wget</title></bookmark>
+<folder id = "products"><title>Products</title>
+<bookmark href = "http://www.zope.org/Members/ajung/AJgallery"><title>AJgallery</title></bookmark>
+<folder id = "authentication"><title>Authentication</title>
+<bookmark href = "http://www.dataflake.org/software/ldaploginadapter/"><title>LDAPLoginAdapter</title></bookmark>
+<bookmark href = "http://www.zope.org/Members/tsarna/LoginManager"><title>LoginManager</title></bookmark>
+</folder>
+<folder id = "database"><title>Database</title>
+<bookmark href = "http://www.zope.org/Members/adustman/Products/MySQLdb"><title>Python MySQL Database Interface</title></bookmark>
+<bookmark href = "http://www.zope.org/Members/aeg/ZDatabaseTool"><title>Zope Database Tool</title></bookmark>
+</folder>
+<bookmark href = "http://www.dieter.handshake.de/pyprojects/zope/DocFinder.html"><title>DocFinder</title></bookmark>
+<bookmark href = "http://www.zope.org/Members/cookie/HTMLWidgets/"><title>HTML Widgets</title></bookmark>
+<bookmark href = "http://www.zope.org/Members/k_vertigo/ZopeProducts/NewsCenter"><title>NewsCenter</title></bookmark>
+<bookmark href = "http://www.txoutcome.org/scripts/zope/library"><title>OIO Library</title></bookmark>
+<folder id = "ptk"><title>PTK</title>
+<bookmark href = "http://www.zope.org/Products/PTK"><title>Portal Toolkit</title></bookmark>
+</folder>
+<bookmark href = "http://www.zope.org/Members/karl/ParsedXML/ParsedXML"><title>Parsed XML</title></bookmark>
+<folder id = "squishdot"><title>Squishdot</title>
+<bookmark href = "http://squishdot.org/search?subject=Help&amp;op=articles"><title>Squishdot Help</title></bookmark>
+</folder>
+<bookmark href = "http://www.zope.org/Members/rossl/ZMirror/ZMirror.tar.tgz/view"><title>Static HTML mirror from Zope folder</title></bookmark>
+<bookmark href = "http://www.zope.org/Members/jdavid/Calendar"><title>The Calendar Tag</title></bookmark>
+<bookmark href = "http://www.mixadlive.com/siti_web/mixadlive/software/translator"><title>Translator</title></bookmark>
+<bookmark href = "http://www.zope.org/Members/fquin/ZDBDocManager/presentation_html"><title>Z Doc Database</title></bookmark>
+<bookmark href = "http://www.zope.org/Members/TheJester/ZBabel"><title>ZBabel Translation System</title></bookmark>
+<bookmark href = "http://www.zope.org/Members/roeder/ZDP-Tools/"><title>ZDP-Tools</title></bookmark>
+<bookmark href = "http://www.zope.org/Members/NIP/ZMailIn"><title>ZMailIn</title></bookmark>
+<bookmark href = "http://www.zope.org/Members/zwork/Members/zwork/Znolk_SQL_Wizard/index_html"><title>Znolk SQL Wizard </title></bookmark>
+<bookmark href = "http://www2.bluedynamics.com:8080/BlueDynamics/products/Znolk/UserManual"><title>Znolk SQL Wizard UserManual</title></bookmark>
+<bookmark href = "http://www.txoutcome.org/"><title>http--www.txoutcome.org-</title></bookmark>
+<bookmark href = "http://www.zope.org/Members/mcdonc/smbUserFolder"><title>smb User Folder</title></bookmark>
+</folder>
+<folder id = "pythonscripts"><title>PythonScripts</title>
+<bookmark href = "http://zope.nipltd.com/public/lists/zope-archive.nsf/47ba74c812dbc5dd8025687f0024bb5f/ac2e9a5470f44bf9802569e3006d6e05?OpenDocument"><title>Porting from Python Methods to PythonScripts in 2.3.0</title></bookmark>
+</folder>
+<bookmark href = "http://www.zope.org/Members/rossl/emailattach"><title>Sending email attachments ...</title></bookmark>
+<bookmark href = "http://www.zope.org/Members/hathawsh/PythonProductTutorial"><title>September 2000 update of the Python Product Development Tutorial</title></bookmark>
+<bookmark href = "http://www.zope.org/Members/Mamey/PHP"><title>Serve PHP-Perl within Zope</title></bookmark>
+<bookmark href = "http://www.zope.org/Members/srichter"><title>Stephan's Zope Portal</title></bookmark>
+<folder id = "tutorials"><title>Tutorials</title>
+<bookmark href = "http://itamarst.org/learningzope/index.html"><title>A Developer's Guide to Learning Zope Howto v1.0.2</title></bookmark>
+<bookmark href = "http://www.zope.org/Members/cavnit/apachevirt"><title>Apache+mod_ssl+PCGI Virtual Serving</title></bookmark>
+<bookmark href = "http://www.zope.org/Members/andym/Komodo/KomodoDebugging"><title>Debugging Zope with Komodo</title></bookmark>
+<bookmark href = "http://zope.immortalitysystems.net/Docs/Membership/Install/"><title>Installing The Membership Product</title></bookmark>
+</folder>
+<bookmark href = "http://dev.zope.org/Members/jrush/howto_rsync_zope"><title>Use Rsync to Backup Zope</title></bookmark>
+<bookmark href = "http://www.zope.org/Members/cba/tokens_usage"><title>Using a tokens property</title></bookmark>
+<bookmark href = "http://uzopia.editthispage.com/"><title>Uzopia weblog</title></bookmark>
+<bookmark href = "http://zdp.zope.org/projects/zbook/book/List_Flat"><title>ZDP Zope Book</title></bookmark>
+<bookmark href = "http://zdp.zope.org/"><title>ZDP Zope Documentation Project</title></bookmark>
+<folder id = "zodb"><title>ZODB</title>
+<bookmark href = "http://www.zope.org/Members/michel/HowTos/ZODB-How-To"><title>ZODB How-To</title></bookmark>
+</folder>
+<folder id = "zpatterns"><title>ZPatterns</title>
+<bookmark href = "http://www.zope.org/Members/pje/Wikis/ZPatterns/HomePage"><title>HomePage of ZPatterns</title></bookmark>
+<bookmark href = "http://www.zope.org/Members/pje/Wikis/ZPatterns/RacksAndSpecialistsSimplified"><title>RacksAndSpecialistsSimplified of ZPatterns</title></bookmark>
+</folder>
+<bookmark href = "http://www.zope.org/Members/zwork/Znolk_SQL_Wizard"><title>Znolk SQL Wizard </title></bookmark>
+<bookmark href = "http://www.zope.org/Members/michel/ZB/"><title>Zope Book</title></bookmark>
+<bookmark href = "http://www.zope.org/Members/AlexR/all_howtos_alpha?pp=1"><title>Zope HowTos</title></bookmark>
+<bookmark href = "http://www.zope.org/Resources/MailingLists"><title>Zope Mailing Lists</title></bookmark>
+<bookmark href = "http://weblogs.userland.com/zopeNewbies/"><title>Zope Newbie News</title></bookmark>
+<bookmark href = "http://www.zope.org/Products"><title>Zope Products</title></bookmark>
+<bookmark href = "http://www.zope-treasures.com/sybSQL/Treasures/"><title>Zope Treasures</title></bookmark>
+<bookmark href = "http://www.lynosullivan.org/news/newssquish/969254176"><title>http--www.lynosullivan.org-news-newssquish-969254176</title></bookmark>
+<bookmark href = "http://www.zope.org/Wikis/zope-perl/FAQ"><title>zope-perl FAQ</title></bookmark>
+</folder>
+<folder id = "p2p"><title>p2p</title>
+<bookmark href = "http://protozilla.mozdev.org/white-paper.html"><title>mozdev.org - protozilla white-paper</title></bookmark>
+</folder>
+</folder></xbel>

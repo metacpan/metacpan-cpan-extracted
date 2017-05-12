@@ -1,0 +1,8 @@
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+lib/XML/Spew.pm
+lib/XML/Spew/XHTML.pm
+t/00-load.t

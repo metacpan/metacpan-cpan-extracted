@@ -1,0 +1,341 @@
+#!/usr/bin/perl
+#
+# This is a demo that uses the Motif 2.0 Container widget.
+# It is initial code for a source code manager front end.
+#
+
+use X11::Wcl;
+
+X11::Wcl::mainloop(
+	ARGV => ["XmContainer", "-trrf"],
+	DELETE => \&delete_window,
+	EDITRES_SUPPORT => 1,
+	INITIAL_RESOURCES => \*DATA,
+	CALLBACKS => [
+		["buttonCB", \&buttonCB, "argument object"],
+		["selectionCB", \&selectionCB, "optional registration time data"],
+	],
+	STARTUP => \&startup,
+	NEED_MOTIF => 1,
+);
+
+# called when window manager is used to close application
+sub delete_window
+{
+	print "closed by window manager\n";
+}
+
+# exit button was pressed
+#
+# $widget is the invoking widget, of type Widget
+# $arg1 is the argument string appearing in the resource that caused
+#     this callback to be invoked
+# $arg2 is the callback struct; it must be cast into the proper type
+#     using the proper constructor
+# $arg3 is the argument from callback registration time; it is
+#     whatever PERL object was passed to X11::Wcl::WcRegisterCallback()
+sub buttonCB
+{
+	my($widget, $arg1, $arg2, $arg3) = @_;
+
+	exit(0);
+}
+
+# This callback routine tracks selection/deselection events in the
+# container widget.
+#
+# $widget is the invoking widget, of type Widget
+# $arg1 is the argument string appearing in the resource that caused
+#     this callback to be invoked
+# $arg2 is the callback struct; it must be cast into the proper type
+#     using the proper constructor
+# $arg3 is the argument from callback registration time; it is
+#     whatever PERL object was passed to X11::Wcl::WcRegisterCallback()
+sub selectionCB
+{
+	my($widget, $arg1, $arg2, $arg3) = @_;
+	my $x;
+	my $y;
+
+	print "*** selectionCB\n";
+
+	# client data; just print it
+	print "    client data ($arg1)\n";
+
+	# registration data
+	# it is a PERL variable, so print it without further manipulation
+	print "    registration data ($arg3)\n";
+
+	# callback struct
+	# expecting XmContainerSelectCallbackStruct, so cast it to that
+	$x = new XmContainerSelectCallbackStruct($arg2);
+	# now dump the various fields in the struct, just as an example of
+	# how to do it
+	for (sort keys %{$x}) {
+		# print field name and value
+		print "    " . $_ . ", " . $x->{$_} . "\n";
+		# the "event" field is itself a struct, do some further
+		# processing on it
+		if ($_ eq "event") {
+			# decode the event.type field so we can see what kind of
+			# event we have received
+			if ($x->{$_}->{type} eq $X11::Wcl::KeyPress) {
+				print "        type KeyPress\n";
+			} elsif ($x->{$_}->{type} eq $X11::Wcl::KeyRelease) {
+				print "        type KeyRelease\n";
+			} elsif ($x->{$_}->{type} eq $X11::Wcl::ButtonPress) {
+				print "        type ButtonPress\n";
+			} elsif ($x->{$_}->{type} eq $X11::Wcl::ButtonRelease) {
+				print "        type ButtonRelease\n";
+			} elsif ($x->{$_}->{type} eq $X11::Wcl::MotionNotify) {
+				print "        type MotionNotify\n";
+			} elsif ($x->{$_}->{type} eq $X11::Wcl::EnterNotify) {
+				print "        type EnterNotify\n";
+			} elsif ($x->{$_}->{type} eq $X11::Wcl::LeaveNotify) {
+				print "        type LeaveNotify\n";
+			} elsif ($x->{$_}->{type} eq $X11::Wcl::FocusIn) {
+				print "        type FocusIn\n";
+			} elsif ($x->{$_}->{type} eq $X11::Wcl::FocusOut) {
+				print "        type FocusOut\n";
+			} elsif ($x->{$_}->{type} eq $X11::Wcl::KeymapNotify) {
+				print "        type KeymapNotify\n";
+			} elsif ($x->{$_}->{type} eq $X11::Wcl::Expose) {
+				print "        type Expose\n";
+			} elsif ($x->{$_}->{type} eq $X11::Wcl::GraphicsExpose) {
+				print "        type GraphicsExpose\n";
+			} elsif ($x->{$_}->{type} eq $X11::Wcl::NoExpose) {
+				print "        type NoExpose\n";
+			} elsif ($x->{$_}->{type} eq $X11::Wcl::VisibilityNotify) {
+				print "        type VisibilityNotify\n";
+			} elsif ($x->{$_}->{type} eq $X11::Wcl::CreateNotify) {
+				print "        type CreateNotify\n";
+			} elsif ($x->{$_}->{type} eq $X11::Wcl::DestroyNotify) {
+				print "        type DestroyNotify\n";
+			} elsif ($x->{$_}->{type} eq $X11::Wcl::UnmapNotify) {
+				print "        type UnmapNotify\n";
+			} elsif ($x->{$_}->{type} eq $X11::Wcl::MapNotify) {
+				print "        type MapNotify\n";
+			} elsif ($x->{$_}->{type} eq $X11::Wcl::MapRequest) {
+				print "        type MapRequest\n";
+			} elsif ($x->{$_}->{type} eq $X11::Wcl::ReparentNotify) {
+				print "        type ReparentNotify\n";
+			} elsif ($x->{$_}->{type} eq $X11::Wcl::ConfigureNotify) {
+				print "        type ConfigureNotify\n";
+			} elsif ($x->{$_}->{type} eq $X11::Wcl::ConfigureRequest) {
+				print "        type ConfigureRequest\n";
+			} elsif ($x->{$_}->{type} eq $X11::Wcl::GravityNotify) {
+				print "        type GravityNotify\n";
+			} elsif ($x->{$_}->{type} eq $X11::Wcl::ResizeRequest) {
+				print "        type ResizeRequest\n";
+			} elsif ($x->{$_}->{type} eq $X11::Wcl::CirculateNotify) {
+				print "        type CirculateNotify\n";
+			} elsif ($x->{$_}->{type} eq $X11::Wcl::CirculateRequest) {
+				print "        type CirculateRequest\n";
+			} elsif ($x->{$_}->{type} eq $X11::Wcl::PropertyNotify) {
+				print "        type PropertyNotify\n";
+			} elsif ($x->{$_}->{type} eq $X11::Wcl::SelectionClear) {
+				print "        type SelectionClear\n";
+			} elsif ($x->{$_}->{type} eq $X11::Wcl::SelectionRequest) {
+				print "        type SelectionRequest\n";
+			} elsif ($x->{$_}->{type} eq $X11::Wcl::SelectionNotify) {
+				print "        type SelectionNotify\n";
+			} elsif ($x->{$_}->{type} eq $X11::Wcl::ColormapNotify) {
+				print "        type ColormapNotify\n";
+			} elsif ($x->{$_}->{type} eq $X11::Wcl::ClientMessage) {
+				print "        type ClientMessage\n";
+			} elsif ($x->{$_}->{type} eq $X11::Wcl::MappingNotify) {
+				print "        type MappingNotify\n";
+			}
+			# print the rest of the fields in event struct
+#			for $y (sort keys %{$x->{$_}}) {
+#				next if $y eq "type";
+#				print "        " . $y . ", " . $x->{$_}->{$y} . "\n";
+#			}
+		}
+	}
+
+	# dump information about the selected widgets that are passed in
+	# the callback struct
+	# number of widgets
+	my $cnt = $x->{'selected_item_count'};
+	if ($cnt > 0) {
+		# array of widgets
+		my $z = $x->{'selected_items'};
+		for ($i=0; $i<$cnt; ++$i) {
+			# cast it to an int *
+			my $y = X11::Wcl::ptrcast($z, "int *");
+			# now get the int (which is the raw memory address, which
+			# we saved in %WIDGETS when the widget was created
+			$y = X11::Wcl::ptrvalue($y, $i);
+			# print information about the widget
+			print "    selected_items[$i] $y @{$WIDGETS{$y}}\n";
+		}
+	}
+}
+
+# for application-specific startup actions
+sub startup
+{
+	my($toplevel, $app_context) = @_;
+
+	# create the widgets to be displayed
+	# just hard-coded for demo purposes
+	add_project($toplevel, 		"proj1");
+	add_directory($toplevel, 	"proj1", 	"a/b/c/d");
+	add_file($toplevel, 		"proj1", 	"a/b/c/d", 	"file1");
+	add_file($toplevel, 		"proj1", 	"a/b/c/d", 	"file2");
+	add_directory($toplevel, 	"proj1", 	"a/b/d");
+	add_file($toplevel, 		"proj1", 	"a/b/d",	"file");
+}
+
+# function to add a new project to the display
+sub add_project
+{
+	my($toplevel, $project) = @_;
+	my $x;
+
+	if (!exists $PROJECTS{$project}) {
+		$PROJECTS{$project} = 1;
+		# get container widget
+		$x = X11::Wcl::WcFullNameToWidget($toplevel, "*container");
+		# create a new project in the container, using the template
+		# defined for projects
+		$x = X11::Wcl::WcCreateChildFromTemplate($x, $project, '$project');
+		# save widget pointer so we can detect its selection in callbacks
+		# see how WIDGETS is used in the callback routine above
+		$WIDGETS{$$x} = ["project", $project];
+		# set the label displayed on the new widget
+		X11::Wcl::WcSetValueFromString($x, "labelString", $project);
+		# display the widget
+		X11::Wcl::XtManageChild($x);
+	}
+}
+
+# function to add a new directory to the display, under a given project
+sub add_directory
+{
+	my($toplevel, $project, $directory) = @_;
+	my $d;
+	my $e;
+	my $x;
+
+	if (exists $PROJECTS{$project} && !exists $PROJECTS{$project}{$directory}) {
+		if (($d, $e) = ($directory =~ m#^(.+)/(.+)$#)) {
+			add_directory($toplevel, $project, $d);
+		} else {
+			$d = $project;
+			$e = $directory;
+		}
+		$PROJECTS{$project}{$directory} = 1;
+		# get container widget
+		$x = X11::Wcl::WcFullNameToWidget($toplevel, "*container");
+		# create a new directory in the container, using the template
+		# defined for directories
+		$x = X11::Wcl::WcCreateChildFromTemplate($x, $directory, '$directory');
+		# save widget pointer so we can detect its selection in callbacks
+		# see how WIDGETS is used in the callback routine above
+		$WIDGETS{$$x} = ["directory", $project, $directory];
+		# set the label displayed on the new widget
+		X11::Wcl::WcSetValueFromString($x, "labelString", $e);
+		# point back to parent project
+		X11::Wcl::WcSetValueFromString($x, "entryParent", "*$d");
+		# display the widget
+		X11::Wcl::XtManageChild($x);
+	}
+}
+
+# function to add a new file to the display, under a given project and directory
+sub add_file
+{
+	my($toplevel, $project, $directory, $file) = @_;
+	my $d;
+	my $e;
+	my $x;
+
+	if (exists $PROJECTS{$project} &&
+		exists $PROJECTS{$project}{$directory} &&
+		!exists $PROJECTS{$project}{$directory}{$file}) {
+		$PROJECTS{$project}{$directory}{$file} = 1;
+		# get container widget
+		$x = X11::Wcl::WcFullNameToWidget($toplevel, "*container");
+		# create a new file in the container, using the template
+		# defined for files
+		$x = X11::Wcl::WcCreateChildFromTemplate($x, $file, '$file');
+		# save widget pointer so we can detect its selection in callbacks
+		# see how WIDGETS is used in the callback routine above
+		$WIDGETS{$$x} = ["file", $project, $directory, $file];
+		# set the label displayed on the new widget
+		X11::Wcl::WcSetValueFromString($x, "labelString", $file);
+		# point back to parent directory
+		X11::Wcl::WcSetValueFromString($x, "entryParent", "*$directory");
+		# display the widget
+		X11::Wcl::XtManageChild($x);
+	}
+}
+
+__END__
+
+MAIN
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+XmContainer.wcChildren: form
+
+! constants
+*wclVerboseWarnings:			True
+!*wcPostCreateDumpResources:	True
+!*wcPreCreateDumpResources:		True
+!*wcTrace:						True
+*background:					light gray
+*foreground:					black
+*FontList:						-*-courier-bold-r-*-*-*-140-100-100-*-*-*-*
+*wclTemplateFiles:				$project, $directory, $file
+
+*form.WcCreate:					XmForm
+*form.WcChildren:				button container
+*form.width:					500
+*form.height:					500
+*form.fractionBase:				1000
+!*form.wcAfterChildren:			WcPrintTree(*form)
+
+*button.WcCreate: XmPushButton
+*button.labelString: EXIT
+*button.activateCallback: 	buttonCB()
+*button.topAttachment:		ATTACH_FORM
+*button.leftAttachment:		ATTACH_FORM
+
+*container.wcCreate:			XmContainer
+*container.entryViewType:		XmSMALL_ICON
+*container.layoutType:			XmDETAIL
+*container.detailColumnHeading:	buttons, locked
+*container.detailColumnHeadingCount: 2
+*container.detailOrder:			1 2
+*container.automaticSelection:	XmAUTO_SELECT
+*container.selectionCallback:	selectionCB(testing)
+*container.topAttachment:		ATTACH_WIDGET
+*container.topWidget:			*button
+*container.leftAttachment:		ATTACH_FORM
+!*container.rightAttachment:	ATTACH_FORM
+!*container.bottomAttachment:	ATTACH_FORM
+
+TEMPLATE project
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+*background:					red
+.wcCreate:						XmIconGadget
+.detail:						jhpb
+.detailCount:					1
+
+TEMPLATE directory
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+*background:					blue
+.wcCreate:						XmIconGadget
+.detail:						jhpb
+.detailCount:					1
+
+TEMPLATE file
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+*background:					green
+.wcCreate:						XmIconGadget
+.detail:						jhpb
+.detailCount:					1

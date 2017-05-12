@@ -1,0 +1,13 @@
+Changes
+README
+MANIFEST
+Makefile.PL
+Parser/Makefile.PL
+Parser/Parser.pm
+eg/cv.html
+eg/cv.htorig
+eg/cv.htsrc
+eg/cv.xml
+eg/xmerge.pl
+miniXQL.pm
+test.pl

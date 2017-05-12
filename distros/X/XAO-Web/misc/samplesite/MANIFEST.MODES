@@ -1,0 +1,6 @@
+# By default all files get chmod'ed to 644 and all directories to 755.
+# Use this file to change that.
+#
+#dir    file    regex
+0755    0755    .*\.pl$
+0700    0600    ^private($|/)

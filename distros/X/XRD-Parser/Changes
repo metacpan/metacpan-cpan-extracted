@@ -1,0 +1,89 @@
+XRD-Parser
+==========
+
+Created:      2009-12-04
+Home page:    <https://metacpan.org/release/XRD-Parser>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=XRD-Parser>
+Maintainer:   Toby Inkster <mailto:tobyink@cpan.org>
+
+0.201  2012-09-11
+
+ - (Packaging) Improve CPAN::Changes compliance.
+
+0.200  2012-09-11
+
+ - (Packaging) Fix confused version numbers.
+ - (Update) Use Digest::SHA instead of Digest::SHA1 as the former is part
+   of the Perl core set of modules.
+
+0.104  2011-12-04
+
+ - (Bugfix Packaging) Newer version of Module::Package::RDF.
+ - Replace UNIVERSAL::AUTHORITY with Object::AUTHORITY.
+
+0.103  2011-11-27
+
+ - (Bugfix) Generate more randomised bnode identifiers.
+ - (Packaging) Module::Package::RDF
+ - (Update) use 5.010
+ - Minor tidy
+
+0.102  2010-08-11
+
+ - (Addition) new_from_url() constructor.
+ - (Removal) new() constructor no longer accepts undef content - use
+   new_from_url() instead.
+
+0.101  2010-07-07
+
+ - Split hostmeta_location function out from hostmeta construtor.
+
+0.100  2010-06-30
+
+ - (Update) Tracked changes to host-meta spec.
+ - Improvements to method for extracting host names from URIs.
+
+0.06  2010-04-26
+
+ - Add reasonable timeouts for hostmeta constructor.
+
+0.05  2010-02-02
+
+ - (Addition) host_uri and template_uri utility functions.
+ - (Update) Copyright 2010.
+ - (Update) Switch to my new build system.
+ - (Update) Synchronise callback functionality with RDF::RDFa::Parser 0.30.
+ - Allow both methods of handling <Property> within <Link> to be toggled
+   independently.
+ - Provide an alternative method of handling <Property> within <Link>: RDFS
+   subproperties.
+
+0.04  2009-12-16
+
+ - Don't reify <Link> elements multiple times for multiple <Property>
+   children.
+ - Parse <Property> children of <Link template> elements.
+ - Support http://host-meta.net/xrd/1.0 and http://host-meta.net/ns/1.0 as
+   alternatives.
+
+0.03  2009-12-14
+
+ - (Addition) Provide an XRD::Parser->hostmeta($uri) shortcut constructor.
+ - Prefer namespace-aware DOM functions.
+ - Send proper HTTP Accept header when requesting XRD files.
+
+0.02  2009-12-09
+
+ - (Addition) Support <Link template/> attribute via a special datatype and
+   special predicate URI scheme.
+ - (Addition) Support for IANA keywords in <Link rel/> attribute.
+ - (Addition) Support for host-meta's <hm:Host/> element as a way to set
+   subjects.
+ - Implement <Alias/> element as an owl:sameAs-like predicate rather than
+   simply duplicating data.
+ - Map XRD <Expires/> element to the RDF URI
+   <http://ontologi.es/xrd#expires>.
+
+0.01  2009-12-05  # First release
+
+

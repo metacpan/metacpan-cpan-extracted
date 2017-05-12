@@ -1,0 +1,8 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+Quote.pm
+Quote.xs
+t/benchmark.pl
+t/quote.t

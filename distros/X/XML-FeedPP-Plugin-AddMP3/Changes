@@ -1,0 +1,9 @@
+Revision history for Perl extension XML::FeedPP::Plugin::AddMP3.
+
+0.02  Tue Apr 10 11:57:03 2007
+	- Encode is not required (althou recommended).
+	- Now it works with perl 5.005, maybe.
+
+0.01  Tue Mar 27 11:57:01 2007
+	- original version; created by h2xs 1.23 with options
+		-X -A XML::FeedPP::Plugin::AddMP3 -b 5.8.0

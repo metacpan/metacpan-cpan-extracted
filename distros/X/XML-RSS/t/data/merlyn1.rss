@@ -1,0 +1,497 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<rdf:RDF
+ xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+ xmlns="http://purl.org/rss/1.0/"
+ xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+ xmlns:taxo="http://purl.org/rss/1.0/modules/taxonomy/"
+ xmlns:dc="http://purl.org/dc/elements/1.1/"
+ xmlns:syn="http://purl.org/rss/1.0/modules/syndication/"
+ xmlns:admin="http://webns.net/mvcb/"
+>
+
+<channel rdf:about="http://use.perl.org/~merlyn/journal/">
+<title>merlyn's Journal</title>
+<link>http://use.perl.org/~merlyn/journal/</link>
+<description>merlyn's use Perl Journal</description>
+<dc:language>en-us</dc:language>
+<dc:rights>use Perl; is Copyright 1998-2006, Chris Nandor. Stories, comments, journals, and other submissions posted on use Perl; are Copyright their respective owners.</dc:rights>
+<dc:date>2006-10-14T21:15:36+00:00</dc:date>
+<dc:publisher>pudge</dc:publisher>
+<dc:creator>pudge@perl.org</dc:creator>
+<dc:subject>Technology</dc:subject>
+<syn:updatePeriod>hourly</syn:updatePeriod>
+<syn:updateFrequency>1</syn:updateFrequency>
+<syn:updateBase>1970-01-01T00:00+00:00</syn:updateBase>
+<items>
+ <rdf:Seq>
+  <rdf:li rdf:resource="http://use.perl.org/~merlyn/journal/31225?from=rss" />
+  <rdf:li rdf:resource="http://use.perl.org/~merlyn/journal/31081?from=rss" />
+  <rdf:li rdf:resource="http://use.perl.org/~merlyn/journal/31034?from=rss" />
+  <rdf:li rdf:resource="http://use.perl.org/~merlyn/journal/31025?from=rss" />
+  <rdf:li rdf:resource="http://use.perl.org/~merlyn/journal/30801?from=rss" />
+  <rdf:li rdf:resource="http://use.perl.org/~merlyn/journal/30556?from=rss" />
+  <rdf:li rdf:resource="http://use.perl.org/~merlyn/journal/30297?from=rss" />
+  <rdf:li rdf:resource="http://use.perl.org/~merlyn/journal/30153?from=rss" />
+  <rdf:li rdf:resource="http://use.perl.org/~merlyn/journal/30016?from=rss" />
+  <rdf:li rdf:resource="http://use.perl.org/~merlyn/journal/30002?from=rss" />
+  <rdf:li rdf:resource="http://use.perl.org/~merlyn/journal/29987?from=rss" />
+  <rdf:li rdf:resource="http://use.perl.org/~merlyn/journal/29946?from=rss" />
+  <rdf:li rdf:resource="http://use.perl.org/~merlyn/journal/29933?from=rss" />
+  <rdf:li rdf:resource="http://use.perl.org/~merlyn/journal/29842?from=rss" />
+  <rdf:li rdf:resource="http://use.perl.org/~merlyn/journal/29788?from=rss" />
+  <rdf:li rdf:resource="http://use.perl.org/~merlyn/journal/29749?from=rss" />
+  <rdf:li rdf:resource="http://use.perl.org/~merlyn/journal/29721?from=rss" />
+  <rdf:li rdf:resource="http://use.perl.org/~merlyn/journal/29622?from=rss" />
+  <rdf:li rdf:resource="http://use.perl.org/~merlyn/journal/29568?from=rss" />
+  <rdf:li rdf:resource="http://use.perl.org/~merlyn/journal/29519?from=rss" />
+  <rdf:li rdf:resource="http://use.perl.org/~merlyn/journal/29401?from=rss" />
+  <rdf:li rdf:resource="http://use.perl.org/~merlyn/journal/29272?from=rss" />
+  <rdf:li rdf:resource="http://use.perl.org/~merlyn/journal/29103?from=rss" />
+  <rdf:li rdf:resource="http://use.perl.org/~merlyn/journal/28936?from=rss" />
+  <rdf:li rdf:resource="http://use.perl.org/~merlyn/journal/28886?from=rss" />
+  <rdf:li rdf:resource="http://use.perl.org/~merlyn/journal/28859?from=rss" />
+  <rdf:li rdf:resource="http://use.perl.org/~merlyn/journal/28736?from=rss" />
+  <rdf:li rdf:resource="http://use.perl.org/~merlyn/journal/28687?from=rss" />
+  <rdf:li rdf:resource="http://use.perl.org/~merlyn/journal/28510?from=rss" />
+  <rdf:li rdf:resource="http://use.perl.org/~merlyn/journal/28298?from=rss" />
+ </rdf:Seq>
+</items>
+<image rdf:resource="http://use.perl.org/images/topics/useperl.gif" />
+</channel>
+
+<image rdf:about="http://use.perl.org/images/topics/useperl.gif">
+<title>merlyn's Journal</title>
+<url>http://use.perl.org/images/topics/useperl.gif</url>
+<link>http://use.perl.org/~merlyn/journal/</link>
+</image>
+
+<item rdf:about="http://use.perl.org/~merlyn/journal/31225?from=rss">
+<title>"Communication is free"</title>
+<link>http://use.perl.org/~merlyn/journal/31225?from=rss</link>
+<description>Not sure why it took this long, but &lt;a href="http://www.digitalcitizen.info/2006/10/05/observations-on-the-ramifications-of-electronic-communication-media/"&gt;someone has finally posted audio&lt;/a&gt; from my "Communication is free" talk at FISL7.0 in Brazil a few months ago.</description>
+<dc:creator>merlyn</dc:creator>
+<dc:date>2006-10-05T14:56:02+00:00</dc:date>
+<dc:subject>journal</dc:subject>
+</item>
+
+<item rdf:about="http://use.perl.org/~merlyn/journal/31081?from=rss">
+<title>You don't know objects if you don't know Smalltalk</title>
+<link>http://use.perl.org/~merlyn/journal/31081?from=rss</link>
+<description>&lt;p&gt;I've often argued that a programmer who says "I know objects" without having touched one of the "pure object" systems like Smalltalk or Eiffel, doesn't really know "objects".  When people would ask "what is smalltalk?", I'd point them at &lt;a href="http://www.squeak.org/"&gt;Squeak&lt;/a&gt;.
+&lt;/p&gt;&lt;p&gt;Well &lt;a href="http://www.onlamp.com/pub/au/2584"&gt;Keith Fieldhouse&lt;/a&gt; has gone and done the next good thing: he's written &lt;a href="http://www.onlamp.com/pub/a/onlamp/2006/09/21/learning_smalltalk.html"&gt;an article for OnLAMP about Squeak&lt;/a&gt; that gives far more handholding than I've been able to do quickly. Yeay Keith. That one's going into my bookmarks.&lt;/p&gt;</description>
+<dc:creator>merlyn</dc:creator>
+<dc:date>2006-09-22T14:17:47+00:00</dc:date>
+<dc:subject>journal</dc:subject>
+</item>
+
+<item rdf:about="http://use.perl.org/~merlyn/journal/31034?from=rss">
+<title>"Responsible Breech Reporting" - me on another podcast again</title>
+<link>http://use.perl.org/~merlyn/journal/31034?from=rss</link>
+<description>&lt;p&gt;I was interviewed for &lt;a href="http://www.securitycatalyst.com/2006/09/17/srt-episode-4-responsible-reporting-of-breaches/"&gt;another episode of Security Catalyst&lt;/a&gt;: this time, a panel on reponsible breech reporting.  Check it out!
+&lt;/p&gt;&lt;p&gt; &lt;i&gt;Update:&lt;/i&gt; or yeah, breach not breech!&lt;/p&gt;</description>
+<dc:creator>merlyn</dc:creator>
+<dc:date>2006-09-18T02:37:55+00:00</dc:date>
+<dc:subject>journal</dc:subject>
+</item>
+
+<item rdf:about="http://use.perl.org/~merlyn/journal/31025?from=rss">
+<title>Perl Fridge Magnets as OmniGraffle Template</title>
+<link>http://use.perl.org/~merlyn/journal/31025?from=rss</link>
+<description>Perhaps posted before, but I just stumbled across &lt;a href="http://www.graffletopia.com/stencils/75"&gt;the Perl Fridge Magnets as an OmniGraffle stencil&lt;/a&gt;.  Enjoy.</description>
+<dc:creator>merlyn</dc:creator>
+<dc:date>2006-09-17T16:51:58+00:00</dc:date>
+<dc:subject>journal</dc:subject>
+</item>
+
+<item rdf:about="http://use.perl.org/~merlyn/journal/30801?from=rss">
+<title>Plates on sticks!  Bears on bicycles!</title>
+<link>http://use.perl.org/~merlyn/journal/30801?from=rss</link>
+<description>And a group doing &lt;a href="http://blogfiles.wfmu.org/KF/2006/02/marimba_ponies.mpg"&gt;the Sabre Dance&lt;/a&gt; on marimba!</description>
+<dc:creator>merlyn</dc:creator>
+<dc:date>2006-08-30T04:39:32+00:00</dc:date>
+<dc:subject>journal</dc:subject>
+</item>
+
+<item rdf:about="http://use.perl.org/~merlyn/journal/30556?from=rss">
+<title>More Leo, more cruise comments, and now in MP3 goodness</title>
+<link>http://use.perl.org/~merlyn/journal/30556?from=rss</link>
+<description>&lt;p&gt;
+I've just pushed episodes 12 to 14 of &lt;a href="http://podcast.geekcruises.com/"&gt;GeekCruises News-es: The Podcast&lt;/a&gt; on the time-release site (the first came out today).  In these episodes, my buddy Leo Laporte interviews &lt;i&gt;me&lt;/i&gt; in a sort of "reverse interview format".
+&lt;/p&gt;&lt;p&gt;
+Also, based on a lot of feedback, I've dropped the "enhanced podcast" format and replaced it with a traditional MP3 flavor.  All my grand plans of having lots of embedded pictures and URL links haven't materialized in the first 11 shows, so it's time to fall back to something almost everybody can enjoy.&lt;/p&gt;</description>
+<dc:creator>merlyn</dc:creator>
+<dc:date>2006-08-07T15:55:38+00:00</dc:date>
+<dc:subject>journal</dc:subject>
+</item>
+
+<item rdf:about="http://use.perl.org/~merlyn/journal/30297?from=rss">
+<title>FLOSS weekly interviews *me*</title>
+<link>http://use.perl.org/~merlyn/journal/30297?from=rss</link>
+<description>&lt;a href="http://www.twit.tv/floss9"&gt;Hear me talk!&lt;/a&gt;</description>
+<dc:creator>merlyn</dc:creator>
+<dc:date>2006-07-15T07:31:01+00:00</dc:date>
+<dc:subject>journal</dc:subject>
+</item>
+
+<item rdf:about="http://use.perl.org/~merlyn/journal/30153?from=rss">
+<title>podcast.geekcruises.com - part 2 of leo laporte</title>
+<link>http://use.perl.org/~merlyn/journal/30153?from=rss</link>
+<description>Part 2 of my podcast interview with Leo Laporte is up, where we talk about the origin of the name of the &lt;a href="http://en.wikipedia.org/wiki/Amazon_Mechanical_Turk"&gt;Amazon Mechanical Turk&lt;/a&gt;.  Subscribe or just listen at &lt;a href="http://podcast.geekcruises.com/"&gt;podcast.geekcruises.com&lt;/a&gt;.</description>
+<dc:creator>merlyn</dc:creator>
+<dc:date>2006-07-03T13:19:03+00:00</dc:date>
+<dc:subject>journal</dc:subject>
+</item>
+
+<item rdf:about="http://use.perl.org/~merlyn/journal/30016?from=rss">
+<title>Why muni-provided "free" wi-fi is a bad idea</title>
+<link>http://use.perl.org/~merlyn/journal/30016?from=rss</link>
+<description>&lt;p&gt;I'm against muni-provided connectivity for three reasons.  And none of these
+apply to things like "police" or "fire", so let me explain why the typical analogy to
+"public services" doesn't apply.
+&lt;/p&gt;&lt;dl&gt;
+&lt;dt&gt;First, there's the "accountability" issue:&lt;/dt&gt;
+&lt;dd&gt; &lt;p&gt;
+    Without "billing", there's no accountability.  If I can get free
+    connections, I can send spam to my heart's content, and you can't turn me
+    off, because I can quickly become "another free user" in a matter of
+    microseconds.
+&lt;/p&gt;&lt;p&gt;
+    And I can start p2p-sharing my child pr0n and ripped movie and song
+    collections, and again, you can't turn me off, because I don't actually
+    have a contract with you to terminate.  Sure, you can arrest me, but you
+    have to find me in the mesh.  It's not like you have a street address for
+    me.  Heck, I might even be operating from a van that constantly drives
+    around.&lt;/p&gt;&lt;/dd&gt;
+&lt;dt&gt;
+Second, there's the "taxpayer dollar" issue:&lt;/dt&gt;
+&lt;dd&gt; &lt;p&gt;
+    Whether we like it or not, when citizens start paying for shipping bits,
+    they're gonna want some say in the kinds of things that are being shipped
+    across the wire.  The moment the soccer mom figures out that part of her
+    tax dollar is paying for that creepy guy over there to download his pr0n,
+    she's gonna be storming city hall.  And she's also going to be complaining
+    loudly when she finds out that her son can access all sorts of evil things
+    "over the city's wireless system!"  She'll want controls put in place, and
+    rightfully so.  After all, she's paying for it.
+&lt;/p&gt;&lt;p&gt;
+As evidence, look at the constant tug-of-war and lawsuits regarding internet access at public libraries.  Do you really want to open this up on a city-wide scale?  It's the very same issue.
+&lt;/p&gt;&lt;p&gt;
+    So, no matter how "open" some of us want this, it's going to start getting
+    filtered.  We'll never have a truly censorship-free mesh, except for
+    perhaps the first six months.  And if there's a constitutional challenge
+    that comes down to a free-speech thing, it'll more likely get shut off
+    than opened back up.&lt;/p&gt;&lt;/dd&gt;
+&lt;dt&gt;
+Third, we kill the incentive for competition:&lt;/dt&gt;
+&lt;dd&gt; &lt;p&gt;
+    OK, you say.  Then if there's enough demand for an uncensored equivalent,
+    some private sector can come along and provide a different mesh that
+    provides the full bits.
+&lt;/p&gt;&lt;p&gt;
+    Well, that's ignoring the economics of the situtation.  To deploy a
+    city-wide private sector net requires a fairly large infrastructure, and
+    that can only be supported by having access to a large customer base.  But
+    most of the customers of the "free" citywide net won't be buying, because
+    for them, the "free" net is almost good enough.  This is false economics,
+    because they're effectively being subsidized $10 a month by the city's
+    taxbase, and if they had to choose between that and a $15 "get everything"
+    net, they might make a more rational choice.&lt;/p&gt;&lt;/dd&gt;
+&lt;/dl&gt; &lt;p&gt;
+So, for these reasons, I say that cities &lt;i&gt;must&lt;/i&gt; stay out of the wifi business.
+As much as I'd like "free" wifi, there's no such thing as a free lunch, and as
+soon as someone realizes they are paying for it, they'll want to control it.
+&lt;/p&gt;&lt;p&gt;
+I'd much rather have a few companies vie for my $15, than for me to get
+censored, slow, no-choice free service.
+&lt;/p&gt;&lt;p&gt;
+Disclaimer - I pay $60/month for Verizon's EVDO service.  I'd still have that
+in every city, regardless of what they do.  I'm speaking more for the friends
+of mine that can't justify that sort of cost.&lt;/p&gt;</description>
+<dc:creator>merlyn</dc:creator>
+<dc:date>2006-06-23T10:45:02+00:00</dc:date>
+<dc:subject>journal</dc:subject>
+</item>
+
+<item rdf:about="http://use.perl.org/~merlyn/journal/30002?from=rss">
+<title>Misquoting JWZ about databases</title>
+<link>http://use.perl.org/~merlyn/journal/30002?from=rss</link>
+<description>&lt;p&gt;
+When some people are confonted with a database problem, they say to themselves, "I know, I'll use MySQL!"
+&lt;/p&gt;&lt;p&gt;
+Now they have two problems.&lt;/p&gt;</description>
+<dc:creator>merlyn</dc:creator>
+<dc:date>2006-06-22T02:11:26+00:00</dc:date>
+<dc:subject>journal</dc:subject>
+</item>
+
+<item rdf:about="http://use.perl.org/~merlyn/journal/29987?from=rss">
+<title>Look what I could win!</title>
+<link>http://use.perl.org/~merlyn/journal/29987?from=rss</link>
+<description>&lt;a href="http://www.freesoftwaremagazine.com/node/1623"&gt;I could win a copy of Learning Perl!&lt;/a&gt;</description>
+<dc:creator>merlyn</dc:creator>
+<dc:date>2006-06-21T11:57:24+00:00</dc:date>
+<dc:subject>journal</dc:subject>
+</item>
+
+<item rdf:about="http://use.perl.org/~merlyn/journal/29946?from=rss">
+<title>Grad school instructor, having never been to college?</title>
+<link>http://use.perl.org/~merlyn/journal/29946?from=rss</link>
+<description>I'm just thinking that my accomplishment of having taught a grad-school level course for credit (Intro to Perl 501 for cse.ogi.edu) without having &lt;i&gt;ever&lt;/i&gt; been to college might be somewhat rare.  Are there other instances that you've seen of a grad-school professor who has never themselves been to anything beyond a high-school education?</description>
+<dc:creator>merlyn</dc:creator>
+<dc:date>2006-06-18T18:58:51+00:00</dc:date>
+<dc:subject>journal</dc:subject>
+</item>
+
+<item rdf:about="http://use.perl.org/~merlyn/journal/29933?from=rss">
+<title>"Duck and Cover" and "A is for Atom"</title>
+<link>http://use.perl.org/~merlyn/journal/29933?from=rss</link>
+<description>&lt;p&gt;Thanks to &lt;a href="http://www.renmenven.org/tooncast/tooncast.html"&gt;The Vintage Tooncast&lt;/a&gt; for making me aware (again) of &lt;a href="http://www.archive.org/details/DuckandC1951"&gt;Duck and Cover&lt;/a&gt; and &lt;a href="http://www.archive.org/details/isforAto1953"&gt;A is for Atom&lt;/a&gt;.
+&lt;/p&gt;&lt;p&gt;
+Duck and Cover is a "civil defense" film about how to protect yourself in a nuclear blast.  It'd be a perfect MST3K piece now: the idea of protecting yourself from radiation with a newspaper seems amazingly naive and almost malicious.  The repetitive "and stay in that position until the danger has passed", without ever explaining (perhaps deliberately) how to know when that has been reached.
+&lt;/p&gt;&lt;p&gt;
+"A is for Atom" is an astonishingly complete and easy-to-watch piece describing precisely how uranium and plutonium bombs work, and goes on to explain how wonderful atomic power will be in the future, providing power, helping farmers, and even producing medical miracles.  Of course, to acheive these goals, the dangers of nuclear waste are never mentioned, nor the medical risks from using nuke materials as tracers in the body.
+&lt;/p&gt;&lt;p&gt;
+Although these have both disappeared from the Tooncast feed by the time I watched them (I'm a bit behind), I'd really suggest subscribing to this feed, as they seem to be picking some amazingly cool stuff from archive.org and providing it directly to my video ipod on a regular basis.&lt;/p&gt;</description>
+<dc:creator>merlyn</dc:creator>
+<dc:date>2006-06-17T04:25:31+00:00</dc:date>
+<dc:subject>journal</dc:subject>
+</item>
+
+<item rdf:about="http://use.perl.org/~merlyn/journal/29842?from=rss">
+<title>In praise of good testing</title>
+<link>http://use.perl.org/~merlyn/journal/29842?from=rss</link>
+<description>&lt;p&gt;
+In my work for $client, last week I spent a few hours making sure that Devel::Cover was mostly happy with my code, running through enough branches so that when I had to "go live" with minor revisions, I could push the change with a fair degree of confidence.
+&lt;/p&gt;&lt;p&gt;
+This week, I concluded that a fundamental data structure (an in-memory hash-of-hashes) that controlled the entire operation and was passed from one part to the next of this 2000-line set of modules, should be changed to be permanent.
+&lt;/p&gt;&lt;p&gt;
+So I pulled out Rose::DB, designed a simple main-row-plus-1-to-n-children database schema, and started refactoring.  Of course, after I got rid of the initial data structure, every test failed.  I would take each test, run it, and watch it fail, and then I would keep hacking the code and fixing it again until the test passed.  Then I'd move on to the next one.
+&lt;/p&gt;&lt;p&gt;
+Six hours later, my complex application was now completely running with Rose::DB-based persistence instead of an in-memory data structure.  And I was very happy that the client had insisted on complete tests before I started, because I was now confident to push this &lt;i&gt;new&lt;/i&gt; version into production.
+&lt;/p&gt;&lt;p&gt;
+Tests. Not just for breakfast, any more.&lt;/p&gt;</description>
+<dc:creator>merlyn</dc:creator>
+<dc:date>2006-06-08T15:52:00+00:00</dc:date>
+<dc:subject>journal</dc:subject>
+</item>
+
+<item rdf:about="http://use.perl.org/~merlyn/journal/29788?from=rss">
+<title>Not quite getting the picture</title>
+<link>http://use.perl.org/~merlyn/journal/29788?from=rss</link>
+<description>&lt;p&gt;
+I had just seen &lt;a href="http://us.imdb.com/title/tt0475276/"&gt; &lt;i&gt;United 93&lt;/i&gt; &lt;/a&gt;, and after the movie, bumped in to &lt;a href="http://us.imdb.com/name/nm0458662/"&gt;a friend of mine&lt;/a&gt;, who is known more for her physical assets than her mental achievements. (Although she's not blonde, this week.)
+&lt;/p&gt;&lt;p&gt;
+I had stayed through the credits, and noticed a lot of "HIMSELF" and "HERSELF", which obviously added to the authenticity of this biopic feeling almost like a documentary.  So I commented to her "Hey, a lot of the people originally involved played themselves", because it had impressed me.
+&lt;/p&gt;&lt;p&gt;
+She replied, "The people on the airplane?"
+&lt;/p&gt;&lt;p&gt;
+{sigh}&lt;/p&gt;</description>
+<dc:creator>merlyn</dc:creator>
+<dc:date>2006-06-02T15:42:31+00:00</dc:date>
+<dc:subject>journal</dc:subject>
+</item>
+
+<item rdf:about="http://use.perl.org/~merlyn/journal/29749?from=rss">
+<title>Geek Cruises News-es: the podcast</title>
+<link>http://use.perl.org/~merlyn/journal/29749?from=rss</link>
+<description>I've started a &lt;a href="http://podcast.geekcruises.com/"&gt;weekly podcast for GeekCruises.com&lt;/a&gt;.  You can &lt;a href="http://phobos.apple.com/WebObjects/MZStore.woa/wa/viewPodcast?id=156151980"&gt;subscribe via iTunes&lt;/a&gt; (the best for us, since it increases the popularity) or &lt;a href="http://geekcruises.libsyn.com/rss"&gt;add the URL directly to your podcatcher&lt;/a&gt;.</description>
+<dc:creator>merlyn</dc:creator>
+<dc:date>2006-05-29T18:39:02+00:00</dc:date>
+<dc:subject>journal</dc:subject>
+</item>
+
+<item rdf:about="http://use.perl.org/~merlyn/journal/29721?from=rss">
+<title>Simple and sweet</title>
+<link>http://use.perl.org/~merlyn/journal/29721?from=rss</link>
+<description>Q: "How do I get my pid into a file, simply?"
+&lt;p&gt;
+A: print { open my $out, "&amp;gt;", "pidfile"; $out or die } $$, "\n";
+&lt;/p&gt;&lt;p&gt;
+Yes, I like Perl.&lt;/p&gt;</description>
+<dc:creator>merlyn</dc:creator>
+<dc:date>2006-05-26T13:04:54+00:00</dc:date>
+<dc:subject>journal</dc:subject>
+</item>
+
+<item rdf:about="http://use.perl.org/~merlyn/journal/29622?from=rss">
+<title>Podcast and upload of my "Perl Best Practices" talk</title>
+<link>http://use.perl.org/~merlyn/journal/29622?from=rss</link>
+<description>&lt;p&gt;
+See &lt;a href="http://www.ourmedia.org/node/225170"&gt;my slides!&lt;/a&gt;
+&lt;/p&gt;&lt;p&gt;
+Hear &lt;a href="http://www.podasp.com/episodes/p/pd/pdxlug/599.mp3"&gt;me talk!&lt;/a&gt;
+&lt;/p&gt;&lt;p&gt;
+Buy &lt;a href="http://www.stonehenge.com/cgi/amazon?isbn=0596001738"&gt;the book!&lt;/a&gt;&lt;/p&gt;</description>
+<dc:creator>merlyn</dc:creator>
+<dc:date>2006-05-17T00:41:39+00:00</dc:date>
+<dc:subject>journal</dc:subject>
+</item>
+
+<item rdf:about="http://use.perl.org/~merlyn/journal/29568?from=rss">
+<title>PHP poster</title>
+<link>http://use.perl.org/~merlyn/journal/29568?from=rss</link>
+<description>See &lt;a href="http://tnx.nl/php"&gt;my favorite description of PHP, in visual form&lt;/a&gt;.</description>
+<dc:creator>merlyn</dc:creator>
+<dc:date>2006-05-09T16:07:43+00:00</dc:date>
+<dc:subject>journal</dc:subject>
+</item>
+
+<item rdf:about="http://use.perl.org/~merlyn/journal/29519?from=rss">
+<title>"my bad" origin</title>
+<link>http://use.perl.org/~merlyn/journal/29519?from=rss</link>
+<description>&lt;p&gt;&lt;p&gt;From &lt;a href="http://www.bookofjoe.com/2006/02/the_origin_of_m.html"&gt;The origin of 'my bad'&lt;/a&gt;:
+&lt;/p&gt;&lt;blockquote&gt; &lt;div&gt;&lt;i&gt;
+The best evidence obtainable at present points to Manute Bol (above), the 7'7" Sudanese NBA player whose native tongue was Dinka, as the inventor, sometime in the 1980s, of this now&amp;#8211;ubiquitous phrase.
+&lt;/i&gt;&lt;/div&gt; &lt;/blockquote&gt;
+&lt;p&gt;Finally, someone to blame for this incredibly hard-to-hear phrase.  Yeay.  I keep wanting to say "my bad &lt;i&gt;what?&lt;/i&gt;", since my and bad are both adjectives there to my ears.&lt;/p&gt;</description>
+<dc:creator>merlyn</dc:creator>
+<dc:date>2006-05-03T19:25:35+00:00</dc:date>
+<dc:subject>journal</dc:subject>
+</item>
+
+<item rdf:about="http://use.perl.org/~merlyn/journal/29401?from=rss">
+<title>Podcast interview with me about my legal entanglement</title>
+<link>http://use.perl.org/~merlyn/journal/29401?from=rss</link>
+<description>&lt;p&gt;
+The &lt;a href="http://www.securitycatalyst.com/"&gt;Security Catalyst&lt;/a&gt; podcast recently &lt;a href="http://www.securitycatalyst.com/?p=110"&gt;interviewed me&lt;/a&gt; regarding my &lt;a href="http://www.lightlink.com/fors/"&gt;legal entanglement&lt;/a&gt; with the State of Oregon ("victim": Intel Corporation).  I haven't had time to listen to this particular show yet, but I remember liking it while I was being interviewed, so it should be a good listen.
+&lt;/p&gt;&lt;p&gt;
+I consider Security Catalyst a very informative and easy-to-listen-to show about desktop and enterprise information security.   If you're not already listening, please give it a run.  Best of breed, as far as I've seen.&lt;/p&gt;</description>
+<dc:creator>merlyn</dc:creator>
+<dc:date>2006-04-21T15:53:07+00:00</dc:date>
+<dc:subject>journal</dc:subject>
+</item>
+
+<item rdf:about="http://use.perl.org/~merlyn/journal/29272?from=rss">
+<title>Today's lesson on job posting</title>
+<link>http://use.perl.org/~merlyn/journal/29272?from=rss</link>
+<description>&lt;p&gt;
+&lt;b&gt;Good&lt;/b&gt;: using &lt;a href="http://jobs.perl.org/"&gt;http://jobs.perl.org/&lt;/a&gt; to &lt;a href="http://jobs.perl.org/job/3923"&gt;post your Perl job to help build a website&lt;/a&gt;.
+&lt;/p&gt;&lt;p&gt;
+&lt;b&gt;Bad&lt;/b&gt;: Providing the &lt;a href="http://www.fashionsmasher.com/"&gt;URL of the yet-to-be-built website&lt;/a&gt; as the "URL for more information" in your post! (At the time of this writing, the URL leads simply to the name of the site and "coming soon").
+&lt;/p&gt;&lt;p&gt;
+Doh!&lt;/p&gt;</description>
+<dc:creator>merlyn</dc:creator>
+<dc:date>2006-04-10T13:13:04+00:00</dc:date>
+<dc:subject>journal</dc:subject>
+</item>
+
+<item rdf:about="http://use.perl.org/~merlyn/journal/29103?from=rss">
+<title>Missing the facts</title>
+<link>http://use.perl.org/~merlyn/journal/29103?from=rss</link>
+<description>&lt;p&gt;
+&lt;a href="http://slashdot.org/~Dr.+Dysphora/journal/132151"&gt;He says&lt;/a&gt;:
+&lt;/p&gt;&lt;blockquote&gt; &lt;div&gt;&lt;i&gt;
+But what is beyond forgiveable
+is that Perl 6 has made the
+market of new Perl books
+nonexistent. This alone
+assures Perl's eventual
+nonexistence. Why would an
+author want to write a Perl
+book that is obsolete in some
+fuzzy time period.
+&lt;/i&gt;&lt;/div&gt; &lt;/blockquote&gt;
+&lt;p&gt;
+To which I replied:
+&lt;/p&gt;&lt;blockquote&gt; &lt;div&gt;&lt;p&gt;&lt;i&gt;
+We just released the 4th edition of "Learning Perl" last summer, and "Intermediate Perl" this month. We're very committed to keeping the flagship tutorial books for the Perl community up to date until Perl6 arrives. There are also a number of other Perl books in the pipeline at O'Reilly that I cannot comment on.
+&lt;/i&gt;&lt;/p&gt;&lt;p&gt;&lt;i&gt;
+If other publishers are slowing down on turning out the junk that spells Perl in all-caps and promises a complete Perl education in some small number of hours or days, that's actually better for the community, not worse.
+&lt;/i&gt;&lt;/p&gt;&lt;/div&gt; &lt;/blockquote&gt;</description>
+<dc:creator>merlyn</dc:creator>
+<dc:date>2006-03-25T18:29:33+00:00</dc:date>
+<dc:subject>journal</dc:subject>
+</item>
+
+<item rdf:about="http://use.perl.org/~merlyn/journal/28936?from=rss">
+<title>Ain't technology grand?</title>
+<link>http://use.perl.org/~merlyn/journal/28936?from=rss</link>
+<description>&lt;p&gt;
+So, I'm working for $client, and I needed to send a presentation to my $boss so that he can push it up on the webinar system for a brownbag I'm presenting today at lunchtime.  He wanted both the powerpoint (ugh) slides (converted from nice nifty Keynote), and a backup PDF in case things broke.
+&lt;/p&gt;&lt;p&gt;
+When I printed the PDF from powerpoint, it came out as a whopping 22 Megabytes.  Ouch.  However, I didn't notice this, and simply attached the message in Thunderbird (another ugh, but that's another story), and pressed "send".   My message was rejected during the send (and also took a while), so I found a way to reprint the PDF from the original Keynote, and it came out to 252K, so I happily sent that along instead.
+&lt;/p&gt;&lt;p&gt;
+But now for the "WTF" moment. I get a message about 20 seconds later from "the mail administrator" (not a human), advising me that "the attached message is too large to deliver".  Yes.  Follow the logic.  The attached message was too large to deliver, so it &lt;i&gt;delivered&lt;/i&gt; it to me in its entirety.
+&lt;/p&gt;&lt;p&gt;
+Oh, joy.
+&lt;/p&gt;&lt;p&gt;
+If only I had faked the "from" on the original message, the bounce would have been "delivered" to the desired recipient instead!&lt;/p&gt;</description>
+<dc:creator>merlyn</dc:creator>
+<dc:date>2006-03-09T15:49:35+00:00</dc:date>
+<dc:subject>journal</dc:subject>
+</item>
+
+<item rdf:about="http://use.perl.org/~merlyn/journal/28886?from=rss">
+<title>Ishmael</title>
+<link>http://use.perl.org/~merlyn/journal/28886?from=rss</link>
+<description>I recently glanced over to see a friend of mine reading a book titled "Ishmael".
+&lt;p&gt;
+I bet him that I knew the first line of the book.  My guess, which turned out to be wrong, was "Call me, Moby Dick."
+&lt;/p&gt;&lt;p&gt;
+However, that seems like it would be a great fiction novel... the story of a great white whale who is obsessed with tormenting this one Captain Ahab until he loses everything.  Anyone want to set up a collaborative writing project for this?
+&lt;/p&gt;&lt;p&gt;
+Disclaimer: everything I know about Moby Dick, I got from &lt;a href="http://en.wikipedia.org/wiki/Moby_Dick"&gt;Wikipedia&lt;/a&gt;.&lt;/p&gt;</description>
+<dc:creator>merlyn</dc:creator>
+<dc:date>2006-03-06T03:11:20+00:00</dc:date>
+<dc:subject>journal</dc:subject>
+</item>
+
+<item rdf:about="http://use.perl.org/~merlyn/journal/28859?from=rss">
+<title>Why do newscasters always ... pause?</title>
+<link>http://use.perl.org/~merlyn/journal/28859?from=rss</link>
+<description>Why do field radio and TV newscasters invariably... pause before delivering
+the last few words of their delivery?  Was this originally some sort of signal
+to the studio that they were done, similar to "over" in pilot communications?
+Who started it?  Why do they still do it?  Can you tell it annoys me?&lt;nobr&gt; &lt;wbr&gt;&lt;/nobr&gt;:-)
+&lt;p&gt;
+"For my use.perl journal... I'm Randal Schwartz."&lt;/p&gt;</description>
+<dc:creator>merlyn</dc:creator>
+<dc:date>2006-03-03T13:29:57+00:00</dc:date>
+<dc:subject>journal</dc:subject>
+</item>
+
+<item rdf:about="http://use.perl.org/~merlyn/journal/28736?from=rss">
+<title>Still fodder for the conversation</title>
+<link>http://use.perl.org/~merlyn/journal/28736?from=rss</link>
+<description>It's nice to see that my legal case &lt;a href="http://cyb3rcrim3.blogspot.com/2006/02/seizure.html"&gt;continues to be noticed and discussed by experts&lt;/a&gt;.</description>
+<dc:creator>merlyn</dc:creator>
+<dc:date>2006-02-20T01:50:17+00:00</dc:date>
+<dc:subject>journal</dc:subject>
+</item>
+
+<item rdf:about="http://use.perl.org/~merlyn/journal/28687?from=rss">
+<title>Pot. Kettle. Black.</title>
+<link>http://use.perl.org/~merlyn/journal/28687?from=rss</link>
+<description>&lt;blockquote&gt;
+&lt;div&gt;Sams signed the code of conduct but didn't know that working at Hooters could be grounds for termination, she said. "I love this school," Sams said. "I felt so proud to cheer for our teams. I was always the loudest one out there screaming (for the Bucs)."&lt;/div&gt;
+&lt;/blockquote&gt;
+&amp;mdash; &lt;a href="http://www.easttennessean.com/media/paper203/news/2006/02/06/News/Cheerleader.Booted.For.Working.At.Hooters.Cries.Foul-1599602.shtml?norewrite&amp;amp;sourcedomain=www.easttennessean.com"&gt;Cheerleader booted for working at Hooters cries foul&lt;/a&gt;</description>
+<dc:creator>merlyn</dc:creator>
+<dc:date>2006-02-15T18:37:18+00:00</dc:date>
+<dc:subject>journal</dc:subject>
+</item>
+
+<item rdf:about="http://use.perl.org/~merlyn/journal/28510?from=rss">
+<title>Sell music on iTunes with no middleman cost</title>
+<link>http://use.perl.org/~merlyn/journal/28510?from=rss</link>
+<description>This is brave: a small music label is setting up a way for &lt;a href="http://www.tunecore.com/"&gt;indie artists to put their music on iTunes and keep 100% of what iTunes pays in response!&lt;/a&gt;.  That's very very cool.
+&lt;p&gt;
+Pudge?  Time to start publishing!&lt;/p&gt;</description>
+<dc:creator>merlyn</dc:creator>
+<dc:date>2006-01-29T18:44:53+00:00</dc:date>
+<dc:subject>journal</dc:subject>
+</item>
+
+<item rdf:about="http://use.perl.org/~merlyn/journal/28298?from=rss">
+<title>The 90's called... they want their code back...</title>
+<link>http://use.perl.org/~merlyn/journal/28298?from=rss</link>
+<description>From &lt;a href="http://groups.google.com/group/comp.infosystems.www.authoring.cgi/browse_thread/thread/752e74dbd910b2a5/6710721867093cc8"&gt;a recent comp.infosystems.www.authoring.cgi post&lt;/a&gt;:
+&lt;blockquote&gt; &lt;div&gt;&lt;blockquote&gt; &lt;div&gt;&lt;tt&gt;sub ParseForm&lt;br&gt;&amp;nbsp; &amp;nbsp; {&lt;br&gt;&amp;nbsp; &amp;nbsp; my ($key, $prefs, $buffer);&lt;br&gt;&amp;nbsp; &amp;nbsp; if ($ENV{'REQUEST_METHOD'} eq 'GET')&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; { @pairs = split(/&amp;amp;/, $ENV{'QUERY_STRING'}) }&lt;br&gt;&amp;nbsp; &amp;nbsp; elsif ($ENV{'REQUEST_METHOD'} eq 'POST')&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; {&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; read(STDIN, $buffer, $ENV{'CONTENT_LENGTH'});&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; @pairs = split(/&amp;amp;/, $buffer)&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; }&lt;br&gt;&amp;nbsp; &amp;nbsp; else {Error('Bad or Unknown Request Method',&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; "The form's request method must be either 'POST' or&lt;br&gt;'GET'. Please check your HTML.")}&lt;br&gt; &lt;br&gt;&amp;nbsp; &amp;nbsp; foreach $pair (@pairs)&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; {&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; local($name, $value) = split(/=/, $pair);&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; $name =~ tr/+/&lt;nobr&gt; &lt;wbr&gt;&lt;/nobr&gt;/;&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; $name =~ s/%([a-fA-F0-9][a-fA-F0-9])/pack("C", hex($1))/eg;&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; $value =~ tr/+/&lt;nobr&gt; &lt;wbr&gt;&lt;/nobr&gt;/;&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; $value =~ s/%([a-fA-F0-9][a-fA-F0-9])/pack("C", hex($1))/eg;&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; $value =~ s/&amp;lt;!--(.)*?--&amp;gt;//mg;&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; $FORM{$name} = $value;&lt;br&gt;...&lt;/tt&gt;&lt;/div&gt; &lt;/blockquote&gt;&lt;/div&gt; &lt;/blockquote&gt;
+And the horror doesn't stop there, but I wanted to minimize your exposure.  This &lt;b&gt;is&lt;/b&gt; 2006, right?</description>
+<dc:creator>merlyn</dc:creator>
+<dc:date>2006-01-10T08:20:17+00:00</dc:date>
+<dc:subject>journal</dc:subject>
+</item>
+
+</rdf:RDF>

@@ -1,0 +1,14 @@
+0.05      2016-11-13 17:11:49+11:00 Australia/Melbourne
+- No changes; just licensing updates
+
+0.04      Jun 02 2014
+          Add pretty-printing option for debugging
+
+0.03      Nov 14 2013
+          Handle "false" serialised values correctly
+
+0.02      Aug 26 2010
+          Escape numerics
+
+0.01      Oct 13 2009
+          First release

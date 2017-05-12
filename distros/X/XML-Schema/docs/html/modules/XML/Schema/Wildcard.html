@@ -1,0 +1,307 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+<head>
+<title>Modules Index</title>
+</head>
+
+<body bgcolor="#ffffff">
+<table border="0" width="100%">
+<tr>
+<td align="left"><a href="../../../index.html"><img src="../../../images/canon.gif" border="0"></a></td>
+<td align="right"><img src="../../../images/canre.gif"></td>
+</tr>
+</table>
+<div align="right">
+<small><a href="../../../index.html">XML Schema Home</a></small>
+</div>
+
+<h1>XML::Schema::Wildcard</h1>
+
+<ul>
+
+    The module implements a wildcard to select or reject an XML
+    element based on its namespace.
+  </ul>
+
+<h2>Table of Contents</h2>
+<ul>
+<table border="0" cellpadding="2" cellspacing="0">
+<tr valign="top">
+<td>
+  <li><b><a href="#section_Synopsis">Synopsis</a></b>
+</td>
+
+<td>
+</td>
+
+<td>
+<td>
+
+</tr>
+<tr valign="top">
+<td>
+  <li><b><a href="#section_Description">Description</a></b>
+</td>
+
+<td>
+</td>
+
+<td>
+<td>
+
+</tr>
+<tr valign="top">
+<td>
+  <li><b><a href="#section_Methods">Methods</a></b>
+</td>
+
+<td>
+<b>:<b>
+</td>
+
+<td>
+<small><a href="#method_new">new()</a>,&nbsp; <a href="#method_select">select()</a>,&nbsp; <a href="#method_process">process()</a>,&nbsp; <a href="#method_namespace">namespace()</a>,&nbsp; <a href="#method_accept">accept()</a></small>
+<td>
+
+</tr>
+</table>
+</ul>
+
+
+
+
+<hr width="100%" size="1" noshade="1"><a name="section_Synopsis"><h2>Synopsis</h2></a>
+<ul><pre><p>use XML::Schema::Wildcard;
+
+my $wildcard;
+
+$wildcard = XML::Schema::Wildcard-&gt;new( namespace =&gt; 'any' );
+$wildcard = XML::Schema::Wildcard-&gt;new( namespace =&gt; 'not' );
+
+# shorter form of above
+$wildcard = XML::Schema::Wildcard-&gt;new( any =&gt; 1 );
+$wildcard = XML::Schema::Wildcard-&gt;new( not =&gt; 1 );
+
+$wildcard = XML::Schema::Wildcard-&gt;new( {
+    namespace =&gt; 'http://tt2.org/XML/Example.xml',
+} );
+
+$wildcard = XML::Schema::Wildcard-&gt;new( {
+    namespace =&gt; [
+        'http://tt2.org/XML/Example1.xml',
+        'http://tt2.org/XML/Example2.xml',
+    ],
+} );
+
+$wildcard = XML::Schema::Wildcard-&gt;new( {
+    namespace =&gt; [ not =&gt; 'http://tt2.org/XML/Example.xml' ],
+} );</b></pre></ul>
+
+  
+<hr width="100%" size="1" noshade="1"><a name="section_Description"><h2>Description</h2></a>
+    <p>
+    This module implements an object class for representing XML
+    Schema wildcards.  This provides for validation of elements 
+    based on their XML namespace component.
+    </p>
+
+  
+
+<hr width="100%" size="1" noshade="1"><a name="section_Methods"><h2>Methods</h2></a><ul>
+<li><p>
+<a name="method_new"><b>new( \%config )</b></a>
+<br>
+
+
+      <p>
+        Constructor method called to create a new wildcard object.  A
+        list of '<code><b>key => value</b></code>
+' pairs can be
+        specified as command line arguments, or alternately, a hash
+        reference can be passed which contains these configuration
+        values.  The method returns a newly instantiated object on
+        success.  On error it returns undef and sets an internal error
+        message which can be retrieved by calling <a href="../../../modules/XML/Schema/Base.html#method_error"><code><b>error()</b></code></a> as a class method.
+
+<ul><pre><p># list of options
+my $card = XML::Schema::Wildcard-&gt;new( namespace =&gt; 'any' )
+    || die XML::Schema::Wildcard-&gt;error();
+
+# hash ref of options
+my $card = XML::Schema::Wildcard-&gt;new( {
+    namespace =&gt; 'any',
+} ) || die XML::Schema::Wildcard-&gt;error();</b></pre></ul>
+
+      </p>
+
+
+      <p>
+        The following configuration options may be specifed:
+      </p>
+
+
+      <p>
+<!-- table -->
+<table border="0" cellpadding="4" cellspacing="1" 
+       bgcolor="#000044">
+<!-- table content -->
+<tr bgcolor="#ccccff">
+<td><b><small>Name</b></td><td><b><small>Typical Values</b></td><td><b><small>Description</b></td></tr>
+
+        <tr valign="top" bgcolor="#eeeeff">
+  <td>
+    <a name="config_namespace"><code><b>namespace</b></code></a>
+  </td>
+  <td>
+    <code><b>'any'</b></code>
+    <br>
+    <code><b>'not'</b></code>
+    <br>
+    <code><b>'http://tt2.org/XML/...'</b></code>
+    <br>
+    <code><b>[&nbsp;not&nbsp;=>&nbsp;'http://tt2.org/XML/...'&nbsp;]</b></code>
+    <br>
+  </td>
+  <td>
+
+            <!-- ignore value -->
+            <!-- ignore value -->
+            <!-- ignore value -->
+            <!-- ignore value -->
+
+	  <p>
+	    This option is used to specify which XML namespaces should
+            be included or excluded by the wildcard.  The value of
+            '<code><b>any</b></code>
+' indicates that any namespaces
+            should be accepted along with elements that are not
+            namespace qualified.  The value of
+            '<code><b>not</b></code>
+' indicates that only those
+            elements that are <i>not</i> namespace qualified should be
+            accepted.  Any other single value is treated as a namespace
+            to which the element should be qualified.
+          </p>
+
+
+	  <p>
+            The option can also be specified as a reference to an 
+            array of namespaces.  The first element in the list can
+            be '<code><b>not</b></code>
+' to indicate that it contains
+            namespaces that the element should <i>not</i> match.  Otherwise
+            it is taken to be a list of namespaces, one of which the 
+            element <i>must</i> match.
+	  </p>
+
+          </td>
+</tr>
+
+
+        <tr valign="top" bgcolor="#eeeeff">
+  <td>
+    <a name="config_any"><code><b>any</b></code></a>
+  </td>
+  <td>
+    <code><b>1</b></code>
+    <br>
+  </td>
+  <td>
+
+            <!-- ignore value -->
+            Alternate way of specifying <code><b>namespace => 'any'</b></code>
+.
+          </td>
+</tr>
+
+
+        <tr valign="top" bgcolor="#eeeeff">
+  <td>
+    <a name="config_not"><code><b>not</b></code></a>
+  </td>
+  <td>
+    <code><b>1</b></code>
+    <br>
+  </td>
+  <td>
+
+            <!-- ignore value -->
+            Alternate way of specifying <code><b>namespace => 'not'</b></code>
+.
+          </td>
+</tr>
+
+
+        <tr valign="top" bgcolor="#eeeeff">
+  <td>
+    <a name="config_process"><code><b>process</b></code></a>
+  </td>
+  <td>
+    <code><b>'skip'</b></code>
+    <br>
+    <code><b>'lax'</b></code>
+    <br>
+    <code><b>'strict'</b></code>
+    <br>
+  </td>
+  <td>
+
+            <!-- ignore value -->
+            <!-- ignore value -->
+            <!-- ignore value -->
+
+	    This value controls the impact on assessment of the items allowed
+            by wildcards.  At present, this has no effect.
+	  </td>
+</tr>
+
+
+      <!-- end of table content -->
+</table>
+</p>
+
+
+    </p><li><p>
+<a name="method_select"><b>select()</b></a>
+<br>
+
+
+	Return the current selection criteria as one of the strings
+        '<code><b>any</b></code>
+', '<code><b>not</b></code>
+' or
+        '<code><b>one</b></code>
+'.
+    </p><li><p>
+<a name="method_process"><b>process()</b></a>
+<br>
+
+
+	Return the current assessment process as one of the strings
+        '<code><b>skip</b></code>
+', '<code><b>lax</b></code>
+' or
+        '<code><b>strict</b></code>
+'.
+    </p><li><p>
+<a name="method_namespace"><b>namespace()</b></a>
+<br>
+
+
+	Return a reference to a hash array of namespace that are accepted
+        or rejected according to the selection criteria.
+    </p><li><p>
+<a name="method_accept"><b>accept( $value )</b></a>
+<br>
+
+
+	Returns true (1) if the value is namespace qualified according to the
+        wildcard selection criteria or false (0) if not.
+    </p></ul>
+
+
+<div align="center">
+<small><b>Perl XML::Schema Documentation</b></small>
+</div>
+</body>
+</html>

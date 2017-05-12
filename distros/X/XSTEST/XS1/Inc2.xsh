@@ -1,0 +1,8 @@
+int
+ok12()
+	CODE:
+	RETVAL = 12;
+	OUTPUT:
+	RETVAL
+
+

@@ -1,0 +1,63 @@
+{
+   "abstract" : "XML elements with the same interface as HTML::Element",
+   "author" : [
+      "Jeff Fearn <jfearn@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4004, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "XML-TreeBuilder",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "File::Basename" : "0",
+            "HTML::Element" : "4.1",
+            "HTML::Tagset" : "3.02",
+            "IO::File" : "0",
+            "Module::Build" : "0",
+            "Test::More" : "0",
+            "XML::Catalog" : "1.02",
+            "XML::Parser" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Basename" : "0",
+            "HTML::Element" : "4.1",
+            "HTML::Tagset" : "3.02",
+            "IO::File" : "0",
+            "XML::Catalog" : "1.02",
+            "XML::Parser" : "0",
+            "perl" : "v5.4.0"
+         }
+      }
+   },
+   "provides" : {
+      "XML::Element" : {
+         "file" : "lib/XML/Element.pm",
+         "version" : "5.4"
+      },
+      "XML::TreeBuilder" : {
+         "file" : "lib/XML/TreeBuilder.pm",
+         "version" : "5.4"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "5.4"
+}

@@ -1,0 +1,937 @@
+#!/usr/bin/perl
+#
+# This is a simple source code manager front end.
+#
+
+use X11::Wcl;
+
+my $SCM;
+my $DEBUG;
+my $toplevel;
+my $PLACEHOLDER = "\001";
+my $USE_LISTTREE =
+	($X11::Wcl::XmVERSION < 2);
+
+if (-f "/usr/local/bin/scm") {
+	$DEBUG = "";
+	$SCM = "/usr/local/bin/scm" 
+} else {
+	$DEBUG = "echo";
+	$SCM = "./scm";
+}
+
+X11::Wcl::mainloop(
+	ARGV => ["xscm", "-trrf"],
+	DELETE => \&delete_window,
+	EDITRES_SUPPORT => 1,
+	INITIAL_RESOURCES => \*DATA,
+	CALLBACKS => [
+		["activateCB", \&activateCB, "argument object"],
+		["highlightCB", \&highlightCB, "argument object"],
+		["outlineCB", \&outlineCB, "argument object"],
+		["selectionCB", \&selectionCB, "argument object"],
+		["exitCB", \&exitCB, "argument object"],
+		["edgetCB", \&edgetCB, "argument object"],
+		["edputCB", \&edputCB, "argument object"],
+		["getCB", \&getCB, "argument object"],
+		["unedgetCB", \&unedgetCB, "argument object"],
+	],
+	STARTUP => \&startup,
+	NEED_MISC => 1,
+	NEED_MOTIF => 1,
+);
+
+# called when window manager is used to close application
+sub delete_window
+{
+	print "closed by window manager\n";
+}
+
+# for 2.0 XmContainer support
+sub widgetname
+{
+	my($raw) = @_;
+	$raw =~ s#[/*. ]#-#g;
+	"w_$raw";
+}
+
+sub error_popup
+{
+	my($text) = @_;
+	if (!defined $::error_popup_widget) {
+		$::error_popup_widget = X11::Wcl::WcCreatePopup($toplevel, "error_dialog");
+	}
+	X11::Wcl::WcSetValueFromString($::error_popup_widget, "messageString", $text);
+	X11::Wcl::XtManageChild($::error_popup_widget);
+}
+
+sub info_popup
+{
+	my($text) = @_;
+	if (!defined $::info_popup_widget) {
+		$::info_popup_widget = X11::Wcl::WcCreatePopup($toplevel, "info_dialog");
+	}
+	X11::Wcl::WcSetValueFromString($::info_popup_widget, "messageString", $text);
+	X11::Wcl::XtManageChild($::info_popup_widget);
+}
+
+sub message_popup
+{
+	my($text) = @_;
+	if (!defined $::message_popup_widget) {
+		$::message_popup_widget = X11::Wcl::WcCreatePopup($toplevel, "message_dialog");
+	}
+	X11::Wcl::WcSetValueFromString($::message_popup_widget, "messageString", $text);
+	X11::Wcl::XtManageChild($::message_popup_widget);
+}
+
+sub question_popup
+{
+	my($text) = @_;
+	if (!defined $::question_popup_widget) {
+		$::question_popup_widget = X11::Wcl::WcCreatePopup($toplevel, "question_dialog");
+	}
+	X11::Wcl::WcSetValueFromString($::question_popup_widget, "messageString", $text);
+	X11::Wcl::XtManageChild($::question_popup_widget);
+}
+
+sub warning_popup
+{
+	my($text) = @_;
+	if (!defined $::warning_popup_widget) {
+		$::warning_popup_widget = X11::Wcl::WcCreatePopup($toplevel, "warning_dialog");
+	}
+	X11::Wcl::WcSetValueFromString($::warning_popup_widget, "messageString", $text);
+	X11::Wcl::XtManageChild($::warning_popup_widget);
+}
+
+sub working_popup
+{
+	my($text) = @_;
+	if (!defined $::working_popup_widget) {
+		$::working_popup_widget = X11::Wcl::WcCreatePopup($toplevel, "working_dialog");
+	}
+	X11::Wcl::WcSetValueFromString($::working_popup_widget, "messageString", $text);
+	X11::Wcl::XtManageChild($::working_popup_widget);
+}
+
+# exit button was pressed
+#
+# $widget is the invoking widget, of type Widget
+# $arg1 is the argument string appearing in the resource that caused
+#     this callback to be invoked
+# $arg2 is the callback struct; it must be cast into the proper type
+#     using the proper constructor
+# $arg3 is the argument from callback registration time; it is
+#     whatever PERL object was passed to X11::Wcl::WcRegisterCallback()
+sub exitCB
+{
+	my($widget, $arg1, $arg2, $arg3) = @_;
+
+	exit(0);
+}
+
+# $widget is the invoking widget, of type Widget
+# $arg1 is the argument string appearing in the resource that caused
+#     this callback to be invoked
+# $arg2 is the callback struct; it must be cast into the proper type
+#     using the proper constructor
+# $arg3 is the argument from callback registration time; it is
+#     whatever PERL object was passed to X11::Wcl::WcRegisterCallback()
+sub edgetCB
+{
+	my($widget, $arg1, $arg2, $arg3) = @_;
+
+	my @x;
+	my $found;
+	for (@SELECTIONS) {
+		@x = @{$_};
+		next unless $x[0] eq "file";
+		++$found;
+		system(qq{
+			cd &&
+			if [ ! -d '$x[1]$x[2]' ]; then
+				$DEBUG mkdir -p '$x[1]$x[2]'
+			fi &&
+			if [ ! -d '$x[1]$x[2]/$x[3]' ]; then
+				$DEBUG mkdir -p '$x[1]$x[2]/$x[3]'
+			fi &&
+			$DEBUG cd '$x[1]$x[2]/$x[3]' &&
+			$DEBUG $SCM -p $x[1]$x[2] edget -d $x[3] $x[4]
+		});
+	}
+	if (!$found) {
+		error_popup("no files are currently selected");
+	}
+}
+
+# $widget is the invoking widget, of type Widget
+# $arg1 is the argument string appearing in the resource that caused
+#     this callback to be invoked
+# $arg2 is the callback struct; it must be cast into the proper type
+#     using the proper constructor
+# $arg3 is the argument from callback registration time; it is
+#     whatever PERL object was passed to X11::Wcl::WcRegisterCallback()
+sub edputCB
+{
+	my($widget, $arg1, $arg2, $arg3) = @_;
+
+	my @x;
+	my $found;
+	for (@SELECTIONS) {
+		@x = @{$_};
+		next unless $x[0] eq "file";
+		++$found;
+		system(qq{
+			cd &&
+			if [ ! -d '$x[1]$x[2]' ]; then
+				$DEBUG mkdir -p '$x[1]$x[2]'
+			fi &&
+			if [ ! -d '$x[1]$x[2]/$x[3]' ]; then
+				$DEBUG mkdir -p '$x[1]$x[2]/$x[3]'
+			fi &&
+			$DEBUG cd '$x[1]$x[2]/$x[3]' &&
+			$DEBUG $SCM -p $x[1]$x[2] edput -d $x[3] $x[4]
+		});
+	}
+	if (!$found) {
+		error_popup("no files are currently selected");
+	}
+}
+
+# $widget is the invoking widget, of type Widget
+# $arg1 is the argument string appearing in the resource that caused
+#     this callback to be invoked
+# $arg2 is the callback struct; it must be cast into the proper type
+#     using the proper constructor
+# $arg3 is the argument from callback registration time; it is
+#     whatever PERL object was passed to X11::Wcl::WcRegisterCallback()
+sub getCB
+{
+	my($widget, $arg1, $arg2, $arg3) = @_;
+
+	my @x;
+	my $found;
+	for (@SELECTIONS) {
+		@x = @{$_};
+		next unless $x[0] eq "file";
+		++$found;
+		system(qq{
+			cd &&
+			if [ ! -d '$x[1]$x[2]' ]; then
+				$DEBUG mkdir -p '$x[1]$x[2]'
+			fi &&
+			if [ ! -d '$x[1]$x[2]/$x[3]' ]; then
+				$DEBUG mkdir -p '$x[1]$x[2]/$x[3]'
+			fi &&
+			$DEBUG cd '$x[1]$x[2]/$x[3]' &&
+			$DEBUG $SCM -p $x[1]$x[2] get -d $x[3] $x[4]
+		});
+	}
+	if (!$found) {
+		error_popup("no files are currently selected");
+	}
+}
+
+# $widget is the invoking widget, of type Widget
+# $arg1 is the argument string appearing in the resource that caused
+#     this callback to be invoked
+# $arg2 is the callback struct; it must be cast into the proper type
+#     using the proper constructor
+# $arg3 is the argument from callback registration time; it is
+#     whatever PERL object was passed to X11::Wcl::WcRegisterCallback()
+sub unedgetCB
+{
+	my($widget, $arg1, $arg2, $arg3) = @_;
+
+	my @x;
+	my $found;
+	for (@SELECTIONS) {
+		@x = @{$_};
+		next unless $x[0] eq "file";
+		++$found;
+		system(qq{
+			cd &&
+			if [ ! -d '$x[1]$x[2]' ]; then
+				$DEBUG mkdir -p '$x[1]$x[2]'
+			fi &&
+			if [ ! -d '$x[1]$x[2]/$x[3]' ]; then
+				$DEBUG mkdir -p '$x[1]$x[2]/$x[3]'
+			fi &&
+			$DEBUG cd '$x[1]$x[2]/$x[3]' &&
+			$DEBUG $SCM -p $x[1]$x[2] unedget -d $x[3] $x[4]
+		});
+	}
+	if (!$found) {
+		error_popup("no files are currently selected");
+	}
+}
+
+# $widget is the invoking widget, of type Widget
+# $arg1 is the argument string appearing in the resource that caused
+#     this callback to be invoked
+# $arg2 is the callback struct; it must be cast into the proper type
+#     using the proper constructor
+# $arg3 is the argument from callback registration time; it is
+#     whatever PERL object was passed to X11::Wcl::WcRegisterCallback()
+sub activateCB
+{
+	my($widget, $arg1, $arg2, $arg3) = @_;
+	my $x = new ListTreeActivateStruct($arg2);
+	if ($x->{'open'}) {
+		# item has been opened
+		my $z = tied(%{$x->{'item'}});
+		my $y = $$z;
+		my @x = @{$WIDGETS{$y}};
+		my $tree = X11::Wcl::WcFullNameToWidget($toplevel, "*tree");
+		X11::Wcl::ListTreeRefreshOff($tree);
+		if ($x[0] eq "project" && !exists $BRANCHES{$x[1]}) {
+			open(BRANCHES, "$SCM -p $x[1] branches |");
+			my @y = <BRANCHES>;
+			close(BRANCHES);
+			# add the default branch
+			add_branch($toplevel, $x[1], "");
+			for (@y) {
+				chomp;
+				next unless /^\d+([.]\d+)*$/;
+				add_branch($toplevel, $x[1], "\@$_");
+			}
+		} elsif ($x[0] eq "branch" && !exists $DIRECTORIES{$x[1]}{$x[2]}) {
+			open(FILES, "$SCM -p $x[1]$x[2] filesall |");
+			my @y = <FILES>;
+			close(FILES);
+			for (@y) {
+				chomp;
+				my($d, $f) = m@^(.*)/(.*)$@;
+				add_directory($toplevel, $x[1], $x[2], $d);
+				add_file($toplevel, $x[1], $x[2], $d, $f);
+			}
+		}
+		X11::Wcl::ListTreeRefreshOn($tree);
+	}
+}
+
+# $widget is the invoking widget, of type Widget
+# $arg1 is the argument string appearing in the resource that caused
+#     this callback to be invoked
+# $arg2 is the callback struct; it must be cast into the proper type
+#     using the proper constructor
+# $arg3 is the argument from callback registration time; it is
+#     whatever PERL object was passed to X11::Wcl::WcRegisterCallback()
+sub highlightCB
+{
+	my($widget, $arg1, $arg2, $arg3) = @_;
+
+	my $i;
+	my $x = new ListTreeMultiReturnStruct($arg2);
+	my $cnt = $x->{'count'};
+	if ($cnt > 0) {
+		# array of item pointers
+		my $z = $x->{'items'};
+		undef @SELECTIONS;
+		for ($i=0; $i<$cnt; ++$i) {
+			my $y = X11::Wcl::ptrcast($z, "int *");
+			$y = X11::Wcl::ptrvalue($y, $i);
+			# print information about the widget
+#			print "    selected_items[$i] $y @{$WIDGETS{$y}}\n";
+			push(@SELECTIONS, $WIDGETS{$y});
+		}
+	}
+}
+
+# 2.0 XmContainer outline changed
+#
+# $widget is the invoking widget, of type Widget
+# $arg1 is the argument string appearing in the resource that caused
+#     this callback to be invoked
+# $arg2 is the callback struct; it must be cast into the proper type
+#     using the proper constructor
+# $arg3 is the argument from callback registration time; it is
+#     whatever PERL object was passed to X11::Wcl::WcRegisterCallback()
+sub outlineCB
+{
+	my($widget, $arg1, $arg2, $arg3) = @_;
+
+	my $x = new XmContainerOutlineCallbackStruct($arg2);
+	if ($x->{reason} == $X11::Wcl::XmCR_EXPANDED) {
+		# item has been opened
+		my $z = $x->{'item'};
+		my $y = $$z;
+		my @x = @{$WIDGETS{$y}};
+		if ($x[0] eq "project" && !%{$BRANCHES{$x[1]}}) {
+			open(BRANCHES, "$SCM -p $x[1] branches |");
+			my @y = <BRANCHES>;
+			close(BRANCHES);
+			for (reverse @y) {
+				chomp;
+				next unless /^\d+([.]\d+)*$/;
+				add_branch($toplevel, $x[1], "\@$_");
+			}
+			# add the default branch
+			add_branch($toplevel, $x[1], "");
+		} elsif ($x[0] eq "branch" && !%{$DIRECTORIES{$x[1]}{$x[2]}}) {
+			open(FILES, "$SCM -p $x[1]$x[2] filesall |");
+			my @y = <FILES>;
+			close(FILES);
+			for (reverse @y) {
+				chomp;
+				my($d, $f) = m@^(.*)/(.*)$@;
+				add_directory($toplevel, $x[1], $x[2], $d);
+				add_file($toplevel, $x[1], $x[2], $d, $f);
+			}
+		}
+	}
+}
+
+# This callback routine tracks selection/deselection events in the
+# 2.0 container widget.
+#
+# $widget is the invoking widget, of type Widget
+# $arg1 is the argument string appearing in the resource that caused
+#     this callback to be invoked
+# $arg2 is the callback struct; it must be cast into the proper type
+#     using the proper constructor
+# $arg3 is the argument from callback registration time; it is
+#     whatever PERL object was passed to X11::Wcl::WcRegisterCallback()
+sub selectionCB
+{
+	my($widget, $arg1, $arg2, $arg3) = @_;
+	my $x;
+	my $y;
+
+#	print "*** selectionCB\n";
+
+	# client data; just print it
+	print "    client data ($arg1)\n";
+
+	# registration data
+	# it is a PERL variable, so print it without further manipulation
+#	print "    registration data ($arg3)\n";
+
+	# callback struct
+	# expecting XmContainerSelectCallbackStruct, so cast it to that
+	$x = new XmContainerSelectCallbackStruct($arg2);
+if (0) {
+	# now dump the various fields in the struct, just as an example of
+	# how to do it
+	for (sort keys %{$x}) {
+		# print field name and value
+		print "    " . $_ . ", " . $x->{$_} . "\n";
+		# the "event" field is itself a struct, do some further
+		# processing on it
+		if ($_ eq "event") {
+			# decode the event.type field so we can see what kind of
+			# event we have received
+			if ($x->{$_}->{type} eq $X11::Wcl::KeyPress) {
+				print "        type KeyPress\n";
+			} elsif ($x->{$_}->{type} eq $X11::Wcl::KeyRelease) {
+				print "        type KeyRelease\n";
+			} elsif ($x->{$_}->{type} eq $X11::Wcl::ButtonPress) {
+				print "        type ButtonPress\n";
+			} elsif ($x->{$_}->{type} eq $X11::Wcl::ButtonRelease) {
+				print "        type ButtonRelease\n";
+			} elsif ($x->{$_}->{type} eq $X11::Wcl::MotionNotify) {
+				print "        type MotionNotify\n";
+			} elsif ($x->{$_}->{type} eq $X11::Wcl::EnterNotify) {
+				print "        type EnterNotify\n";
+			} elsif ($x->{$_}->{type} eq $X11::Wcl::LeaveNotify) {
+				print "        type LeaveNotify\n";
+			} elsif ($x->{$_}->{type} eq $X11::Wcl::FocusIn) {
+				print "        type FocusIn\n";
+			} elsif ($x->{$_}->{type} eq $X11::Wcl::FocusOut) {
+				print "        type FocusOut\n";
+			} elsif ($x->{$_}->{type} eq $X11::Wcl::KeymapNotify) {
+				print "        type KeymapNotify\n";
+			} elsif ($x->{$_}->{type} eq $X11::Wcl::Expose) {
+				print "        type Expose\n";
+			} elsif ($x->{$_}->{type} eq $X11::Wcl::GraphicsExpose) {
+				print "        type GraphicsExpose\n";
+			} elsif ($x->{$_}->{type} eq $X11::Wcl::NoExpose) {
+				print "        type NoExpose\n";
+			} elsif ($x->{$_}->{type} eq $X11::Wcl::VisibilityNotify) {
+				print "        type VisibilityNotify\n";
+			} elsif ($x->{$_}->{type} eq $X11::Wcl::CreateNotify) {
+				print "        type CreateNotify\n";
+			} elsif ($x->{$_}->{type} eq $X11::Wcl::DestroyNotify) {
+				print "        type DestroyNotify\n";
+			} elsif ($x->{$_}->{type} eq $X11::Wcl::UnmapNotify) {
+				print "        type UnmapNotify\n";
+			} elsif ($x->{$_}->{type} eq $X11::Wcl::MapNotify) {
+				print "        type MapNotify\n";
+			} elsif ($x->{$_}->{type} eq $X11::Wcl::MapRequest) {
+				print "        type MapRequest\n";
+			} elsif ($x->{$_}->{type} eq $X11::Wcl::ReparentNotify) {
+				print "        type ReparentNotify\n";
+			} elsif ($x->{$_}->{type} eq $X11::Wcl::ConfigureNotify) {
+				print "        type ConfigureNotify\n";
+			} elsif ($x->{$_}->{type} eq $X11::Wcl::ConfigureRequest) {
+				print "        type ConfigureRequest\n";
+			} elsif ($x->{$_}->{type} eq $X11::Wcl::GravityNotify) {
+				print "        type GravityNotify\n";
+			} elsif ($x->{$_}->{type} eq $X11::Wcl::ResizeRequest) {
+				print "        type ResizeRequest\n";
+			} elsif ($x->{$_}->{type} eq $X11::Wcl::CirculateNotify) {
+				print "        type CirculateNotify\n";
+			} elsif ($x->{$_}->{type} eq $X11::Wcl::CirculateRequest) {
+				print "        type CirculateRequest\n";
+			} elsif ($x->{$_}->{type} eq $X11::Wcl::PropertyNotify) {
+				print "        type PropertyNotify\n";
+			} elsif ($x->{$_}->{type} eq $X11::Wcl::SelectionClear) {
+				print "        type SelectionClear\n";
+			} elsif ($x->{$_}->{type} eq $X11::Wcl::SelectionRequest) {
+				print "        type SelectionRequest\n";
+			} elsif ($x->{$_}->{type} eq $X11::Wcl::SelectionNotify) {
+				print "        type SelectionNotify\n";
+			} elsif ($x->{$_}->{type} eq $X11::Wcl::ColormapNotify) {
+				print "        type ColormapNotify\n";
+			} elsif ($x->{$_}->{type} eq $X11::Wcl::ClientMessage) {
+				print "        type ClientMessage\n";
+			} elsif ($x->{$_}->{type} eq $X11::Wcl::MappingNotify) {
+				print "        type MappingNotify\n";
+			}
+			# print the rest of the fields in event struct
+#			for $y (sort keys %{$x->{$_}}) {
+#				next if $y eq "type";
+#				print "        " . $y . ", " . $x->{$_}->{$y} . "\n";
+#			}
+		}
+	}
+}
+
+	# dump information about the selected widgets that are passed in
+	# the callback struct
+	# number of widgets
+	undef @SELECTIONS;
+	my $cnt = $x->{'selected_item_count'};
+	if ($cnt > 0) {
+		# array of widgets
+		my $z = $x->{'selected_items'};
+		for ($i=0; $i<$cnt; ++$i) {
+			# cast it to an int *
+			my $y = X11::Wcl::ptrcast($z, "int *");
+			# now get the int (which is the raw memory address, which
+			# we saved in %WIDGETS when the widget was created
+			$y = X11::Wcl::ptrvalue($y, $i);
+			# print information about the widget
+#			print "    selected_items[$i] $y @{$WIDGETS{$y}}\n";
+			push(@SELECTIONS, $WIDGETS{$y});
+		}
+	}
+}
+
+# for application-specific startup actions
+sub startup
+{
+	my($_toplevel, $app_context) = @_;
+	my $x;
+
+	$toplevel = $_toplevel;
+
+	# create the project widgets
+	open(PROJECTS, "$SCM projects |");
+	my @x = <PROJECTS>;
+	close(PROJECTS);
+	my $tree = X11::Wcl::WcFullNameToWidget($toplevel, "*tree");
+	if ($USE_LISTTREE) {
+		X11::Wcl::ListTreeRefreshOff($tree);
+	}
+	for $x (@x) {
+		chomp($x);
+		add_project($toplevel, $x);
+	}
+	if ($USE_LISTTREE) {
+		X11::Wcl::ListTreeRefreshOn($tree);
+	}
+}
+
+# function to add a new project to the display
+sub add_project
+{
+	my($toplevel, $project) = @_;
+	my $x;
+
+	if (!exists $PROJECTS{$project}) {
+		if ($USE_LISTTREE) {
+			# get tree widget
+			$x = X11::Wcl::WcFullNameToWidget($toplevel, "*tree");
+			# create a new project in the container, using the template
+			# defined for projects
+			$x = X11::Wcl::ListTreeAddBranch($x, undef, $project);
+			# save widget pointer so we can detect its selection in callbacks
+			# see how WIDGETS is used in the callback routine above
+			$WIDGETS{${tied(%$x)}} = ["project", $project];
+			$PROJECTS{$project} = $x;
+		} else {
+			# get container widget
+			$x = X11::Wcl::WcFullNameToWidget($toplevel, "*container");
+			# create a new project in the container, using the template
+			# defined for projects
+			$x = X11::Wcl::WcCreateChildFromTemplate($x,
+													 widgetname($project),
+													 '$project');
+			# save widget pointer so we can detect its selection in callbacks
+			# see how WIDGETS is used in the callback routine above
+			$WIDGETS{$$x} = ["project", $project];
+			# set the label displayed on the new widget
+			X11::Wcl::WcSetValueFromString($x, "labelString", $project);
+			# display the widget
+			X11::Wcl::XtManageChild($x);
+			$PROJECTS{$project} = 1;
+			# add dummy branch so we can expand it later
+			add_branch($toplevel, $project, $PLACEHOLDER);
+		}
+	}
+}
+
+# function to add a new branch to the display, under a given project
+sub add_branch
+{
+	my($toplevel, $project, $branch) = @_;
+	my $d;
+	my $e;
+	my $x;
+
+	if (exists $PROJECTS{$project} &&
+		!exists $BRANCHES{$project}{$branch}) {
+		if ($USE_LISTTREE) {
+			# get tree widget
+			$x = X11::Wcl::WcFullNameToWidget($toplevel, "*tree");
+			# create a new branch
+			$x = X11::Wcl::ListTreeAddBranch($x, $PROJECTS{$project}, $branch);
+			# save widget pointer so we can detect its selection in callbacks
+			# see how WIDGETS is used in the callback routine above
+			$WIDGETS{${tied(%$x)}} = ["branch", $project, $branch];
+			$BRANCHES{$project}{$branch} = $x;
+		} else {
+			# get container widget
+			$x = X11::Wcl::WcFullNameToWidget($toplevel, "*container");
+			# create a new directory in the container, using the template
+			# defined for directories
+			$x = X11::Wcl::WcCreateChildFromTemplate($x,
+													 widgetname("$project/$branch"),
+													 '$branch');
+			# point back to parent
+			X11::Wcl::WcSetValueFromString($x, "entryParent",
+										   "*" . widgetname($project));
+			if ($branch ne $PLACEHOLDER) {
+				# set the label displayed on the new widget
+				X11::Wcl::WcSetValueFromString($x, "labelString",
+											   $branch eq "" ? " " : $branch);
+				# save widget pointer so we can detect its selection in callbacks
+				# see how WIDGETS is used in the callback routine above
+				$WIDGETS{$$x} = ["branch", $project, $branch];
+				# display the widget
+				X11::Wcl::XtManageChild($x);
+				$BRANCHES{$project}{$branch} = 1;
+				# add dummy directory so we can expand it later
+				add_directory($toplevel, $project, $branch, $PLACEHOLDER);
+			}
+		}
+	}
+}
+
+# function to add a new directory to the display, under a given project
+sub add_directory
+{
+	my($toplevel, $project, $branch, $directory) = @_;
+	my $d;
+	my $e;
+	my $x;
+
+	if (exists $PROJECTS{$project} &&
+		exists $BRANCHES{$project}{$branch} &&
+		!exists $DIRECTORIES{$project}{$branch}{$directory}) {
+		if (($d, $e) = ($directory =~ m@^(.+)/(.+)$@)) {
+			# make sure parent directory is around
+			add_directory($toplevel, $project, $branch, $d);
+			$d = "$project/$branch/$d";
+		} else {
+			# no parent directory
+			$d = "$project/$branch";
+			$e = $directory;
+		}
+		if ($USE_LISTTREE) {
+			# get tree widget
+			$x = X11::Wcl::WcFullNameToWidget($toplevel, "*tree");
+			# create a new directory in the container, using the template
+			# defined for directories
+			$x = X11::Wcl::ListTreeAddBranch($x, $BRANCHES{$project}{$branch}, $directory);
+			# save widget pointer so we can detect its selection in callbacks
+			# see how WIDGETS is used in the callback routine above
+			$WIDGETS{${tied(%$x)}} = ["directory", $project, $branch, $directory];
+			$DIRECTORIES{$project}{$branch}{$directory} = $x;
+		} else {
+			# get container widget
+			$x = X11::Wcl::WcFullNameToWidget($toplevel, "*container");
+			# create a new directory in the container, using the template
+			# defined for directories
+			$x = X11::Wcl::WcCreateChildFromTemplate($x,
+													 widgetname("$d/$e"),
+													 '$directory');
+			# point back to parent
+			X11::Wcl::WcSetValueFromString($x, "entryParent", "*" . widgetname($d));
+			if ($directory ne $PLACEHOLDER) {
+				# set the label displayed on the new widget
+				X11::Wcl::WcSetValueFromString($x, "labelString", $e);
+				# save widget pointer so we can detect its selection in callbacks
+				# see how WIDGETS is used in the callback routine above
+				$WIDGETS{$$x} = ["directory", $project, $branch, $directory];
+				# display the widget
+				X11::Wcl::XtManageChild($x);
+				$DIRECTORIES{$project}{$branch}{$directory} = 1;
+			}
+		}
+	}
+}
+
+# function to add a new file to the display, under a given project and directory
+sub add_file
+{
+	my($toplevel, $project, $branch, $directory, $file) = @_;
+	my $d;
+	my $e;
+	my $x;
+
+	if (exists $PROJECTS{$project} &&
+		exists $BRANCHES{$project}{$branch} &&
+		exists $DIRECTORIES{$project}{$branch}{$directory} &&
+		!exists $FILES{$project}{$branch}{$directory}{$file}) {
+		if ($USE_LISTTREE) {
+			# get tree widget
+			$x = X11::Wcl::WcFullNameToWidget($toplevel, "*tree");
+			# create a new file in the container, using the template
+			# defined for files
+			$x = X11::Wcl::ListTreeAddLeaf($x,
+										   $DIRECTORIES{$project}{$branch}{$directory},
+										   $file);
+			# save widget pointer so we can detect its selection in callbacks
+			# see how WIDGETS is used in the callback routine above
+			$WIDGETS{${tied(%$x)}} = ["file", $project, $branch, $directory, $file];
+			$FILES{$project}{$branch}{$directory}{$file} = $x;
+		} else {
+			# get container widget
+			$x = X11::Wcl::WcFullNameToWidget($toplevel, "*container");
+			# create a new file in the container, using the template
+			# defined for files
+			$x = X11::Wcl::WcCreateChildFromTemplate($x,
+				widgetname("$project/$branch/$directory/$file"),
+				'$file');
+			# save widget pointer so we can detect its selection in callbacks
+			# see how WIDGETS is used in the callback routine above
+			$WIDGETS{$$x} = ["file", $project, $branch, $directory, $file];
+			# set the label displayed on the new widget
+			X11::Wcl::WcSetValueFromString($x, "labelString", $file);
+			# point back to parent directory
+			X11::Wcl::WcSetValueFromString($x, "entryParent",
+				"*" . widgetname("$project/$branch/$directory"));
+			# display the widget
+			X11::Wcl::XtManageChild($x);
+			$FILES{$project}{$branch}{$directory}{$file} = 1;
+		}
+	}
+}
+
+__END__
+
+MAIN
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+xscm.wcChildren: form
+
+! constants
+*wclTemplateFiles:				$project, $branch, $directory, $file
+*wclVerboseWarnings:			True
+!*wcPostCreateDumpResources:	True
+!*wcPreCreateDumpResources:		True
+!*wcTrace:						True
+*background:					light gray
+*foreground:					black
+*FontList:						-*-courier-bold-r-*-*-*-140-100-100-*-*-*-*
+
+*form.WcCreate:					XmForm
+*form.WcChildren: \
+	menuBar \
+	tree \
+	sep1 \
+	form2
+*form.fractionBase:				1000
+
+*menuBar.wcCreate:		XmCreateMenuBar
+*menuBar.wcPopups:		fileMenu
+*menuBar.wcChildren:	file
+*menuBar.topAttachment:		ATTACH_FORM
+*menuBar.leftAttachment:		ATTACH_FORM
+*menuBar.rightAttachment:		ATTACH_FORM
+
+*file.wcCreate:		XmCascadeButton
+*file.subMenuId:	^*fileMenu
+*file.mnemonic:		f
+
+*fileMenu.wcCreate:	XmCreatePulldownMenu
+*fileMenu.wcChildren: quit
+
+*quit.wcCreate:		XmPushButton
+*quit.labelString:	Quit
+*quit.mnemonic:		Q
+*quit.activateCallback:	WcExit
+*quit.accelerator:	Ctrl<Key>C
+*quit.acceleratorText:	Ctrl-C
+
+#if ($XmVERSION < 2)
+! motif 1.x
+*tree.WcCreate: XmCreateScrolledListTree
+*tree.font:						-*-courier-bold-r-*-*-*-140-100-100-*-*-*-*
+*tree.activateCallback: 	activateCB(xxx)
+*tree.highlightCallback: 	highlightCB()
+*tree.lineWidth:				3
+*tree.incCallback: 	True
+*treeSW.topAttachment:		ATTACH_WIDGET
+*treeSW.topWidget:			*menuBar
+*treeSW.leftAttachment:		ATTACH_FORM
+*treeSW.rightAttachment:		ATTACH_FORM
+*treeSW.width:					600
+*treeSW.height:					600
+#else
+! motif 2.0
+*tree.wcCreate:				XmScrolledWindow
+*tree.wcChildren:				container
+*tree.width:					600
+*tree.height:					600
+*tree.scrollBarPlacement:		BOTTOM_RIGHT
+*tree.scrollBarDisplayPolicy:	STATIC
+*tree.scrollingPolicy:		AUTOMATIC
+*tree.scrolledWindowMarginHeight: 5
+*tree.scrolledWindowMarginWidth: 5
+*tree.topAttachment:		ATTACH_WIDGET
+*tree.topWidget:			*menuBar
+*tree.leftAttachment:		ATTACH_FORM
+*tree.rightAttachment:		ATTACH_FORM
+
+*container.wcCreate:			XmContainer
+*container.entryViewType:		XmSMALL_ICON
+*container.layoutType:			XmDETAIL
+*container.detailColumnHeading:	information, locked by \ 
+*container.detailColumnHeadingCount: 2
+*container.detailOrder:			1 2
+*container.automaticSelection:	XmAUTO_SELECT
+*container.selectionCallback:	selectionCB(testing)
+*container.outlineChangedCallback:	outlineCB()
+#endif
+
+*sep1.wcCreate:					XmSeparator
+*sep1.orientation:				HORIZONTAL
+*sep1.topAttachment:			ATTACH_WIDGET
+*sep1.topWidget:				*tree
+*sep1.leftAttachment:			ATTACH_FORM
+*sep1.rightAttachment:			ATTACH_FORM
+
+*form2.wcCreate:		XmpTable
+*form2.wcChildren:	edget edput get unedget
+*form2.layout:		edget 0 0 WH ; edput 1 0 WH ; get 2 0 WH ; unedget 3 0 WH
+*form2.wcAfterChildren:	WcSameSize( .edget .edput .get .unedget )
+*form2.topAttachment:			ATTACH_WIDGET
+*form2.topWidget:				*sep1
+*form2.leftAttachment:			ATTACH_FORM
+*form2.rightAttachment:			ATTACH_FORM
+*form2.bottomAttachment:		ATTACH_FORM
+
+*edget.WcCreate: XmPushButton
+*edget.labelString: EDGET
+*edget.activateCallback: 	edgetCB()
+
+*edput.WcCreate: XmPushButton
+*edput.labelString: EDPUT
+*edput.activateCallback: 	edputCB()
+
+*get.WcCreate: XmPushButton
+*get.labelString: GET
+*get.activateCallback: 	getCB()
+
+*unedget.WcCreate: XmPushButton
+*unedget.labelString: UNEDGET
+*unedget.activateCallback: 	unedgetCB()
+
+! for popup error messages
+*error_dialog.title:		ERROR
+*error_dialog.wcCreate:			XmCreateErrorDialog
+*error_dialog*background:		gray
+*error_dialog*foreground:		black
+*error_dialog.okCallback:	WcUnmanage(*error_dialog)
+*error_dialog.cancelCallback:	WcUnmanage(*error_dialog)
+*error_dialog.helpCallback:	WcUnmanage(*error_dialog)
+
+! for popup info messages
+*info_dialog.title:		INFO
+*info_dialog.wcCreate:			XmCreateInformationDialog
+*info_dialog*background:		gray
+*info_dialog*foreground:		black
+*info_dialog.okCallback:	WcUnmanage(*info_dialog)
+*info_dialog.cancelCallback:	WcUnmanage(*info_dialog)
+*info_dialog.helpCallback:	WcUnmanage(*info_dialog)
+
+! for popup message messages
+*message_dialog.title:		MESSAGE
+*message_dialog.wcCreate:			XmCreateMessageDialog
+*message_dialog*background:		gray
+*message_dialog*foreground:		black
+*message_dialog.okCallback:	WcUnmanage(*message_dialog)
+*message_dialog.cancelCallback:	WcUnmanage(*message_dialog)
+*message_dialog.helpCallback:	WcUnmanage(*message_dialog)
+
+! for popup question messages
+*question_dialog.title:		QUESTION
+*question_dialog.wcCreate:			XmCreateQuestionDialog
+*question_dialog*background:		gray
+*question_dialog*foreground:		black
+*question_dialog.okCallback:	WcUnmanage(*question_dialog)
+*question_dialog.cancelCallback:	WcUnmanage(*question_dialog)
+*question_dialog.helpCallback:	WcUnmanage(*question_dialog)
+
+! for popup warning messages
+*warning_dialog.title:		WARNING
+*warning_dialog.wcCreate:			XmCreateWarningDialog
+*warning_dialog*background:		gray
+*warning_dialog*foreground:		black
+*warning_dialog.okCallback:	WcUnmanage(*warning_dialog)
+*warning_dialog.cancelCallback:	WcUnmanage(*warning_dialog)
+*warning_dialog.helpCallback:	WcUnmanage(*warning_dialog)
+
+! for popup working messages
+*working_dialog.title:		WORKING
+*working_dialog.wcCreate:			XmCreateWorkingDialog
+*working_dialog*background:		gray
+*working_dialog*foreground:		black
+*working_dialog.okCallback:	WcUnmanage(*working_dialog)
+*working_dialog.cancelCallback:	WcUnmanage(*working_dialog)
+*working_dialog.helpCallback:	WcUnmanage(*working_dialog)
+
+TEMPLATE project
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+*foreground:					red
+.wcCreate:						XmIconGadget
+!.detail:						jhpb
+!.detailCount:					1
+
+TEMPLATE branch
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+*foreground:					gold
+.wcCreate:						XmIconGadget
+!.detail:						jhpb
+!.detailCount:					1
+
+TEMPLATE directory
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+*foreground:					blue
+.wcCreate:						XmIconGadget
+!.detail:						jhpb
+!.detailCount:					1
+
+TEMPLATE file
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+*foreground:					green
+.wcCreate:						XmIconGadget
+.detail:						jhpb
+.detailCount:					1

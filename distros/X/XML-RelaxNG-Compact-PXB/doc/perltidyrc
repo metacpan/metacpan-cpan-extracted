@@ -1,0 +1,21 @@
+# PBP .perltidyrc file
+
+-i=4	# Indent level is 4 cols
+-ci=4	# Continuation indent is 4 cols
+-st	# Output to STDOUT
+-b	# backup original to .bak and modify file in-place
+-se	# Errors to STDERR
+-vt=0	# Maximal vertical tightness
+-cti=0  # No extra indentation for closing brackets
+-pt=1	# Medium parenthesis tightness
+-lp	# line up parentheses, brackets, and non-BLOCK braces
+-bt=1	# Medium brace tightness
+-ce	# cuddled else; use this style: '\} else \{'
+-bar	# opening brace always on right, even for long clauses
+-sbt=1  # Medium square bracket tightness
+-bbt=1  # Medium block brace tightness  
+-nolq	# dont outdent long quoted strings (default) 
+-nsfs	# No space before semicolons
+-nolq	# Don't outdent long quoted strings
+-wbb="% + - * / x != == >= <= =~ !~ < > | & >= < = **= += *= &= <<= && += -= /= |= >>= ||= .= %= ^= x="
+            # Break before all operators

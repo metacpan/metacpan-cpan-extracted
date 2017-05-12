@@ -1,0 +1,11 @@
+MANIFEST
+README
+LICENSE
+Todo
+Changes
+Makefile.PL
+lib/Xymon/Server/ExcelOutages.pm
+scripts/ExcelOutages.pl
+t/001_load.t
+test.pl
+META.yml                                 Module meta-data (added by MakeMaker)

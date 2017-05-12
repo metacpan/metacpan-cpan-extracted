@@ -1,0 +1,55 @@
+NAME
+    XML::Jing - Validate XML files using an RNG schema using the Jing tool
+
+VERSION
+    version 0.04
+
+SYNOPSIS
+            use XML::Jing;
+            my $jing = XML::Jing->new('path/to/rng','use compact RNG');
+            my $error = $jing->validate('path/to/xml');
+            if(!$error){
+                    print 'no errors!';
+            }else{
+                    print $error;
+            }
+
+DESCRIPTION
+    This module is a simple interface to Jing which allows checking XML
+    files for validity using an RNG file.
+
+METHODS
+  "new"
+    Arguments: the path to the RNG file to use in validation, and a boolean
+    indicating whether or not the given RNG file uses compact syntax (false
+    means XML syntax)
+
+    Creates a new instance of "XML::Jing".
+
+  "validate"
+    Argument: path to the XML file to validate
+
+    Returns: The first error found in the document, or "undef" if no errors
+    were found.
+
+TODO
+    Jing has more functionality and options than what I have interfaced with
+    here.
+
+    Also, it would be nice to be able to get ALL of the errors in an XML
+    file, instead of jut the first one.
+
+SEE ALSO
+    Jing homepage: <http://www.thaiopensource.com/relaxng/jing.html>
+
+    Inline::Java was used to interface with Jing: Inline::Java
+
+AUTHOR
+    Nathan Glenn <garfieldnate@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by BYU Translation Research Group.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

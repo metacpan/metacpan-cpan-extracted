@@ -1,0 +1,21 @@
+Build.PL
+examples/exp1.pl
+examples/exp2.pl
+lib/XML/ED.pm
+lib/XML/ED/Bare.pm
+lib/XML/ED/Bare.xs
+lib/XML/ED/Node.pm
+lib/XML/ED/NodeSet.pm
+lib/XML/ED/parser.c
+lib/XML/ED/parser.h
+makefile
+MANIFEST			This list of files
+scripts/xmled
+t/Basic.t
+t/Pod.t
+t/Pod_Coverage.t
+t/test.xml
+t/UTF8_Attributes.t
+t/UTF8_Values.t
+META.yml
+SIGNATURE    Added here by Module::Build

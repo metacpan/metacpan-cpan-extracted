@@ -1,0 +1,19 @@
+<stx:transform version="1.0" 
+  xmlns:stx="http://stx.sourceforge.net/2002/ns"
+  strip-space="yes">
+
+  <stx:template match="/root">
+    <node>
+      <stx:variable name="seq1" select="('a', 'b', 'cde')"/>
+      <stx:value-of select="exists($seq1)"/>
+      <stx:text>:</stx:text>
+      <stx:value-of select="exists(('a', 'b', 'cde'))"/>
+      <stx:text>-</stx:text>
+      <stx:variable name="seq4" select="()"/>
+      <stx:value-of select="exists($seq4)"/>
+      <stx:text>:</stx:text>
+      <stx:value-of select="exists(())"/>
+    </node>
+  </stx:template>
+
+</stx:transform>

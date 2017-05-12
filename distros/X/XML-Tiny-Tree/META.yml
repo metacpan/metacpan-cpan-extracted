@@ -1,0 +1,30 @@
+---
+abstract: 'Convert XML::Tiny output into a Tree'
+author:
+  - 'Ron Savage <ron@savage.net.au>'
+build_requires:
+  Test::More: '1.001014'
+configure_requires:
+  Module::Build: '0.4211'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4211, CPAN::Meta::Converter version 2.143240'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: XML-Tiny-Tree
+provides:
+  XML::Tiny::Tree:
+    file: lib/XML/Tiny/Tree.pm
+    version: '1.00'
+requires:
+  File::Spec: '0'
+  Moo: '1.007'
+  Tree: '1.07'
+  Types::Standard: '1.000005'
+  XML::Tiny: '2.06'
+  strict: '0'
+  warnings: '0'
+resources:
+  license: http://www.perlfoundation.org/artistic_license_2_0
+version: '1.00'

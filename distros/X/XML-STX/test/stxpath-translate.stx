@@ -1,0 +1,18 @@
+<stx:transform version="1.0" 
+  xmlns:stx="http://stx.sourceforge.net/2002/ns"
+  stxpath-default-namespace="http://test_ns"
+  strip-space="yes">
+
+  <stx:template match="node">
+    <node>
+      <stx:value-of select="translate('koko','ok','at')"/>
+      <stx:text>-</stx:text>
+      <stx:value-of select="translate('koko','oko','abc')"/>
+      <stx:text>-</stx:text>
+      <stx:value-of select="translate('koko','ok','a')"/>
+      <stx:text>-</stx:text>
+      <stx:value-of select="translate('koko','ok','abc')"/>
+    </node>
+  </stx:template>
+
+</stx:transform>

@@ -1,0 +1,13 @@
+README
+Changes
+MANIFEST
+Makefile.PL
+Node.pm
+test.pl
+parse-orders.pl
+parse-testsuite.pl
+parse-foo.pl
+foo.xml
+orders.xml
+test.xml
+XML-Node.sgml

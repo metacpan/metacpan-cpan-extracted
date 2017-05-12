@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<b:character xmlns:b="http://www.book.org" b:id="1" id1="2">
+	<b:name>name</b:name>
+	<born>1990-01-01</born>
+	<title>title</title>
+</b:character>
+

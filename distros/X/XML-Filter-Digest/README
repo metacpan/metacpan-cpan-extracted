@@ -1,0 +1,248 @@
+NAME
+       XML::Filter::Digest
+
+SYNOPSIS
+           use strict;
+           use XML::Filter::Digest;
+           use XML::Handler::YAWriter;
+           use IO::File;
+
+           my $digest = new XML::Filter::Digest(
+               'Handler'=>
+                   new XML::Handler::YAWriter(
+                   'Output' => new IO::File( ">-" ),
+                   'Pretty' => {
+                       'AddHiddenNewLine' => 1
+                       }
+                   ),
+
+               'Script' =>
+                   new XML::Script::Digest(
+                   'Source' => { 'SystemId' => $ARGV[0] }
+                   )->parse(),
+
+               'Source' => { 'SystemId' => $ARGV[1] }
+               )->parse();
+
+           0;
+
+
+DESCRIPTION
+       Most XML tools aim to parse some simple XML and to produce
+       some formatted output. XML::Filter::Digest aims to do the
+       opposite.
+
+       Many formats can now be parsed by a SAX Driver. XPath
+       offers a smart way to write queries to XML.
+       XML::Filter::Digest is a PerlSAX Filter to query XML and
+       to provide a simpler digest as a result.
+
+       XML::Filter::Digest uses its own script language that can
+       be parsed by XML::Script::Digest to formulate these digest
+       queries.
+
+       In fact, a digest script is well-formed XML.
+
+       The following script defines that the result XML should
+       have a root element called extract, containing several
+       elements called section starting from the 4th HTML header.
+       Those section elements contain id, title and intro
+       elements, which in turn contain the XPath string-value of
+       their nodes as character data.
+
+           <digest name="extract">
+           <collect
+               name="section"
+               node="//html//h2[position()&gt;3]"
+               >
+               <collect
+                   name="id"
+                   node="child::a/attribute::name"
+               />
+               <collect
+                   name="title"
+                   node="."
+               />
+               <collect
+                   name="intro"
+                   node="following-sibling::p[position()=1]"
+               />
+           </collect>
+           </digest>
+
+       The digest script parser silently ignores anything other
+       than digest elements and collect elements. The digest
+       element needs a name attribute defining the name of the
+       root element, while the collect element needs an
+       additional node attribute defining XPath queries for
+       nested elements.
+
+       Only a single digest element should exist within a script
+       document, but there is no need that the digest script be
+       the root element of the document. Nested within the digest
+       element should be collect elements. They may contain
+       several other collect elements recursivly.
+
+       METHODS
+
+       The XML::Filter::Digest object may act as a Filter to
+       receive SAX events, or directly as a Driver if you provide
+       a Source option to the parse method. The filter is
+       reusable, if you arrange that the chain of Handlers is
+       also reusable to handle multiple documents in batches. The
+       filter requires a Handler and a Script option before the
+       start_document method is called.
+
+       The XML::Script::Digest object may act as a Handler to
+       receive SAX events, or directly if you provide a Source
+       option to the parse method. The script object is reusable
+       and a single script object can be used for several filter
+       objects.
+
+       new Creates a new XML::Driver::HTML object. Default
+           options for parsing, described below, are passed as
+           key-value pairs or as a single hash.  Options may be
+           changed directly in the object.
+
+       parse
+           Parses a document by embedding XML::Parser::PerlSAX.
+           This allows you to use XML::Filter::Digest directly as
+           a Driver and simplifies generating a ready-to-use
+           XML::Script::Object.
+
+           Options, described below, are passed as key-value
+           pairs or as a single hash.  Options passed to parse()
+           override the default options in the object for the
+           duration of the parse.
+
+       start_document
+           Notifies the object about the start of a new document.
+           The object will do its cleanup if it's reused.
+
+       end_document
+           Notifies the object about the end of the document.
+           Return value of XML::Script::Digest is $self, to be
+           used as the return value of the parse method.
+
+           XML::Filter::Digest will walk through the script
+           object to generate a stream of SAX events for its
+           Handler. Return value of XML::Filter::Digest is the
+           return value of the end_document method of the Handler
+           object.
+
+       OPTIONS
+
+
+       Script
+           XML::Script::Digest objects can be used for several
+           XML::Filter::Digest objects.
+
+       Handler
+           Default SAX Handler to receive events from
+           XML::Filter::Digest objects.
+
+       Source
+           XML::Filter::Digest and XML::Script can be used on raw
+           XML directly, by calling the parse() method. To do
+           this, the Source option is required for embedding the
+           PerlSAX parser.
+
+           The `Source' hash may contain the following
+           parameters:
+
+           ByteStream
+               The raw byte stream (file handle) containing the
+               document.
+
+           String
+               A string containing the document.
+
+           SystemId
+               The system identifier (URI) of the document.
+
+           Encoding
+               A string describing the character encoding.
+
+           If more than one of `ByteStream', `String', or
+           `SystemId' are present, preference is given first to
+           `ByteStream', then `String', then `SystemId'.
+
+NOTES
+       The XML::Filter::Digest is not a streaming filter, but a
+       buffering filter, as any processing is done by the
+       end_document method. This could cause the Perl interpreter
+       to run out of memory on large XML files. Ideally, define a
+       ulimit, to prevent the system going offline for several
+       minutes, till it detects that there is really no memory to
+       seize somewhere in the network. Adding network swapspace
+       ad infinitum only make things worse, so I have the
+       following line in my .bashrc. Other operating systems
+       offer similar constraints.
+
+           ulimit -v 98304 -d 98304 -m 98304
+
+       This line is ok on a single user machine with 32M ram and
+       128MB swap. I can raise this value, if I know that I wanna
+       walk the dog.
+
+BUGS
+       not yet implemented:
+
+           reuse of XML::Filter::Digest objects.
+
+       XML::XPath::Builder bug:
+
+           XML::Filter::Digest 0.06 has been tested with XML::XPath
+           version 1.10. Prior versions of XML::XPath::Builder wont work.
+
+
+AUTHOR
+         Michael Koehne, Kraehe@Copyleft.De
+         (c) 2001 GNU General Public License
+
+
+SEE ALSO
+       the XML::Parser::PerlSAX manpage and the XML::XPath
+       manpage
+
+
+
+2001-06-13                 perl v5.6.0                          1
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,29 @@
+TYPEMAP
+xh_opts_t  * T_CONV
+xmlNodePtr   O_NODE_OBJECT
+
+INPUT
+O_NODE_OBJECT
+    if( sv_isobject($arg) && (SvTYPE(SvRV($arg)) == SVt_PVMG) ) {
+            $var = INT2PTR($type,PmmSvNode($arg));
+            if ( $var == NULL ) {
+               croak( \"${Package}::$func_name() -- $var contains no data\" );
+               XSRETURN_UNDEF;
+            }
+    }
+    else {
+            croak( \"${Package}::$func_name() -- $var is not a blessed SV reference\" );
+            XSRETURN_UNDEF;
+    }
+T_CONV
+    if (sv_isa($arg, \"XML::Hash::XS\")) {
+        IV tmp = SvIV((SV *) SvRV($arg));
+        $var = INT2PTR(xh_opts_t *, tmp);
+    } else
+        Perl_croak(aTHX_ \"%s: %s is not of type XML::Hash::XS\",
+            ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+            \"$var\")
+
+OUTPUT
+T_CONV
+    sv_setref_pv($arg, \"XML::Hash::XS\", (void *) $var);

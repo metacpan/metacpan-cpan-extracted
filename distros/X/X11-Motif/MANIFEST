@@ -1,0 +1,87 @@
+ANNOUNCE
+README
+config.pm				-- location of X/Motif libraries, etc.
+typemap					-- C to/from perl type translations for all modules
+Artistic				-- Artistic license (same as Perl 5 distribution)
+GPL					-- GNU Copyleft license
+MANIFEST
+Makefile.PL
+Lib/Lib.pm
+Lib/Lib.xs
+Lib/LibCons.pm
+Lib/constants.dat			-- special X11 constants (input to prepare-constants)
+Lib/Makefile.PL
+Lib/list-raw-funs			-- generates raw api listings
+Lib/packages.c
+Lib/raw-Lib-api
+Lib/x-api.h
+Toolkit/Makefile.PL
+Toolkit/Toolkit.pm
+Toolkit/Toolkit.xs
+Toolkit/ToolkitCons.pm
+Toolkit/constants.dat			-- special X Toolkit constants (input to prepare-constants)
+Toolkit/Widget/Makefile.PL
+Toolkit/Widget/Widget.pm
+Toolkit/WidgetClass/Makefile.PL
+Toolkit/WidgetClass/WidgetClass.pm
+Toolkit/raw-Toolkit-api
+Toolkit/toolkit-api.h
+Motif/Makefile.PL
+Motif/Motif.pm
+Motif/Motif.xs
+Motif/MotifCons.pm
+Motif/constants.dat			-- special Motif constants (input to prepare-constants)
+Motif/motif-api.h
+Motif/prepare-constants			-- generates module constants
+Motif/raw-Motif-api
+Motif/XpFolder.c			-- some custom Motif-derived widgets
+Motif/XpFolder.h
+Motif/XpFolderP.h
+Motif/XpStack.c
+Motif/XpStack.h
+Motif/XpStackP.h
+Motif/XpLinedArea.c
+Motif/XpLinedArea.h
+Motif/XpLinedAreaP.h
+Motif/URLChooser/Makefile.PL		-- a pure Motif module implementing a multi-source file selector
+Motif/URLChooser/URLChooser.pm
+Motif/URLChooser/FTP/FTP.pm
+Motif/URLChooser/FTP/Makefile.PL
+Motif/URLChooser/File/File.pm
+Motif/URLChooser/File/Makefile.PL
+Xbae/Makefile.PL			-- Xbae widget interface -- all C code in Motif.xs
+Xbae/Xbae.pm
+Xpm/Makefile.PL
+Xpm/Xpm.pm
+Xpm/Xpm.xs
+XRT/Makefile.PL				-- XRT widget interface
+XRT/constants.dat
+XRT/XRT.in
+XRT/XRT.xs
+XRT/XRTCons.pm
+Athena/Makefile.PL			-- MIT Athena widget interface
+Athena/Athena.pm
+doc/overview
+doc/resources
+examples/cvt-units.pl
+examples/dialog.pl
+examples/draw.pl
+examples/eval.pl
+examples/info-box.pl
+examples/list-res.pl
+examples/matrix.pl
+examples/multi-list.pl
+examples/select-file.pl
+examples/test-xt.pl
+examples/test.pl
+examples/text-set-value.pl
+examples/sc.pl
+examples/CPSC.pm
+examples/Outline.pm
+examples/upload.pl
+examples/xrt.pl
+examples/xrt-upload.pl
+examples/xppcamshaft.pl
+examples/data/cpu_utilization.dat
+examples/data/quit.xpm
+examples/data/sc.dat

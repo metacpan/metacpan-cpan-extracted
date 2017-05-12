@@ -1,0 +1,67 @@
+README for XML-SAX-Machines
+
+XML::SAX::Machines is a collection of APIs that allow complex SAX machines
+to be constructed without a huge amount of extra typing.
+
+This distribution contains three kinds of modules: machines, helpers, and
+filters.  Here's how they are laid out:
+
+- XML::SAX::* contains machines and helpers.
+    - XML::SAX::Machines lets you import the "classic" constructor
+      functions like Tap(), Pipeline(), Manifold(), and ByRecord().
+    - Each machine type has a class that implements it, like
+      XML::SAX::Tap, XML::SAX::Pipeline, etc.
+    - There is currently only one available helper,
+      XML::SAX::EventMethodMaker, which is most useful for building a
+      collection of methods to handle different events in the same way,
+      without having to know all of their names.  It is also useful as a
+      reference for all of the SAX events by looking at the source code,
+      which contains simple tables of what events occur for what kind of
+      handler (compiled by Robin Berjon).
+
+- XML::Filter::* contains filters that are used by ByRecord and Manifold
+  machines to handle SAX events (machines don't handle SAX events, they
+  delegate to the generators/filters/handlers they contain).
+    - XML::Filter::DocSplitter - Splits one doc in to multiple
+      documents, optionally coordinating with an aggregator like
+      XML::Filter::Merger to reassemble them.  ByRecord uses this.
+    - XML::Filter::Distributor - buffers a document and reemits it to
+      each handler in turn. Used by Manifold.
+    - XML::Filter::Tee - a dynamically reconfigurable tee fitting.  Does
+      not buffer.  Used by Tap.  Morally equivalent to
+      XML::Filter::SAXT but more flexible.
+    - XML::Filter::Merger - collects multiple documents and merges them,
+      inserting all secondary documents in to one master document.
+      Used by both ByRecord and Manifold.
+
+All of the XML::Filter::* classes are useful outside of the machines
+that use them.  For instance, XML::Filter::DocSplitter has been used
+(not by me) in a Pipeline to split a huge record oriented file in to
+individual files containing single records (using a custom class derived
+from XML::SAX::Writer).  XML::Filter::Merger is useful as a general way
+to implement <XInclude> style processing when XInclude is not a good
+fit.
+
+See the examples/ directory for, well, examples (and feel free to write
+up creative examples, eventually I'd like to compile a cookbook).
+
+To give a more concrete idea of how SAX machines are typically used,
+here's how to build a pipeline of SAX processors:
+
+    use XML::SAX::Machines qw( Pipeline );
+    use My::SAX::Filter2;
+
+    my $p = Pipeline(
+        "My::SAX::Filter1",
+        My::SAX::Filter2->new( ... ),
+        \$output
+    );
+
+    $p->parse_uri( $ARGV[0] );
+
+That loads (if need be) XML::SAX::Writer and calls it's new() function
+with an Output => \$output option, calls the passed-in instance of
+XML::SAX::Filter2 and calls its set_handler() method to point it to the
+XML::SAX::Writer that was just created, and then loads (if need be)
+My::SAX::Filter1 and calls it's new() function with a Handler => option
+pointing to the XML::SAX::Filter2 instance.

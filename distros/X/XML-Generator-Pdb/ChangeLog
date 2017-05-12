@@ -1,0 +1,12 @@
+2003-04-06 14:20  cvsjohan
+
+	* MANIFEST, MANIFEST.SKIP, Makefile.PL, example/README,
+	example/example.pdb, lib/XML/Generator/Pdb.pm, scripts/pdbtoxml,
+	t/01test.t: Initial revision
+
+2003-04-06 14:20  cvsjohan
+
+	* MANIFEST, MANIFEST.SKIP, Makefile.PL, example/README,
+	example/example.pdb, lib/XML/Generator/Pdb.pm, scripts/pdbtoxml,
+	t/01test.t: initial version
+

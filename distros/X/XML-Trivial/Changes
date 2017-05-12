@@ -1,0 +1,24 @@
+Revision history for XML-Trivial
+
+0.01    2007-08-29
+        First version.
+
+0.02	2007-09-05
+	Added test of parse().
+
+0.03	2007-09-29
+	Repaired serialization of attribute values and text nodes.
+	Added parsing of Doctype declaration.
+	Refined serialization of root node.
+	Added methods representing XML and Doctype declarations.
+
+0.04	2007-11-21
+	Repaired serialization of Doctype declaration.
+	Added some tests.
+
+0.05	2007-12-05
+	XML::Parser::Expat instance is released after parsing.
+
+0.06	2008-12-12
+	Weakened reference to parent element. Memory leaks caused
+	by circular references avoided.

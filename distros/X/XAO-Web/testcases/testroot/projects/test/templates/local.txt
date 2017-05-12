@@ -1,0 +1,7 @@
+system:[<%Page
+          path="/bits/system-test"
+          TEST="<%TEST/f%>"
+        %><%Page/h
+            path="/bits/local-test"
+            TEST="<%TEST/f%>"
+          %>]<%End%>

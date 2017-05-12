@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<NZSRSResponse VerMajor="3" VerMinor="99" RegistrarId="90">
+  <Response Action="Whois" FeId="4" FeSeq="411482" OrigRegistrarId="90" RecipientRegistrarId="90">
+    <FeTimeStamp Day="11" Hour="11" Minute="58" Month="1" Second="58" TimeZoneOffset="+13:00" Year="2010"/>
+    <Domain Delegate="1" DomainName="wotcha.geek.nz" Status="Active">
+      <RegistrantContact Name="Test" Email="test@example.com">
+        <PostalAddress Address1="Street" Address2="Suburb" City="City" CountryCode="NZ"/>
+        <Phone AreaCode="21" CountryCode="64" LocalNumber="0000000"/>
+      </RegistrantContact>
+      <RegistrarPublicContact Name="Test Registrar" Email="PublicEmail@srs.net.nz">
+        <PostalAddress Address1="PublicAddress1" City="PublicCity" CountryCode="NZ"/>
+        <Phone AreaCode="4" CountryCode="64" LocalNumber="PublicPhone"/>
+      </RegistrarPublicContact>
+      <AdminContact Name="Test" Email="test@example.com">
+        <PostalAddress Address1="Street" Address2="Suburb" City="City" CountryCode="NZ"/>
+        <Phone AreaCode="21" CountryCode="64" LocalNumber="0000000"/>
+      </AdminContact>
+      <TechnicalContact Name="DefaultName" Email="DefaultEmail@srs.net.nz">
+        <PostalAddress Address1="DefaultAddress1" Address2="DefaultAddress2" City="DefaultCity" CountryCode="NZ"/>
+        <Phone AreaCode="4" CountryCode="64" LocalNumber="DefaultPhone"/>
+      </TechnicalContact>
+      <BilledUntil Day="11" Hour="11" Minute="31" Month="2" Second="49" TimeZoneOffset="+13:00" Year="2010"/>
+      <RegisteredDate Day="11" Hour="11" Minute="31" Month="1" Second="49" TimeZoneOffset="+13:00" Year="2010"/>
+      <AuditDetails>
+        <AuditTime>
+          <From Day="11" Hour="11" Minute="31" Month="1" Second="49" TimeZoneOffset="+13:00" Year="2010"/>
+        </AuditTime>
+      </AuditDetails>
+    </Domain>
+  </Response>
+</NZSRSResponse>

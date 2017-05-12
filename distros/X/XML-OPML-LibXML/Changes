@@ -1,0 +1,13 @@
+Revision history for Perl extension XML::OPML::LibXML
+
+  0.03  Tue Oct 10 04:30:06 JST 2006
+        - Bumped up XML::LibXML requirement to 1.60
+        - Fixed bug in walkdown
+
+  0.02  Tue Oct 10 03:10:28 JST 2006
+        - Added walkdown(\&cb) API
+        - Added eg/benchmark.pl and sample benchmark against XML::OPML
+        - Minor doc updates
+
+  0.01  Tue Oct 10 00:50:15 2006
+        - original version

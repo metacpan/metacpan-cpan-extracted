@@ -1,0 +1,31 @@
+<stx:transform version="1.0" 
+  xmlns:stx="http://stx.sourceforge.net/2002/ns"
+  strip-space="yes">
+
+  <stx:variable name="var" select="'tek'"/>
+
+  <stx:template match="/root/node[1]">
+    <root>
+      <stx:value-of select="/root/node"/>
+      <stx:text>:</stx:text>
+      <stx:value-of select="/root/node()"/>
+      <stx:text>:</stx:text>
+      <stx:value-of select="//node"/>
+      <stx:text>:</stx:text>
+      <stx:value-of select="../node()"/>
+      <stx:text>:</stx:text>
+      <stx:value-of select="."/>
+      <stx:text>:</stx:text>
+      <stx:value-of select="$var"/>
+      <stx:text>:</stx:text>
+      <stx:value-of select="position()"/>
+      <stx:text>:</stx:text>
+      <stx:value-of select="@id"/>
+      <stx:text>:</stx:text>
+      <stx:value-of select="/root/node/@id"/>
+      <stx:text>:</stx:text>
+      <stx:value-of select="../*/@id"/>
+    </root>
+  </stx:template>
+  
+</stx:transform>

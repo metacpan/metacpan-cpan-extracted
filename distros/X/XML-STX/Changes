@@ -1,0 +1,143 @@
+Revision history for Perl extension XML::STX.
+
+0.43 December 22, 2004
+	- stx:process-siblings (@while, @until)
+	- minor optimizations 
+	- XML::SAX::ExpatXS used as preferred parser
+
+0.42 October 10, 2003
+	- stx:for-each-item (@name, @select)
+	- stx:while (@test)
+	- stx:while infinite loop protection (static expression 
+	  checks, repetition limit)
+	- added STX Viewer - stxview.pl
+	  (Gtk+ based visual browser for STX transforms)
+	- kept track of node identity
+	- added STXPath functions: upper-case, lower-case, 
+	  string-pad, index-of
+
+0.41 July 3, 2003
+	- stx:process-document (@href, @base, @group)
+	- stx:result-document (@href)
+	- stx:namespace-alias (@stylesheet-prefix, @result-prefix)
+	- added STXPath functions: insert-before, remove, 
+	  get-in-scope-prefixes, get-namespace-uri-for-prefix
+	- bug fixes (undefined ErrorListener, NS declarations, 
+	  stx:element)
+
+0.40 May 29, 2003
+        - options moved to stx:transform and stx:group
+	- new matching mechanism (3 precedence categories,
+          'visibility' and 'public' attributes)
+	- new visibility applied to procedures
+	- basic URIResolver implemented
+	- stx:include (@href)
+	- functions treated as QNames
+	- added STXPath functions: string-join, subsequence, node-kind,
+	  ends-with, avg, sum, min, max, round, floor, ceiling, exists
+	- removed functions: get-node, level, sublist, prefix
+	- existing functions revised and updated 
+          (STX WD 5 May 03, F&O WD 2 May 03)
+	- ErrorListener implemented
+	- semantics of stx:value-of changed, added @separator
+	- default-stxpath-namespace renamed to stxpath-default-namespace
+	- STX.pm split to STX.pm (factory) and Runtime.pm
+	  (no API changes)
+	- bug fixes (nested parameter passing, unary -)
+
+0.22 April 10, 2003
+	- stx:with-param (@name, @select, content)
+	  parameters passed with process-children,
+	  process-self, process-atributes, process-buffer,
+	  call-procedure
+	- template/procedure parameters
+
+0.21 March 25, 2003
+	- fixed a bug in returning fallback parser
+
+0.20 March 25, 2003
+	- new TrAX-like API
+	- STXPath revised to match new EBNF grammar
+	  (WD 19 March 2003)
+	- stylesheet parameters (strings, numbers)
+	- fixed matching of PIs with target
+	- removed NS nodes and full axes
+	- variables default to the empty string
+	- bug fixes (resolving QNames, variables in procedures)
+
+0.07 February 14, 2003
+	- group buffers without content (stx:buffer, @name)
+	- local buffers (stx:buffer, @name)
+	- stx:result-buffer (@clear)
+	- stx:process-buffer (@group)
+	- bug fixes (variables as QNames, top-level variables)
+
+0.06 January 31, 2003
+	- stx:procedure (@name, @visibility, @new-scope)
+	- stx:call-procedure (@name, @group)
+	- stx:process-self (@group)
+	- added namespace nodes and namespace axis
+	- bug fixes (@*, namespace-uri, group names as QNames, 
+	  string values, process-children)
+
+0.05 January 15, 2003
+	- the first version uploaded to CPAN
+	- string values updated (WD 14 January)
+	- naming changes according to WD 14 January
+          start-element, end-element, @new-scope, @pass-through
+	- added @group to stx:process-children
+	- added @group to stx:process-attributes
+	- added @name to stx:group
+	- stx:choose, stx:when (@test), stx:otherwise
+	- text nodes no more joined on the output
+	- bug fixes (// in match pattern, position(), 
+	  variable initialization, comparisons, paths as fc arguments, 
+	  '/' match pattern, multiple attributes)
+	- STX NS URI changed to http://stx.sourceforge.net/2002/ns
+
+0.04  September 3, 2002
+	- parenthesis sequence constructors supported in STXPath
+	- stx:process-attributes: without 'mode'
+	- stx:if (@test), stx:else
+	- added STXPath functions: count, empty, item-at, sublist
+
+0.03  July 3, 2002
+	- output well-formedness checks
+	- stx:variable (@name, @select, @keep-value): local variables, 
+	  group variables with select
+	- stx:assign (@name, @select)
+	- recursive template calls (@recursion-entry-point)
+	- lookahead in STXPath (text())
+	- added STXPath functions: has-child-nodes, starts-with, contains, 
+	  substring, substring-before, substring-after, string-length
+	- minor fixes
+
+0.02  June 4, 2002
+	- fixed AVT attributes
+	- complete matching (visible, global)
+	- added STXPath functions: position, get-node, level,
+	  concat, translate, not
+
+0.01  May 31, 2002
+	- original version; created by h2xs 1.20
+	- stx:transform (@version)
+	- stx:options (@strip-space, @no-match-events, 
+	  @default-stxpath-namespace, @recognize-cdata)
+	- stx:template (@match, @priority)
+	- literal elements: full (including AVT in attributes)
+	- literal text (in templates)
+	- stx:process-children: without 'mode'
+	- stx:value-of (@select)
+	- stx:copy (@attributes): elements, text, cdata, 
+	  processing-instructions, comments
+	- stx:element (@name, @namespace)
+	- stx:element-start (@name, @namespace)
+	- stx:element-end (@name, @namespace)
+	- stx:attribute (@name, @namespace, @select)
+	- stx:text, stx:cdata
+	- stx:comment, stx:processing-instruction
+	- matching: the 1st precedence category 
+          (the same group + public/global templates from childrens)
+	- STXPath: no variables, limited set of functions
+	- STXPath functions: true, false, boolean, string, number, 
+	  name, namespace, local-name, prefix, normalize-space

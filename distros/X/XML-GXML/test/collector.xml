@@ -1,0 +1,30 @@
+<collector-test>
+
+<!-- this is the test file for collector.pl -->
+
+<useless>this should be ignored</useless>
+
+<collectme>
+<name>bob</name>
+<age>42</age>
+<quest>turn the moon into green cheese</quest>
+<color>blue</color>
+</collectme>
+
+<collectme name="ned">
+<quest>ensure all the world's urinals get cleaned</quest>
+<color>purple</color>
+<haircolor>brown</haircolor>
+</collectme>
+
+<container quest-default="eat potatoes">
+  <dontcollectme>
+  <p>hello there</p>
+  </dontcollectme>
+  
+  <collectme color="red">
+  <name>fred</name>
+  </collectme>
+</container>
+
+</collector-test>

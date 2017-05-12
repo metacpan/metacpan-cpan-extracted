@@ -1,0 +1,65 @@
+<?xml version="1.0"?>
+<?xml-stylesheet title="CSS_formatting" type="text/css" href="rss.css"?>
+<rss version="2.0"
+  xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+><channel>
+<!-- Generated with Perl's XML::RSS::SimpleGen v11.11 -->
+
+<link>http://www.sacbee.com/content/opinion/national/ivins/</link>
+<title>Molly Ivins</title>
+<description>Molly Ivins on US and Texas politics</description>
+<language>en</language>
+<lastBuildDate>Fri, 05 Mar 2004 09:02:13 GMT</lastBuildDate>
+<skipHours blargle="123465"><hour>0</hour><hour cronk="zarf!!
+">1</hour><hour>2</hour><hour>3</hour><hour>4</hour><hour>5</hour><hour>6</hour><hour>7</hour><hour>8</hour><hour>10</hour><hour>11</hour><hour>12</hour><hour>13</hour><hour>14</hour><hour>15</hour><hour>16</hour><hour>17</hour><hour>18</hour><hour>19</hour><hour>20</hour><hour>22</hour><hour>23</hour></skipHours>
+<sy:updateFrequency>2</sy:updateFrequency>
+<sy:updatePeriod>daily</sy:updatePeriod>
+<sy:updateBase sy:soeu='skree'>1970-01-01T09:10+00:00</sy:updateBase>
+<ttl>720</ttl>
+<webMaster>sburke@cpan.org</webMaster>
+<docs>http://www.interglacial.com/rss/about.html</docs>
+
+<item>
+  <title>Dodging more faults</title>
+  <link>http://www.sacbee.com/content/opinion/national/ivins/story/8405848p-9335264c.html</link>
+  <description>AUSTIN, Texas -- So the Democrats have a candidate at last, and he is about bent over double with gravitas. I think that means he doesn't a have humorous bone in his body. It's a good thing there's at least one serious person in this race -- the Bushies are getting sillier and sillier.</description>
+</item>
+
+<item>
+  <title>Bush whacked the hornets' nest in Haiti</title>
+  <link>http://www.sacbee.com/content/opinion/national/ivins/story/8387221p-9316926c.html</link>
+  <description>AUSTIN, Texas -- Anyone see any reason to think Haiti will be better off without Jean-Bertrand Aristide? Just another little gift from the Bush foreign policy team, straight out of the whacko-right playbook.</description>
+</item>
+
+<item>
+  <title>Hungry and facing eviction</title>
+  <link>http://www.sacbee.com/content/opinion/national/ivins/story/8344739p-9274608c.html</link>
+  <description>AUSTIN, Texas -- Freddie Mac and Fannie Mae have gone and gotten themselves in big trouble. For those of you who do not follow the business pages, I only wish we were talking about pregnant teen-agers. Fannie and Freddie are the two government-sponsored mortgage companies that help most of us buy homes. Trouble is, they've run themselves into big-time debt -- they've doubled the amount they owe in just the last five years. When I say big-time, try $2 trillion. And guess who's on the hook if these things go under? Congratulations, taxpayers.</description>
+</item>
+
+<item>
+  <title>Dean had team spirit</title>
+  <link>http://www.sacbee.com/content/opinion/national/ivins/story/8291863p-9222263c.html</link>
+  <description>AUSTIN, Texas -- Oh boy, a close race in Wisconsin. This is swell! Go, Democrats. A few days ago, a Respected Party Elder advised me to stop dissing John Kerry on account of, &quot;He will be our nominee.&quot; He may be &quot;our nominee,&quot; but he'll still be a boring stiff. OK, sort of an impressive boring stiff.</description>
+</item>
+
+<item>
+  <title>Mudslingers, take your marks</title>
+  <link>http://www.sacbee.com/content/opinion/national/ivins/story/8282336p-9212917c.html</link>
+  <description>AUSTIN, Texas -- Anyone who is not enjoying American politics at this point is missing an important gene and a sense of humor. Whee, we're off! Like a dirty shirt, like a herd of turtles, it's the 2004 presidential campaign.</description>
+</item>
+
+<item>
+  <title>Punished for telling the truth?</title>
+  <link>http://www.sacbee.com/content/opinion/national/ivins/story/8254583p-9185226c.html</link>
+  <description>AUSTIN, Texas -- Friends of liberty, raise hell! To the barricades, or at least to the post office and the emails. A British citizen named Katharine Gun faces two years in prison for revealing that the U.S. National Security Agency tried -- and succeeded -- in getting the Brits to help us with illegal spying operations at the United Nations. The targets were the delegations of the six countries on the U.N. Security Council that were undecided on how to vote on the critical Iraqi war resolution.</description>
+</item>
+
+<item>
+  <title>Soldiers died for intelligence 'mistake'</title>
+  <link>http://www.sacbee.com/content/opinion/national/ivins/story/8244676p-9175499c.html</link>
+  <description>AUSTIN, Texas -- Just for the record, since the record is in considerable peril. These are Orwellian days, my friends, as the Bush administration attempts to either shove the history of the second Gulf War down the memory hole or to rewrite it entirely. Keeping a firm grip on actual historical fact, all of it easily within our imperfect memories, is not that easy amid the swirling storms of misinformation, misremembering and misstatement. But since the war itself stands as a monument to what happens when we let ourselves get stampeded by a chorus of disinformation, let's draw the line right now.</description>
+</item>
+
+
+</channel></rss>

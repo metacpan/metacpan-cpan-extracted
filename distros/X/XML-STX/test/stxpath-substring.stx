@@ -1,0 +1,23 @@
+<stx:transform version="1.0" 
+  xmlns:stx="http://stx.sourceforge.net/2002/ns"
+  strip-space="yes">
+
+  <stx:template match="/*">
+    <root>
+      <stx:value-of select="substring('auto', 1)"/>
+      <stx:text>:</stx:text>
+      <stx:value-of select="substring('auto', 2)"/>
+      <stx:text>:</stx:text>
+      <stx:value-of select="substring('auto', 2, 2)"/>
+      <stx:text>:</stx:text>
+      <stx:value-of select="substring('auto', 2, 10)"/>
+      <stx:text>:</stx:text>
+      <stx:value-of select="substring('auto', 5)"/>
+      <stx:text>:</stx:text>
+      <stx:value-of select="substring('auto', 0)"/>
+      <stx:text>:</stx:text>
+      <stx:value-of select="substring('12345', 1.5, 2.6)"/>
+    </root>
+  </stx:template>
+  
+</stx:transform>

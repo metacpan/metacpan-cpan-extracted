@@ -1,0 +1,13 @@
+<testfile>
+
+<thing name="Fred">
+my name is %%%name%%%
+(should be "Fred")
+</thing>
+
+<thing>
+my name is %%%name%%%
+(should be "Bob")
+</thing>
+
+</testfile>

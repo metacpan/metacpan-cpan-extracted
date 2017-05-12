@@ -1,0 +1,65 @@
+
+===== version history of XML::Compile::WSA
+
+version 0.94: Thu Jun 11 09:41:04 CEST 2015
+
+	Fixes:
+	- be aware that some other modules may take "any"s.  Only doable
+	  by enforcing taking anyElement myself.
+
+version 0.93: Thu Feb  6 17:10:45 CET 2014
+
+	Improvements:
+	- change documentation style.
+
+version 0.92: Mon Jan  6 10:40:29 CET 2014
+
+	Fixes:
+	- depends on WSDL11 [cpantesters]
+
+version 0.91: Mon Jan  6 01:05:54 CET 2014
+
+	Improvements:
+	- support for SOAP 1.2
+
+version 0.90: Tue Oct  1 13:39:09 CEST 2013
+
+	Changes:
+	- renamed XML::Compile::SOAP::WSA::Util into XML::Compile::WSA::Util
+	- added XML::Compile::WSA.
+
+	Fixes:
+	- The $wsdl->call can also have a HASH, not only a LIST.
+
+	Improvements:
+	- use ::Cache::addPrefixes()
+
+version 0.13: Sat Oct  6 13:41:11 CEST 2012
+
+	Improvements:
+
+	- add some explicit references to ::SOAP and ::Daemon.
+	  Suggested by [Patrick Powel]
+
+	- fix some usage documentation.
+
+	- turn keyRewrite=prefixed on for wsa and wsaw.
+
+version 0.12: Mon Nov  1 17:14:36 CET 2010
+
+	Improvements:
+
+	- remove extension() call from the docs. Discovered
+	  by [Patrick Powel]
+
+	- remove dependency on Test::Pod
+
+	- automatic addition of wsa:Action to client and server
+	  messages, if the operation knows about them.
+
+version 0.11: Fri Jun 18 08:59:02 CEST 2010
+	- dependency on XML::Compile::SOAP was missing
+	  [cpantesters]
+
+version 0.10: Fri Jun 15
+	- initial release

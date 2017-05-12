@@ -1,0 +1,33 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.21.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It would check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 a4c4be69b997b744166ec52c98af26df0db3507c Changes
+SHA1 c2507b5f39c3e748836e843fe6131332b145386b MANIFEST
+SHA1 92592f60f2b174c9a12a8599aa3c93790c8fa699 MANIFEST.SKIP
+SHA1 649b4dd0235abf5dba079374462e45c2168bda78 Makefile.PL
+SHA1 cce6b4a76be65da4cfb4602e3fbe63b07da720de Osd.pm
+SHA1 0eae3cb0bc87c7481e638ff20e6bd8a948386b65 Osd.xs
+SHA1 a8a85ee2e4e4c0703deb2967653a23f2ec95559f README
+SHA1 74c30a9ef1c475a4903b883c84a77354cdbc3b48 t/0-signature.t
+SHA1 e0a01852e90dec08d4b4f8f5864adb8ce9c73e32 t/1-basic.t
+SHA1 d1c3cc95221d777f7e4b9786dff5088c47c6b134 typemap
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.1 (GNU/Linux)
+
+iD8DBQE/AYQ4yzKhB4jDpaURAhgPAJwI1CVxCBC/vaplvPOCZ6W1lwEOIQCfePqW
+sJsRWLuNfId7GIed4Sa+UAY=
+=ZsNt
+-----END PGP SIGNATURE-----

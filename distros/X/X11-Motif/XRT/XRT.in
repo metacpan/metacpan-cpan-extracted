@@ -1,0 +1,213 @@
+package X11::XRT;
+
+/* Copyright 1997, 1998 by Ken Fox */
+
+use DynaLoader;
+
+use strict;
+use vars qw($VERSION @ISA);
+
+BEGIN {
+    $VERSION = 1.0;
+    @ISA = qw(DynaLoader);
+
+    bootstrap X11::XRT;
+
+    use X11::Motif qw(:private);
+    use X11::XRTCons;
+}
+
+sub import {
+    my $module = shift;
+    my %done;
+
+    foreach my $sym (@_) {
+	next if ($done{$sym});
+
+	if ($sym eq ':XRT') {
+	    export_pattern(\%X::XRT::, '^XRT');
+	    export_pattern(\%X::XRT::, '^XtNxrt');
+	    export_pattern(\%X::XRT::, '^Xrt');
+	}
+	elsif ($sym eq ':widgets') {
+	    export_pattern(\%X::XRT::, '^xtXrt');
+	    export_pattern(\%X::XRT::, '^xmXrt');
+	}
+	else {
+	    export_symbol(\%X::XRT::, $sym);
+	}
+
+	$done{$sym} = 1;
+    }
+}
+
+sub beta_version { 2 };
+
+package X::XRT;
+
+/* ================================================================================
+ * XRT Graph Widgets */
+
+#ifdef WANT_XRT_GRAPH
+    xtXrtGraphWidgetClass()->register();
+    xtXrtGraphWidgetClass()->register_alias(-graph);
+#endif
+
+/* ================================================================================
+ * XRT Gear Widgets */
+
+#ifdef WANT_XRT_GEAR
+    xmXrtOutlinerWidgetClass()->register();
+    xmXrtOutlinerWidgetClass()->register_alias(-outline);
+
+    xmXrtNodeFolderObjectClass()->register();
+    xmXrtNodeFolderObjectClass()->register_alias(-outlinefolder);
+
+    xmXrtNodeObjectClass()->register();
+    xmXrtNodeObjectClass()->register_alias(-outlinenode);
+
+    xmXrtNodeStyleObjectClass()->register();
+    xmXrtNodeStyleObjectClass()->register_alias(-outlinestyle);
+
+    xmXrtColumnObjectClass()->register();
+    xmXrtColumnObjectClass()->register_alias(-outlinecolumn);
+
+    xmXrtToggleButtonWidgetClass()->register();
+    xmXrtToggleButtonWidgetClass()->register_alias(-xrttoggle);
+#endif
+
+/* ================================================================================
+ * Resource converters */
+
+sub cvt_to_XrtStrings {
+    my $value = shift;
+    $$value = convert_to_Strings($$value);
+}
+
+X::Toolkit::Widget::conversion_is_prohibited('XrtString');
+X::Toolkit::Widget::conversion_is_mandatory('XrtStrings');
+X::Toolkit::Widget::register_converter('XrtStrings', \&cvt_to_XrtStrings);
+
+sub cvt_to_Float {
+    my $value = shift;
+    $$value = convert_to_Float($$value);
+}
+
+X::Toolkit::Widget::conversion_is_mandatory('Float');
+X::Toolkit::Widget::register_converter('Float', \&cvt_to_Float);
+
+sub cvt_to_XrtDataStyle {
+    my $value = shift;
+    $$value = convert_to_DataStyle($$value);
+}
+
+X::Toolkit::Widget::conversion_is_mandatory('XrtDataStyle');
+X::Toolkit::Widget::register_converter('XrtDataStyle', \&cvt_to_DataStyle);
+
+sub cvt_to_XrtDataStyles {
+    my $value = shift;
+    $$value = convert_to_DataStyles($$value);
+}
+
+X::Toolkit::Widget::conversion_is_mandatory('XrtDataStyles');
+X::Toolkit::Widget::register_converter('XrtDataStyles', \&cvt_to_DataStyles);
+
+sub cvt_to_GearString {
+    my $value = shift;
+    my $type = ref $$value;
+
+    if ($type) {
+	if ($type eq 'X::Motif::String') {
+	    $$value = XrtGearStringCreateXmString($$value);
+	}
+	elsif ($type eq 'X::XRT::perl_GearIcon') {
+	    $$value = XrtGearStringCreateIconString($$value);
+	}
+    }
+    else {
+	$$value = XrtGearStringCreateCharString($$value);
+    }
+}
+
+X::Toolkit::Widget::conversion_is_mandatory('GearString');
+X::Toolkit::Widget::register_converter('GearString', \&cvt_to_GearString);
+
+sub cvt_to_GearLabel {
+    my $value = shift;
+
+    if (ref $$value eq 'ARRAY') {
+	# create XrtList or XrtString
+    }
+    else {
+	cvt_to_GearString($value);
+    }
+}
+
+X::Toolkit::Widget::conversion_is_mandatory('GearLabel');
+X::Toolkit::Widget::register_converter('GearLabel', \&cvt_to_GearLabel);
+
+/* ================================================================================
+ * Callback data structures */
+
+package X::XRT::AnyCallData;
+
+#ifdef WANT_XRT_GEAR
+
+$X::Toolkit::Widget::call_data_registry{'XmXrtOutliner,xrtGearFolderStateCallback'} = \"X::XRT::FolderStateCallData";
+$X::Toolkit::Widget::call_data_registry{'XmXrtOutliner,xrtGearSelectionCallback'} = \"X::XRT::SelectCallData";
+$X::Toolkit::Widget::call_data_registry{'XmXrtOutliner,xrtGearNodeActivateCallback'} = \"X::XRT::NodeActivateCallData";
+
+package X::XRT::AnyGearCallData;
+    use vars qw(@ISA);
+    @ISA = qw(X::XRT::AnyCallData);
+
+package X::XRT::GenericContainerCallData;
+    use vars qw(@ISA);
+    @ISA = qw(X::XRT::AnyGearCallData);
+
+package X::XRT::FolderStateCallData;
+    use vars qw(@ISA);
+    @ISA = qw(X::XRT::GenericContainerCallData);
+
+package X::XRT::SelectCallData;
+    use vars qw(@ISA);
+    @ISA = qw(X::XRT::GenericContainerCallData);
+
+package X::XRT::NodeActivateCallData;
+    use vars qw(@ISA);
+    @ISA = qw(X::XRT::GenericContainerCallData);
+
+#endif
+
+/* ================================================================================
+ * Pseudo-inheritance hierarchy for XRT resource types */
+
+package X::XRT::perl_GearObject;
+
+package X::XRT::perl_GearString;
+    use vars qw(@ISA);
+    @ISA = qw(X::XRT::perl_GearObject);
+
+package X::XRT::perl_GearList;
+    use vars qw(@ISA);
+    @ISA = qw(X::XRT::perl_GearObject);
+
+1;
+
+=head1 NAME
+
+X11::XRT - Interface to KL Groups XRT Widget Set
+
+=head1 SYNOPSIS
+
+use X11::XRT qw(:XRT);
+
+=head1 DESCRIPTION
+
+The XRT Widget Set is a nice collection of widgets that extend
+the Motif Widget Set.  This module simply provides a Perl interface
+to those widgets.  This module can only be used with a statically
+built perl interpreter because KL Groups licensing system must
+stamp an executable with a valid license code.
+
+=cut

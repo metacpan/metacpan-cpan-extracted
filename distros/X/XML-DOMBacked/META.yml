@@ -1,0 +1,18 @@
+---
+name: XML-DOMBacked
+version: 1.00
+author:
+  - James A. Duncan <jduncan@fotango.com>
+abstract: objects backed by a DOM
+license: perl
+requires:
+  LWP::UserAgent: 0
+  XML::LibXML: 0
+  perl: 5.008
+build_requires:
+  Test::More: 0
+provides:
+  XML::DOMBacked:
+    file: lib/XML/DOMBacked.pm
+    version: 1.00
+generated_by: Module::Build version 0.2611

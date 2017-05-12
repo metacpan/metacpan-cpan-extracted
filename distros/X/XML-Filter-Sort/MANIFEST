@@ -1,0 +1,18 @@
+Changes
+MANIFEST
+README
+Makefile.PL
+lib/XML/Filter/Sort.pm
+lib/XML/Filter/Sort/Buffer.pm
+lib/XML/Filter/Sort/BufferMgr.pm
+lib/XML/Filter/Sort/DiskBuffer.pm
+lib/XML/Filter/Sort/DiskBufferMgr.pm
+bin/xmlsort
+t/0_config.t
+t/1_buffer.t
+t/2_buffermgr.t
+t/3_sort.t
+t/4_workout.t
+t/5_diskbuffer.t
+t/6_diskworkout.t
+META.yml                                 Module meta-data (added by MakeMaker)

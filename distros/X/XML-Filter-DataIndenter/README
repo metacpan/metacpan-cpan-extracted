@@ -1,0 +1,62 @@
+NAME
+    XML::Filter::DataIndenter - SAX2 Indenter for data oriented XML
+
+SYNOPSIS
+        use XML::Filter::DataIndenter;
+
+        use XML::SAX::Machines qw( Pipeline );
+
+        Pipeline( XML::Filter::DataIndenter => \*STDOUT );
+
+DESCRIPTION
+    ALPHA CODE ALERT: This is the first release. Feedback and patches
+    welcome.
+
+    In data oriented XML, leaf elements (those which contain no elements)
+    contain only character content, all other elements contain only child
+    elements and ignorable whitespace. This filter consumes all whitespace
+    not in leaf nodes and replaces it with whitespace that indents all
+    elements. Character data in leaf elements is left unmolested.
+
+    This filter assumes you're emitting data oriented XML. It will die if it
+    sees non-whitespace character data outside of a leaf element. It also
+    dies if it sees start-tag / end-tag mismatch, just as a service to the
+    programmer.
+
+    Processing instructions and comments are indented as though they were
+    leaf elements except when they occur in leaf elements.
+
+  Example:
+    This document:
+
+        <a><?A?>
+        <!--A--><b><?B?><!--B-->B</b>
+            <!--A-->
+            </a>
+
+    gets reindented as:
+
+        <a>
+          <?A?>
+          <!--A-->
+          <b><?B?><!--B-->B</b>
+          <!--A-->
+        </a>
+
+    (plus or minus a space in each PI, depending on your XML writer).
+
+LIMITATIONS
+    Considers only [\r\n \t] to be whitespace; does not think about the
+    broader Unicode definition of whitespace. This will be addressed when
+    time and need permit.
+
+COPYRIGHT
+        Copyright 2003, R. Barrie Slaymaker, Jr., All Rights Reserved
+
+LICENSE
+    You may use this module under the terms of the BSD, Artistic, oir GPL
+    licenses, any version.
+
+AUTHOR
+    Barrie Slaymaker <barries@slaysys.com>
+

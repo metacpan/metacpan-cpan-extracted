@@ -1,0 +1,143 @@
+=encoding utf8
+
+=head1 NAME
+
+XML::Compile::SOAP::WSS - Web Service Security used in SOAP
+
+=head1 INHERITANCE
+
+ XML::Compile::SOAP::WSS
+   is a XML::Compile::SOAP::Extension
+
+=head1 SYNOPSIS
+
+ use XML::Compile::SOAP::WSDL11;
+ use XML::Compile::SOAP::WSS;
+
+ # strict order of instantiation!
+ my $wss  = XML::Compile::SOAP::WSS->new; # hooks WSDL parser
+ my $wsdl = XML::Compile::WSDL11->new($wsdlfn);    
+
+ my $auth = $wss->basicAuth               # add Security record
+   ( username => $user
+   , password => $password
+   );
+
+ # Will include all defined security features
+ my $call     = $wsdl->compileClient($opname);
+ my ($answer, $trace) = $call->(%data);
+
+ # Only explicit security features:
+ my $call     = $wsdl->compileClient($opname);
+ my ($answer, $trace) = $call->(wsse_Security => $auth, %data);
+
+ my @features = ($auth, ...);    # any selection of features
+ my $answer   = $call->(wsse_Security => \@features, %data);
+
+=head1 DESCRIPTION
+
+The Web Service Security protocol is implemented in the sub-classes of
+L<XML::Compile::WSS|XML::Compile::WSS>. This module integrates WSS features in SOAP usage.
+
+This module is an XML::Compile::SOAP::Extension; a plugin for the
+SOAP infra-structure.  Many of these extension protocols behave badly:
+they usually interfere with the WSDL specification.  Therefore, all
+B<WSDL plugins> have to be instantiated before the WSDL files get read,
+i.e. before the WSDL object itself gets instantiated.  The use of the
+information can only take place when all schema's are read, so these
+security features can only be created after that.
+
+=head1 METHODS
+
+=head2 Constructors
+
+=over 4
+
+=item XML::Compile::SOAP::WSS-E<gt>B<new>(%options)
+
+ -Option--Default
+  schema  undef
+
+=over 2
+
+=item schema => L<XML::Compile::Cache|XML::Compile::Cache> object
+
+Do not use this in combination with a WSDL, but always in any other case.
+
+=back
+
+=back
+
+=head2 Attributes
+
+=over 4
+
+=item $obj-E<gt>B<addFeature>($wssobj)
+
+Add a new L<XML::Compile::WSS|XML::Compile::WSS> object to the list of maintained features.
+
+=item $obj-E<gt>B<features>()
+
+Returns a list of all security features.
+
+=item $obj-E<gt>B<schema>()
+
+=back
+
+=head2 Security features
+
+Create one or more of these "features", components in the security
+header.
+
+=over 4
+
+=item $obj-E<gt>B<basicAuth>(%options)
+
+Implements username/password authentication.
+See documentation in L<XML::Compile::WSS::BasicAuth|XML::Compile::WSS::BasicAuth>.  The %options are
+passed to its new() method.
+
+=item $obj-E<gt>B<signature>(%options)
+
+Put a crypto signature on one or more elements.
+See documentation in L<XML::Compile::WSS::Signature|XML::Compile::WSS::Signature>.  The %options are
+passed to its new() method.
+
+ -Option    --Default
+  sign_types  'SOAP-ENV:Body'
+
+=over 2
+
+=item sign_types => ARRAY
+
+[1.08] specify the types of elements which need to be signed.  If you
+have more elements of the same type, they will all get signed.
+
+=back
+
+=item $obj-E<gt>B<timestamp>(%options)
+
+Adds a timestamp record to the Security header.
+See documentation in L<XML::Compile::WSS::Timestamp|XML::Compile::WSS::Timestamp>.  The %options are
+passed to its new() method.
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of XML-Compile-WSS distribution version 1.14,
+built on May 08, 2017. Website: F<http://perl.overmeer.net/xml-compile/>
+
+Please post questions or ideas to the mailinglist at
+F<http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/xml-compile> .
+For live contact with other developers, visit the C<#xml-compile> channel
+on C<irc.perl.org>.
+
+=head1 LICENSE
+
+Copyrights 2011-2017 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the Artistic license.
+See F<http://dev.perl.org/licenses/artistic.html>
+

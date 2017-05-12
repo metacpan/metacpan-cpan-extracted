@@ -1,0 +1,1070 @@
+package XML::LibXML::Tools;
+
+BEGIN {
+  @XML::LibXML::Tools::ISA = qw( Exporter );
+  @XML::LibXML::Tools::EXPORT = qw( BEFORE AFTER TO );
+  $XML::LibXML::Tools::VERSION = '1.00';
+}
+
+use strict;
+use Exporter;
+
+our $croak = 1;
+
+use XML::LibXML;
+use Carp;
+
+use constant BEFORE => "before";
+use constant AFTER  => "after";
+use constant TO     => "to";
+use constant DEEP   => 1;
+
+use Class::AccessorMaker {
+  # object wide settings
+  defaultLocation => TO,
+
+  # object holders
+  objectDom   => "",
+  storeDom    => 1,
+
+  # error handling
+  error        => undef,
+  errorMsg     => undef,
+  croakOnError => 1,
+  showPath     => 0,
+
+}, "new_init";
+
+
+sub init {
+  my ($self) = @_;
+
+  $self->croakOnError($croak);
+  return $self;
+}
+
+# prevent endless recursion.
+my @already_seen = ();
+
+# ==========================================================================
+#   ERRORS AND SUCH
+# ==========================================================================
+
+sub addError{
+  my $self = shift;
+  my $string = shift;
+
+  $self->errorMsg( ( ($self->errorMsg()) ? ($self->errorMsg()."\n") : "") . $string );
+  $self->error(1);
+
+  if ( $self->croakOnError ) {
+    my @caller = caller(1);
+    my @calledby = caller(2);
+    my ($caller) = $calledby[3]||'';
+    $caller =~ s/XML::LibXML::Tools:://;
+    croak("$string - $caller ($caller[1] line: $caller[2])");
+  }
+
+  return($self);
+}
+
+sub resetError{
+  my $self = shift;
+  $self->error(0);
+  $self->errorMsg("");
+  return($self);
+}
+
+sub checkParams {
+  my $self  = shift;
+  my %param = @_;
+
+  if ( my @missing = grep { !defined $param{params}->{$_} } @{$param{required}} ) {
+    $self->addError("Missing required parameter(s) ".join(", ", @missing));
+
+    return undef;
+  }
+
+  # shouldn't be here, but prevents warnings;
+  $param{params}->{depth} ||= 0;
+
+  return 1;
+}
+
+sub resetHandlers {
+  my $self   = shift;
+  my $caller = [caller(1)]->[1];
+
+  if ( $caller !~ /LibXML::Tools/ ) {
+    @already_seen = ();
+    $self->resetError;
+  }
+}
+
+# ==========================================================================
+#   COMPLEX -> DOM
+# ==========================================================================
+
+sub complex2Dom {
+  my $self  = shift;
+  my %param = @_;
+  $param{depth} ||= 0;
+
+  warn "-" x $param{depth}, "complex2Dom\n" if $self->showPath;
+
+  my $prev = $self->showPath;
+  $self->showPath($param{showpath}) if exists $param{showpath};
+
+  # reset recursion safety
+  $self->resetHandlers();
+
+  # create ourselves a Dom.
+  my $dom = XML::LibXML::Document->new();
+  $dom->setEncoding( "utf-8" );
+
+  # find root element
+  my $ref = $param{data};
+  my $rootName = shift @$ref;
+  $ref = shift @$ref;
+
+  if ( my $type = ref($rootName) ) {
+    if ( $type =~ /ARRAY/ ) {
+      $rootName = shift @$rootName;
+    } elsif ( $type =~ /XML::LibXML/ ) {
+      # to complex.
+      $self->addError("complex2Dom: To complex! ($rootName)");
+    } else {
+      $self->addError("complex2Dom: No rootname! ($rootName)");
+      croak($self->errorMsg);
+    }
+  }
+
+  # create and set it.
+  {
+    eval {
+      local $SIG{__DIE__} = sub { };
+      $dom->setDocumentElement($dom->createElement( $rootName ));
+    };
+    chomp $@;
+    $self->addError("complex2Dom: $@") if $@;
+  }
+  my $root = $dom->getDocumentElement;
+  my $res = $self->array2Dom( %param,
+			      data => $ref,
+			      depth => $param{depth}+1,
+			      dom => $dom,
+			      node => $root );
+
+  # fake 1-node document support
+  if( ref($res) eq "XML::LibXML::Text" ) {
+    $root->addChild($res);
+  }
+
+  $self->objectDom($dom) if !$self->objectDom && $self->storeDom;
+
+  $self->showPath($prev);
+  return ($self->error) ? undef : $dom;
+}
+
+sub array2Dom{
+  my $self = shift;
+  my %param = @_;
+
+  $param{dom} ||= $self->objectDom;
+  $self->checkParams( params   => \%param,
+		      required => [ qw(data dom node) ],
+		    ) || return undef;
+
+  $self->resetHandlers;
+
+  my $type = ref($param{data});
+
+  if ( $type and $self->alreadySeen($param{data}) ) {
+    warn "Circular reference for $type at array2Dom\n";
+    return;
+  }
+
+  my $prev = $self->showPath;
+  $self->showPath($param{showpath}) if exists $param{showpath};
+
+  warn "-" x $param{depth}, "array2Dom\n" if $self->showPath;
+
+  if( $type eq "ARRAY" ){
+    my $first = 1;
+    my @tmp = @{$param{data}};
+
+    while ( @tmp ) {
+      my $key = shift @tmp;
+
+      $key = '' if( !defined $key );
+      my $val = shift @tmp;
+
+      if( my $attr = isAttribute($key) ){
+	my $newNode = $param{dom}->createAttribute($attr, $val);
+	$self->addNode( %param,
+			depth => $param{depth}+1,
+			newNode => $newNode );
+
+      } elsif( my $cmnt = isComment($key) ) {
+	my $element = $param{dom}->createComment( $cmnt );
+	$self->addNode( %param,
+			depth => $param{depth}+1,
+			newNode => $element );
+
+      } elsif ( my $type = ref($key) ) {
+	$self->domAdd(%param,
+		      depth => $param{depth}+1,
+		      data  => [ $key ]);
+
+      } else {
+	if( defined $val ) {
+	  my $element = $param{dom}->createElement($key);
+	  $param{node}->addChild($element);
+
+          # also support XML-doms!
+          if( ref($val) =~ /XML::LibXML::Document|XML::LibXML::DocumentFragment/ ) {
+	    my $content = "";
+	    if( ref($val) =~ /XML::LibXML::Document$/ ) {
+	      $content = $val->getDocumentElement->cloneNode( DEEP );
+	      $content->setOwnerDocument($param{dom});
+	    } else {
+	      $content = $val;
+	    }
+
+	    $element->addChild($content);
+
+	  } else {
+	    my $res = $self->array2Dom( %param,
+				        depth => $param{depth}+1,
+				        data => $val,
+				        node => $element);
+	  }
+
+	} else {
+	  # key _is_ value!
+	  $self->addNode(%param,
+			 depth => $param{depth}+1,
+			 newNode => $self->makeXMLFragment( %param,
+							    depth => $param{depth}+1,
+							    data => $key || '' ) );
+	}
+      }
+    }
+
+    return($param{node});
+
+  } elsif ($type eq "SCALAR") {
+    $self->array2Dom( %param,
+		      depth => $param{depth}+1,
+		      data => scalar($param{data}) );
+
+  } elsif ( $type =~ /XML::LibXML/ ) {
+    $self->addNode ( %param,
+		     depth => $param{depth}+1,
+		     newNode => $self->makeXMLFragment( %param,
+							depth => $param{depth}+1  ) );
+
+  } else{
+    # it's a true scalar! -> return the value!
+    $self->ref2TextNode( %param, depth => $param{depth}+1 );
+  }
+
+  $self->showPath($prev);
+  return ($self->error) ? undef : 1;
+}
+
+# ==========================================================================
+# DOM MANIPULATION
+# ==========================================================================
+
+sub ref2TextNode {
+  my $self  = shift;
+  my %param = @_;
+
+  $param{dom} ||= $self->objectDom;
+  $self->checkParams( params => \%param,
+		      required => [ qw(data dom node) ] ) || return undef;
+
+  my $prev = $self->showPath;
+  $self->showPath($param{showpath}) if exists $param{showpath};
+  warn "-" x $param{depth}, "ref2TextNode\n" if $self->showPath;
+
+  # some times, some where an element is mistaken for a text - correct
+  # that mistake here.
+
+  my $textNode;
+  if ( ref($param{data}) !~ /XML::LibXML/ ) {
+    $textNode = $param{dom}->createTextNode($param{data});
+
+  } elsif ( ref($param{data}) =~ /DocumentFragment|Element/ ) {
+    $textNode = $param{data};
+
+  } elsif ( ref($param{data}) =~ /NodeList/ ) {
+    $textNode = $param{data}->shift;
+
+  } else {
+    $self->addError("ref2TextNode: unknown reference type (".
+		    ref($param{data}).") - can't make node");
+  }
+
+  # reset location -> TO for text nodes
+  $self->addNode( %param,
+		  location => TO,
+		  depth => $param{depth}+1,
+		  newNode => $textNode );
+
+  $self->showPath($prev);
+
+  return ($self->error) ? undef : 1;
+}
+
+sub makeXMLFragment {
+  my $self  = shift;
+  my %param = @_;
+
+  $param{dom} ||= $self->objectDom;
+  $self->checkParams( params => \%param,
+		      required => [ qw(dom data) ]) || return undef;
+
+  my $prev = $self->showPath;
+  $self->showPath($param{showpath}) if exists $param{showpath};
+
+  warn "-" x $param{depth}, "makeXMLFragment\n" if $self->showPath;
+
+  if ( ref($param{data}) =~ /DocumentFragment/ ) {
+    # for fragments, elements and nodes be content.
+    $self->showPath($prev);
+    return $param{data}
+
+  } elsif ( ref($param{data}) =~ /NodeList/ ) {
+    $param{data} = $param{data}->shift->cloneNode( DEEP );
+
+  } elsif ( ref($param{data}) =~ /Element|Node/ ) {
+    $self->showPath($prev);
+    return $param{data}->cloneNode( DEEP );
+
+  }
+
+  if ( ref($param{data}) =~ /ARRAY/ ) {
+    # make array-value a DOM
+    $param{data} = $self->complex2Dom( %param,
+				       data => $param{data},
+				       depth => $param{depth}+1 );
+  }
+
+  my $type = ref($param{data});
+  my $content = "";
+
+  if ( $type =~ /XML::LibXML::Document$/ ) {
+    $content = $param{data}->getDocumentElement->cloneNode( DEEP );
+    $content->setOwnerDocument($param{dom})
+  } elsif ( $type =~ /DocumentFragment|Element/ ) {
+    $content = $param{data};
+
+  } else {
+    $content = $param{dom}->createTextNode($param{data});
+  }
+
+  $self->showPath($prev);
+
+  return ($self->error) ? undef : $content;
+}
+
+sub domUpdate {
+  my $self  = shift;
+  my %param = @_;
+
+  $param{dom} ||= $self->objectDom;
+  $param{dom} || $self->addError("domUpdate : No DOM supplied!");
+
+  if ( !$param{node} and $param{xpath} ) {
+    $param{node} = $param{dom}->findnodes($param{xpath})->shift;
+    $param{node} || $self->addError("Couldn't execute XPATH on supplied DOM ($param{dom}) in domUpdate");
+  }
+
+  $self->checkParams( params => \%param,
+		      required => [ qw(dom node data) ]) || return undef;
+
+  my $prev = $self->showPath;
+  $self->showPath($param{showpath}) if exists $param{showpath};
+
+  warn "-" x $param{depth}, "domUpdate\n" if $self->showPath;
+
+  # reset recursion limiter.
+  $self->resetHandlers;
+
+  my @tmp = @{$param{data}};
+  while (@tmp) {
+    my $key = shift @tmp;
+
+    my $value;
+    $value = shift @tmp if ( !ref($key) );
+
+    if( my $attr = isAttribute($key) ){
+      # update attribute of tag
+      $param{node}->removeAttribute( $attr );
+
+      my $newNode = $param{dom}->createAttribute($attr, $value);
+      $self->addNode( %param,
+		      depth => $param{depth}+1,
+		      newNode => $newNode );
+
+    } elsif ( isComment($key) ) {
+      # make error - but don't croak
+      my $prev = $self->croakOnError; $self->croakOnError(0);
+      $self->addError("domUpdate doesn't support comments. Referting to domAdd");
+      $self->croakOnError($prev);
+
+      $self->domAdd(%param,
+		    depth => $param{depth}+1,
+		    data => [ $key ]);
+
+    } else {
+      # update value element of tag
+      my $type = ref($key);
+
+      if ( !$type ) {
+	my $parent = $param{node}->findnodes("$key");
+	my $node = $parent->shift();
+
+	if (!$node) {
+	  # perhaps adding it is possible...
+	  $self->domAdd( %param,
+			 depth => $param{depth}+1,
+			 data => [ $key => $value ] );
+	  next;
+	}
+
+	my ($elname) = $key =~ /([^\/]*)$/;
+	my $element = $param{dom}->createElement( $elname );
+	my $content = $self->makeXMLFragment(%param,
+					     depth => $param{depth}+1,
+					     data => $value);
+
+	$element->addChild($content);
+	$node->replaceNode($element);
+
+      } elsif ( $type =~ /NodeList$/ ) {
+
+	foreach my $node ( $key->get_nodelist ) {
+	  # add or replace?
+	  my ($parentNode, $addOrReplace);
+	  eval {
+	    local $SIG{__DIE__} = sub {};
+	    $addOrReplace = ($parentNode = $param{node}->findnodes($node->nodeName)->shift)
+	      ? "replaceNode"
+	      : "addChild";
+	  };
+	  chomp($@); $self->addError("domUpdate: $@") if $@;
+
+	  $addOrReplace ||= "addChild";
+	  $parentNode ||= $param{node};
+
+	  my $newNode = $node->cloneNode( DEEP );
+	  $parentNode->$addOrReplace($newNode);
+	}
+
+      } elsif ( $type =~ /XML::LibXML/ ) {
+	my $content = $self->makeXMLFragment(%param,
+					     depth => $param{depth}+1,
+					     data => $key);
+	my $node = $content->findnodes("/")->shift;
+
+	# add or replace?
+	my ($parentNode, $addOrReplace);
+	eval {
+	  local $SIG{__DIE__} = sub {};
+	  $addOrReplace = ($parentNode = $param{node}->findnodes($node->nodeName)->shift)
+	    ? "replaceNode"
+	    : "addChild";
+	};
+	chomp($@); $self->addError("domUpdate: $@") if $@;
+
+	$addOrReplace ||= "addChild";
+	$parentNode ||= $param{node};
+
+	$parentNode->$addOrReplace($content);
+
+      } else {
+	$self->addError("Unknown type at domUpdate");
+      }
+    }
+  }
+
+  $self->showPath($prev);
+
+  return ($self->error) ? undef : 1;
+}
+
+sub domAdd {
+  my $self  = shift;
+  my %param = @_;
+
+  $param{dom} ||= $self->objectDom;
+  if ( !$param{node} and $param{xpath} ) {
+    $param{node} = $param{dom}->findnodes($param{xpath})->shift;
+    $param{node} || $self->addError("Couldn't execute XPATH on supplied DOM in domUpdate");
+  }
+
+  $self->checkParams( params => \%param,
+		      required => [ qw(dom node data) ]) || return undef;
+
+  my $prev = $self->showPath;
+  $self->showPath($param{showpath}) if exists $param{showpath};
+
+  warn "-" x $param{depth}, "domAdd\n" if $self->showPath;
+
+  # reset recursion limiter.
+  $self->resetHandlers;
+
+  my @tmp = @{$param{data}};
+  while (@tmp) {
+    my $key = shift @tmp;
+
+    my $value;
+    $value = shift @tmp if ( !ref($key) );
+
+    if ( my $attr = isAttribute($key) ) {
+      # update attribute of tag
+      $param{node}->removeAttribute( $attr );
+
+      my $newNode = $param{dom}->createAttribute($attr, $value);
+      $self->addNode( %param,
+		      depth => $param{depth}+1,
+		      newNode => $newNode );
+
+    } elsif ( my $comment = isComment($key) ) {
+      $self->addNode( %param,
+		      depth => $param{depth}+1,
+		      newNode => $param{dom}->createComment( $comment ) );
+
+    } else {
+      # get the type.
+      my $type = ref ($key);
+
+      # make a dom for arrays
+      if ( $type =~ /ARRAY/ ) {
+	$key = $self->complex2Dom( %param,
+				   data => $key,
+				   depth => $param{depth}+1);
+	$type = ref ( $key );
+      }
+
+      if ( $type =~ /NodeList/ ) {
+	## adding OR moving a list of Nodes.
+	while ( my $node = $key->shift ) {
+	  my $newNode = $node->cloneNode( DEEP );
+	  $self->addNode( %param,
+			  depth => $param{depth}+1,
+			  newNode => $newNode );
+	}
+
+      } elsif ( $type =~ /XML::LibXML::Document$/ ) {
+	## adding a dom.
+	my $newNode = $key->getDocumentElement->cloneNode( DEEP );
+	$newNode->setOwnerDocument($param{dom});
+	$self->addNode( %param,
+		        depth => $param{depth}+1,
+		        newNode => $newNode );
+
+      } elsif ( $type =~ /XML::LibXML::/ ) {
+	## adding a fragment, element or node
+	my $newNode = $key->cloneNode( DEEP );
+	$self->addNode( %param,
+		        depth => $param{depth}+1,
+		        newNode => $newNode );
+
+      } elsif ( !$type ) {
+	# perhaps it is a xml-scalar-ref
+	if ( $key =~ /SCALAR/ ) {
+	  my $pkey;
+	  eval {
+	    local $SIG{__DIE__} = sub {};
+	    $pkey = $key->nodeName;
+	  };
+	  $key = $pkey if !$@;
+        }
+
+	if ( ref($value) ) {
+	  my $array = $value;
+	  if ( $key ) { $array = [$key => $value] }
+
+	  $self->addNode( %param,
+			  depth => $param{depth}+1,
+			  newNode =>
+			  $self->makeXMLFragment( %param,
+						  depth => $param{depth}+1,
+						  data => $array )
+			);
+	} else {
+	  my $newNode = $param{dom}->createElement( $key );
+	  $self->ref2TextNode( %param,
+			       node => $newNode,
+			       depth => $param{depth}+1,
+			       data => $value );
+	  $self->addNode( %param,
+			  depth => $param{depth}+1,
+			  newNode => $newNode );
+	}
+      } else {
+	$self->addError("Couldn't determine what to do with $key");
+      }
+
+    }
+  }
+
+  $self->showPath($prev);
+  return ($self->error) ? undef : 1;
+}
+
+sub addNode {
+  my $self  = shift;
+  my %param = @_;
+
+  $param{dom} ||= $self->objectDom;
+  $self->checkParams( params => \%param,
+		      required => [ qw(dom node newNode) ]) || return undef;
+
+  $param{location} ||= $self->defaultLocation;
+
+  my $prev = $self->showPath;
+  $self->showPath($param{showpath}) if exists $param{showpath};
+
+  warn "-" x $param{depth}, "addNode\n" if $self->showPath;
+
+  if ( $param{node}->isSameNode ( $param{dom}->getDocumentElement )
+       and $param{location} ne TO ) {
+    $self->addError("addNode: can't add BEFORE or AFTER the root element");
+  }
+
+  if ( $param{location} eq TO ) {
+    $param{node}->addChild($param{newNode});
+
+  } elsif ( $param{location} eq AFTER ) {
+    my $parentNode = $param{node}->parentNode;
+    $parentNode->insertAfter( $param{newNode}, $param{node} );
+
+  } elsif ( $param{location} eq BEFORE ) {
+    my $parentNode = $param{node}->parentNode;
+    $parentNode->insertBefore( $param{newNode}, $param{node} );
+
+  } else {
+    $self->addError("Unknown adding location: $param{location} at addNode");
+    $self->showPath($prev);
+    return undef;
+  }
+
+  $self->showPath($prev);
+  return ($self->error) ? undef : 1;
+}
+
+sub domDelete {
+  my $self  = shift;
+  my %param = @_;
+
+  # reset recursion (just for safety)
+  $self->resetHandlers;
+
+  $param{dom} ||= $self->objectDom;
+  if ( !$param{node} and $param{xpath} ) {
+    $param{node} = $param{dom}->findnodes($param{xpath})->shift;
+    $param{node} || $self->addError("Couldn't execute XPATH on supplied DOM in domDelete");
+  }
+
+  # allow shorthand
+  $param{deleteXPath} = $param{delete} if ( !$param{deleteXPath} and $param{delete} );
+
+  $self->checkParams( params => \%param,
+		      required => [ qw(dom node deleteXPath) ]) || return undef;
+
+
+  my $prev = $self->showPath;
+  $self->showPath($param{showpath}) if exists $param{showpath};
+  warn "-" x $param{depth}, "domDelete\n" if $self->showPath;
+
+  # remove
+  my $set = $param{node}->findnodes($param{deleteXPath});
+  foreach my $deleteNode ( $set->get_nodelist ) {
+
+    if ( $deleteNode->nodeType == 2 ) {
+      # attributes need special treatment
+      $deleteNode->unbindNode;
+
+    } else {
+      $param{node}->removeChild($deleteNode);
+    }
+  }
+
+  $self->showPath($prev);
+  return ($self->error) ? undef : 1;
+}
+
+# ==========================================================================
+#   USEFULL TOOLS?
+# ==========================================================================
+
+sub analyseXpath {
+  my ( $self, $xpath ) = @_;
+
+  # provides last part,number of xpath, parent
+  # eg /newlsetter[1]/section[2]/parot[2]
+  #
+  # returns ('parot', 2, '/newlsetter[1]/section[2]')
+  #
+
+  my $index;
+  if ( $xpath =~ s/\[(\d+)\]$// ) {
+    $index = $1;
+  }
+
+  my ($parent, $part) = $xpath =~ /^(.*)\/([^\/]+)$/;
+
+  return($part, $index, $parent);
+}
+
+sub attribute{
+  my $self = shift;
+  my $name = shift;
+  my $val = shift;
+
+  return( "$name=attr" => $val);
+}
+
+sub isAttribute {
+  my ($name) = shift =~ /^(.*)=attr$/;
+  return $name;
+}
+
+sub  comment {
+  my $self = shift;
+  my $comment = shift;
+
+  return( "$comment=comment" => undef );
+}
+
+sub isComment {
+  my ($comment) = shift =~ /^(.*)=comment$/m;
+  $comment || return undef;
+  # comments look better with surrounding spaces
+  $comment = " " . $comment if $comment !~ /^\s/;
+  $comment .= " " if $comment !~ /\s$/;
+
+  return $comment;
+}
+
+sub alreadySeen {
+  my $self = shift;
+  my $ref  = shift;
+
+  # returns  1      if already seen
+  #          undef  if not yet seen
+  #
+
+  if ( grep { $ref == $_ } @already_seen ) {
+    return 1;
+  } else {
+    push @already_seen , $ref;
+  }
+
+  return undef;
+}
+
+sub DESTROY {
+  my $self = $_[0];
+
+  $self = undef;
+  return undef;
+}
+
+1;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+XML::LibXML::Tools - An API for easy XML::LibXML DOM manipulation
+
+=head1 SYNOPSIS
+
+  use XML::LibXML::Tools;
+
+  my $lxt = XML::LibXML::Tools->new();
+
+  # set croakOnError => 0 for all new objects.
+  $XML::LibXML::Tools::croak = 0;
+
+  my $dom = $lxt->complex2Dom( data =>
+			       [ document =>
+				 [ node =>
+				   [ deeper_content =>
+				     [ $tools->attribute("attribute",
+							 "value"),
+				       "deep content" ],
+				   ],
+				   node => [ "content" ]
+				 ]
+			       ] );
+
+  # change content
+  $tools->domUpdate( xpath => "/document/node",
+	  	     data => [ deeper_content => "Other content" ]);
+
+  # add comment
+  $tools->domAdd( xpath => "/document",
+		  data => [ $tools->comment("blaaa") ]);
+
+  # add a nodeset.
+  $tools->domAdd( xpath => "/document/node[2]",
+		  location => AFTER,
+		  data => [ $dom->findnodes("/document/node[1]") ]);
+
+  # add a DOM
+  $tools->domAdd ( xpath => "/document/node[1]",
+		   location => BEFORE,
+		   data => [ node => [ $otherDom ] ] );
+
+  # delete some nodes
+  $tools->domDelete( xpath => "/document",
+		     deleteXPath => "./node[1]" );
+
+=head1 DESCRIPTION
+
+Hands an interface for merging, updating, adding and deleting a
+L<XML::LibXML::Document> in an easy fashion.
+
+=head1 CONSTANTS
+
+Constants are exported for your ease.
+
+  BEFORE => "before";
+  AFTER  => "after";
+  TO     => "to";
+
+
+All these constants can be used for the location parameter
+
+=head1 METHODS
+
+Methods are all accessors, they are show with their default value.
+
+=head2 defaultLocation ( TO )
+
+  Default adding location.
+
+=head2 objectDom ( "" )
+
+  Filled by complex2Dom if not yet defined, or you.
+
+  Used so that you can skip the dom-parameter for each function which
+  is meant to work at this DOM.
+
+=head2 storeDom( 1 )
+
+  If set to 0 complex2Dom doesn't fill the objectDom so you can
+  manipulate 'externals' DOMs without to much overhead.
+
+=head2 error ( undef )
+
+  Set to 1 by addError
+
+=head2 errorMsg ( undef )
+
+  Holds the message stack
+
+=head2 croakOnError ( 1 )
+
+  If an error occurs, croak (errorMsg)
+
+=head2 showPath ( 0 )
+
+  warns the names of the functions called.
+  Not very usefull unless you are an expert
+
+=head1 FUNCTION PARAMETERS
+
+Most of these functions operate parameter based,
+
+  eg: $lxt->domAdd(node => $node, dom => $dom, data => $ref )
+
+Most of these functions call upon each other. They always pass their
+parameters.
+
+=head2 dom => $dom
+
+  The L<XML::LibXML::Document> you want to perform your operation
+  on. If ommited objectDom is tried.
+
+=head2 node => $dom->node
+
+  The node on which you wish to perform your operation.
+
+=head2 xpath => "/path/to/node"
+
+  If the node is ommited, uses this xpath-statement to get to a node.
+
+=head2 data => $ref
+
+  [ element => "of surprise" ]
+
+  OR
+
+  [ $dom ]
+
+  OR
+
+  [ $nodelist ]
+
+  OR
+
+  [ [ element => [ $nodelist ],
+      element => [ $dom      ],
+      element => [ attribute( "name", "value" ), "content" ] ]
+
+  The data for the operation. Can be an intrigate combination of
+  arrays DOMs and NodeLists
+
+=head2 location => TO
+
+=head2 location => BEFORE
+
+=head2 location => AFTER
+
+  The location for adding.
+
+  TO     : Add to the selected node
+  BEFORE : insert before the selected node
+  AFTER  : insert after the selected node
+
+=head2 deleteXPath, delete
+
+  Used in domDelete. Delete everything that complies to deleteXPath
+  from the selected node.
+
+  delete is shorthand
+
+=head2 showpath
+
+Set the showpath for this operation.
+
+=head2 depth
+
+Used internally for showPath. Please do not meddle with it unless your
+an expert.
+
+=head1 FUNCTIONS
+
+For the sake of easy reading '*name' is a parameter.
+
+All these functions return undef once an error has been raised.
+
+=head2 $dom = complex2Dom ( data => $ref )
+
+  DESCRIPTION
+    Turns an array reference into a L<XML::LibXML::Document>, taking
+    array->[0] as the rootname. calls array2Dom for this purpose.
+
+    The newly created DOM's encoding is set to be UTF-8
+
+=head2 array2Dom ( %params )
+
+  DESCRIPTION
+    Turns *data into a L<XML::LibXML::DocumentFragment> (or alike) so
+    that it can be attached to the *dom or *node at a later point in
+    time. Expert use only.
+
+  REQUIRED PARAMETERS
+    dom, node, data
+
+  NOTE
+    *xpath is ignored here
+    *node is intrepreted as a parentNode.
+
+=head2 domUpdate ( %params )
+
+  DESCRIPTION
+    Update the selected *node with *data by replacing or adding nodes
+    along the way.
+
+  REQUIRED PARAMETERS
+    dom, node OR xpath, data
+
+=head2 domAdd ( %params )
+
+  DESCRIPTION
+    Add *data to *node at *location
+
+  REQUIRED PARAMETERS
+    dom, node OR xpath, data
+
+=head2 domDelete ( %params )
+
+  DESCRIPTION
+    Delete everything from *deleteXPath from *node. Because this is
+    XPath driven there is no way to remove comments - still looking
+    into a solution for that.
+
+  REQUIRED PARAMETERS
+    dom, node OR xpath, data, deleteXPath
+
+=head2 analyseXpath ( "/newlsetter[1]/section[2]/parot[2]" )
+
+  returns 'parot', 2, '/newlsetter[1]/section[2]'
+
+=head2 attribute ( "name", "value" )
+
+  returns the special attribute notation for arrays which need to be
+  transformed to DOMs
+
+=head2 comment ( "comment" )
+
+  returns the special comment notation for arrays which need to be
+  transformed to DOMs
+
+  Puts a space before and after the comment it is not there, since
+  yours truly beliefs that is more beatifull.
+
+=head2 addError ( $message )
+
+  Adds $message to the message stack.
+  Sets error() to 1
+
+=head2 resetError ()
+
+  Resets the error stack and flag.
+
+=head1 CHANGES
+
+  0.71 - released
+  0.72 - minor documentation changes. (it broke on CPAN ... :( )
+
+  0.80 - made sure this also works with a 'broken' Text::Iconv
+
+=head1 SEE ALSO
+
+L<XML::LibXML>
+
+=head1 KNOWN ISSUES
+
+  - Encoding:
+
+    + It is expected that you supply your data in the same encoding as
+      is your DOM.
+
+  - Unfixed checking problem.
+    You might see something like: complex2Dom: To complex! ...
+
+    FIX : Surround the stuff in *data with extra [ ].
+
+=head1 AUTHOR INFORMATION
+
+Originally Written by Robert Bakker as an Exporter.
+
+Then re-written by Hartog de Mik to:
+   beautify code.
+   chop up into functions.
+
+Then finaly re-written by Hartog de Mik into the current OO
+implementation
+

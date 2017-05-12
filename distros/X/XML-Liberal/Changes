@@ -1,0 +1,112 @@
+Revision history for Perl extension XML::Liberal
+
+0.30  Thu Jan 24 21:28:14 PST 2013
+        - Make this a non-devel release
+
+0.29_01  Mon Jun 13 09:10:24 PDT 2011
+        Bug Fixes: 
+        - InvalidEncoding: update error-message regex
+        - HTMLEntity: ignore case in `&AMP;`
+        - XHTMLEmptyTag: accept all HTML 4 elements
+        - LowAsciiChars: fix all chars [RT#57958]; accept leading zeroes
+        - ControlCode: don't claim to handle errors it doesn't fix [RT#57500]
+        - UndeclaredNS: fix a weird Unicode edge case
+        - EntityRef: leave `&` untouched within CDATA sections
+        - UnquotedAttribute: fix missing attribute value
+        - StandaloneAttribute: allow arbitrary whitespace
+
+        New Features:
+        - UnclosedHTML: allow missing end tags for HTML-like elements
+        - TrailingDoctype: allow a `<!DOCTYPE>` declaration after root element
+        - TrailingElements: allow more elements after root element
+        - NestedCDATA: fix nested CDATA sections
+
+        Improvements:
+        - improve some error messages
+        - remove uses of `$&` [RT#59237]
+        - make remedies fully pluggable
+        - fix location reporting for XML documents with long lines
+        - add missing dependencies
+        - depend on HTML::Entities, not ...::Numbered
+
+0.22  Sat Oct  3 04:38:52 PDT 2009
+        - BAD-euc.xml doesn't fail with recent libxml2 apparently(?)
+
+0.21  Tue Mar 17 11:14:46 PDT 2009
+        - Now it works with libxml 2.7.* or over if you use XML::LibXML 1.69_02 or over
+          (Thanks to mala)
+        - Fixed ControlCode handling for non-UTF8 feeds (Thanks to mala)
+
+0.20  Sun Nov  9 22:42:31 PST 2008
+        - Added DeprecatedDTD to fix RSS 0.9[01] feed pointing to netscape DTD
+          (Thanks to mala)
+
+0.19  Wed May 28 11:48:15 PDT 2008
+        - Updated the diagnostic message for control code characters
+          (Thanks to Brad Choate)
+
+0.18  Thu Mar  6 12:46:51 PST 2008
+        - Added a patch to support errors with new libxml
+          (Thanks to Keiichiro Nagano)
+
+0.17  Wed Dec 27 23:11:14 PST 2006
+        - Added Declaration remedy to handle XML with spaces prior to the XML decl.
+          (Thanks to Satoshi Tanimoto)
+
+0.16  Mon Aug 28 20:35:07 JST 2006
+        - Now works with libxml 2.6.26 (Thanks to charsbar)
+
+0.15  Mon Aug 28 18:04:52 JST 2006
+        - Save newline, carrige return and tab in CntrolChars and LowAsciiBytes
+        - Handle &#x00; as well, rather than only 4 digit hex
+
+0.14  Sun Aug 27 15:38:02 JST 2006
+        - Fixed bug that UndeclaredNS doesn't append prefix properly
+        - Added sanitiy tests
+        - Switch to Module::Install and include Test::Base
+        - Added support for utf-8 bytes including control code
+
+0.13  Sun Jul  9 22:03:35 JST 2006
+        - Added globally_unoverride method and Destructor object to hold in a lecical scope
+
+0.12  2006-06-28 06:50:00 CDT
+        - Fixed HTMLEntity handler to handle entities other than just nbsp.
+
+0.11  2006-05-30 20:19:23 JST
+        - Added new Remedy::InvalidEncoding to hack euc-jp/shift_jis
+          gaiji mapped to a valid UTF-8 bytes, then reparse with
+          encoding="utf-8" header. (Reported by hsbt)
+        - Added $XML::Liberall::Debug variable for easy debugging
+        - Don't redo parsing if remedy application failed.
+
+0.10  2006-05-30 18:02:51 JST
+        - Fixed globally_override to work with XML::RSS::LibXML and other tools that calls XML::LibXML::Parser methods.
+        - reorgainzed class strucure to make it simpler.
+
+0.09  2006-05-26 17:05:00 JST
+        - Added more namespaces. Thanks to drry
+
+0.08  2006-05-26 16:53:00 JST
+        - Added globally_override method to override XML::LibXML->new globally
+
+0.07  2006-05-26
+        - New remedy UndeclaredNS to rescue undeclared namespaces found in Atom/RSS feeds.
+
+0.06  2006-03-06T06:48:55Z
+        - Don't replace & used in X(HT)ML entities
+
+0.05  2006-03-06T05:27:12Z
+        - Falls back to UTF-8 explicitly first
+
+0.04  2006-03-06T05:17:08Z
+        - Added parse_fh and parse_file
+
+0.03  2006-03-06T01:21:04Z
+        - Throw an exception when there's no remedy found
+
+
+0.02  2006-03-06T01:17:55Z
+        - Added EntityRef pattern
+
+0.01  Mon Jan  9 10:23:17 2006
+	- original version

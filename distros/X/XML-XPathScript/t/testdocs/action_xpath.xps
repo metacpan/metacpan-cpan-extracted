@@ -1,0 +1,3 @@
+<%
+$template->set( foo => { action => './*[@process = "yes"]' } );
+%><%= apply_templates() %>

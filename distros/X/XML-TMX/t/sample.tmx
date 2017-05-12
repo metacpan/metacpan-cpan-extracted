@@ -1,0 +1,117 @@
+<?xml version="1.0"?>
+<!DOCTYPE tmx SYSTEM "tmx14.dtd">
+
+<tmx version="1.4">
+
+  <header o-tmf="TW4Win 2.0 Format" creationtool="MyTool" adminlang="EN-US"
+          creationdate="20020312T164816Z" creationtoolversion="5.0" srclang="EN-GB"
+          segtype="sentence" datatype="html">
+    <prop type="bodykey">bodyvalue</prop>
+    <note>bodynote</note>
+  </header>
+
+  <body>
+
+    <tu creationid="ALIGN!" creationdate="20020312T163221Z">
+      <prop type="tu_nr">1</prop>
+      <note>tu nr 1</note>
+      <tuv xml:lang="EN-GB">
+        <prop type="tuv_nr">1</prop>
+        <note>tuv nr 1 en</note>
+        <seg>From Paul, called to be an apostle of Christ Jesus by the
+        will of God, and from Sosthenes, our brother, </seg>
+      </tuv>
+
+      <tuv xml:lang="PT-PT">
+        <prop type="tuv_nr">2</prop>
+        <note>tuv nr 2 pt</note>
+        <seg>Paulo, Apóstolo de Jesus Cristo por vontade e chamamento
+        de Deus, e o irmão Sóstenes, </seg>
+      </tuv>
+    </tu>
+
+    <tu creationid="ALIGN!" creationdate="20020312T163221Z">
+      <prop type="tu_nr">2</prop>
+      <note>tu nr 2</note>
+      <tuv xml:lang="EN-GB">
+        <seg>to God's Church which is in Corinth; to you whom God has
+        sanctified in Christ Jesus and called to be holy, together
+        with those who everywhere call upon the name of our Lord
+        Christ Jesus, their Lord and ours.</seg>
+      </tuv>
+
+      <tuv xml:lang="PT-PT">
+        <seg>à Igreja de Deus que está em Corinto. Dirigimo-nos
+        àqueles que foram santificados em Jesus Cristo e chamados a
+        ser santos, juntamente com todos os que invocam em todo o
+        lugar o nome de nosso Senhor Jesus Cristo, Senhor deles e
+        nosso. </seg>
+      </tuv>
+    </tu>
+
+    <tu creationid="ALIGN!" creationdate="20020312T163221Z">
+      <prop type="tu_nr">3</prop>
+      <note>tu nr 3</note>
+      <tuv xml:lang="EN-GB">
+        <seg>Receive grace and peace from God our Father, and Christ
+        Jesus our Lord.</seg>
+      </tuv>
+      <tuv xml:lang="PT-PT">
+        <seg>Graça e paz vos sejam dadas da parte de Deus nosso Pai e
+        do Senhor Jesus Cristo.</seg>
+      </tuv>
+    </tu>
+
+    <tu creationid="ALIGN!" creationdate="20020312T163221Z">
+      <prop type="tu_nr">4</prop>
+      <note>tu nr 4</note>
+      <tuv xml:lang="EN-GB">
+        <seg>I give thanks constantly to my God for you and for the
+        grace of God given to you in Christ Jesus. </seg>
+      </tuv>
+      <tuv xml:lang="PT-PT">
+        <seg>Sem cessar, agradeço a Deus por vossa causa, em vista da
+        graça de Deus que vos foi concedida em Jesus Cristo. </seg>
+      </tuv>
+    </tu>
+
+    <tu creationid="ALIGN!" creationdate="20020312T163221Z">
+      <prop type="tu_nr">5</prop>
+      <note>tu nr 5</note>
+      <tuv xml:lang="EN-GB">
+        <seg>For you have been fully enriched in him with words as
+        well as with knowledge, </seg>
+      </tuv>
+      <tuv xml:lang="PT-PT">
+        <seg>Pois em Jesus é que recebestes todas as riquezas, tanto
+        da palavra como do conhecimento. </seg>
+      </tuv>
+    </tu>
+
+    <tu creationid="ALIGN!" creationdate="20020312T163221Z">
+      <prop type="tu_nr">6</prop>
+      <note>tu nr 6</note>
+      <tuv xml:lang="EN-GB">
+        <seg>even as the testimony concerning Christ was confirmed in
+        you. </seg>
+      </tuv>
+      <tuv xml:lang="PT-PT">
+        <seg>Na verdade, o testemunho de Cristo tornou-se firme em
+        vós, </seg>
+      </tuv>
+    </tu>
+
+    <tu creationid="ALIGN!" creationdate="20020312T163221Z">
+      <prop type="tu_nr">7</prop>
+      <note>tu nr 7</note>
+      <tuv xml:lang="EN-GB">
+        <seg>You do not lack any spiritual gift and only await the
+        glorious coming of Christ Jesus, our Lord. </seg>
+      </tuv>
+      <tuv xml:lang="PT-PT">
+        <seg>a tal ponto que não vos falta nenhum dom, a vós que
+        esperais a Revelação de nosso Senhor Jesus Cristo. </seg>
+      </tuv>
+    </tu>
+  </body>
+</tmx>

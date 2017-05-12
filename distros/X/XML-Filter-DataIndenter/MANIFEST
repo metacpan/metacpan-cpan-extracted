@@ -1,0 +1,7 @@
+CHANGES
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+README
+lib/XML/Filter/DataIndenter.pm
+t/XML-Filter-DataIndenter.t

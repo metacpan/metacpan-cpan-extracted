@@ -1,0 +1,15 @@
+ChangeLog
+MANIFEST
+Makefile.PL
+README
+lib/XML/LibXML/Simple.pm
+lib/XML/LibXML/Simple.pod
+t/01use.t
+t/10XMLin.t
+t/10XMLin.xml
+t/srt.xml
+t/subdir/test2.xml
+t/test1.xml
+xt/99pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

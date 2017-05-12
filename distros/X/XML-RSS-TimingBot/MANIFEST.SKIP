@@ -1,0 +1,9 @@
+^MANIFEST\.bak$
+^[-_a-zA-Z0-9]+[0-9]+\.[0-9]+(?:_[0-9]+)?$
+Makefile(\.old)?$
+t/.*.rtf$
+\.rej$
+CVS
+blib
+~
+rssdata

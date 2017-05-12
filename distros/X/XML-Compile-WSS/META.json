@@ -1,0 +1,51 @@
+{
+   "abstract" : "OASIS Web Services Security",
+   "author" : [
+      "Mark Overmeer"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120630",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "XML-Compile-WSS",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Digest::SHA" : "0",
+            "Encode" : "0",
+            "File::Basename" : "0",
+            "Log::Report" : "0.92",
+            "MIME::Base64" : "0",
+            "Scalar::Util" : "0",
+            "Test::More" : "0.54",
+            "XML::Compile" : "1.50",
+            "XML::Compile::Cache" : "1.00",
+            "XML::Compile::SOAP" : "3.00",
+            "XML::Compile::WSDL11" : "3.00"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "1.14"
+}

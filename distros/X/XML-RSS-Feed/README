@@ -1,0 +1,284 @@
+NAME
+    XML::RSS::Feed - Persistant XML RSS Encapsulation
+
+VERSION
+    2.4
+
+SYNOPSIS
+    A quick and dirty non-POE example that uses a blocking sleep. The magic
+    is in the late_breaking_news method that returns only headlines it
+    hasn't seen.
+
+        use XML::RSS::Feed;
+        use LWP::Simple qw(get);
+
+        my $feed = XML::RSS::Feed->new(
+            url    => "http://www.jbisbee.com/rdf/",
+            name   => "jbisbee",
+            delay  => 10,
+            debug  => 1,
+            tmpdir => "/tmp", # optional caching
+        );
+
+        while (1) {
+            $feed->parse(get($feed->url));
+            print $_->headline . "\n" for $feed->late_breaking_news;
+            sleep($feed->delay); 
+        }
+
+    ATTENTION! - If you want a non-blocking way to watch multiple RSS
+    sources with one process use POE::Component::RSSAggregator.
+
+    If you want to fetch a feed, mark all the headlines as seen, then get
+    events for any new headlines, pass 'init_headlines_seen => 1' to the
+    constructor.
+
+CONSTRUCTOR
+  XML::RSS::Feed->new( url => $url, name => $name )
+    Required Params
+
+        *   name
+
+            Identifier and hash lookup key for the RSS feed.
+
+        *   url
+
+            The URL of the RSS feed
+
+    Optional Params
+
+        *   delay
+
+            Number of seconds between updates (defaults to 600)
+
+        *   tmpdir
+
+            Directory to keep a cached feed (using Storable) to keep
+            persistance between instances.
+
+        *   init_headlines_seen
+
+            Mark all headlines as seen from the intial fetch, and only
+            report new headlines that appear from that point forward.
+
+        *   debug
+
+            Turn debuging on.
+
+        *   headline_as_id
+
+            Boolean value to use the headline as the id when URL isn't
+            unique within a feed.
+
+        *   hlobj
+
+            A class name sublcassed from XML::RSS::Headline
+
+        *   max_headlines
+
+            The max number of headlines to keep. (default is unlimited)
+
+METHODS
+  $feed->parse( $xml_string )
+    Pass in a xml string to parse with XML::RSS and then call process to
+    process the results.
+
+  $feed->process( $items, $title, $link )
+  $feed->process( $items, $title )
+  $feed->process( $items )
+    Calls pre_process, process_items, post_process, title, and link methods
+    to process the parsed results of an RSS XML feed.
+
+    *   $items
+
+        An array of hash refs which will eventually become
+        XML::RSS::Headline objects. Look at XML::RSS::Headline->new() for
+        acceptable arguments.
+
+    *   $title
+
+        The title of the RSS feed.
+
+    *   $link
+
+        The RSS channel link (normally a URL back to the homepage) of the
+        RSS feed.
+
+  $feed->pre_process
+    Mark all headlines from previous run as seen.
+
+  $feed->process_items( $items )
+    Turn an array refs of hash refs into XML::RSS::Headline objects and
+    added to the internal list of headlines.
+
+  $feed->post_process
+    Post process cleanup, cache headlines (if tmpdir), and debug messages.
+
+  $feed->create_headline( %args)
+    Create a new XML::RSS::Headline object and add it to the interal list.
+    Check XML::RSS::Headline->new() for acceptable values for %args.
+
+  $feed->init_all_headlines_seen()
+    After fetching a feed for the first time, mark all headlines as seen so
+    we don't generate a flood of events. Basically don't issue an event for
+    any existing headlines, but for any headline from that point on.
+
+  $feed->num_headlines
+    Returns the number of headlines for the feed.
+
+  $feed->seen_headline( $id )
+    Just a boolean test to see if we've seen a headline or not.
+
+  $feed->headlines
+    Returns an array or array reference (based on context) of
+    XML::RSS::Headline objects
+
+  $feed->late_breaking_news
+    Returns an array or the number of elements (based on context) of the
+    latest XML::RSS::Headline objects.
+
+  $feed->cache
+    If tmpdir is defined the rss info is cached.
+
+  $feed->set_last_updated
+  $feed->set_last_updated( Time::HiRes::time )
+    Set the time of when the feed was last processed. If you pass in a value
+    it will be used otherwise calls Time::HiRes::time.
+
+  $feed->last_updated
+    The time (in epoch seconds) of when the feed was last processed.
+
+  $feed->last_updated_hires
+    The time (in epoch seconds and milliseconds) of when the feed was last
+    processed.
+
+SET/GET ACCESSOR METHODS
+  $feed->title
+  $feed->title( $title )
+    The title of the RSS feed.
+
+  $feed->debug
+  $feed->debug( $bool )
+    Turn on debugging messages
+
+  $feed->init
+  $feed->init( $bool )
+    init is used so that we just load the current headlines and don't return
+    all headlines. in other words we initialize them. Takes a boolean
+    argument.
+
+  $feed->name
+  $feed->name( $name )
+    The identifier of an RSS feed.
+
+  $feed->delay
+  $feed->delay( $seconds )
+    Number of seconds between updates.
+
+  $feed->link
+  $feed->link( $rss_channel_url )
+    The url in the RSS feed with a link back to the site where the RSS feed
+    came from.
+
+  $feed->url
+  $feed->url( $url )
+    The url in the RSS feed with a link back to the site where the RSS feed
+    came from.
+
+  $feed->headline_as_id
+  $feed->headline_as_id( $bool )
+    Within some RSS feeds the URL may not always be unique, in these cases
+    you can use the headline as the unique id. The id is used to check
+    whether or not a feed is new or has already been seen.
+
+  $feed->hlobj
+  $feed->hlobj( $class )
+    Ablity to use a subclass of XML::RSS::Headline. (See Perl Jobs example
+    in XML::RSS::Headline::PerlJobs). This should just be the name of the
+    subclass.
+
+  $feed->tmpdir
+  $feed->tmpdir( $tmpdir )
+    Temporay directory to store cached RSS XML between instances for
+    persistance.
+
+  $feed->init_headlines_seen
+  $feed->init_headlines_seen( $bool )
+    Boolean value to mark all headlines as seen from the intial fetch, and
+    only report new headlines that appear from that point forward.
+
+  $feed->max_headlines
+  $feed->max_headlines( $integer )
+    The maximum number of headlines you'd like to keep track of. (0 means
+    infinate)
+
+DEPRECATED METHODS
+  $feed->failed_to_fetch
+    This should was deprecated because, the object shouldn't really know
+    anything about fetching, it just processes the results. This method
+    currently will always return false
+
+  $feed->failed_to_parse
+    This method was deprecated because, $feed->parse now returns a bool
+    value. This method will always return false
+
+AUTHOR
+    Jeff Bisbee, "<jbisbee at cpan.org>"
+
+BUGS
+    Please report any bugs or feature requests to "bug-xml-rss-feed at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=XML-RSS-Feed>. I will be
+    notified, and then you'll automatically be notified of progress on your
+    bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc XML::RSS::Feed
+
+    You can also look for information at:
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/XML-RSS-Feed>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/XML-RSS-Feed>
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=XML-RSS-Feed>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/XML-RSS-Feed>
+
+ACKNOWLEDGEMENTS
+    Special thanks to Rocco Caputo, Martijn van Beers, Sean Burke, Prakash
+    Kailasa and Randal Schwartz for their help, guidance, patience, and bug
+    reports. Guys thanks for actually taking time to use the code and give
+    good, honest feedback.
+
+    Thank for to Carl Furstenberg for providing feedback for new constructor
+    param of 'init_headlines_seen' so you won't get flooded with headlines
+    on the first fetch of the feed.
+
+    Thanks to Slaven Rezic for pointing out that t/008_store_retrieve.t
+    pointed to broken rss tests on jbisbee.com (that I don't own anymore)
+
+    Thanks to Aaron Krowne for patch for XML::RSS::Headline to use guid as
+    the unique id instead of url if its available.
+
+COPYRIGHT & LICENSE
+    Copyright 2006 Jeff Bisbee, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    XML::RSS::Headline, XML::RSS::Headline::PerlJobs,
+    XML::RSS::Headline::Fark, XML::RSS::Headline::UsePerlJournals,
+    POE::Component::RSSAggregator
+

@@ -1,0 +1,46 @@
+Table2XML version 0.01
+======================
+
+table2xml is an algorithm having two functions that allow the conversion of tabular data to XML
+without using XSLT. This is achieved by reverting the "Flattener" methodology used by Microsoft Excel
+to convert the XML tree format to a two-dimensional table
+(see Opening XML Files in Excel and INFO: Microsoft Excel 2002 and XML).
+
+This reversion is achieved by:
+
+1. (possibly) modifying the flattened table a bit to enable a simpler processing of the data,
+
+2. sequentially processing the data column- and row wise. 
+
+The whole algorithm is done without the aid of any XML library, so it lends itself to easy translation
+into other environments and languages.
+
+For producing the XML, first, we need to invoke parseHeaderForXML, using a (the first?) line with the rootnode and path information.
+After parsing the header info, the table data can be processed row by row by calling addXMLLine.
+The current data row is provided in the single argument lineData, and the built XML string returned and can be concatenated..
+A final call to addXMLLine restores the static variables and finalizes the XML string (closes any open tags).
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+Encode and for testing: Test::More and Test::XML
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 by Roland Kapl
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+

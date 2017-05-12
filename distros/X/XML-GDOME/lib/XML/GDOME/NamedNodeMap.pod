@@ -1,0 +1,120 @@
+=head1 NAME
+
+  XML::GDOME::NamedNodeMap - Interface NamedNodeMap implementation.
+
+=head1 SYNOPSIS
+
+  $int  = $nnm->getLength();
+  $node = $nnm->getNamedItem($name);
+  $node = $nnm->getNamedItemNS($namespaceURI,$localName);
+  $node = $nnm->item($index);
+  $node = $nnm->removeNamedItem($name);
+  $node = $nnm->removeNamedItemNS($namespaceURI,$localName);
+  $node = $nnm->setNamedItem($arg);
+  $node = $nnm->setNamedItemNS($arg);
+
+=head1 METHODS
+
+=over 4
+
+
+=item $int = $nnm->getLength();
+
+
+
+I<Returns>: the number of nodes in this map. The range of valid child node indices is 0 to length-1 inclusive.
+
+
+=item $node = $nnm->getNamedItem($name);
+
+Retrieves a node specified by name.
+
+I<C<name>>: The nodeName of the node to retrieve.
+
+I<Returns>: a Node (of any type) with the specified nodeName, or undef if it does not identify any node in this map.
+
+
+=item $node = $nnm->getNamedItemNS($namespaceURI,$localName);
+
+Retrieves a node specified by local name and namespace URI.
+
+I<C<namespaceURI>>: The namespace URI of the node to retrieve.
+
+I<C<localName>>: The local name of the node to retrieve.
+
+I<Returns>: a Node (of any type) with the specified local name and namespace URI, or undef if they do not identify any node in this map.
+
+
+=item $node = $nnm->item($index);
+
+
+
+I<C<index>>: Index into this map.
+
+I<Returns>: the indexth item in the map. If index is greater than or equal to the number of nodes in this map, this returns undef.
+
+
+=item $node = $nnm->removeNamedItem($name);
+
+Removes a node specified by name. When this map contains the attributes attached to an element, if the removed attribute is known to have a default value, an attribute immediately appears containing the default value as well as the corresponding namespace URI, local name, and prefix when applicable.
+
+I<C<name>>: The nodeName of the node to remove.
+
+I<Returns>: the node removed from this map if a node with such a name exists.
+
+C<GDOME_NO_MODIFICATION_ALLOWED_ERR>: Raised if this map is readonly.
+
+C<GDOME_NOT_FOUND_ERR>: Raised if there is no node named I<name> in this map.
+
+
+=item $node = $nnm->removeNamedItemNS($namespaceURI,$localName);
+
+Removes a node specified by local name and namespace URI. When this map contains the attributes attached to an element, if the removed attribute is known to have a default value, an attribute immediately appears containing the default value as well as the corresponding namespace URI, local name, and prefix when applicable.
+
+I<C<namespaceURI>>: The namespace URI of the node to remove.
+
+I<C<localName>>: The local name of the node to remove.
+
+I<Returns>: the node removed from this map if a node with such a local name and namespace URI exists.
+
+C<GDOME_NO_MODIFICATION_ALLOWED_ERR>: Raised if this map is readonly.
+
+C<GDOME_NOT_FOUND_ERR>: Raised if there is no node named I<name> in this map.
+
+
+=item $node = $nnm->setNamedItem($arg);
+
+Adds a node using its nodeName attribute. If a node with that name is already present in this map, it is replaced by the new one.
+
+I<C<arg>>: a node to store in this map.
+
+I<Returns>: if the new Node replaces an existing node, the replaced Node is returned, otherwise undef is returned.
+
+C<GDOME_INUSE_ATTRIBUTE_ERR>: Raised if arg is an Attr that is already an attribute of another Element object. The DOM user must explicitly clone Attr nodes to re-use them in other elements.
+
+C<GDOME_NO_MODIFICATION_ALLOWED_ERR>: Raised if this map is readonly.
+
+C<GDOME_HIERARCHY_REQUEST_ERR>: Raised if an attempt is made to add a node doesn't belong in this NamedNodeMap. Examples would include trying to insert something other than an Attr node into an Element's map of attributes, or a non-Entity node into the DocumentType's map of Entities.
+
+C<GDOME_WRONG_DOCUMENT_ERR>: Raised if I<arg> was created from a different document than the one that created this map.
+
+
+=item $node = $nnm->setNamedItemNS($arg);
+
+Adds a node using its namespaceURI and localName. If a node with that namespace URI and that local name is already present in this map, it is replaced by the new one
+
+I<C<arg>>: a node to store in this map. The node will later be accessible       using the value of its namespaceURI and localName attributes.
+
+I<Returns>: If the new Node replaces an existing node the replaced Node is returned, otherwise null is returned.
+
+C<GDOME_INUSE_ATTRIBUTE_ERR>: Raised if I<arg> is an Attr that is already an attribute of another Element object. The DOM user must explicitly clone Attr nodes to re-use them in other elements.
+
+C<GDOME_NO_MODIFICATION_ALLOWED_ERR>: Raised if this map is readonly.
+
+C<GDOME_HIERARCHY_REQUEST_ERR>: Raised if an attempt is made to add a node doesn't belong in this NamedNodeMap. Examples would include trying to insert something other than an Attr node into an Element's map of attributes, or a non-Entity node into the DocumentType's map of Entities.
+
+C<GDOME_WRONG_DOCUMENT_ERR>: Raised if I<arg> was created from a different document than the one that created this map.
+
+
+=back
+

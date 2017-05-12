@@ -1,0 +1,1249 @@
+Content-Type: text/xml
+Content-Length: 17259
+
+<?xml version="1.0" encoding="UTF-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="xslt.css" /><title>XML::XSLT - A perl module for processing XSLT
+    </title></head><body>
+
+  
+	
+    <h1>NAME</h1>XML::XSLT - A perl module for processing XSLT
+    
+
+  
+
+  
+	
+    <h1>SYNOPSIS
+    </h1>
+
+    <pre>
+use XML::XSLT;
+
+my $xslt = XML::XSLT-&gt;new ($xsl, warnings =&gt; 1);
+
+$xslt-&gt;transform ($xmlfile);
+
+print $xslt-&gt;toString;
+
+$xslt-&gt;dispose();
+
+    </pre>
+
+  
+
+  
+
+    <h1>DESCRIPTION
+    </h1>
+
+    <p>
+This module implements the W3C's XSLT specification. The goal is full
+implementation of this spec, but we have not yet achieved
+that. However, it already works well.  See 
+      XML::XSLT Commands
+       for
+the current status of each command.
+
+    </p>
+
+    <p>
+XML::XSLT makes use of XML::DOM and LWP::Simple, while XML::DOM
+uses XML::Parser.  Therefore XML::Parser, XML::DOM and LWP::Simple
+have to be installed properly for XML::XSLT to run.
+
+    </p>
+
+  
+
+  
+
+    <h1>Specifying Sources
+    </h1>
+
+    <p>
+The stylesheets and the documents may be passed as filenames, file
+handles regular strings, string references or DOM-trees.  Functions
+that require sources (e.g. new), will accept either a named parameter
+or simply the argument.
+
+    </p>
+
+    <p>
+Either of the following are allowed:
+
+    </p>
+
+    <pre>
+my $xslt = XML::XSLT-&gt;new($xsl);
+my $xslt = XML::XSLT-&gt;new(Source =&gt; $xsl);
+
+    </pre>
+
+    <p>
+In documentation, the named parameter `Source' is always shown, but it
+is never required.
+
+    </p>
+
+    
+
+      <h2>METHODS
+      </h2>
+
+      <ul>
+
+        <li>
+          <b>new(Source =&gt; $xml [, %args])
+          </b>
+
+          <p>
+Returns a new XSLT parser object.  Valid flags are:
+
+          </p>
+
+        </li>
+
+        <ul>
+
+          <li>
+            <b>DOMparser_args
+            </b>
+
+            <p>
+Hashref of arguments to pass to the XML::DOM::Parser object's parse
+method.
+
+            </p>
+
+          </li>
+
+          <li>
+            <b>variables
+            </b>
+
+            <p>
+Hashref of variables and their values for the stylesheet.
+
+            </p>
+
+          </li>
+
+          <li>
+            <b>base
+            </b>
+
+            <p>
+Base of URL for file inclusion.
+
+            </p>
+
+          </li>
+
+          <li>
+            <b>debug
+            </b>
+
+            <p>
+Turn on debugging messages.
+
+            </p>
+
+          </li>
+
+          <li>
+            <b>warnings
+            </b>
+
+            <p>
+Turn on warning messages.
+
+            </p>
+
+          </li>
+
+          <li>
+            <b>indent
+            </b>
+
+            <p>
+Starting amount of indention for debug messages.  Defaults to 0.
+
+            </p>
+
+          </li>
+
+          <li>
+            <b>indent_incr
+            </b>
+
+            <p>
+Amount to indent each level of debug message.  Defaults to 1.
+
+            </p>
+
+          </li>
+
+        </ul>
+
+        <li>
+          <b>open_xml(Source =&gt; $xml [, %args])
+          </b>
+
+          <p>
+Gives the XSLT object new XML to process.  Returns an XML::DOM object
+corresponding to the XML.
+
+          </p>
+
+        </li>
+
+        <ul>
+
+          <li>
+            <b>base
+            </b>
+
+            <p>
+The base URL to use for opening documents.
+
+            </p>
+
+          </li>
+
+          <li>
+            <b>parser_args
+            </b>
+
+            <p>
+Arguments to pase to the parser.
+
+            </p>
+
+          </li>
+
+        </ul>
+
+        <li>
+          <b>open_xsl(Source =&gt; $xml, [, %args])
+          </b>
+
+          <p>
+Gives the XSLT object a new stylesheet to use in processing XML.
+Returns an XML::DOM object corresponding to the stylesheet.  Any
+arguments present are passed to the XML::DOM::Parser.
+
+          </p>
+
+        </li>
+
+        <ul>
+
+          <li>
+            <b>base
+            </b>
+
+            <p>
+The base URL to use for opening documents.
+
+            </p>
+
+          </li>
+
+          <li>
+            <b>parser_args
+            </b>
+
+            <p>
+Arguments to pase to the parser.
+
+            </p>
+
+          </li>
+
+        </ul>
+
+        <li>
+          <b>process(%variables)
+          </b>
+
+          <p>
+Processes the previously loaded XML through the stylesheet using the
+variables set in the argument.
+
+          </p>
+
+        </li>
+
+        <li>
+          <b>transform(Source =&gt; $xml [, %args])
+          </b>
+
+          <p>
+Processes the given XML through the stylesheet.  Returns an XML::DOM
+object corresponding to the transformed XML.  Any arguments present
+are passed to the XML::DOM::Parser.
+
+          </p>
+
+        </li>
+
+        <li>
+          <b>serve(Source =&gt; $xml [, %args])
+          </b>
+
+          <p>
+Processes the given XML through the stylesheet.  Returns a string
+containg the result.  Example:
+
+          </p>
+
+          <pre>
+use XML::XSLT qw(serve);
+
+          </pre>
+
+          <pre>
+$xslt = XML::XSLT-&gt;new($xsl);
+print $xslt-&gt;serve $xml;
+
+          </pre>
+
+        </li>
+
+        <ul>
+
+          <li>
+            <b>http_headers
+            </b>
+
+            <p>
+If true, then prepends the appropriate HTTP headers (e.g. Content-Type,
+Content-Length);
+
+            </p>
+
+            <p>
+Defaults to true.
+
+            </p>
+
+          </li>
+
+          <li>
+            <b>xml_declaration
+            </b>
+
+            <p>
+If true, then the result contains the appropriate &lt;?xml?&gt; header.
+
+            </p>
+
+            <p>
+Defaults to true.
+
+            </p>
+
+          </li>
+
+          <li>
+            <b>xml_version
+            </b>
+
+            <p>
+The version of the XML.
+
+            </p>
+
+            <p>
+Defaults to 1.0.
+
+            </p>
+
+          </li>
+
+          <li>
+            <b>doctype
+            </b>
+
+            <p>
+The type of DOCTYPE this document is.  Defaults to SYSTEM.
+
+            </p>
+
+          </li>
+
+        </ul>
+
+        <li>
+          <b>toString
+          </b>
+
+          <p>
+Returns the result of transforming the XML with the stylesheet as a
+string.
+
+          </p>
+
+        </li>
+
+        <li>
+          <b>to_dom
+          </b>
+
+          <p>
+Returns the result of transforming the XML with the stylesheet as an
+XML::DOM object.
+
+          </p>
+
+        </li>
+
+        <li>
+          <b>media_type
+          </b>
+
+          <p>
+Returns the media type (aka mime type) of the object.
+
+          </p>
+
+        </li>
+
+        <li>
+          <b>dispose
+          </b>
+
+          <p>
+Executes the 
+            dispose
+             method on each XML::DOM object.
+
+          </p>
+
+        </li>
+
+      </ul>
+
+    
+
+  
+
+  
+
+    <h1>XML::XSLT Commands
+    </h1>
+
+    <ul>
+
+      <li>
+        <b>xsl:apply-imports		no
+        </b>
+
+        <p>
+Not supported yet.
+
+        </p>
+
+      </li>
+
+      <li>
+        <b>xsl:apply-templates		limited
+        </b>
+
+        <p>
+Attribute 'select' is supported to the same extent as xsl:value-of
+supports path selections.
+
+        </p>
+
+        <p>
+Not supported yet:
+- attribute 'mode'
+- xsl:sort and xsl:with-param in content
+
+        </p>
+
+      </li>
+
+      <li>
+        <b>xsl:attribute			partially
+        </b>
+
+        <p>
+Adds an attribute named to the value of the attribute 'name' and as value
+the stringified content-template.
+
+        </p>
+
+        <p>
+Not supported yet:
+- attribute 'namespace'
+
+        </p>
+
+      </li>
+
+      <li>
+        <b>xsl:attribute-set		yes
+        </b>
+
+        <p>
+Partially
+
+        </p>
+
+      </li>
+
+      <li>
+        <b>xsl:call-template		yes
+        </b>
+
+        <p>
+Takes attribute 'name' which selects xsl:template's by name.
+
+        </p>
+
+        <p>
+Weak support:
+- xsl:with-param (select attrib not supported)
+
+        </p>
+
+        <p>
+Not supported yet:
+- xsl:sort
+
+        </p>
+
+      </li>
+
+      <li>
+        <b>xsl:choose			yes
+        </b>
+
+        <p>
+Tests sequentially all xsl:whens until one succeeds or
+until an xsl:otherwise is found. Limited test support, see xsl:when
+
+        </p>
+
+      </li>
+
+      <li>
+        <b>xsl:comment			yes
+        </b>
+
+        <p>
+Supported.
+
+        </p>
+
+      </li>
+
+      <li>
+        <b>xsl:copy				partially
+        </b>
+
+      </li>
+
+      <li>
+        <b>xsl:copy-of			limited
+        </b>
+
+        <p>
+Attribute 'select' functions as well as with
+xsl:value-of
+
+        </p>
+
+      </li>
+
+      <li>
+        <b>xsl:decimal-format		no
+        </b>
+
+        <p>
+Not supported yet.
+
+        </p>
+
+      </li>
+
+      <li>
+        <b>xsl:element			yes
+        </b>
+
+      </li>
+
+      <li>
+        <b>xsl:fallback			no
+        </b>
+
+        <p>
+Not supported yet.
+
+        </p>
+
+      </li>
+
+      <li>
+        <b>xsl:for-each			limited
+        </b>
+
+        <p>
+Attribute 'select' functions as well as with
+xsl:value-of
+
+        </p>
+
+        <p>
+Not supported yet:
+- xsl:sort in content
+
+        </p>
+
+      </li>
+
+      <li>
+        <b>xsl:if				limited
+        </b>
+
+        <p>
+Identical to xsl:when, but outside xsl:choose context.
+
+        </p>
+
+      </li>
+
+      <li>
+        <b>xsl:import			no
+        </b>
+
+        <p>
+Not supported yet.
+
+        </p>
+
+      </li>
+
+      <li>
+        <b>xsl:include			yes
+        </b>
+
+        <p>
+Takes attribute href, which can be relative-local, 
+absolute-local as well as an URL (preceded by
+identifier http:).
+
+        </p>
+
+      </li>
+
+      <li>
+        <b>xsl:key				no
+        </b>
+
+        <p>
+Not supported yet.
+
+        </p>
+
+      </li>
+
+      <li>
+        <b>xsl:message			no
+        </b>
+
+        <p>
+Not supported yet.
+
+        </p>
+
+      </li>
+
+      <li>
+        <b>xsl:namespace-alias		no
+        </b>
+
+        <p>
+Not supported yet.
+
+        </p>
+
+      </li>
+
+      <li>
+        <b>xsl:number			no
+        </b>
+
+        <p>
+Not supported yet.
+
+        </p>
+
+      </li>
+
+      <li>
+        <b>xsl:otherwise			yes
+        </b>
+
+        <p>
+Supported.
+
+        </p>
+
+      </li>
+
+      <li>
+        <b>xsl:output			limited
+        </b>
+
+        <p>
+Only the initial xsl:output element is used.  The &quot;text&quot; output method
+is not supported, but shouldn't be difficult to implement.  Only the
+&quot;doctype-public&quot;, &quot;doctype-system&quot;, &quot;omit-xml-declaration&quot;, &quot;method&quot;,
+and &quot;encoding&quot; attributes have any support.
+
+        </p>
+
+      </li>
+
+      <li>
+        <b>xsl:param			experimental
+        </b>
+
+        <p>
+Synonym for xsl:variable (currently). See xsl:variable for support.
+
+        </p>
+
+      </li>
+
+      <li>
+        <b>xsl:preserve-space		no
+        </b>
+
+        <p>
+Not supported yet. Whitespace is always preserved.
+
+        </p>
+
+      </li>
+
+      <li>
+        <b>xsl:processing-instruction	yes
+        </b>
+
+        <p>
+Supported.
+
+        </p>
+
+      </li>
+
+      <li>
+        <b>xsl:sort				no
+        </b>
+
+        <p>
+Not supported yet.
+
+        </p>
+
+      </li>
+
+      <li>
+        <b>xsl:strip-space			no
+        </b>
+
+        <p>
+Not supported yet. No whitespace is stripped.
+
+        </p>
+
+      </li>
+
+      <li>
+        <b>xsl:stylesheet			limited
+        </b>
+
+        <p>
+Minor namespace support: other namespace than 'xsl:' for xsl-commands
+is allowed if xmlns-attribute is present. xmlns URL is verified.
+Other attributes are ignored.
+
+        </p>
+
+      </li>
+
+      <li>
+        <b>xsl:template			limited
+        </b>
+
+        <p>
+Attribute 'name' and 'match' are supported to minor extend.
+('name' must match exactly and 'match' must match with full
+path or no path)
+
+        </p>
+
+        <p>
+Not supported yet:
+- attributes 'priority' and 'mode'
+
+        </p>
+
+      </li>
+
+      <li>
+        <b>xsl:text				yes
+        </b>
+
+        <p>
+Supported.
+
+        </p>
+
+      </li>
+
+      <li>
+        <b>xsl:transform			limited
+        </b>
+
+        <p>
+Synonym for xsl:stylesheet
+
+        </p>
+
+      </li>
+
+      <li>
+        <b>xsl:value-of			limited
+        </b>
+
+        <p>
+Inserts attribute or element values. Limited support:
+
+        </p>
+
+        <p>
+&lt;xsl:value-of select=&quot;.&quot;/&gt;
+
+        </p>
+
+        <p>
+&lt;xsl:value-of select=&quot;/root-elem&quot;/&gt;
+
+        </p>
+
+        <p>
+&lt;xsl:value-of select=&quot;elem&quot;/&gt;
+
+        </p>
+
+        <p>
+&lt;xsl:value-of select=&quot;//elem&quot;/&gt;
+
+        </p>
+
+        <p>
+&lt;xsl:value-of select=&quot;elem[n]&quot;/&gt;
+
+        </p>
+
+        <p>
+&lt;xsl:value-of select=&quot;//elem[n]&quot;/&gt;
+
+        </p>
+
+        <p>
+&lt;xsl:value-of select=&quot;@attr&quot;/&gt;
+
+        </p>
+
+        <p>
+&lt;xsl:value-of select=&quot;text()&quot;/&gt;
+
+        </p>
+
+        <p>
+&lt;xsl:value-of select=&quot;processing-instruction()&quot;/&gt;
+
+        </p>
+
+        <p>
+&lt;xsl:value-of select=&quot;comment()&quot;/&gt;
+
+        </p>
+
+        <p>
+and combinations of these.
+
+        </p>
+
+        <p>
+Not supported yet:
+- attribute 'disable-output-escaping'
+
+        </p>
+
+      </li>
+
+      <li>
+        <b>xsl:variable			experimental
+        </b>
+
+        <p>
+Very limited. It should be possible to define a variable and use it with
+&amp;lt;xsl:value select=&quot;$varname&quot; /&amp;gt; within the same template.
+
+        </p>
+
+      </li>
+
+      <li>
+        <b>xsl:when				limited
+        </b>
+
+        <p>
+Only inside xsl:choose. Limited test support:
+
+        </p>
+
+        <p>
+&lt;xsl:when test=&quot;@attr='value'&quot;&gt;
+
+        </p>
+
+        <p>
+&lt;xsl:when test=&quot;elem='value'&quot;&gt;
+
+        </p>
+
+        <p>
+&lt;xsl:when test=&quot;path/[@attr='value']&quot;&gt;
+
+        </p>
+
+        <p>
+&lt;xsl:when test=&quot;path/[elem='value']&quot;&gt;
+
+        </p>
+
+        <p>
+&lt;xsl:when test=&quot;path&quot;&gt;
+
+        </p>
+
+        <p>
+path is supported to the same extend as with xsl:value-of
+
+        </p>
+
+      </li>
+
+      <li>
+        <b>xsl:with-param			experimental
+        </b>
+
+        <p>
+It is currently not functioning. (or is it?)
+
+        </p>
+
+      </li>
+
+    </ul>
+
+  
+
+  
+
+    <h1>SUPPORT
+    </h1>
+
+    <p>
+General information, bug reporting tools, the latest version, mailing
+lists, etc. can be found at the XML::XSLT homepage:
+
+    </p>
+
+    <pre>
+http://xmlxslt.sourceforge.net/
+
+    </pre>
+
+  
+
+  
+
+    <h1>DEPRECATIONS
+    </h1>
+
+    <p>
+Methods and interfaces from previous versions that are not documented in this
+version are deprecated.  Each of these deprecations can still be used
+but will produce a warning when the deprecation is first used.  You
+can use the old interfaces without warnings by passing 
+      new()
+       the
+flag 
+      use_deprecated
+      .  Example:
+
+    </p>
+
+    <pre>
+$parser = XML::XSLT-&gt;new($xsl, &quot;FILE&quot;,
+                         use_deprecated =&gt; 1);
+
+    </pre>
+
+    <p>
+The deprecated methods will disappear by the time a 1.0 release is made.
+
+    </p>
+
+    <p>
+The deprecated methods are :
+
+    </p>
+
+    <ul>
+
+      <li>
+        <b>output_string
+        </b>
+
+        <p>
+use toString instead
+
+        </p>
+
+      </li>
+
+      <li>
+        <b>result_string
+        </b>
+
+        <p>
+use toString instead
+
+        </p>
+
+      </li>
+
+      <li>
+        <b>output
+        </b>
+
+        <p>
+use toString instead
+
+        </p>
+
+      </li>
+
+      <li>
+        <b>result
+        </b>
+
+        <p>
+use toString instead
+
+        </p>
+
+      </li>
+
+      <li>
+        <b>result_mime_type
+        </b>
+
+        <p>
+use media_type instead
+
+        </p>
+
+      </li>
+
+      <li>
+        <b>output_mime_type
+        </b>
+
+        <p>
+use media_type instead
+
+        </p>
+
+      </li>
+
+      <li>
+        <b>result_tree
+        </b>
+
+        <p>
+use to_dom instead
+
+        </p>
+
+      </li>
+
+      <li>
+        <b>output_tree
+        </b>
+
+        <p>
+use to_dom instead
+
+        </p>
+
+      </li>
+
+      <li>
+        <b>transform_document
+        </b>
+
+        <p>
+use transform instead
+
+        </p>
+
+      </li>
+
+      <li>
+        <b>process_project
+        </b>
+
+        <p>
+use process instead
+
+        </p>
+
+      </li>
+
+      <li>
+        <b>open_project
+        </b>
+
+        <p>
+use 
+          Source
+           argument to 
+          new()
+           and 
+          transform
+           instead.
+
+        </p>
+
+      </li>
+
+      <li>
+        <b>print_output
+        </b>
+
+        <p>
+use 
+          serve()
+           instead.
+
+        </p>
+
+      </li>
+
+    </ul>
+
+  
+
+  
+
+    <h1>BUGS
+    </h1>
+
+    <p>
+Yes.
+
+    </p>
+
+  
+
+  
+
+    <h1>HISTORY
+    </h1>
+
+    <p>
+Geert Josten and Egon Willighagen developed and maintained XML::XSLT
+up to version 0.22.  At that point, Mark Hershberger started moving
+the project to Sourceforge and began working on it with Bron Gondwana.
+
+    </p>
+
+  
+
+  
+
+    <h1>LICENCE
+    </h1>
+
+    <p>
+Copyright (c) 1999 Geert Josten &amp; Egon Willighagen. All Rights
+Reserverd.  This module is free software, and may be distributed under
+the same terms and conditions as Perl.
+
+    </p>
+
+  
+
+  
+
+    <h1>AUTHORS
+    </h1>
+
+    <p>
+Geert Josten &lt;gjosten@sci.kun.nl&gt;
+
+    </p>
+
+    <p>
+Egon Willighagen &lt;egonw@sci.kun.nl&gt;
+
+    </p>
+
+    <p>
+Mark A. Hershberger &lt;mah@everybody.org&gt;
+
+    </p>
+
+    <p>
+Bron Gondwana &lt;perlcode@brong.net&gt;
+
+    </p>
+
+    <p>
+Jonathan Stowe &lt;jns@gellyfish.com&gt;
+
+    </p>
+
+  
+
+  
+
+    <h1>SEE ALSO
+    </h1>
+
+    <p>
+
+      XML::DOM
+      , 
+      LWP::Simple
+      , 
+      XML::Parser
+      
+
+    </p>
+
+  
+
+</body></html>

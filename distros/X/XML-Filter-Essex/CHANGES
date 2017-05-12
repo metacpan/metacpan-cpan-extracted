@@ -1,0 +1,13 @@
+Changes file for XML::Filter::Essex
+
+0.01 Thu Jan 16 15:15:45 EST 2003
+    - Get scripts working in non-threaded mode.  TODO: threaded mode.
+    - add write_to()
+    - add push_output_filters()
+    - got xvalue() working and parse_doc() to not die on EOD
+
+0.000_2
+    - Fixed some typoes in README.  Sheesh.  3AM typing blunders.
+
+0.000_1 Wed Sep 11 23:48:41 2002
+    - Created

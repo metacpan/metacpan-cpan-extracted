@@ -1,0 +1,112 @@
+NAME
+    Xen::Control - control and fetch information about xen domains
+
+SYNOPSIS
+        my $xen = Xen::Control->new();
+        my @domains = $xen->ls;
+
+DESCRIPTION
+    This is a wrapper module interface to Xen `xm` command.
+
+PROPERTIES
+        xm_cmd
+        rm_cmd
+        hibernation_folder
+
+  xm_cmd
+    Holds the command that is used execute xm command. By default it is
+    `sudo xm`.
+
+  rm_cmd
+    Holds the command that is executed to remove xen state files after
+    beeing restored. default is `sudo rm`.
+
+  hibernation_folder
+    Holds the folder where hibernation domain files will be stored.
+
+XM_METHODS
+    "xm" calling methods methods.
+
+  create($domain_name)
+    Starts domain with $domain_name. If the domain is hibernated the the
+    function calls "restore" otherwise "$self->xm('create',
+    $domain_name.'.cfg')".
+
+  ls
+  list
+    Returns an array of Xen::Domain objects representing curently running
+    Xen machines.
+
+  save($domain_name)
+    Hibernate domain named $domain_name. If the name is is not set - undef,
+    will hibernate all domains.
+
+  restore($domain_name)
+    Wakeup hibernated domain named $domain_name. If the name is is not set -
+    undef, will wakeup all hibernated domains.
+
+  shutdown($domain_name)
+    Shutdown domain named $domain_name. If the name is is not set - undef,
+    will shutdown all domains.
+
+  xm(@args)
+    Execute "$self->xm_cmd" with @args and return the output. Dies if the
+    execution fails.
+
+METHODS
+    Other object methods, mostly for internal usage.
+
+  new()
+    Object constructor.
+
+  hibernated_filename($domain_name)
+    Returns filename with path of the $domain_name domain.
+
+  hibernated_domains()
+    Search through "$self->hibernation_folder" for files that end up with
+    ".xen" extension and return their names without the extension. So the
+    return value is an array of hibernated domain names.
+
+TODO
+    Try IPC::System::Simple instead of ``.
+
+LINKS
+    Subversion repository <https://cle.sk/repos/pub/cpan/Xen-Control/>
+
+BUGS
+    Please report any bugs or feature requests to "bug-xen-control at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Xen-Control>. I will be
+    notified, and then you'll automatically be notified of progress on your
+    bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Xen::Control
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Xen-Control>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/Xen-Control>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/Xen-Control>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/Xen-Control>
+
+ACKNOWLEDGEMENTS
+COPYRIGHT & LICENSE
+    Copyright 2008 Jozef Kutej, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

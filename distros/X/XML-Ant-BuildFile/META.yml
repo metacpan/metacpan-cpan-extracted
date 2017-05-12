@@ -1,0 +1,52 @@
+---
+abstract: 'consume Ant build files'
+author:
+  - 'Mark Gardner <mjgardner@cpan.org>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Scalar::Util: '0'
+  Test::More: '0.94'
+  Test::Most: '0'
+  perl: '5.010'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.027, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: XML-Ant-BuildFile
+requires:
+  Carp: '0'
+  English: '0'
+  List::Util: '1.33'
+  Modern::Perl: '0'
+  Module::Pluggable: '0'
+  Moose: '0'
+  Moose::Role: '0'
+  Moose::Util::TypeConstraints: '0'
+  MooseX::Has::Sugar: '0'
+  MooseX::Has::Sugar::Minimal: '0'
+  MooseX::Singleton: '0.26'
+  MooseX::Types::Moose: '0'
+  MooseX::Types::Path::Class: '0'
+  Path::Class: '0'
+  Readonly: '0'
+  Regexp::DefaultFlags: '0'
+  Try::Tiny: '0'
+  XML::Rabbit: v0.0.4
+  XML::Rabbit::Node: v0.0.4
+  XML::Rabbit::RootNode: '0'
+  namespace::autoclean: '0'
+  perl: '5.010'
+  strict: '0'
+  utf8: '0'
+resources:
+  bugtracker: https://github.com/mjgardner/xml-ant-buildfile/issues
+  homepage: http://search.cpan.org/dist/XML-Ant-BuildFile/
+  repository: git://github.com/mjgardner/xml-ant-buildfile.git
+version: '0.216'

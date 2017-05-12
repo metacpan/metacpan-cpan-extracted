@@ -1,0 +1,9 @@
+ChangeLog
+lib/XML/RSS/TimingBotDBI.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+t/01_about_verbose.t
+test_requiring_modification.pl
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<NZSRSResponse VerMajor="3" VerMinor="99" RegistrarId="90">
+  <Response
+     Action="HandleDetailsQry"
+     FeId="4"
+     FeSeq="371215"
+     OrigRegistrarId="90"
+     RecipientRegistrarId="90"
+     Rows="0"
+     >
+    <FeTimeStamp
+       Day="7"
+       Hour="11"
+       Minute="01"
+       Month="1"
+       Second="35"
+       TimeZoneOffset="+13:00"
+       Year="2010"
+       />
+    <Handle HandleId="h_id" Name="A Name Here" Email="me@example.com" ActionId="Action Id Here" RegistrarId="90">
+
+      <PostalAddress Address1="27 Wondering Way" Address2="Warwickshire" />
+      <Phone CountryCode="64" AreaCode="21" LocalNumber="0000000" />
+      <Fax CountryCode="64" AreaCode="21" LocalNumber="0000000" />
+
+      <AuditDetails
+         ActionId="HandleDetailsQry-2009-12-19 23:30:00-something-here"
+         RegistrarId="90"
+         >
+        <AuditTime>
+          <From
+             Day="20"
+             Hour="03"
+             Minute="28"
+             Month="12"
+             Second="10"
+             TimeZoneOffset="+13:00"
+             Year="2009"
+             />
+        </AuditTime>
+        <AuditText><![CDATA[HandleDetailsQry]]></AuditText>
+      </AuditDetails>
+
+    </Handle>
+  </Response>
+</NZSRSResponse>

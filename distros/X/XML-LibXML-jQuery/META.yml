@@ -1,0 +1,41 @@
+---
+abstract: 'Fast, jQuery-like DOM manipulation over XML::LibXML'
+author:
+  - 'Carlos Fernando Avila Gratz <cafe@kreato.com.br>'
+build_requires:
+  Test::Exception: '0'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.1, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: XML-LibXML-jQuery
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  XML::LibXML::jQuery:
+    file: lib/XML/LibXML/jQuery.pm
+    version: '0.08'
+requires:
+  HTML::Selector::XPath: '0'
+  JSON: '2.90'
+  XML::LibXML: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/cafe01/xml-libxml-jquery/issues
+  homepage: https://github.com/cafe01/xml-libxml-jquery
+  repository: git://github.com/cafe01/xml-libxml-jquery.git
+version: '0.08'
+x_authority: cpan:CAFEGRATZ

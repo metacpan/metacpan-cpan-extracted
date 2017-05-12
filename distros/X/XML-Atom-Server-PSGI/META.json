@@ -1,0 +1,78 @@
+{
+   "abstract" : "XML::Atom::Server for PSGI",
+   "author" : [
+      "Daisuke Maki <lestrrat+github@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.4.2",
+   "license" : "perl_5",
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "XML-Atom-Server-PSGI",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0.10108",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.2"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Accessor::Lite" : "0",
+            "Digest::SHA1" : "0",
+            "MIME::Base64" : "0",
+            "Plack" : "1.0024",
+            "Scope::Guard" : "0",
+            "XML::Atom" : "0.41",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "LWP::Protocol::PSGI" : "0",
+            "Test::Fatal" : "0.010",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "XML::Atom::Server::PSGI" : {
+         "file" : "lib/XML/Atom/Server/PSGI.pm",
+         "version" : "0.04"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/lestrrat/p5-XML-Atom-Server-PSGI/issues"
+      },
+      "homepage" : "https://github.com/lestrrat/p5-XML-Atom-Server-PSGI",
+      "repository" : {
+         "url" : "git://github.com/lestrrat/p5-XML-Atom-Server-PSGI.git",
+         "web" : "https://github.com/lestrrat/p5-XML-Atom-Server-PSGI"
+      }
+   },
+   "version" : "0.04"
+}

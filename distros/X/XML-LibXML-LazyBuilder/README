@@ -1,0 +1,192 @@
+NAME
+    XML::LibXML::LazyBuilder - easy and lazy way to create XML documents for
+    XML::LibXML
+
+SYNOPSIS
+      use XML::LibXML::LazyBuilder;
+
+      {
+          package XML::LibXML::LazyBuilder;
+          $d = DOM (E A => {at1 => "val1", at2 => "val2"},
+                    ((E B => {}, ((E "C"),
+                                  (E D => {}, "Content of D"))),
+                     (E E => {}, ((E F => {}, "Content of F"),
+                                  (E "G")))));
+      }
+
+DESCRIPTION
+    This module significantly abridges the overhead of working with
+    XML::LibXML by enabling developers to write concise, nested structures
+    that evaluate into XML::LibXML objects.
+
+FUNCTIONS
+  DOM
+        my $doc = DOM (E $name => \%attr, @children), $var, $enc;
+
+        # With defaults, this is shorthand for:
+
+        my $doc = E($name => \%attr,
+                    @children)->(XML::LibXML::Document->new);
+
+    Generates a "XML::LibXML::Document" object. The first argument is a
+    "CODE" reference created by "E". $var represents the version in the XML
+    declaration, and $enc is the character encoding, which default to 1.0
+    and "utf-8", respectively.
+
+  E
+        my $sub = E tagname => \%attr, @children;
+
+        my $doc = DOM $sub;
+
+    This function returns a "CODE" reference which itself evaluates to an
+    XML::LibXML::Element object. The function returned from "E" expects an
+    XML::LibXML::Document object as its only argument, which is conveniently
+    provided by "DOM".
+
+   Using "E" with an existing XML document
+    "E" can also be used to compose the subtree of an existing XML element.
+    Instead of supplying a name as the first argument of "E", supply an
+    XML::LibXML::Element object. Note, however, that any attributes present
+    in that object will be overwritten by "\%attr", and the supplied element
+    *must* be bound to a document, or the function will croak. This is to
+    ensure that the subtree is connected to the element's document and not
+    some other document.
+
+    As such, any XML::LibXML::Document object passed into the function
+    returned by "E" will be ignored in favour of the document connected to
+    the supplied element. This also means that "E($elem => \%attr,
+    @children)->($ignored_dom);" can be called in void context, because it
+    will just return $elem.
+
+        # parse an existing XML document
+        my $doc = XML::LibXML->load_xml(location => 'my.xml');
+
+        # find an element of interest
+        my ($existing) = $doc->findnodes('//some-element[1]');
+
+        # prepare the subtree
+        my $sub = E $existing => \%attr, @children;
+
+        # this will overwrite the attributes of $existing and append
+        # @children to it; normally the document is passed as an argument
+        # but in this case it would be derived from $existing.
+
+        $sub->();
+
+        # we also don't care about the output of this function, since it
+        # will have modified $doc, which we already have access to.
+
+    Note as well that members of @children can be XML::LibXML::Node objects.
+
+   Namespaces
+    Qualified element names and namespace declaration attributes will behave
+    largely as expected. This means that:
+
+        E 'foo:bar' => { 'xmlns:foo' => 'urn:x-foo:' }; # ...
+
+    ...will properly induct the generated element into the "foo" namespace.
+    E attempts to infer the namespace mapping from the document, so child
+    elements with qualified names will inherit the mapping from their
+    ancestors.
+
+        CAVEAT: When "E" is executed in the context of an *element name*
+        rather than with an existing XML::LibXML::Element, the namespace
+        mappings are scanned from the context of the document root, in
+        document order. This means that the last namespace declaration that
+        appears in the existing document (depth-first) will occupy the given
+        prefix. When an existing element is passed into "E", the namespace
+        search begins there and ascends to the root. If you have any
+        concerns about collisions of namespace declarations, use that form
+        instead.
+
+  P
+        my $sub = P target => { key => 'value' }, @othertext;
+
+    This function returns a "CODE" reference which returns a processing
+    instruction. If you pass in a HASH reference as the first argument, it
+    will be turned into key-value pairs using double-quotes on the values.
+    This means you have to take care of your own escaping of any double
+    quotes that may be in the values. The rest of the arguments are
+    concatenated into a string (intended to behave like "print" in perlfunc,
+    which means if you want spaces between them, you likewise need to add
+    them yourself).
+
+  C
+        my $sub = C @text;
+
+    This function creates a "CODE" reference which returns a comment. Again,
+    @text is simply concatenated, so if you wish to do any additional
+    formatting, do so before passing it in.
+
+  D
+        my $sub = D @text;
+
+    This function creates a "CODE" reference which returns a CDATA section.
+    Works identically to "C".
+
+  F
+        my $sub = F @children;
+
+    This function creates a "CODE" reference which returns a document
+    fragment. Since "DOM" can only accept a single node-generating function,
+    it is particularly useful for the following idiom:
+
+        my $doc = DOM F(
+            (P 'xml-stylesheet' => { type => 'text/xsl', href => '/foo.xsl' }),
+            (E mydoc => {}, @children));
+
+    Which produces:
+
+        <?xml version="1.0" encoding="utf-8"?>
+        <?xml-stylesheet type="text/xsl" href="/foo.xsl"?>
+        <mydoc>...</mydoc>
+
+  DTD
+        my $sub = DTD $name => $public, $system;
+
+    This function creates a "CODE" reference which returns a DTD
+    declaration. Both $public and $system can be "undef".
+
+EXPORT
+    None by default.
+
+  :all
+    Exports "E", "P", "C", "D", "F" and "DOM".
+
+EXAMPLES
+    If you nest your code in braces and use a "package" declaration like so,
+    you can avoid polluting the calling package's namespace:
+
+      my $d;
+      {
+          package XML::LibXML::LazyBuilder;
+          $d = DOM (E A => {at1 => "val1", at2 => "val2"},
+                    ((E B => {}, ((E "C"),
+                                  (E D => {}, "Content of D"))),
+                     (E E => {}, ((E F => {}, "Content of F"),
+                                  (E "G")))));
+      }
+
+    Then, "$d->toString" will generate XML like this:
+
+      <?xml version="1.0" encoding="utf-8"?>
+      <A at1="val1" at2="val2"><B><C/><D>Content of D</D></B><E><F>Content of F</F><G/></E></A>
+
+SEE ALSO
+    XML::LibXML
+
+    The Python module lxml.etree <http://lxml.de/tutorial.html>
+
+AUTHOR
+    Toru Hisai <mailto:toru@torus.jp>
+
+    Namespace and non-element support by Dorian Taylor
+    <mailto:dorian@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2008, 2012 by Toru Hisai
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.10.0 or, at
+    your option, any later version of Perl 5 you may have available.
+

@@ -1,0 +1,27 @@
+---
+abstract: 'Pass stringified XML to XML::Writer'
+author:
+  - "['Peter Sergeant <pete@clueball.com>']"
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: XML-Writer-Lazy
+requires:
+  File::Find: '0'
+  Test::Differences: '0'
+  XML::LibXML::SAX::ChunkParser: '0'
+  XML::SAX: '0'
+  XML::SAX::Base: '0'
+  XML::SemanticDiff: '0'
+  XML::Writer: '0'
+  perl: '5.008'
+resources:
+  bugtracker: https://github.com/pjlsergeant/p5-xml-writer-lazy/issues
+  repository: https://github.com/pjlsergeant/p5-xml-writer-lazy.git
+version: '0.04'

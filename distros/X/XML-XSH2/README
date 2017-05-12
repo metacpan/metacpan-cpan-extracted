@@ -1,0 +1,75 @@
+This is xsh - an XML Editing Shell
+----------------------------------
+Copyright (c) 2002-2011 Petr Pajas
+
+xsh is a powerfull command-line XML (DOM) editing tool/programming
+language in the manner of Unix shell interpreters and line-oriented
+text editors like ed. It can be used either interactively or for
+batch-mode XML processing.
+
+Features:
+---------
+
+- work with multiple DOM trees at once
+
+- XPATH navigation (filesystem-like) navigation within a DOM tree
+
+- copy/move nodes within a DOM tree or between two DOM trees
+
+- node deletion
+
+- node creation (element, attribute, text, cdata, comment,
+  well-balanced chunk)
+
+- XPATH search and XML listing of nodes matched with XPATH
+
+- XPATH-based conditional statements, while statement
+
+- foreach statement allowing usage of relative XPATH expressions
+
+- command output filtering with unix pipe, for example
+  xsh> list //word | grep [A-Z] | less 
+  to read a list all word elements containing chars from [A-Z] in less
+
+- use of system commands (!ls) like in ftp
+
+- XSLT transformation
+
+- validation
+
+- textual and node-list variables
+
+- user-defined procedures
+
+- access to perl and shell commands
+
+- extensive help
+
+- and more
+
+Instalation:
+------------
+
+Download and install all required perl modules. See INSTALL for a
+list. To install xsh itself, check PREFIX in config.mk and type `make
+install'. If you don't trust make-files, read INSTALL for details on
+manual installation.
+
+Usage:
+------
+
+run `xsh -i' from your terminal and type `help | less' to find
+out what to do next.
+
+Licence:
+--------
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of either:
+ 
+    a) GPL - GNU General Public Licence - Version 2
+       See http://www.gnu.org/copyleft/gpl.html or LICENCE file included in
+       XSH distribution package
+
+    b) the "Perl Artistic License" 
+       See Artistic file included in XSH distribution package

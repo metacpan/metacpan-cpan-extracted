@@ -1,0 +1,9 @@
+<stx:transform version="1.0" 
+  xmlns:stx="http://stx.sourceforge.net/2002/ns"
+  strip-space="yes">
+
+  <stx:template match="node[@id=2]">
+    <element name="{name()}">literal text</element>
+  </stx:template>
+  
+</stx:transform>

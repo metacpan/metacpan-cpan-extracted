@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+    <meta>
+        <filters directoryPatterns="" filePatterns=""
+            positiveFilePatterns="" showHiddenFiles="false"/>
+        <options/>
+    </meta>
+    <projectTree name="test.xpr">
+        <folder name="test">
+            <folder name="out">
+                <folder name="lib">
+                    <folder name="XML">
+                        <folder name="Pastor">
+                            <folder name="Test">
+                                <file
+                                    name="out/lib/XML/Pastor/Test/City.pm"/>
+                                <file
+                                    name="out/lib/XML/Pastor/Test/CityCodeIATA.pm"/>
+                                <file
+                                    name="out/lib/XML/Pastor/Test/Country.pm"/>
+                                <file
+                                    name="out/lib/XML/Pastor/Test/CountryCodeISO3166.pm"/>
+                                <file
+                                    name="out/lib/XML/Pastor/Test/Image.pm"/>
+                                <file
+                                    name="out/lib/XML/Pastor/Test/Language.pm"/>
+                                <file
+                                    name="out/lib/XML/Pastor/Test/LanguageCodeISO639.pm"/>
+                                <file
+                                    name="out/lib/XML/Pastor/Test/Location.pm"/>
+                                <file
+                                    name="out/lib/XML/Pastor/Test/Location_function.pm"/>
+                                <file
+                                    name="out/lib/XML/Pastor/Test/Location_position.pm"/>
+                                <file
+                                    name="out/lib/XML/Pastor/Test/myCity.pm"/>
+                                <file
+                                    name="out/lib/XML/Pastor/Test/MyCountry.pm"/>
+                                <file
+                                    name="out/lib/XML/Pastor/Test/MyCountry_bye.pm"/>
+                                <file
+                                    name="out/lib/XML/Pastor/Test/MyCountry_hello.pm"/>
+                                <file
+                                    name="out/lib/XML/Pastor/Test/MyLocation.pm"/>
+                                <file
+                                    name="out/lib/XML/Pastor/Test/State.pm"/>
+                                <file
+                                    name="out/lib/XML/Pastor/Test/StateCodeCompleteIATA.pm"/>
+                                <file
+                                    name="out/lib/XML/Pastor/Test/StateCodeIATA.pm"/>
+                                <file
+                                    name="out/lib/XML/Pastor/Test/SystemID.pm"/>
+                                <file
+                                    name="out/lib/XML/Pastor/Test/UNLoCode.pm"/>
+                                <file
+                                    name="out/lib/XML/Pastor/Test/UNLoCodeSub.pm"
+                                />
+                            </folder>
+                        </folder>
+                    </folder>
+                </folder>
+                <folder name="xml">
+                    <file name="out/xml/country.xml"/>
+                </folder>
+            </folder>
+            <folder name="schema">
+                <file name="schema/common.xsd"/>
+                <file name="schema/schema1.xsd"/>
+                <file name="schema/schema2.xsd"/>
+                <file name="schema/schema3.xsd"/>
+            </folder>
+            <folder name="xml">
+                <file name="xml/country.xml"/>
+            </folder>
+        </folder>
+    </projectTree>
+</project>

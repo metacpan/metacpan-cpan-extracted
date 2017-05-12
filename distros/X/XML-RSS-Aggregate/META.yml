@@ -1,0 +1,14 @@
+--- #YAML:1.0
+name: XML-RSS-Aggregate
+version: 0.02
+license: perl
+distribution_type: module
+requires:
+  Date::Parse: 2.00
+  HTML::Entities: 0.00
+  LWP: 5.60
+  XML::RSS: 0.90
+recommends: {}
+build_requires: {}
+conflicts: {}
+generated_by: Module::Build version 0.14

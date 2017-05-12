@@ -1,0 +1,114 @@
+{
+   "abstract" : "XML::RSS with XML::LibXML",
+   "author" : [
+      "-2007 Daisuke Maki <dmaki@cpan.org>, Tatsuhiko Miyagawa <miyagawa@bulknews.net>. All rights reserved."
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.12.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "XML-RSS-LibXML",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.36"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0.10108",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Accessor::Fast" : "0",
+            "DateTime::Format::Mail" : "0",
+            "DateTime::Format::W3CDTF" : "0",
+            "Encode" : "0",
+            "UNIVERSAL::require" : "0",
+            "XML::LibXML" : "1.66",
+            "XML::LibXML::XPathContext" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "XML::RSS::LibXML" : {
+         "file" : "lib/XML/RSS/LibXML.pm",
+         "version" : "0.3105"
+      },
+      "XML::RSS::LibXML::ImplBase" : {
+         "file" : "lib/XML/RSS/LibXML/ImplBase.pm"
+      },
+      "XML::RSS::LibXML::MagicElement" : {
+         "file" : "lib/XML/RSS/LibXML/MagicElement.pm",
+         "version" : "0.3105"
+      },
+      "XML::RSS::LibXML::Namespaces" : {
+         "file" : "lib/XML/RSS/LibXML/Namespaces.pm"
+      },
+      "XML::RSS::LibXML::Null" : {
+         "file" : "lib/XML/RSS/LibXML/Null.pm"
+      },
+      "XML::RSS::LibXML::V0_9" : {
+         "file" : "lib/XML/RSS/LibXML/V0_9.pm"
+      },
+      "XML::RSS::LibXML::V0_91" : {
+         "file" : "lib/XML/RSS/LibXML/V0_91.pm"
+      },
+      "XML::RSS::LibXML::V0_92" : {
+         "file" : "lib/XML/RSS/LibXML/V0_92.pm"
+      },
+      "XML::RSS::LibXML::V1_0" : {
+         "file" : "lib/XML/RSS/LibXML/V1_0.pm"
+      },
+      "XML::RSS::LibXML::V2_0" : {
+         "file" : "lib/XML/RSS/LibXML/V2_0.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/lestrrat/XML-RSS-LibXML/issues"
+      },
+      "homepage" : "https://github.com/lestrrat/XML-RSS-LibXML",
+      "repository" : {
+         "url" : "git://github.com/lestrrat/XML-RSS-LibXML.git",
+         "web" : "https://github.com/lestrrat/XML-RSS-LibXML"
+      }
+   },
+   "version" : "0.3105",
+   "x_contributors" : [
+      "Miyagawa Tatsuhiko <miyagawa@bulknews.net>",
+      "David E. Wheeler <david@justatheory.com>",
+      "Aaron Crane <arc@cpan.org>",
+      "Syohei YOSHIDA <syohex@gmail.com>",
+      "Daisuke Maki <lestrrat+github@gmail.com>"
+   ]
+}

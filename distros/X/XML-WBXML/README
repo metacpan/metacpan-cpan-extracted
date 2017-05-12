@@ -1,0 +1,27 @@
+XML-WBXML
+
+    This is a wrapper around libwbxml2, which must be installed first.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+AUTHORS
+
+    David Glasser <glasser@bestpractical.com>
+    Mikhail Ivanov <m.ivanych@gmail.com>
+
+
+COPYRIGHT AND LICENCE
+
+    Copyright (C) 2005, Best Practical Solutions LLC.
+
+    This program is free software; you can redistribute it and/or modify
+    it under the same terms as Perl itself.
+

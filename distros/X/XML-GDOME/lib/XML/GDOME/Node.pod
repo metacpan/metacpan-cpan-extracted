@@ -1,0 +1,293 @@
+=head1 NAME
+
+  XML::GDOME::Node - Interface Node implementation.
+
+=head1 SYNOPSIS
+
+  $nnm      = $n->getAttributes();
+  $nodeList = $n->getChildNodes();
+  $node     = $n->getFirstChild();
+  $node     = $n->getLastChild();
+  $str      = $n->getLocalName();
+  $str      = $n->getNamespaceURI();
+  $node     = $n->getNextSibling();
+  $str      = $n->getNodeName();
+  $type     = $n->getNodeType();
+  $str      = $n->getNodeValue();
+              $n->setNodeValue($str);
+  $doc      = $n->getOwnerDocument();
+  $node     = $n->getParentNode();
+  $str      = $n->getPrefix();
+              $n->setPrefix($str);
+  $node     = $n->getPreviousSibling();
+  $node     = $n->appendChild($newChild);
+  $node     = $n->cloneNode($deep);
+  $bool     = $n->hasAttributes();
+  $bool     = $n->hasChildNodes();
+  $node     = $n->insertBefore($newChild,$refChild);
+  $bool     = $n->isSupported($feature,$version);
+              $n->normalize();
+  $node     = $n->removeChild($oldChild);
+  $node     = $n->replaceChild($newChild,$oldChild);
+  $bool     = $n->canAppend($newChild);
+  $str      = $n->toString($mode);
+  @nodes    = $n->findnodes($xpath);
+              $n->iterator( \&nodehandler )
+  $pointer  = $n->gdome_ref;
+
+=head1 METHODS
+
+=over 4
+
+
+=item $nnm = $n->getAttributes();
+
+
+
+I<Returns>: a NamedNodeMap containing the attributes of this node (if it is an Element) or undef otherwise. In array context, returns array.
+
+
+=item $nodeList = $n->getChildNodes();
+
+
+
+I<Returns>: a NodeList that contains all children of this node. If there are no children, this is a NodeList containing no nodes.  Note that attributes are not considered to be children of element nodes - use gdome_n_attributes to obtain the attributes. In array context, returns array.
+
+
+=item $node = $n->getFirstChild();
+
+
+
+I<Returns>: the first child of this node. If there is no such node, this returns undef.
+
+
+=item $node = $n->getLastChild();
+
+
+
+I<Returns>: the last child of this node. If there is no such node, this returns undef.
+
+
+=item $str = $n->getLocalName();
+
+
+
+I<Returns>: the local part of the qualified name of this node. For nodes of any type other than ELEMENT and ATTRIBUTE and nodes created with a DOM Level 1 method, this is always undef.
+
+
+=item $str = $n->getNamespaceURI();
+
+
+
+I<Returns>: the namespace URI of this node, or undef if it is unspecified. For nodes of any type other than ELEMENT and ATTRIBUTE and nodes created with a DOM Level 1 method, this is always undef.
+
+
+=item $node = $n->getNextSibling();
+
+
+
+I<Returns>: the node immediately following this node. If there is no such node, this returns undef.
+
+
+=item $str = $n->getNodeName();
+
+
+
+I<Returns>: the name of this node, depending on its type.
+
+
+=item $type = $n->getNodeType();
+
+
+
+I<Returns>: an integer bigger than 0 representing the type of the underlying object or 0 on error.
+
+
+=item $str = $n->getNodeValue();
+
+
+
+I<Returns>: the value of this node, depending on its type.
+
+
+=item $doc = $n->getOwnerDocument();
+
+
+
+I<Returns>: the documment object associated with this node. This is also the Document object used to create new nodes. When this node is a Document or a DocumentType which is not used with any Document yet, this is undef.
+
+
+=item $node = $n->getParentNode();
+
+
+
+I<Returns>: the parent of this node. All nodes, except Attr, Document, DocumentFragment, Entity, and Notation may have a parent. However, if a node has just been created and not yet added to the tree, or if it has been removed from the tree, this is undef.
+
+
+=item $str = $n->getPrefix();
+
+
+
+I<Returns>: the namespace prefix of this node, or undef if it is unspecified. For nodes of any type other than ELEMENT and ATTRIBUTE and nodes created with a DOM Level 1 method, this is always undef.
+
+
+=item $node = $n->getPreviousSibling();
+
+
+
+I<Returns>: the node immediately preceding this node. If there is no such node, this returns undef.
+
+
+=item $node = $n->appendChild($newChild);
+
+Adds the node I<newChild> to the end of the list of children of this node. If the I<newChild> is already in the tree, it is first removed. If it is a DocumentFragment node, the entire contents of the document fragment are moved into the child list of this node
+
+I<C<newChild>>: The node to add
+
+I<Returns>: the node added.
+
+C<GDOME_NO_MODIFICATION_ALLOWED_ERR>: Raised when the node is readonly.
+
+C<GDOME_WRONG_DOCUMENT_ERR>: Raised if I<newChild> was created from a different document than the one that created this node.
+
+C<GDOME_HIERARCHY_REQUEST_ERR>: Raised if this node is of a type that does not allow children of the type of the I<newChild> node, or if the node to append is one of this node's ancestors or this node itself.
+
+
+=item $node = $n->cloneNode($deep);
+
+Makes a duplicate of this node, i.e., serves as a generic copy constructor for nodes. The duplicate node has no parent; (parentNode is undef). DOCUMENT_TYPE, NOTATION and ENTITY nodes are not supported.
+
+I<C<deep>>: If true, recursively clone the subtree under the specified node;        if false, clone only the node itself (and its attributes, if it is        an Element).
+
+I<Returns>: the duplicate node.
+
+C<GDOME_NOT_SUPPORTED_ERR>: Raised if the type of node being cloned is not supported.
+
+
+=item $bool = $n->hasAttributes();
+
+
+
+I<Returns>: 1 if this node has any attributes, 0 otherwise.
+
+
+=item $bool = $n->hasChildNodes();
+
+
+
+I<Returns>: 1 if this node has any children, 0 otherwise.
+
+
+=item $node = $n->insertBefore($newChild,$refChild);
+
+Inserts the node I<newChild> before the existing child node I<refChild>. If I<refChild> is undef, insert I<newChild> at the end of the list of children. If I<newChild> is a DocumentFragment node, all of its children are inserted, in the same order, before I<refChild>. If the I<newChild> is already in the tree, it is first removed.
+
+I<C<newChild>>: The new node to put in the child list
+
+I<C<refChild>>: the reference node, i.e., the node before which the new node            must be inserted.
+
+I<Returns>: the node being inserted.
+
+C<GDOME_NO_MODIFICATION_ALLOWED_ERR>: Raised when the node is readonly.
+
+C<GDOME_NOT_FOUND_ERR>: Raised if I<refChild> is not a child of this node.
+
+C<GDOME_WRONG_DOCUMENT_ERR>: Raised if I<newChild> was created from a different document than the one that created this node.
+
+C<GDOME_HIERARCHY_REQUEST_ERR>: Raised if this node is of a type that does not allow children of the type of the I<newChild> node, or if the node to insert is one of this node's ancestors or this node itself.
+
+
+=item $bool = $n->isSupported($feature,$version);
+
+Tests whether the DOM implementation implements a specific feature and that feature is supported by this node.
+
+I<C<feature>>: The name of the feature to test.
+
+I<C<version>>: This is the version number of the feature to test. In Level 2,           version 1, this is the string "2.0". If the version is not           specified, supporting any version of the feature will cause the           method to return 1.
+
+I<Returns>: 1 if the specified feature is supported on this node, 0 otherwise.
+
+
+=item $n->normalize();
+
+Puts all Text nodes in the full depth of the sub-tree underneath this Node, including attribute nodes, into a "normal" form where only structure (e.g., elements, comments, processing instructions, CDATA sections, and entity references) separates Text nodes, i.e., there are neither adjacent Text nodes nor empty Text nodes.
+
+
+=item $node = $n->removeChild($oldChild);
+
+Removes the child node indicated by I<oldChild> from the list of children, and returns it.
+
+I<C<oldChild>>: The node being removed
+
+I<Returns>: the node removed.
+
+C<GDOME_NO_MODIFICATION_ALLOWED_ERR>: Raised when the node is readonly.
+
+C<GDOME_NOT_FOUND_ERR>: Raised if I<oldChild> is not a child of this node.
+
+
+=item $node = $n->replaceChild($newChild,$oldChild);
+
+Replaces the child node I<oldChild> with I<newChild> in the list of children, and returns the I<oldChild> node. If I<newChild> is a DocumentFragment object, I<oldChild> is replaced by all of the DocumentFragment children, which are inserted in the same order. If the I<newChild> is already in the tree, it is first removed.
+
+I<C<newChild>>: The new node to put in the child list
+
+I<C<oldChild>>: The node being replaced in the list
+
+I<Returns>: the node replaced.
+
+C<GDOME_NO_MODIFICATION_ALLOWED_ERR>: Raised when the node is readonly.
+
+C<GDOME_NOT_FOUND_ERR>: Raised if I<oldChild> is not a child of this node.
+
+C<GDOME_WRONG_DOCUMENT_ERR>: Raised if I<newChild> was created from a different document than the one that created this node.
+
+C<GDOME_HIERARCHY_REQUEST_ERR>: Raised if this node is of a type that does not allow children of the type of the I<newChild> node, or if the node to put in is one of this node's ancestors or this node itself.
+
+
+=item $bool = $n->canAppend($newChild);
+
+Tests if a I<newChild> can be added in the child list of this node.
+
+I<C<newChild>>: The Node Object ref of the node to test
+
+I<Returns>: 1 if I<newChild> can be added, 0 otherwise.
+
+
+=item $str = $n->toString($mode);
+
+This is the equivalent to XML::GDOME::Document::toString for a single node. This means a node and all its
+       childnodes will be dumped into the result string. There is no formating implemented yet, which may cause an
+       unreadable output. 
+
+I<Returns>: string representation of node and childnodes
+
+
+=item @nodes = $n->findnodes($xpath);
+
+findnodes performs the xpath statement on the current node and returns the result as an array.
+
+
+=item $n->iterator( \&nodehandler )
+
+This is little helper function, that lets one define a function, that will be processed on the current node and all its
+children. The function will recieve as its only parameter the node to proceed. The function uses inorder
+proceeding to traverse the subtree. Therefore you can't reach the childnodes anymore, if the nodehandler
+removes childnodes. 
+
+  $node->iterator( sub { print $_[0]->nodeName(), "\n"; } );    
+
+The example will print all node names in the current subtree.
+
+I<Returns>: return value of the nodehandler while processing the last child of the current node.
+
+
+=item $pointer = $n->gdome_ref;
+
+This returns the pointer to the node in the underlying C libxml2 library.  It is useful for testing if two nodes are the same.  For namespace declaration attributes and xpath namespaces, returns pointer to libxml2 namespace.  Similar to getPointer method in XML::LibXML
+
+I<Returns>: Value of pointer to libxml2 C structure.
+
+
+=back
+

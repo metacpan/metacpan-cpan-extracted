@@ -1,0 +1,11 @@
+CHANGES
+MANIFEST
+README
+TODO
+Makefile.PL
+RSSLite.pm
+t/01basic.t
+t/02rss.t
+t/journal.rss
+t/sampleRSS.xml
+META.yml                                 Module meta-data (added by MakeMaker)

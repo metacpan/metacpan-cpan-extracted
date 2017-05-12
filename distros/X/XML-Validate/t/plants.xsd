@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<xs:schema
+	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	elementFormDefault="qualified">
+	
+	<xs:element name="plants">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="plant" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name="plant">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="flower"/>
+				<xs:element name="name"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name="flower">
+		<xs:complexType>
+			<xs:attribute name="colour" type="xs:string" use="optional"/>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name="name" type="xs:string"/>
+	
+</xs:schema>

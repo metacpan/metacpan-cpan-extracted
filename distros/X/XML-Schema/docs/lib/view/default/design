@@ -1,0 +1,4 @@
+<h2>Design Documentation</h2>
+[% view.toc(item) %]
+
+[% item.content(view) %]

@@ -1,0 +1,106 @@
+#========================================================================
+#
+# Changes 
+#
+# DESCRIPTION
+#   Revision history for the XML::Schema module.
+#
+# AUTHOR
+#   Andy Wardley   <abw@kfs.org>
+#
+# REVISION
+#   $Id: Changes,v 1.3 2003/01/10 11:20:12 abw Exp $
+#========================================================================
+
+#------------------------------------------------------------------------
+# Version 0.07 - 11th January 2003
+#------------------------------------------------------------------------
+
+* Cleaned up some of the documentation for a tentative first alpha 
+  release (at last!).
+
+#------------------------------------------------------------------------
+# Version 0.06 - 20th December 2001
+#------------------------------------------------------------------------
+
+* Moved constant definitions into XML::Schema::Constants and added
+  t/constants.t to test.
+
+* Added factory() method to XML::Schema::Base, cleaned up some further
+  code in there, updated documentation and t/base.t tests.
+
+* Added XML::Schema::Wildcard and t/wildcard.t.  At the moment this is
+  working but the interface may change slightly pending some further
+  investigation required into namespace processing.  The process
+  options SKIP, LAX and STRICT are supported but they currently don't
+  have any effect as no namespace processing is performed.  Note also
+  that this implementation works only on namespace prefixes and
+  doesn't resolve them into their actual namespace values (which it
+  should).
+
+* Added XML::Schema::Attribute::Group and totally cleaned up and (mostly)
+  completed the implementation of attributes, including scoped type 
+  management, relocatable attribute groups, nested groups, wildcards
+  within nested groups, usage: OPTIONAL, REQUIRED, PROHIBIT.  The 
+  only support missing is in those areas that wildcards lack, described
+  above.  Added t/attrgroup.t and various new tests to t/attribute.t
+
+* Changed attribute to perform FIXED constraint check on the post-
+  validation, but pre-activation value.  Previously, this was hacked
+  by scheduling an instance action to check the fixed constraint.
+
+* Had a major overhaul of the documentation, correcting and completing 
+  many more pages.  Still got some ay to go...
+
+
+#------------------------------------------------------------------------
+# Version 0.05 - 19th July 2001
+#------------------------------------------------------------------------
+
+* Added the XML::Schema::Particle::Choice module to implement the choice
+  model group.
+
+* Fixed a bug in the complex type handler which was ignoring the use of 
+  any attributes which hadn't been defined for the type.  Now returns
+  an error of the form "unexpected attribute(s): foo, bar, baz"
+
+* Added the XML::Schema::Type::Provider module to replace the Scope/Scoped
+  modules for handling type management, but haven't yet activated it.
+  There should (I think) be a single module to manage types, model groups,
+  notations, attribute groups, etc.
+
+
+#------------------------------------------------------------------------
+# Version 0.04 - 10th July 2001
+#------------------------------------------------------------------------
+
+* Added some sample templates in 'examples/templates' directory to 
+  reconstruct schema output as XML.
+
+
+#------------------------------------------------------------------------
+# Version 0.03 - 10th July 2001
+#------------------------------------------------------------------------
+
+* Added ID and IDREF simple types with resolution happening via the 
+  XML::Schema::Instance object within the end_element() handler of 
+  a complex type which defines attributes of type ID and/or IDREF.
+
+
+#------------------------------------------------------------------------
+# Version 0.02 - 10th July 2001
+#------------------------------------------------------------------------
+
+* Renamed XML::Schema::Schedule to XML::Schema::Scheduler
+
+* Added 'use' option to XML::Schema::Attribute.  This should really be 
+  positioned in XML::Schema::Type::Complex but it's easier to put it in 
+  here for now.
+
+
+#------------------------------------------------------------------------
+# Version 0.01
+#------------------------------------------------------------------------
+
+* initial version
+

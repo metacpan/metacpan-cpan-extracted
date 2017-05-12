@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+  <w:old xmlns:w="http://random.old.com/a/">
+    <tree>
+      <with>
+        <some>
+          <subtree/>
+        </some>
+      </with>
+    </tree>
+  </w:old>

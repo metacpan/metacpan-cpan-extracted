@@ -1,0 +1,21 @@
+<stx:transform version="1.0" 
+  xmlns:stx="http://stx.sourceforge.net/2002/ns"
+  strip-space="yes">
+
+  <stx:template match="/*">
+    <root>
+      <stx:value-of select="ends-with('auto','to')"/>
+      <stx:text>:</stx:text>
+      <stx:value-of select="ends-with('auto','aut')"/>
+      <stx:text>:</stx:text>
+      <stx:value-of select="ends-with('moto',concat('mo','to'))"/>
+      <stx:text>:</stx:text>
+      <stx:value-of select="ends-with('moto','')"/>
+      <stx:text>:</stx:text>
+      <stx:value-of select="ends-with('','to')"/>
+      <stx:text>:</stx:text>
+      <stx:value-of select="ends-with('','', 'http://my_collation')"/>
+    </root>
+  </stx:template>
+  
+</stx:transform>

@@ -1,0 +1,19 @@
+<stx:transform version="1.0" 
+  xmlns:stx="http://stx.sourceforge.net/2002/ns"
+  stxpath-default-namespace="http://test_ns"
+  strip-space="yes">
+
+  <stx:template match="/">
+    <root>
+      <stx:value-of select="concat('-', ., '-')"/>
+      <stx:text>:</stx:text>
+      <stx:process-children/>
+    </root>
+  </stx:template>
+  
+  <stx:template match="root/node">
+    <stx:variable name="var" select="."/>
+    <stx:value-of select="$var"/>
+  </stx:template>
+
+</stx:transform>

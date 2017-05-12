@@ -1,0 +1,46 @@
+Copyright (C) 2015, Daniel Dragan
+Copyright (C) 2015, cPanel Inc
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+SYNOPSIS
+========
+
+The Config.pm included by default with Perl is pure Perl.  Nearly all Perl apps
+will load Config.pm.  For a number of reasons, of speed and memory space,
+reimplement the P5P shipped Config.pm as an XS library, shareable between
+processes as read-only memory, and with a hash that is better optimized than
+Perl hashes, courtesy of gperf tool which generates collision-free perfect
+hashes.
+
+This module is a drop-in replacement for Config.pm. All code that does
+
+    use Config;
+
+will use the XS implementation after installing this module.  To revert to the
+original pure perl Config.pm, go and delete the following 3 files that will be
+next to each other in /site, Config.pm, Config_mini.pl, Config_xs_heavy.pl, and
+the Config shared library in /auto, after deleting the /site files, the original
+pure perl Config.pm in /lib will be loaded.
+
+Since XS Config is a compiled C shared library, it can not be edited with a text
+editor after it is built.  To change the values in the XS Config module,
+edit the pure perl Config_heavy.pl file with a text editor and rebuild XS
+Config.
+
+IT IS HIGHLY RECOMMENDED THAT YOU HAVE GPERF TOOL INSTALLED AND RUNNABLE FROM
+YOUR PATH BEFORE INSTALLING XS CONFIG.
+
+CONTRIBUTING
+============
+
+XS Config is part of the cperl project http://perl11.org/cperl/ .
+
+The files and parts of XS Config that are git tracked by cperl at
+https://github.com/perl11/cperl/tree/master/ext/Config
+are revised inside/upstream cperl.
+
+Files that are not git tracked by cperl are revised at
+https://github.com/perl11/p5-Config with syncronizing from cperl of the cperl
+git tracked files to the standalone repo.

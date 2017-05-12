@@ -1,0 +1,7 @@
+root
+/x	/y	/a/b/c
+testX	testY	TestA1
+testX	testY	TestA2
+testX	testY	TestA3
+testX	testY	TestA4
+

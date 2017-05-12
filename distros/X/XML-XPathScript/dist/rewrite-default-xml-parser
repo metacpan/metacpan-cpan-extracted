@@ -1,0 +1,6 @@
+# This script rewrites the setting of the default value of $XML_parser
+# in XPathScript.pm. It is invoked by Makefile.PL as the PM_FILTER.
+while(<STDIN>) {
+          s/^(\$XML_parser = )'.*?';$/$1'$ARGV[0]';/;
+          print;
+}

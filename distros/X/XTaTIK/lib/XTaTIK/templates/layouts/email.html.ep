@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <title><%= xtext('market') . ' / ' . xtext('company_name') %></title>
+  <style type="text/css">
+    body {
+      font-family: sans-serif;
+    }
+
+    h1 { font-size: 180%;}
+
+    table { border-collapse: collapse; }
+
+    td, tr, th, td {
+      border: 1px solid #ccc;
+    }
+
+    th, td {
+      padding: 5px 10px;
+    }
+
+    .unsemantic-list {
+      padding-left: 15px;
+      border-left: 4px solid #ccc;
+    }
+
+    .unsemantic-list p {
+      margin: 0 0 5px;
+    }
+  </style>
+</head>
+<body>
+  <h1><%= title %></h1>
+  <%= content %>
+</body>

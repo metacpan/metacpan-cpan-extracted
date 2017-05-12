@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<?pre_doctype hello ?>
+<!-- From https://metacpan.org/source/TODDR/XML-Parser-2.44/samples/canontst.xml
+     Lightly edited to remove ignorable whitespace and inline DTD, and some
+     other stuff -->
+<!DOCTYPE ctest SYSTEM "ctest.dtd">
+<?pre_r1 testing?>
+<?pre_r2 one two?>
+<ctest version="0.5" xmlns:x="urn:1" xmlns:y="urn:2">
+  <x:e a="a"></x:e>
+  <foo k="world" xmlns="urn:3" y:b="there" z="hello">
+    <bar></bar>
+    Here is a PI: <?inside more pi testing ?>. Like it?
+  </foo>
+</ctest><?post_root last stuff?>

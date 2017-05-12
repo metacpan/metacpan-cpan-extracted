@@ -1,0 +1,236 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.81.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 842745cb706f8f2126506f544492f7a80dbe29b3 COPYING
+SHA1 dffd7af341150900e33a04eb43383e21053a8c77 Changes
+SHA1 7a4da4a26e0c19cbd7fead225337c2effe4fac18 MANIFEST
+SHA1 9b875407d60f086714a3ca39de8ef195c106d889 MANIFEST.SKIP
+SHA1 57336b63375efd4073eb4eb5842f3a43b668d327 META.json
+SHA1 9b99eb3e149de221ffc3621b79a72ab8cec7cada META.yml
+SHA1 1fa2401cd4cb49c9962c9e7ed3374886db8a32d0 Makefile.PL
+SHA1 c246f6bc0028acdccd3a4280181a7d5695029da2 debian/changelog
+SHA1 b6abd567fa79cbe0196d093a067271361dc6ca8b debian/compat
+SHA1 1d31c0ffc644b220492d1f4cc3232e3713f7ea6d debian/control
+SHA1 3da6955aaf84462a66b9e8a0114c38c3049bdd52 debian/copyright
+SHA1 e29c8c99c3f8153e458a8c11aefc64e5da95f4d2 debian/my_mangle_examples.pl
+SHA1 7671a7511867b246bfbeb013716ba7dcb68e1710 debian/rules
+SHA1 61652cd1568dcf2614df833eba241755eee34e89 debian/source/format
+SHA1 12854c7ef8aa2af46fe605a83530806ed5293504 debian/watch
+SHA1 0d12321c8d09ef2599920db3c57040b04cabc0fe devel/Encode-X11-xlib.c
+SHA1 a727f045ac38110b586733cc0ffc3fdb3f81ddb7 devel/Encode-X11-xlib.t
+SHA1 bc8b317516d262785c2b3467e9e261372dca9768 devel/Encode-X11-xlib2.c
+SHA1 1733d4555c2afb52f2c06ebd8e1acbfebe1f6556 devel/Makefile
+SHA1 2b619e0c4bd41a09f759b76725719422dbcb660b devel/WM-maybe.pl
+SHA1 101473a153c8a13b89f96ff60816d0cf400ea277 devel/XFree86_DGA-2.t
+SHA1 12ad25396c3561fbbc6c1d311871ab8d3663117d devel/XFree86_VidModeExtension.t
+SHA1 6014dde5eaad71f221b6a43b37549f5f9fe8185d devel/XInputExtension.t
+SHA1 79780d39dc8d7e8f7d0a903331a10bb3fd4f2dc9 devel/atoms.pl
+SHA1 b69bec7a36fba8c25eaa87dd8a584c83d3569d93 devel/choose-window.pl
+SHA1 e3bbcdb89bba4b0d9d74513355a6c251aa24cd42 devel/composite.pl
+SHA1 3bfc171e098263803bc8079abb4762fdccd9139b devel/ctext.pl
+SHA1 c21d88b2a6f71574ef95da6d8e9b103c04799545 devel/cursor-anim.pl
+SHA1 a6dc3769198d8cad8a989eaadd1917d621d10354 devel/cursor-colour.pl
+SHA1 91ced7c88629eb1f484c3a31af284599420702c8 devel/cursor-transparent.pl
+SHA1 e025af98efcdab165dee2d54e8c47335a2b260c5 devel/damage.pl
+SHA1 296f01fe8fff1b2cfc96440489df0d65e94714ed devel/dbe.pl
+SHA1 4f9b4a53aa22eb52f5365115dffdfb445f10035f devel/dpms.pl
+SHA1 5e0427271563e1c7f0eb3b963cff907eeb904a8f devel/dri2.pl
+SHA1 6dc9ef8dc4253f3658174c32fd4b9f4bce4dd1c4 devel/encode-all.el
+SHA1 2dfbb2d459243a3ee3b2e5ba936d90e49e6113dd devel/encode-all.pl
+SHA1 336d27e8f92b9e46226ea1005670fc44149520d5 devel/encode-dump.c
+SHA1 113f7d32e648499a134d52ee01b4e1d17d654fdd devel/encode-run.el
+SHA1 bfa16ffa8503467908a0c9a8551a2b1f4ac9a4d7 devel/encode-run.pl
+SHA1 0c83febf9702a449236916556c45fda9d5ca8a68 devel/encode-xlib-out.pl
+SHA1 9b6b060e678bb3cc8aa255f28c09d25585172f9a devel/encode-xlib.c
+SHA1 4f5ac68cdd2ffae10483cef02be80e4fe3b81f7e devel/exe-screensaver-info.c
+SHA1 0151b07ba0073e4d05a5b91f8b8148b4be3e50ae devel/exe-sync.c
+SHA1 e5a549d81d67ac282ad98f0db65455d1d36a8490 devel/exe-xf86vidmode.c
+SHA1 6cbd8c146a6797cfd1db44b54801229b44a3abbc devel/exe-xi-info.c
+SHA1 4d2b95796b0f31d68483d6aded32f2ac010e8f0e devel/exe-xv-info.c
+SHA1 159401ded9d487b4b881ab005b7db92ab6f915dd devel/exe-xv.c
+SHA1 e72e4571d7f30f12b69896a177c9b400dd18bf70 devel/frame-to-client.pl
+SHA1 d912a65ebf9508891da14c5754acf154ab732978 devel/grab.pl
+SHA1 76af178ef84d6f1c62a28ca3b8f1e80f6c99a922 devel/icon-window.pl
+SHA1 c7b209416b9961cc7c343d557824706854b4cad6 devel/kill-client.pl
+SHA1 2e8cc9246ebaa249f4e96e8dba985a35bc1a0424 devel/lib/X11/Protocol/Ext/DRI2-11.t
+SHA1 57ac8133f9129e893982ae28cdebdeac7d9bac7d devel/lib/X11/Protocol/Ext/DRI2.pm
+SHA1 251c0c85e3b1b19087470d96c9033a2d04e96a74 devel/lib/X11/Protocol/Ext/DRI2.t
+SHA1 6f9a2ac88b29406ff3ddbd3dbfa314ab62a556cd devel/lib/X11/Protocol/Ext/RANDR.pm
+SHA1 969dea1f1c572b84ecaa0021ee753853cb9c502c devel/lib/X11/Protocol/Ext/SYNC-31.t
+SHA1 9195994b373465279b922a0134505c6aac07a58b devel/lib/X11/Protocol/Ext/SYNC.pm
+SHA1 2292d0c4ab6c26c518d9bba71ca3c190c9fb7219 devel/lib/X11/Protocol/Ext/SYNC.t
+SHA1 c563fa5fdb285046fe483ec63b83b29b1aa36b7b devel/lib/X11/Protocol/Ext/XFree86_VidModeExtension.pm
+SHA1 dcf1b61d113c428dcfd98b07499a884d318a2301 devel/lib/X11/Protocol/Ext/XInputExtension.pm
+SHA1 ab9aa93b314f83322a0c34e4a9c8551e8218bf4b devel/lib/X11/Protocol/Ext/XVideo.pm
+SHA1 3f4d75f36558dde7e159305f6a351429bed09d20 devel/magnifier.pl
+SHA1 a76ccd66988ab52c58fa62ad8d13cbb78b5d08c2 devel/maybe/CursorConstants.pm
+SHA1 885c0b2bbce40b0b16e46bfc954a2d8dcb9b11ba devel/mwm-hints-tearoff.pl
+SHA1 865e8b5180ceb4c894f6c570cde617dafee63c4d devel/mydmx
+SHA1 e967f8ee055991364b61347d3361309e642004d7 devel/opcodes.pl
+SHA1 67ff5ccfa9f5c5c5237f78913eabac85800f840b devel/pixmap-view.pl
+SHA1 de9c0a91df8e1bd6e59323c23ebbecb74de35fe6 devel/pointer-mapping.pl
+SHA1 60be225c3e799184dd97ac56aeb2c24672b3b8aa devel/randr.pl
+SHA1 7e5c7e4509b15fc7d4086e297226e8f043212526 devel/render-extension.c
+SHA1 fd29bcef8bedc62caaed2e82126db0744c12eaa0 devel/rootwin.pl
+SHA1 319a9b80f7fb0eaf18c1d83849733921724a2525 devel/rosetta-get-pixel.pl
+SHA1 c00f80fe021d14b283102ebda87577f3a35085f8 devel/rosetta-window-create.pl
+SHA1 56674dea2af814b0251b582cee4e9679447c75c9 devel/saver.pl
+SHA1 e2025251e613dda8ccbc7478925a3824621c0455 devel/scroll-new-window.pl
+SHA1 45157ddab20d7b2f993b85f78b035ca95ad7fc35 devel/selection.pl
+SHA1 b6632d661e9ab13f3f6d76476ece16b70671f2dc devel/setroot.pl
+SHA1 c4f77e681e8fbf7ba69abca898de978d3780620f devel/shm-id.pl
+SHA1 784a621402bc0b1a6bc5a33eae0fabbc11240c8e devel/shm.pl
+SHA1 a20aa9e2afffa6b6b50075b8448780034af45ef5 devel/sync-info.pl
+SHA1 ed0cce088d836f48af1e6bdd76e147a9022ac7b6 devel/sync.pl
+SHA1 32109dba32bcf472182f728f6b251e1f408e97b7 devel/tog-cup.pl
+SHA1 1bfb7825dac9413688e3b38a221f0ccbf88b936a devel/wm-icon-size.pl
+SHA1 12f20a65f5c677e06dc1595441812b99352755e6 devel/wm-size-hints.pl
+SHA1 e62fce3542cd9f6786a94e196feff180357ba7ec devel/wm-state-exercise.pl
+SHA1 abd634d81f95a617f9aeec18a25e1c8e6aa5987a devel/wm-user-time.pl
+SHA1 beecdb435a2be420fcdcade2de7c435bba3e9e0f devel/wm.pl
+SHA1 550384cc80687504a2c083df850c6ac35e5e9113 devel/xdga-setmode.c
+SHA1 11592f1703abcd343053ed92f639c4a9b0e3050b devel/xf86dga.pl
+SHA1 e53d2b8d5782947f6f089836b1183d96e99476be devel/xf86vidmode.pl
+SHA1 c202b9a4ce63713bd4dfcb137f0db67cc96db53d devel/xfixes-barrier.pl
+SHA1 75fd759ba1ef0e7a54a450edeedc0ac11369d4c3 devel/xfixes.pl
+SHA1 6fed8c2d0fd74a521978eca88982f0b9518e7601 devel/xi-info.pl
+SHA1 992a148a6893140b90988f58273d22ced7986738 devel/xinerama.pl
+SHA1 3292341472e3df7503c52be6a8a4548e5a588dfd devel/xkeyboard-mapping.pl
+SHA1 b406837cf96de0448d25f6db33f4aa92d27e9d3f devel/xresource.pl
+SHA1 34b7cd5269e0e96cc0acb291a542e59c8ff9969a devel/xsettings.pl
+SHA1 bc857d737d417c8bde48d960a3ad6cbca34013ab devel/xtest.pl
+SHA1 e2a188b41a3ab350194248ad627ae9d79374bdb0 devel/xvideo.pl
+SHA1 759b14b83359b9967766b1276f8fd94d8a932084 examples/cursor-font-anim.pl
+SHA1 785518bde5e0daa97edb1b8c84fb536a0c12f4af examples/damage-duplicate.pl
+SHA1 752d6400e12e3405cdd4b8d2f5eab11384673dd5 examples/dbe-info.pl
+SHA1 bb357ec62ca2efe848a59abc5052c8c7939e1e6a examples/dbe-swap.pl
+SHA1 a56ecbf8c263ba674385a8169507149a13731a5a examples/mit-screen-saver-external.pl
+SHA1 7852d05aa6fb9ac3ab98a3b21ce219ec5e9d404f examples/view-root.pl
+SHA1 d135dddd49d7c420ca527c725c6a8ed7d6faa08d examples/xfixes-cursor-image.pl
+SHA1 3004bf90f689f0748a3307bbc51d1ea82effb0fa examples/xfixes-selection.pl
+SHA1 552d5771d4db8e6ca68837813515cafc5f17e34b examples/xinerama-info.pl
+SHA1 d67168d6f607bb047266d6224d001192db420b83 examples/xresource-pairwise.pl
+SHA1 aabf54068a92b920703fe03981661b0c642c12d5 examples/xresource-print.pl
+SHA1 87d779e6509329db5e2f445e2d86f0f54b8f3e61 inc/my_pod2html
+SHA1 43912ea78c46ee74a576f1e7aeaf33c7e0dd40c8 lib/Encode/X11.pm
+SHA1 511cd3728ea94c1757baa59f1017cc1bfb2bab7b lib/X11/AtomConstants.pm
+SHA1 41fa9886551ce4aeb9513800fa0f6661eae5e871 lib/X11/CursorFont.pm
+SHA1 06c74898f94e78ca624b103e967b8904e900161d lib/X11/Protocol/ChooseWindow.pm
+SHA1 a24bf7aa2beb6630de24e08c03fb9561ef74bea6 lib/X11/Protocol/Ext/Composite.pm
+SHA1 c2ed412518119355c2f210526910f5d5375557d0 lib/X11/Protocol/Ext/DAMAGE.pm
+SHA1 a0ef5fd3c0b25d4b5f3cb003ed1d88a20d9a7046 lib/X11/Protocol/Ext/DOUBLE_BUFFER.pm
+SHA1 e223fbf30d8de4b06a2255a35f51c1ff2e7a3932 lib/X11/Protocol/Ext/MIT_SCREEN_SAVER.pm
+SHA1 8d22e355384f2046497ee0df2266cb9a8e4c3f7e lib/X11/Protocol/Ext/MIT_SHM.pm
+SHA1 c432362ba953c7a67d2bd98713c958778194c5fb lib/X11/Protocol/Ext/MIT_SUNDRY_NONSTANDARD.pm
+SHA1 59bdb4539be14b2f8d5bfc72ff75405b53f5046b lib/X11/Protocol/Ext/TOG_CUP.pm
+SHA1 fbad0091fcfe1705cb2a42d4ed272e8b5125bbfe lib/X11/Protocol/Ext/XFIXES.pm
+SHA1 bb417336cd120871e2f92adabc2f5e1bb45bcfac lib/X11/Protocol/Ext/XFree86_DGA.pm
+SHA1 8c0e0482c671c80a35b6274b1cfcdeae41257b7c lib/X11/Protocol/Ext/XINERAMA.pm
+SHA1 774d21b40513511664657fd99ac20e90b21acce3 lib/X11/Protocol/Ext/XTEST.pm
+SHA1 7a2cd522926fbfb0717abfa15db92ad8f3ac0e65 lib/X11/Protocol/Ext/X_Resource.pm
+SHA1 44056a93d6ce08fbaef19dde23a585b0abdd56f4 lib/X11/Protocol/GrabServer.pm
+SHA1 f9deec6057075937a406ed0164a47d60ce290d25 lib/X11/Protocol/Other.pm
+SHA1 8ed6dfdfb52531cb452bc07fb364cf76be40be57 lib/X11/Protocol/WM.pm
+SHA1 8ed29aaab9ad68e30b0983e599970bd68016af1e lib/X11/Protocol/XSetRoot.pm
+SHA1 844dc8f0f4f25f1437a7a8963878e0920811669f t/AtomConstants-all.t
+SHA1 760a7d3fe6d02f6a214486d187d1b1bfa9d6857f t/AtomConstants-import.t
+SHA1 d18c6cb202d2d1a1300f4ce6ea7922ed0e23c017 t/AtomConstants.t
+SHA1 5ebf4582208c040bb1032f03f5ade461809594cc t/ChooseWindow.t
+SHA1 8a62d92427a450f202c04703426556ce87acd83d t/Composite-use.t
+SHA1 4a37e280c536179a8ff3ef27b5c344bb3183fd9d t/Composite.t
+SHA1 e7fcc548bc114a56202483f559f0a2fb7e721aec t/DAMAGE-11.t
+SHA1 bebf9f97f5adeac647c718b2bd4d8314f8081674 t/DAMAGE-use.t
+SHA1 39abd9a9f8ab74ececb241f6fc4e89183946c964 t/DAMAGE.t
+SHA1 0d3f14729c3080c365757b6700b019fbc788fa18 t/DOUBLE_BUFFER-use.t
+SHA1 5259ec0641ad3d693daf9e930105f2ba4dfe9093 t/DOUBLE_BUFFER.t
+SHA1 d30fe7319f61cca233f1c6b9ec94c35d2b231220 t/Encode-X11-cns.t
+SHA1 a761410016c081c7a03b9dc30e756370e8a5b80f t/Encode-X11.t
+SHA1 68fe39830214bdc296d524d6f84cfb3bf7f5cfbb t/GrabServer-use.t
+SHA1 ca47519f720e73559a5c45bf0d7cbb1865491622 t/GrabServer.t
+SHA1 9fecbd54120b5f4347782797e29778125827e4f2 t/MIT_SCREEN_SAVER-use.t
+SHA1 8c8f4aa863d56353fc053feea8ab154d7c894ec0 t/MIT_SCREEN_SAVER.t
+SHA1 667c43c8e38b699becdc05927e144372aa27be03 t/MIT_SHM-getimage.t
+SHA1 c43c5b28172eda81a3637dbfd9bc598dcb717d45 t/MIT_SHM-pixmap.t
+SHA1 cafb2955381a6dc6510e13316c501e94ba60e181 t/MIT_SHM-putimage.t
+SHA1 14ce593c6a0098c535d88f1094d545ed07c341f5 t/MIT_SHM-use.t
+SHA1 b8cc8f03878d28507fc991e2bdc7da75857623a7 t/MIT_SHM.t
+SHA1 77d020ef1236bcc35a30bc0fffd09770fc2cea84 t/MIT_SUNDRY_NONSTANDARD-use.t
+SHA1 1bbb2a6ea1183ee185ac56e9c10358fd952b43ad t/MIT_SUNDRY_NONSTANDARD.t
+SHA1 47ebbf1d71ebdc462f51055161de9cd0838f45dc t/MyTestHelpers.pm
+SHA1 fdd9d9c66eef71b5c10fc3de1449246b7dd32ab2 t/Other-import.t
+SHA1 13edaed90e568308ef48de3ba97a341be9b618bd t/Other-use.t
+SHA1 f4fb8b59651caa6e47f3fcabdea534883c88e748 t/Other.t
+SHA1 ba03089826af888323d3eac11e15f41d99379a91 t/TOG_CUP.t
+SHA1 1fa39e9bfa00c192bf0528280fa44cfb2856d9f5 t/WM-import.t
+SHA1 fc6339033c3ee5415260e5c31e9e278f1e314301 t/WM-wide.t
+SHA1 731067b94b45740f07e4aa7c2376a5fe81c18fad t/WM.t
+SHA1 bf5878e7a5c8b72bc12649b7bc3f98cec6f8422f t/XFIXES-1.t
+SHA1 4bf9c28a0e21064d6cd67683fd6c7ac8eaf656b2 t/XFIXES-2-render.t
+SHA1 2f0e31601aba1749faa724b087d3f142f88cd7f0 t/XFIXES-2-shape.t
+SHA1 89f38cff4a11b9c9d2251f19278d33bc615c7986 t/XFIXES-2.t
+SHA1 b292e5ed5c585c7d63e32b22c701bd4c8a2b0cda t/XFIXES-3.t
+SHA1 58a540fc189e2c3eb1daf959a35831b9a593a695 t/XFIXES-4.t
+SHA1 35678f08211ebf08166530e7e53aae156db8f19c t/XFIXES-5.t
+SHA1 3d8768267dbf24ad34eef54a2343675a7b05dbcd t/XFree86_DGA-use.t
+SHA1 cdb928c2a88a9cd5f0d67748aa68d8a123b3557c t/XFree86_DGA.t
+SHA1 220209056784ce5e8990adcd105967f06eeb2ec7 t/XINERAMA-10.t
+SHA1 c82d61fc845a08e45de5a3131b6eae0df329c3b1 t/XINERAMA-11.t
+SHA1 d597b94d9053834bb0d8f5cb94e4e40c62648528 t/XINERAMA-use.t
+SHA1 52dff6a708a3efa6b278419aad8ea430beaa388b t/XSetRoot.t
+SHA1 2c03b3df944aec272ead4588eadea2a009f0d883 t/XTEST.t
+SHA1 a7d38fb3df8441dcd270ca6484f7b7a5263fd9f1 t/X_Resource-use.t
+SHA1 25fa8f39ba08abd30c8771e32195c51e11e61947 t/X_Resource.t
+SHA1 f2ceb7bb4bf68bd24728b90918e63d251fd06183 xt/0-META-read.t
+SHA1 c9e7a47e1f397eb5f46d7e4ef21754d9df76e36e xt/0-Test-ConsistentVersion.t
+SHA1 d9e7f38a8dcfdb76c56951e4214be8eeda2e2289 xt/0-Test-DistManifest.t
+SHA1 9496e4a2a2734c7093ab6961900dd7a55800976e xt/0-Test-Pod.t
+SHA1 083242d959c1a9242c874982e4585872a95bec93 xt/0-Test-Synopsis.t
+SHA1 aeeab05c346c11824a2bb2cc3f3bdb0c522604e2 xt/0-Test-YAML-Meta.t
+SHA1 1cafa4e23b7a691e09161c0927e6920dd663e2ce xt/0-examples-xrefs.t
+SHA1 4a897c9b09f37290f507d151e84b6a3c8defd496 xt/0-file-is-part-of.t
+SHA1 aeb6f41dfae96d04459448f6c3e3dee44691e722 xt/0-no-debug-left-on.t
+SHA1 f76a6bcec1a49d819c94b19d445a472d605c7fde xt/Encode-X11-emacs.el
+SHA1 0c825998d7c7b65f55c8466ac7bc41d37d0767c8 xt/Encode-X11-emacs.t
+SHA1 4057abf13c5b61b6bb77a57ed5a719f3be40559a xt/Encode-round.t
+SHA1 955bf5e58574f4497aea51a4c0ee017e4870466a xt/XSetRoot-Esetroot.t
+SHA1 f40d320e2bed892975bc8c41ebf71c693690ac3c xt/XSetRoot-xsetroot.t
+SHA1 51069b694ce78fde7d42ed539322fae579948d40 xtools/my-check-copyright-years.sh
+SHA1 bfb75ffb7a834c345288e01f561b12695f191d12 xtools/my-check-file-part-of.sh
+SHA1 e9aa27fd220d39ef0054cfcf32516f8a033f75f1 xtools/my-check-spelling.sh
+SHA1 d76762639d4ac9a709b1de9d0ad61974aa5026b2 xtools/my-deb.sh
+SHA1 2db0a23176de55a8ee8f1643f239aeaa2bcf4fa1 xtools/my-diff-prev.sh
+SHA1 6c48137d49c3619eca39796d49f26332eea55d4a xtools/my-kwalitee.sh
+SHA1 e4a15f9b4bcf1d087de2d9ed8e87bf92b0469a6c xtools/my-manifest.sh
+SHA1 eec6a78c6ed57242d151597b048df6ea5efc5cc4 xtools/my-pc.sh
+SHA1 7b1e948c88915689b3782d872ef9b92a2912c593 xtools/my-tags.sh
+SHA1 5c86dd9ca3d2ecf3ee9d90da1537b71e56c8b321 xtools/my-wunused.sh
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBAgAGBQJY5yteAAoJEPjQtOfS0hGRJLoP/irgnAULAssYm452ZNOg3UoG
+2I0A8U8fsghorTNFGjyPPq4kWeE1U/kocv+Va8q0c16rAX+mUmBIu0PFOBKiOJCv
+NC4TaacJEPX450B0mWq51XiUeF5zDlEY11jkcsEeEbqgKMeeYZQ6zipPodxzCb8m
+fP3wEvr/qQMjjsYsDx6vOM23+0L+46qBQjf/a3kVTNVajXrFd5S6T+S0FumQ4H96
+Pz5Sq1nAV1uRJbcXXM4WHVjfCvu7cjd52RUCLG/G2eIf54Plw4dzu1WoVRpudO2f
+l9xlrMW2wppe5Mf/9hF2w7SO8THL4/7MrbxAUYsTH3tH2e95xR/YiFQXORNYwJv7
+wdGw3shbdlzjyNZe4nCIoY9fDDliwDNBQuJM0hme/WNY7Bivx2fKEoLrtHY5S5CK
+HZgvFtX/2Z66T/VUPtXkF154UTCbCyaKXVlOzkctYGqwzWzwImPlxfdRa3EIa1Ip
+tdJDMn2XpFUPUD+NdaPpALqIC9gS2WHJHKf27MMyQMWiifVE31vZmQ0BR53wjUoM
+sVjzNfcQ78IHJCuEiwy5tL4dpXnwNen2KGj8cehUZkaIeOohJjJ3fGa8QB+o27z2
+DWvGR5tUr5W00VQwVxVO0ZteJZELuZW9tK1vdTzYZ9kS7erK/FXfNLWDD6UtLqbc
+1ezr7grBKwh54K1aNWQ5
+=+lLZ
+-----END PGP SIGNATURE-----

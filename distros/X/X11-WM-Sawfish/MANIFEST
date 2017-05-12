@@ -1,0 +1,9 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+Sawfish.pm
+Sawfish/UNIX.pm
+Sawfish/XProp.pm
+t/use.t
+META.yml                                 Module meta-data (added by MakeMaker)

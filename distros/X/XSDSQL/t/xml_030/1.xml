@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<ns1:root xmlns="file:." xmlns:ns1="file:." xmlns:xs="http://www.w3.org/2001/XMLSchema-instance" xs:schemaLocation="file:. schema.xsd">
+    <ns1:el0>el0</ns1:el0>
+</ns1:root>

@@ -1,0 +1,65 @@
+xsh - an XML Editing Shell
+--------------------------
+Copyright (c) 2002-2006 Petr Pajas
+
+Installing on UNIX/BSD/Linux
+=============================
+
+Installing from CPAN:
+---------------------
+
+$ cpan XML::XSH2
+
+as root or 
+
+$ sudo cpan XML::XSH2
+
+as normal user.
+
+Installing from the distribution tar-ball or CVS
+------------------------------------------------
+
+Follow the instructions on http://xsh.sourceforge.net/download.html
+
+Requirements:
+-------------
+
+o Perl version >= 5.8.0
+o libxml2 and libxslt libraries (http://xmlsoft.org)
+  (available on majority of recent Linux distributions)
+
+The following CPAN modules are required (these requirements are
+automatically resolved by the cpan installer and are also bundled with
+the tar-ball distribution).
+
+  IO::Scalar
+  Term::ReadLine::Perl
+  Parse::RecDescent          (>=1.80)
+  XML::LibXML::Common        (>=0.13)
+  XML::LibXML                (>=1.62)
+  XML::LibXSLT               (>=1.62)
+  XML::LibXML::Iterator  
+  XML::XUpdate::LibXML       (>=0.6.0)
+  XML::SAX::Writer           (>=0.44)
+  XML::Filter::DOMFilter::LibXML
+
+For the full list of dependences, see
+http://xsh.sourceforge.net/requirements.html
+
+Installing on Windows
+=====================
+
+XSH2 runs also on Microsoft Windows with Active Perl 5.8
+(http://www.activestate.com) with some limitations:
+
+  o the TAB-completion does not work in windows console
+  o output redirection feature does not work and is disabled
+
+A bundle of packages for installation using the ActivePerl "Perl
+Package Manager" can be obtained from
+http://xsh.sourceforge.net/download.html.
+
+Another possibility for running XSH2 on Win32 is to use some POSIX
+environment such as Cygwin (http://www.cygwin.com/). In that case,
+installation instructions for Unix/Linux apply and all features should
+work as on UNIX.

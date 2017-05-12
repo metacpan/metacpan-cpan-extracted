@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="ISO-8859-2"?><!-- -*- coding: iso-latin-2 -*- -->
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+	 xmlns="http://purl.org/rss/1.0/"
+	 xmlns:dc="http://purl.org/dc/elements/1.1/">
+
+  <channel rdf:about="http://www.root.cz/">
+
+    <title>ROOT.cz</title>
+    <link>http://www.root.cz/</link>
+    <description>Informace (nejenom) se světa Linuxu</description>
+    <language>cs</language>
+    
+  </channel>
+  
+  <item>
+    <title>Lazarus a FPC, aneb editor pro TeX za hodinu práce</title>
+    <link>http://www.root.cz/clanek/2132</link>
+    <description>Jak jste si jistě všimli, programy pro Linux jsou psány ve všeličem. Pojďme se pobavit o jednom zástupci klasických programovacích jazyků v Open Source variantě.</description>
+  </item>
+  
+  <item>
+    <title>Mutt - začínáme bezbolestně (2)</title>
+    <link>http://www.root.cz/clanek/2131</link>
+    <description>V tomto pokračování úvodu do muttu si probere různá nastavení,  konkrétně barviček, práce se složkami, aliasů, spouštění externích programů a signatury.</description>
+  </item>
+  
+  <item>
+    <title>Stalo se v týdnu od 27. 3. do 2. 4.</title>
+    <link>http://www.root.cz/clanek/2130</link>
+    <description>Pro ty, kteří čtou ROOTa jen o víkendu, přinášíme souhrn krátkých zpráv, které jsme v uplynulém týdnu publikovali: Google inovuje - Praha vyhrála u OpenOffice.org - MandrakeSoft již není pod nucenou správou - naložené africké vlaštovky překonaly holuby(TM).</description>
+  </item>
+  
+  <item>
+    <title>Linuxové hry (32): Unreal Tournament</title>
+    <link>http://www.root.cz/clanek/2129</link>
+    <description>Unreal Tournament je střílečka z vlastního pohledu, který je ideální na to, aby vás co nejvíce vtáhl do účasti ve hře, abyste s postavou "srostli". Ve své době si hra získala značnou popularitu vedle svého možná známějšího konkurenta Quake III Arena. V současnosti již vyšly další dva díly, ale UT si stále zachovává velkou oblíbenost, je to už klasika.</description>
+  </item>
+  
+  <item>
+    <title>Akta X 0403</title>
+    <link>http://www.root.cz/clanek/2128</link>
+    <description>Návrh verze 2.0 jazyka RDDL vyvolal smíšené ohlasy; hlavním důvodem je odklon od formátu XLink. Připravuje se nová verze rozhraní SAX. Sadu nástrojů pro práci s XML po delší době rozšířily nové zajímavé céčkové knihovny.</description>
+  </item>
+  
+</rdf:RDF>

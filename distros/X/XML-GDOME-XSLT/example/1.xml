@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<?xml-stylesheet href="http://www.apacheweek.com/inthenews/inthenews-as-1.xsl" type="text/xsl"?>
+
+<news>
+<item>
+<title>Brian Behlendorf: Apache co-founder talks about open source</title>
+ <publication>InfoWorld.com</publication>
+ <url>http://www.infoworld.com/articles/hn/xml/00/11/17/001117hnapache.xml</url>
+ <date>20001117</date>
+ <quote>"the fact that we don't have a multibillion-dollar marketing organization means that, sure, Microsoft is going to be able to claim
+                          things or do things that we can't, but that hasn't hurt us so far." </quote>
+</item>
+
+<item>
+ <title>Apache founders hit Vegas in search of cash</title>
+ <url>http://www.infoworld.com/articles/hn/xml/00/11/13/001113hnapache.xml</url>
+ <publication>InfoWorld.com</publication>
+ <date>20001113</date>
+<quote>"Behlendorf said the ASF may need to look for a little cash to keep up with the demands that developing the leading Web server requires"</quote>
+</item>
+
+</news>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<collection>
+    <head />
+    <list>
+        <fortune id="the-american-lottery">
+            <meta>
+                <title>The American Lottery</title>
+            </meta>
+            <quote>
+                <body>
+                    <p>The American Lottery - all you need is a dollar and a
+dream. We will take the dollar, but you can keep the
+dream.</p>
+                </body>
+            <info>
+                <author>Shlomi Fish</author>
+                <work href="http://www.shlomifish.org/humour.html">Aphorisms List</work>
+                <!-- TODO: Add copyrights, licence, year, etc. -->
+            </info>
+            </quote>
+        </fortune>
+    </list>
+</collection>

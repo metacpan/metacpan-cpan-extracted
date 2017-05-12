@@ -1,0 +1,4 @@
+Name                                        ID   Mem VCPUs      State   Time(s)
+Domain-0                                     0  1417     2     r-----    249.3
+lenny                                        1    64     2     -b----     13.7
+etch                                         3   128     1     r-----     29.7

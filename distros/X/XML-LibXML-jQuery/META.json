@@ -1,0 +1,77 @@
+{
+   "abstract" : "Fast, jQuery-like DOM manipulation over XML::LibXML",
+   "author" : [
+      "Carlos Fernando Avila Gratz <cafe@kreato.com.br>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.1",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "XML-LibXML-jQuery",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTML::Selector::XPath" : "0",
+            "JSON" : "2.90",
+            "XML::LibXML" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Exception" : "0",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "XML::LibXML::jQuery" : {
+         "file" : "lib/XML/LibXML/jQuery.pm",
+         "version" : "0.08"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/cafe01/xml-libxml-jquery/issues"
+      },
+      "homepage" : "https://github.com/cafe01/xml-libxml-jquery",
+      "repository" : {
+         "url" : "git://github.com/cafe01/xml-libxml-jquery.git",
+         "web" : "https://github.com/cafe01/xml-libxml-jquery"
+      }
+   },
+   "version" : "0.08",
+   "x_authority" : "cpan:CAFEGRATZ"
+}

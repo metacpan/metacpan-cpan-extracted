@@ -1,0 +1,5 @@
+<encmap name='ISO-8859-11' expat='yes'>
+  <range byte='x80' len='33' uni='x0080'/>
+  <range byte='xa1' len='58' uni='x0e01'/>
+  <range byte='xdf' len='29' uni='x0e3f'/>
+</encmap>

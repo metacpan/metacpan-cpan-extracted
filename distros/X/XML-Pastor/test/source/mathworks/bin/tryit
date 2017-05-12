@@ -1,0 +1,46 @@
+#!/usr/local/apps/bat/latest/bin/perl
+
+use strict;
+use warnings;
+
+use lib '/sandbox/jmicco/cpan/XML-Pastor-0.54/blib/lib';
+use lib '/sandbox/jmicco/pkg/source/component_harness/generated';
+
+use Data::Dumper qw();
+
+use MW::Ch::product                qw();
+#
+# These lines are required due to a bug in XML::Pastor
+#
+use MW::Ch::Type::product          qw();
+use MW::Ch::Type::ownerInfo        qw();
+use MW::Ch::Type::platformList     qw();
+use MW::Ch::Type::componentDepList qw();
+use MW::Ch::Type::componentDepItem qw();
+use MW::Ch::Type::productDepList   qw();
+use MW::Ch::Type::productDepItem   qw();
+
+my $product = MW::Ch::product->from_xml( '/sandbox/jmicco/pkg/source/component_harness/mProduct.xml' );
+
+print Data::Dumper::Dumper( $product->owner ) . "\n";
+print "Contact Name: " . $product->owner->contactName . "\n";
+print Data::Dumper::Dumper( $product->releasePlatforms ) . "\n";
+
+for my $platform (@{$product->releasePlatforms->platform}) {
+    print "Platform: $platform\n";
+}
+
+print Data::Dumper::Dumper( $product->recommendedProducts );
+
+for my $product (@{$product->recommendedProducts->productDep}) {
+    print "Recommended:" . $product->name . "\n";
+}
+
+print Data::Dumper::Dumper( $product->requiredProducts );
+for my $product (@{$product->requiredProducts->productDep}) {
+    print "Requires: " . $product->name . "\n";
+}
+
+
+print "\n------------------------\n";
+print $product->to_xml(), "\n";

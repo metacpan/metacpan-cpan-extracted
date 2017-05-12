@@ -1,0 +1,19 @@
+0.04   Mon, 06 Jun 2011 16:21:57 +0200
+    - Add xs_object_magic_detach_struct to remove attached structs.
+    - Add xs_object_magic_has_struct and xs_object_magic_has_struct_rv as
+      predicate methods.
+    - Improve test coverage.
+    - Expose xs_object_magic_get_mg to retrieve a scalar's MAGIC
+      structure. xs_object_magic_get_struct_mg, which the headers provided
+      before for this porpose, never actually worked.
+
+0.03    Sun, 17 Apr 2011 17:13:41 +0200
+    - Make the examples in the docs C89-compliant (Emmanuel Rodriguez).
+
+0.02
+    - the header no longer includes ppport.h
+    - add missing aTHX_
+    - doc fixes from Jeremiah Foster
+
+0.01
+    - initial release

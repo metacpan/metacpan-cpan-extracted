@@ -1,0 +1,43 @@
+#c
+Parsing using various test executables of libraries
+
+#0+
+if( -e "exe${div}barexml.exe" ) {
+  ($s, $usec) = gettimeofday();
+  `exe${div}barexml $file`;
+  ($s3, $usec3) = gettimeofday();
+  $sc = $s3-$s + (($usec3-$usec)/1000000);
+  $base3 = $sc;
+  $sc /= $base3;
+  if( !$onlyone ) { tabit('Bare XML','        ','        ',fixed( $sc )); }
+}
+
+#+
+if( -e "exe${div}tinyxml.exe" ) {
+  ($s, $usec) = gettimeofday();
+  `exe${div}tinyxml $file`;
+  ($s3, $usec3) = gettimeofday();
+  $sc = $s3-$s + (($usec3-$usec)/1000000);
+  $sc /= $base3;
+  tabit('Tiny XML','        ','        ',fixed( $sc ));
+}
+
+#+
+if( -e "exe${div}ezxml.exe" ) {
+  ($s, $usec) = gettimeofday();
+  `exe${div}ezxml $file`;
+  ($s3, $usec3) = gettimeofday();
+  $sc = $s3-$s + (($usec3-$usec)/1000000);
+  $sc /= $base3;
+  tabit('EzXML','        ','        ',fixed( $sc ));
+}
+
+#+
+if( -e "exe${div}xmlio.exe" ) {
+  ($s, $usec) = gettimeofday();
+  `exe${div}xmlio $file`;
+  ($s3, $usec3) = gettimeofday();
+  $sc = $s3-$s + (($usec3-$usec)/1000000);
+  $sc /= $base3;
+  tabit('XMLIO','        ','        ',fixed( $sc ));
+}

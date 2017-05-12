@@ -1,0 +1,23 @@
+XML-Parser-REX
+==============
+
+XML::Parser::REX is a shallow XML parser as described here:
+
+http://www.cs.sfu.ca/~cameron/REX.html
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+none
+
+COPYRIGHT AND LICENCE
+
+This library is free software; see POD for license details.

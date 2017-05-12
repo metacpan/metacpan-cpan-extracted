@@ -1,0 +1,74 @@
+#!/usr/bin/perl -s
+use XML::DT;
+use XML::DTDParser "ParseDTDFile";
+use File::Temp;
+
+our ($dtd, $html, $lines);
+
+my $filename = shift;
+
+$dtd = 1 if $filename =~ m!\.dtd$!;
+
+
+if ($dtd) {
+  mkdtskel_fromDTD ($filename, @ARGV);
+}
+else {
+    if ($lines) {
+        ## XXX - fixme, using head/xmllint is not a good idea
+        my $tmpfile = File::Temp->new( UNLINK => 0 )->filename;
+        system("head -$lines $filename | xmllint --recover - > $tmpfile");
+        $filename = $tmpfile;
+    }
+
+    if ($html) {
+        mkdtskel("-html", $filename, @ARGV);
+    }
+    else {
+        mkdtskel($filename, @ARGV);
+    }
+    unlink($filename) if $lines;
+}
+
+__END__
+
+=encoding utf-8
+
+=head1 NAME
+
+mkdtskel - Perl code skeleton generator to process XML files with XML::DT
+
+=head1 SYNOPSIS
+
+  mkdtskel [-lines=20000] <xmlfile>
+
+  mkdtskel -dtd <dtdfile>
+
+  mkdtskel -html <htmlfile>
+
+=head1 DESCRIPTION
+
+Use this command to prepare a skeleton file with basic code needed to
+process your XML file with XML::DT; The command checks the element
+names and for each one, the attributes. This information is described
+on the generated file to remember the programmer.
+
+=head1 SEE ALSO
+
+XML::DT(1), mkdtdskel(1), mkxmltype(1) and perl(1)
+
+=head1 AUTHORS
+
+Jose Joao Almeida, <jj@di.uminho.pt>
+
+Alberto Manuel Simões, <albie@alfarrabio.di.uminho.pt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 1999-2013 by Projecto Natura
+
+This library is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.
+
+=cut
+

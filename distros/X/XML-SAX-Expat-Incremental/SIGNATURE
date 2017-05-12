@@ -1,0 +1,30 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 57013707605229ac99ff85fcef0cc03f5244f187 Changes
+SHA1 4bef7cfff57ff46069e3dc78f9d5bf0075ed2403 MANIFEST
+SHA1 92e0aacc11cd1588df5c852dbdf0d61d9a7a1c2f META.yml
+SHA1 9770a7f921af4d62b2146fbc78f9505453136e13 Makefile.PL
+SHA1 bbbd63a3e4ca1199837c90ead4190d962f0f0b07 lib/XML/SAX/Expat/Incremental.pm
+SHA1 f7376fd5701446ceb6c9249e43946ef1800fa115 t/basic.t
+SHA1 6da947e3423e6f4abc55da961452185b636bc3c0 t/incr.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.7 (Darwin)
+
+iD8DBQFG71rbVCwRwOvSdBgRAluzAJ0RSRUBQyemZrhWq4uQsh1aHhRXawCfYaiL
+DlDxIyzHjQT8fYF5Bn5wrVU=
+=qAJX
+-----END PGP SIGNATURE-----

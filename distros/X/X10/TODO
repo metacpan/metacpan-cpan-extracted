@@ -1,0 +1,16 @@
+
+modify client/server code to be a little more versatile with what can
+be sent back & forth
+
+fix X10::Server to not die when it gets too many connects/disconnects
+going on at the same time.  I think this has something to do with my EOF
+detection on a socket, which seems to be somewhat broken in the module
+I'm using...
+
+expand X10::Device module tree to implement specific (X10) module
+characteristics
+
+allow macros to deal with EventList too
+
+add fuzz amount in scheduled events
+

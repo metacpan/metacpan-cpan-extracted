@@ -1,0 +1,4 @@
+<html>
+ <ns:foo xmlns:ns="http://www.example.com/foo">foo</ns:foo>
+ <default xmlns="http://www.example.com/default"/>
+</html>

@@ -1,0 +1,43 @@
+
+:root {
+  background-color:  #0000AA;
+  font-size: 1em;
+  color:  #0088FF;
+  margin: 0;
+  border-width: 1em;
+  border-color: #0088FF;
+  border-style: solid;
+  padding: 3px;
+  padding-right: 100px;
+}
+
+updatePeriod, updateBase, updateFrequency, Person { display: none; }
+
+Hyah {
+  font-family: "Tahoma", "Verdana", "Arial", "Helvetica", "sans-serif";
+  display: block;
+  white-space: pre;
+  padding: 1em;
+}
+
+Hyah:first-child {
+  font-family: inherit;
+  font-weight: normal;
+  float: right;
+  padding: 0;
+  text-align: right;
+  width: 100px;
+  margin-right: -80px;
+  font-size: 200%;
+}
+
+Hyah:last-child {
+  font-family: "Courier New" , Courier , monospace;
+  font-weight: bold;
+  font-size: 62%;
+  font-weight: normal;
+  padding-top: 0;
+  border-top:  3px dashed #0088ff;
+}
+
+

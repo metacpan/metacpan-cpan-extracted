@@ -1,0 +1,25 @@
+0.07      2015-11-20 08:53:40+11:00 Australia/Melbourne
+0.07
+- Require Perl 5.8.1
+
+0.06      2015-11-14 14:28:19+11:00 Australia/Melbourne
+- Convert to Dist::Zilla
+- Escape single quotes in attributes [RT#108857]
+
+0.05    25 August 2010
+- Escape non-ASCII characters as numerics entities
+
+0.04    18 June 2008
+- Require Test::XML for build so the tests work
+
+0.03    18 June 2008
+- No longer modify data from caller [RT#22020]
+- Remove dependency on Perl6::Export::Attrs
+- Fix tests to declare plans properly
+
+0.02    2 July 2006
+- Test suite and Build.PL prerequesites
+
+0.01    27 May 2006
+- First release
+

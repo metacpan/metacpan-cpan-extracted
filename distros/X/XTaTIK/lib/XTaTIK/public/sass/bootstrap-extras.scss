@@ -1,0 +1,57 @@
+
+.alert-extra-danger,
+.panel-extra-danger > .panel-heading {
+    background-color: #D9534F;
+    border-color: #D43F3A;
+    color: #FFFFFF;
+}
+
+.alert-extra-danger,
+.panel-extra-danger {
+    border-color: #D9534F;
+}
+
+.col-xs-15,
+.col-sm-15,
+.col-md-15,
+.col-lg-15 {
+    position: relative;
+    min-height: 1px;
+    padding-right: 10px;
+    padding-left: 10px;
+}
+
+.col-xs-15 {
+    width: 20%;
+    float: left;
+}
+@media (min-width: 768px) {
+.col-sm-15 {
+        width: 20%;
+        float: left;
+    }
+}
+@media (min-width: 992px) {
+    .col-md-15 {
+        width: 20%;
+        float: left;
+    }
+}
+@media (min-width: 1200px) {
+    .col-lg-15 {
+        width: 20%;
+        float: left;
+    }
+}
+
+.row-fat {
+    margin-bottom: 20px;
+}
+
+.glyphicon-custom-separator {
+    top: -2px;
+}
+
+.glyphicon-custom-separator:before {
+    content: "|";
+}

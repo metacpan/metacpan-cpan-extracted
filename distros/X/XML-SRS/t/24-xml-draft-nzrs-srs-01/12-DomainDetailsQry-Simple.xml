@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<NZSRSRequest VerMinor="11" VerMajor="3">
+
+  <DomainDetailsQry QryId="Query-023" Status="Active" MaxResults="100">
+    <FieldList
+       Status="1"
+       RegistrantContact="1"
+       AdminContact="1"
+       TechnicalContact="1"
+       />
+  </DomainDetailsQry>
+
+</NZSRSRequest>

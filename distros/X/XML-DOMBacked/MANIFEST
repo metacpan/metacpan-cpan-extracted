@@ -1,0 +1,10 @@
+Build.PL
+lib/XML/DOMBacked.pm
+MANIFEST			This list of files
+MANIFEST.SKIP
+t/00simple.t
+t/01uri.t
+t/person.xml
+testdoc.pl
+META.yml
+Makefile.PL

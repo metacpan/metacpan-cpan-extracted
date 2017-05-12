@@ -1,0 +1,11 @@
+In Order to build only one shared object (*.so or *.DLL), that contains the 
+XSUBs for all Sablotron packages, we use a trick: Sablotron.xs includes the 
+PACKAGE_NAME/PACKAGE_NAME.h and PACKAGE_NAME/PACKAGE_NAME.xsh files.
+
+The advantage of a single shared object is, that we can incorporate the libsablot 
+and libexpat into this file. This way our perl module is selfcontained and 
+doesn't depend on any nonstandard libraries on the system. We need this 
+feature for the deployment on a large site.
+
+A. Kruis 
+science + computing ag

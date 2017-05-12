@@ -1,0 +1,874 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+<head>
+<title>Modules Index</title>
+</head>
+
+<body bgcolor="#ffffff">
+<table border="0" width="100%">
+<tr>
+<td align="left"><a href="../../../../index.html"><img src="../../../../images/canon.gif" border="0"></a></td>
+<td align="right"><img src="../../../../images/canre.gif"></td>
+</tr>
+</table>
+<div align="right">
+<small><a href="../../../../index.html">XML Schema Home</a></small>
+</div>
+
+<h1>XML::Schema::Attribute::Group</h1>
+
+<ul>
+
+    This module implements a class of objects to represent XML Schema
+    attribute groups.
+  </ul>
+
+<h2>Table of Contents</h2>
+<ul>
+<table border="0" cellpadding="2" cellspacing="0">
+<tr valign="top">
+<td>
+  <li><b><a href="#section_Synopsis">Synopsis</a></b>
+</td>
+
+<td>
+</td>
+
+<td>
+<td>
+
+</tr>
+<tr valign="top">
+<td>
+  <li><b><a href="#section_Description">Description</a></b>
+</td>
+
+<td>
+</td>
+
+<td>
+<td>
+
+</tr>
+<tr valign="top">
+<td>
+  <li><b><a href="#section_Methods">Methods</a></b>
+</td>
+
+<td>
+<b>:<b>
+</td>
+
+<td>
+<small><a href="#method_new">new()</a>,&nbsp; <a href="#method_name">name()</a>,&nbsp; <a href="#method_namespace">namespace()</a>,&nbsp; <a href="#method_scope">scope()</a>,&nbsp; <a href="#method_attribute">attribute()</a>,&nbsp; <a href="#method_attributes">attributes()</a>,&nbsp; <a href="#method_default_use">default_use()</a>,&nbsp; <a href="#method_use">use()</a>,&nbsp; <a href="#method_required">required()</a>,&nbsp; <a href="#method_optional">optional()</a>,&nbsp; <a href="#method_prohibited">prohibited()</a>,&nbsp; <a href="#method_group">group()</a>,&nbsp; <a href="#method_groups">groups()</a></small>
+<td>
+
+</tr>
+</table>
+</ul>
+
+
+
+
+<hr width="100%" size="1" noshade="1"><a name="section_Synopsis"><h2>Synopsis</h2></a>
+<ul><pre><p>use XML::Schema::Attribute::Group;
+
+# create an attribute group
+my $group = XML::Schema::Attribute::Group-&gt;new({
+    attributes =&gt; {
+	# various ways to define attributes
+        foo =&gt; 'string',	
+        bar =&gt; XML::Schema::Attribute-&gt;new( {
+	    name =&gt; 'bar, 
+	    type =&gt; 'string'
+	} ),
+        baz =&gt; { 
+	    name =&gt; 'baz', 
+	    type =&gt; 'string',
+	},
+        boz =&gt; { 
+	    # name =&gt; 'boz' implied
+	    type =&gt; 'string',
+        },
+        wiz =&gt; { 
+	    type =&gt; 'string', 
+	    use  =&gt; 'required',
+        },
+        waz =&gt; { 
+	    type =&gt; 'string', 
+	    required =&gt; 1,	# alternate way to specify use
+        },
+     },
+}) || die XML::Schema::Attribute::Group-&gt;error();
+
+# another way (of several) to specify usage
+my $group = XML::Schema::Attribute::Group-&gt;new({
+    attributes  =&gt; { ... },
+    default_use =&gt; 'required',
+    optional    =&gt; [ qw( foo bar ) ],
+}) || die XML::Schema::Attribute::Group-&gt;error();
+
+# fetch existing and add new attributes
+my foo = $group-&gt;attribute('foo');
+$group-&gt;attribute( XML::Schema::Attribute-&gt;new( ... ) );
+$group-&gt;attribute( name =&gt; 'flic', type =&gt; 'string', use =&gt; REQUIRED );</b></pre></ul>
+
+  
+<hr width="100%" size="1" noshade="1"><a name="section_Description"><h2>Description</h2></a>
+    <p>
+    This module implements an object class for representing XML
+    attribute groups within XML Schema.  An attribute group defines a
+    collection of attributes and their usage constraints (e.g
+    OPTIONAL, REQUIRED or PROHIBITED).  A <a href="../../../../modules/XML/Schema/Type/Complex.html">complex type</a> definition
+    uses an attribute group to define the acceptable attributes for
+    elements of that type.  Attribute groups can also be defined as
+    independant entities to represent a relocatable collection of 
+    attributes that can be reused in different complex type definitions
+    as required.
+    </p>
+
+    <p>
+    For further information on attribute groups, please consult the
+    W3C XML Schema specification.
+    </p>
+
+  
+
+<hr width="100%" size="1" noshade="1"><a name="section_Methods"><h2>Methods</h2></a><ul>
+<li><p>
+<a name="method_new"><b>new()</b></a>
+<br>
+
+
+      <p>
+        Constructor method called to create a new attribute group.  A
+        list of '<code><b>key => value</b></code>
+' pairs can be
+        specified as command line arguments, or alternately, a hash
+        reference can be passed which contains these configuration
+        values.  The method returns a newly instantiated object on
+        success.  On error it returns undef and sets an internal error
+        message which can be retrieved by calling <a href="../../../../modules/XML/Schema/Base.html#method_error"><code><b>error()</b></code></a> as a class method.
+<ul><pre><p># list of options
+my $group = XML::Schema::Attribute::Group-&gt;new( name =&gt; 'myGroup' )
+     || die XML::Schema::Attribute::Group-&gt;error();
+
+# hash ref of options
+my $group = XML::Schema::Attribute::Group-&gt;new( { name =&gt; 'myGroup' } ) 
+     || die XML::Schema::Attribute::Group-&gt;error();</b></pre></ul>
+
+      </p>
+
+
+      <p>
+        The following configuration options may be specifed:
+      </p>
+
+
+      <p>
+<!-- table -->
+<table border="0" cellpadding="4" cellspacing="1" 
+       bgcolor="#000044">
+<!-- table content -->
+<tr bgcolor="#ccccff">
+<td><b><small>Name</b></td><td><b><small>Typical Values</b></td><td><b><small>Description</b></td></tr>
+
+        <tr valign="top" bgcolor="#eeeeff">
+  <td>
+    <a name="config_name"><code><b>name</b></code></a>
+  </td>
+  <td>
+    <code><b>'myGroup'</b></code>
+  </td>
+  <td>
+
+	    The name of the attribute group.
+          </td>
+</tr>
+
+
+        <tr valign="top" bgcolor="#eeeeff">
+  <td>
+    <a name="config_attributes"><code><b>attributes</b></code></a>
+  </td>
+  <td>
+    <code><b>\%attributes</b></code>
+  </td>
+  <td>
+
+	  <p>
+	    This item can be used to specify a reference to a hash
+            which defines an initial set of attributes for the group.
+            Each key in the hash reference denotes the name of an 
+	    attribute and each value, the corresponding attribute 
+	    definition.  This can be specifed as a reference to an
+            <a href="../../../../modules/XML/Schema/Attribute.html">XML::Schema::Attribute</a> object, as a 
+            simple string denoting the attribute type, e.g. 
+	    <code><b>'integer'</b></code>
+ or as a reference to 
+            a hash array of configuration options from which an
+            attribute object will be created.
+<ul><pre><p>my $group = XML::Schema::Attribute::Group-&gt;new({
+    attributes =&gt; {
+        foo =&gt; 'string',	
+        bar =&gt; XML::Schema::Attribute-&gt;new( {
+	    name =&gt; 'bar, 
+	    type =&gt; 'string'
+	} ),
+        baz =&gt; { 
+	    name =&gt; 'baz', 
+	    type =&gt; 'string',
+	},
+        boz =&gt; { 
+	    # name =&gt; 'boz' implied
+	    type =&gt; 'string',
+        },
+     },
+}) || die XML::Schema::Attribute::Group-&gt;error();</b></pre></ul>
+
+	  </p>
+
+          <p>
+            In additional to all the arguments accepted by the
+            <a href="../../../../modules/XML/Schema/Attribute.html">XML::Schema::Attribute</a> <a href="../../../../modules/XML/Schema/Attribute.html#method_new"><code><b>new()</b></code></a> method, the
+            hash array may also contain a '<code><b>use</b></code>
+'
+            key set to a value of <code><b>'optional'</b></code>
+,
+            <code><b>'required'</b></code>
+ or
+            <code><b>'prohibited'</b></code>
+ to indicate the 
+	    designated usage constraints on the attribute.  
+	  </p>
+
+<ul><pre><p>my $group = XML::Schema::Attribute::Group-&gt;new({
+    attributes =&gt; {
+        flic =&gt; { 
+	    type =&gt; 'string',
+	    use  =&gt; 'optional',
+	},
+        flac =&gt; { 
+	    type =&gt; 'integer',
+	    use  =&gt; 'required',
+        },
+     },
+}) || die XML::Schema::Attribute::Group-&gt;error();</b></pre></ul>
+
+
+	  <p>
+	    Alternately, the hash may contains one of the keys
+	    '<code><b>optional</b></code>
+',
+            '<code><b>required</b></code>
+' or
+            '<code><b>prohibited</b></code>
+' with a true corresponding
+	    value to achieve the same effect.
+	  </p>
+
+<ul><pre><p>my $group = XML::Schema::Attribute::Group-&gt;new({
+    attributes =&gt; {
+        flic =&gt; { 
+	    type =&gt; 'string',
+	    optional =&gt; 1,
+	},
+        flac =&gt; { 
+	    type =&gt; 'integer',
+	    required =&gt; 1,
+        },
+     },
+}) || die XML::Schema::Attribute::Group-&gt;error();</b></pre></ul>
+
+
+	  </td>
+</tr>
+
+
+        <tr valign="top" bgcolor="#eeeeff">
+  <td>
+    <a name="config_use"><code><b>use</b></code></a>
+  </td>
+  <td>
+    <code><b>\%usage</b></code>
+  </td>
+  <td>
+
+	  <p>
+	    The '<code><b>use</b></code>
+' item can be used to specify 
+            a reference to a hash array which maps attribute names to
+            their usage constraints, for those that don't explicitly 
+            specify their own '<code><b>use</b></code>
+' option in the
+	    <a href="#config_attributes"><code><b>attributes</b></code></a> hash as described above.
+<ul><pre><p>my $group = XML::Schema::Attribute::Group-&gt;new({
+    attributes =&gt; { ... },
+    use =&gt; {
+	foo =&gt; 'required',
+	bar =&gt; 'optional',
+    },
+}) || die XML::Schema::Attribute::Group-&gt;error();</b></pre></ul>
+
+	  </p>
+
+          <p>
+            The <a href="../../../../modules/XML/Schema/Constants.html">XML::Schema::Constants</a> module defines a
+            set of constants to represent these values.
+	  </p>
+
+
+<ul><pre><p>use XML::Schema::Constants qw( :attribs );
+
+my $group = XML::Schema::Attribute::Group-&gt;new({
+    attributes =&gt; { ... },
+    use =&gt; {
+	foo =&gt; REQUIRED,
+	bar =&gt; OPTIONAL,
+    },
+}) || die XML::Schema::Attribute::Group-&gt;error();</b></pre></ul>
+
+          <p>
+            Note that while the 
+            above constants are represented in UPPER CASE,  e.g.
+            <code><b>REQUIRED</b></code>
+, the actual values that 
+            they represent, and the ones that you should use if you
+            don't opt for the constants, are all in lower case, e.g.
+            <code><b>'required'</b></code>
+.
+	  </p>
+
+	  </td>
+</tr>
+
+
+        <tr valign="top" bgcolor="#eeeeff">
+  <td>
+    <a name="config_default_use"><code><b>default_use</b></code></a>
+  </td>
+  <td>
+    <code><b>$use</b></code>
+  </td>
+  <td>
+
+	  <p>
+	    The '<code><b>default_use</b></code>
+' item can be used 
+            to specify the default usage for attributes that don't
+            define it in any other way.  The default value for this
+            is '<code><b>optional</b></code>
+'.
+<ul><pre><p>my $group = XML::Schema::Attribute::Group-&gt;new({
+    attributes  =&gt; { ... },
+    default_use =&gt; 'required',
+}) || die XML::Schema::Attribute::Group-&gt;error();</b></pre></ul>
+
+	  </p>
+
+	  </td>
+</tr>
+
+
+        <tr valign="top" bgcolor="#eeeeff">
+  <td>
+    <a name="config_required"><code><b>required</b></code></a>
+  </td>
+  <td>
+    <code><b>\@names</b></code>
+  </td>
+  <td>
+
+	  <p>
+	    This option provides an alternate way of specifying that
+	    certain attributes are <code><b>REQUIRED</b></code>
+.  It
+	    should contain a reference to a list which names all
+	    required attributes.
+<ul><pre><p>my $group = XML::Schema::Attribute::Group-&gt;new({
+    attributes  =&gt; { ... },
+    required    =&gt; [ qw( foo bar ) ],
+}) || die XML::Schema::Attribute::Group-&gt;error();</b></pre></ul>
+
+	  </p>
+
+	  </td>
+</tr>
+
+
+        <tr valign="top" bgcolor="#eeeeff">
+  <td>
+    <a name="config_optional"><code><b>optional</b></code></a>
+  </td>
+  <td>
+    <code><b>\@names</b></code>
+  </td>
+  <td>
+
+	  <p>
+	    Like <a href="#config_required"><code><b>required</b></code></a> above, option provides an 
+            alternate way of specifying <code><b>OPTIONAL</b></code>
+ attributes.
+<ul><pre><p>my $group = XML::Schema::Attribute::Group-&gt;new({
+    attributes  =&gt; { ... },
+    default_use =&gt; 'required',
+    optional    =&gt; [ qw( baz boz ) ],
+}) || die XML::Schema::Attribute::Group-&gt;error();</b></pre></ul>
+
+	  </p>
+
+	  </td>
+</tr>
+
+
+        <tr valign="top" bgcolor="#eeeeff">
+  <td>
+    <a name="config_prohibited"><code><b>prohibited</b></code></a>
+  </td>
+  <td>
+    <code><b>\@names</b></code>
+  </td>
+  <td>
+
+	  <p>
+	    To complete the trilogy, this option allows <code><b>PROHIBITED</b></code>
+
+            attributes to be declared.
+<ul><pre><p>my $group = XML::Schema::Attribute::Group-&gt;new({
+    attributes  =&gt; { ... },
+    prohibited  =&gt; [ qw( baz boz ) ],
+}) || die XML::Schema::Attribute::Group-&gt;error();</b></pre></ul>
+
+	  </p>
+
+	  </td>
+</tr>
+
+
+        <tr valign="top" bgcolor="#eeeeff">
+  <td>
+    <a name="config_group"><code><b>group</b></code></a>
+  </td>
+  <td>
+    <code><b><a&nbsp;href="../../../../modules/XML/Schema/Attribute/Group.html">$group</a></b></code>
+    <br>
+    <code><b>$group_name</b></code>
+    <br>
+    <code><b>\%group_config</b></code>
+    <br>
+  </td>
+  <td>
+
+	    <!-- ignore value --> 
+	    <!-- ignore value --> 
+	    <!-- ignore value --> 
+
+	    This configuration item can be used to specify a sub-group that 
+	    the attribute group should adopt.  All attributes and any wildcard 
+	    defined in the sub-group will then become part of the validation
+	    set for the current attribute group.  The value can be specified
+            as a reference to an existing <a href="../../../../modules/XML/Schema/Attribute/Group.html">XML::Schema::Attribute::Group</a>
+	    object, as a hash reference of configuration options from which such
+            an object can be created, or as a name by which the attribute group 
+            can be fetched from the current scope.
+	  </td>
+</tr>
+
+
+        <tr valign="top" bgcolor="#eeeeff">
+  <td>
+    <a name="config_groups"><code><b>groups</b></code></a>
+  </td>
+  <td>
+    <code><b>[&nbsp;<a&nbsp;href="../../../../modules/XML/Schema/Attribute/Group.html">$group</a>,&nbsp;$group_name,&nbsp;\%group_config,&nbsp;...&nbsp;]</b></code>
+    <br>
+  </td>
+  <td>
+
+	    <!-- ignore value --> 
+	      This option is like <a href="#config_group"><code><b>group</b></code></a> described above but 
+	      accepts a reference to a list of multiple groups, each item of which 
+	      should be one of the acceptable parameters as for <a href="#config_group"><code><b>group</b></code></a>.
+	  </td>
+</tr>
+
+
+        <tr valign="top" bgcolor="#eeeeff">
+  <td>
+    <a name="config_scope"><code><b>scope</b></code></a>
+  </td>
+  <td>
+    <code><b><a&nbsp;href="../../../../modules/XML/Schema/Scope.html">$scope</a></b></code>
+    <br>
+  </td>
+  <td>
+
+	    <!-- ignore value --> 
+
+            This configuration item can be used to bind the attribute
+	    group to a particular lexical scope.  See the <a href="../../../../modules/XML/Schema/Attribute.html#config_scope">corresponding
+	    entry</a> in the <a href="../../../../modules/XML/Schema/Attribute.html">XML::Schema::Attribute</a>
+            documentation for further details.
+	  </td>
+</tr>
+
+
+        <tr valign="top" bgcolor="#eeeeff">
+  <td>
+    <a name="config_namespace"><code><b>namespace</b></code></a>
+  </td>
+  <td>
+    <code><b>'http://tt2.org/XML/xyz.xml'</b></code>
+  </td>
+  <td>
+
+	    The optional XML namespace for the attribute group.
+          </td>
+</tr>
+
+
+        <tr valign="top" bgcolor="#eeeeff">
+  <td>
+    <a name="config_annotation"><code><b>annotation</b></code></a>
+  </td>
+  <td>
+    <code><b>'...interesting&nbsp;note...'</b></code>
+  </td>
+  <td>
+
+	    An optional annotation for the attribute group.  This is not yet
+	    fully supported.
+          </td>
+</tr>
+
+
+      <!-- end of table content -->
+</table>
+</p>
+
+
+    </p><li><p>
+<a name="method_name"><b>name()</b></a>
+<br>
+
+
+      Returns the attribute group name.
+<ul><pre><p>my $name = $group-&gt;name();</b></pre></ul>
+
+
+    </p><li><p>
+<a name="method_namespace">
+<b>namespace(  )</b>
+<br>
+<b>namespace( $new_namespace )</b>
+<br>
+</a>
+
+
+      <!-- ignore args -->
+      <!-- ignore args -->
+      Returns the namespace of the attribute group as optionally
+      specified by the <a href="#config_namespace"><code><b>namespace</b></code></a> configuration item.
+      Can also be called with a single argument to set a new namespace
+      value.
+<ul><pre><p>my $ns = $group-&gt;namespace();
+
+$group-&gt;namespace('http://tt2.org/XML/Example.xml');</b></pre></ul>
+
+    </p><li><p>
+<a name="method_scope">
+<b>scope(  )</b>
+<br>
+<b>scope( $new_scope )</b>
+<br>
+</a>
+
+
+      <!-- ignore args -->
+      <!-- ignore args -->
+
+      Returns the current scope as specified in the
+      <a href="#config_scope"><code><b>scope</b></code></a> configuation item.  Can also be called
+      with a single argument to define a new scope for the attribute
+      group.  This should be a reference to an object which inherits
+      from the <a href="../../../../modules/XML/Schema/Scope.html">XML::Schema::Scope</a> class.
+
+<ul><pre><p>my $scope = $group-&gt;scope();
+
+$group-&gt;scope($new_scope);</b></pre></ul>
+
+    </p><li><p>
+<a name="method_attribute">
+<b>attribute( $name )</b>
+<br>
+<b>attribute( <a href="../../../../modules/XML/Schema/Attribute.html">$attribute</a> )</b>
+<br>
+<b>attribute( name => $name, type => $type, ... )</b>
+<br>
+</a>
+
+
+      <!-- ignore args -->
+      <!-- ignore args -->
+      <!-- ignore args -->
+
+      <p>
+        This method provides a way to retrieve existing attribute
+        definitions and also provide new ones.  When called with a
+        single non-reference argument, <code><b>$name</b></code>
+, the
+        method returns the <a href="../../../../modules/XML/Schema/Attribute.html">attribute</a>
+        object indicated by that name.  If the attribute is not defined
+        then <code><b>undef</b></code>
+ is returned and an appropriate
+        error is set.
+<ul><pre><p>my $attr = $group-&gt;attribute('foo')
+    || die $group-&gt;error();</b></pre></ul>
+
+      </p>
+
+      <p>
+        When called with a single argument, <a href="../../../../modules/XML/Schema/Attribute.html">$attribute</a>, which is
+        a reference to an <a href="../../../../modules/XML/Schema/Attribute.html">XML::Schema::Attribute</a> object,
+        then the attribute is added to the group.
+<ul><pre><p>$group-&gt;attribute( XML::Schema::Attribute-&gt;new( ... ) )
+    || die $group-&gt;error();</b></pre></ul>
+
+      </p>
+
+      <p>
+	Finally, the method can be called with a list of configuration
+        values or a reference to a hash containing those values from which
+        a new <a href="../../../../modules/XML/Schema/Attribute.html">attribute object</a>
+        can be instantiated and added to the group.  The method returns a 
+        reference to the new object created.
+<ul><pre><p>my $flic = $group-&gt;attribute( name =&gt; 'flic', type =&gt; 'string' )
+    || die $group-&gt;error();
+
+my $flac = $group-&gt;attribute( { name =&gt; 'flac', type =&gt; 'string', use =&gt; 'required' } )
+    || die $group-&gt;error();</b></pre></ul>
+
+      </p>
+
+    </p><li><p>
+<a name="method_attributes"><b>attributes()</b></a>
+<br>
+
+
+	This method returns a reference to the hash array containing all 
+	attribute definitions within the group.  Modifying entries in this 
+        hash will have direct effect upon the group.  Use carefully.
+    </p><li><p>
+<a name="method_default_use">
+<b>default_use(  )</b>
+<br>
+<b>default_use( $new_use )</b>
+<br>
+</a>
+
+
+      <!-- ignore args -->
+      <!-- ignore args -->
+      Returns the current default usage value for attributes when 
+      called without any arguments.  This will be one of the strings
+      '<code><b>optional</b></code>
+',
+      '<code><b>required</b></code>
+' or
+      '<code><b>prohibited</b></code>
+'.  Can also be called with an
+      argument, one of those same strings, to set the new default usage
+      policy.   Note that this only affects new attributes created via
+      the <a href="#method_attribute"><code><b>attribute()</b></code></a> method after the call and does
+      not affect any attributes already defined within the group.
+<ul><pre><p>my $use = $group-&gt;default_use();
+
+$group-&gt;default_use('required');</b></pre></ul>
+
+    </p><li><p>
+<a name="method_use">
+<b>use( $name )</b>
+<br>
+<b>use( $name, $use )</b>
+<br>
+</a>
+
+
+      <!-- ignore args -->
+      <!-- ignore args -->
+      When called with a single argument, <code><b>$name</b></code>
+, this
+      method returns the usage string (as above) for the named attribute.
+      Can also be called with a second argument to set a new usage for the
+      attribute.
+<ul><pre><p>my $foo_use = $group-&gt;use('foo');
+
+$group-&gt;use( foo =&gt; 'required' );</b></pre></ul>
+
+    </p><li><p>
+<a name="method_required">
+<b>required(  )</b>
+<br>
+<b>required( $name )</b>
+<br>
+<b>required( $name, $use )</b>
+<br>
+</a>
+
+
+      <!-- ignore args -->
+      <!-- ignore args -->
+      <!-- ignore args -->
+
+      When called without any arguments, this method retursn a
+      reference to a list containing the names of all
+      <code><b>REQUIRED</b></code>
+ attributes in the group.  When
+      called with a single argument, <code><b>$name</b></code>
+, it
+      returns true (1) if the named attribute is
+      <code><b>REQUIRED</b></code>
+ or false (0) if not.  It can also
+      be called with a third argument which is a flag used to set 
+      the attribute's usage to <code><b>REQUIRED</b></code>
+ when
+      true or <code><b>OPTIONAL</b></code>
+ otherwise.
+<ul><pre><p>my $req_hash = $group-&gt;required();
+
+my $foo_req  = $group-&gt;required('foo');
+
+$group-&gt;required( foo =&gt; 1 );</b></pre></ul>
+
+    </p><li><p>
+<a name="method_optional">
+<b>optional(  )</b>
+<br>
+<b>optional( $name )</b>
+<br>
+<b>optional( $name, $use )</b>
+<br>
+</a>
+
+
+      <!-- ignore args -->
+      <!-- ignore args -->
+      <!-- ignore args -->
+
+      As per <a href="#method_required"><code><b>required()</b></code></a> above, this method provides
+      a way to fetch and set <code><b>OPTIONAL</b></code>
+ attribute
+      usage.
+<ul><pre><p>my $opt_hash = $group-&gt;optional();
+
+my $foo_opt  = $group-&gt;optional('foo');
+
+$group-&gt;optional( foo =&gt; 1 );</b></pre></ul>
+
+    </p><li><p>
+<a name="method_prohibited">
+<b>prohibited(  )</b>
+<br>
+<b>prohibited( $name )</b>
+<br>
+<b>prohibited( $name, $use )</b>
+<br>
+</a>
+
+
+      <!-- ignore args -->
+      <!-- ignore args -->
+      <!-- ignore args -->
+
+      As per <a href="#method_required"><code><b>required()</b></code></a> and
+      <a href="#method_optional"><code><b>optional()</b></code></a> above, this method provides a way to
+      fetch and set <code><b>PROHIBITED</b></code>
+ attribute usage.
+<ul><pre><p>my $not_hash = $group-&gt;prohibited();
+
+my $foo_not  = $group-&gt;prohibited('foo');
+
+$group-&gt;prohibited( foo =&gt; 1 );</b></pre></ul>
+
+    </p><li><p>
+<a name="method_group">
+<b>group( $name )</b>
+<br>
+<b>group( <a href="../../../../modules/XML/Schema/Attribute/Group.html">$group</a> )</b>
+<br>
+<b>group( name => $name, attributes => { ... }, ... )</b>
+<br>
+</a>
+
+
+      <!-- ignore args -->
+      <!-- ignore args -->
+      <!-- ignore args -->
+
+      <p>
+        This method provides a way to define a new attribute group
+        that should be added as a sub-group of the current group.  All
+        attributes, wildcards and further sub-groups of the new group
+        will become valid for the current group and all its validation
+        rules will apply.  For example, if a sub-group defines a
+        <a href="#config_required"><code><b>required</b></code></a> attribute then the current attribute
+	group will then also require it.
+      </p>
+
+      <p>
+	The new group can either be specified as a reference to an 
+        existing <a href="../../../../modules/XML/Schema/Attribute/Group.html">XML::Schema::Attribute::Group</a> object,
+	a reference to a hash array of configuration parameters that
+	can be used to instantiate an object of that class, or a simple
+	string indicating a name by which the attribute group can be
+        accessed from the enclosing scope.
+<ul><pre><p>$group-&gt;group( XML::Schema::Attribute::Group-&gt;new(...) )
+    || die $group-&gt;error();
+
+$group-&gt;group( {
+    name =&gt; 'my_new_group', 
+    attributes =&gt; { ... },
+} ) || die $group-&gt;error();
+
+$group-&gt;group('my_other_group')
+    || die $group-&gt;error();</b></pre></ul>
+
+      </p>
+
+
+      <p>
+	Note the important distinction between this method and the
+	<a href="../../../../modules/XML/Schema/Scope.html#method_attribute_group"><code><b>attribute_group()</b></code></a>
+	method inherited from <a href="../../../../modules/XML/Schema/Scope.html">XML::Schema::Scope</a>.  The
+	latter creates (if necessary) an attribute group object and
+	defines it by name in the internal scope lookup table.
+	However, it does not bind it to the current attribute group to
+	contribute to the validation of instance document attributes.
+	The <a href="#method_group"><code><b>group()</b></code></a> method delegates to <a href="../../../../modules/XML/Schema/Scope.html#method_attribute_group"><code><b>attribute_group()</b></code></a> to
+	create and register the new group and then then adds the name of
+	the group to the internal table which binds it into the current 
+        group.
+      </p>
+
+    </p><li><p>
+<a name="method_groups"><b>groups()</b></a>
+<br>
+
+
+	This method returns a reference to a list of the names of
+        other attribute groups that are bound to the current group to
+        contribute to validation.  The actual group references
+        themselves can be fetch via the <a href="../../../../modules/XML/Schema/Scope.html#method_attribute_group"><code><b>attribute_group()</b></code></a> method.
+<ul><pre><p>my $groups = $group-&gt;groups();
+
+print $group-&gt;name, &quot; has sub-groups: &quot;, join(', ', @$groups), &quot;\n&quot;;</b></pre></ul>
+
+
+    </p></ul>
+
+
+<div align="center">
+<small><b>Perl XML::Schema Documentation</b></small>
+</div>
+</body>
+</html>

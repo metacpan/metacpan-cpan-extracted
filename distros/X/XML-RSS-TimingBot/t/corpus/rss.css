@@ -1,0 +1,40 @@
+/*    Just so I can stand to look at this stuff -- sburke   */
+
+* { display: block;  border: thin green solid;  padding: 1px;  margin: 5px }
+
+:root {
+  background-color:  #00a;
+  font-size: 1em;
+  color:  #0088FF;
+  margin: 0;
+  padding: 3px 4em 3px 3px;
+  border: none;
+  font-size: smaller;
+}
+channel { border: none; padding: 0; margin: 0; }
+
+item:before { content: "Item:" }
+item { margin-top: 1em;  border-style: outset;  border-width: 3px; }
+:root:after { content: "__END__" }
+
+skipHours, updateFrequency, updatePeriod, updateBase, ttl {
+  border-width: 4px 40px 4px 40px;
+  font-size: larger;
+  background-color: black;
+  color: #dfd;
+}
+skipHours:before	{ content: "skipHours: "	}
+updateFrequency:before	{ content: "updateFrequency: "	}
+updatePeriod:before	{ content: "updatePeriod: "	}
+updateBase:before	{ content: "updateBase: "	}
+ttl:before		{ content: "ttl: "		}
+
+hour, day {
+  display: inline;
+  border: none;
+  border-right: thin #c0c solid;
+  margin: 0;
+  padding: 0;
+}
+hour:first-child, day:first-child { border-left: thin #c0c solid }
+

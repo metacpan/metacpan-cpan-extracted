@@ -1,0 +1,1 @@
+<response><stuff>stuff val</stuff><more><stuff><foo><stuff>Hidden Stuff</stuff></foo></stuff></more><deep><deep_var1>deep val 1</deep_var1><deep_var2>deep val 2</deep_var2></deep><stuff>more stuff</stuff><some_cdata><![CDATA[blah]]></some_cdata><tricky><![CDATA[foo]]> bar</tricky></response>

@@ -1,0 +1,84 @@
+1.08 - 
+    * Added 'offset' option to the search()
+    * Added scan() utility method
+
+1.07 - 28-Jul-2008
+    * default is 'quick-start' now, without 'show table status' -- all
+      project build_structure scripts need to be updated
+    * support for 'result' option, multiple return fields in searches
+    * support for blobs and text charsets
+    * drivers split into SQL dialect specific and connection specific,
+      removes DBI dependency for direct MySQL implementation.
+    * auto-rollback if we finish with an uncommited transaction (die/destroy)
+
+1.06 - 11-Jan-2005
+    * key_format allows to choose from different list key generation schemas
+    * Minor tweaks and improvements
+    * Moved to standard Artistic license
+
+1.05 - 12-Nov-2003
+    * SPEEDUP: significantly faster list deletes
+    * BUGFIX: same name top level lists were affected by recursive
+      drop_placeholder() in memory
+    * BUGFIX: collections allowed to retrieve non-existing objects
+    * key_length added to list placeholders making it possible to have
+      key lengths from 1 to 255 for lists
+    * a bug in MySQL_DBI treatment of 'distinct' option fixed
+    * transact_*() methods and driver support for InnoDB
+    * glue() method added to all Hash, List and Collection
+    * Hash::collection_key() method added
+    * fetch() can now fetch collections using
+      xaofs://collection/class/Data::Product/ syntax
+    * describe() method implemented for collections
+    * minor bug in Collection fixed
+    * name restrictions are now enforced in List according to
+      documentation
+
+1.04 - 1-Nov-2002
+    * Flexible auto-generated IDs in Lists (including sequential)
+    * Better treatment of default values and null/undefs
+    * MySQL_DBI is split into SQL driver layer and there is a separate
+      object XAO::DO::FS::Glue::MySQL that does not use DBI/DBD and
+      makes XAO::FS about 2 times faster.
+    * Some new tests
+    * Cleanups and some speed optimisations
+    * All references to dictionary are dropped
+    * Benchmarking started to track performance (bench/results-*)
+
+1.03 - 18-Mar-2002
+    * Fixed storing of an empty object
+    * MAJOR: Now NULL and 'undef' are outlawed and never returned
+    * MAJOR: 'default' parameter added to placeholder creation
+    * MAJOR: Fixed major bug with 'unique' treatment on inner objects
+    * Base class changed to Atom to make error throwing uniform
+    * MAJOR: a bug fixed in escaping special characters when searching
+      using 'wq' or 'ws'
+    * MAJOR: fixed bug in relations generation in deep search
+      subroutines; dependencies were wrong when searching for properties
+      of hashes in different lists originating from the same top level
+      object
+    * Added test case for the bug above
+    * check_name method is now available on all FS objects
+    * Removed `mysql' directory and dependance on MySQL-devel;
+      that driver will be distributed separately.
+
+1.02 - 3-Jan-2002
+    * Minor index bug fixed, introduced in 1.01
+    * versions added to packages for convenience
+
+1.01 - 27-Dec-2001
+    * added describe method for List
+    * added embeddable Config object
+    * fixed Makefile.PL to store test db password correctly
+    * started CHANGES file
+    * additional test case for container_object method (skv@xao.com)
+    * uri() fixed on objects created by container_object()
+    * 'unique' always assumes that 'index' is set too, fixes
+      problem with build_structure()
+    * diagnostic of connection failure improved
+    * default test database name changed to test_fs
+    * prefix for default table name changed to 'fs'
+    * xao-fs tool modified to accept 'drop' command
+
+1.0 - 2-Nov-2001
+    * Initial public release

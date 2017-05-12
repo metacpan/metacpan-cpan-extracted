@@ -1,0 +1,26 @@
+---
+abstract: 'Importing XML::Reader using XML::Parsepp '
+author:
+  - 'Klaus Eichner <klaus03@gmail.com>'
+build_requires:
+  Test::More: '0'
+  XML::Reader::Testcases: '0.48'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.025, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: XML-Reader-PP
+requires:
+  Exporter: '0'
+  XML::Reader: '0.48'
+  perl: '5.014'
+  strict: '0'
+  warnings: '0'
+resources:
+  homepage: https://github.com/klaus03/XML-Reader-PP
+  repository: https://github.com/klaus03/XML-Reader-PP.git
+version: '0.04'

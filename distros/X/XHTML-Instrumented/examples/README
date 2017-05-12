@@ -1,0 +1,12 @@
+#!/bin/sh
+
+# on debian systems you can run the commands below
+
+rm /usr/lib/cgi-bin/xhtml-instrumented
+ln -s `pwd` /usr/lib/cgi-bin/xhtml-instrumented
+
+# and then view the tests at
+
+# firefox http://localhost/cgi-bin/xhtml-instrumented/index.cgi
+
+

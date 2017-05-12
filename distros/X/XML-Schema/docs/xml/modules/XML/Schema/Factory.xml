@@ -1,0 +1,31 @@
+<module name="XML::Schema::Modules">
+
+  <about>
+    This module implements a factory class for loading modules and 
+    instantiating objects of other XML::Schema::* classes.
+  </about>
+
+  <synopsis>
+<perl>
+use XML::Schema::Modules;
+
+my $factory = 'XML::Schema::Modules';
+my $element = $factory->create( element => @args )
+    || die $factory->error();
+</perl>
+  </synopsis>
+
+  <description>
+    <p>
+    This module implements a factory class for loading modules and 
+    instantiating objects of other XML::Schema::* classes.
+    </p>
+  </description>
+
+</module>
+
+
+
+
+
+

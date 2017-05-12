@@ -1,0 +1,4 @@
+<doc>
+ This is an XML document without a DTD.
+ <elem>A subelement</elem>
+</doc>

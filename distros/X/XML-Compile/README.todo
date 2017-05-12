@@ -1,0 +1,36 @@
+
+==== XML::Compile README.todo
+
+= initial prefix problem:
+
+An implementational problem: when a prefix is chosen, it is not decided
+by the XML::LibXML library, but by XML::Compile.  An xyz:tag is chosen,
+and xmlns:xyz is added later.  The causes the problem that the node's
+localname will be "xyz:tag" until the node is stringified... which
+is incorrect.
+
+= tests
+ - Missing: test <all> and <choice> in various combinations with
+   blocks, <any> and substitutionGroups.  Many examples in practice
+   seem to show that it works as it should.
+ - the implementation of most basic types should have regression tests,
+
+= known limitations
+ - nillable support for mixed elements
+ - typemaps on basic types
+ - errors on types should show dynamic nested location in structure,
+   not path in schema.
+ - the "assertions" facet
+
+= wishlist
+ - handle XML::LibXML::Error objects
+ - useSchema() relation to ::Cache::declare()?
+ - proposed new schema features:
+     . alternative
+       http://www.ibm.com/developerworks/library/x-xml11pt2/#N103D7
+ - namespace blocking option for templates; exclude deprecated elements
+ - when you use appendChild i.s.o. addChild, the namespace declarators
+   are managed automatically correct, saving a wrapper in the writer
+   and avoiding the prefix trick. [Roman Daniel].  Nicer, but would
+   affect the whole code and most tests.
+ - reader replace hook "XML_SIMPLE"

@@ -1,0 +1,27 @@
+XML::Handler::HTMLWriter
+========================
+
+XML::Handler::HTMLWriter is a SAX handler module for outputting
+HTML, based on the rules in the XSLT specification, including things
+like empty and non-closing tags, and boolean attributes.
+
+INSTALLATION
+
+To install this module type the following:
+
+   $ perl Makefile.PL
+   $ make
+   $ make test
+   $ su
+   # make install
+
+DEPENDENCIES
+
+XML::SAX::Writer, and HTML::Entities.
+
+COPYRIGHT AND LICENCE
+
+Copyright 2001 AxKit.com Ltd.
+
+This module is free software and may be distributed under the same
+terms as Perl itself.

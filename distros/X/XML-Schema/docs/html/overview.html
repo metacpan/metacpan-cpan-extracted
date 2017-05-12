@@ -1,0 +1,198 @@
+
+
+
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+<head>
+<title>Perl XML::Schema Documentation</title>
+</head>
+
+<body bgcolor="#ffffff">
+<table border="0" width="100%">
+<tr>
+<td align="left"><a href="index.html"><img src="images/canon.gif" border="0"></a></td>
+<td align="right"><img src="images/canre.gif"></td>
+</tr>
+</table>
+<div align="right">
+<small><a href="index.html">XML Schema Home</a></small>
+</div>
+
+
+<h1>XML Terminology</h1>
+
+<p>To understand the nature of XML Schema it is important to be familiar 
+with some basic XML terminology.</p>
+<p>An XML <b>tag</b> begins with a '<code>&lt;</code>' and ends with a '<code>&gt;</code>'.
+For example:</p>
+<pre>    &lt;foo&gt;</pre>
+
+<p>The XML <b>element</b> shown below comprises a <b>start tag</b>
+('<code>&lt;name&gt;</code>'), some <b>character content</b> ('<code>Mithrandir</code>'), and an
+<b>end tag</b> ('<code>&lt;/name&gt;</code>').</p>
+<pre>    &lt;name&gt;Mithrandir&lt;/name&gt;</pre>
+
+<p>In additional to character content, an element may include other
+<b>child elements</b> nested within in.  In this example, the
+'<code>&lt;wizard&gt; ... &lt;/wizard&gt;</code>' element contains the
+'<code>&lt;name&gt; ... &lt;/name&gt;</code>' and 
+'<code>&lt;alias&gt; ... &lt;/alias&gt;</code>' elements.</p>
+<pre>    &lt;wizard&gt;
+      &lt;name&gt;Mithrandir&lt;/name&gt;
+      &lt;alias&gt;Gandalf&lt;/alias&gt;
+    &lt;/wizard&gt;</pre>
+
+<p>The start tag of an element may contain <b>attributes</b>
+each comprising of a name and quoted value. </p>
+<pre>    &lt;name lang="Elvish"&gt;Mithrandir&lt;/name&gt;</pre>
+
+<p>An element is said to have a <b>simple type</b> if it contains character
+content, the whole character content and nothing but the character
+content.</p>
+<pre>    &lt;name&gt;Mithrandir&lt;/nam&gt;	    # simple type</pre>
+
+<p>If an element has attributes or non-character child elements then 
+it is said to have a <b>complex type</b>.</p>
+<pre>    &lt;name lang="EN"&gt;Frank&lt;/name&gt;    # complex type (attributes)</pre>
+
+<pre>    &lt;name&gt;			    # complex type (child elements)
+      &lt;first&gt;Frank&lt;/first&gt;
+      &lt;last&gt;Sidebottom&lt;/last&gt;
+    &lt;/name&gt;</pre>
+
+<p>A complex element defines a <b>content model</b> to specify what is
+permitted within the element in terms of character content and child
+elements.  Content models may be defined in terms of <b>particles</b>
+which specify the child elements that may appear within an element,
+along with minimum and maximum occurence constraints.  These particles
+may be specified as a <b>sequence</b> (each element particle must match in
+order), a <b>choice</b> (match just one particle) or <b>all</b> (match all
+particles but in any order).  Particles can be nested recursively
+allowing content models of arbitrary complexity to be defined.</p>
+<pre>    &lt;wizard&gt;			    # sequence:
+      &lt;name&gt;Gandalf&lt;/name&gt;	    #   name   min=1 max=1
+      &lt;colour&gt;Grey&lt;/colour&gt;	    #   colour min=1 max=1
+      &lt;alias&gt;Mithrandir&lt;/alias&gt;     #   alias  min=0 max=unbounded
+      &lt;alias&gt;Beardy&lt;/alias&gt;
+      ...
+    &lt;/wizard&gt;</pre>
+
+<p>If an element accepts both character content and child elements then
+it is said to have a <b>mixed content model</b>.</p>
+<pre>    &lt;p&gt;
+      An HTML paragraph is an example of an XML element with a 
+      &lt;b&gt;mixed content model&lt;/b&gt;.  It can contain plain text 
+      and &lt;i&gt;other XML elements&lt;/i&gt;
+    &lt;/p&gt;</pre>
+
+<p>Elements can also have an <b>empty content model</b> in which case the
+start and end tags can be combined like this:</p>
+<pre>    &lt;br /&gt;</pre>
+
+<p><b>NOTE:</b> The space before the trailing '<code>/</code>' is optional.  However, if
+you find yourself writing XHTML documents, then you should always add
+the space to allow HTML browsers to display the markup correctly.</p>
+<h1>XML Schema Overview</h1>
+
+<p>A schema is a description of the permitted structure and characteristics
+of a class of XML instance documents.  W3C XML Schema is one particular 
+schema standard and is documented extensively at http://w3c.org/.</p>
+<p>This is an XML fragment which describes a &lt;person&gt;.  This is
+termed an "XML instance document".</p>
+<pre>    &lt;person id="abw"&gt;
+      &lt;name&gt;
+        &lt;first&gt;Andy&lt;/first&gt; &lt;last&gt;Wardley&lt;/last&gt;
+      &lt;/name&gt;
+     &lt;email&gt;abw@kfs.org&lt;/email&gt;
+   &lt;/person&gt;</pre>
+
+<p>Here is the schema for this element:</p>
+<pre>    &lt;schema&gt;</pre>
+
+<pre>      &lt;element name="person" type="personType"/&gt;</pre>
+
+<pre>      &lt;complexType name="personType"&gt;
+        &lt;attribute name="id" type="string"/&gt;
+        &lt;element name="name" type="nameType"/&gt;
+        &lt;element name="email" type="emailType"/&gt;
+      &lt;/complexType&gt;</pre>
+
+<pre>      &lt;complexType name="nameType"&gt;
+        &lt;element name="first" type="string"/&gt;
+        &lt;element name="last" type="string"/&gt;
+      &lt;/complexType&gt;</pre>
+
+<pre>      &lt;simpleType name="emailType"&gt;
+        &lt;restriction base="string"&gt;
+          &lt;pattern value="\w+@(\w+\.)+\w+"/&gt;
+        &lt;/restriction&gt;
+      &lt;/simpleType&gt;</pre>
+
+<pre>    &lt;/schema&gt;</pre>
+
+<h1>XML Schema Perl Modules</h1>
+
+<p>These Perl modules implement various objects which can be used to
+define schemata.  At the time of writing, these modules offer "minimal
+conformance" but not "full conformance".  Full conformance implies
+that a schema can be specified as an XML document (like that above)
+which can be processed automatically to construct an internal schema
+representation.  Currently, schemata must be built "by hand" as Perl
+programs as shown below.  However, we intend to encode the schema for
+XML Schema itself to build a minimally conformant parser which can
+bootstrap itself into being a fully conformant parser.</p>
+<pre>    use XML::Schema;</pre>
+
+<pre>    my $schema = XML::Schema-&gt;new();
+ 
+    #------------------------------------------------------------
+    # define simple type for email addresses</pre>
+
+<pre>    my $emailType = $schema-&gt;simpleType( name =&gt; 'email',
+				         base =&gt; 'string' );</pre>
+
+<pre>    $emailType-&gt;constrain( pattern =&gt; '\w+@(\w+\.)+\w+' );</pre>
+
+<pre>    #------------------------------------------------------------
+    # define complex type for name</pre>
+
+<pre>    my $nameType = $schema-&gt;complexType( name =&gt; 'nameType' );</pre>
+
+<pre>    $nameType-&gt;element( name =&gt; 'first', 
+			type =&gt; 'string' );</pre>
+
+<pre>    $nameType-&gt;element( name =&gt; 'last', 
+			type =&gt; 'string' );</pre>
+
+<pre>    #------------------------------------------------------------
+    # define complex type for person</pre>
+
+<pre>    my $personType = $schema-&gt;complexType( name =&gt; 'personType' );</pre>
+
+<pre>    $personType-&gt;attribute( name =&gt; 'id', 
+			    type =&gt; 'string' );</pre>
+
+<pre>    $personType-&gt;element( name =&gt; 'name', 
+			  type =&gt; 'nameType' );</pre>
+
+<pre>    $personType-&gt;element( name =&gt; 'email', 
+			  type =&gt; 'emailType' );</pre>
+
+<pre>    #------------------------------------------------------------
+    # define key schema element</pre>
+
+<pre>    $schema-&gt;element( name =&gt; 'person',
+		      type =&gt; 'personType' );</pre>
+
+<p>Having constructed a schema model in this way, an XML parser can be
+generated to parse instances of this schema.</p>
+<pre>    my $parser = $schema-&gt;parser();</pre>
+
+<pre>    my $result = $parser-&gt;parse('person.xml');</pre>
+
+<div align="center">
+<small><b>Perl XML::Schema Documentation</b></small>
+</div>
+</body>
+</html>

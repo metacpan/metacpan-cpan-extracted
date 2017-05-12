@@ -1,0 +1,25 @@
+#!/usr/bin/perl
+use warnings;
+use strict;
+
+use Log::Log4perl qw(:easy);
+use File::Temp qw(tempfile);
+
+Log::Log4perl->easy_init($DEBUG);
+
+use XML::RSS::FromHTML::Simple;
+
+my $f = XML::RSS::FromHTML::Simple->new({
+    url       => "http://bild.de",
+    rss_file  => "bild.xml",
+});
+
+binmode STDOUT, ":utf8";
+
+$f->link_filter( sub {
+    my($url, $text) = @_;
+
+    return 1;
+});
+
+$f->make_rss() or die $f->error();

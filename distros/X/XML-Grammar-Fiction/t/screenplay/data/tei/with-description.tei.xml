@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tei:text xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:sp="http://web-cpan.berlios.de/modules/XML-Grammar-Screenplay/screenplay-xml-0.2/">
+  <tei:body>
+    <tei:div type="act" xml:id="index">
+      <tei:head>ACT I</tei:head>
+      <tei:div type="scene" xml:id="top">
+        <tei:head>top</tei:head>
+        <tei:div type="scene" xml:id="david_and_goliath">
+          <tei:head>david_and_goliath</tei:head>
+          <tei:stage>
+            <tei:p>
+            David and Goliath are standing by each other.
+            </tei:p>
+        </tei:stage>
+          <tei:sp><tei:speaker>David</tei:speaker>
+            <tei:p>
+                I will kill you.
+            </tei:p>
+        </tei:sp>
+          <tei:sp><tei:speaker>Goliath</tei:speaker>
+            <tei:p>
+                no way, you little idiot!
+            </tei:p>
+        </tei:sp>
+          <tei:sp><tei:speaker>David</tei:speaker>
+            <tei:p>
+                yes way!
+            </tei:p>
+            <tei:p>
+                In the name of Allah, the merciful, I will show you the power
+                of my sling.
+            </tei:p>
+            <tei:p>
+                I shall sling you and bing you till infinity.
+            </tei:p>
+        </tei:sp>
+          <tei:stage>
+            <tei:p>
+                David takes his sling.
+            </tei:p>
+        </tei:stage>
+          <tei:sp><tei:speaker>Goliath</tei:speaker>
+        <tei:p>
+            I'm still waiting.
+        </tei:p>
+    </tei:sp>
+          <tei:sp><tei:speaker>David</tei:speaker>
+        <tei:p>
+            so you are.
+        </tei:p>
+    </tei:sp>
+          <tei:stage>
+        <tei:p>
+            David puts a stone in his sling and shoots Goliath. He hits.
+        </tei:p>
+    </tei:stage>
+        </tei:div>
+      </tei:div>
+    </tei:div>
+  </tei:body>
+</tei:text>

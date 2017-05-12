@@ -1,0 +1,229 @@
+
+==== version history of XML::Compile:WSS
+
+version 1.14: Mon  8 May 09:15:33 CEST 2017
+
+	Fixes:
+	- nonce processing.  rt.cpan.org#121497 [Errietta Kostala]
+
+version 1.13: Tue Jul 21 14:13:35 CEST 2015
+
+	Fixes:
+	- try to eliminate confusion about plugins, when more than one
+	  ::Schema/::WSDL11 is active in one application.
+	  rt.cpan.org#99735 [Jason Adams]
+
+	Improvements:
+	- adding wsu_Id does not monopolize the replace hook anymore.
+
+version 1.12: Thu Feb  6 17:12:02 CET 2014
+
+	Fixes:
+	- ::SOAP12 is optional, as is the availability of the env12
+	  prefix definition. [cpantesters]
+
+	Improvements:
+	- change documentation style.
+
+version 1.11: Mon Jan  6 10:39:31 CET 2014
+
+	Fixes:
+	- depends on XML::Compile::WSDL11 [cpantesters]
+
+version 1.10: Mon Jan  6 01:07:14 CET 2014
+
+	Improvements:
+	- add ::BasicAuth ability to change wsu_Created and wsse_Nonce
+	  per operation. [Alex Rutgers]
+	- add SOAP 1.2 support
+
+version 1.09: Fri Oct 11 15:52:31 CEST 2013
+
+	Fixes:
+	- Accept SOAP-call which passed data as HASH.
+
+version 1.08_02: Sun Sep 22 22:47:26 CEST 2013
+
+	Changes:
+	- Move logic from ::SOAP::WSS into ::WSS::Signature
+
+version 1.08_01: Sat Aug 10 00:20:36 CEST 2013
+
+	Changes:
+	- calls to ::Signature changed
+
+	Improvements:
+	- weaken link to schema
+	- use ::Cache::addPrefixes()
+	- possible to do only partial plugin preparation: READER and/or WRITER
+	- change the way that this actual element signing is triggered, from
+	  a two pass message generation into a single.
+	- add ::Util WSM10_STR_TRANS, :wsm11 and a few more
+	- add ::Util functions wsm_encoded() and wsm_decoded()
+
+
+version 1.07: Sat Nov 17 12:22:59 CET 2012
+
+	Fixes:
+	- remove Digest::SHA1 from the test scripts as wll.
+	  [Caleb Cushing]
+
+version 1.06: Thu Nov 15 08:46:30 CET 2012
+
+	Improvements:
+	- use Digest::SHA, not ::SHA1.  Add it to Makefile.PL
+	  rt.cpan.org#81065 [Chernomyrdin]
+
+version 1.05: Thu Nov  1 15:44:26 CET 2012
+
+	Fixes:
+	- flag ::BasicAuth nonce as Base64 encoded.
+	  rt.cpan.org#80544 [chernomyrdin]
+
+	Improvements:
+	- another nice error when the used initiates ::WSDL before ::WSS
+
+version 1.04: Thu Nov  1 11:44:42 CET 2012
+
+	Changes:
+	- split-of ::Signature into separate distribution
+	  XML::Compile::WSS::Signature  Also moved a lot of the
+	  schema's to that module.
+
+	Fixes:
+	- include_namespaces on SignedInfo for Canonicalization.
+
+	Improvements:
+	- add mustUnderstand attribute to the security header.
+
+	- remove (not exported) C14N* constants from ::Util, because
+	  they are in XML::Compile::C14N::Util
+
+	- permit WSS objects on multiple ::Cache objects [Caleb Cushing]
+	  Only one version of WSS per schema.
+
+	- loadSchemas() is now also instance method.
+
+	- clean-up 3 times function _hook_WSU_ID() for one method
+	  ::WSS::writerHookWsuId()
+
+	- clean error message when the WSS object is created after the WSDL.
+
+	- ::SOAP::WSS::wssConfigs() renamed to ::features()
+	  ::SOAP::WSS::addWSS() renamed to ::addFeature()
+
+version 1.03: Fri Oct 26 17:22:22 CEST 2012
+
+	Fixes:
+
+	- signature: new(remote_pubkey) is documented to accept a filename,
+	  but that was not handled. [Karen Etheridge]
+
+	- signature: also include empty prefixList.
+
+	- signature: openssl input format very stringly 64 chars per
+	  base64 encoded line.
+
+	Improvements:
+
+	- do not use UNIVERSAL::isa [Karen Etheridge]
+
+	- support for receiving X509v3 certificates
+
+	- signature: remove unused _apply_canon_siginfo()
+	  detected by [Karen Etheridge]
+
+version 1.02: Mon Oct 22 11:17:34 CEST 2012
+
+	Fixes:
+
+	- when not using SOAP, then you call create() or check() explicitly.
+
+	- completion of Signature implementation (no real-life testing,
+	  but eats its own food, at least)
+
+	Improvements:
+
+	- added regression test for signatures in t/20*
+
+version 1.01: Thu Oct 18 02:49:30 CEST 2012
+
+	Fixes:
+
+	- need for strict order for creation of (at least one) features
+	  before compileClient() removed.  Noted by [Cale Cushing]
+	  
+	Improvements:
+
+	- many documentation improvements.
+
+	- signature: less namespace declarations.
+
+	- removed examples: they are outdated.
+
+version 1.00: Tue Oct 16 16:50:10 CEST 2012
+
+	Changes:
+
+	- deprecated ::WSS::wsseBasicAuth() and ::WSS::wsseTimestamps
+	  Still available, tests in t/9?old-*
+
+	Fixes:
+
+	- some export constants for :wsse were incorrect.
+
+	Improvements:
+
+	- option ::WSS::new(wss_version) as alternative to 'version',
+	  which is more clear in some circumstances: there are so many
+	  versioned namespaces involved!
+
+	- implementation of XML::Compile::WSS::Signature
+
+	- implementation of XML::Compile::WSS::BasicAuth
+
+	- implementation of XML::Compile::WSS::Timestamp
+
+	- promote ::WSS::_dateTime to ::WSS::dateTime()
+
+	- automatically add ValueType="$xsd/dateTime" to timestamps when
+	  applicable
+
+
+version 0.911: Sat Sep  1 13:00:53 CEST 2012
+
+	Fixes:
+
+	- wsseBasicAuth did not use default UTP11_PTEXT anymore
+	  [Caleb Cushing]
+
+version 0.91: Fri Aug 31 17:03:22 CEST 2012
+	- always permit nonce and created in wsseBasicAuth, not just
+	  in combination with UTP11_PDIGEST
+	  rt.cpan.org #79315 [David McMath]
+	- fix missing xmlns:wsu when wsseBasicAuth it called repetatively.
+	  rt.cpan.org #79318 [David McMath]
+
+version 0.90: Thu Aug 30 09:21:56 CEST 2012
+	- add support for wsseTimestamp and extended Usertoken, with
+	  examples/usertoken/with_help_digest.pl, and t/11digest.t.
+	  Contributed by [David McMath]
+
+version 0.14: Tue Jul 31 21:41:25 CEST 2012
+	- fix: swap parameters to encode password.  With test patched by
+	  rt.cpan.org#78698 [David Tindall Mcmath]
+
+version 0.13: Wed Jan 25 00:10:24 CET 2012
+	- add optional parameter for password type to :wsseBasicAuth()
+	  [mawasak]
+
+version 0.12: Wed Aug 31 11:31:12 CEST 2011
+	- add XML::Compile::WSS::wsseBasicAuth() helper, which was
+	  needed by [Caleb Cushing]
+	- add examples in examples/usertoken/
+
+version 0.11: Fri Apr 29 11:29:16 CEST 2011
+	- add missing dependency to XML::Compile::SOAP [cpantesters]
+
+version 0.10: Wed Apr 27 17:07:40 CEST 2011
+	- initial release

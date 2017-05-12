@@ -1,0 +1,15 @@
+Changes
+lib/XTerm/Conf.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+t/00-load.t
+t/10-xterm.pl
+t/10-xterm.t
+t/11-xterm.pl
+t/12-xterm-conf-string.t
+t/13-xterm-conf.t
+xterm-conf
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

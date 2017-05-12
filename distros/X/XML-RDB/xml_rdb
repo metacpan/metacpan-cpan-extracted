@@ -1,0 +1,344 @@
+#!/usr/bin/perl
+
+eval 'exec /usr/bin/perl  -S $0 ${1+"$@"}'
+    if 0; # not running under some shell
+
+###############################################################
+# xml_rdb - XML to RDB ( Postgres, SQLite, Mysql )            #
+#                                                             #
+# xml_rdb comes with ABSOLUTELY NO WARRANTY; see COPYING file #
+# This is free software, and you are welcome to redistribute  #
+# it under certain conditions; see COPYING file for details   #
+###############################################################
+
+use strict;
+use Data::Dumper;
+use XML::RDB;
+use Getopt::Std;
+$Getopt::Std::OUTPUT_HELP_VERSION=1;
+
+use Benchmark (':all');
+
+### Constants
+sub VERSION_MESSAGE { print "\nXML::RDB - version ".$XML::RDB::VERSION."\n";return 1;}
+
+sub USAGE { print <<"USE";
+xml_rdb
+
+  Reads XML, generates DDL, creates tables, loads the XML data to the tables.
+  And reverses the operation, generating new XML, and unpopulating the tables.
+
+  Design was simplicity, and give a first look into design of a more permanent solution.
+  Autodia, tedia2sql, parsediasql are perl tools and also assist in this.
+
+  tested with: Postgres, SQLite, Mysql  
+  
+  xml_rdb -b -c dsn_config -x some.xml -d some.ddl
+  xml_rdb -b -c dsn_conf -n new_some.xml
+
+ Switch    Option
+  -b               drop tables ( trys to do the right thing, but dont count on it )
+  -c   <file>      dsn_config file  
+
+  ( SQL generation )
+  -x   <file/url>  XML file parsing to DDL
+  -d   [file]      Create and Load DDL filename    (optional with XML file)
+  -l               Load DDL file, do not generate.
+
+  ( XML generation )
+  -n   <file>      Output of tables to a new XML file
+  -n   -           Output of tables to STDOUT
+
+  ( experimental crap ) *ie still broken... you have been forewarned.
+  -a   <dir>       Archive directory
+  -y   <file>      XML's XSD file
+  -z               Test experimental code, i.e. dis-functional.
+
+  ( misc )
+  -t               print xml_rdb dsn template config and exit.
+  -D               Debug for xml_rdb script, 
+                    *But the REAL debug modes for pumps are done in the config file.
+  -v               version                  
+  -h               Show this message
+
+     NOTE: this is perl thanx
+USE
+return 1;
+}
+
+sub TEMPLATE { print <<"TEMP";
+###                 DSN Setup               ###      manditory*
+
+#DSN=DBI:mysql:database=test;host=192.168.0.2;port=3306
+#DSN=DBI:Pg:dbname=test;host=192.168.0.2;port=5432
+#DSN=DBI:SQLite:dbname=test
+#DB_USERNAME=
+#DB_PASSWORD=
+
+###                 Boolean flags 0|1       ###
+
+# DB_* man DBI  
+#  DB_CATALOG examples : 1  Postgres  
+#                        0  SQLite, Mysql 
+# DBIX_* man DBIx::Recordset 
+ 
+DB_CATALOG=0
+DB_PRINTERROR=1
+DB_RAISEERROR=0
+
+DBIX_FETCHSIZEWARN=0
+
+###                 More Numbers            ###
+# DBIx::Recordset::Debug 
+#  Debuglevel
+#   0 = off
+#   1 = log only errors
+#   2 = show connect, disconnect and SQL Statements
+#   3 = some more infos
+#   4 = much infos
+DBIX_DEBUG=0
+
+###                 XML::RDB specific        ###
+
+# Boolean 0|1
+SQL_SELECTS=0
+SQL_HEADERS=0
+
+## All tables names will being with this string TABLE_PREFIX . '_'
+TABLE_PREFIX=gen
+
+# Name appended to primary key of every generated table, default 'id'
+PK_NAME=id
+
+# Name appended to foreign key of every generated table, default 'fk'
+FK_NAME=fk
+
+# Default width & type of text columns, default 50
+TEXT_WIDTH=50
+
+# The spaces a tab has for xml output, default 4
+TAB=2
+
+TEMP
+  return 1;
+}
+
+### Globals
+my(
+  $errcode,   # errcode
+  %options,   # options of the application
+);
+
+&main();
+
+sub main() {
+  $errcode = 0;
+  $errcode = init();
+  $errcode = process() unless ($errcode);
+  term();
+}
+
+sub init() {
+###  What are our standard options here?
+# Switch    Option
+#  -a          Archive directory
+#  -b          drop/create test database ( start over )
+#  -c          dsn_config file 
+#  -d          ddl filename
+#  -l          load ddl filename
+#  -x          XML file to parse 
+#
+#  -n          output of tables to XML file
+#
+#  (experimental crap) ie still broken
+#  -y          XML's XSD file
+#  -z          test new code snip.
+#
+#  -t          print xml_rdb dsn template config and exit.
+#  -D          debugging
+#  -v          version 
+#  -h          Show this message
+  getopts('a:c:d:Dhln:tx:vy:zb',\%options);  
+
+  $options{arch_dir} = $options{a} if ((exists($options{a})) and (-d $options{a}));
+
+  $options{dsn_conf} = ((exists($options{c})) and (-f $options{c}))
+                       ? $options{c} : undef;
+
+  $options{xml_file} = $options{x} if ((exists($options{x})) and (-f $options{x}));
+  $options{xml_file} = $options{x} if ((exists($options{x})) and ($options{x} =~ /^\w+:\/\//));
+  $options{ddl_file} = (($options{d}) and ( defined $options{d} ))
+                       ? $options{d} 
+                       : ($options{xml_file}) 
+                         ? substr(
+                            substr($options{xml_file}, 0, rindex($options{xml_file}, '.')), 
+                            rindex(substr($options{xml_file}, 0, rindex($options{xml_file}, '.')), '/') +1,
+                            length(substr($options{xml_file}, 0, rindex($options{xml_file}, '.'))))
+                            .'.sql'
+                         : undef;
+  $options{template}  = ($options{t}) ? 1 : 0;
+  $options{load_tbls} = ($options{l}) ? 1 : 0;
+
+  $options{new_xml} ||= $options{n};
+
+  $options{drop_tbls} = ($options{b}) ? 1 : 0;
+
+  $options{run_test}  = ($options{z}) ? 1 : 0;
+  $options{xsd_file}  = $options{y} if ((exists($options{y})) and
+                                 (-f $options{y}     ));
+
+  $options{template}  = (exists($options{t})) ? 1 : 0;
+  $options{debug}     = (exists($options{D})) ? 1 : 0;
+  $options{version}   = (exists($options{v})) ? 1 : 0;
+  $options{help}      = (exists($options{h})) ? 1 : 0;
+	
+  # Are we primmed and ready to run?
+  return &VERSION_MESSAGE if ($options{version});
+  return &TEMPLATE        if ($options{template});
+  $errcode = &USAGE if ( $options{help})
+                    or (!$options{dsn_conf});
+  return $errcode;
+}
+
+sub process() {
+  my $rdb = new XML::RDB(config_file => $options{dsn_conf});
+
+  if (! $options{run_test}) {
+    # Generate DDL from XML, Create tables and Load XML data.
+    if ($options{xml_file})  {
+    
+      drop_tables($rdb) if ($options{drop_tbls}-- == 1);
+
+      unless ($options{load_tbls}) { 
+        $rdb->make_tables($options{xml_file}, 
+                          $options{ddl_file});
+        print STDERR '  Generated ddl: '. $options{ddl_file} ."\n";
+      }
+
+      $rdb->create_tables($options{ddl_file}); 
+      print '  Created tables from: '. $options{ddl_file} ."\n";
+    
+      $rdb->populate_tables($options{xml_file});
+      print STDERR '  Loaded table data from: '. $options{xml_file} ."\n";
+    }
+
+    # Create XML 
+    if ($options{new_xml}) {
+      if ($options{new_xml} eq '-') {
+        $rdb->unpopulate_tables(undef);
+      }
+      else {
+        $rdb->unpopulate_tables($options{new_xml});
+        print STDERR '  Created new XML:  '. $options{new_xml} ."\n";
+      }
+      drop_tables($rdb) if ($options{drop_tbls}-- == 1);
+    }   
+
+    drop_tables($rdb) if ($options{drop_tbls} == 1);
+
+  }
+  elsif ($options{run_test}) {
+    # THIS IS BROKEN.., Well, I'm not smart enough to get it running at this time.
+    # That's all fine & dandy but what if you've got an XML Schema???
+    # the first 2 calls are the same:
+    $rdb->make_tables($options{xsd_file}, $options{ddl_file});
+    $rdb->create_tables($options{ddl_file}); 
+    my($root_table_name, $primary_key) =
+                          $rdb->populate_tables($options{xsd_file});
+    print "$root_table_name  $primary_key \n";
+
+    # note we only need the primary key for this next call
+    $rdb->unpopulate_schema($primary_key, 'fully_formed.xml');
+    # Now you've got 'fully_formed.xml' - pass THAT to make_tables
+    # & yer golden:
+    $rdb->make_tables("fully_formed.xml", "REAL_RDB_schema");
+    # Now insert REAL_RDB_schema into yer DB & now any XML documents
+    # conforming to your original XML Schema ('my_xsd_file.xsd') can be
+    # imported into your schema:
+#    my ($rt, $pk) =
+#      $rdb->populate_tables($options{xml_file});
+#
+#    print "\n\n--> To unpopulate the tables and generate new XML:\n"
+#         .'-->   xml_rdb -c '. $options{dsn_conf} 
+#         ."-r $rt -p $pk -n new_". $options{xml_file} . "\n\n";
+  }
+  return $errcode;
+}
+
+sub drop_tables ($) {
+  my $rdb = shift;
+  my $tables = $rdb->drop_tables();
+  print STDERR ("  Dropped tables ...\n"); 
+  map { print STDERR "    $_\n" } @{$tables};
+return $errcode;
+}
+
+sub term() {
+  if ($options{debug}) {
+    print STDERR Dumper(\%options);
+    print STDERR Dumper(\@ARGV);
+    print STDERR "errcode = $errcode\n";
+  }
+  exit($errcode);
+}
+
+##############################################################################
+
+=head1 NAME
+
+xml_rdb - a perl script using the XML::RDB modules to create DDL from XML, load generated DDL and XML data, and able to extract the data back to XML. Tested with Postgreql 8.3, SQLite 3.6.16, and MySQL 5.0.51a.
+
+=head1 INTRODUCTION
+
+Xml_rdb takes a XML file or url as input for the XML::DOM::Parser, extracts information to build and write DDL. An attempt is made to recognise relations within the XML structure then translates it to the DDL. Loads that generated DDL, parsing the DOM tree a second time to extract and load the data. At the bottom of the DDL are select statements to help get a view of those relations found and XML data. Xml_rdb also dumps the data back to XML format. 
+
+Xml_rdb needs a database configuration, xml_rdb -t prints a template for this. Personally recommend a new sandbox or test database. 
+
+Locate a xml file or url, xml_rdb -c <database config> -x <XML file/url>. Generates DDL as <"XML base name".sql>, continues for a second pass to load the XML.
+
+Look over the DDL file, grab the select statements from the bottom and run them for a look at the results. Possible to edit the DDL file's default CREATE TABLE .. "varchar(NN)" fields to something more suitable. Then using the -b and -l switches to reload the data with the newly edited field descriptions, like xml_rdb -b -c <database config> -x <XML file/url> -l. 
+
+Edit the data and export with the -n <new XML file>.
+
+Pros: With the aid of Dia, Autodia and Xml_rdb. It's likely for someone to gain perspective of the XML data quickly. 
+
+Cons: The select statements do not detect mutually exclusive links, so your mileage may vary. MySQL truncates field width without warning; this could be due to debug settings, debug switches are extended from DBI and DBIx to the config file. XML files are loaded into memory, as long as you have memory it's ok... maybe. . Urls are saved as files before loading (wasn't obvious where tho, still looking). This is GREEN, un-employed and bored ... Grabbed this broken mod, fixed some stuff and whee, etc. XSD support isn't working, and may come back later for more fun.
+
+Depend: xml_rdb as a perl script depends on XML::RDB, XML::DOM, DBIx, DBI for the bulk of the work.
+
+=head1 USAGE
+
+=over 4
+
+  xml_rdb -b -c dsn_config -x some.xml -d some.ddl
+  xml_rdb -b -c dsn_conf -n new_some.xml
+
+ Switch    Option
+  -b               drop tables ( trys to do the right thing, but dont count on it )
+  -c   <file>      dsn_config file  
+
+  ( SQL generation )
+  -x   <file/url>  XML file parsing to DDL
+  -d   [file]      Create and Load DDL filename    (optional with XML file)
+  -l               Load DDL file, do not generate.
+
+  ( XML generation )
+  -n   <file>      Output of tables to a new XML file
+  -n   -           Output of tables to STDOUT
+
+  ( experimental crap ) *ie still broken... you have been forewarned.
+  -a   <dir>       Archive directory
+  -y   <file>      XML's XSD file
+  -z               Test experimental code, i.e. dis-functional.
+
+  ( misc )
+  -t               print xml_rdb dsn template config and exit.
+  -D               Debug for xml_rdb script, 
+                    *But the REAL debug modes for pumps are done in the config file.
+  -v               version                  
+  -h               Show this message
+
+=back
+
+=cut
+

@@ -1,0 +1,239 @@
+NAME
+    XML::Hash::LX - Convert hash to xml and xml to hash using LibXML
+
+SYNOPSIS
+        use XML::Hash::LX;
+
+        my $hash = xml2hash $xmlstring, attr => '.', text => '~';
+        my $hash = xml2hash $xmldoc;
+
+        my $xmlstr = hash2html $hash, attr => '+', text => '#text';
+        my $xmldoc = hash2html $hash, doc => 1, attr => '+';
+
+        # Usage with XML::LibXML
+
+        my $doc = XML::LibXML->new->parse_string($xml);
+        my $xp  = XML::LibXML::XPathContext->new($doc);
+        $xp->registerNs('rss', 'http://purl.org/rss/1.0/');
+
+        # then process xpath
+        for ($xp->findnodes('//rss:item')) {
+        # and convert to hash concrete nodes
+        my $item = xml2hash($_);
+        print Dumper+$item
+        }
+
+DESCRIPTION
+    This module is a companion for "XML::LibXML". It operates with LibXML
+    objects, could return or accept LibXML objects, and may be used for easy
+    data transformations
+
+    It is faster in parsing then XML::Simple, XML::Hash, XML::Twig and of
+    course much slower than XML::Bare ;)
+
+    It is faster in composing than XML::Hash, but slower than XML::Simple
+
+    Parse benchmark:
+
+               Rate   Simple     Hash     Twig Hash::LX     Bare
+        Simple   11.3/s       --      -2%     -16%     -44%     -97%
+        Hash     11.6/s       2%       --     -14%     -43%     -97%
+        Twig     13.5/s      19%      16%       --     -34%     -96%
+        Hash::LX 20.3/s      79%      75%      51%       --     -95%
+        Bare      370/s    3162%    3088%    2650%    1721%       --
+
+    Compose benchmark:
+
+               Rate     Hash Hash::LX   Simple
+        Hash     49.2/s       --     -18%     -40%
+        Hash::LX 60.1/s      22%       --     -26%
+        Simple   81.5/s      66%      36%       --
+
+    Benchmark was done on <http://search.cpan.org/uploads.rdf>
+
+EXPORT
+    "xml2hash" and "hash2xml" are exported by default
+
+  :inject
+    Inject toHash method in the namespace of XML::LibXML::Node and allow to
+    call it on any subclass of XML::LibXML::Node directly
+
+    By default is disabled
+
+        use XML::Hash::LX ':inject';
+
+        my $doc = XML::LibXML->new->parse_string($xml);
+        my $hash = $doc->toHash(%opts);
+
+FUNCTIONS
+  xml2hash $xml, [ OPTIONS ]
+    XML could be XML::LibXML::Document, XML::LibXML::DocumentPart or string
+
+  hash2xml $hash, [ doc => 1, ] [ OPTIONS ]
+    Id "doc" option is true, then returned value is XML::LibXML::Document,
+    not string
+
+OPTIONS
+    Every option could be passed as arguments to function or set as global
+    variable in "XML::Hash::LX" namespace
+
+  %XML::Hash::LX::X2H
+    Options respecting convertations from xml to hash
+
+    order [ = 0 ]
+        Strictly keep the output order. When enabled, structures become more
+        complex, but xml could be completely reverted
+
+    attr [ = '-' ]
+        Attribute prefix
+
+            <node attr="test" />  =>  { node => { -attr => "test" } }
+
+    text [ = '#text' ]
+        Key name for storing text
+
+            <node>text<sub /></node>  =>  { node => { sub => '', '#text' => "test" } }
+
+    join [ = '' ]
+        Join separator for text nodes, splitted by subnodes
+
+        Ignored when "order" in effect
+
+            # default:
+            xml2hash( '<item>Test1<sub />Test2</item>' )
+            : { item => { sub => '', '~' => 'Test1Test2' } };
+
+            # global
+            $XML::Hash::LX::X2H{join} = '+';
+            xml2hash( '<item>Test1<sub />Test2</item>' )
+            : { item => { sub => '', '~' => 'Test1+Test2' } };
+
+            # argument
+            xml2hash( '<item>Test1<sub />Test2</item>', join => '+' )
+            : { item => { sub => '', '~' => 'Test1+Test2' } };
+
+    trim [ = 1 ]
+        Trim leading and trailing whitespace from text nodes
+
+    cdata [ = undef ]
+        When defined, CDATA sections will be stored under this key
+
+            # cdata = undef
+            <node><![CDATA[ test ]]></node>  =>  { node => 'test' }
+
+            # cdata = '#'
+            <node><![CDATA[ test ]]></node>  =>  { node => { '#' => 'test' } }
+
+    comm [ = undef ]
+        When defined, comments sections will be stored under this key
+
+        When undef, comments will be ignored
+
+            # comm = undef
+            <node><!-- comm --><sub/></node>  =>  { node => { sub => '' } }
+
+            # comm = '/'
+            <node><!-- comm --><sub/></node>  =>  { node => { sub => '', '/' => 'comm' } }
+
+  $XML::Hash::LX::X2A [ = 0 ]
+    Global array casing
+
+    Ignored when "X2H{order}" in effect
+
+    As option should be passed as
+
+        xml2hash $xml, array => 1;
+
+    Effect:
+
+        # $X2A = 0
+        <node><sub/></node>  =>  { node => { sub => '' } }
+
+        # $X2A = 1
+        <node><sub/></node>  =>  { node => [ { sub => [ '' ] } ] }
+
+  %XML::Hash::LX::X2A
+    By element array casing
+
+    Ignored when "X2H{order}" in effect
+
+    As option should be passed as
+
+        xml2hash $xml, array => [ nodes list ];
+
+    Effect:
+
+        # %X2A = ()
+        <node><sub/></node>  =>  { node => { sub => '' } }
+
+        # %X2A = ( sub => 1 )
+        <node><sub/></node>  =>  { node => { sub => [ '' ] } }
+
+  %XML::Hash::LX::H2X
+    Options respecting convertations from hash to xml
+
+    encoding [ = 'utf-8' ]
+        XML output encoding
+
+    attr [ = '-' ]
+        Attribute prefix
+
+            { node => { -attr => "test", sub => 'test' } }
+            <node attr="test"><sub>test</sub></node>
+
+    text [ = '#text' ]
+        Key name for storing text
+
+            { node => { sub => '', '#text' => "test" } }
+            <node>text<sub /></node>
+            # or 
+            <node><sub />text</node>
+            # order of keys is not predictable
+
+    trim [ = 1 ]
+        Trim leading and trailing whitespace from text nodes
+
+            # trim = 1
+            { node => { sub => [ '    ', 'test' ], '#text' => "test" } }
+            <node>test<sub>test</sub></node>
+
+            # trim = 0
+            { node => { sub => [ '    ', 'test' ], '#text' => "test" } }
+            <node>test<sub>    test</sub></node>
+
+    cdata [ = undef ]
+        When defined, such key elements will be saved as CDATA sections
+
+            # cdata = undef
+            { node => { '#' => 'test' } } => <node><#>test</#></node> # it's bad ;)
+
+            # cdata = '#'
+            { node => { '#' => 'test' } } => <node><![CDATA[test]]></node>
+
+    comm [ = undef ]
+        When defined, such key elements will be saved as comment sections
+
+            # comm = undef
+            { node => { '/' => 'test' } } => <node></>test<//></node> # it's very bad! ;)
+
+            # comm = '/'
+            { node => { '/' => 'test' } } => <node><!-- test --></node>
+
+BUGS
+    None known
+
+SEE ALSO
+    *   XML::Parser::Style::EasyTree
+
+        With default settings should produce the same output as this module.
+        Settings are similar by effect
+
+AUTHOR
+    Mons Anderson, "<mons at cpan.org>"
+
+COPYRIGHT & LICENSE
+    Copyright 2009 Mons Anderson, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

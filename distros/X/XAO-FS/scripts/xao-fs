@@ -1,0 +1,126 @@
+#!/usr/bin/perl -w
+###############################################################################
+
+=head1 NAME
+
+xao-fs - XAO::FS database tool
+
+=head1 SYNOPSIS
+
+xao-fs --dsn=OS:MySQL_DBI:testdb [options] command [arguments]
+
+ Options:
+
+   --dsn        - OS DSN string
+   -s
+
+   --user       - database user name (optional)
+   -u
+
+   --password   - database user password (optional)
+   -p
+
+   --help       - show more details
+
+ Commands:
+
+   drop URI ... - cleans content of the given URI
+
+   init         - completely destroys current content and
+                  create empty database.
+
+=head1 DESCRIPTION
+
+Commands are:
+
+=over
+
+=item drop URI URI ...
+
+Recursively drops content of the given URIs. B<Be careful> - you can
+irrevocably drop huge lists instantly without any questions asked.
+
+Example:
+
+ xao-fs --dsn=DBI:mysql:testdb -u user -p pass drop /People/jsilver
+
+=item init
+
+Completely destroys entire content of the given database and initializes
+minimal database in its place. B<Use with extreme care!>
+
+Example:
+
+ xao-fs --dsn=DBI:mysql:testdb -u user -p pass init
+
+=head1 AUTHOR
+
+Copyright (c) 2001 XAO Inc.
+
+Andrew Maltsev <am@xao.com>
+
+=cut
+
+###############################################################################
+use strict;
+use Getopt::Long;
+use Pod::Usage;
+use XAO::Objects;
+
+my $dbuser;
+my $dbpasswd;
+my $dbdsn;
+Getopt::Long::Configure('bundling');
+GetOptions('user|u=s'               => \$dbuser,
+           'password|passwd|p=s'    => \$dbpasswd,
+           'dsn|s=s'                => \$dbdsn,
+           'help|h|?'               => sub { pod2usage(-verbose => 1); },
+           'usage'                  => sub { pod2usage(-verbose => 0); },
+          ) || pod2usage();
+
+$dbdsn || pod2usage("No --dsn given!\n");
+
+my $cmd=lc(shift(@ARGV)) || pod2usage("No command given!\n");
+
+if($cmd eq 'drop') {
+    my $odb=XAO::Objects->new(objname => 'FS::Glue',
+                              dsn => $dbdsn,
+                              user => $dbuser,
+                              password => $dbpasswd);
+    $odb || die "Can't connect to the database\n";
+
+    foreach my $uri (@ARGV) {
+        my $element=$odb->fetch($uri);
+        if(ref($element)) {
+            my $container=$element->container_object;
+            my $key=$element->container_key;
+            if($container) {
+                $container->delete($key);
+            }
+            else {
+                $element->destroy();
+            }
+        }
+        else {
+            my @path=split(/\/+/,$uri);
+            my $key=pop(@path);
+            my $path='/' . join('/',@path);
+            my $element=$odb->fetch($path);
+            $element->delete($key);
+        }
+    }
+}
+
+elsif($cmd eq 'init') {
+    my $odb=XAO::Objects->new(objname => 'FS::Glue',
+                              dsn => $dbdsn,
+                              user => $dbuser,
+                              password => $dbpasswd,
+                              empty_database => 'confirm');
+}
+
+else {
+    pod2usage("Unknown command: $cmd\n");
+}
+
+exit(0);

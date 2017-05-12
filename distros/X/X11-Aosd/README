@@ -1,0 +1,33 @@
+X11::Aosd
+=========
+
+This Perl extensions binds the aosd library, which can be found here:
+
+  http://www.atheme.org/projects/libaosd.shtml
+
+With this module you are able to program Cairo powered on screen
+display graphics in Perl.
+
+For details refer to the X11::Aosd pod documentation or point your
+browser to
+
+  http://www.exit1.org/X11-Aosd/
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 by Joern Reder
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+

@@ -1,0 +1,33 @@
+# Copyright 2010, 2011, 2012, 2013, 2014, 2016 Kevin Ryde
+#
+# This file is part of X11-Protocol-Other.
+#
+# X11-Protocol-Other is free software; you can redistribute it
+# and/or modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 3, or
+# (at your option) any later version.
+#
+# X11-Protocol-Other is distributed in the hope that it will be
+# useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+# of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with X11-Protocol-Other.  If not, see <http://www.gnu.org/licenses/>.
+
+Source: libx11-protocol-other-perl
+Section: perl
+Priority: optional
+Build-Depends: libtest-perl | perl (>= 5.004.05), cdbs, debhelper (>= 5)
+Maintainer: Kevin Ryde <user42_kevin@yahoo.com.au>
+Standards-Version: 3.9.8
+Homepage: http://user42.tuxfamily.org/x11-protocol-other/index.html
+Bugs: mailto:user42_kevin@yahoo.com.au
+
+Package: libx11-protocol-other-perl
+Architecture: all
+Depends: perl (>= 5.004), libx11-protocol-perl, ${perl:Depends}, ${misc:Depends}
+Description: Various helpers for X11::Protocol
+ Helper functions and modules for X11::Protocol,
+  * "Other" - miscellaneous functions
+  * "GrabServer" - oop/block scoped server grab

@@ -1,0 +1,34 @@
+Revision history for Perl extension XML::RSS::Timing
+                                        Time-stamp: "2004-05-19 12:49:38 ADT"
+
+
+2004-05-19  Sean M. Burke  sburke@cpan.org
+	* Release 1.07
+	* Minor bugfix version: I was missing a min_age alias to the
+	minAge method.
+	
+2004-01-25  Sean M. Burke  sburke@cpan.org
+	* Release 1.06
+	* In the previous release, 090_date_conv.t spuriously threw some
+	errors under MacOS and other systems whose epoch doesn't start at
+	1970-01-01T00:00.  Fixed.
+	
+2004-01-24  Sean M. Burke  sburke@cpan.org
+        * Release 1.05
+        * No real changes over 1.04, just fixing broken ChangeLog, and
+	adding a note to README and Timing.pm docs saying that we don't
+	depend on XML::RSS.
+	
+2004-01-24  Sean M. Burke  sburke@cpan.org
+        * Release 1.04
+        * Added fuller date-format support for updateBase
+
+2004-01-24  Sean M. Burke  sburke@cpan.org
+        * Release 1.02
+        * Prerelease version
+        * Added maxAge
+
+2004-01-15  Sean M. Burke  sburke@cpan.org
+	* Release 1.01
+	* Prerelease version
+

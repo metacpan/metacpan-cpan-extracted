@@ -1,0 +1,55 @@
+NAME
+    Xymon::Client - Interface to xymon/hobbit client.
+
+SYNOPSIS
+      use Xymon::Client;
+      my $xymon = Xymon::Client("/home/hobbit/client/");
+      
+  $xymon->send({
+            server => 'servername',
+            testname => 'test',
+            color => 'red',
+            msg => 'test failed',
+            
+  })
+
+DESCRIPTION
+    Provides an object interface to the xymon/hobbit client.
+
+METHODS
+  Xymon::Client->new($home)
+    Create a new Xymon Client object, passing it the xymon/hobbit home dir.
+    This is usually /home/hobbit/client.
+
+  send({...})
+    Sends a status message to the hobbit server. The following parameters
+    should be passed:
+
+    server: the server name that was tested testname: the name of the test
+    (ie the column on the xymon page) color: the status color msg: the
+    message to send which may be multiline and include any name-colon-value
+    parameters.
+
+    ie
+
+    $xymon->send({ server => 'servername', testname => 'test', color =>
+    'red', msg => 'test failed',
+
+      })
+
+AUTHOR
+        David Peters
+        CPAN ID: DAVIDP
+        davidp@electronf.com
+        http://www.electronf.com
+
+COPYRIGHT
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+
+SEE ALSO
+    perl(1), bb(1)
+

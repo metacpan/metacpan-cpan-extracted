@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="foo.xsl" ?>
+
+<sprockets>
+    <doodads>
+        <thingy ID="0" name="foo"/>
+        <thingy ID="1" name="bar"/>
+    </doodads>
+</sprockets>

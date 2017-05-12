@@ -1,0 +1,15 @@
+<RDF:RDF>
+<RelatedLinks>
+<aboutPage href="http://www.perl.com:80/"/>
+<child href="http://arpp.carleton.ca/cgi/framework" name="Grant's CGI Framework"/>
+<child href="http://hoohoo.ncsa.uiuc.edu/cgi" name="The Common Gateway Interface"/>
+<child href="http://www.perl.org/" name="Welcome to The Perl Institute"/>
+<child href="http://www.oac.uci.edu/indiv/ehood/perlWWW" name="perlWWW"/>
+<child href="http://www.ics.uci.edu/pub/websoft/libwww-perl" name="libwww-perl: WWW Protocol Library for Perl"/>
+<child href="http://mox.perl.com/index.html" name="Tom Christiansen's Mox.Perl.COM Home Page"/>
+<child href="http://lightsphere.com/dev/class" name="CGI Programming Class"/>
+<child href="http://wuarchive.wustl.edu/languages/ada/swcomps/cgi/cgi.html" name="Ada 95 Binding to CGI"/>
+<child href="http://hoohoo.ncsa.uiuc.edu/cgi/overview.html" name="The Common Gateway Interface"/>
+<child href="http://www.hut.fi/%7Ejhi" name="Jarkko Hietaniemi"/>
+</RelatedLinks>
+</RDF:RDF>

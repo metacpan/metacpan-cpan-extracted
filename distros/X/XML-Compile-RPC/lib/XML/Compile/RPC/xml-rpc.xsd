@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  elementsFormDefault="unqualified"
+  attributesFormDefault="unqualified"
+>
+
+<!-- The schema below was mainly written by Elliotte Rusty Harold
+     http://www.cafeconleche.org/books/xmljava/chapters/ch02s05.html
+
+     Changes were made by Mark Overmeer for XML::Compile::RPC.
+     Tricks are needed to map dateTime.iso8601 on schema dateTime,
+     which is only a subset of the former.
+  -->
+
+<!-- The only two possible root elements are methodResponse and
+     methodCall so these are the only two I use a top-level
+     declaration for.
+  --> 
+
+<xsd:element name="methodCall">
+  <xsd:complexType>
+    <xsd:all>
+      <xsd:element name="methodName" type="methodNameType" />
+      <xsd:element name="params" type="CallParamsType" minOccurs="0" />
+    </xsd:all>
+  </xsd:complexType>  
+</xsd:element>
+
+<xsd:element name="methodResponse">
+  <xsd:complexType>
+    <xsd:choice>
+      <xsd:element name="params" type="ResponseParamsType" />
+      <xsd:element name="fault"  type="ResponseFaultType"  />
+    </xsd:choice>
+  </xsd:complexType>  
+</xsd:element>
+
+<xsd:complexType name="ParamType">
+  <xsd:sequence>
+    <xsd:element name="value" type="ValueType"/>
+  </xsd:sequence>
+</xsd:complexType>
+
+<!-- "mixed" is not correct: either string or element. How to express that? -->
+<xsd:complexType name="ValueType" mixed="true">
+  <xsd:choice>
+    <xsd:element name="array"         type="ArrayType"/>
+    <xsd:element name="base64"        type="xsd:base64Binary"/>
+    <xsd:element name="boolean"       type="NumericBoolean"/>
+    <xsd:element name="dateTime.iso8601" type="ISO8601" />
+    <xsd:element name="double"        type="xsd:decimal"/>
+    <xsd:element name="i4"            type="LimitedIntType"/>
+    <xsd:element name="int"           type="LimitedIntType"/>
+    <xsd:element name="nil"           type="NilType"/>
+    <xsd:element name="string"        type="xsd:string"/>
+    <xsd:element name="struct"        type="StructType"/>
+  </xsd:choice>
+</xsd:complexType>
+
+<xsd:simpleType name="LimitedIntType">
+  <xsd:restriction base="xsd:int">
+    <xsd:minInclusive value="-2147483648" />
+    <xsd:maxInclusive value="2147483647" />
+  </xsd:restriction>
+</xsd:simpleType>
+
+<xsd:complexType name="StructType">
+  <xsd:sequence>
+    <xsd:element name="member" type="MemberType"
+       minOccurs="0" maxOccurs="unbounded"/>
+  </xsd:sequence>
+</xsd:complexType>
+
+<xsd:complexType name="MemberType">
+  <xsd:sequence>
+    <xsd:element name="name"  type="xsd:string" />
+    <xsd:element name="value" type="ValueType"  />
+  </xsd:sequence>
+</xsd:complexType>
+
+<xsd:complexType name="ArrayType">
+  <xsd:sequence>
+    <xsd:element name="data">
+      <xsd:complexType>
+        <xsd:sequence>
+          <xsd:element name="value" type="ValueType" 
+             minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:sequence>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:sequence>
+</xsd:complexType>
+
+<xsd:complexType name="NilType">
+  <xsd:sequence />
+</xsd:complexType>
+
+<xsd:simpleType name="methodNameType">
+  <xsd:restriction base="ASCIIString">
+    <xsd:pattern value="([A-Za-z0-9]|/|\.|:|_)*" />
+  </xsd:restriction>
+</xsd:simpleType>
+
+<xsd:complexType name="CallParamsType">
+  <xsd:sequence>
+    <xsd:element name="param"  type="ParamType" 
+      minOccurs="0" maxOccurs="unbounded"/>
+  </xsd:sequence>
+</xsd:complexType>
+
+<xsd:complexType name="ResponseParamsType">
+  <xsd:sequence>
+    <xsd:element name="param" type="ParamType"/>
+  </xsd:sequence>
+</xsd:complexType>
+
+<xsd:complexType name="ResponseFaultType">
+  <xsd:sequence>
+    <xsd:element name="value" type="FaultStructType" />
+  </xsd:sequence>
+</xsd:complexType>
+
+<xsd:complexType name="FaultStructType">
+  <xsd:sequence>
+    <xsd:element name="struct"> 
+      <xsd:complexType> 
+        <xsd:sequence> 
+          <xsd:element name="member" type="MemberType"
+            minOccurs="2" maxOccurs="2" />
+        </xsd:sequence>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:sequence>
+</xsd:complexType>
+
+<xsd:simpleType name="ASCIIString">
+  <xsd:restriction base="xsd:string">
+    <xsd:pattern value="([ -~]|\n|\r|\t)*" />
+  </xsd:restriction>
+</xsd:simpleType>
+
+<xsd:simpleType name="NumericBoolean">
+  <xsd:restriction base="xsd:boolean">
+    <xsd:pattern value="0|1" />
+  </xsd:restriction>
+</xsd:simpleType>
+
+<!-- xsd:dateTime is a sub-set of ISO8601, rewrite needed -->
+<xsd:simpleType name="ISO8601">
+  <xsd:restriction base="xsd:dateTime"/>
+</xsd:simpleType>
+
+</xsd:schema>
+

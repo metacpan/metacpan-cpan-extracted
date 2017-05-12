@@ -1,0 +1,6 @@
+lib/XML/Beautify.pm
+Changes
+MANIFEST
+README
+Makefile.PL
+t/1xml.t

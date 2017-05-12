@@ -1,0 +1,15 @@
+CHANGES
+COPYRIGHT
+MANIFEST
+Makefile.PL
+README
+Wcl-gen
+Wcl-i
+Wcl-i2
+Wcl.pm
+examples/XmContainer
+examples/XmPushButton
+examples/XtAppAddInput
+examples/XtAppAddTimeout
+examples/scm
+examples/xscm

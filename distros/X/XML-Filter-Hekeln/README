@@ -1,0 +1,198 @@
+
+
+
+XML User Contributed                                    XML::Filter::Hekeln(3)
+
+
+NAME
+       XML::Filter::Hekeln - a SAX stream editor
+
+SYNOPSIS
+         use XML::Filter::Hekeln;
+
+         my $hander = new SAXHandler( ... );
+         my $hekeln = new XML::Filter::Hekeln(
+               'Handler' => $handler,
+               'Script'  => $script
+               );
+         my $driver = new SAXDriver( ..., 'Handler' => $hekeln );
+
+
+DESCRIPTION
+       XML::Filter::Hekeln is a sophisticated SAX stream editor.
+
+       Hekeln is a SAX filter. This means that you can use a
+       Hekeln object as a Handler to act on events, and to
+       produce SAX events as a driver for the next handler in the
+       chain. The name Hekeln sounds like the german word for
+       crocheting, whats the best to describe, what Hekeln can do
+       on markup language translation.
+
+       The main design goal was to make it as easy for Perl as
+       possible, while preserving a human readable form for the
+       translation script.
+
+       Hekeln scripts are event based. Hekeln objects stream
+       events to the next in chain. They are therefore useable to
+       handle XML documents larger than physical memory, as they
+       do not need to store the entire document in a DOM or Grove
+       structure. They will also be faster than any XSL in most
+       circumstances.
+
+       To tell you straight, how Hekeln works, I'll start with an
+       example.
+
+       I want to translate XML::Edifact repositories into html.
+       Those repositories start with something like this:
+
+               <repository
+                       agency="UN/ECE/TRADE/WP.4"
+                       code="sdsd"
+                       desc="based on UN/EDIFACT D422.TXT"
+                       name="Service Segment Directory"
+                       version="99A"
+                       >
+
+       Here is a sniplet from test.pl :
+
+               start_element:repository
+               !       $self->handle('start_document',{});
+               <       html    >
+               <       body    >
+               <       h1      >
+                       XML-Edifact Repository
+               </      h1      >
+               <       h2      >
+                       ~name~
+               </      h2      >
+               <       p       >
+                       Agency: ~agency~
+               <       br      >
+                       Code: ~code~
+               <       br      >
+                       Version: ~version~
+               <       br      >
+                       Description: ~desc~
+               </      p       >
+               <       hr      >
+
+               end_element:repository
+               </      body    >
+               </      html    >
+               !       $self->handle('end_document',{});
+
+       This part is handling start_element and end_element
+       events, that have a target called repository. The
+       translation done by Hekeln is done into subroutines that
+       are stored in a hash.
+
+       So anything is possible, if you understand the trick. To
+       understand the trick, uncomment the "'Debug' => 1"
+       parameter of Hekeln invocation in the test.pl script and
+       redirect STDERR to some file.
+
+       This will produce a file starting like :
+
+           $hash->{start_element:repository}=eval "sub {
+               my ($self,$param) = @_;
+               my ($hash) = {};
+               $self->handle('start_document',{});
+               $hash->{Name}="html"; $self->handle("start_element", $hash);
+               $hash->{Name}="body"; $self->handle("start_element", $hash);
+               $hash->{Name}="h1"; $self->handle("start_element", $hash);
+               $hash->{Data}="XML-Edifact Repository"; $self->handle("characters", $hash);
+               $hash->{Name}="h1"; $self->handle("end_element", $hash);
+               $hash->{Name}="h2"; $self->handle("start_element", $hash);
+               $hash->{Data}="$param->{name}"; $self->handle("characters", $hash);
+               $hash->{Name}="h2"; $self->handle("end_element", $hash);
+               $hash->{Name}="p"; $self->handle("start_element", $hash);
+               $hash->{Data}="Agency: $param->{agency}"; $self->handle("characters", $hash);
+               $hash->{Name}="br"; $self->handle("start_element", $hash);
+               $hash->{Data}="Code: $param->{code}"; $self->handle("characters", $hash);
+               $hash->{Name}="br"; $self->handle("start_element", $hash);
+               $hash->{Data}="Version: $param->{version}"; $self->handle("characters", $hash);
+               $hash->{Name}="br"; $self->handle("start_element", $hash);
+               $hash->{Data}="Description: $param->{desc}"; $self->handle("characters", $hash);
+               $hash->{Name}="p"; $self->handle("end_element", $hash);
+               $hash->{Name}="hr"; $self->handle("start_element", $hash);
+               }";
+
+           $hash->{end_element:repository}=eval "sub {
+               my ($self,$param) = @_;
+               my ($hash) = {};
+               $hash->{Name}="body"; $self->handle("end_element", $hash);
+               $hash->{Name}="html"; $self->handle("end_element", $hash);
+               $self->handle('end_document',{});
+               }";
+
+       As you can imagine ~foobaa~ parts within a script will
+       become expanded with the the attributes given in the XML
+       start_element event. Syntax itself is a bit tricky as
+       translation of the script into a sub is stupid and fast.
+
+       Any event that has to be handled by Hekeln starts with an
+       event_name event_target pair and ends with a blank line.
+
+               event_name<DOUBLE_COLON>event_target<NL>
+               left_indicator<TAB>text<TAB>right_indicator<NL>
+               left_indicator<TAB>text<TAB>right_indicator<NL>
+               left_indicator<TAB>text<TAB>right_indicator<NL>
+               <NL>
+
+       Valid as left_indicator are "<", "</", "", "!", "+", "-",
+       "++, "--", "?{" and "?}", while the right indicator may be
+       optional execpt for "<".
+
+       The first produce start_element, end_element and character
+       events, to make Hekeln scripts look similar to the markup
+       you want to produce.
+
+       The "!" indicator is something special as it will be
+       copied into the sub as it is, to be evaluted in the
+       complete context of a script. So its possible to code
+       conditionals or even loops with a constructions like those
+       :
+
+               !       $self->{Flag}{FooBaa}=1;
+               !       unshift $self->{Stack}, "FooBaa";
+
+       and
+
+               !       $self->{Flag}{FooBaa}=undef;
+               !       shift $self->{Stack} if $self->{Stack}[0] eq "FooBaa";
+
+       and
+
+               !       if ($self->{Flag}{FooBaa}) {
+               <       h1      >
+                       flag FooBaa raised
+               </      h1      >
+               !       }
+
+       It wont be necessary to code exactly this, as this is done
+       by "++", "--", "?{" and "?}". "+" and "-" will raise or
+       lower some flag, while "++" and "--" not only manage the
+       flags, but also a stack that is needed to process
+       character events.
+
+       The default behavior is to throw away any event that does
+       not have a subroutine matching the event, target pair.
+       Events that do not have a target, will use the top flag on
+       the stack as a target. So if you want to process character
+       events, use "++" and "--" when handling the surounding
+       start_element and end_element events.
+
+       As a last word: Hekeln is not yet well tested, and badly
+       needs some better documentation. I would aplaude anybody
+       for naming bug, or improving the POD.
+
+AUTHOR
+       Michael Koehne, Kraehe@Copyleft.de
+
+SEE ALSO
+       perl(1), XML::Parser, XML::Parser::PerlSAX
+
+
+2000-3-2               perl 5.005, patch 63                     4
+
+

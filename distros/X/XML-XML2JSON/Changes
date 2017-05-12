@@ -1,0 +1,32 @@
+Revision history for Perl extension XML::XML2JSON.
+
+0.06  Jan 21, 2012
+    - BUG#66830 - Applied patch from rutgeraldo. This patch fixed problems with xmlns declarations.
+    - BUG#66311 - Values of zero were being converted to empty strings.
+    - BUG#72839 - Can now handle json true/false values.
+
+0.05
+    - Re-factored and improved the efficiency of the sanitize method
+    - BUG#35335 - fixed a problem with auto-loading of JSON modules
+
+0.04  Mar 20, 2008
+    - Added obj2dom and dom2obj methods
+    - When using the JSON module, 
+      the to_json and from_json methods are now used
+    - Fixed a bug where sanitize would not remove
+      private_elements that held its children as an array
+
+0.03  Sep 10, 2007
+	- Makefile.PL now uses Module::Install
+	- Fixed a couple typos in the pod
+
+0.02  Sep 6, 2007
+	- Fixed a bug where a JSON module was not auto-loading correctly
+	- Added the json2xml method
+	- Added an alias method for convert called xml2json
+	- Added support for JSON::DWIW
+	- Added attribute_prefix option
+	- Added content_key option
+
+0.01  Sep 4, 2007
+	- original version

@@ -1,0 +1,58 @@
+=head1 CHANGELOG FOR XML::Assert
+
+=head2 VERSION 0.03, 19 JULY 2010
+
+=over
+
+=item *
+
+Correct update to Perl version dependency
+
+=back
+
+=head2 VERSION 0.02, 12 JULY 2010
+
+=over
+
+=item *
+
+Update Perl version dependency
+
+=back
+
+=head2 VERSION 0.01, 25 JUNE 2010
+
+=over
+
+=item *
+
+Initial version
+
+=over
+
+=item *
+
+Added assert_xpath_count, is_xpath_count
+
+=item *
+
+Added assert_xpath_value_match, does_xpath_value_match
+
+=item *
+
+Added assert_xpath_values_match, do_xpath_values_match
+
+=item *
+
+Added assert_attr_value_match, does_attr_value_match
+
+=item *
+
+Added assert_attr_values_match, do_attr_values_match
+
+=back
+
+=back
+
+=cut
+

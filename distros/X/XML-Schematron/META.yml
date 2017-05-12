@@ -1,0 +1,27 @@
+--- #YAML:1.0
+name:               XML-Schematron
+version:            1.09
+abstract:           ~
+author:  []
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Check::ISA:           0
+    Moose:                0
+    MooseX::NonMoose:     0
+    MooseX::Traits:       0
+    MooseX::Types::Path::Class:  0
+    XML::Filter::BufferText:  0
+    XML::SAX:             0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

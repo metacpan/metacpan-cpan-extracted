@@ -1,0 +1,15 @@
+<photo align-default="right" img-border-default="2">
+<br clear="all"/>
+
+<table align="%%%align%%%" border="0">
+  <tr><td>
+    <img src="images/%%%file%%%" border="%%%img-border%%%"/>
+  </td></tr>
+  <tr><td>
+    <p align="center">
+      <smalltype>%%%caption%%%</smalltype>
+    </p>
+  </td></tr>
+</table>
+
+</photo>

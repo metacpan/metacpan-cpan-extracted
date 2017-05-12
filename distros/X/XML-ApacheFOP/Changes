@@ -1,0 +1,17 @@
+Revision history for Perl module XML::ApacheFOP.
+
+0.03  Wed Nov 16 2005
+	- Added reset_image_cache() method which clears the image cache
+	  between fop calls. Thanks again to Ken Neighbors.
+
+0.02  Thu Oct 13 2005
+        - Added "-c" option to support reading in a configuration file.
+          Thanks go to Ken Neighbors for submitting a patch
+          that added this functionality.
+        - Updated the cleaning up of error messages from Java.pm.
+        - The default for the event port is now -1 (off)
+          This is a more reasonable default since this module doesn't
+          do any GUI work.
+
+0.01  Wed Jun  1 09:39:38 2005
+	- original version

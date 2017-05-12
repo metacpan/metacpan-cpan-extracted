@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<collection>
+    <head />
+    <list>
+        <fortune id="the-american-lottery">
+            <meta>
+                <title>The American Lottery</title>
+            </meta>
+            <quote>
+                <body>
+                    <p>The American <b>Lottery</b>.</p>
+<ul>
+<li>It's best <b>served</b> cold.</li>
+<li>It's so good.</li>
+<li>It's a mess.</li>
+</ul>
+<p>Bork, bork, bork!</p>
+<ol>
+<li>One</li>
+<li>II</li>
+<li>33.333</li>
+</ol>
+                </body>
+            <info>
+                <author>Nobody</author>
+                <work>Nothing</work>
+                <!-- TODO: Add copyrights, licence, year, etc. -->
+            </info>
+            </quote>
+        </fortune>
+    </list>
+</collection>

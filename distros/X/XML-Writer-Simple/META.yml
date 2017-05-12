@@ -1,0 +1,25 @@
+---
+abstract: 'Create XML files easily!'
+author:
+  - 'Alberto Simões <ambs@cpan.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: XML-Writer-Simple
+requires:
+  Exporter: '0'
+  XML::DT: '0'
+  XML::DTDParser: '0'
+  strict: '0'
+  vars: '0'
+  warnings: '0'
+resources:
+  repository: https://natura.di.uminho.pt/svn/main/xml/XML-Writer-Simple
+version: '0.12'

@@ -1,0 +1,24 @@
+version 0.002; 2011-10-27
+
+  * bugfix: require bugfixed version of XML::Easy::NodeBasics (for lack
+    of memory leak)
+
+  * check for required Perl version at runtime
+
+  * include META.json in distribution
+
+  * remove stray "=head1" from README
+
+  * convert .cvsignore to .gitignore
+
+  * add MYMETA.json and MYMETA.yml to .gitignore
+
+version 0.001; 2010-08-02
+
+  * bugfix: set $VERSION in module
+
+  * test xml_{s,c}_canonise_chars
+
+version 0.000; 2010-08-02
+
+  * initial released version

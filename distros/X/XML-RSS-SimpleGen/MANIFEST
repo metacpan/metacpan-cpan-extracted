@@ -1,0 +1,15 @@
+ChangeLog
+lib/XML/RSS/SimpleGen.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+t/00_about.t
+t/05_xmltext.t
+t/10_html2xmltext.t
+t/20_http.t
+t/30_simple_xml.t
+t/40_item.t
+t/50_history.t
+t/80_basedate.t
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,12 @@
+Revision history for Perl extension XML::RSS::TimingBotDBI
+                                        Time-stamp: "2004-04-24 00:34:51 ADT"
+
+2004-04-24  Sean M. Burke  sburke@cpan.org
+	* Release 2.01 -- first CPAN release.  Now in its own release, no
+	longer in the same release as XML::RSS::TimingBot.
+
+	Various modifications since 1.01, notably adding suport for the
+	fields for etag storage.
+	
+2004-04-07  Sean M. Burke  sburke@cpan.org
+	* Release 1.01 -- ALPHA

@@ -1,0 +1,4 @@
+To test the example.xml do this:
+1) cat example/example.xml | xmltopdb > PerlDatabase.pdb
+2) install on Palm PerlDB.prc
+3) install on Palm PerlDatabase.pdb

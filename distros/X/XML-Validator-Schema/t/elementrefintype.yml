@@ -1,0 +1,37 @@
+--- |
+    <?xml version="1.0" encoding="UTF-8"?>
+    <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" version="1.0">
+       <xsd:element name="WIP">
+          <xsd:complexType mixed="false">
+             <xsd:sequence>
+                <xsd:element name="websiteID" type="IntOrParam" minOccurs="1" maxOccurs="1" />
+             </xsd:sequence>
+          </xsd:complexType>
+       </xsd:element>
+       <xsd:complexType name="IntOrParam">
+          <xsd:sequence minOccurs="1" maxOccurs="1">
+             <xsd:element ref="param" minOccurs="1" maxOccurs="1"/>
+          </xsd:sequence>
+       </xsd:complexType>
+       <xsd:element name="param">
+          <xsd:complexType mixed="false">
+             <xsd:attribute name="name" type="xsd:string" use="required" />
+          </xsd:complexType>
+       </xsd:element>
+       <xsd:element name="text" type="xsd:string" />
+    </xsd:schema>
+
+--- |
+  <foo />
+--- >
+FAIL
+
+--- |
+  <WIP>
+    <websiteID>
+      <param name="websiteID" />
+    </websiteID>
+  </WIP>
+--- >
+PASS
+

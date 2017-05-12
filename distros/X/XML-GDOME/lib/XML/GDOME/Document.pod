@@ -1,0 +1,219 @@
+=head1 NAME
+
+  XML::GDOME::Document - Interface Document implementation.
+
+=head1 SYNOPSIS
+
+  $docType  = $doc->getDoctype();
+  $elem     = $doc->getDocumentElement();
+  $DOMImpl  = $doc->getImplementation();
+  $attr     = $doc->createAttribute($name);
+  $attr     = $doc->createAttributeNS($namespaceURI,$qualifiedName);
+  $cdata    = $doc->createCDATASection($data);
+  $comment  = $doc->createComment($data);
+  $docFrag  = $doc->createDocumentFragment();
+  $elem     = $doc->createElement($tagName);
+  $elem     = $doc->createElementNS($namespaceURI,$qualifiedName);
+  $entRef   = $doc->createEntityReference($name);
+  $pi       = $doc->createProcessingInstruction($target,$data);
+  $text     = $doc->createTextNode($data);
+  $elem     = $doc->getElementById($elementId);
+  $nodeList = $doc->getElementsByTagName($tagname);
+  $nodeList = $doc->getElementsByTagNameNS($namespaceURI,$localName);
+  $node     = $doc->importNode($importedNode,$deep);
+  $str      = $doc->toString($mode);
+  $str      = $doc->toStringEnc($encoding,$mode);
+
+=head1 CLASS INHERITANCE
+
+L<XML::GDOME::Node> > XML::GDOME::Document
+
+
+=head1 METHODS
+
+=over 4
+
+
+=item $docType = $doc->getDoctype();
+
+
+
+I<Returns>: The Document Type Declaration associated with this document. The DOM Level 2 does not support editing the Document Type Declaration. docType cannot be altered in any way, including through the use of methods inherited from the Node interface, such as insertNode or removeNode.
+
+
+=item $elem = $doc->getDocumentElement();
+
+
+
+I<Returns>: the root Element of the Document.
+
+
+=item $DOMImpl = $doc->getImplementation();
+
+
+
+I<Returns>: the DOMImplementation object that handles this document.
+
+
+=item $attr = $doc->createAttribute($name);
+
+Creates an Attr of the given I<name>. Note that the Attr instance can then be set on an Element using the setAttributeNode method. To create an attribute with a qualified name and namespace URI, use the gdome_doc_createAttributeNS() method.
+
+I<C<name>>: The name of the attribute
+
+I<Returns>: a new Attr object with the nodeName attribute set to I<name>, and localName, prefix, and namespaceURI set to undef. The value of the attribute is the empty string.
+
+
+=item $attr = $doc->createAttributeNS($namespaceURI,$qualifiedName);
+
+Creates an attribute of the given qualified name and namespace URI.
+
+I<C<namespaceURI>>: The namespace URI of the attribute to create
+
+I<C<qualifiedName>>: The qualified name of the attribute to create
+
+I<Returns>: a new Attr object with the following attributes: %Node.nodeName = I<qualifiedName>, %Node.namespaceURI = I<namespaceURI>, %Node.prefix = prefix, extracted from I<qualifiedName>, %Node.localName = localName, extracted from I<qualifiedName>, %Attr.name = I<qualifiedName>, %Node.nodeValue = the empty string.
+
+C<GDOME_NAMESPACE_ERR>: Raised if the I<qualifiedName> is malformed, if the I<qualifiedName> has a prefix and the I<namespaceURI> is %NUKK, if the I<qualifiedName> has a prefix that is "xml" and the I<namespaceURI> is different from "http://www.w3.org/XML/1998/namespace", or if the I<qualifiedName> is "xmlns" and the I<namespaceURI> is different from "http://www.w3.org/2000/xmlns/".
+
+
+=item $cdata = $doc->createCDATASection($data);
+
+Creates a CDATASection node whose value is the specified string.
+
+I<C<data>>: The data for the CDATASection contents
+
+I<Returns>: the new CDATASection object.
+
+
+=item $comment = $doc->createComment($data);
+
+Creates a Comment node whose value is the specified string.
+
+I<C<data>>: The data for the comment contents
+
+I<Returns>: the new Comment object.
+
+
+=item $docFrag = $doc->createDocumentFragment();
+
+Creates an empty DocumentFragment object. 
+
+I<Returns>: the new DocumentFragment object.
+
+
+=item $elem = $doc->createElement($tagName);
+
+Creates an element of the type specified. Note that the instance returned implements the Element interface, so attributes can be specified directly on the returned object. To create an element with a qualified name and namespace URI, use the gdome_doc_createElementNS() function.
+
+I<C<tagName>>: The name of the element type to instantiate.
+
+I<Returns>: a new Element object with the nodeName attribute set to tagName, and localName, prefix, and namespaceURI set to undef.
+
+
+=item $elem = $doc->createElementNS($namespaceURI,$qualifiedName);
+
+Creates an element of the given qualified name and namespace URI.
+
+I<C<namespaceURI>>: The namespace URI of the element to create
+
+I<C<qualifiedName>>: The qualified name of the element to create
+
+I<Returns>: a new Element object with the following attributes: %Node.nodeName = I<qualifiedName>, %Node.namespaceURI = I<namespaceURI>, %Node.prefix = prefix, extracted from I<qualifiedName>, %Node.localName = localName, extracted from I<qualifiedName>, %Element.tagName = I<qualifiedName>.
+
+C<GDOME_NAMESPACE_ERR>: Raised if the I<qualifiedName> is malformed, if the I<qualifiedName> has a prefix and the I<namespaceURI> is undef, or if the I<qualifiedName> has a prefix that is "xml" and the I<namespaceURI> is different from "http://www.w3.org/XML/1998/namespace".
+
+
+=item $entRef = $doc->createEntityReference($name);
+
+Creates an EntityReference object. In addition, if the referenced entity is known, the child list of the EntityReference node is made the same as that of the corresponding Entity node.
+
+I<C<name>>: The name of the entity to reference
+
+I<Returns>: the new EntityReference object.
+
+
+=item $pi = $doc->createProcessingInstruction($target,$data);
+
+Creates a ProcessingInstruction node given the specified name and data strings.
+
+I<C<target>>: The target part of the processing instruction
+
+I<C<data>>: The data for the node
+
+I<Returns>: The new ProcessingInstruction object.
+
+
+=item $text = $doc->createTextNode($data);
+
+Creates a Text node given the specified string.
+
+I<C<data>>: The data for the node
+
+I<Returns>: The new TextNode object.
+
+
+=item $elem = $doc->getElementById($elementId);
+
+
+
+I<C<elementId>>: The unique id value for an element
+
+I<Returns>: the Element whose %ID is given by I<elementId>. If no such element exists, returns undef. Behavior is not defined if more than one element has this %ID.
+
+
+=item $nodeList = $doc->getElementsByTagName($tagname);
+
+
+
+I<C<tagName>>: The name of the tag to match on. The special value * matches           all tags.
+
+I<Returns>: a NodeList of all the elements with a given tag name in the order in which they are encountered in a preorder traversal of the Document tree.
+
+
+=item $nodeList = $doc->getElementsByTagNameNS($namespaceURI,$localName);
+
+
+
+I<C<namespaceURI>>: The namespace URI of the elements to match on. The special                value * matches all namespaces.
+
+I<C<localName>>: The local name of the elements to match on. The special value             * matches all local names.
+
+I<Returns>: a NodeList of all the descendant elements with a given local name and namespace URI in the order in which they are encountered in a preorder traversal of this Document tree.
+
+
+=item $node = $doc->importNode($importedNode,$deep);
+
+Imports a node from another document to this document. The returned node has no parent; (parentNode is undef). The source node is not altered or removed from the original document; this method creates a new copy of the source node. DOCUMENT, DOCUMENT_TYPE, NOTATION and ENTITY nodes are not supported.
+
+I<C<importedNode>>: The node to import.
+
+I<C<deep>>: If 1, recursively import the subtree under the specified node;        if 0, import only the node itself. This has no effect on Attr,        EntityReference, and Notation nodes.
+
+I<Returns>: the imported node that belongs to this Document.
+
+C<GDOME_NOT_SUPPORTED_ERR>: Raised if the type of node being imported is not supported.
+
+
+=item $str = $doc->toString($mode);
+
+Save the DOM tree of the Document to a string
+
+I<C<mode>>: the indentation mode wanted, either GDOME_SAVE_STANDARD or GDOME_SAVE_LIBXML_INDENT
+
+I<Returns>: string representation of DOM tree
+
+
+=item $str = $doc->toStringEnc($encoding,$mode);
+
+Save the DOM tree of the Document to a string
+
+I<C<mode>>: the indentation mode wanted, either GDOME_SAVE_STANDARD or GDOME_SAVE_LIBXML_INDENT
+
+I<C<encoding>>: character encoding to use when generating XML text
+
+I<Returns>: string representation of DOM tree using the specified character encoding standard
+
+
+=back
+

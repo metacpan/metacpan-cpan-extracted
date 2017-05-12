@@ -1,0 +1,116 @@
+#!/usr/bin/perl
+
+use strict;
+use XML::Filter::Hekeln;
+use XML::Handler::YAWriter;
+use XML::Parser::PerlSAX;
+use IO::File;
+
+my $script_file = new IO::File( $ARGV[0] );
+    die 'usage: hekeln script <xmlinfile >xmloutfile' unless $script_file;
+my $irs = $/;
+    undef $/;
+my $script = <$script_file>;
+    close $script_file;
+   $/ = $irs;
+
+my $xml_file = new IO::File( '>-' );
+my $in_file = new IO::File( '<-' );
+
+my $handler = new XML::Handler::YAWriter(
+	'Output' => $xml_file,
+	'Pretty' => {
+		'CatchEmptyElement' => 1,
+		'AddHiddenAttrTab' => 1,
+		'AddHiddenNewLine' => 1,
+		'NoProlog' => 1,
+		'NoDTD' => 1
+		}
+	);
+
+my $hekeln = new XML::Filter::Hekeln(
+#	'Debug'  => 1,
+	'Handler' => $handler,
+	'Script' => $script
+	);
+
+my $parser = new XML::Parser::PerlSAX( 'Handler' => $hekeln );
+   $parser->parse( 'Source' => { 'ByteStream' => $in_file } );
+
+   $in_file->close();
+   $xml_file->close();
+
+0;
+__END__
+
+=head1 NAME
+
+hekeln - command line interface to the Hekeln SAX stream editor
+
+=head1 SYNOPSIS
+
+  hekeln scriptfile < some.xml > some_processed.xml
+
+=head1 DESCRIPTION
+
+Hekeln is a PerlSAX stream editor. The hekeln script provides
+a shell interface for this tool, that could be used for testing
+hekeln scripts or to embed them into other languages.
+
+=head1 OPTIONS
+
+  Currently no options ;-( 
+
+I think that the set of options used in YAWriter are a good start,
+lets look what we additonal need for processing batches.
+
+=head1 ABUSE
+
+Its possible to "chmod u+x" a Hekeln script, but syntax is a bit
+nasty! Lets look at a template :
+
+	#!/usr/bin/perl /usr/bin/hekeln
+	#	this comment is IMPORTANT
+  <blank-line>
+  	start_element:topmost_element
+	!       $self->handle('start_document',{});
+	<	top_tag	>
+  <blank-line>
+  	start_element:second_element
+	<	second_tag	>
+	++	process_it
+  <blank-line>
+  	start_element:second_element
+	--	process_it
+	</	second_tag	>
+  <blank-line>
+  	start_element:topmost_element
+	</	top_tag	>
+	!       $self->handle('end_document',{});
+  <blank-line>
+  	character:process_it
+		~Data~
+
+This script would search through an xml for the occurance of the
+'topmost_element' to open a new xml output document. Any character
+data in a 'second_element' will be dumped.
+
+How blank lines and tabs are aranged is for importance! In a Hekeln
+script any paragraph that starts with a '#' is ignored, so we need the
+blank line, and therefore at least one comment in any script!
+
+Also paragraphs that do not match the '^[^:]+:[^:]+$' template for the
+first line and any line in an interpreted paragraph that does have a
+valid indicator are silently ignored. Perhaps future version will raise
+warnings and errors.
+
+=head1 AUTHOR
+
+  Michael Koehne, Kraehe@Copyleft.De
+  (c) 2000 GNU General Public License
+
+=head1 SEE ALSO
+
+L<XML::Parser::PerlSAX> and L<XML::Filter::Hekeln>
+
+=cut

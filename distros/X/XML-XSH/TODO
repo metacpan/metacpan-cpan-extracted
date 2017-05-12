@@ -1,0 +1,55 @@
+TODO:
+
+- MORE TESTS: open STRING, stream, and similar
+
+* get rid of the XSH subdirectory in the CVS tree
+* alias 'help commands' for 'help command'?
+* document the installation process for ActiveState perl
+* support DTD modification
+* 'locate' - allow use also nearest id() 
+* xsh-grammar: parse xslt parameters as XPATH instead of XSH expressions ??
+* check the XML::LibXML module for XPath-ruled tree additions
+
+- add different examples for using namespaces:
+
+	1) if the ttt prefix is aready declared in the context of ., you may
+	simply do 
+
+	add element ttt:para into . 
+	and the new element ttt:para will be bound with that namespace so
+	doing
+	xsh> ls //ttt:para
+	xsh> ls//*[local-name()='ttt' and namespace-uri()='http://myuri.com']
+	should both list it.
+
+	xsh> add element "ttt:para" namespace http://myuri.com into 
+	is intended (as you write) for adding a new element together with a
+	xmlns declaration of its prefix and the given namespace.
+
+- namespace-rename-uri uri new-prefix [nodes]
+- namespace-rename-prefix old-prefix new-prefix [nodes]
+- namespace-change-uri old-uri new-uri [nodes]
+
+- rename the command files to documents, make files and docs aliases
+
++ check that cd reports error on trying to enter a non-existing node
+
+
+USER-LEVEL IMPLEMENTABLE
+
+- untag/split element                //(on user-level easy with def)
+- comment-out node (?? uncomment ??) //(on user-level easy with def)
+
+
+IMPLEMENTED BUT SOME MORE REFINEMENT IS NEEDED:
+
+o fold/unfold command (fold/unfold elements for subsequent ls commands)
+
+FINISHED:
+* better support for namespaces (e.g. registering as soon as it's available
+  in XML::LibXML(::XPath?)
+
+* add new command "namespaces": lists all currently in effect or if an
+xpath argument is given, those in effect for the individual nodes
+matched
+

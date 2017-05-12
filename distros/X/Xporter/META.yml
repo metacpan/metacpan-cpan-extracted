@@ -1,0 +1,23 @@
+---
+abstract: 'Alt. exporter w/persistent, dflts & auto ISA'
+author:
+  - 'LA Walsh (LAWALSH@cpan.org)'
+build_requires:
+  ExtUtils::MakeMaker: 6.86
+  Test::Simple: 0.44
+  mem: v0.4.5
+configure_requires:
+  ExtUtils::MakeMaker: 6.86
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.88, CPAN::Meta::Converter version 2.133380'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Xporter
+no_index:
+  directory:
+    - t
+    - inc
+requires: {}
+version: v0.1.2

@@ -1,0 +1,15 @@
+Revision history for XML-RSS-PicLens
+
+0.01    2008-06-26
+        - Initial release.
+
+0.02	2008-06-28
+        - Removed bundled Data::Section; it's now a dependency.
+
+0.03    2010-02-13
+        - Allow (and prefer) 'content' everywhere we used to use 'image'.
+        - Make it possible to set the content_type and thumbnail_type.
+
+
+0.04    2010-02-13
+        - Remember to update Changes.

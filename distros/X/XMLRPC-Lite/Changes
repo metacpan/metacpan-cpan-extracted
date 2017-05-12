@@ -1,0 +1,6 @@
+Revision history for Perl extension Perl-XMLRPC-Lite.
+
+0.01  Thu May 16 18:50:17 2013
+	- original version; created by h2xs 1.23 with options
+		-X perl-XMLRPC-Lite
+

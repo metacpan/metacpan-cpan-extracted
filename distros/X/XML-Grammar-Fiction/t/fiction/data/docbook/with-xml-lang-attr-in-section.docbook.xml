@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<article xmlns="http://docbook.org/ns/docbook" xmlns:fic="http://web-cpan.berlios.de/modules/XML-Grammar-Fortune/fiction-xml-0.2/" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="index" xml:lang="en-US" version="5.0">
+  <info>
+    <title>David vs. Goliath - Part I</title>
+  </info>
+  <section xml:id="top">
+    <info>
+      <title>The Top Section</title>
+    </info>
+    <para>
+    David and Goliath were standing by each other.
+    </para>
+    <para>
+    David said unto Goliath: "I will shoot you. I <emphasis role="bold">swear</emphasis> I will"
+    </para>
+    <section xml:id="goliath">
+      <info>
+        <title>Goliath's Response</title>
+      </info>
+      <para>
+    Goliath was not amused.
+    </para>
+      <para>
+    He said to David: "Oh, really. <emphasis>David</emphasis>, the red-headed!".
+    </para>
+    </section>
+  </section>
+  <section xml:id="french" xml:lang="fr-FR">
+    <info>
+       <title>In French</title>
+    </info>
+    <para>
+    Je ne parle pas Français bien.
+    </para>
+  </section>
+</article>

@@ -1,0 +1,12 @@
+#!/usr/bin/perl
+
+use 5.006;
+use strict;
+use warnings;
+use Xtract ();
+
+our $VERSION = '0.16';
+
+$| = 1;
+
+Xtract::main();

@@ -1,0 +1,104 @@
+<!-- Created by VisualScript V2.0  -->
+
+<!-- http://www.smartdraw.com  -->
+
+	<process name="check stock levels"
+	         targetNamespace="http://samples.VS.com"
+	         suppressJoinFailure="yes"
+	         xmlns:tns="http://samples.VS.com"
+	         xmlns:services="http://services.VS.com"
+	         xmlns:stock="http://stockcheck.org"
+	         xmlns="http://schemas.xmlsoap.org/ws/2003/03/business-process/"
+	         >
+	
+	<!-- This process does a warehouse inventory check -->
+	<!-- Version: 1.00 -->
+	<!-- Date/Time: 2003-11-24T09:53:40Z -->
+	  <partnerLinks>
+		  <partnerLink name="client"
+		             partnerLinkType="tns:StockCheck"
+		             myRole="Manufacturer"
+		             partnerRole="Warehouse"/>
+	  </partnerLinks> 
+	  <variables>
+		<!-- input to this process -->
+		  <variable name="input"
+		    messageType="tns:initiateStockCheckMessage"/>
+		<!-- output to this process -->
+		  <variable name="stockconfirm"
+		    messageType="tns:initiateStockCheckMessage"/>
+		<!-- error message - invalid stock code -->
+		  <variable name="stockNotValidFailure"
+		    messageType="services:onStockErrorExceptionPaymentProcessorServiceMessage"/>
+		<!-- error message - missing stock code, or invalid code format -->
+		  <variable name="noStockCodeFailure"
+		    messageType="services:onStockErrorFoundProcessorServiceMessage"/>
+		<!-- ask for result from query -->
+		  <variable name="request"
+		    messageType="tns:receiveInput"/>
+		<!-- return result from query -->
+		  <variable name="response"
+		    messageType="tns:receiveInput"/>
+		<!-- error message - messaging error -->
+		  <variable name="transferRefusedFailure"
+		    messageType="services:StockCheckProcessorServiceCallback"/>
+	  </variables> 
+	  <sequence>
+		    <scope variableAccessSerializable="no">    
+			 <!-- receive input from a request -->
+			    <receive name="receiveInput" partnerLink="client"
+			             portType="tns:StockCheck"
+			             operation="initiate" variable="variable"
+			             createInstance="yes"/>
+			      <faultHandlers> 
+				      <!-- This situation happens when there is a network error -->
+					   <terminate/>
+			      </faultHandlers> 
+			  <sequence>
+				       <assign>
+				        <copy>
+				            <from variable="iinput" part="parameters"
+				            query="//xmlRequest"/>
+				            <to variable="request" part="parameters"
+				            query="/initiateStockCheckProcessorServiceMessage/xmlRequest"/>
+				        </copy>
+				       </assign>  
+					 <!--  Initiate asynchronous processor web service -->
+					        <invoke name="invokeStockCheckProcessorService" partnerLink="StockCheckProcessorService"
+					            portType="services:StockCheckProcessorService"
+					            operation="initiate" inputVariable="request"/>     
+						      <pick> 
+							      <onMessage partnerLink="StockCheckProcessorService"
+							                    portType="services:StockCheckProcessorServiceCallback"
+							                    operation="onResult" variable="response">  
+								       <assign>
+								        <copy>
+								            <from variable="input" part="parameters"
+								            query="//xmlRequest"/>
+								            <to variable="request" part="parameters"
+								            query="/initiateStockCheckProcessorServiceMessage/xmlRequest"/>
+								        </copy>
+								       </assign>  
+							      </onMessage>
+							      <onMessage partnerLink="StockCheckProcessorService"
+							                    portType="services:StockCheckProcessorServiceCallback"
+							                    operation="onTransferRefusedException" variable="transferRefusedFailure">  
+								   <terminate/>
+							      </onMessage>
+							      <onMessage partnerLink="StockCheckProcessorService"
+							                    portType="services:StockCheckProcessorServiceCallback"
+							                    operation="onNoStockCodeException" variable="noStockCodeFailure">  
+								   <terminate/>
+							      </onMessage>
+							     <onAlarm for="P2D">      
+								   <terminate/>
+							     </onAlarm>      
+						      </pick>
+			  </sequence>
+			 <!--  Initiate asynchronous processor web service -->
+			        <invoke name="replyOutput" partnerLink="client"
+			            portType="tns:StockConfirmCallback"
+			            operation="onResult" inputVariable="stockconfirm"/>     
+		    </scope>
+	  </sequence>
+</process>

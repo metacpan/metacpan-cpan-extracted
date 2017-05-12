@@ -1,0 +1,18 @@
+--- #YAML:1.0
+name:                Xpriori-XMS
+version:             0.03
+abstract:            Perl extension for Xpriori::XMS Database.
+license:             ~
+author:              
+    - KAWAI,Takanori
+generated_by:        ExtUtils::MakeMaker version 6.42_01
+distribution_type:   module
+requires:     
+    Digest::MD5:                   
+    HTTP::Request:                 
+    LWP:                           
+    URI::Escape:                   
+    Win32::Service:                
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

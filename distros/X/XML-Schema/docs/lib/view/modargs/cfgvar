@@ -1,0 +1,18 @@
+[%# <config>$foo</config>	         => #config_foo
+  # <config refid="foo">blah</method>    => #config_foo
+  # <config var="foo">blah</method>      => #config_foo
+  # <config class="Template::Stash">foo()</config>
+  #         => classlink("Template::Stash")#config_foo
+  # <config refid="foo" class="Template::Stash">blah</config>
+  #         => classlink("Template::Stash")#config_foo
+  # <config var="foo" class="Template::Stash">blah</method>
+  #         => classlink("Template::Stash")#config_foo
+-%]
+[%- prefix  = item.class ? classurl(item.class) : '';
+    cfgvar  = item.refid or item.var or item.content(site.view.text);
+    cfgvar  = cfgvar.replace('\(.*\)', '') ;
+    content = BLOCK; item.content(view) | trim; END;
+    UNLESS (item.refid or item.var);
+	content = "<code><b>$content</b></code>";
+    END;
+-%][% <a href="[% prefix %]#config_[% var %]">[% content %]</a> -%]

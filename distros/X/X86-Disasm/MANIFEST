@@ -1,0 +1,19 @@
+Changes
+Disasm.xs
+Makefile.PL
+MANIFEST
+ppport.h
+README
+lib/X86/Disasm.pm
+lib/X86/Disasm/Insn.pm
+lib/X86/Disasm/Op.pm
+lib/X86/Disasm/Reg.pm
+#t/disassemble_forward.t
+t/disassemble_hash.t
+t/disassemble_list.t
+#t/disassemble_range.t
+t/disassemble.t
+t/misc.t
+typemap
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

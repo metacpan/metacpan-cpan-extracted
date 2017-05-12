@@ -1,0 +1,7 @@
+Revision history for XML-Filter-RemoveEmpty
+
+0.01	2006-06-27T13:05-0500
+		First version, released on an unsuspecting world.
+
+0.02	2006-06-28T10:40-0500
+		Fixed tests, because someone actually tried the no-XML::SAX::Machines route.

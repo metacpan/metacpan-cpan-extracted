@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE RTML SYSTEM "http://www.estar.org.uk/documents/rtml2.2.dtd">
+<RTML version="2.2" type="update">
+  <Contact>
+    <Name>Alasdair Allan</Name>
+    <User>Robonet/keith.horne</User>
+    <Institution>University of Exeter</Institution>
+    <Email>aa@astro.ex.ac.uk</Email>
+  </Contact>
+  <Project>Planetsearch1</Project>
+  <Telescope/>
+  <IntelligentAgent host="144.173.229.20" port="2050">000106:UA:v1-15:run#10:user#agent</IntelligentAgent>
+  <Observation>
+    <Target type="normal" ident="ExoPlanetMonitor">
+      <TargetName>OGLE-2005-blg-158</TargetName>
+      <Coordinates>
+        <RightAscension units="hms" format="hh mm ss.ss">18 06 04.24</RightAscension>
+        <Declination units="dms" format="sdd mm ss.ss">-28 30 51.50</Declination>
+        <Equinox>J2000</Equinox>
+      </Coordinates>
+    </Target>
+    <Device type="camera">
+      <Filter>
+        <FilterType>R</FilterType>
+      </Filter>
+    </Device>
+    <Schedule>
+      <Exposure type="time" units="seconds">
+        <Count>2</Count>63.5</Exposure>
+      <TimeConstraint>
+        <StartDateTime>2005-05-12T09:00:00</StartDateTime>        
+        <EndDateTime>2005-05-13T03:00:00</EndDateTime>
+      </TimeConstraint>
+      <SeriesConstraint>
+        <Count>8</Count>        
+        <Interval>PT2700.0S</Interval>
+        <Tolerance>PT1350.0S</Tolerance>
+      </SeriesConstraint>
+    </Schedule>
+    <ImageData type="FITS16" delivery="url" reduced="true">http://150.204.240.8/~estar/data/home/estar/data/c_e_20050511_208_1_1_1.fits</ImageData>  
+</Observation>
+  <Score>0.4530854938271604</Score>  
+<CompletionTime>2005-05-12T15:55:24</CompletionTime>
+</RTML>
+

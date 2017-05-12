@@ -1,0 +1,41 @@
+X86::Disasm::Absolute		T_PTROBJ
+X86::Disasm::Ea			T_PTROBJ
+X86::Disasm::Insn		T_PTROBJ
+X86::Disasm::Invariant		T_PTROBJ
+X86::Disasm::InvariantOp	T_PTROBJ
+X86::Disasm::Oplist		T_PTROBJ
+X86::Disasm::Op			T_PTROBJ
+X86::Disasm::Reg		T_PTROBJ
+X86::Disasm			T_PTROBJ
+
+x86_insn_t *			T_PTROBJ
+x86_invariant_t *		T_PTROBJ
+x86_op_t *			T_PTROBJ
+x86_reg_t *			T_PTROBJ
+
+x86_invariant_op_t		T_PTRREF
+x86_operand_fn			T_PTRREF
+DISASM_CALLBACK			T_PTRREF
+DISASM_RESOLVER			T_PTRREF
+DISASM_REPORTER			T_PTRREF
+
+int32_t				T_IV
+uint32_t			T_IV
+qword_t				T_IV
+qword_t *			T_PV
+
+enum x86_asm_format		T_IV
+enum x86_flag_status		T_IV
+enum x86_op_foreach_type	T_IV
+enum x86_insn_cpu		T_IV
+enum x86_insn_group		T_IV
+enum x86_insn_isa		T_IV
+enum x86_insn_prefix		T_IV
+enum x86_insn_note		T_IV
+enum x86_insn_type		T_IV
+enum x86_op_type		T_IV
+enum x86_op_datatype		T_IV
+enum x86_op_access		T_IV
+enum x86_op_flags		T_IV
+enum x86_reg_type		T_IV
+enum x86_options		T_IV

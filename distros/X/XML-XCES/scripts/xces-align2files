@@ -1,0 +1,56 @@
+#!/usr/bin/perl -w
+
+use warnings;
+use strict;
+
+use XML::XCES;
+use Data::Dumper;
+
+my $filename = shift;
+
+my $tuCount = XML::XCES->align2pair($filename, $filename);
+
+print STDERR "+++ $tuCount Translation Units +++\n";
+
+__END__
+
+=head1 NAME
+
+xces-align2files - Converts a XCES align files in a pair of aligned files
+
+=head1 SYNOPSIS
+
+  xces-align2files file.xml
+
+=head2 DESCRIPTION
+
+
+This command receives an XCES xml filename with sentence alignment
+content. It outputs two files with the aligned content in plain text
+format.
+
+Note that the aligned files paths should be absolute or relative to
+the command issue directory.
+
+=head1 AUTHOR
+
+Alberto Simoes, C<< <ambs@cpan.org> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to
+C<bug-xml-xces@rt.cpan.org>, or through the web interface at
+L<http://rt.cpan.org>.  I will be notified, and then you'll automatically
+be notified of progress on your bug as I make changes.
+
+=head1 ACKNOWLEDGEMENTS
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2004-2005 Alberto Simoes, All Rights Reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut
+

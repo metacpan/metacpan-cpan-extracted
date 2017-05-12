@@ -1,0 +1,19 @@
+ChangeLog
+MANIFEST
+Makefile.PL
+README
+lib/XML/Compile/SOAP/WSA.pm
+lib/XML/Compile/SOAP/WSA.pod
+lib/XML/Compile/WSA.pm
+lib/XML/Compile/WSA/Util.pm
+lib/XML/Compile/WSA/Util.pod
+lib/XML/Compile/WSA/xsd/20060512-wsaw.xsd
+lib/XML/Compile/WSA/xsd/20070131-metadata.xsd
+lib/XML/Compile/WSA/xsd/20070619-wsa09.xsd
+lib/XML/Compile/WSA/xsd/20080723-wsa10.xsd
+t/01use.t
+t/20wsa10.t
+t/30wsdl11.t
+xt/99pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

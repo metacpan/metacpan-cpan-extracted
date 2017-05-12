@@ -1,0 +1,55 @@
+#   $Id: README 103 2014-05-27 14:28:14Z adam $
+
+XML/RSS/Tools version 0.34
+==========================
+
+RSS/RDF feeds are commonly available ways of distributing the latest news
+about a given web site for news syndication. This module provides a VERY
+high level way of manipulating them. You can easily use LWP, the XML::RSS
+and XML::LibXSLT do to this yourself.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Build.PL
+   ./Build
+   ./Build test
+   ./Build install
+
+WARNING: During the install it will try to connect to the Internet to
+test the HTTP toolchain.
+
+DEPENDENCIES
+
+This module requires these other non-core modules for full functionality:
+
+  XML::LibXSLT XML::LibXML
+  XML::RSS
+  URI
+  LWP or HTTP::GHTTP or HTTP::Lite or WWW::Curl::Easy
+
+XML::RSS older versions than version 1.0 have a number of defects and
+limitations, please upgrade if possible.
+
+XML::LibXML and XML::LibXSLT rely on the GNOME libxml2 and libxslt
+libraries which need to be installed before attempting to install the
+Perl modules. XML Catalog support in certain versions of XML::LibXML
+may be broken if you are unable to use Catalogs please let me know so
+that I can better document the module.
+
+Please be aware that the API to the URI module changed, at version 1.32,
+and hence how you use the file scheme changed, see the URI changelog for
+more details.
+
+OLDER VERSIONS
+
+To keep CPAN trim, older versions of this module will be continually
+culled as newer versions are loaded. Older versions are available
+upon request.
+
+COPYRIGHT AND LICENCE
+
+XML::RSS::Tools, Copyright (C) Adam John Trickett 2002-2014
+
+See POD for full details.

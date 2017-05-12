@@ -1,0 +1,161 @@
+#!/usr/bin/perl
+# ============================================================================
+#
+# TITLE:       xas-rotate
+#
+# FACILITY:    XAS
+#
+# ABSTRACT:    This procedure will rotate files based on a configuration
+#              file. Primiarily designed for systems without a log file
+#              rotation utility.
+#
+# ENVIRONMENT: XAS Perl Environment
+#
+# PARAMETERS:
+#              --logfile the log file to use
+#              --cfgfile the configuration file to use
+#              --help    prints out a helpful help message
+#              --manual  prints out the procedures manual
+#              --version prints out the procedures version
+#              --debug   toggles debug output
+#              --alerts  toggles alert notification
+#
+# RETURNS:
+#              0 - success
+#              1 - failure
+#
+# Version      Author                                              Date
+# -------      ----------------------------------------------      -----------
+# 0.01         Kevin Esteb                                         02-Apr-2009
+#
+# 0.02         Kevin Esteb                                         10-Jul-2012
+#              Updated the help/version/manual switches to use
+#              pod for the output text.
+#
+# 0.03         Kevin Esteb                                         08-Aug-2012
+#              Changed over to the new app framework.
+#
+# ============================================================================
+#
+
+use lib "../lib";
+use XAS::Apps::Rotate;
+
+main: {
+
+    my $app = XAS::Apps::Rotate->new(
+        -throws   => 'rotate',
+        -facility => 'systems',
+        -priority => 'low',
+    );
+
+    exit $app->run();
+
+}
+
+__END__
+
+=head1 NAME
+
+xas-rotate - rotate files based on a configuration file
+
+=head1 SYNOPSIS
+
+xas-rotate [--help] [--debug] [--manual] [--version]
+
+ options:
+   --help     outputs simple help text
+   --manual   outputs the procedures manual
+   --version  outputs the apps version
+   --debug    toogles debugging output
+   --alerts   toogles alert notifications
+
+=head1 DESCRIPTION
+
+This procedure is a simple template to help write standardized procedures.
+
+=head1 OPTIONS AND ARGUMENTS
+
+=over 4
+
+=item B<-logfile>
+
+The name of the log file to use. Defaults to stderr.
+
+=item B<-cfgfile>
+
+The configuration file to use. The configuration file has the following
+format:
+
+ [settings]
+ compressor = zip         - default file compressor
+ zip-command              - zip command defaults to 'c:\bin\zip.exe'
+ gzip-command             - gzip command defaults to 'c:\bin\gzip.exe'
+ bzip2-command            - bzip2 command defaults to 'c:\bin\bzip2.exe'
+ compress-command         - compress command defaults to 'c:\bin\compress.exe'
+ tail-command             - tail command defaults to 'c:\bin\tail.exe'
+
+ [log\test.log]           - file to process, may have DOS wildcards
+ compress = true          - wither to compress the file
+ method = move            - how to handle the file
+ missingok = false        - whither a missing file is OK
+ lines-or-files = files   - 
+ create-new = false       - create a new file after rotation
+ modify-age               - process based on last modification
+ create-age               - process based in creation time
+ file-size                - process based on file size
+ ifempty                  - process if file is empty
+ file-count               - number of rotated files kept
+ line-count               - how many line to transfer to new file
+ prolog                   - command to process before rotation
+ epilog                   - command to process after rotation
+ pause                    - number of seconds to pause after prolog and epilog
+
+=item B<--help>
+
+Displays a simple help message.
+
+=item B<--debug>
+
+Turns on debbuging.
+
+=item B<--alerts>
+
+Togggles alert notification.
+
+=item B<--manual>
+
+The complete documentation.
+
+=item B<--version>
+
+Prints out the apps version
+
+=back
+
+=head1 EXIT CODES
+
+ 0 - success
+ 1 - failure
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<XAS::Apps::Rotate>
+
+=back
+
+=head1 AUTHOR
+
+Kevin L. Esteb, E<lt>kevin@kesteb.usE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2014 by Kevin L. Esteb
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

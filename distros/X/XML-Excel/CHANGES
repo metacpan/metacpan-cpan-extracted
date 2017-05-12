@@ -1,0 +1,13 @@
+Revision history for Perl extension XML::Excel.
+
+0.02  Thursday May 11 9:30:00 2001
+	-Fixed a problem "Can't call method Value on undefined value".  Added line:
+	defined($cell) ? push(@cols_data, $cell->Value) : push(@cols_data, undef);
+	to push an undef value if no data is available for that cell.
+	Thanks to Jean-Marc VANEL.
+	
+      Tuesday May 15 12:30:00 2001
+	-Added declare_xml() and declare_doctype() functions
+	to allow for xml declaration and doctype declarations.
+	-column headings are now default to <tr$loop_num> instead of <$tag> to conform
+	to XML standard of tag names strting with alphabetic chars or '_'.

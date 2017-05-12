@@ -1,0 +1,19 @@
+=head1 NAME
+
+  XML::GDOME::Comment - Interface Comment implementation.
+
+=head1 SYNOPSIS
+
+
+=head1 CLASS INHERITANCE
+
+L<XML::GDOME::Node> > L<XML::GDOME::CharacterData> > XML::GDOME::Comment
+
+
+=head1 METHODS
+
+=over 4
+
+
+=back
+

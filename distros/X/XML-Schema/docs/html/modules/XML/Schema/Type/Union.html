@@ -1,0 +1,73 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+<head>
+<title>Modules Index</title>
+</head>
+
+<body bgcolor="#ffffff">
+<table border="0" width="100%">
+<tr>
+<td align="left"><a href="../../../../index.html"><img src="../../../../images/canon.gif" border="0"></a></td>
+<td align="right"><img src="../../../../images/canre.gif"></td>
+</tr>
+</table>
+<div align="right">
+<small><a href="../../../../index.html">XML Schema Home</a></small>
+</div>
+
+<h1>XML::Schema::Type::Union</h1>
+
+<ul>
+
+    This module implements the XML Schema union type.
+  </ul>
+
+<h2>Table of Contents</h2>
+<ul>
+<table border="0" cellpadding="2" cellspacing="0">
+<tr valign="top">
+<td>
+  <li><b><a href="#section_Synopsis">Synopsis</a></b>
+</td>
+
+<td>
+</td>
+
+<td>
+<td>
+
+</tr>
+</table>
+</ul>
+
+
+
+
+<hr width="100%" size="1" noshade="1"><a name="section_Synopsis"><h2>Synopsis</h2></a>
+<ul><pre><p>use XML::Schema::Type;
+
+# declare some simple types
+my $int   = XML::Schema::Type::int-&gt;new();
+my $time  = XML::Schema::Type::time-&gt;new();
+my $float = XML::Schema::Type::float-&gt;new();
+
+# declare a union
+my $union = XML::Schema::Type::Union-&gt;new(
+    memberTypes =&gt; [ $int, $time, $float ],
+);
+
+# instantiate a validated member of the union
+my $i = $union-&gt;instance('14');         # ok - int
+my $t = $union-&gt;instance('11:23:36');   # ok - time
+my $f = $union-&gt;instance('1.23');	    # ok - float</b></pre></ul>
+
+  
+
+
+
+
+<div align="center">
+<small><b>Perl XML::Schema Documentation</b></small>
+</div>
+</body>
+</html>

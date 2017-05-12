@@ -1,0 +1,40 @@
+root
+/o/#id	/o/@id	/o/@n	/o/p/#id	/o/p/@n	/o/p/@u	/o/p/a/b/c	/o/p/a/d/e	/o/p/q/#id	/o/p/q/@n	/o/p/q/m/@id	/o/p/q/m/@n	/o/p/q/m/@t	/o/p/q/n	/o/p/r/@id	/o/p/r/@n	/o/p/r/@t	/o/v/@id
+1	{28EA7}	G	1	GP		test1											
+1	{28EA7}	G	1	GP			testA										
+1	{28EA7}	G	1	GP		test2											
+1	{28EA7}	G	1	GP			testB										
+1	{28EA7}	G	1	GP				1	GeP1	1	Name	1					
+1	{28EA7}	G	1	GP				1	GeP1	2	NumMen	0					
+1	{28EA7}	G	1	GP				1	GeP1	3	NumAuen	0					
+1	{28EA7}	G	1	GP				1	GeP1	4	NumVn	0					
+1	{28EA7}	G	1	GP				1	GeP1				test1				
+1	{28EA7}	G	1	GP				1	GeP1				test2				
+1	{28EA7}	G	1	GP				1	GeP1				test3				
+1	{28EA7}	G	1	GP				2	GeP2	1	Name	1					
+1	{28EA7}	G	1	GP				2	GeP2	2	NumMed	0					
+1	{28EA7}	G	1	GP				2	GeP2	3	NumAun	0					
+1	{28EA7}	G	1	GP				2	GeP2	4	NumVidn	0					
+1	{28EA7}	G	1	GP				2	GeP2				test1				
+1	{28EA7}	G	1	GP				2	GeP2				test2				
+1	{28EA7}	G	1	GP				2	GeP2				test3				
+1	{28EA7}	G	1	GP										1	Name	1	
+1	{28EA7}	G	1	GP										2	NumMed	0	
+1	{28EA7}	G	1	GP										3	NumAudin	0	
+1	{28EA7}	G	1	GP										4	NumVidn	0	
+1	{28EA7}	G	2	GU	1												
+1	{28EA7}	G															{4CC5C8BB-C}
+1	{28EA7}	G															{3FB374C}
+1	{28EA7}	G															{5C07A8A}
+2	{05c57c28}	CDGenre	3	CDs				3	GenreProperties	1	Name	1					
+2	{05c57c28}	CDGenre	3	CDs				3	GenreProperties	2	NumMed	0					
+2	{05c57c28}	CDGenre	3	CDs				3	GenreProperties	3	NumAun	0					
+2	{05c57c28}	CDGenre	3	CDs				3	GenreProperties	4	NumVin	0					
+2	{05c57c28}	CDGenre	3	CDs										1	Name	1	
+2	{05c57c28}	CDGenre	3	CDs										2	Name2	1	
+2	{05c57c28}	CDGenre	3	CDs										4	Name4	1	
+2	{05c57c28}	CDGenre	4	CDes	1												
+2	{05c57c28}	CDGenre															{a43bf6}
+2	{05c57c28}	CDGenre															{f6302fe1-e2}
+2	{05c57c28}	CDGenre															{20E88E93C}
+

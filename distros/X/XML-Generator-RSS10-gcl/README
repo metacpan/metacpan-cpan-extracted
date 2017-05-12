@@ -1,0 +1,43 @@
+XML/Generator/RSS10/gcl version 0.01
+=====================================
+
+This module extends Dave Rolsky's XML::Generator::RSS10 to
+support categories taken from the UK Government Category List (gcl),
+a controlled vocabulary for use in the UK e-Government Metadata
+Standard (egms).
+
+The module is intended for use only with XML::Generator::RSS10::egms.
+Please see the documentation accompanying that module for further
+information.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+DEPENDENCIES
+
+This module requires:
+
+   XML::Generator::RSS10
+
+It is intended for use only with:
+
+   XML::Generator::RSS10::egms
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 Andrew Green, andrew@article7.co.uk
+
+Sponsored by Woking Borough Council, http://www.woking.gov.uk/
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

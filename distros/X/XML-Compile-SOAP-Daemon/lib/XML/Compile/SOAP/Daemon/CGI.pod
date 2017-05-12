@@ -1,0 +1,248 @@
+=encoding utf8
+
+=head1 NAME
+
+XML::Compile::SOAP::Daemon::CGI - CGI based server
+
+=head1 INHERITANCE
+
+ XML::Compile::SOAP::Daemon::CGI
+   is a XML::Compile::SOAP::Daemon
+
+=head1 SYNOPSIS
+
+ #### have a look in the examples directory!
+ use XML::Compile::SOAP::Daemon::CGI;
+ my $daemon = XML::Compile::SOAP::Daemon::CGI->new;
+
+ # initialize definitions from WSDL
+ my $wsdl    = XML::Compile::WSDL11->new(...);
+ $wsdl->importDefinitions(...); # more schemas
+ $daemon->operationsFromWSDL($wsdl, callbacks => ...);
+
+ # per connected client
+ my $query = CGI->new;
+ $daemon->runCgiRequest(query => $query);
+
+=head1 DESCRIPTION
+
+This module handles the exchange of SOAP messages via Apache, using
+mod_perl and the popular Perl module CGI.  Have a look at the
+F<examples/> directory, contained in the C<XML-Compile-SOAP-Daemon>
+distribution.
+
+This abstraction level of the object (code in this pm file) is not
+concerned with parsing or composing XML, but only worries about the
+HTTP transport specifics of SOAP messages.
+
+Extends L<"DESCRIPTION" in XML::Compile::SOAP::Daemon|XML::Compile::SOAP::Daemon/"DESCRIPTION">.
+ 
+=head1 METHODS
+
+Extends L<"METHODS" in XML::Compile::SOAP::Daemon|XML::Compile::SOAP::Daemon/"METHODS">.
+ 
+=head2 Constructors
+
+Extends L<"Constructors" in XML::Compile::SOAP::Daemon|XML::Compile::SOAP::Daemon/"Constructors">.
+ 
+=over 4
+
+=item XML::Compile::SOAP::Daemon::CGI-E<gt>B<new>(%options)
+
+ -Option            --Defined in                --Default
+  accept_slow_select  XML::Compile::SOAP::Daemon  <true>
+  output_charset      XML::Compile::SOAP::Daemon  'UTF-8'
+  soap_action_input   XML::Compile::SOAP::Daemon  {}
+  wsa_action_input    XML::Compile::SOAP::Daemon  {}
+  wsa_action_output   XML::Compile::SOAP::Daemon  {}
+
+=over 2
+
+=item accept_slow_select => BOOLEAN
+
+=item output_charset => STRING
+
+=item soap_action_input => HASH|ARRAY
+
+=item wsa_action_input => HASH|ARRAY
+
+=item wsa_action_output => HASH|ARRAY
+
+=back
+
+=back
+
+=head2 Attributes
+
+Extends L<"Attributes" in XML::Compile::SOAP::Daemon|XML::Compile::SOAP::Daemon/"Attributes">.
+ 
+=over 4
+
+=item $obj-E<gt>B<addSoapAction>(HASH|PAIRS)
+
+Inherited, see L<XML::Compile::SOAP::Daemon/"Attributes">
+
+=item $obj-E<gt>B<addWsaTable>( <'INPUT'|'OUTPUT'>, [HASH|PAIRS] )
+
+Inherited, see L<XML::Compile::SOAP::Daemon/"Attributes">
+
+=item $obj-E<gt>B<outputCharset>()
+
+Inherited, see L<XML::Compile::SOAP::Daemon/"Attributes">
+
+=back
+
+=head2 Running the server
+
+Extends L<"Running the server" in XML::Compile::SOAP::Daemon|XML::Compile::SOAP::Daemon/"Running the server">.
+ 
+=over 4
+
+=item $obj-E<gt>B<process>(%options)
+
+Process the content of a single message. Not to be called directly.
+
+ -Option--Default
+  nph     <true>
+
+=over 2
+
+=item nph => BOOLEAN
+
+For FCGI, you probably need to set this to a false value.
+
+=back
+
+=item $obj-E<gt>B<run>(%options)
+
+Used by L<runCgiRequest()|XML::Compile::SOAP::Daemon::CGI/"Running the server"> to process a connection. Not to be called
+directly.
+
+=item $obj-E<gt>B<runCgiRequest>(%options)
+
+ -Option     --Default
+  postprocess  undef
+  query        <created internally>
+
+=over 2
+
+=item postprocess => CODE
+
+When defined, the CODE will get called with a HASH (containing %options
+and other compile information), a HASH of headers (which you may change),
+the HTTP return code, and a reference to the message body (which may be
+changed as well).
+
+Be warned that the message body must be considered as bytes, so not
+as Latin1 or utf-8 string.  You may wish to add or remove bytes. The
+Content-Length will be added to the headers after the call.
+
+=item query => <CGI object>
+
+=back
+
+=back
+
+=head2 Preparations
+
+Extends L<"Preparations" in XML::Compile::SOAP::Daemon|XML::Compile::SOAP::Daemon/"Preparations">.
+ 
+=over 4
+
+=item $obj-E<gt>B<addHandler>($name, $soap, CODE)
+
+Inherited, see L<XML::Compile::SOAP::Daemon/"Preparations">
+
+=item $obj-E<gt>B<operationsFromWSDL>($wsdl, %options)
+
+Inherited, see L<XML::Compile::SOAP::Daemon/"Preparations">
+
+=item $obj-E<gt>B<setWsdlResponse>( $filename, [$filetype] )
+
+Inherited, see L<XML::Compile::SOAP::Daemon/"Preparations">
+
+=back
+
+=head2 Helpers
+
+Extends L<"Helpers" in XML::Compile::SOAP::Daemon|XML::Compile::SOAP::Daemon/"Helpers">.
+ 
+=over 4
+
+=item $obj-E<gt>B<faultInvalidXML>($error)
+
+Inherited, see L<XML::Compile::SOAP::Daemon/"Helpers">
+
+=item $obj-E<gt>B<faultNotSoapMessage>($nodetype)
+
+Inherited, see L<XML::Compile::SOAP::Daemon/"Helpers">
+
+=item $obj-E<gt>B<faultUnsupportedSoapVersion>($env_ns)
+
+Inherited, see L<XML::Compile::SOAP::Daemon/"Helpers">
+
+=item $obj-E<gt>B<handlers>( <'SOAP11'|'SOAP12'|$soap> )
+
+Inherited, see L<XML::Compile::SOAP::Daemon/"Helpers">
+
+=item $obj-E<gt>B<printIndex>( [$fh] )
+
+Inherited, see L<XML::Compile::SOAP::Daemon/"Helpers">
+
+=item $obj-E<gt>B<soapVersions>()
+
+Inherited, see L<XML::Compile::SOAP::Daemon/"Helpers">
+
+=back
+
+=head1 DETAILS
+
+Extends L<"DETAILS" in XML::Compile::SOAP::Daemon|XML::Compile::SOAP::Daemon/"DETAILS">.
+ 
+=head2 Operation handlers
+
+Extends L<"Operation handlers" in XML::Compile::SOAP::Daemon|XML::Compile::SOAP::Daemon/"Operation handlers">.
+ 
+=head2 Returning errors
+
+Extends L<"Returning errors" in XML::Compile::SOAP::Daemon|XML::Compile::SOAP::Daemon/"Returning errors">.
+ 
+=head2 How to use the CGI module
+
+The code and documentation for this module was contributed by Patrick
+Powell in December 2010. Both have seen major changes since.
+
+Go to the F<examples/mod_perl/> directory which is included in
+the distribution of this module, L<XML::Compile::SOAP::Daemon|XML::Compile::SOAP::Daemon>.
+There you find a README describing the process.
+
+=head2 Configuring Apache
+
+Your virtual host may need something like this:
+
+    Options     Indexes FollowSymLinks MultiViews
+    PerlHandler ModPerl::Registry
+    PerlOptions -ParseHeaders
+    AddHandler  perl-script .cgi
+    Options     +ExecCGI
+    Order       allow,deny
+    Allow       from all
+
+=head1 SEE ALSO
+
+This module is part of XML-Compile-SOAP-Daemon distribution version 3.12,
+built on May 13, 2016. Website: F<http://perl.overmeer.net/xml-compile/>
+
+Please post questions or ideas to the mailinglist at
+F<http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/xml-compile> .
+For live contact with other developers, visit the C<#xml-compile> channel
+on C<irc.perl.org>.
+
+=head1 LICENSE
+
+Copyrights 2007-2016 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

@@ -1,0 +1,7 @@
+<%
+    $template->set( 'text()' => { pre => 'bar' } );
+%><%= apply_templates() %>
+<%
+    $template->set( 'text()' => { action => DO_TEXT_AS_CHILD, 
+                                  pre    => 'text: ',             } );
+%><%= apply_templates() %>

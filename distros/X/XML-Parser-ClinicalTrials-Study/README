@@ -1,0 +1,119 @@
+XML::Parser::ClinicalTrials::Study
+----------------------------------
+
+An XML parser/representation for ClinicalTrials.gov data.
+
+SYNOPSIS
+        use File::Slurper 'read_text';
+        use XML::Parser::ClinicalTrials::Study;
+
+        # XML file downloaded from clinicaltrials.gov
+        my $xml   = read_text( 'NCT00003095.xml' );
+        my $study = XML::Parser::ClinicalTrials::Study->new( xml => $xml );
+
+DESCRIPTION
+    The web site <http://clinicaltrials.gov/> publishes information about
+    pharmaceutical clinical trials. This module parses the XML files
+    available for those trials into Moose objects with data accessors. For
+    more details about the contents of these files, see the glossary of
+    CT.gov site terms at <http://www.clinicaltrials.gov/ct2/info/glossary>.
+
+ACCESSORS
+    Study instances have several accessors, both simple value accessors and
+    object accessors.
+
+  Value Accessors
+    These accessors provide simple values. When a value is not present in
+    the XML file, this accessor will return the empty string.
+
+    *   nct_number
+
+    *   sponsor
+
+    *   condition
+
+    *   study_design
+
+    *   description
+
+    *   recruitment_status
+
+    *   source
+
+    *   summary
+
+    *   type
+
+    *   brief_title
+
+    *   official_title
+
+    *   phase
+
+    *   start_date
+
+    *   last_changed
+
+    *   first_received
+
+    *   completion_date
+
+    *   estimated_completion_date
+
+    *   primary_completion_date
+
+    *   actual_enrollment
+
+    *   estimated_enrollment
+
+    *   normalized_phase
+
+  Object Accessors
+    These accessors provide array references of other Moose objects with
+    their own accessors. Where a value is not present in the source XML
+    file, the returned array reference will be empty.
+
+    *   link
+
+        An array reference of XML::Parser::ClinicalTrials::Study::Link
+        objects.
+
+    *   interventions
+
+        An array reference of
+        XML::Parser::ClinicalTrials::Study::Intervention objects.
+
+    *   design
+
+        An array reference of XML::Parser::ClinicalTrials::Study::Design
+        objects.
+
+    *   mesh_terms
+
+        An array reference of XML::Parser::ClinicalTrials::Study::MeSHTerm
+        objects.
+
+    *   locations
+
+        An array reference of XML::Parser::ClinicalTrials::Study::Location
+        objects.
+
+    *   contacts
+
+        An array reference of XML::Parser::ClinicalTrials::Study::Contact
+        objects.
+
+NOTES
+    These modules don't represent *all* of the data found in CT.gov XML
+    files. Patches welcome.
+
+AUTHOR
+    chromatic <chromatic@cpan.org>, sponsored by Golden Guru
+    (<http://goldenguru.com/>).
+
+SEE ALSO
+    XML::Rabbit, WebService::ClinicalTrialsdotGov
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the terms of the Artistic License, version 2.

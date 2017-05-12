@@ -1,0 +1,50 @@
+#!/usr/bin/perl -w
+use strict;
+
+my %encode = (
+	'<' => '&lt;',
+	'&' => '&amp;',
+	'"' => '&quot;',
+);
+
+my $encode = join('', keys(%encode));
+
+my $tag_open;
+
+while(<>) {
+	chomp;
+	my ($type, $value) = m/\A([A()?-])(.*)\Z/;
+
+	if ($type eq 'A') {
+		my ($att, $attval) = m/\AA([^\s]+)\s*(.*)\Z/;
+		print " $att=\"" , encode($attval) , '"';
+		next;
+	}
+
+	print '>' if $tag_open;
+	undef $tag_open;
+
+	if ($type eq '(') {
+		print "<$value";
+		$tag_open = 1;
+	}
+	elsif ($type eq ')') {
+		print "</$value>";
+	}
+	elsif ($type eq '-') {
+		$value =~ s/\\n/\n/g;
+		print encode($value);
+	}
+	elsif ($type eq '?') {
+		print "<?" , encode($value) , "?>";
+	}
+}
+
+print '>' if $tag_open;
+
+sub encode {
+	my $text = shift;
+	$text =~ s/([$encode])/$encode{$1}/g;
+	return $text;
+}
+

@@ -1,0 +1,29 @@
+---
+abstract: 'serialize your RSS as JavaScript'
+author:
+  - 'Brian Cassidy <bricas@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: XML-RSS-JavaScript
+no_index:
+  directory:
+    - css
+    - inc
+    - t
+requires:
+  XML::RSS: 1.31
+  perl: 5.6.0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/bricas/xml-rss-javascript
+version: 0.65

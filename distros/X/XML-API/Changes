@@ -1,0 +1,217 @@
+0.30 (2016-04-11)
+
+    No change from 0.29_1
+
+0.29_1 (2016-04-11)
+
+    Bug Fixes:
+        - Correctly display empty elements as <e /> in fast_strings
+
+    Authoring:
+        - Convert to Module::Build
+        - Auto-tidy files using githook-perltidy
+        - Update some copyright years
+
+0.28 (2015-11-30)
+
+    Enhancements:
+        - Minor update of distribution files
+        - Release numbering change: odd numbers are for development,
+          even numbers are full releases.
+
+0.26_1 (2015-11-29)
+
+    First release in 5 years!
+
+    Enhancements:
+        - Add test for _attrs() method (Joenio Costa)
+
+    Bug Fixes:
+        - Escape apostrophies (Joenio Costa)
+
+0.25 (2010-06-09)
+
+    Un-recorded. Previous history is in Git and Darcs.
+
+
+# Move from darcs to git. Corrupted darcs inventory so patch
+    history lost. Changes:
+    - Created _langs method.
+    - Big simplification in _open _close etc and now almost perfect
+      rendering.
+
+Sun Mar 18 13:19:08 CET 2007  Mark Lawrence <nomad@null.net>
+  * Added POD tests to increase CPANTS Kwalitee.
+
+Sun Mar 18 13:16:54 CET 2007  Mark Lawrence <nomad@null.net>
+  * mv bin/ to example
+  * META.yml taken out of darcs as it is a generated file.
+
+Sun Mar 18 13:16:03 CET 2007  Mark Lawrence <nomad@null.net>
+  * Debian: install example/xml-api.cgi into documentation dir.
+
+Sun Mar 18 13:15:21 CET 2007  Mark Lawrence <nomad@null.net>
+  * Define GPL as licence in Makefile.PL
+
+Sun Mar 18 13:14:18 CET 2007  Mark Lawrence <nomad@null.net>
+  * Update documentation to show XML escaping.
+
+Fri Mar 16 17:09:03 CET 2007  Mark Lawrence <nomad@null.net>
+  * VERSION upped to 0.14
+
+Fri Mar 16 17:05:20 CET 2007  Mark Lawrence <nomad@null.net>
+  * REGEX fix: &item; no longer turned into &amp;item;
+
+Fri Mar 16 17:03:51 CET 2007  Mark Lawrence <nomad@null.net>
+  * Improved output rendering (almost perfect now)
+
+Fri Mar 16 17:02:30 CET 2007  Mark Lawrence <nomad@null.net>
+  * Fixed previously broken _attrs() subroutine
+
+Fri Mar 16 17:00:09 CET 2007  Mark Lawrence <nomad@null.net>
+  * Croak if _add called with XML::API object that has no elements.
+
+Thu Mar  1 13:33:40 CET 2007  Mark Lawrence <nomad@null.net>
+  tagged 0.13
+
+Thu Mar  1 13:29:06 CET 2007  Mark Lawrence <nomad@null.net>
+  * doctype is now optional for generic documents
+
+Thu Mar  1 13:26:55 CET 2007  Mark Lawrence <nomad@null.net>
+  * VERSION to 0.13
+
+Wed Feb 28 14:30:36 CET 2007  Mark Lawrence <nomad@null.net>
+  tagged 0.12
+
+Wed Feb 28 14:26:03 CET 2007  Mark Lawrence <nomad@null.net>
+  * Moved API::Comment and API::Cdata to API::Element::<>
+
+Wed Feb 28 14:22:51 CET 2007  Mark Lawrence <nomad@null.net>
+  * VERSION to 0.12
+  * Renamed internal XML::Element to XML::API::Element to keep namespace clean
+
+Tue Feb 27 15:41:05 CET 2007  Mark Lawrence <nomad@null.net>
+  tagged 0.11
+
+Tue Feb 27 15:27:11 CET 2007  Mark Lawrence <nomad@null.net>
+  * Documented '--' conversion in xml comments
+
+Tue Feb 27 15:02:23 CET 2007  Mark Lawrence <nomad@null.net>
+  * Added XML::XHTML::RSS
+  * Debian changelog => 0.11.
+
+Tue Feb 27 15:01:26 CET 2007  Mark Lawrence <nomad@null.net>
+  * Added Changes file.
+
+Tue Feb 27 14:59:53 CET 2007  Mark Lawrence <nomad@null.net>
+  * Added example CGI script bin/xml-api.cgi
+
+Tue Feb 27 14:56:10 CET 2007  Mark Lawrence <nomad@null.net>
+  * Added Module::Install infrastructure to darcs
+  Now 'darcs dist' should build a working copy.
+
+Tue Feb 27 14:42:25 CET 2007  Mark Lawrence <nomad@null.net>
+  * New Version 0.11
+  * Migration to Tree::Simple away from inbuilt tree code
+  * Makefile.PL and debian/control dependency on Tree::Simple 1.17
+  * Copyright to year 2007
+  * Removed Storable functions (_freeze etc) - doesn't belong here.
+  * Cleaned up and documented _encoding
+  * Cache _as_string output
+  * Remove all references to XSD validation
+  * Escape '<>&"' during element(), element_open(), _add()
+  * New _raw function for no escaping
+  * New _javascript shortcut
+  * New _parsed method
+  * Start of some testing
+  * Complete reorganisation of code and moved documentation inline
+
+Sat Apr 22 14:50:51 CEST 2006  Mark Lawrence <nomad@null.net>
+  * Added _encoding function
+
+Sat Apr 22 13:00:15 CEST 2006  Mark Lawrence <nomad@null.net>
+  * Use portable 'nfreeze' instead of 'freeze' when Storing
+
+Tue Aug 30 17:17:37 CEST 2005  Mark Lawrence <nomad@null.net>
+  tagged 0.09
+
+Tue Aug 30 16:12:41 CEST 2005  Mark Lawrence <nomad@null.net>
+  * Updated README with XML::Parser dep
+  * Added libxml-parser-perl to debian/control
+
+Tue Aug 30 16:07:59 CEST 2005  Mark Lawrence <nomad@null.net>
+  * Added XML encoding parameter
+
+Tue Aug 30 16:05:11 CEST 2005  Mark Lawrence <nomad@null.net>
+  * Added XML::API::_parse (no longer needed in child classes)
+  * Added dependency on XML::Parser::Expat
+
+Tue Aug 30 16:03:06 CEST 2005  Mark Lawrence <nomad@null.net>
+  * Upped VERSION to 0.09
+  * Fixed debian package description
+
+Mon Aug 22 11:45:12 CEST 2005  Mark Lawrence <nomad@null.net>
+  tagged 0.08
+
+Mon Aug 22 11:44:59 CEST 2005  Mark Lawrence <nomad@null.net>
+  * Version and debian/control update
+
+Mon Aug 22 10:55:45 CEST 2005  Mark Lawrence <nomad@null.net>
+  * Increased verbosity for undefined attributes and bad _goto args
+
+Tue Aug 16 21:02:35 CEST 2005  Mark Lawrence <nomad@null.net>
+  * Big simplification for how derived classes instantiate
+  * Upped VERSION to 0.08
+
+Wed Aug  3 13:50:57 CEST 2005  Mark Lawrence <nomad@null.net>
+  tagged 0.07
+
+Wed Aug  3 13:00:34 CEST 2005  Mark Lawrence <nomad@null.net>
+  * Added "-attribute => 'value'" style attributes
+
+Thu Jul 21 17:34:24 CEST 2005  Mark Lawrence <nomad@null.net>
+  * Sort element attributes on render (David Boyce <dsb@boyski.com>)
+
+Wed Jul 20 12:07:52 CEST 2005  Mark Lawrence <nomad@null.net>
+  tagged 0.06
+
+Wed Jul 20 12:06:30 CEST 2005  Mark Lawrence <nomad@null.net>
+  * Added overload of "" operator to allow "print $x".
+
+Wed Jul 20 11:53:58 CEST 2005  Mark Lawrence <nomad@null.net>
+  * Improved output rendering of _add('text') content
+  * Fixed _add(XML::API) (wasn't adding XML::API::Element object properly)
+  * Upped VERSION to 0.06
+  * Check for element attributes which are not defined (useful for catching bugs)
+
+Mon Jun  6 17:14:54 CEST 2005  Mark Lawrence <nomad@null.net>
+  tagged 0.05
+
+Mon Jun  6 17:13:43 CEST 2005  Mark Lawrence <nomad@null.net>
+  * Added the _set_id() method and modified _goto() to match.
+  Increased VERSION to 0.05
+
+Sat Jun  4 12:16:39 CEST 2005  Mark Lawrence <nomad@null.net>
+  tagged 0.04
+
+Sat Jun  4 12:04:17 CEST 2005  Mark Lawrence <nomad@null.net>
+  * Final 'make tgz'!
+
+Sat Jun  4 11:52:27 CEST 2005  Mark Lawrence <nomad@null.net>
+  * Removed 'Changes' from darcs (generated dynamically)
+
+Sat Jun  4 11:51:39 CEST 2005  Mark Lawrence <nomad@null.net>
+  * Corrected 'make tgz'
+
+Sat Jun  4 11:45:34 CEST 2005  Mark Lawrence <nomad@null.net>
+  * Code and readability cleanups in _as_string
+  * Added _fast_string
+  * Documentation cleanup
+  * Added 'tgz' Makefile.PL target
+  * Upped version to 0.04
+
+Fri Apr 29 11:03:37 CEST 2005  Mark Lawrence <nomad@null.net>
+  * API is starting to stabilise. README written.
+
+Thu Mar  3 11:07:45 CET 2005  Mark Lawrence <nomad@null.net>
+  * Initial Revision

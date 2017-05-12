@@ -1,0 +1,223 @@
+NAME
+    XHTML::Util - (alpha software) powerful utilities for common but
+    difficult to nail HTML munging.
+
+  VERSION
+    0.04
+
+SYNOPSIS
+     use strict;
+     use warnings;
+     use XHTML::Util;
+     my $xu = XHTML::Util->new;
+     print $xu->enpara("This is naked\n\ntext for making into paragraphs.");
+
+     # <p>This is naked</p>
+     #
+     # <p>text for making into paragraphs.</p>
+
+     print $xu->enpara("<blockquote>Quotes should probably have paras.</blockquote>", "blockquote");
+     # <blockquote>
+     # <p>Quotes should probably have paras.</p>
+     # </blockquote>
+
+     print $xu->strip_tags('<i><a href="#"><b>Something</b></a>.</i>','a');
+     # <i><b>Something</b>.</i>
+
+DESCRIPTION
+    This is a set of itches I'm sick of scratching 5 different ways from the
+    Sabbath. Right now it's in alpha-mode so please sample but don't count
+    on the interface or behavior. Some of the code is fire tested in other
+    places but as this is a new home and API, it's subject to change. Like
+    they say, release early, release often. Like I say: Release whatever
+    you've got so you'll be embarrassed into making it better.
+
+    You can use CSS expressions to most of the methods. E.g., to only enpara
+    the contents of div tags with a class of "enpara" -- "<div
+    class="enpara"/>" -- you could do this-
+
+     print $xu->enpara($content, "div.enpara");
+
+    To do the contents of all blockquotes and divs-
+
+     print $xu->enpara($content, "div, blockquote");
+
+METHODS
+  new
+    Creates a new "XHTML::Util" object.
+
+  strip_tags
+    Why you might need this-
+
+     my $post_title = "I <3 <a href="http://icanhascheezburger.com/">kittehs</a>";
+     my $blog_link = some_link_maker($post_title);
+     print $blog_link;
+
+     <a href="/oh-noes">I <3 <a href="http://icanhascheezburger.com/">kittehs</a></a>
+
+    That ain't legal so there's no definition for what browsers should do
+    with it. Some sort of tolerate it, some don't. It's never going to be a
+    good user experience.
+
+    What you can do, and I've done successfully for years, is something like
+    this-
+
+     my $post_title = "I <3 <a href="http://icanhascheezburger.com/">kittehs</a>";
+     my $safe_title = $xu->strip_tags($post_title, ["a"]);
+     # Menu link should only go to the single post page.
+     my $menu_view_title = some_link_maker($safe_title);
+     # No need to link back to the page you're viewing already.
+     my $single_view_title = $post_title;
+
+  remove
+    Takes a content block and a CSS selector string. Completely removes the
+    matched nodes, including their content. This differs from "strip_tags"
+    which retains the child nodes intact and only removes the tag(s) proper.
+
+     my $cleaned = $xu->remove($html, "center, img[src^='http']");
+
+  traverse
+    [Not implemented.] Walks the given nodes and executes the given
+    callback.
+
+  translate_tags
+    [Not implemented.] Translates one tag to another.
+
+  remove_style
+    [Not implemented.] Removes styles from matched nodes. To remove all
+    style from a fragment-
+
+     $xu->remove_style($content, "*");
+
+  inline_stylesheets
+    [Not implemented.] Moves all linked stylesheet information into inline
+    style attributes. This is useful, for example, when distributing a
+    document fragment like an RSS/Atom feed and having it match its online
+    appearance.
+
+  html_to_xhtml
+    [Not implemented.] Upgrades old or broken HTML to valid XHTML.
+
+  validate
+    [Not implemented.] Validates a given document or fragment against its
+    claimed DTD or one provided by name.
+
+  enpara
+    To add paragraph markup to naked text. There are many, many
+    implementations of this basic idea out there as well as many like
+    Markdown which do much more. While some are decent, none is really meant
+    to sling arbitrary HTML and get DWIM behavior from places where it's
+    left out; every implementation I've seen either has rigid syntax or has
+    beaucoup failure prone edge cases. Consider these-
+
+     Is this a paragraph
+     or two?
+
+     <p>I can do HTML when I'm paying attention.</p>
+     <p style="color:#a00">Or I need to for some reason.</p>
+     Oh, I stopped paying attention... What happens here? Or <i>here</i>?
+
+     I'd like to see this in a paragraph so it's legal markup.
+     <pre>
+     now
+     this
+     should
+
+
+     not be touched!
+     </pre>I meant to do that.
+
+    With "XHTML::Util->enpara" you will get-
+
+     <p>Is this a paragraph<br/>
+     or two?</p>
+
+     <p>I can do HTML when I'm paying attention.</p>
+     <p style="color:#a00">Or I need to for some reason.</p>
+     <p>Oh, I stopped paying attention... What happens here? Or <i>here</i>?</p>
+
+     <p>I'd like to see this in a paragraph so it's legal markup.</p>
+     <pre>
+     now
+     this
+     should
+ 
+ 
+     not be touched!
+     </pre>
+     <p>I meant to do that.</p>
+
+  xml_parser
+    Don't use unless you read the code and see why/how.
+
+  selector_to_xpath
+    This wraps "selector_to_xpath" in selector_to_xpath
+    HTML::Selector::Xpath. Not really meant to be used but exposed in case
+    you want it.
+
+     print $xu->selector_to_xpath("form[name='register'] input[type='password']");
+     # //form[@name='register']//input[@type='password']
+
+TO DO
+    Finish spec and tests. Get it running solid enough to remove alpha
+    label. Generalize the argument handling. Provide optional setting or
+    methods for returning nodes intead of serialized content. Improve
+    document/head related handling/options.
+
+BUGS AND LIMITATIONS
+    All input should be utf8 or at least safe to run Encode::decode_utf8 on.
+    Regular Latin character sets, I suspect, will be fine but extended sets
+    will probably give garbage or unpredictable results; guessing.
+
+    This module is currently targeted to working with body fragments. You
+    will get fragments back, not documents. I want to expand it to handle
+    both and deal with doc, DTD, head and such but that's not its primary
+    use case so it won't come first.
+
+    I have used many of these methods and snippets in many projects and I'm
+    tired of recycling them. Some are extremely useful and, at least in the
+    case of "enpara", better than any other implementation I've been able to
+    find in any language.
+
+    That said, a lot of the code herein is not well tested or at least not
+    well tested in this incarnation. Bug reports and good feedback are
+    adored.
+
+SEE ALSO
+    XML::LibXML, HTML::Tagset, HTML::Entities, HTML::Selector::XPath,
+    HTML::TokeParser::Simple, CSS::Tiny.
+
+    CSS W3Schools, <http://www.w3schools.com/Css/default.asp>, Learning CSS
+    at W3C, <http://www.w3.org/Style/CSS/learning>.
+
+AUTHOR
+    Ashley Pond V, "<ashley at cpan.org>".
+
+COPYRIGHT & LICENSE
+    Copyright (©) 2006-2009.
+
+    This program is free software; you can redistribute it or modify it or
+    both under the same terms as Perl itself.
+
+DISCLAIMER OF WARRANTY
+    Because this software is licensed free of charge, there is no warranty
+    for the software, to the extent permitted by applicable law. Except when
+    otherwise stated in writing the copyright holders or other parties
+    provide the software "as is" without warranty of any kind, either
+    expressed or implied, including, but not limited to, the implied
+    warranties of merchantability and fitness for a particular purpose. The
+    entire risk as to the quality and performance of the software is with
+    you. Should the software prove defective, you assume the cost of all
+    necessary servicing, repair, or correction.
+
+    In no event unless required by applicable law or agreed to in writing
+    will any copyright holder, or any other party who may modify and/or
+    redistribute the software as permitted by the above licence, be liable
+    to you for damages, including any general, special, incidental, or
+    consequential damages arising out of the use or inability to use the
+    software (including but not limited to loss of data or data being
+    rendered inaccurate or losses sustained by you or third parties or a
+    failure of the software to operate with any other software), even if
+    such holder or other party has been advised of the possibility of such
+    damages.
+

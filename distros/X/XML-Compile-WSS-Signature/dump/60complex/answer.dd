@@ -1,0 +1,342 @@
+$VAR1 = {
+  '{https://ws.example.com/}ping' => bless( do{\(my $o = 59091136)}, 'XML::LibXML::Element' ),
+  wsse_Security => {
+    ds_Signature => [
+      {
+        ds_SignedInfo => {
+          _XML_NODE => bless( do{\(my $o = 57261136)}, 'XML::LibXML::Element' ),
+          ds_CanonicalizationMethod => {
+            Algorithm => 'http://www.w3.org/2001/10/xml-exc-c14n#',
+            c14n_InclusiveNamespaces => {
+              PrefixList => [
+                'ds',
+                'wsu',
+                'xenc',
+                'SOAP-ENV'
+              ]
+            }
+          },
+          ds_Reference => [
+            {
+              ds_Transforms => {
+                ds_Transform => [
+                  {
+                    cho_any => [
+                      {
+                        c14n_InclusiveNamespaces => {
+                          PrefixList => [
+                            'ds',
+                            'wsu',
+                            'xenc',
+                            'SOAP-ENV'
+                          ]
+                        }
+                      }
+                    ],
+                    Algorithm => 'http://www.w3.org/2001/10/xml-exc-c14n#'
+                  }
+                ]
+              },
+              URI => '#node-56286600',
+              ds_DigestValue => 'hd¥|{T±uÀÕÙ≠Qä‡OÕ',
+              ds_DigestMethod => {
+                Algorithm => 'http://www.w3.org/2000/09/xmldsig#sha1'
+              }
+            },
+            {
+              ds_Transforms => {
+                ds_Transform => [
+                  {
+                    cho_any => [
+                      {
+                        c14n_InclusiveNamespaces => {
+                          PrefixList => [
+                            'ds',
+                            'wsu',
+                            'xenc',
+                            'SOAP-ENV'
+                          ]
+                        }
+                      }
+                    ],
+                    Algorithm => 'http://www.w3.org/2001/10/xml-exc-c14n#'
+                  }
+                ]
+              },
+              URI => '#node-57831016',
+              ds_DigestValue => '2Ô•®≥‡¯-cƒxAn¢q≤',
+              ds_DigestMethod => {
+                Algorithm => 'http://www.w3.org/2000/09/xmldsig#sha1'
+              }
+            },
+            {
+              ds_Transforms => {
+                ds_Transform => [
+                  {
+                    cho_any => [
+                      {
+                        c14n_InclusiveNamespaces => {
+                          PrefixList => [
+                            'ds',
+                            'wsu',
+                            'xenc',
+                            'SOAP-ENV'
+                          ]
+                        }
+                      }
+                    ],
+                    Algorithm => 'http://www.w3.org/2001/10/xml-exc-c14n#'
+                  }
+                ]
+              },
+              URI => '#node-57830632',
+              ds_DigestValue => '≤‰√q<Ô©ìÍÍùfxãÚ·S',
+              ds_DigestMethod => {
+                Algorithm => 'http://www.w3.org/2000/09/xmldsig#sha1'
+              }
+            },
+            {
+              ds_Transforms => {
+                ds_Transform => [
+                  {
+                    cho_any => [
+                      {
+                        c14n_InclusiveNamespaces => {
+                          PrefixList => [
+                            'ds',
+                            'wsu',
+                            'xenc',
+                            'SOAP-ENV'
+                          ]
+                        }
+                      }
+                    ],
+                    Algorithm => 'http://www.w3.org/2001/10/xml-exc-c14n#'
+                  }
+                ]
+              },
+              URI => '#node-57831304',
+              ds_DigestValue => '¯€\'-ﬂÅ
+Øíó2ª|¬íêxq',
+              ds_DigestMethod => {
+                Algorithm => 'http://www.w3.org/2000/09/xmldsig#sha1'
+              }
+            },
+            {
+              ds_Transforms => {
+                ds_Transform => [
+                  {
+                    cho_any => [
+                      {
+                        c14n_InclusiveNamespaces => {
+                          PrefixList => [
+                            'ds',
+                            'wsu',
+                            'xenc',
+                            'SOAP-ENV'
+                          ]
+                        }
+                      }
+                    ],
+                    Algorithm => 'http://www.w3.org/2001/10/xml-exc-c14n#'
+                  }
+                ]
+              },
+              URI => '#node-54971504',
+              ds_DigestValue => '~˙C"ì.ò®π}TãXWˇ¥zQ',
+              ds_DigestMethod => {
+                Algorithm => 'http://www.w3.org/2000/09/xmldsig#sha1'
+              }
+            },
+            {
+              ds_Transforms => {
+                ds_Transform => [
+                  {
+                    cho_any => [
+                      {
+                        c14n_InclusiveNamespaces => {
+                          PrefixList => [
+                            'ds',
+                            'wsu',
+                            'xenc',
+                            'SOAP-ENV'
+                          ]
+                        }
+                      }
+                    ],
+                    Algorithm => 'http://www.w3.org/2001/10/xml-exc-c14n#'
+                  }
+                ]
+              },
+              URI => '#node-57830584',
+              ds_DigestValue => ' zm«ÛHKﬂ|ÇÖãÓ]Ü',
+              ds_DigestMethod => {
+                Algorithm => 'http://www.w3.org/2000/09/xmldsig#sha1'
+              }
+            },
+            {
+              ds_Transforms => {
+                ds_Transform => [
+                  {
+                    cho_any => [
+                      {
+                        c14n_InclusiveNamespaces => {
+                          PrefixList => [
+                            'ds',
+                            'wsu',
+                            'xenc',
+                            'SOAP-ENV'
+                          ]
+                        }
+                      }
+                    ],
+                    Algorithm => 'http://www.w3.org/2001/10/xml-exc-c14n#'
+                  }
+                ]
+              },
+              URI => '#node-57830488',
+              ds_DigestValue => 'ëæ@˚µ≠uæbÖØ|ô“D†•Hâ(',
+              ds_DigestMethod => {
+                Algorithm => 'http://www.w3.org/2000/09/xmldsig#sha1'
+              }
+            }
+          ],
+          ds_SignatureMethod => {
+            Algorithm => 'http://www.w3.org/2000/09/xmldsig#hmac-sha1'
+          }
+        },
+        Id => 'SIG-1376089490',
+        ds_KeyInfo => {
+          cho_ds_KeyName => [
+            {
+              wsse_SecurityTokenReference => {
+                cho_any => [
+                  {
+                    wsse_Reference => {
+                      URI => 'TOKEN-53021768',
+                      ValueType => 'http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p'
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        ds_SignatureValue => {
+          _ => 'Õ≠V¿˙ÓìmY0®-)…·œJ
+S'
+        }
+      },
+      {
+        ds_SignedInfo => {
+          _XML_NODE => bless( do{\(my $o = 58184128)}, 'XML::LibXML::Element' ),
+          ds_CanonicalizationMethod => {
+            Algorithm => 'http://www.w3.org/2001/10/xml-exc-c14n#',
+            c14n_InclusiveNamespaces => {
+              PrefixList => [
+                'ds',
+                'wsu',
+                'xenc',
+                'SOAP-ENV'
+              ]
+            }
+          },
+          ds_Reference => [
+            {
+              ds_Transforms => {
+                ds_Transform => [
+                  {
+                    cho_any => [
+                      {
+                        c14n_InclusiveNamespaces => {
+                          PrefixList => [
+                            'ds',
+                            'wsu',
+                            'xenc',
+                            'SOAP-ENV'
+                          ]
+                        }
+                      }
+                    ],
+                    Algorithm => 'http://www.w3.org/2001/10/xml-exc-c14n#'
+                  }
+                ]
+              },
+              URI => '#SIG-1376089490',
+              ds_DigestValue => 'ÜÈa≥i°‡÷9“áD•∏¢–f',
+              ds_DigestMethod => {
+                Algorithm => 'http://www.w3.org/2000/09/xmldsig#sha1'
+              }
+            }
+          ],
+          ds_SignatureMethod => {
+            Algorithm => 'http://www.w3.org/2000/09/xmldsig#rsa-sha1'
+          }
+        },
+        Id => 'SIG-1376089490',
+        ds_KeyInfo => {
+          cho_ds_KeyName => [
+            {
+              wsse_SecurityTokenReference => {
+                cho_any => [
+                  {
+                    wsse_Reference => {
+                      URI => 'TOKEN-53021432',
+                      ValueType => 'http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0#X509v3'
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        ds_SignatureValue => {
+          _ => '≈E
+Ëk?™çÔêÊlËs¶ƒ˝üÅéˇT|á7b-∆ßä_âhsC¢q±P5Ü¥¯OSÖ˙#UCÇ‹‚ÿF/xØ˛úÈOMÓ¨¿òä⁄·⁄làH˜»8·7:T}jS—~ ≠ÒÛÎì∆±ªsÒ8ûä"'
+        }
+      }
+    ],
+    wsse_BinarySecurityToken => {
+      wsu_Id => 'TOKEN-53021432',
+      ValueType => 'http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0#X509v3',
+      EncodingType => 'http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#Base64Binary',
+      _ => 'MIICNjCCAZ+gAwIBAgIJAPCFsh4JQEyUMA0GCSqGSIb3DQEBBQUAMDQxCzAJBgNVBAYTAk5MMQ8w
+DQYDVQQHDAZBcm5oZW0xFDASBgNVBAMMC2V4YW1wbGUuY29tMB4XDTEyMTEwMjIyMDEwOFoXDTEz
+MTEwMjIyMDEwOFowNDELMAkGA1UEBhMCTkwxDzANBgNVBAcMBkFybmhlbTEUMBIGA1UEAwwLZXhh
+bXBsZS5jb20wgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGBAPLWMEhImMNpRTqMns6rADVhu8Yy
+xBpLjh75nOsAj1aIWVM/Oi7pPwjCsMMyZV4iXGhT2WxmE9EmHBwgIqBn90qhbC7G3HwAvsTUAv27
+phPco+u7tfhXmT1jG2NIWf0l/1SqDqXPUDecAz1xjTCYvMjCwm1dtsZDpmiUZVgCoR6XAgMBAAGj
+UDBOMB0GA1UdDgQWBBRvhcWDNhXGhIj34sLkTAHvAT2qNTAfBgNVHSMEGDAWgBRvhcWDNhXGhIj3
+4sLkTAHvAT2qNTAMBgNVHRMEBTADAQH/MA0GCSqGSIb3DQEBBQUAA4GBAN+lDWtlhFSxqLAcqA7R
+IIj0LqMCL0RYEs3rbAaUliee5lM6cOkxStx2wkAVY68yBBLNmEYJ10yt/BLg6LiDeA7UxZ4gj/om
+Q6/OsNC7eQJsxGKedA34/JT0R/zAVrHFkQYWrPNSkRLxQuXYG3xGLbQ6WVGJ25Iw+iYGYnKQYoMk
+'
+    },
+    wsu_Timestamp => {
+      wsu_Expires => {
+        ValueType => 'http://www.w3.org/2001/XMLSchema/dateTime',
+        _ => '2013-08-09T23:09:50Z'
+      },
+      wsu_Id => 'node-56286600',
+      wsu_Created => {
+        ValueType => 'http://www.w3.org/2001/XMLSchema/dateTime',
+        _ => '2013-08-09T23:04:50Z'
+      }
+    },
+    xenc_EncryptedKey => {
+      xenc_EncryptionMethod => {
+        Algorithm => 'http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p'
+      },
+      xenc_CipherData => {
+        xenc_CipherValue => '±}í§êúåÒæ‘*ﬁ:zí.‰ÅπÅUø2ùÙ¯~”∞l8∂€¡Yø[ ùÑ„d•bx•/gŒ%∏«.íãnAÜî¶`VigÃC\'#W˘ì2à˙¯˝ebØÛù§çXó;Púø\'hãv
+7⁄æÑ$$[Æ“Æïóå2ˆ'
+      }
+    }
+  },
+  wsa_MessageID => 'urn:uuid:bc57cb92-6a37-4e99-ad2d-1a0ad718264e',
+  wsa_Action => 'https://ws.example.com/ping',
+  wsa_ReplyTo => {
+    wsa_Address => 'http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous'
+  },
+  wsa_To => 'https://ws.example.com'
+};

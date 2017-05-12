@@ -1,0 +1,58 @@
+<DocumentDefinition>
+  <name>_test_document_hooks</name>
+
+  <element>
+    <name>first</name>
+    <read_hook>
+      <![CDATA[
+      sub {
+        my $self = shift();
+        $self->def_pnotes()->{read_setted} = 'ok';
+      }
+      ]]>
+    </read_hook>
+  </element>
+
+  <element><name>second</name></element>
+
+  <element><name>doc_setonread</name></element>
+
+  <nested_element>
+    <name>nel</name>
+    <element><name>foo</name></element>
+    <read_hook>
+      <![CDATA[
+      sub {
+        my $self = shift();
+        $self->element('foo')->set('foo-setted');
+      }
+      ]]>
+    </read_hook>
+  </nested_element>
+
+
+  <document_write_hook>
+    <![CDATA[
+    sub {
+      my $self = shift();
+      $self->element('second')->set('written');
+    }
+    ]]>
+  </document_write_hook>
+
+  <store>
+    <name>main</name>
+    <base>test/document-hooks</base>
+    <location>Sequential_file:'extension','.hookstest'</location>    
+  </store>
+
+  <read_hook>
+    <![CDATA[
+    sub {
+      my $self = shift();
+      $self->element('doc_setonread')->set('setted');
+    }
+    ]]>
+  </read_hook>
+
+</DocumentDefinition>

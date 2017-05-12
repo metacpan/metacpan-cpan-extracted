@@ -1,0 +1,11 @@
+Build.PL
+lib/XPlanner.pm
+lib/XPlanner/Iteration.pm
+lib/XPlanner/Object.pm
+lib/XPlanner/Person.pm
+lib/XPlanner/Project.pm
+lib/XPlanner/Story.pm
+MANIFEST
+META.yml
+t/00compile.t
+t/login.t

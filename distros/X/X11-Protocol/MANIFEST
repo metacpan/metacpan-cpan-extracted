@@ -1,0 +1,36 @@
+Auth.pm					Read .Xauthority files
+Changes					List of changes from previous versions
+Keysyms.pm				Names of keysyms (like keysymdef.h)
+MANIFEST				List of files
+META.yml                                Module meta-data (added by MakeMaker)
+Makefile.PL				Source for Makefile
+Protocol.pm				The X11 Window System Protocol
+Protocol/Connection.pm			Base class for connections
+Protocol/Connection/FileHandle.pm	Base class for FileHandle connections
+Protocol/Connection/INETFH.pm		TCP/IP FileHandle connections
+Protocol/Connection/INETSocket.pm	TCP/IP IO::Socket connections
+Protocol/Connection/Socket.pm		Base class for IO:Socket connections
+Protocol/Connection/UNIXFH.pm		Unix-domain FileHandle connections
+Protocol/Connection/UNIXSocket.pm	Unix-domain IO::Socket connections
+Protocol/Constants.pm			X11 Protocol symbolic constants
+Protocol/Ext/BIG_REQUESTS.pm		BIG-REQUESTS extension
+Protocol/Ext/SHAPE.pm			SHAPE extension
+Protocol/Ext/XC_MISC.pm			XC-MISC (resource ID) extension
+Protocol/Ext/DPMS.pm			Display Power Management extension
+Protocol/Ext/XFree86_Misc.pm		XFree86 miscellaneous extension
+Protocol/Ext/RENDER.pm			X Render extension
+README					The Instructions
+Todo					The Wishlist
+eg/anim.pl				Animated example
+eg/full_test.pl				Exhaustive test of Protocol.pm et al.
+eg/long-run.pl				A long-running example
+eg/teletype.pl				Two-display example
+eg/random-win.pl                        Error recovering example
+eg/render-clock.pl                      Render extension clock example
+eg/render-test.pl			Exhaustive Render extension test
+eg/widgets1.pl				User interface widget example
+eg/widgets2.pl				X11-Motif version of widget example
+eg/widgets3.pl				Unfinished OO-interface widget example
+eg/widgets.c				C Xlib version of widget example
+eg/wintree.pl				Window hierarchy utility example
+test.pl					Short test of Protocol.pm et al.

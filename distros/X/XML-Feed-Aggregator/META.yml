@@ -1,0 +1,32 @@
+---
+abstract: 'Simple feed aggregator'
+author:
+  - 'Robin Edwards <robin.ge@gmail.com>'
+build_requires:
+  Test::More: 0.94
+  Test::NoWarnings: 1.02
+  Test::UseAllModules: 0.13
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.102341, CPAN::Meta::Converter version 2.102400'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: XML-Feed-Aggregator
+requires:
+  DateTime: 0.66
+  HTML::Scrubber: 0.08
+  Moose: 1.24
+  MooseX::Types: 0.25
+  MooseX::Types::URI: 0.02
+  Try::Tiny: 0.09
+  URI: 1.58
+  XML::Feed: 0.43
+  namespace::autoclean: 0.12
+resources:
+  bugtracker: https://github.com/robinedwards/XML-Feed-Aggregator/issues
+  homepage: http://search.cpan.org/dist/XML-Feed-Aggregator/
+  repository: git://github.com/robinedwards/XML-Feed-Aggregator.git
+version: 0.0401

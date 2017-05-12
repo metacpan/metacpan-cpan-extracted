@@ -1,0 +1,8 @@
+Revision history for Perl extension XML::XPath::Simple.
+
+0.05  Tue Apr 02 17:39:26 2002
+	- completed beta functionality with find(), valueof() and context()
+
+0.01  Tue Mar 26 14:09:36 2002
+	- original version
+

@@ -1,0 +1,49 @@
+#web-button-webdigest { 
+  list-style-image: url("chrome://yahoofavorites/content/mywebdigest.png"); 
+  -moz-image-region: rect(0px 24px 24px 0px);  
+}
+
+#web-button-webdigest:hover {
+  -moz-image-region: rect(24px 24px 48px 0px);
+}
+
+#web-button-webdigest[disabled="true"] { 
+  -moz-image-region: rect(48px 24px 72px 0px);
+}
+
+toolbar[iconsize="small"] #web-button-webdigest {
+  list-style-image: url("chrome://yahoofavorites/content/mywebdigest-small.png");
+  -moz-image-region: rect(0px 16px 16px 0px);
+}
+toolbar[iconsize="small"] #web-button-webdigest:hover {
+  -moz-image-region: rect(16px 16px 32px 0px);
+}
+toolbar[iconsize="small"] #web-button-webdigest[disabled="true"] {
+  -moz-image-region: rect(32px 16px 48px 0px);
+}
+
+
+
+#web-button-tagPage { 
+  list-style-image: url("chrome://yahoofavorites/content/tagwebdigest.png"); 
+  -moz-image-region: rect(0px 24px 24px 0px);  
+}
+
+#web-button-tagPage:hover {
+  -moz-image-region: rect(24px 24px 48px 0px);
+}
+
+#web-button-tagPage[disabled="true"] { 
+  -moz-image-region: rect(48px 24px 72px 0px);
+}
+
+toolbar[iconsize="small"] #web-button-tagPage {
+  list-style-image: url("chrome://yahoofavorites/content/tagwebdigest-small.png");
+  -moz-image-region: rect(0px 16px 16px 0px);
+}
+toolbar[iconsize="small"] #web-button-tagPage:hover {
+  -moz-image-region: rect(16px 16px 32px 0px);
+}
+toolbar[iconsize="small"] #web-button-tagPage[disabled="true"] {
+  -moz-image-region: rect(32px 16px 48px 0px);
+}

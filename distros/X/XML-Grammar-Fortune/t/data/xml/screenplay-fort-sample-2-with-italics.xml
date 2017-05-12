@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<collection>
+<head />
+<list>
+<fortune id="david-and-goliath-1">
+<meta>
+<title>David and Goliath - 1</title>
+</meta>
+<screenplay>
+<body>
+<description>
+<para>
+David and
+<ulink url="http://en.wikipedia.org/wiki/Goliath">Goliath</ulink>
+are standing by each other.
+</para>
+</description>
+<saying character="David">
+<para>
+I will kill you, as written in <italics>Treasure Island</italics>.<br />
+I will kill you.<br />
+You will not <bold>survive</bold>.<br />
+I will kill you.<br />
+I will kill you.<br />
+Ask Jive.
+</para>
+</saying>
+<saying character="Goliath">
+<para>
+no way, you little idiot!
+</para>
+</saying>
+<saying character="David">
+<para>
+yes way!
+</para>
+</saying>
+</body>
+<info>
+<author>Shlomi Fish</author>
+<work href="http://www.shlomifish.org/">David and Goliath Skit</work>
+</info>
+</screenplay>
+</fortune>
+</list>
+</collection>

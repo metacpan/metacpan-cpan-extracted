@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<xs:schema 
+	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	targetNamespace="http://www.site.org/bookperson"
+	xmlns="http://www.site.org/bookperson"
+	xmlns:b="http://www.site.org/book"
+	xmlns:p="http://www.site.org/person"
+>
+
+<xs:import  schemaLocation="person_proxy.xsd"  namespace="http://www.site.org/person"/>
+<xs:import  schemaLocation="book_proxy.xsd"  namespace="http://www.site.org/book"/>
+
+
+<xs:element name="book" type="b:book"/>
+<xs:element name="person" type="p:person"/>
+
+
+</xs:schema>
+

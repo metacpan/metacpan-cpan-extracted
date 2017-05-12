@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<rdf:RDF
+  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns:dc="http://purl.org/dc/elements/1.1/"
+  xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+  xmlns:admin="http://webns.net/mvcb/"
+  xmlns:cc="http://web.resource.org/cc/"
+  xmlns="http://purl.org/rss/1.0/">
+
+<channel rdf:about="http://elpaso.ezoshosting.com/~isshoadmin/blog/">
+<title>LaszloBlog</title>
+<link>http://elpaso.ezoshosting.com/~isshoadmin/blog/</link>
+<description>Journalizing Journalism</description>
+<dc:language>en-us</dc:language>
+<dc:creator></dc:creator>
+<dc:date>2004-02-09T01:03:26+09:00</dc:date>
+<admin:generatorAgent rdf:resource="http://www.movabletype.org/?v=2.64" />
+<cc:license rdf:resource="http://creativecommons.org/licenses/by-nc-sa/1.0/" />
+
+
+<items>
+<rdf:Seq><rdf:li rdf:resource="http://elpaso.ezoshosting.com/~isshoadmin/blog/archives/000111.html" />
+<rdf:li rdf:resource="http://elpaso.ezoshosting.com/~isshoadmin/blog/archives/000109.html" />
+<rdf:li rdf:resource="http://elpaso.ezoshosting.com/~isshoadmin/blog/archives/000107.html" />
+<rdf:li rdf:resource="http://elpaso.ezoshosting.com/~isshoadmin/blog/archives/000103.html" />
+<rdf:li rdf:resource="http://elpaso.ezoshosting.com/~isshoadmin/blog/archives/000099.html" />
+<rdf:li rdf:resource="http://elpaso.ezoshosting.com/~isshoadmin/blog/archives/000095.html" />
+<rdf:li rdf:resource="http://elpaso.ezoshosting.com/~isshoadmin/blog/archives/000093.html" />
+<rdf:li rdf:resource="http://elpaso.ezoshosting.com/~isshoadmin/blog/archives/000091.html" />
+<rdf:li rdf:resource="http://elpaso.ezoshosting.com/~isshoadmin/blog/archives/000080.html" />
+<rdf:li rdf:resource="http://elpaso.ezoshosting.com/~isshoadmin/blog/archives/000078.html" />
+<rdf:li rdf:resource="http://elpaso.ezoshosting.com/~isshoadmin/blog/archives/000073.html" />
+<rdf:li rdf:resource="http://elpaso.ezoshosting.com/~isshoadmin/blog/archives/000069.html" />
+<rdf:li rdf:resource="http://elpaso.ezoshosting.com/~isshoadmin/blog/archives/000048.html" />
+<rdf:li rdf:resource="http://elpaso.ezoshosting.com/~isshoadmin/blog/archives/000029.html" />
+<rdf:li rdf:resource="http://elpaso.ezoshosting.com/~isshoadmin/blog/archives/000028.html" />
+</rdf:Seq>
+</items>
+
+</channel>
+
+<item rdf:about="http://elpaso.ezoshosting.com/~isshoadmin/blog/archives/000111.html">
+<title>NH would be &quot;No Hassle&quot;</title>
+<link>http://elpaso.ezoshosting.com/~isshoadmin/blog/archives/000111.html</link>
+<description>I thought some more about the &quot;Nippon&quot; domain issue, and decided to mention it in the March 2004 issue of Da Vinci. Out of curiousity, I had a look for the .nh domain, and couldn&apos;t find any signs that a...</description>
+<dc:subject></dc:subject>
+<dc:creator>laszlo</dc:creator>
+<dc:date>2004-02-09T01:03:26+09:00</dc:date>
+</item>
+<item rdf:about="http://elpaso.ezoshosting.com/~isshoadmin/blog/archives/000109.html">
+<title>Things look Different from over Here</title>
+<link>http://elpaso.ezoshosting.com/~isshoadmin/blog/archives/000109.html</link>
+<description>In the &quot;Atama no Naka&quot; piece in the March 2004 issue of Da Vinci, Oguri and I look at the different names and categorizations people have for the continents, regions, countries and cites. One American continent, or two? Europe and...</description>
+<dc:subject>news</dc:subject>
+<dc:creator>laszlo</dc:creator>
+<dc:date>2004-02-08T11:34:02+09:00</dc:date>
+</item>
+<item rdf:about="http://elpaso.ezoshosting.com/~isshoadmin/blog/archives/000107.html">
+<title>Why Lions like Redtape</title>
+<link>http://elpaso.ezoshosting.com/~isshoadmin/blog/archives/000107.html</link>
+<description>I started off an essay with a bit of humor, for a change. I told the joke a few times in the ISSHO irc channel before picking up the pen. Many thanks to all who were guinea pigs, willingly or...</description>
+<dc:subject></dc:subject>
+<dc:creator>laszlo</dc:creator>
+<dc:date>2004-02-07T01:42:47+09:00</dc:date>
+</item>
+<item rdf:about="http://elpaso.ezoshosting.com/~isshoadmin/blog/archives/000103.html">
+<title>Selective Addiction</title>
+<link>http://elpaso.ezoshosting.com/~isshoadmin/blog/archives/000103.html</link>
+<description>I completed an essay about addiction a few days ago. The piece will be out in early March, within the pages of &quot;Darling wa Gaikokujin&quot; - Part 2, published by Media Factory. By way of summary: I find myself in...</description>
+<dc:subject>news</dc:subject>
+<dc:creator>laszlo</dc:creator>
+<dc:date>2004-02-03T19:52:11+09:00</dc:date>
+</item>
+<item rdf:about="http://elpaso.ezoshosting.com/~isshoadmin/blog/archives/000099.html">
+<title>The &quot;Social&quot; in Social Networking</title>
+<link>http://elpaso.ezoshosting.com/~isshoadmin/blog/archives/000099.html</link>
+<description>Orkut, Google&apos;s new service. Indeed, What&apos;s the Point? As with parties where people frantically exchange business cards for an hour with one hand while trying to eat and drink something at the same time with the other, these exercises are...</description>
+<dc:subject>news</dc:subject>
+<dc:creator>laszlo</dc:creator>
+<dc:date>2004-01-25T15:42:53+09:00</dc:date>
+</item>
+<item rdf:about="http://elpaso.ezoshosting.com/~isshoadmin/blog/archives/000095.html">
+<title>Which Japanese do you speak?</title>
+<link>http://elpaso.ezoshosting.com/~isshoadmin/blog/archives/000095.html</link>
+<description>At least at some elite facilities, people being trained to teach Japanese as a second language are told early on, &quot;You speak Kokugo (国語 = &apos;nation&apos; + &apos;language&apos;), because you learned the language during your childhood while growing up in...</description>
+<dc:subject></dc:subject>
+<dc:creator>laszlo</dc:creator>
+<dc:date>2004-01-20T19:02:57+09:00</dc:date>
+</item>
+<item rdf:about="http://elpaso.ezoshosting.com/~isshoadmin/blog/archives/000093.html">
+<title>Tackling Immigrant Crime by Building new Prisons - in &quot;their&quot; Country</title>
+<link>http://elpaso.ezoshosting.com/~isshoadmin/blog/archives/000093.html</link>
+<description>The January 18th Scotland on Sunday runs a bit of news that I first noticed in the German-language media....</description>
+<dc:subject>news</dc:subject>
+<dc:creator>laszlo</dc:creator>
+<dc:date>2004-01-18T20:18:19+09:00</dc:date>
+</item>
+<item rdf:about="http://elpaso.ezoshosting.com/~isshoadmin/blog/archives/000091.html">
+<title>How not to Mispronounce your Favorite Sushi Dish</title>
+<link>http://elpaso.ezoshosting.com/~isshoadmin/blog/archives/000091.html</link>
+<description>In the &quot;Inside Darling&apos;s Mind&quot; manga essay in the February 2004 issue of Da Vinci, Oguri and I look at a certain myth of Japanese pronunciation, namely that one simply pronounces words as they are written. Especially when setting out...</description>
+<dc:subject>news</dc:subject>
+<dc:creator>laszlo</dc:creator>
+<dc:date>2004-01-15T09:59:03+09:00</dc:date>
+</item>
+<item rdf:about="http://elpaso.ezoshosting.com/~isshoadmin/blog/archives/000080.html">
+<title>Adventurous but somewhat Skeptical</title>
+<link>http://elpaso.ezoshosting.com/~isshoadmin/blog/archives/000080.html</link>
+<description>In my short New Years message for the January 2 issue of Shukan ST (p9), I express my hopes that folks in Japan will enter this next year both adventurous and skeptical. In times like these, when things are not...</description>
+<dc:subject></dc:subject>
+<dc:creator>laszlo</dc:creator>
+<dc:date>2004-01-01T03:54:13+09:00</dc:date>
+</item>
+<item rdf:about="http://elpaso.ezoshosting.com/~isshoadmin/blog/archives/000078.html">
+<title>Changing of the Guard in Japan&apos;s Media</title>
+<link>http://elpaso.ezoshosting.com/~isshoadmin/blog/archives/000078.html</link>
+<description>Some weeks ago I moblogged a bit about a bash thrown by TV-Asahi to recognize the programs hosted by TAHARA Soichiro. Sunday Project, in particular, with its interesting mix of crossfire between political bigwigs and provocative analysis, has the power...</description>
+<dc:subject></dc:subject>
+<dc:creator>laszlo</dc:creator>
+<dc:date>2003-12-31T22:56:40+09:00</dc:date>
+</item>
+<item rdf:about="http://elpaso.ezoshosting.com/~isshoadmin/blog/archives/000073.html">
+<title>Mobile Blogging, Bad for the Memory?</title>
+<link>http://elpaso.ezoshosting.com/~isshoadmin/blog/archives/000073.html</link>
+<description>From my essay in Shukan ST, Issue for 2003.12.26: If LaszloMoblog ever came to the attention of the pharaohs of old, I&apos;m sure they would accuse me of storing in cyberspace memories that might as well have been kept in...</description>
+<dc:subject></dc:subject>
+<dc:creator>laszlo</dc:creator>
+<dc:date>2003-12-25T12:15:42+09:00</dc:date>
+</item>
+<item rdf:about="http://elpaso.ezoshosting.com/~isshoadmin/blog/archives/000069.html">
+<title>Making the &quot;Representative Committee&quot; Idea work</title>
+<link>http://elpaso.ezoshosting.com/~isshoadmin/blog/archives/000069.html</link>
+<description>I was invited to speak before the Kanagawa NGO International Cooperation Committee (ＮＧＯかながわ国際協力会議) in the building that houses the Kanagawa Prefectural International Exchange Association. The committee submits proposals directly to the governor of Kanagawa, and is currently considering one that...</description>
+<dc:subject></dc:subject>
+<dc:creator>laszlo</dc:creator>
+<dc:date>2003-12-21T23:35:25+09:00</dc:date>
+</item>
+<item rdf:about="http://elpaso.ezoshosting.com/~isshoadmin/blog/archives/000048.html">
+<title>Passing on the Good Will</title>
+<link>http://elpaso.ezoshosting.com/~isshoadmin/blog/archives/000048.html</link>
+<description>Alain Hoang told me about Pay it Forward, a film that introduces an altruistic &quot;pyramid scheme&quot;: when someone does you a good turn, you accept it and pass it on to three others. Can such a concept actually be employed...not...</description>
+<dc:subject>news</dc:subject>
+<dc:creator>laszlo</dc:creator>
+<dc:date>2003-11-27T11:58:59+09:00</dc:date>
+</item>
+<item rdf:about="http://elpaso.ezoshosting.com/~isshoadmin/blog/archives/000029.html">
+<title>NP is for Nepal and for Japan, and for Nothing is without a Price?</title>
+<link>http://elpaso.ezoshosting.com/~isshoadmin/blog/archives/000029.html</link>
+<description>Japanese domains end in jp while Nepalese domains end in np. Right? Well, the story changed a bit. As of November 22, 2003, .np domains are available for individuals and organizations in Japan, as well. While .np is the official...</description>
+<dc:subject>news</dc:subject>
+<dc:creator>laszlo</dc:creator>
+<dc:date>2003-11-23T14:10:20+09:00</dc:date>
+</item>
+<item rdf:about="http://elpaso.ezoshosting.com/~isshoadmin/blog/archives/000028.html">
+<title>James Brown&apos;s &quot;Sex Machine&quot; in Japan: Geroppa, Gerorra</title>
+<link>http://elpaso.ezoshosting.com/~isshoadmin/blog/archives/000028.html</link>
+<description>I take this issue up as the secondary theme of the &quot;atama no naka&quot; manga essay (sidebar) in the January issue of Da Vinci (on sale from December 6, 2003) . When James Brown sings &quot;Get up&quot; throughout the song...</description>
+<dc:subject>news</dc:subject>
+<dc:creator>laszlo</dc:creator>
+<dc:date>2003-11-22T11:59:39+09:00</dc:date>
+</item>
+
+
+</rdf:RDF>

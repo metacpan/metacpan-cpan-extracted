@@ -1,0 +1,102 @@
+<module name="XML::Schema::Test">
+
+  <about>
+    Utility module for XML::Schema regression tests.
+  </about>
+
+  <synopsis>
+<perl>
+use XML::Schema::Test;
+
+# specify number of tests
+ntests(2);
+
+# test if passed value equates true (ok) or false (not ok) 
+ok( $true_or_false );
+
+# test if result matches expected value (ok) or not (not ok)
+match( $result, $expect )
+</perl>
+  </synopsis>
+
+  <description>
+    <p>
+      This module implements some basic subroutines which are used in
+      the XML::Schema regression test suite.  The tests themselves can
+      be found in the 't' subdirectory of the distribution directory.
+    </p>
+  </description>
+
+  <section id="subs" title="Subroutines">
+    <p>
+      This module exports the following subroutines into the caller's package.
+    </p>
+
+    <methods notitle="1">
+      <method id="ntests" args="$n">
+        <p>
+	  Called before any tests to declare how many tests are
+	  expected to follow.
+        </p>
+<perl>
+ntests(2);
+</perl>
+	<p>
+	  This generates the familiar output which is compatible with
+	  Perl's Test::Harness module (i.e. that which gets run when
+	  you 'make test').
+	</p>
+<perl>
+1..2
+</perl>
+	<p>
+	  If the ntests() subroutine isn't called then the test module
+	  will cache all results generated via ok() and match() and
+	  then display the results as the script finishes executing,
+	  having counted them to determine the total number of tests.
+	</p>
+      </method>
+
+      <method id="ok" args="$truth, $error">
+	<p>
+	  Called to register a test result.  The first value should be
+	  any true value to indicate success or any false value to
+	  indicate failure.
+	</p>
+<perl>
+ok( $foo );
+ok( defined $foo );
+ok( $foo > 10 );
+</perl>
+	<p>
+	  The second optional value may be a error message which is
+	  printed in the case of the test failing.  This is very
+	  useful for determining which test failed without having to
+	  count through your script to find the nth test.
+	</p>
+<perl>
+ok( $foo, '$foo is not true' );
+ok( defined $foo, '$foo is not defined' );
+ok( $foo > 10, '$foo is not > 10' );
+</perl>
+      </method>
+
+      <method id="match" args="$result, $expect">
+	<p>
+	  Called to test that a result string matches an expected
+	  string.  Calls <method>ok()</method> with a true value
+	  if they match or a false value if not.
+	</p>
+<perl>
+match( $foo, 'The foo string' );
+</perl>
+      </method>
+    </methods>
+  </section>
+</module>
+
+
+
+
+
+

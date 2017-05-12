@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+ <!DOCTYPE element SYSTEM "myxml.dtd">
+ <VOCPBoxConfig>
+  <boxList>
+   <box number="001">
+    <message>root.rmd</message>
+    <testtag>
+     <testtag myattr="somevalue=" />
+     <testtag />
+     <testtag emptyattr="" />
+     <testtag myattr="someothervalue">There are lots of test tags here, it would seem...</testtag>
+    </testtag>
+    <owner>root</owner>
+    <branch>0=998,1=011,2=012</branch>
+   </box>
+   <box number="011">
+    <message>menu_en.rmd</message>
+    <owner>pat</owner>
+    <branch>0=998,1=101,2=556,3=201,4=301,9=001</branch>
+   </box>
+   <box number="012">
+    <message>menu_fr.rmd</message>
+    <owner>pat</owner>
+    <branch>0=998,1=557,2=102,3=202,4=302,9=001</branch>
+   </box>
+   <box number="100">
+    <type>mail</type>
+    <owner>pat</owner>
+    <email>someuser@psychogenic.com</email>
+   </box>
+   <box number="101">
+    <message>generic_en.rmd</message>
+    <autojump>100</autojump>
+   </box>
+   <box number="102">
+    <message>pat_fr.rmd</message>
+    <autojump>100</autojump>
+   </box>
+   <box number="150">
+    <message>system/pager.rmd</message>
+    <type>pager</type>
+    <owner>root</owner>
+    <email>someuser@psychogenic.com</email>
+   </box>
+   <box number="201">
+    <message>generic_en.rmd</message>
+    <type>group</type>
+    <members>100,555</members>
+   </box>
+   <box number="202">
+    <message>generic_fr.rmd</message>
+    <type>group</type>
+    <members>100,555</members>
+   </box>
+   <box number="300">
+    <type>script</type>
+    <owner>root</owner>
+    <autojump>001</autojump>
+    <script>/usr/local/vocp/bin/toggleEmail2Vm.pl</script>
+    <input>raw</input>
+    <return>tts</return>
+   </box>
+   <box number="301">
+    <message>generic_en.rmd</message>
+    <type>group</type>
+    <members>100,555</members>
+   </box>
+   <box number="302">
+    <message>generic_fr.rmd</message>
+    <type>group</type>
+    <members>100,555</members>
+   </box>
+   <box number="400">
+    <type>faxondemand</type>
+    <file2fax>/usr/local/vocp/faxtest.g3</file2fax>
+   </box>
+   <box number="500">
+    <type>script</type>
+    <owner>pat</owner>
+    <autojump>001</autojump>
+    <script>/var/spool/voice/commands/motd.pl</script>
+    <return>exit</return>
+   </box>
+   <box number="555">
+    <type>mail</type>
+    <owner>fireball</owner>
+    <email>otheruser@psychogenic.com</email>
+   </box>
+   <box number="556">
+    <message>helene_en.rmd</message>
+    <owner>fireball</owner>
+    <autojump>555</autojump>
+   </box>
+   <box number="557">
+    <message>helene_fr.rmd</message>
+    <owner>fireball</owner>
+    <autojump>555</autojump>
+   </box>
+   <box number="600">
+    <type>command</type>
+    <owner>root</owner>
+    <commandList>
+     <command selection="100">
+      <input>text</input>
+      <return>output</return>
+      <run>ip.pl</run>
+     </command>
+     <command selection="150">
+      <input>none</input>
+      <return>output</return>
+      <run>ip.pl eth0 hohohohoho 3rdparam</run>
+     </command>
+     <command selection="200">
+      <input>none</input>
+      <return>tts</return>
+      <run>motd.pl</run>
+     </command>
+     <command selection="250">
+      <input>raw</input>
+      <return>output</return>
+      <run>echo.pl</run>
+     </command>
+    </commandList>
+   </box>
+   <box number="666">
+    <type>command</type>
+    <owner>root</owner>
+    <commandList>
+     <command selection="100">
+      <input>none</input>
+      <return>output</return>
+      <run>date.pl</run>
+     </command>
+     <command selection="200">
+      <input>none</input>
+      <return>exit</return>
+      <run>date.pl</run>
+     </command>
+    </commandList>
+   </box>
+   <box number="998">
+    <message>system/goodbye.rmd</message>
+    <type>exit</type>
+   </box>
+  </boxList>
+ </VOCPBoxConfig>
+

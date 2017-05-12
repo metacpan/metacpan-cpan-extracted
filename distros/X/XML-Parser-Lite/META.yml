@@ -1,0 +1,29 @@
+---
+abstract: 'Lightweight pure-perl XML Parser (based on regexps)'
+author:
+  - 'Byrne Reese (byrne@majordojo.com)'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0.88'
+  Test::Requires: '0.06'
+  diagnostics: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.3'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: XML-Parser-Lite
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  repository: https://github.com/redhotpenguin/perl-XML-Parser-Lite
+version: '0.721'

@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title><%= title() ? title() . ' /' : '' %>
+    <%= xtext('market') . ' / ' . xtext('company_name') %>
+    / Canada<%=
+      geoip_region() eq '00' ? '' : ', ' . geoip_region()
+    %></title>
+
+  <meta name="description" content="<%=
+    stash('meta_desc') // join ' / ', grep length, title(), xtext('market')
+  %>">
+
+  <link rel="shortcut icon" href="/favicon.ico">
+
+  %= asset "bootstrap.css";
+  %= asset "app.css";
+
+  <!--[if lt IE 9]>
+    <script src="/JS/html5shiv.min.js"></script>
+    <script src="/JS/respond.min.js"></script>
+  <![endif]-->
+
+</head>
+<body>
+
+  <nav class="navbar navbar-fixed-top navbar-inverse">
+    <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+      <span class="sr-only">Toggle navigation</span>
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+      </button>
+      <h1 class="navbar-brand">
+        % if ( xtext('show_nav_logo') ) {
+          <a href="/"
+            ><img src="/content-pics/nav-logo.png"
+              alt="<%= xtext 'market' %>
+                &mdash; <%= xtext 'company_name' %>"
+            ></a>
+        % } else {
+          <a href="/"
+            ><%= xtext 'market' %> <small>/
+            <%= xtext 'company_name' %></small></a>
+        % }
+      </h1>
+    </div>
+    <div id="navbar" class="collapse navbar-collapse">
+      <ul class="nav navbar-nav">
+      <li<%== active_page 'home' %>><a href="/"> <i class="glyphicon glyphicon-home"></i> </a></li>
+      <li<%== active_page 'products' %>><a href="/products"><%=
+          xtext 'products_nav_name'
+        %></a></li>
+      % unless ( config 'no_blog' ) {
+        <li<%== active_page 'blog' %>><a href="/blog">Blog</a></li>
+      % }
+
+      <li<%== active_page 'history' %>><a href="/history">Our History</a></li>
+      <li<%== active_page 'about' %>><a href="/about">About</a></li>
+      <li<%== active_page 'contact' %>><a href="/contact">Contact</a></li>
+      </ul>
+
+      <form class="navbar-form navbar-left" role="search" action="/search">
+        <div class="form-group">
+          <input type="text" class="form-control input-sm" placeholder="Search" name="term">
+        </div>
+        <button type="submit" class="btn btn-default input-sm"><i class="glyphicon glyphicon-search"></i></button>
+      </form>
+    </div><!-- /.nav-collapse -->
+    </div><!-- /.container -->
+  </nav><!-- /.navbar -->
+
+  <div id="bg">
+    <div class="container">
+      <p id="cart" class="text-right
+          <%= ( $c->url_for('current') =~ m{^/cart}  )
+            || ( ! scalar( items_in cart->contents ) )
+            ? 'hidden_checkout' : '' %>
+        ">
+        <span title="Total doesn't include shipping charges or taxes"
+          ><%= items_in cart->contents %> ⇴ $<%= cart_dollars %><sup>.<%= cart_cents %></sup></span>
+        <a href="/cart/" class="btn btn-primary">Checkout</a>
+      </p>
+
+      % if ( title ) {
+        <h2><%= title %>
+          % if ( my $et = stash('extended_title') ) {
+            <small><%= $et %></small>
+          % }
+        </h2>
+      % }
+
+      <%= content %>
+    </div>
+  </div>
+  <footer>
+    <div id="footer_social" class="container">
+        <div class="row">
+            <div class="col-md-12 text-center">
+              % for ( items_in xtext 'social' ) {
+                <a href="<%= $_->{url} %>"
+                  ><img src="<%= $_->{icon} %>" alt=""></a>
+              % }
+            </div>
+        </div>
+    </div>
+    <div id="footer_contacts">
+      <div class="container">
+        <div class="row">
+          %= include 'fragments/footer-locations'
+        </div>
+      </div>
+    </div>
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12 text-center">
+          <h2><%= xtext 'market' %>—<%= xtext 'market_tag' %></h2>
+        </div>
+      </div>
+      <div class="terms text-center">
+        <a href="/terms-and-conditions">Terms and conditions</a>
+        <i class="glyphicon glyphicon-custom-separator"></i>
+        <a href="/privacy-policy">Privacy policy</a>
+        <i class="glyphicon glyphicon-custom-separator"></i>
+        <small id="copyright">Copyright © <%= (localtime)[5] + 1900 %>
+          by <a href="<%= xtext('main_web') %>"
+            ><%= xtext 'company_name' %></a>
+        </small>
+        % if ( config 'ip2location_free' and url_for('current') eq '/' ) {
+          <small id="ip2location">This site includes IP2Location
+            LITE data available from <a href="http://lite.ip2location.com">
+            http://lite.ip2location.com</a>
+          </small>
+        % }
+        </p>
+      </div>
+    </div>
+  </footer>
+
+  <a href="/feedback" id="feedback_b"
+    ><i class="glyphicon glyphicon-stats"></i> <span>Feedback</span></a>
+
+  %= asset "bootstrap.js"
+  %= asset "app.js"
+
+  %= include 'fragments/footer-extra-company'
+  %= include 'fragments/footer-extra-site'
+
+  % if ( xtext 'google_analytics' ) {
+    <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]
+        ||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();
+      a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;
+      m.parentNode.insertBefore(a,m)
+    })(window,document,'script',
+      '//www.google-analytics.com/analytics.js','ga');
+    ga('create', '<%= xtext 'google_analytics' %>', 'auto');
+    ga('send', 'pageview');
+    </script>
+  % }
+</body>
+</html>

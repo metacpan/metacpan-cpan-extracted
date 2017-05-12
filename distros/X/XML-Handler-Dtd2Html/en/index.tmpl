@@ -1,0 +1,26 @@
+<!-- TMPL_INCLUDE NAME='_header.tmpl' -->
+<!-- TMPL_IF NAME="idx_elt" -->
+  <h2>Elements Index.</h2>
+<!-- /TMPL_IF -->
+<!-- TMPL_IF NAME="idx_ent" -->
+  <h2>Entities Index.</h2>
+<!-- /TMPL_IF -->
+<!-- TMPL_IF NAME="idx_not" -->
+  <h2>Notations Index.</h2>
+<!-- /TMPL_IF -->
+<!-- TMPL_IF NAME="lst_ex" -->
+  <h2>Examples List.</h2>
+<!-- /TMPL_IF -->
+<blockquote><dl>
+<!-- TMPL_IF NAME="nb" -->
+  <!-- TMPL_LOOP NAME="a_link" -->
+  <dt><!-- TMPL_VAR NAME="a" --><!-- TMPL_IF NAME="root" --> <em>(root)</em><!-- /TMPL_IF -->
+    <!-- TMPL_IF NAME="brief" --> - <!-- TMPL_VAR NAME="brief" --><!-- /TMPL_IF -->
+  </dt>
+  <!-- /TMPL_LOOP -->
+<!-- TMPL_ELSE -->
+  <dt>NONE</dt>
+<!-- /TMPL_IF -->
+</dl></blockquote>
+<!-- TMPL_INCLUDE NAME='_footer.tmpl' -->
+

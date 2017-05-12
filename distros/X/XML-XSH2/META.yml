@@ -1,0 +1,35 @@
+---
+abstract: 'XML Editing Shell'
+author:
+  - 'Petr Pajas (pajas@matfyz.cz)'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: XML-XSH2
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  IO::Scalar: '0'
+  Parse::RecDescent: '1.94'
+  Term::ReadLine: '0'
+  Term::ReadLine::Perl: '0'
+  URI: '0'
+  XML::Filter::DOMFilter::LibXML: '0.03'
+  XML::LibXML: '1.60'
+  XML::LibXML::Common: '0.13'
+  XML::LibXML::Iterator: '0'
+  XML::LibXML::XPathContext: '0.07'
+  XML::LibXSLT: '1.60'
+  XML::SAX::Writer: '0.44'
+  XML::XUpdate::LibXML: v0.6.0
+version: v2.1.26
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

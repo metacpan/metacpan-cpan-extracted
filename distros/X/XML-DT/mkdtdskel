@@ -1,0 +1,37 @@
+#!/usr/bin/perl
+use XML::DT;
+
+mkdtdskel (@ARGV) #simple huh?
+
+__END__
+
+=encoding utf-8
+
+=head1 NAME
+
+mkdtskel - DTD generator using XML::DT
+
+=head1 SYNOPSIS
+
+  mkdttskel <xmlfile>
+
+=head1 DESCRIPTION
+
+This command tries to infer the DTD structure for a specific XML file;
+
+=head1 SEE ALSO
+
+XML::DT(1), mkdtskel(1) and perl(1)
+
+=head1 AUTHORS
+
+Jose João Almeida, <jj@di.uminho.pt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 1999-2004 by Projecto Natura
+
+This library is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.
+
+=cut

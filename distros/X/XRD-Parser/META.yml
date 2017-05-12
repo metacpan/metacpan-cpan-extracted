@@ -1,0 +1,45 @@
+---
+abstract: 'parse XRD and host-meta files into RDF::Trine models'
+author:
+  - 'Toby Inkster <tobyink@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::More: 0.61
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 0
+generated_by: 'Module::Install version 1.06'
+keywords: []
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: XRD::Parser
+name: XRD-Parser
+no_index:
+  directory:
+    - examples
+    - inc
+    - t
+    - xt
+requires:
+  Carp: 0
+  Data::UUID: 0
+  Digest::SHA: 0
+  Encode: 0
+  HTTP::Link::Parser: 0.102
+  LWP::UserAgent: 0
+  Object::AUTHORITY: 0
+  RDF::Trine: 0.135
+  Scalar::Util: 0
+  URI::Escape: 0
+  URI::URL: 0
+  XML::LibXML: 1.70
+  perl: 5.10.0
+resources:
+  bugtracker: http://rt.cpan.org/Dist/Display.html?Queue=XRD-Parser
+  homepage: https://metacpan.org/release/XRD-Parser
+  license: http://dev.perl.org/licenses/
+  repository: https://bitbucket.org/tobyink/p5-xrd-parser
+version: 0.201

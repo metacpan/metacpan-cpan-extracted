@@ -1,0 +1,40 @@
+XML::ParseDTD version 0.1.4
+===========================
+
+This module basically tells you which tags are known by the dtd, which
+child tags a certain tag might have, which tags are defined as a empty
+tags, which attributes a certain tag might have, which values are
+allowed for a certain attribute, which attributes are required, which
+attributes are fixed, which attributes have which default value ...
+well i would say it tells you all that is defined in the dtd (at least
+all that i know of, but i'm not so much into that topic, so please make
+me aware if i missed something). All this information can be accessed
+in 2 diffrent ways: 1. you can simply get it 2. you can pass certain
+data and the module then tells you whether thats ok or not.
+
+Internally the parsed DTD data is simply stored in 6 hash structures.
+Because of this and because of the caching (with help of
+Cache::Cache) the module should be very fast.
+
+Please see the POD for additional information.
+
+INSTALLATION
+
+To install this module, type:
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+
+DEPENDENCIES
+
+- LWP::UserAgent 5.69 by Gisle Aas
+- Cache::Cache 1.02 by DeWitt Clinton
+
+COPYRIGHT AND LICENSE
+
+(c) 2003-2004 Moritz Sinn
+
+This module is free software.  You can redistribute it and/or modify it 
+under the terms of the GNU GENERAL PUBLIC LICENSE (see COPYING).

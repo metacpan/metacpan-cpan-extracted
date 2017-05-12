@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<same>
+  <tree>
+    <top>
+      <some>text<!-- and comment --></some>
+    </top>
+  </tree>
+</same>

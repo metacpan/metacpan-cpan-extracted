@@ -1,0 +1,13 @@
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         XML-RSS-Parser
+version:      4
+version_from: lib/XML/RSS/Parser.pm
+installdirs:  site
+requires:
+    Test::More:                    0
+    Class::ErrorHandler:           0
+    Class::XPath:                  1.4
+    XML::Elemental:                2.0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.12

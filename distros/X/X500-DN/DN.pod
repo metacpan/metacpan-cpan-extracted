@@ -1,0 +1,108 @@
+=head1 NAME
+
+X500::DN - handle X.500 DNs (Distinguished Names), parse and format them
+
+=head1 SYNOPSIS
+
+  use X500::DN;
+
+  my $dn = X500::DN->ParseRFC2253 ('cn=John Doe, o=Acme\\, Inc., c=US') or die;
+  print $dn->getRFC2253String(), "\n";
+
+  $dn = new X500::DN (new X500::RDN ('c'=>'US'), new X500::RDN ('cn'=>'John Doe'));
+  my $rdn0 = $dn->getRDN (0);
+  my $c = $rdn0->getAttributeValue ('c');
+
+=head1 NOTE
+
+The RFC 2253 syntax is I<explicitely backwards> in relation to the ASN.1 SEQUENCE.
+
+So the RFC 2253 string C<S<cn=John Doe, c=US>>
+has the same meaning as the X.500 string C<S<c=US, cn=John Doe>>.
+The X500::DN objects keep the RDNs in X.500 order!
+
+=head1 DESCRIPTION
+
+This module handles X.500 DNs (Distinguished Names).
+Currently, it parses DN strings formatted according to RFC 2253 syntax into an internal format and produces RFC 2253 formatted string from it.
+
+=head2 Methods
+
+=over 4
+
+=item * $object = new X500::DN (rdn, rdn, ...);
+
+Creates a DN object from zero or more arguments of type X500::RDN.
+
+=item * $object = X500::DN->ParseRFC2253 ('cn=John Doe, o=Acme\\, Inc., c=US');
+
+Creates a DN object from an RFC 2253 formatted DN string notation.
+
+=item * $object->getRFC2253String();
+
+Returns the DN as a string formatted according to RFC 2253 syntax.
+
+=item * $object->getOpenSSLString();
+
+Returns the DN as a string formatted suitable for C<openssl req -subj> and C<openssl ca -subj>.
+
+=item * $object->getX500String();
+
+Returns the DN as a string formatted according to X.500 syntax.
+NOTE: This is a hack, there is no definition for a X.500 string syntax!
+
+=item * $object->hasMultivaluedRDNs();
+
+Returns whether the DN contains multi-valued RDNs.
+
+=item * $object->getRDN (num);
+
+Returns the DN's RDN at position num as an X500::RDN object.
+num starts with 0, which will return the first RDN in ASN.1 SEQUENCE order.
+
+=item * $object->getRDNs();
+
+Returns the DN's RDNs, a list of objects of type X500::RDN, in ASN.1 SEQUENCE order.
+
+=back
+
+=head2 EXPORT
+
+None.
+
+=head1 BUGS
+
+=over 4
+
+=item * Due to Parse::RecDescent's greedyness, white space after attribute values gets into the parsed value.
+It might be possible to work around this.
+
+=back
+
+=head1 AUTHOR
+
+Robert Joop E<lt>yaph-070708@timesink.deE<gt>
+
+=head1 COPYRIGHT
+
+Copyright 2002 Robert Joop.  All Rights reserved.
+This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+L<X500::RDN>,
+L<perl>.
+
+=head1 HISTORY
+
+=over 4
+
+=item Early 2002:
+First idea, discussed on comp.lang.perl.moderated
+
+=item April 2002:
+First public release, 0.15
+
+=back
+
+=cut

@@ -1,0 +1,9 @@
+Revision history for Perl extension CanonicalizeXML.
+
+0.05  Fri Jul 09 09:49:52 2010 +0100
+        - Fixed DOS line termiantion feeds for Forte CC
+
+0.01  Tue Jul 13 13:24:16 2004
+	- original version; created by h2xs 1.23 with options
+		-O -n CanonicalizeXML ./CanonicalizeXML/canon/canon.h
+

@@ -1,0 +1,9 @@
+
+=== version history of XML::Compile::License
+
+Unless noted otherwise, these changes where initiated and applied by
+Mark Overmeer.
+
+version 0.01: Mon 21 Mar 13:57:26 CET 2016
+
+	Initial release, split from XML::Compile::SOAP

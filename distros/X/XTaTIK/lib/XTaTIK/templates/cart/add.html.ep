@@ -1,0 +1,9 @@
+% layout 'default';
+% title 'Add to Cart';
+
+<p class="alert alert-success">
+  <i class="glyphicon glyphicon-ok"></i> Successfully added <%= stash 'quantity' %> of <%= stash 'number' %>
+    to the <%= stash('is_quote') ? 'quote' : 'cart' %>.
+
+  <a href="/cart/" class="btn btn-primary">Check out</a> or <a href="<%= stash 'return_to' %>" class="btn btn-default">Continue shopping</a>
+</p>

@@ -1,0 +1,50 @@
+<stx:transform version="1.0" 
+  xmlns:stx="http://stx.sourceforge.net/2002/ns"
+  strip-space="yes">
+
+  <stx:template match="/root">
+    <stx:process-children/>
+  </stx:template>
+
+  <stx:template match="node">
+    <stx:text>/</stx:text>
+    <stx:value-of select="position()"/>
+    <stx:process-attributes group="g1"/>
+    <stx:process-children group="g2"/>
+    <stx:process-attributes group="g3"/>
+  </stx:template>
+
+  <stx:template match="@*">
+    <stx:text> #</stx:text>
+    <stx:value-of select="name()"/>
+  </stx:template>
+
+  <stx:group name="g1">
+
+    <stx:template match="@*">
+      <stx:text> @</stx:text>
+      <stx:value-of select="name()"/>
+    </stx:template>
+
+  </stx:group>
+
+  <stx:group name="g2">
+
+    <stx:template match="text()">
+      <stx:text> {</stx:text>
+      <stx:value-of select="."/>
+      <stx:text>}</stx:text>
+    </stx:template>
+
+  </stx:group>
+
+  <stx:group name="g3">
+
+    <stx:template match="@*">
+      <stx:text> $</stx:text>
+      <stx:value-of select="name()"/>
+    </stx:template>
+
+  </stx:group>
+
+</stx:transform>

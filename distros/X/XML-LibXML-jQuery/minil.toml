@@ -1,0 +1,5 @@
+name = "XML-LibXML-jQuery"
+badges = ["travis", "coveralls"]
+authority="cpan:CAFEGRATZ"
+
+module_maker="ModuleBuildTiny"

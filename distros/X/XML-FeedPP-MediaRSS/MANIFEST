@@ -1,0 +1,8 @@
+CHANGES
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+lib/XML/FeedPP/MediaRSS.pm
+t/spec.t

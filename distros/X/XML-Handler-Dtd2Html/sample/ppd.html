@@ -1,0 +1,836 @@
+<?xml version='1.0' encoding='ISO-8859-1'?>
+<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3.org/1999/xhtml'>
+
+  <head>
+    <meta http-equiv='Content-Type' content='text/html; charset=ISO-8859-1' />
+    <meta name='generator' content='dtd2html 0.41 (Perl 5.006001)' />
+    <meta name='date' content='Wed Nov 12 11:52:11 2003' />
+    <title>Perl Package Distribution </title>
+    
+    <style type='text/css'>
+      a.index {font-weight: bold}
+      hr {text-align: center}
+      h2 {color: red}
+      p.comment {color: green}
+      span.comment {color: green}
+      span.keyword1 {color: teal}
+      span.keyword2 {color: maroon}
+    </style>
+    
+  </head>
+
+  <body>
+    <h1>Perl Package Distribution </h1>
+    <hr />
+    <h2>Elements index.</h2>
+
+  <dl>
+    
+    <dt><a class='index' href='#elt_ABSTRACT'>ABSTRACT</a></dt>
+    
+    <dt><a class='index' href='#elt_AUTHOR'>AUTHOR</a></dt>
+    
+    <dt><a class='index' href='#elt_CODEBASE'>CODEBASE</a></dt>
+    
+    <dt><a class='index' href='#elt_DEPENDENCY'>DEPENDENCY</a></dt>
+    
+    <dt><a class='index' href='#elt_IMPLEMENTATION'>IMPLEMENTATION</a></dt>
+    
+    <dt><a class='index' href='#elt_INSTALL'>INSTALL</a></dt>
+    
+    <dt><a class='index' href='#elt_LANGUAGE'>LANGUAGE</a></dt>
+    
+    <dt><a class='index' href='#elt_LICENSE'>LICENSE</a></dt>
+    
+    <dt><a class='index' href='#elt_OS'>OS</a></dt>
+    
+    <dt><a class='index' href='#elt_OSVERSION'>OSVERSION</a></dt>
+    
+    <dt><a class='index' href='#elt_PERLCORE'>PERLCORE</a></dt>
+    
+    <dt><a class='index' href='#elt_PROCESSOR'>PROCESSOR</a></dt>
+    
+    <dt><a class='index' href='#elt_SOFTPKG'>SOFTPKG</a></dt>
+    
+    <dt><a class='index' href='#elt_TITLE'>TITLE</a></dt>
+    
+    <dt><a class='index' href='#elt_UNINSTALL'>UNINSTALL</a></dt>
+    
+  </dl>
+
+<h2>Entities index.</h2>
+
+<h2>Notations index.</h2>
+
+<h2>Examples list.</h2>
+
+
+
+    <hr />
+    
+    <h2>Element tree.</h2>
+      <ul class='tree'>
+  <li class='tree'><a class='index' href='#elt_SOFTPKG'>SOFTPKG</a>
+<ul class='tree'>
+  <li class='tree'><a class='index' href='#elt_IMPLEMENTATION'>IMPLEMENTATION</a>
+<ul class='tree'>
+  <li class='tree'><a class='index' href='#elt_INSTALL'>INSTALL</a>
+  </li>
+  <li class='tree'><a class='index' href='#elt_CODEBASE'>CODEBASE</a>
+  </li>
+  <li class='tree'><a class='index' href='#elt_OSVERSION'>OSVERSION</a>
+  </li>
+  <li class='tree'><a class='index' href='#elt_LANGUAGE'>LANGUAGE</a>
+  </li>
+  <li class='tree'><a class='index' href='#elt_UNINSTALL'>UNINSTALL</a>
+  </li>
+  <li class='tree'><a class='index' href='#elt_DEPENDENCY'>DEPENDENCY</a>
+  </li>
+  <li class='tree'><a class='index' href='#elt_OS'>OS</a>
+  </li>
+  <li class='tree'><a class='index' href='#elt_PROCESSOR'>PROCESSOR</a>
+  </li>
+  <li class='tree'><a class='index' href='#elt_PERLCORE'>PERLCORE</a>
+  </li>
+</ul>
+  </li>
+  <li class='tree'><a class='index' href='#elt_LICENSE'>LICENSE</a>
+  </li>
+  <li class='tree'><a class='index' href='#elt_ABSTRACT'>ABSTRACT</a>
+  </li>
+  <li class='tree'><a class='index' href='#elt_TITLE'>TITLE</a>
+  </li>
+  <li class='tree'><a class='index' href='#elt_AUTHOR'>AUTHOR</a>
+  </li>
+</ul>
+  </li>
+</ul>
+
+    <hr />
+    
+      <h3>Prolog</h3>
+    <p>
+  
+      &lt;<span class='keyword1'>!DOCTYPE</span> <a href='#elt_SOFTPKG'>SOFTPKG</a>
+    
+      
+      <span class='keyword1'>SYSTEM</span> 'ppd.dtd'
+      
+    
+&gt;
+  
+    </p>
+
+    
+    <p class='comment'> 
+  The DTD for PPD documents is available from the ActiveState website and 
+  the latest version can be found at <a href='http://www.ActiveState.com/PPM/DTD/ppd.dtd'>http://www.ActiveState.com/PPM/DTD/ppd.dtd</a>
+ 
+</p>
+    
+    
+
+    <hr />
+    <ul>
+    
+      <li>
+      
+      
+      
+      
+        <a id='elt_SOFTPKG' name='elt_SOFTPKG'/>
+        <h3>SOFTPKG</h3>
+        <p>&lt;<span class='keyword1'>!ELEMENT</span> SOFTPKG ( <a href='#elt_ABSTRACT'>ABSTRACT</a> | <a href='#elt_AUTHOR'>AUTHOR</a> | <a href='#elt_IMPLEMENTATION'>IMPLEMENTATION</a> | <a href='#elt_LICENSE'>LICENSE</a> | <a href='#elt_TITLE'>TITLE</a> )* &gt;
+        
+          <br />
+          &lt;<span class='keyword1'>!ATTLIST</span> SOFTPKG NAME
+          
+            <span class='keyword1'>CDATA</span>
+          
+          
+            <span class='keyword2'>#REQUIRED</span>
+          
+          
+          &gt;
+        
+          <br />
+          &lt;<span class='keyword1'>!ATTLIST</span> SOFTPKG VERSION
+          
+            <span class='keyword1'>CDATA</span>
+          
+          
+            <span class='keyword2'>#IMPLIED</span>
+          
+          
+          &gt;
+        
+        </p>
+      
+
+      
+      <p class='comment'> It's the root element of a description of a software package, in Perl
+   Package Distribution (PPD) format which is an XML application. 
+</p>
+      
+      <p class='comment'> HISTORY : v0.1 - Initial release 
+</p>
+      
+      <p class='comment'> SEE ALSO : OSD Specification <a href='http://www.microsoft.com/standards/osd/'>http://www.microsoft.com/standards/osd/</a> 
+</p>
+      
+      
+      
+      <ul>
+      
+        <li>NAME : <span class='comment'>
+        
+          <p> Name of the package (e.g. ``Foobar''). 
+</p>
+        </span>
+        
+        </li>
+      
+        <li>VERSION : <span class='comment'>
+        
+          <p> Version number of the package, in comma-delimited format (e.g. ``1,0,0,0'').  
+</p>
+        </span>
+        
+        </li>
+      
+      </ul>
+      
+
+      </li>
+    
+      <li>
+      
+      
+      
+      
+        <a id='elt_TITLE' name='elt_TITLE'/>
+        <h3>TITLE</h3>
+        <p>&lt;<span class='keyword1'>!ELEMENT</span> TITLE ( <span class='keyword1'>#PCDATA</span>  ) &gt;
+        
+        </p>
+      
+
+      
+      <p class='comment'> Used to state the title of the Perl Package. Only one instance should be present. 
+</p>
+      
+      
+      
+
+      </li>
+    
+      <li>
+      
+      
+      
+      
+        <a id='elt_ABSTRACT' name='elt_ABSTRACT'/>
+        <h3>ABSTRACT</h3>
+        <p>&lt;<span class='keyword1'>!ELEMENT</span> ABSTRACT ( <span class='keyword1'>#PCDATA</span>  ) &gt;
+        
+        </p>
+      
+
+      
+      <p class='comment'> Used to provide a short description outlining the nature and purpose of
+  the Perl Package. Only one instance should be present. 
+</p>
+      
+      
+      
+
+      </li>
+    
+      <li>
+      
+      
+      
+      
+        <a id='elt_AUTHOR' name='elt_AUTHOR'/>
+        <h3>AUTHOR</h3>
+        <p>&lt;<span class='keyword1'>!ELEMENT</span> AUTHOR ( <span class='keyword1'>#PCDATA</span>  ) &gt;
+        
+        </p>
+      
+
+      
+      <p class='comment'> Used to provide information about the author(s) of the Perl Package.
+  Multiple instances are valid. 
+</p>
+      
+      
+      
+
+      </li>
+    
+      <li>
+      
+      
+      
+      
+        <a id='elt_LICENSE' name='elt_LICENSE'/>
+        <h3>LICENSE</h3>
+        <p>&lt;<span class='keyword1'>!ELEMENT</span> LICENSE <span class='keyword1'>EMPTY</span>  &gt;
+        
+          <br />
+          &lt;<span class='keyword1'>!ATTLIST</span> LICENSE HREF
+          
+            <span class='keyword1'>CDATA</span>
+          
+          
+            <span class='keyword2'>#REQUIRED</span>
+          
+          
+          &gt;
+        
+        </p>
+      
+
+      
+      <p class='comment'> Indicating the location of the appropriate license agreement or copyright
+  notice for the Perl Package. Only one instance should be present. 
+</p>
+      
+      
+      
+      <ul>
+      
+        <li>HREF : <span class='comment'>
+        
+          <p> Required attribute. A reference to the location of the license agreement
+  or copyright notice for this package. 
+</p>
+        </span>
+        
+        </li>
+      
+      </ul>
+      
+
+      </li>
+    
+      <li>
+      
+      
+      
+      
+        <a id='elt_IMPLEMENTATION' name='elt_IMPLEMENTATION'/>
+        <h3>IMPLEMENTATION</h3>
+        <p>&lt;<span class='keyword1'>!ELEMENT</span> IMPLEMENTATION ( <a href='#elt_CODEBASE'>CODEBASE</a> | <a href='#elt_DEPENDENCY'>DEPENDENCY</a> | <a href='#elt_LANGUAGE'>LANGUAGE</a> | <a href='#elt_OS'>OS</a> | <a href='#elt_OSVERSION'>OSVERSION</a> | <a href='#elt_PERLCORE'>PERLCORE</a> | <a href='#elt_PROCESSOR'>PROCESSOR</a> | 
+  <a href='#elt_INSTALL'>INSTALL</a> | <a href='#elt_UNINSTALL'>UNINSTALL</a> )* &gt;
+        
+        </p>
+      
+
+      
+      <p class='comment'> Used to describe a particular implementation of the Perl Package. Multiple
+  instances are valid, and should be used to describe different implementations/ports
+  for different operating systems or architectures. 
+</p>
+      
+      
+      
+
+      </li>
+    
+      <li>
+      
+      
+      
+      
+        <a id='elt_CODEBASE' name='elt_CODEBASE'/>
+        <h3>CODEBASE</h3>
+        <p>&lt;<span class='keyword1'>!ELEMENT</span> CODEBASE <span class='keyword1'>EMPTY</span>  &gt;
+        
+          <br />
+          &lt;<span class='keyword1'>!ATTLIST</span> CODEBASE FILENAME
+          
+            <span class='keyword1'>CDATA</span>
+          
+          
+            <span class='keyword2'>#IMPLIED</span>
+          
+          
+          &gt;
+        
+          <br />
+          &lt;<span class='keyword1'>!ATTLIST</span> CODEBASE HREF
+          
+            <span class='keyword1'>CDATA</span>
+          
+          
+            <span class='keyword2'>#REQUIRED</span>
+          
+          
+          &gt;
+        
+        </p>
+      
+
+      
+      <p class='comment'> Indicating a location where an archive of the Perl Package can be retrieved.
+  Multiple instances are valid, and can be used to indicate multiple possible
+  locations where the same version of the Perl Package can be retrieved. 
+</p>
+      
+      
+      
+      <ul>
+      
+        <li>FILENAME : <span class='comment'>
+        
+          <p> ??? 
+</p>
+        </span>
+        
+        </li>
+      
+        <li>HREF : <span class='comment'>
+        
+          <p> A reference to the location of the Perl Package distribution. 
+</p>
+        </span>
+        
+        </li>
+      
+      </ul>
+      
+
+      </li>
+    
+      <li>
+      
+      
+      
+      
+        <a id='elt_DEPENDENCY' name='elt_DEPENDENCY'/>
+        <h3>DEPENDENCY</h3>
+        <p>&lt;<span class='keyword1'>!ELEMENT</span> DEPENDENCY <span class='keyword1'>EMPTY</span>  &gt;
+        
+          <br />
+          &lt;<span class='keyword1'>!ATTLIST</span> DEPENDENCY VERSION
+          
+            <span class='keyword1'>CDATA</span>
+          
+          
+            <span class='keyword2'>#IMPLIED</span>
+          
+          
+          &gt;
+        
+          <br />
+          &lt;<span class='keyword1'>!ATTLIST</span> DEPENDENCY NAME
+          
+            <span class='keyword1'>CDATA</span>
+          
+          
+            <span class='keyword2'>#REQUIRED</span>
+          
+          
+          &gt;
+        
+        </p>
+      
+
+      
+      <p class='comment'> Used to indicate a dependency this Perl Package has on another Perl Package.
+  Multiple instances are valid. 
+</p>
+      
+      
+      
+      <ul>
+      
+        <li>VERSION : <span class='comment'>
+        
+          <p> Version number of the dependency, in comma-delimited format (e.g. ``1,0,0,0''). 
+</p>
+        </span>
+        
+        </li>
+      
+        <li>NAME : <span class='comment'>
+        
+          <p> Name of the package that this implementation is dependant upon. 
+</p>
+        </span>
+        
+        </li>
+      
+      </ul>
+      
+
+      </li>
+    
+      <li>
+      
+      
+      
+      
+        <a id='elt_LANGUAGE' name='elt_LANGUAGE'/>
+        <h3>LANGUAGE</h3>
+        <p>&lt;<span class='keyword1'>!ELEMENT</span> LANGUAGE <span class='keyword1'>EMPTY</span>  &gt;
+        
+          <br />
+          &lt;<span class='keyword1'>!ATTLIST</span> LANGUAGE VALUE
+          
+            <span class='keyword1'>CDATA</span>
+          
+          
+            <span class='keyword2'>#REQUIRED</span>
+          
+          
+          &gt;
+        
+        </p>
+      
+
+      
+      <p class='comment'> Used to specify the language used within the given implementation of the
+  Perl Package. Only one instance should be present. 
+</p>
+      
+      
+      
+
+      </li>
+    
+      <li>
+      
+      
+      
+      
+        <a id='elt_OS' name='elt_OS'/>
+        <h3>OS</h3>
+        <p>&lt;<span class='keyword1'>!ELEMENT</span> OS <span class='keyword1'>EMPTY</span>  &gt;
+        
+          <br />
+          &lt;<span class='keyword1'>!ATTLIST</span> OS VALUE
+          
+            <span class='keyword1'>CDATA</span>
+          
+          
+            <span class='keyword2'>#REQUIRED</span>
+          
+          
+          &gt;
+        
+        </p>
+      
+
+      
+      <p class='comment'> Used to outline the operating system required for this implementation of
+  the Perl Package. Multiple instances are valid. Valid values can be taken
+  from the OSD Specification and it's OS element. 
+</p>
+      
+      
+      
+      <ul>
+      
+        <li>VALUE : <span class='comment'>
+        
+          <p> The name of the operating system required for this implementation of the
+  Perl Package. This value should be obtained from Config.pm as 'osname'. 
+</p>
+        </span>
+        
+        </li>
+      
+      </ul>
+      
+
+      </li>
+    
+      <li>
+      
+      
+      
+      
+        <a id='elt_OSVERSION' name='elt_OSVERSION'/>
+        <h3>OSVERSION</h3>
+        <p>&lt;<span class='keyword1'>!ELEMENT</span> OSVERSION <span class='keyword1'>EMPTY</span>  &gt;
+        
+          <br />
+          &lt;<span class='keyword1'>!ATTLIST</span> OSVERSION VALUE
+          
+            <span class='keyword1'>CDATA</span>
+          
+          
+            <span class='keyword2'>#REQUIRED</span>
+          
+          
+          &gt;
+        
+        </p>
+      
+
+      
+      <p class='comment'> Used to outline the required version of the operating system required for
+  this implementation of the Perl Package. Only one instance should be present. 
+</p>
+      
+      
+      
+      <ul>
+      
+        <li>VALUE : <span class='comment'>
+        
+          <p> The version of the operating system required for installation of this
+  implementation of the package, in a comma-delimited format (e.g. ``3,1,0,0''). 
+</p>
+        </span>
+        
+        </li>
+      
+      </ul>
+      
+
+      </li>
+    
+      <li>
+      
+      
+      
+      
+        <a id='elt_PERLCORE' name='elt_PERLCORE'/>
+        <h3>PERLCORE</h3>
+        <p>&lt;<span class='keyword1'>!ELEMENT</span> PERLCORE <span class='keyword1'>EMPTY</span>  &gt;
+        
+          <br />
+          &lt;<span class='keyword1'>!ATTLIST</span> PERLCORE VERSION
+          
+            <span class='keyword1'>CDATA</span>
+          
+          
+            <span class='keyword2'>#REQUIRED</span>
+          
+          
+          &gt;
+        
+        </p>
+      
+
+      
+      <p class='comment'> Used to specify the minimum version of the Perl core distribution that
+  this Perl Package is to be used with. Only one instance should be present. 
+</p>
+      
+      
+      
+      <ul>
+      
+        <li>VERSION : <span class='comment'>
+        
+          <p> Version of the Perl core that is required for this implementation of the
+  Perl Package. 
+</p>
+        </span>
+        
+        </li>
+      
+      </ul>
+      
+
+      </li>
+    
+      <li>
+      
+      
+      
+      
+        <a id='elt_PROCESSOR' name='elt_PROCESSOR'/>
+        <h3>PROCESSOR</h3>
+        <p>&lt;<span class='keyword1'>!ELEMENT</span> PROCESSOR <span class='keyword1'>EMPTY</span>  &gt;
+        
+          <br />
+          &lt;<span class='keyword1'>!ATTLIST</span> PROCESSOR VALUE
+          
+            <span class='keyword1'>CDATA</span>
+          
+          
+            <span class='keyword2'>#REQUIRED</span>
+          
+          
+          &gt;
+        
+        </p>
+      
+
+      
+      <p class='comment'> Outlining the cpu required for this implementation of the Perl Package.
+  Only one instance should be present. 
+</p>
+      
+      
+      
+      <ul>
+      
+        <li>VALUE : <span class='comment'>
+        
+          <p> CPU required for the installation of this implementation of the Perl Package.
+  The following values are all valid according to the OSD Specification:
+   x86 alpha mips sparc 680x0 
+</p>
+        </span>
+        
+        </li>
+      
+      </ul>
+      
+
+      </li>
+    
+      <li>
+      
+      
+      
+      
+        <a id='elt_INSTALL' name='elt_INSTALL'/>
+        <h3>INSTALL</h3>
+        <p>&lt;<span class='keyword1'>!ELEMENT</span> INSTALL ( <span class='keyword1'>#PCDATA</span>  ) &gt;
+        
+          <br />
+          &lt;<span class='keyword1'>!ATTLIST</span> INSTALL HREF
+          
+            <span class='keyword1'>CDATA</span>
+          
+          
+            <span class='keyword2'>#IMPLIED</span>
+          
+          
+          &gt;
+        
+          <br />
+          &lt;<span class='keyword1'>!ATTLIST</span> INSTALL EXEC
+          
+            <span class='keyword1'>CDATA</span>
+          
+          
+            <span class='keyword2'>#IMPLIED</span>
+          
+          
+          &gt;
+        
+        </p>
+      
+
+      
+      <p class='comment'> Used to provide either a reference to an installation script or a series
+  of commands which can be used to install the Perl Package once it has been
+  retrieved. If the EXEC attribute is not specified, the value is assumed to be
+  one or more commands, separated by `;;'. Each such command will be executed
+  by the Perl `system()'function. Only one instance should be present. 
+</p>
+      
+      
+      
+      <ul>
+      
+        <li>HREF : <span class='comment'>
+        
+          <p> Reference to an external script which should be retrieved and run as part of
+  the installation process. Both filenames and URLs should be considered valid. 
+</p>
+        </span>
+        
+        </li>
+      
+        <li>EXEC : <span class='comment'>
+        
+          <p> Name of interpreter/shell used to execute the installation script. If the
+  value of EXEC is `PPM_PERL', the copy of Perl that is executing PPM itself ($^X)
+  is used to execute the install script. 
+</p>
+        </span>
+        
+        </li>
+      
+      </ul>
+      
+
+      </li>
+    
+      <li>
+      
+      
+      
+      
+        <a id='elt_UNINSTALL' name='elt_UNINSTALL'/>
+        <h3>UNINSTALL</h3>
+        <p>&lt;<span class='keyword1'>!ELEMENT</span> UNINSTALL ( <span class='keyword1'>#PCDATA</span>  ) &gt;
+        
+          <br />
+          &lt;<span class='keyword1'>!ATTLIST</span> UNINSTALL HREF
+          
+            <span class='keyword1'>CDATA</span>
+          
+          
+            <span class='keyword2'>#IMPLIED</span>
+          
+          
+          &gt;
+        
+          <br />
+          &lt;<span class='keyword1'>!ATTLIST</span> UNINSTALL EXEC
+          
+            <span class='keyword1'>CDATA</span>
+          
+          
+            <span class='keyword2'>#IMPLIED</span>
+          
+          
+          &gt;
+        
+        </p>
+      
+
+      
+      <p class='comment'> Used to provide either a reference to an uninstallation script or a raw
+  Perl script which can be used to uninstall the Perl Package at a later point.
+  Only one instance should be present. 
+</p>
+      
+      
+      
+      <ul>
+      
+        <li>HREF : <span class='comment'>
+        
+          <p> Reference to an external script which should be retrieved and run as part
+  of the removal process. Both filenames and URLs should be considered valid. 
+</p>
+        </span>
+        
+        </li>
+      
+        <li>EXEC : <span class='comment'>
+        
+          <p> Name of interpreter/shell used to execute the uninstallation script. If the
+  value of EXEC is `PPM_PERL', the copy of Perl that is executing PPM itself ($^X)
+  is used to execute the install script. 
+</p>
+        </span>
+        
+        </li>
+      
+      </ul>
+      
+
+      </li>
+    
+    </ul>
+  
+    <hr />
+    <div><cite>Generated by dtd2html</cite></div>
+
+
+  </body>
+
+</html>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<simple_schema_with_iteration>
+	<el0>el0</el0>
+	<el1>el1</el1>
+	<el2>el2_01</el2>
+	<el2>el2_02</el2>
+	<el2>el2_03</el2>
+</simple_schema_with_iteration>

@@ -1,0 +1,23 @@
+---
+abstract: 'Streaming parse XML data into a result hash based upon a specification hash'
+author:
+  - 'Lucas Theisen <lucastheisen@pastdev.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: XML-Saxtract
+requires:
+  Class::Accessor: '0'
+  LWP::UserAgent: '0'
+  XML::SAX: '0'
+resources:
+  homepage: https://github.com/lucastheisen/saxtract-perl
+  repository: https://github.com/lucastheisen/saxtract-perl.git
+version: '1.03'
+x_serialization_backend: 'YAML::Tiny version 1.69'

@@ -1,0 +1,6 @@
+<!ELEMENT plants (plant)*>
+<!ELEMENT plant (flower, name)>
+<!ELEMENT flower (#PCDATA)>
+<!ELEMENT name (#PCDATA)>
+<!ATTLIST flower colour CDATA #IMPLIED>
+

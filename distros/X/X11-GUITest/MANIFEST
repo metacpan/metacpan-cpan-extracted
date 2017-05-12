@@ -1,0 +1,46 @@
+Changes
+Common.h
+docs/CodingStyle
+docs/Copying
+docs/X11-GUITest.html
+docs/X11-GUITest.txt
+eg/extras/FindControlVisually.pl
+eg/FindWindowLike.pl
+eg/templates/ScriptTemplate.pl
+eg/TextEditor_1.pl
+eg/WebBrowser_1.pl
+GUITest.h
+GUITest.pm
+GUITest.xs
+KeyUtil.c
+KeyUtil.h
+Makefile.PL
+MANIFEST			This list of files
+README
+recorder/aclocal.m4
+recorder/autogen.sh
+recorder/config.h.in
+recorder/configure
+recorder/configure.ac
+recorder/depcomp
+recorder/install-sh
+recorder/Makefile.am
+recorder/Makefile.in
+recorder/man/Makefile.am
+recorder/man/Makefile.in
+recorder/man/x11guirecord.1
+recorder/missing
+recorder/src/main.c
+recorder/src/main.h
+recorder/src/Makefile.am
+recorder/src/Makefile.in
+recorder/src/record.c
+recorder/src/record.h
+recorder/src/record_event.h
+recorder/src/script_file.c
+recorder/src/script_file.h
+t/test.t
+ToDo
+typemap
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

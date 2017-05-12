@@ -1,0 +1,52 @@
+Revision history for XML::NewsML_G2
+
+v0.2.6  Tue Feb 25 17:00:00 2015
+        derived_from added, location now supports latitude/longitude
+
+v0.2.5  Tue Dec 02 15:00:00 2014
+        Added 'summary' and 'teaser'
+
+v0.2.4  Fri Nov 07 18:15:00 2014
+        Added lost headline.
+
+v0.2.3  Fri Nov 07 18:00:00 2014
+        Published repository on Github, fixed attribute order.
+
+v0.2.2  Wed Oct 22 16:15:00 2014
+        Getting started chapter added.
+
+v0.2.1  Wed Oct 22 12:00:00 2014
+        Support for NewsML-G2 2.18 added, documentation improved.
+
+v0.2.0  Mon Oct 20 15:45:00 2014
+        Support for packages, images, audio, video and graphics. NewsML-G2 2.15 implemented.
+
+v0.1_4  Wed Oct 17 09:45:00 2014
+        preparing next public release: guarded unittest against old libxml2 version, improved POD
+
+v0.1_3  Wed Oct 15 18:15:00 2014
+        preparing next public release: support for packages, images, audio, video and graphics. NewsML-G2 version 2.18 implemented.
+
+v0.1.2  Thu Jul  4 18:30:00 2013
+        readme updated, documentation improved, tests added
+
+v0.1.1  Fri Jun 28 16:00:00 2013
+        license file added, unittests extended and refactored, signing added
+
+v0.1.0  Tue Jun 18 18:00:00 2013
+        release v0.0_5 as stable
+
+v0.0_5  Tue Jun 11 10:30:00 2013
+        slugline is now optional
+
+v0.0_4  Mon Jun 10 10:00:00 2013
+        renamed AUTHOR_TEST to RELEASE_TESTING
+
+v0.0_3  Fri Jun  8 22:15:00 2013
+        Schema verification of libxml2 before 2.7 reports bogus errors.
+
+v0.0_2  Fri Jun  8 15:30:00 2013
+        Fix tests & documentation.
+
+v0.0_1  Fri Jun  7 17:30:00 2013
+        Initial release.

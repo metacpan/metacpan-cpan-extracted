@@ -1,0 +1,13 @@
+Wed Apr 19 11:16:38 2006 - 1.025
+    Added POD coverage to XML::Validate::MSXML
+
+Fri Apr  7 13:08:01 2006 - 1.024
+    Minor modifications to t/validate.t and t/libxml.t to allow to work in a Windows environment.
+
+Fri Apr  7 10:50:53 2006 - 1.023
+    Initial CPAN release.
+
+Fri Apr  1 18:45:47 2005 - 1.019
+    Initial release to CPAN.
+
+

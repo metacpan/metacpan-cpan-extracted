@@ -1,0 +1,29 @@
+Revision history for Perl module Xen::API
+
+0.07 2013-11-06
+    - Throw RPC::XML errors
+
+0.06 2013-06-28
+    - use DDC plugin instead of DDS
+
+0.05 2013-04-14
+    - fix whitespace
+    - test and fix script command
+    - add command option to script method
+    - refactor
+
+0.04 2013-04-11
+    - fix documentation, add vbds_only option to list_templates
+
+0.03 2013-01-11
+    - add transfer_vm feature
+
+0.02 2013-01-04
+    - bug fixes
+    - don't delete CD VDIs on destroy
+    - try both set memory interfaces
+    - remove local qualifier on RPC::XML::FORCE_STRING_ENCODING
+
+0.01 2012-11-19
+    - First release to CPAN
+

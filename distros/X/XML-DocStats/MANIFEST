@@ -1,0 +1,15 @@
+lib/XML/DocStats.pm
+lib/Object/_Initializer.pm
+DocStats.html
+Changes
+Makefile.PL
+MANIFEST
+README
+eg/xmldocstats.pl
+t/compile.t
+t/html.t
+t/text.t
+t/lib/Object/_Initializer.pm
+t/lib/Test/Builder.pm
+t/lib/Test/More.pm
+t/lib/Test/Simple.pm

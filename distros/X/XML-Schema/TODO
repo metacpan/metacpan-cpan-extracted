@@ -1,0 +1,56 @@
+This list is quite likely incomplete.
+
+* General
+  - more work on complex and simple handlers... clean up complex like with 
+    attributes
+  - fix ID and IDREFS
+  - complete + document Scope + Scoped
+  - proper namespace validation in Wildcard
+  - model groups
+  - complete and document all simple types (that can be, document those that 
+    can't)
+  - complete and document all facets, including cross-facet validation
+  - complete and document complex types
+  - cleanup/dispose code to break circular references
+
+* Type::Simple
+  - add FACET_ORIGIN to Type::Simple, just need to add facets() method to 
+    return user defined facets
+
+* XML::Schema::Base
+  - debug method(s)
+  - dump_hash(), etc.
+  - option to automatically throw exceptions
+
+* XML::Schema::Type::Simple/Builtin
+  - move init(), instance(), validate(), etc., into Type base class
+  - fixed init() to determine facets.
+  - maybe have 2 kinds of facets:- pre-determined ones (that can't be revoked)
+    and user-defined ones (which can).
+  - note that this is different from fundamental facets which should be very
+    built-in.  Need to fix init() to determine these (from package vars?)
+    or via general purpose profile() method?...
+  - ...or should there be class methods fundamentals(), facets(), actions() etc?
+    These could double up as class methods (return class definitions) or object
+    methods (return object values).
+  - how to derive builtin list types from base and list?
+
+* XML::Schema::Facet
+  - support for binary data in length (already there?)
+  - facets fixed in a base type should prevent derived types from setting 
+    any other value
+  - other schema constraints: minInlusive <= maxInclusive, etc.
+  - minInclusive, etc., as applying to time/date
+  - max/min comparison of dates and other non trivial types
+  - enumeration facets must compliment each other (hey, nice tie! :-)
+    e.g.
+    <restriction>
+      <enumeration value="AK"/>
+      <enumeration value="AL"/>
+      <enumeration value="AR"/>
+      <!-- etc -->
+    </restriction>
+
+* XML::Schema::Test
+  - don't export subs by default
+

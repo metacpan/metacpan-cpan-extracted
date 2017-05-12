@@ -1,0 +1,49 @@
+XML::GXML Readme
+----------------------------------------------------------------------
+
+Thanks for your interest in GXML. GXML is a transformation tool for
+XML, allowing you to process XML code in many ways. It's like XSLT in
+purpose, but much simpler to learn and get started with. While simpler
+than XSLT, GXML has features powerful enough for many tasks, comes in
+an easy-to-use package, and is highly extensible for special tasks.
+
+These are GXML's high-level features:
+
+*  Template substitution for any given element.
+*  Templates may be provided by user code or files on disk.
+*  Any part of the XML, source or template, may contain variables
+   which will be substituted according to well-defined rules.
+*  Variable values may be: things embedded in an enclosing element's
+   start tag, other elements in scope, sub-values of an in-scope
+   element, or provided by user code.
+*  Element tags can have variables in them.
+*  Special commands allow conditionals and looping, e.g. "if exists,"
+   "if equals," and "foreach."
+*  User can specify callbacks for start and/or end of given tags.
+*  Element tags can be easily remapped to other things.
+*  XML syntax can be easily translated into HTML syntax.
+
+GXML is an outgrowth of gxml2html, my tool for converting web sites
+written in XML to HTML output. gxml2html is now "just another
+application" that uses the GXML engine to do its work.
+
+For more complete info, see the user's guide in the distribution at
+docs/index.html or online at:
+
+http://www.multipart-mixed.com/xml/
+
+
+XML::GXML Install
+----------------------------------------------------------------------
+
+Run the following, as usual for any Perl module:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+Then see the user's guide at docs/index.html
+
+Please let me know if you have any problems, suggestions, or other
+comments. Email: josh@multipart-mixed.com

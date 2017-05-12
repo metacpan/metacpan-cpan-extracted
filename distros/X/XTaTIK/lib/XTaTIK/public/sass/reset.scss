@@ -1,0 +1,21 @@
+
+.unstyled_list {
+    list-style: none;
+    margin-left: 0;
+    padding-left: 0;
+}
+
+.checkout_crumbs,
+form ul,
+.list_button_group,
+#article_list,
+#product_list {
+    @extend .unstyled_list;
+}
+
+#search_results,
+#hot_products,
+#product_list > li > .row {
+    list-style: none;
+    padding: 0;
+}

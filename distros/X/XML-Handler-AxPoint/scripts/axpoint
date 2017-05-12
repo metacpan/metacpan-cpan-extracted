@@ -1,0 +1,87 @@
+#!/usr/bin/perl -w
+# $Id: axpoint,v 1.10 2003/10/13 20:59:09 jwalt Exp $
+
+use strict;
+use XML::Handler::AxPoint;
+use XML::SAX;
+use XML::SAX::PurePerl;
+use Getopt::Std;
+use FindBin qw($Script);
+use File::Basename qw(dirname basename);
+use vars qw($opt_p $opt_h $opt_l $opt_v);
+use vars qw($xinclude);
+# Try and load XML::Filter::XInclude
+eval {
+    require XML::Filter::XInclude;
+    $xinclude = 1;
+};
+getopts('phlv');
+
+usage() if $opt_h;
+version() if $opt_v;
+
+my $source = shift(@ARGV) || usage();
+my $output = shift (@ARGV) || \*STDOUT;
+
+my $dir = dirname($source);
+if ($dir) {
+    chdir($dir) || die "Can't change to $dir: $!";
+}
+my $file = basename($source);
+
+my $handler = XML::Handler::AxPoint->new(
+    Output => $output,
+    PrintMode => $opt_p,
+);
+
+if (@ARGV) {
+	require XML::Filter::XSLT;
+	my $filter = XML::Filter::XSLT->new(Handler => $handler);
+	$filter->set_stylesheet_uri(shift @ARGV);
+	$handler = $filter;
+}
+
+if ($xinclude) {
+    XML::SAX::PurePerl->new(
+        Handler => XML::Filter::XInclude->new(Handler => $handler)
+    )->parse_uri($file);
+}
+else {
+    XML::SAX::PurePerl->new(Handler => $handler)->parse_uri($file);
+}
+
+if ($opt_l && $output) {
+    exec("acroread", $output);
+}
+
+exit(0);
+
+sub usage {
+    print <<EOT;
+Usage: $Script [OPTIONS] source [output] [style]
+
+  source    = source XML file containing presentation
+  output    = output PDF file (defaults to STDOUT)
+  style     = XSLT stylesheet file (default: none)
+ 
+OPTIONS are:
+  -p        = print mode - no sub-slide transitions
+  -l        = launch acroread on new slideshow (requires output filename)
+  -h        = this screen
+  -v        = show version and copyright information
+EOT
+    exit(1);
+}
+
+sub version {
+	print <<EOT;
+This is AxPoint version $XML::Handler::AxPoint::VERSION.
+
+AxPoint is copyright axkit.com Ltd, 2002. This is free software
+distributed under either the Perl Artistic License, or the GPL
+version 2.
+
+EOT
+	exit(1);
+}
+

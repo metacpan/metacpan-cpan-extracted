@@ -1,0 +1,25 @@
+my @choices = @macro_args;
+my %choices = map { $_ => 1 } @choices;
+
+$self->add_hook ( 'validate_hook',
+
+  sub {
+    my ( $doc, $content ) = @_;
+    # handle default -- we're allowed to set this enum to undefined if
+    # there's a default value for this element
+    if ( ! defined $content ) {
+      if ( @{$self->elements('default')} ) {
+        return;
+      } else {
+        die "attempt to set an enum to empty\n";
+      }
+    }
+    if ( ! $choices{$content} ) {
+      die "'$content' is not found in enum list\n";
+    };
+  }
+
+);
+
+$self->add_method ( 'enum_options', sub { return @choices } );
+

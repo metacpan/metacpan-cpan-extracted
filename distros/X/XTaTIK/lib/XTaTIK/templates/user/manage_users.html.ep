@@ -1,0 +1,176 @@
+% layout 'default';
+% title 'User Management';
+
+<ol class="breadcrumb">
+  <li><a href="/user/">User Main</a></li>
+  <li class="active">User Management</li>
+</ol>
+
+% if ( flash 'users_update_ok' ) {
+  <p class="alert alert-success">User update was successfully saved.</p>
+% }
+% if ( flash 'users_delete_ok' ) {
+  <p class="alert alert-success">Provided users were
+      successfully deleted.</p>
+% }
+
+<div class="panel panel-primary">
+  <div class="panel-heading">
+    <h3 class="panel-title">Add New User</h3>
+  </div>
+  <div class="panel-body">
+    % if ( flash 'add_success' ) {
+      <p class="alert alert-success">User was successfully added.
+        <a href="/user/manage-users">Add another one.</a>
+      </p>
+    % } else {
+      %= form_for '/user/manage-users/add' => (method => 'POST') => begin
+        <%== form_checker_error_wrapped %>
+        <div>
+          <div class="row">
+            <div class="form-group col-md-6">
+              <label for="c_login">*Login:</label
+              ><%= text_field 'login' => id => 'c_login',
+                class => 'form-control' %>
+            </div>
+            <div class="form-group col-md-6">
+              <label for="c_pass">*Password:</label
+              ><%= password_field 'pass' => id => 'c_pass',
+                class => 'form-control' %>
+            </div>
+          </div>
+          <div class="row">
+            <div class="form-group col-md-6">
+              <label for="c_email">*Email:</label
+              ><%= text_field 'email' => id => 'c_email',
+                class => 'form-control' %>
+            </div>
+            <div class="form-group col-md-6">
+              <label for="c_phone">*Phone:</label
+              ><%= text_field 'phone' => id => 'c_phone',
+                class => 'form-control' %>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-12">
+              <p class="alert alert-success">
+                Valid roles are:
+                <samp><%= join(', ', $c->users->valid_roles) %></samp>
+              </p>
+            </div>
+          </div>
+          <div class="row">
+            <div class="form-group col-md-6">
+              <label for="c_roles">*Roles:</label
+              ><%= text_field 'roles' => id => 'c_roles',
+                class => 'form-control' %>
+            </div>
+            <div class="form-group col-md-6">
+              <label for="c_name">*Name:</label
+              ><%= text_field 'name' => id => 'c_name',
+                class => 'form-control' %>
+            </div>
+          </div>
+        </div>
+        %= submit_button 'Add new user', class => 'btn btn-primary'
+      %= end
+    % }
+  </div>
+</div>
+
+<hr>
+
+% if ( items_in 'users' ) {
+  <div class="panel panel-danger panel-extra-danger">
+    <div class="panel-heading">
+      <h3 class="panel-title">Delete Users</h3>
+    </div>
+    <div class="panel-body">
+      %= form_for '/user/manage-users/delete' => method => 'POST' => begin
+        %= csrf_field
+        <div class="form-group">
+          <label for="email">List of users delete:</label>
+          <%= text_area 'to_delete' => cols => 40, rows => 3,
+            class => 'form-control' %>
+        </div>
+        <%= submit_button 'Delete users',
+            class => 'btn btn-danger' %>
+      %= end
+    </div>
+  </div>
+
+  <div class="panel panel-primary">
+    <div class="panel-heading">
+      <h3 class="panel-title">Update Users</h3>
+    </div>
+    <div class="panel-body">
+      %= form_for '/user/manage-users/update' => method => 'POST' => begin
+
+      %= csrf_field
+
+      <div class="form-group">
+        %= submit_button 'Save changes', class => 'btn btn-primary'
+      </div>
+
+      <ul id="edit_users_list">
+        % for my $u ( items_in 'users' ) {
+          <li class="panel panel-primary">
+            <div class="panel-body">
+              %= hidden_field 'id_' . $u->{id} => $u->{id}
+              <div class="row">
+                <div class="form-group col-md-6">
+                  <label for="c_login_<%= $u->{id} %>">*Login:</label
+                  ><%= text_field 'login_' . $u->{id}
+                    => $u->{login} =>
+                    id => 'c_login_' . $u->{id},
+                    class => 'form-control' %>
+                </div>
+                <div class="form-group col-md-6">
+                  <label for="c_name_<%= $u->{id} %>">*Name:</label
+                  ><%= text_field 'name_' . $u->{id}
+                    => $u->{name} =>
+                    id => 'c_name_' . $u->{id},
+                    class => 'form-control' %>
+                </div>
+              </div>
+              <div class="row">
+                <div class="form-group col-md-6">
+                  <label for="c_email_<%= $u->{id} %>">*Email:</label
+                  ><%= text_field 'email_' . $u->{id}
+                    => $u->{email} =>
+                    id => 'c_email_' . $u->{id},
+                    class => 'form-control' %>
+                </div>
+                <div class="form-group col-md-6">
+                  <label for="c_phone_<%= $u->{id} %>">*Phone:</label
+                  ><%= text_field 'phone_' . $u->{id}
+                    => $u->{phone} =>
+                    id => 'c_phone_' . $u->{id},
+                    class => 'form-control' %>
+                </div>
+              </div>
+              <div class="row">
+                <div class="form-group col-md-6">
+                  <label for="c_roles_<%= $u->{id} %>">*Roles:</label
+                  ><%= text_field 'roles_' . $u->{id}
+                    => $u->{roles} =>
+                    id => 'c_roles_' . $u->{id},
+                    class => 'form-control' %>
+                </div>
+                <div class="col-md-6">
+                  <label>&nbsp;</label><br><!-- Bad programmer! No cookie! -->
+                  <small class="alert alert-success">Valid roles are:
+                    <samp><%= join(', ', $c->users->valid_roles) %></samp>
+                  </small>
+                </div>
+              </div>
+            </div>
+          </li>
+        % }
+      </ul>
+
+      %= submit_button 'Save changes', class => 'btn btn-primary'
+      %= end
+    </div>
+  </div>
+% }

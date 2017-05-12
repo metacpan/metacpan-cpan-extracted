@@ -1,0 +1,493 @@
+
+=head1 NAME
+
+Xmldoom::doc::GettingStarted - A step-by-step tutorial to setting up Xmldoom.
+
+=head1 DESCRIPTION
+
+In the end, you want to have a Perl package made up of custom objects which are 
+backed by the database.  You want these object to work straight-out of the box, with no
+concern to connecting to the database, or initializing Xmldoom --- just B<use> your 
+package, B<new()> some objects, and away you go!
+
+Unfortunately, some setup is required to get Xmldoom going in the first place.  Here is 
+an overview of this process:
+
+=over 4
+
+=item 1
+
+You must write two XML files, conventionally named I<database.xml> and I<objects.xml>,
+which describe your database layout and define your objects respectively.
+
+=item 2
+
+You must "bootstrap" Xmldoom in your code.  This means that the first time anyone 
+trys to use your Xmldoom-ized objects, Xmldoom will be initialized, loading the two XML 
+files described above and registering a connection factory which will manage connections 
+to your database.
+
+=item 3
+
+You must create Perl modules that are bound to the objects described in your 
+object definition (probably I<objects.xml>).  Here you can customize your objects with hooks
+into Xmldoom or by adding methods specific to your project domain.
+
+=back
+
+I know this sounds like a lot, but really it isn't!  The I<database.xml> file can be
+automatically generated from your database (or your database can be generated from your
+I<database.xml> file), this tutorial will provide you with a standard way to bootstrap
+Xmldoom, and the minimal Perl module required to use an Xmldoom object is only three
+lines long.
+
+What that leaves you with is designing your applications objects, which is really what
+you wanted to spend your time doing anyone, right?
+
+=head1 GETTING STARTED
+
+In this tutorial we are going to use the standard (in the ORM world) bookstore
+example.  See the example/BookStore/ directory in the main distribution for a
+more complete example of the same concept.
+
+Our BookStore module will have three objects:
+
+=over 4
+
+=item BookStore::Publisher
+
+Only has a single property, the name of this publisher.
+
+=item BookStore::Author
+
+Has two properties, for the authors first and last name.
+
+=item BookStore::Book
+
+Has several properties: its author, publisher, title, isbn and cost.
+
+=back
+
+The relationships implied here are obvious:  All BookStore::Publisher's and
+BookStore::Author's "contain" zero or more BookStore::Book's and each book has one 
+(and only one) of each BookStore::Publisher and BookStore::Author.
+
+We want to be able to use our object thusly:
+
+  use Xmldoom::Criteria;
+  use BookStore::Book;
+  use BookStore::Author;
+  use BookStore::Publisher;
+  use strict;
+
+  # get a specific publisher from the database by its id.
+  my $publisher = BookStore::Publisher->load({ publisher_id => 127 });
+
+  print $publisher->get_name();
+
+  # get all the books publisher by that publisher.
+  my @books = $publisher->get_books();
+
+  # get the author of the first book
+  my $author = $books[0]->get_author();
+
+  print $author->get_first_name();
+  print $author->get_last_name();
+
+  # add another book by this same author and publisher
+  my $book = $author->add_book({
+  	publisher => $publisher,
+	title     => "My Book",
+	isbn      => "XXXX",
+	cost      => 2.95
+  });
+
+  # get all books where the author's last name is "Smitch"
+  my $criteria = Xmldoom::Criteria->new();
+  $criteria->add( 'author/last_name', 'Smith' );
+  my @books = BookStore::Book->Search( $criteria );
+
+This is just scratching the surface of the interface of an Xmldoom object!  There
+is much, much more.  But thats for another document.  On with the tutorial ...
+
+=head1 DATABASE DEFINITION
+
+Xmldoom needs to know the low-level structure of your database, so we will create
+an XML file called I<database.xml> which contains data directly equivalent to a list
+of SQL CREATE statements.  Xmldoom uses a format compatible to that of Apache Torque [1]
+and Propel [2], which means that we can use their tools or our own.  See either
+L<Xmldoom::doc::UsingTorque> or L<Xmldoom::doc::UsingSQLTranslator> for instructions on
+how to use Apache Torque or SQL::Translator, respectively, to automatically generate XML 
+from you database or to generate a SQL CREATE script from XML.
+
+However, even if you generate the XML from your database, you will probably want to 
+customize it by hand.  For example, we don't define any foreign keys in our database
+(mostly because we started with a MySQL version that didn't support them, but thats another
+story), so we need to define them by hand in the I<database.xml>.  Its also sometimes 
+helpful to have the XML contradict the actual database layout in a few situations, for 
+example, during an upgrade you can have Xmldoom ignore a column by simply not telling it
+about it.
+
+Here is the most basic XML definition that we could use for our bookstore example:
+
+  <?xml version="1.0" standalone="no"?>
+  <database
+   xmlns="http://gna.org/projects/xmldoom/database"
+   xmlns:perl="http://gna.org/projects/xmldoom/database-perl">
+  
+  <table name="publisher">
+  	<column
+  		name="publisher_id"
+  		required="true"
+  		primaryKey="true"
+  		type="INTEGER"
+  	/>
+  	<column
+  		name="name"
+  		required="true"
+  		type="VARCHAR"
+  		size="128"
+  	/>
+  </table>
+  
+  <table name="author">
+  	<column
+  		name="author_id"
+  		required="true"
+  		primaryKey="true"
+  		type="INTEGER"
+  		auto_increment="true"
+  	/>
+  	<column
+  		name="first_name"
+  		required="true"
+  		type="VARCHAR"
+  		size="128"
+  	/>
+  	<column
+  		name="last_name"
+  		required="true"
+  		type="VARCHAR"
+  		size="128"
+  	/>
+  </table>
+  
+  <table name="book">
+  	<column
+  		name="book_id"
+  		required="true"
+  		primaryKey="true"
+  		type="INTEGER"
+  		auto_increment="true"
+  	/>
+  	<column
+  		name="title"
+  		required="true"
+  		type="VARCHAR"
+  		size="255"
+  	/>
+  	<column
+  		name="isbn"
+  		required="true"
+  		type="VARCHAR"
+  		size="24"
+  	/>
+  	<column
+  		name="cost"
+  		required="true"
+  		type="FLOAT"
+  	/>
+  	<column
+  		name="publisher_id"
+  		required="true"
+  		type="INTEGER"
+  	/>
+  	<column
+  		name="author_id"
+  		required="true"
+  		type="INTEGER"
+  	/>
+  
+  	<foreign-key foreignTable="publisher">
+  		<reference
+  			local="publisher_id"
+  			foreign="publisher_id"
+  		/>
+  	</foreign-key>
+  
+  	<foreign-key foreignTable="author">
+  		<reference
+  			local="author_id"
+  			foreign="author_id"
+  		/>
+  	</foreign-key>
+  </table>
+  </database>
+  
+As is probably obvious, the <table/> sections are a direct reflection of SQL CREATE syntax.
+The most notable thing here, is the <foreign-key/> sections.  Without these, Xmldoom won't 
+know how the tables relate.  It doesn't matter which table, you actually put the
+<foreign-key/> on, all connections are bi-directional.  You can include as many <foreign-key/>
+sections as are necessary.  Tables, of course, can have multiple primary-keys and can
+have more than one connection to other tables.
+
+Since the XML format we use for database definition is based on that of Apache Torque and
+Propel, you can also check out their documentation for supplimental information.  Be warned
+that only the basic SQL-equivalent stuff is supported.
+
+Xmldoom specific documentation on the format is forth-comming.
+
+=over 4
+
+=item Propel Documentation on Writing XML Definitions
+
+L<http://propel.phpdb.org/docs/user_guide/chapters/GettingStarted.html#GettingStarted.XMLSchema>
+
+=item Apache Torque Documentation on Writting XML Definitions
+
+L<http://db.apache.org/torque/releases/torque-3.2/generator/schema-reference.html>
+
+=back
+
+=head1 OBJECT DEFINITION
+
+Xmldoom now needs a mapping from the database definition to your objects.  This is very
+different from both Apache Torque and Propel which both only use the database definition.
+The object definition is an XML file conventionally named I<objects.xml>.
+
+The simplest possible I<objects.xml> for our example would be:
+
+  <?xml version="1.0" standalone="no"?>
+  <objects
+   xmlns="http://gna.org/projects/xmldoom/object"
+   xmlns:perl="http://gna.org/porjects/xmldoom/object-perl">
+  
+  <object name="Book" table="book" perl:class="BookStore::Book">
+  	<property name="book_id">
+  		<simple/>
+  	</property>
+  	<property name="title">
+  		<simple/>
+  	</property>
+  	<property name="isbn">
+  		<simple/>
+  	</property>
+  	<property name="cost">
+  		<simple/>
+  	</property>
+  	<property name="publisher">
+  		<object name="Publisher"/>
+  	</property>
+  	<property name="author">
+  		<object name="Author"/>
+  	</property>
+  </object>
+  
+  <object name="Author" table="author" perl:class="BookStore::Author">
+  	<property name="author_id">
+  		<simple/>
+  	</property>
+  	<property name="first_name">
+  		<simple/>
+  	</property>
+  	<property name="last_name">
+  		<simple/>
+  	</property>
+  	<property name="book">
+  		<object name="Book"/>
+  	</property>
+  </object>
+  
+  <object name="Publisher" table="publisher" perl:class="BookStore::Publisher">
+  	<property name="publisher_id">
+  		<simple/>
+  	</property>
+  	<property name="name">
+  		<simple/>
+  	</property>
+  	<property name="book">
+  		<object name="Book"/>
+  	</property>
+  </object>
+  </objects>
+  
+There are a bunch of notable things here:
+
+=over 4
+
+=item *
+
+In the <object/> tag we are attaching the virtual object to both a table (from the 
+I<database.xml>) and to a Perl package name.
+
+=item *
+
+The properties are bound to a column (refered to as an "atttribute" when talking from the
+perspective of objects) of the same name.  If you want to bind to a different attribute,
+use the I<attribute="..."> attribute of the <simple/> tag:
+
+  <property name="prop_name">
+  	<simple attribute="attr_name"/>
+  </property>
+
+=item *
+
+In order to use an <object/> property, a foreign-key must be declared connecting the two
+tables in the I<database.xml>.
+
+=item *
+
+Declaring the properties here has the affect of adding accessor functions to the object
+like get_title() and set_title().  With out the <property/> declaration, these function
+won't exist.
+
+=item *
+
+Since the Publisher object "contains" Book objects (per their one-to-many relationship
+setup by the <foreign-keys/> in the I<database.xml>) the accessor functions added will
+actually be get_books() and add_book().
+
+=back
+
+More specific documentation on the format of this file is forth coming.
+
+=head1 BOOTSTRAPPING
+
+There is a chicken-and-the-egg kind of problem with keeping the database and object
+definitions in external files.  Somehow, when you use your package, these files need
+to be automatically loaded and the data integrated with the Perl object.  This is called
+the bootstrapping process.
+
+There is an endless number of ways to bootstrap Xmldoom.  However, the one I am about to
+describe has proven the best for us.
+
+All Xmldoom objects must descend from Xmldoom::Object, however, not necessarily immediately.
+You can create your own package (ex. BookStore::Object) that your Xmldoom will descend
+from.  This can be useful in its own right, because Xmldoom::Object provides a number of 
+hooks into its operation to customize for your domain.  By providing your own base object,
+you can setup hooks that will apply to I<all> of the objects in your package.  It also makes
+for a great place to put our bootstrapping code, since it will have to be use'd every time
+one of its child objects is use'd.
+
+Here is a good yet simple BookStore/Object.pm code (you can always make this simpler or 
+more complex depending on your needs):
+
+  package BookStore::Object;
+  use base qw(Xmldoom::Object);
+
+  use Module::Util qw/ module_fs_path /;
+  use File::Basename qw/ dirname /;
+  use File::Spec::Functions qw/ catfile /;
+  use DBIx::Romani::Driver::mysql;
+  use Xmldoom::Definition;
+  use strict;
+  
+  our $DATABASE;
+  
+  BEGIN
+  {
+  	my $module_dir = dirname( module_fs_path(__PACKAGE__) );
+  	my $database_xml = catfile( $module_dir, 'database.xml' );
+  	my $objects_xml  = catfile( $module_dir, 'objects.xml' );
+  
+  	# read the database definition
+  	$DATABASE = Xmldoom::Definition::parse_database_uri( $database_xml );
+  	$DATABASE->parse_object_uri( $objects_xml );
+
+	# setup connection factory
+	my $driver  = DBIx::Romani::Driver::mysql->new();
+	my $factory = DBIx::Romani::Connection::Factory->new({
+		dsn      => 'DBI:mysql:database=mydb;host=localhost',
+		username => 'myuser',
+		password => 'mypass',
+		driver   => $driver
+	});
+	$DATABASE->set_connection_factory( $factory );
+  }
+  
+  1;
+
+A more detailed guide on the bootstrapping process is forth comming.
+
+=head1 PERL OBJECTS
+
+For all the objects in the object definition described above, you need
+to have a corresponding Perl package.  It will descend from the custom object class
+we defined above to complete the bootstrapping process.
+
+The simplest possible Perl package would be:
+
+  package BookStore::Book;
+  use base qw(BookStore::Object);
+
+  1;
+
+Besides using the Perl package to simply add domain specific function and operations to 
+your object, there are many other customizations you can make to your object through hooks
+into the base Xmldoom::Object.
+
+A more detailed guide on customizing your objects from Perl is forth comming.
+
+=head1 EMBEDING OBJECT XML IN POD
+
+We have found that when working on a large project with many users hacking on the same
+source control repository, that many problems can arise with having a centralized
+I<objects.xml> file.  One possible solution to this, is keeping the object definitions
+for a specific Perl module embedded in that module's POD documentation and running a
+script to extract and compile the I<objects.xml>.
+
+Here is an example:
+
+  package BookStore::Publisher;
+  use base qw(BookStore::Object);
+
+  1;
+
+  __END__
+
+  =pod
+
+  =begin Xmldoom
+
+  <object name="Publisher" table="publisher">
+  	<property name="publisher_id">
+  		<simple/>
+  	</property>
+  	<property name="name">
+  		<simple/>
+  	</property>
+  	<property name="book">
+  		<object name="Book"/>
+  	</property>
+  </object>
+
+  =end Xmldoom
+
+  =cut
+
+Notice how we omit the perl:class="..." attribute.  This will be automatically added
+by the script later.  Also, using the __END__ token if you can is good policy, because
+it will prevent the Perl compiler from bothering with the object definition which can
+get rather large.
+
+Use the xmldoom-generate script from the command line to recursively walk your modules
+and build the centralized objects.xml:
+
+  $ xmldoom-generate object-xml -r lib/BookStore -o lib/BookStore/objects.xml
+
+=head1 FOOTNOTES
+
+=over 4
+
+=item 1
+
+http://db.apache.org/torque/
+
+=item 2
+
+http://propel.phpdb.org/trac/
+
+=back
+
+=cut
+

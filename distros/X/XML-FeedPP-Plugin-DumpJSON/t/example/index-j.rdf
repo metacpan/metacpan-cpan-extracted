@@ -1,0 +1,1197 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://purl.org/rss/1.0/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:dc="http://purl.org/dc/elements/1.1/">
+<channel rdf:about="http://www.kawa.net/xp/index-j.html">
+<title>Kawa.net xp - Ajax＆Perl技術情報（川崎有亮）</title>
+<link>http://www.kawa.net/xp/index-j.html</link>
+<dc:date>2008-01-05T01:53:00+09:00</dc:date>
+<dc:language>ja</dc:language>
+<dc:rights>Copyright 1995-2006 Yusuke Kawasaki. All rights reserved.</dc:rights>
+<description>川崎有亮の制作したプログラムのご紹介・技術情報など。ajax/JavaScript/Perl/CGI/...</description>
+<image rdf:resource="http://www.kawa.net/xp/images/xp-title-128x32.gif" />
+<items>
+<rdf:Seq>
+<rdf:li rdf:resource="http://www.kawa.net/works/perl/treepp/treepp.html" />
+<rdf:li rdf:resource="http://www.kawa.net/works/perl/feedpp/feedpp.html" />
+<rdf:li rdf:resource="http://www.kawa.net/works/js/jkl/parsexml.html" />
+<rdf:li rdf:resource="http://www.kawa.net/works/perl/i18n-emoji/i18n-emoji.html" />
+<rdf:li rdf:resource="http://www.kawa.net/works/perl/catch/news.html" />
+<rdf:li rdf:resource="http://www.kawa.net/works/perl/phone/pnews.html" />
+<rdf:li rdf:resource="http://kawa.at.webry.info/200712/article_10.html" />
+<rdf:li rdf:resource="http://www.kawa.net/works/ajax/addrajax/addrajax.html" />
+<rdf:li rdf:resource="http://www.kawa.net/works/ajax/ajaxzip2/ajaxzip2.html" />
+<rdf:li rdf:resource="http://kawa.at.webry.info/200712/article_9.html" />
+<rdf:li rdf:resource="http://kawa.at.webry.info/200712/article_8.html" />
+<rdf:li rdf:resource="http://kawa.at.webry.info/200712/article_7.html" />
+<rdf:li rdf:resource="http://kawa.at.webry.info/200712/article_6.html" />
+<rdf:li rdf:resource="http://kawa.at.webry.info/200712/article_5.html" />
+<rdf:li rdf:resource="http://kawa.at.webry.info/200712/article_4.html" />
+<rdf:li rdf:resource="http://kawa.at.webry.info/200712/article_3.html" />
+<rdf:li rdf:resource="http://kawa.at.webry.info/200712/article_2.html" />
+<rdf:li rdf:resource="http://kawa.at.webry.info/200712/article_1.html" />
+<rdf:li rdf:resource="http://itpro.nikkeibp.co.jp/article/COLUMN/20071205/288758/" />
+<rdf:li rdf:resource="http://kawa.at.webry.info/200711/article_14.html" />
+<rdf:li rdf:resource="http://kawa.at.webry.info/200711/article_13.html" />
+<rdf:li rdf:resource="http://kawa.at.webry.info/200711/article_12.html" />
+<rdf:li rdf:resource="http://kawa.at.webry.info/200711/article_11.html" />
+<rdf:li rdf:resource="http://kawa.at.webry.info/200711/article_10.html" />
+<rdf:li rdf:resource="http://kawa.at.webry.info/200711/article_9.html" />
+<rdf:li rdf:resource="http://kawa.at.webry.info/200711/article_8.html" />
+<rdf:li rdf:resource="http://kawa.at.webry.info/200711/article_7.html" />
+<rdf:li rdf:resource="http://kawa.at.webry.info/200711/article_6.html" />
+<rdf:li rdf:resource="http://kawa.at.webry.info/200711/article_5.html" />
+<rdf:li rdf:resource="http://kawa.at.webry.info/200711/article_4.html" />
+<rdf:li rdf:resource="http://kawa.at.webry.info/200711/article_3.html" />
+<rdf:li rdf:resource="http://www.kawa.net/works/js/tips/orientation.html" />
+<rdf:li rdf:resource="http://kawa.at.webry.info/200711/article_1.html" />
+<rdf:li rdf:resource="http://kawa.at.webry.info/200711/article_2.html" />
+<rdf:li rdf:resource="http://kawa.at.webry.info/200710/article_8.html" />
+<rdf:li rdf:resource="http://kawa.at.webry.info/200710/article_9.html" />
+<rdf:li rdf:resource="http://kawa.at.webry.info/200710/article_7.html" />
+<rdf:li rdf:resource="http://kawa.at.webry.info/200710/article_5.html" />
+<rdf:li rdf:resource="http://kawa.at.webry.info/200710/article_4.html" />
+<rdf:li rdf:resource="http://kawa.at.webry.info/200710/article_3.html" />
+<rdf:li rdf:resource="http://kawa.at.webry.info/200710/article_2.html" />
+<rdf:li rdf:resource="http://kawa.at.webry.info/200710/article_1.html" />
+<rdf:li rdf:resource="http://kawa.at.webry.info/200709/article_6.html" />
+<rdf:li rdf:resource="http://kawa.at.webry.info/200709/article_5.html" />
+<rdf:li rdf:resource="http://kawa.at.webry.info/200709/article_4.html" />
+<rdf:li rdf:resource="http://www.kawa.net/text/shibuyajs/facebook/mozilla24.html" />
+<rdf:li rdf:resource="http://kawa.at.webry.info/200709/article_3.html" />
+<rdf:li rdf:resource="http://kawa.at.webry.info/200709/article_2.html" />
+<rdf:li rdf:resource="http://kawa.at.webry.info/200709/article_1.html" />
+<rdf:li rdf:resource="http://itpro.nikkeibp.co.jp/article/COLUMN/20070828/280514/" />
+<rdf:li rdf:resource="http://kawa.at.webry.info/200708/article_3.html" />
+<rdf:li rdf:resource="http://kawa.at.webry.info/200708/article_2.html" />
+<rdf:li rdf:resource="http://www.kawa.net/works/recruit/webservice/dokoiku.html" />
+<rdf:li rdf:resource="http://www.kawa.net/works/recruit/webservice/jalan.html" />
+<rdf:li rdf:resource="http://kawa.at.webry.info/200708/article_1.html" />
+<rdf:li rdf:resource="http://www.kawa.net/works/perl/overhttp/overhttp.html" />
+<rdf:li rdf:resource="http://www.kawa.net/works/perl/romanize/romanize.html" />
+<rdf:li rdf:resource="http://itpro.nikkeibp.co.jp/article/COLUMN/20070726/278339/" />
+<rdf:li rdf:resource="http://kawa.at.webry.info/200707/article_5.html" />
+<rdf:li rdf:resource="http://kawa.at.webry.info/200707/article_4.html" />
+<rdf:li rdf:resource="http://kawa.at.webry.info/200707/article_3.html" />
+<rdf:li rdf:resource="http://kawa.at.webry.info/200707/article_2.html" />
+<rdf:li rdf:resource="http://kawa.at.webry.info/200707/article_1.html" />
+<rdf:li rdf:resource="http://kawa.at.webry.info/200706/article_4.html" />
+<rdf:li rdf:resource="http://kawa.at.webry.info/200706/article_3.html" />
+<rdf:li rdf:resource="http://www.kawa.net/works/js/tips/future-reserved-words.html" />
+<rdf:li rdf:resource="http://kawa.at.webry.info/200706/article_2.html" />
+<rdf:li rdf:resource="http://kawa.at.webry.info/200706/article_1.html" />
+<rdf:li rdf:resource="http://itpro.nikkeibp.co.jp/article/COLUMN/20070521/271716/" />
+<rdf:li rdf:resource="http://www.thinkit.co.jp/free/article/0703/10/6/" />
+<rdf:li rdf:resource="http://itpro.nikkeibp.co.jp/article/COLUMN/20070409/267730/" />
+<rdf:li rdf:resource="http://www.thinkit.co.jp/free/article/0703/10/5/" />
+<rdf:li rdf:resource="http://www.kawa.net/text/sigmarion3/usb.html" />
+<rdf:li rdf:resource="http://www.kawa.net/works/perl/html/tagparser.html" />
+<rdf:li rdf:resource="http://www.thinkit.co.jp/free/article/0703/10/4/" />
+<rdf:li rdf:resource="http://www.thinkit.co.jp/free/article/0703/10/3/" />
+<rdf:li rdf:resource="http://www.thinkit.co.jp/free/article/0703/10/2/" />
+<rdf:li rdf:resource="http://www.thinkit.co.jp/free/article/0703/10/1/" />
+<rdf:li rdf:resource="http://itpro.nikkeibp.co.jp/article/COLUMN/20070316/265426/" />
+<rdf:li rdf:resource="http://itpro.nikkeibp.co.jp/article/COLUMN/20070222/262733/" />
+<rdf:li rdf:resource="http://www.kawa.net/photo/200702-scale5x/index.html" />
+<rdf:li rdf:resource="http://itpro.nikkeibp.co.jp/article/COLUMN/20070129/259848/" />
+<rdf:li rdf:resource="http://itpro.nikkeibp.co.jp/article/COLUMN/20070111/258452/" />
+<rdf:li rdf:resource="http://www.kawa.net/photo/20070101-inuyama/index.html" />
+<rdf:li rdf:resource="http://itpro.nikkeibp.co.jp/article/COLUMN/20061217/257102/" />
+<rdf:li rdf:resource="http://itpro.nikkeibp.co.jp/article/COLUMN/20061201/255603/" />
+<rdf:li rdf:resource="http://www.kawa.net/works/js/jkl/calender.html" />
+<rdf:li rdf:resource="http://itpro.nikkeibp.co.jp/article/COLUMN/20061116/253879/" />
+<rdf:li rdf:resource="http://itpro.nikkeibp.co.jp/article/COLUMN/20061020/251301/" />
+<rdf:li rdf:resource="http://www.kawa.net/works/jcode/uni-escape.html" />
+<rdf:li rdf:resource="http://itpro.nikkeibp.co.jp/article/COLUMN/20061101/252356/" />
+<rdf:li rdf:resource="http://www.kawa.net/works/perl/hatena/bookmarkcount.html" />
+<rdf:li rdf:resource="http://www.kawa.net/works/ajax/addrajax/alpscliplet.html" />
+<rdf:li rdf:resource="http://www.kawa.net/works/ajax/zip/ajaxzip.html" />
+<rdf:li rdf:resource="http://www.kawa.net/works/ajax/ajaxtb/ajaxtb.html" />
+<rdf:li rdf:resource="http://www.kawa.net/works/ajax/ajaxcom/ajaxcom.html" />
+<rdf:li rdf:resource="http://www.kawa.net/works/js/xml/objtree.html" />
+<rdf:li rdf:resource="http://www.kawa.net/works/js/tips/yui-tooltips.html" />
+<rdf:li rdf:resource="http://www.kawa.net/works/ajax/romanize/chinese.html" />
+<rdf:li rdf:resource="http://www.kawa.net/works/js/animation/raster.html" />
+</rdf:Seq>
+</items>
+</channel>
+<image rdf:about="http://www.kawa.net/xp/images/xp-title-128x32.gif">
+<url>http://www.kawa.net/xp/images/xp-title-128x32.gif</url>
+<title>Kawa.net xp - Ajax＆Perl技術情報（川崎有亮）</title>
+<link>http://www.kawa.net/xp/index-j.html</link>
+</image>
+<item rdf:about="http://www.kawa.net/works/perl/treepp/treepp.html">
+<title>[Perl] XML::TreePP - Pure Perl実装によるXMLファイル展開モジュール</title>
+<link>http://www.kawa.net/works/perl/treepp/treepp.html</link>
+<dc:date>2008-01-05T01:53:00+09:00</dc:date>
+<dc:subject>Perl</dc:subject>
+<description>XML::TreePP モジュールは、
+XML ファイルを解析してツリー構造の多次元変数（ハッシュ／配列）に展開します。
+XML テキストと Perl オブジェクト（ハッシュ＆配列）間の相互変換が可能です。
+コンパイル不要の Pure Perl 実装モジュールなので、
+プロバイダのレンタルサーバ環境でも
+.pm ファイル単体のコピーのみで手軽に利用できます。
+（Ajax で利用する JavaScript の XMLHttpRequest オブジェクトのように）
+サーバからの XML ファイルのダウンロード処理にも対応しています。
+安定版アーカイブ：
+XML-TreePP-0.32.tar.gz
+TARGZ
+CPAN
+←通常パッケージ
+最新版ソースファイル：
+lib/XML/TreePP.pm
+PM
+←.pmファイルのみ必要な場合
+Subversion レポジトリ：
+http://xml-treepp.googlecode.com/svn/trunk/XML-TreePP/
+SVN</description>
+</item>
+<item rdf:about="http://www.kawa.net/works/perl/feedpp/feedpp.html">
+<title>[Perl] XML::FeedPP - RSS・RDF・Atomフィードの解析・生成・変換・結合</title>
+<link>http://www.kawa.net/works/perl/feedpp/feedpp.html</link>
+<dc:date>2008-01-05T01:45:00+09:00</dc:date>
+<dc:subject>Perl</dc:subject>
+<description>XML::FeedPP モジュールは、
+RSS 2.0、RSS 1.0 (RDF)、Atom 0.3（および1.0）フィードの
+XML ファイルを解析・生成・変換・結合するための
+Perl モジュールです。
+RSS ベースの1種類の共通 API で RSS・RDF・Atom の各フォーマットの処理に対応しているため、
+手軽に扱えます。
+フィードの読み出し・書き込みはもちろん、
+RSSからRDFへ、RDFからAtomへといった各フォーマット間の相互変換も可能です。
+他サイトからダウンロードした複数のファイルを結合して、
+まとめて1つのファイルとして出力することもできます。
+公開版アーカイブ：
+XML-FeedPP-0.33.tar.gz
+TARGZ
+CPAN
+ ←通常パッケージ
+最新版ソースファイル：
+lib/XML/FeedPP.pm
+PM
+Subversion レポジトリ：
+http://xml-treepp.googlecode.com/svn/trunk/XML-FeedPP/
+SVN
+※ XML::FeedPP バージョン 0.30 から、Atom 1.0 に対応しました。（デフォルトは Atom 0.3 です）</description>
+</item>
+<item rdf:about="http://www.kawa.net/works/js/jkl/parsexml.html">
+<title>[ajax] JKL.ParseXML／ajax通信処理ライブラリ</title>
+<link>http://www.kawa.net/works/js/jkl/parsexml.html</link>
+<dc:date>2007-12-30T20:43:00+09:00</dc:date>
+<dc:subject>ajax</dc:subject>
+<description>JKL.ParseXML クラスは、サーバ上の XML 形式ファイルをダウンロード〜解析して、
+JavaScript オブジェクト（配列やマップ）に変換するライブラリです。
+複雑な DOM 操作なく簡単なスクリプトで XML 形式ファイルを扱えるため、
+Amazon など XML を出力する既存の Web サービスや、
+CGI と連携することで ajax ページを手軽に構築できます。
+IE・Firefox・Opera・Safari のクロスブラウザに対応しています。
+XML を JSONのように手軽に扱える他、
+JSON／CSV／LoadVars 形式ファイルなどのテキストファイルも利用可能です。</description>
+</item>
+<item rdf:about="http://www.kawa.net/works/perl/i18n-emoji/i18n-emoji.html">
+<title>日本語処理・携帯絵文字処理関係のperlモジュール</title>
+<link>http://www.kawa.net/works/perl/i18n-emoji/i18n-emoji.html</link>
+<dc:date>2007-12-30T20:32:00+09:00</dc:date>
+<description>日本語を含む多言語処理(主にUTF8、Shift_JIS、ISO-2022-JP。
+その他にLatin1、EUC-JP、EUC-KR、Big5、GB2310などにも対応)や、
+DoCoMo・SoftBank・au に対応した携帯絵文字処理関連のモジュール群です。</description>
+</item>
+<item rdf:about="http://www.kawa.net/works/perl/catch/news.html">
+<title>[Perl] KCatch.pm／CGI エラーメッセージをブラウザに表示</title>
+<link>http://www.kawa.net/works/perl/catch/news.html</link>
+<dc:date>2007-12-23T15:07:00+09:00</dc:date>
+<dc:subject>Perl</dc:subject>
+<description>KCatch.pm は Perl CGI で発生する Internal Server Error を補足して、
+エラー内容を HTML としてブラウザ画面に表示してくれるモジュールです。
+エラーの発生した行番号なども表示されるので、サーバ上での開発に最適です。</description>
+</item>
+<item rdf:about="http://www.kawa.net/works/perl/phone/pnews.html">
+<title>[Perl] phone.pl 携帯電話キャリア自動判別ライブラリ</title>
+<link>http://www.kawa.net/works/perl/phone/pnews.html</link>
+<dc:date>2007-12-23T14:51:00+09:00</dc:date>
+<dc:subject>Perl</dc:subject>
+<description>phone.plは、携帯電話用の Perl CGI プログラムに
+アクセスしてきているブラウザ情報から、
+携帯電話キャリアや細かな機種情報を自動判別するためのライブラリです。
+phone.plの1ファイルだけで済むため、簡単に導入できます。
+レンタルサーバ・ホスティングサーバなど、
+root 権限を使用できなかったり
+CPAN からのモジュールインストールのできない環境でも、利用できます。
+機種情報は、phone_info 関数の返り値のハッシュから
+プロパティとして読み出してください。</description>
+</item>
+<item rdf:about="http://kawa.at.webry.info/200712/article_10.html">
+<title>[JavaScript] CodeRepos に移動しました！</title>
+<link>http://kawa.at.webry.info/200712/article_10.html</link>
+<dc:creator>Kawa.netブログ（川崎有亮）</dc:creator>
+<dc:date>2007-12-23T06:17:07+09:00</dc:date>
+<dc:subject>Subversion</dc:subject>
+<dc:subject>CodeRepos</dc:subject>
+<dc:subject>JavaScript</dc:subject>
+<description>いくつかの JavaScript ライブラリのプロジェクトを CodeRepos に移動しました。参加者募集中♪</description>
+</item>
+<item rdf:about="http://www.kawa.net/works/ajax/addrajax/addrajax.html">
+<title>ADDRAjax - Ajaxによる住所ドリルダウン検索</title>
+<link>http://www.kawa.net/works/ajax/addrajax/addrajax.html</link>
+<dc:date>2007-12-23T04:50:00+09:00</dc:date>
+<description>都道府県名→市区町村名→町域とドリルダウンで住所を検索する JavaScript ライブラリです。
+JavaScript のみで稼動するため、サーバサイドで稼動するCGIプログラムは不要です。
+住所辞書データの通信には Ajax（JSON）を利用しており、動作も十分に軽量です。
+【2007/12/23 追記】
+jQuery にも対応しました！</description>
+</item>
+<item rdf:about="http://www.kawa.net/works/ajax/ajaxzip2/ajaxzip2.html">
+<title>AjaxZip 2.0 - Ajax郵便番号→住所自動入力フォーム（CGI不要版）</title>
+<link>http://www.kawa.net/works/ajax/ajaxzip2/ajaxzip2.html</link>
+<dc:date>2007-12-23T04:50:00+09:00</dc:date>
+<description>AjaxZip2は、昨年公開した
+『ajaxな住所入力フォーム』
+の新バージョンです。
+郵便番号を入力すると、該当する都道府県名・住所が自動的に入力されます。
+Ajaxと
+JSON フォーマットを利用するJavaScriptライブラリとして公開しました。
+JavaScript のみで稼動するため、サーバサイドで稼動するCGIプログラムは不要です。
+郵便番号→住所変換処理は全てクライアントサイドのJavaScriptで行います。
+既存 HTML の住所入力フォームをたった3行書き換えるだけで利用できます。
+簡単に設置できるため、プログラムに詳しくない方でも導入していただけると思います。
+以下の住所入力フォームに、7桁の郵便番号を入力してみてください。
+【2007/12/09 追記】
+jQuery にも対応しました！</description>
+</item>
+<item rdf:about="http://kawa.at.webry.info/200712/article_9.html">
+<title>MyMiniCity つくりました</title>
+<link>http://kawa.at.webry.info/200712/article_9.html</link>
+<dc:creator>Kawa.netブログ（川崎有亮）</dc:creator>
+<dc:date>2007-12-21T12:11:45+09:00</dc:date>
+<dc:subject>FLASH</dc:subject>
+<description>アクセス数に応じて人口が増えていくらしい、シンプルなシムシティーのウェブ版みたいの。</description>
+</item>
+<item rdf:about="http://kawa.at.webry.info/200712/article_8.html">
+<title>[ネタ] Twitter の RSS はメンテナンス中に 404 Not Found を返す</title>
+<link>http://kawa.at.webry.info/200712/article_8.html</link>
+<dc:creator>Kawa.netブログ（川崎有亮）</dc:creator>
+<dc:date>2007-12-17T18:50:03+09:00</dc:date>
+<dc:subject>RSS</dc:subject>
+<dc:subject>HTTP</dc:subject>
+<dc:subject>Twitter</dc:subject>
+<description>今、Twitter がメンテナンス中 ですが、RSS の URL が 404 Not Found を返してますね。一時的なメンテナンスだったら、503 Service Unavailable かな。</description>
+</item>
+<item rdf:about="http://kawa.at.webry.info/200712/article_7.html">
+<title>[Twitter] 国内・海外のマイクロブログ系サービス</title>
+<link>http://kawa.at.webry.info/200712/article_7.html</link>
+<dc:creator>Kawa.netブログ（川崎有亮）</dc:creator>
+<dc:date>2007-12-17T18:03:00+09:00</dc:date>
+<dc:subject>マイクロブログ</dc:subject>
+<dc:subject>Twitter</dc:subject>
+<description>Twitter を始めとして、ミニブログ・マイクロブログというか、返信不要の短いメッセージのストリーム（流れ）を流しっぱなしにして、友達とゆるくコミュニケーションできるサービスが増えてます。</description>
+</item>
+<item rdf:about="http://kawa.at.webry.info/200712/article_6.html">
+<title>[Vista] マウスを動かさないのにスリープから復帰してしまう</title>
+<link>http://kawa.at.webry.info/200712/article_6.html</link>
+<dc:creator>Kawa.netブログ（川崎有亮）</dc:creator>
+<dc:date>2007-12-17T06:23:52+09:00</dc:date>
+<dc:subject>Vista</dc:subject>
+<description>Windows Vista を使い始めて 3週間ほど 経ちました。基本的に、電化製品の『オートパワーオフ』が好きなので、電源ON→スリープ→休止状態（ハイブリッドスリープ）をVista が自動的にやってくれるのは、ありがたいです。</description>
+</item>
+<item rdf:about="http://kawa.at.webry.info/200712/article_5.html">
+<title>[mobile] ｉモードで background-color で背景色を指定できる判別条件</title>
+<link>http://kawa.at.webry.info/200712/article_5.html</link>
+<dc:creator>Kawa.netブログ（川崎有亮）</dc:creator>
+<dc:date>2007-12-16T05:25:00+09:00</dc:date>
+<dc:subject>携帯</dc:subject>
+<dc:subject>スタイルシート</dc:subject>
+<dc:subject>XHTML</dc:subject>
+<description>ドコモ i モード向けの CGI コンテンツを作っているとき、ほとんどの FOMA 機種では、PC と同じようにスタイルシートで div の背景色を指定できるようになっています。</description>
+</item>
+<item rdf:about="http://kawa.at.webry.info/200712/article_4.html">
+<title>Google デベロッパー交流会（第4回）に行ってきました</title>
+<link>http://kawa.at.webry.info/200712/article_4.html</link>
+<dc:creator>Kawa.netブログ（川崎有亮）</dc:creator>
+<dc:date>2007-12-09T12:39:31+09:00</dc:date>
+<dc:subject>Google</dc:subject>
+<dc:subject>イベント</dc:subject>
+<description>12月7日は、Google デベロッパー交流会（第4回） に行ってきました。金曜の午後開催なので、仕事の都合もあって後半のみ参加しました。川崎も 第1回 に参加させて頂いたこの交流会も4回目。　今回は、これまでのようなラウンドテーブル形式（録画）でなくて、広めの会場で一般の方もライブで聴けるパネルディスカッション形式。実は、録画公開されているバージョンでは、公開 OK かグレーな内容とか正直、結構カットされているような気がするので、貴重でもあります。（笑）今...</description>
+</item>
+<item rdf:about="http://kawa.at.webry.info/200712/article_3.html">
+<title>[MTL] ウノウ尾藤さん</title>
+<link>http://kawa.at.webry.info/200712/article_3.html</link>
+<dc:creator>Kawa.netブログ（川崎有亮）</dc:creator>
+<dc:date>2007-12-08T23:00:29+09:00</dc:date>
+<dc:subject>Facebook</dc:subject>
+<dc:subject>OpenSocial</dc:subject>
+<dc:subject>メディアテクノロジーラボ</dc:subject>
+<description>先週、ウノウ  の CTO の 尾藤さん が メディアテクノロジーラボ (MTL) のオフィスに遊びに来てくれました♪　Facebook や OpenSocial  などのネタで意見交換。どちらも、まだまだ日本では盛り上がっていませんが、先月 OpenSocial が公開されてから、日本人のエンジニア・GEEK な方が Facebook 内にぽつりぽつりながらも、確実に増えてきた印象があります。今後に期待！</description>
+</item>
+<item rdf:about="http://kawa.at.webry.info/200712/article_2.html">
+<title>[PC] DELL Vostro 200 お買い得デスクトップ！</title>
+<link>http://kawa.at.webry.info/200712/article_2.html</link>
+<dc:creator>Kawa.netブログ（川崎有亮）</dc:creator>
+<dc:date>2007-12-08T22:29:16+09:00</dc:date>
+<dc:subject>Vista</dc:subject>
+<dc:subject>買い物</dc:subject>
+<dc:subject>DELL</dc:subject>
+<description>数年ぶりにデスクトップPCを買い換えてみました。先月11月24日にセットアップしました。今も快適に使えているのでレビュー。</description>
+</item>
+<item rdf:about="http://kawa.at.webry.info/200712/article_1.html">
+<title>楽天テクノロジーカンファレンス2007</title>
+<link>http://kawa.at.webry.info/200712/article_1.html</link>
+<dc:creator>Kawa.netブログ（川崎有亮）</dc:creator>
+<dc:date>2007-12-08T21:57:19+09:00</dc:date>
+<dc:subject>イベント</dc:subject>
+<dc:subject>社員食堂</dc:subject>
+<dc:subject>楽天</dc:subject>
+<description>11月24日は、楽天テクノロジーカンファレンス2007 に行ってきました。楽天タワーの、楽天の社員食堂に行ける！というのも魅力です。（笑）</description>
+</item>
+<item rdf:about="http://itpro.nikkeibp.co.jp/article/COLUMN/20071205/288758/">
+<title>マッシュアップ・ラボ 第14回　SNS上のWeb API標準を目指して「OpenSocial」が登場!　バージョン0.5の現状と今後《前編》</title>
+<link>http://itpro.nikkeibp.co.jp/article/COLUMN/20071205/288758/</link>
+<dc:date>2007-12-06T09:00:00Z</dc:date>
+<dc:subject>XML</dc:subject>
+<dc:subject>その他</dc:subject>
+<dc:subject>サーバー</dc:subject>
+<dc:subject>セキュリティ</dc:subject>
+<dc:subject>Java</dc:subject>
+<dc:subject>開発</dc:subject>
+<description>　Google は11月に，SNS などのプラットフォーム上で稼働するアプリケーションをサードパーティが開発・提供するための仕様「OpenSocial」を公開しました。OpenSocial の API が各サービスの仕様差異を基本的に吸収するため，一つの OpenSocial アプリケーションが複数の SNS で同じように稼働し，各サービスのユーザーに機能を提供できるようになります。すでに多くのSNSサービス・ベンダーがOpenSocialへの賛同を表明しています。</description>
+</item>
+<item rdf:about="http://kawa.at.webry.info/200711/article_14.html">
+<title>[OpenSocial] Plaxoでは自前OpenSocialアプリは承認が必要</title>
+<link>http://kawa.at.webry.info/200711/article_14.html</link>
+<dc:creator>Kawa.netブログ（川崎有亮）</dc:creator>
+<dc:date>2007-11-29T03:14:00+09:00</dc:date>
+<dc:subject>Plaxo</dc:subject>
+<dc:subject>OpenSocial</dc:subject>
+<dc:subject>OpenID</dc:subject>
+<description>OpenSocial に コンテナ側として対応する Plaxo は、OpenSocial 対応を表明してからの２週間で、ソーシャルグラフのコネクション数（友だち接続数）を ５倍に増やした らしい。</description>
+</item>
+<item rdf:about="http://kawa.at.webry.info/200711/article_13.html">
+<title>楽天マップ（α版）スポットブックマークサービス</title>
+<link>http://kawa.at.webry.info/200711/article_13.html</link>
+<dc:creator>Kawa.netブログ（川崎有亮）</dc:creator>
+<dc:date>2007-11-24T14:59:14+09:00</dc:date>
+<dc:subject>楽天</dc:subject>
+<dc:subject>地図</dc:subject>
+<description>品川シーサイドに、楽天テクノロジーカンファレンスに来ています。楽天マップ（α版） が公開されました！</description>
+</item>
+<item rdf:about="http://kawa.at.webry.info/200711/article_12.html">
+<title>blognation Japan ローンチパーティ！（東京）</title>
+<link>http://kawa.at.webry.info/200711/article_12.html</link>
+<dc:creator>Kawa.netブログ（川崎有亮）</dc:creator>
+<dc:date>2007-11-17T23:20:00+09:00</dc:date>
+<dc:subject /><description>Web 2.0 EXPO Tokyo 2日目の撤収終了後、セブンズの 直鳥さん のご紹介で、イギリスの情報サイト blognation の日本支局 blognation Japan 設立記念の集まりに合流。日本の情報を世界に向けて発信していくには、やはり英語サイトが重要ですから、今後に発展に期待します！</description>
+</item>
+<item rdf:about="http://kawa.at.webry.info/200711/article_11.html">
+<title>Web 2.0 EXPO Tokyo 会場や基調講演、MTL ブースなどの話</title>
+<link>http://kawa.at.webry.info/200711/article_11.html</link>
+<dc:creator>Kawa.netブログ（川崎有亮）</dc:creator>
+<dc:date>2007-11-17T22:42:00+09:00</dc:date>
+<dc:subject>イベント</dc:subject>
+<dc:subject>web2.0</dc:subject>
+<dc:subject>リクルート</dc:subject>
+<description>『JavaScript Labs』 以外の Web 2.0 EXPO Tokyo の会場やセッションの話。今回のエキスポ会場は、渋谷駅から徒歩5分のセルリアンタワーでした。</description>
+</item>
+<item rdf:about="http://kawa.at.webry.info/200711/article_10.html">
+<title>Web 2.0 EXPO Tokyo 『JavaScript Labs』 講演</title>
+<link>http://kawa.at.webry.info/200711/article_10.html</link>
+<dc:creator>Kawa.netブログ（川崎有亮）</dc:creator>
+<dc:date>2007-11-17T21:31:00+09:00</dc:date>
+<dc:subject>イベント</dc:subject>
+<dc:subject>web2.0</dc:subject>
+<description>Web 2.0 EXPO Tokyo（１日目）で、『JavaScript Labs』と題して発表をさせて頂きました。サイボウズ・ラボの TAKESAKO さん、amachang さんのお２人にも登壇頂いて、最近の JavaScript 界隈の技術ネタや、我々が関心を持っていることなどをご紹介。</description>
+</item>
+<item rdf:about="http://kawa.at.webry.info/200711/article_9.html">
+<title>Sun Tech Days 2007 in Tokyoに出演</title>
+<link>http://kawa.at.webry.info/200711/article_9.html</link>
+<dc:creator>Kawa.netブログ（川崎有亮）</dc:creator>
+<dc:date>2007-11-09T14:20:25+09:00</dc:date>
+<dc:subject>マッシュアップ</dc:subject>
+<dc:subject>イベント</dc:subject>
+<dc:subject>リクルート</dc:subject>
+<description>サン・マイクロシステムズのデベロッパー向けイベント Sun Tech Days 2007 in Tokyo の最終日トリとなるセッション『Mash up Award の現在と未来』で川崎も少し発表してきました。MA3 でサン賞ほか部門賞をトリプル受賞された こみゅすけ の作者 田中さん にもご参加いただいて、Web サービス提供者側（リクルート）、Web サービス利用者側（こみゅすけ）、コンテスト開催者（Sun）という、3者で構成するセッションでした。</description>
+</item>
+<item rdf:about="http://kawa.at.webry.info/200711/article_8.html">
+<title>John Resigからのメッセージ</title>
+<link>http://kawa.at.webry.info/200711/article_8.html</link>
+<dc:creator>Kawa.netブログ（川崎有亮）</dc:creator>
+<dc:date>2007-11-09T02:13:00+09:00</dc:date>
+<dc:subject>jQuery</dc:subject>
+<dc:subject>Shibuya.JS</dc:subject>
+<dc:subject>Twitter</dc:subject>
+<description>Mozilla プレゼンツ John Resig×Shibuya.js の興奮冷めやらぬ今日この頃、jQuery2 のテクニックを応用した OreScript 時代 も盛り上がりそう。</description>
+</item>
+<item rdf:about="http://kawa.at.webry.info/200711/article_7.html">
+<title>見栄えのするプロフ写真の作り方と Facebook 関連動画</title>
+<link>http://kawa.at.webry.info/200711/article_7.html</link>
+<dc:creator>Kawa.netブログ（川崎有亮）</dc:creator>
+<dc:date>2007-11-04T22:55:20+09:00</dc:date>
+<dc:subject>Facebook</dc:subject>
+<dc:subject>YouTube</dc:subject>
+<description>YouTube でも Facebook Song とか、たくさんの動画が投稿されてる。</description>
+</item>
+<item rdf:about="http://kawa.at.webry.info/200711/article_6.html">
+<title>Facebook Developer Garage Japan（オフ会）#1</title>
+<link>http://kawa.at.webry.info/200711/article_6.html</link>
+<dc:creator>Kawa.netブログ（川崎有亮）</dc:creator>
+<dc:date>2007-11-04T22:07:53+09:00</dc:date>
+<dc:subject>Facebook</dc:subject>
+<dc:subject>イベント</dc:subject>
+<description>OpenSocial の足音が聞こえつつも詳細はまだ不明だった先月の26日、都内で Facebook アプリ開発者の初オフ会をやってみました。日本国内の Facebook アプリケーションの開発者はまだ多くないので、その情報交換も兼ねて、Facebook Developer Garage Japan という Facebook 内のグループを始めています。</description>
+</item>
+<item rdf:about="http://kawa.at.webry.info/200711/article_5.html">
+<title>Mac だらけの教室・・・</title>
+<link>http://kawa.at.webry.info/200711/article_5.html</link>
+<dc:creator>Kawa.netブログ（川崎有亮）</dc:creator>
+<dc:date>2007-11-04T15:26:19+09:00</dc:date>
+<dc:subject>Mac</dc:subject>
+<dc:subject>海外</dc:subject>
+<dc:subject>写真</dc:subject>
+<description>UNIX が手元で動くので、プログラマの人で Mac を使う人はだいぶ増えたけど、下の写真は、アメリカの大学の教室でのヒトコマ。ここまで Mac だらけで、揃って林檎マークが光っているのも少し恐ろしい風景に見える・・・。白色ＬＥＤで、講義している先生が洗脳されそう。（笑）</description>
+</item>
+<item rdf:about="http://kawa.at.webry.info/200711/article_4.html">
+<title>Snake vs Kangaroo</title>
+<link>http://kawa.at.webry.info/200711/article_4.html</link>
+<dc:creator>Kawa.netブログ（川崎有亮）</dc:creator>
+<dc:date>2007-11-03T22:57:00+09:00</dc:date>
+<dc:subject>動物</dc:subject>
+<dc:subject>slideshare</dc:subject>
+<description>エグい。</description>
+</item>
+<item rdf:about="http://kawa.at.webry.info/200711/article_3.html">
+<title>Shibuya.JS×Mozilla Japan のイベントに John Resig が登場！</title>
+<link>http://kawa.at.webry.info/200711/article_3.html</link>
+<dc:creator>Kawa.netブログ（川崎有亮）</dc:creator>
+<dc:date>2007-11-03T01:36:01+09:00</dc:date>
+<dc:subject>jQuery</dc:subject>
+<dc:subject>Shibuya.js</dc:subject>
+<dc:subject>JavaScript</dc:subject>
+<description>日本の JavaScript 界のアイドル John Resig が 東京にやってきた!!jQuery.js という最もクールな JavaScript ライブラリの作者です。</description>
+</item>
+<item rdf:about="http://www.kawa.net/works/js/tips/orientation.html">
+<title>window.orientation（iPhone・iPod Touch方向検出）</title>
+<link>http://www.kawa.net/works/js/tips/orientation.html</link>
+<dc:date>2007-11-02T17:39:00+09:00</dc:date>
+<description>iPod Touch では、ブラウザの表示方向を
+window.orientation プロパティで 90 度単位で取得できるらしい。
+値の変化は、onorientationchange イベントで検出できる。</description>
+</item>
+<item rdf:about="http://kawa.at.webry.info/200711/article_1.html">
+<title>平成１９年度情報化月間地方講演会（岐阜）</title>
+<link>http://kawa.at.webry.info/200711/article_1.html</link>
+<dc:creator>Kawa.netブログ（川崎有亮）</dc:creator>
+<dc:date>2007-11-01T23:47:00+09:00</dc:date>
+<dc:subject>地方</dc:subject>
+<dc:subject>マッシュアップ</dc:subject>
+<dc:subject>講演</dc:subject>
+<description>毎年１０月は、経産省などが 情報化月間 と位置づけて情報化に関するいろいろな取り組みをしているそうなのです。今日は、その一環で開催されたセミナーで、岐阜に行ってきました。</description>
+</item>
+<item rdf:about="http://kawa.at.webry.info/200711/article_2.html">
+<title>MTLハーブの芽が出てきました！</title>
+<link>http://kawa.at.webry.info/200711/article_2.html</link>
+<dc:creator>Kawa.netブログ（川崎有亮）</dc:creator>
+<dc:date>2007-11-01T09:43:00+09:00</dc:date>
+<dc:subject>メディアテクノロジーラボ</dc:subject>
+<dc:subject>ハーブ</dc:subject>
+<description>最近、一部界隈では、デスクトップ・ハーブ栽培が流行しつつあるらしい。メディアテクノロジーラボ 謹製のハーブキットを、βテスターという名目で入手。</description>
+</item>
+<item rdf:about="http://kawa.at.webry.info/200710/article_8.html">
+<title>コンスタンツ⇒チューリッヒ⇒ツェルマット（スイス鉄道の旅）</title>
+<link>http://kawa.at.webry.info/200710/article_8.html</link>
+<dc:creator>Kawa.netブログ（川崎有亮）</dc:creator>
+<dc:date>2007-10-29T00:29:48+09:00</dc:date>
+<dc:subject>紅葉</dc:subject>
+<dc:subject>旅行</dc:subject>
+<description>ドイツ・コンスタンツからスイスに入り、チューリッヒ経由でツェルマットまで電車で移動しました。ツェルマットへ行くには、氷河急行に乗るのが有名ですが、チューリッヒからの所要時間は、ベルン経由の経路の方が速かったりします。スイスは鉄道網が発達していて、英語表記もしっかり整備されているので、個人旅行者にとってもとても旅行しやすく、ありがたいです。</description>
+</item>
+<item rdf:about="http://kawa.at.webry.info/200710/article_9.html">
+<title>高島陽物語　～　交流を楽しむ（戸田敦也）より</title>
+<link>http://kawa.at.webry.info/200710/article_9.html</link>
+<dc:creator>Kawa.netブログ（川崎有亮）</dc:creator>
+<dc:date>2007-10-29T00:10:00+09:00</dc:date>
+<dc:subject>高島憲法</dc:subject>
+<description>戸田ゼミ通信のブログ 交流を楽しむ（戸田敦也） に、高島陽物語 シリーズを発見。高島陽（たかしまのぼる）さんとは、ご存命なうちにはお会いできなかったのですが、いろいろな“伝説”を聞いています。こう、まとまったコラムも初めて読みました。</description>
+</item>
+<item rdf:about="http://kawa.at.webry.info/200710/article_7.html">
+<title>Visited Countries／ドイツ・スイス・チェコ旅行</title>
+<link>http://kawa.at.webry.info/200710/article_7.html</link>
+<dc:creator>Kawa.netブログ（川崎有亮）</dc:creator>
+<dc:date>2007-10-25T16:32:00+09:00</dc:date>
+<dc:subject>旅行</dc:subject>
+<description>先週は、ドイツ・スイス・チェコの３カ国旅行に行ってきました。この３ヶ国は陸続きだけど、ツアーで連続日程では行きにくそう。今回は、久しぶりの個人旅行を楽しみました。</description>
+</item>
+<item rdf:about="http://kawa.at.webry.info/200710/article_5.html">
+<title>PRESIDENT（プレジデント）10月29日号　＜宣伝＞</title>
+<link>http://kawa.at.webry.info/200710/article_5.html</link>
+<dc:creator>Kawa.netブログ（川崎有亮）</dc:creator>
+<dc:date>2007-10-11T14:56:00+09:00</dc:date>
+<dc:subject>マッシュアップ</dc:subject>
+<description>自分のメモも兼ねた、宣伝です。</description>
+</item>
+<item rdf:about="http://kawa.at.webry.info/200710/article_4.html">
+<title>新世紀エヴァンゲリオン（TV版）1話～5話が無料配信中《10月18日まで》</title>
+<link>http://kawa.at.webry.info/200710/article_4.html</link>
+<dc:creator>Kawa.netブログ（川崎有亮）</dc:creator>
+<dc:date>2007-10-09T00:38:08+09:00</dc:date>
+<dc:subject>アニメ</dc:subject>
+<dc:subject>エヴァンゲリオン</dc:subject>
+<description>Yahoo!動画 で、エヴァンゲリオン（TV版）1話～5話が無料配信 されている。この連休で思わず見てしまった。大学時代の夏休みに、深夜再放送を連続で見て以来。懐かしい～！CM をスキップできないのは面倒だけど、無料だから仕方ないか。（無料配信は7月21日～10月18日まで）</description>
+</item>
+<item rdf:about="http://kawa.at.webry.info/200710/article_3.html">
+<title>Ebisu.js - Event-Based Inter-Serving Units</title>
+<link>http://kawa.at.webry.info/200710/article_3.html</link>
+<dc:creator>Kawa.netブログ（川崎有亮）</dc:creator>
+<dc:date>2007-10-08T22:00:00+09:00</dc:date>
+<dc:subject>Perl</dc:subject>
+<dc:subject>メディアテクノロジーラボ</dc:subject>
+<dc:subject>CPAN</dc:subject>
+<description>gugod こと Kang-min Liu（劉康民）さんがプライベートで来日中。Shibuya.pm には仕事の都合で行けなかったんだけど、別で一緒に ランチ することに。その後、Ebisu.js について教えてもらった。</description>
+</item>
+<item rdf:about="http://kawa.at.webry.info/200710/article_2.html">
+<title>MA3 作品応募者による MA3 Participant Session を開催しました</title>
+<link>http://kawa.at.webry.info/200710/article_2.html</link>
+<dc:creator>Kawa.netブログ（川崎有亮）</dc:creator>
+<dc:date>2007-10-08T21:26:43+09:00</dc:date>
+<dc:subject>マッシュアップ</dc:subject>
+<dc:subject>リクルート</dc:subject>
+<description>表彰式 のポストと順番が逆になってしまったけど、その前の週末の8月22日（土）にはMash up Award 3rd (MA3) 作品応募者同士で作品の発表・解説を行うイベントを開催。この日は、OneWebDay（ワンウェブデイ） というインターネットに感謝する日だったらしい。マッシュアップ技術の発達も、インターネットがあればこそなので感謝！</description>
+</item>
+<item rdf:about="http://kawa.at.webry.info/200710/article_1.html">
+<title>マッシュアップ・アワード 3rd (MA3)表彰式で『マッシュアップ・バーガー』登場</title>
+<link>http://kawa.at.webry.info/200710/article_1.html</link>
+<dc:creator>Kawa.netブログ（川崎有亮）</dc:creator>
+<dc:date>2007-10-08T20:53:00+09:00</dc:date>
+<dc:subject>マッシュアップ</dc:subject>
+<dc:subject>リクルート</dc:subject>
+<description>9月30日（日）に Mash up Award 3rd の表彰式が開催されました。結果については ニュースリリース や 受賞作品 のページを参照のこと。３回目となる今回は、応募作品の完成度もさらに高まって盛り上がりました。最優秀賞のｙｕｋｉさんが本職プログラマでないというのも、驚きました！マッシュアップ制作現場の裾野が、確実に広がっていますね。</description>
+</item>
+<item rdf:about="http://kawa.at.webry.info/200709/article_6.html">
+<title>[Perl] XML::TreePP モジュール writefile 時の文字化け【解決】</title>
+<link>http://kawa.at.webry.info/200709/article_6.html</link>
+<dc:creator>Kawa.netブログ（川崎有亮）</dc:creator>
+<dc:date>2007-09-26T04:53:00+09:00</dc:date>
+<dc:subject>CDATA</dc:subject>
+<dc:subject>Perl</dc:subject>
+<dc:subject>XML</dc:subject>
+<description>XML::TreePP モジュールで、Perl オブジェクト→XML ファイル出力を行うwritefile() メソッドで文字化けが発生していました。先週末にアップした、バージョン 0.31 で修正されています。writefile() メソッドをご利用の方は、バージョンアップをお願いします。_o_http://www.kawa.net/works/perl/treepp/treepp.html</description>
+</item>
+<item rdf:about="http://kawa.at.webry.info/200709/article_5.html">
+<title>志布志市志布志町志布志（しぶしししぶしちょうしぶし）</title>
+<link>http://kawa.at.webry.info/200709/article_5.html</link>
+<dc:creator>Kawa.netブログ（川崎有亮）</dc:creator>
+<dc:date>2007-09-19T15:54:48+09:00</dc:date>
+<dc:subject>地図</dc:subject>
+<description>『志布志市志布志町志布志』という地名があるんですねッ！！『志布志警察署』とか、『志布志市役所志布志支所』などもある。今年１月１日に合併して誕生した鹿児島県志布志市（しぶしし）。</description>
+</item>
+<item rdf:about="http://kawa.at.webry.info/200709/article_4.html">
+<title>出張 Shibuya.JS 24（Mozilla 24）に参加してきました</title>
+<link>http://kawa.at.webry.info/200709/article_4.html</link>
+<dc:creator>Kawa.netブログ（川崎有亮）</dc:creator>
+<dc:date>2007-09-18T12:09:00+09:00</dc:date>
+<dc:subject>Facebook</dc:subject>
+<dc:subject>JavaScript</dc:subject>
+<dc:subject>Mozilla</dc:subject>
+<description>9月15日（土）～16日（日）にかけて開催されたmozilla の24時間耐久イベントの中で出張 Shibuya.JS 24 として、Shibuya.JS もトークイベントを開催。相変わらず、濃いネタが繰り広げられました。</description>
+</item>
+<item rdf:about="http://www.kawa.net/text/shibuyajs/facebook/mozilla24.html">
+<title>出張 Shibuya.JS 24『Facebook.JS』発表資料（2007年9月15日）</title>
+<link>http://www.kawa.net/text/shibuyajs/facebook/mozilla24.html</link>
+<dc:date>2007-09-17T02:55:00+09:00</dc:date>
+<description>2007年9月15日（土）開催の
+出張 Shibuya.js 24
+のライトニングトーク(5分間)にて、
+『Facebook.JS』と題して発表させて頂きました。
+プレゼン資料を公開します。
+まだまだ、日本国内では Facebook アプリ開発者は多くないので、同志を絶賛・大募集中です！</description>
+</item>
+<item rdf:about="http://kawa.at.webry.info/200709/article_3.html">
+<title>Google『開発者の方々とのラウンドテーブル』に行ってきました</title>
+<link>http://kawa.at.webry.info/200709/article_3.html</link>
+<dc:creator>Kawa.netブログ（川崎有亮）</dc:creator>
+<dc:date>2007-09-13T20:34:00+09:00</dc:date>
+<dc:subject>iGoogle</dc:subject>
+<dc:subject>ガジェット</dc:subject>
+<dc:subject>Google</dc:subject>
+<description>8月某日、渋谷の Google オフィスで開催された座談会に参加してきました。今回のテーマは「iGoogle と Google ガジェット」でした。その日の模様が Google Japan Blog で公開されているので、ご覧ください。（今回は、ブログ掲載１回目。この後、何回かに分けて掲載が続くそうです）</description>
+</item>
+<item rdf:about="http://kawa.at.webry.info/200709/article_2.html">
+<title>つくるぶ『Flash｜Ajax ベストサイトセレクション20』に参加しました</title>
+<link>http://kawa.at.webry.info/200709/article_2.html</link>
+<dc:creator>Kawa.netブログ（川崎有亮）</dc:creator>
+<dc:date>2007-09-12T16:03:00+09:00</dc:date>
+<dc:subject>Flash</dc:subject>
+<dc:subject>JavaScript</dc:subject>
+<dc:subject>つくるぶ</dc:subject>
+<description>メディアテクノロジーラボが運営するデベロッパー応援サイト つくるぶ の企画で、Flash｜Ajax ベストサイトセレクション20 という座談会に参加しました。メジャーなサイトから、有名でなくても面白いサイトを紹介しています。</description>
+</item>
+<item rdf:about="http://kawa.at.webry.info/200709/article_1.html">
+<title>XDev『Webサービス・ビジネス × マッシュアップ』講演資料公開</title>
+<link>http://kawa.at.webry.info/200709/article_1.html</link>
+<dc:creator>Kawa.netブログ（川崎有亮）</dc:creator>
+<dc:date>2007-09-12T15:37:00+09:00</dc:date>
+<dc:subject>ITpro</dc:subject>
+<dc:subject>つくるぶ</dc:subject>
+<dc:subject>発表資料</dc:subject>
+<description>先週の7日（金）になりますが、日経 BP 社主催の XDev（クロスデブ）XDev 2007 X-over Development Conference 2007 で講演させて頂きました。リクルート・メディアテクノロジーラボの つくるぶ のサイトで今回の『Webサービス・ビジネス × マッシュアップ』の発表資料を公開しました。</description>
+</item>
+<item rdf:about="http://itpro.nikkeibp.co.jp/article/COLUMN/20070828/280514/">
+<title>マッシュアップ・ラボ 第13回　速報！Facebookアプリケーション開発（入門編）</title>
+<link>http://itpro.nikkeibp.co.jp/article/COLUMN/20070828/280514/</link>
+<dc:date>2007-08-30T09:00:00Z</dc:date>
+<description>　Facebookは会員数 3400万人（2007年6月現在）で，米国内で MySpace に次ぐ第2位のリーチを持つソーシャルネットワーキングサービス（SNS）です。一般的な SNS の標準機能だけでなく，外部のサービスから Facebook 会員認証機構やプロフィール情報を利用したり，API 仕様に基づいてサードパーティ開発者がプラグインのようにFacebook 内のアプリケーションを追加開発できるFacebook Platformが公開され，注目を集めています。</description>
+</item>
+<item rdf:about="http://kawa.at.webry.info/200708/article_3.html">
+<title>[Facebook] FBJSでFacebookアプリ内でJavaScriptを利用</title>
+<link>http://kawa.at.webry.info/200708/article_3.html</link>
+<dc:creator>Kawa.netブログ（川崎有亮）</dc:creator>
+<dc:date>2007-08-20T16:36:00+09:00</dc:date>
+<dc:subject>FBJS</dc:subject>
+<dc:subject>Facebook</dc:subject>
+<dc:subject>JavaScript</dc:subject>
+<description>Facebook では、FBML という HTML サブセットの独自言語でサードパーティの開発者が誰でもアプリケーションを作成できる。FBML では当初は &amp;lt;script&amp;gt; 要素は利用できなかったが、現在は暫定仕様ながら FBJS として、JavaScript が利用可能になった。</description>
+</item>
+<item rdf:about="http://kawa.at.webry.info/200708/article_2.html">
+<title>[Perl] UUID を取得するワンライナー</title>
+<link>http://kawa.at.webry.info/200708/article_2.html</link>
+<dc:creator>Kawa.netブログ（川崎有亮）</dc:creator>
+<dc:date>2007-08-19T05:44:19+09:00</dc:date>
+<dc:subject>Perl</dc:subject>
+<dc:subject>UUID</dc:subject>
+<dc:subject>CPAN</dc:subject>
+<description>Perl を使ってカンタンに UUID を取得するワンライナー。</description>
+</item>
+<item rdf:about="http://www.kawa.net/works/recruit/webservice/dokoiku.html">
+<title>[Perl] WebService::Recruit::Dokoiku - ドコイク？Webサービス（β版）用インターフェース</title>
+<link>http://www.kawa.net/works/recruit/webservice/dokoiku.html</link>
+<dc:date>2007-08-18T04:02:00+09:00</dc:date>
+<dc:subject>Perl</dc:subject>
+<description>WebService::Recruit::Dokoiku モジュールは、
+ドコイク？Webサービス（β版）
+用の Perl インターフェースです。
+XML や HTTP の面倒な操作も不要で、手軽に Web サービスを利用したアプリを開発できます。
+最新バージョン：
+WebService-Recruit-Dokoiku-0.11.tar.gz
+TARGZ
+CPAN</description>
+</item>
+<item rdf:about="http://www.kawa.net/works/recruit/webservice/jalan.html">
+<title>[Perl] WebService::Recruit::Jalan - じゃらんWebサービス用インターフェース</title>
+<link>http://www.kawa.net/works/recruit/webservice/jalan.html</link>
+<dc:date>2007-08-18T04:02:00+09:00</dc:date>
+<dc:subject>Perl</dc:subject>
+<description>WebService::Recruit::Jalan モジュールは、
+じゃらんWebサービス
+用の Perl インターフェースです。
+XML や HTTP の面倒な操作も不要で、手軽に Web サービスを利用したアプリを開発できます。
+最新バージョン：
+WebService-Recruit-Jalan-0.10.tar.gz
+TARGZ
+CPAN</description>
+</item>
+<item rdf:about="http://kawa.at.webry.info/200708/article_1.html">
+<title>[Perl] Class::Accessor::Children::Fast複数クラスのアクセサ生成</title>
+<link>http://kawa.at.webry.info/200708/article_1.html</link>
+<dc:creator>Kawa.netブログ（川崎有亮）</dc:creator>
+<dc:date>2007-08-15T02:37:00+09:00</dc:date>
+<dc:subject>Perl</dc:subject>
+<dc:subject>CPAN</dc:subject>
+<description>Class::Accessor でアクセサメソッドを生成するのは便利だけど、多数のクラスのアクセサメソッドを一度に定義したいときは、なんだかソースが冗長になってしまう気がする。</description>
+</item>
+<item rdf:about="http://www.kawa.net/works/perl/overhttp/overhttp.html">
+<title>[Perl] XML::OverHTTP - XML over HTTP 方式の Web サービス用インターフェースモジュールのベースクラス</title>
+<link>http://www.kawa.net/works/perl/overhttp/overhttp.html</link>
+<dc:date>2007-08-13T11:21:00+09:00</dc:date>
+<dc:subject>Perl</dc:subject>
+<description>XML::OverHTTP は、Perl で
+XoH (XML over HTTP) 方式の Web サービス用のインターフェースを
+手軽に作成するためのベースクラスとなるモジュールです。
+XML::OverHTTP 単体では、Web サービスを利用できません。
+XML::OverHTTP を継承したインターフェースモジュールを作成し、
+そのインターフェース経由で各 Web サービスを利用する仕組みです。
+最新バージョン：
+XML-OverHTTP-0.07.tar.gz
+TARGZ
+CPAN</description>
+</item>
+<item rdf:about="http://www.kawa.net/works/perl/romanize/romanize.html">
+<title>[Perl] Lingua::*::Romanize::* 日中韓／ローマ字変換モジュール</title>
+<link>http://www.kawa.net/works/perl/romanize/romanize.html</link>
+<dc:date>2007-07-29T11:27:00+09:00</dc:date>
+<dc:subject>Perl</dc:subject>
+<description>Lingua::*::Romanize::* は、日本語・中国語・韓国語の UTF-8 文字列の各国語の読みを
+ローマ字化するPerlモジュール群です。
+Lingua::JA::Romanize::Japanese は、
+日本語（漢字かな混じり文）
+をローマ字化します。→詳細
+Japanese 付属の Juman・MeCab モジュールで、形態素解析を利用した読み下しにも対応します。
+Lingua::ZH::Romanize::Pinyin は、
+中国語（標準語読み）
+をローマ字（ピンイン）化します。→詳細
+Pinyin 付属の Cantonese モジュールで、香港などの広東語読みをサポートします。
+Lingua::KO::Romanize::Hangul は、
+韓国語（ハングル文字）
+をローマ字化します。→詳細</description>
+</item>
+<item rdf:about="http://itpro.nikkeibp.co.jp/article/COLUMN/20070726/278339/">
+<title>マッシュアップ・ラボ 第12回　kizAPI(きざっぴ)の関連語検索APIで旬なフレーズを連想</title>
+<link>http://itpro.nikkeibp.co.jp/article/COLUMN/20070726/278339/</link>
+<dc:date>2007-07-27T09:00:00Z</dc:date>
+<description>　サン・マイクロシステムズとリクルートが開催するマッシュアップ・コンテストMash up Award 3rdの募集がスタートしました。夏休みにちょっと頑張って最優秀賞の賞金100万円を目指しましょう！ 今回はMash up Award 3rd 参加 API の一つ，kizAPI（きざっぴ）を利用したサンプル・コードをご紹介します。</description>
+</item>
+<item rdf:about="http://kawa.at.webry.info/200707/article_5.html">
+<title>『Mash up Caravan in 大阪』出演　～　次は福岡です！</title>
+<link>http://kawa.at.webry.info/200707/article_5.html</link>
+<dc:creator>Kawa.netブログ（川崎有亮）</dc:creator>
+<dc:date>2007-07-24T23:06:34+09:00</dc:date>
+<dc:subject>マッシュアップ</dc:subject>
+<dc:subject>イベント</dc:subject>
+<dc:subject>リクルート</dc:subject>
+<description>今週から大阪を皮切りに、札幌→福岡→東京と全国4都市を回るセミナー形式のイベント『Mash up Caravan』が始まりました。Mash up Award 3rd のキャンペーン企画です。初回となる 7月23日（月）大阪会場 は、川崎も出演させて頂きました。　</description>
+</item>
+<item rdf:about="http://kawa.at.webry.info/200707/article_4.html">
+<title>[本]『兎はウサギの形になりたがる』矢沢サイエンスオフィス／動物が進化して植物になった!?</title>
+<link>http://kawa.at.webry.info/200707/article_4.html</link>
+<dc:creator>Kawa.netブログ（川崎有亮）</dc:creator>
+<dc:date>2007-07-15T01:09:04+09:00</dc:date>
+<dc:subject>技術評論社</dc:subject>
+<dc:subject>科学</dc:subject>
+<dc:subject>本</dc:subject>
+<description>矢沢サイエンスオフィス・編の『兎はウサギの形になりたがる』を読んだ。えぇ～ッ！？　植物は、動物から進化したものだったのですか！？てっきり、植物が動くようになって動物になったものだとばかり思い込んでた。逆に、葉緑素により動かなくて済むようになったから、厚い細胞壁を持ったらしい。</description>
+</item>
+<item rdf:about="http://kawa.at.webry.info/200707/article_3.html">
+<title>『Web標準の日々』、『Mash up Caravan』（マッシュアップ・キャラバン）に出演！</title>
+<link>http://kawa.at.webry.info/200707/article_3.html</link>
+<dc:creator>Kawa.netブログ（川崎有亮）</dc:creator>
+<dc:date>2007-07-08T16:00:00+09:00</dc:date>
+<dc:subject>マッシュアップ</dc:subject>
+<dc:subject>イベント</dc:subject>
+<dc:subject>リクルート</dc:subject>
+<description> サンマイクロシステムズ社とリクルート社の共催で、マッシュアップ・コンテスト『Mash up Award 3rd (MA3)』（マッシュアップ・アワード）が開催中です。今回対象となるWebサービスも、27社・団体の約 70 API と拡大されました！倍増の優勝賞金 100万円 GET 目指して、ドシドシご応募をお待ちしています！</description>
+</item>
+<item rdf:about="http://kawa.at.webry.info/200707/article_2.html">
+<title>[訪] 嵯峨嵐山／小倉百人一首の殿堂“時雨殿”（しぐれでん）</title>
+<link>http://kawa.at.webry.info/200707/article_2.html</link>
+<dc:creator>Kawa.netブログ（川崎有亮）</dc:creator>
+<dc:date>2007-07-01T22:19:00+09:00</dc:date>
+<dc:subject>京都</dc:subject>
+<dc:subject>博物館</dc:subject>
+<dc:subject>お出かけ</dc:subject>
+<description>etoさんもオススメ の時雨殿へ。百人一首をテーマにした施設で、任天堂の技術支援で2006年1月27日にオープン。&quot;小倉百人一首文化財団&quot;の理事長でもある、任天堂の山内さんの出資らしい。</description>
+</item>
+<item rdf:about="http://kawa.at.webry.info/200707/article_1.html">
+<title>[訪] 京都国際マンガミュージアム／500円で読み放題!!</title>
+<link>http://kawa.at.webry.info/200707/article_1.html</link>
+<dc:creator>Kawa.netブログ（川崎有亮）</dc:creator>
+<dc:date>2007-07-01T21:45:00+09:00</dc:date>
+<dc:subject>京都</dc:subject>
+<dc:subject>博物館</dc:subject>
+<dc:subject>お出かけ</dc:subject>
+<description>「京都国際マンガミュージアム」は、日本初の総合的なマンガ博物館。2006年11月25日にオープンしたそうなので、約半年。地下鉄の烏丸御池駅（２番出口）から徒歩1分。烏丸通りを北側へスグ。日本のマンガ文化を、歴史ある京都から発信するのは面白い。</description>
+</item>
+<item rdf:about="http://kawa.at.webry.info/200706/article_4.html">
+<title>[Acrobat] Adobe Reader新インストーラはApolloへの布石？</title>
+<link>http://kawa.at.webry.info/200706/article_4.html</link>
+<dc:creator>Kawa.netブログ（川崎有亮）</dc:creator>
+<dc:date>2007-06-18T05:26:19+09:00</dc:date>
+<dc:subject>Acrobat</dc:subject>
+<dc:subject>Adobe</dc:subject>
+<dc:subject>Apollo</dc:subject>
+<description>Acrobat Reader (Adobe Reader) のインストール手順が、ActiveX＆Firefox Addon 経由になったのは、もう遠くない将来的にApollo のインストール・普及をよりスムーズにさせていくための布石かな？参照⇒Mozilla FirefoxでのAdobe Readerインストール手順</description>
+</item>
+<item rdf:about="http://kawa.at.webry.info/200706/article_3.html">
+<title>[Safari] 祝・Windows版登場！　3.0βでの変更点チェック</title>
+<link>http://kawa.at.webry.info/200706/article_3.html</link>
+<dc:creator>Kawa.netブログ（川崎有亮）</dc:creator>
+<dc:date>2007-06-13T21:13:30+09:00</dc:date>
+<dc:subject>Safari</dc:subject>
+<dc:subject>Mac</dc:subject>
+<dc:subject>WebKit</dc:subject>
+<description>ついに Windows 版の Safari 3.0 ベータ版 が公開されました！（祝）Mac 向けの動作確認のために、いちいち Mac を起動しなくて済むようになる？と思ったけど、3.0βは『Mac OS X v10.4.9 以降』なんですね！？正式版でもこのままかなあ？　一般には OS を更新しない人は多いので、当面は、まだまだ Safari 2.0 のサポートは必要そうですね。。。　Safari 3.0 をカンタンにチェックしてみました。</description>
+</item>
+<item rdf:about="http://www.kawa.net/works/js/tips/future-reserved-words.html">
+<title>[JavaScript] Safari では char/short などの予約語を変数名に使えない</title>
+<link>http://www.kawa.net/works/js/tips/future-reserved-words.html</link>
+<dc:date>2007-06-13T20:07:00+09:00</dc:date>
+<dc:subject>JavaScript</dc:subject>
+<description>Safari では char や short といった予約語を、JavaScript の変数名として使えないのですね。
+IE や Firefox では動くのに、Safari だけ動かないプログラムがあり、ハマりました。。。
+言語仕様的な予約語だから使わない、というのはモチロンだけど、『goto』とか『class』くらいは
+直感的に何となく怪しそうだと分かるが、C 言語でもないし『char』が使えないとは思わなかったヨ。
+2007/06/13 追記：　Windows 版の Safari 3.0 の結果も追加しました！</description>
+</item>
+<item rdf:about="http://kawa.at.webry.info/200706/article_2.html">
+<title>[Perl] MIMEマルチパートメール中のテキスト本文を置換する</title>
+<link>http://kawa.at.webry.info/200706/article_2.html</link>
+<dc:creator>Kawa.netブログ（川崎有亮）</dc:creator>
+<dc:date>2007-06-04T14:11:00+09:00</dc:date>
+<dc:subject>Perl</dc:subject>
+<dc:subject>メール</dc:subject>
+<dc:subject>CPAN</dc:subject>
+<description>Perl Email Project というプロジェクトで開発されているPerl のメール処理モジュール群がかなり充実しています。「ファイル添付メール」や「HTMLメール」などの「MIME マルチパートメール」は自前のコードで処理するのは結構面倒で、多様な MTA に対応するのは難しくバグも発生しやすい状況でしたが、この Email::MIME モジュール達を利用すると、手軽にマルチパートメールを扱えるようになります。</description>
+</item>
+<item rdf:about="http://kawa.at.webry.info/200706/article_1.html">
+<title>[CD] VOICES OF BEAUTY／Wagram Music　《お気に入り》</title>
+<link>http://kawa.at.webry.info/200706/article_1.html</link>
+<dc:creator>Kawa.netブログ（川崎有亮）</dc:creator>
+<dc:date>2007-06-04T00:55:47+09:00</dc:date>
+<dc:subject>フランス</dc:subject>
+<dc:subject>CD</dc:subject>
+<description>最近、よく聴いている CD は、VOICES OF BEAUTY です。引越ししてから、しばらくCDラックに隠れていたのを見つけた。フランスの Wagram Music から昨年発売されたコンピレーション・アルバム。美しい女性ボーカルで、日曜日の昼下がりに最適な1枚です。</description>
+</item>
+<item rdf:about="http://itpro.nikkeibp.co.jp/article/COLUMN/20070521/271716/">
+<title>マッシュアップ・ラボ 第11回　TAGGY Search APIで横断タグ検索サンプル・コード</title>
+<link>http://itpro.nikkeibp.co.jp/article/COLUMN/20070521/271716/</link>
+<dc:date>2007-05-23T09:00:00Z</dc:date>
+<dc:subject>EC</dc:subject>
+<dc:subject>Java</dc:subject>
+<dc:subject>Webサービス</dc:subject>
+<dc:subject>WWWシステム</dc:subject>
+<dc:subject>サーバー</dc:subject>
+<dc:subject>その他</dc:subject>
+<dc:subject>XML</dc:subject>
+<description>　最近，マッシュアップ系のコンテストが次々に開催されています。今回はそのうちの一つ，TAGGY Mash Up Contest 2007が対象とするWeb API の具体的な使い方について，サンプル・コードを交えてご紹介します。</description>
+</item>
+<item rdf:about="http://www.thinkit.co.jp/free/article/0703/10/6/">
+<title>JSライブラリ・ラボ 第６回：自作ライブラリの公開とJavaScriptライブラリの今後</title>
+<link>http://www.thinkit.co.jp/free/article/0703/10/6/</link>
+<dc:date>2007-04-11T00:00:00+09:00</dc:date>
+</item>
+<item rdf:about="http://itpro.nikkeibp.co.jp/article/COLUMN/20070409/267730/">
+<title>マッシュアップ・ラボ 第10回　Yahoo!関連検索ワードWebサービスを使った連想ゲーム</title>
+<link>http://itpro.nikkeibp.co.jp/article/COLUMN/20070409/267730/</link>
+<dc:date>2007-04-10T09:00:00Z</dc:date>
+<description>　今回の主題である関連検索ワードWebサービスは，Yahoo!で検索をしたときに検索結果画面の下部に表示される関連キーワードを，API経由で取得できるサービスです。あるキーワードから連想される関連キーワードを返してくれます。</description>
+</item>
+<item rdf:about="http://www.thinkit.co.jp/free/article/0703/10/5/">
+<title>JSライブラリ・ラボ 第５回：グローバル変数の制御と更新履歴ファイル</title>
+<link>http://www.thinkit.co.jp/free/article/0703/10/5/</link>
+<dc:date>2007-04-09T00:00:00+09:00</dc:date>
+</item>
+<item rdf:about="http://www.kawa.net/text/sigmarion3/usb.html">
+<title>シグマリオンIIIでFOMA接続／SDカードリーダ</title>
+<link>http://www.kawa.net/text/sigmarion3/usb.html</link>
+<dc:date>2007-04-07T17:08:00+09:00</dc:date>
+<description>NTTドコモのシグマリオン�Vで、PHSカードを利用していましたが、
+今回、念願の USB(mini-A)〜USB(A) 変換ケーブルを入手したので、
+FOMA 接続や PC カードリーダに挑戦してみました。
+（このページは、2004年12月20日に書いたものです。
+2007年4月7日追記）</description>
+</item>
+<item rdf:about="http://www.kawa.net/works/perl/html/tagparser.html">
+<title>[Perl] HTML::TagParser - HTMLソースの解析／属性値やinnerTextの取得</title>
+<link>http://www.kawa.net/works/perl/html/tagparser.html</link>
+<dc:date>2007-04-06T19:56:00+09:00</dc:date>
+<dc:subject>Perl</dc:subject>
+<description>HTML::TagParser は、HTML ソースコードの解析を行う Perl モジュールです。
+DOM 風のインターフェースで、各 HTML タグごとに属性値やinnerText値を取得できます。
+Pure Perl 実装ですので、コンパイル不要で手軽に利用できます。
+ページ中の特定のタグの内容を抽出したり、リンクを辿っていくスクリプトなどで利用できます。
+Encode.pm バージョン 2.10〜2.12 間で発生していた FB_XMLCREF 問題に対応しました。(2006/11/01)
+Encode::FB_XMLCREF でなく Encode::XMLCREF を利用します。（効果は同じです）
+2.12 は既に最新バージョンではありませんが、Perl 5.8.7-8 のデフォルトのため影響が大きいです。</description>
+</item>
+<item rdf:about="http://www.thinkit.co.jp/free/article/0703/10/4/">
+<title>JSライブラリ・ラボ 第４回：JavaScriptライブラリの作成</title>
+<link>http://www.thinkit.co.jp/free/article/0703/10/4/</link>
+<dc:date>2007-04-04T00:00:00+09:00</dc:date>
+</item>
+<item rdf:about="http://www.thinkit.co.jp/free/article/0703/10/3/">
+<title>JSライブラリ・ラボ 第３回：YUIライブラリと外部JSの呼び出し手法</title>
+<link>http://www.thinkit.co.jp/free/article/0703/10/3/</link>
+<dc:date>2007-04-02T00:00:00+09:00</dc:date>
+</item>
+<item rdf:about="http://www.thinkit.co.jp/free/article/0703/10/2/">
+<title>JSライブラリ・ラボ 第２回：jQueryライブラリの内部とonloadイベント記法</title>
+<link>http://www.thinkit.co.jp/free/article/0703/10/2/</link>
+<dc:date>2007-03-28T00:00:00+09:00</dc:date>
+</item>
+<item rdf:about="http://www.thinkit.co.jp/free/article/0703/10/1/">
+<title>JSライブラリ・ラボ 第１回：Prototypeライブラリの内部</title>
+<link>http://www.thinkit.co.jp/free/article/0703/10/1/</link>
+<dc:date>2007-03-20T00:00:00+09:00</dc:date>
+</item>
+<item rdf:about="http://itpro.nikkeibp.co.jp/article/COLUMN/20070316/265426/">
+<title>マッシュアップ・ラボ 第9回　わかりやすい楽天ウェブサービス商品検索</title>
+<link>http://itpro.nikkeibp.co.jp/article/COLUMN/20070316/265426/</link>
+<dc:date>2007-03-19T09:00:00Z</dc:date>
+<description>今回は，楽天ウェブサービスを取り上げます。
+楽天市場はモール内に多数の店舗を抱えており，
+同じ商品でも店舗によって価格が違ったり，商品説明などにも独自の工夫が見らます。
+価格.com 同様に，家電製品に限らない多くの商品が扱われていますから，
+API 経由でそのデータベースを自由に検索できることで，利便性が高まりそうです。</description>
+</item>
+<item rdf:about="http://itpro.nikkeibp.co.jp/article/COLUMN/20070222/262733/">
+<title>マッシュアップ・ラボ 第8回　価格.com WEBサービスで商品検索</title>
+<link>http://itpro.nikkeibp.co.jp/article/COLUMN/20070222/262733/</link>
+<dc:date>2007-02-23T09:00:00Z</dc:date>
+<dc:subject>EC</dc:subject>
+<dc:subject>その他</dc:subject>
+<description>　今回は，カカクコム社が提供する「価格.com WEBサービス」と，その商品検索 API のカンタンな使い方をサンプル・コードを交えてご紹介します。価格.com の持つ膨大なデータを「サーチ」できる最初の一歩です。</description>
+</item>
+<item rdf:about="http://www.kawa.net/photo/200702-scale5x/index.html">
+<title>SCALE 5x - The 5th Annual Southern California Linux Expo</title>
+<link>http://www.kawa.net/photo/200702-scale5x/index.html</link>
+<dc:date>2007-02-22T05:36:00+09:00</dc:date>
+<description>ロサンゼルスで開催された
+SCALE (Southern California Linux Expo)
+に行って来たのでカンタンにご報告。
+『南カリフォルニア Linux エキスポ』として毎年開催されているもので、今回が5年目。
+Linux という名前が入っていますが、オープンソースを中心とした幅広い内容のイベントです。
+2007年2月9日〜11日の期間中、出張で
+別のカンファレンス
+に行った帰り道なので10日に立ち寄れただけ。
+とはいえ、去年はもう少しのところで日程が合わず行けなかったので、今回はタイミングが合って良かった。</description>
+</item>
+<item rdf:about="http://itpro.nikkeibp.co.jp/article/COLUMN/20070129/259848/">
+<title>マッシュアップ・ラボ 第7回　Skypeボタンでオンライン状態を公開</title>
+<link>http://itpro.nikkeibp.co.jp/article/COLUMN/20070129/259848/</link>
+<dc:date>2007-01-30T09:00:00Z</dc:date>
+<dc:subject>EC</dc:subject>
+<dc:subject>Java</dc:subject>
+<dc:subject>メール</dc:subject>
+<dc:subject>開発</dc:subject>
+<description>　さて今回は，マッシュアップ・コンテストと，その参加 API の一つであるSkype ボタンをご紹介します。Mash up Award 2nd は，昨年2006年6〜7月に開催されたSun×RECRUIT Mash up Awardを拡大し，計16社から Web サービス API の提供を受けて現在開催中の日本最大級のマッシュアップ・サイト構築のコンテストです。</description>
+</item>
+<item rdf:about="http://itpro.nikkeibp.co.jp/article/COLUMN/20070111/258452/">
+<title>マッシュアップ・ラボ 第6回　ソーシャルブックマーク件数で人気評価</title>
+<link>http://itpro.nikkeibp.co.jp/article/COLUMN/20070111/258452/</link>
+<dc:date>2007-01-12T09:00:00Z</dc:date>
+<description>　さて，連載第6回となる今回は，ソーシャルブックマークを取り上げます。ソーシャルブックマークサービスは，自分でお気に入り（ブックマーク）をネット上に保存して後で編集・検索できたり，会社と自宅など複数のパソコンで共有できるサービスです。</description>
+</item>
+<item rdf:about="http://www.kawa.net/photo/20070101-inuyama/index.html">
+<title>日本モンキーパークに行ってみたよ（2007年1月1日）</title>
+<link>http://www.kawa.net/photo/20070101-inuyama/index.html</link>
+<dc:date>2007-01-02T08:21:00+09:00</dc:date>
+<description>愛知県犬山の
+日本モンキーパーク
+に行ってみたよ。
+名古屋駅から30分、犬山遊園駅で跨座式モノレールに乗り換えて5分で着きます。
+ここでは、冬の風物詩、珍しい「たき火にあたるサル」を見ることができます。
+温泉に入るサルは日本に多くても、普通のサルは火が苦手だそうです。
+屋久島出身のここのヤクニホンサルは、たき火にあたり、焼イモも食べる。
+リスザルの島では、放し飼いのリスザル達がスグそばまで寄ってきてくれる！
+小さくて動きが速いので、ピントを合わせられない…。ちょこまか動いて、かなりカワイイ。
+また、アフリカ館の裏手では、新種のヒトも展示されています。
+他にも、尻がピンク色のハート型のサルとか、名前も分からないサルが盛り沢山。
+期待していた以上に楽しめました！</description>
+</item>
+<item rdf:about="http://itpro.nikkeibp.co.jp/article/COLUMN/20061217/257102/">
+<title>マッシュアップ・ラボ 第5回　じゃらんWebサービスでホテル・宿情報を検索</title>
+<link>http://itpro.nikkeibp.co.jp/article/COLUMN/20061217/257102/</link>
+<dc:date>2006-12-19T09:00:00Z</dc:date>
+<description>　今回はウェブサイトのフロント側に戻って，データベース検索系のAPIとしてじゃらんWebサービスを使用したホテル・宿情報の検索処理を行います。例えば，特に地域を限定したサイト等では，一つの有効なコンテンツ要素として利用できそうです。</description>
+</item>
+<item rdf:about="http://itpro.nikkeibp.co.jp/article/COLUMN/20061201/255603/">
+<title>マッシュアップ・ラボ 第4回　トルコ＆ベトナムに注目！〜 Google Analyticsアクセス解析</title>
+<link>http://itpro.nikkeibp.co.jp/article/COLUMN/20061201/255603/</link>
+<dc:date>2006-12-04T09:00:00Z</dc:date>
+<dc:subject>経営</dc:subject>
+<description>　今回は、マッシュアップ・サイトを公開した後のアクセス分析に有効な Google Analytics と、第1回で紹介した「くるくるブログ」を解析した結果から得られた今後のウェブのトレンドについて解説します。解析結果など一部の資料は、11月29日(水)開催の情報処理学会のセミナー 『Web2.0の現在と展望』 で報告したものです。</description>
+</item>
+<item rdf:about="http://www.kawa.net/works/js/jkl/calender.html">
+<title>[JavaScript] JKL.Calendar／ポップアップするカレンダー表示クラス</title>
+<link>http://www.kawa.net/works/js/jkl/calender.html</link>
+<dc:date>2006-12-01T10:17:00+09:00</dc:date>
+<dc:subject>JavaScript</dc:subject>
+<description>JKL.Calendar は、ポップアップでカレンダー表示を行うクラスです。
+2006年10月にクラス名を変更しましたが、2005年4月のリリース当初のクラス名 JKL.Calender も
+別名定義してあるので、こちらも利用可能です。半年前にご指摘いただいた typo でした。
+合わせて、選択可能な日付範囲指定用のプロパティ min_date／max_date を追加しました。
+Yahoo! UI ライブラリのカレンダー機能がかなり強力なので、
+最近なら YUI もオススメできそうですが、
+実は JKL.Calendar の方が日本語環境では使いやすかったりするかもしれません。</description>
+</item>
+<item rdf:about="http://itpro.nikkeibp.co.jp/article/COLUMN/20061116/253879/">
+<title>マッシュアップ・ラボ 第3回　livedoorお天気Webサービスでブログパーツを作る</title>
+<link>http://itpro.nikkeibp.co.jp/article/COLUMN/20061116/253879/</link>
+<dc:date>2006-11-17T09:00:00Z</dc:date>
+<dc:subject>Java</dc:subject>
+<dc:subject>Linux</dc:subject>
+<dc:subject>Webサービス</dc:subject>
+<dc:subject>XML</dc:subject>
+<dc:subject>サーバー</dc:subject>
+<dc:subject>オープンソース</dc:subject>
+<dc:subject>WWWシステム</dc:subject>
+<dc:subject>その他</dc:subject>
+<dc:subject>Windows</dc:subject>
+<description>　前回ご紹介した Flickr API は海外発の Web サービス API でしたが，国内からも多くの API が登場しています。今回は，その中でも早い時期から API 公開に取り組んでいた livedoor天気情報 の提供する Web サービス API をご紹介します。</description>
+</item>
+<item rdf:about="http://itpro.nikkeibp.co.jp/article/COLUMN/20061020/251301/">
+<title>マッシュアップ・ラボ 第1回　WebサービスAPI＋マッシュアップことはじめ</title>
+<link>http://itpro.nikkeibp.co.jp/article/COLUMN/20061020/251301/</link>
+<dc:date>2006-11-10T09:00:00Z</dc:date>
+<dc:subject>Java</dc:subject>
+<dc:subject>XML</dc:subject>
+<dc:subject>SOAP</dc:subject>
+<dc:subject>セキュリティ</dc:subject>
+<dc:subject>Webサービス</dc:subject>
+<dc:subject>WWWシステム</dc:subject>
+<dc:subject>サーバー</dc:subject>
+<dc:subject>開発</dc:subject>
+<description>　Web 2.0の要素として，「マッシュアップ（mash up）」という言葉がよく聞かれるようになりました。マッシュアップとは，複数のWebサービスを融合して，新しいサービスとして提供する形態を指します。コンテンツ・ホルダーがWebサービスとして自社データの提供を拡大してくる中で，マッシュアップによって新たな価値を生み出す場が広がってきました。この「マッシュアップ・ラボ」では，WebサービスAPIやマッシュアップ技術の最新動向と，マッシュアップ・サイト構築の要素となる各社のAPIの具体的な使い方についてサンプル・コードを交えて紹介していきます。</description>
+</item>
+<item rdf:about="http://www.kawa.net/works/jcode/uni-escape.html">
+<title>Shift_JIS に含まれない文字をエスケープ (Jcode.pm編)</title>
+<link>http://www.kawa.net/works/jcode/uni-escape.html</link>
+<dc:date>2006-11-05T02:18:00+09:00</dc:date>
+<description>下記の『&#xFA11;』『&#x9127;』『&#x9AD9;』の3文字は
+現在は Unicode を使って表現できますが、
+Shift_JIS には含まれない文字のため、
+クライアント環境によっては表示できない場合は依然多く、文字化けしやすいです。</description>
+</item>
+<item rdf:about="http://itpro.nikkeibp.co.jp/article/COLUMN/20061101/252356/">
+<title>マッシュアップ・ラボ 第2回　JavaScriptからFlickr APIで画像検索</title>
+<link>http://itpro.nikkeibp.co.jp/article/COLUMN/20061101/252356/</link>
+<dc:date>2006-11-02T09:00:00Z</dc:date>
+<dc:subject>Java</dc:subject>
+<dc:subject>SOAP</dc:subject>
+<dc:subject>Webサービス</dc:subject>
+<dc:subject>サーバー</dc:subject>
+<dc:subject>WWWシステム</dc:subject>
+<dc:subject>データベース</dc:subject>
+<dc:subject>XML</dc:subject>
+<description>　第1回では，マッシュアップの背景やWebサービスAPIにかかわる技術要素をご紹介しました。今回からはサンプル・コードを交えて，具体的なWebサービスAPIの使い方を紹介していきます。今回は，Flickr APIを利用した画像検索を取り上げます。サーバーサイドのプログラムが不要なように，ブラウザ内で動作が完結する JavaScript を利用します。キーワード指定で Flickr 上の画像を検索し，ブラウザ上にカンタンに表示できます。</description>
+</item>
+<item rdf:about="http://www.kawa.net/works/perl/hatena/bookmarkcount.html">
+<title>WebService::Hatena::BookmarkCount - はてなブックマーク件数取得APIへのPerlインターフェース</title>
+<link>http://www.kawa.net/works/perl/hatena/bookmarkcount.html</link>
+<dc:date>2006-10-15T13:48:00+09:00</dc:date>
+<description>WebService::Hatena::BookmarkCount モジュールは、
+はてなブックマーク件数取得API にアクセスして、
+指定したURLの被ブックマーク件数を取り出します。
+カンタンなメソッド１つで呼び出せるため、XML-RPC に関して勉強する必要がありません。w
+有用な情報を便利なインターフェースで提供してくれているはてなに感謝します！
+本モジュールの使用には、
+XML::TreePP モジュールと、
+LWP::UserAgent または
+HTTP::Lite のいずれかのモジュールが必要です。
+Perl 5.005／5.6.x／5.8.x で動きます。
+Pure Perl実装のため、コンパイル不要で手軽に利用できます。</description>
+</item>
+<item rdf:about="http://www.kawa.net/works/ajax/addrajax/alpscliplet.html">
+<title>AlpsCliplet - ドリルダウンな ALPSLAB Clip! ブログ用地図画像作成</title>
+<link>http://www.kawa.net/works/ajax/addrajax/alpscliplet.html</link>
+<dc:date>2006-09-25T10:55:00+09:00</dc:date>
+<description>ALPSLAB Clip!は、ブログ等に地図を貼り付けることができるサービスです。
+AlpsCliplet は、ALPSLAB Clip!用のタグを簡単に生成するためのツールです。
+このページの住所検索フォームには、
+ADDRAjax
+を利用しています。
+下記のプルダウンから、住所を選択してください。</description>
+</item>
+<item rdf:about="http://www.kawa.net/works/ajax/zip/ajaxzip.html">
+<title>ajaxな住所入力フォーム</title>
+<link>http://www.kawa.net/works/ajax/zip/ajaxzip.html</link>
+<dc:date>2006-09-24T00:15:00+09:00</dc:date>
+<description>いっけんすると普通の住所入力フォームですが、郵便番号7桁を入力すると・・・。</description>
+</item>
+<item rdf:about="http://www.kawa.net/works/ajax/ajaxtb/ajaxtb.html">
+<title>[ajax] AjaxTB／トラックバック機能を静的HTMLページに追加するJavaScript</title>
+<link>http://www.kawa.net/works/ajax/ajaxtb/ajaxtb.html</link>
+<dc:date>2006-09-19T00:38:00+09:00</dc:date>
+<dc:subject>ajax</dc:subject>
+<description>本サイト(kawa.net)が最初にトラックバックに対応したのは、2004年11月でした。
+その後、ソーシャルブックマークの普及や SPAM の増加によって
+トラックバックは死んだは
+とまで言われて地位はだいぶ下がっていますが、
+今ごろになって、また本サイトのトラックバック機能を実装し直してみました。
+本サイトは CMS／ブログ等を使ってない静的な HTML ファイルばかりなのですが、
+旧バージョンでは、トラックバックpingの届いたページの HTML ファイルを
+自動的に書き換える仕組みで実装していました。
+ただし、nobody 権限で HTML ファイルを書き換えるのは嫌いなので、cron で回しています。
+新バージョンは ajax を利用して実装しています(正確にはresponseTextを使用)。
+CGI 呼び出しはトラックバック到着時のみで、ページの表示時には静的テキストファイルを
+使用して CGI は起動しないため、サーバへの負荷も軽いです。
+もちろん、ページ自体も静的 HTML ファイルのままです。
+トラックバックが増えても（見た目はともかく）ページ本体の HTML コードには影響がないので、
+トラックバックの当初の繁栄理由の1つだった Google ページランクのアップは期待できません。
+しかしその分トラックバック SPAM の意欲をいくらか削ぐことは出来るかも？
+新着コメントは、
+RSS形式 および
+JSON形式 でも
+参照できます。
+この RSS ファイル・JSON ファイルは、
+ajaxtb.cgi?__mode=rss
+にアクセスすると、強制更新できます。</description>
+</item>
+<item rdf:about="http://www.kawa.net/works/ajax/ajaxcom/ajaxcom.html">
+<title>[ajax] AjaxCom／静的HTMLページに1行コメントを書き込める掲示板</title>
+<link>http://www.kawa.net/works/ajax/ajaxcom/ajaxcom.html</link>
+<dc:date>2006-09-19T00:37:00+09:00</dc:date>
+<dc:subject>ajax</dc:subject>
+<description>AjaxCom は、静的HTMLページに1行コメントを書き込める掲示板機能を追加できます。
+このページも単なるHTMLファイルですが、
+【コメントはこちらへ】のエリアにメッセージを書き込めます。
+サーバ側の CGI を起動するのはコメント書き込み時のみで、毎回のコメント表示時は CGI 不要のため、サーバ負荷も軽いです。
+新着コメントは、
+RSS形式 および
+JSON形式 でも
+参照できます。
+この RSS ファイル・JSON ファイルは、
+ajaxcom.cgi?__mode=rss
+にアクセスすると、強制更新できます。
+コメントの送信・表示には ajax（responseText）を利用しています。
+お試し投稿・練習・フリートーク用のページを作成しました。
+⇒こちらへ</description>
+</item>
+<item rdf:about="http://www.kawa.net/works/js/xml/objtree.html">
+<title>[JSAN] XML.ObjTree - XML〜JavaScriptオブジェクト変換クラス</title>
+<link>http://www.kawa.net/works/js/xml/objtree.html</link>
+<dc:date>2006-08-14T01:39:00+09:00</dc:date>
+<dc:subject>JSAN</dc:subject>
+<description>XML.ObjTree クラスは、Perl 用の
+XML::TreePP
+モジュールの JavaScript 版です。
+XML ファイルと JavaScript オブジェクト（連想配列）間の相互変換を行います。
+prototype.js または
+JSAN の
+HTTP.Request
+クラスと併用することで、
+JKL.ParseXML の
+後継
+としても利用できます。
+ECMA-357 の普及を待たずに、
+ECMAScript for XML (E4X)
+風のXMLのオブジェクト利用が可能になります。
+Intel Mac 版の Safari で、
+DOMParser オブジェクトの async プロパティが read-only となる点にも対応しています。
+IE で（サーバ上でなく）ローカルのXMLファイルを開きやすくなりました。（2006/08/14）</description>
+</item>
+<item rdf:about="http://www.kawa.net/works/js/tips/yui-tooltips.html">
+<title>[YUI] マウスオーバーでリンク先サムネイル表示</title>
+<link>http://www.kawa.net/works/js/tips/yui-tooltips.html</link>
+<dc:date>2006-06-26T15:07:00+09:00</dc:date>
+<dc:subject>YUI</dc:subject>
+<description>Yahoo! UI Library
+の YAHOO.widget.Tooltip オブジェクトのツールチップ機能と、
+Simple API
+のサムネイル画像取得サービスを組み合わせて、
+マウスオーバーでリンク先サイトのサムネイル表示を行うデモです。</description>
+</item>
+<item rdf:about="http://www.kawa.net/works/ajax/romanize/chinese.html">
+<title>[Ajax] 中国語の漢字にピンインのローマ字ルビ</title>
+<link>http://www.kawa.net/works/ajax/romanize/chinese.html</link>
+<dc:date>2006-06-13T20:17:00+09:00</dc:date>
+<dc:subject>Ajax</dc:subject>
+<description>中国語を入力すると、
+ピンイン（ピン音）
+のローマ字ルビを付けて表示します。
+簡体字（中国／GB2312）・繁体字（台湾／BIG5）どちらの文字も利用できます。
+このページは ajax で実装しています。
+ウェブサービスとしても利用できます。
+サーバ側の Perl/CGI とは、
+POX over HTTPで通信します。</description>
+</item>
+<item rdf:about="http://www.kawa.net/works/js/animation/raster.html">
+<title>[JavaScript] Animation.Raster - ラスタスクロールだ！</title>
+<link>http://www.kawa.net/works/js/animation/raster.html</link>
+<dc:date>2006-05-31T10:32:00+09:00</dc:date>
+<dc:subject>JavaScript</dc:subject>
+<description>Animation.Raster クラスは、
+JavaScript で
+擬似ラスタースクロール
+するためのライブラリです。
+10年以上前のゲームみたいに、「うねうね」するエフェクトを楽しめます。
+CPU の速いマシンでも遅いマシンでも、同じ実時間内でアニメ表示します。
+速いマシンの方がスムーズに表示されます。（GHzクラスのCPUが必要です）
+Internet Explorer 7.0、Firefox 1.5、Opera 8.5、Safari 2.0.3、OmniWeb 5.1.3 で
+動作確認しています。
+ただし、IE は『ページを表示するごとに確認する』にはしないでください。</description>
+</item>
+</rdf:RDF>

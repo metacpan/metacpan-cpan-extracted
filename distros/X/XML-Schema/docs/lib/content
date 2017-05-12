@@ -1,0 +1,2 @@
+[% content = PROCESS $template -%]
+[% PROCESS layout %]

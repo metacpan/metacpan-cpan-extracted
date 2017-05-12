@@ -1,0 +1,45 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.70.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 294505f858f11dd062e9916e3f50d88210a9ef54 CONTRIBUTING
+SHA1 27c6e317492db405ab919cab2624d56da596cdd4 COPYRIGHT
+SHA1 8ff1a3f4117c3a443b8db7b70cde2e013efb4be4 CREDITS
+SHA1 8b4f362eef391e0c1d770e38c157e6411c292677 Changes
+SHA1 92e814cc1012761b866ee092fc2393bd4848d4ff INSTALL
+SHA1 ec5a7b4f3023f03ebf821b57690758f7e6f3ae2a LICENSE
+SHA1 afc705057fe83fe841813b0a93a9006fdc7b43b9 MANIFEST
+SHA1 d5625a576a8fef1567d85a3f05b6b9ae0a5bb17a META.json
+SHA1 0ff81c7eddb3968c09a07ee848842dbea7c07654 META.yml
+SHA1 c1e7cad458bb06806821fc47b29089de58a6c449 Makefile.PL
+SHA1 f0443d8f857384741b2cf16c67cced54dff7d08b README
+SHA1 da2c43cdb7fe3b6b780013be0542c2dd98f6f016 bin/perl-xt-manager
+SHA1 805fa529596e358b254abf962ae75fd4fe7b217a dist.ini
+SHA1 e673c6010dd9666077f6559f9692e5717610e6d4 doap.ttl
+SHA1 83c44a5ee88f81abb8f46e74c936d4064d5c408d lib/XT/Manager.pm
+SHA1 54b519fe36f36a4a8d5166472a935745e1bae5f0 lib/XT/Manager/API.pm
+SHA1 4f5527e9f2b64a0025db9bd0cac087dfe5fd16b5 lib/XT/Manager/Command.pm
+SHA1 b4a57cce264310b467ecf5b943333ced2f215b86 lib/XT/Manager/Command/pull.pm
+SHA1 789975e920e300181028cb93017fdd6762e7d5a5 lib/XT/Manager/Command/push.pm
+SHA1 b89de8bb768cbe1eea39dfa0047de2b80b24b38d lib/XT/Manager/Command/remove.pm
+SHA1 d361b5f75b6f4a42041ea75561281834ceb15372 lib/XT/Manager/Command/status.pm
+SHA1 2f9e9df4d0a148446ba1b014e572557634b5e54f t/01basic.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.14 (GNU/Linux)
+
+iEYEARECAAYFAlKeTzYACgkQzr+BKGoqfTllXwCeMep45jubswKvvu4SlQbBNIcK
+AeMAnAvV7YyT26Zh9ALdETuTmhkVA8cO
+=DhkO
+-----END PGP SIGNATURE-----

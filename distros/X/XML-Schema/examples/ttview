@@ -1,0 +1,108 @@
+#!/usr/bin/perl -w                                         # -*- perl -*-
+#
+# $XML-Schema/examples/ttview
+#
+# Quick hack (polished turd :-) which tests the ability to present a 
+# schema view via TT templates.
+#
+
+use lib qw( ./lib ../lib );
+use strict;
+use Template;
+use XML::Schema;
+use Cwd qw( chdir getcwd );
+
+
+#------------------------------------------------------------------------
+# grok directories
+
+my $root = getcwd;
+$root =~ s/(\/examples(\/\w+)*)$//;
+
+my $ttdir = "$root/examples/templates";
+
+die "cannot find templates directory: $ttdir\n"
+    unless -d $ttdir;
+
+
+#------------------------------------------------------------------------
+# create sample schema
+
+my $schema = XML::Schema->new();
+
+my $namet = $schema->complexType( name => 'nameType' )
+    || die $schema->error();
+
+my $firstt = $namet->simpleType( name => 'firstType', type => 'string' )
+    || die $schema->error();
+
+my $first = $namet->element( name => 'first', type => $firstt )
+    || die $namet->error();
+
+my $lastt = $namet->simpleType( name => 'lastType', type => 'string' )
+    || die $schema->error();
+
+my $last = $namet->element( name => 'last', type => $lastt )
+    || die $namet->error();
+
+my $emailt = $schema->simpleType( name => 'email', base => 'string' )
+    || die $schema->error();
+
+$emailt->constrain( pattern => '\w+\@.+' )
+    || die $emailt->error();
+
+$namet->content( sequence => [ { element => $first },
+			       { element => $last  } ] )
+    || die $namet->error();
+
+my $person = $schema->complexType(
+    name => 'personType',
+    attributes => {
+	id => 'string'
+    },
+) || die $schema->error();
+
+my $name = $person->element( name => 'name', type => $namet )
+    || die $person->error();
+
+my $email = $person->element( name => 'email', type => $emailt )
+    || die $person->error();
+
+$person->content( sequence => [ { element => $name  },
+				{ element => $email }  ])
+    || die $schema->error();
+
+$schema->element( name => 'person', type => $person)
+    || die $schema->error();
+
+#------------------------------------------------------------------------
+# test ability to read XML instance
+
+my $xml =<<END_XML;
+<person id="abw">
+  <name>
+    <first>Andy</first> <last>Wardley</last>
+  </name>
+  <email>abw\@kfs.org</email>
+</person>
+END_XML
+
+my $parser = $schema->parser()
+    || die $schema->error();
+    
+my $result = $parser->parse($xml)
+    || die $parser->error();
+
+
+#------------------------------------------------------------------------
+# present via TT
+
+my $template = Template->new( {
+    INCLUDE_PATH => $ttdir,
+    RECURSION    => 1,
+    TRIM         => 1,
+} );
+				       
+$template->process( 'schema', { schema => $schema } )
+    || die $template->error();    
+

@@ -1,0 +1,50 @@
+`XML-Atom-Microformats 0.00_00 cpan:TOBYINK`
+	issued     2010-04-28;
+	label      "Initial preview"@en.
+
+`XML-Atom-Microformats 0.00_01 cpan:TOBYINK`
+	issued     2010-04-29;
+	changeset  [
+		item  "Take advantage of new XML-Atom-OWL and HTML-Microformats features for better base/document URI handling."^^Change ;
+	].
+
+`XML-Atom-Microformats 0.00_02 cpan:TOBYINK`
+	issued     2010-04-29;
+	changeset  [
+		item  "List correct dependencies in Makefile.PL."^^Bugfix ;
+	].
+
+
+`XML-Atom-Microformats 0.001 cpan:TOBYINK`
+	issued     2010-12-21;
+	label      "First stable release"@en;
+	changeset  [
+		item  "use HTML::Microformats 0.100."^^Update ;
+		item  "use XML::Atom::OWL 0.100."^^Update ;
+		item  "use RDF::Query 2.900."^^Update ;
+		item  "Improve test cases."^^Packaging ;
+	].
+
+`XML-Atom-Microformats 0.002 cpan:TOBYINK`
+	issued     2010-12-22;
+	changeset  [
+		item  "Remove spurious 'use RDF::TrineShortcuts'."^^Bugfix ;
+	].
+
+`XML-Atom-Microformats 0.003 cpan:TOBYINK`
+	issued     2011-11-03;
+	label      "hLong hTime hNo hSee"@en;
+	changeset  [
+		item   "entry_* methods are separate list items in the pod."^^Documentation ;
+		item   "use RDF::Trine 0.135"^^Update ;
+		item   "use RDF::RDFa::Parser 1.096"^^Update ;
+		item   "Module::Package::RDF"^^Packaging ;
+	].
+
+`XML-Atom-Microformats 0.004 cpan:TOBYINK`
+	issued     2012-07-07;
+	changeset  [
+		item   "Correct module name in SYNOPSIS."^^Documentation ;
+		item   "Minor changes to dependencies."^^Packaging ;
+	].
+

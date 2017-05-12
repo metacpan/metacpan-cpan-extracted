@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<anonymous_sequence>
+	<el0>0_el0</el0>
+	<el1>0_el1</el1>
+	<el0>1_el0</el0>
+	<el1>1_el1</el1>
+	<el1>2_el1</el1>
+	<el2>el2_0</el2>	
+	<el2>el2_1</el2>
+	<el2>el2_2</el2>
+	<el2>el2_3</el2>
+	<el3>el3</el3>
+</anonymous_sequence>

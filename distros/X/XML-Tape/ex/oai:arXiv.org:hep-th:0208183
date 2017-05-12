@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <oai_dc:dc xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+ <dc:title>Generalized Bogoliubov Transformation for Confined Fields: Applications
+ in Casimir Effect</dc:title>
+ <dc:creator>Silva, J. C. da</dc:creator>
+ <dc:creator>Khanna, F. C.</dc:creator>
+ <dc:creator>Neto, A. Matos</dc:creator>
+ <dc:creator>Santana, A. E.</dc:creator>
+ <dc:description>  The Bogoliubov transformation in thermofield dynamics, an operator formalism
+for the finite-temperature quantum-field theory, is generalized to describe a
+field in arbitrary confined regions of space and time. Starting with the scalar
+field, the approach is extended to the electromagnetic field and the
+energy-momentum tensor is written via the Bogoliubov transformation. In this
+context, the Casimir effect is calculated for zero and non-zero temperature,
+and therefore it can be considered as a vacuum condensation effect of the
+electromagnetic field. This aspect opens an interesting perspective for using
+this procedure as an effective scheme for calculations in the studies of
+confined fields, including the interacting fields.
+</dc:description>
+ <dc:description>Comment: 20 pages, latex(article)</dc:description>
+ <dc:date>2002-08-25</dc:date>
+ <dc:type>text</dc:type>
+ <dc:identifier>http://arXiv.org/abs/hep-th/0208183</dc:identifier>
+ </oai_dc:dc>

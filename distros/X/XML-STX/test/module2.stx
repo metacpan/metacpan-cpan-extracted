@@ -1,0 +1,27 @@
+<stx:transform version="1.0" 
+  xmlns:stx="http://stx.sourceforge.net/2002/ns"
+  strip-space="yes">
+
+  <stx:param name="top1"/>
+  <stx:param name="top2" select="'d2'"/>
+
+ 
+  <stx:template match="node">
+    <stx:param name="node"/>
+
+    <stx:value-of select="$node"/>
+    <stx:process-attributes>
+      <stx:with-param name="no" select="position()"/>
+    </stx:process-attributes>
+  </stx:template>
+  
+  <stx:group>
+
+    <stx:template match="@*" public="yes">
+      <stx:param name="no"/>
+      <stx:value-of select="concat($no,'[',name(),'=',.,']')"/>
+    </stx:template>
+    
+  </stx:group>
+
+</stx:transform>

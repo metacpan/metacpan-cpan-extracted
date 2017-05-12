@@ -1,0 +1,24 @@
+<stx:transform version="1.0" 
+  xmlns:stx="http://stx.sourceforge.net/2002/ns"
+  strip-space="yes">
+
+  <stx:template match="/root">
+    <stx:process-children/>
+  </stx:template>
+  
+  <stx:template match="cdata()|text()|comment()|processing-instruction()"/>
+
+  <stx:template match="*">
+
+    <stx:value-of select="."/>
+    <stx:text>/</stx:text>
+    <stx:process-attributes/>
+    <stx:text>/</stx:text>
+  </stx:template>
+
+  <stx:template match="@*">
+    <stx:value-of select="."/>
+    <stx:text>|</stx:text>
+  </stx:template>
+
+</stx:transform>

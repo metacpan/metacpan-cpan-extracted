@@ -1,0 +1,17 @@
+MANIFEST
+Makefile.PL
+README
+Changes
+XSLoader.pm
+XSLoader_pm.PL
+eg/net-pcap.pl
+eg/posix.pl
+t/00-load.t
+t/01-api.t
+t/XSLoader.t
+t/distchk.t
+t/podcover.t
+t/pod.t
+t/portfs.t
+META.yml
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,14 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         XML-FOAFKnows-FromvCard
+version:      0.6
+version_from: lib/XML/FOAFKnows/FromvCard.pm
+installdirs:  site
+requires:
+    Digest::SHA1:                  0
+    Encode:                        0
+    IDNA::Punycode:                0
+    Text::vCard:                   1.96
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

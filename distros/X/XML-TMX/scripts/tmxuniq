@@ -1,0 +1,108 @@
+#!/usr/bin/perl -s
+use DB_File;
+use Fcntl ;
+use Lingua::PT::PLNbase;
+use XML::TMX::Reader;
+use Digest::MD5 qw(md5_hex);
+use Encode;
+
+our ($cont,$id,$dig,$tok,$o,$fast);
+
+if ($cont) {
+    tie %dic, 'DB_File', "__tmxuniq_$$.db", O_RDWR|O_CREAT , 0640, $DB_BTREE;
+} else {
+    tie %dic, 'DB_File', "__tmxuniq_$$.db", O_RDWR|O_CREAT|O_TRUNC , 0640, $DB_BTREE;
+}
+
+my $cid = 0;
+
+for my $file (@ARGV){
+    my $tm = XML::TMX::Reader->new($file);
+
+    print STDERR "Processing...";
+
+    $tm->for_tu
+      (
+       { output => $o || "$file._" },
+       sub {
+           my $tu = shift;
+           $cid++;
+           $tu->{-prop}{id} = $cid if $id;
+
+           my $key = join("|||", map { n($tu->{$_}{-seg}) } sort grep { !/^-/ } keys %$tu);
+           my $digest = md5_hex(encode_utf8($key));
+
+           unless ($cid % 10000) {
+               my $size = -s "__tmxuniq_$$.db";
+               printf STDERR
+                 "\rTotal: %10d  Removed: %8d (%.2f%%)  Database size: %10d bytes",
+                   $cid, $rem, (100*$rem/$cid), $size;
+           }
+
+           if ($dic{$digest}) {
+               $dic{$digest} .= "$cid;" unless $fast;
+               $rem ++;
+               return undef
+           } else {
+               $dic{$digest} = "$cid;";
+               $tu->{-prop}{digest} = $digest if $dig;
+               return {%$tu} ; # used clone.. no idea why
+           }
+       }
+      );
+
+    my $size = -s "__tmxuniq_$$.db";
+    if ($cid) {
+        printf STDERR "\rTotal: %10d  Removed: %8d (%.2f%%)  Database size: %10d bytes\n",
+          $cid, $rem, (100*$rem/$cid), $size;
+    } else {
+        printf STDERR "\rHuh.. empty TMX?\n";
+    }
+    undef $tm;
+}
+untie %h;
+
+sub n {
+    my $a = shift;
+
+    $a =~ s/\.{6,}/...../g;
+
+    $a = tokenize( { rs => ' ' } => $a ) if $tok;
+
+    $a =~ s/\s+/ /g;
+    $a =~ s/ $//;
+    $a =~ s/^ //;
+    return $a;
+}
+
+__END__
+
+=head1 NAME
+
+tmxuniq - removes duplicated translation units from TMXs
+
+=head1 SYNOPSIS
+
+ tmxuniq [options] -l=en:pt tmx1 ... 
+
+=head1 DESCRIPTION
+
+Removes duplicated translation units from a set of TMX (Translation
+Memory eXange format).
+
+=head1 OPTIONS
+
+ -id  -- insert a uniq id property in each TU
+ -dig -- insert a digest property in each TU
+ -tok -- tokenize/normalize text
+ -o=out.tmx -- (with 1 argument) redefine output (default = input._)
+
+=head1 AUTHOR
+
+J.Joao Almeida, jj@di.uminho.pt
+
+=head1 SEE ALSO
+
+perl(1).
+
+=cut      

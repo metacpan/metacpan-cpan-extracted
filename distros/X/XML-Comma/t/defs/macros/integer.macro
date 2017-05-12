@@ -1,0 +1,14 @@
+$self->add_hook ( 'validate_hook',
+
+  sub {
+    my ( $doc, $content ) = @_;
+    eval {
+      die unless int($content) == $content;
+    }; if ( $@ ) {
+      die "'$content' is not an integer\n";
+    }
+  }
+
+);
+
+1;

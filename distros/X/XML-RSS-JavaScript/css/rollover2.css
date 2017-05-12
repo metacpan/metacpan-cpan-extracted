@@ -1,0 +1,47 @@
+.rss_feed {
+    width: 400px;
+    border: 1px solid gray;
+}
+
+.rss_feed_title {
+    background-color: #000;
+    color: #fff;
+    text-align: center;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: bold;
+    padding: 2px;
+}
+
+.rss_feed ul {
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.rss_item {
+    border-top: 1px solid gray;
+}
+
+.rss_feed a {
+    display: block;
+    padding: 2px;
+    padding-left: 5px;
+    background-color: #c0c0c0;
+    border-left: 1em solid #ddd;
+}
+
+.rss_feed a:link, .rss_feed a:visited {
+    color: #000;
+    text-decoration: none;
+}
+
+.rss_feed a:hover {
+    background-color: #999;
+    color: #fff;
+    border-left: 1em solid #bbb;
+}
+
+.rss_item_desc {
+    display: none;
+}

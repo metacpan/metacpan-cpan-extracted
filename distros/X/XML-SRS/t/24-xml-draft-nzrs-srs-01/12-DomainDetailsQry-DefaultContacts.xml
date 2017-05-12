@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<NZSRSResponse VerMajor="3" VerMinor="99" RegistrarId="90">
+  <Response
+     Action="DomainDetailsQry"
+     FeId="4"
+     FeSeq="371227"
+     OrigRegistrarId="1"
+     RecipientRegistrarId="1"
+     Rows="1"
+     >
+    <FeTimeStamp Day="7" Hour="11" Minute="10" Month="1" Second="46" TimeZoneOffset="+13:00" Year="2010"/>
+    <Domain Delegate="1" DomainName="x.geek.nz" RegistrantRef="11829" RegistrarId="104" Status="Active" Term="1">
+      <DefaultContacts AdminContact="1" TechnicalContact="1"/>
+      <AuditDetails
+         ActionId="RenewDomains-2009-12-19 23:30:00-x.geek.nz"
+         RegistrarId="50"
+         >
+        <AuditTime>
+          <From
+             Day="20"
+             Hour="03"
+             Minute="28"
+             Month="12"
+             Second="10"
+             TimeZoneOffset="+13:00"
+             Year="2009"
+             />
+        </AuditTime>
+        <AuditText><![CDATA[RenewDomains]]></AuditText>
+      </AuditDetails>
+    </Domain>
+  </Response>
+</NZSRSResponse>

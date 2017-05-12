@@ -1,0 +1,18 @@
+<stx:transform version="1.0" 
+  xmlns:stx="http://stx.sourceforge.net/2002/ns"
+  strip-space="yes">
+
+  <stx:template match="/root/node[3]">
+    <root>
+      <stx:process-attributes/>
+    </root>
+  </stx:template>
+
+  <stx:template match="@*">
+    <a>
+      <stx:value-of select="local-name()"/>:
+      <stx:value-of select="position()"/>
+    </a>
+  </stx:template>
+
+</stx:transform>

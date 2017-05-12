@@ -1,0 +1,48 @@
+NAME
+    XML::RAI::Enclosure - An extension to XML::RAI adding enclosure support
+
+DESCRIPTION
+    A subclass of XML::RAI::Object, XML::RAI::Enclosure handles the mapping
+    function and retrieval of RSS channel elements.
+
+USAGE
+            use XML::RAI;
+            use XML::RAI::Enclosure;
+        
+            my $rai = XML::RAI->parse($feed_xml);
+        
+            for my $i (@{$rai->items}) {
+                     print $i->title,"\n" ;
+                     for my $e (XML::RAI::Enclosure->load($i)) {
+                         print $e->url, "\n";
+                         print $e->length, "\n";
+                         print $e->type, "\n";
+                     }
+            }
+
+METHODS
+    XML::RAI::Enclosure->load
+        A class method that accepts an XML::RAI::Item and returns a list of
+        XML::RAI::Enclosures.
+
+    $enclosure->src
+        An object method that returns the XML::RSS::Parser::Element that the
+        object is using as its source.
+
+    $enclosure->parent
+        An object method that returns the parent of the RAI object.
+
+    $enclosure->url
+        An object method that returns the enclosure URL attribute.
+
+    $enclosure->length
+        An object method that returns the enclosure length attribute.
+
+    $enclosure->type
+        An object method that returns the enclosure type attribute. For
+        example: 'audio/mpeg'
+
+AUTHOR & COPYRIGHT
+    Josh McAdams <joshua dot mcadams at gmail dot com> created this
+    extension and released it under the GPL.
+

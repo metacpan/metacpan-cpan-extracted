@@ -1,0 +1,4 @@
+XML::Checker ERROR-101: undefined ELEMENT [doc]
+XML::Checker ERROR-101: undefined ELEMENT [elem]
+XML::Checker ERROR-103: undefined attribute [attr]
+	Context: Element elem

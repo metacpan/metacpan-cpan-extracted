@@ -1,0 +1,10 @@
+ChangeLog for XML::FeedLite
+===========================
+
+2.0   switched from broken LWP::Parallel::UserAgent to WWW::Curl::Simple (using W::C::Multi support)
+
+1.008 minor changes, playing the CPANTS game
+
+1.007 fixed broken manifest
+
+1.006 Kwalitee improvements

@@ -1,0 +1,111 @@
+
+This is a description of the Audio::Xmpcr module.
+
+It provides access to control the XM Satellite Radio 'PCR' device.
+The PCR is a small, user-interface-less box that tunes into XM Satellite
+Radio.  Control is performed via a USB port, and (on linux) the usb-serial
+module. Serial support in perl is provided by Device::SerialPort.
+
+For technical reasons, and because the box is a shared hardware resource,
+a daemon is provided. Depending on your needs, it may be preferable
+to communicate with the PCR via the daemon. See the pod documentation
+for more information.
+
+This package is a rewrite and extension of Chris Carlson's original work. 
+Much appreciation goes to him for publishing the protocol (which he 
+in turn discovered from someone else; thanks also to whoever that is!).
+
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+                       ******    WARNING    ********
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+Please note that a bug has been found in Audio::DSP 0.02, which causes
+extreme memory leaks and can halt your operating system when free memory
+is exhausted. The author has been notified, but a fixed package is not 
+available of this writing. If you need to use 0.02,  you'll need to fix 
+the bug yourself.  Replace line 594 of DSP.xs, by adding a call to sv_2mortal.
+Line 594 should now look like:
+
+        XPUSHs(sv_2mortal(newSVpvn(buf, status)));
+
+There are other changes required, but they won't impact Audio::Xmpcr.
+
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+         ******    Note about Channel Lists    ********
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+Any program that uses the serial API will cache the channel list 
+to a disk file to reduce start-up time. If the channel list changes,
+you'll need to delete this file and restart the daemon: ~/.xmpcrd-cache
+
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+ Building
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+To build it, make sure you have Device::SerialPort, Audio::Wav, and
+Audio::DSP loaded.  Unpack the module, and type :
+
+	perl Makefile.PL
+	make install
+
+that's it.
+
+
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+ Starting the daemon (if you elect to use it)
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+An optional daemon is provided. The API is called the same way whether
+or not you're using the daemon. So why would you want to use the daemon?
+
+* A full channel listing can be obtained instantly with the daemon, 
+     but will take ~10-20 seconds without.
+* The daemon will, if you elect, alert you to song changing events.
+     Methods in the API are provided to provide you with a list of 
+     just those channels (and the new song names) that changed.
+
+To start the daemon, just run the command 'xmpcrd'. If you pass the
+'-d' argument, debugging information will be generated. (in particular,
+it just prints the client commands as they are executed.) It takes a
+minute or so to come up when 'power on' is executed, since it has to scan 
+all of the channels. 
+
+The daemon recognizes when the web-interface connects, and tries to
+start the darkice program (for audio brodcast to icecast). See
+http://www.icecast.org for more info. If all you want is web-based control
+(and no audio broadcasting), you can disable darkice by editing the
+daemon's source (there's a configuration section at the top).
+
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+ Setting up the web interface (if you elect to use it)
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+Likewise, to use the web interface, copy the web/index.cgi file 
+(and templates) to a convenient place in your web directory, and 
+edit the configuration section at the top of the .cgi to point to the 
+location of the templates.
+
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+Included applications:
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+* All command-line applications are placed into your perl's $SCRIPTDIR.
+* All applications have a preferences block at the top of the source;
+                            edit it to set local parameters.
+
+
+	xmripper: Rip individual songs from a channel (into wavs) for making mp3's
+            
+	index.cgi: A web interface for controlling the pcr remotely. Offers
+        icecast support, so you can broadcast the audio over the network. 
+        Find this code in the web/ directory of the source Xmpcr package.
+
+	xmfinder: A program that searches channels for songs you want, 
+                                                and records only them.
+
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+ Pod documentation
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+See the pod documentation in Xmpcr.pm for:
+	* A more detailed description of the api
+	* A copyright notice. 
+
+	
+Thanks,
+
+Paul Bournival
+paulb@cajun.nu     13 Aug 03

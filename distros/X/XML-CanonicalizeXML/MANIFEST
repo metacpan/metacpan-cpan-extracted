@@ -1,0 +1,16 @@
+CanonicalizeXML.xs
+Changes
+const-c.inc
+const-xs.inc 
+Makefile.PL
+MANIFEST
+ppport.h
+README
+t/XML-CanonicalizeXML.t
+fallback/const-c.inc
+fallback/const-xs.inc
+lib/XML/CanonicalizeXML.pm
+canon/Makefile.PL
+canon/canon.h
+canon/canon.c
+META.yml                                 Module meta-data (added by MakeMaker)

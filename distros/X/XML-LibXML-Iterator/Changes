@@ -1,0 +1,20 @@
+Revision history for Perl extension XML::LibXML::Iterator.
+
+1.04 Fri Sep 28 2007
+    - fixed RT#29262
+    - minor documentation fixes
+
+1.03 Mon Aug 06 2007
+    - fixed RT#28688 by using the provided patch
+
+1.02  Sat Jun 23 2007
+    - fixed RT#6873
+    - cleaned up the tests
+    - more compliance with the traversal specification
+
+1.01  Sat Jun 23 2007
+    - fixed RT related bugs (though with a huge delay, sorry)
+
+1.00  Fri Nov  8 2002
+    - extracted the modules from the main XML::LibXML bundle.
+

@@ -1,0 +1,34 @@
+<stx:transform version="1.0" 
+  xmlns:stx="http://stx.sourceforge.net/2002/ns"
+  strip-space="yes">
+
+  <stx:template match="/root">
+    <node>
+      <stx:variable name="x" select="('a', 'b', 'c')"/>
+      <stx:variable name="z" select="('z')"/>
+
+      <stx:value-of select="insert-before($x, 0, $z)"/>
+      <stx:text>:</stx:text>
+      <stx:value-of select="insert-before($x, 1, $z)"/>
+      <stx:text>:</stx:text>
+      <stx:value-of select="insert-before($x, 2, $z)"/>
+      <stx:text>:</stx:text>
+      <stx:value-of select="insert-before($x, 3, $z)"/>
+      <stx:text>:</stx:text>
+      <stx:value-of select="insert-before($x, 4, $z)"/>
+      <stx:text>/</stx:text>
+      <stx:value-of select="$x"/>
+      <stx:text>:</stx:text>
+      <stx:value-of select="$z"/>
+      <stx:text>/</stx:text>
+      <stx:value-of select="insert-before((), 1, $z)"/>
+      <stx:text>:</stx:text>
+      <stx:value-of select="insert-before($x, 1, ())"/>
+      <stx:text>/</stx:text>
+      <stx:value-of select="insert-before($x, -2, $z)"/>
+      <stx:text>:</stx:text>
+      <stx:value-of select="insert-before($x, 9, $z)"/>
+    </node>
+  </stx:template>
+
+</stx:transform>

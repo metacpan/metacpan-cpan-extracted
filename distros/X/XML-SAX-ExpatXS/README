@@ -1,0 +1,141 @@
+README file for Perl extension XML::SAX::ExpatXS
+================================================
+
+1. Introduction
+2. Dependencies
+3. Installation
+4. Callbacks
+5. Encoding
+
+
+1.Introduction
+------------------------------
+
+This module is a direct XS implementation of Perl SAX parser 
+using Expat. XML::SAX::Expat is implemented as a layer over 
+XML::Parser.
+
+The first version of this module has been created by Matt 
+Sergeant reusing sources of XML::Parser. The current maintainer 
+is Petr Cimprich <petr AT gingerall DOT cz>.
+
+The wrapper is considered stable. Feedback of any kind is 
+appreciated.
+
+
+2. Dependencies
+------------------------------
+
+This module requires Expat XML parser. XML::SAX::ExpatXS 1.10 
+or higher requires Expat 1.95.4 or higher (because 
+of XML_SetSkippedEntityHandler). For older Expat versions, it 
+is recommended to use XML::SAX::ExpatXS 1.09.
+
+You can download Expat from: http://expat.sourceforge.net/
+
+Required Perl modules are: 
+
+	XML::NamespaceSupport
+	XML::SAX
+
+
+3. Installation
+------------------------------
+
+perl Makefile.PL
+make
+make test
+make install
+
+You will need a C compiler to build this module from sources. Other 
+option is to install a binary PPM package.
+
+Expat must be installed prior to building XML::SAX::ExpatXS.
+If expat is installed, but in a non-standard directory, then use 
+the following options to Makefile.PL:
+
+    EXPATLIBPATH=...  To set the directory in which to find libexpat
+
+    EXPATINCPATH=...  To set the directory in which to find expat.h
+
+For example:
+
+    perl Makefile.PL EXPATLIBPATH=/home/me/lib EXPATINCPATH=/home/me/include
+
+Note that if you build against a shareable library in a non-standard 
+location you may (on some platforms) also have to set your LD_LIBRARY_PATH 
+environment variable at run time for perl to find the library. On Windows, 
+you have to set your PATH environment variable.
+
+
+4. Callbacks
+------------------------------
+
+These Perl SAX callbacks are supported and tested:
+
+ start_document()
+ end_document()
+ start_element()
+ end_element()
+ characters()
+ processing_instruction()
+ start_prefix_mapping()
+ end_prefix_mapping()
+ set_document_locator()
+ fatal_error()
+ comment()
+ start_dtd()
+ end_dtd()
+ start_cdata()
+ end_cdata()
+ element_decl
+ attribute_decl
+ notation_decl()
+ unparsed_entity_decl()
+ external_entity_decl()
+ internal_entity_decl()
+ start_entity()
+ end_entity ()
+ resolve_entity()
+ skipped_entity()
+
+These methods are never called by XML::SAX::ExpatXS:
+
+ warning()
+ error()
+ ignorable_whitespace()
+
+This one is deprecated but it works with XML::SAX::ExpatXS:
+
+ xml_decl()
+
+
+5. Encoding
+------------------------------
+
+These charsets and encodings are supported:
+
+UTF-8        (1)
+UTF-16	     (1)
+US-ASCII     (1)
+ISO-8859-1   (1)
+ISO-8859-2   (2)
+ISO-8859-3   (2)
+ISO-8859-4   (2)
+ISO-8859-5   (2)
+ISO-8859-7   (2)
+ISO-8859-8   (2)
+ISO-8859-9   (2)
+WINDOWS-1250 (2)
+WINDOWS-1252 (2)
+BIG5	     (2)
+EUC-KR	     (2)
+EUC-JP	     (2,3)
+Shift JIS.   (2,3)
+
+(1) Expat built-in
+(2) external handler
+(3) see lib/XML/SAX/ExpatXS/Encodings/Japanese_Encodings.msg
+
+Other encodings can be added with XML::Encoding, see 
+lib/XML/SAX/ExpatXS/Encodings/README for more info.

@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<?xml-stylesheet title="CSS_formatting" type="text/css" href="./rss.css"?>
+<rss version="2.0"
+  xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+><channel>
+<!-- Generated with Perl's XML::RSS::SimpleGen v11.11 -->
+
+<link>http://jerkcity.com/</link>
+<title>Jerkcity</title>
+<description>Jerkcity is a daily comic strip featuring the adventures of deuce, pants, rands and spigot.</description>
+<language>en-US</language>
+<lastBuildDate>Mon, 08 Mar 2004 09:59:02 GMT</lastBuildDate>
+<skipHours><hour>0</hour><hour>1</hour><hour>3</hour><hour>4</hour><hour>5</hour><hour>6</hour><hour>7</hour><hour>8</hour><hour>9</hour><hour>11</hour><hour>12</hour><hour>13</hour><hour>14</hour><hour>15</hour><hour>16</hour><hour>17</hour><hour>19</hour><hour>20</hour><hour>21</hour><hour>22</hour><hour>23</hour></skipHours>
+<sy:updateFrequency>3</sy:updateFrequency>
+<sy:updatePeriod>daily</sy:updatePeriod>
+<sy:updateBase>1970-01-01T02:00+00:00</sy:updateBase>
+<ttl>480</ttl>
+<webMaster>sburke@cpan.org</webMaster>
+<docs>http://www.interglacial.com/rss/about.html</docs>
+
+<item>
+  <title>strange toilet</title>
+  <link>http://www.jerkcity.com/jerkcity1984.html</link>
+  <description>&#x3c;img alt=&#x22;jerkcity #1984&#x22; src=&#x22;http://www.jerkcity.com/jerkcity1984.gif&#x22; /&#x3e;</description>
+</item>
+
+
+</channel></rss>

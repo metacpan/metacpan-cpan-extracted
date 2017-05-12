@@ -1,0 +1,8 @@
+MANIFEST
+Makefile.PL
+ChangeLog
+example/README
+example/example.pdb
+lib/XML/Generator/Pdb.pm
+scripts/pdbtoxml
+t/01test.t

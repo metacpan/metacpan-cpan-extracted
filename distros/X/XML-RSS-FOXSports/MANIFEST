@@ -1,0 +1,8 @@
+Changes
+lib/XML/RSS/FOXSports.pm
+lib/XML/RSS/FOXSports/Constants.pm
+lib/XML/RSS/FOXSports/Utils.pm
+Makefile.PL
+MANIFEST
+README
+t/1.t

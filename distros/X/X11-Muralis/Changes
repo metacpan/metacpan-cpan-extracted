@@ -1,0 +1,36 @@
+Revision History for X11-Muralis
+================================
+
+v0.1003 2017-01-07
+------------------
+
+* 2017-01-07 11:11:22 +1100
+  version bump
+* 2017-01-07 11:10:37 +1100
+  Another method of getting around the VERSION thing
+* 2017-01-07 11:00:07 +1100
+  Gave up on getting $VERSION to work.
+
+v0.1002 2016-06-06
+------------------
+
+* 2016-06-06 16:00:13 +1000
+  seems like a plain README is required
+* 2016-06-06 15:58:26 +1000
+  Converted to Dist::Zilla
+* 2016-01-01 14:02:49 +1100
+  Tweaking build and manifest.
+* 2016-01-01 13:58:48 +1100
+  adding TODO list
+* 2016-01-01 13:58:35 +1100
+  adding github meta
+* 2016-01-01 13:52:14 +1100
+  version bump in advance
+* 2010-09-07 18:13:03 +1000
+  Merge branch 'master' of github.com:rubykat/X11-Muralis
+* 2010-09-06 08:56:19 +1000
+  Tweaking.
+
+===================================
+End of changes in the last 365 days
+===================================

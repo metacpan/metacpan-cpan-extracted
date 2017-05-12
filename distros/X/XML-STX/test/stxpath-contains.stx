@@ -1,0 +1,23 @@
+<stx:transform version="1.0" 
+  xmlns:stx="http://stx.sourceforge.net/2002/ns"
+  strip-space="yes">
+
+  <stx:template match="/*">
+    <root>
+      <stx:value-of select="contains('auto','au')"/>
+      <stx:text>:</stx:text>
+      <stx:value-of select="contains('auto','ut')"/>
+      <stx:text>:</stx:text>
+      <stx:value-of select="contains('auto','uta')"/>
+      <stx:text>:</stx:text>
+      <stx:value-of select="contains('moto',concat('o','to'))"/>
+      <stx:text>:</stx:text>
+      <stx:value-of select="contains('moto','')"/>
+      <stx:text>:</stx:text>
+      <stx:value-of select="contains('','koko')"/>
+      <stx:text>:</stx:text>
+      <stx:value-of select="contains('','')"/>
+    </root>
+  </stx:template>
+  
+</stx:transform>

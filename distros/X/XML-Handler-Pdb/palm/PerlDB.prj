@@ -1,0 +1,222 @@
+"mdl"
+7
+"PerlDB","appl","Perl",1043,300,0
+"Global Db as Database
+Global Nrec as Integer
+Global dbidx as Integer
+
+Sub Project_Startup()
+    Dim result as Integer
+    
+    result = dbopen(db, ~PerlDatabase~, 0)
+    If result Not= 0 Then
+        MsgBox ~Error ~ + str(result) + ~Opening PerlDatabase, pls install~
+        Stop
+     End If
+     dbidx = 1
+     Nrec = dbgetnorecs(Db)
+End Sub"
+0
+0
+""
+""
+""
+"mod"
+"C:\NSBasic\Projects\PerlDBa.cod"
+"Module1043"
+"vew"
+3,1003,#FALSE#,#TRUE#,#TRUE#,0,0,0,160,160,0,#FALSE#,#TRUE#
+"XML::Handler::Pdb"
+"frmMain"
+"Sub Form1003_Before()
+    fldAbout.Text = ~XML::Handler::Pdb allows you to create a PDB from an XML file.~ +_
+    ~This little palm app allows you to test the outcome of the example.xml file in the distribution.~ +_
+    ~You can use the 'xmltopdb' app to generate a PDB or you can use the SAX Handler from your web app or smth similar.~ +_
+    Chr(10) + ~(c) 2003 Johan Van den Brande~
+End Sub"
+0
+"Sub Form1003_After()
+
+End Sub"
+""
+"fld"
+1
+#FALSE#,#FALSE#,#FALSE#,#TRUE#,#TRUE#,1024,#FALSE#,#FALSE#,#FALSE#
+"obj"
+2
+"fld","fldAbout",1008,0,16,124,160,#TRUE#,0,""
+""
+"but"
+1
+#TRUE#,#TRUE#,#TRUE#
+"obj"
+2
+"but","Button1041",1041,61,144,12,36,#TRUE#,0,"Proceed"
+"Sub object1041()
+    NextForm ~frmDB~
+End Sub"
+"vew"
+3,1005,#FALSE#,#TRUE#,#TRUE#,0,0,0,160,160,0,#FALSE#,#TRUE#
+"XML::Handler::Pdb"
+"frmDB"
+""
+0
+"Sub Form1005_After()
+    Dim result as Integer
+    Dim numrecs as Integer
+    Dim i as Integer
+    
+    Dim inta as Integer
+    Dim intb as Short
+    Dim datt as Date
+    Dim tim as Time
+    Dim byt as Byte
+    Dim flt as Float
+    Dim sing as Single
+    Dim txt as String
+    
+    Dim x as Integer    
+    Dim fld as String
+
+    Show(dbidx)
+End Sub
+
+
+
+"
+""
+"lbl"
+1
+"obj"
+2
+"lbl","Label1010",1010,4,16,11,20,#TRUE#,1,"int :"
+""
+"lbl"
+1
+"obj"
+2
+"lbl","Label1011",1011,4,28,11,29,#TRUE#,1,"date :"
+""
+"lbl"
+1
+"obj"
+2
+"lbl","Label1012",1012,4,40,11,29,#TRUE#,1,"time :"
+""
+"lbl"
+1
+"obj"
+2
+"lbl","Label1013",1013,4,52,11,29,#TRUE#,1,"byte :"
+""
+"lbl"
+1
+"obj"
+2
+"lbl","Label1014",1014,4,64,11,31,#TRUE#,1,"float :"
+""
+"lbl"
+1
+"obj"
+2
+"lbl","Label1015",1015,4,76,11,38,#TRUE#,1,"double :"
+""
+"lbl"
+1
+"obj"
+2
+"lbl","Label1016",1016,4,100,11,33,#TRUE#,1,"short :"
+""
+"lbl"
+1
+"obj"
+2
+"lbl","Label1017",1017,4,88,11,29,#TRUE#,1,"text :"
+""
+"but"
+1
+#TRUE#,#TRUE#,#TRUE#
+"obj"
+2
+"but","btnNext",1018,123,147,12,36,#TRUE#,0,">"
+"Sub object1018()
+    If dbidx < Nrec Then
+        dbidx = dbidx+1
+        Show dbidx
+    End If
+End Sub"
+"but"
+1
+#TRUE#,#TRUE#,#TRUE#
+"obj"
+2
+"but","btnPrev",1019,2,146,12,36,#TRUE#,0,"<"
+"Sub object1019()
+    If (dbidx > 1) Then
+        dbidx = dbidx-1
+        Show dbidx
+    End If
+End Sub"
+"fld"
+1
+#TRUE#,#TRUE#,#TRUE#,#FALSE#,#TRUE#,80,#FALSE#,#FALSE#,#FALSE#
+"obj"
+2
+"fld","fldDouble",1022,51,76,12,105,#TRUE#,0,""
+""
+"fld"
+1
+#TRUE#,#TRUE#,#TRUE#,#FALSE#,#TRUE#,80,#FALSE#,#FALSE#,#FALSE#
+"obj"
+2
+"fld","fldFloat",1024,51,64,12,105,#TRUE#,0,""
+""
+"fld"
+1
+#TRUE#,#TRUE#,#TRUE#,#FALSE#,#TRUE#,80,#FALSE#,#FALSE#,#FALSE#
+"obj"
+2
+"fld","fldDate",1026,51,28,12,105,#TRUE#,0,""
+""
+"fld"
+1
+#TRUE#,#TRUE#,#TRUE#,#FALSE#,#TRUE#,80,#FALSE#,#FALSE#,#FALSE#
+"obj"
+2
+"fld","fldTime",1028,51,40,12,105,#TRUE#,0,""
+""
+"fld"
+1
+#TRUE#,#TRUE#,#TRUE#,#FALSE#,#TRUE#,80,#FALSE#,#FALSE#,#FALSE#
+"obj"
+2
+"fld","fldText",1030,51,88,12,105,#TRUE#,0,""
+""
+"fld"
+1
+#TRUE#,#TRUE#,#TRUE#,#FALSE#,#TRUE#,80,#FALSE#,#FALSE#,#FALSE#
+"obj"
+2
+"fld","fldInt",1032,51,16,12,105,#TRUE#,0,""
+""
+"fld"
+1
+#TRUE#,#TRUE#,#TRUE#,#FALSE#,#TRUE#,80,#FALSE#,#FALSE#,#FALSE#
+"obj"
+2
+"fld","fldByte",1034,51,52,12,105,#TRUE#,0,""
+""
+"lbl"
+1
+"obj"
+2
+"lbl","lblNav",1038,67,147,11,25,#TRUE#,0,"00/00"
+""
+"fld"
+1
+#TRUE#,#TRUE#,#TRUE#,#FALSE#,#TRUE#,80,#FALSE#,#FALSE#,#FALSE#
+"obj"
+2
+"fld","fldShort",1039,51,100,12,105,#TRUE#,0,""
+""
+"end"

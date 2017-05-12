@@ -1,0 +1,37 @@
+Revision history for Perl extension XML::RDB.
+
+Sat Sep 26 17:33:19 CDT 2009  Ken Carroll
+  Dressed up the API some
+  Changed recursive sub calls to goto statements in 
+    RDB, RDB::MakeTables, RDB::PopulateTables.pm, RDB::UnpopulateTables
+  Added SQL_SELECTS, SQL_HEADERS boolean options to config file
+  Added linkage RDB to RDB::MakeTables for SQL_SELECTS, SQL_HEADERS
+  Removed constants in RDB.pm
+  Removed dbix_ tables and related routines for DBIx::Sequence in RDB::PopulateTables
+  Changed mtn, no longer calls normalize in RDB.pm
+  Replaced get_xml_name with get_real_element_names_db in RDB.pm
+  Combined the _make_tables and _make_table routines (recursive)
+  Replaced make_sequence_tables, make_root_n_pk_table with _make_work_tables 
+  xml_rdb: added STDOUT option for generated XML
+  Removed DBIx Flush statements.
+  Should see another boost in performance and memory usage. 
+
+Tue Sep 22 10:36:30 CDT 2009 Ken Carroll
+  API adds: create_tables, drop_tables, done
+  Added root_n_pk table holding root table and key parameters, changing the API
+  Added SQLite support.
+  Added DBIx, DBI debug vars to config. 
+  Added use strict.
+  Added done <- DESTROY, disconnects DB & XML::DOM::Parser->dispose
+  Added Undef’d unused DBIx globs, the ones found.
+  Added select generation in output DDL
+  Moved XML::DOM::Parser and DB handles, utilizing one for each object from RDB.pm.
+  should see double in speed and better memory usage.
+  Tested with Perl 5.10, Postgreql 8.3, SQLite 3.6.16, and MySQL 5.0.51a. 
+  Fixed the config vars.
+  Added most build info files
+
+0.01  Mon Apr 14 16:04:17 2003
+  - original version; created by h2xs 1.22 with options
+  -AX -n XML::RDB --skip-exporter --skip-autoloader
+

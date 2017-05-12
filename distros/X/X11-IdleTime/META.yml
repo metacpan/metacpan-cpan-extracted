@@ -1,0 +1,17 @@
+--- #YAML:1.0
+name:                X11-IdleTime
+version:             0.08
+abstract:            Get the idle time of X11
+license:             perl
+author:              
+    - Adam Wendt <thelsdj@gmail.com>
+generated_by:        ExtUtils::MakeMaker version 6.44
+distribution_type:   module
+requires:     
+    Inline:                        0.44
+    Inline::C:                     0.44
+build_requires:
+    Inline::MakeMaker:             0.44
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

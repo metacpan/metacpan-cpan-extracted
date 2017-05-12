@@ -1,0 +1,488 @@
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+XML::Loy - Extensible XML Reader and Writer
+
+
+=head1 SYNOPSIS
+
+  use XML::Loy;
+
+  # Create new document with root node
+  my $xml = XML::Loy->new('env');
+
+  # Add elements to the document
+  my $header = $xml->add('header');
+
+  # Nest elements
+  $header->add('greetings')->add(title => 'Hello!');
+
+  # Append elements with attributes and textual data
+  $xml->add(body => { date => 'today' })->add(p => "That's all!");
+
+  # Use CSS3 selectors for element traversal
+  $xml->at('title')->attr(style => 'color: red');
+
+  # Attach comments
+  $xml->at('greetings')->comment('My Greeting');
+
+  # Print with pretty indentation
+  print $xml->to_pretty_xml;
+
+  # <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+  # <env>
+  #   <header>
+  #
+  #       <!-- My Greeting -->
+  #       <greetings>
+  #         <title style="color: red">Hello!</title>
+  #       </greetings>
+  #     </header>
+  #     <body date="today">
+  #       <p>That&#39;s all!</p>
+  #     </body>
+  #   </env>
+
+
+=head1 DESCRIPTION
+
+L<XML::Loy> allows for the simple creation
+of small serialized XML documents with
+various namespaces.
+It focuses on simplicity and extensibility,
+while giving you the full power of L<Mojo::DOM>.
+
+
+=head1 METHODS
+
+L<XML::Loy> inherits all explicit methods from
+L<Mojo::DOM> and implements the following new ones.
+
+
+=head2 new
+
+  my $xml = XML::Loy->new(<<'EOF');
+  <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+  <entry>
+    <fun>Yeah!</fun>
+  <entry>
+  EOF
+
+  $xml = XML::Loy->new('Document');
+  $xml = XML::Loy->new(Document => { foo => 'bar' });
+  my $xml_new = $xml->new(Document => {id => 'new'} => 'My Content');
+
+Constructs a new L<XML::Loy> document.
+Accepts either all parameters supported by L<Mojo::DOM> or
+all parameters supported by L<add|/add>.
+
+
+=head2 add
+
+  my $xml = XML::Loy->new('Document');
+
+  # Add an empty element
+  $xml->add('Element');
+
+  # Add elements with attributes
+  my $elem = $xml->add(Element => { type => 'text/plain' });
+
+  # Add nested elements with textual content
+  $elem->add(Child => "I'm a child element");
+
+  # Add elements with attributes, textual content, and a comment
+  $xml->add(p => { id => 'id_4' }, 'Hello!', 'My Comment!');
+
+  # Add elements with rules for pretty printing
+  $xml->add(Data => { -type => 'armour' }, 'PdGzjvj..');
+
+  # Add XML::Loy objects
+  $elem = $xml->new(Element => 'Hello World!');
+  $xml->add($elem);
+
+Adds a new element to a L<XML::Loy> document, either
+as another L<XML::Loy> object or newly defined.
+Returns the root node of the added L<XML::Loy>
+document.
+
+Parameters to define elements are a tag name,
+followed by an optional hash reference
+including all attributes of the XML element,
+an optional textual content,
+and an optional comment on the element
+(if the comment should be introduced to an empty element,
+text content has to be C<undef>).
+
+For giving directives for rendering element content
+with L<pretty printing|/to_pretty_xml>,
+a special C<-type> attribute can be defined:
+
+=over 2
+
+=item
+
+C<escape>
+
+XML escape the content of the node.
+
+  my $xml = XML::Loy->new('feed');
+  my $html = $xml->add(html => { -type => 'escape' });
+  $html->add(h1 => { style => 'color: red' } => 'I start blogging!');
+  $html->add(p => 'What a great idea!')->comment('First post');
+
+  print $xml->to_pretty_xml;
+
+  # <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+  # <feed>
+  #   <html>
+  #     &lt;h1 style=&quot;color: red&quot;&gt;I start blogging!&lt;/h1&gt;
+  #
+  #     &lt;!-- First post --&gt;
+  #     &lt;p&gt;What a great idea!&lt;/p&gt;
+  #   </html>
+  # </feed>
+
+=item
+
+C<raw>
+
+Treat children as raw data (no pretty printing).
+
+  my $plain = XML::Loy->new(<<'PLAIN');
+  <entry>There is <b>no</b> pretty printing</entry>
+  PLAIN
+
+  my $xml = XML::Loy->new('entry');
+  my $text = $xml->add(text => { -type => 'raw' });
+  $text->add($plain);
+
+  print $xml->to_pretty_xml;
+
+  # <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+  # <entry>
+  #   <text><entry>There is <b>no</b> pretty printing</entry>
+  # </text>
+  # </entry>
+
+
+=item
+
+C<armour:n>
+
+Indent the content and automatically
+introduce linebreaks after every
+C<n>th character.
+Intended for base64 encoded data.
+Defaults to 60 characters line-width after indentation.
+
+  my $xml = XML::Loy->new('entry');
+
+  my $b64_data = <<'B64';
+    VGhpcyBpcyBqdXN0IGEgdGVzdCBzdHJpbmcgZm
+    9yIHRoZSBhcm1vdXIgdHlwZS4gSXQncyBwcmV0
+    dHkgbG9uZyBmb3IgZXhhbXBsZSBpc3N1ZXMu
+  B64
+
+  my $data = $xml->add(
+    data => { -type => 'armour:30' } => $b64_data
+  );
+
+  $data->comment('This is base64 data!');
+
+  print $xml->to_pretty_xml;
+
+  # <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+  # <entry>
+  #
+  #   <!-- This is base64 data! -->
+  #   <data>
+  #     VGhpcyBpcyBqdXN0IGEgdGVzdCBzdH
+  #     JpbmcgZm9yIHRoZSBhcm1vdXIgdHlw
+  #     ZS4gSXQncyBwcmV0dHkgbG9uZyBmb3
+  #     IgZXhhbXBsZSBpc3N1ZXMu
+  #   </data>
+  # </entry>
+
+=back
+
+
+=head2 set
+
+  my $xml = XML::Loy->new('Document');
+  $xml->set(Element => { id => 5 });
+
+  # Overwrite
+  $xml->set(Element => { id => 6 });
+
+Adds a new element as a child to the node only once.
+Accepts all parameters as defined in L<add|/add>.
+
+If one or more elements with the same tag name are
+already children of the requesting node,
+the old elements will be deleted and
+comments will be merged if possible.
+
+
+=head2 comment
+
+  $node = $node->comment('Resource Descriptor');
+
+Prepends a comment to the current node.
+If a node already has a comment, comments will be merged.
+
+
+=head2 extension
+
+  # Add extensions
+  my $xml = $xml->extension('Fun', 'XML::Loy::Atom', -HostMeta);
+
+  # Further additions
+  $xml->extension(-Atom::Threading);
+
+  my @extensions = $xml->extension;
+
+Adds or returns an array of extensions.
+When adding, returns the document.
+When getting, returns the array of associated extensions.
+
+The extensions are associated to the document, they are not associated
+to the object. That means, you can't add extensions to documents
+without a root node.
+
+With this package the following extensions are bundled:
+L<Atom|XML::Loy::Atom>,
+L<Atom-Threading|XML::Loy::Atom::Threading>,
+L<ActivityStreams|XML::Loy::ActivityStreams>,
+L<GeoRSS|XML::Loy::GeoRSS>,
+L<OStatus|XML::Loy::OStatus>,
+L<XRD|XML::Loy::XRD>,
+and L<HostMeta|XML::Loy::HostMeta>.
+If an extension has a leading minus symbol, it is assumed
+to be located in the C<XML::Loy> namespace, making C<XML::Loy::Atom>
+and C<-Atom> equivalent.
+
+See L<Extensions|/EXTENSIONS> for further information.
+
+B<Note:> The return value of the extension method is experimental
+and may change without warnings.
+
+
+=head2 as
+
+  my $xml = XML::Loy->new('<XRD><Subject>akron</Subject></XRD>');
+  my $xrd = $xml->as(-XRD, -HostMeta);
+
+  $xrd->alias('acct:akron@sojolicio.us');
+
+  print $xrd->to_pretty_xml;
+
+  # <XRD xmlns="http://docs.oasis-open.org/ns/xri/xrd-1.0"
+  #      xmlns:hm="http://host-meta.net/xrd/1.0"
+  #      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  #   <Subject>akron</Subject>
+  #   <Alias>acct:akron@sojolicio.us</Alias>
+  # </XRD>
+
+Convert an L<XML::Loy> based object to another object.
+Accepts the base class and optionally a list of extensions.
+This only changes the namespace of the base class - extensions
+will stay intact.
+
+See L<Extensions|/EXTENSIONS> for further information.
+
+B<Note:> This method is experimental and may change without warnings!
+
+
+=head2 mime
+
+  print $xml->mime;
+
+The mime type associated with the object class.
+See L<Extensions|/EXTENSIONS> for further information.
+
+
+=head2 namespace
+
+  my $xml = XML::Loy->new('doc');
+  $xml->namespace('http://sojolicio.us/ns/global');
+  $xml->namespace(fun => 'http://sojolicio.us/ns/fun');
+  $xml->add('fun:test' => { foo => 'bar' }, 'Works!');
+  print $xml->namespace;
+
+  print $xml->to_pretty_xml;
+
+  # <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+  # <doc xmlns="http://sojolicio.us/global"
+  #      xmlns:fun="http://sojolicio.us/fun">
+  #   <fun:test foo="bar">Works!</fun:test>
+  # </doc>
+
+Returns the namespace of the node or
+adds namespace information to the node's root.
+When adding, the first parameter gives the prefix, the second one
+the namespace. The prefix parameter is optional.
+Namespaces are always added to the document's root,
+that means,
+they have to be unique in the scope of the whole document.
+
+
+=head2 to_pretty_xml
+
+  print $xml->to_pretty_xml;
+  print $xml->to_pretty_xml(2);
+
+Returns a stringified, pretty printed XML document.
+Optionally accepts a numerical parameter,
+defining the start of indentation (defaults to C<0>).
+
+
+=head1 EXTENSIONS
+
+  package Fun;
+  use XML::Loy with => (
+    prefix    => 'fun',
+    namespace => 'http://sojolicio.us/ns/fun',
+    mime      => 'application/fun+xml'
+  );
+
+  # Add new methods to the object
+  sub add_happy {
+    my $self = shift;
+    my $word = shift;
+
+    my $cool = $self->add('-Cool');
+    my $cry  = uc($word) . '!!! \o/ ';
+    $cool->add(Happy => {foo => 'bar'}, $cry);
+  };
+
+L<XML::Loy> allows for inheritance
+and thus provides two ways of extending the functionality:
+By using a derived class as a base class or by extending a
+base class with the L<extension|extension> method.
+
+With this package the following extensions are bundled:
+L<Atom|XML::Loy::Atom>,
+L<Atom-Threading|XML::Loy::Atom::Threading>,
+L<ActivityStreams|XML::Loy::ActivityStreams>,
+L<GeoRSS|XML::Loy::GeoRSS>,
+L<OStatus|XML::Loy::OStatus>,
+L<XRD|XML::Loy::XRD>,
+and L<HostMeta|XML::Loy::HostMeta>.
+
+For the purpose of extension, three attributes can be set when
+L<XML::Loy> is used (introduced with the keyword C<with>).
+
+=over 2
+
+=item
+
+C<namespace> - Namespace of the extension.
+
+=item
+
+C<prefix> - Preferred prefix to associate with the namespace.
+
+=item
+
+C<mime> - Mime type of the base document.
+
+=back
+
+You can use derived objects in your application as you
+would do with any other object class.
+
+  package main;
+  use Fun;
+  my $obj = Fun->new('Fun');
+  $obj->add_happy('Yeah!');
+  print $obj->to_pretty_xml;
+
+  # <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+  # <Fun xmlns="http://sojolicio.us/ns/fun">
+  #   <Cool>
+  #     <Happy foo="bar">YEAH!!!! \o/ </Happy>
+  #   </Cool>
+  # </Fun>
+
+The defined namespace is introduced as the document's
+namespace. The prefix is not in use for derived classes.
+
+Without any changes to the class, you can use this module as an
+extension to another L<XML::Loy> based document as well.
+
+  use XML::Loy;
+
+  my $obj = XML::Loy->new('object');
+
+  # Use XML::Loy based class 'Fun'
+  $obj->extension('Fun');
+
+  # Use methods provided by the base class or any extension
+  $obj->add_happy('Yeah!');
+
+  # Print with pretty indentation
+  print $obj->to_pretty_xml;
+
+  # <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+  # <object xmlns:fun="http://sojolicio.us/ns/fun">
+  #   <Cool>
+  #     <fun:Happy foo="bar">YEAH!!!! \o/ </fun:Happy>
+  #   </Cool>
+  # </object>
+
+The defined namespace of C<Fun> is introduced with the
+prefix C<fun>. The prefix is prepended to all elements
+added by the L<add|/add> and L<set|/set> methods in the extension class.
+To prevent this prefixing, prepend the element name with
+a C<-> (like with C<E<lt>-Cool /E<gt>> in the example
+above).
+
+Derived classes are always C<strict> and C<utf8>, use C<warnings>
+and import all C<features> of Perl 5.10.
+
+
+=head1 DEPENDENCIES
+
+L<Mojolicious>, L<Test::Warn> (for testing).
+
+
+=head1 CAVEATS
+
+L<XML::Loy> focuses on the comfortable handling of small documents of
+serialized data and the ease of extensibility.
+It is - as well as the underlying parser - written in pure perl and
+not intended to be the fastest thing out there
+(although I believe there's plenty of space for optimization).
+That said - it may not suit all your needs, but there are loads of excellent
+XML libraries out there, you can give a try then.
+Just to name a few:
+For fast parsing of huge documents, try L<XML::Twig>.
+For validation and the availability of lots of tools from the XML world,
+try L<XML::LibXML>.
+For simple deserialization,
+try L<XML::Bare> and L<XML::Fast>.
+For similar scope, but without dependencies aside the core,
+try L<XML::MyXML>.
+
+
+=head1 CONTRIBUTORS
+
+L<Renée Bäcker|https://github.com/reneeb>
+
+
+=head1 AVAILABILITY
+
+  https://github.com/Akron/XML-Loy
+
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2011-2016, L<Nils Diewald|http://nils-diewald.de/>.
+
+This program is free software, you can redistribute it
+and/or modify it under the same terms as Perl.
+
+=cut

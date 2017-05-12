@@ -1,0 +1,140 @@
+#!/usr/bin/perl
+# ============================================================================
+#
+# TITLE:       xas-init
+#
+# FACILITY:    XAS
+#
+# ABSTRACT:    This procedure will create various directories.
+#
+# ENVIRONMENT: The XAS Middleware Environment
+#
+# PARAMETERS:
+#              --log-type     toggles the log type
+#              --log-facility changes the log facility to use
+#              --log-file     name of the log file
+#              --help         prints out a helpful help message
+#              --manual       prints out the procedures manual
+#              --version      prints out the procedures version
+#              --debug        toggles debug output
+#              --alerts       toggles alert notification
+#
+# RETURNS:
+#              0 - success
+#              1 - failure
+#
+# Version      Author                                              Date
+# -------      ----------------------------------------------      -----------
+# 0.01         Kevin Esteb                                         11-Jan-2017
+#
+# ============================================================================
+#
+
+use lib "../lib";
+use XAS::Apps::Init;
+
+main: {
+
+    my $app = XAS::Apps::Init->new(
+        -throws   => 'xas-init',
+        -facility => 'systems',
+        -priority => 'low',
+    );
+
+    exit $app->run();
+
+}
+
+__END__
+
+=head1 NAME
+
+xas-init - create directories on systemd systems
+
+=head1 SYNOPSIS
+
+xas-init [--help] [--manual]
+
+ options:
+   --help         outputs simple help text
+   --manual       outputs the procedures manual
+   --version      outputs the apps version
+   --debug        toogles debugging output
+   --alerts       toogles alert notifications
+   --log-file     name of the log file 
+   --log-type     toggles the log type
+   --log-facility changes the log facility
+
+=head1 DESCRIPTION
+
+This procedure will create the /var/run/xas and /var/lock/xas directories.
+On systemd, these directories reside on filesystems that use tmpfs. So they
+disappear upon system reboot. On none systemd systems this procedure will do
+nothing.
+
+=head1 OPTIONS AND ARGUMENTS
+
+=over 4
+
+=item B<--help>
+
+Displays a simple help message.
+
+=item B<--debug>
+
+Turns on debbuging.
+
+=item B<--alerts>
+
+Togggles alert notification.
+
+=item B<--log-type>
+
+Toggles the log type. Defaults to 'console'. Can be 'console', 'file', 
+'json' or 'syslog'.
+
+=item B<--log-facility>
+
+Toggles the log facilty. Defaults to 'local6'. This follows syslog
+convention.
+
+=item B<--log-file>
+
+Optional logfile. When specified the log type is set to 'file'.
+
+=item B<--manual>
+
+The complete documentation.
+
+=item B<--version>
+
+Prints out the apps version
+
+=back
+
+=head1 EXIT CODES
+
+ 0 - success
+ 1 - failure
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<XAS|XAS>
+
+=back
+
+=head1 AUTHOR
+
+Kevin L. Esteb, E<lt>kevin@kesteb.usE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2012-2017 Kevin L. Esteb
+
+This is free software; you can redistribute it and/or modify it under
+the terms of the Artistic License 2.0. For details, see the full text
+of the license at http://www.perlfoundation.org/artistic_license_2_0.
+
+=cut

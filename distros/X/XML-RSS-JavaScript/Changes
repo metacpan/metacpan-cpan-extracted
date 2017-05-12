@@ -1,0 +1,42 @@
+Revision history for Perl extension XML::RSS::JavaScript 
+
+0.65 2013-10-02
+    - Don't ship MYMETA (RT #89176)
+
+0.64 2012-11-06
+    - Updated Changes file to spec
+    - repackaged with a new version of Module::Install
+
+0.63 2009-11-19
+    - repackaged with a new version of Module::Install
+
+0.62 2008-03-04
+    - minor code and test suite improvements
+
+0.61 2007-08-17
+    - XML::RSS no longer has _encode, using HTML::Entities directly.
+    - switch to Module::Install
+
+0.60 2007-01-22
+    - escape titles, descriptions and urls
+
+0.5  2005-09-23
+    - Added JSON exporting
+    - switched to Module::Build
+
+0.41 2005-03-02
+    - added pod and pod coverage tests
+
+0.4  2004-10-01
+    - restructured test files
+    - 100% test coverage
+
+0.3  2003-10-29
+    - added example of sucking in existing RSS feed and spitting out 
+      JavaScript.
+
+0.2  2003-10-03
+    - added CSS sample files to the MANIFEST
+
+0.1  2003-09-29
+    - first version 

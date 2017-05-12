@@ -1,0 +1,42 @@
+This is a PERL module that interfaces PERL to the Widget Creation
+Library and Motif.
+
+You must have the following installed before you start:
+
+- Wcl 2.7.2
+- Motif (whichever version you want to use with Wcl)
+- SWIG 1.1 (I am using 1.1-3)
+
+I have placed a copy of Wcl 2.7.2 in CPAN with this module.
+
+To install:
+
+    perl Makefile.PL
+    make
+    make install
+
+This has been tested under RedHat Linux 4.2 using RedHat Motif 2.0,
+and under AIX 3.2.5, AIX 4.2 and HPUX 10.10, using Motif 1.x.  Porting
+to other platforms should be easy.  Setting up for the Athena widgets
+should also be easy.
+
+There is very little custom code in this module, it is mostly
+generated from X11 and Motif header files by SWIG.
+
+The Wcl-gen perl script runs the C preprocessor on a selected set of
+header files, then edits the output a bit to make it more palatable to
+SWIG.  To port to a new platform, you should only need to make
+modifications to Wcl-gen, and perhaps the header file list in Wcl-i,
+and obviously Makefile.PL.
+
+The Makefile is set up to have SWIG generate HTML documentation on the
+constants and classes that it generates.  There is also some pod
+documentation on the functionality provided by the package in the
+Wcl-pm file, and in the examples in the examples/ directory.
+
+The Makefile setup is a bit odd, if you know all about MakeMaker, let
+me know how to fix it up.
+
+Joe Buehler
+jhpb@sarto.gaithersburg.md.us
+August 31, 1997

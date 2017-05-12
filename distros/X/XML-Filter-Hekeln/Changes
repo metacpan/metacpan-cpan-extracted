@@ -1,0 +1,6 @@
+Revision history for Perl extension XML::Filter::Hekeln.
+
+0.01  Thu Dec  2 20:29:43 1999
+	- original version; created by h2xs 1.19
+0.02  Sun Feb  6 18:23:14 CET 2000
+	- improvement of script and processing

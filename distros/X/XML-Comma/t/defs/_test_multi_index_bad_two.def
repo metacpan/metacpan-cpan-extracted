@@ -1,0 +1,21 @@
+<DocumentDefinition>
+
+  <name>_test_multi_index_bad_two</name>
+
+  <element><name>foo</name></element>
+  <element><name>bar</name></element>
+
+  <store>
+    <name>one</name>
+    <base>test/multi_bad_two</base>
+    <location>Sequential_file:'max',100,'extension','.multi_first'</location>
+    <index_on_store>one</index_on_store>
+  </store>
+
+  <index>
+    <name>one</name>
+    <index_from_store>made_up</index_from_store>
+    <field><name>foo</name></field>
+  </index>
+
+</DocumentDefinition>

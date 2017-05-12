@@ -1,0 +1,86 @@
+=head1 NAME
+
+XML::Essex::ResultValues - How Essex manages result values
+
+=head1 DESCRIPTION
+
+    The first part of this material is also in L<XML::Essex>.
+
+Essex is designed to Do The Right Thing for the vast majority of
+uses, so it manages result values automatically unless you take
+control.  Below is a set of detailed rules for how it manages
+the result value for a filter's processing run, but the overview is:
+
+=over
+
+=item *
+
+Generators and Filters normally do not need to manage a result.  The
+result from the next filter downstream's end_document handler will be
+returned automatically or an exception will be thrown if an incomplete
+document is sent downstream.
+
+=item *
+
+Handlers should either set a result value by calling C<result()> with
+it, or C<return> that result normally after the end_document is
+received.
+
+=item *
+
+Generators, filters and handlers should all die() on unexpected
+conditions and most error conditions (a FALSE or undefined result is not
+necessarily an error condition for a handler).
+
+Generators and filters generally should not return a value of their own
+because this will surprise calling code which is expecting a return
+value of the type that the final SAX handler returns.
+
+=back
+
+=head2 Details
+
+In order to free the coder from having to manage these end_document
+result values, Essex maintains a result value as an attribute of the
+filter and returns it if the filter has transmitted any events.  If the
+filter has not transmitted any events, it must set this manually, or an
+exception is thrown.
+
+In addition to the result value itself, Essex also tracks whether the
+value has been set or not.  It is an error to exit normally from the
+filter without having set a result value.  Setting the value to C<undef>
+is legal and legitimate, and is thus counted as having set it.
+
+The result value is set or retrieved by the C<result()> function /
+method.  The rules that Essex uses to manage this value are:
+
+=over
+
+=item 1
+
+Before entering the main routine, sets C<result()> to undef and clear the
+C<result_has_been_set> flag.
+
+=item 2
+
+The result of each end_document C<put()> sends is captured by calling
+C<result()>, overwriting any previous values and setting the
+C<result_has_been_set_flag>.
+
+=item 3
+
+On normal exit (via return), the last C<result()> set is returned and any
+C<return>ed value is ignored. If no result has been set and no events
+were C<put()> downstream, then the C<return>ed value is returned.  If
+events were C<put()> downstream and no result was set, than an exception
+is thrown.
+
+=item 4
+
+If the filter C<die()>s with an "end of XML input\n" exception, then
+the last C<result()> set is returned.  If no result was set, then the
+exception is propogated.
+
+=back
+
+=cut

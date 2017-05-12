@@ -1,0 +1,59 @@
+XML-Debian-ENetInterfaces
+
+VERSION
+
+0.07
+
+Built and tested with:
+This is perl, v5.10.1 (*) built for x86_64-linux-gnu-thread-multi
+(with 51 registered patches, see perl -V for more detail)
+
+REQUIREMENTS
+
+perl >= v5.10
+This requirement would be trivial to remove.
+
+XML::LibXML		For generating XML.
+XML::Parser::PerlSAX	For parsing XML.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc XML::Debian::ENetInterfaces
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=XML-Debian-ENetInterfaces
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/XML-Debian-ENetInterfaces
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/XML-Debian-ENetInterfaces
+
+    Search CPAN
+        http://search.cpan.org/dist/XML-Debian-ENetInterfaces/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2011 Michael Mestnik
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

@@ -1,0 +1,17 @@
+ABOUT
+
+This module implements XML::Parser's IxTree style parser
+(same as 'XML::Parser::Style::Tree', but it keeps tag attributes
+in their original order, thanks to Tie::IxHash).
+This allows to parse and then reconstruct the original
+document with respect to original attribute ordering).
+
+SEE ALSO
+
+Tree Parser on CPAN:
+http://search.cpan.org/~msergeant/XML-Parser/Parser/Style/Tree.pm
+
+Tie::IxHash on CPAN:
+http://search.cpan.org/~chorny/Tie-IxHash/
+
+https://github.com/iafan/XML-Parser-Style-IxTree

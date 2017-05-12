@@ -1,0 +1,28 @@
+DESCRIPTION
+
+  XML::Structured - simple conversion API from XML to perl structures
+                    and back
+
+PREREQUISITES
+
+  XML::Structured requires either XML::Parser or XML::SAX.
+
+BUILDING/INSTALLING
+
+  Once the archive is unpacked, use these commands:
+
+      perl Makefile.PL
+      make
+      make install
+
+VERSION
+
+  This is version 1.0 of XML::structured
+
+LICENSE
+
+  Copyright 2006 Michael Schroeder mls@suse.de
+
+  This library is free software; you can redistribute it and/or modify
+  it under the same terms as Perl itself. 
+

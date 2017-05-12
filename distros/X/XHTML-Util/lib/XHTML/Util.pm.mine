@@ -1,0 +1,237 @@
+package XHTML::Enpara;
+use strict;
+use warnings;
+use HTML::Tagset 3.02 ();
+use Carp;
+use Scalar::Util "blessed";
+
+my $isKnown = \%HTML::Tagset::isKnown;
+my $canTighten = \%HTML::Tagset::canTighten;
+my $isHeadElement = \%HTML::Tagset::isHeadElement;
+my $isBodyElement = \%HTML::Tagset::isBodyElement;
+my $isPhraseMarkup = \%HTML::Tagset::isPhraseMarkup;
+my $isHeadOrBodyElement = \%HTML::Tagset::isHeadOrBodyElement;
+my $isList = \%HTML::Tagset::isList;
+my $isTableElement = \%HTML::Tagset::isTableElement;
+my $isFormElement = \%HTML::Tagset::isFormElement;
+my $p_closure_barriers = \@HTML::Tagset::p_closure_barriers;
+
+my $isBlockLevel = { map {; $_ => 1 }
+                     grep { ! ( $isPhraseMarkup->{$_} || $isFormElement->{$_} ) }
+                     keys %{$isBodyElement}
+                 };
+
+
+sub enpara {
+    my ( $c, $root ) = @_;
+
+#    blessed($root) 
+# check for documentElement or ownerDoc and proceed from there.
+
+    $root->normalize;
+    my $doc = $root->getOwnerDocument;
+
+#    my @enpara_nodes = $root->childNodes;
+#    push @enpara_nodes, $root->findnodes('//[@class]');
+    for my $named_enpara ( $root->findnodes('*[@class]') )
+    {
+        next unless $isBlockLevel->{$named_enpara->nodeName};
+        next unless $named_enpara->getAttribute("class") =~ /\benpara\b/;
+        _enpara_this_nodes_content($named_enpara, $doc);
+    }
+    _enpara_this_nodes_content($root, $doc);
+}
+
+sub _enpara_this_nodes_content {
+    my ( $parent, $doc ) = @_;
+
+    my $lastChild = $parent->lastChild;
+    my @naked_block;
+    for my $node ( $parent->childNodes )
+    {
+        if ( $isBlockLevel->{$node->nodeName}
+             or
+             $node->nodeName eq "a" # special case block level, so IGNORE
+             and
+             grep { $_->nodeName eq "img" } $node->childNodes
+             )
+        {
+            next unless @naked_block; # nothing to enblock
+            my $p = $doc->createElement("p");
+            $p->setAttribute("enpara","enpara");
+            $p->appendChild($_) for @naked_block;
+            $parent->insertBefore( $p, $node )
+                if $p->textContent =~ /\S/;
+            @naked_block = ();
+        }
+        elsif ( $node->nodeName eq "#text"
+                and
+                $node->nodeValue =~ /(?:[^\S\n]*\n){2,}/
+                )
+        {
+            my $text = $node->nodeValue;
+
+            my @text_part = map { $doc->createTextNode($_) }
+                split /([^\S\n]*\n){2,}/, $text;
+
+            my @new_node;
+            for ( my $x = 0; $x < @text_part; $x++ )
+            {
+                if ( $text_part[$x]->nodeValue =~ /\S/ )
+                {
+                    push @naked_block, $text_part[$x];
+                }
+                else # it's a blank newline node so _STOP_
+                {
+                    next unless @naked_block;
+                    my $p = $doc->createElement("p");
+                    $p->setAttribute("enpara","enpara");
+                    $p->appendChild($_) for @naked_block;
+                    @naked_block = ();
+                    push @new_node, $p;
+                }
+            }
+            if ( @new_node )
+            {
+                $parent->insertAfter($new_node[0], $node);
+                for ( my $x = 1; $x < @new_node; $x++ )
+                {
+                    $parent->insertAfter($new_node[$x], $new_node[$x-1]);
+                }
+            }
+            $node->unbindNode;
+        }
+        else
+        {
+            push @naked_block, $node; # if $node->nodeValue =~ /\S/;
+        }
+
+        if ( $node->isSameNode( $lastChild )
+             and @naked_block )
+        {
+            my $p = $doc->createElement("p");
+            $p->setAttribute("enpara","enpara");
+            $p->appendChild($_) for ( @naked_block );
+            $parent->appendChild($p) if $p->textContent =~ /\S/;
+        }
+    }
+
+    my $newline = $doc->createTextNode("\n");
+    my $br = $doc->createElement("br");
+
+    for my $p ( $parent->findnodes('//p[@enpara="enpara"]') )
+    {
+        $p->removeAttribute("enpara");
+        $parent->insertBefore( $newline->cloneNode, $p );
+        $parent->insertAfter( $newline->cloneNode, $p );
+
+        my $frag = $doc->createDocumentFragment();
+
+        my @kids = $p->childNodes();
+        for ( my $i = 0; $i < @kids; $i++ )
+        {
+            my $kid = $kids[$i];
+            next unless $kid->nodeName eq "#text";
+            my $text = $kid->nodeValue;
+            $text =~ s/\A\n// if $i == 0;
+            $text =~ s/\n\z// if $i == $#kids;
+
+            my @lines = map { $doc->createTextNode($_) }
+                split /(\n)/, $text;
+
+            for ( my $i = 0; $i < @lines; $i++ )
+            {
+                $frag->appendChild($lines[$i]);
+                unless ( $i == $#lines
+                         or
+                         $lines[$i]->nodeValue eq "\n" )
+                {
+                    $frag->appendChild($br->cloneNode);
+                }
+            }
+            $kid->replaceNode($frag);
+        }
+    }
+}
+
+
+1;
+
+
+__END__
+typedef enum {
+    XML_ELEMENT_NODE=           1,
+    XML_ATTRIBUTE_NODE=         2,
+    XML_TEXT_NODE=              3,
+    XML_CDATA_SECTION_NODE=     4,
+    XML_ENTITY_REF_NODE=        5,
+    XML_ENTITY_NODE=            6,
+    XML_PI_NODE=                7,
+    XML_COMMENT_NODE=           8,
+    XML_DOCUMENT_NODE=          9,
+    XML_DOCUMENT_TYPE_NODE=     10,
+    XML_DOCUMENT_FRAG_NODE=     11,
+    XML_NOTATION_NODE=          12,
+    XML_HTML_DOCUMENT_NODE=     13,
+    XML_DTD_NODE=               14,
+    XML_ELEMENT_DECL=           15,
+    XML_ATTRIBUTE_DECL=         16,
+    XML_ENTITY_DECL=            17,
+    XML_NAMESPACE_DECL=         18,
+    XML_XINCLUDE_START=         19,
+    XML_XINCLUDE_END=           20
+#ifdef LIBXML_DOCB_ENABLED
+   ,XML_DOCB_DOCUMENT_NODE=     21
+#endif
+} xmlElementType;
+
+my @block_level = qw( blockquote fieldset address noscript iframe
+                      object param script table tbody thead tfoot form
+                      div map pre dl h1 h2 h3 h4 h5 h6 hr ol ul dd dt
+                      li td th tr p colgroup applet multicol xmp
+                      listing area center dir col menu del ins nolayer
+                      isindex plaintext caption bgsound ilayer legend
+                      );
+
+my %block_level = map { $_ => 1 } @block_level;
+
+
+is_deeply($isBlockLevel, \%block_level);
+
+use Test::More tests => 1;
+
+XML::LibXML based only at first because it's easier.
+
+actual markup
+remove_markup("leaving content")
+
+entire Nodes
+remove_tags("
+
+enpara
+
+translate_tags
+
+traverse("/*") -> callback
+
+strip_styles(* or [list])
+strip_attributes()
+
+inline_stylesheets(names/paths)
+
+fragment_to_xhtml
+
+
+We WILL NOT be covering other well known and well done implementations like HTML::Entities or URI::Escape
+
+   use Rose::HTML::Util qw(:all);
+
+   $esc = escape_html($str);
+   $str = unescape_html($esc);
+
+   $esc = escape_uri($str);
+   $str = unescape_uri($esc);
+
+   $comp = escape_uri_component($str);
+
+   $esc = encode_entities($str);

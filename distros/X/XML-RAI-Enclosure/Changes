@@ -1,0 +1,15 @@
+### 2004-09-26 ###
+
+General cleanup of distribution in order to raise kwalitee of the code.  For this version that includes: 
+
+- has_changelog: you're looking at it
+- has_meta_yml
+- has_readme
+- has_test_pod
+- has_test_pod_coverage
+- no_pod_errors
+
+But can't help:
+
+- is_prereq
+

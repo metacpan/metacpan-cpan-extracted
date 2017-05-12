@@ -1,0 +1,54 @@
+HACKING Xacobeo
+===============
+
+Feel free to hack Xacobeo and to send patches. The application's code should be
+documented well enough for anyone to jump in and to have fun.
+
+The latest version of the code is available at:
+	http://github.com/potyl/xacobeo
+
+Xacobeo is mainly written in Perl and has some bits of XS (C functions) in order
+to improve its performance. Ideally all hacking should be done in Perl and C
+should be used as a last resort.
+
+The application relies heavily on XML::LibXML and indirectly on libxml2. All XML
+operations are performed through these libraries.
+
+Xacobeo is translated into other languages through GNU's standard gettext
+mechanism (thanks to Locale::TextDomain). When adding code make sure that all
+output is marked to be translated by using the proper i18n functions (__ and
+friends). Take a look at perldoc lib/Xacobeo/I18n.pm.
+
+
+Command line utilities
+----------------------
+
+Xacobeo provides a built-in script: 'commands' that makes the testing of the
+application easier. This script is used to build, test, run, translate and even
+release Xacobeo.
+
+To build the application simply do:
+	./commands build
+
+To test your changes:
+	./commands test
+
+To run the application without installing it:
+	./commands run
+
+You can change the default input file through the parameter FILE:
+	./commands run FILE=tests/SVG.svg
+
+To find memory leaks in newly added XS code do:
+	./commands leaks
+
+To update the I18n .po files run:
+	./commands i18n
+
+To check that all your new files will be uploaded to CPAN do:
+	./command distcheck
+
+To clean your working folder:
+	./command clean
+
+The script 'commands' provides more utilities, make sure to peek at the file.

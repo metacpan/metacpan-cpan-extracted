@@ -1,0 +1,8 @@
+Revision history for Perl extension XML::Parser::REX
+
+1.01	Fri Apr 27 07:18:06 MUT 2012	
+	- Added $XML::Parser::REX::VERSION
+	- Fixed typo in changelog
+
+1.0	Wed Apr 25 14:44:21 MUT 2012
+	- Initial Release

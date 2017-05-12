@@ -1,0 +1,37 @@
+<stx:transform version="1.0" 
+  xmlns:gr="http://my_groups"
+  xmlns:stx="http://stx.sourceforge.net/2002/ns"
+  strip-space="yes" pass-through="none">
+
+  <stx:template match="root/node">
+    <n>
+      <stx:call-procedure name="value"/>
+      <stx:process-children/>
+      <stx:process-attributes/>
+      <stx:process-self/>
+    </n>
+  </stx:template>
+
+  <stx:template match="node/text()">
+    <stx:text>(</stx:text>
+      <stx:call-procedure name="value"/>
+    <stx:text>)</stx:text>
+  </stx:template>
+
+  <stx:template match="node/@*">
+    <stx:text>{</stx:text>
+      <stx:call-procedure name="value"/>
+    <stx:text>}</stx:text>
+  </stx:template>
+
+  <stx:template match="node">
+    <stx:text>[</stx:text>
+      <stx:call-procedure name="value"/>
+    <stx:text>]</stx:text>
+  </stx:template>
+
+  <stx:procedure name="value">
+    <stx:value-of select="."/>
+  </stx:procedure>
+  
+</stx:transform>

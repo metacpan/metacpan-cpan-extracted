@@ -1,0 +1,1551 @@
+2.   Service code list
+
+     Change indicators
+
+     a plus sign (+)    for an addition
+     an asterisk (*)    for an addition/subtraction/change to an entry
+                        for a particular data element
+     a hash sign (#)    for changes to names
+     a vertical bar (|) for changes to text for descriptions,
+                        notes and functions
+     a minus sign (-)   for a deletion
+     a X sign (X)       for marked for deletion
+
+----------------------------------------------------------------------
+
+  0001  Syntax identifier
+
+  Desc: Coded identification of the agency controlling a syntax and
+        syntax level used in an interchange.
+
+  Repr: a4
+
+   UNOA   UN/ECE level A
+             As defined in ISO 9735.
+   UNOB   UN/ECE level B
+             As defined in ISO 9735.
+   UNOC   UN/ECE level C
+             As defined in ISO 8859-1 : Information processing -
+             Part 1: Latin alphabet No. 1.
+   UNOD   UN/ECE level D
+             As defined in ISO 8859-2 : Information processing -
+             Part 2: Latin alphabet No. 2.
+   UNOE   UN/ECE level E
+             As defined in ISO 8859-5 : Information processing -
+             Part 5: Latin/Cyrillic alphabet.
+   UNOF   UN/ECE level F
+             As defined in ISO 8859-7 : Information processing -
+             Part 7: Latin/Greek alphabet.
+
+----------------------------------------------------------------------
+
+   0002  SYNTAX VERSION NUMBER
+
+   Desc: Version number of the syntax.
+
+   Repr: an1
+
+   1      Version 1
+             ISO 9735:1988.
+   2      Version 2
+             ISO 9735:1990.
+   3      Version 3
+             ISO 9735 Amendment 1:1992.
+
+----------------------------------------------------------------------
+
+* 0007  Partner identification code qualifier
+
+  Desc: Qualifier referring to the source of codes for the identifiers
+        of interchanging partners.
+
+  Repr: an..4
+
+        1 DUNS (Dun & Bradstreet)
+             Self explanatory.
+        4 IATA (International Air Transport Association)
+             Self explanatory.
+#|      5 INSEE (Institut National de la Statistique et des
+          Etudes Economiques) - SIRET
+             French national statistics institute. SIRET means Systeme
+             Informatique du Repertoire des entreprises et de leurs
+             ETablissements.
+        8 UCC Communications ID (Uniform Code Council Communications
+          Identifier)
+             The Uniform Code Council Communications Identifier is a
+             ten digit code used to uniquely identify physical and
+             logical locations.
+#       9 DUNS (Dun & Bradstreet) with 4 digit suffix
+             Self explanatory.
+       12 Telephone number
+             Self explanatory.
+       14 EAN (European Article Numbering Association)
+             Self explanatory.
+       18 AIAG (Automotive Industry Action Group)
+             Self explanatory.
+#|     22 INSEE (Institut National de la Statistique et des
+          Etudes Economiques) - SIREN
+             French national statistics institute. SIREN means Systeme
+             Informatique du Repertoire des ENtreprises (et de leurs
+             etablissements).
+       30 ISO 6523: Organization identification
+             Self explanatory.
+       31 DIN (Deutsches Institut fuer Normung)
+             German standardization institute.
+       33 BfA (Bundesversicherungsanstalt fuer Angestellte)
+             German social security association.
+       34 National Statistical Agency
+             Self explanatory.
+#      51 GEIS (General Electric Information Services)
+             Self explanatory.
+#      52 INS (IBM Network Services)
+             Self explanatory.
+X      53 Datenzentrale des Einzelhandels
+             German data centre for retail trade.
+#      54 Bundesverband der Deutschen Baustoffhaendler
+             German building material trade association.
+       55 Bank identifier code
+             Self explanatory.
+X      56 Statens Teleforvaltning
+             Norwegian telecommunications regulatory authority (NTRA).
+#|     57 KTNet (Korea Trade Network Services)
+             Self explanatory.
+       58 UPU (Universal Postal Union)
+             Self explanatory.
+#|     59 ODETTE (Organization for Data Exchange through
+          Tele-Transmission in Europe)
+             European automotive industry project.
+       61 SCAC (Standard Carrier Alpha Code)
+             Directory of standard multimodal carriers and tariff
+             agent codes. The SCAC lists and codes transportation
+             companies.
+       63 ECA (Electronic Commerce Australia)
+             Australian association for electronic commerce.
+|      65 TELEBOX 400 (Deutsche Telekom)
+             German telecommunications service.
+       80 NHS (National Health Service)
+             United Kingdom National Health Service.
+       82 Statens Teleforvaltning
+             Norwegian telecommunications regulatory authority (NTRA).
+       84 Athens Chamber of Commerce
+             Greek Chamber of Commerce.
+       85 Swiss Chamber of Commerce
+             Swiss Chamber of Commerce.
+       86 US Council for International Business
+             United States Council for International Business.
+|      87 National Federation of Chambers of Commerce and Industry
+             Belgium National Federation of Chambers of Commerce and
+             Industry.
+       89 Association of British Chambers of Commerce
+             Association of British Chambers of Commerce.
+       90 SITA (Societe Internationale de Telecommunications
+          Aeronautiques)
+             SITA (Societe Internationale de Telecommunications
+             Aeronautiques).
+       91 Assigned by seller or seller's agent
+             Self explanatory.
+       92 Assigned by buyer or buyer's agent
+             Self explanatory.
+   ZZZ    Mutually defined
+             Self explanatory.
+
+----------------------------------------------------------------------
+
+  0025  Recipient's reference/password qualifier
+
+  Desc: Qualifier for the recipient's reference or password.
+
+  Repr: an2
+
+  Note: To be used as specified in the partners interchange agreement.
+
+   AA     Reference
+             Self explanatory.
+   BB     Password
+             Self explanatory.
+
+----------------------------------------------------------------------
+
+  0029  Processing priority code
+
+  Desc: Code determined by the sender requesting processing priority
+        for the interchange.
+
+  Repr: a1
+
+   A      Highest priority
+             Self explanatory.
+
+----------------------------------------------------------------------
+
+  0031  Acknowledgement request
+
+  Desc: Code determined by the sender for acknowledgement of the
+        interchange.
+
+  Repr: n1
+
+        1 Requested
+             Acknowledgement is requested.
+
+----------------------------------------------------------------------
+
+  0035  Test indicator
+
+  Desc: Indication that the interchange is a test.
+
+  Repr: n1
+
+        1 Interchange is a test
+             Self explanatory.
+
+----------------------------------------------------------------------
+
+  0051  Controlling agency
+
+  Desc: Code identifying the agency controlling the specification,
+        maintenance and publication of the message type.
+
+  Repr: an..2
+
+   AA     EDICONSTRUCT
+             French construction project.
+   AB     DIN (Deutsches Institut fuer Normung)
+             German standardization institute.
+   AC     ICS (International Chamber of Shipping)
+             Self explanatory.
+   AD     UPU (Union Postale Universelle)
+             Universal Postal Union.
+   CC     CCC (Customs Co-operation Council)
+             Self explanatory.
+   CE     CEFIC (Conseil Europeen des Federations de l'Industrie
+          Chimique)
+             EDI project for chemical industry.
+   EC     EDICON
+             UK Construction project.
+   ED     EDIFICE (Electronic industries project)
+             EDI Forum for companies with Interest in Computing and
+             Electronics (EDI project for EDP/ADP sector).
+   EE     EC + EFTA (European Communities and European Free Trade
+          Association)
+             Self explanatory.
+   EN     EAN (European Article Numbering Association)
+             Self explanatory.
+   ER     UIC (International Union of railways)
+             European railways.
+   EU     European Union
+             Self explanatory.
+   EX     IECC (International Express Carriers Conference)
+             Self explanatory.
+   IA     IATA (International Air Transport Association)
+             Self explanatory.
+   KE     KEC (Korea EDIFACT Committee)
+             Self explanatory.
+   LI     LIMNET
+             UK Insurance project.
+   OD     ODETTE (Organization for Data Exchange through
+          Tele-Transmission in Europe)
+             European automotive industry project.
+   RI     RINET (Reinsurance and Insurance Network)
+             Self explanatory.
+   RT     UN/ECE/TRADE/WP.4/GE.1/EDIFACT Rapporteurs' Teams
+             Self explanatory.
+   UN     UN/ECE/TRADE/WP.4
+             United Nations Economic UN Economic Commission for Europe
+             (UN/ECE), Committee on the development of trade (TRADE),
+             Working Party on facilitation of international trade
+             procedures (WP.4).
+
+----------------------------------------------------------------------
+
+   0052  MESSAGE VERSION NUMBER
+
+   Desc: Version number of a message type.
+
+   Repr: an..3
+
+   1      Status 1 version
+             Message approved and issued as a status 1 (trial)
+             message. (Valid for directories published after March
+             1990 and prior to March 1993)
+   2      Status 2 version
+             Message approved and issued as a status 2 (formal
+             recommendation) message. (Valid for directories
+             published after March 1990 and prior to March 1993)
+   88     1988 version
+             Message approved and issued in the 1988 release of the
+             UNTDID (United Nations Trade Data Interchange Directory)
+             as a status 2 (formal recommendation) message.
+   89     1989 version
+             Message approved and issued in the 1989 release of the
+             UNTDID (United Nations Trade Data Interchange Directory)
+             as a status 2 (formal recommendation) message.
+   90     1990 version
+             Message approved and issued in the 1990 release of the
+             UNTDID (United Nations Trade Data Interchange Directory)
+             as a status 2 (formal recommendation) message.
+   D      Draft version
+             Message approved and issued as a draft message. (Valid
+             for directories published after March 1993)
+   S      Standard version
+             Message approved and issued as a standard message.
+             (Valid for directories published after March 1993)
+
+----------------------------------------------------------------------
+
+   0054  MESSAGE RELEASE NUMBER
+
+   Desc: Release number within the current message version number.
+
+   Repr: an..3
+
+   1      First release
+             Message approved and issued in the first release of the
+             year of the UNTDID (United Nations Trade Data
+             Interchange Directory). (Valid for directories published
+             prior to March 1990)
+   2      Second release
+             Message approved and issued in the second release of the
+             year of the UNTDID (United Nations Trade Data Interchange
+             Directory) (Valid for directories published prior to
+             March 1990).
+   902    Trial release 1990
+             Message approved and issued in the 1990 status 1
+             (trial) release of the UNTDID (United Nations Trade Data
+             Interchange Directory).
+   911    Trial release 1991
+             Message approved and issued in the 1991 status 1 (trial)
+             release of the UNTDID (United Nations Trade Data
+             Interchange Directory).
+   912    Standard release 1991
+             Message approved and issued in the 1991 status 2
+             (standard) release of the UNTDID (United Nations Trade
+             Data Interchange Directory).
+   921    Trial release 1992
+             Message approved and issued in the 1992 status 1 (trial)
+             release of the UNTDID (United Nations Trade Data
+             Interchange Directory).
+   932    Standard release 1993
+             Message approved and issued in the 1993 status 2
+             (standard) release of the UNTDID (United Nations Trade
+             Data Interchange Directory).
+   93A    Release 1993 - A
+             Message approved and issued in the 1993 release of the
+             UNTDID (United Nations Trade Data Interchange
+             Directory).
+   94A    Release 1994 - A
+             Message approved and issued in the first 1994 release of
+             the UNTDID (United Nations Trade Data Interchange
+             Directory).
+   94B    Release 1994 - B
+             Message approved and issued in the second 1994 release
+             of the UNTDID (United Nations Trade Data Interchange
+             Directory).
+   95A    Release 1995 - A
+             Message approved and issued in the first 1995 release of
+             the UNTDID (United Nations Trade Data Interchange
+             Directory).
+   95B    Release 1995 - B
+             Message approved and issued in the second 1995 release
+             of the UNTDID (United Nations Trade Data Interchange
+             Directory).
+   96A    Release 1996 - A
+             Message approved and issued in the first 1996 release of
+             the UNTDID (United Nations Trade Data Interchange
+             Directory).
+   96B    Release 1996 - B
+             Message approved and issued in the second 1996 release
+             of the UNTDID (United Nations Trade Data Interchange
+             Directory).
+
+----------------------------------------------------------------------
+
+  0057  Association assigned code
+
+  Desc: Code, assigned by the association responsible for the design
+        and maintenance of the message type concerned, which further
+        identifies the message.
+
+  Repr: an..6
+
+  Note: Use codes defined by association given in 0051.
+
+----------------------------------------------------------------------
+
+* 0065  Message type identifier
+
+  Desc: Code identifying a type of message and assigned by its
+        controlling agency.
+
+  Repr: an..6
+
+   APERAK Application error and acknowledgement message
+             The function of this message is:
+             a)  to inform a message issuer that his message has been
+             received by the addressee's application and has been
+             rejected due to errors encountered during its processing
+             in the application.
+             b)  to acknowledge to a message issuer the receipt of his
+             message by the addressee's application.
++  AUTACK Secure authentication and acknowledgement message
+             Message authenticating sent messages, or providing
+             secure acknowledgement of received interchanges,
+             groups, messages or packages. A secure authentication
+             and acknowledgement message can be used to:
+             a)  give secure authentication or non-repudiation of
+             origin to messages, packages, groups or interchanges.
+             b)  give secure acknowledgement or non-repudiation of
+             receipt to secured messages, packages, groups or
+             interchanges.
+   AUTHOR Authorization message
+             Message sent by the Ordering Customer (or Payor or Agent
+             on behalf of the Ordering Customer) or by a third party
+             having authority on the Ordering Customer's payments to
+             the Ordered Bank, to authorize the Ordered Bank to
+             execute a given financial transaction.
+             This financial transaction might relate to both: multiple
+             messages like PAYMUL and DIRDEB and single instruction
+             messages like PAYORD and PAYEXT.
+             An Authorisation Message could also be sent from the
+             Ordered Bank to the Ordering Customer or its
+             Authorisation Authority to request authorisation for a
+             given financial transaction.
+   BANSTA Banking status message
+             Message sent by the receiver of a previously sent-message
+             to report on the status of processing of this original
+             message. It indicates, at the application level, the
+             acceptance or rejection of the message or the ability for
+             the receiver of the message to execute or not the
+             instructions received.
+   BAPLIE Bayplan/stowage plan occupied and empty locations message
+             Message to transmit information about equipment and goods
+             on a means of transport, including their location on the
+             means of transport. The message can be exchanged between
+             (liner's) agents, tonnage centers, stevedores and ships
+             masters/operators.
+   BAPLTE Bayplan/stowage plan total numbers message
+             Message to transmit information about the total numbers
+             of equipment and quantity of goods on a means of
+             transport. The message can be exchanged between (liner's)
+             agents, tonnage centers, stevedores and ships
+             masters/operators.
+   BOPBNK Bank transactions and portfolio transactions report message
+             Message sent by banks to the Balance of Payment (BOP)
+             compiler for reporting of the banks' own transactions,
+             aggregated individual customer transactions and portfolio
+             transactions. The message could also be used for
+             reporting the assets and liabilities positions of the
+             banks.
+   BOPCUS Balance of payment customer transaction report message
+             Message sent by banks to the Balance of Payment (BOP)
+             compiler for reporting - one by one - individual customer
+             transactions (debit and credit) processed during a
+             specific time period. Actually, this transaction
+             information can be distilled - one by one- from PAYORD /
+             PAYMUL / PAYEXT and BOPINF messages respectively.
+   BOPDIR Direct balance of payment declaration message
+             Message sent by non-bank residents to report directly to
+             the Balance of Payment (BOP) compiler on: transactions
+             via bank accounts held at a resident bank, transactions
+             via bank accounts held at a non-resident bank,
+             transactions and clearing via accounts with non-bank non-
+             residents, foreign assets and liabilities, information
+             in the context of a BOP-related survey (stocks and
+             flows); for those countries which base their compilation
+             of the BOP on surveys.
+   BOPINF Balance of payment information from customer message
+             Message sent by a payee to its bank on receipt of one
+             specified amount as a settlement of a transaction with a
+             non-resident. The Balance of Payment (BOP) compiler has
+             to be informed of the transaction via the payee's bank.
+#| CALINF Vessel call information message
+             Notice from a liner agent to a stevedore providing
+             information concerning the expected arrival of a vessel
+             and the expected cargo operations.
++  CASINT Request for legal administration action in civil proceedings
+          message
+             A request for lodgment of data to commence or enforce a
+             civil proceeding.
++  CASRES Legal administration response in civil proceedings message
+             A legal response (CASRES) to a request for lodgement of
+             data to commence or enforce a civil proceeding.
+   COARRI Container discharge/loading report message
+             A message by which the container terminal reports that
+             the containers specified have been discharged from a
+             seagoing vessel (discharged as ordered, overlanded or
+             shortlanded), or have been loaded into a seagoing
+             vessel.
+   CODECO Container gate-in/gate-out report message
+             A message by which a terminal, depot, etc. confirms that
+             the containers specified have been delivered or picked up
+             by the inland carrier (road, rail or barge). This
+             message can also be used to report internal terminal
+             container movements (excluding loading and discharging
+             the vessel).
+   CODENO Permit expiration/clearance ready notice message
+             Notice specifying the cargo for which either the validity
+             of the permits/Customs documents expires at short notice
+             or for which regulatory Customs clearance has taken
+             place.
+   COEDOR Container stock report message
+             A message to report containers that are in stock of the
+             sending party (i.e., a terminal, depot or container
+             freight station).
+   COHAOR Container special handling order message
+             Order to perform a specified special handling and/or
+             service on containers.
+   COMDIS Commercial dispute message
+             Message providing notice of commercial dispute against
+             one or more invoices is usually raised by the buyer to
+             notify the seller that something was found wrong with the
+             goods delivered or the services rendered (goods damaged,
+             delivery incomplete, delivery late, etc.). The dispute
+             must be resolved before the related invoice can be
+             settled.
+             The message will be used to: - notify a dispute; -
+             correspond about an existing dispute (structured
+             information); - notify the settlement of a dispute.
+             The message will serve at the same time as the dispute
+             notice and as the dispute answer.
+   CONAPW Advice on pending works message
+             Message to enable a contractor who intends to start works
+             to advise public authorities and water, gas, telephone,
+             electricity distributors of his intention and to request
+             them to send back plans or information under any form
+             concerning existing networks.
+   CONDPV Direct payment valuation message
+             Message of instruction sent by the contractor to the
+             party responsible for payments, to pay the subcontractors
+             for work completed.
+|  CONDRA Drawing administration message
+             The message will be used for the administration of each
+             exchange of a set of engineering/CAD files. It will give
+             additional information about the files; for example,
+             their nature, a list of their contents and technical
+             information necessary to interpret them.
+             The whole process of exchanging engineering or CAD
+             (Computer Aided Design) files between different parties
+             within projects will be supported by EDIFACT messages.
+             The message CONDRA is one of these messages.
+   CONDRO Drawing organisation message
+             The message CONDRO is intended to describe the general
+             (project) organisation and structure, valid for a whole
+             project or environment.
+             The whole process of exchanging engineering or CAD
+             (Computer Aided Design) files between different parties
+             within one project will be supported by EDIFACT messages.
+             The message CONDRO is one of these messages.
+   CONEST Establishment of contract message
+             Message to formally establish and issue the contractual
+             Bill of Quantities (BoQ). This documentation becomes the
+             contractual basis for all future work and payment for the
+             project.
+   CONITT Invitation to tender message
+             At the pre-construction stage of a construction project,
+             the Client will wish to appoint a contractor to execute
+             the works. The first step in this appointment process is
+             to issue an invitation to tender (ITT) to contractors
+             this will require a commercial offer to be made by the
+             contractor to the client.
+   CONPVA Payment valuation message
+             Message used between a contractor and the client's
+             representative, during the process of approving the value
+             and payment for work completed for a given period of
+             time.
+   CONQVA Quantity valuation message
+             Message used by a contractor to submit progress details
+             to a client or his representative. The message may be
+             used also for subsets of the project where work has been
+             contracted out to other parties. In these cases the
+             exchange would be between the subcontractor and the party
+             that subcontracted the work.
+   CONRPW Response of pending works message
+             Message to reply to a CONAPW message and to enable
+             service providers to respond to a contractor giving
+             details of any services and networks in the location
+             where construction work is to be undertaken.
+   CONTEN Tender message
+             Message sent by main contractor or subcontractor for the
+             purposes of submitting a tender which is a commercial
+             offer to execute the project work defined in the bill of
+             quantities within the invitation to tender.
+   CONTRL Syntax and service report message
+             Message syntactically acknowledging or rejecting, with
+             error indication, a received interchange, functional
+             group or message.
+   CONWQD Work item quantity determination message
+             Message used between a contractor and the client's
+             representative or other partners within the construction
+             process, for justifying the work item quantities given in
+             messages that describe the work items or their progress
+             valuations.
+|  COPARN Container announcement message
+             The message contains an order to release, to make
+             available, to accept or to call down containers or to
+             announce the impending arrival of containers.
+             This message is part of a total set of container-related
+             messages. These messages serve to facilitate the
+             intermodal handling of containers by streamlining the
+             information exchange.
+             The business scenario for the container messages is
+             clarified in a separate document, called: 'Guide to the
+             scenario of EDIFACT container messages'.
+             The order may pertain to cargo related containers (full
+             container load and less than container load), the
+             arrangement of empty containers prior to loading and
+             after stripping, as well as the arrangements for leasing
+             the empty containers (on-hire and off-hire of
+             containers).
+   COPINO Container pre-notification message
+             A message by which an inland carrier notifies of the
+             delivery or pick-up of containers.
+   COPRAR Container discharge/loading order message
+             A message to order to the container terminal that the
+             containers specified have to be discharged from a
+             seagoing vessel or have to be loaded into a seagoing
+             vessel.
+   COREOR Container release order message
+             Order to release containers, and giving permission for
+             them to be picked up by or on behalf of a specified
+             party.
+   COSTCO Container stuffing/stripping confirmation message
+             Confirmation that specified goods/consignments have been
+             stuffed into or stripped from LCL-containers.
+   COSTOR Container stuffing/stripping order message
+             Order that specified goods/consignments are to be stuffed
+             into (already or still to be delivered) or stripped from
+             LCL-containers.
+   CREADV Credit advice message
+             Message sent by the account servicing financial
+             institution to the account owner to inform the account
+             owner that its account has been or will be credited for a
+             specified amount on the date indicated, in settlement of
+             the referenced business transaction(s).
+   CREEXT Extended credit advice message
+             Message sent by the account servicing financial
+             institution to the account owner to inform the account
+             owner that its account has been or will be credited for a
+             specified amount on the date indicated, in settlement of
+             the referenced business transaction(s), and to provide to
+             the payee full details of the transactions to which the
+             extended credit advice relates.
+   CREMUL Multiple credit advice message
+             A Multiple Credit Advice message is sent by an Account
+             Servicing Financial Institution to the Account Owner or
+             to a third party, which has agreed bilaterally in
+             advance, that its account(s) has been or will be credited
+             for specified amount(s) on the date(s) indicated, in
+             settlement of the referenced business transaction(s).
+   CUSCAR Customs cargo report message
+             Message to permit the transfer of data from a carrier to
+             a Customs administration for the purpose of meeting
+             Customs cargo reporting requirements.
+   CUSDEC Customs declaration message
+             Message to permit the transfer of data from a declarant
+             to a Customs administration for the purpose of meeting
+             legislative and/or operational requirements in respect of
+             the declaration of goods for import, export or transit.
+   CUSEXP Customs express consignment declaration message
+             Message to permit the transfer of data from an express
+             carrier to a Customs administration for the purpose of
+             meeting Customs cargo reporting and/or clearance
+             requirements.
+   CUSREP Customs conveyance report message
+             Message to permit the transfer of data from a carrier to
+             a Customs administration for the purpose of meeting
+             Customs reporting requirements in respect of the means of
+             transport on which the cargo is carried.
+|  CUSRES Customs response message
+             This Customs Response Message (CUSRES) permits the
+             transfer of data from a customs administration:
+             - to acknowledge the receipt of the message
+             - to indicate whether the information received is correct
+             or if there are errors (i.e. accepted without errors,
+             accepted with errors, rejected, etc.)
+             - to inform the sender of the status of the customs
+             declaration (i.e. goods released, goods for examination,
+             documents required, etc.)
+             - to transmit additional information as agreed between
+             parties (i.e. tax information, quantity information,
+             etc.)
+             - to respond to batched messages (i.e. CUSDEC, CUSCAR,
+             CUSREP, CUSEXP).
+   DEBADV Debit advice message
+             Message sent by the account servicing financial
+             institution to the account owner to inform the account
+             owner that its account has been or will be debited for a
+             specified amount on the date indicated, in settlement of
+             the referenced business transaction(s).
+   DEBMUL Multiple debit advice message
+             A DEBMUL message is sent by an Account Servicing
+             Financial Institution to the Account Owner or to a third
+             party, which has agreed bilaterally in advance, that its
+             account(s) has been or will be debited for specified
+             amount(s) on the date(s) indicated, in settlement of the
+             referenced business transaction(s).
+|  DELFOR Delivery schedule message
+             DELFOR is a message which is sent from a party who is
+             planning the use or consumption of products to a party
+             who has to plan for the supply of the products. The
+             message gives the requirements regarding details for
+             short term delivery and/or medium to long scheduling for
+             products. The scheduling can be used to authorize
+             manufacturing and or the provision of materials. This is
+             based on the terms and conditions defined in a purchase
+             order or contract.
+#  DELJIT Delivery just in time message
+             Message providing the ability for a customer to convey
+             precise delivery sequence and just-in-time schedule
+             requirements to a supplier, and is intended to supplement
+             the delivery schedule message (DELFOR).
+   DESADV Despatch advice message
+             A message specifying details for goods despatched or
+             ready for despatch under agreed conditions.
+             The United Nations Despatch Advice Message serves both as
+             a specification for Delivery Despatch Advice and also as
+             a Returns Despatch Advice message.
++  DESTIM Equipment damage and repair estimate message
+             A message for use by the container repair, shipping and
+             leasing industry. It may be used by a container equipment
+             repair depot to send an owner or user a description of
+             damages to the equipment, as an estimate of the repair
+             actions and costs needed to rectify such damages. A
+             recipient owner may forward the estimate to a lessee. The
+             message may also be used by an owner or lessee as an
+             authorization message to the repair depot to perform the
+             repairs indicated in the estimate, and as an
+             acknowledgment of his willingness to pay for those
+             repairs indicated in the estimate for his account.
+   DIRDEB Direct debit message
+             Message sent by the creditor to the creditor's bank
+             instructing it to claim specified amounts from the
+             debtor(s) and to credit these amounts to a single account
+             it services for the creditor in settlement of the
+             referenced transaction(s).
+   DIRDEF Directory definition message
+             The Directory definition message (DIRDEF) permits the
+             transfer of the contents of a UN/EDIFACT Directory set or
+             parts thereof.
+   DOCADV Documentary credit advice message
+             Message to indicate to the beneficiary the terms and
+             conditions of a documentary credit that has been
+             originated by the issuing bank and received by the
+             advising bank (or an intermediary advising bank).
+   DOCAMA Advice of an amendment of a documentary credit message
+             The Advice of an Amendment of a Documentary Credit
+             message is originated by the Advising Bank, or
+             Intermediary Advising Bank, and sent to the Beneficiary.
+             It is used to inform the Beneficiary of the terms and
+             conditions of an amendment to a documentary credit
+             requested by the Applicant.
+   DOCAMI Documentary credit amendment information message
+             The Documentary Credit Amendment Information message is
+             used to indicate the terms and conditions of an amended
+             documentary credit from the Issuing Bank to the Applicant
+             and/or Applicant's Bank.
+   DOCAMR Request for an amendment of a documentary credit message
+             The Request for an Amendment of a Documentary Credit
+             originated by the Applicant, or Applicant's Bank, and
+             sent to the Issuing Bank. It is issued to  request the
+             Issuing Bank to amend the terms and conditions of an
+             issued Documentary Credit or to cancel the Documentary
+             Credit.
+   DOCAPP Documentary credit application message
+             Message from a party requesting the issuance of a
+             documentary credit to the party providing such service.
+             In this message, the conditions under which the sender of
+             the message requires the documentary credit to be issued
+             are given.
+   DOCARE Response to an amendment of a documentary credit message
+             The Response to an Amendment of a Documentary Credit
+             originated by the Beneficiary and sent to the parties
+             involved in the documentary credit. It is issued to
+             advise the acceptance or non acceptance of an amendment.
+   DOCINF Documentary credit issuance information message
+             Message to indicate the terms and conditions of an issued
+             documentary credit from the issuing Bank to the applicant
+             and/or the applicant's bank.
+   FINCAN Financial cancellation message
+             A Financial Cancellation Message is sent by the Ordering
+             Customer (or Payor or Agent on behalf of the Ordering
+             Customer)or by a third party having authority on the
+             Ordering Customer's payments to the Ordered Bank to
+             request cancellation of a given financial message or
+             transaction.
+   FINSTA Financial statement of an account message
+             This message can be used to cater for various
+             communication functions between financial institutions
+             and their customers. The most frequent function is to
+             provide a statement of booked items confirming entries on
+             a customer's account. The message type may contain
+             several accounts (quoted in the B-level).
+   GENRAL General purpose message
+             A message to enable the transmission of textual
+             information.
+   GESMES Generic statistical message
+             The compilation of statistics is a continuous chain
+             starting with raw data collection, followed by a number
+             of harmonization and aggregation processes leading to
+             aggregated statistical data.
+             Raw data collection is realized by means of surveys,
+             sampling, direct reporting from individuals, economic
+             operators. Harmonization and aggregation processes are
+             very often handled by statistical bodies or authorized
+             economic operators in case of direct reporting.
+             A Generic Statistical Message (GESMES) is used by an
+             organisation involved in this elaboration process to
+             transmit a statistical data set.
+             It permits the transmission of the following, either in
+             the same and/or different messages:
+             -the statistical concepts comprising the data set and
+             their structure
+             -if required, all related information ( code sets,
+             labels, methodological notes, footnotes, etc.),
+             -the statistical figures of the data set.
+             This message could be used by producers and users of
+             statistical information such as: National Statistical
+             Offices, ministries, private and public administrations,
+             private companies etc.
+   HANMOV Cargo/goods handling and movement message
+             Message from a party to a warehouse/distribution centre
+             identifying the handling services and where required the
+             movement of specified goods, limited to warehouses within
+             the jurisdiction of the distribution centre.
+#  IFCSUM Forwarding and consolidation summary message
+             Message used for consolidation purposes from a party
+             arranging forwarding and transport services to the party
+             for which the transport of the consolidated cargo is
+             destined. The message can be used to exchange information
+             concerning the consolidated cargo between forwarders,
+             carriers and agents enabling those parties to handle the
+             consignments included in the consolidation. In addition
+             it can be used for a collection of consignments
+             originating from one shipper for forwarding and transport
+             services.
+   IFTCCA Forwarding and transport shipment charge calculation message
+             Message to request the calculation of the transport
+             charges of a specific shipment and to answer to such a
+             request.
+   IFTDGN Dangerous goods notification message
+             Message from the party responsible to declare the
+             dangerous goods (e.g. carrier's agent, freight
+             forwarder) to the party acting on behalf of the local
+             authority performing the checks on conformance with the
+             legal requirements on the control of dangerous goods,
+             normally Port Authority, conveying the information
+             relating to one conveyance/voyage of a means of transport
+             such as a vessel, train, truck or barge, on the dangerous
+             goods being loaded, unloaded, and/or in transit.
+   IFTFCC International transport freight costs and other charges
+          message
+             A message specifying freight, handling and transport
+             costs and other related charges between transport service
+             providers and their customers.
+   IFTIAG Dangerous cargo list message
+             The International Forwarding and Transport Dangerous
+             Cargo List Message is a message:
+             - from the party acting on behalf of the carrier for the
+             gathering of the dangerous goods information of the cargo
+             in a certain port or place of call or loading,
+             - to the party acting on behalf of the carrier in the
+             next port or place of call or discharge,
+             conveying the information relating to one conveyance or
+             voyage of a means of transport such as a vessel, train,
+             truck or barge, on the dangerous goods being carried on
+             board - irrespective of the operations that will take
+             place in the next port of call.
+             This message provides the basic information by which the
+             message recipient can notify to the local authorities
+             about the loading, unloading and transit-related
+             operations, by means of the International forwarding and
+             transport dangerous goods notification message (IFTDGN).
+   IFTMAN Arrival notice message
+             Message from the party providing forwarding and/or
+             transport services to the party such as has been
+             indicated in the contract, giving notice and details of
+             the arrival of the consignment.
+   IFTMBC Booking confirmation message
+             Message from the party providing forwarding and/or
+             transport services to the party booking those services
+             giving the confirmation information to the booking of the
+             consignment concerned. A confirmation might read that the
+             booking of a consignment is accepted, pending,
+             conditionally accepted or rejected. The conditions under
+             which requested services take place may be given in this
+             message.
+   IFTMBF Firm booking message
+             Message from a party definitely booking forwarding
+             and/or transport services for a consignment to the party
+             providing those services. The message will contain the
+             conditions under which the sender of the messages
+             requires the services to take place.
+   IFTMBP Provisional booking message
+             Message from a party requesting space and/or giving brief
+             details of a planned consignment for forwarding and/or
+             transport services to the party providing those services.
+             In this message, the conditions under which the planned
+             transport should take place can be given.
+   IFTMCS Instruction contract status message
+             Message from the party providing the transport/forwarding
+             services to the party that issued the instructions for
+             those services stating the actual details, terms and
+             conditions (charges when applicable) of the service and
+             of the consignment involved. In addition it can be used
+             for the exchange of contract information between carriers
+             mutually.
+   IFTMIN Instruction message
+             Message from the party issuing an instruction regarding
+             forwarding/transport services for a consignment under
+             conditions agreed, to the party arranging the forwarding
+             and/or transport services.
+   IFTRIN Forwarding and transport rate information message
+             Message to request transport rate information and to
+             answer to such a message.
+   IFTSAI Forwarding and transport schedule and availability
+          information message
+             Message to request transport schedule or availability
+             information and to answer such a request.
+   IFTSTA International multimodal status report message
+             Message to report the transport status and/or a change in
+             the transport status (i.e. event) between agreed parties.
+   IFTSTQ International multimodal status request message
+             Message to request an international multimodal status
+             report message (IFTSTA) in order to provide details
+             relating to transport status and/or a change in the
+             transport status between agreed parties.
+   INSPRE Insurance premium message
+             Message used by communicating parties to notify the
+             recipient about premiums due from a client. All
+             information needed to produce a detailed request for
+             payment can be sent.
+   INVOIC Invoice message
+             Message claiming payment for goods or services supplied
+             under conditions agreed between the seller and the buyer.
+             The UNSM invoice message, with correct data
+             qualification, serves also as the specification for debit
+             note and credit note messages.
+   INVRPT Inventory report message
+             Message specifying information relating to held
+             inventories. The inventory report message is intended to
+             be used in either direction between trading partners.
++  ITRRPT In transit report detail message
+             A message specifying to a delivery party, the details of
+             goods within grouped consignments despatched by the
+             delivering party. This message is used in a multi-step
+             transportation process involving only consignors,
+             grouping centres and consignees.
+             A grouping centre (consolidation point) is a logistic
+             point where goods are moved from one means of transport
+             to another, to optimize transport cost. This message is
+             not to be used to identify additional services related to
+             the despatched goods (warehousing, packaging, etc.) which
+             may provided by the third party at the same location
+             along with the Grouping service.
+   JAPRES Job application result message
+             Message specifying decisions of an employer related to
+             job applications and interviews and employment or
+             rejections and, when necessary, reasons for the decisions
+             or rejections. The message is transmitted from an
+             employer or employment agency to an employment agency.
+   JINFDE Job information demand message
+             Message sent by a governmental agency to an employer in
+             response to a work grant request. This message asks for
+             specific additional information (e.g. visa) for further
+             processing of the work grant request.
+   JOBAPP Job application proposal message
+             Message specifying detailed information of proposals for
+             one or more job applicants from an employment agency to
+             an employer. The detailed information is related to
+             profession, occupation, age, education, experiences,
+             salaries, other benefits, requested location of the job,
+             work and contract conditions.
+   JOBCON Job order confirmation message
+             The message intent is to confirm the receipt of
+             information of a Job Order Message related to a vacancy
+             or vacancies. The message is transmitted from an
+             employment agency to an employer. The information is
+             related to age, sex, profession, salaries, experiences,
+             education, work and contract conditions.
+   JOBMOD Job order modification message
+             A message specifying modifications of a previously sent
+             Job Order Message of one or more offered jobs or
+             vacancies in an enterprise or organization. The Job Order
+             Modification Message is transmitted from an employer or
+             employment agency to an employment office. The
+             information and the changes detailed in the message are
+             related to profession, experiences, salaries, education,
+             work and contract conditions.
+   JOBOFF Job order message
+             A message specifying details for one or more vacancies
+             (occupation, salaries, experiences, work and contract
+             conditions) for an employer to the employment agency.
+   MEDPID Person identification message
+             The message is used to pass detailed information on
+             persons from, for instance, health insurance agencies to
+             local government in order to verify, add, change or
+             delete person related data in information systems. The
+             message may also be used to transfer person information
+             between various application systems within one
+             organisation (i.e hospital).
++  MEDREQ Medical service request message
+             A Medical Service Request message is sent from a service
+             requester to the service provider to order
+             investigations, to modify a previous order or ordered
+             investigation or to cancel a previous order.
++  MEDRPT Medical service report message
+             A Medical Service Report message is sent from a service
+             provider to the service requester to report new results
+             on performed investigations, to modify a previous result
+             item or a complete result report or to cancel a previous
+             result report.
+   MOVINS Stowage instruction message
+             Message containing details of one means of transport
+             vehicle, giving instructions regarding the loading,
+             discharging and restowage of equipment and/or cargoes and
+             the location on the means of transport where the
+             operation must take place.
+#  ORDCHG Purchase order change request message
+             Message from the buyer to the seller, specifying details
+             of the buyer's request to change a purchase order.
+   ORDERS Purchase order message
+             Message specifying details for goods or services ordered
+             under conditions agreed between the seller and the buyer.
+   ORDRSP Purchase order response message
+             Message from the seller to the buyer, responding to a
+             purchase order message or a purchase order change
+             request message.
+   PARTIN Party information message
+             Message to enable the transmission of basic information
+             regarding locations and the related operational,
+             administrative, financial, manufacturing and trading
+             data.
+   PAXLST Passenger list message
+             Message to permit the transfer of passenger/crew data
+             (where national privacy legislation permits and with
+             agreement of all parties involved) from a customs,
+             immigration or other designated authority in the country
+             of departure to the appropriate authorities in the
+             country of arrival of the means of transport.
+   PAYDUC Payroll deductions advice message
+             Message sent by a party to a service providing
+             organisation, to detail payments by payroll deductions,
+             on behalf of employees, made to the service providing
+             organisation.
+   PAYEXT Extended payment order message
+             Message sent by the ordering customer (or payor or agent
+             on behalf of the ordering customer) to the ordered bank,
+             to instruct the ordered bank to debit an account it
+             services for the ordering customer, and to arrange for
+             the payment of a specified amount to the beneficiary (or
+             payee or agent in favour of beneficiary) in settlement of
+             the referenced business transaction(s), and to provide to
+             the payee full details of the transactions to which the
+             extended payment order relates.
+   PAYMUL Multiple payment order message
+             Message sent by the ordering customer (or payor or agent
+             on behalf of the ordering customer) to the ordered bank,
+             to instruct the ordered bank to debit an account it
+             services for the ordering customer, and to arrange for
+             the payment of specified amounts to several beneficiaries
+             (or payees) in settlement of the referenced business
+             transaction(s).
+   PAYORD Payment order message
+             Message sent by the ordering customer (or payor or agent
+             on behalf of the ordering customer) to the ordered bank,
+             to instruct the ordered bank to debit an account it
+             services for the ordering customer, and to arrange for
+             the payment of a specified amount to the beneficiary (or
+             payee or agent in favour of beneficiary) in settlement
+             of the referenced business transaction(s).
+   PRICAT Price/sales catalogue message
+             Message to enable the transmission of information
+             regarding pricing and catalogue details for goods and
+             services offered by a seller to a buyer.
++  PRODAT Product data message
+             A message to submit master data - a set of data that is
+             rarely changed - to identify and describe products a
+             supplier offers to his (potential) customer or buyer.
+             This information of long validity includes technical and
+             functional product description but not commercial terms
+             and conditions. This message can be used as well to
+             update the information on a previously sent PRODAT
+             message.
+   PRODEX Product exchange reconciliation message
+             Message used as a communication between two trading
+             partners with agreements for the loan of products to each
+             other, to provide information about movements of products
+             from and to various locations on particular dates.
+   PRPAID Insurance premium payment message
+             Message used by communicating parties to notify the
+             recipient about premiums to be collected, paid, not paid
+             or partly paid, either individually or in series via
+             bordereaux or statements.
+   QALITY Quality data message
+             Message to enable the transmission of the results of
+             tests performed to satisfy a specified product or process
+             requirement. The content includes, but it is not limited
+             to, test data and measurements, statistical information,
+             and the testing methods employed.
+   QUOTES Quote message
+             Message which provides potential sellers with the ability
+             to provide price, delivery schedule, and other conditions
+             for potential sales of goods or services.
+   RDRMES Raw data reporting message
+             A Raw data reporting message (RDRMES) is sent in response
+             to predefined and identified questions. Raw data are
+             collected by numerous offices in the public and private
+             sectors. Much of the data is predefined and repetitious.
+             The data are often codified such that their description
+             has been pre-set and meets the criteria of the
+             collector.
++  REBORD Reinsurance bordereau message
+             A reinsurance bordereau message is made of individual
+             policy data and their impact on a reinsurance contract.
+             More specifically, the REBORD can be used to report how
+             the reinsurance premiums or claims figures are built up,
+             or to report individual cessions affecting a reinsurance
+             contract.
+   RECADV Receiving advice message
+             This message is to address the business needs related to
+             the goods receipt. This message is used to report the
+             physical receipt of goods. The message allows for the
+             reporting of discrepancies in products, quantities,
+             terms, packages, etc.
++  RECALC Reinsurance calculation message
+             RECALC is a generic message used in reinsurance
+             environment to show various types of calculation that are
+             either based on the loss ratio or on the technical result
+             of a reinsurance contract or program, mainly in the area
+             of commissions and commission adjustments and in stop
+             loss claims. This message supports results shown in the
+             RETACC message.
+   RECECO Credit risk cover message
+             Message to apply for preliminary credit assessment (used
+             during negotiation with prospective clients); apply for
+             credit protection; reply to credit requests; revise
+             amount and expiry date of credit protection and terms;
+             cancel credit protection. The message will serve at the
+             same time as the request for credit risk cover and as the
+             answer (approval or rejection to that request).
+   RECLAM Reinsurance claims message
+             A reinsurance claims message is exchanged between
+             insurers, professional intermediaries, reinsurers to send
+             information concerning a loss and/or to request
+             settlement (payment or refund) concerning the loss.
+   REMADV Remittance advice message
+             Message which provides a detailed accounting relative to
+             a payment, or other form of financial settlement, on a
+             specified date for the provision of goods and/or services
+             as detailed in the advice.
++  REPREM Reinsurance premium message
+             The Reinsurance Premium Message (REPREM) allows to
+             support the technical entries for any premium or
+             brokerage adjustment amount. For this purpose, it enables
+             to render all the relevant data (mainly amounts and the
+             way they are built up) used in the actual calculation of
+             the adjustment, as well as the other relevant elements
+             used in the specific formula.
+   REQDOC Request for document message
+             Message to enable a party to request the sending, or re-
+             sending, of data, either as a document or message, or in
+             some other agreed form.
+   REQOTE Request for quote message
+             Message which provides potential buyers with the ability
+             to solicit price, delivery schedule, and other conditions
+             from potential sellers of goods or services.
+   RESETT Reinsurance settlement message
+             A reinsurance settlement message is exchanged by
+             insurers, reinsurers, bureaux, brokers and professional
+             reinsurance intermediaries to send all information that
+             enables to identify, reconcile and set-off technical
+             accounts.
+   RESMSG Reservation message
+             A Reservation message is sent by a tourism operator to
+             one or more service providers in order to request desired
+             services. These services may be subject to confirmation
+             by any of the parties concerned.
++  RESREQ Reservation request - interactive message
+             An interactive Travel, Tourism and Leisure Reservations
+             Request is sent by a customer or his agent, to a service
+             provider to reserve, modify or cancel a Travel, Tourism
+             and Leisure service. The Travel, Tourism and Leisure
+             Reservation Response - Interactive message (RESRSP) is
+             utilised to provide an interactive response to the
+             interactive service request.
++  RESRSP Reservation response - interactive message
+             An interactive Travel, Tourism and Leisure Reservations
+             Response is sent by a customer or his agent, to convey
+             the results of a reservations request for a Travel,
+             Tourism and Leisure service. The Travel, Tourism and
+             Leisure Reservation Request - Interactive message
+             (RESREQ) is utilised to provide the interactive request
+             to which the RESRSP is used to respond.
+   RETACC Reinsurance technical account message
+             The RETACC is used by the sender to report to the
+             receiver the latter's position in the sender's books with
+             respect to one single reinsurance contract. It is in this
+             sense a type of account for services rendered, and may
+             initiate a payment flow either directly or via a
+             periodical overview statement.
+   SAFHAZ Safety and hazard data message
+             The Safety and hazard data message is to enable the
+             communication of safety data and advice on relevant
+             materials supplied to industrial customers so as to
+             enable them to take measures to protect their employees
+             and the environment from any potential harmful effects
+             from these materials.
+#| SANCRT International movement of goods governmental regulatory
+          message
+             The SANCRT message permits a commercial operator to apply
+             to a national agency for the issue of a certificate,
+             permit, authorization etc. in respect of products to be
+             imported or exported. It further permits the issuing
+             authority to transmit to the applicant and to the
+             exporting or importing country's relevant national
+             authority, (e.g. Customs, Agriculture etc.) the details
+             of the certificate, permit or authorization in respect of
+             those products thus facilitating the import/export
+             clearance of the consignment whilst ensuring that all
+             certificate, permit, authorization requirements are met.
+   SLSFCT Sales forecast message
+             Message to enable the transmission of forecast data
+             related to products or services, such as corresponding
+             location, period, product identification, pricing,
+             monetary amount, quantity, market sector information,
+             sales parties. It enables the recipient to process the
+             information automatically and use it for production,
+             planning, marketing, statistical purposes, etc.
+   SLSRPT Sales data report message
+             Message to enable the transmission of sales data related
+             to products or services, such as corresponding location,
+             period, product identification, pricing, monetary amount,
+             quantity, market sector information, sales parties. It
+             enables the recipient to process the information
+             automatically and use it for production, planning,
+             marketing, statistical purposes, etc.
+   SSIMOD Modification of identity details message
+             The SSIMOD message is sent to communicate to the country
+             of first registration the modification of identity
+             details which took place since the last transmission
+             related to the worker.
+   SSRECH Worker's insurance history message
+             The SSRECH message is sent by a designated body in one
+             State to the equivalent body in another State giving
+             details of a worker's Social Security insurance history
+             as requested by the latter State.
+   SSREGW Notification of registration of a worker message
+             The SSREGW message is exchanged between designated bodies
+             to enable interchange and registration of a worker's
+             social security number. The message is also exchanged by
+             designated bodies to request and compile details of
+             worker's social security insurance record.
+   STATAC Statement of account message
+             Message from a seller or his agent to a buyer or his
+             agent, providing information about the status of the
+             account at a specific point in time. It is used as an aid
+             to reconciliation. At the same time it may be a reminder
+             of payment due.
+   SUPCOT Superannuation contributions advice message
+             Message sent by a party to an organisation administering
+             a superannuation scheme, to detail contribution payments
+             made for members of the superannuation scheme.
+   SUPMAN Superannuation maintenance message
+             Message sent by a party to an organisation administering
+             a superannuation scheme, to specify membership
+             maintenance information about superannuation scheme
+             members.
+   SUPRES Supplier response message
+             A Reservation message is sent by a tourism operator to
+             one or more service providers in order to request desired
+             services. These services may be subject to confirmation
+             by any of the parties concerned. The Supplier response
+             presented herein is the response to the Reservation
+             message (RESMSG).
+   TANSTA Tank status report message
+             A message from a vessel to the shipplanning department of
+             a shipping line and vice versa (e.g. via satellite),
+             giving details about the contents of ballast tanks, fuel
+             tanks, water tanks and other figures necessary for the
+             calculation of the stability of the vessel.
++  VATDEC Value added tax message
+             This VAT Declaration Message (VATDEC) permits the
+             transfer of data from a declarant to a national VAT
+             collecting authority for the purpose of meeting
+             legislative and/or operational requirements in respect of
+             the declarations of VAT.
+             The declarant may be a taxpayer who is obliged to send
+             VAT returns the authorities, or an accountant or others
+             who on behalf of one several taxpayers send VAT returns
+             to the authorities and who is mandated to do so by the
+             authorities and the taxpayer.
+             The declaration may contain one or several returns.
+             The message may also be used, for example:
+             - within the European Union, to transmit VAT summary
+             information for the Value Added Tax Information Exchange
+             System (VIES) from a declarant to the relevant national
+             VIES collecting authorities.
+             - to transmit other related or comparable VAT information
+             from a declarant to the relevant authorities.
+|  VESDEP Vessel departure message
+             A message from a stevedore to a liner agent or from a
+             liner agent to a local authority (e.g. port authority) to
+             inform the latter party of the departure of a vessel and
+             giving information on the actual container or cargo
+             operations.
+   WKGRDC Work grant decision message
+             Message specifying details of decisions of the
+             governmental agency to an employer relating to a work
+             grant request or permit for one or more workers.
+   WKGRRE Work grant request message
+             Message specifying details of requests to a governmental
+             authority from an employer for workers who need a
+             work grant or permit.
+
+----------------------------------------------------------------------
+
+  0073  First/last sequence message transfer indication
+
+  Desc: Indication used for the first and last message in a sequence
+        of the same type of message relating to the same topic.
+
+  Repr: a1
+
+   C      Creation
+             First transmission of a number of transfers of the same
+             message.
+   F      Final
+             Last transmission of a number of transfers of the same
+             message.
+
+----------------------------------------------------------------------
+
+  0081  Section identification
+
+  Desc: A character identifying the next section in a message.
+
+  Repr: a1
+
+   D      Header/detail section separation
+             To qualify the segment UNS, when separating the header
+             from the detail section of a message.
+   S      Detail/summary section separation
+             To qualify the segment UNS, when separating the detail
+             from the summary section of a message.
+
+----------------------------------------------------------------------
+
+  0083  Action, coded
+
+  Desc: A code indicating acknowledgement, or rejection (the action
+        taken) of a subject interchange, or part of the subject
+        interchange.
+
+  Repr: an..3
+
+        1 Acknowledged (this level and all lower levels)
+             Self explanatory.
+        2 Acknowledged - errors detected and reported
+             Self explanatory.
+        3 One or more rejected - next lower level
+             Self explanatory.
+        4 This level and all lower levels rejected
+             The corresponding referenced-level and all its lower
+             referenced-levels are rejected. One or more errors are
+             reported at this reporting-level or a lower reporting-
+             level.
+        5 UNB/UNZ accepted
+             Self explanatory.
+        6 UNB/UNZ rejected
+             Self explanatory.
+        7 This level acknowledged, next lower level acknowledged if
+          not explicitly rejected
+             The corresponding referenced-level is acknowledged. All
+             messages or functional groups at the next lower
+             referenced-level are acknowledged except those explicitly
+             reported as rejected at the next lower reporting-level in
+             this CONTRL message.
+        8 Interchange received
+             The subject interchange has been received. UNB, UNZ and
+             UNA if present, is acknowledged. The other parts of the
+             interchange will be acknowledged or rejected in a
+             subsequent CONTRL message.
+
+----------------------------------------------------------------------
+
+* 0085  Syntax Error, coded
+
+  Desc: A code indicating the syntax error detected.
+
+  Repr: an..3
+
+        1 UNA not supported
+             Notification that the UNA character string cannot be
+             understood or complied with.
+        2 Syntax version or level not supported
+             Notification that the syntax version and/or level is not
+             supported by the recipient.
+        3 Message version/release not supported
+             Notification that the message type, version number and/or
+             release number in the UNG and/or UNH segments are not
+             supported by the recipient.
+        4 Service segment missing/invalid
+             Notification that a service segment is missing, contains
+             invalid data or cannot be processed for any reason.
+        5 Trailer check in error
+             Notification that data contained in the trailer does not
+             agree with data in the header and/or that the functional
+             group or message or segment count is incorrect.
+        6 Data segment missing/invalid
+             Notification that a data segment is missing, contains
+             invalid data or cannot be processed for any reason.
+        7 Interchange recipient not actual recipient
+             Notification that the Interchange recipient (S003) is
+             different from the actual recipient.
+        8 Too many data elements in segment
+             Indication that a data segment contains too many data
+             elements.
+        9 Mandatory data element missing
+             Indication that a mandatory data element is missing in a
+             service or data segment.
+       10 Data element attribute error
+             Indication that a data element does not conform to the
+             relevant message or segment specification.
+       11 Password invalid
+             Indication that the password in segment UNB is invalid.
+       12 Invalid value
+             Notification that the value of a simple data element,
+             composite data element or component data element does not
+             conform to the relevant specifications for the value.
+       13 Missing
+             Notification that a mandatory (or otherwise required)
+             service or user segment, data element, composite data
+             element or component data element is missing
+       14 Value not supported in this position
+             Notification that the recipient does not support use of
+             the specific value of an identified simple data element,
+             composite data element or component data element in the
+             position where it is used. The value may be valid
+             according to the relevant specifications and may be
+             supported if it is used in another position.
+       15 Not supported in this position
+             Notification that the recipient does not support use of
+             the segment type, simple data element type, composite
+             data element type or component data element type in the
+             specific in the identified position.
+       16 Too many constituents
+             Notification that the identified segment contained to
+             many data elements or that the identified composite data
+             element contained too many component data elements.
+       17 No agreement
+             No agreement exist that allows receipt of an interchange,
+             functional group or message with the value of the
+             identified simple data element, composite data element or
+             component data element.
+       18 Unspecified error
+             Notification that an error has been identified, but the
+             nature of the error is not reported.
+       19 Invalid decimal notation
+             Notification that the character indicated as decimal
+             notation in UNA is invalid, or the decimal notation used
+             in a data element is not consistent with the one
+             indicated in UNA.
+       20 Character invalid as service character
+             Notification that a character advised in UNA is invalid
+             as service character.
+       21 Invalid character(s)
+             Notification that one or more character(s) used in the
+             interchange is not a valid character as defined by the
+             syntax level indicated in UNB. The invalid character is
+             part of the referenced-level, or followed immediately
+             after the identified part of the interchange.
+       22 Invalid service character(s)
+             Notification that the service character(s) used in the
+             interchange is not a valid service character as advised
+             in UNA or not one of the service characters in the syntax
+             level indicated in UNB or defined in an interchange
+             agreement. If the code is used in UCS or UCD, the invalid
+             character followed immediately after the identified part
+             of the interchange.
+       23 Unknown Interchange sender
+             Notification that the Interchange sender (S002) is
+             unknown.
+       24 Too old
+             Notification that the received interchange or functional
+             group is older than a limit specified in an IA or
+             determined by the recipient.
+       25 Test indicator not supported
+             Notification that a test processing could not be
+             performed for the identified interchange, functional
+             group or message.
+       26 Duplicate detected
+             Notification that a possible duplication of a previously
+             received interchange, functional group or message has
+             been detected. The earlier transmission may have been
+             rejected.
+       27 Security function not supported
+             Notification that a security function related to the
+             referenced-level or data element is not supported.
+       28 References do not match
+             Notification that the control reference in UNB/UNG/UNH
+             does not match the one in UNZ/UNE/UNT.
+       29 Control count does not match number of instances received
+             Notification that the number of functional groups/
+             messages/segments does not match the number given in
+             UNZ/UNE/UNT.
+       30 Functional groups and messages mixed
+             Notification that individual messages and functional
+             groups have been mixed at the same level in the
+             interchange.
+       31 More than one message type in group
+             Notification that different message types are contained
+             in a functional group.
+       32 Lower level empty
+             Notification that the interchange did not contain any
+             messages or functional groups, or a functional group did
+             not contain any messages.
+       33 Invalid occurrence outside message or functional group
+             Notification that an invalid segment or data element
+             occurred in the interchange, between messages or between
+             functional groups. Rejection is reported at the level
+             above.
+       34 Nesting indicator not allowed
+             Notification that explicit nesting has been used in a
+             message where it shall not be used.
+       35 Too many segment repetitions
+             Notification that a segment was repeated too many times.
+       36 Too many segment group repetitions
+             Notification that a segment group is repeated to many
+             times.
+       37 Invalid type of character(s)
+             Notification that one or more numeric characters were
+             used in an alphabetic (component) data element or that
+             one or more alphabetic characters were used in a numeric
+             (component) data element.
+       38 Missing digit in front of decimal sign
+             Notification that a decimal sign is not preceded by one
+             or more digits.
+       39 Data element too long
+             Notification that the length of the data element received
+             exceeded the maximum length specified in the data element
+             description.
+       40 Data element too short
+             Notification that the length of the data element received
+             is shorter than the minimum length specified in the data
+             element description.
+       41 Permanent communication network error
+             Notification that a permanent error was reported by the
+             communication network used for transfer of the
+             interchange. Re-transmission of an identical interchange
+             with the same parameters at network level will not
+             succeed.
+       42 Temporary communication network error
+             Notification that a temporary error was reported by the
+             communication network used for transfer of the
+             interchange. Re-transmissions of an identical interchange
+             may succeed.
+       43 Unknown interchange recipient
+             Notification that the interchange recipient is not known
+             by a network provider.
++      44 Application temporarily unavailable
+             Notification that traffic for an application is
+             inhibited.

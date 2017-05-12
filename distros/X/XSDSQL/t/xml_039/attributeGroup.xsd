@@ -1,0 +1,41 @@
+﻿<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                targetNamespace="http://www.camera.org" 
+				xmlns="http://www.camera.org"
+				xmlns:xx="http://www.camera.org"
+				xmlns:zz="namespace2"
+ 				elementFormDefault="unqualified"
+				attributeFormDefault="qualified"
+>
+
+	<xs:import namespace="namespace2"  schemaLocation="schema2.xsd"/>
+
+	<xs:attribute name="attr10" type="xs:string"/>
+
+	<xs:attributeGroup name="ag1">
+		<xs:attribute name="attr1" type="xs:string"/>
+		<xs:attribute name="attr2" type="xs:string"/>
+		<xs:attribute ref="xx:attr10" />
+		<xs:attribute ref="zz:lang" />
+ 	</xs:attributeGroup>
+
+	<xs:complexType name="ct1">
+		<xs:sequence minOccurs="1" maxOccurs="1">
+			<xs:element name="el0_ct1" type="xs:string"/>
+		</xs:sequence>
+   		<xs:attributeGroup ref="ag1"/>
+	</xs:complexType>
+
+
+	<xs:element name="s1">
+		<xs:complexType>
+			<xs:sequence minOccurs="0" maxOccurs="1">
+				<xs:element ref="zz:el0" minOccurs="0" maxOccurs="1"/> 
+				<xs:element name="ela" type="ct1" minOccurs="0" maxOccurs="1"/>
+			</xs:sequence>
+ <!--  		<xs:attributeGroup ref="ag1"/> -->
+		</xs:complexType>
+	</xs:element>
+</xs:schema>
+
+ 

@@ -1,0 +1,104 @@
+=head1 NAME
+
+  XML::GDOME::CharacterData - Interface CharacterData implementation.
+
+=head1 SYNOPSIS
+
+  $str = $cd->getData();
+         $cd->setData($str);
+  $int = $cd->getLength();
+         $cd->appendData($arg);
+         $cd->deleteData($offset,$count);
+         $cd->insertData($offset,$arg);
+         $cd->replaceData($offset,$count,$arg);
+  $str = $cd->substringData($offset,$count);
+
+=head1 CLASS INHERITANCE
+
+L<XML::GDOME::Node> > XML::GDOME::CharacterData
+
+
+=head1 METHODS
+
+=over 4
+
+
+=item $str = $cd->getData();
+
+
+
+I<Returns>: the character data of the node that implements this interface.
+
+
+=item $int = $cd->getLength();
+
+
+
+I<Returns>: The number of characters that are available. This may have the value zero, i.e., CharacterData nodes may be empty.
+
+
+=item $cd->appendData($arg);
+
+Append the string to the end of the character data of the node. Upon success, data provides access to the concatenation of data and the string specified.
+
+I<C<arg>>: The string to append
+
+C<GDOME_NO_MODIFICATION_ALLOWED_ERR>: Raised when the node is readonly.
+
+
+=item $cd->deleteData($offset,$count);
+
+Remove a range of characters from the node. If the sum of I<offset> and I<count> exceeds length then all characters from I<offset> to the end of the data are deleted. Upon success, data and length reflect the change.
+
+I<C<offset>>: The offset from which to start removing
+
+I<C<count>>: The number of characters to delete.
+
+C<GDOME_INDEX_SIZE_ERR>: Raised if the specified offset is greater than the number of characters in data.
+
+C<GDOME_NO_MODIFICATION_ALLOWED_ERR>: Raised when the node is readonly.
+
+
+=item $cd->insertData($offset,$arg);
+
+Insert a string at the specified character offset.
+
+I<C<offset>>: The character offset at which to insert
+
+I<C<arg>>: The string to insert
+
+C<GDOME_INDEX_SIZE_ERR>: Raised if the specified offset is greater than the number of characters in data.
+
+C<GDOME_NO_MODIFICATION_ALLOWED_ERR>: Raised when the node is readonly.
+
+
+=item $cd->replaceData($offset,$count,$arg);
+
+Replace the characters starting at the specified character I<offset> with the specified string. If the sum of I<offset> and I<count> exceeds length, then all characters to the end of the data are replaced;
+
+I<C<offset>>: The offset from which to start replacing
+
+I<C<count>>: The number of characters to replace.
+
+I<C<arg>>: The String with which the range must be replaced
+
+C<GDOME_INDEX_SIZE_ERR>: Raised if the specified I<offset> is greater than the number of characters in data.
+
+C<GDOME_NO_MODIFICATION_ALLOWED_ERR>: Raised when the node is readonly.
+
+
+=item $str = $cd->substringData($offset,$count);
+
+Extracts a range of data from the node.
+
+I<C<offset>>: Start offset of substring to extract
+
+I<C<count>>: The number of characters to extract
+
+I<Returns>: The specified substring. If the sum of I<offset> and I<count> exceeds the length, then all characters to the end of the data are returned.
+
+C<GDOME_INDEX_SIZE_ERR>: Raised if the specified I<offset> is greater than the number of characters in data.
+
+
+=back
+

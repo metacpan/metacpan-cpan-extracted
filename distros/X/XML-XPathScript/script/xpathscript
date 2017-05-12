@@ -1,0 +1,184 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use XML::XPathScript;
+use Getopt::Long;
+use Symbol;
+use File::Basename;
+use Carp;
+
+my $VERSION = '1.54';
+
+my ( $query, $interpolate );
+GetOptions( 'query=s' => \$query, 
+            'interpolate' => \$interpolate,
+            'version'   => \&die_version,
+          );
+
+sub die_version {
+    my( $date ) = q$Date$ 
+                    =~ /\((.*?)\)/;
+    my( $revision ) = q$Revision$ =~ /(\d+)/;
+
+    die <<"END_VERSION";
+$0 : revision $revision ($date)
+using XML::XPathScript version $XML::XPathScript::VERSION
+END_VERSION
+}
+
+# trick so that xps story  => xps story.xml story.xps
+@ARGV = ( $ARGV[0].'.xml', $ARGV[0].'.xps'  ) if @ARGV == 1;
+
+# offline dirty magic
+$Fake::Request = AxKit::Apache->request();
+$Fake::Request->param( split /[;&=]/, $query ) if $query;		
+
+usage() unless @ARGV >= 2;
+
+my $xmlfile = shift @ARGV;
+$Fake::Request->uri( $xmlfile );
+
+$XML::XPathScript::DoNotInterpolate = !$interpolate if $interpolate;
+
+# to keep 'warnings' happy
+my $foo = $XML::XPathScript::DoNotInterpolate;
+
+open my $xml_fh, $xmlfile or die "Cannot open XML file '$xmlfile': $!\n";
+
+undef $/;
+my $xml = <$xml_fh>;
+my $xps = XML::XPathScript->new;
+
+while ( my $stylefile = shift @ARGV ) {
+    my $stylesheet;
+
+    if ( $stylefile !~ /::/ ) {
+        chdir dirname($stylefile);
+        open( $stylesheet, basename($stylefile)) || die "Cannot open Stylesheet file '$stylefile': $!";
+    }
+    else {
+        eval "use $stylefile";
+        die $@ if $@;
+        $stylesheet = eval "\$${stylefile}::stylesheet"
+            or croak "couldn't load stylesheet from module $stylefile";
+    }
+
+    $xml = eval { $xps->transform( $xml => $stylesheet ) };
+    die "error while transforming with stylesheet '$stylefile': $@\n"
+        if $@;
+}
+
+print $xml;
+
+exit(0);
+
+sub usage {
+    print STDERR <<EOT;
+Usage: xpathscript [-i] [-q="query-string"] xmlfile stylesheet_files
+       or
+       xpathscript [-i] [-q="query-string"] file
+	     in which case the xml file will be assumed 
+		 to be file.xml and the xps file to be file.xps
+
+	-i interpolation is enabled
+	-q the string will be used as if it was the 
+		query string passed by the client.
+
+	see 'perldoc xpathscript' for more details
+EOT
+    exit(0);
+}
+
+# Let's cheat so that stylesheets using AxKit::Apache->request
+# works offline too
+package AxKit::Apache;
+
+sub request
+{
+	return bless \%Fake::Request, 'AxKit::Apache';
+}
+
+sub args{ return $_[0]->param() };
+
+sub param
+{
+	my $self = shift;
+	my %h = @_;
+
+	# quick init, if needed
+	$self->{param} = {} unless $self->{param};
+
+	while( my( $k, $v ) = each %h )
+	{
+		$self->{param}{$k}= $v;	
+	}
+	return %{$self->{param}};
+}
+
+sub uri {
+    my $self = shift;
+    $self->{uri} = shift if @_;
+    return $self->{uri};
+}
+
+__END__
+
+=head1 NAME
+
+xpathscript - XPathScript command-line utility
+
+=head1 SYNOPSIS
+
+xpathscript [-i] [-q=<query_string>] <xml_file> <stylesheet_files or modules..>
+
+xpathscript [-i] [-q=<query_string>] <name> 
+	
+=head1 DESCRIPTION
+
+Transforms the xml document using the one or more given
+XPathScript stylesheets. If a module name is passed as
+one of the stylesheets,
+xpathscript will 
+try to load it and use its local $stylesheet variable as the stylesheet.
+
+If no stylesheet is provided, 
+xpathscript assumes that the xml source
+file  and the XPathScript stylesheet are named <name>.xml and <name>.xps.
+
+=head2 ARGUMENTS
+
+=over
+
+=item -i
+
+Enable interpolation
+
+=item -q=<query_string>
+
+query_string is passed as if it was a query string. E.g.,
+
+	xpathscript -q="page=3&images=no" doc.xml htmlify.xps
+	
+will act as if the document was requested from the web server with the url
+'http://your.server.org/doc.xml?page=3&images=no'
+
+=back
+
+=head1 SEE ALSO
+
+L<XML::XPathScript>
+
+=head1 BUGS
+
+Please send bug reports to <bug-xml-xpathscript@rt.cpan.org>,
+or via the web interface at 
+http://rt.cpan.org/Public/Dist/Display.html?Name=XML-XPathScript .
+
+=head1 AUTHOR
+
+Yanick Champoux, <yanick@cpan.org>
+
+=cut
+

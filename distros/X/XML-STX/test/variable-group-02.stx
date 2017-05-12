@@ -1,0 +1,13 @@
+<stx:transform version="1.0" 
+  xmlns:stx="http://stx.sourceforge.net/2002/ns"
+  strip-space="yes">
+
+  <stx:variable name="g1"/>
+
+  <stx:template match="/root">
+    <stx:copy>
+      <stx:value-of select="concat('O',$g1,'K')"/>
+    </stx:copy>
+  </stx:template>
+
+</stx:transform>

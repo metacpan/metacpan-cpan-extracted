@@ -1,0 +1,59 @@
+XTerm-Conf
+============
+
+Change the xterm configuration like colors, size, fonts etc. within a
+running xterm.
+
+INSTALLATION
+
+If you have a modern CPAN.pm, then you can install this module using
+
+	cpan .
+
+Otherwise use
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SCRIPT USAGE
+
+    xterm-conf options
+
+See the documentation for a complete list of options.
+
+MODULE USAGE
+
+    use XTerm::Config;
+    xterm_conf(-key => val ...)
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc xterm-conf
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=XTerm-Conf
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/XTerm-Conf
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/XTerm-Conf
+
+    Search CPAN
+        http://search.cpan.org/dist/XTerm-Conf
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006,2008 Slaven Rezic
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

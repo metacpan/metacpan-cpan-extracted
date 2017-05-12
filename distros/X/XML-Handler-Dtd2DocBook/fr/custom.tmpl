@@ -1,0 +1,25 @@
+<!-- TMPL_LOOP NAME="ent" -->
+<!ENTITY <TMPL_VAR NAME=name>.brief "<refpurpose><TMPL_VAR NAME=brief></refpurpose>" >
+
+  <!-- TMPL_LOOP NAME="doc_attrs" -->
+<!ENTITY <TMPL_VAR NAME=name_ent>.desc
+    "<refsect2><title><TMPL_VAR NAME=name></title>
+      <!-- TMPL_LOOP NAME="doc" --><para><TMPL_VAR NAME=data></para>
+      <!-- /TMPL_LOOP -->
+      <!-- TMPL_LOOP NAME="tag" --><para><TMPL_VAR NAME=entry> : <TMPL_VAR NAME=data></para>
+      <!-- /TMPL_LOOP --></refsect2>" >
+  <!-- /TMPL_LOOP -->
+
+<!ENTITY <TMPL_VAR NAME=name>.desc
+    "<title>Description</title>
+      <!-- TMPL_LOOP NAME="doc" --><para><!-- TMPL_VAR NAME="data" --></para>
+      <!-- /TMPL_LOOP -->
+      <!-- TMPL_LOOP NAME="tag" --><para><TMPL_VAR NAME=entry> : <TMPL_VAR NAME=data></para>
+      <!-- /TMPL_LOOP -->
+      <!-- TMPL_LOOP NAME="attrs" -->&<TMPL_VAR NAME=name_ent>.desc;
+      <!-- /TMPL_LOOP -->" >
+
+<!-- /TMPL_LOOP -->
+
+
+

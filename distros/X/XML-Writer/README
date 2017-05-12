@@ -1,0 +1,25 @@
+XML::Writer is a simple Perl module for writing XML documents: it
+takes care of constructing markup and escaping data correctly, and by
+default, it also performs a significant amount of well-formedness
+checking on the output, to make certain (for example) that start and
+end tags match, that there is exactly one document element, and that
+there are not duplicate attribute names.
+
+Here is an example:
+
+  my $writer = new XML::Writer();
+
+  $writer->startTag('greeting', 'type' => 'simple');
+  $writer->characters("Hello, world!");
+  $writer->endTag('greeting');
+  $writer->end();
+
+If necessary, error-checking can be turned off for production use.
+
+See the Changes file for detailed changes between versions.
+
+Copyright (c) 1999 by Megginson Technologies.
+Copyright (c) 2003 Ed Avis <ed@membled.com>
+Copyright (c) 2004-2010 Joseph Walton <joe@kafsemo.org>
+
+Current development is hosted at <http://josephw.github.com/xml-writer-perl/>.

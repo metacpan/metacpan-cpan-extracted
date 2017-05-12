@@ -1,0 +1,25 @@
+<itemlist>
+
+<table border="2">
+<!-- print column titles first -->
+  <tr>
+	<th>name</th>
+	<th>quantity</th>
+	<th>agent</th>
+	<th>notes</th>
+  </tr>
+
+<!-- now print the items -->
+<gxml:foreach expr="item">
+  <tr>
+	<td>%%%item:name%%%</td>
+	<td>%%%item:quantity%%%</td>
+	<td>%%%item:agent%%%</td>
+	<td>%%%item:notes%%%</td>
+  </tr>
+</gxml:foreach>
+
+</table>
+
+</itemlist>
+

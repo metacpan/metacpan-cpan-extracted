@@ -1,0 +1,29 @@
+# test the <xsd:all> works correctly with minOccurs="0" elements
+--- |
+  <?xml version="1.0" encoding="UTF-8"?>
+  <schema xmlns="http://www.w3.org/2001/XMLSchema">
+    <element name="test" type="Test"/>
+    <complexType name="Test">
+      <all>
+        <element name="aString" type="string"/>
+        <element name="bString" type="string" minOccurs="0"/>
+      </all>
+    </complexType>
+  </schema>
+
+--- |
+  <test>
+    <aString>foobar</aString>
+  </test>
+--- >
+PASS
+
+--- |
+  <test>
+    <aString>foobar</aString>
+    <bString>foobar</bString>
+  </test>
+--- >
+PASS
+
+

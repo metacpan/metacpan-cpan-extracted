@@ -1,0 +1,24 @@
+
+==== README to examples/namesservice/
+
+This directory demonstrates the implementation of a SOAP server, mimicing
+the behavior of an existing service.  The XML::Compile::SOAP distribution
+demonstrates various ways to create clients for this same service.  Here,
+we focus on the server implementation.
+
+The original service published a nice WSDL file, and a separate schema,
+which have been beautified a bit but nothing more.
+
+ . namesservice.wsdl
+   The WSDL file, describing the service.
+
+ . namesservice.xsd
+   The Schema file, describing the data types transmitted.
+
+To run this example, first start the server
+  ./server.pl -vvv
+
+and then run the client
+  ./client.pl
+
+Please contribute.

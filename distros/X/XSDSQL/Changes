@@ -1,0 +1,176 @@
+Revision history for Perl extension blx::xsdsql
+
+0.01 July  20 18:24 2010
+    - original version; created by h2xs 1.23 with options
+    -XA -b 5.8.0 -n blx::xsdsql::ut
+
+0.02 December 09  18:48 2010
+    - add TABLE_PREFIX param to blx::xsdsql::parser::parsefile
+    - exclude dirs if name begin with a point into blx::xsdsql::parser::parsefile::get_db_namespaces
+    - exclude dirs if name begin with a point into blx::xsdsql::parser::generator::get_namespaces
+    - new commands display_namespaces,drop_sequence,create_sequence in xsd2sql.pl
+    - correct the crash if the command is unknow in xsd2sql.pl
+    - new options t,l,p,w in xsd2sql.pl
+    - generic internal params restyle ( Es: my ($self,%params)=@_)     in subs
+    - add LEVEL_FILTER and TABLES_FILTER  params to blx::xsdsql::generator
+    - add params SCHEMA_NAME and SCHEMA_INSTANCE to blx::xsdsql::xml::new and blx::xsdsql::xml::write
+    - implement a new test suite
+    - implement a xsd groups
+    
+0.03 January 04  19:04 2011  
+    - correct bugs in  documentation
+    - new commands drop_view, create_view 
+    - implement drop view and create view classes 
+    - change email address of the author 
+    - minor bugs corretted  
+
+0.04 January 20 20:08 2011
+    - correct bugs in documentation
+    - minor bugs corretted 
+    - new commands drop_dictionary,create_dictionary,insert_dictionary in xsd2sql.pl
+    - correct bug in create_view for oracle
+    - make clean delete temporary files in test directory
+    
+0.05 March 31 17:07 2011 
+    - complete restyle of parsing algorithms
+    - minor bugs corretted 
+    
+0.06 June 11 12:00 2011
+    - xsd group implemented 
+    - a first implementation of namespace 
+    - new options in test.pl/xsd2sql/xml.pl
+    - bugs corrected 
+     
+    
+0.06.1 June 16 16:13 2011
+    - corrected algo bugs on param ROOT_TAG_PARAMS of  method blx::xsdsql::xml::write
+
+0.06.2 -  July 20 18:12 2011
+    - corrected max int on parser 
+    - bug in write mandatory note with value null string
+    - create_view: in the header of views converted comment PATH to ROOTPATH
+    - bug on choice - a default minOccurs for a choice node is 0 and not 1
+    - bug on choice into a node with maxOccurs > 1
+    - change the param CHOISE into CHOICE  in all modules
+    - correct documentation
+    - add this attribute in class blx::xsdsql::xml::generic::table and new columns in table_dictionary:
+        PARENT_PATH,IS_ROOT_TABLE,IS_UNPATH,IS_INTERNAL_REF,VIEW_NAME
+    - new method blx::xsdsql::xml::generic::table::reset_columns
+    - revised the method  blx::xsdsql::xml::generic::table::add_columns
+    - new param FORCE in blx::xsdsql::xml::generic::column::get_sql_name
+    - new attribute CHOICE for class blx::xsdsql::xml::generic::column and new column in column_dictionary
+    - flat the columns of a group with maxoccurs <= 1 into the parent table
+    - new option -X in test.pl (modality change, test.pl use for default xmldiff if is installed)
+    - new option -S in test.pl (modality change, for default test.pl esecute xsd2sql in one step) 
+    - new param NO_FLAT_GROUPS in blx::xsdsql::parser::parsefile
+    - correct bug on join a table with maxoccurs > 1 in create view
+    - parser restyling code
+
+0.07.0    - September 5 19:15 2011
+    - simpleContent implementation
+    - column  restyling code
+    - table restyling code
+    - new attribute ATTRIBUTE for class blx::xsdsql::xml::generic::column and new column in column_dictionary
+    - new method   blx::xsdsql::path_map::resolve_attributes
+    - attribute implementation
+    - correct documentation
+    - restyle structure  of table dictionary 
+    - obsolete params TABLE_IS_TYPE,SIMPLE_TYPE,COMPLEX_TYPE,SIMPLE_CONTENT,GROUP_TYPE in blx::xsdsql::xml::generic::table
+    - new param XSD_TYPE in  blx::xsdsql::xml::generic::table
+    - correct bug on xseq choice
+
+0.07.1    - September 7 18:05 2011
+    - xsd2sql.pl -    correct warning parser command if $ARGV[0] is not set
+                      add attribute EMIT_SCHEMA_DUMPER 
+    - exclusion system attribute for nodes at level 1
+    - correct some tests because  not passed if is use diff command  
+
+0.08 - <no_date> 
+    - internal version - not published
+
+0.09 - March 6 18:05 2012
+    - new algorithmics for schema parsing (RINCHI::Xmlschema removing)
+    - multiplies namespace support
+    - support for import,fractionDigit,attributes,custom_header,element_ref,attribute_ref
+    - better algorithm for generate names
+
+0.09.1 - May 10 18:05 2012 
+    - new syntax for perl 5.14
+
+0.09.2 - November 27 - 17:19 2012
+    - package in form tar.gz for win users (suggest from MITHALDU@cpan.org)
+
+
+0.09.3 - January 20 - 18:00 2013 
+    - new class method blx::xsdsql::dbconn::get_info
+    - the method  blx::xsdsql::dbconn::get_application_avaliables is deprecated, use the new method get_application_availables
+    - the class methods get_applications_classname,get_database_availables,get_application_avaliables 
+      of the class blx::xsdsql::dbconn are cached and return a sorted array 
+    - the regression test use Test::Database for default (suggest from  CHORNY@cpan.org)
+    - test.pl - new option D (do not use Test::Database for connection but the old method)
+    - test.pl - new option F (do not clean the database after tests end)
+    - isql.pl - new option e (use Test::Database for connection)
+    - xml.pl  - new option e (use Test::Database for connection)
+    - correct bug to retrieve connection string in blx::xsdsql::dbconn::oracle::dbi
+    - adding META.yml (suggest from  CHORNY@cpan.org)
+    - for tests xmldiff is mandatory
+
+0.10.0 - April 11 -  21:25 2013 
+    - the xsd element 'element' support reference external namespace - Ex: <xs:element ref="zz:el0"/> (test 38)
+    - test.pl - correct bug - with option T set, the temporary files now are cleaned
+    - the xsd element 'attribute' now support reference external namespace - Ex:  <xs:attribute ref="zz:lang" />  (test 38)
+    - for tests xmllint is mandatory
+    - xsd element attributeGroup implemented (test 39)
+    - correct documentation
+    - the method  blx::xsdsql::generator::generate force utf8 encoding in output file if the schema encoding is utf8 
+    - xsd element field and selector are ignored
+    - xsd element list implemented (test 40)
+    - xsd element notation implemented (test 41)
+    - xsd element include implemented (test 42)
+    - xsd element redefine simple type implemented (test 43)
+    - correct bug writing xml file in blx::xsdsql::xml (test 37)
+    - correct bug on support multiplies schema files in import (now support many root tables) (test 29) 
+    - the method  blx::xsdsql::dbconn::get_application_avaliables is eliminated
+    - xsd element complexContent implement (test 44)
+    - xsd element redefine implemented (test 44)
+    - the dictionary tables and the sequence generator are not dependented by the schema 
+    - xsd element redefine group type implement (test 45)
+    - correct bug on qualified element ref (test 46)
+    - correct bug on generate sql objects on childs schema at level > 1 (test 47)
+    - correct bug on generate correct xml file (test 47) 
+    - the called of the constructors of table/colum class now pass the debug mode
+    - check ok for groups in sequence (test 48)
+    - the static method blx::xsdsql::xsd_parser::get_db_namespaces are dropped
+    - the class blx::xsdsql::IStream is renamed in blx::xsdsql::ios::istream
+    - the class blx::xsdsql::OStream is renamed in blx::xsdsql::ios::ostream
+    - the class blx::xsdsql::log is renamed in blx::xsdsql::ios::debuglogger
+    - correct emitted package name where emitted debug info in module blx::xsdsql::ios::debuglogger
+    - the internal checks are implemented with  affirm of the module Carp::Assert - set the env NDEBUG to ignore  affirm
+    - new package blx::xsdsql::version contenent the package version
+    - the package blx::xsdsql::ut is renamed in blx::xsdsql::ut::ut and not contain the  package version
+    - the package blx::xsdsql::common_interfaces is renamed in blx::xsdsql::ut::common_interfaces 
+    - the package blx::xsdsql::default_constructor is deleted
+    - implemented or corrected the types gDay,gMonthday,gYearMonth,gYear (test 3)
+    - xsd entity and dtd tags into xml are now implemented  (test 49)
+    - the xsd attribute mixed is implemented (test 50)
+    - the xsd types double and float now are converted into string because the values permitted are *inf* *nan*
+    - the xsd type decimal is converted into a predefined big decimal if it's not possible to determiny numdigits or decimal digits
+    - add tests for delete rows
+    - test.pl for default now delete the rows after the write - use the option W for not delete the rows
+    - the generation of conversion xsd type => sql types are reimplemented 
+    - the generation of sql names work with a map of invalid names many big and for all databases
+    - correct a bug into  blx::xsdsql::ut::common_interfaces::set_attrs_value
+    - the dictionary has changed: in tables and in columns
+    - it's possible to create the schema object from the dictionary
+    - xml.pl are obsolete and are dropped -  use the new program xml_repo.pl
+    - new program xml_repo.pl for create dictionary, import/load  schemas and store/put xml 
+    - new api - the old API is still usable but has changed; it's  preferable to use the new API in module blx::xsdsql::schema_repository
+    - test.pl now use the new API
+    - new db implemented: mysql and DBM
+    - the package Test::Database are excluded - for tests the default database is DBM 
+    - now the encoding of an xml file adjust the encoding stream of the output file 
+    - new package blx::xsdsql::connection in substitution of package blx::xsdsql::dbconn
+    - the perl namespace blx::xsdsql::xml renamed in blx::xsdsql::schema_repository::sql
+    - add test with node in utf8 code (test 51)
+    - add test with encoding not in utf8 (test 52)
+    

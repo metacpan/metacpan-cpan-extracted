@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE RTML SYSTEM "http://www.estar.org.uk/documents/rtml2.2.dtd">
+<RTML version="2.2" type="failed">
+  <Contact>
+    <Name>Alasdair Allan</Name>
+    <User>TEST/estar</User>
+    <Institution>University of Exeter</Institution>
+    <Email>aa@astro.ex.ac.uk</Email>
+  </Contact>
+  <Project>TEA01</Project>
+  <Telescope/>
+  <IntelligentAgent host="144.173.229.20" port="2050">000052:UA:v1-15:run#10:user#agent</IntelligentAgent>
+  <Observation>
+    <Target type="normal" ident="ExoPlanetMonitor">
+      <TargetName>OGLE-2005-blg-006</TargetName>
+      <Coordinates>
+        <RightAscension units="hms" format="hh mm ss.ss">17 52 32.36</RightAscension>
+        <Declination units="dms" format="sdd mm ss.ss">-32 32 54.70</Declination>
+        <Equinox>J2000</Equinox>
+      </Coordinates>
+    </Target>
+    <Device type="camera">
+      <Filter>
+        <FilterType>R</FilterType>
+      </Filter>
+    </Device>
+    <Schedule>
+      <Exposure type="time" units="seconds">
+        <Count>4</Count>106.0</Exposure>
+      <TimeConstraint>
+        <StartDateTime>2005-05-11T15:00:00</StartDateTime>
+        <EndDateTime>2005-05-12T15:00:00</EndDateTime>
+      </TimeConstraint>
+      <SeriesConstraint>
+        <Count>1</Count>
+        <Interval>PT21600.0S</Interval>
+        <Tolerance>PT10800.0S</Tolerance>
+      </SeriesConstraint>
+    </Schedule>
+  </Observation>
+  <Score>0.3187674691358025</Score>
+  <CompletionTime>2005-05-12T16:26:39</CompletionTime>
+</RTML>

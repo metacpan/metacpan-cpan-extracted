@@ -1,0 +1,33 @@
+# NOTE: this file is generated automatically from the template
+# file: [% root %]/etc/ttree.tt2
+
+# ttree directory/file options
+src  = [% root %]/src
+dest = [% root %]/html
+lib  = [% root %]/lib
+[% IF ttroot -%]
+lib  = [% ttroot %]
+[% END -%]
+
+verbose
+recurse
+
+# uncomment next line to copy images
+# copy=\.(png|gif|jpg)$
+
+# ignore CVS, RCS, README and Emacs backup files
+ignore = \b(CVS|RCS|README)\b
+ignore = ^#
+
+pre_process = config
+process     = content
+
+#perl5lib = /home/abw/tt2/lib 
+
+post_chomp
+recursion = 1
+eval_perl = 1
+#trim
+
+define root  = [% root %]
+define debug = [% debug %]

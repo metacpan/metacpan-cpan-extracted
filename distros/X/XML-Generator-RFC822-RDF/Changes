@@ -1,0 +1,13 @@
+# Id$
+
+1.1	Wed Dec 22 2004
+
+	- ADDED hooks to generate 'Brief' RDF SAX2
+	  events
+
+	- UPDATED t/20-write.t and t/30-triples.t
+	  accordingly
+
+1.0	Tue Dec 21 2004
+
+	- Initial release

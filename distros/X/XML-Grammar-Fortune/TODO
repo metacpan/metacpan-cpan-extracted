@@ -1,0 +1,35 @@
+Pressing:
+---------
+
+* Remove the empty <table class="info"> where appropriate.
+
+================================
+
+Non-pressing:
+-------------
+
+* Make sure the RELAX NG validation reports line numbers for the problems
+it sees (is this a limitation of XML::LibXML or libxml2 ?).
+
+* Implement the <quote> fortune type.
+    - for a quotation along with attribution, URL, etc.
+
+* Implement the <screenplay> (or <play> perhaps) fortune type.
+
+* Document the grammar.
+
+* Add more tags:
+    - XHTML tags: a, b, i, strong, em,
+    - <url> tag for self-enclosing URL.
+
+* Render the information in the <info> element in a better way using the
+stylesheet.
+
+* Convert to XML-GrammarBase.
+
+* Implement HTML-like <link />s (like follow-up on quote, sequels, etc.)
+
+* Implement tags and categories.
+
+* Convert to xml:id, xml:lang, xlink, etc.
+

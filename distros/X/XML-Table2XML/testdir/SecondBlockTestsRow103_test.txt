@@ -1,0 +1,12 @@
+root
+/a/#id	//a/y/z	/a/c	/r/x	/r/s	/r/s/t
+1	test1	test0			
+1	test1	test1			
+1	test1	test2			
+2	test2	test0			
+2	test2	test1			
+2	test2	test2			
+			testX	testS1	TestT1
+			testX	testS2	
+			testX	testS3	TestT1
+

@@ -1,0 +1,10 @@
+Changes
+examples/urban.shp
+examples/urban.shx
+lib/XML/Generator/SVG/ShapeFile.pm
+Makefile.PL
+MANIFEST
+META.yml
+t/00-load.t
+t/10-render.t
+

@@ -1,0 +1,8 @@
+CHANGES
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+README
+TODO
+lib/XML/Filter/TableWrapper.pm
+t/test.t

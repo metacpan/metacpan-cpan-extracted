@@ -1,0 +1,49 @@
+{
+   "abstract" : "Basic framework to provide DTD catalogs",
+   "author" : [
+      "Eric Brine, C<< <ikegami@adaelis.com> >>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.110580",
+   "license" : [
+      "unrestricted"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "XML-Catalogs",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : 0
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : 0,
+            "File::ShareDir" : 0,
+            "URI::file" : 0,
+            "version" : 0
+         }
+      }
+   },
+   "provides" : {
+      "XML::Catalogs" : {
+         "file" : "lib/XML/Catalogs.pm",
+         "version" : "v1.0.3"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://creativecommons.org/publicdomain/zero/1.0/"
+      ]
+   },
+   "version" : "v1.0.3"
+}

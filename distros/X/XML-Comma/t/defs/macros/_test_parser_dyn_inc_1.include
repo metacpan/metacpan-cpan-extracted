@@ -1,0 +1,11 @@
+sub {
+
+return <<END;
+
+<element>
+  <name>dynamic_include_element_one</name>
+</element>
+
+END
+
+}

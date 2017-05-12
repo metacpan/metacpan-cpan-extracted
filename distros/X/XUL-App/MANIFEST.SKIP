@@ -1,0 +1,15 @@
+^tmp
+\.swp$
+~$
+^blib
+^smerge$
+^Makefile$
+\.old$
+^demo/ExportReader/tmp/
+pm_to_blib
+\.bak$
+^demo/YahooFavorites2/
+/tmp/
+po/foo\.po$
+po/meta\.po$
+

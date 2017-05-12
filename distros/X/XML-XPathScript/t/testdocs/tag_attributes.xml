@@ -1,0 +1,6 @@
+<doc>
+<foo bar="baz">
+    <a/>
+    <b/>
+</foo>
+</doc>

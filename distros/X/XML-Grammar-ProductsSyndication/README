@@ -1,0 +1,42 @@
+XML::Grammar::ProductsSyndication
+
+This module implements an XML grammar to syndicate products on one's web-sites.
+It has tags for categories (<cat>'s), products (<prod>'s) and sets of products
+(<set>'s), that allow to organise one products' into categories and render
+them into a well structured XHTML that can be further styled using CSS.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the perldoc command.
+
+    perldoc XML::Grammar::ProductsSyndication
+
+You can also look for information at:
+
+    Search CPAN
+        http://search.cpan.org/dist/XML::Grammar::ProductsSyndication
+
+    CPAN Request Tracker:
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=XML::Grammar::ProductsSyndication
+
+    AnnoCPAN, annotated CPAN documentation:
+        http://annocpan.org/dist/XML::Grammar::ProductsSyndication
+
+    CPAN Ratings:
+        http://cpanratings.perl.org/d/XML::Grammar::ProductsSyndication
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 Shlomi Fish
+
+This program is released under the following license: MIT X11.
+

@@ -1,0 +1,20 @@
+Changelog.ini
+Changes
+lib/X500/DN/Marpa.pm
+lib/X500/DN/Marpa/Actions.pm
+lib/X500/DN/Marpa/DN.pm
+lib/X500/DN/Marpa/RDN.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+META.json
+META.yml
+README
+scripts/back.compat.pl
+scripts/pod2html.sh
+scripts/synopsis.pl
+scripts/tiny.pl
+t/back.compat.t
+t/dn.t
+xt/author/changes.t
+xt/author/pod.t

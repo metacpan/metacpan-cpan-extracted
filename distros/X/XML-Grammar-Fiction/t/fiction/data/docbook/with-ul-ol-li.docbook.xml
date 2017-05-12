@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<article xmlns="http://docbook.org/ns/docbook" xmlns:fic="http://web-cpan.berlios.de/modules/XML-Grammar-Fortune/fiction-xml-0.2/" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="index" xml:lang="" version="5.0">
+  <info>
+    <title>David vs. Goliath - Part I</title>
+  </info>
+  <section xml:id="top">
+    <info>
+      <title>The Top Section</title>
+    </info>
+    <para>
+        King <link xlink:href="http://en.wikipedia.org/wiki/David">David</link> and Goliath were standing by each other.
+    </para>
+    <para>
+    David said unto Goliath: "I will shoot you. I <emphasis role="bold">swear</emphasis> I will"
+    </para>
+    <section xml:id="goliath">
+      <info>
+        <title>Goliath's Response</title>
+      </info>
+      <para>
+    Goliath was not amused.
+    </para>
+      <para>
+    He said to David: "Oh, really. <emphasis>David</emphasis>, the red-headed!".
+    </para>
+    <para>
+    David started listing Goliath's disadvantages:
+    </para>
+    <orderedlist>
+    <listitem>
+    <para>
+    You're slow.
+    </para>
+    </listitem>
+    <listitem>
+    <para>
+    You're big.
+    </para>
+    </listitem>
+    <listitem>
+    <para>
+    You're stupid.
+    </para>
+    </listitem>
+    </orderedlist>
+    <para>
+    Goliath was insulted and told David he should use bullets for the
+    points, instead:
+    </para>
+    <itemizedlist>
+    <listitem>
+    <para>
+    David.
+    </para>
+    </listitem>
+    <listitem>
+    <para>
+    Saul.
+    </para>
+    </listitem>
+    <listitem>
+    <para>
+    Jonathan.
+    </para>
+    </listitem>
+    <listitem>
+    <para>
+    Michal.
+    </para>
+    </listitem>
+    <listitem>
+    <para>
+    Meyrav.
+    </para>
+    </listitem>
+    </itemizedlist>
+    </section>
+  </section>
+</article>

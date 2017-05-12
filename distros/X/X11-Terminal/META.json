@@ -1,0 +1,57 @@
+{
+   "abstract" : "Create customised X11 terminal windows",
+   "author" : [
+      "Evan Giles <egiles@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "X11-Terminal",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Moose" : "0.54",
+            "perl" : "v5.6.1"
+         }
+      }
+   },
+   "provides" : {
+      "X11::Terminal" : {
+         "file" : "lib/X11/Terminal.pm",
+         "version" : "v1.0.0"
+      },
+      "X11::Terminal::GnomeTerminal" : {
+         "file" : "lib/X11/Terminal/GnomeTerminal.pm",
+         "version" : "v1.0.0"
+      },
+      "X11::Terminal::Konsole" : {
+         "file" : "lib/X11/Terminal/Konsole.pm",
+         "version" : "v1.0.0"
+      },
+      "X11::Terminal::XTerm" : {
+         "file" : "lib/X11/Terminal/XTerm.pm",
+         "version" : "v1.0.0"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/egiles/x11-terminal"
+      }
+   },
+   "version" : "v1.0.0"
+}

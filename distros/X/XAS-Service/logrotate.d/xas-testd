@@ -1,0 +1,18 @@
+
+/var/log/xas/xas-testd.log {
+    prerotate
+        /usr/sbin/service xas-testd stop
+    endscript
+    daily
+    nodateext
+    rotate 5
+    missingok
+    notifempty
+    sharedscripts
+    su xas xas
+    create 0664 xas xas
+    postrotate
+        /usr/sbin/service xas-testd start
+    endscript
+}
+

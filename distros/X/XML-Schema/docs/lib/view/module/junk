@@ -1,0 +1,25 @@
+[% IF 0 %]
+[% IF (notes = item.getElementsByTagName('note', 0)) && 0 -%]
+[% PROCESS bar %]
+[% IF notes.size > 1 -%]
+<b>NOTES:</b>
+<ul>
+[% FOREACH note = notes -%]
+<li>[% note.content(view) %]
+[% END %]
+</ul>
+[% ELSE %]
+<b>NOTE: </b>[% [% note.content(view) %]
+[% END %]
+[% PROCESS bar %]
+[% END %]
+[% END %]
+
+
+[% IF 0 %]
+[% IF (sections = item.getElementsByTagName('section', 0)) && 0 -%]
+[% FOREACH s = sections -%]
+[% section(s.title) %]
+[% site.view.module.print(s)
+[% END %]
+[% END %]

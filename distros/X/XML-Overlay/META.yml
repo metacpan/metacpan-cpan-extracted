@@ -1,0 +1,19 @@
+--- #YAML:1.0
+name: XML-Overlay
+version: 0.01
+author:
+  - Matt S Trout <mstrout@cpan.org>
+abstract: Apply overlays to XML documents
+license: perl
+requires:
+  Class::XML: 0.04
+  Test::More: 0.0
+provides:
+  XML::Overlay:
+    file: lib/XML/Overlay.pm
+    version: 0.01
+  XML::Overlay::action:
+    file: lib/XML/Overlay/action.pm
+  XML::Overlay::target:
+    file: lib/XML/Overlay/target.pm
+generated_by: Module::Build version 0.25

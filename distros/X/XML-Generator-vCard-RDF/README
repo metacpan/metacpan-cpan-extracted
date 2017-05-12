@@ -1,0 +1,157 @@
+NAME
+    XML::Generator::vCard::RDF - generate RDF/XML SAX2 events for vCard 3.0
+
+SYNOPSIS
+     use XML::SAX::Writer;
+     use XML::Generator::vCard::RDF;
+
+     my $writer = XML::SAX::Writer->new();
+     my $driver = XML::Generator::vCard::RDF->new(Handler=>$writer);
+
+     $driver->parse_files("test.vcf");
+
+DESCRIPTION
+    Generate RDF/XML SAX2 events for vCard 3.0
+
+DOCUMENT FORMAT
+    SAX2 events map to the *Representing vCard Objects in RDF/XML* W3C note:
+
+     http://www.w3.org/TR/2001/NOTE-vcard-rdf-20010222/
+
+    Additionally, an extra description will be added for each unique email
+    address. Each description will be identified by the value of SHA1 digest
+    of the address and simply point back to the vCard description.
+
+    For example, the test file for this package contains the email address
+    *senzala@example.com* which will cause the following description to be
+    added to the final output :
+
+     <rdf:RDF>
+      <rdf:Description rdf:about = 't/Senzala.vcf'>
+       <!-- vcard data here -->
+      </rdf:Description>
+
+      <!-- c0e0c54660f33a3ec7f22f902d0e5ead8bd4e4f4 == SHA1(senzala@example.com) -->
+
+      <rdf:Description rdf:about='http://xmlns.com/foaf/0.1/mbox_sha1sum#c0e0c54660f33a3ec7f22f902d0e5ead8bd4e4f4'>
+       <rdfs:seeAlso rdf:resource='t/Senzala.vcf' /></rdf:Description>
+      </rdf:Description>
+     </rdf:RDF>
+
+    This is done to facilitate merging vCard data with RDF representations
+    of email messages, using XML::Generator::RFC822::RDF. For example :
+
+     <rdf:RDF>
+
+      <rdf:Description rdf:about='x-urn:ietf:params:rfc822#5b0c8c9f9b2b782375f515a0b24b3a821a59a34a'>
+       <rfc822:To rdf:resource='http://xmlns.com/foaf/0.1/mbox_sha1sum#c0e0c54660f33a3ec7f22f902d0e5ead8bd4e4f4' />
+       <!-- ... -->
+      </rdf:Description>
+
+      <rdf:Description rdf:about='http://xmlns.com/foaf/0.1/mbox_sha1sum#c0e0c54660f33a3ec7f22f902d0e5ead8bd4e4f4'>
+       <vCard:FN>Senzala Restaurant</vCard:FN>
+       <vCard:EMAIL>senzala@example.com</vCard:EMAIL>
+      </rdf:Description>
+
+     </rdf:RDF>
+
+PACKAGE METHODS
+  __PACKAGE__->new(%args)
+    This method inherits from *XML::SAX::Base*
+
+OBJECT METHODS
+OBJECT METHODS
+  $pkg->parse_files(@files)
+    Generate SAX2 events for one, or more, vCard files.
+
+    Returns true or false.
+
+  $pkg->parse_files(@files)
+PRIVATE METHODS
+    Private methods are documented below in case you need to subclass this
+    package to tweak its output.
+
+  $obj->_render_doc(\@vcards)
+  $obj->_render_card(Text::vCard)
+  $obj->_render_fn(Text::vCard)
+  $obj->_render_n(Text::vCard)
+  $obj->_render_nickname(Text::vCard)
+  $obj->_render_photo(Text::vCard)
+  $obj->_render_bday(Text::vCard)
+  $obj->_render_adrs(Text::vCard)
+  $obj->_render_labels(Text::vCard)
+  $obj->_render_tels(Text::vCard)
+  $obj->_render_emails(Text::vCard)
+  $obj->_render_instantmessaging(Text::vCard)
+  $obj->_render_mailer(Text::vCard)
+  $obj->_render_tz(Text::vCard)
+  $obj->_render_geo(Text::vCard)
+  $obj->_render_org(Text::vCard)
+  $obj->_render_title(Text::vCard)
+  $obj->_render_role(Text::vCard)
+  $obj->_render_logo(Text::vCard)
+  $obj->_render_categories(Text::vCard)
+  $obj->_render_note(Text::vCard)
+  $self->_render_sound(Text::vCard)
+  $self->_render_url(Text::vCard)
+  $obj->_render_key(Text::vCard)
+  $obj->_render_custom(Text::vCard)
+    By default this method does nothing. It is here to be subclassed.
+
+  $obj->_im_services()
+    Returns a hash ref mapping an instant messaging service type to an XML
+    element. Default is :
+
+     {"aim"    => "foaf:aimChatID",
+      "yahoo"  => "foaf:yahooChatID",
+      "msn"    => "foaf:msnChatID",
+      "jabber" => "foaf:JabberID",
+      "icq"    => "foaf:icqChatId"}
+
+    This is called by the *_render_instantmessaging* method.
+
+NAMESPACES
+    This package generates SAX events using the following XML namespaces :
+
+    * vCard
+         http://www.w3.org/2001/vcard-rdf/3.0#
+
+    * rdf
+         http://www.w3.org/1999/02/22-rdf-syntax-ns#
+
+    * foaf:
+         http://xmlns.com/foaf/0.1/
+
+    * geo
+         http://www.w3.org/2003/01/geo/wgs84_pos#
+
+VERSION
+    1.4
+
+DATE
+    $Date: 2004/12/28 21:50:27 $
+
+AUTHOR
+    Aaron Straup Cope <ascope@cpan.org>
+
+SEE ALSO
+    Text::vCard
+
+    XML::Generator::vCard
+
+    XML::Generator::RFC822::RDF
+
+BUGS
+    vCards containg binary PHOTO images may cause Perl to segfault on Mac
+    OSX and come flavours of Linux (but not FreeBSD.) The source of this
+    problem has been traced, I think, to a regular expression issue in the
+    Perl Text::ParseWords library. A bug report has been filed.
+
+    Please report all other bugs via http://rt.cpan.org
+
+LICENSE
+    Copyright (c) 2004, Aaron Straup Cope. All Rights Reserved.
+
+    This is free software, you may use it and distribute it under the same
+    terms as Perl itself.
+

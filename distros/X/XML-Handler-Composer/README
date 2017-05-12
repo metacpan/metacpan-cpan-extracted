@@ -1,0 +1,26 @@
+XML::Handler::Composer version 0.01
+===================================
+
+DESCRIPTION
+
+XML::Handler::Composer is similar to XML::Writer, XML::Handler::XMLWriter, XML::Handler::YAWriter etc. in that it
+generates XML output. 
+
+This implementation may not be fast and it may not be the best solution for your particular problem, but it has some
+features that may be missing in the other implementations.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 1999,2000 Enno Derksen
+All rights reserved.
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

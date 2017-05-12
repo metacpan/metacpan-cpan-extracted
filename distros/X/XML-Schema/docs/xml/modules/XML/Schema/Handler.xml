@@ -1,0 +1,15 @@
+<module name="XML::Schema::Handler">
+
+  <about>
+    This module implements a base class handler responsible
+    for receiving parse events from the parse and performing
+    the appropiate action.
+  </about>
+
+</module>
+
+
+
+
+
+

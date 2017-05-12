@@ -1,0 +1,211 @@
+#!/opt/links/perl -w
+
+# -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+# xmpcrd - the XM Radio daemon
+# Pass in a '-d' flag for debugging info.
+#
+# This application is subject to the same copyright as the
+# Audio::Xmpcr module.
+# -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+# Configuration
+# -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+my $start_darkice=1;   # set to 0 to turn off darkice with web-interface
+# -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+
+use strict;
+use IO::Socket::INET;
+use Audio::Xmpcr;
+use bytes;
+
+select(STDOUT); $|=1;
+my $debug=(scalar @ARGV) ? 1 : 0;
+my $port=32463;
+my($locker,$curChannel,$state,$darkice,@channels,%appName,%events,%cmds)=
+																					("",0,"off");
+my %scanner=(
+	THISCHAN => 1,
+	CURCHANCTR => 1,
+);
+
+my $radio=new Audio::Xmpcr(SERIALPORT => "/dev/ttyUSB0");
+$SIG{PIPE}=sub { print "Client seems to have disconnected!\n" };
+
+my $s=new IO::Socket::INET(
+	LocalAddr => inet_ntoa(INADDR_ANY),
+	LocalPort => $port,
+	Listen => 5,
+	Type => SOCK_STREAM,
+	Proto => "tcp",
+	ReuseAddr => 1,
+) or die "Can't create server socket: $!";
+my($sfn,$rin)=(fileno($s));
+makevec();
+
+print "XMPCR daemon ready and waiting for connections...\n";
+my %clients;
+while(1) {
+	my($rout)=("");
+
+	if (select($rout=$rin,undef,undef,.25)) {
+		if (vec($rout,$sfn,1)) {
+			my $c=$s->accept;
+			$clients{fileno($c)}=$c;
+			makevec();
+			$events{fileno($c)}=0;
+			$cmds{fileno($c)}=[];
+			print "New client has connected\n";
+		}
+		
+		for my $c (keys %clients) {
+			my $fh=$clients{$c};
+			if (vec($rout,$c,1)) {
+				my $cmd=getstr($clients{$c});
+				logmsg("Client says: " . ($cmd || ""));
+				if (! $cmd) {
+					delete $clients{$c};
+					delete $appName{$c};
+					delete $cmds{$c};
+					makevec();
+					logmsg("goodbye client");
+				} elsif ($cmd eq "status") {          # get current song/status
+					my %h=$radio->status();
+					for my $k (keys %h) {
+						print $fh "$k\t$h{$k}\n";
+					}
+					print $fh "LOCKER\t@{[ $locker || '' ]}\n";
+				} elsif ($cmd eq "off" and $state eq "on") { 
+					if ($locker and $locker ne $appName{$c}) {
+						print $fh "error\tlocked\n" ;
+					} else {
+						$locker=$appName{$c} || "noname";
+						$radio->power("off");
+						@channels=();
+						$state="off";
+						$locker="";
+						if ($darkice) {
+							kill(15,$darkice);
+							sleep(2);
+							kill(9,$darkice);
+							waitpid($darkice,0);
+						}
+						$darkice=undef;
+					}
+				} elsif ($cmd eq "on" and $state eq "off") {
+					$locker=$appName{$c};
+					logmsg("power up:");
+					system("/usr/bin/aumix -l 0");
+					logmsg("turn power on");
+					$radio->power("on");
+					logmsg("get channel list");
+					map { $channels[$_->{NUM}]=$_; } $radio->list;
+					logmsg(sprintf("We have %d channels at powerup",scalar @channels));
+					logmsg("list has been fetched");
+					$scanner{THISCHAN}=$scanner{CURCHANCTR}=1;
+					$state="on";
+					$curChannel=1;
+					logmsg("set channel to 1");
+					$radio->setchannel(1);
+					logmsg("done set channel to 1");
+					logmsg("start darkice");
+					if ($locker and $locker =~ /web/ and $start_darkice) {
+						if ($darkice=fork()) {
+							# darkice server goes up
+						} else {
+							exec("/usr/bin/darkice -c /etc/darkice.cfg");
+							die "can't run darkice?";
+						}
+					}
+				logmsg("done powering up");
+				} elsif ($cmd eq "on" or $cmd eq "off") {
+					# trying to turn power on when it's already on, or 
+					# off when it's already off. don't do anything.. it's okay..
+				} elsif ($cmd =~ /^list\s*(\d*)$/ and $state eq "on") {
+					my $ch=$1;
+					refresh($ch) if $ch;
+					for my $k ($ch ? ($channels[$ch]) : @channels) {
+						print $fh "$k->{NUM}\t$k->{NAME}\t$k->{CAT}\t$k->{SONG}\t$k->{ARTIST}\n"  if $k;
+					}
+				} elsif ($cmd =~ /^channel (\d+)$/ and $state eq "on") {
+					next unless $state eq "on";
+					if ($locker and $locker ne $appName{$c}) {
+						print $fh "error\tlocked by $locker\n" ;
+					} else {
+						$curChannel=$1;
+						$radio->setchannel($curChannel);
+					}
+				} elsif ($cmd =~ /^appname (\S*)$/) {
+					$appName{$c}=$1;
+					logmsg("Application name is $1");
+				} elsif ($cmd eq "forcelock") {
+					$locker="";
+				} elsif ($cmd =~ /^events (\S*)$/) {
+					$events{$c}=$1 eq "on" ? 1 : 0;
+				} else {
+					print $fh "huh?\n" ;
+				}
+				print $fh "Ready\n" ;
+			}
+		}
+	}
+
+	# update the next channel listing, every 1/4 second
+	if ($state eq "on") {
+		refresh($scanner{THISCHAN});
+		while(1) {
+			last if defined $channels[++$scanner{THISCHAN}];
+			$scanner{THISCHAN}=1,last if $scanner{THISCHAN}>scalar @channels;
+		}
+
+		# every .5 second, update the current channel, since we always want that
+		# one up-to-date
+		refresh($curChannel) if $scanner{CURCHANCTR}++%2==0;
+	}
+}
+
+sub refresh {
+  my($ch)=@_;
+  my $k=$radio->list($ch);
+	return unless $k;
+	if ($k->{ARTIST} ne $channels[$ch]->{ARTIST} or $k->{SONG} ne $channels[$ch]->{SONG}) {
+		$channels[$ch]=$k;
+		map {
+			if ($events{$_}) {
+				my $fh=$clients{$_};
+				print $fh "+\t$k->{NUM}\t$k->{NAME}\t$k->{CAT}\t$k->{SONG}\t$k->{ARTIST}\n" ;
+			}
+		} keys %clients;
+	} 
+}
+
+# remake the client vector
+sub makevec {
+	$rin="";
+	vec($rin,$sfn,1)=1;
+	printf("ReMaking vector for %d clients\n",scalar keys %clients);
+	for my $c (keys %clients) {
+		vec($rin,$c,1)=1;
+	}
+}
+
+# read a string from the socket
+sub getstr {
+  my($c)=@_;
+	my $ret="";
+	while(1) {
+		my $buf;
+		sysread($c,$buf,1024);
+		$ret .= $buf;
+		last if ! $buf or $ret =~ /\n$/;
+	}
+	$ret =~ s/\r$//sg if $ret;   # stoopid newlines
+	$ret =~ s/\n$//s if $ret;   # chop last linefeed
+	push(@{ $cmds{$c} },split(/\n/s,$ret));
+	return scalar(@{ $cmds{$c} }) ? pop(@{ $cmds{$c} }) : "";
+}
+
+sub logmsg {
+	my($msg)=@_;
+	print $msg . "\n" if $debug;
+}

@@ -1,0 +1,77 @@
+<?xml version="1.0"?>
+<?xml-stylesheet title="CSS_formatting" type="text/css" href="./rss.css"?>
+<rss version="2.0"
+  xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+><channel>
+<!-- Generated with Perl's XML::RSS::SimpleGen v11.11 -->
+
+<link>http://www.rupaul.com/weblog.shtml</link>
+<title>RuPaul</title>
+<description>(Supermodel!)</description>
+<language>en-US</language>
+<lastBuildDate>Thu, 04 Mar 2004 12:56:17 GMT</lastBuildDate>
+<skipHours><hour>0</hour><hour>1</hour><hour>2</hour><hour>3</hour><hour>4</hour><hour>5</hour><hour>6</hour><hour>7</hour><hour>8</hour><hour>9</hour><hour>10</hour><hour>11</hour><hour>12</hour><hour>14</hour><hour>15</hour><hour>16</hour><hour>17</hour><hour>18</hour><hour>19</hour><hour>20</hour><hour>21</hour><hour>22</hour><hour>23</hour></skipHours>
+<sy:updateFrequency>1</sy:updateFrequency>
+<sy:updatePeriod>daily</sy:updatePeriod>
+<sy:updateBase>1970-01-01T13:00+00:00</sy:updateBase>
+<ttl>1440</ttl>
+<webMaster>sburke@cpan.org</webMaster>
+<docs>http://www.interglacial.com/rss/about.html</docs>
+<image>
+  <title>RuPaul</title>
+  <url>http://www.interglacial.com/rss/images/ru_143_220.jpg</url>
+  <link>http://www.rupaul.com/weblog.shtml</link>
+  <width>143</width>
+  <height>220</height>
+  <description>(Supermodel!)</description>
+</image>
+
+<item>
+  <title>well worth the wait</title>
+  <link>http://www.rupaul.com/2004_03_01_archive.shtml#107839351546751814</link>
+  <description>i&#8217;m taking a break from blogging until next month. i am currently putting the finishing touches on my forthcoming album, my gift to you and the conservative...</description>
+</item>
+
+<item>
+  <title>thank you, ladies</title>
+  <link>http://www.rupaul.com/2004_02_01_archive.shtml#107647620469368995</link>
+  <description>ATLANTA has always been my spiritual touchstone, so when GEORGES told me that</description>
+</item>
+
+<item>
+  <title>hot link special</title>
+  <link>http://www.rupaul.com/2004_02_01_archive.shtml#107589545421202546</link>
+  <description>DJ TENNESSEE sent out the following message and link to a bunch of his friends. the remixes are a fucking laugh riot! my fave is the KEEP DEAN ALIVE (crystal...</description>
+</item>
+
+<item>
+  <title>minor details</title>
+  <link>http://www.rupaul.com/2004_02_01_archive.shtml#107573025921648473</link>
+  <description>i intended to read</description>
+</item>
+
+<item>
+  <title>you show me yours...and i&#8217;ll show you mine</title>
+  <link>http://www.rupaul.com/2004_01_01_archive.shtml#107555154133471663</link>
+  <description>a tv station in SAN FRANCISCO was fined almost $30.000 because, during a live local news broadcast from the stage production PUPPETRY OF THE PENIS, a male...</description>
+</item>
+
+<item>
+  <title>the medallion</title>
+  <link>http://www.rupaul.com/2004_01_01_archive.shtml#107538082238616295</link>
+  <description>last saturday night, a surprise birthday dinner was arranged for my friend MICHAEL ROURKE at BARRY DILLER&#8217;S house. the party consisted of just under 20...</description>
+</item>
+
+<item>
+  <title>.</title>
+  <link>http://www.rupaul.com/2004_01_01_archive.shtml#107537286971781940</link>
+</item>
+
+<item>
+  <title>and the award goes to...</title>
+  <link>http://www.rupaul.com/2004_01_01_archive.shtml#107520866194632327</link>
+  <description>&#8220;Join us this Monday Jan. 26 for Club Sissy, with scheduled performers Raja, Jazzmun, Tara Nova, Kiwi [Miss Sissy 2004], and, of course, Viva Sex, with...</description>
+</item>
+
+
+</channel></rss>

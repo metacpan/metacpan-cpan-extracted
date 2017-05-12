@@ -1,0 +1,35 @@
+Revision history for XML::GXML
+
+2.1  May 22, 2001 - Josh Carter <josh@multipart-mixed.com>
+     - Created makefile and otherwise made GXML a "proper" Perl
+       module, ready to go into CPAN.
+     - Fixed some spelling errors in the docs.
+     - Made --debug option to gxml2html work again.
+
+2.2  Feb 20, 2002 - Josh Carter <josh@multipart-mixed.com>
+     - Added new style of dynamic templates, using hashrefs instead of
+       two subroutines.
+     - Fixed bug where elements only containing other elements (but no
+       chardata) were getting dropped.
+     - Works with all warnings on, use strict, etc..
+     - <gxml:foreach> on 1 element works now.
+     - Updated README with more useful information for people browsing
+       CPAN.
+
+2.3  Mar 01, 2002 - Josh Carter <josh@multipart-mixed.com>
+     - Added much better 'make test' that'll compare test results for
+       everything in the 'test' directory to known sums.
+     - Added "if not equal" conditional command.
+     - Corrected a terminolgy mishap used throughout the module and
+       docs. (I misread what "entity" meant in the spec. duh.)
+
+2.4  Oct 04, 2003 - Josh Carter <josh@multipart-mixed.com>
+     - Fixed EqualsCommand so it better figures out where to look up
+       attributes in the expression.
+     - Added loading of .xhtml files into template manager.
+     - Support for different variable markers
+
+To Do:
+     - Update Object API section of docs
+     - Credits list!
+     - Pass XML prolog through when HTML mode is turned off

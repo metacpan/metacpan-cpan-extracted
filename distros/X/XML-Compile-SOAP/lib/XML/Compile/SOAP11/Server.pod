@@ -1,0 +1,55 @@
+=encoding utf8
+
+=head1 NAME
+
+XML::Compile::SOAP11::Server - SOAP1.1 server needs
+
+=head1 INHERITANCE
+
+ XML::Compile::SOAP11::Server
+   is a XML::Compile::SOAP11
+   is a XML::Compile::SOAP
+
+ XML::Compile::SOAP11::Server
+   is a XML::Compile::SOAP::Server
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
+This module does not implement an actual soap server, but the
+needs to create the server side.  The server daemon is implemented
+by L<XML::Compile::SOAP::Daemon|XML::Compile::SOAP::Daemon>
+
+Extends L<"DESCRIPTION" in XML::Compile::SOAP::Server|XML::Compile::SOAP::Server/"DESCRIPTION">.
+ 
+Extends L<"DESCRIPTION" in XML::Compile::SOAP11|XML::Compile::SOAP11/"DESCRIPTION">.
+ 
+=head1 METHODS
+
+Extends L<"METHODS" in XML::Compile::SOAP::Server|XML::Compile::SOAP::Server/"METHODS">.
+ 
+Extends L<"METHODS" in XML::Compile::SOAP11|XML::Compile::SOAP11/"METHODS">.
+ 
+=head1 DETAILS
+
+Extends L<"DETAILS" in XML::Compile::SOAP11|XML::Compile::SOAP11/"DETAILS">.
+ 
+=head1 SEE ALSO
+
+This module is part of XML-Compile-SOAP distribution version 3.21,
+built on January 11, 2017. Website: F<http://perl.overmeer.net/xml-compile/>
+
+Please post questions or ideas to the mailinglist at
+F<http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/xml-compile> .
+For live contact with other developers, visit the C<#xml-compile> channel
+on C<irc.perl.org>.
+
+=head1 LICENSE
+
+Copyrights 2007-2017 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

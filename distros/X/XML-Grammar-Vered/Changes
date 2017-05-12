@@ -1,0 +1,42 @@
+Revision history for XML-Grammar-Vered
+
+v0.0.9  2014-02-17
+    - Fix the misplacement xml:space="..." in the ".xslt" stylesheet.
+        - Caused test failures with some combinations of libxml2 and libxslt
+        and should not have worked in the first place according to the
+        standards.
+        - For more information, see:
+        https://mail.gnome.org/archives/xml/2014-February/thread.html
+
+v0.0.8  2014-01-02
+    - Fix the double =encoding directive in the POD. It confused MetaCPAN:
+        - https://github.com/CPAN-API/metacpan-web/issues/1051#issuecomment-33903716
+        - Fixed by replacing "-Encoding" in weaver.ini to "-SingleEncoding"
+        - Thanks to ether on #dist-zilla
+
+v0.0.7  2014-01-02
+    - META.yml provides and minimal perl version (CPANTS).
+    - Add a test for trailing space.
+
+v0.0.6  2013-05-14
+    - Rename the example away from "bad-elements" to avoid confusion:
+        - http://www.nntp.perl.org/group/perl.cpan.testers.discuss/2013/05/msg3139.html
+
+v0.0.5  2013-05-09
+    - Get rid of Makefile.PL.
+        - It doesn't handle three digit version ("vX.Y.Z")
+        dependencies too well.
+    - Add minimal dependency on v0.2.2 on XML-GrammarBase.
+        - To fix test failures due to old and broken libxml2 versions.
+
+v0.0.4  2013-02-20
+    - Add MANIFEST.SKIP and got rid of packed-up temporary files (*~).
+
+v0.0.3  2013-01-23
+    - Add minimal dependency on v0.2.1 on XML-GrammarBase.
+
+v0.0.2  2013-01-21
+    - Add t/00-libxml-basic.t and t/00-libxslt-basic.t .
+
+v0.0.1  2013-01-18
+    - First version, released on an unsuspecting world

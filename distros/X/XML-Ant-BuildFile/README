@@ -1,0 +1,234 @@
+NAME
+
+    XML::Ant::BuildFile::Project - consume Ant build files
+
+VERSION
+
+    version 0.216
+
+SYNOPSIS
+
+        use XML::Ant::BuildFile::Project;
+    
+        my $project = XML::Ant::BuildFile::Project->new( file => 'build.xml' );
+        print 'Project name: ', $project->name, "\n";
+        print "File lists:\n";
+        for my $list_ref (@{$project->file_lists}) {
+            print 'id: ', $list_ref->id, "\n";
+            print join "\n", @{$list_ref->files};
+            print "\n\n";
+        }
+
+DESCRIPTION
+
+    This class uses XML::Rabbit to consume Ant build files using a Moose
+    object-oriented interface. It is a work in progress and in no way a
+    complete implementation of all Ant syntax.
+
+ATTRIBUTES
+
+ file
+
+    On top of XML::Rabbit's normal behavior, this class will also coerce
+    Path::Class::File objects to the strings expected by
+    XML::Rabbit::Role::Document.
+
+ name
+
+    Name of the Ant project.
+
+ paths
+
+    Hash of XML::Ant::BuildFile::Resource::Paths from the build file. The
+    keys are the path ids.
+
+ targets
+
+    Hash of XML::Ant::BuildFile::Targets from the build file. The keys are
+    the target names.
+
+METHODS
+
+ filelists
+
+    Returns an array of all filelists in the project.
+
+ filelist
+
+    Given an index number returns that filelist from the project. You can
+    also use negative numbers to count from the end. Returns undef if the
+    specified filelist does not exist.
+
+ map_filelists
+
+    Given a code reference, transforms every filelist element into a new
+    array.
+
+ filter_filelists
+
+    Given a code reference, returns an array with every filelist element
+    for which that code returns true.
+
+ find_filelist
+
+    Given a code reference, returns the first filelist for which the code
+    returns true.
+
+ num_filelists
+
+    Returns a count of all filelists in the project.
+
+ path
+
+    Given a list of one or more id strings, returns a list of
+    XML::Ant::BuildFile::Resource::Paths for <classpath/>s and <path/>s in
+    the project.
+
+ target
+
+    Given a list of target names, return the corresponding
+    XML::Ant::BuildFile::Target objects. In scalar context return only the
+    last target specified.
+
+ all_targets
+
+    Returns a list of all targets as XML::Ant::BuildFile::Target objects.
+
+ target_names
+
+    Returns a list of the target names from the build file.
+
+ has_target
+
+    Given a target name, returns true or false if the target exists.
+
+ num_targets
+
+    Returns a count of the number of targets in the build file.
+
+ BUILD
+
+    After construction, the app-wide XML::Ant::Properties singleton stores
+    any <property/> name/value pairs set by the build file, as well as any
+    resource string expansions handled by XML::Ant::BuildFile::Resource
+    plugins. It also contains the following predefined properties as per
+    the Ant documentation:
+
+    os.name
+
+    basedir
+
+    ant.file
+
+    ant.project.name
+
+SUPPORT
+
+ Perldoc
+
+    You can find documentation for this module with the perldoc command.
+
+      perldoc XML::Ant::BuildFile::Project
+
+ Websites
+
+    The following websites have more information about this module, and may
+    be of help to you. As always, in addition to those websites please use
+    your favorite search engine to discover more resources.
+
+      * MetaCPAN
+
+      A modern, open-source CPAN search engine, useful to view POD in HTML
+      format.
+
+      http://metacpan.org/release/XML-Ant-BuildFile
+
+      * Search CPAN
+
+      The default CPAN search engine, useful to view POD in HTML format.
+
+      http://search.cpan.org/dist/XML-Ant-BuildFile
+
+      * RT: CPAN's Bug Tracker
+
+      The RT ( Request Tracker ) website is the default bug/issue tracking
+      system for CPAN.
+
+      https://rt.cpan.org/Public/Dist/Display.html?Name=XML-Ant-BuildFile
+
+      * AnnoCPAN
+
+      The AnnoCPAN is a website that allows community annotations of Perl
+      module documentation.
+
+      http://annocpan.org/dist/XML-Ant-BuildFile
+
+      * CPAN Ratings
+
+      The CPAN Ratings is a website that allows community ratings and
+      reviews of Perl modules.
+
+      http://cpanratings.perl.org/d/XML-Ant-BuildFile
+
+      * CPAN Forum
+
+      The CPAN Forum is a web forum for discussing Perl modules.
+
+      http://cpanforum.com/dist/XML-Ant-BuildFile
+
+      * CPANTS
+
+      The CPANTS is a website that analyzes the Kwalitee ( code metrics )
+      of a distribution.
+
+      http://cpants.cpanauthors.org/dist/XML-Ant-BuildFile
+
+      * CPAN Testers
+
+      The CPAN Testers is a network of smokers who run automated tests on
+      uploaded CPAN distributions.
+
+      http://www.cpantesters.org/distro/X/XML-Ant-BuildFile
+
+      * CPAN Testers Matrix
+
+      The CPAN Testers Matrix is a website that provides a visual overview
+      of the test results for a distribution on various Perls/platforms.
+
+      http://matrix.cpantesters.org/?dist=XML-Ant-BuildFile
+
+      * CPAN Testers Dependencies
+
+      The CPAN Testers Dependencies is a website that shows a chart of the
+      test results of all dependencies for a distribution.
+
+      http://deps.cpantesters.org/?module=XML::Ant::BuildFile::Project
+
+ Bugs / Feature Requests
+
+    Please report any bugs or feature requests through the web interface at
+    https://github.com/mjgardner/xml-ant-buildfile/issues. You will be
+    automatically notified of any progress on the request by the system.
+
+ Source Code
+
+    The code is open to the world, and available for you to hack on. Please
+    feel free to browse it and play with it, or whatever. If you want to
+    contribute patches, please send me a diff or prod me to pull from your
+    repository :)
+
+    https://github.com/mjgardner/xml-ant-buildfile
+
+      git clone git://github.com/mjgardner/xml-ant-buildfile.git
+
+AUTHOR
+
+    Mark Gardner <mjgardner@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2014 by GSI Commerce.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

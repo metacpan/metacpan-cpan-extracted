@@ -1,0 +1,49 @@
+<DocumentDefinition>
+  <name>_test_parser</name>
+
+  <element><name>plu</name></element>
+  <element><name>sing</name></element>
+
+  <element>
+    <name>d8</name>
+    <macro>date_8</macro>
+  </element>
+
+  <element>
+    <name>ut</name>
+    <macro>unix_time</macro>
+  </element>
+
+  <element>
+    <name>ot</name>
+    <macro>range:1,10</macro>
+  </element>
+
+  <element>
+    <name>en</name>
+    <macro>enum:'foo','bar','kazzam'</macro>
+  </element>
+
+  <nested_element>
+    <name>nested</name>
+    <element><name>nested_plu</name></element>
+    <element><name>nested_sing</name></element>
+    <plural>'nested_plu'</plural>
+  </nested_element>
+
+  <? dummy preprocessor directive ?>
+
+  <? #include _test_parser_include ?>
+
+  <? #include {_test_parser_dyn_inc_1} ?>
+
+  <? #include {_test_parser_dyn_inc_2} 'dyn_arg_el_one', 'dyn_arg_el_two' ?>
+
+  <!-- <? #include {_test_parser_di_eval_err} "blue", "red ?> -->
+
+  <!-- <? #include {_test_parser_di_eval_err} "blue", "red" ?> -->
+
+  <!-- <? #include {_test_parser_di_exe_err} "blue", "red" ?> -->
+
+  <plural>'plu'</plural>
+</DocumentDefinition>

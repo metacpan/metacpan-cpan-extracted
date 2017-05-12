@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+
+
+<ns2:s3 
+		xmlns:xs='http://www.w3.org/2001/XMLSchema-instance' 
+		xmlns:hh="http://www.camera.org" 
+		xmlns:zz="namespace4" 
+		xmlns:ns2="namespace2" 
+    	xs:schemaLocation="http://www.camera.org ./schema1.xsd"
+>ns2s3</ns2:s3>
+
+
+

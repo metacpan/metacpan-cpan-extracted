@@ -1,0 +1,1 @@
+<ul><pre>[% item.content(site.view.text) | trim | html(entity=1) %]</pre></ul>

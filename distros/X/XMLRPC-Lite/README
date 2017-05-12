@@ -1,0 +1,58 @@
+NAME
+    XMLRPC::Lite - client and server implementation of XML-RPC protocol
+
+SYNOPSIS
+    Client
+          use XMLRPC::Lite;
+          print XMLRPC::Lite
+              -> proxy('http://betty.userland.com/RPC2')
+              -> call('examples.getStateStruct', {state1 => 12, state2 => 28})
+              -> result;
+
+    CGI server
+          use XMLRPC::Transport::HTTP;
+
+          my $server = XMLRPC::Transport::HTTP::CGI
+            -> dispatch_to('methodName')
+            -> handle
+          ;
+
+    Daemon server
+          use XMLRPC::Transport::HTTP;
+
+          my $daemon = XMLRPC::Transport::HTTP::Daemon
+            -> new (LocalPort => 80)
+            -> dispatch_to('methodName')
+          ;
+          print "Contact to XMLRPC server at ", $daemon->url, "\n";
+          $daemon->handle;
+
+DESCRIPTION
+    XMLRPC::Lite is a Perl modules which provides a simple nterface to the
+    XML-RPC protocol both on client and server side. Based on SOAP::Lite
+    module, it gives you access to all features and transports available in
+    that module.
+
+    See t/26-xmlrpc.t for client examples and examples/XMLRPC/* for server
+    implementations.
+
+DEPENDENCIES
+     SOAP::Lite
+
+SEE ALSO
+     SOAP::Lite
+
+CREDITS
+    The XML-RPC standard is Copyright (c) 1998-2001, UserLand Software, Inc.
+    See <http://www.xmlrpc.com> for more information about the XML-RPC
+    specification.
+
+COPYRIGHT
+    Copyright (C) 2000-2001 Paul Kulchenko. All rights reserved.
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+AUTHOR
+    Paul Kulchenko (paulclinger@yahoo.com)
+

@@ -1,0 +1,119 @@
+NAME
+    XML::LibXML::Overlay - Overlays for XML files
+
+SYNOPSIS
+      # target.xml:
+      ####
+      # <catalog>
+      #   <book id="book0" delete="me">
+      #     <author>Larry Wall</author>
+      #     <author>Tom Christiansen</author>
+      #     <author>Delete Me!</author>
+      #     <title>Programming Perl: There's More Than One Way To Do It</title>
+      #     <isbn>9780596000271</isbn>
+      #   </book>
+      #   <book id="book2">
+      #     <author>Elliotte Rusty Harold</author>
+      #     <author>W. Scott Means</author>
+      #     <title>XML in a Nutshell: A Desktop Quick Reference</title>
+      #     <isbn>9780596007645</isbn>
+      #   </book>
+      # </catalog>
+
+      # overlay.xml
+      ####
+      # <overlay>
+      #   <target xpath="/catalog/book[@id='book0']/author[text()='Delete Me!']">
+      #     <action type="delete" />
+      #   </target>
+      #   <target xpath="/catalog/book[@id='book2']">
+      #     <action type="insertBefore">
+      #       <book id="book2">
+      #         <author>Mark Jason Dominus</author>
+      #           <title>Higher-Order Perl. Transforming Programs with Programs</title>
+      #           <isbn>9781558607019</isbn>
+      #       </book>
+      #     </action>
+      #   </target>
+      # </overlay>
+
+      use XML::LibXML;
+      use XML::LibXML::Overlay;
+
+      my $overlay = XML::LibXML::Overlay->load_xml(
+        'location' => '/path/to/overlay.xml',
+      );
+      my $target = XML::LibXML->load_xml(
+        'location' => '/path/to/target.xml',
+      );
+
+      $overlay->apply_to($target);
+
+      # do whatever you want with $target
+
+DESCRIPTION
+    XML::LibXML::Overlay allowes to apply overlay files to XML files. This
+    modul is a rewirte of XML::Overlay, but it uses plain XML::LibXML
+    instead of the Class::XML thru XML::Parser stack.
+
+DETAILS
+    XML::LibXML::Overlay inherits from XML::LibXML. So you can use
+    XML::LibXML::Overlay like XML::LibXML. The only difference is, that
+    "load_xml" returns a XML::LibXML::Overlay::Document instead of a
+    XML::LibXML::Document.
+
+  Tags
+    Following Tags can be used in a overlay document.
+
+   overlay
+    Specifies the root element, and contains any target element.
+
+   target
+    Selectes one or more nodes of the target document given by the
+    <i>xpath</i> attribute. Target Elements contain any number of action
+    elements.
+
+   action
+    The attributes <i>type</i> and <i>attribute</i> of action nodes specify
+    a action which sould be applied to the target element.
+
+  Action attributes
+    Following attributes can be used to specify an action.
+
+   appendChild
+    Appends the content of the action element as child to the end of the
+    target nodes.
+
+   delete
+    Deletes the target element.
+
+   insertBefore
+    Inserts the content of the action element as sibling before the target
+    nodes.
+
+   insertAfter
+    Inserts the content of the action element as sibling after the target
+    nodes.
+
+   setAttribute
+    Sets the value of the specified attribute to the content of the action
+    node.
+
+   removeAttribute
+    Removes the specified attribute.
+
+METHODS
+  load_xml
+    Can be used as "load_xml" in XML::LibXML, but returns a
+    XML::LibXML::Overlay::Document instead of a XML::LibXML::Document.
+
+SEE ALSO
+    XML::LibXML, XML::Overlay
+
+AUTHOR
+    Alexander Keusch, "<kalex at cpan.org>"
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

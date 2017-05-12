@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<NZSRSRequest VerMinor="11" VerMajor="3">
+
+    <HandleUpdate
+       ActionId="xx102"
+       HandleId="xx102"
+       >
+      <!-- this is essentially a no-op -->
+    </HandleUpdate>
+
+</NZSRSRequest>

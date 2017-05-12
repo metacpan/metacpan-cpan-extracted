@@ -1,0 +1,90 @@
+% layout 'default';
+% title stash('product')->{title};
+<% if ( my $gd = stash('product')->{group_desc} ) {
+  stash('extended_title', $gd );
+  title stash('product')->{title} . ', ' . $gd;
+} %>
+% stash active_page => 'products';
+
+
+<div class="row">
+  <div class="col-md-4 col-md-push-8">
+    % for ( split /\?/, stash('product')->{image} ) {
+      <div class="well thumbnail prod_pic">
+        <img src="/product-pics/<%= $_ %>" alt="" class="img-responsive">
+      </div>
+    % }
+  </div>
+
+  <div class="col-md-8 col-md-pull-4">
+    <div class="panel panel-<%=
+      stash('product')->{contact_for_pricing} ? 'primary' : 'success'
+    %>">
+    <div class="row valign panel-body"
+      ><div class="col-md-3">
+        <span class="product_number">#<%= stash('product')->{number} %></span>
+      </div
+      ><div class="col-md-5">
+        % if ( stash('product')->{contact_for_pricing} ) {
+          <p class="alert quote_only alert-warning text-center"
+            style="margin-bottom: 0"><small><i class="glyphicon glyphicon-info-sign"></i> Not
+            available for purchase online. You can request a quote, during checkout.</small></p>
+        % } else {
+          <span class="price_large">
+            % if ( stash('product')->{freebie} ) {
+              FREE
+            % } else {
+              $<%= stash('product')->{price_dollars}
+                %><sup>.<%= stash('product')->{price_cents} %></sup>
+              <span class="sku">per <%= stash('product')->{unit} %></span>
+            % }
+          </span>
+        % }
+      </div
+      ><div class="col-md-4">
+        %= form_for '/cart/add' => (method => 'POST') =>  class => "form-inline" => begin
+          %= csrf_field
+          %= hidden_field number => stash('product')->{number}
+
+          <div class="form-group">
+            <%= text_field 'quantity', value => 1, class => 'form-control qty-input' %>
+          </div>
+
+          % if ( stash('product')->{contact_for_pricing} ) {
+            <%= submit_button 'Add to quote', class => 'btn btn-primary' %>
+          % } else {
+            <%= submit_button 'Add to cart', class => 'btn btn-success' %>
+          % }
+        %= end
+      </div
+    ></div>
+    </div>
+
+    % if ( my $options = stash('product')->{options} ) {
+      <div class="panel panel-default">
+        <div class="panel-heading">Product options</div>
+        <div class="panel-body">
+          <ul id="product_options_list">
+            % for ( items_in $options ) {
+              <li>
+                % if ( $_->{is_self} ) {
+                  <span class="btn btn-default disabled"
+                    ><%= $_->{desc} %></span>
+                % } else {
+                  <a href="<%= $_->{url} %>"
+                     class="btn btn-primary"><%= $_->{desc} %></a>
+                % }
+              </li>
+            % }
+          </ul>
+        </div>
+      </div>
+    % }
+
+    <div class="panel panel-default">
+      <div class="panel-body">
+        <%== stash('product')->{description} %>
+      </div>
+    </div>
+  </div>
+</div>

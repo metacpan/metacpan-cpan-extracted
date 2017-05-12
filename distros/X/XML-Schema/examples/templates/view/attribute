@@ -1,0 +1,7 @@
+{ name => '[% item.name %]', type => '[% item.type.name or item.type %]'
+[%- IF (f = self.fixed) -%]
+, fixed => '[% f %]
+[%- ELSIF (d = self.default) -%]
+, default => '[% d %]'
+[%- END -%]
+ }

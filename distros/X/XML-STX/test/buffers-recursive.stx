@@ -1,0 +1,33 @@
+<stx:transform version="1.0" 
+  xmlns:stx="http://stx.sourceforge.net/2002/ns"
+  strip-space="yes">
+
+  <stx:template match="list">
+    <l i="{count(//*)}">
+      <stx:buffer name="b1">
+	<stx:process-children/>
+      </stx:buffer>
+      <stx:text>:</stx:text>
+      <stx:process-buffer name="b1" group="g1"/>
+    </l>
+  </stx:template>
+
+  <stx:group name="g1">
+
+    <stx:template match="li" public="yes">
+      <stx:value-of select="concat('i.',position())"/>
+    </stx:template>
+  
+    <stx:template match="l">
+      <l i="{count(//*)}">
+	<stx:process-children/>
+      </l>
+    </stx:template>
+
+    <stx:template match="text()">
+      <stx:value-of select="concat('[',.,']')"/>
+    </stx:template>
+
+  </stx:group>
+
+</stx:transform>

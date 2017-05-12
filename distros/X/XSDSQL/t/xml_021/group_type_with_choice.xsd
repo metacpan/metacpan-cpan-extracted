@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+
+
+	<xs:group name="g0">
+		<xs:sequence>
+			<xs:element name="c2" type="xs:string"/>
+			<xs:element name="c1" type="xs:string" minOccurs="0"/>
+		</xs:sequence>
+	</xs:group>
+
+	<xs:element name="root">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:choice>
+					<xs:element name="c1" type="xs:string"/>
+					<xs:group ref="g0"/> 
+				</xs:choice>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+</xs:schema>
+

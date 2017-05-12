@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE data [
+  <!ELEMENT data (stuff+)>
+  <!ELEMENT stuff (name,empty)>
+  <!ELEMENT name  (#PCDATA)>
+  <!ELEMENT empty EMPTY>
+  <!ATTLIST empty foo CDATA #REQUIRED>
+]>
+<data>
+  <stuff>
+    <name>Moose</name>
+    <empty foo="bar" />
+  </stuff>
+  <stuff>
+    <name>Thingy</name>
+    <empty foo="baz" />
+  </stuff>
+</data>

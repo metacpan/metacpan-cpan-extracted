@@ -1,0 +1,17 @@
+--- #YAML:1.0
+name:                XML-SAX-Expat-Incremental
+version:             0.05
+abstract:            Incremental/non-blocking SAX Driver for Expat
+license:             ~
+generated_by:        ExtUtils::MakeMaker version 6.32
+distribution_type:   module
+requires:     
+    Test::Exception:               0
+    Test::More:                    0
+    XML::Parser:                   0
+    XML::SAX::Expat:               0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Yuval Kogman

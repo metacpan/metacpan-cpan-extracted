@@ -1,0 +1,638 @@
+# Below is a documentation.
+
+=head1 NAME
+
+XML::Directory - returns a content of directory as XML.
+
+=head1 SYNOPSIS
+
+ use XML::Directory::String;
+ $dir = XML::Directory::String->new('/home/petr',3,10);
+ $rc = $dir->parse_dir;
+ @res = $dir->get_array;
+
+or
+
+ use XML::Directory::SAX;
+ use MyHandler;
+ $h = MyHandler->new();
+ $e = MyErrorHandler->new();
+ $dir = XML::Directory::SAX->new( Handler => $h, ErrorHandler => $e,
+                                  details => 3, depth => 10);
+ $rc = $dir->parse_dir('/home/petr');
+
+=head1 DESCRIPTION
+
+This extension provides two classes: XML::Directory::String and
+XML::Directory::SAX. Their methods make it possible to set parameters
+such as level of details or maximal number of nested sub-directories
+and generate either string containing the resulting XML or SAX events.
+
+The SAX generator is based on XML::SAX::Base; it's supposed to cooperate
+with other XML::SAX compliant modules safely.
+
+The original function (get_dir) is still supported via XML::Directory
+base class.
+
+ use XML::Directory(qw(get_dir));
+ my @xml = get_dir('/home/petr');
+
+=head2 METHODS COMMON TO BOTH CLASSES
+
+Methods common to both classes are defined in the XML::Directory
+base class.
+
+=over
+
+=item set_path
+
+ $dir->set_path('/home/petr');
+
+Resets path. An initial path can be set using the constructor.
+
+=item set_details
+
+ $dir->set_details(3);
+
+Sets or resets level of details to be returned. Can be also set using 
+the constructor. Valid values are 1, 2 or 3.
+
+ 1 = brief
+
+ Example:
+
+ <?xml version="1.0" encoding="utf-8"?>
+ <dirtree>
+   <directory name="test">
+     <file name="dir2xml.pl"/>
+   </directory>
+ </dirtree>
+
+ 2 = normal
+
+ Example:
+
+ <?xml version="1.0" encoding="utf-8"?>
+ <dirtree>
+   <head version="0.70">
+     <path>/home/petr/test</path>
+     <details>2</details>
+     <depth>5</depth>
+   </head>
+   <directory name="test" depth="0">
+     <path></path>
+     <modify-time epoch="998300843">Mon Aug 20 11:47:23 2001</modify-time>
+     <file name="dir2xml.pl">
+       <mode code="33261">rwx</mode>
+       <size unit="bytes">225</size>
+       <modify-time epoch="998300843">Mon Aug 20 11:47:23 2001</modify-time>
+     </file>
+   </directory>
+ </dirtree>
+
+ 3 = verbose
+
+ Example:
+
+ <?xml version="1.0" encoding="utf-8"?>
+ <dirtree>
+   <head version="0.70">
+     <path>/home/petr/test</path>
+     <details>3</details>
+     <depth>5</depth>
+   </head>
+   <directory name="test" depth="0" uid="500" gid="100">
+     <path></path>
+     <access-time epoch="999857485">Fri Sep  7 12:11:25 2001</access-time>
+     <modify-time epoch="998300843">Mon Aug 20 11:47:23 2001</modify-time>
+     <file name="dir2xml.pl" uid="500" gid="100">
+       <mode code="33261">rwx</mode>
+       <size unit="bytes">225</size>
+       <access-time epoch="998300843">Mon Aug 20 11:47:23 2001</access-time>
+        <modify-time epoch="998300843">Mon Aug 20 11:47:23 2001</modify-time>
+     </file>
+   </directory>
+ </dirtree>
+
+See the C<DTD> chapter for more details.
+
+=item set_maxdepth
+
+ $dir->set_maxdepth(5);
+
+Sets or resets number of nested sub-directories to be parsed. Can also be
+set using the constructor. 0 means that only a directory specified by path 
+is parsed (no sub-directories).
+
+=item parse_dir, parse
+
+ $rc  = $dir->parse_dir;
+ $rc  = $dir->parse;
+
+Both methods are equivalent, the later is supported for the sake of backward
+compatibility. It scans directory tree specified by path. When used from the
+XML::Directory::String class instance it stores its XML representation 
+in memory ($dir->{xml}) and returns a number of lines. For 
+XML::Directory::SAX it generate SAX events and returns a result of
+the end_document function. Parse methods of the SAX generator also accept
+parameters: paths and options.
+
+This method checks a validity of details and depth. In the event a parameter
+is out of valid range, an error occurs. The same is true if the path 
+specified can't be found. For the SAX generator, missing content handler is 
+also treated as error.
+
+=item get_path
+
+ $path = $dir->get_path;
+
+Returns current path.
+
+=item get_details
+
+ $details = $dir->get_details;
+
+Returns current level of details.
+
+=item get_maxdepth
+
+ $maxdepth = $dir->get_maxdepth;
+
+Returns current number of nested sub-directories.
+
+=item pkg->order_by
+
+ $dir->order_by($code)
+
+Sort contents of a directory. Valid options for I<$code> are :
+
+=over
+
+=item df
+
+directories, files I<default>
+
+=item fd
+
+files, directories
+
+=item a
+
+alphabetical ascending
+
+=item z
+
+alphabetical descending
+
+=back
+
+=item enable_ns;
+
+ $dir->enable_ns; 
+
+Enables a support for namespaces.
+
+=item disable_ns;
+
+ $dir->disable_ns; 
+
+Disables a support for namespaces.
+
+=item enable_doctype;
+
+ $dir->enable_doctype; 
+
+A DOCTYPE declaration will be generated.
+
+Level of details: 1
+
+ <!DOCTYPE dirtree PUBLIC "-//GA//DTD XML-Directory 1.0 Level1//EN"
+     "http://www.gingerall.org/dtd/XML-Directory/1.0/dirtree-level1.dtd">
+
+Level of details: 2
+
+ <!DOCTYPE dirtree PUBLIC "-//GA//DTD XML-Directory 1.0 Level2//EN"
+     "http://www.gingerall.org/dtd/XML-Directory/1.0/dirtree-level2.dtd">
+
+Level of details: 3
+
+ <!DOCTYPE dirtree PUBLIC "-//GA//DTD XML-Directory 1.0 Level3//EN"
+     "http://www.gingerall.org/dtd/XML-Directory/1.0/dirtree-level3.dtd">
+
+A local copy of DTD files is in the C<dtd> directory.
+
+=item disable_doctype;
+
+ $dir->disable_doctype; 
+
+No DOCTYPE declaration will be generated. This is the default behavior.
+
+=item get_ns_data;
+
+ $ns  = $dir->get_ns_data;
+
+Returns a hash reference with the following keys:
+
+=over
+
+=item enabled
+
+either 1 or 0
+
+=item uri
+
+namespace URI, 'http://gingerall.org/directory/1.0/' by default 
+
+=item prefix
+
+namespace prefix, 'xd' by default
+
+=back
+
+=item encoding
+
+ $encoding = $dir->encoding;
+ $dir->encoding('utf-8');
+
+Gets or sets an encoding of generated XML document. The encoding must be 
+a string acceptable for an XML encoding declaration. The default value is
+'utf-8'. The encoding doesn't apply to SAX so far.
+
+=item enable_rdf
+
+ $dir->enable_rdf('index.n3');
+
+Enables a support of RDF/Notation3 meta-data. The parser looks for files with
+same name as the argument of this method in each directory. If found, the file
+is passed to RDF::Notation3 parser and properties of particular resources
+(files or directories) are merged to resulting XML. The N3 file itself is not
+listed in the XML. See http://www.w3.org/DesignIssues/Notation3.html for more 
+details on RDF/Notation3.
+
+In addition, one more element doc:Position (where doc prefix is bound to
+URI namespace of http://gingerall.org/charlie-doc/1.0/) is added. This element
+contains a position of the first triple with the current document as subject 
+within the triple array, so that the order of files/directories can be 
+controlled using the RDF/N3 file. The doc:Position element is generated even
+when a document is not found in the N3 file or the N3 is not found in a 
+directory; it is generated as a unique identifier handy e.g. for sorting in 
+this event. Use $dir->disable_rdf to disable his feature.
+
+If there is a property called doc:Type with value of 'document' found for 
+a directory, sub-directories and files are not processed. This is a way to
+emulate multiple-file documents efficiently.
+
+If, for example, a directory contains a file named Apache.html:
+
+ <xd:file name="Apache.html">
+   <xd:mode code="33188">rw-</xd:mode>
+   <xd:size unit="bytes">41913</xd:size>
+   <xd:modify-time epoch="999344286">Sat Sep  1 13:38:06 2001</xd:modify-time>
+ </xd:file>
+
+Then a presence of the following Notation3 file
+
+ @prefix dc: <http://purl.org/dc/elements/1.1/>.
+ <Apache.html> 
+	 dc:Title "Apache";
+	 dc:Description "mod_perl Apache module".
+
+results in:
+
+ <xd:file name="Apache.html">
+   <xd:mode code="33188">rw-</xd:mode>
+   <xd:size unit="bytes">41913</xd:size>
+   <xd:modify-time epoch="999344286">Sat Sep  1 13:38:06 2001</xd:modify-time>
+   <doc:position>1</doc:position>
+   <dc:Title>Apache</dc:Title>
+   <dc:Description>mod_perl Apache module</dc:Description>
+ </xd:file>
+
+Since using RDF meta-data requires to use namespaces, this method enables
+namespaces automatically. It also checks whether the RDF::Notation3 module
+is installed and issues an error if not.
+
+=item disable_rdf
+
+ $dir->disable_rdf;
+
+Disables RDF/N3 support.
+
+=item error_treatment
+
+ $et = $dir->error_treatment;
+ $dir->error_treatment('warn');
+
+Gets or sets a way errors are treated in. There are two possible
+values:
+
+=over
+
+=item die 
+
+The parse_dir method dies (actually croaks) on an error. Default value.
+
+=item warn
+
+The parse_dir methods catches the error. String generator returns an XML error
+message. SAX driver throws a SAX exception and calls an error handler if
+defined (otherwise it dies as for "die"). String $dir->{error} property is 
+set to an error number.
+
+Example of an error message:
+
+ <?xml version="1.0" encoding="utf-8"?>
+ <dirtree xmlns="http://gingerall.org/directory/1.0/">
+ <error number="3">Path /home/petr/work/done not found!</error>
+ </dirtree>
+
+=back
+
+=back
+
+=head2 XML::DIRECTORY::STRING
+
+=over
+
+=item new
+
+ $dir = XML::Directory->new('/home/petr',2,5);
+ $dir = XML::Directory->new('/home/petr',2);
+ $dir = XML::Directory->new('/home/petr');
+
+The constructor accepts up to 3 parameters: path, details (1-3, brief or 
+verbose XML) and depth (number of nested sub-directories). The last two 
+parameters are optional (defaulted to 2 and 1000).
+
+=item get_arrayref
+
+ $res = $dir->get_arrayref;
+
+Returns a parsed XML directory image as a reference to array (each field 
+contains one line of the XML file).
+
+=item get_array
+
+ @res = $dir->get_array;
+
+Returns a parsed XML directory image as an array (each field 
+contains one line of the XML file).
+
+=item get_string
+
+ $res = $dir->get_string;
+
+Returns a parsed XML directory image as a string.
+
+=back
+
+=head2 XML::DIRECTORY::SAX
+
+=over
+
+=item new
+
+ $dir = XML::Directory::SAX->new( Handler => $h, ErrorHandler => $e,
+                                  details => 3, depth => 10);
+
+The constructor accepts an option hash as its only parameter. The hash keys
+may include all options recognized by XML::SAX::Base (e.g. Handler, 
+ErrorHandler, Source) and three options specific to XML::Directory::SAX 
+(details, depth, path).
+
+The only mandatory option is Handler, other options either have their default 
+values (details=2, depth=1000, path=<current working directory>) or aren't
+required.
+
+=item other methods
+
+Other methods include these inherited from XML::Directory (see
+METHODS COMMON TO BOTH CLASSES) and those inherited from XML::SAX::Base.
+
+Among them the following could be useful to change handlers during the parse
+time safely:
+
+=over
+
+=item set_content_handler
+
+ $h = new MyHandler;
+ $dir->set_content_handler($h);
+
+Sets SAX content handler.
+
+=item set_error_handler
+
+ $e = new MyErrorHandler;
+ $dir->set_error_handler($e);
+
+Sets SAX error handler.
+
+=back
+
+See XML::SAX::Base documentation for more details.
+
+=back
+
+=head2 ORIGINAL INTERFACE
+
+=over
+
+=item get_dir();
+
+ @xml = get_dir('/home/petr',2,5);
+
+This functions takes a path as a mandatory parameter and details and depth
+as optional ones. It returns an array containing an XML representation of 
+directory specified by the path. Each field of the array represents one line 
+of the XML.
+
+Optional arguments are defaulted to 2 and 1000.
+
+=back
+
+=head2 XML::DIRECTORY::APACHE
+
+This is a mod_perl module that serves as an Apache interface to
+XML::Directory::String. It allows to send parameters in http request and
+receive a result (XML representation of a directory tree) in http
+response. Errors are caught and sent as XML via http to prevent Apache error.
+
+Parameters include:
+
+=over
+
+=item path
+
+absolute path to a directory to be parsed, mandatory
+
+The path is not send in query but as an extra path instead. This seems to
+be more appropriate for this kind of parameter.
+
+=item dets
+
+level of details, optional
+
+=item depth
+
+maximal number of nested sub-directories, optional
+
+=item ns
+
+if set to 1, namespaces are used, optional
+
+=back
+
+To use this module, add a similar section to your Apache config file
+
+ <Location /xdir>
+     SetHandler perl-script
+     PerlHandler XML::Directory::Apache
+     PerlSendHeader On
+ </Location>
+
+and send a request to:
+
+ http://hostname/xdir/home/petr/work[?dets=1&depth=1&ns=1]
+
+The path portion following 'xdir' is taken as path; other parameters can
+be send in query.
+
+=head2 DTD
+
+Resulting XML documents can be of three types. The type of document is specified in the constructor or using the C<set_details> method.
+
+Level of details: 1 (brief)
+
+ <!ELEMENT dirtree (directory)>
+ <!ELEMENT directory (directory, file)>
+ <!ATTLIST directory
+           name CDATA #REQUIRED>
+ <!ELEMENT file EMPTY>
+ <!ATTLIST file
+           name CDATA #REQUIRED>
+
+Level of details: 2 (normal)
+
+ <!ELEMENT dirtree (head, directory)>
+ <!ELEMENT head (path, details, depth)>
+ <!ATTLIST head
+           version CDATA #REQUIRED>
+ <!ELEMENT path (#PCDATA)>
+ <!ELEMENT details (#PCDATA)>
+ <!ELEMENT depth (#PCDATA)>
+ <!ELEMENT directory (directory, file, path, modify-time)>
+ <!ATTLIST directory
+           name CDATA #REQUIRED>
+ <!ELEMENT file (mode, size, modify-time)>
+ <!ATTLIST file
+           name CDATA #REQUIRED>
+ <!ELEMENT modify-time (#PCDATA)>
+ <!ATTLIST modify-time
+           epoch NMTOKEN #REQUIRED>
+ <!ELEMENT mode (#PCDATA)>
+ <!ATTLIST mode
+           code NMTOKEN #REQUIRED>
+ <!ELEMENT size (#PCDATA)>
+ <!ATTLIST size
+           unit CDATA #FIXED "bytes">
+
+Level of details: 3 (verbose)
+
+ <!ELEMENT dirtree (head, directory)>
+ <!ELEMENT head (path, details, depth)>
+ <!ATTLIST head
+           version CDATA #REQUIRED>
+ <!ELEMENT path (#PCDATA)>
+ <!ELEMENT details (#PCDATA)>
+ <!ELEMENT depth (#PCDATA)>
+ <!ELEMENT directory (directory, file, path, modify-time, access-time)>
+ <!ATTLIST directory
+           name CDATA #REQUIRED
+           depth NMTOKEN #REQUIRED
+           uid NMTOKEN #REQUIRED
+           gid NMTOKEN #REQUIRED>
+ <!ELEMENT file (mode, size, modify-time, access-time)>
+ <!ATTLIST file
+           name CDATA #REQUIRED
+           uid NMTOKEN #REQUIRED
+           gid NMTOKEN #REQUIRED>
+ <!ELEMENT modify-time (#PCDATA)>
+ <!ATTLIST modify-time
+           epoch NMTOKEN #REQUIRED>
+ <!ELEMENT access-time (#PCDATA)>
+ <!ATTLIST access-time
+           epoch NMTOKEN #REQUIRED>
+ <!ELEMENT mode (#PCDATA)>
+ <!ATTLIST mode
+           code NMTOKEN #REQUIRED>
+ <!ELEMENT size (#PCDATA)>
+ <!ATTLIST size
+           unit CDATA #FIXED "bytes">
+
+There is also an modular DTD available, see the C<dtd> directory. 
+You can take a look at an HTML documentation of this DTD by DTDParse
+utility:
+
+=over
+
+=item *
+
+=for html <a href="dirtree/level1/index.html">dirtree, level1</a>
+
+=item *
+
+=for html <a href="dirtree/level2/index.html">dirtree, level2</a>
+
+=item *
+
+=for html <a href="dirtree/level3/index.html">dirtree, level3</a>
+
+=back
+
+This DTD allows you to extend the list of allowable elements using parameter 
+entities, so that extended XML files can be still validated.
+
+An extended vocabulary can be either because of RDF/N3 metadata 
+(see C<enable_rdf>), or, for instance, a directory of .dbk files, might be 
+munged for <articleinfo> data which would be included in the output. The 
+output could then be cached and munged again later using another SAX filter 
+or XSLT.
+
+This is how to extend the DTD:
+
+ <?xml version = "1.0" ?>
+ <!DOCTYPE dirtree SYSTEM [
+   <!ENTITY % file "(mode,size,modify-time,foo)">
+   <!ELEMENT foo (#PCDATA)>
+ ]>...
+
+=head1 VERSION
+
+Current version is 0.99.
+
+=head1 LICENSING
+
+Copyright (c) 2001-2002 Ginger Alliance. All rights reserved. This program 
+is free software; you can redistribute it and/or modify it under the same 
+terms as Perl itself. 
+
+=head1 AUTHOR
+
+Petr Cimprich, petr@gingerall.cz
+
+=head1 CONTRIBUTORS
+
+Duncan Cameron, dcameron@bcs.org.uk
+
+Chris Snyder, csnyder@longitude.com
+
+Aaron Straup Cope, asc@vineyard.net
+
+Gerhard Wannemacher, g.wannemacher@eurodata.de
+
+=head1 SEE ALSO
+
+perl(1), XML::SAX, RDF::Notation3.
+
+=cut

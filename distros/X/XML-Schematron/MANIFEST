@@ -1,0 +1,15 @@
+Changes
+lib/XML/Schematron.pm
+lib/XML/Schematron/LibXSLT.pm
+lib/XML/Schematron/SchemaReader.pm
+lib/XML/Schematron/Schema.pm
+lib/XML/Schematron/Test.pm
+lib/XML/Schematron/XPath.pm
+lib/XML/Schematron/XSLTProcessor.pm
+Makefile.PL
+MANIFEST			This list of files
+t/001basic.t
+t/data/order.scm
+t/data/order.xml
+TODO
+META.yml                                 Module meta-data (added by MakeMaker)

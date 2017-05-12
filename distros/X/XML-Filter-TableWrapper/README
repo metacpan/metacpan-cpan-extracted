@@ -1,0 +1,23 @@
+README for XML-SAX-Machines
+
+WARNING: ALPHA CODE ALERT!!! Developing to this API could well be like trying
+to skate on quicksand :).
+
+XML::SAX::Machines is a collection of APIs that allow complex SAX machines
+to be constructed without a huge amount of extra typing.
+
+More documentation will be forthcoming, but here's the gist of it:
+
+To build a pipeline of SAX processors, do something like:
+
+    use XML::SAX::Machines qw( Pipeline );
+
+    my $p = Pipeline(
+        "My::SAX::Filter1",
+        "My::SAX::Filter2",
+        \$output
+    );
+
+    $p->parse_uri( $ARGV[0] );
+
+

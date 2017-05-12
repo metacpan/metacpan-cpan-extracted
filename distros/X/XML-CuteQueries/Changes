@@ -1,0 +1,58 @@
+0.6613: Wed Jun 01 2011
+   - minor bug in exporter … and by minor I mean major
+
+0.6613: Fri Dec 18 2009
+   - tiny bug regarding attr names vs namespaces
+
+0.6612: Wed Oct 21 2009
+   - Just added Data::Dumper to the Makefile.PL reqs
+
+0.6611: Thu Sep 03 2009
+   - fixed a bug with nostrict_single vs KAR queries
+
+0.6610: Wed Aug 19 2009
+   - I made CQ() do a little more stuff
+
+0.6602: Wed Jul 29 2009
+   - pulled in some DRY stuff from Hans Dieter Pearcey (aka hdp)
+   - added more KAR examples to the pods, tested some of that too
+
+0.6601: Tue Jul 28 2009
+   - fixed various bugs with KAR lists for attribute queries.
+   - fixed bugs re: trimming values in KAR results
+
+0.6600: Mon Jul 27 2009
+   - added klist single-value failure
+   - split up nostrict into nostrict_single and nostrict_match
+   - added a CQ export "constant" for convenience, not documented
+     until I see if I like it.
+   - added KAR lists.  They're kinda new and I'm not sure
+     they're described well (last entry in the CUTE QURIES item
+     list)
+
+0.6502: Sun Jul 26 2009
+   - Another patch from Hans. C<< >> won't escape an L<> inside?
+     Huh.
+
+0.6501: Sat Jul 25 2009
+   - added scalar query sub-types: xml() twig() recurse_text()
+   - removed the recurse_text=>1 option -- affects entire query,
+     should be per match
+   - fixed a few uninitialized values warnings for nostrict=>1 queries.
+
+0.6001: Mon Jul 20 2009
+   - forgot a dependency
+
+0.6000: Mon Jul 13 2009
+   - qr(.) queries nolonger work, they must now be qq(<re>.)
+   - added a bunch of tests using the new qq(<re>) and qq(<nre>)
+
+0.5001: Wed Jul 08 2009
+   - Doc bugs found by Hans Dieter Pearcey
+
+0.5000: Mon Jul 06 2009
+   - Brainstorming
+   - "just brainstorming" is no reason to not include a bunch of
+     tests and documentation.
+   - got the queries working the way I intended.
+   - fully documented

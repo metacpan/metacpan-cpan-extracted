@@ -1,0 +1,32 @@
+XML-Atom-Filter
+
+XML::Atom::Filter eases creation of command line tools to filter and
+process Atom feeds.
+
+This release of XML::Atom::Filter works with Atom 1.0 feeds when used with
+XML::Atom 0.13_01 or later.
+
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    * XML::Atom 0.11
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+COPYRIGHT AND LICENCE
+
+Copyright 2005-2006 Mark Paschal <markpasc@markpasc.org>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<!DOCTYPE NZSRSResponse SYSTEM "protocol.dtd">
+<NZSRSResponse VerMajor="5" VerMinor="2">
+<Response Action="RegistrarDetailsQry" FeId="9" FeSeq="587" OrigRegistrarId="101" RecipientRegistrarId="101" Rows="1">
+<FeTimeStamp Day="28" Hour="13" Minute="19" Month="7" Second="00" TimeZoneOffset="+12:00" Year="2010"/>
+<Registrar AccRef="n/a" Name="Model Registrar B" RegistrarId="101" URL="www.model-b.co.te">
+<RegistrarPublicContact Name="Model B Registrar" Email="support@model-b.co.te"><PostalAddress Address1="37, Zenow Street" City="Newton City" CountryCode="NZ" PostalCode="99002"/><Phone AreaCode="9" CountryCode="99" LocalNumber="345-6789"/><Fax AreaCode="9" CountryCode="99" LocalNumber="345-6790"/></RegistrarPublicContact><RegistrarSRSContact Name="Model A Registrar" Email="manager@model-b.co.te"><PostalAddress Address1="37, Zenow Street" City="Newton City" CountryCode="NZ" PostalCode="99002"/><Phone AreaCode="9" CountryCode="99" LocalNumber="345-6789"/><Fax AreaCode="9" CountryCode="99" LocalNumber="345-6790"/></RegistrarSRSContact><DefaultTechnicalContact Name="Model B Registrar" Email="support@model-b.co.te"><PostalAddress Address1="37, Zenow Street" City="Newton City" CountryCode="NZ" PostalCode="99002"/><Phone AreaCode="9" CountryCode="99" LocalNumber="345-6789"/><Fax AreaCode="9" CountryCode="99" LocalNumber="345-6790"/></DefaultTechnicalContact><EncryptKeys><EncryptKey><![CDATA[-----BEGIN PGP PUBLIC KEY BLOCK-----
+Version: GnuPG v1.4.9 (GNU/Linux)
+
+mI0ES95VnwEEAJrnQXzbyd8mlBuFj3vqb7DNI0lfwYM8gDZrOTAV/YroK3xNjHmn
+hb+AUPrytt7UtUGQkhW78vv3Ydri6JMKFozYkm8xja31k+s5cinaOcvrhj97AZwy
+a1n2PrfoArBRQAk62f/gJK7pC0Pe8k8jNl82E/RmN859Wfi6ZC/Sl0djABEBAAG0
+OFNSUyBFUFAgUHJveHkgKERhZW1vbikgPHNycy1lcHAtcHJveHktc3JzcnBzQHNy
+cy5uZXQubno+iLwEEwECACYFAkveVZ8CGwMFCQHhM4AGCwkIBwMCBBUCCAMEFgID
+AQIeAQIXgAAKCRDlST+x5EQPb+hlA/0Y5l9TUAeZP58HLZmXkzIY3zFfS2Rasbnt
+OWjWx2MDlR3BiebK7dUtvhtPJtJVdOIPCOM+XC1qIXWLHW9oqoanuMHz3qWjXnXX
+cBdZHzkIwW1bwShJA41yCES7uoE5iDkFeCpRUHnL+d9pemIVGLlo1CALGye/T6QH
+aacYNfaA6A==
+=A2qP
+-----END PGP PUBLIC KEY BLOCK-----]]></EncryptKey></EncryptKeys>
+<EPPAuth Password="$5$Z%BdK5e^$8QgqKe3lfcbIEIDhvLojDT5u7v2LCUclL256h.8EUp8"/>
+<Allowed2LDs><SecondLD DomainName="co.te"/><SecondLD DomainName="net.te"/><SecondLD DomainName="org.te"/></Allowed2LDs>
+<Roles><Role RoleName="CancelDomain"/><Role RoleName="Connect"/><Role RoleName="CreateDomain"/><Role RoleName="Query"/>
+<Role RoleName="QueryRegACL"/><Role RoleName="Registrar"/><Role RoleName="TransferDomain"/><Role RoleName="UncancelDomain"/>
+<Role RoleName="UpdateDomain"/><Role RoleName="UpdateRegistrar"/><Role RoleName="Whois"/></Roles>
+<AuditDetails ActionId="Test /tmp/srsregn-codeqa/submodules/SRS-EPP-Proxy/t/mappings/14-login//create/00b-registrar-auth.yml 0 1" RegistrarId="1">
+<AuditTime><From Day="28" Hour="12" Minute="55" Month="7" Second="56" TimeZoneOffset="+12:00" Year="2010"/></AuditTime>
+<AuditText/></AuditDetails></Registrar></Response>
+<Response Action="AccessControlListQry" FeId="9" FeSeq="587" OrigRegistrarId="101" RecipientRegistrarId="101" Rows="1">
+<FeTimeStamp Day="28" Hour="13" Minute="19" Month="7" Second="00" TimeZoneOffset="+12:00" Year="2010"/>
+<AccessControlList List="whitelist" Resource="epp_connect" Size="1"/></Response></NZSRSResponse>

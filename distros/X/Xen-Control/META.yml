@@ -1,0 +1,30 @@
+---
+name: Xen-Control
+version: 0.04
+author:
+  - 'Jozef Kutej <jkutej@cpan.org>'
+abstract: control and fetch information about xen domains
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Carp::Clan: 0
+  Class::Accessor::Fast: 0
+  Getopt::Long: 0
+  List::MoreUtils: 0
+  Pod::Usage: 0
+build_requires:
+  Test::Differences: 0
+  Test::Environment: 0
+  Test::More: 0
+provides:
+  Xen::Control:
+    file: lib/Xen/Control.pm
+    version: 0.04
+  Xen::Domain:
+    file: lib/Xen/Domain.pm
+    version: 0.01
+generated_by: Module::Build version 0.280801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

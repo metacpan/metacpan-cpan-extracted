@@ -1,0 +1,14 @@
+#!perl
+
+our $VERSION = '0.005002'; # VERSION
+
+use Mojolicious::Lite;
+use 5.020;
+use experimental qw/postderef/;
+use FindBin;
+BEGIN { unshift @INC, "$FindBin::Bin/../lib" }
+
+require Mojolicious::Commands;
+Mojolicious::Commands->start_app('XTaTIK');
+
+__END__

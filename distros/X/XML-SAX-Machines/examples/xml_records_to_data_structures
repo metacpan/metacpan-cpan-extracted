@@ -1,0 +1,17 @@
+use XML::Handler::2Simple;
+use XML::SAX::Machines qw( ByRecord );
+
+use IO::Handle;   ## Older XML::LibXML versions need this
+use Data::Dumper;
+
+$Data::Dumper::Indent    = 1;
+$Data::Dumper::Terse     = 1;
+$Data::Dumper::Quotekeys = 1;
+
+ByRecord(
+    XML::Handler::2Simple->new(
+        DataHandler => sub {
+            warn Dumper( $_[1] );
+        },
+    )
+)->parse_file( \*STDIN );

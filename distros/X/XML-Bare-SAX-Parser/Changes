@@ -1,0 +1,4 @@
+XML::Bare::SAX::Parser Changelog
+
+0.01 ( internal )
+  - First release; based on XML::Bare 0.30

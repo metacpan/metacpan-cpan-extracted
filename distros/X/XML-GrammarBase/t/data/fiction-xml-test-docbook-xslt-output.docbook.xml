@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<article xmlns="http://docbook.org/ns/docbook" xmlns:fic="http://web-cpan.berlios.de/modules/XML-Grammar-Fortune/fiction-xml-0.2/" xmlns:db="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="index" xml:lang="" version="5.0">
+  <db:info>
+    <db:title>David vs. Goliath - Part I</db:title>
+  </db:info>
+  <section xml:id="top">
+    <db:info>
+      <db:title>The Top Section</db:title>
+    </db:info>
+    <db:para>
+    King <db:link xlink:href="http://en.wikipedia.org/wiki/David">David</db:link> and Goliath were standing by each other.
+    </db:para>
+    <db:para>
+    David said unto Goliath: "I will shoot you. I <db:emphasis role="bold">swear</db:emphasis> I will"
+    </db:para>
+    <section xml:id="goliath">
+      <db:info>
+        <db:title>Goliath's Response</db:title>
+      </db:info>
+      <db:para>
+    Goliath was not amused.
+    </db:para>
+      <db:para>
+    He said to David: "Oh, really. <db:emphasis>David</db:emphasis>, the red-headed!".
+    </db:para>
+      <db:para>
+    David started listing Goliath's disadvantages:
+    </db:para>
+      <db:blockquote xml:lang="fr-FR" xml:id="my_blockquote">
+    <db:orderedlist>
+    <db:listitem>
+    <db:para>
+    You're slow.
+    </db:para>
+    </db:listitem>
+    <db:listitem>
+    <db:para>
+    You're big.
+    </db:para>
+    </db:listitem>
+    <db:listitem>
+    <db:para>
+    You're stupid.
+    </db:para>
+    </db:listitem>
+    </db:orderedlist>
+    <db:para>
+    Goliath was insulted and told David he should use bullets for the
+    points, instead:
+    </db:para>
+    <db:itemizedlist>
+    <db:listitem>
+    <db:para>
+    David.
+    </db:para>
+    </db:listitem>
+    <db:listitem>
+    <db:para>
+    Saul.
+    </db:para>
+    </db:listitem>
+    <db:listitem>
+    <db:para>
+    Jonathan.
+    </db:para>
+    </db:listitem>
+    <db:listitem>
+    <db:para>
+    Michal.
+    </db:para>
+    </db:listitem>
+    <db:listitem>
+    <db:para>
+    Meyrav.
+    </db:para>
+    </db:listitem>
+    <db:listitem>
+    <db:para>
+    I ♥ Unicode Here. Give me ASCII or give me déþ! Héllô.
+    </db:para>
+    </db:listitem>
+    </db:itemizedlist>
+    </db:blockquote>
+    </section>
+  </section>
+</article>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<playlist version="1" xmlns="http://xspf.org/ns/0/">
+	<trackList>
+		<track>
+			<album>provider</album>
+			<title>Videobox</title>
+			<image>/static/images/mylogo.png</image>
+		</track>
+		<track>
+			<album>content</album>
+			<image>static/images/poster.jpg</image>
+			<location>http://server430.files.example.com/e1/hq_flv/321779.flv?h=9d512f72b8b19c863bbee572ad3be219</location>
+			<meta rel="thumbvideo">http://server320.files.example.com/e1/preview_flv/321779.flv</meta>
+			<meta rel="thumb">http://server320.files.example.com/e1/screenshot2/32/17/321779/321779_preview_{i}.jpg</meta>
+			<meta rel="type">flv</meta>
+		</track>
+	</trackList>
+</playlist>

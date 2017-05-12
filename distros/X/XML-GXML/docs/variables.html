@@ -1,0 +1,268 @@
+
+
+<head><title>Using GXML: Variables</title></head>
+
+<h2>Using GXML: Variables</h2>
+by Josh Carter &lt; josh@multipart-mixed.com &gt;<br>
+May 10, 2001<br>
+
+<hr>
+
+
+
+
+<br clear="all">
+<h2>Basic Variable Substitution</h2>
+
+
+
+<p>
+The syntax of a variable is as follows, for a variable called "name":
+</p>
+
+<pre>
+    &#37;&#37;&#37;name&#37;&#37;&#37;
+</pre>
+
+<p>
+How exactly the value of "name" is determined is somewhat complicated.
+XML specifies a standard format for attributes of an element, as
+follows:
+</p>
+
+<pre>
+    &lt;element
+        name = "Fred"
+        date = "July 4, 2034"
+    &gt;
+
+    (this is the content of the element; "name" and "date" are
+    in scope here.)
+
+    &lt;/element&gt;
+</pre>
+
+<p>
+The way everyone's used to seeing XML attributes written, however, is
+using enclosing elements, e.g.:
+</p>
+
+<pre>
+    &lt;element&gt;
+        &lt;name&gt;Fred&lt;/name&gt;
+        &lt;date&gt;July 4, 2034&lt;/date&gt;
+    &lt;/element&gt;
+</pre>
+
+<p>
+GXML supports both styles. Thus both of these work:
+</p>
+
+<pre>
+    &lt;element name="Fred"&gt;
+
+    name is &#37;&#37;&#37;name&#37;&#37;&#37;
+    (will be "Fred")
+
+    &lt;/element&gt;
+
+    &lt;element&gt;
+        &lt;name&gt;Fred&lt;/name&gt;
+
+        name is &#37;&#37;&#37;name&#37;&#37;&#37;
+    &lt;/element&gt;
+</pre>
+
+
+
+
+
+
+<br clear="all">
+<h2>Variable Scoping</h2>
+
+
+
+<p>
+This is easy stuff if you're used to programming. I'll tell you the
+formal rules first, but you can skip to the examples if you like. The
+following rules apply for determining if a attribute is in scope, that
+is, accessible through a variable:
+</p>
+
+<ul>
+  <li>For attributes declared in the start tag:
+  <ul>
+    <li>The start tag must <b>enclose</b> the element where the
+      variable is used. It does not need to be the immediate parent;
+      the given start tag may be several levels up.</li>
+    <li>If there are several possible candidates, the most closely
+      enclosing one will be chosen.</li>
+  </ul>
+  </li>
+  <li>For attributes that are sub-elements:
+  <ul>
+    <li>The attribute element must be a peer of where the variable is
+      used, or be enclosed by a common parent.</li>
+    <li>If there are several possible candidates, the most closely
+      enclosing one will be chosen.</li>
+    <li>If there are several possible candidates <em>at the same
+      level</em> (i.e. peers of each other), the first will be taken.</li>
+  </ul>
+  </li>
+</ul>
+
+<p>
+It's probably easiest to see with an example. First, where attributes
+are declared in the start tag:
+</p>
+
+<pre>
+    &lt;manager name="Fred"&gt;
+
+        &lt;employee name="Bob"&gt;
+            name is &#37;&#37;&#37;name&#37;&#37;&#37;
+            (will be "Bob" here)
+        &lt;/employee&gt;
+
+        name is &#37;&#37;&#37;name&#37;&#37;&#37;
+        (will be "Fred" here)
+    &lt;/manager&gt;
+
+    name is &#37;&#37;&#37;name&#37;&#37;&#37;
+    (will be undefined here)
+</pre>
+
+<p>
+Now for the case where attributes are elements themselves:
+</p>
+
+<pre>
+    &lt;manager&gt;
+      &lt;name&gt;Fred&lt;/name&gt;
+
+        &lt;employee&gt;
+            &lt;name&gt;Bob&lt;/name&gt;
+            &lt;name&gt;Bo3b&lt;/name&gt;
+            
+            (multiple personalities, maybe?)
+
+            name is &#37;&#37;&#37;name&#37;&#37;&#37;
+            (will be "Bob" here)
+        &lt;/employee&gt;
+
+        name is &#37;&#37;&#37;name&#37;&#37;&#37;
+        (will be "Fred" here)
+    &lt;/manager&gt;
+
+    name is &#37;&#37;&#37;name&#37;&#37;&#37;
+    (will be undefined here)
+</pre>
+
+
+
+
+
+
+<br clear="all">
+<h2>Bending the Scoping Rules</h2>
+
+
+
+<p>
+I'm sure there are some CS hard-core types who would get infuriated
+over this feature, but GXML will allow you to get around some scoping
+constraints. You can "drill down," as it were, into elements which are
+within your scope to get enclosed values which aren't. Again, this is
+easier seen than described:
+</p>
+
+<pre>
+    &lt;manager&gt;
+      &lt;name&gt;Fred&lt;/name&gt;
+
+        &lt;employee&gt;
+            &lt;name&gt;Bob&lt;/name&gt;
+        &lt;/employee&gt;
+    &lt;/manager&gt;
+
+    name is &#37;&#37;&#37;name&#37;&#37;&#37;
+    (will be undefined here because it's not in scope, but:)
+
+    name is &#37;&#37;&#37;manager:name&#37;&#37;&#37;
+    (will be "Fred")
+
+    name is &#37;&#37;&#37;manager:employee:name&#37;&#37;&#37;
+    (will be "Bob")
+</pre>
+
+<p>
+Thus the syntax is using colons to indicate a drill-down into a given
+element. In practice I've only found this feature useful in conjunction
+with the "foreach" command, but maybe you'll put GXML to some other
+use (or abuse) that requires this.
+</p>
+
+
+<br clear="all">
+<h2>Default Values</h2>
+
+
+
+<p>
+Variables can have default values specified by "<tt>-default</tt>"
+appended to their name. Default values will only be used once all
+other rules for resolving a variable have been tried. Thus:
+</p>
+
+<pre>
+    &lt;org-chart name-default="unnamed person"&gt;
+
+    &lt;manager name="Fred"&gt;
+
+        &lt;employee name="Bob"&gt;
+            name is &#37;&#37;&#37;name&#37;&#37;&#37;
+            (will be "Bob" here)
+        &lt;/employee&gt;
+
+        name is &#37;&#37;&#37;name&#37;&#37;&#37;
+        (will be "Fred" here)
+    &lt;/manager&gt;
+
+    name is &#37;&#37;&#37;name&#37;&#37;&#37;
+    (will be "unnamed person")
+
+    &lt;org-chart&gt;
+</pre>
+
+<p>
+Default values are especially useful when using templates, since a
+template can use many variables but also specify defaults, enabling
+the user to only specify things that are different from the defaults.
+</p>
+
+
+
+
+
+<p>
+<b><a href="templates.html">On to Templates!</a></b>
+</p>
+
+<p>
+<b><a href="gxml-guide.html">Back to the GXML Guide</a></b>
+</p>
+
+<p>
+<b><a href="gxml2html-guide.html">Back to the gxml2html Guide</a></b>
+</p>
+
+
+
+
+
+
+<hr>
+<font size="-1"><i>Copyright (c) 2001-2002 Josh Carter</i></font>
+
+<!-- end of Using GXML: Variables -->

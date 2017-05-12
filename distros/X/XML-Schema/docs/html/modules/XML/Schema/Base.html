@@ -1,0 +1,680 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+<head>
+<title>Modules Index</title>
+</head>
+
+<body bgcolor="#ffffff">
+<table border="0" width="100%">
+<tr>
+<td align="left"><a href="../../../index.html"><img src="../../../images/canon.gif" border="0"></a></td>
+<td align="right"><img src="../../../images/canre.gif"></td>
+</tr>
+</table>
+<div align="right">
+<small><a href="../../../index.html">XML Schema Home</a></small>
+</div>
+
+<h1>XML::Schema::Base</h1>
+
+<ul>
+
+    This module implements a base class from which all other
+    XML::Schema::* modules are subclassed.
+  </ul>
+
+<h2>Table of Contents</h2>
+<ul>
+<table border="0" cellpadding="2" cellspacing="0">
+<tr valign="top">
+<td>
+  <li><b><a href="#section_Synopsis">Synopsis</a></b>
+</td>
+
+<td>
+</td>
+
+<td>
+<td>
+
+</tr>
+<tr valign="top">
+<td>
+  <li><b><a href="#section_Description">Description</a></b>
+</td>
+
+<td>
+</td>
+
+<td>
+<td>
+
+</tr>
+<tr valign="top">
+<td>
+  <li><b><a href="#section_Package_Variables">Package Variables</a></b>
+</td>
+
+<td>
+<b>:<b>
+</td>
+
+<td>
+<small><a href="#pkgvar_ETYPE">$ETYPE</a>,&nbsp; <a href="#pkgvar_SNIPPET">$SNIPPET</a>,&nbsp; <a href="#pkgvar_INSPECT_LEVEL">$INSPECT_LEVEL</a></small>
+<td>
+
+</tr>
+<tr valign="top">
+<td>
+  <li><b><a href="#section_Methods">Methods</a></b>
+</td>
+
+<td>
+<b>:<b>
+</td>
+
+<td>
+<small><a href="#method_new">new()</a>,&nbsp; <a href="#method_init">init()</a>,&nbsp; <a href="#method_init_mandopt">init_mandopt()</a>,&nbsp; <a href="#method_error">error()</a>,&nbsp; <a href="#method_error_value">error_value()</a>,&nbsp; <a href="#method_throw">throw()</a>,&nbsp; <a href="#method_factory">factory()</a></small>
+<td>
+
+</tr>
+<tr valign="top">
+<td>
+  <li><b><a href="#section_Private_Methods">Private Methods</a></b>
+</td>
+
+<td>
+<b>:<b>
+</td>
+
+<td>
+<small><a href="#method__baseargs">_baseargs()</a>,&nbsp; <a href="#method__mandatory">_mandatory()</a>,&nbsp; <a href="#method__optional">_optional()</a>,&nbsp; <a href="#method__arguments">_arguments()</a>,&nbsp; <a href="#method_DEBUG">DEBUG()</a>,&nbsp; <a href="#method_TRACE">TRACE()</a>,&nbsp; <a href="#method_ID">ID()</a>,&nbsp; <a href="#method__inspect">_inspect()</a>,&nbsp; <a href="#method__text_snippet">_text_snippet()</a></small>
+<td>
+
+</tr>
+</table>
+</ul>
+
+
+
+
+<hr width="100%" size="1" noshade="1"><a name="section_Synopsis"><h2>Synopsis</h2></a>
+<ul><pre><p>package XML::Schema::MyModule;
+
+use base qw( XML::Schema::Base );
+use vars qw( $ERROR @MANDATORY %OPTIONAL );
+
+@MANDATORY = qw( id );
+%OPTIONAL  =   ( msg =&gt; 'Hello World' );
+
+sub init {
+    my ($self, $config) = @_;
+
+    # search inheritance tree for mandatory/optional params
+    $self-&gt;init_mandopt($config)
+	|| return;
+
+    return $self;
+}
+
+package main;
+
+my $module = XML::Schema::MyModule-&gt;new( id =&gt; 12345 )
+     || die $XML::Schema::MyModule::ERROR;</b></pre></ul>
+
+  
+<hr width="100%" size="1" noshade="1"><a name="section_Description"><h2>Description</h2></a>
+    <p>
+    This module implements a base class from which all other
+    XML::Schema::* modules are subclassed.  Unless you're
+    hacking on the internals of the XML::Schema::* modules
+    then you probably don't need to worry too much about what's
+    going on in here.
+    </p>
+
+
+    <p>
+    It implements a <a href="#method_new"><code><b>new()</b></code></a> constructor method for
+    instantiating objects which works in conjunction with an
+    <a href="#method_init"><code><b>init()</b></code></a> which performs per-object initialisation.
+    Splitting this object creation process into two methods makes
+    subclassing much easier.
+    </p>
+
+
+    <p>
+    It also implements a general purpose <a href="#method_error"><code><b>error()</b></code></a>
+    method which objects can use to report error conditions and
+    callers can use to query those errors.
+    </p>
+
+
+    <p>
+    Various other useful "private" methods are defined for the
+    base class and in some cases, subclasses to use for debugging,
+    examining package variables, and other miscellaneous tasks.
+    </p>
+
+  
+<hr width="100%" size="1" noshade="1"><a name="section_Package_Variables"><h2>Package Variables</h2></a><ul>
+<li><a name="pkgvar_ETYPE"><b>$ETYPE</b></a>
+<br>
+
+      <p>
+	The <a href="#method_throw"><code><b>throw()</b></code></a> method, when called by an object
+	without specifying an exception type, e.g.
+<ul><pre><p>$myobject-&gt;throw('attempt to fit round peg in square hole');</b></pre></ul>
+
+	will look for the <code>$ETYPE</code> package variable
+	in the object's package and if defined, will use that
+	value as the default error type.  
+      </p>
+
+    <li><a name="pkgvar_SNIPPET"><b>$SNIPPET</b></a>
+<br>
+
+      <p>
+	Internal value used by the <a href="#method__text_snippet"><code><b>_text_snippet()</b></code></a>
+	method to define the default length to truncate text to.  Set
+	to 16 by default.
+      </p>
+
+    <li><a name="pkgvar_INSPECT_LEVEL"><b>$INSPECT_LEVEL</b></a>
+<br>
+
+      <p>
+	Controls the depth to which the <a href="#method__inspect"><code><b>_inspect()</b></code></a>
+	debugging method recurses into the depths of nested data
+	structures.  Set to 3 by default.
+      </p>
+
+    </ul>
+
+<hr width="100%" size="1" noshade="1"><a name="section_Methods"><h2>Methods</h2></a><ul>
+<li><p>
+<a name="method_new">
+<b>new( \%config )</b>
+<br>
+<b>new( key => value, key => value, ... )</b>
+<br>
+</a>
+
+
+    <!-- ignore args -->
+    <!-- ignore args -->
+      <p>
+	General purpose constructor method which can be used to
+	instantiate new objects of classes derived from
+	XML::Schema::Base.
+      </p>
+
+
+      <p>
+	The method expects a hash array of configuration items either
+	passed directly by reference or as list of <code>key =>
+	value</code> pairs which are automatically folded into a hash
+	reference.  A new object is constructed from a blessed hash
+	and the <a href="#method_init"><code><b>init()</b></code></a> method is called, passing the
+	configuration hash as an argument.
+      </p>
+
+
+<ul><pre><p>package XML::Schema::MyModule;
+
+use base qw( XML::Schema::Base );
+use vars qw( $ERROR );
+
+package main;
+
+my $obj1 = XML::Schema::MyModule-&gt;new({ pi =&gt; 3.14, e =&gt; 2.718 });
+my $obj2 = XML::Schema::MyModule-&gt;new(  pi =&gt; 3.14, e =&gt; 2.718  );</b></pre></ul>
+
+    </p><li><p>
+<a name="method_init"><b>init( \%config )</b></a>
+<br>
+
+
+      <p>
+	Called by the <a href="#method_new"><code><b>new()</b></code></a> constructor to perform
+	any per-object initialisation.  A reference to a hash array of
+	configuration parameters is passed as an argument.  The method
+	should return $self on success or undef on failure (e.g. by
+	calling <code>$self->error()</code>).
+      </p>
+
+<ul><pre><p>sub init {
+    my ($self, $config) = @_;
+	
+    $self-&gt;{ _LIKES } = $config-&gt;{ likes }
+        || return $self-&gt;error(&quot;no 'likes' parameter specified&quot;) 
+
+    return $self;
+}</b></pre></ul>
+
+    </p><li><p>
+<a name="method_init_mandopt"><b>init_mandopt( \%config )</b></a>
+<br>
+
+
+      <p>
+	Optional initialisation method utilised by some derived
+        modules which examines the <code><b>@MANDATOY</b></code>
+ and
+        <code><b>@OPTIONAL</b></code>
+ or
+        <code><b>%OPTIONAL</b></code>
+ package variables in all of the
+        object's superclasses to construct a full list of mandatory
+        and optional arguments for the object.
+     </p>
+
+     <p>
+        The method then examines both lists copying corresponding 
+        values from the <code><b>$config</b></code>
+ into 
+        <code><b>$self</b></code>
+.  Any variables named in the
+	mandatory list must be defined or an error will be raised
+        and undef returned.
+    </p>
+
+<ul><pre><p>sub init {
+    my ($self, $config) = @_;
+
+    # search inheritance tree for mandatory/optional params
+    $self-&gt;init_mandopt($config)
+	|| return;
+
+    return $self;
+}</b></pre></ul>
+
+    </p><li><p>
+<a name="method_error"><b>error( $msg, $msg, ... )</b></a>
+<br>
+
+
+      <p>
+	Can be called as a class or object method to get or set the
+	relevant error variable.  Returns the current value of the
+	error variables when called without arguments, or undef when
+	called with argument(s) which are used to set the error
+	variable (multiple arguments are concatenated).
+      </p>
+
+<ul><pre><p># class method to set $XML::Schema::MyModule::ERROR
+XML::Schema::MyModule-&gt;error('Failed to have cake and eat it');
+
+# class method to retrieve $XML::Schema::MyModule::ERROR
+warn XML::Schema::MyModule-&gt;error();
+
+# object method to set $myobj-&gt;{ _ERROR }
+$myobj-&gt;error('Stone throwing detected in glass house');
+
+# object method to get $myobj-&gt;{ _ERROR }
+warn $myobj-&gt;error();</b></pre></ul>
+
+    </p><li><p>
+<a name="method_error_value"><b>error_value( $item, $got, @legal )</b></a>
+<br>
+
+
+      <p>
+	Generates a formatted error message and passes it to the
+	<a href="#method_error"><code><b>error()</b></code></a> method.  This method is used to
+	report an illegal value specified for a parameter.  The first
+	argument indicates the name of the item, the second specifies
+	the illegal value received and the remaining arguments give
+	legal alternatives.  A call such as:
+<ul><pre><p>$myobj-&gt;error_value('doodah', 'badval', 'foo', 'bar', 'baz');</b></pre></ul>
+
+	is then equivalent to:
+<ul><pre><p>$myobj-&gt;error(&quot;doodah must be 'foo', 'bar' or 'baz' (not: 'badval')&quot;);</b></pre></ul>
+
+      </p>
+
+    </p><li><p>
+<a name="method_throw">
+<b>throw( <a href="../../../modules/XML/Schema/Exception.html">$exception</a> )</b>
+<br>
+<b>throw( $error )</b>
+<br>
+<b>throw( $type, $info )</b>
+<br>
+</a>
+
+
+      <!-- ignore args -->
+      <!-- ignore args -->
+      <!-- ignore args -->
+      <p>
+	Called to throw an error as an
+	<a href="../../../modules/XML/Schema/Exception.html">XML::Schema::Exception</a> object using the error
+	message passed as the first argument as the information field
+	for the exception.  The error type is defined in the
+	<a href="#pkgvar_ETYPE">$ETYPE</a>
+ package variable in the derived class
+	or defaults to the value of <a href="#pkgvar_ETYPE">$ETYPE</a>
+ in this
+	base class package (the string 'undef', by default). 
+      </p>
+
+
+<ul><pre><p>package XML::Schema::MyModule;
+
+use base qw( XML::Schema::Base );
+use vars qw( $ETYPE );
+$ETYPE = 'MyModule';
+
+package main;
+
+$myobj = XML::Schema::MyModule-&gt;new();
+$myobj-&gt;throw('An error');	    # throws &quot;[MyModule] An error&quot;</b></pre></ul>
+
+
+      <p>
+	Alternately, the method can be called with two explicit
+	arguments to denote the type and info fields.
+      </p>
+
+
+<ul><pre><p>$myobj-&gt;throw('Cake', 'Let them eat it!');  # throws &quot;[Cake] Let them eat it!&quot;</b></pre></ul>
+
+    </p><li><p>
+<a name="method_factory">
+<b>factory( $factory )</b>
+<br>
+<b>factory(  )</b>
+<br>
+</a>
+
+
+      <!-- ignore args -->
+      <!-- ignore args -->
+	<p>
+	Various objects need to create instances of other objects at
+	various time.  To avoid hard-coding loads of package names
+	across numerous different files, the objects instead delegate
+	to a factory object to perform this task in a well-defined and
+	extensible manner.  Objects can be passed a
+	<code>factory</code> argument with their constructor which can
+	contain the name of an object class or reference to an object
+	which should be used as a factory by that object.  This method
+	can also be called on a previously instantiated object to set
+	or update the value for its factory.
+	</p>
+
+	<p>
+	When called without arguments, the method returns the current
+	internal _FACTORY value or if undefined, the class or
+	object reference defined in the <a href="../../../modules/XML/Schema.html#pkgvar_FACTORY">$XML::Schema::FACTORY</a>
+.
+	</p>
+
+    </p></ul>
+
+<hr width="100%" size="1" noshade="1"><a name="section_Private_Methods"><h2>Private Methods</h2></a>
+    <p>
+      These methods are deemed "private" (or more accurately,
+      "protected") and are intended for the use of classes derived
+      from XML::Schema::Base.
+    </p>
+
+
+    <b>Private Methods:</b>
+<ul>
+<li><p>
+<a name="method__baseargs"><b>_baseargs( $name, $name, ... )</b></a>
+<br>
+
+
+	<p>
+	  This method walks up the inheritance tree collecting various
+	  package variables along the way and collating them for the
+	  derived object class.  Variable names in which the caller is
+	  interested should be passed as arguments.  A reference to a
+	  list is returned which contains further references to lists
+	  and/or hash arrays, depending on the variable type.
+	</p>
+
+<ul><pre><p>sub init {
+    my ($self, $config) = @_;
+
+    my $baseargs = $self-&gt;_baseargs(qw( @MANDATORY %OPTIONAL ));
+    my ($mandatory, $optional) = @$baseargs;
+
+    ...
+
+    return $self;
+}</b></pre></ul>
+
+
+	<p>
+	  For example, consider the following inheritance tree:
+	</p>
+
+<ul><pre><p>package XML::Schema::Test::Foo;
+use base qw( XML::Schema::Base );
+use vars qw( @MANDATORY %OPTIONAL );
+
+@MANDATORY = qw( one two );
+%OPTIONAL  = ( foo =&gt; 'default foo' );
+
+package XML::Schema::Test::Bar;
+use base qw( XML::Schema::Base );
+use vars qw( @MANDATORY %OPTIONAL );
+
+@MANDATORY = qw( three four );
+%OPTIONAL  = ( bar =&gt; 'default bar' );
+
+package XML::Schema::Test::Baz;
+use base qw( XML::Schema::Test::Foo
+             XML::Schema::Test::Bar );
+use vars qw( @MANDATORY %OPTIONAL );
+
+@MANDATORY = qw( five six );
+%OPTIONAL  = ( baz =&gt; 'default baz' );</b></pre></ul>
+
+
+	<p>
+	  Now let's call the _baseargs() method against these
+	  different packages and see what they return.
+	</p>
+
+<ul><pre><p>my @names = qw( @MANDATORY %OPTIONAL );
+
+XML::Schema::Test::Foo-&gt;_baseargs(@names);
+
+# returns:
+# [	
+#     [ 'one', 'two' ] 
+#     { foo =&gt; 'default foo' }
+# ]
+
+XML::Schema::Test::Bar-&gt;_baseargs(@names);
+
+# returns:
+# [	
+#     [ 'three', 'four' ] 
+#     { bar =&gt; 'default bar' }
+# ]
+
+XML::Schema::Test::Baz-&gt;_baseargs(@names);
+
+# returns:
+# [	
+#     [ 'one', 'two', 'three', 'four' ] 
+#     { foo =&gt; 'default foo'
+#       bar =&gt; 'default bar'
+#       baz =&gt; 'default baz' 
+#     }
+# ]</b></pre></ul>
+
+
+	<p>
+	  Note that package variables specified as hash arrays can
+	  also be specified as lists.  In this case, the list is
+	  assumed to represent the hash keys which all have empty (but
+	  defined) values.
+	</p>
+
+<ul><pre><p>@OPTIONAL = qw( foo bar );
+
+# equivalent to:
+%OPTIONAL = ( foo =&gt; '', bar =&gt; '' );</b></pre></ul>
+
+      </p><li><p>
+<a name="method__mandatory"><b>_mandatory( \@names, \%config )</b></a>
+<br>
+
+
+	<p>
+	  This method examines the $config hash array for values
+	  specified by name in the $names list and copies them to the
+	  $self object.  All items are deemed mandatory and the method
+	  will raise an error and return undef if any item is not
+	  defined.
+	</p>
+
+<ul><pre><p>sub init {
+    my ($self, $config) = @_;
+
+    my $baseargs = $self-&gt;_baseargs(qw( @MANDATORY ));
+
+    return $self-&gt;_mandatory($baseargs-&gt;[0], $config);
+}</b></pre></ul>
+
+      </p><li><p>
+<a name="method__optional"><b>_optional( \%names, \%config )</b></a>
+<br>
+
+
+	<p>
+	  Like <a href="#method__mandatory"><code><b>_mandatory()</b></code></a>, this method examines the
+	  $config hash array for values specified as keys in the
+	  $names hash and copies them to the $self object.  The values
+	  in the $names hash are used as defaults for items which are
+	  not defined in $config.  If the default value contains a
+	  CODE reference then the subroutine will be called.  The
+	  $names item may also be specified as a reference to a list
+	  in which case all default values are set to the empty
+	  string, ''.
+        </p>
+
+<ul><pre><p>sub init {
+    my ($self, $config) = @_;
+
+    my $baseargs = $self-&gt;_baseargs(qw( %OPTIONAL ));
+
+    return $self-&gt;_optional($baseargs-&gt;[0], $config);
+}</b></pre></ul>
+
+      </p><li><p>
+<a name="method__arguments"><b>_arguments( \@names, \@args )</b></a>
+<br>
+
+
+	<p>
+	  Similar to <a href="#method__mandatory"><code><b>_mandatory()</b></code></a> and
+	  <a href="#method__optional"><code><b>_optional()</b></code></a> above, this method sets named
+	  values but in this case from positional arguments.  The
+	  expected names of values are specified by reference to a
+	  list as the first argument and the list of candidate values
+	  is passed by reference as the second.  An error is raised
+	  and undef returned if any value is undefined.
+	</p>
+
+<ul><pre><p>sub new {
+    my ($class, @args) = @_;
+
+    my $baseargs = $class-&gt;_baseargs('@ARGUMENTS');
+
+    my $self = bless {
+        _ERROR  =&gt; '',
+    }, $class;
+
+    return $self-&gt;_arguments($baseargs-&gt;[0], \@args)
+        || $class-&gt;error($self-&gt;error());
+}</b></pre></ul>
+
+      </p></ul>
+
+
+    <b>Debug Methods:</b>
+<ul>
+<li><p>
+<a name="method_DEBUG"><b>DEBUG( $msg, $msg, ... )</b></a>
+<br>
+
+
+	Simple debugging method which prints all arguments to 
+	STDERR.
+<ul><pre><p>$myobj-&gt;DEBUG(&quot;The cat sat on the mat\n&quot;);</b></pre></ul>
+
+      </p><li><p>
+<a name="method_TRACE"><b>TRACE( @args )</b></a>
+<br>
+
+
+	More funky debugging method which generates a trace message
+	showing various potentially useful items, depending on the
+	value defined in the objects <code>_DEBUG</code> value or the
+	<code>$DEBUG</code> package variables in the object's class.
+	The higher the value (currently 0-4) the more detail is
+	generated.
+<ul><pre><p>$myobj-&gt;TRACE(&quot;The &quot;, $cat, &quot; sat on the &quot;, $mat);</b></pre></ul>
+
+      </p><li><p>
+<a name="method_ID"><b>ID()</b></a>
+<br>
+
+
+	Returns a string representing an identifier for the object
+	for debugging purposes.  By default, the value of the 
+	<a href="#pkgvar_ETYPE">$ETYPE</a>
+ variable in the object's package
+	is return.   Subclasses will most likely redefine this 
+	method to return some more meaningful value.
+      </p><li><p>
+<a name="method__inspect">
+<b>_inspect( $something )</b>
+<br>
+<b>_inspect( $something, $level )</b>
+<br>
+</a>
+
+
+        <!-- ignore args -->
+        <!-- ignore args -->
+
+	Attempts to Do The Right Thing to print a meaningful
+	representation of the <code>$something</code> passed as an
+	argument.  Will recurse into <code>$something</code>'s
+	structure while <code>$level</code> is less than 
+	<a href="#pkgvar_INSPECT_LEVEL">$INSPECT_LEVEL</a>
+.
+      </p><li><p>
+<a name="method__text_snippet">
+<b>_text_snippet( $text )</b>
+<br>
+<b>_text_snippet( $text, $length )</b>
+<br>
+</a>
+
+
+        <!-- ignore args -->
+        <!-- ignore args -->
+
+	Returns <code>$text</code> truncated to (at most)
+	<code>$length</code> characters, or the current value
+	of <a href="#pkgvar_SNIPPET">$SNIPPET</a>
+ if <code>$length</code>
+	is unspecified.  Strings that are truncated are returned
+	with '...' appended.
+      </p></ul>
+
+  
+<div align="center">
+<small><b>Perl XML::Schema Documentation</b></small>
+</div>
+</body>
+</html>

@@ -1,0 +1,49 @@
+#!/usr/bin/perl -s
+use XML::TMX::Reader;
+
+print STDERR "";
+
+my $TTU = 0;
+my $n = scalar(@ARGV);
+
+for my $file (@ARGV) {
+    my $tm = XML::TMX::Reader->new($file);
+
+    my $TU = 0;
+    $tm->for_tu({-raw => 1 },
+                 sub { $TU++ ;
+                       print STDERR "\r$TU..." unless $TU%1000;
+                   }
+                );
+    print STDERR "\r$file: $TU tu.\n";
+    $TTU += $TU;
+
+}
+print STDERR "total: $TTU tu.\n" if $n > 1;
+
+__END__
+
+=encoding utf-8
+
+=head1 NAME
+
+tmxwc - gives statistics about tmx files
+
+=head1 SYNOPSIS
+
+ tmxwc  tmx1 [tmx2 ...]
+
+=head1 DESCRIPTION
+
+Gives statistical information about TMX files like the number of
+translation units.
+
+=head1 AUTHOR
+
+Alberto Simões, E<lt>ambs@cpan.orgE<gt>
+
+=head1 SEE ALSO
+
+perl(1).
+
+=cut

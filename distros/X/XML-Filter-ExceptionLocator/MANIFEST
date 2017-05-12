@@ -1,0 +1,13 @@
+Changes
+Chucker.pm
+ExceptionLocator.pm
+MANIFEST
+MANIFEST.SKIP
+README
+t/01basic.t
+t/02chucker.t
+t/Chucker.pm
+t/bigger.xml
+t/ok.xml
+META.yml                                 Module meta-data (added by MakeMaker)
+Makefile.PL

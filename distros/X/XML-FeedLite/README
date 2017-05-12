@@ -1,0 +1,25 @@
+XML::FeedLite
+=========
+
+XML::FeedLite is an HTTP client for fetching and processing RSS and
+Atom feeds in parallel, using WWW::Curl::Simple.
+
+XML::FeedLite is designed to be fast and light on pre-requisites (no
+XML libraries like SAX, Expat, Xerces are required). It should also
+work happily under mod_perl including Apache::Registry. Problems using
+existing similar modules like XML::Atom in mod_perl were the primary
+drivers for writing this module.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+DEPENDENCIES
+
+See Build.PL

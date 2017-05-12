@@ -1,0 +1,53 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.61.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 f3f7dd180342534670eacefcecea9d18a6dbcbeb Build.PL
+SHA1 3ed93500ad8ab019c5f5bb4100d225c6b423dfc9 Changes
+SHA1 0c1dd3c98c2bac6514161b4b14f8b9e81e6e9773 MANIFEST
+SHA1 cc5b703c7c2f15d62b622609e389e57c8dca619c META.yml
+SHA1 188bad51492c8cfcdc301e0408c151e01c8d5785 Makefile.PL
+SHA1 2885d6de16a4a2539f57e2de5823b1ae9284f625 README
+SHA1 19302650213a8faac10ededc7883d41158aeac8e lib/XHTML/MediaWiki.pm
+SHA1 c9bc56dc40af36d8b9a36ddde1a5586d751ee0da t/blending.t
+SHA1 d5e8091b7e4ef0472247279110cbdd5ced38f5e8 t/cdata.t
+SHA1 e7b32c4d75f3b316a10fc53a93965420d11bfe08 t/changes.t
+SHA1 86c9715845d672e783b560bfe352189a37f57006 t/comment.t
+SHA1 db053789dece0cb8aa2c16896f1c5c335d1482a3 t/div.t
+SHA1 f2096d29c9a357963036e30c6f91407c2ac2430e t/footnotes.t
+SHA1 e724b9968d66c4d0c3e3ff09b5787eaef6845639 t/headers.t
+SHA1 518a498da2278e95c4b6d01ba087a47d39bbac49 t/html.t
+SHA1 bec6fdebdff35273fcf135c826a075546fe43139 t/line.t
+SHA1 1174bd5df8a3abefbbe34cd5cda611c8e8d08cbd t/links.t
+SHA1 ef9bed598d69d3fa24273aa30e1939ec5fe81b4c t/misc.t
+SHA1 8ee2fdd58f18d40893aad0c5105d9344c314cba2 t/nowiki.t
+SHA1 b73cf7d945591814d09c01ad7bf07a04d15fe0bf t/ordered.t
+SHA1 47194b231f1b11915a8b0e8b1d7d2997c8d00e57 t/para_break.t
+SHA1 6f58b10bd30ac5842eeedc32ddb4c72902752011 t/paragraph.t
+SHA1 9d38eb83b6fa38c6d35dc1892b5a03f108e0719f t/pod.t
+SHA1 1255f17de94bf569503519d5e9a2c5d5692f800f t/pod_coverage.t
+SHA1 853a6a3b1652f9e0da439722fe6fb28115693216 t/pre.t
+SHA1 6e8e72c9d6607bf30cf18fdfac770b35b0fdd06a t/prewiki.t
+SHA1 d3aad5d8b00ef3ee5d878ed635da16a0a4e808f8 t/template.t
+SHA1 d781743e755d44ba9d310637f1419eacf067d27f t/test02.t
+SHA1 b4a0078a2a22fe90b963df1d08e322ad40e4177f t/unordered.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+
+iGcEARECACcFAktXgUggGmh0dHA6Ly93d3cuZ2FtMy5uZXQvcG9saWN5Lmh0bWwA
+CgkQliSr/X1H0FwfGwCg0NwHRpSNF3KEvmat1BeP7nT4aowAoKy0QRDlY2czUDS2
+eNzrUkhuN+Ku
+=QJIO
+-----END PGP SIGNATURE-----

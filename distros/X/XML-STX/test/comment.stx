@@ -1,0 +1,15 @@
+<stx:transform version="1.0" 
+  xmlns:stx="http://stx.sourceforge.net/2002/ns"
+  strip-space="yes">
+
+  <stx:template match="node[@id=2]">
+    <stx:text>T1</stx:text>
+    <stx:comment>
+      <stx:text>Comment Text:</stx:text>
+      <stx:value-of select="position()"/>
+    </stx:comment>
+    <stx:text>T2</stx:text>
+    <stx:text>T3</stx:text>
+  </stx:template>
+  
+</stx:transform>

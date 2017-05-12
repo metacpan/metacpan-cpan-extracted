@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<dm:diff xmlns:dm="http://www.locus.cz/diffmark">
+  <page attr="1">
+    <dm:delete>
+      <word value="Arbeiter"/>
+    </dm:delete>
+    <word value="Kopf">
+      <dm:insert>
+        <trans value="hlava"/>
+      </dm:insert>
+    </word>
+  </page>
+</dm:diff>

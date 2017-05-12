@@ -1,0 +1,25 @@
+Build.PL
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+lib/XML/Atom/Categories.pm
+lib/XML/Atom/Collection.pm
+lib/XML/Atom/Service.pm
+lib/XML/Atom/Workspace.pm
+lib/XML/Atom/Atompub.pm
+t/00.load.t
+t/01.namespace.t
+t/02.categories.t
+t/03.collection.t
+t/04.workspace.t
+t/05.service.t
+t/06.atompub.t
+t/perlcritic.t
+t/pod-coverage.t
+t/pod.t
+t/samples/sample.atomcat
+t/samples/sample.atomsvc
+t/samples/sample.atom
+META.json

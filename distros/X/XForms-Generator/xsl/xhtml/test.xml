@@ -1,0 +1,394 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!-- $Id: test.xml,v 1.9 2002/10/13 23:14:38 rick Exp $ -->
+<!-- get emacs to shut up -->
+<!DOCTYPE html [
+  <!ELEMENT head (xforms:model+)>
+  <!ELEMENT body (xforms:group+)>
+  <!ELEMENT xforms:model ANY>
+  <!ELEMENT xforms:group ANY>
+]>
+<html xmlns:xforms="http://www.w3.org/2002/xforms/cr">
+  <head>
+	  <link rel="stylesheet" type="text/css" href="xforms.css"/>
+	  <style type="text/css">
+		form#model2 {
+		border: thin solid;
+		padding: .5em;
+		}
+		div.repeat-group {
+		background-color: #eee;
+		}
+	  </style>
+	  <title>Xforms Test</title>
+	  <xforms:model id="default">
+		<xforms:submission action="filter_test.cgi" 
+						   method="form-data-post"/>
+		<xforms:instance xmlns="">
+		  <text>
+			<text-input>mytext</text-input>
+			<secret>mypass</secret>
+		  </text>
+		  <textarea>1 mutltiline text data
+2 in the textarea</textarea>
+		  <output>this is the output</output>
+		  <file>testfile</file>
+		  <selectOne>2</selectOne>
+		  <selectMany>2 3</selectMany>
+		  <selectOne-2>2</selectOne-2>
+		  <selectMany-2>2 3</selectMany-2>
+		  <selectOne-3>2</selectOne-3>
+		  <selectMany-3>2 3</selectMany-3>
+		  <itemset-value>v2</itemset-value>
+		  <itemset-value-1>v2</itemset-value-1>
+		  <itemset-value-2>v2</itemset-value-2>
+		  <itemset>
+			<item value="v1" caption="value 1"/>
+			<item value="v2" caption="value 2"/>
+			<item value="v3" caption="value 3"/>
+		  </itemset>
+		  <repeat>
+			<item value="one">
+			  <itemset-value>v1</itemset-value>
+			  <selectMany>1</selectMany>
+			  <selectOne>1</selectOne>
+			</item>
+			<item value="two">
+			  <itemset-value>v2</itemset-value>
+			  <selectMany>1 2</selectMany>
+			  <selectOne>2</selectOne>
+			</item>
+			<item value="three">
+			  <itemset-value>v3</itemset-value>
+			  <selectMany>1 2 3</selectMany>
+			  <selectOne>3</selectOne>
+			</item>
+		  </repeat>
+
+		  <bound-repeat>
+			<item value="one">
+			  <itemset-value>v1</itemset-value>
+			  <selectMany>1</selectMany>
+			  <selectOne>1</selectOne>
+			</item>
+			<item value="two">
+			  <itemset-value>v2</itemset-value>
+			  <selectMany>1 2</selectMany>
+			  <selectOne>2</selectOne>
+			</item>
+			<item value="three">
+			  <itemset-value>v3</itemset-value>
+			  <selectMany>1 2 3</selectMany>
+			  <selectOne>3</selectOne>
+			</item>
+		  </bound-repeat>
+
+		</xforms:instance>
+		<xforms:bind nodeset="bound-repeat/item" id="bound-repeat" minOccurs="4"/>
+		<xforms:bind ref="my/compute/output" id='compute'
+					 calculate="sum(repeat/item/selectOne)"/>
+	  </xforms:model>
+
+	  <xforms:model id="model2">
+		<xforms:submission action="filter_test.cgi" 
+						   method="get"/>
+		<xforms:instance>
+		  <input>model2</input>
+		  <outer>
+			<inner>
+			  <bound-data>bound</bound-data>
+			  <bound-set>
+				<item value="v1" caption="bound 1"/>
+				<item value="v2" caption="bound 2"/>
+				<item value="v3" caption="bound 3"/>
+			  </bound-set>
+			</inner>
+		  </outer>
+		</xforms:instance>
+		<xforms:bind ref="outer" id="outer">
+		  <xforms:bind ref="inner" id="inner">
+			<xforms:bind ref="bound-data" id="bound-input"
+						 required='outer/inner/bound-data = "bound"'
+						 />
+			<xforms:bind ref="bound-data" id="unrequired-input"
+						 required='outer/inner/bound-data = "foo"'
+						 />
+			<xforms:bind nodeset="bound-set/item" id="bound-set"/>
+			<xforms:bind ref='bound-data' id='hidden-input'
+						 relevant='false()'/>
+			<xforms:bind ref='bound-data' id='invalid-input'
+						 isValid='false()'/>
+		  </xforms:bind>
+		</xforms:bind>
+	  </xforms:model>
+  </head>
+  <body>
+	<xforms:group>
+	  <!-- no-display groups do not generate divs.
+	  can be used for context grouping as below -->
+	  <xforms:group class="no-display" ref="text">
+		<xforms:input class="text-input" ref="text-input">
+		  <xforms:caption>text</xforms:caption>
+		</xforms:input>
+		<xforms:secret class="text-input" ref="secret">
+		  <xforms:caption>password</xforms:caption>
+		</xforms:secret>
+	  </xforms:group>
+	  <xforms:textarea class="text-input" ref="textarea">
+		<xforms:caption>textarea</xforms:caption>
+	  </xforms:textarea> 
+	  <div class="input">
+		<span class="caption">Some output</span>
+		<xforms:output ref="output"/>
+	  </div>
+	  <div class="input">
+		<span class="caption">Computed output</span>
+		<xforms:output bind="compute"/>
+	  </div>
+	  <xforms:upload accessKey="u" mediatype="text/html" ref="file">
+		<xforms:caption>file</xforms:caption>
+	  </xforms:upload>
+	  <div class="input">
+		<span class="caption">Some buttons</span>
+		<span class="input">
+		  <xforms:trigger
+						 xmlns:xforms="http://www.w3.org/2002/01/xforms"
+						 class="button" ref="button">
+			<xforms:help>
+			  Click on the pretty button!
+			</xforms:help>
+			<xforms:caption>
+			  This is a button!
+			</xforms:caption>
+		  </xforms:trigger>&#160;
+		  <xforms:submit submission="">
+			<xforms:caption>Save</xforms:caption>
+		  </xforms:submit>
+		</span>
+	  </div>
+
+	  <xforms:select1 ref="selectOne" appearance="compact">
+		<xforms:caption>list</xforms:caption>
+		<xforms:item>
+		  <xforms:caption>one</xforms:caption>
+		  <xforms:value>1</xforms:value>
+		</xforms:item>
+		<xforms:item>
+		  <xforms:caption>two</xforms:caption>
+		  <xforms:value>2</xforms:value>
+		</xforms:item>
+		<xforms:item>
+		  <xforms:caption>three</xforms:caption>
+		  <xforms:value>3</xforms:value>
+		</xforms:item>
+	  </xforms:select1>
+	  <div class="input">
+		<span class="caption"/><xforms:group class="group">
+		  <xforms:hint>Group Here!</xforms:hint>
+		  <xforms:caption>Group</xforms:caption>
+		  <xforms:select1 ref="selectOne-2" appearance="full">
+			<xforms:caption>radio</xforms:caption>
+			<xforms:item>
+			  <xforms:caption>one</xforms:caption>
+			  <xforms:value>1</xforms:value>
+			</xforms:item>
+			<xforms:item>
+			  <xforms:caption>two</xforms:caption>
+			  <xforms:value>2</xforms:value>
+			</xforms:item>
+			<xforms:item>
+			  <xforms:caption>three</xforms:caption>
+			  <xforms:value>3</xforms:value>
+			</xforms:item>
+		  </xforms:select1>
+		  <xforms:select ref="selectMany-2" appearance="full">
+			<xforms:caption>multiple</xforms:caption>
+			<xforms:item>
+			  <xforms:caption>one</xforms:caption>
+			  <xforms:value>1</xforms:value>
+			</xforms:item>
+			<xforms:item>
+			  <xforms:caption>two</xforms:caption>
+			  <xforms:value>2</xforms:value>
+			</xforms:item>
+			<xforms:item>
+			  <xforms:caption>three</xforms:caption>
+			  <xforms:value>3</xforms:value>
+			</xforms:item>
+		  </xforms:select>
+		  <xforms:select ref="itemset-value" appearance="full">
+			<xforms:caption>dynamic</xforms:caption>
+			<xforms:itemset nodeset="itemset/item">
+			  <xforms:caption ref="@caption"/>
+			  <xforms:value ref="@value"/>
+			</xforms:itemset>
+		  </xforms:select>
+		</xforms:group>
+	  </div>
+
+	  <xforms:select ref="selectMany-3" appearance="compact">
+		<xforms:caption>multiple</xforms:caption>
+		<xforms:choices>
+		  <xforms:caption>Group 1</xforms:caption>
+		  <xforms:item>
+			<xforms:caption>one</xforms:caption>
+			<xforms:value>1</xforms:value>
+		  </xforms:item>
+		  <xforms:item>
+			<xforms:caption>two</xforms:caption>
+			<xforms:value>2</xforms:value>
+		  </xforms:item>
+		</xforms:choices>
+		<xforms:choices>
+		  <xforms:caption>Group 2</xforms:caption>
+		  <xforms:hint>Not many here...</xforms:hint>
+		  <xforms:item>
+			<xforms:caption>three</xforms:caption>
+			<xforms:value>3</xforms:value>
+		  </xforms:item>
+		</xforms:choices>
+	  </xforms:select>
+
+	  <xforms:select1 ref="selectOne-3" appearance="minimal">
+		<xforms:caption>Menu</xforms:caption>
+		<xforms:item>
+		  <xforms:caption>one</xforms:caption>
+		  <xforms:value>1</xforms:value>
+		</xforms:item>
+		<xforms:item>
+		  <xforms:caption>two</xforms:caption>
+		  <xforms:value>2</xforms:value>
+		</xforms:item>
+		<xforms:item>
+		  <xforms:caption>three</xforms:caption>
+		  <xforms:value>3</xforms:value>
+		</xforms:item>
+	  </xforms:select1>
+	  <xforms:select1 ref="itemset-value" appearance="compact">
+		<xforms:caption>dynamic list</xforms:caption>
+		<xforms:itemset nodeset="itemset/item">
+		  <xforms:caption ref="@caption"/>
+		  <xforms:value ref="@value"/>
+		</xforms:itemset>
+	  </xforms:select1>
+	  <div class="repeat-group">
+		<xforms:repeat bind="bound-repeat">
+		  <xforms:caption>Bound Repeat</xforms:caption>
+		  <xforms:input ref="@value">
+			<xforms:caption>value</xforms:caption>
+		  </xforms:input>
+		</xforms:repeat>
+	  </div>
+	  <p/>
+	  <div class="repeat-group">
+		<xforms:repeat nodeset="repeat/item">
+		  <xforms:caption>Repeat</xforms:caption>
+		  <xforms:input ref="@value">
+			<xforms:caption>value</xforms:caption>
+		  </xforms:input>
+
+		  <xforms:select1 ref="selectOne" appearance="minimal">
+			<xforms:caption>Menu</xforms:caption>
+			<xforms:item>
+			  <xforms:caption>one</xforms:caption>
+			  <xforms:value>1</xforms:value>
+			</xforms:item>
+			<xforms:item>
+			  <xforms:caption>two</xforms:caption>
+			  <xforms:value>2</xforms:value>
+			</xforms:item>
+			<xforms:item>
+			  <xforms:caption>three</xforms:caption>
+			  <xforms:value>3</xforms:value>
+			</xforms:item>
+		  </xforms:select1>
+
+		  <xforms:select1 ref="selectOne" appearance="full">
+			<xforms:caption>radio</xforms:caption>
+			<xforms:item>
+			  <xforms:caption>one</xforms:caption>
+			  <xforms:value>1</xforms:value>
+			</xforms:item>
+			<xforms:item>
+			  <xforms:caption>two</xforms:caption>
+			  <xforms:value>2</xforms:value>
+			</xforms:item>
+			<xforms:item>
+			  <xforms:caption>three</xforms:caption>
+			  <xforms:value>3</xforms:value>
+			</xforms:item>
+		  </xforms:select1>
+
+		  <xforms:select1 ref="itemset-value" appearance="compact">
+			<xforms:caption>dynamic list</xforms:caption>
+			<xforms:itemset nodeset="/itemset/item">
+			  <xforms:caption ref="@caption"/>
+			  <xforms:value ref="@value"/>
+			</xforms:itemset>
+		  </xforms:select1>
+		  
+		  <xforms:select ref="selectMany" appearance="compact">
+			<xforms:caption>multiple</xforms:caption>
+			<xforms:choices>
+			  <xforms:caption>Group 1</xforms:caption>
+			  <xforms:item>
+				<xforms:caption>one</xforms:caption>
+				<xforms:value>1</xforms:value>
+			  </xforms:item>
+			  <xforms:item>
+				<xforms:caption>two</xforms:caption>
+				<xforms:value>2</xforms:value>
+			  </xforms:item>
+			</xforms:choices>
+			<xforms:choices>
+			  <xforms:caption>Group 2</xforms:caption>
+			  <xforms:hint>Not many here...</xforms:hint>
+			  <xforms:item>
+				<xforms:caption>three</xforms:caption>
+				<xforms:value>3</xforms:value>
+			  </xforms:item>
+			</xforms:choices>
+		  </xforms:select>
+
+		  <xforms:select1 ref="itemset-value" appearance="compact">
+			<xforms:caption>bound dynamic list</xforms:caption>
+			<xforms:itemset bind="bound-set" model="model2">
+			  <xforms:caption ref="@caption"/>
+			  <xforms:value ref="@value"/>
+			</xforms:itemset>
+		  </xforms:select1>
+
+		</xforms:repeat>
+	  </div>
+	</xforms:group>
+	
+	<xforms:group model="model2">
+	  <xforms:input ref="input">
+		<xforms:caption>model 2 input</xforms:caption>
+	  </xforms:input>
+	  <xforms:input bind="bound-input">
+		<xforms:caption>required input</xforms:caption>
+	  </xforms:input>
+	  <xforms:input bind="unrequired-input">
+		<xforms:caption>unrequired input</xforms:caption>
+	  </xforms:input>
+	  <xforms:input bind="invalid-input">
+		<xforms:caption>invalid input</xforms:caption>
+	  </xforms:input>
+	  (irrelevant input here)
+	  <xforms:input bind="hidden-input">
+		<xforms:caption>hidden input</xforms:caption>
+	  </xforms:input>
+
+	  <xforms:select1 ref="itemset-value-2" appearance="compact" model="default">
+		<xforms:caption>bound dynamic list</xforms:caption>
+		<xforms:itemset bind="bound-set" model="model2">
+		  <xforms:caption ref="@caption"/>
+		  <xforms:value ref="@value"/>
+		</xforms:itemset>
+	  </xforms:select1>
+	  <xforms:submit submission="">
+		<xforms:caption>Save Model 2</xforms:caption>
+	  </xforms:submit>
+	</xforms:group>
+  </body>
+</html>

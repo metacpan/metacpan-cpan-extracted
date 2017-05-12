@@ -1,0 +1,64 @@
+% title 'Thank You';
+% layout 'default';
+
+% if ( @{stash('cart')} ) {
+  <ul class="checkout_crumbs text-center">
+    <li class="col-md-15 label-success">Review products</li>
+    <li class="col-md-15 label-success">Enter contact information</li>
+    <li class="col-md-15 label-success">Review Pricing</li>
+    <li class="col-md-15 label-success">Pay for the order</li>
+    <li class="col-md-15 label-primary">Receive confirmation</li>
+  </ul>
+% } else {
+  <ul class="checkout_crumbs text-center">
+    <li class="col-md-4 label-success">Review products</li>
+    <li class="col-md-4 label-success">Enter contact information</li>
+    <li class="col-md-4 label-primary">Receive confirmation</li>
+  </ul>
+% }
+
+<div class="row">
+    % if ( items_in 'quote' ) {
+        <div class="col-md-<%= scalar(items_in 'cart') ? 6 : 12 %>">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h3 class="panel-title"><i class="glyphicon glyphicon-comment"></i> Your Quote Request</h3>
+                </div>
+                <div class="panel-body">
+                    <p>Thank you for your interest in our products.
+                        A sales representative will contact you
+                        within 2 business days.
+                    </p>
+
+                    <p>Your quote number is
+                        <strong><%= stash 'quote_number' %></strong>.
+                        Have this number handy if you contact us with
+                        any questions about your quote request.
+                    </p>
+                </div>
+            </div>
+        </div>
+    % }
+    % if ( items_in 'cart' ) {
+        <div class="col-md-<%= scalar(items_in 'quote') ? 6 : 12 %>">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h3 class="panel-title"><i class="glyphicon glyphicon-shopping-cart"></i> Your Purchase</h3>
+                </div>
+                <div class="panel-body">
+                    <p>Thank you for your purchase!
+                        Your order will be shipped on the <strong>next
+                        business day</strong> and will arrive within
+                        <strong>5–7 business days</strong>.
+                    </p>
+
+                    <p>Your order number is
+                        <strong><%= stash 'order_number' %></strong>.
+                        Have this number handy if you contact us with any
+                        questions about your order.
+                    </p>
+                </div>
+            </div>
+        </div>
+    % }
+</div>

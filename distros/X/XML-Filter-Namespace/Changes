@@ -1,0 +1,20 @@
+Revision history for Perl extension XML::Filter::Namespace.
+
+1.03  Sun Apr 27 19:40:21 BST 2003
+	- Fix stupid bug in Makefile.PL which prevented building.  Big
+	  thanks to CPAN Testers for pointing this out to me...
+
+1.02  Thu Apr 24 14:35:48 BST 2003
+	- Add Module::Build support.
+
+1.01  Thu Dec  5 09:38:35 GMT 2002
+	- Corrected examples in pod.
+
+1.00  Wed Dec  4 13:02:06 GMT 2002
+	- Copied source from internal module, cleaned up.
+
+0.01  Tue Dec  3 17:41:02 2002
+	- original version; created by h2xs 1.22 with options
+		-AX -b 5.6.1 -n XML::Filter::Namespace
+
+# @(#) $Id: Changes,v 1.5 2003/04/27 18:41:37 dom Exp $

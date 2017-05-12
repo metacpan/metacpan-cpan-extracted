@@ -1,0 +1,127 @@
+			XML::Node Version 0.11
+
+Here is a quick but complete example to show you how XML::Node promises
+to keep your XML processing scripts short and clear.
+----------  orders.xml  ----------------------------------------------
+<Orders>
+  <Order ID="0008">
+    <Item>A Book</Item>
+    <Quantity>1</Quantity>
+    <TagsThatIDontCare>Something</TagsThatIDontCare>
+   </Order>
+   <TagsThatIDontCare>Blah Blah</TagsThatIDontCare>
+</Orders>
+
+----------  parse-orders.pl ------------------------------------------
+use XML::Node;
+
+my $item = "";
+my $quantity = "";
+my $id = "";
+
+$p = XML::Node->new();
+
+$p->register(">Orders>Order:ID","char" => \$item);
+$p->register(">Orders>Order>Item","char" => \$item);
+$p->register(">Orders>Order>Quantity","char" => \$quantity);
+$p->register(">Orders>Order","end" => \&handle_order_end);
+
+print "Processing file [orders.xml]...\n";
+$p->parsefile("orders.xml");
+
+sub handle_order_end
+{
+    print "Found order [$id] -- Item: [$item] Quantity: [$quantity]\n";
+    $id="";
+    $item = "";
+    $quantity = "";
+}
+
+---------------------------------------------------------------------
+Copyright (c)  1999,2000,2001 Chang  Liu 
+All rights  reserved.  
+
+This program is  free software; you can redistribute  it and/or modify
+it under the same terms as Perl itself.
+
+This is  a Perl  extension interface to  XML::Parser.  It  requires at
+least version 5.004 of perl.  The documentation for this extension can
+be  found in  pod  format in  the file Node.pm. The 'perldoc' program,
+provided  with  the  perl  distribution,  can be  used  to  view  this
+documentation.
+
+The  purpose  of   this  module  is  to  simplify   interface  of  XML
+parser. Instead of worrying about "start", "end", and "char" callbacks
+of every single XML node, you can  simply say that you only want to be
+notified  when  a  path,  such  as ">TestCase>Name",  is  found.  Path
+">TestCase>Name" corresponds to XML nodes:
+  <TestCase>
+    ...
+    <Name>Something</Name>
+    ...
+  </TestCase>
+
+Using XML::Node, you can easily ignore the parts of XML files that you
+are not interested  in.  Another feature of XML::Node  is that you can
+register a variable instead  of a callback function. The corresponding
+string  found in a  XML file  will be  automatically appended  to your
+variable. This  way, you don't have  to write a  callback function for
+this type of simple handling. Here's an example:
+
+  my $testcase_name = "";
+  register(">TestCase>Name","char" => \$testcase_name);
+
+
+---------------------------------------------------------------------
+To  install this  module, cd  to  the directory  that contains  this
+README file and type the following:
+
+	perl Makefile.PL
+
+Alternatively, if  you plan to install XML::Node  somewhere other than
+your  system's perl library  directory.  You  can type  something like
+this:
+
+	perl Makefile.PL PREFIX=/home/me/perl INSTALLDIRS=perl
+
+Then to build you run make.
+
+	make
+
+You can then test the module by typing:
+
+	make test
+
+There are some sample utilities in the samples directory along with an
+xml form  of the XML  specification to test  them on. You may  need to
+change  the  '#!' line  at  the  top of  these  utilities  to what  is
+appropriate for your system. If  you're going to play around with them
+prior to installing  the module, you would need to  add the blib paths
+to your perl  search path, like this (assuming  your current directory
+is samples):
+
+    perl -I../blib/lib -I../blib/arch test.pl
+
+or set your PERLLIB environment variable.
+
+If you have write access to the installation directories, you may then
+install by typing:
+
+    make install
+
+After this, you  may use "man XML::Node" to view the  man page of this
+module.
+
+
+---------------------------------------------------------------------
+When testing the package, make sure "make install" is called every 
+time after "Node.pm" is modified.
+---------------------------------------------------------------------
+To rebuild the package: 
+	edit MANIFEST
+	perl Makefile.PL
+	make dist or nmake dist (make sure tar and gzip are on path.)
+
+  --Chang Liu (liu@ics.uci.edu | changliu@acm.org)
+
+

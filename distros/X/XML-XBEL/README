@@ -1,0 +1,180 @@
+NAME
+    XML::XBEL - OOP for reading and writing XBEL documents.
+
+SYNOPSIS
+     # creating an XBEL document
+
+     use XML::XBEL;
+     use XML::XBEL::Folder;
+     use XML::XBEL::Bookmark;
+
+     my $xbel = XML::XBEL->new();
+     $xbel->new_document({title=>"My Bookmarks"});
+
+     $xbel->add_bookmark({href  => "http://foo.com",
+                          title => "foo",
+                          desc  => "bar"});
+
+     my $folder1 = XML::XBEL::Folder->new({title => "comp"});
+     my $folder2 = XML::XBEL::Folder->new({title => "lang"});
+     my $folder3 = XML::XBEL::Folder->new({title => "perl"});
+
+     my $bm = XML::XBEL::Bookmark->new({"title=>"misc"});
+     $bm->href("http://groups.google.com/groups?q=comp.lang.perl.misc");
+
+     $folder3->add_bookmark($bm);
+     $folder2->add_folder($folder3);
+     $folder1->add_folder($folder2);
+
+     $xbel->add_folder($folder1);
+
+     print $xbel->toString();
+
+     # parsing an XBEL document
+
+     use XML::XBEL;
+
+     my $xbel = XML::XBEL->new();
+     $xbel->parse_file($file);
+ 
+     foreach my $bm ($xbel->bookmarks()) {
+
+         print sprintf("%s points to %s\n",
+                       $bm->title(),
+                       $bm->href());
+     } 
+
+DESCRIPTION
+    OOP for reading and writing XBEL files.
+
+PACKAGE METHODS
+  __PACKAGE__->new()
+    Returns an *XML::XBEL* object.
+
+OBJECT METHODS
+  $self->parse_file($file)
+    Returns true or false.
+
+  $self->parse_string($string)
+    Returns true or false.
+
+  $obj->new_document(\%args)
+    Valid arguments are :
+
+    * title
+        String.
+
+    * desc
+        String.
+
+    * info
+        Hash ref, with the following key/value pairs :
+
+        * *owner*
+              Array ref.
+
+    Returns true or false.
+
+  $obj->title($title)
+    Get/set the title for an XBEL document.
+
+    Returns a string when called with no arguments; otherwise returns true
+    or false.
+
+  $obj->desc($description)
+    Get/set the description for an XBEL document.
+
+    Returns a string when called with no arguments; otherwise returns true
+    or false.
+
+  $obj->info(\%args)
+    Get/set the metadata for an XBEL document.
+
+    Valid args are :
+
+    * owner
+        Array reference
+
+    Returns an array reference when called with no arguments; otherwise
+    returns true or false.
+
+  $obj->bookmarks($recursive)
+    Returns a list of child *XML::XBEL::Bookmark* objects.
+
+    Where *$recursive* is a boolean indicating whether to return all the
+    bookmarks in an XBEL document or only its immediate children.
+
+  $obj->folders($recursive)
+    Returns a list of child *XML::XBEL::Folder* objects.
+
+    Where *$recursive* is a boolean indicating whether to return all the
+    folders in an XBEL document or only its immediate children.
+
+  $obj->aliases($recursive)
+    Returns a list of child *XML::XBEL::Alias* objects.
+
+    Where *$recursive* is a boolean indicating whether to return all the
+    aliases in an XBEL document or only its immediate children.
+
+  $obj->find_by_id($id)
+    Returns an *XML::XBEL::Bookmark* or *XML::XBEL::Folder* object whose id
+    attribute matches $id.
+
+  $obj->find_by_href($href)
+    Returns a list of *XML::XBEL::Bookmark* objects whose href attribute
+    matches $href.
+
+  $obj->add_bookmark((XML::XBEL::Bookmark || \%args))
+    Add a new bookmark to an XBEL document.
+
+    If passed a hash ref, valid arguments are the same as those defined for
+    the *XML::XBEL::Bookmark* object constructor.
+
+  $obj->add_folder((XML::XBEL::Folder || \%args))
+    Add a new folder to an XBEL document.
+
+    If passed a hash ref, valid arguments are the same as those defined for
+    the *XML::XBEL::Folder* object constructor.
+
+  $obj->add_alias((XML::XBEL::Alias || \%args))
+    Add a new alias to an XBEL document.
+
+    If passed a hash ref, valid arguments are the same as those defined for
+    the *XML::XBEL::Alias* object constructor.
+
+  $obj->add_separator()
+    Add a new separator to an XBEL document.
+
+  $obj->toString($format)
+  $obj->toFile($filename,$format)
+  $obj->toFH(\*$fh,$format)
+  $obj->toSAX(A::SAX::Handler)
+    Generate SAX events for the XBEL object.
+
+VERSION
+    1.4
+
+DATE
+    $Date: 2005/04/02 20:54:52 $
+
+AUTHOR
+    Aaron Straup Cope <ascope@cpan.org>
+
+SEE ALSO
+    XML::XBEL::Folder
+
+    XML::XBEL::Bookmark
+
+    XML::XBEL::Alias
+
+    XML::XBEL::Separator
+
+BUGS
+    It's possible. Please report all bugs via http://rt.cpan.org
+
+LICENSE
+    Copyright (c) 2004 Aaron Straup Cope. All rights reserved.
+
+    This is free software, you may use it and distribute it under the same
+    terms as Perl itself.
+

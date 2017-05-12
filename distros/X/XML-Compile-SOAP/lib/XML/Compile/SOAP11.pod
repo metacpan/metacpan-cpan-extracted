@@ -1,0 +1,367 @@
+=encoding utf8
+
+=head1 NAME
+
+XML::Compile::SOAP11 - SOAP 1.1 protocol
+
+=head1 INHERITANCE
+
+ XML::Compile::SOAP11 has extra code in
+   XML::Compile::SOAP11::Encoding
+
+ XML::Compile::SOAP11
+   is a XML::Compile::SOAP
+
+ XML::Compile::SOAP11 is extended by
+   XML::Compile::SOAP11::Client
+   XML::Compile::SOAP11::Server
+
+=head1 SYNOPSIS
+
+ # use either XML::Compile::SOAP11::Client or ::Server
+ # See XML::Compile::SOAP for global usage examples.
+
+=head1 DESCRIPTION
+
+This module handles the SOAP protocol version 1.1.
+See F<http://www.w3.org/TR/2000/NOTE-SOAP-20000508/>).
+The implementation tries to behave like described in
+F<http://www.ws-i.org/Profiles/BasicProfile-1.0.html>
+
+Two extensions are made: the SOAP11 client
+L<XML::Compile::SOAP11::Client|XML::Compile::SOAP11::Client>.
+and server in L<XML::Compile::SOAP11::Server|XML::Compile::SOAP11::Server>.
+
+Extends L<"DESCRIPTION" in XML::Compile::SOAP|XML::Compile::SOAP/"DESCRIPTION">.
+ 
+=head1 METHODS
+
+Extends L<"METHODS" in XML::Compile::SOAP|XML::Compile::SOAP/"METHODS">.
+ 
+=head2 Constructors
+
+Extends L<"Constructors" in XML::Compile::SOAP|XML::Compile::SOAP/"Constructors">.
+ 
+=over 4
+
+=item $obj-E<gt>B<new>(%options)
+
+To simplify the URIs of the actors, as specified with the C<destination>
+option, you may use the STRING C<NEXT>.  It will be replaced by the
+right URI.
+
+ -Option    --Defined in        --Default
+  media_type  XML::Compile::SOAP  text/xml
+  schemas     XML::Compile::SOAP  created internally
+
+=over 2
+
+=item media_type => MIMETYPE
+
+=item schemas => C<XML::Compile::Cache> object
+
+=back
+
+=item XML::Compile::SOAP11-E<gt>B<register>($uri, $envns)
+
+Inherited, see L<XML::Compile::SOAP/"Constructors">
+
+=back
+
+=head2 Accessors
+
+Extends L<"Accessors" in XML::Compile::SOAP|XML::Compile::SOAP/"Accessors">.
+ 
+=over 4
+
+=item $obj-E<gt>B<mediaType>()
+
+Inherited, see L<XML::Compile::SOAP/"Accessors">
+
+=item $obj-E<gt>B<schemas>()
+
+Inherited, see L<XML::Compile::SOAP/"Accessors">
+
+=item $obj-E<gt>B<version>()
+
+Inherited, see L<XML::Compile::SOAP/"Accessors">
+
+=back
+
+=head2 Single message
+
+Extends L<"Single message" in XML::Compile::SOAP|XML::Compile::SOAP/"Single message">.
+ 
+=over 4
+
+=item $obj-E<gt>B<compileMessage>( <'SENDER'|'RECEIVER'>, %options )
+
+ -Option        --Defined in        --Default
+  body            XML::Compile::SOAP  []
+  destination     XML::Compile::SOAP  []
+  faults          XML::Compile::SOAP  []
+  header          XML::Compile::SOAP  undef
+  headerfault                         []
+  mustUnderstand  XML::Compile::SOAP  []
+  procedure       XML::Compile::SOAP  undef
+  role            XML::Compile::SOAP  ULTIMATE
+  roles           XML::Compile::SOAP  []
+
+=over 2
+
+=item body => ENTRIES|HASH
+
+=item destination => ARRAY-OF-PAIRS
+
+=item faults => ENTRIES|HASH
+
+=item header => ENTRIES|HASH
+
+=item headerfault => ENTRIES
+
+ARRAY of simple name with element references, for all expected
+faults.  There can be unexpected faults, which will not get
+decoded automatically.
+
+=item mustUnderstand => STRING|ARRAY-OF-STRING
+
+=item procedure => TYPE
+
+=item role => URI|ARRAY-OF-URI
+
+=item roles => ARRAY-OF-URI
+
+=back
+
+=item $obj-E<gt>B<messageStructure>($xml)
+
+=item XML::Compile::SOAP11-E<gt>B<messageStructure>($xml)
+
+Inherited, see L<XML::Compile::SOAP/"Single message">
+
+=back
+
+=head2 Helpers
+
+Extends L<"Helpers" in XML::Compile::SOAP|XML::Compile::SOAP/"Helpers">.
+ 
+=head2 Transcoding
+
+Extends L<"Transcoding" in XML::Compile::SOAP|XML::Compile::SOAP/"Transcoding">.
+ 
+=over 4
+
+=item $obj-E<gt>B<replyMustUnderstandFault>($type)
+
+Inherited, see L<XML::Compile::SOAP/"Transcoding">
+
+=item $obj-E<gt>B<roleAbbreviation>($uri)
+
+Inherited, see L<XML::Compile::SOAP/"Transcoding">
+
+=item $obj-E<gt>B<roleURI>($uri|STRING)
+
+Inherited, see L<XML::Compile::SOAP/"Transcoding">
+
+=back
+
+=head1 DETAILS
+
+Extends L<"DETAILS" in XML::Compile::SOAP|XML::Compile::SOAP/"DETAILS">.
+ 
+=head2 SOAP introduction
+
+Extends L<"SOAP introduction" in XML::Compile::SOAP|XML::Compile::SOAP/"SOAP introduction">.
+ 
+=head2 Supported servers
+
+Extends L<"Supported servers" in XML::Compile::SOAP|XML::Compile::SOAP/"Supported servers">.
+ 
+=head2 Naming types and elements
+
+Extends L<"Naming types and elements" in XML::Compile::SOAP|XML::Compile::SOAP/"Naming types and elements">.
+ 
+=head2 Client and Server implementations
+
+Extends L<"Client and Server implementations" in XML::Compile::SOAP|XML::Compile::SOAP/"Client and Server implementations">.
+ 
+=head2 Use of wildcards (any and anyAttribute)
+
+Extends L<"Use of wildcards (any and anyAttribute)" in XML::Compile::SOAP|XML::Compile::SOAP/"Use of wildcards (any and anyAttribute)">.
+ 
+=head2 Header and Body entries
+
+You only call L<compileMessage()|XML::Compile::SOAP11/"Single message"> explicitly if you do not have a WSDL
+file which contains this information. In the unlucky situation, you
+have to dig out the defined types by hand.
+
+But even with a WSDL, there are still a few problems you may encounter.
+For instance, the WSDL will not contain C<mustUnderstand> and C<actor>
+header routing information.  You can add these to the compileClient call
+
+  my $call = $wsdl->compileClient
+    ( 'MyCall'
+    , mustUnderstand => 'h1'
+    , destination    => [ h1 => 'NEXT' ]
+    );
+
+=head3 Simplest form
+
+In the simplest form, the C<header> and C<body> refer (optionally) to a
+list of PAIRS, each containing a free to choose unique label and the
+type of the element.  The unique label will be used in the Perl HASH
+which represents the message.
+
+ my $h1el = pack_type $myns, $some_local;
+ my $b1el = 'myprefix:$other_local';
+
+ my $encode_query = $client->compileMessage
+   ( 'SENDER'
+   , header   => [ h1 => $h1el ]
+   , body     => [ b1 => $b1el ]
+   , mustUnderstand => 'h1'
+   , destination    => [ h1 => 'NEXT' ]
+   );
+
+=head3 Most powerful form
+
+When the simple form is too simple, you can use a HASH for the header,
+body or both.  The HASH structure is much like the WSDL structure.
+For example:
+
+ my $encode_query = $client->compileMessage
+   ( 'SENDER'
+   , header   =>
+      { use   => 'literal'
+      , parts => [ { name => 'h1', element => $h1el
+                   , mustUnderstand => 1, destination => 'NEXT'
+                   } ]
+      }
+   , body     => [ b1 => $b1el ]
+   );
+
+So, the header now is one HASH, which tells us that we have a literal
+definition (this is the default).  The optional parts for the header is
+an ARRAY of HASHes, each describing one part.  As you can see, the
+mustUnderstand and destination fields are more convenient (although
+the other syntax will work as well).
+
+If you feel the need to control the compilation of the various parts,
+with hooks or options (see L<XML::Compile::Schema::compile()|XML::Compile::Schema/"Compilers">), then have
+a look at L<XML::Compile::Cache::declare()|XML::Compile::Cache/"Administration">.  Declare how to handle the
+various types before you call L<compileMessage()|XML::Compile::SOAP11/"Single message">.
+
+=head2 Receiving faults in SOAP1.1
+
+When faults are received, they will be returned with the C<Fault> key
+in the data structure.  So:
+
+  my $answer = $call->($question);
+  if($answer->{Fault}) { ... }
+
+As extra service, for each of the fault types, as defined with
+L<compileMessage(faults)|XML::Compile::SOAP/"Single message">, a decoded structure is included.  The name
+of that structure can be found like this:
+
+  if(my $faults = $answer->{Fault})
+  {   my $name    = $faults->{_NAME};
+      my $decoded = $answer->{$name};
+      ...
+  }
+
+The untranslated C<$faults> HASH looks like this:
+
+ Fault =>
+   { faultcode => '{http://schemas.xmlsoap.org/soap/envelope/}Server.first'
+   , faultstring => 'my mistake'
+   , faultactor => 'http://schemas.xmlsoap.org/soap/actor/next'
+   , detail => { '{http://test-types}fault_one' => [ XMLNODES ] }
+   , _NAME => 'fault1'
+   }
+
+The C<_NAME> originates from the L<compileMessage(faults)|XML::Compile::SOAP/"Single message"> option:
+
+   $soap->compileMessage('RECEIVER', ...
+     , faults => [ fault1 => '{http://test-types}fault_one' ] );
+
+Now, automatically the answer will contain the decoded fault
+structure as well:
+
+  fault1 =>
+    { code => '{http://schemas.xmlsoap.org/soap/envelope/}Server.first'
+    , class  => [ 'http://schemas.xmlsoap.org/soap/envelope/'
+         , 'Receiver', 'first' ]
+    , reason => 'my mistake',
+    , role   => 'NEXT'
+    , detail => { help => 'please ignore' }
+    }
+
+The C<detail> is the decoding of the XMLNODES, which are defined to
+be of type C<< {http://test-types}fault_one >>.
+
+The C<class> is an unpacked version of the code.  SOAP1.2 is using the
+(better) terms C<Sender> and C<Receiver>.
+
+C<role> is constructed by decoding the C<faultactor> using
+L<roleAbbreviation()|XML::Compile::SOAP/"Transcoding">.  The names are closer to the SOAP1.2 specification.
+
+If the received fault is of an unpredicted type, then the client tries
+to DWIM. in the worst case, C<detail> will list the unparsed XMLNODEs.
+When the L<XML::Compile::SOAP::Daemon|XML::Compile::SOAP::Daemon> server has produced the error,
+the content of the reply will typically be
+
+ { Fault =>        # SOAP version specific
+    { _NAME => 'error'
+    , #...more...
+    }
+ , error =>        # less SOAP version specific, readable
+    { role    => 'NEXT'
+    , reason  => 'procedure xyz for SOAP11 produced an invalid response'
+    , error   => 'some explanation'
+    , code    =>
+        '{http://schemas.xmlsoap.org/soap/envelope/}Server.invalidResponse'
+    , class   => [ SOAP11ENV, 'Receiver', 'invalidResponse' ],
+    }
+  }
+
+Hence, a typical client routine could contain
+
+  my ($answer, $trace) = $call->(message => $message);
+  if(my $f = $answer->{Fault})
+  {   if($f->{_NAME} eq 'error')
+      {   # server implementation error
+          die "SERVER ERROR:\n$answer->{error}{error}\n";
+      }
+      else
+      {   # the fault is described in the WSDL, handle it!
+          warn "FAULT:\n",Dumper $answer->{$f->{_NAME}};
+      }
+  }
+  else
+  {   # correct answer
+      print Dumper $answer;
+  }
+
+Or
+
+  my ($answer, $trace) = $call->(message => $message);
+  $answer or die $trace->error;
+
+=head1 SEE ALSO
+
+This module is part of XML-Compile-SOAP distribution version 3.21,
+built on January 11, 2017. Website: F<http://perl.overmeer.net/xml-compile/>
+
+Please post questions or ideas to the mailinglist at
+F<http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/xml-compile> .
+For live contact with other developers, visit the C<#xml-compile> channel
+on C<irc.perl.org>.
+
+=head1 LICENSE
+
+Copyrights 2007-2017 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

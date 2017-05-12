@@ -1,0 +1,83 @@
+# test a sequence containing a choice
+--- |
+ <schema xmlns="http://www.w3.org/2001/XMLSchema">
+   <element name="container">
+     <complexType>
+       <sequence>
+         <choice>
+           <element name="head_one"/>
+           <element name="head_two"/>
+           <sequence>
+              <element name="multi_head" minOccurs="1" maxOccurs="unbounded"/>
+           </sequence>
+         </choice>
+         <element name="middle"/>
+         <element name="tail"/>
+       </sequence>
+     </complexType>
+   </element>
+ </schema>
+
+--- |
+ <container>
+   <head_one/>
+   <middle/>
+   <tail/>
+ </container>
+--- >
+PASS
+
+--- |
+ <container>
+   <multi_head/>
+   <multi_head/>
+   <multi_head/>
+   <middle/>
+   <tail/>
+ </container>
+--- >
+PASS
+ 
+--- |
+ <container>
+   <head_two/>
+   <middle/>
+   <tail/>
+ </container>
+--- >
+PASS
+
+--- |
+ <container>
+   <middle/>
+   <tail/>
+ </container>
+--- >
+FAIL /'middle' does not match content model '\(\(head_one\|head_two\|\(multi_head\+\)\),middle,tail\)'/
+
+--- |
+ <container>
+   <head_one/>
+   <head_two/>
+   <middle/>
+   <tail/>
+ </container>
+--- >
+FAIL
+
+--- |
+ <container>
+   <head_two/>
+   <tail/>
+ </container>
+--- >
+FAIL
+
+--- |
+ <container>
+   <head_two/>
+   <middle/>
+ </container>
+--- >
+FAIL
+

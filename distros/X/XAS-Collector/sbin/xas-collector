@@ -1,0 +1,169 @@
+#!/usr/bin/perl
+# ============================================================================
+#             Copyright (c) 2014 Kevin L. Esteb All Rights Reserved
+#
+#
+# TITLE:       xas-collector
+#
+# FACILITY:    XAS 
+#
+# ABSTRACT:    This procdure will collect alert data from the message queue
+#              and store it into a database.
+#
+# ENVIRONMENT: XAS Environment
+#
+# PARAMETERS:  
+#              --log-file     the log file to use
+#              --log-type     the type of log file
+#              --log-facility the facility class of the log
+#              --pid-file     the pid file to use
+#              --cfg-file     the configuration file to use
+#              --install      install as a service on Windows
+#              --deinstall    deinstall as a service on Windows
+#              --help         prints out a helpful help message
+#              --manual       prints out the procedures manual
+#              --version      prints out the procedures version
+#              --debug        toggles debug output
+#              --daemon       wither to become a daemon
+#              --alerts       toggles alert notification
+#
+# RETURNS:     0 - success
+#              1 - failure
+#              2 - already running
+#
+# Version      Author                                              Date
+# -------      ----------------------------------------------      -----------
+# 0.01         Kevin Esteb                                         25-Nov-2014
+#
+# ============================================================================
+#
+
+use lib "../lib";
+use XAS::Apps::Collector::Process;
+
+main: {
+
+    my $app = XAS::Apps::Collector::Process->new(
+        -throws  => 'xas-collector',
+    );
+
+    exit $app->run();
+
+}
+
+__END__
+
+=head1 NAME
+
+xas-collector - Collects events for the XAS environment
+
+=head1 SYNOPSIS
+
+xas-collector [--help] [--debug] [--manual] [--version]
+
+ options:
+
+    --log-file     the log file to use
+    --log-type     the type of log file
+    --log-facility the facility class of the log
+    --pid-file     the pid file to use
+    --cfg-file     the configuration file to use
+    --install      install as a service on Windows
+    --deinstall    deinstall as a service on Windows
+    --help         prints out a helpful help message
+    --manual       prints out the procedures manual
+    --version      prints out the procedures version
+    --debug        toggles debug output
+    --daemon       wither to become a daemon
+    --alerts       toggles alert notification
+
+=head1 DESCRIPTION
+
+This procedure monitors queues on the the message queue server and process
+any entries on those queues. This uses a configuration file to load the
+specific modules needed to do this task.
+
+=head1 CONFIGURATION
+
+Please refer to L<XAS::Apps::Collector::Process|XAS::Apps::Collector::Process> 
+for configuration file information.
+
+=head1 OPTIONS AND ARGUMENTS
+
+=over 4
+
+=item B<-cfg-file>
+
+The configuration file to use.
+
+=item B<--log-type>
+
+Toggles the log type. Defaults to 'console'. Can be 'console', 'file', 
+'json' or 'syslog'.
+
+=item B<--log-facility>
+
+Toggles the log facilty. Defaults to 'local6'. This follows syslog
+convention.
+
+=item B<--log-file>
+
+The log file to use.
+
+=item B<--pid-file>
+
+the pid file to use.
+
+=item B<--daemon>
+
+Run as a daemon.
+
+=item B<--debug>
+
+Turns on debbuging.
+
+=item B<--help>
+
+Displays a simple help message.
+
+=item B<--manual>
+
+The complete documentation.
+  
+=item B<--version>
+
+Prints out the apps version
+
+=back
+
+=head1 EXIT CODES
+
+ 0 - success
+ 1 - failure
+ 2 - already running
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<XAS::Apps::Collector::Process|XAS::Apps::Collector::Process>
+
+=item L<XAS::Collector|XAS::Collector>
+
+=item L<XAS|XAS>
+
+=back
+
+=head1 AUTHOR
+
+Kevin L. Esteb, E<lt>kesteb@kesteb.usE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2012-2014 Kevin L. Esteb
+
+This is free software; you can redistribute it and/or modify it under
+the terms of the Artistic License 2.0. For details, see the full text
+of the license at http://www.perlfoundation.org/artistic_license_2_0.
+
+=cut

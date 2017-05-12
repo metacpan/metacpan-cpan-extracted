@@ -1,0 +1,49 @@
+X11::GUITest ($Id: CodingStyle 203 2011-05-15 02:03:11Z ctrondlp $)
+
+This is a short list of coding style guidelines to be used when
+developing for this project.
+--------------------------------------------------------------------
+
+General:
+- Utilize language idioms for aspects not covered below.
+- Be consistent.
+- Write the code for people first, computers second.
+- If you are just adding enhancements to an existing
+  module and not rewriting it, you should maintain the
+  existing coding styles that are in place.
+
+Indentation:
+- 4 character indents
+
+Braces/Spacing:
+
+	int func(void)
+	{
+	}
+
+	if (var) {
+		printf("Hello\n");
+	}
+
+	while (true) {
+	}
+
+Variables:
+- Descriptive names for globals or ones that are file scoped.  Mixed
+  case is also prefered for these.
+- Shorter names can be used for locals.
+- Use static and const when appropriate.
+- Perl variables should be scoped appropriately.
+
+Functions/Subroutines:
+- Utilize mixed case, first character of each word capitalized
+- Noun, Verb, etc. ordering of function names should be consistent 
+  (i.e., GetThis, SetThat)
+
+Commenting:
+- Don't try to explain HOW your code works, rather explain WHY it is
+  doing what it does.
+- And if you have to explain a lot about your code, consider rewriting
+  your code to be easier to follow.
+
+--------------------------------------------------------------------

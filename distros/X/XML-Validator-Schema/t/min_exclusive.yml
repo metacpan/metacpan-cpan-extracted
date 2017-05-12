@@ -1,0 +1,20 @@
+--- |
+  <?xml version="1.0" encoding="UTF-8"?>
+  <schema xmlns="http://www.w3.org/2001/XMLSchema">
+    <element name="foo" type="sometype"/>
+    <simpleType name="sometype">
+       <restriction base="decimal">
+          <minExclusive value="-50"/>
+       </restriction>
+    </simpleType>
+  </schema>
+
+--- |
+  <foo>-49</foo>
+--- >
+PASS
+
+--- |
+  <foo>-50</foo>
+--- >
+FAIL

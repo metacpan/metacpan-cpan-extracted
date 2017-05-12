@@ -1,0 +1,36 @@
+
+======== version history for XML::Compile::RPC
+
+version 0.17: Thu Sep 12 08:30:44 CEST 2013
+	- rpc "string" type, now from ASCIIstring to xsd:string
+	  [Caleb Cushing]
+
+version 0.16: Sun Aug 18 13:34:51 CEST 2013
+	- add 'nil' fields, reported by [Caleb Cushing]
+	- move t/99pod.t to xt/ to remove dependency on Test::POD
+
+version 0.15: Thu Jun 17 12:14:54 CEST 2010
+	- documentation clean-ups.
+	- fix for change in Log::Report, now exporting trace() by default.
+
+version 0.14: Wed Oct 28 10:43:08 CET 2009
+	- make XML::Compile::RPC a helper of ::Client, instead of a ::Client
+	  derived from ::RPC.
+
+version 0.13: Tue Oct 27 17:01:34 CET 2009
+	- typo: value type Base64 -> base64
+	- add ::Client::headers() accessor to be able to manipulate
+	  the header under fly.
+	- return fault code -1, when the faultCode value is 0: to
+	  fail or not to fail, that's the question.
+
+version 0.12: Sat Oct 24 22:31:07 CEST 2009
+	- more documentation and doc-fixes.
+
+version 0.11: Sat Oct 24 21:11:42 CEST 2009
+	- documentation fixes
+	- more flexibility in the call parameters.
+
+version 0.10: Wed Oct 21 13:56:11 CEST 2009
+	- initial version, probably full implementation but not
+	  tested in real-life.

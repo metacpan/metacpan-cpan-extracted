@@ -1,0 +1,156 @@
+=encoding utf8
+
+=head1 NAME
+
+XML::Compile::XOP::Include - Represents one XOP node.
+
+=head1 SYNOPSIS
+
+  # See also SYNOPSIS of XML::Compile::XOP
+  my $xop       = XML::Compile::XOP->new;
+  my $xop_image = $xop->bytes($binary_image);
+  my $answer    = $call->(image => $xop_image);
+
+=head1 DESCRIPTION
+
+Represents one data-set which will be represented as separate (binary)
+object during transport.  This can only be used on data fields which
+are base64Binary.
+
+YOU SHOULD NOT instantiate this kind of objects directly, but use the
+L<XML::Compile::XOP|XML::Compile::XOP> method to create them.
+
+The object is overloaded to produce the contained data when a scalar is
+required, for instance when you call functions like "length".  This means
+that, hopefully, the end-user does not see much of a difference between
+data which is transported inline or packaged separately.
+
+=head1 METHODS
+
+=head2 Constructors
+
+=over 4
+
+=item XML::Compile::XOP::Include-E<gt>B<fromMime>($object)
+
+Collect the data from a HTTP::Message object.
+
+=item XML::Compile::XOP::Include-E<gt>B<new>(%options)
+
+You have to specify either a C<file> or C<byte> source.  Otherwise, the
+constructor will return C<undef>.
+
+ -Option--Default
+  bytes   undef
+  cid     <required>
+  file    undef
+  type    <required>
+  xmime   <required>
+  xop     <required>
+
+=over 2
+
+=item bytes => STRING|SCALAR
+
+Take the data from a STRING of reference.
+
+=item cid => STRING
+
+The Content-ID of the binary attachment.
+
+=item file => FILENAME|FILEHANDLE
+
+Take the data from the specified file.
+
+=item type => MIMETYPE
+
+The MIME-Type of the data.
+
+=item xmime => VERSION
+
+=item xop => VERSION
+
+=back
+
+=back
+
+=head2 Accessors
+
+=over 4
+
+=item $obj-E<gt>B<cid>()
+
+Returns the Content-ID.
+
+=item $obj-E<gt>B<content>( [$byref] )
+
+Returns the content, when $byref (boolean) is true, then the value is
+returned by reference.
+
+=item $obj-E<gt>B<contentCharset>()
+
+Returns the character set, as provided by the Content-Type header.
+
+=item $obj-E<gt>B<contentType>()
+
+Returns the media type included in the Content-Type header.
+
+=item $obj-E<gt>B<string>()
+
+Returns the content as string in Perl internal encoding.
+
+=back
+
+=head2 Processing
+
+=over 4
+
+=item $obj-E<gt>B<mimePart>( [$headers] )
+
+Produce the message part which contains a normal mime representation
+of a binary file.  You may provide an initial $headers (HTTP::Headers)
+object, or an ARRAY of headers to instantiate such an object.
+
+=item $obj-E<gt>B<write>($filename|$fh)
+
+Write the content to the specified FILE.
+
+=item $obj-E<gt>B<xmlNode>($document, $path, $tag)
+
+The $document will be used to construct the node from.  The $path
+is an indicator for the location of the node within the data
+structure (used in error messages).  The $tag is the prefixed name
+for the node to be created.
+
+Returned is an XML node to be included in the output tree.
+
+=back
+
+=head1 OVERLOAD
+
+=over 4
+
+=item overload: B<"">
+
+This object stringifies to its binary content.
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of XML-Compile-SOAP distribution version 3.21,
+built on January 11, 2017. Website: F<http://perl.overmeer.net/xml-compile/>
+
+Please post questions or ideas to the mailinglist at
+F<http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/xml-compile> .
+For live contact with other developers, visit the C<#xml-compile> channel
+on C<irc.perl.org>.
+
+=head1 LICENSE
+
+Copyrights 2007-2017 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

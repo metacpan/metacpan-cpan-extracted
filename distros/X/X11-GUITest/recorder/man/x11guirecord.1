@@ -1,0 +1,45 @@
+.\" $Id: x11guirecord.1 215 2011-12-06 12:49:16Z ctrondlp $
+.\" 
+.TH "x11guirecord" "1" "x11guirecord 0.25" "Dennis K. Paulsen" ""
+.SH "NAME"
+x11guirecord \- Record perl scripts containing user interactions, for playback using X11::GUITest.
+.SH "SYNOPSIS"
+.B "x11guirecord"
+\-s \fIscript\fP
+[\-w \fIwait\fP]
+[\-e \fIexitkey\fP]
+[\-n \fInodelay\fP]
+[\-g \fIgranularity\fP]
+[\-? \fIhelp\fP]
+
+
+.SH "DESCRIPTION"
+.PP 
+\fIx11guirecord\fP
+Record perl scripts containing user interactions, for playback using X11::GUITest.
+.SH "OPTIONS"
+.TP 
+.B \-s \fIscript\fP
+Specifies the script file to record to
+.TP 
+.B [\-w \fIwait\fP]
+Seconds to wait before recording
+.TP 
+.B [\-d \fIdelaythreshold\fP]
+Event delay (ms) threshold to account for / record (default: 50)
+.TP 
+.B [\-e \fIexitkey\fP]
+Exit key to stop recording (default: ESC)
+.TP 
+.B [\-n \fInodelay\fP]
+Don't include user delays
+.TP 
+.B [\-g \fIgranularity\fP]
+Level of granularity (mouse move frequency, default: 10 out of 1\-10)
+.TP 
+.B [\-? \fIhelp\fP]
+Show this help message
+
+.SH "AUTHOR"
+Dennis K. Paulsen <ctrondlp@cpan.org>
+.br .br 

@@ -1,0 +1,12 @@
+Revision history for Perl extension XML::Simple::Tree.
+
+0.01  Sat Aug 13 01:56:41 2005
+	- original version; created by h2xs 1.23 with options
+		-Xan XML::Simple::Tree
+
+0.02  Wed Nov 02 19:32:40 2005
+	- Added toXML method and removed export of XMLout
+
+0.03  Wed Nov 09 01:16:01 2005
+	- Fixed bug in toXML method.
+

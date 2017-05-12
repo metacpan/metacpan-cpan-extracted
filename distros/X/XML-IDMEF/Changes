@@ -1,0 +1,57 @@
+Revision history for Perl extension XML::IDMEF.
+
+0.01  Mon Sep 23 14:36:12 2002
+	- original version; created by h2xs 1.5 with options
+		-A -X -n XML::IDMEF
+
+0.02  2002/09/24
+        - pod doc ready for release
+        - basic test implemented
+        - TODO: use IDMEF v0.6, better test, refactor doc
+
+0.03  2002/09/24
+        - corrected namespace bug crashing the tests
+
+0.04  2002/09/25
+        - refactored api to get uniformed call syntax
+          byte2string becomes byte_to_string, tohash ->to_hash
+          gettype -> get_type & 'in' is now a class method
+        - more tests
+        - TODO: previous TODOs + add 'cmp' method
+
+0.05  2002/09/25
+        - changed Makefile.PL to contain dependencies
+
+0.06  2002/10/15
+	- corected small bug in dtd: source interfaces -> interface
+
+0.07  2002/11/19
+        - upgraded the IDMEF DTD to version 0.7 of the IDMEF draft
+        - corrected some typos, improved documentation
+        - modified create_time to accept an optional epoch time in argument
+        - introduced 'contains' function, to test for tagpath existence
+
+0.08  2002/12/02
+        - fixed a big bug in 'contains'
+        - changed xml_encode to encode non printable characters in xml STRINGs
+        - in create_time, corrected bugs with epoch time and month
+        - TODO: add 'get' & 'cmp' methods
+
+0.09 2003/06/04
+        - now uses XML::DOM instead of XML::Simple. The later is unable to support
+          the requirement of children element order inside an XML node, and had to be
+          replaced.
+        - implemented get() and set() methods 
+        - updated internal pseudo DTD format to be able to build really valid XML messages
+        - upgraded to IDMEF v1.0
+        - remove some functions from the documentations. they are yet still in the
+          module to maintain backward compatibility.
+        - renamed a few methods. the old names can still be used.
+
+0.10 2003/06/10
+        - corrected bug in add() on multiple similar nodes
+
+0.11 2004/11/29
+        - upgraded the IDMEF DTD to version 1.2 of the IDMEF draft, thanks to some 
+          patches sent by David Maciejak.
+        - rewrote the test sequence properly

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<foo>
+  <bar>
+    <zbr>kdjflsk</zbr>
+  </bar>
+  <body>
+    <listA>
+      <listB>a</listB>
+      <listB>b</listB>
+      <listB>c</listB>
+      <listB>d</listB>
+    </listA><listA><listB>e</listB><listB>f</listB><listB>g</listB><listB>h</listB></listA>
+  </body>
+</foo>

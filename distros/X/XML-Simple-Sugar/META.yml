@@ -1,0 +1,38 @@
+---
+abstract: 'Sugar sprinkled on XML::Simple'
+author:
+  - 'Chris Tijerina'
+build_requires:
+  Test::Exception: '0'
+  Test::More: '0'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: XML-Simple-Sugar
+provides:
+  XML::Simple::Sugar:
+    file: lib/XML/Simple/Sugar.pm
+    version: v1.1.1
+requires:
+  Modern::Perl: '0'
+  Moops: '0'
+  UNIVERSAL::isa: '0'
+  XML::Simple: '0'
+  overload: '0'
+  perl: v5.18.0
+resources:
+  bugtracker: https://github.com/Camspi/XML-Simple-Sugar/issues
+  homepage: https://github.com/Camspi/XML-Simple-Sugar
+  repository: https://github.com/Camspi/XML-Simple-Sugar.git
+version: v1.1.1
+x_contributors:
+  - 'Camspi <amarus18@hotmail.com>'
+  - 'Chris Tijerina <ctijerina@emortgagelogic.com>'
+x_serialization_backend: 'YAML::Tiny version 1.70'

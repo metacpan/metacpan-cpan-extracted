@@ -1,0 +1,8 @@
+Changes
+lib/XML/Checker.pm
+lib/XML/Checker/DOM.pm
+lib/XML/Checker/Parser.pm
+lib/XML/DOM/ValParser.pm
+Makefile.PL
+MANIFEST
+README

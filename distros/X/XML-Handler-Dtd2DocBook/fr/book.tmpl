@@ -1,0 +1,60 @@
+<!DOCTYPE book PUBLIC '-//OASIS//DTD DocBook XML V4.2//EN'
+               'http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd' [
+<!ENTITY % customs_ent  SYSTEM '<TMPL_VAR NAME=name>.customs.ent' >
+%customs_ent;
+<!ENTITY prolog    SYSTEM '<TMPL_VAR NAME=name>.prolog.gen' >
+<!-- TMPL_IF NAME="nb_elt" -->
+<!ENTITY % elements_ent  SYSTEM '<TMPL_VAR NAME=name>.elements.ent' >
+%elements_ent;
+<!ENTITY elements  SYSTEM '<TMPL_VAR NAME=name>.elements.gen' >
+<!-- /TMPL_IF -->
+<!-- TMPL_IF NAME="nb_ent" -->
+<!ENTITY % entities_ent  SYSTEM '<TMPL_VAR NAME=name>.entities.ent' >
+%entities_ent;
+<!ENTITY entities  SYSTEM '<TMPL_VAR NAME=name>.entities.gen' >
+<!-- /TMPL_IF -->
+<!-- TMPL_IF NAME="nb_not" -->
+<!ENTITY % notations_ent SYSTEM '<TMPL_VAR NAME=name>.notations.ent' >
+%notations_ent;
+<!ENTITY notations SYSTEM '<TMPL_VAR NAME=name>.notations.gen' >
+<!-- /TMPL_IF -->
+<!-- TMPL_IF NAME="nb_ex" -->
+<!ENTITY % examples_ent  SYSTEM '<TMPL_VAR NAME=name>.examples.ent' >
+%examples_ent;
+<!ENTITY examples  SYSTEM '<TMPL_VAR NAME=name>.examples.gen' >
+<!-- /TMPL_IF -->
+]>
+
+<book id='<TMPL_VAR NAME=name>'>
+  <!-- ?dbhtml filename='<TMPL_VAR NAME=name>.html'? -->
+
+  <bookinfo>
+    <!-- TMPL_IF NAME="date" --><pubdate><!-- TMPL_VAR NAME="date" --></pubdate><!-- /TMPL_IF -->
+    <bibliomisc>Page g&eacute;n&eacute;r&eacute;e par dtd2db</bibliomisc>
+    <bibliomisc><!-- TMPL_VAR NAME="generator" --></bibliomisc>
+  </bookinfo>
+
+  <title><!-- TMPL_VAR NAME="title" --></title>
+
+  <reference id='index.prolog'>
+    <?dbhtml filename="index.prolog.html"?>
+    <title>Prologue</title>
+    &prolog;
+  </reference>
+
+<!-- TMPL_IF NAME="nb_elt" -->
+  &elements;
+<!-- /TMPL_IF -->
+<!-- TMPL_IF NAME="nb_ent" -->
+  &entities;
+<!-- /TMPL_IF -->
+<!-- TMPL_IF NAME="nb_not" -->
+  &notations;
+<!-- /TMPL_IF -->
+<!-- TMPL_IF NAME="nb_ex" -->
+  &examples;
+<!-- /TMPL_IF -->
+
+</book>
+
+

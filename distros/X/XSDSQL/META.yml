@@ -1,0 +1,32 @@
+---
+abstract: 'stored xml into databases'
+author:
+  - 'lorenzo bellotti <pauseblx@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+distribution_type: module
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 6.57_05'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: blx-xsdsql
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Attribute::Constant: 0.06
+  Carp::Assert: 0.20
+  DBD::DBM: 0.06
+  DBI: 1.616
+  Filter::Include: 1.6
+  MLDBM: 2.05
+  Modern::Perl: 1.20121103
+  SQL::Statement: 1.33
+  XML::Parser: 1.21
+  XML::Writer: 0.600
+version: 0.010000

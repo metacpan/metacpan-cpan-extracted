@@ -1,0 +1,4 @@
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+lib/XML/Handler/2Simple.pm

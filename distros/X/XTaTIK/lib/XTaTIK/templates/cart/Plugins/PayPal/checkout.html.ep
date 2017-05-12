@@ -1,0 +1,120 @@
+% title 'Enter Your Information';
+% layout 'default';
+
+% if ( items_in 'cart' ) {
+  <ul class="checkout_crumbs text-center">
+    <li class="col-md-15 label-success">Review products</li>
+    <li class="col-md-15 label-primary">Enter contact information</li>
+    <li class="col-md-15 label-default">Review Pricing</li>
+    <li class="col-md-15 label-default">Pay for the order</li>
+    <li class="col-md-15 label-default">Receive confirmation</li>
+  </ul>
+% } else {
+  <ul class="checkout_crumbs text-center">
+    <li class="col-md-4 label-success">Review products</li>
+    <li class="col-md-4 label-primary">Enter contact information</li>
+    <li class="col-md-4 label-default">Receive confirmation</li>
+  </ul>
+% }
+
+%= form_for '/cart/checkout-review' => (method => 'POST') => begin
+  %= csrf_field
+  <%== form_checker_error_wrapped %>
+  <div>
+    <div class="row">
+      <div class="form-group col-md-6">
+        <label for="c_name">*First Name:</label
+        ><%= text_field 'name' => id => 'c_name',
+          class => 'form-control' %>
+      </div>
+      <div class="form-group col-md-6">
+        <label for="c_lname">*Last Name:</label
+        ><%= text_field 'lname' => id => 'c_lname',
+          class => 'form-control' %>
+      </div>
+    </div>
+    <div class="row">
+      <div class="form-group col-md-6">
+        <label for="c_email">*Email:</label
+        ><%= email_field 'email' => id => 'c_email',
+          class => 'form-control' %>
+      </div>
+      <div class="form-group col-md-6">
+        <label for="c_phone">*Phone number:</label
+        ><%= text_field 'phone' => id => 'c_phone',
+          class => 'form-control' %>
+      </div>
+    </div>
+    <div class="row">
+      <div class="form-group col-md-6">
+        <label for="c_address1">*Address line 1:</label
+        ><%= text_field 'address1' => id => 'c_address1',
+          class => 'form-control' %>
+      </div>
+      <div class="form-group col-md-6">
+        <label for="c_address2">Address line 2:</label
+        ><%= text_field 'address2' => id => 'c_address2',
+          class => 'form-control' %>
+      </div>
+    </div>
+    <div class="row">
+      <div class="form-group col-md-4">
+        <label for="c_city">*City:</label
+        ><%= text_field 'city' => id => 'c_city',
+          class => 'form-control' %>
+      </div>
+      <div class="form-group col-md-4">
+        <label for="c_province">*Province:</label
+        ><%= select_field 'province' =>
+            [
+              ['--Please choose one--','none'],
+              ['Alberta',             'AB'],
+              ['British Columbia',    'BC'],
+              ['Manitoba',            'MB'],
+              ['New Brunswick',       'NB'],
+              ['New Foundland',       'NL'],
+              ['Northwest Terriories','NT'],
+              ['Nova Scotia',         'NS'],
+              ['Nunavut',             'NU'],
+              ['Ontario',             'ON'],
+              ['Prince Edward Island','PE'],
+              ['Quebec',              'QC'],
+              ['Saskatchewan',        'SK'],
+              ['Yukon',               'YT'],
+            ],
+          id => 'c_province', class => 'form-control'
+        %>
+      </div>
+      <div class="form-group col-md-4">
+        <label for="c_zip">*Postal code:</label
+        ><%= text_field 'zip' => id => 'c_zip',
+          class => 'form-control' %>
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="c_promo_code">Promo code:</label
+      ><%= text_field 'promo_code' => id => 'c_promo_code',
+        class => 'form-control' %>
+    </div>
+    % for ( items_in xtext 'paypal_custom_fields' ) {
+      <div class="form-group paypal_custom_field">
+        %= include inline => $_->{markup}
+      </div>
+    % }
+    <div class="checkbox">
+      <label><%= check_box do_save_address => 1, id => 'c_do_save_address'
+      %>remember my information on this computer for 1 week <small>(you can uncheck this later to forget)</small></label>
+    </div>
+    <div class="checkbox">
+      <label><%= check_box toc => 1, id => 'c_toc'
+      %>*I have read and agree with <a target="_blank" href="/terms-and-conditions">Terms and Conditions</a> and <a target="_blank" href="/privacy-policy">Privacy Policy</a></label>
+    </div>
+  </div>
+  % if ( items_in 'cart' ) {
+    %= submit_button 'Calculate taxes and shipping charge', class => 'btn btn-lg btn-primary'
+
+  % } else {
+    %= submit_button 'Submit quote request', class => 'btn btn-lg btn-primary'
+  % }
+
+%= end

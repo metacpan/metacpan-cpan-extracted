@@ -1,0 +1,67 @@
+<?xml version="1.0"?>
+<?xml-stylesheet title="CSS_formatting" type="text/css" href="./rss.css"?>
+<rss version="2.0"
+  xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+><channel>
+<!-- Generated with Perl's XML::RSS::SimpleGen v11.11 -->
+
+<link>http://www.thesmokinggun.com/</link>
+<title>The Smoking Gun</title>
+<description>The Smoking Gun brings you authentic exclusive documents -- cool, confidential, quirky -- that can't be found elsewhere on the Web.</description>
+<language>en-US</language>
+<lastBuildDate>Sat, 06 Mar 2004 12:56:45 GMT</lastBuildDate>
+<skipHours><hour>0</hour><hour>1</hour><hour>2</hour><hour>3</hour><hour>4</hour><hour>5</hour><hour>6</hour><hour>7</hour><hour>8</hour><hour>9</hour><hour>10</hour><hour>11</hour><hour>12</hour><hour>14</hour><hour>15</hour><hour>16</hour><hour>17</hour><hour>18</hour><hour>19</hour><hour>20</hour><hour>21</hour><hour>22</hour><hour>23</hour></skipHours>
+<sy:updateFrequency>1</sy:updateFrequency>
+<sy:updatePeriod>daily</sy:updatePeriod>
+<sy:updateBase>1970-01-01T13:00+00:00</sy:updateBase>
+<ttl>1440</ttl>
+<webMaster>sburke@cpan.org</webMaster>
+<docs>http://www.interglacial.com/rss/about.html</docs>
+
+<item>
+  <title>Streisand Refusing To Pay Up In Legal Loss</title>
+  <link>http://www.thesmokinggun.com/archive/babsmoney1.html</link>
+</item>
+
+<item>
+  <title>Three Points, Two Credits, No Net</title>
+  <link>http://www.thesmokinggun.com/archive/ugatest1.html</link>
+</item>
+
+<item>
+  <title>Lionel Richie Estranged Wife's Lush Life</title>
+  <link>http://www.thesmokinggun.com/archive/richiediv1.html</link>
+</item>
+
+<item>
+  <title>Mayor Charged For Performing Gay Marriages</title>
+  <link>http://www.thesmokinggun.com/archive/newpaltz1.html</link>
+</item>
+
+<item>
+  <title>Three Hurt In Geezer Salad Bar Brawl</title>
+  <link>http://www.thesmokinggun.com/archive/srbrawl1.html</link>
+</item>
+
+<item>
+  <title>FCC Hears It From Super Bowl Boob Tubers</title>
+  <link>http://www.thesmokinggun.com/archive/jjfcc1.html</link>
+</item>
+
+<item>
+  <title>TSG Mugshot: Joe Frazier</title>
+  <link>http://www.thesmokinggun.com/mugshots/joefraziermug1.html</link>
+</item>
+
+<item>
+  <title>TSG Mugshot: James Brown</title>
+  <link>http://www.thesmokinggun.com/mugshots/jbrownmug1.html</link>
+</item>
+
+<item>
+  <title>TSG Mugshot: Patty Hearst</title>
+  <link>http://www.thesmokinggun.com/mugshots/phearstmug1.html</link>
+</item>
+
+
+</channel></rss>

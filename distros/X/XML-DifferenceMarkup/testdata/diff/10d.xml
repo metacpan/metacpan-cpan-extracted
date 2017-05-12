@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<dm2:diff xmlns:dm2="http://www.locus.cz/diffmark">
+  <dm2:delete>
+    <dm:old xmlns:dm="http://www.deadmouse.com/"/>
+  </dm2:delete>
+  <dm2:insert>
+    <dm:new xmlns:dm="http://www.deadmouse.com/"/>
+  </dm2:insert>
+</dm2:diff>

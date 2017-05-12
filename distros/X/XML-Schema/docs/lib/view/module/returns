@@ -1,0 +1,4 @@
+<p>
+[% IF item.title %]<small><b>[% item.title %]: </b></small>[% END %]
+[% item.content(view) %]
+</p>

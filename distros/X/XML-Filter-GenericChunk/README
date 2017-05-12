@@ -1,0 +1,23 @@
+XML::Filter::GenericChunk
+
+XML::Filter::GenericChunk is a base class for SAX filters that are able to
+parse wellballanced chunks from SAX events and transforms this chunk
+into a sequence of SAX events.
+
+This package also implements a second module:
+XML::Filter::CharacterChunk, which is a basicly a sample
+implementation, that collects all data from characters() events and
+generates SAX events from this data as it would be a normal XML
+section.
+
+The Module requires XML::SAX and XML::LibXML 1.4 or higher
+
+The installation is easy and should not cause any problems :-)
+
+perl Makefile.PL
+make
+make test
+# and (as superuser)
+make install
+
+For bug reports and enhancements please use http://rt.cpan.org

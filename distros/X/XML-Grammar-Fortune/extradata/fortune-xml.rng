@@ -1,0 +1,306 @@
+<?xml version="1.0"?>
+<!-- $Id: testSuite.rng,v 1.12 2003/01/29 12:24:07 jjc Exp $ -->
+<grammar xmlns="http://relaxng.org/ns/structure/1.0"
+    datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes"
+    >
+    <start>
+        <choice>
+            <element name="collection">
+                <ref name="head"/>
+                <element name="list">
+                    <oneOrMore>
+                        <ref name="fortune" />
+                    </oneOrMore>
+                </element>
+            </element>
+            <element name="facts">
+                <ref name="head"/>
+                <oneOrMore>
+                    <element name="list">
+                        <attribute name="xml:id">
+                            <data type="ID"/>
+                        </attribute>
+                        <attribute name="title">
+                            <text/>
+                        </attribute>
+                        <oneOrMore>
+                            <element name="f">
+                                <optional>
+                                    <attribute name="xml:id">
+                                        <data type="ID"/>
+                                    </attribute>
+                                </optional>
+                                <oneOrMore>
+                                    <element name="l">
+                                        <attribute name="xml:lang">
+                                            <text />
+                                        </attribute>
+                                        <ref name="quote_body"/>
+                                        <optional>
+                                            <ref name="common_info" />
+                                        </optional>
+                                    </element>
+                                </oneOrMore>
+                            </element>
+                        </oneOrMore>
+                    </element>
+                </oneOrMore>
+            </element>
+        </choice>
+    </start>
+    <define name="quote_body">
+        <element name="body">
+            <ref name="regular_html_text" />
+        </element>
+    </define>
+    <define name="head">
+        <element name="head">
+            <empty/>
+        </element>
+    </define>
+    <define name="fortune">
+        <element name="fortune">
+            <attribute name="id">
+                <data type="ID"/>
+            </attribute>
+            <element name="meta">
+                <element name="title">
+                    <text/>
+                </element>
+            </element>
+            <choice>
+                <element name="irc">
+                    <element name="body">
+                        <oneOrMore>
+                            <choice>
+                                <element name="saying">
+                                    <attribute name="who">
+                                        <text/>
+                                    </attribute>
+                                    <text/>
+                                </element>
+                                <element name="me_is">
+                                    <attribute name="who">
+                                        <text/>
+                                    </attribute>
+                                    <text/>
+                                </element>
+                                <element name="joins">
+                                    <attribute name="who">
+                                        <text/>
+                                    </attribute>
+                                    <text/>
+                                </element>
+                                <element name="leaves">
+                                    <attribute name="who">
+                                        <text/>
+                                    </attribute>
+                                    <text/>
+                                </element>
+                            </choice>
+                        </oneOrMore>
+                    </element>
+                    <element name="info">
+                        <optional>
+                            <element name="channel">
+                                <text />
+                            </element>
+                        </optional>
+                        <optional>
+                            <element name="network">
+                                <text />
+                            </element>
+                        </optional>
+                        <optional>
+                            <element name="date">
+                                <text />
+                            </element>
+                        </optional>
+                        <optional>
+                            <element name="tagline">
+                                <text />
+                            </element>
+                        </optional>
+                    </element>
+                </element>
+                <element name="raw">
+                    <element name="body">
+                        <element name="text">
+                            <text />
+                        </element>
+                    </element>
+                    <ref name="common_info" />
+                </element>
+                <element name="quote">
+                    <ref name="quote_body"/>
+                    <ref name="common_info" />
+                </element>
+                <element name="screenplay">
+                    <element name="body">
+                        <zeroOrMore>
+                            <choice>
+                                <element name="description">
+                                    <ref name="several_paras"/>
+                                </element>
+                                <element name="saying">
+                                    <attribute name="character">
+                                        <text/>
+                                    </attribute>
+                                    <ref name="several_paras"/>
+                                </element>
+                            </choice>
+                        </zeroOrMore>
+                    </element>
+                    <ref name="common_info" />
+                </element>
+            </choice>
+        </element>
+    </define>
+
+    <define name="common_info">
+        <element name="info">
+            <optional>
+                <element name="author">
+                    <text />
+                </element>
+            </optional>
+            <optional>
+                <element name="work">
+                    <optional>
+                        <attribute name="href">
+                            <!-- TODO: perhaps add a URL datatype.-->
+                            <text />
+                        </attribute>
+                    </optional>
+                    <text />
+                </element>
+            </optional>
+            <optional>
+                <element name="date">
+                    <text />
+                </element>
+            </optional>
+            <optional>
+                <element name="source">
+                    <text />
+                </element>
+            </optional>
+            <optional>
+                <element name="license">
+                    <text />
+                </element>
+            </optional>
+        </element>
+    </define>
+    <define name="several_paras">
+        <oneOrMore>
+            <ref name="para"/>
+        </oneOrMore>
+    </define>
+    <define name="para">
+        <element name="para">
+            <zeroOrMore>
+                <choice>
+                    <text/>
+                    <element name="inlinedesc">
+                        <zeroOrMore>
+                            <ref name="single_inline_elem"/>
+                        </zeroOrMore>
+                    </element>
+                    <ref name="single_inline_elem"/>
+                    <element name="br">
+                        <empty/>
+                    </element>
+                </choice>
+            </zeroOrMore>
+        </element>
+    </define>
+    <define name="bold">
+        <element name="bold">
+            <text />
+        </element>
+    </define>
+    <define name="italics">
+        <element name="italics">
+            <text />
+        </element>
+    </define>
+    <define name="ulink">
+        <element name="ulink">
+                <attribute name="url">
+                    <text/>
+                </attribute>
+                <zeroOrMore>
+                    <choice>
+                        <text />
+                        <ref name="bold"/>
+                        <ref name="italics"/>
+                    </choice>
+            </zeroOrMore>
+        </element>
+    </define>
+    <define name="single_inline_elem">
+        <choice>
+            <text/>
+            <ref name="ulink"/>
+            <ref name="bold"/>
+            <ref name="italics"/>
+        </choice>
+    </define>
+    <define name="inside_para_text">
+        <zeroOrMore>
+            <choice>
+                <text />
+                <element name="br">
+                    <empty/>
+                </element>
+                <element name="b">
+                    <text />
+                </element>
+                <element name="i">
+                    <text />
+                </element>
+                <element name="strong">
+                    <text />
+                </element>
+                <element name="em">
+                    <text />
+                </element>
+                <element name="a">
+                    <attribute name="href">
+                        <text/>
+                    </attribute>
+                    <ref name="inside_para_text" />
+                </element>
+            </choice>
+        </zeroOrMore>
+    </define>
+    <define name="inside_quote_list">
+        <oneOrMore>
+            <element name="li">
+                <choice>
+                    <ref name="inside_para_text" />
+                    <ref name="regular_html_text" />
+                </choice>
+            </element>
+        </oneOrMore>
+    </define>
+    <define name="regular_html_text">
+        <oneOrMore>
+            <choice>
+                <element name="p">
+                    <ref name="inside_para_text" />
+                </element>
+                <element name="ul">
+                    <ref name="inside_quote_list" />
+                </element>
+                <element name="ol">
+                    <ref name="inside_quote_list" />
+                </element>
+                <element name="blockquote">
+                    <ref name="regular_html_text" />
+                </element>
+            </choice>
+        </oneOrMore>
+    </define>
+</grammar>

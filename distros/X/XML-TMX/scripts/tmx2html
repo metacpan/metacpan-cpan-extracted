@@ -1,0 +1,42 @@
+#!/usr/bin/perl -w -s
+
+use strict;
+use warnings;
+
+use XML::TMX;
+use XML::TMX::Reader;
+
+our ($icons);
+
+my $tmx = shift;
+my $tmx_obj = XML::TMX::Reader->new($tmx);
+print $tmx_obj->to_html(icons => $icons);
+
+=encoding UTF-8
+
+=head1 NAME
+
+tmx2html - Converts a TMX to an HTML formated page
+
+=head1 SYNOPSIS
+
+   tmx2html [-icons] file.tmx > file.html
+
+=head1 DESCRIPTION
+
+Pretty prints a TMX as an HTML file. Icons for languages can be
+produced, but still buggy.
+
+=head1 SEE ALSO
+
+perl(1)
+
+=head1 AUTHOR
+
+Alberto Manuel Brandão Simões, E<lt>ambs@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2011 by Alberto Manuel Brandão Simões
+
+=cut

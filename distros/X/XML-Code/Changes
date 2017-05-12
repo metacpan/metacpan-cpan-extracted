@@ -1,0 +1,10 @@
+History of XML::Code perl module.
+
+0.4 Sun May 2, 2004
+   Added new methods: doctype(), escape(), add_textnode() and add_empty().
+
+0.3 Sun March 28, 2004
+   Two basic tests added: test.pl and t/use.t.
+
+0.2 Sun March 21, 2004
+   Start of existence.

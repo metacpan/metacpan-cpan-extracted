@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                XML-FeedPP-Plugin-DumpJSON
+version:             0.33
+abstract:            ~
+license:             perl
+author:              ~
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    JSON::Syck:                    0
+    Test::More:                    0
+    XML::FeedPP:                   0.33
+    XML::TreePP:                   0.33
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

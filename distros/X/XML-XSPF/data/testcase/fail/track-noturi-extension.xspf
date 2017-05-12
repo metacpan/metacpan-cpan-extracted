@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  Description: link must be a legal URI
+  Expect:      InvalidLink{attr:application,element:extension,parent:track}
+-->
+
+<playlist version="1" xmlns="http://xspf.org/ns/0/">
+  <trackList>
+    <track>
+
+      <extension application="This should be a URI" />
+
+    </track>
+  </trackList>
+</playlist>

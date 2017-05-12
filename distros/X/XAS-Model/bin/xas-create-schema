@@ -1,0 +1,150 @@
+#!/usr/bin/perl
+# ============================================================================
+#             Copyright (c) 2012 Kevin L. Esteb All Rights Reserved
+#
+#
+# TITLE:       xas-create-schema
+#
+# FACILITY:    XAS 
+#
+# ABSTRACT:    This procedure will create the database schema.
+#
+# ENVIRONMENT: XAS
+#
+# PARAMETERS:  
+#              --dbtype    type of database to create
+#              --revision  the revision for the schema
+#              --schema    the database schema to load
+#              --directory the directory to place the schema file
+#              --help      prints out a helpful help message
+#              --manual    prints out the procedures manual
+#              --version   prints out the procedures version
+#              --debug     toggles debug output
+#
+# RETURNS:     0 - success
+#              1 - failure
+#
+# Version      Author                                              Date
+# -------      ----------------------------------------------      -----------
+# 0.01         Kevin Esteb                                         02-Apr-2009
+#
+# 0.02         Kevin Esteb                                         10-Jul-2012
+#              Updated the help/version/manual switches to use
+#              pod for the output text.
+#
+# 0.03         Kevin Esteb                                         08-Aug-2012
+#              Changed over to the new app framework.
+#
+# ============================================================================
+#
+
+use lib "../lib";
+use XAS::Apps::Database::Schema;
+
+main: {
+
+    my $app = XAS::Apps::Database::Schema->new(
+        -throws => 'create-schema',
+    );
+
+    exit $app->run();
+
+}
+
+__END__
+
+=head1 NAME
+
+xas-create-schema - this procedure creates a database schema
+
+=head1 SYNOPSIS
+
+xas-create-schema [--help] [--debug] [--manual] [--version] [--dbtype]
+
+ options:
+   --dbtype     the type of database system  
+   --schema     the database schema to load
+   --revision   the revison for the schema
+   --directory  the directory to place the schema file
+   --help       outputs simple help text
+   --manual     outputs the procedures manual
+   --version    outputs the apps version
+   --debug      toogles debugging output
+   --[no]alerts toogles alert notification
+
+=head1 DESCRIPTION
+
+This procedure will create the sql schema for the XAS database. By default
+this is for SQLite. 
+
+=head1 OPTIONS AND ARGUMENTS
+
+=over 4
+
+=item B<--dbtype>
+
+The type of database. This can be one of the following:
+
+ PostgreSQL 
+ SQLite
+ MySQL
+
+Or any other SQL::Translater database name.
+
+=item B<--schema>
+
+The database schema to load. Defaults to "XAS::Model::Database::Testing".
+
+=item B<--revision>
+
+The revision for this schema. Defaults to "0.01".
+
+=item B<--directory>
+
+The directory to write the schema into. Defaults to "./sql.".
+
+=item B<--help>
+
+Displays a simple help message.
+
+=item B<--debug>
+
+Turns on debbuging.
+
+=item B<--alerts>
+
+Toggles alert notification. The default is on.
+
+=item B<--manual>
+
+The complete documentation.
+  
+=item B<--version>
+
+Prints out the apps version
+
+=back
+
+=head1 EXIT CODES
+
+ 0 - success
+ 1 - failure
+
+=head1 SEE ALSO
+
+ SQL::Translator
+ XAS::Apps::Database::Schema
+
+=head1 AUTHOR
+
+Kevin L. Esteb, E<lt>kevin@kesteb.usE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2012 by Kevin L. Esteb
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

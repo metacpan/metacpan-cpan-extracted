@@ -1,0 +1,22 @@
+# test the error message for content-model failures
+--- |
+  <xs:schema xmlns:xs="mydoc">
+    <xs:element name="A">
+      <xs:complexType>
+        <xs:sequence>
+          <xs:element name="B" />
+          <xs:element name="C" />
+        </xs:sequence>
+      </xs:complexType>
+    </xs:element>
+  </xs:schema>
+
+--- |
+  <A><B/></A>
+--- >
+FAIL /Contents of element 'A'/
+
+--- |
+  <A><C/><B/><C/></A>
+--- >
+FAIL /Inside element 'A'/

@@ -1,0 +1,108 @@
+
+1. Intro
+2. Building
+3. Environment
+4. Known problems
+5. More info
+
+!!!!!!!!!!!!!!!!!!!!!!!!!! READ THIS FIRST !!!!!!!!!!!!!!!!!!!!!!!
+
+This version is to be used with the new version of Expat (> 1.95)
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+1. Intro
+========================================
+
+This perl module is encapsulation of the XSLT processor called
+Sablotron. If you don't know, what is XSLT, look at
+http://www.w3.org site. If you don't know, what is Sablotron, look
+at http://www.gingerall.com.
+
+Original creator of XML::Sablotron is Ginger Alliance s.r.o.; Czech
+Republic.
+
+XML::Sablotron is a simple Perl package, which encapsulates the C API
+of Sablotron XSLT processor. The only important fact is, that this
+package uses the dynamic linking of Sablotron.
+
+If you need use this module on platforms, which do not allow dynamic
+linking, please contact us.
+
+
+2. Building
+========================================
+
+Here is what you need:
+	a Linux box (tested on RH 6 and 7) with GNU C++ compiler
+  or
+	a NT box (testes on Win NT 4.0) with VC++ 4.2 (and later)
+
+If you need any other port, please contact us.
+
+You need also the Sablotron package to be correctly installed on you machine. 
+If you don't have it, download it from http://www.gingerall.com.
+
+Unpack the tar-ball file into a directory of your choice.
+
+Change into the XML-Sablot* directory and type
+
+  perl Makefile.PL
+  make
+  make test
+  make install (if you want; may require the root privileges)
+
+Running a Win32 box you have to type:
+
+  perl Makefile.PL LIBS="-Lx:\somewhere\lib"
+  nmake
+  nmake test
+  nmake install (if you want)
+
+
+If the test process fails, there may be something wrong with your 
+environment. Please, check the following "Environment" section.
+
+If you see any errors, you may try to fix it or just contact us.
+Any help or feedback from users is highly appreciated.
+
+
+3. Environment
+========================================
+
+NT boxes need set the PATH variable to the Sablotron bin/ directory.
+
+
+4. Known problems
+========================================
+
+Due the mixing of C++ library (Sablotron) and C library (Perl
+extension) there are some problems on several platforms (e.g
+FreeBSD). This problems are caused by 'misunderstanding' between C++
+and C linker.
+
+As a result you may see complaints of unresolved symbols like
+__rtti_user, __builtin_vec_new and/or others.
+
+Solution is not simple and not deterministic. You have to force linker
+to use some standard libraries (like -lgcc) while linking Perl
+extension. To do it, set the LIBS='-lgcc' (or similar) as a
+Makefile.PL parameter.
+
+To pass required librraies to linker, you may use the LIBS parameter to Makefile.PL (e.g. perl Makefile.PL LIBS='-liconv -lreadline).
+
+HTH
+
+
+5. More info
+========================================
+
+We suppose you have read the README file. If you haven't, read it now.
+If it is not enough, take a look at our website
+
+http://www.gingerall.org
+
+Maintainer of this package is Pavel Hlavnicka (pavel@gingerall.cz)
+
+Enjoy Sablotron!!

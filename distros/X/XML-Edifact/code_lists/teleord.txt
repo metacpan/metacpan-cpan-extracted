@@ -1,0 +1,7 @@
+edifact						teleord
+sgmt:teleord:item.description			IMD
+elmt:IMD:teleord:item.characteristic.coded	2 0
+
+code:7081:BAU					teleord	Book Author
+code:7081:BPU					teleord	Book Publisher
+code:7081:BTI					teleord	Book Title

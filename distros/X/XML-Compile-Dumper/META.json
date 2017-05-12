@@ -1,0 +1,48 @@
+{
+   "abstract" : "Remember precompiled XML processors",
+   "author" : [
+      "Mark Overmeer"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120630",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "XML-Compile-Dumper",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Dump::Streamer" : "2.08",
+            "Log::Report" : "0.09",
+            "Math::BigInt" : "1.77",
+            "Test::More" : "0.54",
+            "Test::Pod" : "1.00",
+            "XML::Compile" : "0.64",
+            "XML::Compile::Tester" : "0.01",
+            "XML::LibXML" : "1.63"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.14"
+}

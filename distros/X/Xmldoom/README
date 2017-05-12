@@ -1,0 +1,13 @@
+
+Xmldoom is a framework that allows you to bind database tables to Perl
+objects.  This codebase began as a port of Python code which performed the
+same function, but has now far exceeded the original version.
+
+The official website is now on Gna!:
+
+http://gna.org/projects/xmldoom
+
+For historic purposes, you can find the original CVS repository on Savannah:
+
+http://savannah.nongnu.org/projects/xmldoom
+

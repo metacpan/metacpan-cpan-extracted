@@ -1,0 +1,27 @@
+==========
+ XML-XCES
+==========
+
+This module intents to incorporate tools to manage XML XCES files
+(XCES stands for XMS Corpus Encoding Standard).
+
+We are developing it accordingly with our needs which means it
+probably does not do what you want. Meanwhile, feel free to send
+comments, bug-reports, requests and patches.
+
+==> INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+==> COPYRIGHT AND LICENCE
+
+Copyright (C) 2004-2005 Alberto Simoes
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

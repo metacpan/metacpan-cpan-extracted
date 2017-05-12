@@ -1,0 +1,8 @@
+root
+/a	/a/b	/a/b/c	/r
+testA	testB	test0	
+testA	testB	test1	
+testA	testB	test2	
+			testR1
+			testR2
+

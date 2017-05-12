@@ -1,0 +1,205 @@
+# sequence with repetion
+
+--- |
+  <?xml version="1.0" encoding="UTF-8"?>
+  <schema xmlns="http://www.w3.org/2001/XMLSchema">
+   <element name="foo">
+      <complexType>
+        <sequence maxOccurs="unbounded">
+          <element name="one_or_more-1" minOccurs="1" maxOccurs="unbounded"/>
+          <element name="zero_or_one-2" minOccurs="0" maxOccurs="1"/>
+          <element name="one_or_two-3" minOccurs="1" maxOccurs="2"/>
+        </sequence>
+      </complexType>
+    </element>
+   <element name="bar">
+      <complexType>
+        <choice maxOccurs="3">
+          <element name="one"/>
+          <element name="two"/>
+          <element name="three"/>
+        </choice>
+      </complexType>
+    </element>
+   <element name="baz">
+      <complexType>
+        <all minOccurs="0">
+          <element name="one"/>
+          <element name="two"/>
+          <element name="three"/>
+        </all>
+      </complexType>
+    </element>
+   <element name="comp">
+      <complexType>
+        <choice maxOccurs="unbounded">
+           <element ref="foo"/>
+           <element ref="bar"/>
+        </choice>
+      </complexType>
+   </element>
+  </schema>
+
+--- |
+ <baz>
+  <one/>
+  <two/>
+  <three/>
+ </baz>
+--- >
+PASS
+
+--- |
+ <baz/>
+--- >
+PASS
+
+--- |
+ <bar>
+  <one/>
+  <one/>
+  <one/>
+ </bar>
+--- >
+PASS
+
+--- |
+ <bar>
+  <one/>
+  <one/>
+  <one/>
+  <one/>
+ </bar>
+--- >
+FAIL
+
+--- |
+ <bar>
+  <one/>
+  <two/>
+  <three/>
+ </bar>
+--- >
+PASS
+
+--- |
+ <bar>
+  <one/>
+  <two/>
+  <three/>
+  <three/>
+ </bar>
+--- >
+FAIL
+
+--- |
+ <foo>
+  <one_or_more-1 />
+  <one_or_more-1 />
+  <one_or_more-1 />
+  <one_or_two-3 />
+  <one_or_more-1 />
+  <one_or_more-1 />
+  <one_or_more-1 />
+  <one_or_two-3 />
+  <one_or_more-1 />
+  <one_or_more-1 />
+  <one_or_more-1 />
+  <one_or_two-3 />
+ </foo>
+--- >
+PASS
+
+--- |
+ <foo>
+  <one_or_more-1 />
+  <one_or_more-1 />
+  <one_or_more-1 />
+  <zero_or_one-2 />
+  <one_or_two-3 />
+  <one_or_two-3 />
+  <one_or_more-1 />
+  <one_or_more-1 />
+  <one_or_more-1 />
+  <one_or_two-3 />
+  <one_or_more-1 />
+  <one_or_more-1 />
+  <one_or_more-1 />
+  <one_or_two-3 />
+ </foo>
+--- >
+PASS
+
+
+--- |
+ <foo>
+  <one_or_more-1 />
+  <one_or_more-1 />
+  <zero_or_one-2 />
+  <one_or_more-1 />
+  <one_or_two-3 />
+  <one_or_two-3 />
+ </foo>
+--- >
+FAIL
+
+--- |
+ <foo>
+  <one_or_more-1 />
+  <one_or_more-1 />
+  <one_or_more-1 />
+  <zero_or_one-2 />
+  <one_or_two-3 />
+  <one_or_two-3 />
+  <one_or_more-1 />
+  <one_or_more-1 />
+  <one_or_more-1 />
+  <one_or_two-3 />
+  <one_or_more-1 />
+  <one_or_more-1 />
+  <one_or_more-1 />
+  <one_or_two-3 />
+  <zero_or_one-2 />
+  <one_or_two-3 />
+  <one_or_two-3 />
+ </foo>
+--- >
+FAIL /'zero_or_one-2' does not match/
+
+--- |
+ <comp>
+ <foo>
+  <one_or_more-1 />
+  <one_or_more-1 />
+  <one_or_more-1 />
+  <one_or_two-3 />
+  <one_or_more-1 />
+  <one_or_more-1 />
+  <one_or_more-1 />
+  <one_or_two-3 />
+  <one_or_more-1 />
+  <one_or_more-1 />
+  <one_or_more-1 />
+  <one_or_two-3 />
+ </foo>
+ <bar>
+  <one/>
+  <one/>
+ </bar>
+ <foo>
+  <one_or_more-1 />
+  <one_or_more-1 />
+  <one_or_two-3 />
+  <one_or_more-1 />
+  <one_or_more-1 />
+  <one_or_more-1 />
+  <one_or_two-3 />
+  <one_or_more-1 />
+  <one_or_more-1 />
+  <one_or_more-1 />
+  <one_or_two-3 />
+ </foo>
+ </comp>
+--- >
+PASS
+

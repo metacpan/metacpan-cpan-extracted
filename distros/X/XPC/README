@@ -1,0 +1,682 @@
+NAME
+    XPC - XML Procedure Call
+
+SYNOPSIS
+      use XPC;
+
+    and then
+
+      my $xpc = XPC->new(<<END_XPC);
+      <?xml version='1.0' encoding='UTF-8'?>
+      <xpc>
+        <call procedure='localtime'/>
+      </xpc>
+      END_XPC
+
+    or
+
+      my $xpc = XPC->new();
+      $xpc->add_call('localtime');
+
+    or
+
+      my $xpc = XPC->new_call('localtime');
+
+    and then later
+
+      print XML_FILE $xpc->as_string();
+
+DESCRIPTION
+    This class represents an XPC request or response. It uses XML::Parser to
+    parse XML passed to its constructor.
+
+MOTIVATION
+    A Commentary on the XML-RPC Specification and Definition of XPC Version
+    0.2
+
+  Introduction
+
+    The following commentary is based upon the specification from the
+    UserLand web site. The version referenced for this commentary has a
+    notation on it that it was "Updated 10/16/99 DW" (see
+    http://www.xmlrpc.com/spec).
+
+    These comments are stylistic in nature, and it is well recognized by the
+    author that style in program and protocol design are very personal. This
+    commentary will, however, point out the rationale of the proposed
+    changes to the specification's design.
+
+  Procedure Call Structural Simplifications
+
+    The example in the "Request example" section looks like this:
+
+      <methodCall>
+        <methodName>examples.getStateName</methodName>
+        <params>
+          <param>
+            <value><i4>41</i4></value>
+          </param>
+        </params>
+      </methodCall>
+
+    We note by looking at the remainder of the specification that there are
+    only two top-level elements allowed in XML-RPC: "methodCall" and
+    "methodResponse". Since methods are *the* subject of RPC, and since all
+    top-level elements in the design are about methods, there is no need to
+    have the redundant qualifier "method" in the names of these elements.
+    Thus, the example would be modified to look like this:
+
+      <call>
+        <methodName>examples.getStateName</methodName>
+        <params>
+          <param>
+            <value><i4>41</i4></value>
+          </param>
+        </params>
+      </call>
+
+    Now, the content of the "methodName" element is constrained to be very
+    simple text (from the "Payload format" section, which says "...
+    identifier characters, upper and lower-case A-Z, the numeric characters,
+    0-9, underscore, dot, colon and slash"). It is also mandatory. This is
+    precisely the reason XML includes the ability to add attributes to
+    elements (it is technically redundant, but very convenient). So, we
+    really should turn this example into:
+
+      <call method='examples.getStateName'>
+        <params>
+          <param>
+            <value><i4>41</i4></value>
+          </param>
+        </params>
+      </call>
+
+    Once the "methodName" element has been removed from the design, the
+    "params" element becomes superfluous, since its only purpose was to
+    group the parameters and separate them from the method name. Now, the
+    "call" element *is* the element that groups the parameters, leaving us
+    with:
+
+      <call method='examples.getStateName'>
+        <param>
+          <value><i4>41</i4></value>
+        </param>
+      </call>
+
+  Header Nomenclature
+
+    One final comment on terminology: RPC stands for Remote *Procedure*
+    Call, so we should probably not use the term "method" when we mean
+    "procedure" or something else. Since the "procedures" can return values,
+    which corresponds in some languages to the term "function", we have a
+    rivalry for the term to use. "Procedure" matches the acronym nicely, but
+    for some folks "Function" would have a better connotation. Fans of
+    Eiffel might even prefer "Feature", or "Query" for calls returning a
+    value and "Routine" or "Command" for those not. Given the variety of
+    possibilities, here we stay with the simple policy of matching the
+    acronym:
+
+      <call procedure='examples.getStateName'>
+        <param>
+          <value><i4>41</i4></value>
+        </param>
+      </call>
+
+  Scalar Values
+
+    Typically, an interface definition determines the number, names and
+    types of parameters to a procedure call. It is incumbent upon the caller
+    to conform to that specification. Therefore, the declaration for any
+    procedure to be called as part of an interface *should* indicate the
+    expected types of the parameters, which means that the caller should not
+    have to indicate the type of value it is passing (and, the value
+    *itself* isn't passed in general, but rather a *textual representation*
+    of the value is passed). XML-RPC should not be blind to typing issues.
+    These issues should not appear in the calling standard, but rather in an
+    interface definition standard (about which more later). Removing the
+    type information from the example results in:
+
+      <call procedure='examples.getStateName'>
+        <param>
+          <value>41</value>
+        </param>
+      </call>
+
+    Since the <value> element really now just means "scalar" (see the
+    specification section "Scalar <value>s"), let's call it that:
+
+      <call procedure='examples.getStateName'>
+        <param>
+          <scalar>41</scalar>
+        </param>
+      </call>
+
+    If for some reason not contemplated here type information is necessary
+    for scalars, then having a simple "type" attribute of the "scalar"
+    element would suffice, especially since the set of allowable values is
+    fixed, small, and consists of only short string values ("i4", "int",
+    "boolean", "string", "double", "dateTime.iso8601", and "base64").
+
+    If we only ever expected simple, short scalar values, we could make one
+    more change, to:
+
+      <!-- NOTE: This is NOT a proposed change -->
+      <call procedure='examples.getStateName'>
+        <param>
+          <scalar value='41'/>
+        </param>
+      </call>
+
+    but, it is presumed that it would be possible to have a very long scalar
+    string value, for which the former representation would be better.
+
+  Named Parameters
+
+    Some procedures may be implemented in a language that makes it very easy
+    to implement named parameters. Supporting this would be easy:
+
+      <call procedure='examples.getStateName'>
+        <param name='stateNum'>
+          <scalar>41</scalar>
+        </param>
+      </call>
+
+  Scalar Types
+
+    Whether types apply to calls and interfaces or just to interfaces, they
+    are an important part of the specification.
+
+    The specification defines "i4" and "int" to be synonyms for a 'four-byte
+    signed integer'. Since the value will be represented in the call as
+    text, this description really isn't an appropriate specification, since
+    it is written in terms of a binary representation. We suggest here a
+    single term for this data type, "integer", and that it be defined in
+    terms of a range of acceptable values: -2,147,483,648 to +2,147,483,647
+    (just the range of vales that can be stored in a two's complement 32-bit
+    binary representation).
+
+    The "boolean" data type is distinct from the "integer" data type, yet
+    its domain {"0", "1"} is a subset of the "integer" domain instead of the
+    more consistent {"false", "true"}. If "boolean" is going to be treated
+    as its own type, it should have its own domain.
+
+    The specification defines "double" to be 'double-precision signed
+    floating point number'. Note that in the 1999-01-21
+    questions-and-answers section near the end of the document, it is
+    revealed that the full generality of the data type commonly meant by
+    such a description is not available. Niether infinities, nor "NaN" (the
+    Not-a-Number value) are permitted. Not even exponential notation is
+    allowed. Very simple strings matching the Perl regular expression:
+
+      /^([+-])(\d*)(\.)(\d*)$/
+
+    are the only ones permitted according to the answer given, although one
+    suspects that what was meant was something closer to this:
+
+      /^([+-])?(\d*)((\.)(\d*))?$/
+
+    because the first expression requires the sign to be present, and
+    permits ""+."" and ""-."" as valid strings (although to what values they
+    would map is a mystery).
+
+    Note: The second expression makes the leading sign and trailing decimal
+    point and digits optional, but still isn't perfect, since it allows the
+    empty string as a value.
+
+    This type should be called "rational" instead of "double" to get away
+    from the physical description. "decimal" is another potentially
+    reasonable name for this type.
+
+    Also, the FAQ answer says the range of allowable values is
+    implementation- dependant, but the specification refers to
+    "double-precision floating-point", which does have an expected set of
+    behaviors for most people.
+
+    The specification mentions "ASCII" in the type definition for string,
+    but XML permits all of Unicode. Shouldn't one expect to be able to pass
+    around string values with all the characters thus permitted? Shouldn't
+    servers and clients be written to handle this broader character set, and
+    convert as necessary internally? Otherwise, we are taking a big step
+    back from the promise of XML and the web.
+
+    The "dateTime.iso8601" data type name is awkward. They didn't refer to
+    the IEEE 754 floating point standard in the name of the "double" type
+    (which would have been "double.ieee754" if they had). Unless the
+    specification is going to allow multiple "dateTime" variants, the
+    qualifier is just an annoyance. In addition, most people call this type
+    "timestamp", even if their computer languages sometimes just call it
+    "DATE" (as in many SQL implementations). So, here we propose that this
+    type just be called "timestamp" and that the type description refer to
+    the ISO 8601 standard.
+
+    Finally, the "base64" type (added 1999-01-21) really should be "binary"
+    with the encoding standard (Base-64) referenced in the type description.
+
+  Structures
+
+    Structures continue the same idiom used elsewhere in the specification:
+    the avoidance of element attributes. Here is the example used in the
+    specification (modified to acommodate the recommendations already made
+    here):
+
+      <struct>
+        <member>
+          <name>lowerBound</name>
+          <scalar>18</scalar>
+        </member>
+        <member>
+          <name>upperBound</name>
+          <scalar>139</scalar>
+        </member>
+      </struct>
+
+    The "name" element here should be converted into an attribute of the
+    "member" element, leaving:
+
+      <struct>
+        <member name='lowerBound'>
+          <scalar>18</scalar>
+        </member>
+        <member name='upperBound'>
+          <scalar>139</scalar>
+        </member>
+      </struct>
+
+  Arrays
+
+    The "array" element is defined with a superfluous "data" child element.
+    This element serves no function, so it should be removed. Here is the
+    example from the specification (again, modified based on previous
+    recommendations):
+
+      <array>
+        <data>
+          <scalar>12</scalar>
+          <scalar>Egypt</scalar>
+          <scalar>false</scalar>
+          <scalar>-31</scalar>
+        </data>
+      </array>
+
+    Removing the unneeded "data" element leaves us with:
+
+      <array>
+        <scalar>12</scalar>
+        <scalar>Egypt</scalar>
+        <scalar>false</scalar>
+        <scalar>-31</scalar>
+      </array>
+
+    We have recommended getting rid of "value" and using "scalar", but the
+    specification allows a "value" to contain a scalar value *or* a "struct"
+    *or* an "array". We can still do without the "value" element, though:
+
+      <array>
+        <scalar>12</scalar>
+        <array>
+          <scalar>Egypt</scalar>
+          <scalar>false</scalar>
+          <scalar>-31</scalar>
+        </array>
+      </array>
+
+  Responses
+
+    The example in the document is:
+
+      <?xml version="1.0"?>
+      <methodResponse>
+        <fault>
+          <value>
+            <struct>
+              <member>
+                <name>faultCode</name>
+                <value><int>4</int></value>
+              </member>
+              <member>
+                <name>faultString</name>
+                <value><string>Too many parameters.</string></value>
+              </member>
+            </struct>
+          </value>
+        </fault>
+      </methodResponse>
+
+    This has much unnecessary nesting. It is *much* simpler to store the
+    fault code as an attribute of the "fault" element and to have the fault
+    description be the body of the "fault" element:
+
+      <?xml version="1.0"?>
+      <methodResponse>
+        <fault code='4'>
+          Too many parameters.
+        </fault>
+      </methodResponse>
+
+  Adding a Consistent Top-Level Element
+
+    It would be nice if one could always be sure that XML data involved in
+    the XML-RPC protocol had a particular root element.
+
+    Another benefit of doing this is that a given request *could* include
+    multiple calls, which for certain types of interactions could be of
+    great performance benefit. If you need to make many related calls, the
+    network latency would be a real drag on performance, but batching up the
+    calls into one big bundle amortizes the transport time, increasing
+    performance. A top- level element of "xpc" is used here to stand for
+    "XML Procedure Call".
+
+      <xpc>
+        <call> ...  </call>
+        <call> ...  </call>
+        <call> ...  </call>
+      </xpc>
+
+    As soon as we decide to put multiple calls in a transmission, it begs
+    the issue of tieing responses to calls. We could use order for this, but
+    we could also provide an attribute to "call" and "response" called "id"
+    that is optionally provided by the caller, and if present, is copied
+    into the response element for that call.
+
+    HTTP POST REQUEST CONTENT:
+
+      <xpc>
+        <call ... id='1'> ...  </call>
+        <call ... id='foo'> ...  </call>
+        <call ... id='some_guid'> ...  </call>
+      </xpc
+
+    HTTP RESPONSE CONTENT:
+
+      <xpc>
+        <response id='1'> ...  </call>
+        <response id='foo'> ...  </call>
+        <response id='some_guid'> ...  </call>
+      </xpc
+
+    Another benefit of having a consistent top-level element is that we can
+    use it to specify the protocol version:
+
+      <xpc version='0.2'>
+        <call ...> ...  </call>
+      </xpc
+
+    Finally, using a consistent top-level element permits the response to
+    contain a copy of the request if desired.
+
+    HTTP POST REQUEST CONTENT:
+
+      <xpc>
+        <call ... id='1'> ...  </call>
+        <call ... id='foo'> ...  </call>
+        <call ... id='some_guid'> ...  </call>
+      </xpc
+
+    HTTP RESPONSE CONTENT:
+
+      <xpc>
+        <call ... id='1'> ...  </call>
+        <call ... id='foo'> ...  </call>
+        <call ... id='some_guid'> ...  </call>
+        <response id='1'> ...  </call>
+        <response id='foo'> ...  </call>
+        <response id='some_guid'> ...  </call>
+      </xpc
+
+  Extended Types
+
+    Given that XML-RPC is an XML application, it is disconcerting to see its
+    design be so blind to XML issues such as Unicode values (discussed
+    above) and tree-structured data. Suppose a procedure was to accept XML
+    as a parameter or to return XML as its result. How would this be
+    accomplished with XML-RPC? The answer seems to be "stuff it in a string
+    scalar". But, to be a proper string, all the markup would have to be
+    escaped:
+
+      <call procedure='foo'>
+        <param>
+          <scalar>
+            &lt;bar&gt;Here's some text in an element.&lt;/bar&gt;
+          </scalar>
+        </param>
+      </call>
+
+    However, if we add to the "scalar", "array" and "struct" types a new
+    type "xml", then we can do the natural thing:
+
+      <call procedure='foo'>
+        <param>
+          <xml>
+            <bar>Here's some text in an element.</bar>
+          </xml>
+        </param>
+      </call>
+
+    We could even use XML Namespaces if needed to resolve element name
+    collisions if they arise (namespaces are commonly used for this reason
+    in XSLT transforms).
+
+    Technically speaking, allowing parameters and results to contain XML
+    makes the other XML-RPC types redundant, but providing shortcuts for
+    these common cases does make sense.
+
+  Interface Specifications
+
+    In order to provide true discoverability, there needs to be a way for a
+    client to ask the server what operations it supports, and to get back
+    interface information for the supported procedures.
+
+    Sending an empty "query" element should cause the server to return an
+    array of procedure names:
+
+    HTTP POST REQUEST CONTENT:
+
+      <xpc>
+        <query/>
+      </xpc>
+
+    HTTP RESPONSE CONTENT:
+
+      <xpc>
+        <result>
+          <array>
+            <scalar>foo</scalar>
+            <scalar>bar</scalar>
+          </array>
+        </result>
+      </xpc>
+
+    Sending a "query" element with a procedure name filled in should return
+    a response containing a prototype:
+
+    HTTP POST REQUEST CONTENT:
+
+      <xpc>
+        <query procedure='foo'/>
+      </xpc>
+
+    HTTP RESPONSE CONTENT:
+
+      <xpc>
+        <prototype procedure='foo'>
+          <comment>
+            The 'foo' procedure! Given an integer, returns an array with that
+            many elements, with each element containing the integer number of
+            its position within the array.
+          </comment>
+          <param-def name='splee' type='scalar' subtype='integer'/>
+          <result-def type='array'/>
+        </prototype>
+      </xpc>
+
+    Requesting information on an unknown procedure results in a "fault"
+    return:
+
+    HTTP POST REQUEST CONTENT:
+
+      <xpc>
+        <query procedure='quux'/>
+      </xpc>
+
+    HTTP RESPONSE CONTENT:
+
+      <xpc>
+        <fault code='42'>
+          Unknown procedure name 'quux'!
+        </fault>
+      </xpc>
+
+  Conclusion
+
+    The "Strategies/Goals" section of the specification lists these items
+    (paraphrased):
+
+    *   Leverage the ability of CGI to pass many firewalls to build an RPC
+        mechanism that can cross many platforms and many network boundaries.
+
+    *   Cleanliness.
+
+    *   Extensibility.
+
+    *   Easy implementation.
+
+    The first of these seems to be met without difficulty by leveraging the
+    HTTP protocol.
+
+    Cleanliness is of course a subjective measure, and this document has
+    pointed out many points on which we think cleanliness can be improved.
+
+    The original specification doesn't seem to address extensibility other
+    than to list it as a goal. This document's addition of the XML type
+    provides much extensibility.
+
+    Ease of implementation should not be radically decreased by the modified
+    version of XML-RPC proposed here, except in the handling of Unicode
+    text. This is likely the main reason ASCII was specified in the original
+    protocol definition.
+
+ADDITIONAL INFORMATION
+    The following sections provide details behind the proposed XPC.
+
+  Document Type Definition for Proposed XPC
+
+    This appendix shows the complete simple DTD for XPC. It is no more
+    complicated than the XML-RPC DTD (see
+    http://www.ipso-facto.demon.co.uk/xml-rpc-inline.html or
+    http://www.ontosys.com/xml-rpc/xml-rpc.dtd).
+
+      <!-- We are going to use this parameter entity to refer to the value      -->
+      <!-- element types.                                                       -->
+      <!ENTITY % value "(scalar|array|struct|xml)" >
+      <!ENTITY % request "(query|call)" >
+      <!ENTITY % response "(prototype|result|fault)" >
+
+      <!-- We can have any number of calls and responses inside the top-level   -->
+      <!-- element (but at least one).                                          -->
+      <!ELEMENT xpc ( %request; | %response; )+ >
+      <!ATTLIST xpc version CDATA #IMPLIED >
+
+      <!-- A query is always empty, and it has an optional procedure attribute. -->
+      <!-- It can also have an id attribute to distinguish it from other        -->
+      <!-- requests in the same transaction.                                    -->
+      <!ELEMENT query EMPTY >
+      <!ATTLIST query procedure CDATA #IMPLIED >
+      <!ATTLIST query id ID #IMPLIED > <!-- TODO: Can it be ID *and* #IMPLIED? -->
+
+      <!-- A call can have zero or more parameters.                             -->
+      <!ELEMENT call (param)* >
+      <!ATTLIST call procedure CDATA #REQUIRED >
+      <!ATTLIST call id ID #IMPLIED > <!-- TODO: Can it be ID *and* #IMPLIED? -->
+
+      <!-- A param *must* have one of the value elements as a child.            -->
+      <!ELEMENT param %value; >
+      <!ATTLIST param name CDATA #IMPLIED >
+
+      <!-- Types for scalars are shown here as optional, but they may not need  -->
+      <!-- to be part of the design.                                            -->
+      <!ELEMENT scalar (#PCDATA) >
+      <!ATTLIST scalar type (boolean|integer|rational|string|timestamp|binary)
+        #IMPLIED >
+
+      <!-- An array has any number of elements, each of which is of one of the  -->
+      <!-- value elements.                                                      -->
+      <!ELEMENT array (scalar|array|struct)* >
+
+      <!-- A structure has one or more members.                                 -->
+      <!ELEMENT struct (member+) >
+
+      <!-- A member has a name and *must* contain one of the value elements as  -->
+      <!-- a child.                                                             -->
+      <!ELEMENT member %value; >
+      <!ATTLIST member name CDATA #REQUIRED >
+
+      <!-- An xml value element can contain any XML data.                       -->
+      <!ELEMENT xml ANY >
+
+      <!-- A fault has a name and contains text.                                -->
+      <!ELEMENT fault (#PCDATA) >
+      <!ATTLIST fault code CDATA #REQUIRED >
+      <!ATTLIST fault id ID #IMPLIED > <!-- TODO: Can it be ID *and* #IMPLIED? -->
+
+      <!-- A result is like a param, and  *must* have one of the value elements -->
+      <!-- as a child.                                                          -->
+      <!ELEMENT result %value; >
+      <!ATTLIST result name CDATA #IMPLIED >
+      <!ATTLIST result id ID #IMPLIED > <!-- TODO: Can it be ID *and* #IMPLIED? -->
+
+      <!-- A prototype gives the calling convention for a procedure.            -->
+      <!ELEMENT prototype (comment?, (param-def|result-def)*) >
+      <!ATTLIST prototype procedure CDATA #REQUIRED >
+      <!ATTLIST prototype id ID #IMPLIED > <!-- TODO: Can it be ID *and* #IMPLIED? -->
+
+      <!-- A param-def defines an optional name, type and subtype for the       -->
+      <!-- parameter. It may also contain a comment about the parameter.        -->
+      <!ELEMENT param-def (comment?) >
+      <!ATTLIST param-def name CDATA #IMPLIED >
+      <!ATTLIST param-def type (scalar|array|struct|xml) #IMPLIED >
+      <!ATTLIST param-def subtype (boolean|integer|rational|string|timestamp|binary) #IMPLIED >
+
+      <!-- A result-def defines an optional name, type and subtype for the      -->
+      <!-- result. It may also contain a comment about the result.              -->
+      <!ELEMENT result-def (comment?) >
+      <!ATTLIST param-def name CDATA #IMPLIED >
+      <!ATTLIST param-def type (scalar|array|struct|xml) #IMPLIED >
+      <!ATTLIST param-def subtype (boolean|integer|rational|string|timestamp|binary) #IMPLIED >
+
+      <!ELEMENT comment (#PCDATA) >
+
+  XML Schema for Proposed XPC
+
+      <!-- TODO -->
+
+  An XML-RPC <---> XPC Gateway
+
+    The following XSLT transform will convert XML-RPC requests into XPC
+    requests:
+
+      <!-- TODO -->
+
+    The following XSLT transform will convert XPC responses into XML-RPC
+    responses (where it is possible):
+
+      <!-- TODO -->
+
+    The following XSLT transform will convert XPC requests into XML-RPC
+    requests (where it is possible):
+
+      <!-- TODO -->
+
+    The following XSLT transform will convert XML-RPC responses into XPC
+    responses:
+
+      <!-- TODO -->
+
+AUTHOR
+    Gregor N. Purdy <gregor@focusresearch.com>
+
+COPYRIGHT
+    Copyright (C) 2001 Gregor N. Purdy. All rights reserved.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as Perl itself.
+

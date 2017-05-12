@@ -1,0 +1,13 @@
+<stx:transform version="1.0" 
+  xmlns:stx="http://stx.sourceforge.net/2002/ns"
+  strip-space="yes">
+
+  <stx:template match="node">
+    <stx:value-of select="name()"/>-2
+  </stx:template>
+
+  <stx:template match="*">
+    <stx:value-of select="name()"/>-3
+  </stx:template>
+  
+</stx:transform>

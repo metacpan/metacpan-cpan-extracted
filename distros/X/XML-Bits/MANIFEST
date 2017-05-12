@@ -1,0 +1,9 @@
+Build.PL
+Changes
+lib/XML/Bits.pm
+MANIFEST
+MANIFEST.SKIP
+META.yml
+README
+t/00-load.t
+t/basic.t

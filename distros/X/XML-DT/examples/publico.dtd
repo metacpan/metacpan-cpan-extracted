@@ -1,0 +1,9 @@
+<!ELEMENT publico (data,artigo+)>
+<!ELEMENT artigo (sec, ante?, titulo, texto)>
+<!ELEMENT data (#PCDATA)>
+<!ELEMENT sec (#PCDATA)>
+<!ELEMENT ante (#PCDATA)>
+<!ELEMENT titulo (#PCDATA)>
+<!ELEMENT p (#PCDATA)>
+<!ELEMENT st (#PCDATA)>
+<!ELEMENT texto (p|st)+>

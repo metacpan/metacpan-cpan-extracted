@@ -1,0 +1,20 @@
+Revision history for Perl extension XML::DOM::BagOfTricks.
+
+0.01  Thu Dec  9 18:06:10 2004
+	- original version; created by h2xs 1.23 with options
+		-X XML::DOM::BagOfTricks
+        - created original module based on XML::Xerces::BagOfTricks
+0.02  Wed Dec 22 2004
+	- Modified API changing get to create where ambiguous
+	- Added new methods based on XML::DOM::Twig
+
+0.03  Fri Jan 7 2005
+	- improved test coverage
+	- clarified and documented new behaviour of text elements
+
+0.04  Wed Feb 2 2005
+	- fixed errors in documentation
+	- doubled the number of tests
+	- fixed createDocument to attach root element to document element
+0.05 Wed Mar 30 2005
+	- no longer requires XML::Xerces::DOMDocument in getElementwithText

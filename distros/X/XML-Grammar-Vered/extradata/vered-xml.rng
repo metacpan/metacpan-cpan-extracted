@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- $Id: testSuite.rng,v 1.12 2003/01/29 12:24:07 jjc Exp $ -->
+<grammar xmlns="http://relaxng.org/ns/structure/1.0"
+    xmlns:vrd="http://www.shlomifish.org/open-source/projects/XML-Grammar/Vered/"
+    xmlns:xlink="http://www.w3.org/1999/xlink"
+    datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes"
+    >
+    <start>
+        <element name="vrd:document">
+            <ref name="common_attrs" />
+            <attribute name="version">
+                <text />
+            </attribute>
+            <ref name="info" />
+            <element name="vrd:body">
+                <ref name="common_attrs" />
+                <zeroOrMore>
+                    <element name="vrd:preface">
+                        <ref name="section_contents" />
+                    </element>
+                </zeroOrMore>
+                <oneOrMore>
+                    <ref name="section" />
+                </oneOrMore>
+            </element>
+        </element>
+    </start>
+    <define name="global_attrs">
+        <optional>
+            <attribute name="xml:id">
+                <data type="ID"/>
+            </attribute>
+        </optional>
+        <optional>
+            <attribute name="xml:lang">
+                <data type="NCName" />
+            </attribute>
+        </optional>
+    </define>
+    <define name="common_attrs">
+        <ref name="global_attrs" />
+        <optional>
+            <attribute name="xlink:href">
+                <data type="anyURI"/>
+            </attribute>
+        </optional>
+    </define>
+    <define name="section_contents">
+        <ref name="global_attrs" />
+        <ref name="info" />
+        <ref name="several_paras" />
+        <zeroOrMore>
+            <ref name="section" />
+        </zeroOrMore>
+    </define>
+    <define name="section">
+        <element name="vrd:section">
+            <ref name="global_attrs" />
+            <ref name="info" />
+            <ref name="several_paras" />
+            <ref name="some_items" />
+            <zeroOrMore>
+                <ref name="section" />
+            </zeroOrMore>
+        </element>
+    </define>
+    <define name="some_items">
+        <zeroOrMore>
+            <ref name="item" />
+        </zeroOrMore>
+    </define>
+    <define name="item">
+        <element name="vrd:item">
+            <ref name="global_attrs" />
+            <ref name="info" />
+            <ref name="several_paras" />
+            <ref name="some_items" />
+        </element>
+    </define>
+    <define name="several_paras">
+        <zeroOrMore>
+            <choice>
+                <ref name="blockquote"/>
+                <ref name="p"/>
+                <ref name="ol"/>
+                <ref name="ul"/>
+                <ref name="programlisting"/>
+                <ref name="bad_code"/>
+                <ref name="code_blk"/>
+            </choice>
+        </zeroOrMore>
+    </define>
+    <define name="inside_list">
+        <oneOrMore>
+            <ref name="li" />
+        </oneOrMore>
+    </define>
+    <define name="ol">
+        <element name="vrd:ol">
+            <ref name="inside_list" />
+        </element>
+    </define>
+    <define name="ul">
+        <element name="vrd:ul">
+            <ref name="inside_list" />
+        </element>
+    </define>
+    <define name="blockquote">
+        <element name="vrd:blockquote">
+            <ref name="common_attrs" />
+            <ref name="several_paras"/>
+        </element>
+    </define>
+    <define name="li">
+        <element name="vrd:li">
+            <oneOrMore>
+                <ref name="p" />
+            </oneOrMore>
+        </element>
+    </define>
+    <define name="p">
+        <element name="vrd:p">
+            <zeroOrMore>
+                <choice>
+                    <ref name="text_with_style" />
+                    <ref name="span" />
+                    <ref name="a" />
+                </choice>
+            </zeroOrMore>
+        </element>
+    </define>
+    <define name="text_with_style">
+        <choice>
+            <text />
+            <ref name="b" />
+            <ref name="i" />
+            <element name="vrd:cpan_self_dist">
+                <attribute name="d">
+                    <text />
+                </attribute>
+                <empty />
+            </element>
+            <element name="vrd:cpan_self_mod">
+                <attribute name="m">
+                    <text />
+                </attribute>
+                <empty />
+            </element>
+            <element name="vrd:cpan_mod">
+                <attribute name="m">
+                    <text />
+                </attribute>
+                <text />
+            </element>
+            <element name="vrd:pdoc">
+                <attribute name="d">
+                    <text />
+                </attribute>
+                <text />
+            </element>
+            <element name="vrd:pdoc_f">
+                <attribute name="f">
+                    <text />
+                </attribute>
+                <text />
+            </element>
+            <element name="vrd:strong">
+                <text />
+            </element>
+            <element name="vrd:em">
+                <text />
+            </element>
+            <element name="vrd:code">
+                <text />
+            </element>
+            <element name="vrd:filepath">
+                <text />
+            </element>
+        </choice>
+    </define>
+    <define name="span">
+        <element name="vrd:span">
+            <ref name="common_attrs" />
+            <oneOrMore>
+                <ref name="text_with_style" />
+            </oneOrMore>
+        </element>
+    </define>
+    <define name="a">
+        <element name="vrd:a">
+            <ref name="global_attrs" />
+            <attribute name="xlink:href">
+                <data type="anyURI"/>
+            </attribute>
+            <oneOrMore>
+                <ref name="text_with_style" />
+            </oneOrMore>
+        </element>
+    </define>
+    <define name="b">
+        <element name="vrd:b">
+            <text />
+        </element>
+    </define>
+    <define name="i">
+        <element name="vrd:i">
+            <text />
+        </element>
+    </define>
+    <define name="title">
+        <element name="vrd:title">
+            <text />
+        </element>
+    </define>
+    <define name="code_contents">
+        <ref name="common_attrs" />
+        <attribute name="syntax">
+            <text/>
+        </attribute>
+        <text/>
+    </define>
+    <define name="bad_code">
+        <element name="vrd:bad_code">
+            <ref name="code_contents" />
+        </element>
+    </define>
+    <define name="code_blk">
+        <element name="vrd:code_blk">
+            <ref name="code_contents" />
+        </element>
+    </define>
+    <define name="programlisting">
+        <element name="vrd:programlisting">
+            <ref name="code_contents" />
+        </element>
+    </define>
+    <define name="info">
+        <element name="vrd:info">
+            <ref name="title" />
+        </element>
+    </define>
+</grammar>

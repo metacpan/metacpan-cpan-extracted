@@ -1,0 +1,35 @@
+=== version history of XML::Compile::Dumper
+All changes made by Mark Overmeer, unless explicitly noted differently.
+
+version 0.14: Wed Jan 22 10:32:56 CET 2014
+
+	Fix:
+	- add Log::Report to some namespaces
+	- add Data::Dumper::Streamer ':undump' to the output
+
+	Improvements:
+	- change documentation style.
+
+version 0.13: Fri Mar 26 11:14:56 CET 2010
+
+	Fix:
+	- name of test file in MANIFEST
+
+version 0.12: Fri Mar 26 10:14:04 CET 2010
+
+	Fixes:
+	- do not use /bin/pwd in t/99pod.t
+	- add "use Log::Report" to the output [Robin V.]
+
+version 0.11: Mon Nov 24 13:47:18 CET 2008
+
+	Changes:
+	- requires XML::Compile::Tester
+	- correct abstract
+
+version 0.10: Sun Dec 23 10:39:04 CET 2007
+
+	- split-off from XML::Compile, to
+	   + reduce the number of dependencies for XML::Compile
+	   + to give Yves some time to adapt Data::Dump::Streamer to
+	     perl5.10

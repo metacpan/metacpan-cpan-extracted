@@ -1,0 +1,37 @@
+# an enumerated attribute
+
+--- |
+  <?xml version="1.0" encoding="utf-8"?>
+  <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="unqualified" attributeFormDefault="unqualified">
+    <xs:element name="country" type="countryType" />
+    <xs:complexType name="countryType">
+       <xs:attribute name="name" type="countryNameType" use="required"/>
+    </xs:complexType>
+    <xs:simpleType name="countryNameType">
+       <xs:restriction base="xs:string">
+         <xs:enumeration value="NY"/>
+         <xs:enumeration value="RI"/>
+         <xs:enumeration value="NJ"/>
+       </xs:restriction>
+    </xs:simpleType>
+  </xs:schema>
+
+--- |
+  <country name="FL"/>
+--- >
+FAIL /not in allowed list/
+
+--- |
+  <country name="NY"/>
+--- >
+PASS
+
+--- |
+  <country name="RI"/>
+--- >
+PASS
+
+--- |
+  <country name="XX"/>
+--- >
+FAIL /not in allowed list/

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:trackback='http://madskills.com/public/xml/rss/module/trackback/'>
+  <channel>
+    <title>my little example feed</title>
+    <link>http://www.example.com/</link>
+    <description>example tagline</description>
+    <language>en</language>
+  <item>
+    <title>First post</title>
+    <link>http://www.example.com/archives/1</link>
+    <description>First post!</description>
+    <trackback:ping>http://www.example.com/PING</trackback:ping>
+    <trackback:about>http://www.example.com/PINGED</trackback:about>
+  </item>
+  </channel>
+</rss>

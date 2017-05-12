@@ -1,0 +1,10 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+String.pm
+test.pl
+example/eg.pl
+example/eg.xml
+ppm/XML-Writer-String.ppd
+ppm/XML-Writer-String.tar.gz

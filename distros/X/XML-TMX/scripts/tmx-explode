@@ -1,0 +1,78 @@
+#!/usr/bin/perl
+
+use warnings;
+use strict;
+
+use XML::TMX::Reader;
+
+my @files = grep {-f $_} @ARGV;
+
+for my $file (@files) {
+    print STDERR "exploding $file..";
+
+    my $reader = XML::TMX::Reader->new($file);
+
+    my $name = $file;
+    $name =~ s/\.tmx//;
+
+    my %fh;
+    my $i = 1;
+    $reader->for_tu(
+                    sub {
+                        my ($langs) = @_;
+                        print STDERR "." unless $i % 10;
+                        for my $l (keys %$langs) {
+                            next if $l eq "-prop";
+                            mkdir $l unless -d $l;
+                            $langs->{$l} =~ s/\n/ /g;
+                            $langs->{$l} =~ s/\s+/ /g;
+                            unless ($fh{$l}) {
+                                open $fh{$l}, ">$l/$name";
+                                binmode $fh{$l}, ":utf8";
+                            }
+                            print {$fh{$l}} "$i\t$langs->{$l}\n";
+                        }
+                        ++$i;
+                    },
+                   );
+    close $fh{$_} for (keys %fh);
+    print STDERR "DONE\n";
+}
+
+=encoding UTF-8
+
+=head1 NAME
+
+tmx-explode - explodes tmx files in a file per language
+
+=head1 SYNOPSIS
+
+   tmx-explode foo.tmx bar.tmx
+
+   # if foo.tmx and bar.tmx have only PT and EN languages, you will get
+   #  \-EN
+   #     \-- foo
+   #     \-- bar
+   #  \-PT
+   #     \-- foo
+   #     \-- bar
+
+=head1 DESCRIPTION
+
+Explodes a set of tmx files, creating a folder per language, and a
+file per tmx file.
+
+=head1 SEE ALSO
+
+perl(1)
+
+=head1 AUTHOR
+
+Alberto Manuel Brandão Simões, E<lt>ambs@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2012 by Alberto Manuel Brandão Simões
+
+=cut
+

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- with comments -->
+<?xml-stylesheet type="text/xml" href="#style1"?>
+<!DOCTYPE NewsML PUBLIC "urn:newsml:iptc.org:20001006:NewsMLv1.0:1" "dtds/NewsMLv1.0.dtd" [
+<!ELEMENT doc (p)*>
+<!ELEMENT p (#PCDATA)>
+<!ATTLIST p attribute CDATA #REQUIRED>
+<!ENTITY entity "***** this was an entity *****">
+]>
+<doc xmlns:x="urn:x-is-simple">
+	<target x:Href="http://www.afp.com/dtd/AFPCatalog.xml"/>
+	<ns:no-content xmlns:ns="urn:m&#38;n"/>
+<!-- A comment in the code -->
+	<p entity="there&apos;s an &entity; here &amp; here are double quotes &quot;">there's an &entity; here &amp; here are double quotes "</p>
+	<p>20011022</p>
+
+	<p>&gt;</p>
+
+	<x:div>This is an embedded tag: &lt;tag&gt;</x:div>
+
+	<p attribute="escaped &quot; XML in an attribute.">Is the attribute escaped?</p>
+	<p eval="$var &gt; 4 ? &apos;bigger&apos; : &quot;smaller&quot; ">Is the attribute escaped? we got </p>
+	<p>same as in above $var &gt; 4 ? 'bigger' : "smaller" </p>
+
+	<p test="m&amp;n">(*) Is the '&amp;' in the attribute escaped? ❤</p>
+
+	]]&gt;
+
+<![CDATA[<greeting>Hello, world!</greeting>]]> 
+
+<!-- should we  escape stuff & bad things < > in a comment? -->
+
+<?magnum <insane> pi="a&b"?>
+
+</doc>

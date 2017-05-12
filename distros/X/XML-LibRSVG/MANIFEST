@@ -1,0 +1,12 @@
+Changes
+LibRSVG.pm
+LibRSVG.xs
+typemap
+Makefile.PL
+MANIFEST
+README
+testfiles/computer.svg
+t/00basic.t
+t/01stdout.t
+t/02sv.t
+

@@ -1,0 +1,173 @@
+use strict;
+
+use XML::Comma;
+use XML::Comma::Util qw( dbg );
+use XML::Comma::Pkg::Transfer::HTTP_Transfer;
+
+###
+### still need good tests for put_push and put_archive...
+###
+
+my $doc = XML::Comma::Doc->
+  new ( type => '_test_transfer_manual' );
+
+$doc->simple_el ( 'a' );
+$doc->store ( store     => 'main',
+              no_hooks  => 1,
+              keep_open => 1 );
+$doc->file()->set ( 'hello', extension=>'.txt' );
+
+#print $doc->to_string() . "\n";
+
+####
+#
+# ping
+#
+####
+
+print "ping: ";
+print $doc->def()->def_pnotes()->{xfer}->ping();
+print "\n";
+
+####
+#
+# put tests
+#
+####
+
+my $hash = $doc->comma_hash();
+
+print "transferring w/out hooks ... ";
+my $key = $doc->store ( store     => 'main',
+                        no_hooks  => 1,
+                        keep_open => 1 )->doc_key();
+my $first_key = $key;
+$doc->def()->def_pnotes()->{xfer}->put ( $doc, 1 );
+print "done\n";
+
+print "checking local hash ... ";
+if ( $hash eq $doc->comma_hash() ) {
+  print "ok\n";
+} else {
+  print "error, doesn't match\n";
+}
+
+print "checking remote hash ... ";
+my $rhash = $doc->def()->def_pnotes()->{xfer}->get_hash ($key);
+if ( $hash eq $rhash ) {
+  print "ok\n";
+} else {
+  print "error, doesn't match\n";
+}
+
+print "transferring with hooks  ... ";
+$doc->def()->def_pnotes()->{xfer}->put ( $doc );
+print "done\n";
+
+print "checking local hash ... ";
+if ( $hash eq $doc->comma_hash() ) {
+  print "ok\n";
+} else {
+  print "error, doesn't match\n";
+}
+
+print "checking remote hash ... ";
+$rhash = $doc->def()->def_pnotes()->{xfer}->get_hash ($key);
+if ( $hash ne $rhash ) {
+  print "ok\n";
+} else {
+  print "error, shouldn't match\n";
+}
+
+print "storing normally ... ";
+$doc->store();
+print "done\n";
+
+print "hooks should now match ... ";
+$hash =  $doc->comma_hash();
+$rhash = $doc->def()->def_pnotes()->{xfer}->get_hash ($key);
+if ( $hash eq $rhash ) {
+  print "ok\n";
+} else {
+  print "error, doesn't match\n";
+}
+
+print "making an altered copy ... ";
+$doc = XML::Comma::Doc->retrieve ( $key );
+$doc->simple_el ( "b" );
+$key = $doc->copy()->doc_key();
+print "done\n";
+
+print "checking local hash ... ";
+if ( $hash ne $doc->comma_hash() ) {
+  print "ok\n";
+} else {
+  print "error, shouldn't match\n";
+}
+
+$hash = $doc->comma_hash();
+print "checking remote hash ... ";
+$rhash = $doc->def()->def_pnotes()->{xfer}->get_hash ($key);
+if ( $hash eq $rhash ) {
+  print "ok\n";
+} else {
+  print "error, doesn't match\n";
+}
+
+####
+#
+# get test
+#
+####
+
+print "erasing doc files by hand ... ";
+foreach my $blob ( $doc->get_all_blobs() ) {
+  unlink $blob->get_location();
+}
+unlink $doc->doc_location();
+if ( ! -r $doc->doc_location() and ! -r $doc->file()->get_location() ) {
+  print "ok\n";
+} else {
+  print "error\n";
+}
+
+print "get_and_store() ... ";
+$doc = $doc->def()->def_pnotes()->{xfer}->get_and_store ( $doc->doc_key() );
+if ( $doc and -r $doc->doc_location and -r $doc->file()->get_location() ) {
+  print "ok\n";
+} else {
+  print "error\n";
+}
+
+print "checking new hash ... ";
+if ( $hash eq $doc->comma_hash() ) {
+  print "ok\n";
+} else {
+  print "error, doesn't match\n";
+}
+
+####
+#
+# erase test
+#
+####
+
+$key = $first_key;
+$doc = XML::Comma::Doc->retrieve ( $key );
+$key = $doc->doc_key();
+print "erasing ...";
+my $response = $doc->def()->def_pnotes()->{xfer}->erase ( $doc );
+if ( $response eq $key ) {
+  print "ok\n";
+} else {
+  print "error\n";
+}
+
+print "checking hash ... ";
+$rhash = $doc->def()->def_pnotes()->{xfer}->get_hash ($key);
+if ( $rhash eq '' ) {
+  print "ok\n";
+} else {
+  print "error -- $rhash\n";
+}
+

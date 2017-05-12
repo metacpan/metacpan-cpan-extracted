@@ -1,0 +1,516 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns:thr="http://purl.org/syndication/thread/1.0" version="0.3" xmlns="http://purl.org/atom/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xml:lang="en">
+<title>ProNet</title>
+<link rel="alternate" type="text/html" href="http://www.sixapart.com/pronet/weblog/" />
+<modified>2006-05-26T04:48:13Z</modified>
+<tagline>ProNet</tagline>
+<id>tag:www.sixapart.com,2006:/pronet//15</id>
+<generator url="http://www.movabletype.org/" version="3.2">Movable Type</generator>
+<copyright>Copyright (c) 2006, jallen</copyright>
+<entry>
+<title>Coming soon: Movable Type 3.3 (beta)</title>
+<link rel="replies" type="application/atom+xml" 
+      href="" 
+      thr:count="1" thr:when="2006-05-25T21:27:37Z" />
+<link rel="alternate" type="text/html" href="http://www.sixapart.com/pronet/weblog/2006/05/coming_soon_movable_type_33_beta.html" />
+<modified>2006-05-26T04:48:13Z</modified>
+<issued>2006-05-26T04:39:11Z</issued>
+<id>tag:www.sixapart.com,2006:/pronet//15.6812</id>
+<created>2006-05-26T04:39:11Z</created>
+<summary type="text/plain">We have some great news: Movable Type 3.3 is just about ready and the beta test will be starting next week! While we&apos;ll be posting details on some of the goals and best features of the latest version tomorrow, we...</summary>
+<author>
+<name>jallen</name>
+
+</author>
+<dc:subject>Movable Type</dc:subject>
+<content type="text/html" mode="escaped" xml:lang="en" xml:base="http://www.sixapart.com/pronet/">
+<![CDATA[<p>We have some great news: Movable Type 3.3 is just about ready and the beta test will be starting next week!   While we'll be posting details on some of the goals and best features of the latest version tomorrow, we wanted to let you know that it was coming and gather some feedback while we're in the preparation phase.</p>
+
+<p>For those of you who participated in the v3.2 beta, the process will be very familiar as we've kept many of the things that worked well and you told us you liked best:</p>
+
+<ul>
+<li>An open and public beta</li>
+<li>3 to 5 versioned releases plus nightly builds</li>
+<li>A beta blog serving as the hub of the beta testing activity</li>
+<li>Easy submission of bug reports</li>
+<li>Technical support for the beta on the beta blog</li>
+</ul>
+
+<p>We're also making one significant change in the process: We're tightly constraining the beta test to three weeks, to make feedback more directed and have more structure around milestones. Basically, we want to make it easier for you to know where you stand in the beta process, without having to wonder, "Is it ready for me to start really testing yet?"  The answer will be "yes". </p>
+
+<p>So, if you've participated in other beta tests, we'd love to hear about things that worked really well for you.  We're always looking for ways to improve and your feedback is crucial to making sure that we do.</p>
+]]>
+
+
+</content>
+</entry>
+<entry>
+<title>Time to Check In on IE7</title>
+<link rel="replies" type="application/atom+xml" 
+      href="" 
+      thr:count="2" thr:when="2006-05-25T21:27:37Z" />
+<link rel="alternate" type="text/html" href="http://www.sixapart.com/pronet/weblog/2006/04/time_to_check_i.html" />
+<modified>2006-05-17T19:27:01Z</modified>
+<issued>2006-04-26T02:44:05Z</issued>
+<id>tag:www.sixapart.com,2006:/pronet//15.6761</id>
+<created>2006-04-26T02:44:05Z</created>
+<summary type="text/plain">Astute observers of Microsoft&apos;s progress on Internet Explorer 7 will note that the team has reached a significant milestone, and that means it&apos;s probably time to get serious about checking out the latest versions. Most of us who hack around...</summary>
+<author>
+<name>anildash</name>
+
+</author>
+<dc:subject>Design</dc:subject>
+<content type="text/html" mode="escaped" xml:lang="en" xml:base="http://www.sixapart.com/pronet/">
+<![CDATA[<p>Astute observers of Microsoft's progress on <a href="http://www.microsoft.com/windows/ie/">Internet Explorer 7</a> will note that the team has reached a significant milestone, and that means it's probably time to get serious about checking out the latest versions. Most of us who hack around on websites probably haven't invested too much time in trying it out so far, but there's a couple things that make the latest build worth installing.</p>
+
+<p>First, this is the <em>real</em> Beta 2. Having installed some older versions, we could have sworn they used that name before, but those were apparently <em>previews</em> of this beta. If only there were a greek letter that somehow preceded "Beta"! Nitpicking aside, the <a href="http://blogs.msdn.com/ie/">IE Team's blog</a> has a <a href="http://blogs.msdn.com/ie/archive/2006/04/24/582542.aspx">surprising but exciting announcement</a> that with the release of Beta 2 there's now <em>telephone support</em> available for IE7 users. For <em>free</em>. That's a pretty cool thing to do for beta software, and great to see.</p>
+
+<p>There's also a really great <a href="http://www.microsoft.com/downloads/details.aspx?familyid=D13EE10D-2718-47F1-AA86-1E32D526383D&displaylang=en">readiness toolkit</a>, which has the essentials for installing the latest builds, but also has some real time-savers like a compatibility checklist, links to developer blogs that talk about IE, and tools for checking your site's compatibility with the new browser. It's a must-have if you're looking to save time in preparing for the new browser.</p>
+
+<p>Just as important, the IE team has provided <a href="http://blogs.msdn.com/ie/archive/2006/03/24/560095.aspx">a system for feedback</a> where you can submit bugs or issues that you find with the new browser. If you haven't been keeping track of Microsoft's progress in trying to be more open about these kinds of things, you might be pleasantly surprised how good the IE team is at incorporating this kind of feedback.</p>
+
+<p>Last but not least, Microsoft partnered with the folks at CNET's Download.com to start up a new <a href="http://www.ieaddons.com/default.aspx">IE Add-Ons</a> site. A lot of the items there so far look like general system add-ins or old-fashioned plugins more than the kind of browser enhancements in Firefox's <a href="https://addons.mozilla.org/?application=firefox">extensions directory</a>, but that'll probably get better over time. For now, it's a good sign that Microsoft is caring again about making their browser of use to power users and web developers just as much as to people who just use the browser that came with their computer.</p>
+
+<p>That leads to the best example of that new commitment, as well as the one must-have download for people using IE7 today: The <a href="http://www.microsoft.com/downloads/details.aspx?FamilyID=e59c3964-672d-4511-bb3e-2d5e1db91038&displaylang=en">web developer toolbar</a> for IE7. Those of you who are as addicted to the <a href="https://addons.mozilla.org/extensions/moreinfo.php?id=60">Firefox Web Developer extension</a> as we are will definitely appreciate having this new resource available.</p>]]>
+
+</content>
+</entry>
+<entry>
+<title>Your Work Is Valuable, Remember?</title>
+<link rel="replies" type="application/atom+xml" 
+      href="" 
+      thr:count="0" thr:when="" />
+<link rel="alternate" type="text/html" href="http://www.sixapart.com/pronet/weblog/2006/04/your_work_is_va.html" />
+<modified>2006-04-13T01:22:04Z</modified>
+<issued>2006-04-13T00:10:07Z</issued>
+<id>tag:www.sixapart.com,2006:/pronet//15.6710</id>
+<created>2006-04-13T00:10:07Z</created>
+<summary type="text/plain">As blogging starts to grow into a bigger industry with more money and resources pouring into it, we want to make sure that the people who benefit most are the community members who make all of this possible. For us,...</summary>
+<author>
+<name>anildash</name>
+
+</author>
+
+<content type="text/html" mode="escaped" xml:lang="en" xml:base="http://www.sixapart.com/pronet/">
+<![CDATA[<p>As blogging starts to grow into a bigger industry with more money and resources pouring into it, we want to make sure that the people who benefit most are the community members who make all of this possible. For us, one of the best signs of the healthy ecosystem that's developed around blogging is that more people make a living working on Six Apart platforms outside our company than inside, even though we've been growing pretty rapidly over the past few years.</p>
+
+<p>The latest example of how we're trying to invest in increasing the value of blogging skills is <a href="http://www.thestylecontest.com/">The Style Contest</a>. Maybe it's because our <a href="http://www.sixapart.com/about/corner/">co-founder</a> is a designer herself, but it just seems to make sense that people who do smart, creative work should get rewarded for it. And it's not just the money (although $4000 in cash doesn't hurt!) but the recognition that helps show that all of us together have helped blogs succeed this far, and are going to be what takes blogging to the next level.</p>
+
+<p>This goes for everyone else in the community, too. <a href="http://www.sixapart.com/pronet/weblog/2004/09/dropcash_featur.html">Plugin developers</a>. folks who help build out templates for people, those who offer their expertise as consultants, <em>everyone</em> has got an opportunity. Frankly, those of us who build the tools shouldn't be the only ones who see the benefits of the booming popularity of blogs. If they say <a href="http://money.cnn.com/magazines/moneymag/bestjobs/top50/index.html">software development</a> is supposed to be one of the best jobs in the country, then we'd like to help make it even better, by doing things like helping Professional Network members find jobs doing the work they love. For bloggers in general, we've got efforts from our <a href="http://www.sixapart.com/pronet/weblog/affiliate_program.html">affiliate program</a> to TypePad's <a href="http://www.sixapart.com/typepad/news/2005/09/tips_accepted_h_1.html">tip jar</a> that let you get as much out of blogging as you put into it.</p>
+
+<p>We're definitely proud that our company's been growing in the same way that blogs themselves have been. But if you're a designer, or a developer, we just wanted to take a minute to let you know, especially if you're a <a href="http://www.sixapart.com/pronet/">Professional Network</a> member, that we're even more excited about opening up opportunities for you to benefit from blogs as well.</p>]]>
+
+</content>
+</entry>
+<entry>
+<title>Pixelicious Icons</title>
+<link rel="replies" type="application/atom+xml" 
+      href="" 
+      thr:count="2" thr:when="2006-05-25T21:27:37Z" />
+<link rel="alternate" type="text/html" href="http://www.sixapart.com/pronet/weblog/2006/04/pixelicious_ico.html" />
+<modified>2006-04-11T01:12:14Z</modified>
+<issued>2006-04-11T01:11:58Z</issued>
+<id>tag:www.sixapart.com,2006:/pronet//15.6707</id>
+<created>2006-04-11T01:11:58Z</created>
+<summary type="text/plain">Sometimes when you&apos;re on crunch time in building a site, you just need a couple of simple pixel icons to really help a design sing. One of the coolest new resources we&apos;ve seen is Mini Pixel Icons, which offers exactly...</summary>
+<author>
+<name>anildash</name>
+
+</author>
+<dc:subject>Design</dc:subject>
+<content type="text/html" mode="escaped" xml:lang="en" xml:base="http://www.sixapart.com/pronet/">
+<![CDATA[<p>Sometimes when you're on crunch time in building a site, you just need a couple of simple pixel icons to really help a design sing. One of the coolest new resources we've seen is <a href="http://ndesign-studio.com/resources/pixel_icons.htm">Mini Pixel Icons</a>, which offers exactly what the name implies. There's a pile of icons you can use freely for up to 10 icons, and all you have to do is provide a link or get a license if you wan to use more than that. Worth bookmarking for future reference.</p>]]>
+
+</content>
+</entry>
+<entry>
+<title>Mac Perl Geeks: Check Out Affrus</title>
+<link rel="replies" type="application/atom+xml" 
+      href="" 
+      thr:count="0" thr:when="" />
+<link rel="alternate" type="text/html" href="http://www.sixapart.com/pronet/weblog/2006/04/mac_perl_geeks.html" />
+<modified>2006-04-06T20:36:58Z</modified>
+<issued>2006-04-06T19:56:16Z</issued>
+<id>tag:www.sixapart.com,2006:/pronet//15.6676</id>
+<created>2006-04-06T19:56:16Z</created>
+<summary type="text/plain">We&apos;ve got a whole pile of Mac nerds in the office who spent all day busily installing Boot Camp, and now that they&apos;ve realized that... hey, it&apos;s just Windows, they&apos;re looking for something new to play with. Maybe it&apos;s time...</summary>
+<author>
+<name>anildash</name>
+
+</author>
+<dc:subject>Perl</dc:subject>
+<content type="text/html" mode="escaped" xml:lang="en" xml:base="http://www.sixapart.com/pronet/">
+<![CDATA[<p>We've got a whole pile of Mac nerds in the office who spent all day busily installing <a href="http://www.apple.com/macosx/bootcamp/">Boot Camp</a>, and now that they've realized that... hey, it's just Windows, they're looking for something new to play with. Maybe it's time to check out <a href="http://www.latenightsw.com/affrus/">Affrus</a>, a new IDE for Perl hackers on Mac OS X. Seems like a nice tool to try out for people who are doing advanced Movable Type plugins or who want to work on the LiveJournal code base, or even if you just like getting your hands dirty with Perl. All the basics are there, like solid text editing, Perltidy integration, and Finder integration, but there's also a robust set of debugging functions that you can access through the graphical interface or through the command line.</p>]]>
+
+</content>
+</entry>
+<entry>
+<title>The Style Contest has launched!</title>
+<link rel="replies" type="application/atom+xml" 
+      href="" 
+      thr:count="0" thr:when="" />
+<link rel="alternate" type="text/html" href="http://www.sixapart.com/pronet/weblog/2006/03/the_style_contest.html" />
+<modified>2006-04-06T18:39:55Z</modified>
+<issued>2006-03-31T19:00:20Z</issued>
+<id>tag:www.sixapart.com,2006:/pronet//15.6665</id>
+<created>2006-03-31T19:00:20Z</created>
+<summary type="text/plain">While everyone talks about content being king, there is no doubt that design and aesthetics are a big part of what makes an audience sit up and take notice of a blog. Designers are often the unsung heroes of the...</summary>
+<author>
+<name>jallen</name>
+
+</author>
+<dc:subject>Design</dc:subject>
+<content type="text/html" mode="escaped" xml:lang="en" xml:base="http://www.sixapart.com/pronet/">
+<![CDATA[<p>While everyone talks about content being king, there is no doubt that design and aesthetics are a big part of what makes an audience sit up and take notice of a blog.  Designers are often the unsung heroes of the blogosphere.</p>
+
+<h3>One Design Works for Millions of Blogs</h3>
+
+<p>Last year, we made our first big step in helping designers who use Six Apart platforms by <a href="http://www.thestylecontest.com/help/weblog_design_standard">standardizing the layout and structure of templates</a> across all three of our products, Movable Type, TypePad and LiveJournal.  With support for this new standard template, designers now have one set of guidelines to follow to reach the biggest possible audience. Instead of learning the details of one particular system, you can focus on what you do best: <strong>Creating beautiful, useful designs</strong>. </p>
+
+<p>Since the debut of the standard templates last August, the total audience that can be reached with a single design has expanded to include <em>over ten million blogs</em>.</p>
+
+<h3>Introducing The Style Contest</h3>
+
+<p style="float: right; margin: 10px; margin-right: 0px;"><img alt="The Style Contest for Movable Type, TypePad and LiveJournal" src="http://www.sixapart.com/movabletype/news/tophat.gif" width="93" height="74" /></p>
+
+<p>In order to demonstrate the benefits of these new styles in a real and practical way, we decided to have a design contest.  At the same time, three other driven and talented individuals from our community &#8212; <a href="http://movalog.com">Arvind Satyanarayan</a>, <a href="http://learningmovabletype.com">Elise Bauer</a> and <a href="http://www.plasticmind.com">Jesse Gardner</a> &#8212; had the same exact idea.  </p>
+
+<p>So we joined forces and today are announcing the fruits of that labor: <a href="http://www.thestylecontest.com/">The Style Contest for Movable Type, TypePad and LiveJournal</a> has launched!  Designers: Start your browsers!</p>
+
+<h3>Design for millions of blogs. Or just make a few thousand bucks</h3>
+
+<p>Sponsored by <a href="http://www.sixapart.com/">Six Apart</a>, <a href="http://www.adobe.com/">Adobe</a> and <a href="http://www.westciv.com/style_master/">StyleMaster</a>, this contest features <strong><a href="http://www.thestylecontest.com/prizes/">over $17,000 in prizes</a></strong>, which includes $10,000 in cash to the Grand Prize and category winners  as well as other great prizes.  What's more, <em>every</em> qualified entrant gets discounts on some awesome in-demand design products.</p>
+
+<p>The prize winners will be chosen by <a href="http://www.thestylecontest.com/judges/">five excellent designers</a> who have agreed to serve as the contest's judges: <a href="http://www.powazek.com">Derek Powazek</a>, <a href="http://www.jasonsantamaria.com/">Jason Santa Maria</a>, <a href="http://www.moxiedesignstudios.com/">Kathy Scoleri and Joelle Reeder</a> and <a href="http://blogs.westciv.com/dog_or_higher/">John Allsopp</a>.  </p>
+
+<p>So whether you are a designer or someone who loves a great design, <a href="http://www.thestylecontest.com/">The Style Contest</a> is for you.</p>
+
+<h3>Acknowledgments</h3>
+
+<p>First, we'd like to thank <strong>all of you who use</strong> <a href="http://www.sixapart.com/typepad">TypePad</a>, <a href="http://www.sixapart.com/movabletype">Movable Type</a> and <a href="http://www.sixapart.com/livejournal">LiveJournal</a>.  We at Six Apart recognize that design helps tell your readers who you are, and we want to make sure our blogs are as attractive and pleasing as our customers.</p>
+
+<p>We are extremely happy and thankful to have our <strong>talented and creative judges</strong> on our team.  In selecting them, we know that we've chosen people who not only understand design at a visceral level but are people who are well-respected and well-known in their field.  They know their stuff.</p>
+
+<p>All of us at Six Apart also want to thank and recognize <strong>The Style Contest team &#8212; Arvind, Jesse and Elise &#8212;</strong> for their Herculean efforts in making this contest a reality.  They've already put in hundreds of hours in making sure this was the contest was the best it could be.  Thanks to those efforts, we're sure we'll be seeing some exciting and beautiful designs.</p>
+
+<p>And finally, we'd like to acknowledge you, <strong>the designers</strong>.  Without you we would all still be using Comic Sans, technicolor horizontal rules, animated under construction gifs and blink tags. We thank you for rescuing us from that visual hell. This contest is for you.  We can't wait to see what you come up with.</p>
+
+<p><strong>Related announcements:</strong></p>
+
+<ul>
+<li><a href="http://blog.plasticmind.com/0s-and-1s/the_style_contest_1.php">Jesse Gardner's post</a></li>
+<li><a href="http://www.movalog.com/archives/announcements/the-style-contest">Arvind Satyanarayan's post</a></li>
+<li><a href="http://www.learningmovabletype.com/announce/a/001553the_style_contest_is_live.php">Elise Bauer's post</a></li>
+</ul>
+]]>
+
+
+</content>
+</entry>
+<entry>
+<title>In The Mix</title>
+<link rel="replies" type="application/atom+xml" 
+      href="" 
+      thr:count="0" thr:when="" />
+<link rel="alternate" type="text/html" href="http://www.sixapart.com/pronet/weblog/2006/03/in_the_mix.html" />
+<modified>2006-04-06T19:48:10Z</modified>
+<issued>2006-03-20T17:05:07Z</issued>
+<id>tag:www.sixapart.com,2006:/pronet//15.6626</id>
+<created>2006-03-20T17:05:07Z</created>
+<summary type="text/plain">I&amp;#8217;m at Microsoft&amp;#8217;s Mix06 event today; If you&amp;#8217;re here, be sure to catch up with us in Ballroom C at 3:00pm this afternoon for the session on Extending Your Experience. We&amp;#8217;ll be showing off some cool stuff about Movable Type...</summary>
+<author>
+<name>anildash</name>
+
+</author>
+<dc:subject>Events</dc:subject>
+<content type="text/html" mode="escaped" xml:lang="en" xml:base="http://www.sixapart.com/pronet/">
+<![CDATA[<p>I&#8217;m at Microsoft&#8217;s <a href="http://www.mix06.com/">Mix06</a> event today; If you&#8217;re here, be sure to catch up with us in Ballroom C at <strong>3:00pm this afternoon</strong> for the session on <a href="https://content.mix06.com/content/SessionView.aspx?TopicID=8a6a8c2e-8919-437f-ad64-5f982de10076">Extending Your Experience</a>. We&#8217;ll be showing off some cool stuff about <a href="http://www.sixapart.com/business/movable-type/">Movable Type Enterprise</a>, as well as demonstrating some of the lessons we&#8217;ve learned about <a href="http://www.sixapart.com/movabletype/news/2006/03/eating_away_fro.html">making business software that people actually want to use</a>.</p>
+
+<h4>It&#8217;s Bill Gates!</h4>
+
+<p>Right now, though, it&#8217;s <a href="http://www.microsoft.com/events/executives/billgates.mspx">Bill Gates&#8217; keynote</a> that&#8217;s got everyone&#8217;s rapt attention. It&#8217;s kind of surprising, since sadly it doesn&#8217;t seem like <a href="http://www.wired.com/news/technology/gallery/1,69978,3.html">Justin Timberlake</a> is joining Bill onstage this time. That disappointment aside, there&#8217;s some good news:Amidst the typical Microsoft-speak (if we all had a nickel for each time the word &#8220;rich&#8221; or &#8220;experience&#8221; was used, we&#8217;d be&#8230;  Bill Gates) there&#8217;s actually some really interesting new things coming from Microsoft. All of us who&#8217;ve been frustrated in the past four or five years by Internet Explorer have a lot to look forward to, with improvements around both standards support as well as feeds. There&#8217;s tons more that Microsoft and everybody else will be showing off, that&#8217;ll no doubt be covered well on the <a href="http://blog.mix06.com/virtualmix/">Virtual Mix</a> site.</p>
+
+<h4>Like peanut butter and chocolate</h4>
+
+<p>Overall, though, the most interesting thing about the Mix event is that it&#8217;s one of the few times that the world of developers and consultants who work primarily with Microsoft technologies like .NET and Visual Studio get to interact with folks who live in the LAMP/Dynamic scripting-heavy Web 2.0 world. Basically, Windows people don&#8217;t always hang out with web people in the real world, a lot of times. That means there&#8217;s a lot of good ideas that probably don&#8217;t get shared. Hopefully this is a good way to help fix that.</p>
+
+<p>At Six Apart, we&#8217;ve got our feet pretty firmly planted in both camps, from the open source goodness of LiveJournal to the cool Windows Mobile stuff that our SplashBlog team works on. So it&#8217;s nice to be around a crowd that appreciates both. There will undoubtedly be lots of blogging about the event over the next few days, but so far, it&#8217;s a good start at doing a surprisingly different kind of conference for Microsoft.</p>
+]]>
+
+
+</content>
+</entry>
+<entry>
+<title>eTech Wrap Up – a Rant and Rave</title>
+<link rel="replies" type="application/atom+xml" 
+      href="" 
+      thr:count="0" thr:when="" />
+<link rel="alternate" type="text/html" href="http://www.sixapart.com/pronet/weblog/2006/03/etech_wrap_up_a.html" />
+<modified>2006-03-17T21:28:49Z</modified>
+<issued>2006-03-17T17:34:28Z</issued>
+<id>tag:www.sixapart.com,2006:/pronet//15.6619</id>
+<created>2006-03-17T17:34:28Z</created>
+<summary type="text/plain">It has been about a week since I returned from Oreilly’s eTech Conference in San Diego. I figured now is a good a time as any to give a brief round up of the conference for those that weren’t in...</summary>
+<author>
+<name>Byrne Reese</name>
+<url>http://www.typepad.com/</url>
+</author>
+<dc:subject>Events</dc:subject>
+<content type="text/html" mode="escaped" xml:lang="en" xml:base="http://www.sixapart.com/pronet/">
+<![CDATA[<p>It has been about a week since I returned from <a href="http://oreilly.com/">Oreilly’s</a> <a href="http://conferences.oreillynet.com/etech/">eTech Conference</a> in San Diego. I figured now is a good a time as any to give a brief round up of the conference for those that weren’t in attendance. Well, it’s not so much a “round up” as it is a mix of my personal rants and raves.</p>
+]]>
+<![CDATA[<ol>
+<li>First, to all the product vendors out there: AJAX is NOT an “emerging technology” anymore. It has emerged. Therefore, companies please stop talking about Ajax like its new, exciting or in any way is a differentiator for you. Enough said.</li>
+<li>The theme of the conference was a tad ironic. Talking to this crowd about “Attenuation” and “Attention Management” is like preaching to a pack of hungry wolves about vegetarianism. At any given time you could look around and see 80% of the crowd flat out not paying attention to the guy talking about how to be more effective at focusing your attention (<a href="http://www.flickr.com/photos/geodog/112780771/">with rare exception</a>). There <a href="http://www.flickr.com/photos/geodog/112779746/">they</a> <a href="http://www.flickr.com/photos/dsifry/110939974/">would</a> <a href="http://www.flickr.com/photos/80899500@N00/110649628/">all</a> <a href="http://www.flickr.com/photos/57746891@N00/110268536/">be</a> obsessively typing away at the bazillion things competing for their attention: “what’s new on the <a href="http://wiki.oreillynet.com/etech/index.cgi">wiki</a>?”, “oh my god I haven’t checked my email in 30 seconds!”, “what are they saying on the <a href="http://www.seanbonner.com/blog/archives/002200.php#002200">IRC channel</a>? Anything funny? No. How about now? No. And now?”, not to mention the million IM chat windows: “what session are you going to next? What session are you in right now?” So, attendees, next time you go to a session about attention management: try closing your laptop and disconnecting for <em>just</em> a couple minutes. If nothing else, its just polite.</li>
+<li>Now for a little “wisdom.” Don’t get caught up in the surf, follow the under currents. Attenuation is honestly kind of lame, and no one really needs new <a href="http://www.thinkfree.com/">calendaring software</a>, or an <a href="http://www.zimbra.com/">email client</a>.  Even if it does have tags or uses Ajax. No, really, you don’t. So skip all the product demos and hang out in the hallways. Saddle up next to someone – anyone – and <em>talk</em>. Everything in the sessions has already emerged, or else the presenters would not have had time to prepare. The “emerging” part of the conference is taking place in the hallways. So don&#8217;t be shy: get out there.<br/><br />For me, I found that the most interesting undercurrent to be the <a href="http://shufflebrain.com/etech06.htm">application of game mechanics to product design</a>. Discuss.</li>
+<li>Identity is frick’n hard. <a href="http://blame.ca/dick/">Dick Hardt</a> gave a great keynote (certainly one of the most entertaining) about <a href="http://sxip.com/">SXIP</a>, identity and trust; but the bottom line is this: solving this problem is almost as difficult as trying to explain it to someone. I spent more time drawing protocol diagrams, trying to explain the difference between authentication and authorization, and showing that, yes, <a href="http://www.openid.net/">a URL can be used as the basis for identity</a>, than I did actually engaged in conversations about how we are going to solve the problem. Good luck to anyone trying to build a business in this space. You will need it. Seriously, <em>good luck</em>, because the solution is desparately needed.</li>
+<li>More <a href="http://avantgame.blogspot.com/2006/02/werewolf-attack-etech-2006.html">Werewolf</a>! More Werewolf! Major props to <a href="http://crucially.livejournal.com/">Artur</a> (also known as &#8220;<a href="http://www.flickr.com/photos/57746891@N00/110268518/">that guy with the segway</a>&#8221;) and <a href="http://avantgame.blogspot.com/">Jane</a> for hosting Werewolf – a <a href="http://www.eblong.com/zarf/werewolf.html">game</a> of deductive reasoning, lying, finger pointing, logic, debate and “Brrrrrrraaaaaaaaaaiiiiiiinsssss” (you would have to have been there).</li>
+<li>Oh yeah: <a href="http://mrl.nyu.edu/~jhan/ftirtouch/">Holy crap</a>.</li>
+</ol>
+
+<p>But if I seem at all sour, it is only because I am being dramatic and attempting in my lame way to be funny. eTech was actually a lot of fun, and a conference I hope I have the privilege of attending frequently.</p>
+]]>
+</content>
+</entry>
+<entry>
+<title>Need help with Movable Type?</title>
+<link rel="replies" type="application/atom+xml" 
+      href="" 
+      thr:count="0" thr:when="" />
+<link rel="alternate" type="text/html" href="http://www.sixapart.com/pronet/weblog/2006/03/movable_type_support.html" />
+<modified>2006-03-14T10:30:47Z</modified>
+<issued>2006-03-14T08:25:50Z</issued>
+<id>tag:www.sixapart.com,2006:/pronet//15.6581</id>
+<created>2006-03-14T08:25:50Z</created>
+<summary type="text/plain"> As you probably know, Movable Type is a powerful application, and sometimes we can&apos;t even anticipate all the clever ways that the community comes up with to create blogs or publish websites. Given all the options available, it&apos;s inevitable...</summary>
+<author>
+<name>jallen</name>
+
+</author>
+
+<content type="text/html" mode="escaped" xml:lang="en" xml:base="http://www.sixapart.com/pronet/">
+<![CDATA[<p style="float:right; margin: 10px; margin-right:0px;"><a href="https://secure.sixapart.com/t/account" style="border : none; text-decoration : none;"><img src="http://www.sixapart.com/movabletype/news/MTSupport/YourAccount.png" width="129" height="104" alt="Help ticket links in Your Account" style="border : none; text-decoration : none;" /></a></p>
+
+<p>As you probably know, <a href="http://www.sixapart.com/movabletype/">Movable Type</a> is a powerful application, and sometimes we can't even anticipate all the clever ways that the community comes up with to create blogs or publish websites. Given all the options available, it's inevitable that sometimes you might have a question or a problem that isn't addressed in the <a href="http://www.sixapart.com/movabletype/docs/3.2/">user manual</a> or the <a href="http://www.sixapart.com/movabletype/kb/">knowledge base</a>.</p>
+
+<p>In fact, most of us who work on Movable Type get questions from friends, family, and even complete strangers about the clever or crazy things they want to do. Sometimes, it's just looking for help in the fight against comment spam.  Other times it's an email to our <a href="http://www.sixapart.com/pronet">ProNet mailing list</a> about a potential bug or server error. And if you're like us, sometimes you just end up tearing your hair out because of a silly mistake that you won't catch until the moment you've asked someone else to help you.</p>
+
+<p style="float:left; margin: 10px; margin-left:0px;"><a href="http://www.sixapart.com/movabletype/"style="border : none; text-decoration : none;"><img src="http://www.sixapart.com/movabletype/news/MTSupport/mthome.png" width="246" height="145" alt="Current Users login on Movable Type homepage" style="border : none; text-decoration : none;" /></a></p>
+
+<p>Whatever the case, we've got a way to help. The best option for if you're having problems is to file a support ticket with our support team. Since most people have never seen what the process looks like, we thought we'd give you a tour.</p>
+
+<p>Technical support packages for Movable Type have been around for a few years now.  If you have a <a href="http://www.sixapart.com/movabletype/pricing_commercial">paid license for Movable Type</a> and either a problem or a question that a <a href="http://www.sixapart.com/cgi-bin/mt/mt-search.cgi?IncludeBlogs=38&amp;Template=mtdocs">user manual and knowledge base search</a>  doesn't satisfy, don't be shy about using the ticket system.</p>
+
+<h3>Filing a help ticket</h3>
+
+<p style="float:right; margin: 10px; margin-right:0px;"><a href="http://www.sixapart.com/movabletype/news/MTSupport/TicketEditing.png" style="border : none; text-decoration : none;"><img src="http://www.sixapart.com/movabletype/news/MTSupport/TicketEditing-t.png" style="border : none; text-decoration : none;" width="313" height="176" alt="Ticket Editing" /></a></p>
+
+<p>To file a help ticket, you simply need to <a href="https://secure.sixapart.com/t/account">log into your account</a> via TypeKey.  You can always find a link to your account in the "Current Users" section of the <a href="http://www.sixapart.com/movabletype/">Movable Type homepage</a> (as seen above).</p>
+
+<p>Once logged in, you will see a box to the right labelled "Help &amp; Support" (as shown at the top of this article) with links to the knowledge base and the ticket system.  Simply click on the "Open a new ticket" link and you're ready to submit your help request. (<a href="http://www.sixapart.com/movabletype/news/MTSupport/TicketEditing.png">screenshot</a>). (You might want to take a look at the always-helpful <a href="http://www.sixapart.com/movabletype/kb/your_account/support_ticket.html">support ticket guidelines</a> before filing a ticket.)</p>
+
+<p style="float:left; margin: 10px; margin-left:0px;"><a href="http://www.sixapart.com/movabletype/news/MTSupport/TicketReview.png" style="border : none; text-decoration : none;"><img src="http://www.sixapart.com/movabletype/news/MTSupport/TicketReview-t.png" style="border : none; text-decoration : none;" width="234"  height="143" alt="Ticket Review" /></a></p>
+
+<p>Once you submit a ticket to our tech support team, you will be shown <a href="http://www.sixapart.com/movabletype/news/MTSupport/TicketSubmitted.png">a listing of all of your open tickets</a>, the date on which they were created and their current status which will either "Awaiting Staff response" or "Awaiting User response".</p>
+
+<p>From there you can click on any ticket in order to see the <a href="http://www.sixapart.com/movabletype/news/MTSupport/TicketReview.png">details of that ticket (screenshot)</a> including any response from our technical support team.  From there you can also close tickets and view your <a href="http://www.sixapart.com/movabletype/news/MTSupport/ClosedTicketHistory.png">previously closed ticket (screenshot)</a>.</p>
+
+<h3>Supporting the Community</h3>
+
+<p>We're very proud of our support offerings at Six Apart because you've told us often how much you appreciate being able to get your problems solved or your questions answered quickly by professionals instead of having to dig around on the web.  As far as we're concerned, if you spend more time blogging than you do working on your blog software, we've done our jobs.</p>
+
+<p>If you'd like to take advantage of our technical support offering but don't have a paid license yet, we have an array of them for <a href="http://www.sixapart.com/movabletype/pricing">individuals</a>, <a href="http://www.sixapart.com/movabletype/pricing_commercial">commerical use</a>, <a href="http://www.sixapart.com/movabletype/pricing_educational">schools</a> and <a href="http://www.sixapart.com/movabletype/pricing_not-for-profit">non-profit  organizations</a>.  As always, if you have any trouble finding the right license, don't hesistate to <a href="http://www.sixapart.com/movabletype/contact?personal-custom">drop us a line</a> and we'll help you with something that fits your needs.</p>
+]]>
+
+
+</content>
+</entry>
+<entry>
+<title>Join us at the Blog Business Summit</title>
+<link rel="replies" type="application/atom+xml" 
+      href="" 
+      thr:count="0" thr:when="" />
+<link rel="alternate" type="text/html" href="http://www.sixapart.com/pronet/weblog/2006/03/join_us_at_the.html" />
+<modified>2006-03-08T01:08:50Z</modified>
+<issued>2006-03-07T20:22:12Z</issued>
+<id>tag:www.sixapart.com,2006:/pronet//15.6562</id>
+<created>2006-03-07T20:22:12Z</created>
+<summary type="text/plain">We&apos;re proud to be participating in the Blog Business Summit next week, not just because it&apos;s an event focused on business blogs, but because the advice and attention of the summit is all practical and useful for businesses today. For...</summary>
+<author>
+<name>anildash</name>
+
+</author>
+<dc:subject>Events</dc:subject>
+<content type="text/html" mode="escaped" xml:lang="en" xml:base="http://www.sixapart.com/pronet/">
+<![CDATA[<p>We're proud to be participating in the <a href="http://blogbusinesssummit.com/register.htm">Blog Business Summit</a> next week, not just because it's an event focused on <a href="http://www.sixapart.com/business/">business blogs</a>, but because the advice and attention of the summit is all practical and useful for businesses today.</p>
+
+<p><a href="http://blogbusinesssummit.com/register.htm" style="text-decoration : none; border : none; float : left; padding : 10px;"><img alt="Blog Business Summit LA" src="http://www.sixapart.com/pronet/BBS_220x128_PRNTLA6.gif" width="220" height="128" /></a><br />
+For example, a lot of attention's been paid to some of the negative scare stories that can arise from companies communicating poorly with bloggers. But in the Summit blog, Teresa Valdez Klein's <a href="http://blogbusinesssummit.com/2006/03/how_fed_ex_and.htm">advice for FedEx</a> gave the company practical tips on how to benefit from engaging the blogosphere.</p>
+
+<p>It's exactly that sort of useful, focused, and productive business blogging that we're hoping to encourage by participating in the conversation. We hope you'll join us, and to make it easier, we've been able to arrange a discount for the Professional Network community. <a href="http://blogbusinesssummit.com/register.htm">Sign up</a> using code <code>PRNTLA6</code> and save $50 on your registration fees. You'll want to hurry up-- time and space are running out as the event gets closer!</p>]]>
+
+</content>
+</entry>
+<entry>
+<title>Connecting your blog to Skype</title>
+<link rel="replies" type="application/atom+xml" 
+      href="" 
+      thr:count="0" thr:when="" />
+<link rel="alternate" type="text/html" href="http://www.sixapart.com/pronet/weblog/2006/02/connecting_your.html" />
+<modified>2006-02-27T01:10:22Z</modified>
+<issued>2006-02-26T07:53:05Z</issued>
+<id>tag:www.sixapart.com,2006:/pronet//15.6520</id>
+<created>2006-02-26T07:53:05Z</created>
+<summary type="text/plain">Millions of people around the world use Skype to talk to each other, and since blogs are all about helping people communicate better, we&apos;re glad to see a number of new efforts making it easier to plug into Skype right...</summary>
+<author>
+<name>anildash</name>
+
+</author>
+<dc:subject>Movable Type</dc:subject>
+<content type="text/html" mode="escaped" xml:lang="en" xml:base="http://www.sixapart.com/pronet/">
+<![CDATA[<p>Millions of people around the world use <a href="http://www.skype.com">Skype</a> to talk to each other, and since blogs are all about helping people communicate better, we're glad to see a number of new efforts making it easier to plug into Skype right from your Movable Type-powered blog.</p>
+
+<p><img alt="SkypeBlue.png" src="http://www.sixapart.com/pronet/SkypeBlue.png" width="219" height="201" style="padding : 10px; float : left;" />Skype Journal, the most popular independent blog about the Skype community, has shared an overview called "<a href="http://www.skypejournal.com/blog/archives/2006/02/skype_tags_and_your_blog.php">Skype Tags and Your Blog</a>". In his post, Stuart Henshall says,</p>
+
+<blockquote>Skype Tags for MT - Movable Type. How to add Chat tags, VM - voice messaging, and "info" tags. Add the code below to your MT templates and you will have active icons. There are a whole range of icons you can activate all using the same basic structure.</blockquote>
+
+<p>Using Skype's APIs, it's easy to add icons to your blog for any common action, such as initiating a call, leaving a voice message, discovering a person's online status, or just finding out a user's information.</p>
+
+<p>One of the best parts of the new functionality is that it shows off the clever ways that open APIs can be extended, adding new features that a platform's creators might never have anticipated. Judging by the <a href="http://share.skype.com/sites/en/2006/02/experimenting_with_skype_tags.html">enthusiastic post</a> on Skype's official blog, the Skype team is just as excited as we are.</p>
+
+<p>Of course, since both Skype Journal and the official Skype Share blog are both powered by <a href="/movabletype">Movable Type</a>, we expect that their teams will find even better ways to make blogs and voice chat work together in the future.</p>]]>
+
+</content>
+</entry>
+<entry>
+<title>TrackBack Growing Up</title>
+<link rel="replies" type="application/atom+xml" 
+      href="" 
+      thr:count="1" thr:when="2006-05-25T21:27:38Z" />
+<link rel="alternate" type="text/html" href="http://www.sixapart.com/pronet/weblog/2006/02/trackback_worki.html" />
+<modified>2006-02-27T01:09:40Z</modified>
+<issued>2006-02-25T21:36:10Z</issued>
+<id>tag:www.sixapart.com,2006:/pronet//15.6519</id>
+<created>2006-02-25T21:36:10Z</created>
+<summary type="text/plain">It&amp;#8217;s been a great week for TrackBack: First, PRWeb, one of the most popular sources for news releases on the web, has just announced that they&amp;#8217;ve added support for TrackBack to all the press releases on the site. This shows...</summary>
+<author>
+<name>Byrne Reese</name>
+<url>http://www.typepad.com/</url>
+</author>
+<dc:subject>TrackBack</dc:subject>
+<content type="text/html" mode="escaped" xml:lang="en" xml:base="http://www.sixapart.com/pronet/">
+<![CDATA[<p>It&#8217;s been a great week for TrackBack: First, <a href="http://www.prweb.com/">PRWeb</a>, one of the most popular sources for news releases on the web, has just announced that they&#8217;ve <a href="http://www.prweb.com/releases/2006/2/prweb349374.htm">added support for TrackBack</a> to all the press releases on the site. This shows one of the very practical benefits of TrackBack even for non-blog content, hopefully leading towards corporate communication being more open and community-driven.</p>
+
+<p>We&#8217;re also delighted to note that there&#8217;s been a very positive initial reception to our <a href="http://www.sixapart.com/pronet/weblog/2006/02/submitting_trac.html">announcement</a> of an effort to standardize TrackBack. It is great to see so many people in <a href="http://www.sixapart.com/pipermail/trackback-protocol/">participating</a> in the provisional <a href="http://www.lifewiki.net/trackback/">TrackBack Working Group</a>.</p>
+
+<p>Some of the key players in community standards and recent documentation efforts have already weighed in on the announcement:</p>
+
+<ul>
+<li><p>Dave Winer <a href="http://www.scripting.com/2006/02/21.html#When:7:10:48PM">notes the effort</a> without much comment, but his links are often a precursor to more full comments later. As Dave has pointed out himself, correctly, his own past implementations of TrackBack were compatible because breaking backwards compatibility even in the pursuit of technical improvements is not a path to be chosen lightly. Though there are sometimes instances when creating a new, incompatible path can be necessary in order to enable new benefits for users, it ought to be a considered decision, and Dave&#8217;s point is well taken as the conversation around standardization begins.</p></li>
+<li><p>Sam Ruby <a href="http://www.intertwingly.net/blog/2006/02/21/TrackBack-Standard">adds his link</a> as well, again without extensive comment, but (judging by past experience) with the promise of some contributions of understated genius. If a TrackBack validator someday springs forth, it&#8217;ll no doubt be because of Sam doing a lot of the not-very-glamorous heavy lifting behind the scenes.</p></li>
+</ul>
+
+<p>Of course, any new effort has some bumps. As <a href="http://weblog.philringnalda.com/2006/02/21/unwelcome">Phil Ringnalda noted</a>, we were having some glitches with our mailing list software, but it seems like everything&#8217;s cleared up now. <a href="http://photomatt.net/2006/02/21/better-trackback/#comment-52832">Others pointed out</a> that they were unable to access the <a href="http://www.lifewiki.net/attachments/view/101/2.2">newly revised TrackBack specification</a> without first authenticating via <a href="http://openid.net/">Open ID</a>. That too was an oversight on our part, and is now resolved.</p>
+
+<p>So if you had experienced a problem in the past few days trying to join the standardization effort, <a href="http://www.sixapart.com/mailman/listinfo/trackback-protocol">try again</a>, and you should be able to get through without a hitch. Even better, greater real-world adoption of the protocol means that the efforts of the group will someday be able to provide benefits to actual users, and not just to those of us who are interested in the technology.</p>
+]]>
+
+
+</content>
+</entry>
+<entry>
+<title>Favicons in TypePad Just Got Easier</title>
+<link rel="replies" type="application/atom+xml" 
+      href="" 
+      thr:count="0" thr:when="" />
+<link rel="alternate" type="text/html" href="http://www.sixapart.com/pronet/weblog/2006/02/easy_favicons_i.html" />
+<modified>2006-02-25T02:03:29Z</modified>
+<issued>2006-02-23T18:38:55Z</issued>
+<id>tag:www.sixapart.com,2006:/pronet//15.6517</id>
+<created>2006-02-23T18:38:55Z</created>
+<summary type="text/plain">I&apos;ve been looking for new ways to customize my personal TypePad site. Laura from TypePad Technical support recently posted a great how-to for creating your own favorite icon, or favicon, in TypePad. Then, one of my favorite TypePad bloggers, swissmiss,...</summary>
+<author>
+<name>ginevra</name>
+
+</author>
+<dc:subject>TypePad</dc:subject>
+<content type="text/html" mode="escaped" xml:lang="en" xml:base="http://www.sixapart.com/pronet/">
+<![CDATA[<p>I've been looking for new ways to customize <a href="http://ginevra.typepad.com">my personal</a> TypePad site. Laura from TypePad Technical support recently posted a great <a href="http://www.sixapart.com/typepad/news/2006/01/adding_a_person.html#more">how-to</a> for creating your own favorite icon, or favicon, in TypePad. Then, one of my favorite TypePad bloggers, <a href="http://swissmiss.typepad.com/weblog/2006/02/favicon_generat.html">swissmiss</a>, linked to the <a href="http://www.chami.com/html-kit/services/favicon/">Favicon Generator</a>, where you can upload any image and it's changed into a favicon, making it even easier to personalize your TypePad blog.</p>
+]]>
+
+
+</content>
+</entry>
+<entry>
+<title>Submitting TrackBack as an Internet Standard</title>
+<link rel="replies" type="application/atom+xml" 
+      href="" 
+      thr:count="5" thr:when="2006-05-25T21:27:38Z" />
+<link rel="alternate" type="text/html" href="http://www.sixapart.com/pronet/weblog/2006/02/submitting_trac.html" />
+<modified>2006-02-22T22:16:22Z</modified>
+<issued>2006-02-21T19:06:00Z</issued>
+<id>tag:www.sixapart.com,2006:/pronet//15.6495</id>
+<created>2006-02-21T19:06:00Z</created>
+<summary type="text/plain">In 2002, Ben and Mena Trott had an idea for how blogging systems could communicate with one another more effectively about the plethora of content being created. They dubbed the idea &quot;TrackBack&quot; and they implemented it in Movable Type. What...</summary>
+<author>
+<name>Byrne Reese</name>
+<url>http://www.typepad.com/</url>
+</author>
+<dc:subject>TrackBack</dc:subject>
+<content type="text/html" mode="escaped" xml:lang="en" xml:base="http://www.sixapart.com/pronet/">
+<![CDATA[<p>In 2002, Ben and Mena Trott had an idea for how blogging systems could communicate with one another more effectively about the plethora of content being created. They dubbed the idea "<a href="http://en.wikipedia.org/wiki/Trackback">TrackBack</a>" and they implemented it in <a href="http://www.sixapart.com/movabletype/">Movable Type</a>. What followed surprised everyone, the idea and technology they created spread like wildfire. Now, several years later, TrackBack is in use by over 50 million blogs and news sites across the Internet. </p>
+
+<p>As many familiar with the protocol will attest, TrackBack, despite its wide market adoption, is far from perfect -- largely due to the fact that TrackBack was invented for a blogosphere that was much different in size and makeup. Today, blogging has exploded in popularity, presenting TrackBack with a whole new set of challenges to address. Specifically, those challenges include the need for:</p>
+
+<ul>
+<li>Standardization</li>
+<li>Protocol Extensibility</li>
+<li>Authentication</li>
+<li>Better documentation</li>
+</ul>
+]]>
+<![CDATA[<p>Since TrackBack was invented, little has been done to secure TrackBack to prevent people from abusing it and generating unsolicited, unwanted, and ultimately irrelevant "TrackBack Spam." Managing unwanted TrackBacks takes time away from bloggers and blog hosting services that could be better spent elsewhere.</p>
+
+<p>Also, over the years, a number of protocols have emerged to service roughly the same set of problems as TrackBacks -- to inform resources and services on the Internet of the availability of new content. TrackBack and "<a href="http://www.sixapart.com/movabletype/docs/3.2/g_contextsensitive_help/blog_settings_entry_defaults/update_pings.html">update pings</a>" have a lot in common, and the industry could benefit a great deal by simplifying and potentially merging them into a single and cohesive standard.</p>
+
+<p>Finally, Six Apart has engaged many companies wishing to extend the TrackBack protocol in some way, a proposition that Six Apart is excited about and encourages. However, <a href="http://joi.ito.com/archives/2006/01/17/irving_wladawskybergers_definition_of_open_standards.html">no one company should ever be a constraint on anyone's desire to innovate</a> and deliver new and interesting technologies to the blogging world. Extension of the protocol should be simple, logical, and enabled by the protocol itself.</p>
+
+<p>These challenges do not affect Six Apart alone, but the blogging industry at large. If we want to address these challenges, while ensuring interoperability and backwards compatibility with the existing protocol, then we must do so collectively and cooperatively. </p>
+
+<p>Therefore, Six Apart is beginning the process of submitting TrackBack to the Internet community and establishing TrackBack as a standard. To that end, Six Apart would like to invite anyone who is interested to join a <a href="http://www.lifewiki.net/trackback">provisional TrackBack Working Group</a> by signing up for the <a href="http://www.sixapart.com/mailman/listinfo/trackback-protocol">TrackBack-protocol mailing list</a>, and engaging its members in a discussion about the future of TrackBack.</p>
+
+<p>Our first order of business will be to review the <a href="http://www.lifewiki.net/trackback/TrackBackCharter">proposed charter</a> and establish  that there is enough interest in the Internet community to take this project on.</p>
+
+<p>In the end, you can play a big role in helping us make TrackBack, one of the cornerstone protocols of the blogging industry, more secure and more useful by contributing your time and your voice.</p>
+
+<p><em>Update: Six Apart's list servers are experiencing a problem whereby public mailing lists are getting reset to private. If you get a "sorry you are banned" message - that is a mistake. Be patient and check back with this post for updates. We are working to resolve the problem as soon as possible. We're sorry for the inconvenience.</em></p>
+]]>
+</content>
+</entry>
+<entry>
+<title>Tech Blogs Need Dogs</title>
+<link rel="replies" type="application/atom+xml" 
+      href="" 
+      thr:count="1" thr:when="2006-05-25T21:27:38Z" />
+<link rel="alternate" type="text/html" href="http://www.sixapart.com/pronet/weblog/2006/02/tech_blogs_need.html" />
+<modified>2006-02-20T21:19:42Z</modified>
+<issued>2006-02-20T19:59:39Z</issued>
+<id>tag:www.sixapart.com,2006:/pronet//15.6512</id>
+<created>2006-02-20T19:59:39Z</created>
+<summary type="text/plain">We&apos;ve been fans of the Amazon Web Services blog since it launched on TypePad last year, but it&apos;s not just because we love the technology and APIs that the site shows off. It&apos;s because of its cute, fuzzy nose. In...</summary>
+<author>
+<name>anildash</name>
+
+</author>
+<dc:subject>Blog Strategy</dc:subject>
+<content type="text/html" mode="escaped" xml:lang="en" xml:base="http://www.sixapart.com/pronet/">
+<![CDATA[<p>We've been fans of the <a href="http://aws.typepad.com/">Amazon Web Services</a> blog since it launched on <a href="http://www.typepad.com">TypePad</a> last year, but it's not just because we love the technology and APIs that the site shows off. It's because of its <strong>cute, fuzzy nose</strong>.</p>
+
+<p>In addition to the usual promotion of web services that you'd expect, the AWS blog does a great job of introducing the more human side of the team behind the tech. Need proof? Just take a look at <a href="http://aws.typepad.com/aws/2006/02/introducing_the.html">the recent post</a> introducing Rufus, the preeminent four-legged member of the AWS team. Often times discussions of technology and related topics can seem a bit dry; A team blog offers a great way to show that there's some personality on the other side of a website.</p>
+
+<p>Just like similar <a href="http://www.typepad.com">TypePad</a>-powered tech blogs by the teams behind web services such as <a href="http://paypal.typepad.com/">PayPal</a>, <a href="http://sforce.blogs.com/">Salesforce.com</a>, <a href="http://blog.flickr.com/">Flickr</a>, and <a href="http://blog.del.icio.us/">del.icio.us</a>, the Amazon Web Services blog does a great job of telling the story of both an interesting set of web technologies and the even more interesting people (and dogs!) who build them.</p>]]>
+
+</content>
+</entry>
+
+</feed>

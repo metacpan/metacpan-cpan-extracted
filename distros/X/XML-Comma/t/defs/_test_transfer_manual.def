@@ -1,0 +1,125 @@
+<DocumentDefinition>
+  <name>_test_transfer_manual</name>
+
+  <element><name>simple_el</name></element>
+  <element><name>hooked_el</name></element>
+  
+  <blob_element>
+    <name>file</name>
+    <extension><![CDATA[ $self->extension() ]]></extension>
+
+    <method>
+      <name>extension</name>
+      <code><![CDATA[ sub { $_[0]->_data_hash()->{extension} }]]></code>
+    </method>
+    <method>
+     <name>content_type</name>
+     <code><![CDATA[sub { $_[0]->_data_hash()->{content_type} }]]></code>
+    </method>
+    <method>
+      <name>_data_hash</name>
+      <code><![CDATA[ sub { $_[0]->{_local_hash} ||= {}; } ]]></code>
+    </method>
+    <method>
+     <name>set_extension</name>
+     <code><![CDATA[
+       sub {
+         my ( $self, $filename ) = @_;
+         my $extension;
+         # we need to get an extension from the filename, if we
+         # can. if not, we'll use the extension we already have on
+         # record. if we don't have any knowledge about an extension,
+         # we'll die.
+         $filename =~ m|.*\.(.*)$|;
+         if ( $1 ) {
+           $extension = $1;
+           my $type_entry = $self->def_pnotes()->{types}->{lc $extension} ||
+             die "bad extension '$extension'\n";
+           $self->_data_hash()->{content_type} = $type_entry->{type};
+           $self->_data_hash()->{extension} = $type_entry->{extension};
+         } else {
+           die "don't know what extension to use\n"  unless
+             $self->extension();
+         }
+     }]]></code>
+    </method>
+
+  <read_hook>
+    <![CDATA[ sub { $_[0]->set_extension($_[0]->get_location()); } ]]>
+  </read_hook>
+  <set_from_file_hook>
+    <![CDATA[ sub { $_[0]->set_extension($_[1]) } ]]>
+  </set_from_file_hook>
+  <set_hook><![CDATA[
+    sub {
+      # if we're setting, make sure we already have been given an
+      # extension to work with. if we're clearing, clear the
+      # extension.
+      my ( $self, $content_ref, $args ) = @_;
+      if ( ${$content_ref} ){
+        if ( my $string = $args->{filename} || $args->{extension} ) {
+          $self->set_extension($string);
+        }
+        die "not allowed to 'set()' without pre-specifying an extension"  unless
+          $_[0]->extension();
+      } else {
+        $_[0]->_data_hash()->{extension} = '';
+      }
+    } ]]></set_hook>
+
+  <def_hook>
+    <![CDATA[
+             my %types = ();
+             $types{txt} = { type => 'text/plain', extension => '.txt' };
+             $self->def_pnotes()->{types} = \%types;
+      ]]>
+  </def_hook>
+  </blob_element>
+
+
+  <store>
+    <name>main</name>
+    <base>test/transfer-manual</base>
+    <location>Sequential_file</location>    
+    <file_permissions>0666</file_permissions>
+    <pre_store_hook>
+      <![CDATA[
+        sub {
+          my ( $self, $storage ) = @_;
+          $self->hooked_el ( $self->simple_el() );
+        }
+        ]]>
+    </pre_store_hook>
+    <post_store_hook>
+      <![CDATA[
+        sub {
+          my ( $self, $storage ) = @_;
+          $self->def()->def_pnotes()->{xfer}->put ( $self );
+        }
+      ]]>
+    </post_store_hook>
+    <erase_hook>
+      <![CDATA[
+        sub {
+          my ( $self, $storage, $location ) = @_;
+          $self->def()->def_pnotes()->{xfer}->erase ( $self );
+        }
+      ]]>
+    </erase_hook>
+  </store>
+
+  <def_hook>
+    <![CDATA[
+use XML::Comma::Pkg::Transfer::HTTP_Transfer;
+
+$self->def_pnotes()->{xfer} = XML::Comma::Pkg::Transfer::HTTP_Transfer->new
+  ( target      => 'http://khk.allafrica.com/HTTP_Transfer.comma',
+    ignore_on   => [ 'khk' ] );
+      ]]>
+  </def_hook>
+
+</DocumentDefinition>
+
+
+
+

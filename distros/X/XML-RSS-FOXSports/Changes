@@ -1,0 +1,11 @@
+Revision history for Perl extension XML::RSS::FOXSports.
+
+0.02  Wed Dec 7 2005
+        - First CPAN Release
+        - Added compatibilty for XML::RSS::Parser 4.0
+        - A day that will live in infamy
+
+0.01  Thur May 26 2005
+	- Original version; created by h2xs 1.22
+        - Unreleased
+

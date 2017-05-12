@@ -1,0 +1,4 @@
+<xml>
+<some>tag</some>
+<some><other>tag</other></some>
+</xml>

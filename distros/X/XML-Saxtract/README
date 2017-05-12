@@ -1,0 +1,187 @@
+NAME
+
+    XML::Saxtract - Streaming parse XML data into a result hash based upon
+    a specification hash
+
+VERSION
+
+    version 1.03
+
+SYNOPSIS
+
+        use XML::Saxtract qw(saxtract_string saxtract_uri);
+    
+        my $xml = "<root id='1' />";
+        my $spec = { '/root/@id' => rootId };
+    
+        my $result = saxtract_string( $xml, $spec );
+        my $rootId = $result->{rootId};
+    
+        my $complex_xml = <<'XML';
+        <root xmlns='http://abc' xmlns:d='http://def' d:id='1' name='root' d:other='abc'>
+          <person id='1'>Lucas</person>
+          <d:employee id='2'>Ali</d:employee>
+          <person id='3'>Boo</person>
+          <d:employee id='4'>Dude</d:employee>
+        </root>
+        XML
+    
+        # get a list of all the people
+        my $complex_spec = {
+            'http://def' => 'k',
+            '/root/person' => {
+                name => 'first_person',
+                type => 'first',
+                spec => {
+                    '' => 'name',
+                    '/@id' => 'id'
+                }
+            }
+        };
+        my $result = saxtract_string( $complex_xml, $complex_spec );
+        print( "$result->{first_person}{id}: $result->{first_person}{name}\n" );
+        # Prints:
+        # 1: Lucas
+    
+        # get a list of all the people
+        my $complex_spec = {
+            'http://def' => 'k',
+            '/root/person' => {
+                name => 'people',
+                type => 'list',
+                spec => {
+                    '' => 'name',
+                    '/@id' => 'id'
+                }
+            }
+        };
+        my $result = saxtract_string( $complex_xml, $complex_spec );
+        foreach my $person ( @{$result->{people}} ) {
+            print( "$person->{id}: $person->{name}\n" );
+        }
+        # Prints:
+        # 1: Lucas
+        # 3: Boo
+    
+        # get a map of all the employees
+        my $complex_spec = {
+            'http://def' => 'k',
+            '/root/k:employee' => {
+                name => 'employees',
+                type => 'map',
+                key => 'name',
+                spec => {
+                    '' => sub {
+                        my ($object, $value) = @_;
+                        $object->{name} => $value;
+                        $object->{email} => lc($value) . '@example.com';
+                    },
+                    '/@id' => 'id'
+                }
+            }
+        };
+        my $result = saxtract_string( $complex_xml, $complex_spec );
+        foreach my $employee ( values( %{$result->{employees}} ) ) {
+            print( "$employee->{id}: $employee->{name} <$employee->{email}>\n" );
+        }
+        # Prints:
+        # 2: Ali <ali@example.com>
+        # 4: Dude <dude@example.com>
+    
+        # get a map of all the employees generating a compound key
+        my $complex_spec = {
+            'http://def' => 'k',
+            '/root/k:employee' => {
+                name => 'employees',
+                type => sub {
+                    my ( $object, $value ) = @_;
+                    $object->{"$value->{id}|$value->{name}"} = $value;
+                },
+                spec => {
+                    '' => sub {
+                        my ($object, $value) = @_;
+                        $object->{name} => $value;
+                        $object->{email} => lc($value) . '@example.com';
+                    },
+                    '/@id' => 'id'
+                }
+            }
+        };
+        my $result = saxtract_string( $complex_xml, $complex_spec );
+        foreach my $compound_key ( keys( %{$result->{employees}} ) ) {
+            print( "$compound_key: <$result->{employees}{$compund_key}{email}>\n" );
+        }
+        # Prints:
+        # 2|Ali: <ali@example.com>
+        # 4|Dude: <dude@example.com>
+
+DESCRIPTION
+
+    This module provides methods for SAX based (streaming) parsing of XML
+    data into a result hash based upon a specification hash.
+
+EXPORT_OK
+
+ saxtract_string( $xml_string, $specification, [%options] )
+
+    Parses the xml_string according to the specification optionally setting
+    values in the result object. If the result object is not specified, a
+    new empty hash is created and a reference to it is returned.
+
+    xml_string
+
+      A string containing the xml to be parsed.
+
+    specification
+
+      A Saxtract specification hash.
+
+    options
+
+      object
+
+	A reference to a hash to load with the results of the parsing.
+
+ saxtract_url( $url, $specification, [%options] )
+
+    Parses the xml_string according to the specification optionally setting
+    values in the result object. If the result object is not specified, a
+    new empty hash is created and a reference to it is returned.
+
+    url
+
+      A URL used to locate the XML content. LWP::UserAgent will be used to
+      retrieve the content from this URL.
+
+    specification
+
+      A Saxtract specification hash.
+
+    options
+
+      object
+
+	A reference to a hash to load with the results of the parsing.
+
+      agent
+
+	If specified, this agent will be used to request the XML, if not, a
+	new LWP::UserAgent will be used.
+
+      die_on_failure
+
+	If true, the request will die on any http response other than 200.
+	$@ will be set to the HTTP::Response object returned by the
+	request.
+
+AUTHOR
+
+    Lucas Theisen <lucastheisen@pastdev.com>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2013 by Lucas Theisen.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

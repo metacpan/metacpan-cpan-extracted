@@ -1,0 +1,38 @@
+---
+name: XML-Handler-ExtOn
+version: 0.06
+author:
+  - 'Zahatski Aliaksandr, <zag@cpan.org>'
+abstract: The handler for expansion of Perl SAX by objects.
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Tie::UnionHash: 0
+  XML::Filter::SAX1toSAX2: 0
+  XML::Parser::PerlSAX: 0
+  XML::SAX: 0
+  XML::SAX::Writer: 0
+provides:
+  XML::Handler::ExtOn:
+    file: lib/XML/Handler/ExtOn.pm
+    version: 0.06
+  XML::Handler::ExtOn::Attributes:
+    file: lib/XML/Handler/ExtOn/Attributes.pm
+  XML::Handler::ExtOn::Context:
+    file: lib/XML/Handler/ExtOn/Context.pm
+  XML::Handler::ExtOn::Element:
+    file: lib/XML/Handler/ExtOn/Element.pm
+  XML::Handler::ExtOn::IncXML:
+    file: lib/XML/Handler/ExtOn/IncXML.pm
+  XML::Handler::ExtOn::SAX12ExtOn:
+    file: lib/XML/Handler/ExtOn/SAX12ExtOn.pm
+  XML::Handler::ExtOn::TieAttrs:
+    file: lib/XML/Handler/ExtOn/TieAttrs.pm
+    version: 0.01
+  XML::Handler::ExtOn::TieAttrsName:
+    file: lib/XML/Handler/ExtOn/TieAttrsName.pm
+generated_by: Module::Build version 0.3
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

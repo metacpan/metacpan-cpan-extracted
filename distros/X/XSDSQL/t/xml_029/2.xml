@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+
+
+<hh:s1 
+		xmlns:xs='http://www.w3.org/2001/XMLSchema-instance' 
+		xmlns:hh="http://www.camera.org" 
+		xmlns:zz="namespace4" 
+    	xs:schemaLocation="http://www.camera.org ./schema1.xsd"
+>   
+	<ela>
+		<zz:el0>ela_2</zz:el0>
+		<zz:el1>
+			<zz:el0_ct1>el01_ct1</zz:el0_ct1>
+		</zz:el1>
+	</ela>
+	<hh:elb> 			
+		<zz:el0>elb_2</zz:el0>
+	</hh:elb>
+	<elc>elc_2</elc>
+	<eld>
+		<eld1>eld_1</eld1>
+		<eld2>eld_2</eld2>
+	</eld>
+	<ele>
+		<el0>ele_2</el0> <!-- il prefisso non ci deve essere  perchè è associato allo schema elementFormDefault="unqualified" -->
+		<el1>
+			<el0_ct1>el02_ct1</el0_ct1>
+		</el1>
+	</ele>
+	
+</hh:s1>
+
+
+

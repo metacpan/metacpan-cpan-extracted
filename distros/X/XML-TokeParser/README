@@ -1,0 +1,333 @@
+XML/TokeParser version 0.05
+=======================
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+NAME
+    XML::TokeParser - Simplified interface to XML::Parser
+
+SYNOPSIS
+        use XML::TokeParser;
+                                                                        #
+        #parse from file
+        my $p = XML::TokeParser->new('file.xml')
+                                                                        #
+        #parse from open handle
+        open IN, 'file.xml' or die $!;
+        my $p = XML::TokeParser->new( \*IN, Noempty => 1 );
+                                                                        #
+        #parse literal text
+        my $text = '<tag xmlns="http://www.omsdev.com">text</tag>';
+        my $p    = XML::TokeParser->new( \$text, Namespaces => 1 );
+                                                                        #
+        #read next token
+        my $token = $p->get_token();
+                                                                        #
+        #skip to <title> and read text
+        $p->get_tag('title');
+        $p->get_text();
+                                                                        #
+        #read text of next <para>, ignoring any internal markup
+        $p->get_tag('para');
+        $p->get_trimmed_text('/para');
+                                                                        #
+        #process <para> if interesting text
+        $t = $p->get_tag('para');
+        $p->begin_saving($t);
+        if ( $p->get_trimmed_text('/para') =~ /interesting stuff/ ) {
+            $p->restore_saved();
+            process_para($p);
+        }
+
+DESCRIPTION
+    XML::TokeParser provides a procedural ("pull mode") interface to
+    XML::Parser in much the same way that Gisle Aas' HTML::TokeParser
+    provides a procedural interface to HTML::Parser. XML::TokeParser splits
+    its XML input up into "tokens," each corresponding to an XML::Parser
+    event.
+
+    A token is a bless'd reference to an array whose first element is an
+    event-type string and whose last element is the literal text of the XML
+    input that generated the event, with intermediate elements varying
+    according to the event type.
+
+    Each token is an *object* of type XML::TokeParser::Token. Read
+    "XML::TokeParser::Token" to learn what methods are available for
+    inspecting the token, and retrieving data from it.
+
+METHODS
+    $p = XML::TokeParser->new($input, [options])
+        Creates a new parser, specifying the input source and any options.
+        If $input is a string, it is the name of the file to parse. If
+        $input is a reference to a string, that string is the actual text to
+        parse. If $input is a reference to a typeglob or an IO::Handle
+        object corresponding to an open file or socket, the text read from
+        the handle will be parsed.
+
+        Options are name=>value pairs and can be any of the following:
+
+        Namespaces
+            If set to a true value, namespace processing is enabled.
+
+        ParseParamEnt
+            This option is passed on to the underlying XML::Parser object;
+            see that module's documentation for details.
+
+        Noempty
+            If set to a true value, text tokens consisting of only
+            whitespace (such as those created by indentation and line breaks
+            in between tags) will be ignored.
+
+        Latin
+            If set to a true value, all text other than the literal text
+            elements of tokens will be translated into the ISO 8859-1
+            (Latin-1) character encoding rather than the normal UTF-8
+            encoding.
+
+        Catalog
+            The value is the URI of a catalog file used to resolve PUBLIC
+            and SYSTEM identifiers. See XML::Catalog for details.
+
+    $token = $p->get_token()
+        Returns the next token, as an array reference, from the input.
+        Returns undef if there are no remaining tokens.
+
+    $p->unget_token($token,...)
+        Pushes tokens back so they will be re-read. Useful if you've read
+        one or more tokens too far. Correctly handles "partial" tokens
+        returned by get_tag().
+
+    $token = $p->get_tag( [$token] )
+        If no argument given, skips tokens until the next start tag or end
+        tag token. If an argument is given, skips tokens until the start tag
+        or end tag (if the argument begins with '/') for the named element.
+        The returned token does not include an event type code; its first
+        element is the element name, prefixed by a '/' if the token is for
+        an end tag.
+
+    $text = $p->get_text( [$token] )
+        If no argument given, returns the text at the current position, or
+        an empty string if the next token is not a 'T' token. If an argument
+        is given, gathers up all text between the current position and the
+        specified start or end tag, stripping out any intervening tags (much
+        like the way a typical Web browser deals with unknown tags).
+
+    $text = $p->get_trimmed_text( [$token] )
+        Like get_text(), but deletes any leading or trailing whitespaces and
+        collapses multiple whitespace (including newlines) into single
+        spaces.
+
+    $p->begin_saving( [$token] )
+        Causes subsequent calls to get_token(), get_tag(), get_text(), and
+        get_trimmed_text() to save the returned tokens. In conjunction with
+        restore_saved(), allows you to "back up" within a token stream. If
+        an argument is supplied, it is placed at the beginning of the list
+        of saved tokens (useful because you often won't know you want to
+        begin saving until you've already read the first token you want
+        saved).
+
+    $p->restore_saved()
+        Pushes all the tokens saved by begin_saving() back onto the token
+        stream. Stops saving tokens. To cancel saving without backing up,
+        call begin_saving() and restore_saved() in succession.
+
+  XML::TokeParser::Token
+    A token is a blessed array reference, that you acquire using
+    "$p->get_token" or "$p->get_tag", and that might look like:
+
+        ["S",  $tag, $attr, $attrseq, $raw]
+        ["E",  $tag, $raw]
+        ["T",  $text, $raw]
+        ["C",  $text, $raw]
+        ["PI", $target, $data, $raw]
+
+    If you don't like remembering array indices (you're a real programmer),
+    you may access the attributes of a token like:
+
+    "$t->tag", "$t->attr", "$t->attrseq", "$t->raw", "$t->text",
+    "$t->target", "$t->data".
+
+    ****Please note that this may change in the future, where as there will
+    be 4 token types, XML::TokeParser::Token::StartTag ....
+
+    What kind of token is it?
+
+    To find out, inspect your token using any of these is_* methods (1 ==
+    true, 0 == false, d'oh):
+
+    is_text
+    is_comment
+    is_pi which is short for is_process_instruction
+    is_start_tag
+    is_end_tag
+    is_tag
+
+    What's that token made of? To retrieve data from your token, use any of
+    the following methods, depending on the kind of token you have:
+
+    target
+        only for process instructions
+
+    data
+        only for process instructions
+
+    raw for all tokens
+
+    attr
+        only for start tags, returns a hashref ( "print "#link ",
+        ""$t->attr""->{href}" ).
+
+    my $attrseq = $t->attrseq
+        only for start tags, returns an array ref of the keys found in
+        "$t->attr" in the order they originally appeared in.
+
+    my $tagname = $t->tag
+        only for tags ( "print "opening ", ""$t->tag"" if
+        ""$t->is_start_tag" ).
+
+    my $text = $token->text
+        only for tokens of type text and comment
+
+    Here's more detailed info about the tokens.
+
+    Start tag
+        The token has five elements: 'S', the element's name, a reference to
+        a hash of attribute values keyed by attribute names, a reference to
+        an array of attribute names in the order in which they appeared in
+        the tag, and the literal text.
+
+    End tag
+        The token has three elements: 'E', the element's name, and the
+        literal text.
+
+    Character data (text)
+        The token has three elements: 'T', the parsed text, and the literal
+        text. All contiguous runs of text are gathered into single tokens;
+        there will never be two 'T' tokens in a row.
+
+    Comment
+        The token has three elements: 'C', the parsed text of the comment,
+        and the literal text.
+
+    Processing instruction
+        The token has four elements: 'PI', the target, the data, and the
+        literal text.
+
+    The literal text includes any markup delimiters (pointy brackets,
+    <![CDATA[, etc.), entity references, and numeric character references
+    and is in the XML document's original character encoding. All other text
+    is in UTF-8 (unless the Latin option is set, in which case it's in
+    ISO-8859-1) regardless of the original encoding, and all entity and
+    character references are expanded.
+
+    If the Namespaces option is set, element and attribute names are
+    prefixed by their (possibly empty) namespace URIs enclosed in curly
+    brackets and xmlns:* attributes do not appear in 'S' tokens.
+
+DIFFERENCES FROM HTML::TokeParser
+    Uses a true XML parser rather than a modified HTML parser.
+
+    Text and comment tokens include extracted text as well as literal text.
+
+    PI tokens include target and data as well as literal text.
+
+    No tokens for declarations.
+
+    No "textify" hash.
+
+    unget_token correctly handles partial tokens returned by get_tag().
+
+    begin_saving() and restore_saved()
+
+EXAMPLES
+    Example:
+
+        use XML::TokeParser;
+        use strict;
+                                                                                   #
+        my $text = '<tag foo="bar" foy="floy"> some text <!--comment--></tag>';
+        my $p    = XML::TokeParser->new( \$text );
+                                                                                   #
+        print $/;
+                                                                                   #
+        while( defined( my $t = $p->get_token() ) ){
+            local $\="\n";
+            print '         raw = ', $t->raw;
+                                                                                   #
+            if( $t->tag ){
+                print '         tag = ', $t->tag;
+                                                                                   #
+                if( $t->is_start_tag ) {
+                    print '        attr = ', join ',', %{$t->attr};
+                    print '     attrseq = ', join ',', @{$t->attrseq};
+                }
+                                                                                   #
+                print 'is_tag       ', $t->is_tag;
+                print 'is_start_tag ', $t->is_start_tag;
+                print 'is_end_tag   ', $t->is_end_tag;
+            }
+            elsif( $t->is_pi ){
+                print '      target = ', $t->target;
+                print '        data = ', $t->data;
+                print 'is_pi        ', $t->is_pi;
+            }
+            else {
+                print '        text = ', $t->text;
+                print 'is_text      ', $t->is_text;
+                print 'is_comment   ', $t->is_comment;
+            }
+                                                                                   #
+            print $/;
+        }
+        __END__
+
+    Output:
+
+                 raw = <tag foo="bar" foy="floy">
+                 tag = tag
+                attr = foo,bar,foy,floy
+             attrseq = foo,foy
+        is_tag       1
+        is_start_tag 1
+        is_end_tag   0
+
+                 raw =  some text 
+                text =  some text 
+        is_text      1
+        is_comment   0
+
+                 raw = <!--comment-->
+                text = comment
+        is_text      0
+        is_comment   1
+
+                 raw = </tag>
+                 tag = tag
+        is_tag       1
+        is_start_tag 0
+        is_end_tag   1
+
+BUGS
+    To report bugs, go to
+    <http://rt.cpan.org/NoAuth/Bugs.html?Dist=XML-TokeParser> or send mail
+    to <bug-XML-Tokeparser@rt.cpan.org>
+
+AUTHOR
+    Copyright (c) 2003 D.H. aka PodMaster (current maintainer). Copyright
+    (c) 2001 Eric Bohlman (original author).
+
+    All rights reserved. This program is free software; you can redistribute
+    it and/or modify it under the same terms as Perl itself. If you don't
+    know what this means, visit <http://perl.com/> or <http://cpan.org/>.
+
+SEE ALSO
+    HTML::TokeParser, XML::Parser, XML::Catalog, XML::Smart, XML::Twig.
+

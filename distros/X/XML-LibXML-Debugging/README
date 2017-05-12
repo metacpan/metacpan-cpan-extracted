@@ -1,0 +1,50 @@
+NAME
+    XML::LibXML::Debugging - get debugging information from XML::LibXML nodes
+
+SYNOPSIS
+      use XML::LibXML::Debugging;
+
+      my $parser = XML::LibXML->new;
+      my $doc    = $parser->parse_file('input.xml');
+      print $doc->toClarkML;
+
+DESCRIPTION
+    This module adds a couple of additional methods to XML::LibXML::Node
+    objects which are mostly aimed at helping figure out what's going on with
+    the DOM's namespaces and structure. `toClarkML` produces a string of
+    XML-like markup with explicit namespaces. The following XML:
+
+      <foo xmlns="http://example.com/1"
+           xmlns:bar="http://example.com/2"
+           bar:baz="quux" />
+
+    Might be represented as:
+
+      <{http://example.com/1}foo
+           {http://www.w3.org/2000/xmlns/}xmlns="http://example.com/1"
+           {http://www.w3.org/2000/xmlns/}bar="http://example.com/2"
+           {http://example.com/2}baz="quux" />
+
+    Another method `toDebuggingHash` returns a hashref suitable for dumping
+    using Data::Dumper.
+
+BUGS
+    Please report any bugs to <http://rt.cpan.org/>.
+
+SEE ALSO
+    XML::LibXML, XML::LibXML::Debugging.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2009-2011 by Toby Inkster
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

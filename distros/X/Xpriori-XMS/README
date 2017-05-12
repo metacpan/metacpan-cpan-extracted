@@ -1,0 +1,42 @@
+Xpriori-XMS version 0.02
+========================
+
+Perl extension for XprioriXMS/NeoCoreXMS Database.
+
+You should configure your XpriroiXMS/NeoCoreXMS,
+before using this distribution.
+Because I can't find out a good way to set your database 
+for testing distribution tests, this distribution has 
+only 1 test. Instead of test codes, you can use samples/*.pl 
+for your tests.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+ - utf8
+ - LWP
+ - HTTP::Request
+ - URI::Escape
+ - Digest::MD5
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2009 by KAWAI, Takanori / NIPPON-RAD
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.7 or,
+at your option, any later version of Perl 5 you may have available.
+
+

@@ -1,0 +1,12 @@
+Revision history for Perl extension XML::Tidy::Tiny.
+
+0.02  2011-05-24
+	-  Make TODO Test 
+        <a>
+            9
+            <b>123</b>
+        </a>
+
+0.01  2011-05-23
+	- original version; created by h2xs 1.23 with options
+

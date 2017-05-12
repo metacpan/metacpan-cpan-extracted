@@ -1,0 +1,176 @@
+<DocumentDefinition>
+  <name>_test_storage</name>
+  <element><name>el</name></element>  
+  <element><name>el2</name></element>  
+  <element><name>flagged</name></element>
+
+  <blob_element>
+    <name>bl</name>
+    <extension>'.b'</extension>
+    <read_hook>
+      <![CDATA[
+      sub {
+        my $self = shift();
+        $self->def_pnotes()->{read_setted} = 'ok';
+      }
+      ]]>
+    </read_hook>
+  </blob_element>    
+
+  <blob_element>
+    <name>bl2</name>
+    <extension>'.b'</extension>
+  </blob_element>    
+
+  <store>
+  <name>one</name>
+  <base>test/one</base>
+  <location>Sequential_dir:'max',2</location>  
+  <location>Sequential_dir:'max',2</location>  
+  <location>Sequential_file:'max',10,'extension','.one'</location>
+  </store>
+
+  <store>
+  <name>two</name>
+  <base>test/two</base>
+  <location>GMT_3layer_dir</location>  
+  <location>Sequential_file:'max',10,'extension','.one'</location>
+  </store>
+
+  <store>
+  <name>three</name>
+  <base>test/three</base>
+  <location>Sequential_file:'max',10,'extension','.gz'</location>
+  <output>Gzip</output>
+  </store>
+
+  <store>
+  <name>four</name>
+  <base>test/four</base>
+  <location>Sequential_file:'max',10,'extension','.encrypt'</location>
+  <output>Blowfish: 'key',      'some 16-byte key',
+                    'key_hash', '09d6240d90187d3e30f9b438510e973a'</output>
+  <!-- <output>
+   <![CDATA[
+   Blowfish: 
+     'key' => do { print "key ('1234'): "; my $key=<>; chop $key; $key },
+     'key_hash' => '81dc9bdb52d04dc20036dbd8313ed055',       
+    ]]>   </output> -->
+  </store>
+
+  <store>
+  <name>five</name>
+  <base>test/five</base>
+  <location>Sequential_file:'max',10,'extension','.gz_hmac_encrypt'</location>
+
+  <output>Gzip</output>
+
+  <output>HMAC_MD5: 'key',      'an-hmac-sillykey',
+                    'key_hash', '7c116a20dcc378de2afb4cc9955a2187'</output>
+
+  <output>Blowfish: 'key',      'another-sillykey',
+                    'key_hash', '6ae8eaeaa226a03a46d79a359ab00db0'</output>
+  </store>
+
+  <store>
+  <name>six</name>
+  <base>test/six</base>
+  <location>Sequential_dir:'max',2</location>
+  <location>Derived_file:'derive_from','el'</location>
+  </store>
+
+  <store>
+  <name>seven</name>
+  <base>test/seven</base>
+  <location>Sequential_dir:'max',2</location>
+  <location>Derived_dir:'derive_from','el','max','3'</location>
+  <location>Derived_file:'derive_from','el'</location>
+  </store>
+
+  <store>
+  <name>eight</name>
+  <base>test/eight</base>
+  <location>Sequential_file:'max',10,'extension','.gz'</location>
+  <pre_store_hook>
+    <![CDATA[
+    sub {
+      my ( $doc, $store ) = @_;
+      $doc->el ( 'one-hook' );      
+    };
+    ]]>
+  </pre_store_hook>
+
+  <pre_store_hook>
+    <![CDATA[
+    sub {
+      my ( $doc, $store ) = @_;
+      $doc->el ( $doc->el() . ';two-hooks' );      
+    };
+    ]]>
+  </pre_store_hook>
+
+  <post_store_hook>
+    <![CDATA[
+    sub {
+      my ( $doc, $store ) = @_;
+      $doc->el ( $doc->el() . ';three-hooks' );
+      $doc->store ( no_hooks=>1 );
+    };
+    ]]>
+  </post_store_hook>
+  </store>
+
+
+  <store>
+  <name>nine</name>
+  <base>test/nine</base>
+  <location>Derived_file:'derive_from','el','tail_balanced',2</location>
+  </store>
+
+  <store>
+  <name>ten</name>
+  <base>test/ten</base>
+  <location>Sequential_dir</location>
+  <location>Derived_file:'derive_from','el','head_balanced',2</location>
+  </store>
+
+  <def_hook>
+    <![CDATA[    
+    $self->def_pnotes->{key1} = "0123456789abcdef";
+    $self->def_pnotes->{key2} = "something else !";
+    ]]>
+  </def_hook>
+
+  <store>
+    <name>eleven</name>
+    <base>test/eleven</base>
+    <location>Sequential_dir:'max',2</location>
+    <location>Derived_GMT_3layer_dir:'derive_from','el'</location>
+    <location>Derived_file:'derive_from','el2'</location>
+  </store>
+
+  <store>
+    <name>twelve</name>
+    <base>test/twelve</base>
+    <location>Sequential_dir: 'digits', ['x','y', 'z'], 'max', 2</location>
+    <location>Sequential_file: 'digits', ['a','b', 'c'], 'max', 4</location>
+  </store>
+
+  <store>
+    <name>thirteen</name>
+    <base>test/thirteen</base>
+    <location>Timestamped_random</location>
+  </store>
+
+  <store>
+    <name>fourteen</name>
+    <base>test/fourteen</base>
+    <location>Sequential_dir: 'digits', ['x','y', 'z'], 'max', 2</location>
+    <location>Timestamped_random: 'gmt_balance', 1</location>
+  </store>
+
+</DocumentDefinition>
+
+
+
+

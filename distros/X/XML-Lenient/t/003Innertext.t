@@ -1,0 +1,35 @@
+use strict;
+use warnings;
+use Moo;
+use Method::Signatures;
+use Test::More;
+use XML::Lenient;
+no warnings "uninitialized";
+
+my $p = XML::Lenient->new();
+my $ml = 'asdf';
+my $inner = $p->innertext($ml);
+ok('asdf' eq $inner, 'Simple innertext works');
+$ml = '<x>asdf</x>';
+$inner = $p->innertext($ml);
+ok('asdf' eq $inner, 'Single tag works');
+$ml = '<x><x><x><x>asdf</x></x></x></x>';
+$inner = $p->innertext($ml);
+ok('asdf' eq $inner, 'Tags 4 deep works');
+$ml = '<x><x><x><x>asdf';
+$inner = $p->innertext($ml);
+ok('asdf' eq $inner, 'Tags 4 deep but unmatched works');
+$ml = '<x><y><z><t>asdf';
+$inner = $p->innertext($ml);
+ok('asdf' eq $inner, 'Different tags 4 deep but unmatched works');
+$ml = '<x qwer>asdf</x>';
+$inner = $p->innertext($ml);
+ok('asdf' eq $inner, 'Tags with values work');
+$ml = '<x><y>asdf</x></y>';
+$inner = $p->innertext($ml);
+ok('asdf' eq $inner, 'Magic happens to mismatched tags');
+$ml = '<x>asdf<x><x><x>asdf</x></x></x></x>';
+$inner = $p->innertext($ml);
+ok('asdf<x><x><x>asdf</x></x></x>' eq $inner, 'Deep tags returned after text starts');
+
+done_testing;

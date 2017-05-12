@@ -1,0 +1,100 @@
+NAME
+    XML::FOAF - Parse FOAF (Friend of a Friend) data
+
+SYNOPSIS
+        use XML::FOAF;
+        use URI;
+        my $foaf = XML::FOAF->new(URI->new('http://foo.com/my.foaf'));
+        print $foaf->person->mbox, "\n";
+
+DESCRIPTION
+    *XML::FOAF* provides an object-oriented interface to FOAF (Friend of a
+    Friend) data.
+
+USAGE
+  XML::FOAF->new($data [, $base_uri ])
+    Reads in FOAF data from *$data* and parses it. Returns a *XML::FOAF*
+    object on success, "undef" on error. If an error occurs, you can call
+
+        XML::FOAF->errstr
+
+    to get the text of the error.
+
+    *$base_uri* is the base URI to be used in constructing absolute URLs
+    from resources defined in your FOAF data, and is required unless *$data*
+    is a URI object, in which case the *$base_uri* can be obtained from that
+    URI.
+
+    *$data* can be any of the following:
+
+    *   A URI object
+
+        An object blessed into any *URI* subclass. For example:
+
+            my $uri = URI->new('http://foo.com/my.foaf');
+            my $foaf = XML::FOAF->new($uri);
+
+        The URI can be either for a FOAF file (for example, the above), or
+        an HTML page containing a "<link>" tag for FOAF auto-discovery:
+
+            <link rel="meta" type="application/rdf+xml" title="FOAF" href="http://foo.com/my.foaf" />
+
+        If the URI points to an HTML page with FOAF auto-discovery enabled,
+        *XML::FOAF* will parse the HTML to find the FOAF file automatically.
+
+    *   A scalar reference
+
+        This indicates a reference to a string containing the FOAF data. For
+        example:
+
+            my $foaf_data = <<FOAF;
+            ...
+            FOAF
+            my $foaf = XML::FOAF->new(\$foaf_data, 'http://foo.com');
+
+    *   A filehandle
+
+        An open filehandle from which the FOAF data can be read. For
+        example:
+
+            open my $fh, 'my.foaf' or die $!;
+            my $foaf = XML::FOAF->new($fh, 'http://foo.com');
+
+    *   A file name
+
+        A simple scalar containing the name of a file containing the FOAF
+        data. For example:
+
+            my $foaf = XML::FOAF->new('my.foaf', 'http://foo.com');
+
+  $foaf->person
+    Returns a *XML::FOAF::Person* object representing the main identity in
+    the FOAF file.
+
+  $foaf->assurance
+    If the FOAF file indicates a PGP signature in *wot:assurance*, the URL
+    for the detatched signature file will be returned, "undef" otherwise.
+
+  $foaf->verify
+    Attempts to verify the FOAF file using the PGP signature returned from
+    *assurance*. *verify* will fetch the public key associated with the
+    signature from a keyserver. If no PGP signature is noted in the FOAF
+    file, or if an error occurs, "undef" is returned. If the signature is
+    invalid, 0 is returned. If the signature is valid, the PGP identity
+    (name and email address, generally) of the signer is returned.
+
+    Requires *Crypt::OpenPGP* to be installed.
+
+REFERENCES
+    http://xmlns.com/foaf/0.1/
+
+    http://rdfweb.org/foaf/
+
+LICENSE
+    *XML::FOAF* is free software; you may redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+AUTHOR & COPYRIGHT
+    Except where otherwise noted, *XML::FOAF* is Copyright 2003 Benjamin
+    Trott, cpan@stupidfool.org. All rights reserved.
+

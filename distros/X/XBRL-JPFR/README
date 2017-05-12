@@ -1,0 +1,82 @@
+XBRL::JPFR version 0.03
+===================
+
+XBRL::JPFR is an module for reading XBRL instance documents which are disclosed at
+Tokyo Stock Exchange(TSE,TDnet) and Japan Financial Service Agancy(FSA,EDINET).
+JPFR means Japan Financial Reporting.
+
+INSTALLATION
+    perl Makefile.PL
+    make
+    make install
+    cp taxo/* your/schema/directory/
+
+DPENDENCIES
+    XBRL
+    Hash::Merge
+    Clone
+    URI
+
+USAGE
+    See bin/{dumpxbrl,timeseries}.
+
+COPYRIGHT AND LICENCE
+    Copyright (C) 2012 by Mark Gannon
+    Copyright (C) 2015 by Tetsuya Yamamoto
+    This library is free software; you can redistribute it and/or modify
+    it under the same terms as Perl itself, either Perl version 5.10 or,
+    at your option, any later version of Perl 5 you may have available.
+    NO WARRANTY AT ALL.
+
+REFERENCES
+    XBRL              https://www.xbrl.org/
+    XBRL2.1 Spec      http://www.xbrl.org/Specification/XBRL-2.1/REC-2003-12-31/XBRL-2.1-REC-2003-12-31+corrected-errata-2013-02-20.html
+    TSE XBRL Spec     http://www.jpx.co.jp/equities/listing/xbrl/03.html
+    FSA XBRL Spec     https://disclosure.edinet-fsa.go.jp/E01NW/EKW0EZ0015.html, and its links for old standards.
+    TSE Disclosure    https://www.release.tdnet.info/index.html
+    FSA Disclosure    http://disclosure.edinet-fsa.go.jp/
+    my page(japanese) http://www6.kiwi-us.com/~biz/fr/
+
+BUGS AND PROBLEMS
+    I list what I found. There may be any other bugs and problems.
+    1. Item.pm: decimals specification is based on TDnet and EDINET.
+    2. Taxonomy.pm
+       DTS(Discoverable Taxonomy Set)
+       XBRL2.1: 3.2
+       DTS rules of discovery: ONLY the followings are referenced.
+         1. referenced directly from an XBRL Instance using the <schemaRef> element.
+         2. referenced from a discovered taxonomy schema via an XML Schema import element.
+         3. referenced from a discovered Linkbase document via a <loc> element.
+         6. referenced from a discovered taxonomy schema via a <linkbaseRef> element.
+    3. Role files, reference files and gla files are not parsed.
+    4. XBRL2.1: 3.5.3.7.2
+       href of locator may be relative.
+    5. XBRL2.1: 3.5.4
+       abc.xsd#element(/1/14)... will not work.
+    6. I cannot find a rule to decide which label is used for definition tree.
+       2009/S00046BP/jpfr-q3r-E00351-000-2009-09-30-01-2009-11-10.xbrl
+       uri=http://info.edinet-fsa.go.jp/jp/fr/gaap/role/StatementsOfIncome
+       id_short=jpfr-q3r-E00351-000_SubsidyIncomeEIBounty, etc.
+    7. I cannot find a rule to decide Consolidated or NonConsolidated for EDINET 2013-08-31 standard.
+       http://www.fsa.go.jp/search/20130821/2b_1.pdf: P31
+       Context.pm:make_label_ja_edinet
+    8. In cases for invalid contexts.
+       2684/S00057FU/jpfr-q2r-E03369-000-2009-12-31-01-2010-02-12.xbrl
+         No relative duration nor instant(edinet,Pruir1QuarterConsolidatedInstant)
+       4684/S00039KN/jpfr-q1r-E05025-000-2009-06-30-01-2009-08-07.xbrl
+         No relative duration nor instant(edinet,Prior1LastQuarterConsolidatedInstant)
+       4686
+         No relative duration nor instant(edinet,Prior1LastQuarterConsolidatedInstant)
+       7921
+         No relative duration nor instant(edinet,Prior1NonYearConsolidatedInstant)
+       8697
+         No relative duration nor instant(edinet,Prir1QuarterConsolidatedInstant)
+    9. No resolution of prefix to namespace.
+       6779/S000B2EV/ifrs-asr-E01807-000-2012-03-31-01-2012-06-22.xbrl
+         No dimension label(ifrs0_ComponentsOfEquityAxis)
+         ifrs0 must be resolved to 'http://xbrl.ifrs.org/taxonomy/2011-03-25/ifrs'.
+   10. Linux Only. This module will not work on Windows systems.
+
+How to decide japanese label.
+    omitted.
+

@@ -1,0 +1,95 @@
+
+			Copyright 1997, 1998, Ken Fox
+			    All rights reserved.
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of either:
+
+	a) the GNU General Public License as published by the Free
+	Software Foundation; either version 1, or (at your option) any
+	later version, or
+
+	b) the "Artistic License" which comes with this Kit.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See either
+    the GNU General Public License or the Artistic License for more details.
+
+    You should have received a copy of the Artistic License with this
+    Kit, in the file named "Artistic".  If not, I'll be glad to provide one.
+
+    You should also have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+--------------------------------------------------------------------------------
+This is the third BETA release of a Perl interface to:
+
+  * the X11 C library
+  * the X11 Toolkit
+  * the Xpm pixmap library
+  * the OSF Motif widget set (version 1.2.4)
+  * the Xbae widget set (used with Motif)
+  * the XRT widget set (used with Motif)
+  * the MIT Athena widget set (not yet available)
+
+To build the release:
+
+  1. Edit config.pm to customize the compilation options to your
+     site.  The default configuration is for Solaris 2.5 with
+     CDE.  The Athena module is not yet available.  (If you add
+     it, please send me the patches!)
+
+     If you are on a system that is not already defined in the
+     config.pm, please send me the necessary changes so it is
+     supported in a future release.  Thanks!
+
+  2. Run "perl Makefile.PL".  Make sure that you are running perl
+     version 5.004 or higher.  (Perl 5.005 has not been tested.)
+
+  3. Run "make"
+
+  4. If you need to build a static perl interpreter (you are using
+     the XRT widgets for example) run "make xperl".  This is a
+     static version of the perl interpreter that has all of the X11
+     modules built into it.  "xperl" still supports dynamic loading
+     of other modules so it isn't necessary to link every module
+     that you need into it.
+
+  5. If you are using the XRT widgets you must activate the XRT
+     license embedded into the static perl built in step #4.  Run
+     "xrt_auth xperl"
+
+If everything builds properly, you will have a new "./blib" directory
+with all the modules installed into it.  Please do not install this into
+your perl site directory unless you are SURE you want to deal with beta
+software.  The software probably has unknown bugs and may change in
+incompatible ways.
+
+  6. If you really want to use beta software, install the X11
+     modules into your site directory by running "make install"
+
+You can test the modules by running some of the scripts in the examples
+directory.  In particular, try "xppcamshaft.pl" because that uses quite
+a few different Motif widgets in a real-world example.  If you have a
+minimal Perl installation, try "test.pl" for a tiny demo.  There aren't
+any regression style tests, so don't try to run a "make test".
+
+Please send bug reports to <fox@vulpes.com>.  Include a typescript
+session of the bug and the output of "perl -V".  If you run into
+compilation errors, please send your config.pm along with the complete
+output of make.
+
+Documentation in "./doc" is far from complete, but it should enable
+an experienced Motif programmer to start using the module.
+
+Three areas where I could use additional help are writing widget
+demonstrations, writing documentation and incorporating new widgets.
+I'm spending most of my time writing documentation; the code itself is
+fairly stable.
+
+Any questions or comments?  Please send them to <fox@vulpes.com>.
+
+- Ken
+  8:00 pm Friday, August 14, 1998

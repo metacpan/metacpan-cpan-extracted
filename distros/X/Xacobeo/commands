@@ -1,0 +1,180 @@
+#!/usr/bin/make -f
+
+# Local installation place
+DEST=target
+
+# Default test file
+FILE=tests/sample.xml
+
+VERSION=$(shell perl -le "print `grep VERSION lib/Xacobeo.pm`")
+PACKAGE=Xacobeo
+EMAIL=$(shell git config --global user.email)
+
+PERL_MODULES=$(shell find lib/Xacobeo/ -type f -name '*.pm')
+
+# Compiler stuff
+LIBRARIES=gtk+-2.0 libxml-2.0
+
+ifdef DEBUG
+	DEBUG_ARGS=-DHAS_DEBUG
+else
+	DEBUG_ARGS=-D__EMPTY
+endif
+
+
+CFLAGS=$(shell pkg-config --cflags $(LIBRARIES); perl -MExtUtils::Embed -e ccopts)
+LIBS=$(shell pkg-config --libs $(LIBRARIES) ; perl -MExtUtils::Embed -e ldopts)
+CC=gcc $(DEBUG_ARGS) -g -std=c99 -Werror -Wall -Wextra -pedantic-errors -pedantic \
+ -Wshadow \
+ -Wunused-parameter \
+ -Wmissing-field-initializers \
+ -Wmissing-noreturn \
+ -Wmissing-declarations \
+ -Wmissing-prototypes \
+ -Wmissing-format-attribute \
+ -Wpointer-arith \
+ -Wwrite-strings \
+ -Wformat \
+ -Wformat-nonliteral \
+ -Wformat-security \
+ -Wswitch-default \
+ -Winit-self \
+ -Wundef \
+ -Waggregate-return \
+ -Wnested-externs \
+ -Wno-unused-function
+
+
+.PHONY: info
+info:
+	@echo "VERSION $(VERSION)"
+	@echo "CFLAGS  $(CFLAGS)"
+	@echo "LIBS    $(LIBS)"
+	@echo "CC      $(CC)"
+
+
+perl-build: Build
+Build: Build.PL
+	perl Build.PL --config ccflags="$(DEBUG_ARGS)"
+
+
+build: i18n Build
+	./Build
+
+
+.PHONY: install
+install: $(DEST)/local/bin/xacobeo
+$(DEST)/local/bin/xacobeo: build
+	rm -rf $(DEST) || true
+	./Build install --install_base $(DEST)
+
+
+.PHONY: fakeinstall
+fakeinstall: build
+	./Build fakeinstall --install_base /usr 
+
+
+.PHONY: run
+run: install
+	PERL5LIB=$(DEST)/lib/perl5 $(DEST)/bin/xacobeo $(FILE)
+
+
+.PHONY: dist
+dist: $(PACKAGE)-$(VERSION).tar.gz
+$(PACKAGE)-$(VERSION).tar.gz: build
+	./Build dist
+
+
+.PHONY: distcheck
+distcheck: build
+	./Build distcheck
+
+
+.PHONY: test
+test: xs
+	./Build test
+
+
+.PHONY: tag
+tag:
+	git tag "$(VERSION)"
+
+
+.PHONY: push
+push:
+	git push --tags origin master
+
+
+.PHONY: upload
+upload: dist
+	cpan-upload -verbose -mailto "$(EMAIL)" -user potyl "$(PACKAGE)-$(VERSION).tar.gz"
+
+
+.PHONY: release
+release: clean test dist distcheck tag push upload
+	@echo "Release $(PACKAGE) $(VERSION) done."
+	
+
+.PHONY: xs
+xs: build commands
+
+
+xs/main.o: xs/main.c
+	$(CC) $(CFLAGS) -o $@ -c $<
+
+
+xs/logger.o: xs/logger.c
+	$(CC) $(CFLAGS) -o $@ -c $<
+
+
+xs/code.o: xs/code.c
+	$(CC) $(CFLAGS) -o $@ -c $<
+
+
+xs/libxml.o: xs/libxml.c
+	$(CC) $(CFLAGS) -Wno-unused-parameter -o $@ -c $<
+	
+
+main: xs/main.o xs/code.o xs/logger.o xs/libxml.o
+	$(CC) $(LIBS) -o $@ xs/main.o xs/code.o xs/logger.o xs/libxml.o	
+
+
+.PHONY: all
+all: main xs
+
+
+.PHONY: leaks
+leaks: main
+	valgrind --tool=memcheck --leak-check=full --show-reachable=yes --trace-children=yes --suppressions=.valgrind ./main --quit $(FILE)
+
+
+.PHONY: clean
+clean:
+	- [ -f Build ] && ./Build clean  > /dev/null 2>&1 || true
+	-rm -rf $(PACKAGE)-*/ 2> /dev/null || true
+	-rm $(PACKAGE)-*.tar.gz 2> /dev/null || true
+	-rm libxacobeo-perl_* 2> /dev/null || true
+	-rm Build 2> /dev/null || true
+	-rm -rf _build 2> /dev/null || true
+	-rm -f main xs/*.o  || true
+	-rm -f lib/Xacobeo/XS.xs lib/Xacobeo/XS.c lib/Xacobeo/libxml2-perl.typemap || true
+
+
+.PHONY: i18n
+i18n: po/messages.pot po/*.po
+
+
+po/messages.pot:  bin/xacobeo $(PERL_MODULES)
+	xgettext --language=Perl \
+	  --keyword \
+	  --keyword=__ \
+	  --keyword=__x \
+	  --keyword=__n:1,2 \
+	  --keyword=__nx:1,2 \
+	  --keyword=__xn \
+	  --keyword=N__ \
+	  -o $@ bin/xacobeo $(PERL_MODULES)
+
+
+po/%.po: po/messages.pot
+	msgmerge --update $@ $<

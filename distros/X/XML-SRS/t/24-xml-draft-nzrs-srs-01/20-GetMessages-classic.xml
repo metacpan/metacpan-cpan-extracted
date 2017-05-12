@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<NZSRSRequest VerMajor="5" VerMinor="0" RegistrarId="140">
+  <GetMessages MaxResults="1" />
+</NZSRSRequest>

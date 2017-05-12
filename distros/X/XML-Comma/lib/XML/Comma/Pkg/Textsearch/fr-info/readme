@@ -1,0 +1,5 @@
+Code for Preprocessor_Fr.pm based on snowball code found at
+http://snowball.tartarus.org/french/stemmer.html. The snowball
+listing, as well as a good plain-language description of the
+algorithm, plus stop-words list and test file of 20,000+ words, are
+copied here, for reference.

@@ -1,0 +1,36 @@
+--- |
+  <?xml version="1.0" encoding="UTF-8"?>
+  <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" version="1.0">
+      <xsd:element name="top">
+          <xsd:complexType mixed="false">
+              <xsd:sequence>
+                <xsd:element name="inner" type="xsd:string" minOccurs="2" maxOccurs="2" />
+             </xsd:sequence>
+          </xsd:complexType>
+      </xsd:element>
+  </xsd:schema>
+
+--- |
+  <top>
+    <inner/>
+  </top>
+--- >
+FAIL
+
+--- |
+  <top>
+    <inner/>
+    <inner/>
+  </top>
+--- >
+PASS
+
+--- |
+  <top>
+    <inner/>
+    <inner/>
+    <inner/>
+  </top>
+--- >
+FAIL
+

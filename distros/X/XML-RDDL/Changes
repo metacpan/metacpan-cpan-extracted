@@ -1,0 +1,23 @@
+
+Revision history for Perl extension XML::RDDL:
+
+1.02  sun 20020707 03:55
+    - a test file was rotten
+
+1.01  sat 20020706 19:40
+    - added proper prereqs
+
+1.00  sat 20020706 17:22
+    - cleaned up docs
+
+0.04  sat 20011118 22:54:08
+	- added misc bits for cleanup
+
+0.03  tue 20011030 21:02:01
+	- previous release b0rkn, rereleasing...
+
+0.02  tue 20011030 21:01:01
+	- removed Factories and upgraded to support XML::SAX::Base
+
+0.01  tue 20010821 18:32:07
+	- original version

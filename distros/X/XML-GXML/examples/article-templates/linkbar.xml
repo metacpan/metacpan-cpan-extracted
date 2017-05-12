@@ -1,0 +1,27 @@
+<linkbar>
+<br/>
+
+<table bgcolor="#A4A3CB" border="0" cellspacing="0" cellpadding="3">
+<tr>
+  <td><b>Departments</b></td>
+</tr>
+<tr><td><hr/></td></tr>
+<tr><td>Top News</td></tr>
+<tr><td>Local</td></tr>
+<tr><td>World</td></tr>
+<tr><td>Editorials</td></tr>
+<tr><td>Politics</td></tr>
+<tr><td>Tech</td></tr>
+<tr><td>Classifieds</td></tr>
+<tr><td>Comics</td></tr>
+
+<tr bgcolor="%%%page-bgcolor%%%"><td>&#160;</td></tr>
+
+<tr><td><b>From Our<br/>Advertisers</b></td></tr>
+<tr><td><hr/></td></tr>
+<tr><td>Free beer!</td></tr>
+<tr><td>Free spam!</td></tr>
+<tr><td>Great deal on<br/>potatoes!</td></tr>
+</table>
+
+</linkbar>

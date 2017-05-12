@@ -1,0 +1,48 @@
+---
+abstract: 'Provides syndication for a set of'
+author:
+  - 'Shlomi Fish <shlomif@cpan.org>'
+build_requires:
+  Test::More: 0
+  autodie: 0
+configure_requires:
+  Module::Build: 0.36
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4007, CPAN::Meta::Converter version 2.132830'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: XML-Grammar-Fortune-Synd
+provides:
+  XML::Grammar::Fortune::Synd:
+    file: lib/XML/Grammar/Fortune/Synd.pm
+    version: 0.0211
+  XML::Grammar::Fortune::Synd::App:
+    file: lib/XML/Grammar/Fortune/Synd/App.pm
+    version: 0.0211
+  XML::Grammar::Fortune::Synd::Heap::Elem:
+    file: lib/XML/Grammar/Fortune/Synd/Heap/Elem.pm
+    version: 0.0211
+requires:
+  Class::Accessor: 0
+  DateTime::Format::W3CDTF: 0
+  Exporter: 0
+  File::Spec: 0
+  Getopt::Long: 0
+  Heap::Binary: 0
+  Heap::Elem::Ref: 0
+  List::Util: 0
+  XML::Feed: 0
+  XML::Grammar::Fortune: 0.0506
+  XML::RSS: 1.46
+  YAML::XS: 0
+  base: 0
+  perl: 5.008
+  strict: 0
+  vars: 0
+  warnings: 0
+resources:
+  license: http://www.opensource.org/licenses/mit-license.php
+  repository: https://bitbucket.org/shlomif/fortune-xml
+version: 0.0211

@@ -1,0 +1,151 @@
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-bugs: <http://ontologi.es/doap-bugs#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://dev.perl.org/licenses/>
+	dc:title             "the same terms as the perl 5 programming language system itself".
+
+<http://purl.org/NET/cpan-uri/dist/XT-Manager/project>
+	a                    doap:Project;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap-deps:runtime-requirement [
+		doap-deps:on "match::simple 0.004"^^doap-deps:CpanId;
+	], [ doap-deps:on "thanks 0.001"^^doap-deps:CpanId ], [ doap-deps:on "App::Cmd 0.300"^^doap-deps:CpanId ], [ doap-deps:on "Moo 1.002000"^^doap-deps:CpanId ], [ doap-deps:on "Path::Tiny 0.017"^^doap-deps:CpanId ], [
+		doap-deps:on "Syntax::Collector 0.006"^^doap-deps:CpanId;
+	], [ doap-deps:on "Throwable 0.200000"^^doap-deps:CpanId ], [
+		doap-deps:on "Types::Standard 0.004"^^doap-deps:CpanId;
+	], [ doap-deps:on "XT::Util 0.001"^^doap-deps:CpanId ];
+	doap-deps:test-requirement [ doap-deps:on "Test::More 0.96"^^doap-deps:CpanId ];
+	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=XT-Manager>;
+	doap:created         "2012-02-07"^^xsd:date;
+	doap:developer       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:download-page   <https://metacpan.org/release/XT-Manager>;
+	doap:homepage        <https://metacpan.org/release/XT-Manager>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:name            "XT-Manager";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/XT-Manager/v_0-001>, <http://purl.org/NET/cpan-uri/dist/XT-Manager/v_0-002>, <http://purl.org/NET/cpan-uri/dist/XT-Manager/v_0-003>, <http://purl.org/NET/cpan-uri/dist/XT-Manager/v_0-004>, <http://purl.org/NET/cpan-uri/dist/XT-Manager/v_0-005>, <http://purl.org/NET/cpan-uri/dist/XT-Manager/v_0-006>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/tobyink/p5-xt-manager>;
+	];
+	doap:shortdesc       "manage a collection of author tests shared between multiple projects".
+
+<http://purl.org/NET/cpan-uri/dist/XT-Manager/v_0-001>
+	a                    doap:Version;
+	rdfs:label           "Initial release";
+	dc:identifier        "XT-Manager-0.001"^^xsd:string;
+	dc:issued            "2012-09-20"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/XT-Manager-0.001.tar.gz>;
+	doap:revision        "0.001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/XT-Manager/v_0-002>
+	a                    doap:Version;
+	dc:identifier        "XT-Manager-0.002"^^xsd:string;
+	dc:issued            "2012-09-20"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Declare dependency on Throwable.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/XT-Manager-0.002.tar.gz>;
+	doap:revision        "0.002"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/XT-Manager/v_0-003>
+	a                    doap:Version;
+	dc:identifier        "XT-Manager-0.003"^^xsd:string;
+	dc:issued            "2012-09-20"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix version number for XT::Manager::Command::push.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/XT-Manager-0.003.tar.gz>;
+	doap:revision        "0.003"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/XT-Manager/v_0-004>
+	a                    doap:Version;
+	rdfs:label           "faster please!";
+	dc:identifier        "XT-Manager-0.004"^^xsd:string;
+	dc:issued            "2013-05-20"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Moose -> Moo.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Path::Class -> Path::Tiny.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "smartmatch -> match::smart.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "MooseX::Types -> Type::Tiny.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/XT-Manager-0.004.tar.gz>;
+	doap:revision        "0.004"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/XT-Manager/v_0-005>
+	a                    doap:Version;
+	dc:identifier        "XT-Manager-0.005"^^xsd:string;
+	dc:issued            "2013-12-02"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "use Dist::Inkt.";
+		], [
+			a doap-changeset:Bugfix, doap-changeset:Update;
+			rdfs:label "Cope with changes to Syntax::Collector.";
+			doap-changeset:fixes <http://purl.org/NET/cpan-uri/rt/ticket/90620>;
+			doap-changeset:thanks <http://purl.org/NET/cpan-uri/person/andk>;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/XT-Manager-0.005.tar.gz>;
+	doap:revision        "0.005"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/XT-Manager/v_0-006>
+	a                    doap:Version;
+	dc:identifier        "XT-Manager-0.006"^^xsd:string;
+	dc:issued            "2013-12-03"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Bump required version of Syntax::Collector.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/XT-Manager-0.006.tar.gz>;
+	doap:revision        "0.006"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/andk>
+	a                    foaf:Person;
+	foaf:name            "Andreas J König";
+	foaf:nick            "ANDK";
+	foaf:page            <https://metacpan.org/author/ANDK>.
+
+<http://purl.org/NET/cpan-uri/person/tobyink>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:tobyink@cpan.org>;
+	foaf:name            "Toby Inkster";
+	foaf:nick            "TOBYINK";
+	foaf:page            <https://metacpan.org/author/TOBYINK>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/90620>
+	a                    doap-bugs:Issue;
+	doap-bugs:id         "90620"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=90620>.
+

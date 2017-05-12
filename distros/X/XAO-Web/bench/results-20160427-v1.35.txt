@@ -1,0 +1,52 @@
+------------------ With try/otherwise in Web::Page::expand():
+
+====== Comparison:
+                             Rate no-cache-template memory-cache-template local-cache-template memcached-cache-template no-cache-path memory-cache-path local-cache-path memcached-cache-path
+no-cache-template        119131/s                --                   -4%                  -5%                      -5%          -72%              -75%             -75%                 -75%
+memory-cache-template    124104/s                4%                    --                  -1%                      -1%          -71%              -74%             -74%                 -74%
+local-cache-template     125136/s                5%                    1%                   --                      -0%          -70%              -74%             -74%                 -74%
+memcached-cache-template 125284/s                5%                    1%                   0%                       --          -70%              -74%             -74%                 -74%
+no-cache-path            421561/s              254%                  240%                 237%                     236%            --              -13%             -13%                 -13%
+memory-cache-path        482402/s              305%                  289%                 286%                     285%           14%                --              -0%                  -1%
+local-cache-path         482403/s              305%                  289%                 286%                     285%           14%                0%               --                  -1%
+memcached-cache-path     485893/s              308%                  292%                 288%                     288%           15%                1%               1%                   --
+
+------------------ With the old code, no error checking in Web::Page::expand():
+
+====== Comparison:
+                             Rate no-cache-template memory-cache-template memcached-cache-template local-cache-template no-cache-path memcached-cache-path memory-cache-path local-cache-path
+no-cache-template        122370/s                --                   -2%                      -2%                  -2%          -73%                 -74%              -74%             -75%
+memory-cache-template    124399/s                2%                    --                      -0%                  -0%          -72%                 -74%              -74%             -74%
+memcached-cache-template 124695/s                2%                    0%                       --                  -0%          -72%                 -74%              -74%             -74%
+local-cache-template     124841/s                2%                    0%                       0%                   --          -72%                 -74%              -74%             -74%
+no-cache-path            450782/s              268%                  262%                     262%                 261%            --                  -4%               -5%              -6%
+memcached-cache-path     471118/s              285%                  279%                     278%                 277%            5%                   --               -1%              -2%
+memory-cache-path        476020/s              289%                  283%                     282%                 281%            6%                   1%                --              -1%
+local-cache-path         481440/s              293%                  287%                     286%                 286%            7%                   2%                1%               --
+
+------------------ With eval{} in Web::Page::expand():
+
+====== Comparison:
+                             Rate no-cache-template local-cache-template memcached-cache-template memory-cache-template no-cache-path memcached-cache-path local-cache-path memory-cache-path
+no-cache-template        123957/s                --                  -1%                      -1%                   -2%          -73%                 -75%             -75%              -75%
+local-cache-template     125018/s                1%                   --                      -0%                   -2%          -73%                 -75%             -75%              -75%
+memcached-cache-template 125604/s                1%                   0%                       --                   -1%          -73%                 -74%             -74%              -75%
+memory-cache-template    126944/s                2%                   2%                       1%                    --          -73%                 -74%             -74%              -74%
+no-cache-path            463158/s              274%                 270%                     269%                  265%            --                  -6%              -6%               -6%
+memcached-cache-path     492331/s              297%                 294%                     292%                  288%            6%                   --              -0%               -0%
+local-cache-path         492487/s              297%                 294%                     292%                  288%            6%                   0%               --               -0%
+memory-cache-path        494658/s              299%                 296%                     294%                  290%            7%                   0%               0%                --
+
+------------------ With eval{} and delegated get_args() in Web::Page::expand():
+
+====== Comparison:
+                             Rate no-cache-template memcached-cache-template local-cache-template memory-cache-template no-cache-path local-cache-path memcached-cache-path memory-cache-path
+no-cache-template        123447/s                --                      -1%                  -1%                   -1%          -73%             -75%                 -75%              -75%
+memcached-cache-template 124144/s                1%                       --                  -1%                   -1%          -73%             -74%                 -74%              -75%
+local-cache-template     124841/s                1%                       1%                   --                   -0%          -73%             -74%                 -74%              -75%
+memory-cache-template    124988/s                1%                       1%                   0%                    --          -73%             -74%                 -74%              -75%
+no-cache-path            455148/s              269%                     267%                 265%                  264%            --              -6%                  -6%               -8%
+local-cache-path         484299/s              292%                     290%                 288%                  287%            6%               --                  -0%               -2%
+memcached-cache-path     486610/s              294%                     292%                 290%                  289%            7%               0%                   --               -2%
+memory-cache-path        495831/s              302%                     299%                 297%                  297%            9%               2%                   2%                --
+

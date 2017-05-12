@@ -1,0 +1,109 @@
+#!/usr/bin/perl -w
+##############################################################################
+# $Id: xmlnsnorm,v 1.1 2002/10/09 23:06:08 grantm Exp $
+#
+# Title:    xmlnsnorm
+#
+# Author:   Grant McLean <grantm@cpan.org>
+#
+# Script for normalising namespace prefixes in XML files.  Use -h option for
+# help.
+#
+
+use strict;
+
+use Getopt::Long;
+use Pod::Usage;
+
+use IO::File;
+use XML::SAX::ParserFactory;
+use XML::SAX::Writer;
+use XML::Filter::NSNormalise;
+
+
+##############################################################################
+# Handle command line parameters
+#
+
+my %opt = (m => []);
+
+GetOptions(\%opt, 'm=s', 'h') || pod2usage(0);
+
+pod2usage({-verbose => 2, -exitval => 0}) if($opt{h});
+
+pod2usage(0) unless(@{$opt{m}});
+
+my $filename = shift || '-';
+
+
+##############################################################################
+# Build up the hash of URI to Prefix mappings.
+#
+
+my %mapping = map { split /\s+/, $_, 2 } @{$opt{m}};
+
+
+##############################################################################
+# Create a filter pipeline and 'run' it
+#
+
+my $writer = XML::SAX::Writer->new( Output => \*STDOUT );
+my $filter = XML::Filter::NSNormalise->new( Map => \%mapping, Handler => $writer );
+my $parser = XML::SAX::ParserFactory->parser(Handler => $filter);
+
+my $fd = IO::File->new("<$filename") || die "$!";
+
+$parser->parse_file($fd);
+
+print "\n";
+
+exit;
+
+__END__
+
+=head1 NAME
+
+xmlnsnorm - normalises namespace prefixes in XML files
+
+=head1 SYNOPSIS
+
+  xmlnsnorm -m 'URI prefix' [ -m 'URI prefix' ... ] [ <filename> ]
+
+  Options:
+   -m <mapping> specify URI to prefix mapping (space separated)
+   -h           help - display the full documentation
+
+  Example:
+   xmlnsnorm -m 'http://purl.org/dc/elements/1.1/ dc' in.xml >out.xml
+
+=head1 DESCRIPTION
+
+This script takes an XML document either on STDIN or from a named file and
+writes a 'normalised' version of the file to STDOUT.  Any prefixed names
+(elements or attributes) associated with a mapped namespace URI will have their
+prefix changed to the prefix you specify.  Any namespace prefixes which occur
+in the document but for which you have not specified a mapping, will be passed
+through unchanged.
+
+=head1 SEE ALSO
+
+This script uses the following modules:
+
+  XML::SAX::ParserFactory
+  XML::Filter::NSNormalise
+  XML::SAX::Writer
+
+=head1 AUTHOR
+
+Grant McLean <grantm@cpan.org>
+
+=head1 COPYRIGHT
+
+Copyright (c) 2002 Grant McLean.  All rights reserved. This program is
+free software; you can redistribute it and/or modify it under the same terms
+as Perl itself.
+
+=cut
+
+
+

@@ -1,0 +1,9 @@
+<NZSRSResponse VerMajor="3" VerMinor="6" RegistrarId="199">
+  <Response Action="DomainUpdate" FeId="2" FeSeq="108979231" OrigRegistrarId="199" RecipientRegistrarId="199" TransId="Cheesecake">
+    <FeTimeStamp Day="08" Hour="17" Minute="18" Month="12" Second="42" TimeZoneOffset="+13:00" Year="2009"/>
+    <Error Hint="INVALID_REQUEST_ERROR" ErrorId="DOMAIN_INACTIVE" Severity="err">
+      <Description><![CDATA[An inactive domain may only be updated if uncancelled]]></Description>
+      <ErrorDetails><![CDATA[inactive.gen.nz]]></ErrorDetails>
+    </Error>
+  </Response>
+</NZSRSResponse>

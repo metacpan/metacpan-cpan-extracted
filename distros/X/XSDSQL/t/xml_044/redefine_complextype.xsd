@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<xs:schema 
+	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+ 	targetNamespace="http://www.book.org" 
+	xmlns="http://www.book.org"
+>
+
+<!-- ROOT_SCHEMA -->
+
+	<xs:redefine schemaLocation="schema1.xsd">
+		<xs:complexType name="book">
+			<xs:complexContent>
+				<xs:restriction base="book">
+					<xs:sequence>
+						<xs:element ref="isbn"/>
+						<xs:element ref="title"/> 
+						<xs:element ref="author" minOccurs="0" maxOccurs="unbounded"/> 
+						<xs:element ref="character" minOccurs="0" maxOccurs="unbounded"/>
+					</xs:sequence>
+					<xs:attribute ref="id"/>
+					<xs:attribute ref="available"/>
+				</xs:restriction>
+			</xs:complexContent>
+		</xs:complexType>
+
+		<xs:complexType name="person">
+			<xs:complexContent>
+				<xs:restriction base="person">
+					<xs:sequence>
+						<xs:element ref="name"/>
+						<xs:element ref="born"/> 
+					</xs:sequence>
+					<xs:attribute ref="id"/>
+				</xs:restriction>
+			</xs:complexContent>
+		</xs:complexType>
+
+	</xs:redefine>
+
+<xs:element name="book" type="book"/>
+<xs:element name="person" type="person"/>
+	
+</xs:schema>

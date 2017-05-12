@@ -1,0 +1,78 @@
+Revision history for Perl extension XML::Atom::Syndication
+
+0.942 Jan 1 2008
+    - Nothing new. Just a distribution sans the %$!*#~@ OS X
+      resource files.
+      
+0.941 Dec 31 2007
+    - Fix dangling references in pseudo doc object used by inner_atom
+    - Incremented XML::Elemental dependency to v2.01
+
+0.94 Aug 17 2006
+    - Added inner_atom method to the feed, entry and source classes + tests
+    - A few more documentation fixes
+
+0.93 Jul 21 2006
+    - Documentation fixes. (Thanks to John Gruber and gdsotirov)
+    - Fixed bug were I misread section 3.1.1.3 and was wrapping XHTML 
+      content in divs. Also updated related tests.
+    - Fixed bug in XML::Atom::Syndication::Text were Encode was not loaded 
+      before being used. Because of Encode's extensive use this problem is 
+      only apparent under certain conditions.
+    - Added no_cdata method to XML::Atom::Syndication::Writer. 
+
+0.92 Jun 17 2006
+    - Found a bug in XML::Writer::characters. Now handling encoding of character 
+      data ourselves. Subsequentally was performing inline_markup_2 test 
+      incorrectly. Fixed those also.
+    
+0.91 Jun 17 2006
+    - Added conditional use of Encode to XML::Atom::Syndication::Content so 
+      module won't fail when used with versions prior to Perl 5.8
+
+0.901Mar 15 2006
+    - Fixed botched distribution file
+
+0.9  Mar 15 2006
+    - Complete rewrite and overhaul released. Initially based on XML::Atom 
+      interface then tweaked and optimized for Atom 1.0 compliance. Puts 
+      portability over performance.
+
+0.09 Jul 16 2005
+    - Replaced use of Style param in XML::Atom::Syndication with Handlers param.
+      This lowered the necessary prerequisite of XML::Parser needed.
+    - Fixed XHTML namespace and removed trailing slash. (bjoern@hoehrmann.de)
+
+0.08 Sep 23 2004
+    - Add proper handling of unknown namespace prefixes.
+
+0.07 May 03 2004
+    - Fixed bug in Element qname method.
+
+0.06 Apr 28 2004
+    - Fixed undefined variable warning that slipped in.
+    - Modified test so this doesn't happen again.
+
+0.05 Apr 28 2004
+    - Fixed undefined subroutine bug in Element _xpath_attribues_name.
+    - Clarified qname method usage in docs.
+
+0.04 Apr 27 2004
+    - Exposed _xpath_name as qname in Element.
+    - Dies if an unregistered XOath prefix is namespace URI is 
+      encountered.
+
+0.03 Apr 18 2004
+    - Implemented Document and Characters objects rather then use 
+      dynamically generated ones from Elemental style.
+
+0.02 Apr 15 2004
+	- Implemented xpath_namespace method for registering other 
+	  namespace mappings for XPath queries.
+	- Fixed mishandling of mirror content in get method.
+	- Removed _ from XML::Parser->parsefile method call.
+	- Implemented CGI->param like handling of XPath queries with the
+	  Element query method.
+
+0.01 Apr 07 2004
+	- Initial release into CPAN.

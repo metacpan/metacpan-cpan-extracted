@@ -1,0 +1,2170 @@
+<?xml version="1.0" encoding="utf-8"?>
+<document xmlns="http://www.shlomifish.org/open-source/projects/XML-Grammar/Vered/" xmlns:xlink="http://www.w3.org/1999/xlink" version="0.2.0" xml:lang="en-GB" xml:id="index">
+<info>
+<title>Perl Elements to Avoid</title>
+</info>
+<body>
+<preface xml:id="intro">
+<info>
+<title>Introduction</title>
+</info>
+<p>
+Often when people ask for help with Perl code, they show Perl code that
+suffers from many bad or outdated elements. This is expected, as there
+are many bad Perl tutorials out there, and lots of bad code that people
+have learned from, but it is still not desirable. In order to not get
+"yelled at" for using these, here is the document of the bad elements that
+people tend to use and some better practices that should be used instead.
+</p>
+<p>
+A book I read said, that as opposed to most previous idea systems, they
+were trying to <b>liquidate negatives</b> instead of instilling positives
+in people. So in the spirit of liquidating negatives, this tutorial-in-reverse
+aims to show you what <b>not to do</b>.
+</p>
+<p>
+<strong>Note:</strong> Please don't think this advice is meant as gospel.
+There are some instances where one can expect to deviate from it, and a lot
+of it can be considered only my own opinion. I tried to filter the various
+advice I found in the <a xlink:href="#sources_of_advice">sources for this advice</a>
+and get rid of things that are a matter of taste or not so critical, or have
+arguments here or there (so-called <a xlink:href="http://bikeshed.com/">colour of
+the bike shed arguments</a>), but some of the advice here may still be
+controversial.
+</p>
+</preface>
+<section xml:id="bad-elements">
+<info>
+<title>The List of Bad Elements</title>
+</info>
+<item xml:id="no-indentation">
+<info>
+<title>No Indentation</title>
+</info>
+<p>
+<a xlink:href="http://en.wikipedia.org/wiki/Indent_style">Indentation</a> means
+that the contents of every block are promoted from their containing environment
+by using a shift of some space. This makes the code easier to read and follow.
+</p>
+<p>
+Code without indentation is harder to read and so should be avoided.
+<a xlink:href="http://en.wikipedia.org/wiki/Indent_style">The Wikipedia article</a>
+lists several styles - pick one and follow it.
+</p>
+</item>
+<item xml:id="no-strict-and-warnings">
+<info>
+<title>No &quot;use strict;&quot; and &quot;use warnings;&quot;</title>
+</info>
+<p>
+All modern Perl code should have the "use strict;" and "use warnings;" pragmas
+that prevent or warn against misspelling variable names, using undefined
+values, and other bad practices. So start your code (in every file) with this:
+</p>
+<code_blk syntax="perl">
+use strict;
+use warnings;
+</code_blk>
+<p>
+Or:
+</p>
+<code_blk syntax="perl">
+package MyModule;
+use strict;
+use warnings;
+</code_blk>
+</item>
+<item xml:id="open-function-style">
+<info>
+<title>Correct style for using the open function</title>
+</info>
+<p>
+<a xlink:href="http://perldoc.perl.org/functions/open.html">The open function</a>
+is used to open files, sub-processes, etc. The correct style for it is:
+</p>
+<code_blk syntax="perl">
+open my $input_fh, "&lt;", $input_filename
+    or die "Could not open '$input_filename' - $!";
+</code_blk>
+<p>
+some <b>wrong</b>, insecure and/or outdated styles are:
+</p>
+<bad_code syntax="perl">
+# Bareword filehandle (type glob), two arguments open (insecure) and no
+# error handling
+open INPUT, "&lt;$filename";
+# Also opens from $INPUT.
+open INPUT;
+# Bareword filehandle with three args open and no exception thrown.
+open INPUT, "&lt;", $filename;
+# Bareword filehandle with two-args open and exception (rare, but possible):
+open INPUT, "&lt;$filename"
+    or die "Cannot open $filename - $!";
+# Lexical file handle with two-args open (instead of three-args open)
+# and no exception
+open my $input_fh, "&lt;$filename";
+</bad_code>
+</item>
+<item xml:id="calling-variables-file">
+<info>
+<title>Calling variables &quot;file&quot;</title>
+</info>
+<p>
+Some people call their variables "file". However, file can mean either
+<a xlink:href="http://en.wikipedia.org/wiki/File_descriptor">file handles</a>,
+file names, or the contents of the file. As a result, this should be avoided
+and one can use the abbreviations "fh" for file handle, or "fn" for filenames
+instead.
+</p>
+</item>
+<item xml:id="identifiers-without-underscores">
+<info>
+<title>Identifiers without underscores</title>
+</info>
+<p>
+Some people name their identifiers as several words all in lowercase and
+not separated by underscores ("_"). As a result, this makes the code harder
+to read. So instead of:
+</p>
+<code_blk syntax="perl">
+my @namesofpresidents;
+</code_blk>
+<p>
+Say:
+</p>
+<code_blk syntax="perl">
+my @names_of_presidents;
+</code_blk>
+<p>
+Or maybe:
+</p>
+<code_blk syntax="perl">
+my @presidents_names;
+</code_blk>
+</item>
+<item xml:id="prototypes">
+<info>
+<title>Don't use prototypes for subroutines</title>
+</info>
+<p>
+Some people are tempted to declare their subroutines using
+<code>sub my_function ($$@)</code>, with the signature of the accepted parameter
+types, which is called a prototype. However, this tends to break code more
+often than not, and should be avoided.
+</p>
+<p>
+If you're looking for parameter lists to functions and methods, take a look
+at <cpan_self_dist d="Devel-Declare" /> from
+CPAN. But don't use prototypes.
+</p>
+<p>
+For more information, see:
+</p>
+<ol>
+<li>
+<p>
+<a xlink:href="https://www.socialtext.net/perl5/prototype">Discussion on the Perl 5 Wiki</a>
+</p>
+</li>
+<li>
+<p>
+<a xlink:href="http://stackoverflow.com/questions/297034/why-are-perl-5s-function-prototypes-bad">“Why
+are Perl 5’s function prototypes bad?”</a> on Stack Overflow.
+</p>
+</li>
+</ol>
+</item>
+<item xml:id="ampersand-in-subroutine-calls">
+<info>
+<title>Ampersand in Subroutine Calls</title>
+</info>
+<p>
+One should not call a subroutine using <code>&amp;myfunc(@args)</code> unless
+you're sure that is what you want to do (like overriding prototypes). Normally
+saying <code>myfunc(@args)</code> is better.
+</p>
+<p>
+For more information see
+<a xlink:href="https://www.socialtext.net/perl5/subroutines_called_with_the_ampersand">the
+relevant page</a> on the Perl 5 Wiki.
+</p>
+</item>
+<item xml:id="assigning-from-dollar-underscore">
+<info>
+<title>Assigning from $_</title>
+</info>
+<p>
+Some people write code like the following:
+</p>
+<code_blk syntax="perl">
+while (&lt;$my_fh&gt;)
+{
+    my $line = $_;
+    # Do something with $line…
+}
+</code_blk>
+<p>
+Or:
+</p>
+<code_blk syntax="perl">
+foreach (@users)
+{
+    my $user = $_;
+    # Process $user…
+}
+</code_blk>
+<p>
+However, you can easily assign the explicit and lexical variables in the
+loop's opening line like so:
+</p>
+<code_blk syntax="perl">
+while (my $line = &lt;$my_fh&gt;)
+{
+    # Do something with $line…
+}
+</code_blk>
+<p>
+and:
+</p>
+<code_blk syntax="perl">
+foreach my $user (@users)
+{
+    # Process $user…
+}
+</code_blk>
+</item>
+<item xml:id="foreach-lines">
+<info>
+<title>Using &quot;foreach&quot; on lines</title>
+</info>
+<p>
+Some people may be tempted to write this code:
+</p>
+<code_blk syntax="perl">
+foreach my $line (&lt;$my_file_handle&gt;)
+{
+    # Do something with $line.
+}
+</code_blk>
+<p>
+This code appears to work but what it does is read the entire contents of the
+file pointed by $my_file_handle into a (potentially long) list of lines, and
+then iterate over them. This is inefficient. In order to read one line
+at a time, use this instead:
+</p>
+<code_blk syntax="perl">
+while (my $line = &lt;$my_file_handle&gt;)
+{
+    # Do something with $line.
+}
+</code_blk>
+</item>
+<item xml:id="string-notation">
+<info>
+<title>String Notation</title>
+</info>
+<p>
+Perl has a flexible way to write strings and other delimiters, and you should
+utilize it for clarity. If you find yourself writing long strings, write them
+as <a xlink:href="http://en.wikipedia.org/wiki/Here_document">here-documents</a>:
+</p>
+<code_blk syntax="perl">
+my $long_string_without_interpolation = &lt;&lt;'EOF';
+Hello there. I am a long string.
+I am part of the string.
+And so am I.
+EOF
+</code_blk>
+<p>
+There are also <code>&lt;&lt;"EOF"</code> for strings with interpolation
+and <code>&lt;&lt;`EOF`</code> for trapping command output. Make sure you never
+use bareword here documents <code>&lt;&lt;EOF</code> which are valid syntax,
+but many people are never sure whether they are <code>&lt;&lt;"EOF"</code> or
+<code>&lt;&lt;'EOF'</code>.
+</p>
+<p>
+If your strings are not too long but contain the special characters that
+correspond with the default delimiters (e.g: <code>'</code>, <code>"</code>,
+<code>`</code>, <code>/</code> etc.), then you can use the initial letter followed
+by any arbitrary delimiter notation: <code>m{\A/home/sophie/perl}</code>,
+<code>q/My name is 'Jack' and I called my dog "Diego"./</code>.
+</p>
+</item>
+<item xml:id="slurp">
+<info>
+<title>Slurping a file (i.e: Reading it all into memory)</title>
+</info>
+<p>
+One can see several bad ways to read a file into memory in Perl. Among them
+are:
+</p>
+<code_blk syntax="perl">
+# Not portable and suffers from possible
+# shell code injection.
+my $contents = `cat $filename`;
+# Wasteful of CPU and memory:
+my $contents = join("", &lt;$fh&gt;);
+# Even more so:
+my $contents = '';
+while (my $line = &lt;$fh&gt;)
+{
+    $contents .= $line;
+}
+</code_blk>
+<p>
+You should avoid them all. Instead the proper way to read an entire file
+into a long string is to either use CPAN distributions for that such as
+<cpan_self_dist d="File-Slurp" /> or
+<cpan_self_dist d="IO-All" />, or alternatively
+write down the following function and use it:
+</p>
+<code_blk syntax="perl">
+sub _slurp
+{
+    my $filename = shift;
+    open my $in, '&lt;', $filename
+        or die "Cannot open '$filename' for slurping - $!";
+    local $/;
+    my $contents = &lt;$in&gt;;
+    close($in);
+    return $contents;
+}
+</code_blk>
+</item>
+<item xml:id="paragraphs">
+<info>
+<title>Write code in Paragraphs using Empty Lines</title>
+</info>
+<p>
+If one of your blocks is long, split it into "code paragraphs", with empty
+lines between them and with each paragraph doing one thing. Then, it may be a
+good idea to precede each paragraph with a comment explaining what it does, or
+to extract it into its own function or method.
+</p>
+</item>
+<item xml:id="io-socket">
+<info>
+<title>Use IO::Socket and friends instead of lower-level calls</title>
+</info>
+<p>
+One should use <cpan_mod m="IO::Socket">the IO::Socket</cpan_mod> family of
+modules for networking Input/Output instead of the
+lower-level socket()/connect()/bind()/etc. calls. As of this writing,
+<pdoc d="perlipc"></pdoc> contains outdated information demonstrating how
+to use the lower-level API which is not recommended.
+</p>
+</item>
+<item xml:id="subroutine-arguments">
+<info>
+<title>Subroutine Arguments Handling</title>
+</info>
+<p>
+The first thing to know about handling arguments for subroutines is to avoid
+referring to them directly by index. Imagine you have the following code:
+</p>
+<code_blk syntax="perl">
+sub my_function
+{
+    my $first_name = $_[0];
+    my $street = $_[1];
+    my $city = $_[2];
+    my $country = $_[3];
+    .
+    .
+    .
+}
+</code_blk>
+<p>
+Now, what if you want to add <code>$last_name</code> between <code>$first_name</code>
+and <code>$street</code>?
+You'll have to promote all the indexes after it! Moreover, this scheme
+is error-prone and you may reuse the same index more than once, or
+miss some indexes.
+</p>
+<p>
+Instead do either:
+</p>
+<code_blk syntax="perl">
+sub my_function
+{
+    my $first_name = shift;
+    my $street = shift;
+    my $city = shift;
+    my $country = shift;
+    .
+    .
+    .
+}
+</code_blk>
+<p>
+Or:
+</p>
+<code_blk syntax="perl">
+sub my_function
+{
+    my ($first_name, $street, $city, $country) = @_;
+    .
+    .
+    .
+}
+</code_blk>
+<p>
+The same thing holds for unpacking <code>@ARGV</code>, the array containing the
+command-line arguments for a Perl program, or any other array. Don't use
+<code>$ARGV[0]</code>, <code>$ARGV[1]</code> etc. directly, but instead unpack
+<code>@ARGV</code> using the methods given above. For processing
+command line arguments, you should also consider using
+<cpan_self_mod m="Getopt::Long" />.
+</p>
+<item xml:id="clobbering-arrays-or-hashes">
+<info>
+<title>Don’t clobber arrays or hashes</title>
+</info>
+<p>
+Often people ask how to pass arrays or hashes to subroutines. The answer is
+that the right way to do it is to pass them as a reference as an argument
+to the subroutine:
+</p>
+<code_blk syntax="perl">
+sub calc_polynomial
+{
+    my ($x, $coefficients) = @_;
+    my $x_power = 1;
+    my $result = 0;
+    foreach my $coeff (@{$coefficients})
+    {
+        $result += $coeff * $x_power;
+    }
+    continue
+    {
+        $x_power *= $x;
+    }
+    return $result;
+}
+print "(4*x^2 + 2x + 1)(x = 5) = ", calc_polynomial(5, [1, 2, 4]);
+</code_blk>
+<p>
+You shouldn't clobber the subroutine's arguments list with entire arrays
+or hashes (e.g: <code>my_func(@array1, @array2);</code> or
+<code>my_func(%myhash, $scalar)</code> ), as this will make it difficult to
+extract from <code>@_</code>.
+</p>
+</item>
+<item xml:id="named-parameters">
+<info>
+<title>Named Parameters</title>
+</info>
+<p>
+If the number of parameters that your subroutine accepts gets too long, or
+if you have too many optional parameters, make sure you convert it to use
+named arguments. The standard way to do it is to pass a hash reference or
+a hash of arguments to the subroutine:
+</p>
+<code_blk syntax="perl">
+sub send_email
+{
+    my $args = shift;
+    my $from_address = $args-&gt;{from};
+    my $to_addresses = $args-&gt;{to};
+    my $subject = $args-&gt;{subject};
+    my $body = $args-&gt;{body};
+    .
+    .
+    .
+}
+send_email(
+    {
+        from =&gt; 'shlomif@perl-begin.org',
+        to =&gt; ['shlomif@perl-begin.org', 'sophie@perl-begin.org'],
+        subject =&gt; 'Perl-Begin.org Additions',
+        .
+        .
+        .
+    }
+);
+</code_blk>
+</item>
+</item>
+<item xml:id="chop">
+<info>
+<title>Avoid using chop() to trim newlines characters from lines</title>
+</info>
+<p>
+Don't use <a xlink:href="http://perldoc.perl.org/functions/chop.html">the built-in
+function chop()</a> in order to remove newline characters from the end
+of lines read using the diamond operator (<code>&lt;&gt;</code>), because this
+may cause the last character in a line without a line feed character to be
+removed. Instead, use <a xlink:href="http://perldoc.perl.org/functions/chomp.html">chomp()</a>.
+</p>
+<p>
+If you expect to process DOS/Windows-like text files whose lines end with the
+dual Carriage Return-Line Feed character on Unix systems then use the
+following in order to trim them: <code>$line =~ s/\x0d?\x0a\z//;</code>.
+</p>
+<p>
+For more information see:
+</p>
+<ul>
+<li>
+<p>
+<a xlink:href="http://onlamp.com/pub/a/onlamp/2006/08/17/understanding-newlines.html">"Understanding Newlines"</a> - by Xavier Noria on OnLAMP.com.
+</p>
+</li>
+<li>
+<p>
+<a xlink:href="http://en.wikipedia.org/wiki/Newline">Wikipedia article about newlines</a>
+</p>
+</li>
+</ul>
+</item>
+<item xml:id="lowercase_modules_and_pkgs">
+<info>
+<title>Don't start Modules and Packages with a Lowercase Letter</title>
+</info>
+<p>
+Both modules and packages (the latter also known as namespaces) and all
+intermediate components thereof should always start with an uppercase letter,
+because modules and packages that start with a lowercase letter are
+reserved for pragmas. So this is bad:
+</p>
+<bad_code syntax="perl">
+# This is file person.pm
+package person;
+use strict;
+use warnings;
+1;
+</bad_code>
+<p>
+And this would be better:
+</p>
+<code_blk syntax="perl">
+# Better code!
+# This is file MyProject/Person.pm
+package MyProject::Person;
+use strict;
+use warnings;
+.
+.
+.
+1;
+</code_blk>
+</item>
+<item xml:id="indirect-object-notation">
+<info>
+<title>Avoid Indirect Object Notation</title>
+</info>
+<p>
+Don't use the so-called “Indirect-object notation” which can be seen in a lot
+of old code and tutorials and is more prone to errors:
+</p>
+<bad_code syntax="perl">
+my $new_object = new MyClass @params;
+</bad_code>
+<p>
+Instead use the <code>MyClass-&gt;new(…)</code> notation:
+</p>
+<code_blk syntax="perl">
+my $new_object = MyClass-&gt;new(@params);
+</code_blk>
+<p>
+For more information and the motivation for this advice, see chromatic’s article
+<a xlink:href="http://modernperlbooks.com/mt/2009/08/the-problems-with-indirect-object-notation.html">“The
+Problems with Indirect Object Notation”</a>.
+</p>
+</item>
+<item xml:id="dollar-dollar">
+<info>
+<title>$$myarray_ref[$idx] or $$myhash_ref{$key}</title>
+</info>
+<p>
+Don't write <code>$$myarray_ref[$idx]</code>, which is cluttered and can be easily
+confused with <code>(${$myarray_ref})-&gt;[$idx]</code>. Instead, use the
+arrow operator - <code>$myarray_ref-&gt;[$idx]</code>. This also applies for
+hash references - <code>$myhash_ref-&gt;{$key}</code>.
+</p>
+</item>
+<item xml:id="c-style-for-loops">
+<info>
+<title>C-style for loops</title>
+</info>
+<p>
+Some beginners to Perl tend to use C-style-for-loops to loop over an array's
+elements:
+</p>
+<code_blk syntax="perl">
+for (my $i=0 ; $i &lt; @array ; $i++)
+{
+    # Do something with $array[$i]
+}
+</code_blk>
+<p>
+However, iterating over the array itself would normally be preferable:
+</p>
+<code_blk syntax="perl">
+foreach my $elem (@array)
+{
+    # Do something with $elem.
+}
+</code_blk>
+<p>
+If you still need the index, do:
+</p>
+<code_blk syntax="perl">
+foreach my $idx (0 .. $#array)
+{
+    my $elem = $array[$idx];
+    # Do something with $idx and $elem.
+}
+# perl-5.12.0 and above:
+foreach my $idx (keys(@array))
+{
+    my $elem = $array[$idx];
+    # Do something with $idx and $elem.
+}
+# Also perl-5.12.0 and above.
+while (my ($idx, $elem) = each(@array))
+{
+    # Do something with $idx and $elem.
+}
+</code_blk>
+<p>
+An arbitrary C-style for loop can be replaced with a while loop with
+a “continue” block.
+</p>
+</item>
+<item xml:id="non-intrusive-commenting">
+<info>
+<title>Avoid Intrusive Commenting</title>
+</info>
+<p>
+Some commenting is too intrusive and interrupts the flow of reading the code.
+Examples for that are the <code>########################</code> hard-rules that
+some people put in their code, the comments using multiple
+<a xlink:href="http://en.wikipedia.org/wiki/Number_sign">number signs ("#")</a>,
+like <code>####</code>, or excessively long comment block. Please avoid all those.
+</p>
+<p>
+Some schools of software engineering argue that if the code's author feels
+that a comment is needed, it usually indicates that the code is not clear
+and should be factored better (like extracting a method or a subroutine with
+a meaningful name.). It probably does not mean that you should avoid writing
+comments altogether, but excessive commenting could prove as a red flag.
+</p>
+<p>
+If you're interested in documenting the public interface of your modules and
+command-line programs, refer to <pdoc d="perlpod">, Perl's Plain Old
+Documentation (POD)</pdoc>, which allows one to quickly and easily document
+one's code. POD has
+<a xlink:href="http://search.cpan.org/search?query=pod&amp;mode=all">many extensions
+available on CPAN</a>, which may prove of use.
+</p>
+</item>
+<item xml:id="accessing_object_slots_directly">
+<info>
+<title>Accessing Object Slots Directly</title>
+</info>
+<p>
+Since <a xlink:href="../../topics/object-oriented/">Perl objects</a> are simple
+references some programmers are tempted to access them directly:
+</p>
+<bad_code syntax="perl">
+$self-&gt;{'name'} = "John";
+print "I am ", $self-&gt;{'age'}, " years old\n";
+# Or even: (Really bad code)
+$self-&gt;[NAME()] = "John";
+</bad_code>
+<p>
+However, this is sub-optimal as explained in
+<a xlink:href="http://www.shlomifish.org/lecture/Perl/Newbies/lecture5/accessors/">the
+Perl
+for Newbies section about "Accessors"</a>, and one should use accessors
+using code like that:
+</p>
+<code_blk syntax="perl">
+# Good code.
+$self-&gt;_name("John");
+print "I am ", $self-&gt;_age(), " years old\n";
+</code_blk>
+<p>
+As noted in the link, you can use one of CPAN's many accessor generators to
+generate accessors for you.
+</p>
+</item>
+<item xml:id="caret_and_dollar_sign_in_regexes">
+<info>
+<title>'^' and '$' in Regular Expressions</title>
+</info>
+<p>
+Some people use "^" and "$" in regular expressions to mean
+beginning-of-the-string or end-of-the-string. However, they can mean
+beginning-of-a-line and end-of-a-line respectively using the <code>/m</code> flag
+which is confusing. It's a good idea to use <code>\A</code> for start-of-string
+and <code>\z</code> for end-of-string always, and to specify the <code>/m</code> flag
+if one needs to use "^" and "$" for start/end of a line.
+</p>
+</item>
+<item xml:id="magic_numbers">
+<info>
+<title>Magic Numbers</title>
+</info>
+<p>
+Your code should not include <a xlink:href="http://en.wikipedia.org/wiki/Magic_number_%28programming%29#Unnamed_numerical_constants">unnamed
+numerical constants also known as "magic numbers" or "magic constants"</a>.
+For example, there is one in this code to shuffle a deck of cards:
+</p>
+<bad_code syntax="perl">
+for my $i (0 .. 51)
+{
+    my $j = $i + int(rand(52-$i));
+    @cards[$i,$j] = @cards[$j,$i];
+}
+</bad_code>
+<p>
+This code is bad because the meaning of 52 and 51 is not explained and they
+are arbitrary. A better code would be:
+</p>
+<code_blk syntax="perl">
+# Good code.
+# One of:
+my $deck_size = 52;
+Readonly my $deck_size =&gt; 52;
+for my $i (0 .. $deck_size-1)
+{
+    my $j = $i + int(rand($deck_size-$i));
+    @cards[$i,$j] = @cards[$j,$i];
+}
+</code_blk>
+<p>
+(Of course in this case, you may opt to use a shuffle function from CPAN,
+but this is just for the sake of demonstration.).
+</p>
+</item>
+<item xml:id="vars_in_quotes">
+<info>
+<title>String Variables Enclosed in Double Quotes</title>
+</info>
+<p>
+One can sometimes see people write code like that:
+</p>
+<bad_code syntax="perl">
+my $name = shift(@ARGV);
+print "$name", "\n";
+if ("$name" =~ m{\At}i)
+{
+    print "Your name begins with the letter 't'";
+}
+</bad_code>
+<p>
+However, it's not necessary to enclose $name in double quotes (i.e:
+<code>"$name"</code>) because it's already a string. Using it by itself as
+<code>$name</code> will do just fine:
+</p>
+<code_blk syntax="perl">
+# Better code.
+my $name = shift(@ARGV);
+print $name, "\n";
+if ($name =~ m{\At}i)
+{
+    print "Your name begins with the letter 't'";
+}
+</code_blk>
+<p>
+Also see <a xlink:href="../../uses/text-generation/">our page about text
+generation</a> for other ways to delimit text.
+</p>
+<p>
+Note that sometimes enclosing scalar variables in double-quotes makes sense -
+for example if they are objects with overloaded stringification. But this is
+the exception rather than the rule.
+</p>
+</item>
+<item xml:id="at-array-for-subscripting">
+<info>
+<title>@array[$idx] for array subscripting</title>
+</info>
+<p>
+Some newcomers to Perl 5 would be tempted to write <code>@array[$index]</code>
+to subscript a single element out of the array <code>@array</code>. However,
+<code>@array[$index]</code> is a single-element array <b>slice</b>. To get
+a single subscript out of <code>@array</code> use <code>$array[$idx]</code> (with
+a dollar sign). Note that if you want to extract several elements, you can
+use an array slice such as <code>@array[@indexes]</code> or
+<code>@array[$x,$y] = @array[$y,$x]</code>. However, then it's a list which should
+be used in list context.
+</p>
+</item>
+<item xml:id="vars-a-and-b">
+<info>
+<title>Variables called $a and $b</title>
+</info>
+<p>
+One should not create lexical variables called <code>$a</code> and <code>$b</code>
+because there are built-in-variables called that used for
+<pdoc_f f="sort">sorting</pdoc_f> and other uses (such as reduce in
+<cpan_self_mod m="List::Util" />), which the lexical variables will interfere
+with:
+</p>
+<bad_code syntax="perl">
+my ($a, $b) = @ARGV;
+.
+.
+.
+# Won't work now.
+my @array = sort { length($a) &lt;=&gt; length($b) } @other_array;
+</bad_code>
+<p>
+Instead, use other single-letter variable names such as
+<code>$x</code> and <code>$y</code>, or better yet give more descriptive names.
+</p>
+</item>
+<item xml:id="flow-stmts-without-labels">
+<info>
+<title>Flow Control Statements Without an Explicit Label</title>
+</info>
+<p>
+One can sometimes see flow-control statements such as
+<pdoc_f f="next">next</pdoc_f>, <pdoc_f f="last">last</pdoc_f> or
+<pdoc_f f="redo">redo</pdoc_f> used without an explicit label following
+them, in which case they default to re-iterating or breaking out of the
+innermost loop. However, this is inadvisable, because later on, one may modify
+the code to insert a loop in between the innermost loop and the flow control
+statement, which will break the code. So always append a label to "next",
+"last" and "redo" and label your loops accordingly:
+</p>
+<code_blk syntax="perl">
+LINES:
+while (my $line = &lt;&gt;)
+{
+    if ($line =~ m{\A#})
+    {
+        next LINES;
+    }
+}
+</code_blk>
+</item>
+<item xml:id="abuse_of_array_last_index">
+<info>
+<title>($#array + 1) and Other Abuses of $#.</title>
+</info>
+<p>
+The <code>$#array</code> notation gives the last index in <code>@array</code> and
+is always equal to the array length minus one. Some people use it to signify
+the length of the array:
+</p>
+<bad_code syntax="perl">
+my @flags = ((0) x ($#names +1))
+</bad_code>
+<p>
+However this is unnecessary because one can better do it by evaluating
+<code>@names</code> in scalar context, possibly by saying <code>scalar(@names)</code>.
+</p>
+<code_blk syntax="perl">
+# Better code.
+my @flags = ((0) x @names);
+</code_blk>
+</item>
+<item xml:id="last_elems_of_array">
+<info>
+<title>$array[$#array], $array[$#array-1], etc.</title>
+</info>
+<p>
+One can sometimes see people references the last elements of arrays using
+notation such as <code>$array[$#array]</code>, <code>$array[$#array-1]</code>
+or even <code>$array[scalar(@array)-1]</code>. This duplicates the identifier
+and is error prone and there's a better way to do it in Perl using
+negative indexes. <code>$array[-1]</code> is the last element of the array,
+<code>$array[-2]</code> is the second-to-last, etc.
+</p>
+</item>
+<item xml:id="re_string_interpolate">
+<info>
+<title>Interpolating Strings into Regular Expressions</title>
+</info>
+<p>
+One can often see people interpolate strings directly into regular expressions:
+</p>
+<bad_code syntax="perl">
+my $username = shift(@ARGV);
+open my $pass_fh, '&lt;', '/etc/passwd'
+    or die "Cannot open /etc/passwd - $!";
+PASSWD:
+while (my $line = &lt;$pass_fh&gt;)
+{
+    if ($line =~ m{\A$username}) \# Bad code here.
+    {
+        print "Your username is in /etc/passwd\n";
+        last PASSWD;
+    }
+}
+close($pass_fh);
+</bad_code>
+<p>
+The problem is that when a string is interpolated into a regular expression
+it is interpolated as a mini-regex, and special characters there behave like
+they do in a regular expression. So if I input <code>'.*'</code> into the command
+line in the program above, it will match all lines. This is a special case
+of <a xlink:href="http://community.livejournal.com/shlomif_tech/35301.html">code
+or markup injection</a>.
+</p>
+<p>
+The solution to this is to use \Q and \E to signify a
+<pdoc_f f="quotemeta">quotemeta()</pdoc_f> portion that will treat the
+interpolated strings as plaintext with all the special characters escaped.
+So the line becomes: <code>if ($line =~ m{\A\Q$username\E})</code>.
+</p>
+<p>
+Alternatively, if you do intend to interpolate a sub-regex, signify this
+fact with a comment. And be careful with regular expressions that are accepted
+from user input.
+</p>
+</item>
+<item xml:id="overuse_dollar_underscore">
+<info>
+<title>Overusing $_</title>
+</info>
+<p>
+It's a good idea not to overuse <code>$_</code> because using it, especially in
+large scopes, is prone to errors, including many subtle ones. Most Perl
+operations support operating on other variables and you should use lexical
+variables with meaningful names instead of $_ whenever possible.
+</p>
+<p>
+Some places where you have to use <code>$_</code> are <pdoc_f f="map">map</pdoc_f>,
+<pdoc_f f="grep">grep</pdoc_f> and other functions like that, but even in
+that case it might be desirable to set a lexical variable to the value of
+<code>$_</code> right away: <code>map { my $line = $_; … } @lines</code>.
+</p>
+</item>
+<item xml:id="mixing_tabs_and_spaces">
+<info>
+<title>Mixing Tabs and Spaces</title>
+</info>
+<p>
+Some improperly configured text editors may be used to write code that, while
+indented well at a certain tab size looks terrible on other tab sizes, due
+to a mixture of tabs and spaces. So either use tabs for indentation or make
+sure your tab key expands to a constant number of spaces. You may also wish
+to make use of <cpan_self_dist d="Perl-Tidy" /> to properly format your
+code.
+</p>
+</item>
+<item xml:id="qx_for_command_execution">
+<info>
+<title>`…` or qx// for Executing Commands</title>
+</info>
+<p>
+Some people are tempted to use backticks (<code>`…`</code>) or <code>qx/…/</code>
+for executing commands for their side-effects. E.g:
+</p>
+<bad_code syntax="perl">
+use strict;
+use warnings;
+my $temp_file = "tempfile.txt";
+`rm -f $temp_file`;
+</bad_code>
+<p>
+However, this is not idiomatic because <code>`…`</code> and <code>qx/…/</code> are
+used to trap a command's output and to return it as a big string or as a list
+of lines. It would be a better idea to use
+<pdoc_f f="system">system()</pdoc_f> or to seek more idiomatic Perl-based
+solutions on CPAN or in the Perl core (such as using
+<pdoc_f f="unlink">unlink()</pdoc_f> to delete a file in our case.).
+</p>
+<p>
+Some people even go and ask how to make the <code>qx/…/</code> output go to
+the screen, which is a clear indication that they want to use system().
+</p>
+</item>
+<item xml:id="explicit_return">
+<info>
+<title>No Explicit Returns</title>
+</info>
+<p>
+As noted in "Perl Best Practices", all functions must have an explicit
+“return” statement, as otherwise they implicitly return the last
+expression, which would be subject to change upon changing the code. If you
+don't want the subroutine to return anything (i.e: it's a so-called
+"procedure"), then write <code>return;</code> to always return a false value,
+which the caller won't be able to do anything meaningful with.
+</p>
+<p>
+Another mistake is to write "return 0;" or "return undef;" to return
+false, because in list context, they will return a one-element list which
+is considered true. So always type <code>return;</code> to return false.
+</p>
+</item>
+<item xml:id="varvarname">
+<info>
+<title>&quot;Varvarname&quot; - Using a variable as another variable's name.</title>
+</info>
+<p>
+Mark Jason Dominus has written about
+<a xlink:href="http://perl.plover.com/varvarname.html">varvarname -
+"Why it's stupid to `use a variable as a variable name'"</a>, namely if
+<code>$myvar</code> is <code>'foobar'</code> they want to operate on the value of
+<code>$foobar</code>. While there are ways to achieve similar things in Perl,
+the best way is to use <a xlink:href="../../topics/hashes/">hashes</a> (possibly
+pointing to complex records with more information) and lookup them by
+the string you want to use. Read the link by Mark Jason Dominus for more
+information.
+</p>
+</item>
+<item xml:id="leading_underscores">
+<info>
+<title>Use Leading Underscores ('_') for Internal Methods and Functions</title>
+</info>
+<p>
+When writing a module use leading underscores in identifiers of methods and
+functions to signify those that are: 1. Subject to change. 2. Are used
+internally by the module. 3. Should not be used from outside. By using
+<cpan_self_dist d="Pod-Coverage" /> one can make sure that the external API
+of the module is documented and it will skip the identifiers with leading
+underscores, that can be thought of as "private" ones.
+</p>
+<p>
+Here's an example:
+</p>
+<code_blk syntax="perl">
+package Math::SumOfSquares;
+use strict;
+use warnings;
+use List::Utils qw(sum);
+sub _square
+{
+    my $n = shift;
+    return $n * $n;
+}
+sub sum_of_squares
+{
+    my ($numbers) = @_;
+    return sum(map { _square($_) } @$numbers);
+}
+1;
+</code_blk>
+</item>
+<item xml:id="print_to_fh">
+<info>
+<title>print $fh @args</title>
+</info>
+<p>
+It is preferable to write <code>print {$write_fh} @args</code>
+over <code>print $write_fh @args</code> because the latter can more easily be
+mistaken for <code>print $write_fh, @args</code> (which does something different)
+and does not provide enough visual hints that you are writing to the
+<code>$write_fh</code> filehandle. Therefore, always wrap the file-handle in
+curly braces (so-called "dative block"). (Inspired by "Perl Best Practices").
+</p>
+</item>
+<item xml:id="STDIN_instead_of_ARGV">
+<info>
+<title>Using STDIN instead of ARGV</title>
+</info>
+<p>
+One can write code while reading from STDIN:
+</p>
+<bad_code syntax="perl">
+use strict;
+use warnings;
+# Strip comments.
+LINES:
+while (my $line = &lt;STDIN&gt;)
+{
+    if ($line =~ m{\A *#})
+    {
+        next LINES;
+    }
+    print $line;
+}
+</bad_code>
+<p>
+However, it is usually better to use <code>ARGV</code> instead of <code>STDIN</code>
+because it also allows processing the filenames from the command line. This
+can also be achieved by simply saying <code>&lt;&gt;</code>. So the code becomes:
+</p>
+<code_blk syntax="perl">
+# Better code:
+use strict;
+use warnings;
+# Strip comments.
+LINES:
+while (my $line = &lt;&gt;)
+{
+    if ($line =~ m{\A *#})
+    {
+        next LINES;
+    }
+    print $line;
+}
+</code_blk>
+</item>
+<item xml:id="modifying_iterated_array">
+<info>
+<title>Modifying arrays or hashes while iterating through them.</title>
+</info>
+<p>
+Some people ask about how to add or remove elements to an existing array or
+hash when iterating over them using “foreach” and other loops. The
+answer to that is that Perl will likely not handle it too well, and it expects
+that during loops the keys of a data structure will remain constant.
+</p>
+<p>
+The best way to achieve something similar is to populate a new array or hash
+during the loop by using <pdoc_f f="push">push()</pdoc_f> or a hash lookup
+and assignment. So do that instead.
+</p>
+</item>
+<item xml:id="code_in_foreign_lang">
+<info>
+<title>Comments and Identifiers in a Foreign Language</title>
+</info>
+<p>
+Apparently, many non-native English speakers write code with comments and
+even identifiers in their native language. The problem with this is that
+programmers who do not speak that language will have a hard time understanding
+what is going on here, especially after the writers of the foreign language
+code post it in to an Internet forum in order to get help with it.
+</p>
+<p>
+Consider what Eric Raymond wrote in
+<a xlink:href="http://www.catb.org/~esr/faqs/hacker-howto.html#skills4">his
+"How to Become a Hacker" document</a> (where hacker is a software enthusiast
+and not a computer intruder):
+</p>
+<blockquote>
+<p>
+4. If you don't have functional English, learn it.
+</p>
+<p>
+As an American and native English-speaker myself, I have previously been
+reluctant to suggest this, lest it be taken as a sort of cultural imperialism.
+But several native speakers of other languages have urged me to point out that
+English is the working language of the hacker culture and the Internet, and
+that you will need to know it to function in the hacker community.
+</p>
+<p>
+Back around 1991 I learned that many hackers who have English as a second
+language use it in technical discussions even when they share a birth tongue;
+it was reported to me at the time that English has a richer technical
+vocabulary than any other language and is therefore simply a better tool for
+the job. For similar reasons, translations of technical books written in
+English are often unsatisfactory (when they get done at all).
+</p>
+<p>
+Linus Torvalds, a Finn, comments his code in English (it apparently never
+occurred to him to do otherwise). His fluency in English has been an important
+factor in his ability to recruit a worldwide community of developers for Linux.
+It's an example worth following.
+</p>
+<p>
+Being a native English-speaker does not guarantee that you have language skills
+good enough to function as a hacker. If your writing is semi-literate,
+ungrammatical, and riddled with misspellings, many hackers (including myself)
+will tend to ignore you. While sloppy writing does not invariably mean sloppy
+thinking, we've generally found the correlation to be strong — and we have no
+use for sloppy thinkers. If you can't yet write competently, learn to.
+</p>
+</blockquote>
+<p>
+So if you're posting code for public scrutiny, make sure it is written with
+English identifiers and comments.
+</p>
+</item>
+<item xml:id="perlform">
+<info>
+<title>Using perlform for formatting text.</title>
+</info>
+<p>
+One should not use “perlform” for formatting text, because it makes
+use of global identifiers, and should use the
+<cpan_self_dist d="Perl6-Form" /> CPAN distribution instead. Also see
+our <a xlink:href="../../uses/text-generation/">text generation page</a> for
+more information. (Inspired by "Perl Best Practices").
+</p>
+</item>
+<item xml:id="obj_new">
+<info>
+<title>Using $obj->new for object construction.</title>
+</info>
+<p>
+Sometimes you can see class constructors such as:
+</p>
+<bad_code syntax="perl">
+sub new
+{
+    my $proto = shift;
+    my $class = ref($proto) || $proto;
+    my $self = {};
+    …
+}
+</bad_code>
+<p>
+The problem here is that this allows one to do
+<code>$my_object_instance-&gt;new</code> to create a new instance of the object,
+but many people will expect it to be invalid or to clone the object. So don't
+do that and instead write your constructors as:
+</p>
+<code_blk syntax="perl">
+# Better code:
+sub new
+{
+    my $class = shift;
+    my $self = {};
+    bless $self, $class;
+    …
+}
+</code_blk>
+<p>
+Which will disable it and will just allow
+<code>ref($my_object_instance)-&gt;new(…)</code>. If you need a clone method,
+then code one called "clone()" and don't use "new" for that.
+</p>
+<p>
+(Thanks to
+<a xlink:href="http://www.stonehenge.com/merlyn/UnixReview/col52.html">Randal L.
+Schwartz's post "Constructing Objects"</a> for providing the insight to this).
+</p>
+</item>
+<item xml:id="law_of_demeter">
+<info>
+<title>Law of Demeter</title>
+</info>
+<p>
+See the <a xlink:href="http://en.wikipedia.org/wiki/Law_of_Demeter">Wikipedia article
+about "Law of Demeter" for more information</a>. Namely, doing many nested
+method calls like
+<code>$self-&gt;get_employee('sophie')-&gt;get_address()-&gt;get_street()</code>
+is not advisable, and should be avoided.
+</p>
+<p>
+A better option would be to provide methods in the containing objects to
+access those methods of their contained objects. And an even better way would
+be to structure the code so that each object handles its own domain.
+</p>
+</item>
+<item xml:id="delegating_parameter_passing">
+<info>
+<title>Passing parameters in delegation</title>
+</info>
+<p>
+Sometimes we encounter a case where subroutines each pass the same parameter
+to one another in delegation, just because the innermost subroutines in the
+callstack need it.
+</p>
+<p>
+To avoid it, create a class, and declare methods that operate on the
+fields of the class, where you can assign the delegated arguments.
+</p>
+</item>
+<item xml:id="duplicate_code">
+<info>
+<title>Duplicate Code</title>
+</info>
+<p>
+As noted in
+<a xlink:href="http://www.shlomifish.org/philosophy/books-recommends/#refactoring">Martin
+Fowler's "Refactoring"</a> book (but held as a fact for a long time
+beforehand),
+<a xlink:href="http://en.wikipedia.org/wiki/Duplicate_code">duplicate code</a> is a
+code smell, and should be avoided. The solution is to extract duplicate
+functionality into subroutines, methods and classes.
+</p>
+</item>
+<item xml:id="long_functions">
+<info>
+<title>Long Functions and Methods</title>
+</info>
+<p>
+Another common code smell is
+<a xlink:href="http://c2.com/cgi/wiki?LongMethodSmell">long
+subroutines and methods</a>. The solution to these is to extract several
+shorter methods out, with meaningful names.
+</p>
+</item>
+<item xml:id="map_instead_of_foreach">
+<info>
+<title>Using map instead of foreach for side-effects</title>
+</info>
+<p>
+You shouldn't be using <pdoc_f f="map">map</pdoc_f> to iterate on a list
+instead of foreach if you're not interested in constructing a new list and
+all you are interested in are the side-effects. For example:
+</p>
+<bad_code syntax="perl">
+use strict;
+use warnings;
+map { print "Hello $_!\n"; } @ARGV;
+</bad_code>
+<p>
+Would be better written as:
+</p>
+<code_blk syntax="perl">
+use strict;
+use warnings;
+foreach my $name (@ARGV)
+{
+    print "Hello $name!\n";
+}
+</code_blk>
+<p>
+Which better conveys one's intention and may be a bit more efficient.
+</p>
+</item>
+<item xml:id="ternary_operator_instead_of_if_else">
+<info>
+<title>Using the ternary operator for side-effects instead of if/else</title>
+</info>
+<p>
+A similar symptom to the above is people who wish to use the ternary
+inline- conditional operator (<code>? :</code>) for choosing to execute between
+two different statements with side-effects
+instead of using <code>if</code> and <code>else</code>. For example:
+</p>
+<bad_code syntax="perl">
+$cond_var ? ($hash{'if_true'} .= "Cond var is true")
+          : ($hash{'if_false'} .= "Cond var is false")
+</bad_code>
+<p>
+(This is assuming the ternary operator was indeed written correctly, which
+is not always the case).
+</p>
+<p>
+However, the ternary operator is meant to be an expression that is a choice
+between two values and should not be used for its side-effects. To do the
+latter, just use <code>if</code> and <code>else</code>:
+</p>
+<code_blk syntax="perl">
+if ($cond_var)
+{
+    $hash{'if_true'} .= "Cond var is true";
+}
+else
+{
+    $hash{'if_false'} .= "Cond var is false";
+}
+</code_blk>
+<p>
+This is safer, and better conveys one’s intentions.
+</p>
+<p>
+For more information, refer to
+<a xlink:href="http://www.nntp.perl.org/group/perl.beginners/2012/04/msg120480.html">a
+relevant thread on the Perl beginners mailing list</a> (just make sure you read
+it in its entirety).
+</p>
+</item>
+<item xml:id="nested_top_level_subroutines">
+<info>
+<title>Nested top-level subroutines</title>
+</info>
+<p>
+One should not nest an inner top-level subroutine declared using
+<code>sub inner</code> inside of an outer one, like so:
+</p>
+<bad_code syntax="perl">
+sub outer
+{
+    sub inner
+    {
+        .
+        .
+        .
+    }
+    # Use inner here
+}
+</bad_code>
+<p>
+This code will compile and run, but may break in subtle ways.
+</p>
+<p>
+The first problem with this approach is that <code>inner()</code> will still be
+visible outside <code>outer()</code>, but the more serious problem is that the
+inner subroutine will only get one copy of the lexical variables inside
+<code>outer()</code>.
+</p>
+<p>
+The proper and safer way to declare an inner subroutine is to declare
+a lexical variable and set it to an anonymous subroutine, which is
+also known as a closure:
+</p>
+<code_blk syntax="perl">
+sub outer
+{
+    my ($foo, $bar) = @_;
+    my $print_foo = sub {
+        print "Foo is '$foo'\n";
+        return;
+    };
+    $print_foo-&gt;();
+    $foo++;
+    $print_foo-&gt;();
+    return;
+}
+</code_blk>
+</item>
+<item xml:id="grep_instead_of_any">
+<info>
+<title>Using grep instead of any and friends</title>
+</info>
+<p>
+Sometimes one can see people using <pdoc_f f="grep">grep</pdoc_f> to find
+the first matching element in an array, or whether such an element exists at
+all. However, grep is intended to extract <b>all</b> matching elements out
+of a list, not just the first one, and as a result will not stop until it
+finds them all. To remedy this look at either <code>first()</code> from
+<cpan_self_mod m="List::Util" /> (to find the first match) or
+"any/all/notall/none" from <cpan_self_mod m="List::MoreUtils" /> (to find
+whether a single element exists). These better convey one's intention
+and may be more efficient because they stop on the first match.
+</p>
+<p>
+One should note that if one does such lookups often, then they should try
+to use a <a xlink:href="../../topics/hashes/">hash</a> instead.
+</p>
+</item>
+<item xml:id="FileHandle_module">
+<info>
+<title>Using the FileHandle Module</title>
+</info>
+<p>
+The FileHandle module is old and bad, and should not be used. One should
+use the <a xlink:href="http://perldoc.perl.org/IO/Handle.html">IO::Handle</a>
+family of modules instead.
+</p>
+</item>
+<item xml:id="file_includes">
+<info>
+<title>&quot;Including&quot; files instead of using Modules</title>
+</info>
+<p>
+We are often asked how one can "include" a file in a Perl program (similar
+to <a xlink:href="http://php.net/manual/en/function.include.php">PHP's include</a>
+or <a xlink:href="http://ss64.com/bash/period.html">the shell's
+"source" or "." operators</a>. The answer is that the better way is to extract
+the common functionality from all the programs into
+<a xlink:href="../../topics/modules-and-packages/">modules</a> and load them by
+using "use" or "require".
+</p>
+<p>
+Note that <pdoc_f f="do">do</pdoc_f> can be used to evaluate a file (but in
+a different scope), but it's almost always not needed.
+</p>
+<p>
+Some people are looking to supply a common configuration to their programs
+as global variables in the included files, and those people should look at
+CPAN configuration modules such as <cpan_self_dist d="Config-IniFiles" />
+or <a xlink:href="http://search.cpan.org/search?query=json&amp;mode=all">the
+various JSON modules</a> for the ability to read configuration files
+in a safer and better way.
+</p>
+</item>
+<item xml:id="global_vars_iface">
+<info>
+<title>Using Global Variables as an Interface to the Module</title>
+</info>
+<p>
+While it is possible to a large extent, one should generally not use global
+variables as an interface to a module, and should prefer having a procedural
+or an object oriented interface instead. For information about this see our
+<a xlink:href="../../topics/modules-and-packages/">page about modules and
+packages</a> and our <a xlink:href="../../topics/object-oriented/">our page
+about object oriented programming in Perl</a>.
+</p>
+</item>
+<item xml:id="declaring_all_vars_at_top">
+<info>
+<title>Declaring all variables at the top</title>
+</info>
+<p>
+Some inexperienced Perl programmers, possibly by influence from languages
+such as C, like to declare all variables used by the program at the top of
+the program or the relevant subroutines. Like so:
+</p>
+<bad_code syntax="perl">
+my $first_name;
+my $last_name;
+my $address;
+my @people;
+my %cities;
+.
+.
+.
+</bad_code>
+<p>
+However, this is bad form in Perl, and the preferable way is to declare all
+the variables when they are first used, and at the innermost scope where they
+should retain their value. This will allow to keep track of them better.
+</p>
+</item>
+<item xml:id="switch_pm">
+<info>
+<title>Using Switch.pm</title>
+</info>
+<p>
+One should not use Switch.pm to implement a
+<a xlink:href="http://en.wikipedia.org/wiki/Switch_statement">switch statement</a>
+because it's a source filter, tends to break a lot of code, and causes
+unexpected problems. Instead one should either use <code>given/when</code>, which
+are only available in perl-5.10 and above, or dispatch tables, or alternatively
+plain <code>if/elsif/else</code> structures.
+</p>
+</item>
+<item xml:id="threads">
+<info>
+<title>Using threads in Perl</title>
+</info>
+<p>
+Some beginners, when thinking they need to multitask their programs start
+thinking they should use perl threads. However, as mentioned in
+<pdoc d="perlthrtut"></pdoc>, perl threads are very much unlike
+the traditional thread modules, share nothing by default and are in fact
+heavyweight processes (instead of the usual lightweight ones). See also
+<a xlink:href="http://www.perlmonks.org/index.pl?node_id=288022">Elizabeth
+Mattijsen’s write-up about perl's ithreads on perlmonks</a>.
+</p>
+<p>
+To sum up, usually threads are the wrong answer and you should be using
+forking processes or something like POE (see our
+<a xlink:href="../../uses/multitasking/">page about multitasking</a>) instead.
+</p>
+</item>
+<item xml:id="calling-the-shell-too-much">
+<info>
+<title>Calling Shell Commands Too Much</title>
+</info>
+<p>
+Some people are tempted to use shell commands for performing
+various tasks using <code>`…`</code>, <code>qx/…/</code>, <code>system()</code>,
+piped-open, etc. However, usually Perl has built-in routines or alternatively
+CPAN modules, which are more portable, and often would be faster than
+calling the shell for help, and they should be used instead.
+</p>
+<p>
+As an extreme example, the site <i>The Daily WTF</i>
+had <a xlink:href="http://thedailywtf.com/Articles/The_UNIX_Philosophy.aspx">a
+feature</a> which featured the following code to determine the file size
+in Perl:
+</p>
+<bad_code syntax="perl">
+my $filesize = `wc -c $file | cut -c0-8 | sed 's/ //g'`;
+</bad_code>
+<p>
+Reportedly, replacing this line with <code>my $filesize = -s $file</code> (which
+as noted earlier should have been called <code>$filename</code> instead), resulted
+in the program being 75 minutes faster on average (!).
+</p>
+<p>
+Normally, if you find yourself using UNIX text processing commands such as
+“sed”, “awk”, “grep”, and “cut”, you should
+implement it in pure-Perl code.
+</p>
+</item>
+<item xml:id="missing-semicolons-at-the-end-of-blocks">
+<info>
+<title>Missing Semicolons at the end of blocks</title>
+</info>
+<p>
+The perl interpreter allows one to omit the last trailing semicolon (";") in
+the containing block. Like so:
+</p>
+<bad_code syntax="perl">
+if ( COND() )
+{
+     print "Success!\n";
+     call_routine() \# No semicolon here.
+}
+</bad_code>
+<p>
+However, this isn't a good idea, because it is inconsistent, and may cause
+errors (or obscure failures) if one-or-more statements are added afterwards.
+</p>
+<p>
+As a result, you should end every statement with a semicolon (";") even i
+it’s the last one. A possible exception to this may be single-line and/or
+single-statement blocks like in <pdoc_f f="map">map</pdoc_f>.
+</p>
+</item>
+<item xml:id="list-form-of-open-with-one-arg">
+<info>
+<title>List form of open with one argument.</title>
+</info>
+<p>
+Recent versions of of perl introduced the list-forms of piping to and from a
+command, such as <code>open my $fh, '-|', 'fortune', $collection</code> or
+<code>open my $printer, '|-', 'lpr', '-Plp1'</code>. However, not only they are
+not implemented on Windows and other UNIX-like systems yet, but when one passes
+only one argument to them, they pass it to the shell verbatim.
+</p>
+<p>
+As a result, if one passes an array variable to them, as in:
+</p>
+<bad_code syntax="perl">
+open my $fh, '-|', @foo
+    or die "Could not open program! - $!"
+</bad_code>
+<p>
+One can pass only a single argument to <code>@foo</code>, which would be dangerous.
+To mitigate that, one should use the <cpan_self_dist d="IPC-Run" />
+or the <cpan_self_dist d="IPC-System-Simple" /> CPAN distributions.
+</p>
+</item>
+<item xml:id="trailing-whitespace">
+<info>
+<title>Trailing Whitespace</title>
+</info>
+<p>
+With many editors, it can be common to write new code or modify existing
+one, so that some lines will contain trailing whitespace, such as
+spaces (ASCII 32 or 0x20) or tabs characters. These trailing spaces normally
+do not cause much harm, but they are not needed and can be distracted.
+</p>
+<p>
+While you should not feel bad about having trailing space, it is a good idea
+to sometimes search for them using a command such as <code>ack '[ \t]+$'</code>
+(or <code>ack -a '[ \t]+$'</code> for completeness - see
+<a xlink:href="http://betterthangrep.com/">ack</a>, and get rid of them.
+</p>
+<p>
+Some editors also allow you to highlight trailing whitespace when present. See
+for example:
+</p>
+<ul>
+<li>
+<p>
+<a xlink:href="http://vim.wikia.com/wiki/Highlight_unwanted_spaces">Highlight
+unwanted spaces in Vim</a>. Also see <a xlink:href="http://vim.wikia.com/wiki/Highlight_unwanted_spaces">this post</a>.
+</p>
+</li>
+<li>
+<p>
+<a xlink:href="http://emacswiki.org/emacs/ShowWhiteSpace">EmacsWiki:
+Show White Space</a>.
+</p>
+</li>
+</ul>
+</item>
+<item xml:id="string-eval">
+<info>
+<title>Misusing String Eval</title>
+</info>
+<p>
+String <pdoc_f f="eval">eval</pdoc_f> allows one to compile and execute
+(possibly generated) strings as Perl expressions. While it is a powerful
+feature, there are usually better and safer ways to achieve what you want
+using string <code>eval ""</code>. So you should only use it, if you are an expert
+and really know what you are doing.
+</p>
+<p>
+Related to string eval, is using two or more <code>/e</code> flags in the
+<code>s///</code> substitution. While one /e flag is often useful (for example
+when substituting counters like in <code>s/#\./($i++)."."/ge</code>) the second
+/e flags just evaluates the generated expression again. This can easily be done
+with using string eval inside the right-hand-side, assuming it is needed which
+is normally not the case.
+</p>
+</item>
+<item xml:id="dash-starting-named-params">
+<info>
+<title>Named Parameters That Start With Dash</title>
+</info>
+<p>
+If you're defining interfaces that accept a flattened hash or a hash reference
+of named parameters, there is no need to call the parameters with keys starting
+with a dash, like so:
+</p>
+<bad_code syntax="perl">
+my $obj = MyClass-&gt;new(
+    {
+        -name =&gt; "George",
+        -occupation =&gt; "carpenter",
+        -city =&gt; "Inverness",
+    }
+);
+</bad_code>
+<p>
+The dashes are not needed because Perl can safely escape and deal with plain
+names that only contain alphanumeric characters and underscores, and they
+just add clutter to the code. Named arguments starting with dashes were
+prevalent in some early modules such as <cpan_self_dist d="Tk" /> or
+<cpan_self_dist d="Config-IniFiles" />, but they should not be used in
+more modern modules.
+</p>
+<p>
+Instead, design your interfaces with calling conventions like so:
+</p>
+<code_blk syntax="perl">
+my $obj = MyClass-&gt;new(
+    {
+        name =&gt; "George",
+        occupation =&gt; "carpenter",
+        city =&gt; "Inverness",
+    }
+);
+</code_blk>
+</item>
+<item xml:id="code_and_markup_injection">
+<info>
+<title>Code and Markup Injection</title>
+</info>
+<p>
+Care must be taken when constructing statements that are passed to an
+interpreter, when putting arbitrary strings inside (using string interpolation
+or other methods). This is because if the strings are subject to input from
+the outside world (including the users), then one can use specially crafted
+strings for executing arbitrary commands and exploiting the system.
+</p>
+<p>
+An example of this is outputting HTML using
+<code>print "&lt;p&gt;" . $paragraph_text . "&lt;/p&gt;\n";</code> which may allow
+inserting arbitrary, malicious, markup inside <code>$paragraph_text</code>,
+which may include malicious JavaScript, that can steal passwords or alter
+the page’s contents.
+</p>
+<p>
+For more information, see:
+</p>
+<ol>
+<li>
+<p>
+<a xlink:href="../../topics/security/code-markup-injection/">“Code/Markup Injection
+and Its Prevention”</a> resource on this site.
+</p>
+</li>
+<li>
+<p>
+Wikipedia articles about
+<a xlink:href="http://en.wikipedia.org/wiki/SQL_injection">SQL injection</a>
+and
+<a xlink:href="http://en.wikipedia.org/wiki/Cross-site_scripting">Cross-site
+scripting</a>.
+</p>
+</li>
+<li>
+<p>
+The site <a xlink:href="http://bobby-tables.com/">Bobby Tables</a> about SQL
+injections.
+</p>
+</li>
+</ol>
+</item>
+<item xml:id="init_arrays_from_arrayrefs">
+<info>
+<title>Initializing Arrays and Hashes from Anonymous References</title>
+</info>
+<p>
+Some beginners to Perl are tempted to use the anonymous array reference
+constructor (<code>[ … ]</code>) to initialise array variables, or alternatively
+anonymous hash references (<code>{ … }</code>) to initialise hash variables, like
+so:
+</p>
+<bad_code syntax="perl">
+my @arr = [1 .. 10];
+my %uk_info = { continent =&gt; "Europe", capital =&gt; "London", };
+</bad_code>
+<p>
+However, these reference constructors actually create a single scalar that
+contains a reference and, as a result, in the case of the array, one will have
+a single element array, and in case of the hash, one will have an error
+with a hash that was initialised only with a single key (that was converted
+to a nonsensical string).
+</p>
+<p>
+Array and hash variables should be initialized using lists enclosed in
+parentheses:
+</p>
+<code_blk syntax="perl">
+my @arr = (1 .. 100);
+my %uk_info = ( continent =&gt; "Europe", capital =&gt; "London", );
+</code_blk>
+<p>
+For more information about the difference between references and aggregate
+variables, refer to our <a xlink:href="../../topics/references/">references</a>
+page.
+</p>
+</item>
+<item xml:id="long_lines">
+<info>
+<title>Overly Long Lines in the Source Code</title>
+</info>
+<p>
+It is a good idea to avoid overly long lines in the source code, because
+they need to be scrolled to read, and may not fit within the margins of your
+co-developers’ text editors. If the lines are too long, you should break
+them or reformat them (for example, by adding a newline before or after an
+operator), and by breaking long string constants into several lines using
+the string concatenation operator - <code>.</code>.
+</p>
+<p>
+Many coding standards require lines to fit within 80 characters or
+78 characters or so, and you should standardise on a similar limit for your
+own code.
+</p>
+</item>
+<item xml:id="no_upwards_for_dirs">
+<info>
+<title>Getting rid of special entries in directory contents</title>
+</info>
+<p>
+Calling <pdoc_f f="readdir">readdir()</pdoc_f> repetitively, or calling it
+in list context will normally return the two special entries of <filepath>.</filepath>
+(the same directory) and <filepath>..</filepath> (the parent directory) which should not
+be checked, and should normally be ignored. One can often find that people
+are trying to skip them in various sub-optimal ways:
+</p>
+<bad_code syntax="perl">
+if ($dir_entry =~ m/\A\./) # Will skip all directories that start with dot.
+if ($dir_entry =~ m/^\./) # Same but \A is preferable for start-of-string.
+if ($dir_entry =~ m/\A\.\.?\z/) # Obfuscated.
+if ($dir_entry =~ m/\A\.{1,2}\z/) # Not much better.
+if ($dir_entry eq "." or $dir_entry eq "..") # May not be portable.
+</bad_code>
+<p>
+The best way to do that is to use <cpan_self_mod m="File::Spec" />’s
+<code>no_upwards()</code> function:
+</p>
+<code_blk syntax="perl">
+foreach my $entry (File::Spec-&gt;no_upwards(readdir($dir_handle))
+{
+}
+</code_blk>
+<p>
+Note that <cpan_self_dist d="File-Slurp" /> wraps that for you in its
+<code>read_dir()</code> function and other file system abstraction modules provide
+similar functionality.
+</p>
+</item>
+<item xml:id="assigning_list_to_scalar">
+<info>
+<title>Assigning a List to a Scalar Variable</title>
+</info>
+<p>
+Normally, assigning from a function or an expression that returns a list
+to a scalar variable, will not yield what you want:
+</p>
+<bad_code syntax="perl">
+my $characters = split(//, $string);
+</bad_code>
+<p>
+This will cause the list as returned by split to be evaluated in scalar
+context, and to return a single (and not very meaningful) scalar item.
+You normally want one of those:
+</p>
+<code_blk syntax="perl">
+my @characters = split(//, $string);
+my $chars_aref = [ split(//, $string) ];
+my $num_chars = () = split(//, $string); \# Use length instead in this case.
+</code_blk>
+<p>
+A lot of the confusion stems from the fact that people expect arrays in Perl
+to be contained directly in scalars. For more information about that,
+consult <a xlink:href="../../topics/references/">our page about references</a>.
+</p>
+</item>
+<item xml:id="dot_asterisk">
+<info>
+<title>Regular Expressions starting or ending with “.*”</title>
+</info>
+<p>
+It is not necessary to put <code>.*</code> or <code>.*?</code> into the beginning or
+end of regular
+expressions to match something anywhere inside the string. So for example
+<code>if ($hay_stack =~ /.*ab+c.*/)</code> can be replaced with the simpler:
+<code>if ($hay_stack =~ /ab+c/)</code>. If you wish to match and extract the
+prefix, you should say <code>(.*?)</code> or <code>(.*)</code>.
+</p>
+</item>
+<item xml:id="recursive_directory_traversal">
+<info>
+<title>Recursive Directory Traversal Without Using File::Find and Friends</title>
+</info>
+<p>
+Some beginners to Perl are tempted to write a recursive directory traversal
+(i.e: finding all files in a directory, its sub-directories, its
+sub-sub-directories, etc.) by using procedural recursion or other sub-optimal
+means. However, the idiomatic way is to use the core module File::Find or
+its CPAN friends. For more information, see
+<a xlink:href="../../uses/sys-admin/#directory_traversal">our resources about
+directory traversal</a>.
+</p>
+</item>
+<item xml:id="non_recursive_file_find">
+<info>
+<title>Using File::Find for listing the contents of a directory non-recursively</title>
+</info>
+<p>
+Alternatively, sometimes people are tempted to use File::Find or similar
+modules to non-recursively list the contents of a single directory. However,
+in this case, it is a better idea to simply use
+<pdoc_f f="opendir">opendir()</pdoc_f>,
+<pdoc_f f="readdir">readdir()</pdoc_f> and
+<pdoc_f f="closedir">closedir()</pdoc_f>, in conjunction with
+<a xlink:href="#no_upwards_for_dirs">no_upwards</a>, or an abstraction of them.
+</p>
+<p>
+File::Find and friends should be reserved for a recursive traversal.
+</p>
+</item>
+<item xml:id="populating_array_with_same_reference">
+<info>
+<title>Populating an Array with Multiple Copies of the Same Reference</title>
+</info>
+<p>
+You can sometimes see code like that:
+</p>
+<bad_code syntax="perl">
+my @array_of_arrays = ([]) x $num_rows;
+</bad_code>
+<p>
+Or:
+</p>
+<bad_code syntax="perl">
+my @row;
+my @array_of_rows;
+foreach my $elem (@existing_array)
+{
+    @row = generate_row($elem);
+    push @array_of_rows, \@row;
+}
+</bad_code>
+<p>
+The problem with code like this is that the same referent (see
+<a xlink:href="../../topics/references/">our resources about references in
+Perl</a>) is being used in all places in the array, and so they will
+always be synchronised to the same contents.
+</p>
+<p>
+As a result, the two code excerpts should be written as such instead:
+</p>
+<code_blk syntax="perl">
+my @array_of_arrays = map { [] } (1 .. $num_rows);
+</code_blk>
+<p>And:</p>
+<code_blk syntax="perl">
+my @array_of_rows;
+foreach my $elem (@existing_array)
+{
+    my @row = generate_row($elem);
+    push @array_of_rows, \@row;
+}
+</code_blk>
+<p>
+Or alternatively:
+</p>
+<code_blk syntax="perl">
+my @array_of_rows;
+foreach my $elem (@existing_array)
+{
+    push @array_of_rows, [generate_row($elem)];
+}
+</code_blk>
+</item>
+<item xml:id="conditional_my_decls">
+<info>
+<title>Conditional my declarations.</title>
+</info>
+<p>
+It is not a good idea to append a trailing if statement modifier to a
+declaration of a lexical variable using <code>my</code>:
+</p>
+<bad_code syntax="perl">
+my $var = VALUE() if (COND());
+my ($var1, @array2) if (COND());
+</bad_code>
+<p>
+This code might compile and appear to run but you probably want to declare
+a lexical variable for the rest of its scope. If you need to assign to it
+conditionally, then do it in a separate statement:
+</p>
+<code_blk syntax="perl">
+my $var;
+if (COND())
+{
+    $var = VALUE();
+}
+</code_blk>
+</item>
+<item xml:id="one_var_for_two_purposes">
+<info>
+<title>Using One Variable for Two (or More) Different Purposes</title>
+</info>
+<p>
+Within the scope of its declaration, a variable should serve one purpose, and
+serve it well. One should not re-use a variable for a completely different
+purpose later on in the scope. Creating new variables is cheap in Perl and
+should not be a concern to avoid clarity.
+</p>
+</item>
+<item xml:id="backslash_n_on_rhs">
+<info>
+<title>Using \1 instead of $1 on the Right Hand Side of a Substitution</title>
+</info>
+<p>
+There is no good reason to use <code>\\1</code>, <code>\\2</code>, etc. in the
+right-hand-side of a substitution instead of <code>$1</code> <code>$2</code>
+etc. While this may work, the backslash-digits variables are aimed at
+back-references, such as matching the exact string of a capture again within
+the left hand side of a regular expression:
+</p>
+<bad_code syntax="perl">
+$s =~ s/(H\w+)\s+(W\w+)/\1 [=] \2/;
+</bad_code>
+<p>
+Better code:
+</p>
+<code_blk syntax="perl">
+$s =~ s/(H\w+)\s+(W\w+)/$1 [=] $2/;
+</code_blk>
+</item>
+<item xml:id="premature_optimization">
+<info>
+<title>Premature Optimisation</title>
+</info>
+<p>
+On various online Perl forums, we are often getting asked questions like:
+“What is the speediest way to do task X?” or “Which of these pieces of code
+will run faster?”. The answer is that in this day and age of extremely fast
+computers, you should optimise for clarity and modularity first, and worry
+about speed when and if you find it becomes a problem. Remember Professor
+Don Knuth’s words that “Premature Optimisation is the root of all evil.”
+(attributing it to C.A.R. Hoare).
+</p>
+<p>
+If you do find that your program runs too slowly, refer to our
+<a xlink:href="../../topics/optimising-and-profiling/">page about Optimising and
+Profiling Perl code</a>, but don't optimise prematurely.
+</p>
+</item>
+<item xml:id="version_control">
+<info>
+<title>Not Using Version Control</title>
+</info>
+<p>
+For everything except for short throwaway scripts, or otherwise incredibly
+short programs, there is no good excuse, not to use a version control system
+(a.k.a: "revision control systems", "source control systems", or more in
+general as part of "software configuration management"). This is especially
+true nowadays given the availability of several powerful, easy to use,
+open-source (and as a result free-of-charge), and cross-platform, version
+control systems, that you should have not a lot of problems to deploy, learn
+and use.
+</p>
+<p>
+For more information and the motivation behind using version control systems,
+see
+<a xlink:href="../../tutorials/perl-for-newbies/part5/#page--version-control--DIR">the
+relevant section out of the fifth part of “Perl for Perl Newbies”</a>
+for more discussion about the motivation behind that, some links and a
+demonstration.
+</p>
+<p>
+Some links for further discussion:
+</p>
+<ul>
+<li>
+<p>
+<a xlink:href="http://better-scm.shlomifish.org/">The Better SCM Site</a>
+</p>
+</li>
+<li>
+<p>
+<a xlink:href="http://producingoss.com/en/vc-systems.html">The Free Version Control
+Systems Appendix of <i>Producing Open Source Software</i></a>.
+</p>
+</li>
+<li>
+<p>
+The Wikipedia
+<a xlink:href="http://en.wikipedia.org/wiki/List_of_revision_control_software">List
+of revision control software</a>.
+</p>
+</li>
+<li>
+<p>
+<a xlink:href="http://perlhacks.com/2012/03/you-must-hate-version-control-systems/">“You
+Must Hate Version Control Systems”</a> - a discussion on Dave Cross’ blog
+about best practices in the software development industry.
+</p>
+</li>
+</ul>
+</item>
+<item xml:id="automated_tests">
+<info>
+<title>Writing Automated Tests</title>
+</info>
+<p>
+Automated tests help verify that the code is working correctly, that bugs
+are not introduced due to refactoring or the addition of new feature, and also
+provide specifications and interface documentation to the code. As a result,
+automated tests have been considered a good practise for a long time.
+</p>
+<p>
+For more information about how to write automated tests, see
+<a xlink:href="../../uses/qa/">our page about quality assurance in
+Perl</a>.
+</p>
+</item>
+</section>
+<section xml:id="sources_of_advice">
+<info>
+<title>Sources of This Advice</title>
+</info>
+
+<p>
+This is a short list of the sources from which this advice was taken which
+also contains material for further reading:
+</p>
+
+<ol>
+
+<li>
+<p>
+<a xlink:href="$(ROOT)/books/advanced/#pbp">The
+Book "Perl Best Practices"</a> by Damian Conway - contains a lot of good
+advice and food for thought, but sometimes should be deviated from.
+Also see the
+<a xlink:href="https://www.socialtext.net/perl5/index.cgi?pbp_module_recommendation_commentary">"PBP
+Module Recommendation Commentary"</a> on the Perl 5 Wiki.
+</p>
+</li>
+
+<li>
+<p>
+<a xlink:href="https://www.socialtext.net/perl5/index.cgi?ancient_perl">"Ancient
+Perl"</a> on the Perl 5 Wiki.
+</p>
+</li>
+
+<li>
+<p>
+<a xlink:href="http://modernperlbooks.com/">chromatic's "Modern Perl" Book and
+Blog</a>
+</p>
+</li>
+
+<li>
+<p>
+The book <a xlink:href="http://www.refactoring.com/"><i>Refactoring</i> by Martin
+Fowler</a> - not particularly about Perl, but still useful.
+</p>
+</li>
+
+<li>
+<p>
+The book
+<a xlink:href="http://pragprog.com/book/tpp/the-pragmatic-programmer"><i>The Pragmatic
+Programmer: From Journeyman to Master</i></a> - also not particularly about
+Perl, and I found it somewhat disappointing, but it is an informative book.
+</p>
+</li>
+
+<li>
+<p>
+Advice given by people on <a xlink:href="$(ROOT)/irc/#freenode">Freenode's #perl
+channel</a>, on the Perl Beginners mailing list, and on other Perl forums.
+</p>
+</li>
+
+</ol>
+
+</section>
+</body>
+</document>

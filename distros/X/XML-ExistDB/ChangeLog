@@ -1,0 +1,30 @@
+
+========= version history of XML::eXistDB
+
+version 0.14: Sat Jul 25 23:41:24 CEST 2015
+
+	Fixes:
+	- allow empty string for username and password [Alberto Simões]
+	- fix handling of undef values.
+
+version 0.13: Wed Jan 22 11:27:48 CET 2014
+
+	Improvements:
+	- use ::Cache::addPrefixes()
+	- change documentation style
+
+version 0.12: Tue Aug 28 11:13:19 CEST 2012
+	- fix upload() and uploadDocument() in various ways
+	  rt.cpan.org #77963 [Rik van den Eijnden]
+
+version 0.11: Thu Jun  3 11:42:33 CEST 2010
+	- fix autodect of filename in document upload.
+	  rt.cpan.org#56945 [Grégoire Montcheuil]
+	- repair trace() syntax problem caused by Log::Report code
+	  change.
+
+version 0.10: Thu Jan 14 13:00:13 CET 2010
+	- documentation fixes
+
+version 0.09: 2010-01-13 23:36
+	- initial

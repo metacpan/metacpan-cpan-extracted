@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<plants>
+	<flower colour="green">
+		<name>Arum apulum</name>
+	</flower>
+	<flower colour="green,brown">
+		<name>Arum discoridis</name>
+	</flower>
+</plants>

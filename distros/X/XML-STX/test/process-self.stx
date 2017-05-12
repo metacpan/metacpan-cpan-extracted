@@ -1,0 +1,32 @@
+<stx:transform version="1.0" 
+  xmlns:gr="http://my_groups"
+  xmlns:hr="http://my_groups"
+  xmlns:stx="http://stx.sourceforge.net/2002/ns"
+  strip-space="yes" pass-through="none">
+
+  <stx:template match="/root">
+    <a>
+      <stx:process-self/>
+    </a>
+  </stx:template>
+
+  <stx:template match="root">
+    <b>
+      <stx:process-self group="gr:G1"/>
+    </b>
+  </stx:template>
+
+  <stx:template match="*">
+    <c>FAILED</c>
+  </stx:template>
+
+  <stx:group name="hr:G1">
+
+    <stx:template match="*">
+      <c>OK</c>
+    </stx:template>
+
+  </stx:group>
+  
+
+</stx:transform>

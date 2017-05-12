@@ -1,0 +1,10 @@
+root
+/a/#id	/a/b/@att	/a/b/c	/a/z	/a/d/e	/r/commonR	/r/commonR/@att	/r/s	/r/s/@att2
+1		test0						
+2			wewer	testA				
+2			wewer	testB				
+2			wewer	testC				
+3	dsd	test1						
+					hehe	fef	tetst	
+					hehe	fef	tesr	wer
+

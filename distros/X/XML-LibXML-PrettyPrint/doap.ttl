@@ -1,0 +1,174 @@
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-bugs: <http://ontologi.es/doap-bugs#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://dev.perl.org/licenses/>
+	dc:title             "the same terms as the perl 5 programming language system itself".
+
+<http://purl.org/NET/cpan-uri/dist/XML-LibXML-PrettyPrint/project>
+	a                    doap:Project;
+	doap-bugs:issue      <http://purl.org/NET/cpan-uri/rt/ticket/71821>, <http://purl.org/NET/cpan-uri/rt/ticket/75752>, <http://purl.org/NET/cpan-uri/rt/ticket/90036>, <http://purl.org/NET/cpan-uri/rt/ticket/96000>;
+	doap-deps:runtime-requirement [ doap-deps:on "perl 5.008001"^^doap-deps:CpanId ], [ doap-deps:on "Exporter::Tiny"^^doap-deps:CpanId ], [ doap-deps:on "XML::LibXML 1.62"^^doap-deps:CpanId ];
+	doap-deps:test-requirement [ doap-deps:on "Test::More 0.96"^^doap-deps:CpanId ], [ doap-deps:on "Test::Warnings"^^doap-deps:CpanId ];
+	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=XML-LibXML-PrettyPrint>;
+	doap:created         "2011-10-19"^^xsd:date;
+	doap:download-page   <https://metacpan.org/release/XML-LibXML-PrettyPrint>;
+	doap:homepage        <https://metacpan.org/release/XML-LibXML-PrettyPrint>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      [
+		a foaf:Person;
+		foaf:mbox <mailto:tobyink@cpan.org>;
+		foaf:name "Toby Inkster";
+	];
+	doap:name            "XML-LibXML-PrettyPrint";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/XML-LibXML-PrettyPrint/v_0-001>, <http://purl.org/NET/cpan-uri/dist/XML-LibXML-PrettyPrint/v_0-002>, <http://purl.org/NET/cpan-uri/dist/XML-LibXML-PrettyPrint/v_0-003>, <http://purl.org/NET/cpan-uri/dist/XML-LibXML-PrettyPrint/v_0-004>, <http://purl.org/NET/cpan-uri/dist/XML-LibXML-PrettyPrint/v_0-005>, <http://purl.org/NET/cpan-uri/dist/XML-LibXML-PrettyPrint/v_0-006>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/tobyink/p5-xml-libxml-prettyprint>;
+	];
+	doap:shortdesc       "add pleasant whitespace to a DOM tree".
+
+<http://purl.org/NET/cpan-uri/dist/XML-LibXML-PrettyPrint/v_0-001>
+	a                    doap:Version;
+	rdfs:label           "Initial release";
+	dc:issued            "2011-10-20"^^xsd:date;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/XML-LibXML-PrettyPrint-0.001.tar.gz>;
+	doap:revision        "0.001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/XML-LibXML-PrettyPrint/v_0-002>
+	a                    doap:Version;
+	dc:issued            "2011-11-03"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Declare dependency on 'Pragmatic'."@en;
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "new_from_html constructor was exposing a private lexical variable that I didn't want to expose."@en;
+		], [
+			rdfs:label "Make elements with @property but no @content preserve whitespace in HTML."@en;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/XML-LibXML-PrettyPrint/v_0-001>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/XML-LibXML-PrettyPrint-0.002.tar.gz>;
+	doap:revision        "0.002"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/XML-LibXML-PrettyPrint/v_0-003>
+	a                    doap:Version;
+	dc:issued            "2012-03-15"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Handle CDATA nodes."@en;
+			doap-changeset:fixes <http://purl.org/NET/cpan-uri/rt/ticket/75752>;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/XML-LibXML-PrettyPrint/v_0-002>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/XML-LibXML-PrettyPrint-0.003.tar.gz>;
+	doap:revision        "0.003"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/XML-LibXML-PrettyPrint/v_0-004>
+	a                    doap:Version;
+	dc:issued            "2013-09-10"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			rdfs:label "In HTML, the <dl> element should be block, not compact."@en;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/XML-LibXML-PrettyPrint/v_0-003>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/XML-LibXML-PrettyPrint-0.004.tar.gz>;
+	doap:revision        "0.004"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/XML-LibXML-PrettyPrint/v_0-005>
+	a                    doap:Version;
+	dc:issued            "2014-09-07"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Bundle a command-line script called xml-pretty."@en;
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "use Dist::Inkt."@en;
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "Add repo link."@en;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/XML-LibXML-PrettyPrint/v_0-004>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/XML-LibXML-PrettyPrint-0.005.tar.gz>;
+	doap:revision        "0.005"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/XML-LibXML-PrettyPrint/v_0-006>
+	a                    doap:Version;
+	dc:issued            "2014-09-07"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Backport to Perl 5.8.1."@en;
+		], [
+			a doap-changeset:Tests;
+			rdfs:label "Rewrite test suite to use Test::Warnings instead of Test::Warn."@en;
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Inherit from Exporter::Tiny instead of Pragmatic."@en;
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Don't use parent.pm to establish inheritance."@en;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/XML-LibXML-PrettyPrint/v_0-005>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/XML-LibXML-PrettyPrint-0.006.tar.gz>;
+	doap:revision        "0.006"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/ALTREUS>
+	a                    foaf:Agent;
+	foaf:mbox            <mailto:ALTREUS@cpan.org>.
+
+<http://purl.org/NET/cpan-uri/person/dhorne>
+	a                    foaf:Agent;
+	foaf:mbox            <mailto:dhorne@cpan.org>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/71821>
+	a                    doap-bugs:Issue;
+	rdfs:label           "Not memory-efficient for large files";
+	dc:created           "2011-10-20T20:20:37+01:00"^^xsd:dateTime;
+	dc:reporter          [ a foaf:Agent; foaf:mbox <mailto:rr@yopmail.com> ];
+	doap-bugs:id         "71821";
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=71821>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/rejected>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/75752>
+	a                    doap-bugs:Issue;
+	rdfs:label           "Warning on CDATA";
+	dc:created           "2012-03-13T22:47:25Z"^^xsd:dateTime;
+	dc:reporter          <http://purl.org/NET/cpan-uri/person/dhorne>;
+	doap-bugs:id         "75752";
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=75752>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/90036>
+	a                    doap-bugs:Issue;
+	rdfs:label           "repo metadata not detected by metacpan or search.cpan.org";
+	dc:created           "2013-11-04T12:12:27Z"^^xsd:dateTime;
+	dc:reporter          [
+		a foaf:Agent;
+		foaf:mbox <mailto:dsteinbrunner@pobox.com>;
+	];
+	doap-bugs:id         "90036";
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=90036>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/96000>
+	a                    doap-bugs:Issue;
+	rdfs:label           "Utility function, pretty_file";
+	dc:created           "2014-05-27T13:26:32+01:00"^^xsd:dateTime;
+	dc:reporter          <http://purl.org/NET/cpan-uri/person/ALTREUS>;
+	doap-bugs:id         "96000";
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=96000>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/open>.
+

@@ -1,0 +1,58 @@
+<refentry id='prolog'>
+  <?dbhtml filename='prolog.html' ?>
+
+  <refentryinfo>
+    <!-- TMPL_IF NAME="date" --><pubdate><!-- TMPL_VAR NAME="date" --></pubdate><!-- /TMPL_IF -->
+    <bibliomisc>Page g&eacute;n&eacute;r&eacute;e par dtd2db</bibliomisc>
+  </refentryinfo>
+
+  <refmeta>
+    <indexterm>
+      <primary>prolog</primary>
+      <secondary><!-- TMPL_VAR NAME="name" --></secondary>
+    </indexterm>
+    <refentrytitle><!-- TMPL_VAR NAME="name" --></refentrytitle>
+    <refmiscinfo><!-- TMPL_VAR NAME="generator" --></refmiscinfo>
+  </refmeta>
+
+  <refnamediv>
+    <refname><!-- TMPL_VAR NAME="name" --></refname>
+    <refpurpose>&prolog.<!-- TMPL_VAR NAME="name" -->.brief;</refpurpose>
+  </refnamediv>
+
+  <refsynopsisdiv>
+    <title>Synopsis</title>
+    <informaltable frame='all'>
+      <tgroup cols='3'>
+        <colspec colnum='1' colname='c1'/>
+        <colspec colnum='2' colname='c2'/>
+        <colspec colnum='3' colname='c3'/>
+        <tbody>
+          <row rowsep='1'>
+            <entry align='left'><emphasis>Nom</emphasis></entry>
+<!-- TMPL_IF NAME="publicId" -->
+            <entry align='left'><emphasis>Public</emphasis></entry>
+<!-- /TMPL_IF -->
+<!-- TMPL_IF NAME="systemId" -->
+            <entry align='left'><emphasis>Syst&egrave;me</emphasis></entry>
+<!-- /TMPL_IF -->
+          </row>
+          <row rowsep='1'>
+            <entry align='left'><!-- TMPL_VAR NAME="name" --></entry>
+<!-- TMPL_IF NAME="publicId" -->
+            <entry align='left'><!-- TMPL_VAR NAME="publicId" --></entry>
+<!-- /TMPL_IF -->
+<!-- TMPL_IF NAME="systemId" -->
+            <entry align='left'><!-- TMPL_VAR NAME="systemId" --></entry>
+<!-- /TMPL_IF -->
+          </row>
+        </tbody>
+      </tgroup>
+    </informaltable>
+  </refsynopsisdiv>
+
+  <refsect1>
+    &prolog.<!-- TMPL_VAR NAME="name" -->.desc;
+  </refsect1>
+</refentry>
+

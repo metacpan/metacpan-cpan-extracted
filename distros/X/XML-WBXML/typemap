@@ -1,0 +1,88 @@
+WB_UTINY *    T_PV
+WBXMLAttribute *				T_PTROBJ
+WBXMLAttribute **				T_PTROBJ
+WBXMLAttributeName *				T_PTROBJ
+WBXMLBuffer *					T_PTROBJ
+WBXMLBuffer **					T_PTROBJ
+WBXMLContentHandler *				T_PTROBJ
+WBXMLConvWBXML2XMLParams *			T_PTROBJ
+WBXMLConvXML2WBXMLParams *			T_PTROBJ
+WBXMLEncoder *					T_PTROBJ
+WBXMLEncoderXMLGenType				T_PTROBJ
+WBXMLError					T_PTROBJ
+WBXMLLanguage					T_PTROBJ
+WBXMLList *					T_PTROBJ
+WBXMLListEltCleaner * destructor		T_PTROBJ
+WBXMLParser *					T_PTROBJ
+WBXMLTag *					T_PTROBJ
+WBXMLTree *					T_PTROBJ
+WBXMLTree **					T_PTROBJ
+WBXMLTreeAttribute *				T_PTROBJ
+WBXMLTreeNode *					T_PTROBJ
+WBXMLTreeNodeType				T_PTROBJ
+WBXMLValueType					T_PTROBJ
+WBXMLVersion					T_PTROBJ
+char * const *					T_PTROBJ
+const WBXMLAttrEntry *				T_PTROBJ
+const WBXMLExtValueEntry *			T_PTROBJ
+const WBXMLLangEntry *				T_PTROBJ
+const WBXMLNameSpaceEntry *			T_PTROBJ
+const WBXMLTagEntry *				T_PTROBJ
+const char *					T_PTROBJ
+const fpos_t *					T_PTROBJ
+const struct rlimit *				T_PTROBJ
+const unsigned char *				T_PTROBJ
+const unsigned char **				T_PTROBJ
+const void *					T_PTROBJ
+const wchar_t *					T_PTROBJ
+dev_t						T_IV
+div_t						T_OPAQUE_STRUCT
+double [ ]					T_PTROBJ
+fpos_t						T_NV
+fpos_t ( * ) ( void *, fpos_t, int )		T_PTROBJ
+fpos_t *					T_PTROBJ
+id_t						T_UV
+idtype_t					T_PTROBJ
+int ( * ) ( const void *, const void * )	T_PTROBJ
+int ( * ) ( void * )				T_PTROBJ
+int ( * ) ( void *, char *, int )		T_PTROBJ
+int ( * ) ( void *, const char *, int )		T_PTROBJ
+int ( * ) ( void *, const void *, const void * )	T_PTROBJ
+int *						T_PTROBJ
+ldiv_t						T_OPAQUE_STRUCT
+lldiv_t						T_OPAQUE_STRUCT
+long *						T_PTROBJ
+long long					T_NV
+mode_t						T_UV
+pid_t						T_IV
+siginfo_t *					T_PTROBJ
+size_t *					T_PTROBJ
+struct rlimit *					T_PTROBJ
+struct rusage *					T_PTROBJ
+u_int32_t					T_UV
+unsigned *					T_PTROBJ
+unsigned char **				T_PTROBJ
+unsigned int *					T_PTROBJ
+unsigned long long				T_NV
+unsigned short *				T_PTROBJ
+unsigned short [ 3 ]				T_PTROBJ
+unsigned short [ 7 ]				T_PTROBJ
+void ( * ) ( void )				T_PTROBJ
+#############################################################################
+INPUT
+T_OPAQUE_STRUCT
+	if (sv_derived_from($arg, \"${ntype}\")) {
+	    STRLEN len;
+	    char  *s = SvPV((SV*)SvRV($arg), len);
+
+	    if (len != sizeof($var))
+		croak(\"Size %d of packed data != expected %d\",
+			len, sizeof($var));
+	    $var = *($type *)s;
+	}
+	else
+	    croak(\"$var is not of type ${ntype}\")
+#############################################################################
+OUTPUT
+T_OPAQUE_STRUCT
+	sv_setref_pvn($arg, \"${ntype}\", (char *)&$var, sizeof($var));

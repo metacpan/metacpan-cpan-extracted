@@ -1,0 +1,44 @@
+Revision history for Perl extension XML::SimpleObject.
+
+0.1  Mon Feb  5 14:54:38 2001
+	- original version; created by h2xs 1.19
+
+0.2  Fri Feb  8 01:07:32 2001
+        - fixed documentation typos, thanks Michel
+	- children_names() willl return an array of child element names for a 
+          given element
+        - children() called without an argument returns an array of all 
+          children element objects (though not in any particular order)
+
+0.3  Mon Apr  16 10:20:04 2001
+        - fixed children() bugs
+        - fixed name() accessor within 'foreach ($obj->children)' loops
+
+0.4  Sat Jul 7 2001
+        - changed element treatment to allow all characters (thanks to Pekka 
+          Ahmavuo)
+
+0.41  Fri Aug 24 2001
+        - changed to allow parsing without separate XML::Parser object
+        - changed to handle empty elements properly; thanks to Thomas Ziehmer
+        - changed convert() implementation to allow zero values and some flow 
+          enhancements; thanks to Eric Kolve
+
+0.5  Wed Jan 23 2002
+	- added XML::SimpleObject::LibXML providing the same interface using 
+	  XML::LibXML; it's faster and uses the libxml DOM methods rather 
+	  than iterating the tree twice. See the separate perldoc for this
+	  module.
+
+0.51  Sat Jan 26 2002
+	- fixed Makefile.PL to include dependencies
+
+0.52  Tue Mar 6 2003
+	- applied patch to SimpleObject.pm to permit inheritance (thanks to 
+          Cliff Stanford)
+	- fixed changes with libxml 1.53 to work with constant XML_TEXT_NODE
+        - added XML::SimpleObject::Enhanced.pm (need to document)
+
+0.53  Tue Mar 6 2003
+	- bad dist fix
+

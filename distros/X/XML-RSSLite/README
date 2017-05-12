@@ -1,0 +1,48 @@
+
+	THIS VERSION BREAKS BACKWARDS COMPATIBILITY
+	It is very similar and should require only minor changes,
+	but it is not a drop-in upgrade.
+
+          parseXML is now parseRSS
+
+Okay, apparently a few people actually use this, so I should probably release
+a new version. I've actually had this done for almost a year now but I wanted
+to write a real test suite for it, maybe next time. Instead, all I can say is
+I've been *using* it for the last year without a problem. Please provide me
+with a copy of any document wish it chokes on when making a bug report.
+
+=============================================================================
+
+XML::RSSLite is a meant as a relaxed parser+,* and lightweight+,++
+replacement for XML::RSS. In fact, it contains a generic lightweight
+XML pseudo-parser** that can be used for other content.
+
+For RSS/RDF/weblog/Scripting News content parseRSS does the following:
+
+    o Remove html tags to leave plain text
+
+    o Remove characters other than 0-9~!@#$%^&*()-+=a-zA-Z[];',.:"<>?\s
+
+    o Use <url> tags when <link> is empty
+
+    o Use misplaced urls in <title> when <link> is empty
+
+    o Exract links from <a href=...> if required   
+
+    o Limit links to ftp and http
+
+    o Join relative urls to the site base
+
+If you can make a convincing argument against any of these behaviors they
+may be relaxed. Otherwise, you might use parseXML.
+
++     Under certain circumstances; not valid during leap years, full
+      moons, high tides, vernal equinoxes, or Wednesdays. YMMV.
+
+*     We hope, the new parser may be too strict, please provide samples
+      of content which you believe should parse but does not.
+
+++    The new found "correctness" comes at a performance cost, it is
+      slower than prior versions, but still faster than XML::RSS.
+
+**    Not fully compliant with the W3C specifications.

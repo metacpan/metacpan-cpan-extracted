@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- $Id: testSuite.rng,v 1.12 2003/01/29 12:24:07 jjc Exp $ -->
+<grammar xmlns="http://relaxng.org/ns/structure/1.0"
+    xmlns:fic="http://web-cpan.berlios.de/modules/XML-Grammar-Fortune/fiction-xml-0.2/"
+    xmlns:xlink="http://www.w3.org/1999/xlink"
+    datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes"
+    >
+    <start>
+        <element name="fic:document">
+            <ref name="common_attrs" />
+            <attribute name="version">
+                <text />
+            </attribute>
+            <element name="fic:head">
+                <empty/>
+            </element>
+            <element name="fic:body">
+                <ref name="common_attrs" />
+                <ref name="title" />
+                <oneOrMore>
+                    <ref name="section" />
+                </oneOrMore>
+            </element>
+        </element>
+    </start>
+    <define name="common_attrs">
+        <optional>
+            <attribute name="xml:id">
+                <data type="ID"/>
+            </attribute>
+        </optional>
+        <optional>
+            <attribute name="xml:lang">
+                <data type="NCName" />
+            </attribute>
+        </optional>
+        <optional>
+            <attribute name="xlink:href">
+                <data type="anyURI"/>
+            </attribute>
+        </optional>
+    </define>
+    <define name="section">
+        <element name="fic:section">
+            <ref name="common_attrs" />
+            <ref name="title" />
+            <ref name="several_paras" />
+            <zeroOrMore>
+                <ref name="section" />
+            </zeroOrMore>
+        </element>
+    </define>
+    <define name="several_paras">
+        <zeroOrMore>
+            <choice>
+                <ref name="blockquote"/>
+                <ref name="para"/>
+                <ref name="ol"/>
+                <ref name="ul"/>
+                <ref name="programlisting"/>
+            </choice>
+        </zeroOrMore>
+    </define>
+    <define name="inside_list">
+        <oneOrMore>
+            <ref name="li" />
+        </oneOrMore>
+    </define>
+    <define name="ol">
+        <element name="fic:ol">
+            <ref name="inside_list" />
+        </element>
+    </define>
+    <define name="ul">
+        <element name="fic:ul">
+            <ref name="inside_list" />
+        </element>
+    </define>
+    <define name="blockquote">
+        <element name="fic:blockquote">
+            <ref name="common_attrs" />
+            <ref name="several_paras"/>
+        </element>
+    </define>
+    <define name="li">
+        <element name="fic:li">
+            <oneOrMore>
+                <ref name="para" />
+            </oneOrMore>
+        </element>
+    </define>
+    <define name="para">
+        <element name="fic:p">
+            <zeroOrMore>
+                <choice>
+                    <ref name="text_with_style" />
+                    <ref name="span" />
+                </choice>
+            </zeroOrMore>
+        </element>
+    </define>
+    <define name="text_with_style">
+        <choice>
+            <text />
+            <ref name="b" />
+            <ref name="i" />
+        </choice>
+    </define>
+    <define name="span">
+        <element name="fic:span">
+            <ref name="common_attrs" />
+            <oneOrMore>
+                <ref name="text_with_style" />
+            </oneOrMore>
+        </element>
+    </define>
+    <define name="b">
+        <element name="fic:b">
+            <text />
+        </element>
+    </define>
+    <define name="i">
+        <element name="fic:i">
+            <text />
+        </element>
+    </define>
+    <define name="title">
+        <element name="fic:title">
+            <text />
+        </element>
+    </define>
+    <define name="programlisting">
+        <element name="fic:programlisting">
+            <text />
+        </element>
+    </define>
+</grammar>
+

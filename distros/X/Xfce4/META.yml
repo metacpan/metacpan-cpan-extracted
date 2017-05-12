@@ -1,0 +1,14 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Xfce4
+version:      0.001
+version_from: Xfce4.pm
+installdirs:  site
+requires:
+    ExtUtils::Depends:             0.2
+    ExtUtils::PkgConfig:           1.03
+    Glib:                          1.081
+    Gtk2:                          1.081
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.21

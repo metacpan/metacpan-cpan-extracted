@@ -1,0 +1,61 @@
+Revision history for Perl extension Sablotron.
+
+0.98 
+	- SXP DOMHandler interface added
+	- module layout reorganized
+
+0.97 Mon Dec 30 14:29:00 2002
+	- changes related to the development of Sablotron
+	- mapping of namespaces added to xql() function (DOM)
+	
+0.80 Thu Jan 10 12:38:00 2002
+	- XML::Sablotron::Situation::setOptions added
+	- JavaScript may be linked (Makefile.PL)
+
+0.70 Wed Sep 19 10:13:00 2001
+	- XML::Sablotron::SAXBuiler added
+
+0.61 Wed Jun 16 11:26:00 2001
+	- DOM.pm modified so it may be used w/ perl 5.005_03
+
+0.60 Wed Jun 13 15:00:00 2001
+	- introduced a subset of DOM level 1
+	  (see perldoc XML::Sablotron::DOM)
+	- new API for XML::Sablotron processor
+  	  (see perldoc XML::Sablotron)
+
+0.50 Wed Dec 20 09:17:00 2000
+	- to be used with new version of Expat (> 1.95)
+	- Set/GetContentType
+	- Set/GetEncoding
+	- SetOutputEncoding
+	- memory leak related to the releasing of handlers fixed
+
+0.42 Thu Jul 19 14:40:00 2000
+	- SetBaseForScheme
+	- Miscellaneous handler support (document info)
+
+
+0.41 Thu Jul 11 16:00:00 2000
+	- -s and -c switches for Makefile.PL
+	- -DPERL_POLLUTE for Perl 5.6
+	- problem with <malloc.h> fixed (NT and PERL_OBJECT)
+
+0.40  Thu Jun 29 18:00:00 2000
+	- new object interface
+	- messages handler support
+	- scheme handler support
+	- RegMessageHandler deprecated
+	- UnregMessageHandler deprecated
+
+
+0.35  Thu May 17 16:40:00 2000
+	- 'Sablot' prefix removed from function names
+	- POD documnetation updated
+	- message (and error) handler support
+
+0.34  Tue May 09 18:00:00 2000
+	- version changed according to Sablotron release
+
+0.01  Fri Dec 31 09:07:45 1999
+	- original version; created by h2xs 1.19

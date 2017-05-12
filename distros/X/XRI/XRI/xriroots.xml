@@ -1,0 +1,29 @@
+<roots>
+  <XRIDescriptor xmlns="xri:$r.s/XRIDescriptor">
+    <Resolved>@</Resolved>
+    <XRIAuthority>
+      <URI>http://devat.registry.idcommons.net</URI>
+    </XRIAuthority>
+  </XRIDescriptor>
+
+  <XRIDescriptor xmlns="xri:$r.s/XRIDescriptor">
+    <Resolved>=</Resolved>
+    <XRIAuthority>
+      <URI>http://devequals.registry.idcommons.net</URI>
+    </XRIAuthority>
+  </XRIDescriptor>
+
+  <XRIDescriptor xmlns="xri:$r.s/XRIDescriptor">
+    <Resolved>*</Resolved>
+    <XRIAuthority>
+      <URI>http://dev.idcommons.net/xri/auth/user</URI>
+    </XRIAuthority>
+  </XRIDescriptor>
+
+  <XRIDescriptor xmlns="xri:$r.s/XRIDescriptor">
+    <Resolved>(mailto:user@example.com)</Resolved>
+    <XRIAuthority>
+      <URI>http://dev.idcommons.net/xri/auth/user</URI>
+    </XRIAuthority>
+  </XRIDescriptor>
+</roots>

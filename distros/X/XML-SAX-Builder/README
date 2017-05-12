@@ -1,0 +1,33 @@
+XML::SAX::Builder
+=================
+
+This is yet another module to attempt to make generation of XML
+documents easier than the corresponding print statements...  In
+particular, this implementation attempts to play nicely with SAX
+pipelines and handle namespaces correctly.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Test::More (any version )
+  XML::NamespaceSupport (any version)
+  XML::SAX::Writer (any version)
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 Dominic Mitchell
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+
+@(#) $Id: README,v 1.1 2003/04/12 23:58:58 dom Exp $

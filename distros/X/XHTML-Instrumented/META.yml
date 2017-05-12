@@ -1,0 +1,30 @@
+---
+name: XHTML-Instrumented
+version: 0.092
+author:
+  - '"G. Allen Morris III" <gam3@gam3.net>'
+abstract: packages to control XHTML
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Params::Validate: 0
+  XML::Parser: 0
+  perl: 5.6.0
+build_requires:
+  Test::Warn: 0
+  Test::XML: 0
+  Test::XML::Order: 0.03
+provides:
+  XHTML::Instrumented:
+    file: lib/XHTML/Instrumented.pm
+    version: 0.092
+  XHTML::Instrumented::Form:
+    file: lib/XHTML/Instrumented/Form.pm
+    version: 0.09
+  XHTML::Instrumented::Form::Control:
+    file: lib/XHTML/Instrumented/Form/Control.pm
+generated_by: Module::Build version 0.280801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

@@ -1,0 +1,35 @@
+---
+abstract: 'OPDS (Open Publication Distribution System) feed creation'
+author:
+  - 'Marco Pessotto <melmothx@gmail.com>'
+build_requires:
+  Test::Differences: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: XML-OPDS
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Data::Page: '0'
+  DateTime: '0'
+  DateTime::Format::RFC3339: '0'
+  Moo: '1'
+  Type::Tiny: '1'
+  URI: '0'
+  XML::Atom: '0.41'
+  perl: '5.008'
+resources:
+  IRC: irc://chat.freenode.net/#amusewiki
+  WebIRC: https://webchat.freenode.net/?channels=#amusewiki
+  homepage: http://amusewiki.org
+  repository: https://github.com/melmothx/libxml-opds-perl
+version: '0.05'

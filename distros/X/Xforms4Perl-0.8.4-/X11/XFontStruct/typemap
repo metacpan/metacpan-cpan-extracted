@@ -1,0 +1,16 @@
+TYPEMAP
+XFontStruct *	T_XFont
+Font		T_IV
+#############################################################################
+INPUT
+T_XFont
+	if (sv_isa($arg, \"X11::XFontStruct\")) {
+	    IV tmp = SvIV((SV*)SvRV($arg));
+	    $var = ($type) tmp;
+	}
+	else
+	    croak(\"$var is not of type X11::XFontStruct\")	
+#############################################################################
+OUTPUT
+T_XFont
+	sv_setref_pv($arg, \"X11::XFontStruct\", (void*)$var);

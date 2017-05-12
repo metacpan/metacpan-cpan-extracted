@@ -1,0 +1,129 @@
+=encoding utf8
+
+=head1 NAME
+
+XML::Compile::WSS::Sign - Base for WSS Signers
+
+=head1 INHERITANCE
+
+ XML::Compile::WSS::Sign is extended by
+   XML::Compile::WSS::Sign::HMAC
+   XML::Compile::WSS::Sign::RSA
+
+=head1 SYNOPSIS
+
+  # either
+  use XML::Compile::WSS::Util qw/DSIG_RSA_SHA1/;
+  my $sign = XML::Compile::WSS::Sign->new
+    ( sign_method => DSIG_RSA_SHA1
+    , private_key => $key
+    , ...
+    );
+
+  # or
+  use XML::Compile::WSS::Sign::RSA;
+  my $sign = XML::Compile::WSS::Sign::RSA->new
+    ( hashing     => 'SHA1'
+    , private_key => $key
+    , ...
+    );
+
+=head1 DESCRIPTION
+
+=head2 Supported signers
+
+=over 4
+
+=item * RSA
+
+=back
+
+Hire me to implement other signers!
+
+=head1 METHODS
+
+=head2 Constructors
+
+=over 4
+
+=item XML::Compile::WSS::Sign-E<gt>B<fromConfig>(HASH|PAIRS)
+
+Try to be very flexible.  CONFIG can be a HASH, which could also be
+passed to L<new()|XML::Compile::WSS::Sign/"Constructors"> directly.  But it can also be various kinds of
+objects.
+
+=item XML::Compile::WSS::Sign-E<gt>B<new>(%options)
+
+ -Option     --Default
+  sign_method  DSIG_RSA_SHA1
+
+=over 2
+
+=item sign_method => TYPE
+
+=back
+
+=back
+
+=head2 Attributes
+
+=over 4
+
+=item $obj-E<gt>B<signMethod>()
+
+=back
+
+=head2 Handlers
+
+=over 4
+
+=item $obj-E<gt>B<builder>()
+
+=item $obj-E<gt>B<checker>()
+
+=back
+
+=head1 DETAILS
+
+=head2 Signing, the generic part
+
+The base of this whole security protocol is crypto-signing the messages,
+so you will always need to specify some parameters for L<new()|XML::Compile::WSS::Sign/"Constructors">.
+
+  my $wss  = XML::Compile::WSS::Signature->new
+    ( signer => DSIG_$algo
+    , ...parameters for $algo...
+    );
+
+When the algorithm is known (see the next sections of this chapter),
+then the parameters will be used to produce the CODE which will do the
+signing.
+
+=head2 Defend against man-in-the-middle
+
+The signature can easily be spoofed with a man-in-the-middle attack,
+unless you hard-code the remote's public key.
+
+  my $wss  = XML::Compile::WSS::Signature->new
+    ( ...
+    , remote_token          => $token
+    );
+
+=head1 SEE ALSO
+
+This module is part of XML-Compile-WSS-Signature distribution version 2.02,
+built on July 16, 2016. Website: F<http://perl.overmeer.net/xml-compile/>
+
+Please post questions or ideas to the mailinglist at
+F<http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/xml-compile> .
+For live contact with other developers, visit the C<#xml-compile> channel
+on C<irc.perl.org>.
+
+=head1 LICENSE
+
+Copyrights 2012-2016 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

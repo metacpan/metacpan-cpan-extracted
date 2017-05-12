@@ -1,0 +1,91 @@
+==============================
+XML/RSS/FOXSports version 0.02
+==============================
+
+XML::RSS::FOXSports is an XML::RSS::Parser subclass providing an 
+object oriented interface to FOXSports.com RSS 2.0 feeds.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+   
+FOXSPORTS.COM FEED USAGE
+
+Please see the FOXSports.com RSS feeds website (http://msn.foxsports.com/story/2005035) 
+for terms of use of their content. From FOXSports.com website:
+
+  By providing content summaries along with the URL's for the specific articles, 
+  subscribers have the ability to simply preview the article or click through to 
+  the content provider and read it in its entirety.
+
+  What kind of content does FOXSports.com syndicate via RSS?
+  FOXSports.com offers its viewers the ability to subscribe to 
+  feeds based on their individual interests. If you're a die-hard 
+  sports fan who doesn't want to miss a beat, or a casual enthusiast 
+  who simply enjoys reading the headlines, then we recommend subscribing 
+  to some of the following feeds. The feeds are free of charge to 
+  use for individuals and non-profit organizations for non-commercial 
+  use. Attribution (included in each feed) is required.
+  
+LEAGUES AND TEAMS AVAILABLE IN VERSION 0.02
+
+When requesting a team feed, the requested team must be in the requested league.
+Therefore this method call will throw a die: $fsp->parse_team('MLS', 'giants')
+
+  MLS 
+    los_angeles      dc_united     columbus
+    chicago          san_jose      fc_dallas
+    real_salt_lake   colorado      metrostars
+    new_england      kansas_city   chivas_usa 
+
+  MLB
+    angels    astros      athletics   blue_jays    braves     
+    brewers   cardinals   cubs        devil_rays   diamondbacks 
+    dodgers   giants      indians     mariners     marlins   
+    mets      nationals   orioles     padres       phillies 
+    pirates   rangers     red_sox     reds         rockies  
+    royals    tigers      twins       white_sox    yankees
+
+  NFL
+    forty_niners   bears        bengals     bills      broncos
+    browns         buccaneers   cardinals   chargers   chiefs
+    colts          cowboys      dolphins    eagles     falcons
+    giants         jaguars      jets        lions      packers
+    panthers       patriots     raiders     rams       ravens
+    redskins       saints       seahawks    steelers   texans
+    titans         vikings
+   
+  NBA 
+    sixers        bobcats        bucks           bulls      cavaliers
+    celtics       clippers       grizzlies       hawks      heat              
+    hornets       jazz           kings           knicks     lakers            
+    magic         mavericks      nets            nuggets    pacers            
+    pistons       raptors        rockets         spurs      suns              
+    supersonics   timberwolves   trail_blazers   warriors   wizards
+  
+  NHL
+    avalanche   blackhawks    blue_jackets   blues       bruins           
+    canadiens   canucks       capitals       coyotes     devils           
+    flames      flyers        hurricanes     islanders   kings            
+    lightning   maple_leafs   mighty_ducks   oilers      panthers         
+    penguins    predators     rangers        red wings   sabres           
+    senators    sharks        stars          thrashers   wild
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  XML::Parser XML::RSS::Parser 2.15  Class::XPath 1.4
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) Brian Perez 2005. All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

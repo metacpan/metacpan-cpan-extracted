@@ -1,0 +1,12 @@
+[%# <pkgvar>$XYZ</pkgvar>	         => #pkgvar_XYZ
+  # <pkgvar refid="$XYZ">blah</pkgvar>   => #pkgvar_XYZ
+  # <pkgvar var="$XYZ">blah</pkgvar>     => #pkgvar_XYZ
+  # <pkgvar class="Template::Stash">$XYZ</method>
+  #         => classlink("Template::Stash")#pkgvar_XYZ
+  # <pkgvar var="$XYZ" class="Template::Stash">blah</method>
+  #         => classlink("Template::Stash")#pkgvar_XYZ
+-%]
+[%- prefix = item.class ? classurl(item.class) : '';
+    pkgvar = item.refid or item.var or item.content(site.view.text);
+    pkgvar = pkgvar.replace('\W+', '') ;
+-%]<a href="[% prefix %]#pkgvar_[% pkgvar %]">[% item.content(view) | trim %]</a>

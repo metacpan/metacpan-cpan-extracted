@@ -1,0 +1,5 @@
+0.71 - released
+0.72 - minor documentation changes. (it broke on CPAN ... :( )
+
+0.80 - made sure this also works with a 'broken' Text::Iconv
+	

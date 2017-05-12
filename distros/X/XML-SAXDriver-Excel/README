@@ -1,0 +1,39 @@
+Module: XML::SAXDriver::Excel
+
+Description:
+    XML::SAXDriver::Excel provides a SAX interface to easily transform Excel documents into XML.  
+    The module uses Spreadsheet::ParseExcel to parse Excel files and simultaneously write out XML data.  
+    XML::SAXDriver::Excel allows to create your own Spreadsheet::ParseExcel object with defaults that 
+    fit your needs or just use defaults.  There will be more handlers added later (ex. DTD, etc...).  
+    This module complements the XML::Excel module and should be used to provide a lightweight SAX
+    interface which enhances performance and well as decreases the memory foot mark.  
+    
+Copying:
+    Copyright (c) 2001 Ilya Sterin. All rights reserved.
+
+    This program is free software; you can redistribute it and/or modify
+    it under the same terms as Perl itself.
+
+Prerequisites:
+    perl 5.002
+    Spreadsheet::ParseExcel
+    
+    Other Prerequisites:
+    Although you can install and run without, these module(s) are needed to pass as handlers to XML::SAXDriver::Excel
+    
+    XML::Handler::YAWriter 
+    
+Build/Installation:
+    Standard build/installation supported by ExtUtils::MakeMaker(3)...
+	perl Makefile.PL
+	make
+	make test
+	make install
+	
+	(If you don't have a c compiler, you can optionaly place the file Excel.pm in the XML/SAXDriver/CSV
+	directory in the perl include directory)
+
+Author:
+    Ilya Sterin <isterin@cpan.org>
+    
+

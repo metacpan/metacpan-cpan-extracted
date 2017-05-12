@@ -1,0 +1,9 @@
+Revision history for Perl extension XML::DB::DatabaseManager.
+
+0.01  Sun May 19 22:27:12 2002
+	- original version; created by ExtUtils::ModuleMaker 0.20102
+	- released 2002-07-17 with drivers for exist0.8 (patched), xindice 1.0
+	  and simple file sytem.
+0.02  2003-30-01
+	- exist driver upgraded for version 0.9 and general minor tweaks
+

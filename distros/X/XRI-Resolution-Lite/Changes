@@ -1,0 +1,17 @@
+Revision history for XRI-Resolution-Lite
+
+0.04  Tue Feb 22 13:13:12 2011  
+
+  * Remove dead xri resolver in tests
+  * Use Carp instead of Carp::Clan
+  * Use parent instead of base
+
+0.02  2008-08-15 / 15:50
+
+  * Add resolution output format flags at third arguments of resolve() methods 
+  * Specified output format "text/uri-list", it is returned as ARRAY or ARRAYREF.
+
+0.01  2008-05-15 / 16:34
+
+  * First version, released on an unsuspecting world.
+

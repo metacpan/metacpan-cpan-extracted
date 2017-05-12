@@ -1,0 +1,243 @@
+=head1 NAME
+
+XML::Comma FAQ - frequently asked questions about XML::Comma
+
+=head1 DESCRIPTION
+
+XML::Comma is an information management platform. It was designed to
+be used as a core tool for developing Very Large Websites. Comma
+specifies an XML-based document definition format, encourages Perl
+code to be embedded in these definitions, and specifies an API for
+manipulating documents and document collections. Comma includes
+functionality to store sets of documents in ordered, extensible ways,
+and integrates with a relational database to index, sort and retrieve
+collections of documents.
+
+=head1 BASIC INFORMATION
+
+=head2 How is XML::Comma licensed and distributed?
+
+XML::Comma is Free Software released under the GNU General Public
+License. For more information about the license, please see
+http://www.fsf.org/licenses/gpl.html
+
+Comma is distributed as a Perl module. The most recent version is
+always available at http://xml-comma.org/download/
+
+=head2 Is there an XML::Comma web site?
+
+Yes. http://xml-comma.org/
+
+=head2 Is there an XML::Comma mailing list?
+
+Yes. Please see http://xml-comma.org/mailing-list.html
+
+=head2 What documentation is available?
+
+The B<XML::Comma User's Guide> describes the Comma API in detail. It
+is available in HTML and PDF. The Guide can be found in the C<Comma/docs>
+directory of the distribution, or at:
+
+  http://xml-comma.org/guide-filter.html
+  http://xml-comma.org/guide.pdf
+
+=head1 CONFIGURATION QUESTIONS
+
+=head2 Some indexing.t tests are failing on a new XML::Comma install using MySQL; what's going on?
+
+Comma relies on MySQL's "USE DATA LOCAL" function, which has been
+disabled by default in MySQL versions 3.23.48 and greater. This change
+to MySQL breaks a few of the indexing tests. MySQL can be recompiled
+with the option "--enable-local-infile" to turn back on the LOCAL
+functionality. Or mysqld can be started with the argument
+"--local-infile=1". See the following piece of MySQL documentation:
+
+  http://www.mysql.com/doc/en/LOAD_DATA_LOCAL.html
+
+You may also need to pass 'mysql_local_infile=1' as an argument in the
+data source name you use to connect (via the DBI modules) to
+MySQL. The dsn is specified in the Comma/Configuration.pm file. 
+
+=head2 I'm trying to use the SimpleC parser.  Why am I getting all of these "BEGIN failed--compilation aborted" error messages when I try to start Apache?
+
+As stated in mod_perl documentation at
+http://perl.apache.org/docs/1.0/guide/troubleshooting.html#foo_____at__dev_null_line_0,
+there is no file associated with a handler from mod_perl's
+perspective, so $0 is set to C</dev/null>.
+
+If a pre-compiled version of the SimpleC parser is not found by
+Inline, Inline tries (using the FindBin module) to figure out its
+"current working directory." FindBin croaks when $0 is set to
+C</dev/null>, which causes Apache to abort the startup process.
+
+You can get a compiled version of the parser in the right spot by
+simply invoking
+
+  perl -MXML::Comma -e ''
+
+from a command line. Comma asks Inline to install its compiled files
+below C<XML::Comma-E<gt>tmp_directory>.
+
+If you are worried about your pre-compiled parser being clobbered
+between apache restarts (for example because your tmp_directory is
+C</tmp>), you can add a
+
+  BEGIN { $0 = "/path/to/handler" }
+
+block to your handler script, which will prevent FindBin from
+croaking, and allow Inline's compilation step to proceed normally.
+
+
+=head1 CODE QUESTIONS
+
+=head2 What's the difference between $foo->bar() and $foo->element('bar')->get()?
+
+This is really a question about Comma's "shortcut" syntax, which
+defines a mapping between method calls and the elements of a given
+container.
+
+There is a section on the shortcut syntax in the guide that goes into
+more detail, but here is a quick list of the seven possible ways a
+shortcut can can be resolved.
+
+  $x->foo ( [@args] )                  # becomes:
+  $x->method('foo, @args)              # if there is a method "foo"
+  $x->element('foo')                   # singular, nested
+  $x->elements('foo')                  # plural, nested
+  $x->element('foo')->get()            # singular, non-nested, no @args 
+  $x->element('foo')->set(@args)       # singular, non-nested, with @args
+  $x->elements_group_get('foo')        # plural, nested, no @args
+  $x->elements_group_set('foo', @args) # plural, nested, with @args
+
+=head2 How do I tell how many instances of a given plural element exist?
+
+Because the elements() method always tries to return a "list" of
+elements -- which means that it returns an array in list context and a
+reference to an array in scalar context -- you have to do a bit of
+extra work to determine how many instances of a plural element
+exist. The most concise (and the recommended) way to do this is:
+
+  my $how_many_foos = scalar ( @{$doc->elements('foo')} );
+
+=head2 How do I check whether a given element exists, without auto-creating it?
+
+Comma elements automatically get created when you ask for them. So the
+following code first makes a new Doc, then (behind the scenes) makes a
+new Element object for you:
+
+  XML::Comma::Doc->new ( type=>'Some_Def' )->element ( "foo" );
+
+This automatic creation (auto-vivication, in Perl lingo) is almost
+always what you want. But there are cases where you need to check
+whether an Element already exists before you try to manipulate it. For
+example, you might have a nested element that has some required
+children -- and you probably only want to create that element when
+you're sure you're ready to populate it fully.
+
+The idiom to do this turns out to be almost the same as the idiom to
+check how many instances of a plural element exist, given above:
+
+  if ( @{$doc->elements('foo')} ) {
+    $doc->foo()->child ( 'some value' );
+  }
+
+
+=head2 What does the BAD_CONTENT error that talks about '& found that isn't part of an entity reference' mean?
+
+You have a problem that boils down to something along these lines:
+
+  $doc->element('some_element')->set ( "foo & bar" );
+
+Element content must be legal XML -- so no &lt;, &gt;, or &amp;
+characters are allowed. These special characters must be "escaped" by
+replacing them with their entity codes (respectively &amp;lt;,
+&amp;gt;, or &amp;amp;). The C<Comma::Util::XML_basic_escape()> and
+C<Comma::Util::XML_basic_unescape()> methods are available, as are
+shortcut flags for the element C<set()> and C<get()> methods:
+
+  $doc->element('some_element()->set ( "foo & bar", escape=>1 );
+  $doc->element('some_element')->get ( unescape=>1 );
+  $doc->some_element ( "foo & bar", escape=>1 );
+
+Note that there is no way to pass the C<unescape> flag in the
+shortcut-get syntax (so there are three examples above, rather than
+four). It is fair to construe this as a problem with the API.
+
+=head2 What's wrong with 'while($iterator++){}' ?
+
+There is a bug in Perl (both versions 5.6.1 and 5.8.0) that leads to a
+memory leak in Comma code like this:
+
+  my $iterator = $index->iterator();
+  while ( $iterator++ ) {
+    ...
+  }
+
+or:
+
+  if ( $iterator++ ) {
+  }
+
+If you use the 'while($iterator++){}' or 'if($iterator++){}', then
+your Iterators objects won't ever get garbage-collected. This is very
+often not a problem; any stand-alone script will be fine, the
+Iterators will get properly DESTROYed when the script exits. But code
+like the above running inside, for example, a web application, can be
+a problem. 
+
+This works fine:
+
+  my $iterator = $index->iterator();
+  while ( ++$iterator ) {
+    ...
+  }
+  
+The pre-increment may seem a little counter-intuitive, but the
+Iterator class is written to Do The Right Thing for this very common
+case. And the pre-increment doesn't trigger the memory leak. And this
+is fine, too:
+
+  my $iterator = $index->iterator();
+  while ( $iterator ) {
+    ...
+    $iterator++;
+  }
+
+
+=head2 What does an error that ends 'sh: /tmp/log.comma: Permission denied' mean?
+
+Comma writes a line about all un-caught errors to a log file. The
+location of the log file is controlled by a setting in Comma.pm -- the
+default is C</tmp/log.comma/>. This file probably needs to be writable
+by any processes that use the Comma framework. In most installations,
+the file is made world-writable (which should tell you that the Comma
+log system isn't intended to be used as part of any security auditing
+or similar framework -- you should write additional code to handle any
+secure reporting that an application might need.)
+
+
+=head1 PERFORMANCE
+
+=head2 Is XML::Comma fast?
+
+Sure. We don't know of any faster way to develop (or to add new
+features to) large-scale applications that manipulate collections of
+hundreds of thousands of pieces of messy-but-structured
+information. We use it every day, and so do many, many people who
+access the web sites we build.
+
+Oh, wait: you meant, "does it run fast?" Well, that's in the eye of
+the beholder. Comma's bottleneck is the parsing and object-ifying of
+XML files. The power and flexibility that the API gives you comes at
+some cost -- a hand-coded, special-purpose implementation could well
+be faster for any single usage.
+
+However, we've worked hard to make Comma fast enough to be really,
+really, useful. For example, Comma's "Inline" parser is about twice as
+fast as the general-use XML parsers against which we've benchmarked it
+(because Comma documents aren't allowed to make use of all parts of
+the XML specification). An experienced designer of large-scale
+internet systems will easily be able to structure and tune a
+Comma-based system to serve hundreds of thousands of dynamic pages a
+day on mid-range x86 boxes.
+

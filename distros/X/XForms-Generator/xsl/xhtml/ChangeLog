@@ -1,0 +1,37 @@
+2002-10-13  Rick Frankel  <rick@rafnix.none>
+
+	* xforms.xsl: updated for new draft std. Handle dynamic lists for
+	radio/checkbox
+
+	* test.xml: ditto, added dynamic checkbox
+
+2002-10-11  Rick Frankel  <rick@rafnix.none>
+
+	* xforms.xsl: removed textarea rows/cols param (use css instead)
+
+2002-08-27  Rick Frankel  <rick@rafnix.none>
+
+	* xforms.xsl: fixed bug with handling of @calculate
+
+	* added PostFilter package and test cgi.
+
+2002-08-25  Rick Frankel  <rick@rafnix.none>
+
+	* xforms.xsl: added instance encoding
+
+2002-08-20  Rick Frankel  <rick@rafnix.none>
+
+	* README.xml: added docbook based readme
+
+2002-08-15  Rick Frankel  <rick@rafnix.none>
+
+	* xforms.xsl: added hidden input to output. fixed relative paths
+	(name attributes)
+
+2002-08-13  Rick Frankel  <rick@rafnix.none>
+
+	* xforms.xsl: repeat working, all constraints except calculate
+
+	* xforms.css: modfied to support contraints
+
+	* test.xml: ditto

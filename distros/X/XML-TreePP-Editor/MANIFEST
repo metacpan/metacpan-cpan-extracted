@@ -1,0 +1,10 @@
+CHANGES
+MANIFEST
+Makefile.PL
+README
+runtests
+lib/XML/TreePP/Editor.pm
+t/000-pod.t
+t/001-pod-coverage.t
+t/010-XML-TreePP-Editor.t
+

@@ -1,0 +1,19 @@
+<stx:transform version="1.0" 
+  xmlns:stx="http://stx.sourceforge.net/2002/ns"
+  strip-space="yes">
+
+  <stx:template match="node[1]">
+    <n>
+      <stx:value-of select="string-join(('a', 'b', 'c'), '-')"/>
+      <stx:text>:</stx:text>
+      <stx:value-of select="string-join((), '-')"/>
+      <stx:text>:</stx:text>
+      <stx:value-of select="string-join((.,5), '-sep-')"/>
+      <stx:text>:</stx:text>
+      <stx:value-of select="string-join(('Now', 'is', 'the', 'time'), ' ')"/>
+      <stx:text>:</stx:text>
+      <stx:value-of select="string-join(('abra', 'cadabra'), '')"/>
+    </n>
+  </stx:template>
+
+</stx:transform>

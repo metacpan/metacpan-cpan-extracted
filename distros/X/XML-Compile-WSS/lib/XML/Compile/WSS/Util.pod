@@ -1,0 +1,164 @@
+=encoding utf8
+
+=head1 NAME
+
+XML::Compile::WSS::Util - constants for XML::Compile::WSS
+
+=head1 INHERITANCE
+
+ XML::Compile::WSS::Util
+   is a Exporter
+
+=head1 SYNOPSIS
+
+ use XML::Compile::WSS::Util qw/:wss11/;
+
+=head1 DESCRIPTION
+
+This module collects constants used by various standards related
+to the Web Service Security (WSS) group of W3C.
+
+These constants may also be used by other applications: they are
+not limited to the L<XML::Compile::WSS|XML::Compile::WSS> module. Please inform me
+when you use this list in combination with other applications.
+
+=head1 CONSTANTS
+
+=head2 Export TAG :wss11
+
+  WSS_11   WSSE_10      DSIG_NS      DSIG11_NS    GHC_NS
+  WSU_10   WSS11MODULE  DSIG_MORE_NS XENC_NS      DSP_NS
+  WSM_10   XTP_10	WSU_NS
+
+=head2 Export tag :xtp10
+
+Defines convenient constants in the x509 namespace. See
+F<http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0.pdf>
+
+  XTP10_X509   XTP10_X509v3   XTP10_X509PKI   XTP10_X509PKC
+
+=head2 Export tag :wsm10
+
+Defines convenient constants in the soap-messages namespace.  See
+F<http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0.pdf >
+
+  WSM10_BASE64    WSM10_STR_TRANS
+
+=over 4
+
+=item B<wsm_decoded>($encoding, $bytes)
+
+Decode the sequence of $bytes from the given encoding.
+
+=item B<wsm_encoded>($encoding, $bytes)
+
+Encode the sequence of $bytes into the preferred.
+
+=back
+
+=head2 Export tag :wsm11
+
+[1.08] Defines convenient constants in the soap-messages namespace.  See
+F<http://docs.oasis-open.org/wss-m/wss/v1.1.1/os/wss-SOAPMessageSecurity-v1.1.1-os.html>
+
+=head2 Export tag C<:utp11>
+
+Defines constants for the username-token-profile.
+See F<http://docs.oasis-open.org/wss/v1.1/wss-v1.1-spec-os-UsernameTokenProfile.pdf>
+
+  UTP11_PTEXT   UTP11_PDIGEST   UTP11_USERNAME
+
+=head2 Export tag :dsig
+
+Defines convenient constants for signature reference URIs, mainly specified in
+F<http://www.w3.org/TR/2008/REC-xmldsig-core-20080610/>
+
+  DSIG_NS           DSIG_MGMT_DATA      DSIG_XML11_NO_COMM
+  DSIG_SIGPROPS     DSIG_X509_CERT      DSIG_XML11_COMMENTS
+  DSIG_OBJECT       DSIG_SHA1           DSIG_XMLEXC_NO_COMM
+  DSIG_MANIFEST     DSIG_BASE64         DSIG_XMLEXC_COMMENTS
+  DSIG_DSA_KV       DSIG_HMAC_SHA1      DSIG_XSLT
+  DSIG_RSA_KV       DSIG_DSA_SHA1       DSIG_XPATH
+  DSIG_X509_DATA    DSIG_RSA_SHA1       DSIG_ENV_SIG
+  DSIG_PGP_DATA     DSIG_XML10_NO_COMM
+  DSIG_SPKI_DATA    DSIG_XML10_COMMENTS
+
+=head2 Export tag :dsigm (dsigm-more)
+
+Defines constants defined by RFC4050 and RFC4051.
+
+=over 4
+
+=item * RFC4050 Using the ECDSA for XML Digital Signatures F<http://www.ietf.org/rfc/rfc4050.txt>
+
+=item * RFC4051 Additional XML Security Uniform Resource Identifiers (URIs) F<http://www.ietf.org/rfc/rfc4051.txt>
+
+=back
+
+  DSIGM_MD5             DSIGM_ECDSA_SHA224    DSIGM_CAM192
+  DSIGM_SHA224          DSIGM_ECDSA_SHA256    DSIGM_CAM256
+  DSIGM_SHA384          DSIGM_ECDSA_SHA384    DSIGM_KW_CAM128
+  DSIGM_HMAC_MD5        DSIGM_ECDSA_SHA512    DSIGM_KW_CAM192
+  DSIGM_HMAC_SHA224     DSIGM_ESIGN_SHA1      DSIGM_KW_CAM256
+  DSIGM_HMAC_SHA256     DSIGM_ESIGN_SHA224    DSIGM_PSEC_KEM
+  DSIGM_HMAC_SHA384     DSIGM_ESIGN_SHA256    DSIGM_KV
+  DSIGM_HMAC_SHA512     DSIGM_ESIGN_SHA384    DSIGM_RETR_METHOD
+  DSIGM_HMAC_RIPEMD160  DSIGM_ESIGN_SHA512    DSIGM_KEY_NAME
+  DSIGM_RSA_MD5         DSIGM_DSA_SHA256      DSIGM_RAW_X509
+  DSIGM_RSA_SHA256      DSIGM_CURVE_URN       DSIGM_RAW_PGP
+  DSIGM_RSA_SHA384      DSIGM_XPTR            DSIGM_RAW_SPKIS
+  DSIGM_RSA_SHA512      DSIGM_ARCFOUR         DSIGM_PKCS7_DATA
+  DSIGM_ECDSA_SHA1      DSIGM_CAM128          DSIGM_RAW_PKCS7_DATA
+
+=head2 Export tag :dsig11
+
+Defines convenient constants for the extensions on dsig, defined in
+F<http://www.w3.org/TR/2011/CR-xmldsig-core1-20110303/>
+
+  DSIG11_NS       DSIG11_EC_KV    DSIG11_DER_KV   DSIG_X509_CERT
+
+=head2 Export tag :xenc
+
+Defines convenient constants for encryption referencing URIs, mainly
+specified in F<http://www.w3.org/TR/2002/REC-xmlenc-core-20021210/>
+
+  XENC_NS         XENC_PROPS      XENC_AES128     XENC_DH
+  XENC_MIME_TYPE  XENC_SHA256     XENC_AES192     XENC_DH_KV
+  XENC_ELEMENT    XENC_SHA512     XENC_AES256     XENC_KW_3DES
+  XENC_CONTENT    XENC_RIPEMD160  XENC_RSA_1_5    XENC_KW_AES128
+  XENC_KEY        XENC_3DES       XENC_RSA_OAEP   XENC_KW_AES192
+  XENC_DSIG       XENC_KW_AES256
+
+=head2 Export tag :xghc
+
+Defines convenient constants for generic hybrid
+algorithm referencing URIs, as specified in
+F<http://www.w3.org/TR/2011/CR-xmlsec-generic-hybrid-20110303/>
+
+  GHC_NS      GHC_GENERIC     GHC_RSAES_KEM     GHC_ECIES_KEM
+
+=head2 Export tag :dsp
+
+Defines constants for "Digital signature properties" as specified in
+F<http://www.w3.org/TR/2011/CR-xmldsig-properties-20110303/>
+
+  DSP_NS
+
+=head1 SEE ALSO
+
+This module is part of XML-Compile-WSS distribution version 1.14,
+built on May 08, 2017. Website: F<http://perl.overmeer.net/xml-compile/>
+
+Please post questions or ideas to the mailinglist at
+F<http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/xml-compile> .
+For live contact with other developers, visit the C<#xml-compile> channel
+on C<irc.perl.org>.
+
+=head1 LICENSE
+
+Copyrights 2011-2017 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the Artistic license.
+See F<http://dev.perl.org/licenses/artistic.html>
+

@@ -1,0 +1,14 @@
+my $code = sub {
+  my $name = shift;
+  return <<"END";
+
+<element>
+  <name>$name</name>
+</element>
+
+END
+};
+
+sub {
+  return join ( "\n\n", map { $code->($_) } @_ ); 
+}

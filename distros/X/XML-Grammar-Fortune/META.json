@@ -1,0 +1,84 @@
+{
+   "abstract" : "convert the FortunesXML grammar to other formats and from plaintext.",
+   "author" : [
+      "Shlomi Fish <shlomif@iglu.org.il>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.421",
+   "keywords" : [
+      "convert",
+      "fortune",
+      "fortunes",
+      "grammar",
+      "markup",
+      "meta-data",
+      "quotation",
+      "quotations",
+      "quote",
+      "quotes",
+      "text",
+      "unix",
+      "xml"
+   ],
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "XML-Grammar-Fortune",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "IO::String" : "0",
+            "Test::Differences" : "0",
+            "Test::More" : "0",
+            "Test::XML::Ordered" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.36"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::ShareDir" : "1.00",
+            "File::Spec" : "0",
+            "MooX" : "0",
+            "MooX::late" : "0",
+            "Text::Format" : "0",
+            "XML::GrammarBase::Role::RelaxNG" : "v0.2.2",
+            "XML::GrammarBase::Role::XSLT" : "v0.2.2",
+            "XML::LibXML" : "2.0017",
+            "XML::LibXSLT" : "1.80",
+            "perl" : "5.014",
+            "vars" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "XML::Grammar::Fortune" : {
+         "file" : "lib/XML/Grammar/Fortune.pm",
+         "version" : "0.0600"
+      },
+      "XML::Grammar::Fortune::ToText" : {
+         "file" : "lib/XML/Grammar/Fortune/ToText.pm",
+         "version" : "0.0600"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://web-cpan.berlios.de/modules/XML-Grammar-Fortune/",
+      "license" : [
+         "http://www.opensource.org/licenses/mit-license.php"
+      ],
+      "repository" : {
+         "url" : "https://bitbucket.org/shlomif/fortune-xml"
+      },
+      "x_Freshmeat" : "http://freshmeat.net/projects/fortune-xml"
+   },
+   "version" : "0.0600"
+}

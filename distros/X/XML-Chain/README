@@ -1,0 +1,382 @@
+NAME
+
+    XML::Chain - chained way of manipulating and inspecting XML documents
+
+SYNOPSIS
+
+        use XML::Chain qw(xc);
+    
+        # basics
+        my $div = xc('div', class => 'pretty')
+                    ->c('h1')->t('hello')
+                    ->up
+                    ->c('p', class => 'intro')->t('world')
+                    ->root
+                    ->a( xc('p')->t('of chained XML.') );
+        say $div->as_string;
+        # <div class="pretty"><h1>hello</h1><p class="intro">world</p><p>of chained XML.</p></div>
+
+DESCRIPTION
+
+    ☢ at this moment XML::Chain is in early prototype phase ☢
+
+    This module provides fast and easy way to create and manipulate XML
+    elements via set of chained method calls.
+
+EXPORTS
+
+ xc
+
+    Exported factory method creating new XML::Chain::Selector object with a
+    document element as provided in parameters. For example:
+
+        my $icon = xc('i', class => 'icon-download icon-white');
+        # <i class="icon-download icon-white"/>
+
+    See "c, append_and_current" in XML::Chain::Selector for the element
+    parameter description and "CHAINED METHODS" in XML::Chain::Selector for
+    methods of returned object.
+
+  xc($name, @attrs) scalar with 1+ arguments
+
+    Element with $name will be create as document element and  @attrs  will
+    be added to it in the same order.
+
+    In case of hash reference passed as argument, key + values will be set
+    as attributes, in alphabetical sorted key name order.
+
+  xc($xml_libxml_ref)
+
+    In case of XML::LibXML, it will be set as document element.
+
+  xc($what_ref)
+
+    Any other reference will be passed to "slurp($what)" in IO::Any which
+    will be then parsed by "load_xml" in XML::LibXML and result set as
+    document element.
+
+        say xc([$tmp_dir, 't01.xml'])->as_string
+        say xc(\'<body><h1>and</h1><h1>head</h1></body>')
+                ->find('//h1')->count
+
+  xc($scalar)
+
+    Element with $scalar will be create as document element.
+
+        say xc('body');
+
+CHAINED METHODS, METHODS and ELEMENT METHODS
+
+    See XML::Chain::Selector and XML::Chain::Element.
+
+CHAINED DOCUMENT METHODS
+
+        xc('body')->t('save me')->set_io_any([$tmp_dir, 't01.xml'])->store;
+        # $tmp_dir/t01.xml file now consists of:
+            <body>save me</body>
+        xc([$tmp_dir, 't01.xml'])->empty->c('div')->t('updated')->store;
+        # $tmp_dir/t01.xml file now consists of:
+            <body><div>updated</div></body>
+
+ set_io_any
+
+    Store  $what  of IO::Any for future use with  -store() >
+
+ store
+
+    Calls  IO::Any-spew($io_any, $self->as_string, {atomic => 1}) > to save
+    XML back it it's original file of the the target set via set_io_any.
+
+TODO
+
+        - partial/special tidy (on elements inside xml)
+        - per ->data() storage
+        - ->each(sub {...}) / ->map(sub {}) / ->grep(sub {})
+        - setting and handling namespaces and elements with ns prefixes
+        - ~ton of selectors and manipulators to be added
+
+CONTRIBUTORS & CREDITS
+
+    Initially inspired by Strophe.Builder, then also by jQuery.
+
+    The following people have contributed to the XML::Chain by committing
+    their code, sending patches, reporting bugs, asking questions,
+    suggesting useful advice, nitpicking, chatting on IRC or commenting on
+    my blog (in no particular order):
+
+        Mohammad S Anwar
+        you?
+
+    Also thanks to my current day-job-employer http://geizhals.at/.
+
+BUGS
+
+    Please report any bugs or feature requests via
+    https://github.com/meon/XML-Chain/issues.
+
+AUTHOR
+
+    Jozef Kutej
+
+COPYRIGHT & LICENSE
+
+    Copyright 2017 Jozef Kutej, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+
+----------------------------------------------------------------------------
+NAME
+
+    XML::Chain::Selector - selector for traversing the XML::Chain
+
+SYNOPSIS
+
+        my $user = xc('user', xmlns => 'testns')
+                    ->auto_indent({chars=>' 'x4})
+                    ->a(xc('name')->t('Johnny Thinker'))
+                    ->a(xc('username')->t('jt'))
+                    ->c('bio')
+                        ->a(xc('div', xmlns => 'http://www.w3.org/1999/xhtml')
+                            ->a(xc('h1')->t('about'))
+                            ->a(xc('p')->t('...')))
+                        ->a(xc('greeting')->t('Hey'))
+                        ->up;
+        say $user->as_string;
+
+    Will print:
+
+        <user xmlns="testns">
+            <name>Johnny Thinker</name>
+            <username>jt</username>
+            <bio>
+                <div xmlns="http://www.w3.org/1999/xhtml">
+                    <h1>about</h1>
+                    <p>...</p>
+                </div>
+                <greeting>Hey</greeting>
+            </bio>
+        </user>
+
+DESCRIPTION
+
+CHAINED METHODS
+
+ c, append_and_select
+
+    Appends new element to current elements and changes context to them.
+    New element is defined in parameters:
+
+        $xc->c('i', class => 'icon-download icon-white')
+        # <i class="icon-download icon-white"/>
+
+    First parameter is name of the element, then followed by optional
+    element attributes.
+
+ t, append_text
+
+    Appends text to current elements.
+
+        xc('span')->t('some')->t(' ')->t('more text')
+        # <span>some more text</span>
+
+    First parameter is name of the element, then followed by optional
+    element attributes.
+
+ root
+
+    Sets document element as current element.
+
+        say xc('p')
+            ->t('this ')
+            ->a(xc('b')->t('is'))
+            ->t(' important!')
+            ->root->as_string;
+        # <p>this <b>is</b> important!</p>
+
+ up, parent
+
+    Traverse current elements and replace them by their parents.
+
+ find
+
+        say $xc->find('//p/b[@class="less"]')->text_content;
+
+    Look-up elements by xpath and set them as current elements.
+
+ children
+
+    Set all current elements child nodes as current elements.
+
+ first
+
+    Set first current elements as current elements.
+
+ empty
+
+    Removes all child nodes from current elements.
+
+ rename
+
+        my $body = xc('bodyz')->rename('body');
+        # <body/>
+
+    Rename node name(s).
+
+ each
+
+        # rename using each
+        $body->rename('body');
+        $body
+            ->a(xc('p.1')->t(1))
+            ->a(xc('p.2')->t(2))
+            ->a(xc('div')->t(3))
+            ->a(xc('p.3')->t(4))
+            ->each(sub { $_->rename('p') if $_->name =~ m/^p[.]/ });
+        is($body, '<body><p>1</p><p>2</p><div>3</div><p>4</p></body>','rename using each()');
+
+    Loops through all selected elements and calls callback for each of
+    them.
+
+ remap
+
+        xc('body')->a('p', i => 1)->children->remap(
+            sub {
+                (map {xc('e', i => $_)} 1 .. 3), $_;
+            }
+        )->root;
+        # <body><e i="1"/><e i="2"/><e i="3"/><p i="1"/></body>
+
+    Replaces all selected elements by callback returned elements.
+
+ rm, remove_and_parent
+
+        my $pdiv = xc('base')
+                ->a(xc('p')->t(1))
+                ->a(xc('p')->t(2))
+                ->a(xc('div')->t(3))
+                ->a(xc('p')->t(4));
+        my $p = $pdiv->find('//p');
+        # $pdiv->find('//p[position()=3]')->rm->name eq 'base'
+        # $p->count == 2     # deleted elements are skipped also in old selectors
+        # <base><p>1</p><p>2</p><div>3</div></base>
+
+    Deletes current elements and returnes their parent.
+
+ auto_indent
+
+        my $simple = xc('div')
+                        ->auto_indent(1)
+                        ->c('div')->t('in')
+                        ->root;
+        say $simple->as_string;
+
+    Will print:
+
+        <div>
+            <div>in</div>
+        </div>
+
+    Turn on/off tidy/auto-indentation of document elements. Default
+    indentation characters are tabs.
+
+    Argument can be either true/false scalar or a hashref with indentation
+    options. Currently	{chars=' 'x4} > will set indentation characters to
+    be four spaces.
+
+    NOTE Currently works only on element on which as_string() is called
+    using HTML::Tidy. In the future it is planned to be possible to set
+    indentation on/off also for nested elements. For example not to indent
+    embedded html elements.
+
+    WARNING HTML::Tidy has a circular reference and leaks memory when used.
+    Better don't use auto_indent() at in this version in persistent
+    environments.
+
+CHAINED DOCUMENT METHODS
+
+    See "CHAINED DOCUMENT METHODS" in XML::Chain.
+
+METHODS
+
+ as_string, toString
+
+    Returns string representation of current XML elements. Call root before
+    to get a string representing the whole document.
+
+        $xc->as_string
+        $xc->root->as_string
+
+ as_xml_libxml
+
+    Returns array of current elements as XML::LibXML objects.
+
+ text_content
+
+    Returns text content of all current XML elements.
+
+ count / size
+
+        say $xc->find('//b')->count;
+
+    Return the number of current elements.
+
+ single
+
+        my $lxml_el = $xc->find('//b')->first->as_xml_libxml;
+
+    Checks is there is exactly one element in current elements and return
+    it as XML::Chain::Element object.
+
+AUTHOR
+
+    Jozef Kutej
+
+COPYRIGHT & LICENSE
+
+    Copyright 2017 Jozef Kutej, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+
+----------------------------------------------------------------------------
+NAME
+
+    XML::Chain::Element - helper class for XML::Chain representing single
+    element
+
+SYNOPSIS
+
+        xc('body')->c(h1)->t('title')->root
+
+DESCRIPTION
+
+    Returned by "single" in XML::Chain::Selector call.
+
+METHODS
+
+ name
+
+    return element name
+
+ as_xml_libxml
+
+    Returns XML::LibXML::Element object.
+
+ XML::Chain::Selector methods
+
+    All of the XML::Chain::Selector methods works too.
+
+AUTHOR
+
+    Jozef Kutej
+
+COPYRIGHT & LICENSE
+
+    Copyright 2017 Jozef Kutej, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

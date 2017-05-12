@@ -1,0 +1,313 @@
+=encoding utf8
+
+=head1 NAME
+
+XML::Compile - Compilation based XML processing
+
+=head1 INHERITANCE
+
+ XML::Compile is extended by
+   XML::Compile::Schema
+
+=head1 SYNOPSIS
+
+ # See XML::Compile::Schema / ::WSDL / ::SOAP11 etc
+
+=head1 DESCRIPTION
+
+Many (professional) applications process XML messages based on a formal
+specification, expressed in XML Schemas.  XML::Compile translates
+between XML and Perl with the help of such schemas.  Your Perl program
+only handles a tree of nested HASHes and ARRAYs, and does not need to
+understand namespaces and other general XML and schema nastiness.
+
+Three serious WARNINGS:
+
+=over 4
+
+=item *
+
+The focus is on B<data-centric XML>, which means that mixed elements
+are not handler automatically: you need to work with XML::LibXML nodes
+yourself, on these spots.
+
+=item *
+
+The B<data is not strictly validated>, still a large number of
+compile-time errors can be reported.  Values are checked quite thoroughly.
+Structure as well.
+
+=item *
+
+Imports and includes, as used in the schemas, are NOT performed
+automatically.  Schema's and such are NOT collected from internet
+dynamically; you have to call L<XML::Compile::Schema::importDefinitions()|XML::Compile::Schema/"Administration">
+explicitly with filenames of locally stored copies. Includes do only
+work if they have a targetNamespace defined, which is the same as that
+of the schema it is included into.
+
+=back
+
+=head1 METHODS
+
+Methods found in this manual page are shared by the end-user modules,
+and should not be used directly: objects of type C<XML::Compile> do not
+exist!
+
+=head2 Constructors
+
+These constructors are base class methods to be extended,
+and therefore should not be accessed directly.
+
+=over 4
+
+=item XML::Compile-E<gt>B<new>( [$xmldata], %options )
+
+The $xmldata is a source of XML. See L<dataToXML()|XML::Compile/"Compilers"> for valid ways,
+for example as filename, string or C<undef>.
+
+If you have compiled all readers and writers you need, you may simply
+terminate the compiler object: that will clean-up (most of) the
+XML::LibXML objects.
+
+ -Option        --Default
+  parser_options  <many>
+  schema_dirs     undef
+
+=over 2
+
+=item parser_options => HASH|ARRAY
+
+See XML::LibXML::Parser for a list of available options which can be
+used to create an XML parser (the new method). The default will set you
+in a secure mode.  See L<initParser()|XML::Compile/"Compilers">.
+
+=item schema_dirs => DIRECTORY|ARRAY-OF-DIRECTORIES
+
+Where to find schema's.  This can be specified with the
+environment variable C<SCHEMA_DIRECTORIES> or with this option.
+See L<addSchemaDirs()|XML::Compile/"Accessors"> for a detailed explanation.
+
+=back
+
+=back
+
+=head2 Accessors
+
+=over 4
+
+=item $obj-E<gt>B<addSchemaDirs>(@directories|$filename)
+
+=item XML::Compile-E<gt>B<addSchemaDirs>(@directories|$filename)
+
+Each time this method is called, the specified @directories will be added
+in front of the list of already known schema directories.  Initially,
+the value of the environment variable C<SCHEMA_DIRECTORIES> is added
+(therefore tried as last resort). The constructor option C<schema_dirs>
+is a little more favorite.
+
+Values which are C<undef> are skipped.  ARRAYs are flattened.  Arguments
+are split at colons (on UNIX) or semi-colons (windows) after flattening.
+The list of directories is returned, in all but VOID context.
+
+When a C<.pm> package $filename is given, then the directory
+to be used is calculated from it (platform independently).  So,
+C<something/XML/Compile.pm> becomes C<something/XML/Compile/xsd/>.
+This way, modules can simply add their definitions via C<<
+XML::Compile->addSchemaDirs(__FILE__) >> in a BEGIN block or in main.
+ExtUtils::MakeMaker will install everything what is found in the
+C<lib/> tree, so also your xsd files.  Probably, you also want to use
+L<knownNamespace()|XML::Compile/"Administration">.
+
+example: adding xsd's from your own distribution
+
+  # file xxxxx/lib/My/Package.pm
+  package My::Package;
+
+  use XML::Compile;
+  XML::Compile->addSchemaDirs(__FILE__);
+  # now xxxxx/lib/My/Package/xsd/ is also in the search path
+
+  use constant MYNS => 'http://my-namespace-uri';
+  XML::Compile->knownNamespace(&MYNS => 'my-schema-file.xsd');
+  $schemas->importDefinitions(MYNS);
+
+=back
+
+=head2 Compilers
+
+=over 4
+
+=item $obj-E<gt>B<dataToXML>($node|REF-XML|XML-STRING|$filename|$fh|$known)
+
+=item XML::Compile-E<gt>B<dataToXML>($node|REF-XML|XML-STRING|$filename|$fh|$known)
+
+Collect $xml data, from a wide variety of sources.  In SCALAR context,
+an XML::LibXML::Element or XML::LibXML::Document is returned.
+In LIST context, pairs of additional information follow the scalar result.
+
+When a ready XML::LibXML::Node (::Element or ::Document) $node is
+provided, it is returned immediately and unchanged.  A SCALAR reference is
+interpreted as reference to $xml as plain text ($xml texts can be large,
+and you can improve performance by passing it around by reference
+instead of copy).  Any value which starts with blanks followed by a
+'E<lt>' is interpreted as $xml text.
+
+You may also specify a pre-defined I<known> name-space URI.  A set of
+definition files is included in the distribution, and installed somewhere
+when this all gets installed.  Either define an environment variable
+named SCHEMA_LOCATION or use L<new(schema_dirs)|XML::Compile/"Constructors"> (option available to
+all end-user objects) to inform the library where to find these files.
+
+According the XML::LibXML::Parser manual page, passing a $fh
+is much slower than pasing a $filename.  However, it may be needed to
+open a file with an explicit character-set.
+
+example: 
+
+  my $xml = $schema->dataToXML('/etc/config.xml');
+  my ($xml, %details) = $schema->dataToXML($something);
+
+  my $xml = XML::Compile->dataToXML('/etc/config.xml');
+
+=item $obj-E<gt>B<initParser>(%options)
+
+=item XML::Compile-E<gt>B<initParser>(%options)
+
+Create a new parser, an XML::LibXML::Parser object. By default, the
+parsing is set in a safe mode, avoiding exploits. You may explicitly
+overrule it, especially if you need to process entities.
+
+=back
+
+=head2 Administration
+
+=over 4
+
+=item $obj-E<gt>B<findSchemaFile>($filename)
+
+=item XML::Compile-E<gt>B<findSchemaFile>($filename)
+
+Runs through all defined schema directories (see L<addSchemaDirs()|XML::Compile/"Accessors">)
+in search of the specified $filename.  When the $filename is absolute,
+that will be used, and no search is needed.  An C<undef> is returned when
+the file is not found, otherwise a full path to the file is returned to
+the caller.
+
+Although the file may be found, it still could be unreadible.
+
+=item $obj-E<gt>B<knownNamespace>($ns|PAIRS)
+
+=item XML::Compile-E<gt>B<knownNamespace>($ns|PAIRS)
+
+If used with only one $ns, it returns the filename in the
+distribution (not the full path) which contains the definition.
+
+When PAIRS of $ns-FILENAME are given, then those get defined.
+This is typically called during the initiation of modules, like
+L<XML::Compile::WSDL11|XML::Compile::WSDL11> and L<XML::Compile::SOAP|XML::Compile::SOAP>.  The definitions
+are global: not related to specific instances.
+
+The FILENAMES are relative to the directories as specified with some
+L<addSchemaDirs()|XML::Compile/"Accessors"> call.
+
+=item $obj-E<gt>B<walkTree>($node, CODE)
+
+Walks the whole tree from $node downwards, calling the CODE reference
+for each $node found.  When that routine returns false, the child
+nodes will be skipped.
+
+=back
+
+=head1 DETAILS
+
+=head2 Distribution collection overview
+
+For end-users, the following packages are of interest (the other
+are support packages):
+
+=over 4
+
+=item * L<XML::Compile::Schema|XML::Compile::Schema>
+
+Interpret schema elements and types: create processors for XML messages.
+
+=item * L<XML::Compile::Cache|XML::Compile::Cache>
+
+Helps you administer compiled readers and writers, especially useful it
+there are a lot of them.  Extends L<XML::Compile::Schema|XML::Compile::Schema>.
+
+=item * L<XML::Compile::SOAP|XML::Compile::SOAP>
+
+Implements the SOAP 1.1 protocol. client side.
+
+=item * L<XML::Compile::SOAP12|XML::Compile::SOAP12>
+
+Implements the SOAP 1.2 protocol.
+
+=item * L<XML::Compile::WSDL11|XML::Compile::WSDL11>
+
+Use SOAP with a WSDL version 1.1 communication specification file.
+
+=item * L<XML::Compile::SOAP::Daemon|XML::Compile::SOAP::Daemon>
+
+Create a SOAP daemon, directly from a WSDL file.
+
+=item * L<XML::Compile::Tester|XML::Compile::Tester>
+
+Helps you write regression tests.
+
+=item * L<XML::Rewrite|XML::Rewrite>
+
+Clean-up XML structures: beautify, simplify, extract.
+
+=item * L<XML::Compile::Dumper|XML::Compile::Dumper>
+
+Enables you to save pre-compiled XML handlers, the results of any
+C<compileClient>.  However, this results in huge files, so this may
+not be worth the effort.
+
+=back
+
+=head2 Comparison
+
+Where other Perl modules (like SOAP::WSDL) help you using these schemas
+(often with a lot of run-time XPath searches), XML::Compile takes a
+different approach: instead of run-time processing of the specification,
+it will first compile the expected structure into a pure Perl CODE
+reference, and then use that to process the data as often as needed.
+
+There are many Perl modules with the same intention as this one:
+translate between XML and nested hashes.  However, there are a few
+serious differences:  because the schema is used here (and not by the
+other modules), we can validate the data.  XML requires validation but
+quite a number of modules simply ignore that.
+
+Next to this, data-types are formatted and processed correctly; for
+instance, the specification prescribes that the C<Integer> data-type
+must accept values of at least 18 digits... not fitting in Perl's idea
+of longs.
+
+XML::Compile also supports all more complex data-types like C<list>,
+C<union>, C<substitutionGroup> (unions on complex type level), and even
+the nasty C<any> and C<anyAttribute>, which is rarely the case for the
+other modules.
+
+=head1 SEE ALSO
+
+This module is part of XML-Compile distribution version 1.56,
+built on March 30, 2017. Website: F<http://perl.overmeer.net/xml-compile/>
+
+Please post questions or ideas to the mailinglist at
+F<http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/xml-compile> .
+For live contact with other developers, visit the C<#xml-compile> channel
+on C<irc.perl.org>.
+
+=head1 LICENSE
+
+Copyrights 2006-2017 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the Artistic license.
+See F<http://dev.perl.org/licenses/artistic.html>
+

@@ -1,0 +1,154 @@
+#   SVN: $Id: Changes 101 2014-05-27 14:25:39Z adam $
+
+Revision history for Perl extension XML::RSS::Tools.
+
+0.34  Tue 27 May 2014
+    - Fix for Windows false positive test failures, only tested against
+      Strawberry Perl (RT #96001)
+    - Module code unchanged
+
+0.33  Fri 23 May 2014
+    - More modern Build system
+    - Tested on more modern perls, not tested on older ones
+    - Minor text changes
+
+0.32  Sun 06 July 2008
+    - Build/test fix for old (unsupported) XML::LibXML systems
+    - Added external licence file
+    - Module code unchanged
+    - Unreleased
+
+0.31  Mon 30 June 2008
+    - Build/test fixes:
+        * Fix to 53-no-debug-tests-1.t, thanks to David Cantrell
+        * Minor tweak to Build.PL.META.yml files
+    - Module code unchanged
+
+0.30  Sun 29 June 2008
+    - Can now use WWW::Curl::Easy as HTTP layer (no proxy support yet)
+    - Various build/text fixes and improvments:
+        * Washed all tests through Perltidy
+        * More tests - Thanks to Perl Testing: A Developer's Notebook
+        * Enforced PBP via Test::Perl::Critic
+        * Now tested on Perl 5.10 and partially on legacy 5.6.1 systems
+        * Minor test fixes
+    - Switched from CVS to Subversion for revision control
+    - Added crypto signature and tested via Test::Signature
+    - Bumped various dependant modules up in version
+    - Now uses GNU GPL Version 3.0 and later
+
+0.20  Sun 28 January 2007
+    - Wash code through PBP/Perltidy
+    - Remove article, provide link instead
+    - Remove example rss file
+    - Convert documented files to example files
+    - Fix META.yml bug
+    - More tests and better coverage
+    - Using MAKEFILE.SKIP
+
+0.16  Fri 15 January 2006
+    - Fix bug in xsl import - thanks to Martin Flack
+    - Support Build.PL
+    - Added extra POD tests
+    - More additions to the POD
+
+0.15  Sun 06 February 2005
+    - Catalog support in some versions of XML::LibXML appears to
+      be broken
+    - Minor test changes and fixes to POD and build process
+    - URI has changed, tests changes to adapt
+    - Module code unchanged
+
+0.14  Sat 24 April 2004
+    - Configuration diagnostics in tests
+    - Minor doc corrections/changes
+    - META.yml file corrections and additions
+    - Module code unchanged
+
+0.13  Sun 28 March 2004
+    - Implement HTTP Proxy support - no tests yet
+    - Supplementary documentation converted from HTML to POD
+    - Minor code and test additions/changes
+    - Layout of files revised, initial attempt to make package
+      Module::Build compatible - still not complete
+
+0.12  Thu 12 June 2003
+    - Lots of fixes to the build & test process:
+        * Example 5 added to the manifest
+        * http-tests.t defect corrected
+        * Makefile corrected
+    - Module code unchanged
+
+0.11  Wed 11 June 2003
+    - POD Improvements
+    - Corrections to included RSS feed
+    - Example 5 added
+    - Documentation improvements, print style-sheet added for easier
+      printing
+    - Fix & changes to Makefile.PL, should auto detect a HTTP server
+      for testing purposes
+    - Tests overhauled and cleaned up
+    - Defect in xsl_uri subroutine detected and corrected
+
+0.10  Sat 04 May 2003
+    - Initial XML Catalog support, see www.oasis-open.org
+    - Added ability to select which HTTP client to use
+    - Added support for HTTP::Lite as a HTTP client
+    - Syntax tests on constructor added
+    - More tests
+    - Added an RSS feed of the documentation
+
+0.09  Fri 28 March 2003
+    - Tested with latest XML::RSS Versions 0.98 and 1.02
+    - Changes and additions to documentation and HTML
+    - Warning message in Makefile.PL removed now that XML::RSS has
+      moved out of beta
+    - Bump versions of dependents up in Makefile.PL
+    - Experimental support for FileHandle objects, internally and
+      from an external call
+    - More tests, including a POD test
+
+0.08  Fri 10 January 2003
+    - Incorporates "The Perl Review" Article - Processing RSS Files
+      with XSLT
+    - Minor changes to HTML, and updated links
+    - Removed Diagnostics pragma
+    - Warning message added to Makefile.PL
+    - Extra tests for RSS versions
+    - Ability to disable RSS normalisation
+    - Extra code examples
+
+0.07  Sun 24 November 2002
+    - More minor changes
+    - Tests re-organised, re-ordered, and expanded
+    - Additional Documentation
+    - Uses the URI module for parsing URIs
+    - File can be passed by the URI handler
+
+0.06  Thu 01 August 2002
+    - Cosmetic changes to the HTML, and minor additions
+    - Test script corrections
+    - Module code unchanged
+
+0.05  Wed 31 July 2002
+    - Null URIs dealt with
+    - Extra example script provided
+    - Minor changes
+    - Tests changed for extra CPANPLUS compatibility
+
+0.04  Mon 13 May 2002
+    - Minor changes
+    - Defect in test script corrected
+
+0.03  Sun 12 May 2002
+    - More minor changes and fixes
+    - Example script included
+    - Uploaded to more sensible location on CPAN
+
+0.02  Sat 11 May 2002
+    - Test suite created
+    - Uploaded to CPAN as alpha code
+
+0.01  Sun 28 Apr 2002
+    - original version; created by h2xs 1.21 with options
+        -X -n XML::RSS::Tools

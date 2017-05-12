@@ -1,0 +1,86 @@
+{
+   "abstract" : "parse an Atom file into RDF",
+   "author" : [
+      "Toby Inkster <tobyink@cpan.org>",
+      "TOBYINK <tobyink@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Moose::Meta::Class::__ANON__::SERIAL::12 version , CPAN::Meta::Converter version 2.140640",
+   "keywords" : [
+      "ActivityStrea.ms",
+      "Atom",
+      "AtomOWL",
+      "Feed",
+      "OWL",
+      "RDF",
+      "Syndication"
+   ],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "XML-Atom-OWL",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "optional_features" : {},
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "1.00",
+            "DateTime" : "0",
+            "Encode" : "0",
+            "HTTP::Link::Parser" : "0.100",
+            "LWP::UserAgent" : "0",
+            "MIME::Base64" : "0",
+            "RDF::Trine" : "0.135",
+            "Scalar::Util" : "0",
+            "URI" : "1.30",
+            "URI::URL" : "0",
+            "XML::LibXML" : "1.70",
+            "common::sense" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.61"
+         }
+      }
+   },
+   "provides" : {
+      "XML::Atom::OWL" : {
+         "file" : "lib/XML/Atom/OWL.pm",
+         "version" : "0.104"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "X_identifier" : "http://purl.org/NET/cpan-uri/dist/XML-Atom-OWL/project",
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Dist/Display.html?Queue=XML-Atom-OWL"
+      },
+      "homepage" : "https://metacpan.org/release/XML-Atom-OWL",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "svn",
+         "web" : "http://goddamn.co.uk/svn-web/perlmods/browse/XML-Atom-OWL/"
+      }
+   },
+   "version" : "0.104"
+}

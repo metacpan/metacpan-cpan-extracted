@@ -1,0 +1,17 @@
+<stx:transform version="1.0" 
+  xmlns:stx="http://stx.sourceforge.net/2002/ns"
+  strip-space="no">
+
+  <stx:template match="/root">
+    <stx:process-children group="g1"/>
+  </stx:template>
+
+  <stx:group name="g1" strip-space="yes">
+    
+    <stx:template match="text()">
+      [<stx:copy/>]
+    </stx:template>
+
+  </stx:group>
+
+</stx:transform>

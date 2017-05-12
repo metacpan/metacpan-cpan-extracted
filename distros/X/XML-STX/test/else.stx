@@ -1,0 +1,25 @@
+<stx:transform version="1.0" 
+  xmlns:stx="http://stx.sourceforge.net/2002/ns">
+
+  <stx:template match="/root">
+    <root>
+      <stx:process-children/>
+    </root>
+  </stx:template>
+  
+  <stx:template match="node">
+    <stx:if test="@id=1">
+      <stx:value-of select="@id"/>
+    </stx:if>
+    <stx:else>
+      <stx:value-of select="concat('[',@id,']')"/>
+      <stx:if test="@id=2">
+	<stx:value-of select="'OK'"/>
+      </stx:if>
+      <stx:else>
+	<stx:value-of select="position()"/>
+      </stx:else>
+    </stx:else>
+  </stx:template>
+
+</stx:transform>

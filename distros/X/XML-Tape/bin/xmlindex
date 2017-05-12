@@ -1,0 +1,64 @@
+#!/usr/bin/perl
+#
+# $Id: xmlindex,v 1.1.1.1 2005/06/08 09:29:13 patrick Exp $
+#
+# Patrick Hochstenbach <Patrick.Hochstenbach@UGent.be>
+#
+use XML::Tape::Index qw(:all);
+use Getopt::Long;
+use strict;
+
+my $verbose   = 0;
+my $drop      = 0;
+my $buff_size = 10 * 1024;
+my $mem_size  = 4 * 1024 * 1024; 
+
+GetOptions(
+        "v" => \$verbose, 
+        "d" => \$drop,
+        "m=i" => \$mem_size, 
+        "f=i" => \$buff_size ,
+);
+
+my $xmltape = shift;
+
+unless (-r $xmltape) {
+    print STDERR <<EOF;
+usage: $0 [options] xmltape
+
+options:
+    -v          - verbose
+    -d          - drop index
+    -m [bytes]  - memory allocation in bytes
+    -f [bytes]  - read buffer size in bytes
+
+EOF
+    exit(1);
+}
+
+if ($drop) {
+    my $ret = indexdrop($xmltape);
+    exit $ret ? 0 : 2;
+}
+
+if (indexexists($xmltape)) {
+    indexdrop($xmltape);
+}
+
+$XML::Tape::Index::VERBOSE    = $verbose;
+$XML::Tape::Index::CACHE_SIZE = $mem_size;
+$XML::Tape::Reader::BUFF_SIZE = $buff_size; 
+
+$SIG{INT} = \&crtlC;
+
+my $index = indexopen($xmltape, 'w');
+my $ret = $index->reindex;
+$index->indexclose;
+
+exit $ret ? 0 : 3;
+
+sub crtlC {
+    print STDERR "caught SIGINT cleaning up...\n";
+    indexdrop($xmltape);
+    exit 4;
+}

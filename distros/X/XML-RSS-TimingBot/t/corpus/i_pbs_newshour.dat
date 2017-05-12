@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<?xml-stylesheet title="CSS_formatting" type="text/css" href="./rss.css"?>
+<rss version="2.0"
+  xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+><channel>
+<!-- Generated with Perl's XML::RSS::SimpleGen v11.11 -->
+
+<link>http://www.pbs.org/newshour/newshour_index.html</link>
+<title>PBS NewsHour</title>
+<description>Full text, audio, and video of stories from the PBS NewsHour with Jim Lehrer</description>
+<language>en-US</language>
+<lastBuildDate>Tue, 09 Mar 2004 04:57:20 GMT</lastBuildDate>
+<sy:updateFrequency>12</sy:updateFrequency>
+<sy:updatePeriod>daily</sy:updatePeriod>
+<skipHours><hour>0</hour><hour>2</hour><hour>4</hour><hour>6</hour><hour>8</hour><hour>10</hour><hour>12</hour><hour>14</hour><hour>16</hour><hour>18</hour><hour>20</hour><hour>22</hour></skipHours>
+<ttl>120</ttl>
+<sy:updateBase>1970-01-01T01:00+00:00</sy:updateBase>
+<webMaster>sburke@cpan.org</webMaster>
+<docs>http://www.interglacial.com/rss/about.html</docs>
+
+<item>
+  <title>Step Forward</title>
+  <link>http://www.pbs.org/newshour/bb/middle_east/jan-june04/iraq_3-8.html</link>
+  <description>The Iraqi Governing Council signed an interim constitution today. Gwen Ifill discusses the significance of this transitional law with Feisal Istrabadi, who serves as a senior adviser to Governing Council member Adnan Pachachi, and Juan Cole, professor of Middle East history at the University of Michigan.</description>
+</item>
+
+<item>
+  <title>Tough at the Top</title>
+  <link>http://www.pbs.org/newshour/bb/business/jan-june04/ceo_3-8.html</link>
+  <description>Last Friday, Martha Stewart became the latest corporate executive to fall -- in her case, a conviction for lying to prosecutors over a personal stock trade. Other once highflying CEOs are facing criminal prosecution for defrauding their companies and shareholders, and profiting personally from it. Margaret Warner gets perspectives from Jeffrey Sonnenfeld of the Yale School of Management, Lawrence White of the Stern School of Business at New York University and Rosabeth Moss Kanter of Harvard Business School.</description>
+</item>
+
+<item>
+  <title>Martha Stewart Verdict</title>
+  <link>http://www.pbs.org/newshour/bb/law/jan-june04/martha.html</link>
+  <description>A federal jury in New York City found home decorating guru and publisher Martha Stewart guilty of four counts of conspiracy, making false statements and obstructing justice. The charges related to Stewart's dumping of Imclone stock, a biotech company, the day before health regulators refused to approve its anti-cancer drug and its stock price plummeted. Terence Smith speaks with New York Times correspondent Constance Hays about the verdict.</description>
+</item>
+
+<item>
+  <title>The Blackmun Tapes</title>
+  <link>http://www.pbs.org/newshour/bb/law/jan-june04/blackback_03-05.html</link>
+  <description>In part two of a special report on the tapes of the late Supreme Court Justice Harry Blackmun, Ray Suarez looks at two other major decisions.</description>
+</item>
+
+<item>
+  <title>Shields &amp; Brooks</title>
+  <link>http://www.pbs.org/newshour/bb/political_wrap/jan-june04/sb_03-05.html</link>
+  <description>Jim Lehrer continues the discussion about the Blackmun papers, the troubling situation in Haiti and election 2004 with syndicated columnist Mark Shields and New York Times columnist David Brooks.</description>
+</item>
+
+
+</channel></rss>

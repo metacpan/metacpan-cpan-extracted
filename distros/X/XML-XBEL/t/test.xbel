@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE xbel PUBLIC "+//IDN python.org//DTD XML Bookmark Exchange Language 1.0//EN//XML" "http://pyxml.sourceforge.net/topics/dtds/xbel-1.0.dtd">
+<xbel>
+    <title>Bookmarks</title>
+    <info>
+        <metadata owner="http://www.mozilla.org/products/firefox/#BookmarksToolbarFolder">NC:PersonalToolbarFolder</metadata>
+    </info>
+    <folder id="NC%3ABookmarksRoot#$81a3d299">
+        <title>readme</title>
+        <bookmark id="rdf%3A#$n9UIH" href="http://members.aol.com/heliogabby/bio/eng.htm">
+            <title>Lampridius: The Life of Heliogabalus</title>
+        </bookmark>
+	<bookmark id="rdf%3A#$o9UIH" href="http://w3.oqlf.gouv.qc.ca/BDL/gabarit_bdl.asp?Al=1&amp;ltr=G"><title>Banque de Depannage Linguistique</title>
+    </bookmark>
+    <bookmark id="rdf%3A#$p9UIH" href="http://www.autrijus.org/par-intro/">
+        <title>Introduction to Perl Archive Toolkit</title>
+    </bookmark>
+    <bookmark id="rdf%3A#$q9UIH" href="http://slate.msn.com/id/2080262/">
+        <title>Turkey Shoot - How Bush made enemies of our allies. By Paul Glastris</title>
+    </bookmark>
+<bookmark id="rdf%3A#$r9UIH" href="http://shiflett.org/books/httphandbook/?task=samples&amp;chapter=18"><title>HTTP Developer's Handbook : SSL</title>
+</bookmark>
+<bookmark id="rdf%3A#$t9UIH" href="http://techreview.com/articles/print_version/farmer0403.asp">
+    <title>Surveillance Nation</title>
+</bookmark>
+<bookmark id="rdf%3A#$u9UIH" href="http://firstmonday.dk/issues/issue8_3/esposito/index.html">
+    <title>The processed book</title>
+</bookmark>
+<bookmark id="rdf%3A#$v9UIH" href="http://firstmonday.dk/issues/issue8_3/garfinkel/index.html">
+    <title>Leaderless resistance today</title>
+</bookmark>
+<bookmark id="rdf%3A#$w9UIH" href="http://www.w3.org/2003/01/21-RDF-RDB-access/">
+    <title>RDF Access to Relational Databases</title>
+</bookmark>
+<bookmark id="rdf%3A#$x9UIH" href="http://www.w3.org/2000/10/swap/dbork/dbview.py">
+    <title>http://www.w3.org/2000/10/swap/dbork/dbview.py</title>
+</bookmark>
+<bookmark id="rdf%3A#$y9UIH" href="http://www.ontopia.net/topicmaps/materials/tmrdf.html">
+    <title>Living with topic maps and RDF</title>
+</bookmark>
+<bookmark id="rdf%3A#$z9UIH" href="http://www.movabletype.org/trackback/beginners/">
+    <title>movabletype.org : TrackBack Explanation</title>
+</bookmark>
+<bookmark id="rdf%3A#$A9UIH" href="http://search.cpan.org/author/SMUELLER/Acme-Chef-0.05/lib/Acme/Chef.pm">
+    <title>acme::chef</title>
+</bookmark>
+<bookmark id="rdf%3A#$B9UIH" href="http://www.washingtonmonthly.com/features/2003/0304.marshall.html">
+    <title>"Practice to Deceive" by Joshua Micah Marshall</title>
+</bookmark>
+<bookmark id="rdf%3A#$C9UIH" href="http://www.onlamp.com/lpt/a/3310">
+    <title>O'Reilly Network: Building an Address Book with OpenLDAP</title>
+</bookmark>
+<bookmark id="rdf%3A#$D9UIH" href="http://www.devshed.com/Server_Side/Administration/Tunnelling/print_html">
+    <title>secure tunnelling with ssh</title>
+</bookmark>
+<bookmark id="rdf%3A#$E9UIH" href="http://www.netsys.com/cgi-bin/display_article.cgi?908">
+    <title>MySQL SSH Tunneling..</title>
+</bookmark>
+<bookmark id="rdf%3A#$G9UIH" href="http://www.prescod.net/xml/sexprs.html">
+    <title>XML is not S-Expressions</title>
+</bookmark>
+<bookmark id="rdf%3A#$H9UIH" href="http://www.artima.com/intv/garden.html">
+    <title>Programming is Gardening, not Engineering</title>
+</bookmark>
+<bookmark id="rdf%3A#$I9UIH" href="http://www.xml.gov/documents/in_progress/namespacePolicyDraft.htm">
+    <title>Namespace Policy Draft</title>
+</bookmark>
+<bookmark id="rdf%3A#$J9UIH" href="http://www.nitle.org/lsi.php">
+    <title>Projects: Latent Semantic Indexing</title>
+</bookmark>
+<bookmark id="rdf%3A#$K9UIH" href="http://www.semanticplanet.com/2003/04/rdfForModularExtensibleMarkup.html">
+    <title>RDF for Modular, Extensible Markup</title>
+</bookmark>
+<bookmark id="rdf%3A#$L9UIH" href="http://www.nytimes.com/2003/05/04/magazine/04FOOD.html?pagewanted=print&amp;position="><title>The Futures of Food</title>
+</bookmark>
+<bookmark id="rdf%3A#$M9UIH" href="http://weblog.burningbird.net/fires/001153.htm">
+<title>RDF Poetry Finder: Pieces of the Puzzle</title>
+</bookmark>
+<bookmark id="rdf%3A#$N9UIH" href="http://paulgraham.com/hp.html">
+<title>Hackers and Painters</title>
+</bookmark>
+<bookmark id="rdf%3A#$O9UIH" href="http://www.mikerubel.org/computers/rsync_snapshots/">
+<title>rsync snapshots</title>
+</bookmark>
+<bookmark id="rdf%3A#$P9UIH" href="http://xmlresume.sourceforge.net/dtd/resume.dtd">
+<title>objective</title>
+</bookmark>
+<bookmark id="rdf%3A#$Q9UIH" href="http://www.cooperativeresearch.net/timeline/main/essayaninterestingday.html">
+<title>An Interesting Day: President Bush's Movements and Actions on 9/11</title>
+</bookmark>
+<bookmark id="rdf%3A#$R9UIH" href="http://www.apache.org/~fielding/uri/rev-2002/issues.html">
+<title>Issues List for the URI specification (RFC 2396 revision)</title>
+</bookmark>
+<bookmark id="rdf%3A#$QYJDg3" href="http://www.pfir.org/tripoli-overview">
+<title>tripoli</title>
+</bookmark>
+<bookmark id="rdf%3A#$Vsrhi3" href="http://www.jfsowa.com/pubs/semnet.htm">
+<title>Semantic Networks</title>
+</bookmark>
+<bookmark id="rdf%3A#$Xsrhi3" href="http://www.capescience.com/articles/commonerrors/index.shtml">
+<title>Common WSDL Errors</title>
+</bookmark>
+<bookmark id="rdf%3A#$BFlRL1" href="http://www.miam-miam.com/PATISSIER/pain/pain.htm">
+<title>la boulangerie pÃÂ¢tisserie de miam-miam: la fabrication du pain</title>
+</bookmark>
+<bookmark id="rdf%3A#$PH0Ua1" href="http://www.faqs.org/rfcs/rfc2396.html">
+<title>RFC 2396 [uris]</title>
+</bookmark>
+<bookmark id="rdf%3A#$QH0Ua1" href="http://www.relaxng.org/compact-tutorial-20030326.html">
+<title>RELAX NG Compact Syntax Tutorial</title>
+</bookmark>
+<bookmark id="rdf%3A#$ZTkO61" href="http://www.xml.com/lpt/a/2003/08/06/x3d.html">
+<title>XML.com: Extensible 3D: XML Meets VRML</title>
+</bookmark>
+<folder id="rdf%3A#$khJ4y">
+<title>perl</title>
+<bookmark id="rdf%3A#$JaUIH" href="http://www.stonehenge.com/merlyn/WebTechniques/col53.html">
+<title>Getting image colors to text (Sep 00)</title>
+</bookmark>
+<bookmark id="rdf%3A#$EaUIH" href="http://rf.net/~james/perli18n.html#Q16">
+<title>Perl, Unicode and i18N FAQ</title>
+</bookmark>
+<bookmark id="rdf%3A#$taUIH" href="http://www.perl.com/doc/FAQs/FAQ/oldfaq-html/Q4.12.html">
+<title>Perl FAQ 4.12: How can I find the Julian Day?</title>
+</bookmark>
+<bookmark id="rdf%3A#$lIULI2" href="http://perlmonks.org/?node_id=277754">
+<title>Perl/Tk --- Weather Map Grabber</title>
+</bookmark>
+<bookmark id="rdf%3A#$maUIH" href="http://tomacorp.com/perl/xs.html">
+<title>xs</title>
+</bookmark>
+</folder>
+</folder>
+<alias ref = "rdf%3A#$EaUIH" />
+</xbel>

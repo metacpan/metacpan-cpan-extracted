@@ -1,0 +1,14 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         XML-Filter-EzPod
+version:      1.2
+version_from: EzPod.pm
+installdirs:  site
+requires:
+    Pod::SAX:                      0
+    Test::More:                    0
+    XML::SAX::Base:                0.1
+    XML::SAX::Writer:              0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

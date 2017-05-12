@@ -1,0 +1,40 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 33317486c4fa2cf7fec85bf92ed38ac0f64233a0 CONTRIBUTING
+SHA1 b8d5ecff631bab29e7cf26872ad58a03c2dcda15 COPYRIGHT
+SHA1 540e627824058dc4b3f75009923f7af8f8e388c8 CREDITS
+SHA1 ab17e9162cab1a14908b42bbb55dfb55d9129bdf Changes
+SHA1 6c5d3a87dc9ae664030afdcc3d70a4f3e12620c1 INSTALL
+SHA1 34f5e12514b91055de4b164a1f2327ef5c30ba53 LICENSE
+SHA1 ee8f92cccd703bda04bd8ed6f9f37a400ffd8513 MANIFEST
+SHA1 1db37bdd7511a2140f4f912d18258011a1fc7432 META.json
+SHA1 766b220bbc03549b8417d434aa1704ac7848b1da META.yml
+SHA1 5792ed20b80aed2bd5dd186a912ddef4c73aedbf Makefile.PL
+SHA1 e1ff2f300d2ba2acefd7219ae39e65780753a1c3 README
+SHA1 3ceaa18b08f460360acb6d8f47bfecc97fa77ec3 TODO
+SHA1 78ee707a91756c4d598bf2ff72500dd31b603bab dist.ini
+SHA1 15907122d4d360d7c0a55ec59c7926b6bade13d6 doap.ttl
+SHA1 aafa4c7b8374822f41452357f5c7696bd98969a9 examples/with_rdfa_parser.pl
+SHA1 dcc232b313d909913b7292226594fb1a6d37fa3b lib/XML/Atom/FromOWL.pm
+SHA1 6a5eefacb03a685daca89c5794c2d4d323b10109 t/01basic.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlQRcfUACgkQzr+BKGoqfTkUbwCgpnjfu3r6GDl3jf/irgv6xA/k
+92UAniVXQ2rBK3CHK67uxLEntt2TsBra
+=vt2+
+-----END PGP SIGNATURE-----

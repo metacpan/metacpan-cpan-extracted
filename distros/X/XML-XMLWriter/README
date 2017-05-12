@@ -1,0 +1,53 @@
+XML::XMLWriter version 0.1
+============================
+
+XMLWriter is a Perl 5 object class, its purpose is to make writing XML
+documents easier, cleaner, safer and standard conform. Its easier
+because of the object oriented way XML documents are written with
+XMLWriter. Its cleaner because of the simple but logical API and its
+safe and standard conform because of the automatically done checking
+against the the DTD.
+
+But still: it might be a matter of taste whether one finds XMLWriter
+usefull or not and it probably has some bugs (i would appreciate a lot
+if you report them to me), many usefull features are missing, not
+implemented or not even thought of and perhaps the API with all its
+simpleness might be confusing though. So please tell me your opinion
+and tell me the way how you would make XMLWriter better. Its not so
+easy to develop a good API for this matter.
+
+XMLWriter contains 3 packages: XMLWriter.pm which gives you the
+document object, Element.pm which provides the element/tag objects and
+PCData.pm which represents the parsed character data the document
+contains. There'll probably come more objects in feature releases.
+The most interesting class is Element.pm. It provides some methods you
+can call on every document element, but besides those methods it uses
+the AUTOLOAD feature of perl to expect every not known method name
+to be the name of a tag that should be added to the list of child tags
+of the element the method is called on. So calling "$html->head"
+will simply add a new element (the head element) to the list of child
+tags of the html element. The head object is returned.  Have a look at
+the examples for better understanding. You should also read the POD of
+Element.pm and PCdata.pm.
+
+Please see the POD for additional information.
+
+INSTALLATION
+
+To install this module, type:
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+
+DEPENDENCIES
+
+        XML::ParseDTD 0.1.3
+
+COPYRIGHT AND LICENSE
+
+(c) 2003 Moritz Sinn
+
+This module is free software.  You can redistribute it and/or modify it 
+under the terms of the GNU GENERAL PUBLIC LICENSE (see COPYING).

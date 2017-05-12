@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Schema definition of a component -->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+   <xsd:include schemaLocation="componentDepList.xsd"/>
+   <xsd:include schemaLocation="source.xsd"/>
+   <xsd:include schemaLocation="ownerInfo.xsd"/>
+   <xsd:element name="component" type="component"/>
+   <xsd:complexType name="component">
+      <xsd:sequence>
+         <xsd:element name="owner" type="ownerInfo" minOccurs="0">
+            <xsd:annotation>
+               <xsd:documentation>This field is the development owner of the component.  It identifies a group or person responsible.</xsd:documentation>
+            </xsd:annotation>
+         </xsd:element>
+         <xsd:element name="dependsOn" type="componentDepList" minOccurs="0"/>
+         <xsd:element name="source" type="source"/>
+         <xsd:element name="packageOnRelease" type="xsd:boolean" default="false" minOccurs="0"/>
+      </xsd:sequence>
+      <xsd:attribute name="name" type="xsd:string" use="required"/>
+   </xsd:complexType>
+</xsd:schema>

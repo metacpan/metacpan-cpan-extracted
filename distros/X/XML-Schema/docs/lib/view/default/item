@@ -1,0 +1,6 @@
+[%  INCLUDE html/item 
+	title   = item.title 
+	content = item.content(view) 
+%]
+<br>
+<br>

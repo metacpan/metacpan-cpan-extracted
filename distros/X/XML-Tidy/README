@@ -1,0 +1,413 @@
+NAME
+    XML::Tidy - tidy indenting of XML documents
+
+VERSION
+    This documentation refers to version 1.16 of XML::Tidy, which was
+    released on Tue Jun 21 04:14:28:29 -0500 2016.
+
+SYNOPSIS
+      use XML::Tidy;
+
+      # create new   XML::Tidy object from         MainFile.xml
+      my $tidy_obj = XML::Tidy->new('filename' => 'MainFile.xml');
+
+      # Tidy up the indenting
+         $tidy_obj->tidy();
+
+      # Write out changes back to MainFile.xml
+         $tidy_obj->write();
+
+DESCRIPTION
+    This module creates XML document objects (with inheritance from
+    XML::XPath) to tidy mixed-content (i.e., non-data) text node indenting.
+    There are also some other handy member functions to compress and expand
+    your XML document object (into either a compact XML representation or a
+    binary one).
+
+TODO
+    - maybe add to bcompress support for binary char, wide UTF-8, short
+    ints, and single or quad-precision floats
+    - maybe store in compress recurring patterns of node index sets in a new
+    array that can be indexed itself
+    - fix reload() from messing up Unicode escaped &XYZ; components like
+    Copyright &#xA9; and Registered &#xAE;
+    - What else does Tidy need?
+
+USAGE
+  new()
+    This is the standard Tidy object constructor. Except for the new
+    'binary' option, it can take the same parameters as an XML::XPath object
+    constructor to initialize the XML document object. These can be any one
+    of:
+
+      'filename' => 'SomeFile.xml'
+      'binary'   => 'SomeBinaryFile.xtb'
+      'xml'      => $variable_which_holds_a_bunch_of_XML_data
+      'ioref'    => $file_InputOutput_reference
+      'context'  => $existing_node_at_specified_context_to_become_new_obj
+
+  reload()
+    The reload() member function causes the latest data contained in a Tidy
+    object to be re-parsed (which re-indexes all nodes).
+
+    This can be necessary after modifications have been made to nodes which
+    impact the tree node hierarchy because XML::XPath's find() member
+    preserves state information which can get out-of-sync.
+
+    reload() is probably rarely useful by itself but it is needed by strip()
+    and prune() so it is exposed as a method in case it comes in handy for
+    other uses.
+
+  strip()
+    The strip() member function searches the Tidy object for all
+    mixed-content (i.e., non-data) text nodes and empties them out. This
+    will basically unformat any markup indenting.
+
+    strip() is used by compress() and tidy() but it is exposed because it
+    could be worthwhile by itself.
+
+  tidy()
+    The tidy() member function can take a single optional parameter as the
+    string that should be inserted for each indent level. Some examples:
+
+      # Tidy up indenting with default two  (2) spaces per indent level
+         $tidy_obj->tidy();
+
+      # Tidy up indenting with         four (4) spaces per indent level
+         $tidy_obj->tidy('    ');
+
+      # Tidy up indenting with         one  (1) tab    per indent level
+         $tidy_obj->tidy("\t");
+
+    The default behavior is to use two (2) spaces for each indent level. The
+    Tidy object gets all mixed-content (i.e., non-data) text nodes
+    reformatted to appropriate indent levels according to tree nesting
+    depth.
+
+    NOTE: tidy() disturbs some XML escapes in whatever ways XML::XPath does.
+    It has been brought to my attention that these modules also strip CDATA
+    tags from XML files / data they operate on. Even though CDATA tags don't
+    seem very common, I wish they could work smoothly too. Hopefully the
+    vast majority of files will work fine and support for other types can be
+    added later.
+
+  compress()
+    The compress() member function calls strip() on the Tidy object then
+    creates an encoded comment which contains the names of elements and
+    attributes as they occurred in the original document. Their respective
+    element and attribute names are replaced with just the appropriate index
+    throughout the document.
+
+    compress() can accept a parameter describing which node types to attempt
+    to shrink down as abbreviations. This parameter should be a string of
+    just the first letters of each node type you wish to include as in the
+    following mapping:
+
+      e = elements
+      a = attribute   keys
+      v = attribute values *EXPERIMENTAL*
+      t = text       nodes *EXPERIMENTAL*
+      c = comment    nodes *EXPERIMENTAL*
+      n = namespace  nodes *not-yet-implemented*
+
+    Attribute values ('v') and text nodes ('t') both seem to work fine with
+    current tokenization. I've still labeled them EXPERIMENTAL because they
+    seem more likely to cause problems than valid element or attribute key
+    names. I have some bugs in the comment node compression which I haven't
+    been able to find yet so that one should be avoided for now. Since these
+    three node types ('vtc') all require tokenization, they are not included
+    in default compression ('ea'). An example call which includes values and
+    text would be:
+
+      $tidy_obj->compress('eavt');
+
+    The original document structure (i.e., node hierarchy) is preserved.
+    compress() significantly reduces the file size of most XML documents for
+    when size matters more than immediate human readability. expand()
+    performs the opposite conversion.
+
+  expand()
+    The expand() member function reads any XML::Tidy::compress comments from
+    the Tidy object and uses them to reconstruct the document that was
+    passed to compress().
+
+  bcompress('BinaryOutputFilename.xtb')
+    The bcompress() member function stores a binary representation of any
+    Tidy object. The format consists of:
+
+      0) a null-terminated version string
+      1) a byte specifying how many bytes later indices will be
+      2) the number of bytes from 1 above to designate the total string  count
+      3) the number of null-terminated          strings from 2 above
+      4) the number of bytes from 1 above to designate the total integer count
+      5) the number of 4-byte                  integers from 4 above
+      6) the number of bytes from 1 above to designate the total float   count
+      7) the number of 8-byte (double-precision) floats from 6 above
+      8) node index sets until the end of the file
+
+    Normal node index sets consist of two values. The first is an index
+    (again the number of bytes long comes from 1) into the three lists as if
+    they were all linear. The second is a single-byte integer identifying
+    the node type (using standard DOM node type enumerations).
+
+    A few special cases exist in node index sets though. If the index is
+    null, it is interpreted as a close-element tag (so no accompanying type
+    value is read). On the other end, when the index is non-zero, the type
+    value is always read. In the event that the type corresponds to an
+    attribute or a processing instruction, the next index is read (without
+    another accompanying type value) in order to complete the data fields
+    required by those node types.
+
+    NOTE: Please bear in mind that the encoding of binary integers and
+    floats only works properly if the values are not surrounded by spaces or
+    other delimiters and each is contained in its own single node. This is
+    necessary to enable thorough reconstruction of whitespace from the
+    original document. I recommend storing every numerical value as an
+    isolated attribute value or text node without any surrounding
+    whitespace.
+
+      # Examples which encode all numbers as binary:
+      <friend name="goodguy" category="15">
+        <hitpoints>31.255</hitpoints>
+        <location>
+          <x>-15.65535</x>
+          <y>16383.7</y>
+          <z>-1023.63</z>
+        </location>
+      </friend>
+
+      # Examples which encode all numbers as strings:
+      <enemy name="badguy" category=" 666 ">
+        <hitpoints> 2.0 </hitpoints>
+        <location> 4.0 -2.0 4.0 </location>
+      </enemy>
+
+    The default file extension is .xtb (for XML::Tidy binary).
+
+  bexpand('BinaryInputFilename.xtb')
+    The bexpand() member function reads a binary file which was previously
+    written from bcompress(). bexpand() is an XML::Tidy object constructor
+    like new() so it can be called like:
+
+      my $xtbo = XML::Tidy->bexpand('BinaryInputFilename.xtb');
+
+  prune()
+    The prune() member function takes an XPath location to remove (along
+    with all attributes and child nodes) from the Tidy object. For example,
+    to remove all comments:
+
+      $tidy_obj->prune('//comment()');
+
+    or to remove the third baz (XPath indexing is 1-based):
+
+      $tidy_obj->prune('/foo/bar/baz[3]');
+
+    Pruning your XML tree is a form of tidying too so it snuck in here. =)
+
+  write()
+    The write() member function can take an optional filename parameter to
+    write out any changes to the Tidy object. If no parameters are given,
+    write() overwrites the original XML document file (if a 'filename'
+    parameter was given to the constructor).
+
+    write() will croak() if no filename can be found to write to.
+
+    write() can also take a secondary parameter which specifies an XPath
+    location to be written out as the new root element instead of the Tidy
+    object's root. Only the first matching element is written.
+
+  toString()
+    The toString() member function is almost identical to write() except
+    that it takes no parameters and simply returns the equivalent XML string
+    as a scalar. It is a little weird because normally only XML::XPath::Node
+    objects have a toString() member but I figure it makes sense to extend
+    the same syntax to the parent object as well since it is a useful
+    option.
+
+createNode Wrappers
+    The following are just aliases to Node constructors. They'll work with
+    just the unique portion of the node type as the member function name.
+
+  e() or el() or elem() or createElement()
+    wrapper for XML::XPath::Node::Element->new()
+
+  a() or at() or attr() or createAttribute()
+    wrapper for XML::XPath::Node::Attribute->new()
+
+  c() or cm() or cmnt() or createComment()
+    wrapper for XML::XPath::Node::Comment->new()
+
+  t() or tx() or text() or createTextNode()
+    wrapper for XML::XPath::Node::Text->new()
+
+  p() or pi() or proc() or createProcessingInstruction()
+    wrapper for XML::XPath::Node::PI->new()
+
+  n() or ns() or nspc() or createNamespace()
+    wrapper for XML::XPath::Node::Namespace->new()
+
+EXPORTED CONSTANTS
+    XML::Tidy also exports the same node constants as XML::XPath::Node
+    (which correspond to DOM values). These include:
+
+  UNKNOWN_NODE
+  ELEMENT_NODE
+  ATTRIBUTE_NODE
+  TEXT_NODE
+  CDATA_SECTION_NODE
+  ENTITY_REFERENCE_NODE
+  ENTITY_NODE
+  PROCESSING_INSTRUCTION_NODE
+  COMMENT_NODE
+  DOCUMENT_NODE
+  DOCUMENT_TYPE_NODE
+  DOCUMENT_FRAGMENT_NODE
+  NOTATION_NODE
+  ELEMENT_DECL_NODE
+  ATT_DEF_NODE
+  XML_DECL_NODE
+  ATTLIST_DECL_NODE
+  NAMESPACE_NODE
+    XML::Tidy also exports:
+
+  STANDARD_XML_DECL
+    which returns a reasonable default XML declaration string.
+
+CHANGES
+    Revision history for Perl extension XML::Tidy:
+
+    - 1.16 G6LM4EST Tue Jun 21 04:14:28:29 -0500 2016
+      * stopped using my old fragile package generation and manually updated
+      all distribution files (though Dist::Zilla should let me generate much
+      again)
+
+      * updated license to GPLv3+
+
+      * fixed 00pod.t and 01podc.t to eval the Test modules from issue and
+      patch: HTTPS://RT.CPAN.Org/Public/Bug/Display.html?id=85592 (Thanks
+      again MichielB.)
+
+      * replaced all old '&&' with 'and' in POD
+
+    - 1.14 G6JMERCY Sun Jun 19 14:27:12:34 -0500 2016
+      * separated old PT from VERSION to fix non-numeric issue:
+      HTTPS://RT.CPAN.Org/Public/Bug/Display.html?id=56073 (Thanks to
+      Slaven.)
+
+      * removed Unicode from POD but added encoding utf8 anyway to pass
+      tests and resolve issues:
+      HTTPS://RT.CPAN.Org/Public/Bug/Display.html?id=92434 and
+      HTTPS://RT.CPAN.Org/Public/Bug/Display.html?id=85592 (Thanks to
+      Sudhanshu and MichielB.)
+
+    - 1.12.B55J2qn Thu May 5 19:02:52:49 2011
+      * made "1.0" float binarize as float again, rather than just "1" int
+
+      * cleaned up POD and fixed EXPORTED CONSTANTS heads blocking together
+
+    - 1.10.B52FpLx Mon May 2 15:51:21:59 2011
+      * added tests for undefined non-standard XML declaration to suppress
+      warnings
+
+    - 1.8.B2AMvdl Thu Feb 10 22:57:39:47 2011
+      * aligned .t code
+
+      * added test for newline before -r to try to resolve:
+      HTTPS://RT.CPAN.Org/Ticket/Display.html?id=65471 (Thanks, Leandro.)
+
+      * fixed off-by-one error when new gets a readable (non-newline)
+      filename (that's not "filename" without a pre-'filename' param) to
+      resolve: HTTPS://RT.CPAN.Org/Ticket/Display.html?id=65151 (Thanks,
+      Simone.)
+
+    - 1.6.A7RJKwl Tue Jul 27 19:20:58:47 2010
+      * added head2 POD for EXPORTED CONSTANTS to try to pass t/00podc.t
+
+    - 1.4.A7QCvHw Mon Jul 26 12:57:17:58 2010
+      * hacked a little test for non-UTF-8 decl str to resolve FrankGoss'
+      need for ISO-8859-1 decl encoding to persist through tidying
+
+      * md sure META.yml is being generated correctly for the CPAN
+
+      * updated license to GPLv3
+
+    - 1.2.75BACCB Fri May 11 10:12:12:11 2007
+      * made "1.0" float binarize as just "1" int
+
+      * made ints signed and bounds checked
+
+      * added new('binary' => 'BinFilename.xtb') option
+
+    - 1.2.54HJnFa Sun Apr 17 19:49:15:36 2005
+      * fixed tidy() processing instruction stripping problem
+
+      * added support for binary ints and floats in bcompress()
+
+      * tightened up binary format and added pod
+
+    - 1.2.54HDR1G Sun Apr 17 13:27:01:16 2005
+      * added bcompress() and bexpand()
+
+      * added compress() and expand()
+
+      * added toString()
+
+    - 1.2.4CKBHxt Mon Dec 20 11:17:59:55 2004
+      * added exporting of XML::XPath::Node (DOM) constants
+
+      * added node object creation wrappers (like LibXML)
+
+    - 1.2.4CCJW4G Sun Dec 12 19:32:04:16 2004
+      * added optional 'xpath_loc' => to prune()
+
+    - 1.0.4CAJna1 Fri Dec 10 19:49:36:01 2004
+      * added optional 'filename' => to write()
+
+    - 1.0.4CAAf5B Fri Dec 10 10:41:05:11 2004
+      * removed 2nd param from tidy() so that 1st param is just indent
+      string
+
+      * fixed pod errors
+
+    - 1.0.4C9JpoP Thu Dec 9 19:51:50:25 2004
+      * added xplc option to write()
+
+      * added prune()
+
+    - 1.0.4C8K1Ah Wed Dec 8 20:01:10:43 2004
+      * inherited from XPath so that those methods can be called directly
+
+      * original version (separating Tidy.pm from Merge.pm)
+
+INSTALL
+    From the command shell, please run:
+
+      `perl -MCPAN -e "install XML::Tidy"`
+
+    or uncompress the package and run the standard:
+
+      `perl Makefile.PL; make; make test; make install`
+
+FILES
+    XML::Tidy requires:
+
+    Carp to allow errors to croak() from calling sub
+
+    XML::XPath to use XPath statements to query and update XML
+
+    XML::XPath::XMLParser to parse XML documents into XPath objects
+
+    Math::BaseCnv to handle base-64 indexing for compress() and expand()
+
+LICENSE
+    Most source code should be Free! Code I have lawful authority over is
+    and shall be! Copyright: (c) 2004-2016, Pip Stuart. Copyleft : This
+    software is licensed under the GNU General Public License (version 3 or
+    later). Please consult HTTP://GNU.Org/licenses/gpl-3.0.txt for important
+    information about your freedom. This is Free Software: you are free to
+    change and redistribute it. There is NO WARRANTY, to the extent
+    permitted by law. See HTTP://FSF.Org for further information.
+
+AUTHOR
+    Pip Stuart <Pip@CPAN.Org>
+

@@ -1,0 +1,12 @@
+<h2>Table of Contents</h2>
+<ul>
+[% FOREACH item = toc -%]
+<li><a href="#[% item.id %]">[% item.title %]</a>
+[% IF (subs = item.subs.size) -%]
+[% FOREACH sub = item.subs -%]
+<br>
+- <a href="#[% sub.id %]">[% sub.title %]</a>
+[% END %]
+[% END %]
+[% END %]
+</ul>

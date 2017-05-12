@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions
+ xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+ xmlns:http="http://schemas.xmlsoap.org/wsdl/http/"
+ xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+ xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+ xmlns:exp="urn:example:wsdl"
+ targetNamespace="urn:example:wsdl">
+
+ <wsdl:types>
+  <xsd:schema targetNamespace="urn:example:wsdl">
+
+   <xsd:element name="list" type="exp:listType" />
+   <xsd:complexType name="listType">
+    <xsd:sequence>
+     <xsd:element name="item" minOccurs="0" maxOccurs="unbounded">
+      <xsd:complexType>
+       <xsd:sequence>
+        <xsd:element name="id" type="xsd:int"/>
+        <xsd:element name="name" type="xsd:string"/>
+       </xsd:sequence>
+      </xsd:complexType>
+     </xsd:element>
+    </xsd:sequence>
+   </xsd:complexType>
+
+   <xsd:element name="result" type="xsd:int"/>
+
+  </xsd:schema>
+ </wsdl:types>
+
+ <wsdl:message name="request_via_element">
+   <wsdl:part name="list" element="exp:list"/>
+ </wsdl:message>
+ <wsdl:message name="answer_via_element">
+   <wsdl:part name="result" element="exp:result"/>
+ </wsdl:message>
+
+ <wsdl:portType name="query">
+   <wsdl:operation name="using_element">
+     <wsdl:input  message="exp:request_via_element"/>
+     <wsdl:output message="exp:answer_via_element"/>
+   </wsdl:operation>
+ </wsdl:portType>
+
+ <wsdl:binding name="query_SOAPHTTP" type="exp:query">
+   <soap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http"/>
+   <wsdl:operation name="using_element">
+     <soap:operation style="rpc"/>
+     <wsdl:input>
+       <soap:body use="literal" namespace="urn:sonae:elegibilidade:exp"/>
+     </wsdl:input>
+     <wsdl:output>
+       <soap:body use="literal" namespace="urn:sonae:elegibilidade:exp"/>
+     </wsdl:output>
+   </wsdl:operation>
+ </wsdl:binding>
+
+ <wsdl:service name="service">
+   <wsdl:port binding="exp:query_SOAPHTTP" name="query">
+     <soap:address location="http://localhost:3000/ws/exp/soap"/>
+   </wsdl:port>
+ </wsdl:service>
+</wsdl:definitions>

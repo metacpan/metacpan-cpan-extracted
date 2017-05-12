@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Schema definition for a product item short description -->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+   <xsd:element name="productDepItem" type="productDepItem"/>
+   <xsd:complexType name="productDepItem">
+      <xsd:attribute name="name" type="xsd:string" use="required">
+      </xsd:attribute>
+   </xsd:complexType>
+</xsd:schema>

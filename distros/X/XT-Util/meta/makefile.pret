@@ -1,0 +1,9 @@
+# This file provides instructions for packaging.
+
+`XT-Util`
+	perl_version_from m`XT::Util`;
+	version_from      m`XT::Util`;
+	readme_from       m`XT::Util`;
+	requires          p`JSON 2.00`;
+	test_requires     p`Test::More 0.61`.
+

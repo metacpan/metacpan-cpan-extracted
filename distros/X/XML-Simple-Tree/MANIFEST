@@ -1,0 +1,22 @@
+Changes
+lib/XML/Simple/Tree.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/cut.t
+t/data/base.xml
+t/data/cut_exp1.xml
+t/data/cut_exp2.xml
+t/data/cut_exp3.xml
+t/data/move_exp1.xml
+t/data/move_exp2.xml
+t/data/paste_cut1.xml
+t/data/paste_exp1.xml
+t/data/paste_exp2.xml
+t/data/t1.xml
+t/data/t4.xml
+t/move.t
+t/paste.t
+t/toXML.t
+t/traverse.t

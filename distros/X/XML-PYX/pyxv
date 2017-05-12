@@ -1,0 +1,9 @@
+#!/usr/bin/perl
+
+use XML::PYX;
+
+my $p = XML::PYX::Parser::ToCSF->new(Validating => 1);
+
+if (@ARGV) { $p->parsefile($ARGV[0]); }
+else { $p->parse(\*STDIN); }
+

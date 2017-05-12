@@ -1,0 +1,76 @@
+#!/usr/bin/perl
+
+use strict;
+$^W = 1;
+
+my $counter = 0;
+
+# takes a true/false value as first arg, prints "[not] ok ..." followed
+# by the second arg
+sub ok {
+    $counter++;
+    print ''.($_[0] ? 'ok ' : 'not ok ').$counter."\t$_[1]\n";
+    return $_[0];
+}
+
+sub is {
+    ok($_[0] eq $_[1], $_[2]) ||
+      print "# got: [$_[0]]\n# exp: [$_[1]]\n";
+}    
+
+# compares first two args deeply, prints "[not] ok ..." followed by third arg
+# NB *only* handles scalars, hashes and arrays
+sub is_deeply {
+    my($msg, @args) = reverse(@_);
+    ok(_is_deeply(@args), $msg);
+}
+
+sub _is_deeply {
+    my @args = @_;
+    return 0 unless(ref($args[0]) eq ref($args[1]));
+    if(ref($args[0]) eq '') {
+        return ($args[0] eq $args[1]);
+    } elsif(ref($args[0]) eq 'ARRAY') {
+        return _is_deeply_arrays(@args);
+    } elsif(ref($args[0]) eq 'HASH') {
+        return _is_deeply_hashes(@args);
+    } else {
+        return 0
+    }
+}
+
+sub _is_deeply_arrays {
+    return 0 if(@{$_[0]} != @{$_[1]}); # different sizes
+    foreach my $i (0 .. $#{$_[0]}) {
+        return 0 if(!_is_deeply($_[0]->[$i], $_[1]->[$i]));
+    }
+    return 1;
+}
+
+sub _is_deeply_hashes {
+    my %arg1 = %{$_[0]};
+    my %arg2 = %{$_[1]};
+    return 0 if((keys %arg1) != (keys %arg2)); # different sizes
+    return 0 if(!_is_deeply_arrays(              # different keys
+        [sort keys %arg1], [sort keys %arg2]
+    ));
+    return 0 if(!_is_deeply_arrays(              # different values
+        [@arg1{sort keys %arg1}], [@arg2{sort keys %arg1}]
+    ));
+    return 1;
+};
+
+# strips the 'attrib' key out of any hashes in a structure
+sub strip_attribs {
+    return unless(ref($_[0]));
+    if(ref($_[0]) eq 'ARRAY') {
+        foreach (@{$_[0]}) { strip_attribs($_) }
+    } elsif(ref($_[0]) eq 'HASH') {
+        delete $_[0]->{attrib};
+        if($_[0]->{type} eq 'e') {
+	    foreach (@{$_[0]->{content}}) { strip_attribs($_) }
+	}
+    }
+}
+
+1;

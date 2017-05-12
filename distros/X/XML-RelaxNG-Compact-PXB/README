@@ -1,0 +1,84 @@
+NAME
+
+XML::RelaxNG::Compact::PXB
+
+VERSION
+
+  0.15
+
+DESCRIPTION
+
+ Those who are looking into the XML data binding framework may benefit from
+ this module. Especially those people who tired of refactoring their XML/XPath
+ code every time their namespace change or some part of their schema have changed.
+ Ok, I lied. 
+ It binds  RelaxNG Compact schema [http://relaxng.org/compact-tutorial-20030326.html] but I will use XML term
+ since there are several very easy ways to translate your XML schema into the RNGC and
+ most modern open source schema developments are centered on RNGC rather than XML).
+  
+ This is XML RelaxNG compact data  binding framework. For any RelaxNG compact schema
+ represented as perl data structures it will create the tree of perl classes.
+ Basicaly it binds every element from the XML (RelaxNG compact) schema
+ into corresponded perl object. It uses XML::LibXML for actual XML document parsing where
+ validation is provided by the API unmarshalling process. It supports namspaces, of course.
+ It automatically creates helper modules and test suit as well.
+ The syntax of the data model language allows to include direct mappings
+ from the XML schema to SQL database table entries. Please see XML::RelaxNG::Compact::DataModel
+ for more information. 
+ This module is not pretending to be a YetAnotherOne POE + ORM on steroids.
+ It just does what was outlined above. It utilizes Perl::Critic and perltidy to insure that
+ it creates uniform, highly supportable and extendable API.
+ 
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc  XML::RelaxNG::Compact::PXB
+
+You can also look for information at:
+    
+    ./doc/ folder
+    ./examples/ folder
+    
+    
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/XML::RelaxNG::Compact::PXB
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/XML::RelaxNG::Compact::PXB
+
+    Search CPAN
+        http://search.cpan.org/dist/XML::RelaxNG::Compact::PXB
+
+
+TODO
+
+use LibXML RelaxNG schema parsing abilites to eliminate need for 
+perl data structures
+
+Use PPI module from CPAN to create API in more OO cleaner way and provide
+better support for users's schema callbacks
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007-2011,  Fermi Reasearch Alliance (FRA)  
+
+You should have received a copy of the Fermitools license
+with this software.  If not, see <http://fermitools.fnal.gov/about/terms.html>
+
+
+AUTHOR
+
+Maxim Grigoriev, <maxim |AT| fnal.gov>

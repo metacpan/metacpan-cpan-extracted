@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE plants [
+	<!ELEMENT plants (plant)*>
+	<!ELEMENT plant (flower, name)>
+	<!ELEMENT flower (#PCDATA)>
+	<!ELEMENT name (#PCDATA)>
+	<!ATTLIST flower colour CDATA #IMPLIED>
+]>
+<plants>
+	<plant>
+		<flower colour="green"></flower>
+		<name>Arum apulum</name>
+	</plant>
+	<plant>
+		<flower colour="green,brown"></flower>
+		<name>Arum discoridis</name>
+	</plant>
+</plants>

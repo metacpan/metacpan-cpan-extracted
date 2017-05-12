@@ -1,0 +1,278 @@
+% layout 'default';
+% title 'Master Products Database';
+
+<ol class="breadcrumb">
+  <li><a href="/user/">User Main</a></li>
+  <li class="active">Master Products Database</li>
+</ol>
+
+% if ( flash 'product_update_ok' ) {
+  <p class="alert alert-success">Products were successfully updated.</p>
+% }
+
+% if ( flash 'product_delete_ok' ) {
+  <p class="alert alert-success">Products were successfully deleted.</p>
+% }
+
+<div class="panel panel-primary">
+  <div class="panel-heading">
+    <h3 class="panel-title"><a href="/user/master-products-database">Add Product</a></h3>
+  </div>
+  <div class="panel-body">
+    % if ( stash 'product_add_ok' ) {
+      <p class="alert alert-success">Product was successfully added.
+        <a href="<%= url_for '/user/master-products-database' %>">Add
+          another one</a>.
+      </p>
+    % } else {
+      <%= form_for '/user/master-products-database' =>
+        method => 'POST' => begin %>
+        %= csrf_field
+
+        % if ( stash 'already_have_this_product' ) {
+          <p class="alert alert-danger">This product number is already
+            in the database. Aborting addition.
+          </p>
+        %}
+
+        <%== form_checker_error_wrapped %>
+
+        %= hidden_field add_product => 1
+
+        <div class="row">
+          <div class="form-group col-md-5">
+            <label for="number">*Number:</label
+            ><%= text_field 'number'
+              => id => 'number', class => 'form-control'
+            %>
+          </div>
+          <div class="form-group col-md-5">
+            <label for="image">Image:</label
+            ><%= text_field 'image'
+              => id => 'image', class => 'form-control'
+            %>
+          </div>
+          <div class="form-group col-md-2">
+            <label for="price">Price:</label
+            ><%= text_field 'price'
+              => id => 'price', class => 'form-control'
+            %>
+          </div>
+        </div>
+        <div class="row">
+          <div class="form-group col-md-6">
+            <label for="title">Title:</label
+            ><%= text_field 'title'
+              => id => 'title', class => 'form-control'
+            %>
+          </div>
+          <div class="form-group col-md-6">
+            <label for="quote_description">Quote description:</label
+            ><%= text_field 'quote_description'
+              => id => 'quote_description', class => 'form-control'
+            %>
+          </div>
+        </div>
+        <div class="row">
+          <div class="form-group col-md-6">
+            <label for="description">Description:</label
+            ><%= text_area 'description', cols => 40, rows => 3,
+              id => 'description', class => 'form-control'
+            %>
+          </div>
+          <div class="form-group col-md-6">
+            <label for="tip_description">Tip description:</label
+            ><%= text_area 'tip_description', cols => 40, rows => 3,
+              id => 'tip_description', class => 'form-control'
+            %>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="category">Category <small style="color: #7A7FBD;">
+            (Category format: <samp>[cat1*::*cat2*::* ...
+            *::*cat_n][cat1*::*cat2*::* ... *::*cat_n][cat3*::*NOCAT]</samp>
+          )</small>:</label
+          ><%= text_field 'category',
+            id => 'category', class => 'form-control'
+          %>
+        </div>
+        <div class="row">
+          <div class="form-group col-md-3">
+            <label for="unit">Unit:</label
+            ><%= text_field 'unit', id => 'unit', class => 'form-control' %>
+          </div>
+          <div class="form-group col-md-3">
+            <label for="group_master">Group master:</label
+            ><%= text_field 'group_master', id => 'group_master',
+              class => 'form-control'
+            %>
+          </div>
+          <div class="form-group col-md-3">
+            <label for="group_desc">Group description:</label
+            ><%= text_field 'group_desc', id => 'group_desc',
+              class => 'form-control'
+            %>
+          </div>
+          <div class="form-group col-md-3">
+            <label for="recommended">Recommended products:</label
+            ><%= text_field 'recommended', id => 'recommended',
+              class => 'form-control'
+            %>
+          </div>
+        </div>
+        %= submit_button 'Add product', class => 'btn btn-primary'
+      %= end
+    % }
+  </div>
+</div>
+
+<hr>
+
+% if ( items_in 'products' ) {
+  <div class="panel panel-danger panel-extra-danger">
+    <div class="panel-heading">
+      <h3 class="panel-title">Delete Products</h3>
+    </div>
+    <div class="panel-body">
+      <%= form_for '/user/master-products-database/delete'
+        => method => 'POST' => begin %>
+        %= csrf_field
+        <div class="form-group">
+          <label for="email">List of products to delete:</label>
+          <%= text_area 'to_delete' => cols => 40, rows => 3,
+            class => 'form-control'
+          %>
+        </div>
+        <%= submit_button 'Delete products', class => 'btn btn-danger' %>
+      %= end
+    </div>
+  </div>
+
+  <div class="panel panel-primary">
+    <div class="panel-heading">
+      <h3 class="panel-title">Update Products</h3>
+    </div>
+    <div class="panel-body">
+      <%= form_for '/user/master-products-database/update'
+        => method => 'POST', id => 'master_db_update_form' => begin %>
+
+      <div class="form-group">
+        <%= text_field 'filter', id => 'filter',
+          class => 'form-control',
+            placeholder => 'Filter numbers (regex)' %>
+      </div>
+
+      %= csrf_field
+
+      <div class="form-group">
+        %= submit_button 'Update products', class => 'btn btn-primary'
+      </div>
+
+      <ul id="edit_products_list">
+        % for my $p ( items_in 'products' ) {
+          <li class="panel panel-primary">
+            <div class="panel-body">
+              %= hidden_field 'id_' . $p->{id} => $p->{id}
+              <div class="row">
+                <div class="form-group col-md-6">
+                  <label for="number_<%= $p->{id} %>">Number:</label
+                  ><%= text_field 'number_' . $p->{id} => $p->{number},
+                    id => 'number_' . $p->{id}, class => 'form-control'
+                  %>
+                </div>
+                <div class="form-group col-md-6">
+                  <label for="image_<%= $p->{id} %>">Image:</label
+                  ><%= text_field 'image_' . $p->{id} => $p->{image},
+                    id => 'image_' . $p->{id}, class => 'form-control'
+                  %>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="price_<%= $p->{id} %>">Price:</label
+                ><%= text_field 'price_' . $p->{id} => $p->{price},
+                  id => 'price_' . $p->{id}, class => 'form-control'
+                %>
+              </div>
+              <div class="form-group">
+                <label for="title_<%= $p->{id} %>">Title:</label
+                ><%= text_field 'title_' . $p->{id} => $p->{title},
+                  id => 'title_' . $p->{id}, class => 'form-control'
+                %>
+              </div>
+              <div class="form-group">
+                <label for="description_<%= $p->{id} %>">Description:</label
+                ><%= text_area 'description_' . $p->{id}
+                  => $p->{description}, cols => 40, rows => 5,
+                  id => 'description_' . $p->{id}, class => 'form-control'
+                %>
+              </div>
+              <div class="row">
+                <div class="form-group col-md-6">
+                  <label for="tip_description_<%= $p->{id} %>">Tip
+                    description:</label
+                  ><%= text_area
+                    'tip_description_' . $p->{id} => $p->{tip_description},
+                    cols => 40, rows => 3,
+                    id => 'tip_description_' . $p->{id},
+                    class => 'form-control'
+                  %>
+                </div>
+                <div class="form-group col-md-6">
+                  <label for="quote_description_<%= $p->{id} %>">Quote
+                    description:</label
+                  ><%= text_area 'quote_description_' . $p->{id}
+                    => $p->{quote_description}, cols => 40, rows => 3,
+                    id => 'quote_description_' . $p->{id},
+                    class => 'form-control'
+                  %>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="category_<%= $p->{id} %>">Category:</label
+                ><%= text_field 'category_' . $p->{id} => $p->{category},
+                  id => 'category_' . $p->{id}, class => 'form-control'
+                %>
+              </div>
+              <div class="row">
+                <div class="form-group col-md-4">
+                  <label for="group_master_<%= $p->{id} %>">Group
+                    master:</label
+                  ><%= text_field 'group_master_' . $p->{id}
+                    => $p->{group_master},
+                    id => 'group_master_' . $p->{id},
+                    class => 'form-control'
+                  %>
+                </div>
+                <div class="form-group col-md-4">
+                  <label for="group_desc_<%= $p->{id} %>">Group
+                    description:</label
+                  ><%= text_field 'group_desc_' . $p->{id}
+                    => $p->{group_desc},
+                    id => 'group_desc_' . $p->{id}, class => 'form-control'
+                  %>
+                </div>
+                <div class="form-group col-md-4">
+                  <label for="unit_<%= $p->{id} %>">Unit:</label
+                  ><%= text_field 'unit_' . $p->{id} => $p->{unit},
+                    id => 'unit_' . $p->{id}, class => 'form-control'
+                  %>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="recommended_<%= $p->{id} %>">Recommended
+                  products:</label
+                ><%= text_area 'recommended_' . $p->{id}
+                  => $p->{recommended}, cols => 40, rows => 3,
+                  id => 'recommended_' . $p->{id}, class => 'form-control'
+                %>
+              </div>
+            </div>
+          </li>
+        % }
+      </ul>
+
+      %= submit_button 'Update products', class => 'btn btn-primary'
+      %= end
+    </div>
+  </div>
+% }

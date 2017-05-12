@@ -1,0 +1,110 @@
+# test a decimal with totalDigits and FractionDigits restrictions
+
+--- |
+ <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="dec" type="myDecimal"/>
+  <xs:element name="dec2" type="myDecimal2"/>
+  <xs:simpleType name="myDecimal">
+    <xs:restriction base="xs:decimal">
+      <xs:totalDigits value="5"/>
+      <xs:fractionDigits value="2"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="myDecimal2">
+    <xs:restriction base="xs:decimal">
+      <xs:totalDigits value="3"/>
+      <xs:fractionDigits value="0"/>
+    </xs:restriction>
+  </xs:simpleType>
+ </xs:schema>
+
+--- |
+  <dec>12345</dec>
+--- >
+PASS
+
+--- |
+  <dec>-12345</dec>
+--- >
+PASS
+
+--- |
+  <dec>123.45</dec>
+--- >
+PASS
+
+--- |
+  <dec>123.450</dec>
+--- >
+PASS
+
+--- |
+  <dec>123.4500000</dec>
+--- >
+PASS
+
+--- |
+  <dec>00000123.45</dec>
+--- >
+PASS
+
+--- |
+  <dec>00000123.4500000</dec>
+--- >
+PASS
+
+--- |
+  <dec>-123.45</dec>
+--- >
+PASS
+
+--- |
+  <dec>12.345</dec>
+--- >
+FAIL
+
+--- |
+  <dec>123456</dec>
+--- >
+FAIL
+
+--- |
+  <dec>123.456</dec>
+--- >
+FAIL
+
+--- |
+  <dec2>456</dec2>
+--- >
+PASS
+
+--- |
+  <dec2>456.0</dec2>
+--- >
+PASS
+
+--- |
+  <dec2>0456.00</dec2>
+--- >
+PASS
+
+--- |
+  <dec2>00456</dec2>
+--- >
+PASS
+
+--- |
+<dec>0.45</dec>
+--- >
+PASS
+
+--- |
+<dec>.45</dec>
+--- >
+PASS
+
+--- |
+<dec></dec>
+--- >
+FAIL
+

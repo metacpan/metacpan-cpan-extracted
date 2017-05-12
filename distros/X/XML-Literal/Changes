@@ -1,0 +1,8 @@
+[Changes for 0.02 - 2006-08-24]
+
+* Removed an unneccessary "use Sub::Override" line from the module.
+  Reported by: Asaf Bartov
+
+[Changes for 0.01 - 2006-07-21]
+
+* Initial CPAN release.

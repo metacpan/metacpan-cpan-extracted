@@ -1,0 +1,420 @@
+#!/usr/bin/perl -w
+#
+# 「現金及び現金同等物の期首残高」はPrior1YearConsolidatedInstant 前期の期末残高なので表示しない。
+
+#use Getopt::Declare;
+use Encode;
+use Data::Dumper;
+use XBRL::JPFR;
+use Getopt::Long;
+use Pod::Usage;
+use Math::NumberCruncher;
+use Hash::Merge qw(merge);
+
+$Data::Dumper::Freezer = 'freeze';
+
+my %args = (
+	#'item'				=> 1,
+	'item'				=> 0,
+	'tree'				=> 0,
+	'context'			=> 0,
+	'label'				=> 0,
+	'simple'			=> 0,
+	'debug'				=> 0,
+	'english'			=> 0,
+	's0'				=> ',',
+	's1'				=> '&',
+	's2'				=> '=',
+	'dir'				=> undef,
+	'fields'			=> [],
+	'context_fields'	=> [],
+	'type'				=> [],
+	'role'				=> [],
+	'notextblock'		=> 0,
+	'indent'			=> '  ',
+	'std'				=> 0,
+	'<xbrl>'			=> undef,
+);
+GetOptions(\%args,
+	'item|i', 'tree|t', 'context|c', 'label|l', 'simple|s', 'english|en|e', 'debug|g',
+	's0=s', 's1=s', 's2=s', 'dir|d=s', 'indent=s',
+	'fields|f=s@{1,}', 'context_fields|cf=s@{1,}', 'type=s@{1,3}', 'role=s@{1,}',
+	'notextblock',
+	'std',
+	'<>' => sub { $args{'<xbrl>'} = $_[0] },
+	'help|h',
+);
+#print Dumper(\%args);
+
+if (!defined $args{'<xbrl>'} || !-e $args{'<xbrl>'} || $args{'help'}) {
+	pod2usage(-verbose => 2);
+}
+if (!-d $args{'dir'}) {
+	print STDERR "$0: Specify the schema directory with -d\n";
+	exit 1;
+}
+
+my $xbrl = XBRL::JPFR->new ({
+	file => $args{'<xbrl>'},
+	schema_dir => $args{'dir'},
+	only_ja => !$args{'english'},
+	lang => $args{'english'} ? 'en' : 'ja',
+	#only_items => $args{'item'} && !$args{'tree'} && !$args{'context'} && !$args{'label'},
+	only_items => $args{'item'},
+	std_labels => $args{'std'},
+});
+
+if ($args{'tree'}) {
+	dump_trees($xbrl, @args{'type', 'role', 'fields', 'context_fields'});
+}
+elsif ($args{'context'}) {
+	dump_contexts($xbrl, $args{'fields'});
+}
+elsif ($args{'label'}) {
+	dump_labels($xbrl, $args{'fields'});
+}
+elsif ($args{'debug'}) {
+	dump_debug($xbrl);
+	dump_trees($xbrl, @args{'type', 'role', 'fields', 'context_fields'});
+}
+elsif ($args{'item'}) {
+	dump_items($xbrl, $args{'fields'});
+}
+else {
+	pod2usage(-verbose => 2);
+}
+
+exit 0;
+
+
+sub dump_trees {
+	my ($xbrl, $types, $role, $fields, $context_fields) = @_;
+	if ($args{'simple'}) {
+		$fields = [qw(depth label)] if !$fields || !@$fields;
+		$types = [qw(def pre)] if !$types || !@$types;
+		$context_fields = [qw(adjValue)] if !$context_fields || !@$context_fields;
+	}
+	else {
+		$types = [qw(def pre cal)] if !$types || !@$types;
+		$fields = [qw(
+			depth order weight label id_short id_full
+			name id type subGroup substitutionGroup abstract nillable periodType
+		)] if !$fields || !@$fields;
+		$context_fields = [qw(value)] if !$context_fields || !@$context_fields;
+	}
+	my $trees = $xbrl->get_trees();
+	foreach my $type (@$types) {
+		my $trees_type = $$trees{$type};
+		my @roles = $role && @$role ? @$role : (sort keys %$trees_type);
+		foreach my $role (@roles) {
+			print_line([$type, $role]);
+			my $branches = $$trees_type{$role};
+			my ($rows, $cons) = flatten_branches($xbrl, $branches, $type, $fields, $context_fields);
+			if ($args{'simple'}) {
+				$cons = [grep {!/Prior/} @$cons];
+				my @header = (@$fields[1..$#$fields], @$cons);
+				print_line(\@header);
+				foreach my $cols (@$rows) {
+					my $depth = $$cols{'depth'};
+					my $ind = $args{'indent'} x $depth;
+					$$cols{'label'} = "$ind$$cols{'label'}" if exists $$cols{'label'};
+					$$cols{'id_short'} = "$ind$$cols{'id_short'}" if exists $$cols{'id_short'};
+					print_line([@$cols{@header}]);
+				}
+			}
+			else {
+				my @header = (@$fields, @$cons);
+				print_line(\@header);
+				foreach my $cols (@$rows) {
+					print_line([@$cols{@header}]);
+				}
+			}
+			print "\n";
+		}
+	}
+}
+
+sub flatten_branches {
+	my ($xbrl, $branches, $type, $fs, $cf) = @_;
+	my ($d, $o);
+	my @rows;
+	my @contexts;
+	foreach my $branch (@$branches) {
+		next unless $branch;
+		next if $args{'notextblock'} && $$branch{'id_short'} =~ /TextBlock/;
+		next if $branch->prefLabel && $branch->prefLabel =~ /periodStartLabel/;
+		my %cols;
+		@cols{@$fs} = @$branch{@$fs};
+		my ($vals, $cons) = context_values($xbrl, $branch, $type, $cf);
+		%cols = %{ merge(\%cols, $vals) };
+		push @rows, \%cols;
+		push_contexts(\@contexts, $cons);
+		my @tos = sort {$$a{'order'} <=> $$b{'order'}} @{$$branch{'tos'}};
+		my ($rs, $cs) = flatten_branches($xbrl, \@tos, $type, $fs, $cf) if @tos;
+		push @rows, @$rs if $rs && @$rs;
+		push_contexts(\@contexts, $cs);
+	}
+	return (\@rows, \@contexts);
+}
+
+sub push_contexts {
+	my ($contexts, $cons) = @_;
+	return if !$cons;
+	foreach my $con (@$cons) {
+		push @$contexts, $con if !grep (/^$con$/, @$contexts);
+	}
+}
+
+sub context_values {
+	my ($xbrl, $branch, $type, $cf) = @_;
+	return if $branch->abstract() eq 'true';
+	return ({weight => $branch->weight()}, []) if $type eq 'cal';
+	my $id_short = $branch->id_short();
+	return if !exists $$xbrl{'itemhash'}{$id_short};
+	my $items = $$xbrl{'itemhash'}{$id_short};
+	my %vals;
+	my @cons;
+	foreach my $context (sort keys %$items) {
+		my $item = $$items{$context};
+		push @cons, $context;
+		my @vs;
+		if (ref($item) =~ /ARRAY/) {
+			foreach my $i (@$item) {
+				foreach my $f (@$cf) {
+					push @vs, $i->$f();
+				}
+			}
+		}
+		else {
+			foreach my $f (@$cf) {
+				push @vs, $item->$f();
+			}
+		}
+		$vals{$context} = join $args{'s1'}, @vs;
+	}
+	return (\%vals, \@cons);
+}
+
+sub dump_items {
+	my ($xbrl, $fields) = @_;
+	my $items = $xbrl->get_all_items();
+	$fields = [ $$items[0]->get_fields() ] if (!$fields || !@$fields) && @$items;
+	print_line($fields);
+	foreach my $item (@$items) {
+		next if $args{'notextblock'} && $$item{'name'} =~ /TextBlock/;
+		print_line([@$item{@$fields}]);
+	}
+}
+
+sub dump_contexts {
+	my ($xbrl, $fields) = @_;
+	my $conts = $xbrl->get_all_contexts();
+	$fields = [qw(
+		id scheme identifier startDate endDate label duration lang dimension
+	)] if !$fields || !@$fields;
+	print_line($fields);
+	foreach my $id (sort keys %$conts) {
+		my $cont = $$conts{$id};
+		print_line([@$cont{@$fields}]);
+	}
+}
+
+sub dump_labels {
+	my ($xbrl, $fields) = @_;
+	my $labels = $$xbrl{'taxonomy'}{'labels'};
+	$fields = [ $$labels[0]->get_fields() ] if (!$fields || !@$fields) && @$labels;
+	print_line($fields);
+	foreach my $label (@$labels) {
+		print_line([@$label{@$fields}]);
+	}
+}
+
+sub dump_debug {
+	my ($xbrl) = @_;
+	my @keys = (
+		'schema_files', 'linkbase_files', 'itemhash', 'labelhash', 'trees', 'contexts', 'units',
+	);
+	foreach my $key (@keys) {
+		print Data::Dumper->Dump([$$xbrl{$key}], [$key]), "\n";
+	}
+	my $key = 'elements';
+	print Data::Dumper->Dump([$$xbrl{'taxonomy'}{$key}], [$key]), "\n";
+}
+
+sub print_line {
+	my ($vals) = @_;
+	no warnings;
+	my @cols;
+	foreach my $val (@$vals) {
+		if (ref($val) =~ /HASH/) {
+			my @vs;
+			foreach my $k (sort keys %$val) {
+				push @vs, "$k$args{'s2'}$$val{$k}";
+			}
+			push @cols, join $args{'s1'}, @vs;
+		}
+		elsif (ref($val) =~ /ARRAY/) {
+			if (@$val && ref($$val[0]) =~ /HASH/) {
+				# for Context->dimension
+				my @vs;
+				foreach my $a (@$val) {
+					foreach my $k (sort keys %$a) {
+						push @vs, "$k$args{'s2'}$$a{$k}";
+					}
+				}
+				push @cols, join $args{'s1'}, @vs;
+			}
+			else {
+				push @cols, join $args{'s1'}, @$val;
+			}
+		}
+		elsif (ref($val) =~ /Date::Manip::Date/) {
+			my ($y, $m, $d) = $val->value();
+			my $v = sprintf "%d-%02d-%02d", $y, $m, $d;
+			push @cols, $v;
+		}
+		elsif (ref($val) =~ /XML::LibXML::Element/) {
+			# for Item->img
+			my @vs;
+			foreach my $attr ($val->attributes()) {
+				my $name = $attr->nodeName();
+				my $value = $attr->value();
+				push @vs, "$name$args{'s2'}$value";
+			}
+			push @cols, join $args{'s1'}, @vs;
+		}
+		elsif (!ref($val)) {
+			push @cols, $val;
+		}
+		else {
+			die "$0: invalid ref\n".Dumper($val);
+		}
+	}
+	my $line;
+	if ($args{'s0'} eq ',') {
+		$line = '"'. join ('","', @cols). '"';
+	}
+	else {
+		$line = join $args{'s0'}, @cols;
+	}
+	print "$line\n";
+}
+
+__END__
+
+=head1 NAME
+
+dumpxbrl
+
+=head1 SYNOPSIS
+
+dumpxbrl {-t|-c|-l|-i|-g} -d dir/to/schema/files <xbrl> [options]
+
+=head1 DESCRIPTION
+
+B<This program> will parse the given xbrl file and print it's contents.
+
+If a file needed to parse the xbrl doesn't exist, the file is downloaded to the directory specified by -d option.
+
+You can store the taxonomies of TDnet and EDINET to the schema directory in advance. But I donnot examine it.
+
+example:
+
+To dump a presentation tree of consolidated balance sheet with fields(depth,order,id_short) and context fileds(value,adjValue)
+
+dumpxbrl -t --notextblock <xbrl> -f depth order id_short -cf value adjValue -type pre -role http://disclosure.edinet-fsa.go.jp/role/jppfs/rol_ConsolidatedBalanceSheet -d dir/to/schema/files
+
+Debug dump with -g option will help you understand JPFR.
+
+dumpxblr -g -d dir/to/schema/files <xbrl>
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-h[elp]>
+
+Prints a help message and exits.
+
+=item B<-i[tem]>
+
+Prints items. It is much faster than the other dumps, because no taxonomy is parsed, or bacause only the XBRL-instance is parsed.
+
+=item B<-t[ree]>
+
+Prints definition, presentaion, and/or calculation trees.
+
+=item B<-c[ontext]>
+
+Prints contexts.
+
+=item B<-l[abel]>
+
+Prints labels.
+
+=item B<-g|debug>
+
+Prints contents for debug.
+
+=item B<-e[nglish]>
+
+Prints in english.
+
+=item B<-s[imple]>
+
+Prints simple trees(with -tree). It represents hierarchies of the threes as indented labels.
+
+=item B<-f[ields] field_names...>
+
+Sets fields to show(with -tree).
+
+=item B<-context_fields|cf field_names...>
+
+Sets context fields to show(with -tree).
+
+=item B<-type string...>
+
+Sets type(s) to show(with -tree).
+
+types are 'def', 'pre' and 'cal'. these are default types.
+
+=item B<-role string...>
+
+Sets role(s) to show(with -tree).
+
+=item B<-indent string>
+
+Indent string for simple trees(with -tree).
+
+=item B<-s0 string>
+
+Separator between fields.
+
+=item B<-s1 string>
+
+Separator between values.
+
+=item B<-s2 string>
+
+Separator between key and value.
+
+=item B<-notextblock>
+
+Doesnot print TextBlock.
+
+=back
+
+=head1 AUTHOR
+
+Tetsuya Yamamoto <yonjouhan@gmail.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2015 by Tetsuya Yamamoto
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut
+

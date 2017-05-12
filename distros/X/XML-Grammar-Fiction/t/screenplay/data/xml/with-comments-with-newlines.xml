@@ -1,0 +1,31 @@
+<?xml version='1.0' encoding='utf-8'?>
+<document xmlns="http://web-cpan.berlios.de/modules/XML-Grammar-Screenplay/screenplay-xml-0.2/">
+    <head>
+    </head>
+    <body id="index">
+<scene id="top">
+    <scene id="david_and_goliath">
+        <saying character="David">
+            <para>
+                I will kill you.
+            </para>
+            <!-- David and Goliath are Biblical characters -->
+        </saying>
+        <saying character="Goliath">
+            <para>
+                no way, you little idiot!
+            </para>
+            <!--
+FILL IN - some scenes.
+            -->
+        </saying>
+        <saying character="David">
+            <para>
+                yes way!
+            </para>
+        </saying>
+</scene>
+
+</scene>
+</body>
+</document>

@@ -1,0 +1,24 @@
+---
+abstract: 'Maintain tag attribute ordering when parsing XML into a tree'
+author:
+  - 'Igor Afanasyev <igor.afanasyev@gmail.com>'
+build_requires: {}
+configure_requires:
+  Module::Build: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.421, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: XML-Parser-Style-IxTree
+provides:
+  XML::Parser::Style::IxTree:
+    file: lib/XML/Parser/Style/IxTree.pm
+    version: '1.0'
+requires:
+  Tie::IxHash: '1.22'
+  XML::Parser::Style::Tree: '0'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '1.0'

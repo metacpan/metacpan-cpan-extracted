@@ -1,0 +1,21 @@
+--- |
+  <?xml version="1.0" encoding="UTF-8"?>
+  <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="unqualified">
+    <xs:element name="PROSPEC">
+       <xs:complexType>
+          <xs:sequence>
+             <xs:element name="PRO_SpecDummyA" type="xs:string"/>
+             <xs:element name="PRO_SpecName" type="xs:string"/>
+          </xs:sequence>
+          <xs:attribute name="XIDY" type="xs:string"/>
+       </xs:complexType>
+    </xs:element>
+  </xs:schema>
+
+--- |
+ <PROSPEC XIDY="ID1xxx">
+  <PRO_SpecDummyA>12345678</PRO_SpecDummyA>
+  <PRO_SpecName>Title</PRO_SpecName>
+ </PROSPEC>
+--- >
+PASS

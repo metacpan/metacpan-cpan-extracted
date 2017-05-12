@@ -1,0 +1,245 @@
+NAME
+    XML::LibXML::Augment - extend XML::LibXML::{Attr,Element,Document} on a
+    per-namespace/element basis
+
+SYNOPSIS
+     {
+       package Local::Element::Bar;
+   
+       use 5.010;
+       use strict;
+       use warnings;
+       use XML::LibXML::Augment -names => ['{http://example.com/}bar'];
+   
+       sub tellJoke
+       {
+         say q{A man walked into a bar.};
+         say q{"Ouch," he said.};
+         say q{It was an iron bar.};
+       }
+     }
+ 
+     {
+       package main;
+   
+       use 5.010;
+       use strict;
+       use warnings;
+       use XML::LibXML::Augment;
+   
+       my $doc = XML::LibXML->load_xml(string => <<'XML');
+       <foo xmlns="http://example.com/">
+         <bar baz="1" />
+       </foo>
+       XML
+   
+       XML::LibXML::Augment->upgrade($doc);
+       $doc->findnodes('//*[@baz]')->shift->tellJoke;
+     }
+
+DESCRIPTION
+    XML::LibXML is super-awesome. However, I don't know about you, but
+    sometimes I wish it had some domain-specific knowledge. For example, if I
+    have an XML::LibXML::Element which represents an HTML `<form>` element,
+    why can't it have a `submit` method?
+
+    OK, so I can subclass XML::LibXML::Element, but then I call `childNodes`
+    on my subclass, and get back plain, non-subclassed objects, and I'm back
+    where I first began.
+
+    XML::LibXML::Augment is the package I've been meaning to write for quite
+    some time, to take care of all those issues.
+
+    The magic is in the import method. You write a package which imports
+    XML::LibXML::Augment with particular settings. Then, once you've parsed
+    the document, you call `XML::LibXML::Augment->upgrade` on the root node.
+
+  `import %args`
+    Currently three options are supported. Each has a leading hyphen.
+
+   `-names => \@list`
+    Each item on the list is the name of an element you want to override. If
+    the element is in a namespace, use Clark notation:
+
+     {http://www.example.com/namespace}localname
+
+    If the element is not in a namespace, then leave out the curly braces.
+    Because of clashes (see "Conflict resolution" in CAVEATS below) it seems
+    like a bad idea to try to augment non-namespaced elements based entirely
+    on their localname. But, hey, you want to do it? It's your funeral.
+
+    You can use "*" as the localname to indicate that you wish to subclass all
+    elements in a particular namespace. (Again, see "Conflict resolution".)
+
+    Yes, this is a list, because it might make sense to use the same package
+    to cover, say, HTML `<a>`, `<link>` and `<area>` elements.
+
+   `-type => $type`
+    $type can be either 'Element', 'Attr' or 'Document', but defaults to
+    'Element'. This indicates what sort of thing you're subclassing. Only
+    elements, attributes and documents are supported. (Document subclassing is
+    based on the namespace and localname of its root element.)
+
+    Elements, attributes and documents are pairwise disjoint classes, so you
+    cannot (for example) subclass elements and attributes in the same package.
+
+   `-isa => \@packages`
+    Normally the import routine will automatically establish your package as a
+    subclass of XML::LibXML::Augment::Attr or XML::LibXML::Augment::Element by
+    monkeying around with your @ISA.
+
+    There are times when you want more precise control over @ISA though, such
+    as inheritance heirarchies:
+
+      Local::HTML::TableHeader
+         -> Local::HTML::TableCell
+            -> Local::HTML::Element
+               -> XML::LibXML::Augment::Element
+
+    In this case, you probably want to use the automatic subclassing for
+    Local::HTML::Element, but not for the other two classes, which would work
+    better with explicit subclassing:
+
+     {
+       package Local::HTML::TableCell;
+       use XML::LibXML::Augment
+         -names => ['{http://www.w3.org/1999/xhtml}td'],
+         -isa   => ['Local::HTML::Element'];
+     }
+
+  `upgrade(@things)`
+    This is a function, not a method. It's not exported, so call it with its
+    full name:
+
+     XML::LibXML::Augment::upgrade(@things);
+
+    Upgrades the things in-place, skipping over things that cannot be
+    upgraded, and returns the things as a list. You can of course call it like
+    this:
+
+     @upgraded = XML::LibXML::Augment->upgrade(@things);
+
+    But bear in mind that because of the way Perl method calls work, this is
+    effectively the same as:
+
+     @upgraded = (
+       'XML::LibXML::Augment',
+       XML::LibXML::Augment::upgrade(@things),
+       );
+
+    What is upgrading? Things that are not blessed objects are not upgradable.
+    Blessed objects that XML::LibXML::Augment can find an appropriate subclass
+    for are reblessed into that package (e.g. XML::LibXML::Comment is
+    reblessed into XML::LibXML::Augment::Comment). The nodes in
+    XML::LibXML::NodeLists are reblessed.
+
+  `rebless($thing)`
+    This is basically a single-argument version `upgrade` but designed to be
+    called as a class method, and doesn't recurse into nodelists.
+
+      my $upgraded = XML::LibXML::Augment->rebless($element);
+
+    Note that $element is actually upgraded in-place.
+
+      refaddr($upgraded) == refaddr($element); # true
+
+  `ideal_class_for_object($object)`
+    Calculates the class that `rebless` would bless the object into, but
+    doesn't actually do the reblessing.
+
+  `make_class(@superclasses)`
+    Constructs a new class that is a subclass of the given classes. Call this
+    as a class method. Returns the class name. This is a method used
+    internally by XML::LibXML::Augment, documented in case anybody else wants
+    to use it.
+
+  `BLESS`
+    XML::LibXML::Augment doesn't actually have a method called `BLESS`, but
+    your package can do.
+
+    Inspired by Moose's `BUILD` method, your package's `BLESS` method will be
+    called (if it exists) just after an XML::LibXML node is reblessed into
+    your package. Unlike Moose's `BUILD` method, the inheritance chain isn't
+    automatically walked. It is your package's responsibility to call
+    `SUPER::BLESS` if required.
+
+    Do bear in mind that XML::LibXML's node objects are little more than
+    pointers to the "real" XML nodes that live on the C side of the XS divide.
+    As such, XML::LibXML can (and frequently does) destroy and re-instantiate
+    the pointers willy-nilly. This may limit the usefulness of `BLESS`.
+
+HOW DOES IT WORK?
+    Mostly just careful use of inheritance.
+
+CAVEATS
+  Conflict resolution
+    Only one class can handle any given element. If two different modules want
+    to subclass, say, XHTML `<form>` elements, there can be only one winner.
+    So, which one wins? Neither. XML::LibXML::Augment creates a brand,
+    spanking new class which inherits from both, and that new class wins. This
+    will usually work, but may trip up sometimes. The `joke.pl` example
+    bundled with the XML-LibXML-Augment release gives a demonstration of this
+    feature.
+
+    Note that packages which use an element wildcard, for instance:
+
+     package Local::HTML::Element;
+     use XML::LibXML::Augment -names => ['{http://www.w3.org/1999/xhtml}*'];
+
+    are treated purely as fallbacks. If there exists a non-wildcard class to
+    handle an element, then the wildcard class will be ignored altogether - it
+    won't be included in the funky on-the-fly class generation described
+    above.
+
+    For these reasons, wildcards are perhaps best avoided. It's usually better
+    to do something like:
+
+     package Local::HTML::Element;
+     our @ELEMENTS;
+     BEGIN {
+       @ELEMENTS = map { "{http://www.w3.org/1999/xhtml}$_" }
+         qw/a area b col colgroup ... u/;
+     }
+     use XML::LibXML::Augment -names => \@ELEMENTS;
+
+  XML::LibXML::XPathContext
+    We don't touch XML::LibXML::XPathContext. Results from calling, e.g.
+    `findnodes` on an XPath context will return plain old XML::LibXML nodes.
+    (You can of course upgrade them.) That doesn't render XPath completely
+    unusable though - XML::LibXML::Node also has a `findnodes` method, which
+    will return upgraded objects.
+
+  Subclassing all elements (or all attributes)
+    XML::LibXML::Augment requires you to specify the namespace URI and
+    localname of the elements/attributes you wish to subclass. If you want to
+    provide additional methods to all XML::LibXML::Elements, then perhaps
+    XML::LibXML::Augment is not for you. Try:
+
+     sub XML::LibXML::Element::myAwesomeMethod {
+       ...
+     }
+
+    If you think adding methods to other peoples' classes is evil, then go
+    write some Java and quit complaining.
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=XML-LibXML-Augment>.
+
+SEE ALSO
+    XML::LibXML.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2012, 2014 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

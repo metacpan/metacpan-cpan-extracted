@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  Description: The "version" attribute for the playlist element must be 0 or 1.
+  Expect:      
+-->
+
+<playlist version="25" xmlns="http://xspf.org/ns/0/">
+
+  <trackList>
+  </trackList>
+
+</playlist>

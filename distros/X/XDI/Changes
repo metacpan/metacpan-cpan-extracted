@@ -1,0 +1,9 @@
+Revision history for XDI
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+
+0.02	11 Sep 2012
+		Updated message code to reflect proposed multiplicity syntax
+		$($msg) => $msg
+		$secret => $($secret)

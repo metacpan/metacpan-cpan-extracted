@@ -1,0 +1,18 @@
+<stx:transform version="1.0" 
+  xmlns:stx="http://stx.sourceforge.net/2002/ns"
+  strip-space="yes">
+
+  <stx:template match="node[@id=2]">
+    <stx:value-of select="name()"/>-1
+  </stx:template>
+
+  <stx:template match="node" priority="2">
+    <stx:value-of select="name()"/>-2
+  </stx:template>
+
+  <stx:template match="*">
+    <stx:value-of select="name()"/>-3
+    <stx:process-children/>
+  </stx:template>
+  
+</stx:transform>

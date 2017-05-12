@@ -1,0 +1,20 @@
+Source: libxas-logmon-perl
+Section: perl
+Priority: optional
+Build-Depends: debhelper (>= 7), perl
+Maintainer: kevin l. esteb <kevin@kesteb.us>
+Standards-Version: 3.9.4
+Homepage: http://scm.kesteb.us/trac/
+
+Package: libxas-logmon-perl
+Architecture: all
+Depends: ${misc:Depends}, ${perl:Depends}
+Description: Middleware for Datacenter Operations - log monitoring
+ .
+ XAS is Middleware for Datacenter Operations. It provides standardized
+ methods, modules and philosophy for constructing large distributed
+ applications that are the backbone of your operations center.
+ .
+ This package provides the log file monitoring  modules. This will monitor 
+ log files and send the resulting messages to a message queue server as 
+ messages.

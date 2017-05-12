@@ -1,0 +1,1145 @@
+<?xml version='1.0' encoding='utf-8'?>
+<?xml-stylesheet type="text/xml" href="compare-ml.xsl"?>
+<!DOCTYPE comparison SYSTEM "comparison.dtd">
+<!--
+TODO:
+
+* Add intelligent merging of renamed paths.
+* Add IDE integration.
+* Add Speed (?)
+-->
+<comparison>
+    <meta>
+        <implementations>
+            <impl id="cvs">
+                <name>CVS</name>
+            </impl>
+            <impl id="aegis">
+                <name>Aegis</name>
+            </impl>
+            <impl id="arch">
+                <name>Arch</name>
+            </impl>
+            <impl id="bitkeeper">
+                <name>BitKeeper</name>
+            </impl>
+            <impl id="cmsynergy">
+                <name>CMSynergy</name>
+            </impl>
+            <impl id="co-op">
+                <name>Co-Op</name>
+            </impl>
+            <impl id="darcs">
+                <name>Darcs</name>
+            </impl>
+            <impl id="monotone">
+                <name>Monotone</name>
+            </impl>
+            <impl id="opencm">
+                <name>OpenCM</name>
+            </impl>
+            <impl id="perforce">
+                <name>Perforce</name>
+            </impl>
+            <impl id="subversion">
+                <name>Subversion</name>
+            </impl>
+            <impl id="superversion">
+                <name>Superversion</name>
+            </impl>
+            <impl id="svk">
+                <name>svk</name>
+            </impl>
+            <impl id="vesta">
+                <name>Vesta</name>
+            </impl>
+            <impl id="vss">
+                <name>Visual SourceSafe</name>
+            </impl>
+        </implementations>
+        <timestamp>
+            $Id: scm-comparison.xml 61 2005-04-06 17:09:28Z shlomif $
+        </timestamp>
+    </meta>
+    <contents>
+<section id="main">
+    <title>Version Control System Comparison</title>
+    <expl>
+        This is a comparison of version-control systems. It is split
+        into several categories and sub-categories under which the
+        systems are checked.
+    </expl>
+    <section id="repos_operations">
+        <title>Repository Operations</title>
+        <section id="atomic_commits">
+            <title>Atomic Commits</title>
+            <expl>
+                Support for atomic commits means that if an operation on the
+                repository is interrupted in the middle, the repository will
+                not be left in an inconsistant state. Are the check-in
+                operations atomic? Are the check-in operations atomic, or can
+                interrupting an operation leave the repository in an
+                intermediate state?
+            </expl>
+            <compare>
+                <s id="cvs">No. CVS commits are not atomic.</s>
+                <s id="arch">Yes. Commits are atomic.</s>
+                <s id="darcs">Yes. Commits are atomic.</s>
+                <s id="subversion">Commits are atomic.</s>
+                <s id="superversion">Commits are atomic.</s>
+                <s id="svk">Commits are atomic.</s>
+                <s id="aegis">Commits are atomic.</s>
+                <s id="bitkeeper">Yes (but need to verify)</s>
+                <s id="monotone">Yes.</s>
+                <s id="opencm">Yes. Commits are atomic.</s>
+                <s id="perforce">Yes. Commits are atomic.</s>
+                <s id="vesta">Yes. Commits are atomic.</s>
+                <s id="co-op">Yes. Commits are atomic.</s>
+                <s id="vss">No. VSS commits are not atomic.</s>
+                <s id="cmsynergy">Yes. Commits are atomic.</s>
+            </compare>
+        </section>
+        <section id="move">
+            <title>Files and Directories Moves or Renames</title>
+            <expl>
+                Does the system support moving a file or directory to
+                a different location while still retaining the history
+                of the file?
+            </expl>
+            <compare>
+                <s id="cvs">
+                    No. Renames are not supported and a manual one
+                    may break history in two.
+                </s>
+                <s id="subversion">Yes. Renames are supported.</s>
+                <s id="superversion">No. Renames are not supported.</s>
+                <s id="svk">Yes. Renames are supported.</s>
+                <s id="arch">Yes. Renames are supported.</s>
+                <s id="darcs">Yes. Renames are supported.</s>
+                <s id="bitkeeper">Yes. Renames are supported.</s>
+                <s id="aegis">Yes. Renames are supported.</s>
+                <s id="monotone">Yes. Renames are supported.</s>
+                <s id="opencm">Yes. Renames are supported</s>
+                <s id="perforce">
+                    Not directly (you copy and then delete but it manages to
+                    keep track of the branch; the item below allows for this
+                    very feature)
+                </s>
+                <s id="vesta">
+                    Yes.  The unit of checkout/checkin is a directory
+                    tree.  Files and directories can be added,
+                    deleted, and renamed between versions.
+                </s>
+                <s id="co-op">Renames of files are supported.
+                    Renaming a directory requires creating a new one,
+                    moving the files and deleting the old one.
+                    Moved file histories are preserved.
+                </s>
+                <s id="vss">
+                    Affects the whole history, it's like renaming a
+                    file in the CVS repository. There is a kludgy workaround
+                    using "share-rename,move,delete" that gets what you
+                    want.
+                </s>
+                <s id="cmsynergy">Yes. Renames are supported.</s>
+           </compare>
+        </section>
+        <section id="copy">
+            <title>File and Directories Copies</title>
+            <expl>
+                Does the version control system supports copying
+                files or directories to a different location at the
+                repository level, while retaining the history?
+            </expl>
+            <compare>
+                <s id="cvs">No. Copies are not supported.</s>
+                <s id="subversion">Yes. And it's a very cheap operation (O(1)) that
+                    is also utilized for branching
+                </s>
+                <s id="superversion">No. Copies are not supported.</s>
+                <s id="svk">Yes. Same as subversion.</s>
+                <s id="arch">No. Copies of files and directory structures are
+                    not supported.
+                </s>
+                <s id="darcs">No. Copies of files and directory structures are
+                    not supported.
+                </s>
+                <s id="bitkeeper">
+                    Yes. Copies are supported.
+                </s>
+                <s id="aegis">No. Copies are not supported.</s>
+                <s id="monotone">Yes. Copies are supported</s>
+                <s id="opencm">No. Copies are not supported.</s>
+                <s id="perforce">Copies are supported (though, because
+                    of its architecture, I don't know how well)
+                </s>
+                <s id="vesta">
+                    Yes.  A new package/branch can be based on any
+                    existing version without affecting the past
+                    history.  (This is also an O(1) operation.)
+                </s>
+                <s id="co-op">Copying doesn't retain history, moving does.</s>
+                <s id="vss">Yes. Copies are supported up to a point.</s>
+                <s id="cmsynergy">Yes, and it's a very cheap operation (update the target
+					directory to include the new file/directory).
+				</s>
+           </compare>
+        </section>
+        <section id="repos_clone">
+            <title>Remote Repository Replication</title>
+            <expl>
+                Does the system support cloning a remote repository to get
+                a functionally equivalent copy in the local system? That
+                should be done without any special access to the remote
+                server except for normal repository access.
+            </expl>
+            <compare>
+                <s id="cvs">No.</s>
+                <s id="subversion">Indirectly, by using Chia-Ling Kao's SVN::Mirror
+                    add-on or Shlomi Fish' svn-push utility.
+                </s>
+                <s id="superversion">Yes.</s>
+                <s id="svk">Yes.</s>
+                <s id="arch">Yes.</s>
+                <s id="darcs">Yes.</s>
+                <s id="bitkeeper">Yes.</s>
+                <s id="aegis">Yes.</s>
+                <s id="monotone">Yes.</s>
+                <s id="opencm">No.</s>
+                <s id="perforce">Yes. Via the Perforce Proxy (P4P) tool.</s>
+                <s id="vesta">Yes.  Replication is a fundamental part of the design.</s>
+                <s id="co-op">Repositories are always replicated on local machines.
+                    There is no central server.
+                </s>
+                <s id="vss">
+                    Not directly possible with the included GUI or
+                    command line tools; ssarc and ssrestor might be useable
+                </s>
+                <s id="cmsynergy">Yes, as long as you have the (more expensive) Distributed package.</s>
+            </compare>
+        </section>
+        <section id="push">
+            <title>Propagating Changes to Parent Repositories</title>
+            <expl>
+                Can the system propagate changes from one repository to
+                another?
+            </expl>
+            <compare>
+                <s id="cvs">No.</s>
+                <s id="subversion">Yes, using either Chia-Ling Kao's SVN::Mirror
+                    script or the svn-push utility by Shlomi Fish.
+                </s>
+                <s id="superversion">No.</s>
+                <s id="svk">Yes.</s>
+                <s id="arch">Yes.</s>
+                <s id="darcs">Yes.</s>
+                <s id="bitkeeper">Yes.</s>
+                <s id="aegis">Yes.</s>
+                <s id="monotone">Yes.</s>
+                <s id="opencm">No.</s>
+                <s id="perforce">Unknown. Probably Not.</s>
+                <s id="vesta">
+                    Yes.
+                </s>
+                <s id="co-op">It's a peer-to-peer system,
+                    which keeps all replicas of the repository in sync.
+                </s>
+                <s id="vss">
+                    Not directly possible with the included GUI or
+                    command line tools; ssarc and ssrestor might be useable
+                </s>
+                <s id="cmsynergy">Yes, as long as you have the (more expensive) Distributed package.</s>
+            </compare>
+        </section>
+        <section id="permissions">
+            <title>Repository Permissions</title>
+            <expl>
+                Is it possible to define permissions on access to different
+                parts of a remote repository? Or is access open for all?
+            </expl>
+            <compare>
+                <s id="cvs">
+                    Limited. "pre-commit hook scripts" can be used to
+                    implement various permissions systems.
+                </s>
+                <s id="arch">
+                    Yes. It is possible to define permissions on access to
+                    different parts of a remote repository based on the
+                    permission systems of the underlying protocol.
+                </s>
+                <s id="darcs">
+                    No.
+                </s>
+                <s id="aegis">
+                    Yes. Aegis relies on the UNIX permissions system to
+                    implement permissions for files in the repository.
+                </s>
+                <s id="bitkeeper">
+                    FILL IN
+                </s>
+                <s id="subversion">
+                    Yes. The WebDAV-based service supports defining HTTP
+                    permissions for various directories of the repository.
+                </s>
+                <s id="superversion">
+                    No.
+                </s>
+                <s id="svk">
+                    Same as subversion.
+                </s>
+                <s id="monotone">
+                    Yes. It is possible to restrict incoming changes
+                    from certain sources to be performed only in certain
+                    parts of the repository.
+                </s>
+                <s id="opencm">
+                    Permissions are defined on a per-branch
+                    basis.
+                </s>
+                <s id="perforce">
+                    Yes. (more than half a dozen of permission levels that can
+                    be set in a file by file basis)
+                </s>
+                <s id="vesta">
+                    Yes.  Access permissions for each package (the
+                    unit of checkout/checkin) can be different.
+                    Access permissions for a branch can be different
+                    from the basis package.
+                </s>
+                <s id="co-op">First access (joining the project)
+                    requires administrator's approval.
+                    Subsequent access to that project is not controlled.
+                </s>
+                <s id="vss">
+                    Project specific permissions (read, write, delete, destroy)
+                    can be set per user; but see "Networking Support":
+                    this makes "Repository Permissions" a hindrance to
+                    accidental damage but cannot prevent intentional damage.
+                </s>
+                <s id="cmsynergy">No, though a single server can serve many repositories.</s>
+            </compare>
+        </section>
+        <section id="changesets">
+            <title>Changesets' Support</title>
+            <expl>
+                Does the repository supports changesets? Changesets are a way
+                to group a number of modifications that are relevant to each
+                other in one atomic package, that can be cancelled or
+                propagated as needed.
+            </expl>
+            <compare>
+                <s id="cvs">No. Changes are file-specific.</s>
+                <s id="subversion">Partial support. There are implicit
+                    changeset that are generated on each commit.
+                </s>
+                <s id="superversion">Partial support. Changes are grouped into changesets,
+                    but cannot be cancelled invididually yet.
+                </s>
+                <s id="svk">Same as subversion.
+                </s>
+                <s id="aegis">
+                    Yes. Changesets are supported.
+                </s>
+                <s id="bitkeeper">
+                    Yes. Changesets are supported.
+                </s>
+                <s id="arch">
+                    Yes. Changesets are supported.
+                </s>
+                <s id="darcs">
+                    Yes. Changesets are supported.
+                </s>
+                <s id="monotone">
+                    Yes. Changesets are supported.
+                </s>
+                <s id="opencm">
+                    Yes. Changesets are supported.
+                </s>
+                <s id="perforce">
+                    Yes. Changesets are supported.
+                </s>
+                <s id="vesta">
+                    Not exactly.  Vesta uses a related concept of
+                    configurations instead, which some has similar
+                    properties.
+                </s>
+                <s id="co-op">Yes. Changesets are the default.</s>
+                <s id="vss">No.  Changes are file-specific.</s>
+                <s id="cmsynergy">Yes.  Changesets (or tasks) are fundamental
+                	to the way Synergy works.</s>
+           </compare>
+        </section>
+        <section id="annotate">
+            <title>Tracking Line-wise File History</title>
+            <expl>
+                Does the version control system has an option to track the
+                history of the file line-by-line? I.e: for each line show
+                at which revision it was most recently changed, and by whom?
+            </expl>
+            <compare>
+                <s id="cvs">Yes. cvs annotate</s>
+                <s id="subversion">Yes. (svn blame)</s>
+                <s id="superversion">No.</s>
+                <s id="svk">Yes. (svk blame)</s>
+                <s id="bitkeeper">Yes. (bk annotate)</s>
+                <s id="arch">Not in the command line client, but ViewARCH,
+                a web-interface for Arch, has it.</s>
+                <s id="darcs">Yes. (darcs annotate)</s>
+                <s id="monotone">No.</s>
+                <s id="aegis">Yes. aeannotate</s>
+                <s id="opencm">Unknown. Probably not.</s>
+                <s id="perforce">Yes, an annotation feature is present.</s>
+                <s id="vesta">
+                    No, but it would be easy to implement a tool that
+                    did this, as the Vesta repository provides direct
+                    filesystem access to all versions.
+                </s>
+                <s id="co-op">Not directly, but it's possible to compare
+                    any two versions using a visual differ.
+                </s>
+                <s id="vss">Not directly, but it's possible to compare
+                    any two versions using a visual differ.
+                </s>
+                <s id="cmsynergy">Probably, if you're a sufficiently proficient hacker with
+					their scripting language.
+                </s>
+           </compare>
+        </section>
+    </section>
+    <section id="features">
+        <title>Features</title>
+        <section id="work_on_dir">
+            <title>Ability to Work only on One Directory of the Repository</title>
+            <expl>
+                Can the version control system checkout only one directory of
+                the repository? Or restrict the check-ins to only one
+                directory?
+            </expl>
+            <compare>
+                <s id="cvs">Yes.</s>
+                <s id="subversion">Yes.</s>
+                <s id="superversion">No.</s>
+                <s id="svk">Yes.</s>
+                <s id="bitkeeper">No. All changes are made repository-wide.</s>
+                <s id="arch">
+                    It is possible to commit only a certain directory.
+                    However, one must check out the entire repository as a
+                    whole.
+                </s>
+                <s id="darcs">
+                    It is possible to commit only a certain directory.
+                    However, one must check out the entire repository as a
+                    whole.
+                </s>
+                <s id="aegis">No. All changes are made repository-wide.</s>
+                <s id="monotone">No. All changes are tree-wide.</s>
+                <s id="opencm">No. All changes are made to a project as
+                    a unit
+                </s>
+                <s id="perforce">
+                    Yes. Changes to a sub-directory of the repository
+                    are supported.
+                </s>
+                <s id="vesta">
+                    Yes and no. The unit of checkout/checkin (called a
+                    package) is a directory tree.  Most projects use
+                    more than one.  Once created, a package must be
+                    checked out/in as a unit.
+                </s>
+                <s id="co-op">No. All changes are made to a project as
+                    a unit, but it's possible to access each file's
+                    history separately.
+                </s>
+                <s id="vss">Yes.</s>
+                <s id="cmsynergy">Yes and no.  Files and directories are checked out and in
+					individually, however you have to work in the context of a project,
+					which consists of one or more directories.</s>
+           </compare>
+        </section>
+        <section id="tracking_uncommited_changes">
+            <title>Tracking Uncommited Changes</title>
+            <expl>
+                Does the software has an ability to track the changes in the
+                working copy that were not yet commited to the repository?
+            </expl>
+            <compare>
+                <s id="cvs">Yes. Using cvs diff</s>
+                <s id="subversion">Yes. Using svn diff</s>
+                <s id="superversion">Yes. Local changes are detected and shown immediately. Changes can be
+                  collected in a local buffer before being committed to the repository.</s>
+                <s id="svk">Yes. Using svk diff</s>
+                <s id="bitkeeper">Yes. Using bk diff.</s>
+                <s id="arch">
+                    Yes, using "tla changes".
+                </s>
+                <s id="darcs">
+                    Yes, using "darcs whatsnew".
+                </s>
+                <s id="aegis">Yes. Using aediff</s>
+                <s id="monotone">Yes. In a similar fashion to CVS.</s>
+                <s id="opencm">Yes. Using cm diff</s>
+                <s id="aegis">Yes. Using aediff.</s>
+                <s id="perforce">Yes.</s>
+                <s id="vesta">
+                    Yes.  Intermediate immutable snapshots can be
+                    taken during an active checkout (with vadvance).
+                    These intermediate versions can be treated just
+                    like checked in versions: they can be replicated
+                    to other repositories and used as the basis for
+                    branches.
+                </s>
+                <s id="co-op">Yes, using built-in visual differ/editor.</s>
+                <s id="vss">Yes, using integrated diff tool.</s>
+                <s id="cmsynergy">Yes, either using integrated diff tool or user-configured
+					external diff tool</s>
+            </compare>
+        </section>
+        <section id="per_file_commit_messages">
+            <title>Per-File Commit Messages</title>
+            <expl>
+                Does the system has a way to assign a per-file commit message
+                to the changeset, as well as a per-changeset message?
+            </expl>
+            <compare>
+                <s id="cvs">No. Commit messages are per change.</s>
+                <s id="subversion">No. There is no such feature.</s>
+                <s id="superversion">Yes.</s>
+                <s id="svk">No. There is no such feature.</s>
+                <s id="bitkeeper">Yes. It is possible to have a per-file
+                    commit message</s>
+                <s id="arch">
+                    No.
+                </s>
+                <s id="darcs">
+                    No.
+                </s>
+                <s id="monotone">
+                    Yes. It is possible to attach a comment to a certain
+                    file at a certain revision.
+                </s>
+                <s id="opencm">
+                    Unknown.
+                </s>
+                <s id="perforce">
+                    No. Commit messages are per change.
+                </s>
+                <s id="vesta">
+                    Not exactly.  The unit of checkin is a directory,
+                    and commit messages are assigned at that level,
+                    not to individual files.  Since configurations are
+                    also versioned, they also have commit messages.
+                </s>
+                <s id="co-op">No. Commit messages are per change.
+                    They go to all project members and update
+                    their repositories.
+                </s>
+                <s id="vss">Since changesets are not supported, yes.</s>
+                <s id="cmsynergy">Yes.</s>
+           </compare>
+        </section>
+    </section>
+    <section id="technical_status">
+        <title>Technical Status</title>
+        <section id="documentation">
+            <title>Documentation</title>
+            <expl>
+                How well is the system documented? How easy it is to
+                get started using it?
+            </expl>
+            <compare>
+                <s id="cvs">Excellent. There are many online tutorials and
+                    resources and an online book. The command line client
+                    also provides an online comprehensive help system.
+                </s>
+                <s id="subversion">
+                    Very good. There is a free online book and some online
+                    tutorials and resources. The book is written in
+                    DocBook/XML and so is convertible to many different
+                    formats. The command-line client also provides a good
+                    online help system that can be used as a reference.
+                </s>
+                <s id="superversion">
+                    Fairly poor. There are two tutorials, but there is no
+                    reference. Installing and getting started with the GUI
+                    is very easy though.
+                </s>
+                <s id="svk">
+                    Very poor at this moment.
+                </s>
+                <s id="aegis">
+                    Medium. The documentation is given in several large scope
+                    troff documents, that are only usable as not-so-PDFish
+                    PDF documents, and as text documents that lack any
+                    formatting. It is very hard to get started using
+                    it with the online resources. The content is of good
+                    quality, but otherwise not made very accessible.
+                </s>
+                <s id="arch">
+                    Medium. There are two online tutorials and a
+                    comprehensive online documentation. The command line
+                    client also supplies a reference page. However, some of
+                    the documentation is out of date or incomplete.
+                </s>
+                <s id="darcs">
+                    Good. The manual contains a brief tutorial and a solid
+                    reference.  Every sub-command can print its usage.
+                    Because the command-set is small and the model is
+                    simple, many users find it easy to get started.
+                </s>
+                <s id="bitkeeper">
+                    Very good. There is a comprehensive help at the BitKeeper
+                    site. Each command is documented in its own man page,
+                    and the client contains a help tool that offers
+                    an integrated help system.
+                </s>
+                <s id="monotone">
+                    Good. There's an overview and tutorial written in Texi,
+                    and a man page. The client supplies documentation for
+                    every command.
+                </s>
+                <s id="opencm">
+                    Well documented.
+                </s>
+                <s id="perforce">
+                    Very Good (html and command line help)
+                </s>
+                <s id="vesta">
+                    Quite thoroughly (HTML, man pages, published
+                    papers, a book-length research report).
+                </s>
+                <s id="co-op">Very good. Step-by-step tutorial and HTML help
+                    is included.
+                </s>
+                <s id="vss">Medium.  Help file which is sometimes useful.
+                	However, the interface is reasonably intuitive so
+                	documentation isn't needed as much.
+                </s>
+                <s id="cmsynergy">Medium.  Lots of books, plus somewhat
+                	clunky set of HTML pages, but has some radical concepts
+                	which can cause real problems really quickly.  They recommend
+                	a day's training for basic users, more for more advanced users.
+                	Took a while to become fluent.
+                </s>
+            </compare>
+        </section>
+        <section id="ease_of_deployment">
+            <title>Ease of Deployment</title>
+            <expl>
+                How easy it is to deploy the software? What are
+                the depenedencies and how can they be satisfied?
+            </expl>
+            <compare>
+                <s id="cvs">
+                    Good. Out of being the de-facto standard,
+                    CVS is available on most systems and is easy
+                    to deploy.
+                </s>
+                <s id="arch">
+                    Excellent. An arch service is nothing but a
+                    filesystem-space hosted by any of its supported
+                    protocols (FTP, SFTP, WebDAV, etc.). The arch client
+                    is written in C, and is portable across UNIX systems
+                    (and on Win32 only with a UNIX emulation layer).
+                </s>
+                <s id="darcs">
+                    Very good. darcs requires few external libraries,
+                    however you need the Glasgow Haskell Compiler if you
+                    cannot find a binary. To start working, just "darcs
+                    init".
+                </s>
+                <s id="bitkeeper">
+                    Good. All that is required is downloading a binary
+                    for the system and installing it using the installation
+                    script. The package is self-contained and is easy to
+                    set up.
+                </s>
+                <s id="aegis">
+                    The Aegis binary should be installed as SUID-root, and
+                    so requires root privileges to install. It also not very
+                    portable to Win32 systems. Other than that, Aegis supports
+                    an easy autoconf or RPM/apt-based installation process.
+                </s>
+                <s id="subversion">
+                    A Subversion service requires installing an Apache 2
+                    module (if one wishes to use HTTP as the underlying
+                    protocol) or its own proprietary server. The client
+                    requires only the Subversion-specific logic and the
+                    Neon WebDAV library (for HTTP). Installation of the
+                    components is quite straightforward, but will require
+                    some work, assuming Subversion does not come prepackaged
+                    for one's system.
+                </s>
+                <s id="superversion">
+                    If Java 1.4 is installed, deployment of Superversion
+                    usually takes two clicks.
+                </s>
+                <s id="svk">
+                    In addition to installing subversion, users are required
+                    to install the subversion perl bindings and a few modules
+                    from CPAN.
+                </s>
+                <s id="monotone">
+                    Excellent. It is possible to copy or compile the executable
+                    to the user's machine, without any configuration or
+                    external dependencies.
+                </s>
+                <s id="opencm">
+                    Very good. Install the RPM, or build from tarball and
+                    install the init script.
+                </s>
+                <s id="perforce">
+                    Very good. Perforce is very easy to deploy.
+                </s>
+                <s id="vesta">
+                    Medium to Good.  There is a detailed installation guide
+                    for setting it up using a binary kit.  RPMs and
+                    Debian packages have been recently released.
+                    There are no dependencies on other software.
+                    Vesta, however, is required to build itself.
+                </s>
+                <s id="co-op">Very easy to deploy, since there is no central
+                    server. Can be configured to use e-mail or LAN (or both) for
+                    synchronization. For e-mail, requires MAPI-compliant
+                    e-mail client.
+                </s>
+                <s id="vss">
+                    Very good - an installation package which does the work.
+                    When you create a repository it installs the exe's in a
+                    directory and you can run them from there if you need to.
+                </s>
+                <s id="cmsynergy">
+                    Medium.  There is a detailed install guide for
+                	setting it up using a binary kit and a set of scripts.  However
+                	it still took several tries to get it properly installed and
+                	configured.  The Windows client is a slightly clunky Windows
+                	installer.
+                </s>
+           </compare>
+        </section>
+        <section id="command_set">
+            <title>Command Set</title>
+            <expl>
+                What is the command set? How compatible it is with
+                the commands of CVS (the current open-source defacto
+                standard)?
+            </expl>
+            <compare>
+                <s id="cvs">
+                    A simple command set that includes three most commonly
+                    used commands (cvs commit, cvs update and cvs checkout)
+                    and several others.
+                </s>
+                <s id="subversion">
+                    A CVS-like command set which is easy to get used to
+                    for CVS-users.
+                </s>
+                <s id="superversion">
+                    There is little need to memorize a command set because
+                    all actions take place in a GUI. A part of the terminology
+                    used in the application is borrowed from CVS.
+                </s>
+                <s id="svk">
+                    A CVS-like command set which is easy to get used to
+                    for CVS-users.
+                </s>
+                <s id="bitkeeper">
+                    A CVS-like command set with some easy-to-get-used-to
+                    complications due to its different way of work and
+                    philosophy.
+                </s>
+                <s id="aegis">
+                    A complex command set that involves many operations
+                    just to get started. Not CVS-compatible. (albeit
+                    support for such basic operations was contemplated)
+                    Note that Aegis is a Software Configuration Management
+                    system and not just a simple version control system,
+                    which may justify this extra complexity.
+                </s>
+                <s id="arch">
+                    Many commands are compatible with CVS or BitKeeper. However,
+                    there are many other commands for it for different uses.
+                    Aliasing of commands is possible so it it may be possible
+                    to make it more compatible.
+                </s>
+                <s id="darcs">
+                    The command set is fairly compact and the core commands
+                    are easy to understand.  Follows CVS in a few places,
+                    but since the model is different most commands are
+                    unique.
+                </s>
+                <s id="monotone">
+                    Tries to follow CVS conventions, but deviates where there
+                    is a different design.
+                </s>
+                <s id="opencm">
+                    A CVS-like command set that is familiar to existing CVS
+                    users.
+                </s>
+                <s id="perforce">
+                    Very extensive but not compatible with CVS.
+                </s>
+                <s id="vesta">
+                    The command set is unrelated to CVS.  Most of the
+                    time, users use about 5 commands.  Few ever need
+                    to know more than about 20 commands.
+                </s>
+                <s id="co-op">Basic commands are compatible with CVS.</s>
+                <s id="vss">
+                    A bit of an afterthought.  It's possible to do basic
+                	things, but it's really geared up for using the GUI.
+                </s>
+                <s id="cmsynergy">An extensive and powerful command set,
+                	which has some CVS similarity, though the architecture
+                	is so different that it quickly moves away for anything
+                	but the basics.
+                </s>
+           </compare>
+        </section>
+        <section id="networking">
+            <title>Networking Support</title>
+            <expl>
+                How well is the networking integration in the system?
+                How compliant it with existing protocols and infra-structure.
+            </expl>
+            <compare>
+                <s id="cvs">
+                    Good. CVS uses a proprietary protocol with various
+                    variations for its client/server protocol. This protocol
+                    can be tunneled over an SSH-connection to support
+                    encryption.
+                </s>
+                <s id="arch">
+                    Excellent. Arch can utilize a multitude of protocols
+                    for its service, which is nothing but a dumb remote
+                    filesystem server. Currently supported protocols include
+                    FTP, SFTP, WebDAV (remote file access over HTTP),
+                    as well as any remote filesystem protocol (NFS, SMB).
+                </s>
+                <s id="darcs">
+                    Good. Darcs supports getting patches over HTTP, and
+                    getting and sending patches over SSH and email.
+                </s>
+                <s id="subversion">
+                    Very good. The Subversion service can use either
+                    WebDAV+DeltaV (which is HTTP or HTTPS based) as its
+                    underylying protocol, or its own proprietary protocol
+                    that can be channeled over an SSH connection.
+                </s>
+                <s id="superversion">
+                    Good. Network support based on RMI is integrated
+                    seamlessly. Encryption and HTTP tunnelling are planned
+                    for the near future.
+                </s>
+                <s id="svk">
+                    Very good. svk uses SVN::Mirror to retrieve remote
+                    repository. There has been plans to add VCP support
+                    to SVN::Mirror so it will be able to mirror from arbitary
+                    remote version control systems.
+                </s>
+                <s id="bitkeeper">
+                    Good. Repositories can be checked out from remote
+                    over HTTP, and BitKeeper also sports its own proprietary
+                    protocol for communicating between one repository and
+                    the other.
+                </s>
+                <s id="aegis">
+                    Poor. Aegis is filesystem-oriented and so can be networked
+                    only via NFS (network file-system) or a similar protocol.
+                    There exists some HTTP-functionality, but it is quite
+                    limited.
+                </s>
+                <s id="monotone">
+                    Good. Uses a custom protocol called "netsync".
+                </s>
+                <s id="opencm">
+                    Good. Uses its own proprietary client/server protocol.
+                </s>
+                <s id="perforce">
+                    Good. (single TCP/IP socket)
+                </s>
+                <s id="vesta">
+                    Networking is inherent to the system.  The
+                    repository exports both an NFS interface and an
+                    RPC interface.  The checkout and checkin tools
+                    automatically contact a remote repository when
+                    required to perform an operation.
+                </s>
+                <s id="co-op">Uses the simplest LAN interface:
+                    copying files between shared directories.
+                </s>
+                <s id="vss">
+                    VSS uses a Windows network share which has to be writable
+                    for the VSS users (since this means doubling maintenance
+                    for new users). Add user in VSS and to share permissions.
+                    the share is most often world-writable, as is the default
+                    when creating a share) It does not perform well over a
+                    slow network connection.
+                </s>
+                <s id="cmsynergy">Good (single TCP/IP socket)</s>
+            </compare>
+        </section>
+        <section id="portability">
+            <title>Portability</title>
+            <expl>
+                How portable is the version-control system to various
+                operating systems, computer architectures, and other
+                types of systems?
+            </expl>
+            <compare>
+                <s id="cvs">Good. Client works on UNIX, Windows and Mac OS.
+                    Server works on UNIXes and on Windows with a UNIX
+                    emulation layer.
+                </s>
+                <s id="subversion">
+                    Excellent. Clients and Servers work on UNIX,
+                    Windows and Mac OS X.
+                </s>
+                <s id="superversion">
+                    Excellent. Clients and servers work on any Java
+                    1.4-compatible platform. There is official support
+                    for Windows, Linux and OS/2.
+                </s>
+                <s id="svk">
+                    Good. Clients requires subversion and its perl bindings.
+                </s>
+                <s id="bitkeeper">
+                    Very good. Binaries are available for most common UNIX
+                    systems and for Windows 98 and above.
+                </s>
+                <s id="aegis">
+                    Medium. The source is portable across all UNIXes,
+                    but the Windows version work only using cygwin, and even
+                    then not entirely natively.
+                </s>
+                <s id="arch">
+                    Good. The source is portable across all UNIXes,
+                    but requires a UNIX emulation layer on Windows. (need to
+                    verify). A service can be hosted on any platform
+                    that sports a suitable Internet service.
+                </s>
+                <s id="darcs">
+                    Very good. Supports many UNIXes, Mac OS X, and Windows,
+                    and is written in a portable language.
+                </s>
+                <s id="monotone">
+                    Excellent. Executable is portable across all UNIXes and
+                    Win32.
+                </s>
+                <s id="opencm">
+                    Good. Portable across all UNIX systems.
+                </s>
+                <s id="perforce">
+                    Excellent. Runs on UNIX, Mac OS, BeOS and Windows.
+                </s>
+                <s id="vesta">
+                    Good.  It should be portable to any UNIX system.
+                    Currently it runs on Digital/Compaq/HP Tru64 UNIX
+                    and Linux on several different CPU architectures.
+                    Ports to Solaris and FreeBSD are planned but
+                    haven't begun yet.
+                </s>
+                <s id="co-op">Windows only: starting with Win95.</s>
+                <s id="vss">
+                    The Microsoft Product is Windows only.
+                    <a href="http://www.mainsoft.com/">MainSoft</a>
+                    ships a version of it for some UNIX platforms.
+                </s>
+                <s id="cmsynergy">
+                    Very good - various flavours of Unix,
+                    Windows (only NT family for the server), VMS, and
+                    possibly other systems.
+                </s>
+            </compare>
+        </section>
+    </section>
+    <section id="user_interaces">
+        <title>User Interfaces</title>
+        <section id="web_interface">
+            <title>Web Interface</title>
+            <expl>
+                Does the system have a WWW-based interface that can be
+                used to browse the tree and the various revisions of the
+                files, perform arbitrary diffs, etc?
+            </expl>
+            <compare>
+                <s id="cvs">Yes.
+                    WebCVS, <a href="http://viewcvs.sourceforge.net/">ViewCVS</a>,
+                    and <a href="http://www.horde.org/chora/">Chora</a>.
+                </s>
+                <s id="bitkeeper">Yes. Its own built-in web-interface.</s>
+                <s id="subversion">Yes.
+                    <a href="http://viewcvs.sourceforge.net/">ViewCVS</a>,
+                    <a href="http://freshmeat.net/projects/svnweb/">SVN::Web</a>,
+                    <a href="http://websvn.tigris.org/">WebSVN</a>,
+                    <a href="http://viewsvn.berlios.de/">ViewSVN</a>,
+                    <a href="http://www.outoforder.cc/projects/apache/mod_svn_view/">mod_svn_view</a>,
+                    <a href="http://www.horde.org/chora/">Chora</a>,
+                    <a href="http://www.edgewall.com/trac/">Trac</a>, and
+                    <a href="http://web-cpan.berlios.de/modules/SVN-RaWeb-Light/">SVN::RaWeb::Light</a>.
+                    Aside
+                    from that, the Subversion Apache service provides a
+                    rudimentary web-interface.
+                    </s>
+                <s id="superversion">No.</s>
+                <s id="svk">Yes. Same as Subversion.</s>
+                <s id="arch">
+                    There's <a href="http://arch.bluegate.org/viewarch.html">ViewARCH</a>, and
+                    <a href="http://migo.sixbit.org/software/archzoom/">ArchZoom</a>
+                    which are
+                    works in progress.
+                </s>
+                <s id="darcs">
+                    <a href="http://abridgegame.org/cgi-bin/darcs.cgi/darcs/">darcs.cgi</a>
+                    is included in the distribution.
+                </s>
+                <s id="aegis">Yes.</s>
+                <s id="monotone">No.</s>
+                <s id="opencm">No.</s>
+                <s id="perforce">Yes, P4Web.</s>
+                <s id="vesta">
+                    Yes: <a href="http://www.scooter.cx/vestaweb/">Vestaweb</a>.
+                </s>
+                <s id="co-op">Since this functionality is always
+                    available locally, there is no need for web interface.
+                </s>
+                <s id="vss">
+                    It is possible to code one using the API, but no official
+                    or third-party one exists.
+                </s>
+                <s id="cmsynergy">Possibly.</s>
+            </compare>
+        </section>
+        <section id="availability_of_guis">
+            <title>Availability of Graphical User-Interfaces.</title>
+            <expl>
+                What is the availability of graphical user-interfaces for
+                the system? How many GUI clients are present for it?
+            </expl>
+            <compare>
+                <s id="cvs">Very good. There are many available GUIs:
+                    WinCVS, Cervisia (for KDE),
+                    TortoiseCVS (Windows Explorer plug-in).
+                </s>
+                <s id="bitkeeper">Good. BitKeeper ships with several
+                    GUIs for performing common tasks. I'm not aware
+                    of any third-part GUIs.
+                </s>
+                <s id="subversion">Very good. There are many available
+                    GUIs: RapidSVN (cross-platform),
+                    TortoiseSVN (Windows Explorer plug-in), Jsvn (Java), etc.
+                    Most of them are still under development.
+                </s>
+                <s id="superversion">
+                    A GUI is integrated.
+                </s>
+                <s id="svk">
+                    No GUIs are available.
+                </s>
+                <s id="arch">
+                    There are
+                    <a href="http://www.ibe.miee.ru/tlator/">tlator</a>,
+                    <a href="http://www.hpl.hp.com/personal/Yasushi_Saito/octopy/">Octopy</a>,
+                    and <a href="http://www.nongnu.org/archway/">ArchWay</a>
+                    and possibly others under development.
+                </s>
+                <s id="darcs">
+                    None to speak of.  (There is a modest graphical
+                    interface to a few commands in the distribution, but it
+                    is not being developed currently.)
+                </s>
+                <s id="aegis">
+                    There is tkaegis.
+                </s>
+                <s id="monotone">
+                    No GUIs are available.
+                </s>
+                <s id="opencm">
+                    No GUIs are available.
+                </s>
+                <s id="perforce">
+                    Yes, P4Win and others based on the available libp4
+                    library.
+                </s>
+                <s id="vesta">
+                    No GUIs are available, but the repository has a
+                    C++ API, and it's not be hard to write one.  (At
+                    least three different project-specific ones have
+                    been written by users at Compaq and Intel.)
+                </s>
+                <s id="co-op">The system is GUI-based by design.</s>
+                <s id="vss">
+                    Standalone GUI comes with it, plus SCCI plug-in for
+                    MS Visual Developer Studio. There is an Eclipse
+                    plug-in.
+                </s>
+                <s id="cmsynergy">
+                    A couple of GUIs.  A motif-based one
+                    (even on Windows) allows most functionality but is clunky.
+                    A nicer Java one allows developer work but not much
+                    administrative stuff. Has an SCCI plug-in, though it
+                    doesn't handle network problems well.
+                </s>
+           </compare>
+        </section>
+    </section>
+    <section id="license">
+        <title>License</title>
+        <expl>
+            What are the licensing terms for the software?
+        </expl>
+        <compare>
+            <s id="cvs">GNU GPL (open source)</s>
+            <s id="arch">GNU GPL (open source)</s>
+            <s id="darcs">GNU GPL (open source)</s>
+            <s id="bitkeeper">
+                Proprietary, binary only license. Comes in
+                two versions: gratis and pay per use. The gratis license
+                is intended for development of free software only and is
+                <a href="bk-license.html">problematic</a>. The pay
+                per use license is free of most of its problems.
+            </s>
+            <s id="aegis">
+                GNU GPL (open source)
+            </s>
+            <s id="subversion">
+                Apache/BSD-style license. (open-source)
+            </s>
+            <s id="superversion">
+                GNU GPL (open-source)
+            </s>
+            <s id="svk">Perl License. (open source)</s>
+            <s id="monotone">GNU GPL (open source)</s>
+            <s id="opencm">
+                GNU GPL (open source), but moving soon to
+                BSD or CPL (also open source).
+            </s>
+            <s id="perforce">
+                A proprietary, binary only, commercial license.
+                <a href="http://perforce.com/perforce/price.html">Price
+                    starting at $750 per seat for the first year</a> and then
+                $150 for continuing support for the subsequent years. Free for
+                Open Source projects (no support in this case).
+            </s>
+            <s id="vesta">
+                GNU LGPL (open source)
+            </s>
+            <s id="co-op">Proprietary, short text key. 30-day
+                full-featured trial. Free to "observers"
+                (members who don't make changes).
+                $159 per workstation.
+            </s>
+            <s id="vss">
+                VSS Ships with MSDN, and can also be purchased
+                stanalone or with other tools.
+            </s>
+            <s id="cmsynergy">
+                Prices negotiable with salesman.
+                Server is typically roughly 20,000 British Pounds.
+                Clients are 4,000 British Pounds.  Per-year costs of 18%
+                of original.
+            </s>
+        </compare>
+    </section>
+</section>
+    </contents>
+</comparison>

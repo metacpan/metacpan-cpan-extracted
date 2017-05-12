@@ -1,0 +1,206 @@
+NAME
+    XML::Generator::vCard - generate SAX2 events for vCard 3.0
+
+SYNOPSIS
+     use XML::SAX::Writer;
+     use XML::Generator::vCard;
+
+     my $writer = XML::SAX::Writer->new();
+     my $driver = XML::Generator::vCard->new(Handler=>$writer);
+
+     $driver->parse_files("test.vcf");
+
+DESCRIPTION
+    Generate SAX2 events for vCard 3.0.
+
+    This package supersedes *XML::SAXDriver::vCard*.
+
+DOCUMENT FORMAT
+    SAX2 events map to the *vCard 3.0 XML DTD* draft:
+
+     http://xml.coverpages.org/draft-dawson-vcard-xml-dtd-00.txt
+
+    The draft itself has since expired but it still seems like a perfectly
+    good place to start from.
+
+PACKAGE METHODS
+  __PACKAGE__->new(%args)
+    This method inherits from *XML::SAX::Base*.
+
+    Returns a *XML::Generator::vCard* object.
+
+OBJECT METHODS
+  $pkg->parse_files(@files)
+    Generate SAX2 events for one, or more, vCard files.
+
+    Returns true or false.
+
+PRIVATE METHODS
+    Private methods are documented below in case you need to subclass this
+    package to tweak its output.
+
+  $obj->_render_doc(\@vcards)
+  $obj->_render_card(Text::vCard)
+  $obj->_render_fn(Text::vCard)
+  $obj->_render_n(Text::vCard)
+  $obj->_render_nickname(Text::vCard)
+  $obj->_render_photo(Text::vCard)
+  $obj->_render_bday(Text::vCard)
+  $obj->_render_adrs(Text::vCard)
+  $obj->_render_labels(Text::vCard)
+  $obj->_render_tels(Text::vCard)
+  $obj->_render_emails(Text::vCard)
+  $obj->_render_instantmessaging(Text::vCard)
+  $obj->_render_mailer(Text::vCard)
+  $obj->_render_tz(Text::vCard)
+  $obj->_render_geo(Text::vCard)
+  $obj->_render_org(Text::vCard)
+  $obj->_render_title(Text::vCard)
+  $obj->_render_role(Text::vCard)
+  $obj->_render_logo(Text::vCard)
+  $obj->_render_categories(Text::vCard)
+  $obj->_render_note(Text::vCard)
+  $self->_render_sound(Text::vCard)
+  $self->_render_url(Text::vCard)
+  $obj->_render_key(Text::vCard)
+  $obj->_render_custom(Text::vCard)
+    By default this method does nothing. It is here to be subclassed.
+
+  $obj->_im_services()
+    Returns a hash ref mapping an instant messaging service type to an XML
+    element. Default is :
+
+     {"aim"    => "foaf:aimChatID",
+      "yahoo"  => "foaf:yahooChatID",
+      "msn"    => "foaf:msnChatID",
+      "jabber" => "foaf:JabberID",
+      "icq"    => "foaf:icqChatId"}
+
+    This is called by the *_render_instantmessaging* method.
+
+NAMESPACES
+    This package generates SAX events using the following XML namespaces :
+
+    * vCard
+         x-urn:cpan:ascope:xml-generator-vcard#
+
+    * foaf:
+         http://xmlns.com/foaf/0.1/
+
+HOW TO
+  Filter cards by category
+     package MyGenerator;
+     use base qw (XML::Generator::vCard);
+
+     sub _render_card {
+         my $self = shift;
+         my $card = shift;
+
+         my $cats = $vcard->get({"node_type" => 'categories'}) ||
+                    $vcard->get({"node_type" => 'category'});
+
+         if (! $cats) {
+             return 1;
+         }
+     
+         if (! grep { $_->value() eq "foo" } split(",",$cats->[0])) {
+             return 1;
+         }
+
+         return $self->SUPER::_render_card($vcard);
+     }
+
+     package main;
+
+     my $writer = XML::SAX::Writer->new();
+     my $parser = MyGenerator->new(Handler=>$writer);
+
+     $parser->parse_files(@ARGV);
+
+  Generate SAX events for a custom 'X-*' field
+     package MyGenerator;
+     use base qw (XML::Generator::vCard);
+
+     sub _render_custom {
+       my $self  = shift;
+       my $vcard = shift;
+
+       my $custom = $vcard->get({"node_type" => "x-foobar"});
+        
+       if (! $addresses) {
+          next;
+       }
+
+       foreach my $foo (@$custom) {
+        
+          my $types = join(";",$foo->types());
+
+          $self->_pcdata({Name       => "foo:bar",
+                          Value      => $foo->value(),
+                          Attributes => {"{}type"=> {Name  => "type",
+                                                     Value => $types}}
+                          });
+       }
+
+       return 1;
+     }
+ 
+     package main;
+
+     my $writer = XML::SAX::Writer->new();
+     my $parser = MyGenerator->new(Handler=>$writer);
+
+     $parser->parse_files(@ARGV);
+
+  Add custom namespaces
+     package MyGenerator;
+     use base qw (XML::Generator::vCard);
+
+     sub namespaces {
+         my $self = shift;
+     
+         my $ns = $self->SUPER::namespaces();
+         $ns->{ "foo" } = "x-urn:foo:bar#";
+
+         return $ns;
+     }
+
+     package main;
+
+     my $writer = XML::SAX::Writer->new();
+     my $parser = MyGenerator->new(Handler=>$writer);
+
+     $parser->parse_files(@ARGV);
+
+VERSION
+    1.3
+
+DATE
+    $Date: 2004/12/28 23:31:29 $
+
+AUTHOR
+    Aaron Straup Cope <ascope@cpan.org>
+
+SEE ALSO
+    Text::vCard
+
+    XML::Generator::vCard::Base
+
+    http://www.ietf.org/rfc/rfc2426.txt
+
+    http://www.ietf.org/rfc/rfc2425.txt
+
+BUGS
+    vCards containg binary PHOTO images may cause Perl to segfault on Mac
+    OSX and come flavours of Linux (but not FreeBSD.) The source of this
+    problem has been traced, I think, to a regular expression issue in the
+    Perl Text::ParseWords library. A bug report has been filed.
+
+    Please report all other bugs via http://rt.cpan.org
+
+LICENSE
+    Copyright (c) 2004, Aaron Straup Cope. All Rights Reserved.
+
+    This is free software, you may use it and distribute it under the same
+    terms as Perl itself.
+

@@ -1,0 +1,11 @@
+<?xml version="1.0" ?>
+<formula id="small_article">
+   <filter type='trim'/>
+   <element name="title" desc="Title" type="string" size="120" required="yes"/>
+   <element name="subtitle" desc="SubTitle" type="string" size="255" />
+   <element name="topic" desc="Topic" type="string" size="80"/>
+   <element name="abstract" desc="Abstract" type="string" size="1024"/>
+   <element name="body" desc="body" type="string" size="65536">
+	 <filter type="to_xml"/>
+   </element>
+</formula>

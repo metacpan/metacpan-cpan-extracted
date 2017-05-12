@@ -1,0 +1,16 @@
+Changes
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+README
+lib/XML/Handler/AxPoint.pm
+t/00basic.t
+t/01pres.t
+t/02xslt.t
+testfiles/ax_logo.png
+testfiles/demo.xsl
+testfiles/example.axp
+testfiles/pointers.png
+testfiles/redbg.png
+testfiles/world_map-960.png
+scripts/axpoint

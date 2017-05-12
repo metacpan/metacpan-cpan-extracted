@@ -1,0 +1,7 @@
+<cmd-foreach>
+I saw a person, and his name was %%%person:name%%%, age %%%person:age%%%
+<gxml:foreach expr="subthing">
+  And I'm a subloop for %%%person:name%%% <interation num="%%%subthing%%%"/>
+</gxml:foreach>
+And the title is %%%title%%% (should be "yo")
+</cmd-foreach>

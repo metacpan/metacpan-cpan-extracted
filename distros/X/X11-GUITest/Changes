@@ -1,0 +1,273 @@
+X11::GUITest ($Id: Changes 241 2014-03-16 11:39:42Z ctrondlp $)
+
+This is the list of module changes between revisions.
+--------------------------------------------------------------------
+
+0.28 Mon Mar 17 2014 07:15
+
+  - Fix RT #75728: X11-GUITest: Build Dependencies: libxt-dev and libxtst-dev
+
+  - Applied RT #88194: Correct minor typo and remove a link dependency
+
+  - Support for RT #69960: GetWindowPid() and GetWindowsFromPid()
+
+  - Fix RT #84053, #93677: With newer Perl (5.14), modules should include $Config{ccflags}
+	when also specifying their own
+
+  - Minor updates to file preambles, comments
+
+  - Updated for RT #93668 - Updated license file
+
+  - Updates for RT #93667 - For `make test`, support environments that may have 0 client
+    windows (xvfb-run)
+
+  - Various documentation updates
+ 
+0.27 Wed Feb 05 2013 00:01
+
+  - Move some files to the project root dir.
+
+  - Fix RT #79751: Build on OpenBSD AMD64 failed
+
+  - Add repository and license info
+
+0.26 Sat Feb 02 2013 14:20
+
+  - Replace legacy XKeycodeToKeysym calls
+
+  . Fix typo DOW to DOWN
+
+  - Add supoprt fot AltGr and right Control and Shift
+
+  - Enhanced GetWindowName() to check _NET_WM_NAME for text.
+
+0.25 Sat May 21 2011 09:00
+
+  - Added IsWindowCursor() function to determine if a window
+    has the specified cursor.
+
+  - Various recorder enhancements.
+
+  - Added -d (delaythreshold) option to recorder.   Allows for inclusion
+    of more/less granular event delays.
+
+  - Added WaitSeconds() function, perhaps a little more intuitive then select.
+
+  - Support for mouse wheel scrolling, using M_DOWN and M_UP
+    constants.
+
+0.24 Sun May 01 2011 16:50
+
+  - Reorganized source code and POD.
+
+  - Updated x11guirecord build to use autotools.
+
+  - Backend support added for internationalization.
+
+  - Alternate document formats is now an optional build step for
+    maintainer.
+
+0.23 Sun Apr 24 2011 22:30
+
+  - Added support for recording using x11guirecord utility.
+
+  - Updated behavior of QuoteStringForSendKeys function in handling
+    zeros.
+
+  - Added alias QSfSK() to QuoteStringForSendKeys() function.
+
+0.22 Thu Jan 06 2011 20:00
+
+  - Example script eg/FindControlVisually.pl added to help demonstrate
+    finding controls/widgets on screen using a baseline image.
+
+  - Applied Thorsten H's AltGr keyboard modifier support.  This
+    applies to international (German, etc.) languages.
+
+  - Minor compiler warning fix.
+
+  - Skip building/testing if we're in AUTOMATED_TESTING (smoke testing)
+	and DISPLAY isn't setup.  Alleviate bogus test reports in this case.
+
+0.21 Sat May 06 2006 10:24
+
+  - Implemented Nelson Caro's patch 1.1 dealing mostly
+    with Makefile.PL enhancements concerning older versions
+    of Perl.
+
+  - Implemented Nelson Caro's patch 1.2 dealing
+    with efficiency improvements, and fault handling.  Also,
+    GetWindowPos() now returns the border width of a window.
+
+  - Implemented Nelson Caro's patch 1.3; which improves
+    GetWindowFromPoint() in dealing with correct window border
+    width.  Also, FindWindowLike now handles invalid windows better.
+
+  - Applied patches cpan #13682(XK_Meta_L fallback) and
+    cpan #13684 (StartApp) from Alexey Tourbin. Compiler define
+    X11_GUITEST_ALT_L_FALLBACK_META_L enabled by default.
+
+  - Added special # modifier for Meta_Left.  This modifier can be
+    used like the existing ones (Alt=%, Control=^, etc.).
+
+  - Applied Nelson's updates to test.t.  Helps to eleviate X server
+    jams when using Exceed, for MS Windows.  Also testing GetMousePos()
+    in list context.
+
+  - Applied Nelson's patch to support multi-screen operation in various
+    functions.  Certain functions now include an additional parameter to specify
+    the screen number.
+
+  - Corrected incompatibility between Xinerama and the XTest extension.  Compile
+    with X11_GUITEST_USING_XINERAMA defined.  See Makefile.PL for details.
+
+0.20 Sat Feb 14 2004 09:43
+
+  - Now linking to Xext when building to support
+    HP-UX 11 and possibly other OSs.
+
+  - Added links into the documentation to the various
+    project distribution sites.
+
+  - test.t checks are now skipped if X Windows isn't
+    running.  An appropriate warning message accompanies
+    this.
+
+0.19 Sat Dec 13 2003 11:28
+
+  - Added FindWindowLike.pl example script.
+
+  - Fixed a SendKeys bug spotted on RedHat 7.3
+    systems.
+
+  - Added eg/templates/ScriptTemplate.pl for the
+    purpose of constructing future example scripts.
+
+  - Enhanced to help support Perl v5.5.3 (older; doesn't
+    have newSVuv defined).
+
+  - Various enhancements to the documentation.
+
+  - Updated copyrights for new year.
+
+0.18 Sun Sep 28 2003 17:45
+
+  - Added GetWindowFromPoint function.
+
+  - Added GetParentWindow function.
+
+  - Should now compile/link properly on Solaris systems.
+
+0.17 Sat Sep 06 2003 09:23
+
+  - Corrected < and > key mappings.
+
+  - Minor speed enhancements
+
+  - Rearranged documentation sections.
+
+  - Enabled optimizations and all warnings in
+    Makefile.PL
+
+0.16 Sun Aug 03 2003 15:00
+
+  - Added PressMouseButton, ReleaseMouseButton.
+
+  - Added WebBrowser_1.pl example script.
+
+  - Added more SendKeys examples, i.e. Ctrl-Shift-l
+
+  - Added SetWindowName function.
+
+  - Added documentation for DISPLAY environment
+    variable alteration for the purpose of interacting
+    with applications on remote X servers.
+
+  - test.t modified to accommodate scenarios when
+    there are no windows present that have a WM_NAME
+    property set.
+
+  - Other minor documentation enhancements.
+
+0.15 Sat Jun 28 2003 17:45
+
+  - Quote string function will now handle data
+    present after any embedded newline characters.
+
+  - Enhanced TextEditor_1.pl example.
+
+  - Added additional checks in test.t
+
+  - Pristinized the typemap.
+
+  - Misc. code/documentation enhancements.
+
+  - Removed docs/Packaging file. Note: Now using
+    `make tardist` to generate new module builds.
+
+  - Removed MakeDocs.sh..  Now handled in Makefile.PL
+
+  - Added a note that goes into man page concerning other
+    documentation.
+
+  - For those websites that grab only the POD from
+    GUITest.pm, I've added a note into the documentation
+    intended to relay that there is more then just that
+    available for documentation.
+
+  - Added LSH (Shift_L), RSH (Shift_R), LCT (Control_L),
+    RCT (Control_R), LAL (Alt_L), RAL (Alt_R) abbreviated
+    key names.
+
+  - Added PressKey and ReleaseKey per suggestion.  Also
+    included PressReleaseKey.
+
+0.14 Sun May 18 2003 11:53
+
+  - Documentation updates
+
+  - Official support for FreeBSD 5.0
+
+0.13 Sun Mar 30 2003 19:32
+
+  - Enhanced and reenabled man3 POD generation.
+
+  - Added WaitWindowClose
+
+  - Added TextEditor_1.pl example script.
+
+  - Documentation updates
+
+0.12 Fri Mar 21 2003 02:35
+
+  - Added IsKeyPressed
+
+  - Added logical mouse button Ids to :CONST export tag:
+    M_BTN1 - M_BTN5
+
+  - Added IsMouseButtonPressed
+
+  - Updated documentation
+
+  - Added QuoteStringForSendKeys
+
+  - Disabled man3 POD generation in Makefile.PL until I
+    find a pristine method of generating one manual
+    page from the PM and XS file.  Currently I'm using
+    MakeDocs.sh to construct the core text/html
+    documentation.
+
+0.11 Sun Mar 09 2003 16:01
+
+  - Fixed aliased {PGU} and {PGD} keys.
+
+  - Added GetMousePos, IsChild functions.
+
+  - Now packaging as X11-GUITest-[VERSION].tar.gz versus
+    x11guitest-[VERSION].tar.gz
+
+  - Made enhancements to the documentation.
+
+0.10 Tue Mar 05 2003 18:00
+
+  - Initial Release.

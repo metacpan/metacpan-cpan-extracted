@@ -1,0 +1,24 @@
+data
+/sales/#id	/sales/ord_date	/sales/ord_num	/sales/payterms	/sales/qty	/sales/stores/@stor_id	/sales/stores/stor_name	//sales/stores/stor_address	/sales/titles/@title_id	/sales/titles/title	/sales/titles/type	/sales/titles/publishers/@pub_id	/sales/titles/publishers/pub_name
+6871BU1032	14.Sep.94	6871	Net 60	5	6380	Eric the Read Books	788 Catamaugus Ave.	BU1032	The Busy Executive's Database Guide	business	1389	Algodata Infosystems
+722aPS2091	13.Sep.94	722a	Net 60	3	6380	Eric the Read Books	788 Catamaugus Ave.	PS2091	Is Anger the Enemy?	psychology	0736	New Moon Books
+A2976PC8888	24.Mai.93	A2976	Net 30	50	7066	Barnum's	567 Pasadena Ave.	PC8888	Secrets of Silicon Valley	popular_comp	1389	Algodata Infosystems
+QA7442.3PS2091	13.Sep.94	QA7442.3	ON invoice	75	7066	Barnum's	567 Pasadena Ave.	PS2091	Is Anger the Enemy?	psychology	0736	New Moon Books
+D4482PS2091	14.Sep.94	D4482	Net 60	10	7067	News & Brews	577 First St.	PS2091	Is Anger the Enemy?	psychology	0736	New Moon Books
+P2121TC3218	15.Jun.92	P2121	Net 30	40	7067	News & Brews	577 First St.	TC3218	Onions, Leeks, and Garlic: Cooking Secrets of the Mediterranean	trad_cook	0877	Binnet & Hardley
+P2121TC4203	15.Jun.92	P2121	Net 30	20	7067	News & Brews	577 First St.	TC4203	Fifty Years in Buckingham Palace Kitchens	trad_cook	0877	Binnet & Hardley
+P2121TC7777	15.Jun.92	P2121	Net 30	20	7067	News & Brews	577 First St.	TC7777	Sushi, Anyone?	trad_cook	0877	Binnet & Hardley
+N914008PS2091	14.Sep.94	N914008	Net 30	20	7131	Doc-U-Mat: Quality Laundry and Books	24-A Avogadro Way	PS2091	Is Anger the Enemy?	psychology	0736	New Moon Books
+N914014MC3021	14.Sep.94	N914014	Net 30	25	7131	Doc-U-Mat: Quality Laundry and Books	24-A Avogadro Way	MC3021	The Gourmet Microwave	mod_cook	0877	Binnet & Hardley
+P3087aPS1372	29.Mai.93	P3087a	Net 60	20	7131	Doc-U-Mat: Quality Laundry and Books	24-A Avogadro Way	PS1372	Computer Phobic AND Non-Phobic Individuals: Behavior Variations	psychology	0877	Binnet & Hardley
+P3087aPS2106	29.Mai.93	P3087a	Net 60	25	7131	Doc-U-Mat: Quality Laundry and Books	24-A Avogadro Way	PS2106	Life Without Fear	psychology	0736	New Moon Books
+P3087aPS3333	29.Mai.93	P3087a	Net 60	15	7131	Doc-U-Mat: Quality Laundry and Books	24-A Avogadro Way	PS3333	Prolonged Data Deprivation: Four Case Studies	psychology	0736	New Moon Books
+P3087aPS7777	29.Mai.93	P3087a	Net 60	25	7131	Doc-U-Mat: Quality Laundry and Books	24-A Avogadro Way	PS7777	Emotional Security: A New Algorithm	psychology	0736	New Moon Books
+QQ2299BU7832	28.Okt.93	QQ2299	Net 60	15	7896	Fricative Bookshop	89 Madison St.	BU7832	Straight Talk About Computers	business	1389	Algodata Infosystems
+TQ456MC2222	12.Dez.93	TQ456	Net 60	10	7896	Fricative Bookshop	89 Madison St.	MC2222	Silicon Valley Gastronomic Treats	mod_cook	0877	Binnet & Hardley
+X999BU2075	21.Feb.93	X999	ON invoice	35	7896	Fricative Bookshop	89 Madison St.	BU2075	You Can Combat Computer Stress!	business	0736	New Moon Books
+423LL922MC3021	14.Sep.94	423LL922	ON invoice	15	8042	Bookbeat	679 Carson St.	MC3021	The Gourmet Microwave	mod_cook	0877	Binnet & Hardley
+423LL930BU1032	14.Sep.94	423LL930	ON invoice	10	8042	Bookbeat	679 Carson St.	BU1032	The Busy Executive's Database Guide	business	1389	Algodata Infosystems
+P723BU1111	11.Mär.93	P723	Net 30	25	8042	Bookbeat	679 Carson St.	BU1111	Cooking with Computers: Surreptitious Balance Sheets	business	1389	Algodata Infosystems
+QA879.1PC1035	22.Mai.93	QA879.1	Net 30	30	8042	Bookbeat	679 Carson St.	PC1035	But Is It User Friendly?	popular_comp	1389	Algodata Infosystems
+

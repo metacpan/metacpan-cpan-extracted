@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<playlist version="1" xmlns="http://xspf.org/ns/0/" xmlns:po="http://www.projectopus.com">
+<title>Ambient 040428</title>
+<annotation></annotation>
+<creator>rcrath</creator>
+<date>2006-04-08 04:47:00</date>
+<trackList><track>
+<title>Ambient 040428</title>
+<creator>rcrath</creator><annotation>different loops different day...1 guitar, 1 PC, 1 me.</annotation>
+<identifier>http://www.projectopus.com/node/2378</identifier>
+<location>http://www.projectopus.com/song/download.mp3?id=2544</location>
+<info>http://www.projectopus.com/user/432</info>
+<image>http://www.projectopus.com/system/files?file=pictures/picture-432.jpg</image>
+<extension application="http://www.projectopus.com">
+<po:clip length="337000"/>
+<po:region name="Honolulu">http://www.projectopus.com/regionportal/1678</po:region>
+<po:genre name="Ambient">http://www.projectopus.com/genre/1110</po:genre>
+<po:nid>2378</po:nid>
+</extension>
+</track>
+</trackList>
+</playlist>

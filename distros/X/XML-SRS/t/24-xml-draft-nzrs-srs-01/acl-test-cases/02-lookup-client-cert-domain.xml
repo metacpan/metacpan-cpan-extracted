@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<NZSRSRequest VerMinor="11" VerMajor="3" RegistrarId="100">
+  <AccessControlListQry List="allow" Type="registrar_domain" Resource="epp_client_certs">
+    <DomainNameFilter>leibniz.*</DomainNameFilter>
+    <RegistrarIdFilter>128</RegistrarIdFilter>
+  </AccessControlListQry>
+</NZSRSRequest>

@@ -1,0 +1,4 @@
+CVS
+^Makefile$
+^Makefile.old$
+^MANIFEST.bak$

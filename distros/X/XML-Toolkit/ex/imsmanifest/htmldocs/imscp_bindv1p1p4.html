@@ -1,0 +1,3689 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+
+
+  
+  <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+
+
+  
+  <meta name="LASTUPDATED" content="11/01/04 07:44:11">
+
+
+
+  
+  
+  <title>IMS Content Packaging XML Binding</title>
+  <link rel="alternate" media="print" href="http://www.imsglobal.org/printer.cfm">
+
+
+  
+  <script language="Javascript" type="text/javascript">
+<!--Style sheet selector
+if (navigator.appVersion.indexOf('Mac') != -1)
+document.write ('<LINK REL=stylesheet HREF="../../../macimsstyles.css" TYPE="text/css">');
+if (navigator.appName == 'Netscape')
+document.write ('<LINK REL=stylesheet HREF="../../../try2netscape.css" TYPE="text/css">');
+if (navigator.appName == 'Microsoft Internet Explorer')
+document.write ('<LINK REL=stylesheet HREF="../../../try2.css" TYPE="text/css">');
+else
+document.write ('<LINK REL=stylesheet HREF="../../../try2.css" TYPE="text/css">');
+//-->
+  </script>
+</head>
+
+
+<body>
+
+
+<table summary="layout table" border="0" cellspacing="0" width="100%">
+
+
+  <tbody>
+
+    <tr>
+
+
+      <td class="mainbody" valign="middle" width="19%"><img src="images/speclogo.jpg" alt="IMS Logo" height="173" width="117"></td>
+
+
+      <td class="mainbody" valign="middle" width="81%">
+      
+      <p class="mainbodybigger">IMS Content Packaging XML Binding</p>
+
+
+      
+      <p class="mainbodystrong">Version 1.1.4 Final Specification</p>
+
+
+      </td>
+
+
+    </tr>
+
+
+  
+  </tbody>
+</table>
+
+
+<p class="mainbody">Copyright &copy; 2004 IMS Global Learning
+Consortium, Inc. All Rights Reserved.<br>
+
+
+The IMS Logo is a registered trademark of IMS Global Learning
+Consortium, Inc.<br>
+
+
+Document Name: IMS Content Packaging XML Binding<br>
+
+
+Revision: 04 October 2004<br>
+
+
+</p>
+
+
+<hr>
+<p><a name="1656730"></a></p>
+
+
+<p><a name="1656763"></a></p>
+
+
+<table summary="This table describes" border="0" cellpadding="5" cellspacing="0">
+
+
+  <tbody>
+
+    <tr>
+
+
+      <td class="mainbody"><a name="1656733"></a>Date Issued:<br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1656735"></a>04 October 2004<br>
+
+
+      </td>
+
+
+    </tr>
+
+
+    <tr>
+
+
+      <td class="mainbody"><a name="1656737"></a>Latest version:<br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1656739"></a><a href="http://www.imsglobal.org/content/packaging/cpv1p1p4/imscp_bindv1p1p4.html">
+http://www.imsglobal.org/content/packaging/cpv1p1p4/imscp_bindv1p1p4.html</a><br>
+
+
+      </td>
+
+
+    </tr>
+
+
+
+    <tr>
+
+
+      <td class="mainbody"><a name="1656745"></a>Register comments or
+implementations:<br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1656747"></a><a href="http://www.imsglobal.org/developers/ims/imsforum/categories.cfm?catid=5">
+http://www.imsglobal.org/developers/ims/imsforum/categories.cfm?catid=5</a><br>
+
+
+      </td>
+
+
+    </tr>
+
+
+
+    <tr>
+
+
+      <td colspan="2" rowspan="1">
+      
+      <p><b>IPR and Distribution Notices</b></p>
+
+
+      
+      <p>Recipients of this document are requested to submit,
+with
+their comments, notification of any relevant patent claims or other
+intellectual property rights of which they may be aware that might be
+infringed by any implementation
+of the specification set forth in this document, and to provide
+supporting documentation.</p>
+
+
+      
+      <p>IMS takes no position regarding the validity or scope of
+any
+intellectual property or other rights that might be claimed to pertain
+to the implementation or use of the technology described in this
+document or the extent to which any license under such rights might or
+might not be available; neither does it represent that it has made any
+effort to identify any such rights. Information on IMS's procedures
+with respect to rights in IMS specifications can be found at the IMS
+Intellectual Property Rights web page: <a href="http://www.imsglobal.org/ipr/imsipr_policyFinal.pdf">http://www.imsglobal.org/ipr/imsipr_policyFinal.pdf</a>.</p>
+
+
+      
+      <p>Copyright &copy; IMS Global Learning Consortium
+2006. All
+Rights Reserved.</p>
+
+
+      
+      <p>If you wish to distribute this document or use this
+document
+to implement a product or service, you must complete a valid license
+registration with IMS and receive an email from IMS granting the
+license. To register, follow the instructions on the IMS website: <a href="http://www.imsglobal.org/specificationdownload.cfm">http://www.imsglobal.org/specificationdownload.cfm</a>.</p>
+
+
+      
+      <p>This document may be copied and furnished to others by
+Licensee organizations registered on the IMS website provided that the
+above copyright notice and this paragraph are included on all such
+copies. However, this document itself may not be modified in any way,
+such as by removing the copyright notice or references to IMS, except
+as needed for the purpose of developing IMS specifications, under the
+auspices of a chartered IMS work group.</p>
+
+
+      
+      <p>Use of this specification to develop products or
+services is
+governed by the license with IMS found on the IMS website:&nbsp;<a href="http://www.imsglobal.org/content/packaging/cpv1p1p4/cpv1p1p4speclicense.html">http://www.imsglobal.org/content/packaging/cpv1p1p4/cpv1p1p4speclicense.html</a>.</p>
+
+
+      
+      <p>The limited permissions granted above are perpetual and
+will
+not be revoked by IMS or its successors or assigns.</p>
+
+
+      
+      <p>THIS SPECIFICATION IS BEING OFFERED WITHOUT ANY WARRANTY
+WHATSOEVER, AND IN PARTICULAR, ANY WARRANTY OF NONINFRINGEMENT IS
+EXPRESSLY DISCLAIMED. ANY USE OF THIS SPECIFICATION SHALL BE MADE
+ENTIRELY AT THE IMPLEMENTER'S OWN RISK, AND NEITHER THE CONSORTIUM, NOR
+ANY OF ITS MEMBERS OR SUBMITTERS, SHALL HAVE ANY LIABILITY WHATSOEVER
+TO ANY IMPLEMENTER OR THIRD PARTY FOR ANY DAMAGES OF ANY NATURE
+WHATSOEVER, DIRECTLY OR INDIRECTLY, ARISING FROM THE USE OF THIS
+SPECIFICATION.</p>
+
+      
+      <p></p>
+
+
+      </td>
+
+
+    </tr>
+
+
+  
+  </tbody>
+</table>
+
+
+<h1><a name="1676189"></a>Table of Contents</h1>
+
+
+<br>
+
+
+ <a name="1676191"></a><a href="imscp_bindv1p1p4.html#1664078">1.
+Introduction</a> <br>
+
+
+&nbsp;&nbsp;&nbsp;&nbsp; <a name="1676193"></a> <a href="imscp_bindv1p1p4.html#1671030">1.1 Overview</a> <br>
+
+
+ &nbsp;&nbsp;&nbsp;&nbsp; <a name="1676195"></a> <a href="imscp_bindv1p1p4.html#1672955">1.2 Scope and Context</a> <br>
+
+
+ &nbsp;&nbsp;&nbsp;&nbsp; <a name="1676197"></a> <a href="imscp_bindv1p1p4.html#1672975">1.3 Structure of this
+Document</a> <br>
+
+
+ &nbsp;&nbsp;&nbsp;&nbsp; <a name="1676199"></a> <a href="imscp_bindv1p1p4.html#1670540">1.4 Nomenclature</a> <br>
+
+
+ &nbsp;&nbsp;&nbsp;&nbsp; <a name="1676201"></a> <a href="imscp_bindv1p1p4.html#1656939">1.5 References</a> <br>
+
+
+ <br>
+
+
+ <a name="1676203"></a><a href="imscp_bindv1p1p4.html#1671231">2.
+XML Basics</a> <br>
+
+
+&nbsp;&nbsp;&nbsp;&nbsp; <a name="1676205"></a> <a href="imscp_bindv1p1p4.html#1671234">2.1 Elements</a> <br>
+
+
+ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="imscp_bindv1p1p4.html#1671238">2.1.1 Element
+Contents</a> <br>
+
+
+ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="imscp_bindv1p1p4.html#1671240">2.1.2 Element
+Attributes</a> <br>
+
+
+ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="imscp_bindv1p1p4.html#1671245">2.1.3 Element
+Names</a> <br>
+
+
+ &nbsp;&nbsp;&nbsp;&nbsp; <a name="1676213"></a> <a href="imscp_bindv1p1p4.html#1671260">2.2 Document Type Definitions</a>
+<br>
+
+
+ &nbsp;&nbsp;&nbsp;&nbsp; <a name="1676215"></a> <a href="imscp_bindv1p1p4.html#1671269">2.3 XML Schemas</a> <br>
+
+
+ &nbsp;&nbsp;&nbsp;&nbsp; <a name="1676217"></a> <a href="imscp_bindv1p1p4.html#1671281">2.4 Valid Character Sets</a> <br>
+
+
+ &nbsp;&nbsp;&nbsp;&nbsp; <a name="1676219"></a> <a href="imscp_bindv1p1p4.html#1671285">2.5 Special Handling
+Requirements</a> <br>
+
+
+ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="imscp_bindv1p1p4.html#1671287">2.5.1 XML
+Reserved Characters</a> <br>
+
+
+ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="imscp_bindv1p1p4.html#1671303">2.5.2 White
+Space Handling</a> <br>
+
+
+ <br>
+
+
+ <a name="1676225"></a><a href="imscp_bindv1p1p4.html#1671320">3.
+Narrative Description of XML Binding</a> <br>
+
+
+&nbsp;&nbsp;&nbsp;&nbsp; <a name="1676227"></a> <a href="imscp_bindv1p1p4.html#1671325">3.1 &lt;manifest&gt; Elements</a>
+<br>
+
+
+ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="imscp_bindv1p1p4.html#1674446">3.1.1
+&lt;metadata&gt;</a> <br>
+
+
+ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="imscp_bindv1p1p4.html#1671389">3.1.2
+&lt;organizations&gt;</a> <br>
+
+
+ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="imscp_bindv1p1p4.html#1671460">3.1.3
+&lt;resources&gt;</a> <br>
+
+
+ &nbsp;&nbsp;&nbsp;&nbsp; <a name="1676235"></a> <a href="imscp_bindv1p1p4.html#1671504">3.2 &lt;metadata&gt; Elements</a>
+<br>
+
+
+ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="imscp_bindv1p1p4.html#1671506">3.2.1
+&lt;schema&gt;</a> <br>
+
+
+ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="imscp_bindv1p1p4.html#1671513">3.2.2
+&lt;schemaversion&gt;</a> <br>
+
+
+ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="imscp_bindv1p1p4.html#1671519">3.2.3
+Meta-data</a> <br>
+
+
+ &nbsp;&nbsp;&nbsp;&nbsp; <a name="1676243"></a> <a href="imscp_bindv1p1p4.html#1671538">3.3 &lt;organizations&gt;
+Elements</a> <br>
+
+
+ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="imscp_bindv1p1p4.html#1671539">3.3.1
+&lt;organization&gt;</a> <br>
+
+
+ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="imscp_bindv1p1p4.html#1671562">3.3.2
+&lt;title&gt;</a> <br>
+
+
+ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="imscp_bindv1p1p4.html#1671565">3.3.3
+&lt;item&gt;</a> <br>
+
+
+ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="imscp_bindv1p1p4.html#1671586">3.3.4
+&lt;metadata&gt;</a> <br>
+
+
+ &nbsp;&nbsp;&nbsp;&nbsp; <a name="1676253"></a> <a href="imscp_bindv1p1p4.html#1671607">3.4 &lt;resources&gt;
+Elements</a> <br>
+
+
+ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="imscp_bindv1p1p4.html#1671611">3.4.1
+&lt;resource&gt;</a> <br>
+
+
+ &nbsp;&nbsp;&nbsp;&nbsp; <a name="1676257"></a> <a href="imscp_bindv1p1p4.html#1671688">3.5 Extensibility</a> <br>
+
+
+ <br>
+
+
+ <a name="1676259"></a><a href="imscp_bindv1p1p4.html#1671696">4.
+Samples</a> <br>
+
+
+<br>
+
+
+ <a name="1676261"></a><a href="imscp_bindv1p1p4.html#1671801">Appendix A - Additional
+Resources</a> <br>
+
+
+<br>
+
+
+ <a name="1676263"></a><a href="imscp_bindv1p1p4.html#1661382">About This Document</a> <br>
+
+
+&nbsp;&nbsp;&nbsp;&nbsp; <a name="1676265"></a> <a href="imscp_bindv1p1p4.html#1657465">List of Contributors</a> <br>
+
+
+ <br>
+
+
+ <a name="1676267"></a><a href="imscp_bindv1p1p4.html#1673970">Revision History</a> <br>
+
+
+<br>
+
+
+ <a name="1676269"></a><a href="imscp_bindv1p1p4.html#1675580">Index</a> <br>
+
+
+ 
+<h1><a name="1664078"></a>1. Introduction</h1>
+
+
+<h2><a name="1671030"></a>1.1 Overview</h2>
+
+
+<p><a name="1672939"></a>This document describes the XML binding
+for the IMS Content Packaging v1.1.4 specification. This document
+specifies the binding of the Content Packaging specification in
+the W3C XML 1.0 Specification.</p>
+
+
+<p><a name="1672943"></a>There are some specific rules that have
+guided the creation of this XML binding document:</p>
+
+
+<ul>
+
+
+  <li><a name="1672947"></a>The XML binding will adhere to the XML
+1.0 Specification of the W3C;</li>
+
+
+  <li><a name="1672949"></a>It must maintain the definitional
+structure of the specification;</li>
+
+
+  <li><a name="1672950"></a>It must permit extensions.</li>
+
+
+  <li><a name="1672952"></a>The latest agreed practice within IMS
+is that camel case is used for the element tags in XML. This has
+not been adopted in this maintenance release because this would
+have required all previously created content package manifests to
+be altered. Instances that conform to CPv1.1.3 are compatible
+with CPv1.1.4 (with the exception of changing the XSD control
+document assignment in the header of the instance file).
+Instances that may not conform are those that have an
+&lt;organization&gt; element with 0 &lt;item&gt; elements.</li>
+
+
+</ul>
+
+
+<h2><a name="1672955"></a>1.2 Scope and Context</h2>
+
+
+<p><a name="1672959"></a>This document is the IMS Content
+Packaging XML Binding v1.1.4 specification. As such it will be
+used as the basis for the production of the following v1.1.4
+documents:</p>
+
+
+<ul>
+
+
+  <li><a name="1672962"></a>IMS Content Packaging XML XSDs;</li>
+
+
+  <li><a name="1672965"></a>IMS Content Packaging Best Practice and
+Implementation Guide [CP, 04c].</li>
+
+
+</ul>
+
+
+<p><a name="1672969"></a>This binding has been derived from the
+agreed IMS Content Packaging Information Model v1.1.4 [CP, 04a]
+and conforms to the XML 1.0 Specification [XML, 98] of the W3C.
+Version 1.1.4 is a maintenance release update to the version
+1.1.3 specification and a description of the changes is given in
+the accompanying addendum documents [CP, 04d].</p>
+
+
+<p><a name="1672974"></a>A list of future planned enhancements
+can be found in Appendix D of the Best Practice Guide [CP,
+04c]</p>
+
+
+<h2><a name="1672975"></a>1.3 Structure of this Document</h2>
+
+
+<p><a name="1672977"></a>The structure of this document is:</p>
+
+
+<p><a name="1670539"></a></p>
+
+
+<table summary="This table describes the structure of this document" border="0" cellpadding="5" cellspacing="0">
+
+
+  <tbody>
+
+    <tr>
+
+
+      <td class="mainbody"><a name="1673003"></a>2. XML Basics<br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1673007"></a>A brief description of
+the components within an XML schema;<br>
+
+
+      </td>
+
+
+    </tr>
+
+
+    <tr>
+
+
+      <td class="mainbody"><a name="1673011"></a>3. Narrative
+Description of XML Binding<br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1673014"></a>The description of the
+elements and attributes used within the XML binding itself;<br>
+
+
+      </td>
+
+
+    </tr>
+
+
+    <tr>
+
+
+      <td class="mainbody"><a name="1673017"></a>4. Samples<br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1673020"></a>Several samples of
+content packages;<br>
+
+
+      </td>
+
+
+    </tr>
+
+
+    <tr>
+
+
+      <td class="mainbody"><a name="1673022"></a>Appendix A -
+Additional Resources<br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1673025"></a>References to other
+Content Packaging related resources.<br>
+
+
+      </td>
+
+
+    </tr>
+
+
+  
+  </tbody>
+</table>
+
+
+<h2><a name="1670540"></a>1.4 Nomenclature</h2>
+
+
+<p><a name="1670740"></a></p>
+
+
+<table summary="This table describes the definition of technical names used in this document" border="0" cellpadding="5" cellspacing="0">
+
+
+  <tbody>
+
+    <tr>
+
+
+      <td class="mainbody"><a name="1673031"></a>CDATA<br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1673033"></a>Character Data<br>
+
+
+      </td>
+
+
+    </tr>
+
+
+    <tr>
+
+
+      <td class="mainbody"><a name="1673035"></a>CPI<br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1673037"></a>Content &amp;
+Packaging Interchange<br>
+
+
+      </td>
+
+
+    </tr>
+
+
+    <tr>
+
+
+      <td class="mainbody"><a name="1673040"></a>DTD<br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1673042"></a>Document Type
+Definition<br>
+
+
+      </td>
+
+
+    </tr>
+
+
+    <tr>
+
+
+      <td class="mainbody"><a name="1673044"></a>PCDATA<br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1673046"></a>Parsed Character
+Data<br>
+
+
+      </td>
+
+
+    </tr>
+
+
+    <tr>
+
+
+      <td class="mainbody"><a name="1673049"></a>W3C<br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1673051"></a>World Wide Web
+Consortium<br>
+
+
+      </td>
+
+
+    </tr>
+
+
+    <tr>
+
+
+      <td class="mainbody"><a name="1673054"></a>XML<br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1673056"></a>Extensible Mark-up
+Language<br>
+
+
+      </td>
+
+
+    </tr>
+
+
+  
+  </tbody>
+</table>
+
+
+<h2><a name="1656939"></a>1.5 References</h2>
+
+
+<p><a name="1656971"></a></p>
+
+
+<table summary="This table describes the references used in this specification" border="0" cellpadding="5" cellspacing="0">
+
+
+  <tbody>
+
+    <tr>
+
+
+      <td class="mainbody"><a name="1656942"></a>[CP, 04a]<br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1656944"></a><em>IMS Content
+Packaging Information Model v1.1.4</em><span>,</span> C.Smythe,
+A.Jackl, <u>IMS Global Learning Consortium, Inc.</u>, October
+2004.<br>
+
+
+      </td>
+
+
+    </tr>
+
+
+    <tr>
+
+
+      <td class="mainbody"><a name="1670781"></a>[CP, 04c]<br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1670783"></a><em>IMS Content
+Packaging Best Practice and Implementation Guide
+v1.1.4</em><span>,</span> C.Smythe, A.Jackl, <u>IMS Global
+Learning Consortium, Inc.</u>, October 2004.<br>
+
+
+      </td>
+
+
+    </tr>
+
+
+    <tr>
+
+
+      <td class="mainbody"><a name="1656950"></a>[CP, 04d]<br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1656952"></a><em>IMS Content
+Packaging Summary of Changes v1.1.4</em><span>,</span> C.Smythe,
+A.Jackl, <u>IMS Global Learning Consortium, Inc.</u>, October
+2004.<br>
+
+
+      </td>
+
+
+    </tr>
+
+
+    <tr>
+
+
+      <td class="mainbody"><a name="1674769"></a>[IMSBUND, 01]<br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1674771"></a><em>Using IMS Content
+Packaging to Package Instances of LIP and Other IMS
+Specifications v1.0</em>, B.Olivier, M.McKell, <u>IMS Global
+Learning Consortium, Inc.</u>, August 2001.<br>
+
+
+      </td>
+
+
+    </tr>
+
+
+    <tr>
+
+
+      <td class="mainbody"><a name="1674802"></a>[MD, 04]<br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1674804"></a><em>IMS Meta-data Best
+Practice Guide for IEEE 1484.12.1-2002 Standard for Learning
+Object Metadata v1.3</em>, P.Barker, L.Campbell, A.Roberts,
+      <u>IMS Global Learning Consortium, Inc.</u>, May 2004.<br>
+
+
+      </td>
+
+
+    </tr>
+
+
+    <tr>
+
+
+      <td class="mainbody"><a name="1673065"></a>[ISO/IEC10646]<br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1673068"></a>ISO (International
+Organization for Standardization). ISO/IEC 10646-1993 (E).
+Information technology - Universal Multiple-Octet Coded Character
+Set (UCS) - Part 1: Architecture and Basic Multilingual Plane.
+[Geneva]: International Organization for Standardization, 1993
+(plus amendments AM 1 through AM 7).<br>
+
+
+      </td>
+
+
+    </tr>
+
+
+    <tr>
+
+
+      <td class="mainbody"><a name="1673070"></a>[Unicode, 96]<br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1673072"></a>The Unicode
+Consortium. The Unicode Standard, Version 2.0. Reading, Mass.:
+Addison-Wesley Developers Press, 1996.<br>
+
+
+      </td>
+
+
+    </tr>
+
+
+    <tr>
+
+
+      <td class="mainbody"><a name="1673075"></a>[XML, 98]<br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1673079"></a>XML 1.0 Specification
+of the W3C: <a href="http://www.w3.org/TR/1998/REC-xml-19980210">http://www.w3.org/TR/1998/REC-xml-19980210</a>.<br>
+
+
+      </td>
+
+
+    </tr>
+
+
+    <tr>
+
+
+      <td colspan="1" rowspan="2"><a name="1673082"></a>[XML, 99]<br>
+
+
+      </td>
+
+
+      <td colspan="1" rowspan="2"><a name="1673086"></a>XML Namespace
+Recommendation of W3C: <a href="http://www.w3.org/TR/1999/REC-xml-names-19990114">http://www.w3.org/TR/1999/REC-xml-names-19990114</a>.<br>
+
+
+ <a name="1673092"></a>XML Schema Recommendation of W3C: <a href="http://www.w3.org/TR/2001/REC-xmlschema-0-20010502/">http://www.w3.org/TR/2001/REC-xmlschema-0-20010502/</a>.<br>
+
+
+      </td>
+
+
+    </tr>
+
+
+    <tr>
+
+
+      <td></td>
+
+
+    </tr>
+
+
+  
+  </tbody>
+</table>
+
+
+<h1><a name="1671231"></a>2. XML Basics</h1>
+
+
+<p><a name="1671232"></a>The Content Packaging data model can be
+defined as a hierarchy. Hierarchical models are convenient for
+representing data consisting of many elements and sub-elements.
+XML is perfectly suited for representing hierarchical models. An
+XML document is a hierarchy comprised of elements that have
+contents and attributes.</p>
+
+
+<h2><a name="1671234"></a>2.1 Elements</h2>
+
+
+<p><a name="1671235"></a>An element is a component of a document
+that has been identified in a way a computer can understand. Each
+element has a tag name. When a tag name is shown as
+"&lt;TAGNAME&gt;", with less-than and greater-than symbols before
+and after the tag name, it serves as the start-tag to mark the
+beginning of an element. When that same tag name has a forward
+slash "/" added, it serves as an end-tag such as
+"&lt;/TAGNAME&gt;". An element may have contents between its
+start and end-tags, and may have one or more attributes. When an
+XML element has a start and end-tag (also called an opening and
+closing tag) with a common name, it is considered to be
+"well-formed" XML. The contents of an element are placed between
+the start and end-tags as shown below:</p>
+
+
+<pre>&lt;TAGNAME&gt;contents&lt;/TAGNAME&gt;<br></pre>
+
+
+<h3><a name="1671238"></a>2.1.1 Element Contents</h3>
+
+
+<p><a name="1671239"></a>An element may contain other elements,
+Parsed Character Data (PCDATA), Character Data (CDATA), or a
+mixture of PCDATA and elements. The allowable contents of an
+element are its content model. PCDATA really means any character
+string that does not contain elements. PCDATA is what the bulk of
+elements will use between their start and end-tags. CDATA is
+different in that it is a method for adding any character data
+that should not be processed. For example, you could add some
+JavaScript code instructions using a CDATA section. A CDATA
+section tells the parser not to look for any mark-up until after
+it locates the end of the CDATA section.</p>
+
+
+<h3><a name="1671240"></a>2.1.2 Element Attributes</h3>
+
+
+<p><a name="1671241"></a>An attribute provides additional
+information about an element. Attributes are a way of attaching
+characteristics or properties to the elements of a document. An
+element may have more than one attribute. Attributes are
+contained within the start tag of an element. Attributes are
+represented by an attribute name followed by an equal sign and
+the attribute value in quotation marks:</p>
+
+
+<pre>&lt;timeframe&gt; <br>   &lt;begin restrict="1"&gt; 1999-07-23 &lt;/begin&gt;<br>&lt;/timeframe&gt;<br></pre>
+
+
+<p><a name="1671244"></a>In this example, the &lt;timeframe&gt;
+element contains another element: the &lt;begin&gt; element. The
+&lt;begin&gt; element has one attribute 'restrict', with the
+value "1". The value for the element &lt;begin&gt; is
+"1999-07-23". These two elements then make up a timeframe begin
+date.</p>
+
+
+<h3><a name="1671245"></a>2.1.3 Element Names</h3>
+
+
+<p><a name="1671247"></a>Each element has a unique name, referred
+to as the tag name. XML is case-sensitive in its processing of
+tag names. The IMS Content Packaging XML Binding adheres to the
+following tag name rules:</p>
+
+
+<ul>
+
+
+  <li><a name="1671251"></a>All tag names will conform to the rules
+for element naming as given within the XML 1.0
+Specification.</li>
+
+
+  <li><a name="1671253"></a>Names beginning in XML in any case or
+mix of cases are not permitted.</li>
+
+
+  <li><a name="1671255"></a>The IMS binding will use only lowercase
+tag and element names.</li>
+
+
+  <li><a name="1671257"></a>Element names may not include words
+reserved by the XML specification. These include:<br>
+
+
+DOCTYPE<br>
+
+
+ELEMENT<br>
+
+
+ATTLIST<br>
+
+
+ENTITY</li>
+
+
+  <li><a name="1671259"></a>Tag names defined by the IMS binding
+may not be redefined.</li>
+
+
+</ul>
+
+
+<h2><a name="1671260"></a>2.2 Document Type Definitions</h2>
+
+
+<p><a name="1671262"></a>The tag name, content model, and
+attributes of elements are defined in a Document Type Definition
+(DTD) statement. This may exist as an external file or a block of
+text internal to an XML document. Internal DTDs are used to
+override elements defined in external DTD files, so an internal
+DTD should be used with care. The DTD defines the elements that
+may be used and may define the contents of the elements.</p>
+
+
+<p><a name="1671267"></a>This specification defines a DTD
+(imscp_rootv1p1.dtd) as a non-normative reference. Some XML
+editors may make use of a DTD to help guide the developer in
+creating the proper elements at the proper locations in an XML
+file. Other developers will make use of DTDs to validate their
+XML documents to ensure their document is consistent with all of
+the element names and locations defined in the DTD. Details of
+the construction of DTDs are outside the scope of this document,
+but links to the XML 1.0 Specification are included in section
+1.5 of this document.</p>
+
+
+<h2><a name="1671269"></a>2.3 XML Schemas</h2>
+
+
+<p><a name="1671272"></a>A schema is a formal specification of
+element names that indicates which elements are allowed in an XML
+document, and in which combinations. New schema languages, such
+as those defined in the XML-Schemas Working Group, provide the
+same baseline functionality as a DTD. However, because these
+schema languages are extensible, developers can augment them with
+additional information, such as data types, inheritance, and
+presentation rules. This makes these new schema languages far
+more powerful than DTDs. For more information about XML schemas,
+there is a link to the W3C XML Schema Recommendation in section
+1.5.</p>
+
+
+<p><a name="1671278"></a>This specification defines a W3C XML
+Schema as a non-normative reference. Some XML editors may make
+use of schemas to help guide the developer in creating the proper
+elements at the proper locations in an XML file. Other developers
+will make use of schemas to validate their XML documents and/or
+to define extensions to the IMS Content Packaging Binding.
+Details of the construction of schemas are outside the scope of
+this document.</p>
+
+
+<h2><a name="1671281"></a>2.4 Valid Character Sets</h2>
+
+
+<p><a name="1671283"></a>A Content Packaging record must use
+UTF-8 or UTF-16 encoding of the character sets as defined in ISO
+10646. See the XML Version 1.0 for more details on the
+specification of well-formed XML.</p>
+
+
+<h2><a name="1671285"></a>2.5 Special Handling Requirements</h2>
+
+
+<h3><a name="1671287"></a>2.5.1 XML Reserved Characters</h3>
+
+
+<p><a name="1671289"></a>Some characters used in XML must be
+escaped when used outside of their XML-defined usage as found in
+section 2.4 of the XML 1.0 Specification. These characters are
+ampersand (&amp;), less than (&lt;), greater than (&gt;),
+apostrophe ('), and the double-quote character (").</p>
+
+
+<p><a name="1671290"></a>These characters may be represented
+using either numeric character references or the strings "&amp;",
+"&lt;", "&gt;", "&amp;apos;", and """.</p>
+
+
+<p><a name="1671294"></a>Below is a more complete quote from the
+W3C XML standards:</p>
+
+
+<p><a name="1671296"></a>Quote from Extensible Markup Language
+(XML) 1.0<br>
+
+
+W3C Recommendation 10-February-1998<br>
+
+
+2.4 Character Data and Markup</p>
+
+
+<p><font class="mainbodysmindent"><a name="1671298"></a><em>"Text
+consists of intermingled character data and markup. Markup takes
+the form of start-tags, end-tags, empty-element tags, entity
+references, character references, comments, CDATA section
+delimiters, document type declarations, and processing
+instructions.</em></font></p>
+
+
+<p><font class="mainbodysmindent"><a name="1671299"></a><em>"All
+text that is not markup constitutes the character data of the
+document.</em></font></p>
+
+
+<p><font class="mainbodysmindent"><a name="1671300"></a><em>"The
+ampersand character (&amp;) and the left angle bracket (&lt;) may
+appear in their literal form only when used as markup delimiters,
+or within a comment, a processing instruction, or a CDATA
+section. They are also legal within the literal entity value of
+an internal entity declaration; see "4.3.2 Well-Formed Parsed
+Entities". If they are needed elsewhere, they must be escaped
+using either numeric character references or the strings "&amp;"
+and "&lt;" respectively. The right angle bracket (&gt;) may be
+represented using the string "&gt;", and must, for compatibility,
+be escaped using "&gt;" or a character reference when it appears
+in the string "]]&gt;" in content, when that string is not
+marking the end of a CDATA section.</em></font></p>
+
+
+<p><font class="mainbodysmindent"><a name="1671301"></a><em>"In
+the content of elements, character data is any string of
+characters, which does not contain the start-delimiter of any
+markup. In a CDATA section, character data is any string of
+characters not including the CDATA-section-close delimiter,
+"]]&gt;".</em></font></p>
+
+
+<p><font class="mainbodysmindent"><a name="1671302"></a><em>"To
+allow attribute values to contain both single and double quotes,
+the apostrophe or single-quote character (') may be represented
+as "&amp;apos;", and the double-quote character (") as
+"""."</em></font></p>
+
+
+<h3><a name="1671303"></a>2.5.2 White Space Handling</h3>
+
+
+<p><a name="1671304"></a>Questions often arise as to whether
+Web-based data transmission tools might inadvertently strip off
+or transform some of the white space characters embedded in data
+transmitted between systems using XML. To eliminate concern about
+this issue, refer to the following quote from the W3C XML
+standards, which indicate that all white space must be preserved
+where it is part of the data.</p>
+
+
+<p><a name="1671309"></a>Quote from Extensible Markup Language
+(XML) 1.0<br>
+
+
+W3C Recommendation 10-February-1998<br>
+
+
+2.10 White Space Handling</p>
+
+
+<p><font class="mainbodysmindent"><a name="1671312"></a><em>"In
+editing XML documents, it is often convenient to use "white
+space" (spaces, tabs, and blank lines, denoted by the
+non-terminal S in this specification) to set apart the mark-up
+for greater readability. Such white space is typically not
+intended for inclusion in the delivered version of the document.
+On the other hand, "significant" white space that should be
+preserved in the delivered version is common, for example in
+poetry and source code.</em></font></p>
+
+
+<p><font class="mainbodysmindent"><a name="1671314"></a><em>"An
+XML processor must always pass all characters in a document that
+are not mark-up through to the application. A validating XML
+processor must also inform the application which of these
+characters constitute white space appearing in element
+content.</em></font></p>
+
+
+<p><font class="mainbodysmindent"><a name="1671315"></a><em>"A
+special attribute named xml:space may be attached to an element
+to signal an intention that in that element, white space should
+be preserved by applications. In valid documents, this attribute,
+like any other, must be declared if it is used. When declared, it
+must be given as an enumerated type whose only possible values
+are "default" and "preserve". For example:</em></font></p>
+
+
+<p><font class="mainbodysmindent"><a name="1671316"></a><em>"&lt;!ATTLIST poem xml:space (default|preserve)
+'preserve'&gt;</em></font></p>
+
+
+<p><font class="mainbodysmindent"><a name="1671317"></a><em>"The
+value "default" signals that applications' default white-space
+processing modes are acceptable for this element; the value
+"preserve" indicates the intent that applications preserve all
+the white space. This declared intent is considered to apply to
+all elements within the content of the element where it is
+specified, unless overridden with another instance of the
+xml:space attribute."</em></font></p>
+
+
+<h1><a name="1671320"></a>3. Narrative Description of XML
+Binding</h1>
+
+
+<p><a name="1671322"></a>This specification defines the XML
+format using narrative. XML DTDs and XML Schemas that implement
+this <em>abstract</em> format are referenced as non-normative
+parts of this specification.</p>
+
+
+<h2><a name="1671325"></a>3.1 &lt;manifest&gt; Elements</h2>
+
+
+<p><a name="1671327"></a><strong>Description.</strong> The first,
+top-level &lt;manifest&gt; element in the Manifest encloses all
+the reference data. Subsequent occurrences of the
+&lt;manifest&gt; elements inside the top-level &lt;manifest&gt;
+are used to compartmentalize files, meta-data, and organization
+structure for aggregation, disaggregation, and reuse. The
+best-practice use of the IMS Content Packaging specification will
+result in each "learning object" or "atomic unit of learning"
+being placed within its own &lt;manifest&gt; element.</p>
+
+
+<p><a name="1671335"></a></p>
+
+
+<div align="center"><img src="images/Fig3p1Bind.gif" alt="&lt;manifest&gt; elements" border="0" height="203" hspace="0" vspace="0" width="416"></div>
+
+
+<center><strong><a name="1671342"></a>Figure 3.1 &lt;manifest&gt;
+elements.</strong></center>
+
+
+<p><a name="1671344"></a><strong>Multiplicity.</strong> The
+top-level &lt;manifest&gt; occurs once and only once within the
+IMS Manifest file.</p>
+
+
+<p><a name="1671345"></a><strong>Attributes</strong></p>
+
+
+<ul>
+
+
+  <li><a name="1671346"></a><strong>identifier (required).</strong>
+An identifier, provided by an author or authoring tool, that is
+unique within the Manifest. Data type = string;</li>
+
+
+  <li><a name="1671347"></a><strong>version (optional).</strong>
+Identifies the version of the Manifest. Is used to distinguish
+between manifests with the same identifier. Data type =
+string;</li>
+
+
+  <li><a name="1671348"></a><strong>xml:base (optional).</strong>
+This provides a relative path offset for the content file(s). The
+usage of this element is defined in the XML Base Working Draft
+from the W3C. Data type = string.</li>
+
+
+</ul>
+
+
+<p><a name="1671351"></a><strong>Elements</strong></p>
+
+
+<ul>
+
+
+  <li><a name="1671352"></a>&lt;metadata&gt;</li>
+
+
+  <li><a name="1671353"></a>&lt;organizations&gt;</li>
+
+
+  <li><a name="1671355"></a>&lt;resources&gt;</li>
+
+
+  <li><a name="1671357"></a>&lt;manifest&gt;</li>
+
+
+</ul>
+
+
+<h3><a name="1674446"></a>3.1.1 &lt;metadata&gt;</h3>
+
+
+<p><a name="1674447"></a></p>
+
+
+<div align="center"><img src="images/Fig3p2Bind2.gif" alt="&lt;metadata&gt; elements" border="0" height="267" hspace="0" vspace="0" width="416"></div>
+
+
+<center><strong><a name="1674448"></a>Figure 3.2 &lt;metadata&gt;
+elements.</strong></center>
+
+
+<p><a name="1671367"></a><strong>Multiplicity.</strong> Occurs
+zero or once within a &lt;manifest&gt; element.</p>
+
+
+<p><a name="1671368"></a><strong>Elements</strong></p>
+
+
+<ul>
+
+
+  <li><a name="1671370"></a>&lt;schema&gt;</li>
+
+
+  <li><a name="1671371"></a>&lt;schemaversion&gt;</li>
+
+
+  <li><a name="1671373"></a>Meta-Data: Implementers are free to
+choose from any of the meta-data elements defined in the IMS
+Meta-Data specification or other meta-data standards.</li>
+
+
+</ul>
+
+
+<p><a name="1671376"></a><strong>Example</strong></p>
+
+
+<pre>&lt;metadata&gt;<br>   &lt;schema&gt;IMS Content&lt;/schema&gt;<br>   &lt;schemaversion&gt;1.1&lt;/schemaversion&gt;<br>   &lt;imsmd:lom&gt;<br>      &lt;imsmd:general&gt;<br>         &lt;imsmd:title&gt;<br>            &lt;imsmd:langstring xml:lang="en-US"&gt;Simple Manifest&lt;/imsmd:langstring&gt;<br>         &lt;/imsmd:title&gt;<br>      &lt;/imsmd:general&gt;<br>   &lt;/imsmd:lom&gt;<br>&lt;/metadata&gt;<br></pre>
+
+
+<h3><a name="1671389"></a>3.1.2 &lt;organizations&gt;</h3>
+
+
+<p><a name="1671390"></a><strong>Description.</strong> Describes
+zero, one, or more structures or organizations (i.e.,
+&lt;organization&gt; elements) for this package.</p>
+
+
+<p><a name="1671391"></a></p>
+
+
+<div align="center"><img src="images/Fig3p3Bind3.gif" alt="&lt;organizations&gt; elements" border="0" height="313" hspace="0" vspace="0" width="634"></div>
+
+
+<center><strong><a name="1671397"></a>Figure 3.3 -
+&lt;organizations&gt; elements.</strong></center>
+
+
+<p><a name="1671399"></a><strong>Multiplicity.</strong> Occurs
+once within a &lt;manifest&gt; element.</p>
+
+
+<p><a name="1671400"></a><strong>Attributes</strong></p>
+
+
+<ul>
+
+
+  <li><a name="1671401"></a><strong>default (optional).</strong>
+Identifies the default organization to use. Data type =
+idref.</li>
+
+
+</ul>
+
+
+<p><a name="1671402"></a><strong>Elements</strong></p>
+
+
+<ul>
+
+
+  <li><a name="1671403"></a>&lt;organization&gt;</li>
+
+
+</ul>
+
+
+<p><a name="1671404"></a><strong>Example</strong></p>
+
+
+<pre>&lt;organizations default="TOC1"&gt;<br>   &lt;organization identifier="TOC1" structure="hierarchical"&gt;<br>      &lt;title&gt;default&lt;/title&gt;<br>      &lt;item identifier="ITEM1" identifierref="RESOURCE1" isvisible="true"&gt;<br>         &lt;title&gt;Lesson 1&lt;/title&gt;<br>         &lt;item identifier="ITEM2" identifierref="RESOURCE2" isvisible="true"&gt;<br>            &lt;title&gt;Introduction 1&lt;/title&gt;<br>         &lt;/item&gt;<br>         &lt;item identifier="ITEM3" identifierref="RESOURCE3" isvisible="true"&gt;<br>            &lt;title&gt;Content 1&lt;/title&gt;<br>         &lt;/item&gt;<br>         &lt;item identifier="ITEM4" identifierref="RESOURCE4" isvisible="true"&gt;<br>            &lt;title&gt;Summary 1&lt;/title&gt;<br>         &lt;/item&gt;<br>      &lt;/item&gt;<br>      &lt;item identifier="ITEM5" identifierref="RESOURCE5" isvisible="false"&gt;<br>         &lt;title&gt;Lesson 2&lt;/title&gt;<br>         &lt;item identifier="ITEM6" identifierref="RESOURCE6" isvisible="false"&gt;<br>            &lt;title&gt;Introduction 2&lt;/title&gt;<br>         &lt;/item&gt;<br>         &lt;item identifier="ITEM7" identifierref="RESOURCE7" isvisible="false"&gt;<br>            &lt;title&gt;Content 2&lt;/title&gt;<br>         &lt;/item&gt;<br>         &lt;item identifier="ITEM8" identifierref="RESOURCE8" isvisible="false"&gt;<br>            &lt;title&gt;Summary 2&lt;/title&gt;<br>         &lt;/item&gt;<br>      &lt;/item&gt;<br>      &lt;item identifier="ITEM9" identifierref="RESOURCE9" isvisible="true"&gt;<br>         &lt;title&gt;Lesson 3&lt;/title&gt;<br>         &lt;item identifier="ITEM10" identifierref="RESOURCE10" isvisible="true" parameters="foo"&gt;<br>            &lt;title&gt;Introduction 3&lt;/title&gt;<br>         &lt;/item&gt;<br>         &lt;item identifier="ITEM11" identifierref="RESOURCE11" isvisible="true"&gt;<br>            &lt;title&gt;Content 3&lt;/title&gt;<br>         &lt;/item&gt;<br>         &lt;item identifier="ITEM12" identifierref="RESOURCE12" isvisible="true"&gt;<br>            &lt;title&gt;Summary 3&lt;/title&gt;<br>         &lt;/item&gt;<br>      &lt;/item&gt;<br>   &lt;/organization&gt;<br>&lt;/organizations&gt;<br></pre>
+
+
+<h3><a name="1671460"></a>3.1.3 &lt;resources&gt;</h3>
+
+
+<p><a name="1671461"></a><strong>Description.</strong> This
+element identifies a collection of content files.</p>
+
+
+<p><a name="1671462"></a></p>
+
+
+<div align="center"><img src="images/Fig3p4Bind4.gif" alt="&lt;resources&gt; elements" border="0" height="217" hspace="0" vspace="0" width="515"></div>
+
+
+<center><strong><a name="1671469"></a>Figure 3.4 -
+&lt;resources&gt; elements.</strong></center>
+
+
+<p><a name="1671471"></a><strong>Multiplicity.</strong> Occurs
+once and only once within a &lt;manifest&gt; element.</p>
+
+
+<p><a name="1671472"></a><strong>Attributes</strong></p>
+
+
+<ul>
+
+
+  <li><a name="1671473"></a><strong>xml:base (optional).</strong>
+This provides a relative path offset for the content file(s). The
+usage of this element is defined in the XML Base Working Draft
+from the W3C. Data type = string.</li>
+
+
+</ul>
+
+
+<p><a name="1671476"></a><strong>Elements</strong></p>
+
+
+<ul>
+
+
+  <li><a name="1671478"></a>&lt;resource&gt;</li>
+
+
+</ul>
+
+
+<p><a name="1671479"></a><strong>Example</strong></p>
+
+
+<pre>&lt;resources&gt;<br>   &lt;resource identifier="RESOURCE1" type="webcontent" href="lesson1.htm"&gt;<br>      &lt;file href="lesson1.htm"/&gt;<br>   &lt;/resource&gt;<br>   &lt;resource identifier="RESOURCE2" type="webcontent" href="intro1.htm"&gt;<br>      &lt;file href="intro1.htm"/&gt;<br>   &lt;/resource&gt;<br>   &lt;resource identifier="RESOURCE3" type="webcontent" href="content1.htm"&gt;<br>      &lt;file href="content1.htm"/&gt;<br>   &lt;/resource&gt;<br>   &lt;resource identifier="RESOURCE4" type="webcontent" href="summary1.htm"&gt;<br>      &lt;file href="summary1.htm"/&gt;<br>   &lt;/resource&gt;<br>&lt;/resources&gt;<br></pre>
+
+
+<h2><a name="1671504"></a>3.2 &lt;metadata&gt; Elements</h2>
+
+
+<h3><a name="1671506"></a>3.2.1 &lt;schema&gt;</h3>
+
+
+<p><a name="1671508"></a><strong>Description.</strong> Describes
+the schema used (e.g., IMS Content). If no schema element is
+present, it is assumed to be "IMS Content". Data type =
+string.</p>
+
+
+<p><a name="1671509"></a><strong>Multiplicity.</strong> Occurs
+zero or once within &lt;metadata&gt;.</p>
+
+
+<p><a name="1671510"></a><strong>Example</strong></p>
+
+
+<pre>&lt;schema&gt;IMS Content&lt;/schema&gt;<br></pre>
+
+
+<h3><a name="1671513"></a>3.2.2 &lt;schemaversion&gt;</h3>
+
+
+<p><a name="1671515"></a><strong>Description.</strong> Describes
+version of the above schema (e.g., 1,0, 1.1). If no version is
+present, it is assumed to be "1.1". Data type = string.</p>
+
+
+<p><a name="1671516"></a><strong>Multiplicity.</strong> Occurs
+zero or once within &lt;metadata&gt;.</p>
+
+
+<p><a name="1671517"></a><strong>Example</strong></p>
+
+
+<pre>&lt;schemaversion&gt;1.1&lt;/schemaversion&gt;<br></pre>
+
+
+<h3><a name="1671519"></a>3.2.3 Meta-data</h3>
+
+
+<p><a name="1671522"></a><strong>Description.</strong> See the
+IMS Meta-Data specification for more detail on the meta-data that
+are available for describing and cataloguing content packages.
+The IMS Meta-Data v1.2.1 is the default specification but other
+specifications/standards are permitted.</p>
+
+
+<p><a name="1671526"></a><strong>Multiplicity.</strong> Defined
+in the relevant meta-data specification.</p>
+
+
+<p><a name="1671528"></a><strong>Example:</strong> In-line
+meta-data</p>
+
+
+<pre>&lt;metadata&gt;<br>   &lt;imsmd:lom&gt;<br>      &lt;imsmd:general&gt;<br>         &lt;imsmd:title&gt;<br>            &lt;imsmd:langstring xml:lang="en-US"&gt;Simple Manifest&lt;/imsmd:langstring&gt;<br>         &lt;/imsmd:title&gt;<br>      &lt;/imsmd:general&gt;<br>   &lt;/imsmd:lom&gt;<br>&lt;/metadata&gt;<br></pre>
+
+
+<h2><a name="1671538"></a>3.3 &lt;organizations&gt; Elements</h2>
+
+
+<h3><a name="1671539"></a>3.3.1 &lt;organization&gt;</h3>
+
+
+<p><a name="1671540"></a><strong>Description.</strong> This
+element describes a particular, passive organization of the
+material.</p>
+
+
+<p><a name="1671541"></a><strong>Multiplicity.</strong> Occurs
+zero or more times within &lt;organizations&gt;.</p>
+
+
+<p><a name="1671542"></a><strong>Attributes</strong></p>
+
+
+<ul>
+
+
+  <li><a name="1671543"></a><strong>identifier (required).</strong>
+An identifier, provided by an author or authoring tool, that is
+unique within the Manifest. Data type = id.</li>
+
+
+  <li><a name="1671545"></a><strong>structure (optional).</strong>
+Assumes a default value of "hierarchical", such as is common with
+a tree view or structural representation of data. Data type =
+string.</li>
+
+
+</ul>
+
+
+<p><a name="1671546"></a><strong>Elements</strong></p>
+
+
+<ul>
+
+
+  <li><a name="1671547"></a>&lt;title&gt;</li>
+
+
+  <li><a name="1671548"></a>&lt;item&gt;</li>
+
+
+  <li><a name="1671549"></a>&lt;metadata&gt;</li>
+
+
+</ul>
+
+
+<p><a name="1671550"></a><strong>Example</strong></p>
+
+
+<pre>&lt;organization identifier="TOC1"&gt;<br>   &lt;title&gt;default&lt;/title&gt;<br>   &lt;item identifier="ITEM1" identifierref="RESOURCE1" isvisible="true"&gt;<br>      &lt;title&gt;Lesson 1&lt;/title&gt;<br>   &lt;/item&gt;<br>   &lt;item identifier="ITEM2" identifierref="RESOURCE2" isvisible="true"&gt;<br>      &lt;title&gt;Introduction 1&lt;/title&gt;<br>   &lt;/item&gt;<br>&lt;/organization&gt;<br></pre>
+
+
+<h3><a name="1671562"></a>3.3.2 &lt;title&gt;</h3>
+
+
+<p><a name="1671563"></a><strong>Description.</strong> This
+element describes the title of an &lt;item&gt;.</p>
+
+
+<p><a name="1671564"></a><strong>Multiplicity.</strong> Occurs
+zero or more times within &lt;item&gt;.</p>
+
+
+<h3><a name="1671565"></a>3.3.3 &lt;item&gt;</h3>
+
+
+<p><a name="1671567"></a><strong>Description.</strong> This
+element describes a node within a structure.</p>
+
+
+<p><a name="1671568"></a><strong>Multiplicity.</strong> Occurs
+one or more times within &lt;organization&gt; and zero or more
+times within &lt;item&gt;.</p>
+
+
+<p><a name="1671569"></a><strong>Attributes</strong></p>
+
+
+<ul>
+
+
+  <li><a name="1671570"></a><strong>identifier (required).</strong>
+An identifier that is unique within the Manifest. Data type =
+id.</li>
+
+
+  <li><a name="1671572"></a><strong>identifierref
+(optional).</strong> A reference to a &lt;resource&gt; identifier
+(within the same package) or a sub-Manifest that is used to
+resolve the ultimate location of the file. If no identifierref is
+supplied, it is assumed that there is no content associated with
+this entry in the organization. Data type = string.</li>
+
+
+  <li><a name="1671575"></a><strong>isvisible (optional).</strong>
+Indicates whether or not this resource is displayed when the unit
+of instruction is rendered. If not present, value is assumed to
+be 'true'. Data type = boolean.</li>
+
+
+  <li><a name="1671576"></a><strong>parameters (optional).</strong>
+Static parameters to be passed to the content file at launch
+time. Data type = string.</li>
+
+
+</ul>
+
+
+<p><a name="1671577"></a><strong>Elements</strong></p>
+
+
+<ul>
+
+
+  <li><a name="1671578"></a>&lt;title&gt;</li>
+
+
+  <li><a name="1671579"></a>&lt;item&gt;</li>
+
+
+  <li><a name="1671580"></a>&lt;metadata&gt;</li>
+
+
+</ul>
+
+
+<p><a name="1671581"></a><strong>Example</strong></p>
+
+
+<pre>&lt;item identifier="ITEM3" identifierref="RESOURCE3" isvisible="true"&gt;<br>   &lt;title&gt;Content 1&lt;/title&gt;<br>&lt;/item&gt;<br></pre>
+
+
+<h3><a name="1671586"></a>3.3.4 &lt;metadata&gt;</h3>
+
+
+<p><a name="1671589"></a><strong>Description.</strong> This
+element contains meta-data that describes the resource.
+Implementers are free to choose from any of the meta-data
+elements defined in the IMS Meta-Data specification or to define
+their own meta-data schema.</p>
+
+
+<p><a name="1671592"></a><strong>Multiplicity.</strong> Occurs
+zero or once within &lt;organization&gt;.</p>
+
+
+<p><a name="1671593"></a><strong>Example</strong></p>
+
+
+<pre>&lt;organization identifier="TOC1"&gt;<br>   &lt;metadata&gt;<br>   &lt;!-- schema and schemaversion not given as they apply at manifest level --&gt;<br>      &lt;imsmd:lom&gt;<br>         &lt;imsmd:educational&gt;<br>            &lt;imsmd:interactivitylevel&gt;1&lt;/imsmd:interactivitylevel&gt;<br>         &lt;/imsmd:educational&gt;<br>      &lt;/imsmd:lom&gt;<br>   &lt;/metadata&gt;<br>&lt;/organization&gt;<br></pre>
+
+
+<h2><a name="1671607"></a>3.4 &lt;resources&gt; Elements</h2>
+
+
+<p><a name="1671609"></a>A collection of references to resources.
+There is no assumption of order or hierarchy. Resources can be
+described in-line or externally.</p>
+
+
+<h3><a name="1671611"></a>3.4.1 &lt;resource&gt;</h3>
+
+
+<p><a name="1671612"></a><strong>Description.</strong> This
+element describes a specific content file.</p>
+
+
+<p><a name="1671614"></a><strong>Multiplicity.</strong> Occurs
+zero or more times within &lt;resources&gt;.</p>
+
+
+<p><a name="1671615"></a><strong>Attributes</strong></p>
+
+
+<ul>
+
+
+  <li><a name="1671616"></a><strong>identifier (required).</strong>
+An identifier, provided by the author or authoring tool, that is
+unique within the Manifest.</li>
+
+
+  <li><a name="1671618"></a><strong>'type' (required).</strong> A
+string that identifies the type of resource. This specification
+defines the type "webcontent" plus reserved terms that are used
+to denote the packaging of content defined by other IMS
+specifications, including Learning Design. These labels are
+defined in Section 7 of the Implementation Handbook titled 'Using
+IMS Content Packaging to Package Instances of LIP and Other IMS
+Specifications' [IMSBUND, 01]. An IMS specification may extend
+the table in section 7 by using the syntax and including a
+normative statement to that effect in the specification.</li>
+
+
+  <li><a name="1671622"></a><strong>xml:base (optional).</strong>
+This provides a relative path offset for the content file(s). The
+usage of this element is defined in the XML Base Working Draft
+from the W3C. Data type = string.</li>
+
+
+  <li><a name="1671626"></a><strong>href (optional).</strong> A
+reference to the "entry point" of this resource. External
+fully-qualified URIs are also permitted.</li>
+
+
+</ul>
+
+
+<p><a name="1671627"></a><strong>Elements</strong></p>
+
+
+<ul>
+
+
+  <li><a name="1671628"></a>&lt;metadata&gt;</li>
+
+
+  <li><a name="1671629"></a>&lt;file&gt;</li>
+
+
+  <li><a name="1671630"></a>&lt;dependency&gt;</li>
+
+
+</ul>
+
+
+<p><a name="1671632"></a><strong>Example:</strong> In-line
+resource</p>
+
+
+<pre>&lt;resource identifier="RESOURCE2" type="webcontent" href="topics/index.htm"&gt;<br>   &lt;file href="topics/index.htm"/&gt;<br>   &lt;file href="images/pic1.gif"/&gt;<br>   &lt;file href="images/pic2.gif"/&gt;<br>&lt;/resource&gt;<br></pre>
+
+
+<h4><a name="1671640"></a>3.4.1.1 &lt;metadata&gt;</h4>
+
+
+<p><a name="1671643"></a><strong>Description.</strong> This
+element contains meta-data that describes the resource.
+Implementers are free to choose from any of the meta-data
+elements defined in the <span>IEEE 1484.12.1-2002 Standard for
+Learning Object Metadata (see IMS Meta-Data v1.3 [MD, 04] for
+best practices and guidelines in implementing the IEEE LOM
+specification).</span> or to define their own meta-data
+schema.</p>
+
+
+<p><a name="1671649"></a><strong>Multiplicity.</strong> Occurs
+zero or once within &lt;resource&gt;.</p>
+
+
+<h4><a name="1671650"></a>3.4.1.2 &lt;file&gt;</h4>
+
+
+<p><a name="1671652"></a><strong>Description.</strong> Identifies
+one or more local files that this resource is dependent on. This
+includes the resource being referenced in the href attribute of
+&lt;resource&gt;. If the resource references an absolute URL
+(using href), &lt;file&gt; element(s) are not required.</p>
+
+
+<p><a name="1671654"></a><strong>Multiplicity.</strong> Occurs
+zero or more times within &lt;resource&gt;.</p>
+
+
+<p><a name="1671655"></a><strong>Attributes</strong></p>
+
+
+<ul>
+
+
+  <li><a name="1671656"></a><strong>href (required).</strong> URL
+of the file.</li>
+
+
+</ul>
+
+
+<p><a name="1671657"></a><strong>Element</strong></p>
+
+
+<ul>
+
+
+  <li><a name="1671658"></a>&lt;metadata&gt;</li>
+
+
+</ul>
+
+
+<p><a name="1671659"></a><strong>Example</strong></p>
+
+
+<pre>&lt;file href="topics/index.htm"/&gt;<br></pre>
+
+
+<h4><a name="1671661"></a>3.4.1.3 &lt;dependency&gt;</h4>
+
+
+<p><a name="1671663"></a><strong>Description.</strong> This
+element identifies a single resource that can act as a container
+for multiple files that this resource depends upon.</p>
+
+
+<p><a name="1671665"></a><strong>Multiplicity.</strong> Occurs
+zero or more times within &lt;resource&gt;.</p>
+
+
+<p><a name="1671666"></a><strong>Attributes</strong></p>
+
+
+<ul>
+
+
+  <li><a name="1671668"></a><strong>identifierref
+(required).</strong> An identifier for other resources to
+reference.</li>
+
+
+</ul>
+
+
+<p><a name="1671669"></a><strong>Example</strong></p>
+
+
+<pre>&lt;resources&gt;<br>   &lt;resource identifier="R_A2" type="webcontent" href="sco1.html"&gt;<br>      &lt;metadata/&gt;<br>      &lt;file href="sco1.html"/&gt;<br>      &lt;dependency indentiferref="R_A5"/&gt;<br>   &lt;/resource&gt;<br>   &lt;resource identifier="R_A5" type="webcontent" href="pics/distress_sigs_add.jpg"&gt;<br>      &lt;metadata/&gt;<br>      &lt;file href="pics/distress_sigs_add.jpg"/&gt;<br>   &lt;/resource&gt;<br>&lt;/resources&gt;<br></pre>
+
+
+<h2><a name="1671688"></a>3.5 Extensibility</h2>
+
+
+<p><a name="1671692"></a>The IMS Content Packaging XML Binding is
+extensible through the use of XML Namespaces and XML Schemas. It
+is expected that the extensibility mechanism will be used to
+describe additional types of meta-data, organizations, and
+resources. More information and examples of extensibility are
+contained in the IMS Content Packaging Best Practice Guide [CP,
+04c].</p>
+
+
+<h1><a name="1671696"></a>4. Samples</h1>
+
+
+<p><a name="1671698"></a>A number of supporting files accompany
+the IMS Content Packaging specification documents and are
+available in the download .zip file (imscp_v1p1p4.zip). The files
+in the zip file are as follows:</p>
+
+
+<p><a name="1674400"></a></p>
+
+
+<table summary="This table describes contents of the CP spec." border="1" cellpadding="5" cellspacing="0">
+
+
+  <tbody>
+
+    <tr>
+
+
+      <td class="mainbody"><a name="1674320"></a><span>\</span>imscp_infov1p1p4.pdf<br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1674324"></a>IMS Content Packaging
+Information Model<br>
+
+
+      </td>
+
+
+    </tr>
+
+
+    <tr>
+
+
+      <td class="mainbody"><a name="1674326"></a><span>\</span>imscp_bindv1p1p4.pdf<br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1674331"></a>IMS Content Packaging
+XML Binding (this document)<br>
+
+
+      </td>
+
+
+    </tr>
+
+
+    <tr>
+
+
+      <td class="mainbody"><a name="1674333"></a><span>\</span>imscp_bestv1p1p4.pdf<br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1674337"></a>IMS Content Packaging
+Best Practice Guide<br>
+
+
+      </td>
+
+
+    </tr>
+
+
+    <tr>
+
+
+      <td class="mainbody"><a name="1675572"></a>\imscp_sumcv1p1p4.pdf<br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1675574"></a>IMS Content Packaging
+Summary of Changes<br>
+
+
+      </td>
+
+
+    </tr>
+
+
+    <tr>
+
+
+      <td class="mainbody"><a name="1674341"></a><span>\</span>schema\
+imscp_v1p1.xsd<br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1674344"></a>IMS Content XML
+Schema, version 1.1.4<br>
+
+
+      </td>
+
+
+    </tr>
+
+
+    <tr>
+
+
+      <td class="mainbody"><a name="1674354"></a><span>\</span>samples\All_Elements<br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1674357"></a>Illustrates a simple
+manifest using Content Packaging elements.<br>
+
+
+      </td>
+
+
+    </tr>
+
+
+    <tr>
+
+
+      <td class="mainbody"><a name="1674360"></a><span>\</span>samples\QTI_Example<br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1674364"></a>Illustrates a simple
+manifest packaging QTI elements.<br>
+
+
+      </td>
+
+
+    </tr>
+
+
+    <tr>
+
+
+      <td class="mainbody"><a name="1674366"></a><span>\</span>samples\Full_Metadata<br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1674369"></a>Illustrates a manifest
+that uses all elements and attributes defined in the IMS Content
+Packaging specification.<br>
+
+
+      </td>
+
+
+    </tr>
+
+
+    <tr>
+
+
+      <td class="mainbody"><a name="1674372"></a><span>\</span>samples\Multiple_Organizations<br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1674374"></a>Illustrates the use of
+multiple &lt;organizations&gt;, to provide different paths
+through a course.<br>
+
+
+      </td>
+
+
+    </tr>
+
+
+    <tr>
+
+
+      <td class="mainbody"><a name="1674376"></a><span>\</span>samples\Simple_Manifest<br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1674379"></a>Illustrates a simple
+manifest.<br>
+
+
+      </td>
+
+
+    </tr>
+
+
+    <tr>
+
+
+      <td class="mainbody"><a name="1674381"></a><span>\</span>samples\Sub_Manifests<br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1674384"></a>Illustrates the use of
+sub-Manifests to promote reuse. This example takes the Simple
+Manifest example, and implements it using sub-Manifests.<br>
+
+
+      </td>
+
+
+    </tr>
+
+
+  
+  </tbody>
+</table>
+
+
+<p><a name="1671787"></a>The W3C 'xml:' namespace definition file
+is available online but in cases where the parser does not have
+internet access, users may modify the schema to reference a local
+version of 'xml.xsd' that has been retrieved from W3C and
+associated with the same namespace. In these cases the local
+version is a control document and as such it should be in the
+root directory along with the manifest file itself.</p>
+
+
+<p><a name="1671791"></a>The filename of the Content Packaging
+control XSD only identifies the primary and secondary versions of
+the version i.e., for the v1.1.4 release the XSD filename is
+'ims_cpv1p1.xsd'. The full version number is recorded in the
+'version' attribute on the schema declaration e.g.,:</p>
+
+
+<pre>&lt;xsd:schema targetNamespace="http://www.imsglobal.org/xsd/imscp_v1p1" <br>   xmlns:xsd="http://www.w3.org/2001/XMLSchema" <br>   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"<br>   xmlns="http://www.imsglobal.org/xsd/imscp_v1p1" <br>   elementFormDefault="qualified" version="IMS CP 1.1.4"&gt;<br></pre>
+
+
+<h1><a name="1671801"></a>Appendix A - Additional Resources</h1>
+
+
+<h4><a name="1671802"></a>IMS Content Documents</h4>
+
+
+<p><font class="mainbodysmindent"><a name="1671805"></a>IMS
+Content Packaging Information Model: <a href="http://www.imsglobal.org/content/packaging/">http://www.imsglobal.org/content/packaging/</a></font></p>
+
+
+<p><font class="mainbodysmindent"><a name="1671808"></a>IMS
+Content Packaging Best Practice Guide: <a href="http://www.imsglobal.org/content/packaging/">http://www.imsglobal.org/content/packaging/</a></font></p>
+
+
+<h4><a name="1671809"></a>IMS Meta-data Documents</h4>
+
+
+<p><font class="mainbodysmindent"><a name="1672773"></a>The IMS
+Meta-Data Best Practice and Implementation Guide: <a href="http://www.imsglobal.org/metadata/">http://www.imsglobal.org/metadata/</a></font></p>
+
+
+<p><font class="mainbodysmindent"><a name="1672775"></a>The IMS
+Learning Resource Meta-Data Information Model: <a href="http://www.imsglobal.org/metadata/">http://www.imsglobal.org/metadata/</a></font></p>
+
+
+<h4><a name="1672776"></a>ADL/AICC Documents</h4>
+
+
+<p><font class="mainbodysmindent"><a name="1671816"></a>Sharable
+Content Object Reference Model
+(SCORM<span>tm</span>)<span>:</span> <a href="http://www.adlnet.org/">http://www.adlnet.org/</a></font></p>
+
+
+<p><font class="mainbodysmindent"><a name="1671817"></a>Aviation
+Industry CBT Committee (AICC) API for Web Implementation: <a href="http://www.aicc.org/">http://www.aicc.org/</a></font></p>
+
+
+<h4><a name="1671819"></a>IEEE Documents</h4>
+
+
+<p><font class="mainbodysmindent"><a name="1671822"></a>IEEE LTSC
+1484.12 Learning Object Metadata: <a href="http://ltsc.ieee.org/wg12">http://ltsc.ieee.org/wg12</a></font></p>
+
+
+<h4><a name="1671824"></a>XML</h4>
+
+
+<p><font class="mainbodysmindent"><a name="1671827"></a>XML
+Version 1.0 specification of the W3C: <a href="http://www.w3.org/TR/1998/REC-xml-19980210">http://www.w3.org/TR/1998/REC-xml-19980210</a></font></p>
+
+
+<p><font class="mainbodysmindent"><a name="1671830"></a>XML
+Namespace Recommendation of W3C: <a href="http://www.w3.org/TR/1999/REC-xml-names-19990114">http://www.w3.org/TR/1999/REC-xml-names-19990114</a></font></p>
+
+
+<p><font class="mainbodysmindent"><a name="1671832"></a>XML
+Inclusion Technical Report: <a href="http://www.w3.org/TR/xinclude">http://www.w3.org/TR/xinclude</a></font></p>
+
+
+<p><font class="mainbodysmindent"><a name="1671835"></a>XML
+Schema specification of the W3C: <a href="http://www.w3.org/TR/2001/REC-xmlschema-0-20010502/">http://www.w3.org/TR/2001/REC-xmlschema-0-20010502/</a></font></p>
+
+
+<h1><a name="1661382"></a>About This Document</h1>
+
+
+<p><a name="1657456"></a></p>
+
+
+<table summary="This table describes the document properties" border="1" cellpadding="5" cellspacing="0">
+
+
+  <tbody>
+
+    <tr>
+
+
+      <td class="mainbody"><a name="1657413"></a><strong>Title</strong><br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1657415"></a>IMS Content Packaging
+XML Binding<br>
+
+
+      </td>
+
+
+    </tr>
+
+
+    <tr>
+
+
+      <td class="mainbody"><a name="1657417"></a><strong>Editors</strong><br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1657419"></a>Colin Smythe (IMS),
+Alex Jackl (IMS)<br>
+
+
+      </td>
+
+
+    </tr>
+
+
+    <tr>
+
+
+      <td class="mainbody"><a name="1657425"></a><strong>Version</strong><br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1657427"></a>1.1.4<br>
+
+
+      </td>
+
+
+    </tr>
+
+
+    <tr>
+
+
+      <td class="mainbody"><a name="1657429"></a><strong>Version
+Date</strong><br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1657431"></a>04 October 2004<br>
+
+
+      </td>
+
+
+    </tr>
+
+
+    <tr>
+
+
+      <td class="mainbody"><a name="1657433"></a><strong>Status</strong><br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1657435"></a><strong>Final
+Specification</strong><br>
+
+
+      </td>
+
+
+    </tr>
+
+
+    <tr>
+
+
+      <td class="mainbody"><a name="1657437"></a><strong>Summary</strong><br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1657439"></a>This document
+describes the XML Binding that implements the IMS Content
+Packaging Information Model.<br>
+
+
+      </td>
+
+
+    </tr>
+
+
+    <tr>
+
+
+      <td class="mainbody"><a name="1657441"></a><strong>Revision
+Information</strong><br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1657443"></a>04 October 2004<br>
+
+
+      </td>
+
+
+    </tr>
+
+
+    <tr>
+
+
+      <td class="mainbody"><a name="1657445"></a><strong>Purpose</strong><br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1657447"></a>This document has been
+approved by the IMS Technical Board and is made available for
+adoption.<br>
+
+
+      </td>
+
+
+    </tr>
+
+
+    <tr>
+
+
+      <td class="mainbody"><a name="1657449"></a><strong>Document
+Location</strong><br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1668655"></a><a href="http://www.imsglobal.org/content/packaging/cpv1p1p4/imscp_bindv1p1p4.html">
+http://www.imsglobal.org/content/packaging/cpv1p1p4/imscp_bindv1p1p4.html</a><br>
+
+
+      </td>
+
+
+    </tr>
+
+
+  
+  </tbody>
+</table>
+
+
+<p><a name="1657458"></a></p>
+
+
+<p><a name="1657462"></a></p>
+
+
+<table summary="This table describes" border="1" cellpadding="5" cellspacing="0">
+
+
+  <tbody>
+
+    <tr>
+
+
+      <td class="mainbody"><a name="1657461"></a>To register any
+comments or questions about this specification please visit: <a href="http://www.imsglobal.org/developers/ims/imsforum/categories.cfm?catid=5">
+http://www.imsglobal.org/developers/ims/imsforum/categories.cfm?catid=5</a><br>
+
+
+      </td>
+
+
+    </tr>
+
+
+  
+  </tbody>
+</table>
+
+
+<p><a name="1657464"></a></p>
+
+
+<h2><a name="1657465"></a>List of Contributors</h2>
+
+
+<p><a name="1657466"></a>The following individuals contributed to
+the development of this document:</p>
+
+
+<p><a name="1668739"></a></p>
+
+
+<table summary="This table describes The list of contributors for this document" border="0" cellpadding="5" cellspacing="0">
+
+
+  <tbody>
+
+    <tr>
+
+
+      <th class="mainbody" scope="col"><strong>Name</strong></th>
+
+
+      <th class="mainbody" scope="col">
+      <strong>Organization</strong></th>
+
+
+      <th class="mainbody" scope="col"><strong>Name</strong></th>
+
+
+      <th class="mainbody" scope="col">
+      <strong>Organization</strong></th>
+
+
+    </tr>
+
+
+    <tr>
+
+
+      <td class="mainbody"><a name="1669298"></a>Thor Anderson<br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1669300"></a>Collegis<br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1669366"></a>Boyd Nielsen<br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1669368"></a>NETg<br>
+
+
+      </td>
+
+
+    </tr>
+
+
+    <tr>
+
+
+      <td class="mainbody"><a name="1669302"></a>Jay Beavers<br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1669304"></a>Microsoft<br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1669370"></a>Bill Olivier<br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1669372"></a>CETIS<br>
+
+
+      </td>
+
+
+    </tr>
+
+
+    <tr>
+
+
+      <td class="mainbody"><a name="1669306"></a>Fred Beshears<br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1669308"></a>UC Berkeley<br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1669374"></a>Claude Ostyn<br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1669376"></a>Click2learn, Inc.<br>
+
+
+      </td>
+
+
+    </tr>
+
+
+    <tr>
+
+
+      <td class="mainbody"><a name="1669310"></a>Kerri Blinco<br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1669312"></a>DEST<br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1669378"></a>Mike Pettit<br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1669380"></a>Blackboard<br>
+
+
+      </td>
+
+
+    </tr>
+
+
+    <tr>
+
+
+      <td class="mainbody"><a name="1669314"></a>Lorna Campbell<br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1669316"></a>JISC (CETIS)<br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1669382"></a>Daniel Rehak<br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1669384"></a>Carnegie Mellon
+University<br>
+
+
+      </td>
+
+
+    </tr>
+
+
+    <tr>
+
+
+      <td class="mainbody"><a name="1669318"></a>Adam Cooper<br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1669320"></a>FD Learning<br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1669386"></a>Tyde Richards<br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1669388"></a>IBM<br>
+
+
+      </td>
+
+
+    </tr>
+
+
+    <tr>
+
+
+      <td class="mainbody"><a name="1669322"></a>Rich Cushman<br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1669324"></a>SCT<br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1669390"></a>GianLuca
+Rolandelli<br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1669392"></a>GIUNTI<br>
+
+
+      </td>
+
+
+    </tr>
+
+
+    <tr>
+
+
+      <td class="mainbody"><a name="1669326"></a>Philip Dodds<br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1669328"></a>ADL<br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1669394"></a>Udo Schuermann<br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1669396"></a>Blackboard<br>
+
+
+      </td>
+
+
+    </tr>
+
+
+    <tr>
+
+
+      <td class="mainbody"><a name="1669330"></a>Pierre Gorissen<br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1669332"></a>SURF<br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1669398"></a>James Simon<br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1669400"></a>SUN Microsystems<br>
+
+
+      </td>
+
+
+    </tr>
+
+
+    <tr>
+
+
+      <td class="mainbody"><a name="1669334"></a>Steve Griffin<br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1669336"></a>IMS<br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1669402"></a>Colin Smythe<br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1669404"></a>IMS<br>
+
+
+      </td>
+
+
+    </tr>
+
+
+    <tr>
+
+
+      <td class="mainbody"><a name="1669338"></a>Mike Halm<br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1669340"></a>Penn State<br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1669406"></a>Colin Tattersall<br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1669408"></a>OUNL<br>
+
+
+      </td>
+
+
+    </tr>
+
+
+    <tr>
+
+
+      <td class="mainbody"><a name="1669342"></a>Andy Heath<br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1669344"></a>IMS Europe<br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1669410"></a>Schawn Thropp<br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1669412"></a>ADL<br>
+
+
+      </td>
+
+
+    </tr>
+
+
+    <tr>
+
+
+      <td class="mainbody"><a name="1669346"></a>Alan Hoberney<br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1669348"></a>ADL<br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1669414"></a>Tom Wason<br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1669416"></a>IMS<br>
+
+
+      </td>
+
+
+    </tr>
+
+
+    <tr>
+
+
+      <td class="mainbody"><a name="1669350"></a>Alex Jackl<br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1669352"></a>IMS<br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1669418"></a>Raymond Yee<br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1669420"></a>UC Berkeley<br>
+
+
+      </td>
+
+
+    </tr>
+
+
+    <tr>
+
+
+      <td class="mainbody"><a name="1669354"></a>Wilbert Kraan<br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1669356"></a>JISC (CETIS)<br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1669422"></a>Bill Young<br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1669424"></a>Sun Microsystems<br>
+
+
+      </td>
+
+
+    </tr>
+
+
+    <tr>
+
+
+      <td class="mainbody"><a name="1669358"></a>Mladen Maljkovic<br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1669360"></a>WebCT<br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1669426"></a>Kenny Young<br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1669428"></a>Microsoft<br>
+
+
+      </td>
+
+
+    </tr>
+
+
+    <tr>
+
+
+      <td class="mainbody"><a name="1669362"></a>Chris Moffatt<br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1669364"></a>Microsoft<br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1669430"></a><br>
+
+
+      <br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1669432"></a><br>
+
+
+      <br>
+
+
+      </td>
+
+
+    </tr>
+
+
+  
+  </tbody>
+</table>
+
+
+<h1><a name="1673970"></a>Revision History</h1>
+
+
+<p><a name="1669879"></a></p>
+
+
+<table summary="This table describes document revision history" border="1" cellpadding="5" cellspacing="0">
+
+
+  <tbody>
+
+    <tr bgcolor="#cccccc">
+
+
+      <th class="mainbody" scope="col"><strong>Version
+No.</strong></th>
+
+
+      <th class="mainbody" scope="col"><strong>Release
+Date</strong></th>
+
+
+      <th class="mainbody" scope="col"><strong>Comments</strong></th>
+
+
+    </tr>
+
+
+    <tr>
+
+
+      <td class="mainbody"><a name="1674131"></a>Final 1.0<br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1674133"></a>25 May 2000<br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1674135"></a>Updated document to
+address the following open issues:<br>
+
+
+ <a name="1674137"></a>a) Explained basic differences between
+DTDs and other Schemas for document validation in both the Best
+Practice Guide and the Binding document;<br>
+
+
+ <a name="1674138"></a>b) Ensured that the samples provided with
+the specification are separated into different folders depending
+on whether a DTD or an XDR file is used as the control document.
+The samples used in the body of the specification documents are
+only well-formed and do not rely upon a particular control
+document;<br>
+
+
+ <a name="1674142"></a>c) Added a URL for where users can
+download the samples;<br>
+
+
+ <a name="1674143"></a>d) Made an explicit comment that none of
+the samples provided (wherever they occur) refer to any sort of
+control document;<br>
+
+
+ <a name="1674144"></a>e) Reordered the Appendices to fit the
+order they're mentioned in the specification documents.<br>
+
+
+      </td>
+
+
+    </tr>
+
+
+    <tr>
+
+
+      <td class="mainbody"><a name="1674146"></a>Final 1.1<br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1674148"></a>19 April 2001<br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1674150"></a>Updated document to
+address the following open issues:<br>
+
+
+ <a name="1674152"></a>a) Clarified the use of the
+&lt;organization&gt; element in section 3.3.1;<br>
+
+
+ <a name="1674155"></a>b) Deprecated the use of XInclude: removed
+samples from Sections 4.6 and 4.7;<br>
+
+
+ <a name="1674158"></a>c) Extended meta-data functionality to
+&lt;organization&gt;, &lt;item&gt;, and &lt;file&gt;;<br>
+
+
+ <a name="1674162"></a>d) Changed the 'type' attribute on
+&lt;organization&gt; to 'structure' with a default value of
+'hierarchical';<br>
+
+
+ <a name="1674165"></a>e) Added &lt;dependency&gt; element to
+Section 3.4.1.3;<br>
+
+
+ <a name="1674167"></a>f) Added sample of meta-data on
+&lt;organization&gt; to Section 3.3.4;<br>
+
+
+ <a name="1674168"></a>g) Deprecated the use of
+&lt;manifestref&gt; and moved (sub)Manifests out of the
+&lt;resources&gt; block;<br>
+
+
+ <a name="1674172"></a>h) Changed resource &lt;item&gt; element
+attribute back to 'identifierref' from 'resourceref';<br>
+
+
+ <a name="1674173"></a>i) Made several minor edits; changed
+references to sub-manifest to (sub)Manifest; updated the
+graphics;<br>
+
+
+ <a name="1674177"></a>j) Added &lt;dependency&gt; example to
+Section 3.4.1.3.<br>
+
+
+      </td>
+
+
+    </tr>
+
+
+    <tr>
+
+
+      <td class="mainbody"><a name="1674179"></a>Final 1.1.1<br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1674181"></a>23 May 2001<br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1674183"></a>Updated XML-Schema
+sample in Binding Appendix B.<br>
+
+
+      </td>
+
+
+    </tr>
+
+
+    <tr>
+
+
+      <td class="mainbody"><a name="1674185"></a>Final 1.1.2<br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1674187"></a>08 August 2001<br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1674189"></a>Made several editorial
+corrections, and:<br>
+
+
+ <a name="1674191"></a>a) Corrected references from a specific
+IMS Meta-Data version to just IMS Meta-Data;<br>
+
+
+ <a name="1674196"></a>b) Removed the copies of the DTD and XSD
+from the appendix for ease of updating in the future;<br>
+
+
+ <a name="1674199"></a>c) Removed references to XDR (XML Data
+Representation) schema, since it is no longer supported by
+Microsoft.<br>
+
+
+      </td>
+
+
+    </tr>
+
+
+    <tr>
+
+
+      <td class="mainbody"><a name="1674201"></a>Final 1.1.3<br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1674203"></a>12 June 2003<br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1674205"></a>The changes contained
+within v1.1.3 are:<br>
+
+
+ <a name="1674208"></a>a) 'xml:' prefix recommendation - adoption
+of the W3C 'xml.xsd' file for the definition of the 'xml:'
+namespaced attributes available to the content package;<br>
+
+
+ <a name="1674211"></a>b) XML binding version identification
+attribute - clarification on the version numbering and
+corresponding namespace consequences for the content package XML
+schema;<br>
+
+
+ <a name="1674214"></a>c) ID and IDREF usage in the XML binding -
+clarification on the implications of the usage of the 'xsd:ID'
+and 'xsd:IDREF' features in the content package XML schema;<br>
+
+
+ <a name="1674217"></a>d) XML binding min/max constraints
+relaxation - removal of the min/max constraints that are
+currently incorrectly imposed within the content package XML
+schema;<br>
+
+
+ <a name="1674219"></a>e) 'parameter' attribute vocabulary -
+adoption of a syntax for the definition of the parameters as
+contained in the 'parameter' attribute plus definition of the
+algorithm to construct an associated URI;<br>
+
+
+ <a name="1674222"></a>f) 'isvisible' attribute clarification -
+clarification on the consequences on the rendering of the content
+and its title due to the usage of the 'isVisible' attribute;<br>
+
+
+ <a name="1674225"></a>g) 'type' attribute vocabulary -
+clarification on the usage of the 'webcontent' and other terms
+permitted for the 'type' attribute vocabulary<br>
+
+
+ <a name="1674226"></a>h) 'Href' filename format recommendation -
+formal definition of the file name formats that must be adopted
+when using the 'Href' attribute;<br>
+
+
+ <a name="1674230"></a>i) ZIP file format recommendation - formal
+definition of the ZIP file format that must be adopted;<br>
+
+
+ <a name="1674231"></a>j) Submanifest usage best practices
+clarification - clarification on the permitted referencing
+between a manifest and its contained (sub)Manifests.<br>
+
+
+      </td>
+
+
+    </tr>
+
+
+    <tr>
+
+
+      <td class="mainbody"><a name="1669888"></a>Final 1.1.4<br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1669890"></a>04 October 2004<br>
+
+
+      </td>
+
+
+      <td class="mainbody"><a name="1674283"></a>Made several editorial
+and clarifying corrections, and:<br>
+
+
+ <a name="1674284"></a>a) Corrected inconsistent name-spacing
+using xml:lang and x:lang;<br>
+
+
+ <a name="1674285"></a>b) Clarified conflicting information
+describing the &lt;organizations&gt; element;<br>
+
+
+ <a name="1674286"></a>c ) Removed remaining references to the
+&lt;variation&gt; element;<br>
+
+
+ <a name="1674287"></a>d) Coordinated Item element multiplicity
+between Info Model and Binding documents;<br>
+
+
+ <a name="1669892"></a>e) Corrected all graphics to be consistent
+with the v1p1p4 schema.<br>
+
+
+      </td>
+
+
+    </tr>
+
+
+  
+  </tbody>
+</table>
+
+
+<h1><a name="1675930"></a>Index</h1>
+
+
+<p><strong><a name="IX_A"></a>A</strong><br>
+
+
+ <a name="1675936"></a>Aggregation <a href="imscp_bindv1p1p4.html#1671327">1</a><br>
+
+
+ <a name="1675937"></a>Attributes<br>
+
+
+&nbsp;&nbsp;&nbsp;&nbsp; <a name="1675939"></a>default <a href="imscp_bindv1p1p4.html#1674162">1</a><br>
+
+
+&nbsp;&nbsp;&nbsp;&nbsp; <a name="1675941"></a>isvisible <a href="imscp_bindv1p1p4.html#1674222">1</a><br>
+
+
+&nbsp;&nbsp;&nbsp;&nbsp; <a name="1675943"></a>parameters <a href="imscp_bindv1p1p4.html#1674219">1</a><br>
+
+
+&nbsp;&nbsp;&nbsp;&nbsp; <a name="1675945"></a>structure <a href="imscp_bindv1p1p4.html#1674162">1</a><br>
+
+
+&nbsp;&nbsp;&nbsp;&nbsp; <a name="1675947"></a>type <a href="imscp_bindv1p1p4.html#1674225">1</a><br>
+
+
+&nbsp;&nbsp;&nbsp;&nbsp; <a name="1675950"></a>version <a href="imscp_bindv1p1p4.html#1674191">1</a>, <a href="imscp_bindv1p1p4.html#1674211">2</a><br>
+
+
+<br>
+
+
+</p>
+
+
+<p><strong><a name="IX_B"></a>B</strong><br>
+
+
+ <a name="1675957"></a>Best Practice Guide <a href="imscp_bindv1p1p4.html#1672965">1</a>, <a href="imscp_bindv1p1p4.html#1671692">2</a>, <a href="imscp_bindv1p1p4.html#1674337">3</a>, <a href="imscp_bindv1p1p4.html#1671808">4</a><br>
+
+
+ <a name="1675965"></a>Binding <a href="imscp_bindv1p1p4.html#1672939">1</a>, <a href="imscp_bindv1p1p4.html#1671247">2</a>, <a href="imscp_bindv1p1p4.html#1671278">3</a>, <a href="imscp_bindv1p1p4.html#1671320">4</a>, <a href="imscp_bindv1p1p4.html#1671692">5</a>, <a href="imscp_bindv1p1p4.html#1674331">6</a>, <a href="imscp_bindv1p1p4.html#1674287">7</a><br>
+
+
+</p>
+
+
+<p><strong><a name="IX_C"></a>C</strong><br>
+
+
+ <a name="1675970"></a>Content Package <a href="imscp_bindv1p1p4.html#1672952">1</a>, <a href="imscp_bindv1p1p4.html#1671522">2</a><br>
+
+
+</p>
+
+
+<p><strong><a name="IX_D"></a>D</strong><br>
+
+
+ <a name="1675974"></a>Disaggregation <a href="imscp_bindv1p1p4.html#1671327">1</a><br>
+
+
+ <a name="1675976"></a>DTD <a href="imscp_bindv1p1p4.html#1674138">1</a><br>
+
+
+</p>
+
+
+<p><strong><a name="IX_E"></a>E</strong><br>
+
+
+ <a name="1675979"></a>Elements<br>
+
+
+&nbsp;&nbsp;&nbsp;&nbsp; <a name="1675981"></a>dependency <a href="imscp_bindv1p1p4.html#1674165">1</a><br>
+
+
+&nbsp;&nbsp;&nbsp;&nbsp; <a name="1675984"></a>file <a href="imscp_bindv1p1p4.html#1674138">1</a>, <a href="imscp_bindv1p1p4.html#1674208">2</a><br>
+
+
+&nbsp;&nbsp;&nbsp;&nbsp; <a name="1675986"></a>item <a href="imscp_bindv1p1p4.html#1674158">1</a><br>
+
+
+&nbsp;&nbsp;&nbsp;&nbsp; <a name="1675989"></a>manifest <a href="imscp_bindv1p1p4.html#1674173">1</a>, <a href="imscp_bindv1p1p4.html#1674231">2</a><br>
+
+
+&nbsp;&nbsp;&nbsp;&nbsp; <a name="1675991"></a>organization <a href="imscp_bindv1p1p4.html#1674152">1</a><br>
+
+
+&nbsp;&nbsp;&nbsp;&nbsp; <a name="1675993"></a>resource <a href="imscp_bindv1p1p4.html#1674172">1</a><br>
+
+
+&nbsp;&nbsp;&nbsp;&nbsp; <a name="1675995"></a>resources <a href="imscp_bindv1p1p4.html#1674168">1</a><br>
+
+
+&nbsp;&nbsp;&nbsp;&nbsp; <a name="1675998"></a>schema <a href="imscp_bindv1p1p4.html#1674199">1</a>, <a href="imscp_bindv1p1p4.html#1674211">2</a><br>
+
+
+&nbsp;&nbsp;&nbsp;&nbsp; <a name="1676000"></a>title <a href="imscp_bindv1p1p4.html#1674222">1</a><br>
+
+
+ <a name="1676002"></a>Extensibility <a href="imscp_bindv1p1p4.html#1671688">1</a><br>
+
+
+<br>
+
+
+</p>
+
+
+<p><strong><a name="IX_I"></a>I</strong><br>
+
+
+ <a name="1676010"></a>IEEE <a href="imscp_bindv1p1p4.html#1671643">1</a>, <a href="imscp_bindv1p1p4.html#1671819">2</a><br>
+
+
+ <a name="1676011"></a>IMS Specifications<br>
+
+
+&nbsp;&nbsp;&nbsp;&nbsp; <a name="1676018"></a>Content Packaging <a href="imscp_bindv1p1p4.html#1672939">1</a>, <a href="imscp_bindv1p1p4.html#1671247">2</a>, <a href="imscp_bindv1p1p4.html#1671278">3</a>, <a href="imscp_bindv1p1p4.html#1671327">4</a>, <a href="imscp_bindv1p1p4.html#1671618">5</a>, <a href="imscp_bindv1p1p4.html#1671692">6</a>, <a href="imscp_bindv1p1p4.html#1671698">7</a>, <a href="imscp_bindv1p1p4.html#1671805">8</a><br>
+
+
+&nbsp;&nbsp;&nbsp;&nbsp; <a name="1676022"></a>Learner Information Package <a href="imscp_bindv1p1p4.html#1671618">1</a><br>
+
+
+&nbsp;&nbsp;&nbsp;&nbsp; <a name="1676028"></a>Meta-Data <a href="imscp_bindv1p1p4.html#1671373">1</a>, <a href="imscp_bindv1p1p4.html#1671522">2</a>, <a href="imscp_bindv1p1p4.html#1671589">3</a>, <a href="imscp_bindv1p1p4.html#1671643">4</a>, <a href="imscp_bindv1p1p4.html#1672773">5</a><br>
+
+
+&nbsp;&nbsp;&nbsp;&nbsp; <a name="1676029"></a>Question and Test Interoperability <a href="imscp_bindv1p1p4.html#1674360">1</a><br>
+
+
+ <a name="1676034"></a>Information Model <a href="imscp_bindv1p1p4.html#1672969">1</a>, <a href="imscp_bindv1p1p4.html#1674324">2</a>, <a href="imscp_bindv1p1p4.html#1671805">3</a><br>
+
+
+ <a name="1676037"></a>ISO <a href="imscp_bindv1p1p4.html#1673065">1</a>, <a href="imscp_bindv1p1p4.html#1671283">2</a><br>
+
+
+ <a name="1676041"></a>isvisible <a href="imscp_bindv1p1p4.html#1671410">1</a>, <a href="imscp_bindv1p1p4.html#1671445">2</a>, <a href="imscp_bindv1p1p4.html#1671554">3</a><br>
+
+
+<br>
+
+
+</p>
+
+
+<p><strong><a name="IX_L"></a>L</strong><br>
+
+
+ <a name="1676047"></a>Learning <a href="imscp_bindv1p1p4.html#1671327">1</a><br>
+
+
+ <a name="1676049"></a>Learning Object <a href="imscp_bindv1p1p4.html#1671327">1</a><br>
+
+
+ <a name="1676051"></a>LOM <a href="imscp_bindv1p1p4.html#1671643">1</a><br>
+
+
+ <a name="1676053"></a>LTSC <a href="imscp_bindv1p1p4.html#1671822">1</a><br>
+
+
+</p>
+
+
+<p><strong><a name="IX_M"></a>M</strong><br>
+
+
+ <a name="1676063"></a>Manifest <a href="imscp_bindv1p1p4.html#1671325">1</a>, <a href="imscp_bindv1p1p4.html#1671367">2</a>, <a href="imscp_bindv1p1p4.html#1671399">3</a>, <a href="imscp_bindv1p1p4.html#1671471">4</a>, <a href="imscp_bindv1p1p4.html#1671598">5</a>, <a href="imscp_bindv1p1p4.html#1674357">6</a>, <a href="imscp_bindv1p1p4.html#1674173">7</a><br>
+
+
+ <a name="1676070"></a>Meta-data <a href="imscp_bindv1p1p4.html#1671327">1</a>, <a href="imscp_bindv1p1p4.html#1671373">2</a>, <a href="imscp_bindv1p1p4.html#1671522">3</a>, <a href="imscp_bindv1p1p4.html#1671589">4</a>, <a href="imscp_bindv1p1p4.html#1671643">5</a>, <a href="imscp_bindv1p1p4.html#1671692">6</a><br>
+
+
+</p>
+
+
+<p><strong><a name="IX_N"></a>N</strong><br>
+
+
+ <a name="1676074"></a>Namespace <a href="imscp_bindv1p1p4.html#1671787">1</a><br>
+
+
+ <a name="1676078"></a>Normative <a href="imscp_bindv1p1p4.html#1671267">1</a>, <a href="imscp_bindv1p1p4.html#1671322">2</a>, <a href="imscp_bindv1p1p4.html#1671618">3</a><br>
+
+
+</p>
+
+
+<p><strong><a name="IX_R"></a>R</strong><br>
+
+
+ <a name="1676088"></a>Resource <a href="imscp_bindv1p1p4.html#1671478">1</a>, <a href="imscp_bindv1p1p4.html#1671572">2</a>, <a href="imscp_bindv1p1p4.html#1671611">3</a>, <a href="imscp_bindv1p1p4.html#1671663">4</a><br>
+
+
+ <a name="1676094"></a>Resources <a href="imscp_bindv1p1p4.html#1673025">1</a>, <a href="imscp_bindv1p1p4.html#1671355">2</a>, <a href="imscp_bindv1p1p4.html#1671460">3</a>, <a href="imscp_bindv1p1p4.html#1671607">4</a>, <a href="imscp_bindv1p1p4.html#1671668">5</a><br>
+
+
+</p>
+
+
+<p><strong><a name="IX_S"></a>S</strong><br>
+
+
+ <a name="1676105"></a>Schema <a href="imscp_bindv1p1p4.html#1673007">1</a>, <a href="imscp_bindv1p1p4.html#1671272">2</a>, <a href="imscp_bindv1p1p4.html#1671370">3</a>, <a href="imscp_bindv1p1p4.html#1671506">4</a>, <a href="imscp_bindv1p1p4.html#1671589">5</a>, <a href="imscp_bindv1p1p4.html#1671643">6</a>, <a href="imscp_bindv1p1p4.html#1671787">7</a>, <a href="imscp_bindv1p1p4.html#1669892">8</a><br>
+
+
+ <a name="1676107"></a>Schemas <a href="imscp_bindv1p1p4.html#1674137">1</a><br>
+
+
+ <a name="1676112"></a>Standards <a href="imscp_bindv1p1p4.html#1671294">1</a>, <a href="imscp_bindv1p1p4.html#1671304">2</a>, <a href="imscp_bindv1p1p4.html#1671373">3</a>, <a href="imscp_bindv1p1p4.html#1671522">4</a><br>
+
+
+ <a name="1676118"></a>Structure <a href="imscp_bindv1p1p4.html#1672949">1</a>, <a href="imscp_bindv1p1p4.html#1671327">2</a>, <a href="imscp_bindv1p1p4.html#1671407">3</a>, <a href="imscp_bindv1p1p4.html#1671545">4</a>, <a href="imscp_bindv1p1p4.html#1671567">5</a><br>
+
+
+ <a name="1676120"></a>sub-Manifest <a href="imscp_bindv1p1p4.html#1674384">1</a><br>
+
+
+</p>
+
+
+<p><strong><a name="IX_W"></a>W</strong><br>
+
+
+ <a name="1676136"></a>W3C <a href="imscp_bindv1p1p4.html#1672939">1</a>, <a href="imscp_bindv1p1p4.html#1673079">2</a>, <a href="imscp_bindv1p1p4.html#1671272">3</a>, <a href="imscp_bindv1p1p4.html#1671304">4</a>, <a href="imscp_bindv1p1p4.html#1671348">5</a>, <a href="imscp_bindv1p1p4.html#1671473">6</a>, <a href="imscp_bindv1p1p4.html#1671622">7</a>, <a href="imscp_bindv1p1p4.html#1671787">8</a>, <a href="imscp_bindv1p1p4.html#1671827">9</a>, <a href="imscp_bindv1p1p4.html#1674208">10</a><br>
+
+
+</p>
+
+
+<p><strong><a name="IX_X"></a>X</strong><br>
+
+
+ <a name="1676140"></a>XInclude <a href="imscp_bindv1p1p4.html#1674155">1</a><br>
+
+
+ <a name="1676152"></a>XML <a href="imscp_bindv1p1p4.html#1672939">1</a>, <a href="imscp_bindv1p1p4.html#1673075">2</a>, <a href="imscp_bindv1p1p4.html#1671231">3</a>, <a href="imscp_bindv1p1p4.html#1671262">4</a>, <a href="imscp_bindv1p1p4.html#1671304">5</a>, <a href="imscp_bindv1p1p4.html#1671320">6</a>, <a href="imscp_bindv1p1p4.html#1671473">7</a>, <a href="imscp_bindv1p1p4.html#1671622">8</a>, <a href="imscp_bindv1p1p4.html#1671692">9</a>, <a href="imscp_bindv1p1p4.html#1674331">10</a>, <a href="imscp_bindv1p1p4.html#1671824">11</a>, <a href="imscp_bindv1p1p4.html#1674199">12</a>, <a href="imscp_bindv1p1p4.html#1674211">13</a><br>
+
+
+&nbsp;&nbsp;&nbsp;&nbsp; <a name="1676158"></a>XSD <a href="imscp_bindv1p1p4.html#1672952">1</a>, <a href="imscp_bindv1p1p4.html#1671262">2</a>, <a href="imscp_bindv1p1p4.html#1671791">3</a><br>
+
+
+ <a name="1676159"></a>XML Features<br>
+
+
+&nbsp;&nbsp;&nbsp;&nbsp; <a name="1676161"></a>XInclude <a href="imscp_bindv1p1p4.html#1674155">1</a><br>
+
+
+ <a name="1676162"></a>XML Schema<br>
+
+
+&nbsp;&nbsp;&nbsp;&nbsp; <a name="1676164"></a>DTD <a href="imscp_bindv1p1p4.html#1674138">1</a><br>
+
+
+&nbsp;&nbsp;&nbsp;&nbsp; <a name="1676166"></a>XSD <a href="imscp_bindv1p1p4.html#1674196">1</a><br>
+
+
+ <a name="1676168"></a>XSD <a href="imscp_bindv1p1p4.html#1674196">1</a><br>
+
+
+<br>
+
+
+</p>
+
+
+<p><strong><a name="IX_Z"></a>Z</strong><br>
+
+
+ <a name="1676173"></a>ZIP <a href="imscp_bindv1p1p4.html#1674230">1</a><br>
+
+
+ <a name="1676175"></a>Zip <a href="imscp_bindv1p1p4.html#1671698">1</a><br>
+
+
+</p>
+
+
+<p><a name="1675580"></a></p>
+
+
+<center>
+<p>&nbsp;</p>
+
+
+<p>&nbsp;</p>
+
+
+<p>&nbsp;</p>
+
+
+<p class="mainbody"><em>IMS Global Learning Consortium, Inc.
+("IMS") is publishing the information contained in this</em> IMS
+Content Packaging XML Binding <em>("Specification") for purposes
+of scientific, experimental, and scholarly collaboration
+only.<br>
+
+
+<br>
+
+
+IMS makes no warranty or representation regarding the accuracy or
+completeness of the Specification.<br>
+
+
+ This material is provided on an "As Is" and "As Available"
+basis.<br>
+
+
+<br>
+
+
+The Specification is at all times subject to change and revision
+without notice.<br>
+
+
+<br>
+
+
+It is your sole responsibility to evaluate the usefulness,
+accuracy, and completeness of the Specification as it relates to
+you.<br>
+
+
+<br>
+
+
+IMS would appreciate receiving your comments and suggestions.<br>
+
+
+<br>
+
+
+Please contact IMS through our website at <a href="http://www.imsglobal.org">http://www.imsglobal.org</a><br>
+
+
+<br>
+
+
+Please refer to Document Name:</em> IMS Content Packaging XML
+Binding <em>Revision:</em> 04 October 2004</p>
+
+
+</center>
+
+
+<hr>
+</body>
+</html>

@@ -1,0 +1,1 @@
+<code><b>[% item.content(site.view.text) | trim | html(entity=1) %]</b></code>

@@ -1,0 +1,9 @@
+@prefix dc: <http://purl.org/dc/elements/1.1/>.
+
+<dir2xml_string.pl> 
+	dc:Title "dir2xml_string";
+	dc:Description "an example how to use the String class".
+
+<dir2xml_sax.pl>
+	dc:Title "dir2xml_string";
+	dc:Description "an example how to use the SAX class".

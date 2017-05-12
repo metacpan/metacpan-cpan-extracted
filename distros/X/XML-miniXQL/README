@@ -1,0 +1,39 @@
+*** THIS IS ALPHA SOFTWARE ***
+*** THIS IS ALPHA SOFTWARE ***
+*** THIS IS ALPHA SOFTWARE ***
+
+NAME
+    XML::miniXQL - Module for doing stream based XML queries
+
+SYNOPSIS
+      use XML::miniXQL;
+
+      my $results = XML::miniXQL::queryXML({Style => 'Hash'}, $xml, @searches);
+
+DESCRIPTION
+    This module provides a simplistic XQL like search engine for XML
+    files. It only supports a subset of XQL, because it does all
+    it's searching on streams, not on the document as a whole
+    (unlike XML::XQL). For this reason, only ancestor relationships
+    are supported, not sibling or child relationships. XML::miniXQL
+    also doesn't return nodes, it only returns the value (text)
+    found as the result of the query. As a result, you can't use
+    this module for node manipulation, however it's faster than
+    XML::XQL, so it can be used on a web backend or some such
+    environment. Xmerge is provided as an example of usage.
+
+    The queries are passed in as an array of queries, and the
+    results passed out as either a simple tuple list (each alternate
+    value is either the query or the result respectively), or as a
+    hash with the values being an array. See xmerge.pl as an example
+    of the Hash style. The List style is the default.
+
+AUTHOR
+    Matt Sergeant matt@sergeant.org
+
+SEE ALSO
+    perl(1).
+
+*** THIS IS ALPHA SOFTWARE ***
+*** THIS IS ALPHA SOFTWARE ***
+*** THIS IS ALPHA SOFTWARE ***

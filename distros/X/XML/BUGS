@@ -1,0 +1,69 @@
+General
+-------
+
+1.perl Makefile.PL doesn't notice test.pl file, so make test tries to
+call t/* files directly. FIXED IN THIS VERSION
+
+2. No proper support for anything other than ASCII :-( This is certainly
+fixable, but hasn't been fixed yet.
+
+XML::XUpdate::LibXML
+--------------------
+
+1.XML::XUpdate::LibXML returns
+Can't locate object method "append" via package "XML::LibXML::Element" at /usr/lib/perl5/site_perl/5.6.0/XML/XUpdate/LibXML.pm line 132, <IN> line 92.
+- solution: upgrade your XML::XUPdate::LibXML to the latest version.
+
+
+Xindice (1.0)
+-------------
+
+1. Xindice won't upload full hamlet.xml; gives
+RPC::XML::Client:send_request: HTTP server error: EOF" at lib/XML/SimpleDB/Database/Xindice.pm line 251
+(driven from RPC::XML::request->new('db.insertDocument', $collectionName, $id, $content);
+Fix: http://marc.theaimsgroup.com/?l=xindice-dev&m=102149898512882&w=2
+
+1b. Having applied fix above, now dies with:
+Fatal error parsing XML: org.xml.sax.SAXParseException: unexpected end of file found
+(the file can be loaded from the command line, so it isnt a problem with the file itself).
+
+2. Xindice's setDocument doesn't seem to do anything.
+
+eXist 0.8
+-------------
+
+1. Hangs up with no threads available after creating server collections.
+Fix: http://www.geocrawler.com/lists/3/SourceForge/8389/0/8925237/
+
+2. Fails to understand // as part of a valid XPath when applied to the
+top-level node in a collection  (eg if collection contains only <node>hi</node>
+collection(/colname)//node returns nothing). It should be self-or-descendant,
+shouldn't it? Certainly different behaviour from Xindice. Check this again -
+may have been due to me not removing <result> wrapper...
+
+3. CreateId is not yet included in the standard exist distribution.
+
+eXist 0.9
+---------
+
+CreateId is not yet included in the standard exist distribution.
+
+Other
+-----
+
+If using XML::RPC with Apache, and xml-rpc calls mysteriously vanish, try
+reverting to XML::Parser 2.29 (see note in XML:RPC directory).
+
+For RPC::XML, if 2 mysterious trailing characters being added to xml being
+saved, change line 487 of XML.pm to:
+MIME::Base64::encode_base64($$self, '')
+
+
+Differences between Exist and Xindice
+-------------------------------------
+
+Exist will treat /db as the root collection; Xindice doesn't see it as a 
+collection. So there is no way to see the top-level collections using
+listChildCollections over XML:RPC?
+
+ 

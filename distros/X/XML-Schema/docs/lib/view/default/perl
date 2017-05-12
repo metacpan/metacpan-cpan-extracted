@@ -1,0 +1,6 @@
+[% IF item.title -%]
+<p>
+<b>[% item.title %]</b>
+[% END -%]
+<ul><pre><p>[% item.content(site.view.text) | trim | html(entity=1) | replace('&amp;lt;', '&lt;') %]</b></pre></ul>
+[% "</p>" IF item.title -%]

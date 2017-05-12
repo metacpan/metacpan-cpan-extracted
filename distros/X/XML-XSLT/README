@@ -1,0 +1,78 @@
+			Perl module: XML::XSLT
+
+Copyright (c) 1999 Geert Josten & Egon Willighagen.
+Copyright (c) 2001 Mark A. Hershberger
+
+All rights reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself. 
+
+The Perl licence can be found in the README file in the Perl source
+distribution.
+
+Information can be found at: http://xmlxslt.sourceforge.net/ 
+
+The module can be found at:
+http://www.cpan.org/modules/by-module/XML
+
+*** THIS IS ALPHA SOFTWARE ***
+
+Expect the interface to change between versions.
+
+This is a Perl module to parse XSL Transformational sheets. For a
+description of the XSLT, see http://www.w3.org/TR/xslt. Currently, it
+uses XML::Parser and XML::DOM, but an effort is being made to use
+XML::XPath.
+
+XML::Parser is a Perl extension interface to James Clark's XML parser,
+expat.  It requires at least version 5.004 of perl and can be found on
+CPAN.
+
+XML::DOM is a Perl module that allows XML::Parser to build an Object
+Oriented data structure with a DOM Level 1 compliant interface.
+
+While we are working towards conformance with the W3 spec, this is an
+alpha version and the module does not conform to the XSLT working
+draft at this moment. New releases will be announced on the perl-xml
+mailing list [You can subscribe to this list by sending a message to
+subscribe-perl-xml@lyris.activestate.com] and to the XML::XSLT mailing
+list [subscribe by sending a message to
+xmlxslt-subscribe@listbot.com].
+
+Please post bug reports to <https://sourceforge.net/bugs/?group_id=6054>
+
+To configure this module, cd to the directory that contains this
+README file and type the following.
+
+	perl Makefile.PL
+
+Then to build you run make.
+
+	make
+
+Run the tests:
+
+        make test
+
+If you have write access to the perl library directories, you may then
+install by typing (as superuser):
+
+	make install
+
+If you want to install this module somewhere other than the standard location
+then you should use:
+
+ 	perl Makefile.PL PREFIX=/location/of/libs
+
+at the first stage above and then in a program that wants to use the module
+you should put:
+
+	use lib qw(/locations/of/libs/lib/perl5);
+
+early on in the program.
+
+DEPENDENCIES
+
+This module requires XML::DOM (and its dependency XML::Parser) and also
+requires Test::More to perform its tests.

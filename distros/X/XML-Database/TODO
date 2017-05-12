@@ -1,0 +1,6 @@
+1. Fix the problem of returning a list when Match is not found.  Since it then still returns
+when it should keep searching. (Done 9/14/02)
+	
+2. Fix the Node and NodePath differences with getElementsByTagName() for Node
+	
+3.	

@@ -1,0 +1,2 @@
+0.05
+	- Fix a leak (http://rt.cpan.org/Public/Bug/Display.html?id=23838), thanks to Nicholas Perez

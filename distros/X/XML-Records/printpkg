@@ -1,0 +1,18 @@
+#!perl -w
+use strict;
+use XML::Records;
+
+my $p=XML::Records->new('modules.xml') or die "$!";
+$p->set_records('module');
+while (my $record=$p->get_record()) {
+  my $pkg=$record->{package};
+  if (ref $pkg eq 'ARRAY') {
+    for my $subpkg (@$pkg) {
+      print $subpkg->{name},"\n";
+    }
+  }
+  else {
+    print $pkg->{name},"\n";
+  }
+}
+

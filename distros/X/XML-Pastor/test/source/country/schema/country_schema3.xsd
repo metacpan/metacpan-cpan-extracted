@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:include schemaLocation="common.xsd"/>
+	<xs:element name="city" type="City">
+		<xs:annotation>
+			<xs:documentation>IATA City</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="language" type="Language">
+		<xs:annotation>
+			<xs:documentation>ISO 639 language</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="location" type="Location">
+		<xs:annotation>
+			<xs:documentation>UN Location (UN/LOCODE)</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="state" type="State">
+		<xs:annotation>
+			<xs:documentation>IATA State</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="country" type="Country">
+		<xs:annotation>
+			<xs:documentation>Country</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:complexType name="City">
+		<xs:annotation>
+			<xs:documentation>IATA city</xs:documentation>
+		</xs:annotation>
+		<xs:sequence minOccurs="0">
+			<xs:element name="name" type="xs:string" minOccurs="0"/>
+			<xs:element ref="country" minOccurs="0"/>
+			<xs:element ref="state" minOccurs="0"/>
+		</xs:sequence>
+		<xs:attribute name="sid" type="SystemID" use="optional"/>
+		<xs:attribute name="code" type="CityCodeIATA" use="optional"/>
+	</xs:complexType>
+	<xs:complexType name="Country">
+		<xs:annotation>
+			<xs:documentation>ISO 3166-1 Country </xs:documentation>
+		</xs:annotation>
+		<xs:sequence minOccurs="0">
+			<xs:element name="name" type="xs:string" minOccurs="0"/>
+			<xs:element ref="location" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element ref="state" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element ref="city" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+		<xs:attribute name="sid" type="SystemID" use="optional"/>
+		<xs:attribute name="code" type="CountryCodeISO3166" use="optional"/>
+	</xs:complexType>
+	<xs:complexType name="Language">
+		<xs:annotation>
+			<xs:documentation>ISO 639 Language</xs:documentation>
+		</xs:annotation>
+		<xs:attribute name="sid" type="SystemID" use="optional"/>
+		<xs:attribute name="code2" type="LanguageCodeISO639" use="optional"/>
+		<xs:attribute name="name" type="xs:string" use="optional"/>
+	</xs:complexType>
+	<xs:complexType name="Location">
+		<xs:annotation>
+			<xs:documentation>UN Location (UN/LOCODE)</xs:documentation>
+		</xs:annotation>
+		<xs:sequence minOccurs="0">
+			<xs:element ref="country" minOccurs="0"/>
+			<xs:element name="function" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>the function(s) of this location</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:attribute name="country" type="xs:boolean"/>
+					<xs:attribute name="port" type="xs:boolean"/>
+					<xs:attribute name="railTerminal" type="xs:boolean"/>
+					<xs:attribute name="roadTerminal" type="xs:boolean"/>
+					<xs:attribute name="airport" type="xs:boolean"/>
+					<xs:attribute name="postalExchange" type="xs:boolean"/>
+					<xs:attribute name="multimodal" type="xs:boolean"/>
+					<xs:attribute name="fixedTransport" type="xs:boolean"/>
+					<xs:attribute name="borderCrossing" type="xs:boolean"/>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="position" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>GEO position</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:attribute name="laititude" type="xs:decimal"/>
+					<xs:attribute name="laititude_str" type="xs:string"/>
+					<xs:attribute name="longitude" type="xs:decimal"/>
+					<xs:attribute name="longitude_str" type="xs:string"/>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+		<xs:attribute name="sid" type="SystemID" use="optional">
+			<xs:annotation>
+				<xs:documentation>system ID</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="code" type="UNLoCode" use="optional">
+			<xs:annotation>
+				<xs:documentation>example : TR.IST</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="countryCode" type="CountryCodeISO3166" use="optional">
+			<xs:annotation>
+				<xs:documentation>example: TR</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="subCode" type="UNLoCodeSub" use="optional">
+			<xs:annotation>
+				<xs:documentation>example : IST</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="localityCode" type="UNLoCodeSub" use="optional">
+			<xs:annotation>
+				<xs:documentation>IATA locality (airport) code</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="name" type="xs:string" use="optional"/>
+	</xs:complexType>
+	<xs:complexType name="State">
+		<xs:annotation>
+			<xs:documentation>IATA State</xs:documentation>
+		</xs:annotation>
+		<xs:sequence minOccurs="0">
+			<xs:element ref="country" minOccurs="0"/>
+		</xs:sequence>
+		<xs:attribute name="sid" type="SystemID" use="optional"/>
+		<xs:attribute name="code" type="StateCodeCompleteIATA" use="optional"/>
+		<xs:attribute name="countryCode" type="CountryCodeISO3166" use="optional"/>
+		<xs:attribute name="subCode" type="StateCodeIATA" use="optional"/>
+		<xs:attribute name="name" type="xs:string" use="optional"/>
+	</xs:complexType>
+	<xs:element name="myCity">
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="City">
+					<xs:sequence minOccurs="0">
+						<xs:element name="nameChinese" type="xs:string"/>
+					</xs:sequence>
+					<xs:attributeGroup ref="MyAttribGroup"/>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:complexType name="MyCountry">
+		<xs:complexContent>
+			<xs:extension base="Country">
+				<xs:sequence minOccurs="0">
+					<xs:element ref="image"/>
+					<xs:sequence minOccurs="0">
+						<xs:element name="bye" minOccurs="0" maxOccurs="unbounded">
+							<xs:complexType>
+								<xs:attribute name="name" type="xs:string"/>
+							</xs:complexType>
+						</xs:element>
+					</xs:sequence>
+					<xs:element name="hello">
+						<xs:complexType>
+							<xs:all>
+								<xs:element name="world" type="xs:string"/>
+								<xs:element name="planet" type="xs:string"/>
+							</xs:all>
+						</xs:complexType>
+					</xs:element>
+				</xs:sequence>
+				<xs:attribute name="surfaceArea" type="xs:double"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="MyLocation">
+		<xs:complexContent>
+			<xs:extension base="Location">
+				<xs:sequence minOccurs="0">
+					<xs:group ref="MyGroup" minOccurs="0"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:group name="MyGroup">
+		<xs:sequence>
+			<xs:element ref="image" minOccurs="0"/>
+			<xs:element ref="language" minOccurs="0"/>
+		</xs:sequence>
+	</xs:group>
+	<xs:attributeGroup name="MyAttribGroup">
+		<xs:attribute name="greetings" type="xs:string"/>
+		<xs:attribute name="salutations" type="xs:string"/>
+	</xs:attributeGroup>
+</xs:schema>

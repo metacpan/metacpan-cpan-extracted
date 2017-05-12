@@ -1,0 +1,42 @@
+X11-Resolution
+
+Get information about the current resolution for X.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc X11::Resolution
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=X11-Resolution
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/X11-Resolution
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/X11-Resolution
+
+    Search CPAN
+        http://search.cpan.org/dist/X11-Resolution/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 Zane C. Bowers
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

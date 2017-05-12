@@ -1,0 +1,12 @@
+
+<doc>pre
+<foo bar="baz">intro
+prechildren
+prechild
+<a></a>postchild
+prechild
+<b></b>postchild
+postchildren
+extro
+</foo>post
+</doc>

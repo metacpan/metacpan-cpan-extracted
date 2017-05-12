@@ -1,0 +1,81 @@
+<?xml version='1.0' encoding='utf-8'?>
+<?xml-stylesheet type="text/xml" href="compare-ml.xsl"?>
+<!DOCTYPE comparison SYSTEM "comparison.dtd">
+<!--
+TODO:
+
+* Add intelligent merging of renamed paths.
+* Add IDE integration.
+* Add Speed (?)
+-->
+<comparison>
+    <meta>
+        <implementations>
+            <impl id="cvs">
+                <name>CVS</name>
+                <url>http://www.cvshome.org/</url>
+            </impl>
+            <impl id="svn">
+                <name>SVN</name>
+                <url>http://subversion.tigris.org/</url>
+                <fullname>Subversion Version Control System</fullname>
+            </impl>
+            <impl id="bazaar">
+                <name>Bazaar</name>
+                <url>http://bazaar-vcs.org/</url>
+                <vendor>Canonical</vendor>
+            </impl>
+            <impl id="toobad">
+                <name>Toobad</name>
+                <url>http://toobad.tld/</url>
+                <fullname>Not-Too-Bad</fullname>
+                <vendor>MyCompany</vendor>
+            </impl>
+
+        </implementations>
+        <timestamp>
+            $Id: scm-comparison.xml 61 2005-04-06 17:09:28Z shlomif $
+        </timestamp>
+    </meta>
+    <contents>
+<section id="main">
+    <title>Version Control System Comparison</title>
+    <expl>
+        This is a comparison of version-control systems. It is split
+        into several categories and sub-categories under which the
+        systems are checked.
+    </expl>
+    <section id="repos_operations">
+        <title>Repository Operations</title>
+        <section id="atomic_commits">
+            <title>Atomic Commits</title>
+            <expl>
+                Support for atomic commits means that if an operation on the
+                repository is interrupted in the middle, the repository will
+                not be left in an inconsistant state. Are the check-in
+                operations atomic? Are the check-in operations atomic, or can
+                interrupting an operation leave the repository in an
+                intermediate state?
+            </expl>
+            <compare>
+                <s id="cvs">No. CVS commits are not atomic.</s>
+                <s id="arch">Yes. Commits are atomic.</s>
+                <s id="darcs">Yes. Commits are atomic.</s>
+                <s id="subversion">Commits are atomic.</s>
+                <s id="superversion">Commits are atomic.</s>
+                <s id="svk">Commits are atomic.</s>
+                <s id="aegis">Commits are atomic.</s>
+                <s id="bitkeeper">Yes (but need to verify)</s>
+                <s id="monotone">Yes.</s>
+                <s id="opencm">Yes. Commits are atomic.</s>
+                <s id="perforce">Yes. Commits are atomic.</s>
+                <s id="vesta">Yes. Commits are atomic.</s>
+                <s id="co-op">Yes. Commits are atomic.</s>
+                <s id="vss">No. VSS commits are not atomic.</s>
+                <s id="cmsynergy">Yes. Commits are atomic.</s>
+            </compare>
+        </section>
+    </section>
+</section>
+    </contents>
+</comparison>

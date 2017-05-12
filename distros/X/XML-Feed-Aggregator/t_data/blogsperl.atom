@@ -1,0 +1,2084 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+    <title>blogs.perl.org</title>
+    <link rel="alternate" type="text/html" href="http://blogs.perl.org/" />
+    <link rel="self" type="application/atom+xml" href="http://blogs.perl.org/atom.xml" />
+    <id>tag:blogs.perl.org,2009-10-07://1</id>
+    <updated></updated>
+    <subtitle>There&apos;s more than one way to blog it.</subtitle>
+    <generator uri="http://www.sixapart.com/movabletype/">Movable Type Pro 4.32-en</generator>
+
+<entry>
+    <title>Faster Perl debugging through crazy tricks?</title>
+    <link rel="alternate" type="text/html" href="http://blogs.perl.org/users/alex_balhatchet/2011/02/faster-perl-debugging-through-crazy-tricks.html" />
+    <id>tag:blogs.perl.org,2011:/users/alex_balhatchet//92.1460</id>
+
+    <published>2011-02-11T21:42:55Z</published>
+    <updated>2011-02-11T21:51:19Z</updated>
+
+    <summary>Hi all, I&apos;m at work right now, waiting for some code to run in the Perl Debugger and I got to thinking. Right now I&apos;ve set a break point and I&apos;ve hit &quot;c&quot; for continue executing, and in the background...</summary>
+    <author>
+        <name>Alex Balhatchet</name>
+        <uri>http://kaoru.slackwise.net</uri>
+    </author>
+    
+    <category term="perldebugging" label="perl debugging" scheme="http://www.sixapart.com/ns/types#tag" />
+    
+    <content type="html" xml:lang="en" xml:base="http://blogs.perl.org/users/alex_balhatchet/">
+        <![CDATA[<p>Hi all,</p>
+
+<p>I'm at work right now, waiting for some code to run in the Perl Debugger and I got to thinking. Right now I've set a break point and I've hit "c" for continue executing, and in the background the debugger is doing all these checks on every single line and slowing down the execution of my program like crazy. I know it's doing <em>something</em> because if I hit ^C is halts properly at its current point of execution. What if there were some way to speed this up?</p>
+
+<p>I'm thinking...</p>
+
+<pre><code>DB > b $condition
+DB > $DB::breakpoints_only_mode = 1;
+DB > c</code></pre>
+
+<p>Setting $DB::breakpoints_only_mode essentially promises the debugger that you won't hit ^C or anything silly like that. The implementation would be something like...</p>
+
+<ul>
+	<li>Set up a hook of some kind for all existing breakpoints, which turns debugger flags on, then checks the breakpoint, then turns debugger flags back off again.</li>
+	<li>Turn off the debugger flag(s?)</li>
+	<li>Continue running the code as normal</li>
+</ul>
+
+<p>What do Smarter People Than Me think of this idea?</p>
+
+<p>(of course it's entirely possible that the debugger isn't actually slowing down my code all that much... but it feels like it is?)</p>]]>
+        
+    </content>
+</entry>
+
+<entry>
+    <title>Lazyweb: ElasticSearch proxy </title>
+    <link rel="alternate" type="text/html" href="http://blogs.perl.org/users/clinton_gormley/2011/02/lazyweb-elasticsearch-proxy.html" />
+    <id>tag:blogs.perl.org,2011:/users/clinton_gormley//239.1459</id>
+
+    <published>2011-02-11T11:51:49Z</published>
+    <updated>2011-02-11T12:08:10Z</updated>
+
+    <summary>Hi all We get a lot of people who want to use javascript to talk to their ElasticSearch server, directly from the browser. This poses a problem, as ElasticSearch doesn&apos;t offer any authentication, or request filtering. I&apos;d like to write...</summary>
+    <author>
+        <name>Clinton Gormley</name>
+        
+    </author>
+    
+    <category term="perlelasticsearchdancerproxyauthentication" label="perl elasticsearch dancer proxy authentication" scheme="http://www.sixapart.com/ns/types#tag" />
+    
+    <content type="html" xml:lang="en" xml:base="http://blogs.perl.org/users/clinton_gormley/">
+        <![CDATA[<p>Hi all</p>
+
+<p>We get a lot of people who want to use javascript to talk to their <a href="http://www.elasticsearch.org">ElasticSearch</a> server, directly from the browser.</p>
+
+<p>This poses a problem, as ElasticSearch doesn't offer any authentication, or request filtering.</p>
+
+<p>I'd like to write <strong>ElasticSearch::Proxy</strong>, which would be configurable to:<br />
+<ul><br />
+	<li>allow restriction on GET/HEAD/POST/PUT/DELETE requests</li><br />
+<li>parse the incoming JSON request, filter out anything that shouldn't be allowed, and then forward the request on to the ES server</li><br />
+<li>allow authenticated requests, with different permissions</li><br />
+</ul></p>
+
+<p>With the module, I'd like to provide various ready made server configurations, ie you should be able to plug it into mod_perl, dancer, whatever...</p>
+
+<p>I'm only familiar with mod_perl - haven't used any of the other frameworks.</p>
+
+<p><strong>LAZYWEB</strong>: What webservers should I target, and are there any existing modules which may be useful to use with the above?</p>
+
+<p>thanks</p>
+
+<p>clint</p>]]>
+        
+    </content>
+</entry>
+
+<entry>
+    <title>Moving my Meta Modules</title>
+    <link rel="alternate" type="text/html" href="http://blogs.perl.org/users/barbie/2011/02/moving-my-meta-modules.html" />
+    <id>tag:blogs.perl.org,2011:/users/barbie//72.1458</id>
+
+    <published>2011-02-11T15:59:38Z</published>
+    <updated>2011-02-11T16:01:41Z</updated>
+
+    <summary>Some time ago I wrote Test-YAML-Meta. At the time the name was given as a compliment to Test-YAML-Valid, which validates YAML files in terms of the formatting, rather than the data. Test-YAML-Meta took that a step further and validated the...</summary>
+    <author>
+        <name>Barbie</name>
+        <uri>http://barbie.missbarbell.co.uk</uri>
+    </author>
+    
+    <category term="testqametaspeccpanmeta" label="test qa metaspec cpanmeta" scheme="http://www.sixapart.com/ns/types#tag" />
+    
+    <content type="html" xml:lang="en" xml:base="http://blogs.perl.org/users/barbie/">
+        <![CDATA[<p>Some time ago I wrote <a href="http://search.cpan.org/perldoc?Test-YAML-Meta">Test-YAML-Meta</a>. At the time the name was given as a compliment to <a href="http://search.cpan.org/perldoc?Test-YAML-Valid">Test-YAML-Valid</a>, which validates YAML files in terms of the formatting, rather than the data. <a href="http://search.cpan.org/perldoc?Test-YAML-Meta">Test-YAML-Meta</a> took that a step further and validated the content data for META.yml files included with CPAN distributions against the evolving CPAN META Specification.</p>
+<p>With the release of <a href="http://search.cpan.org/perldoc?Parse-CPAN-Meta">Parse-CPAN-Meta</a> I wrote <a href="http://search.cpan.org/perldoc?Test-CPAN-Meta">Test-CPAN-Meta</a>, which dropped the sometimes complex dependency of the more verbose YAML parsers, for the one that was specifically aimed at CPAN META.yml files. With the emergence of JSON, there was a move to encourage authors to release META.json files too. Although considered a subset of the full YAML specification, JSON has a much better defined structure that has more complete parser support. Coinciding with this move was the desire by David Golden to properly define a specification for the CPAN Meta files. It was agreed that v2.0 of the CPAN Meta Specification should use JSON as the default implementation. As a consequence I then released <a href="http://search.cpan.org/perldoc?Test-JSON-Meta">Test-JSON-Meta</a>.</p>
+<p>Although the initial naming structure seemed the right the thing at the time, it is becoming clearer that really the names need to be revised. As such I looking to change two of the distributions to better fit the implementations. So in the coming weeks expect to see some updates. The name changes I'm planning are:</p>
+<ul>
+<li><a href="http://search.cpan.org/perldoc?Test-CPAN-Meta">Test-CPAN-Meta</a> =&gt; Test-CPAN-Meta (no change)</li>
+<li><a href="http://search.cpan.org/perldoc?Test-YAML-Meta">Test-YAML-Meta</a> =&gt; Test-CPAN-Meta-YAML</li>
+<li><a href="http://search.cpan.org/perldoc?Test-JSON-Meta">Test-JSON-Meta</a> =&gt; Test-CPAN-Meta-JSON</li>
+</ul>
+<p>Underneath these current namespaces is the Version module that describes the data structures of the various specifications. In the short term these will also move, but will be replaced by a dependency on the main <a href="http://search.cpan.org/perldoc?CPAN-Meta">CPAN-Meta</a> distribution in the future. There will be final releases for <a href="http://search.cpan.org/perldoc?Test-YAML-Meta">Test-YAML-Meta</a> and <a href="http://search.cpan.org/perldoc?Test-JSON-Meta">Test-JSON-Meta</a>, which will act as a wrapper distribution to re-point the respective distributions to their new identities.</p>
+]]>
+        
+    </content>
+</entry>
+
+<entry>
+    <title>How to set up your own PerlMongers web service in 10 minutes or less</title>
+    <link rel="alternate" type="text/html" href="http://blogs.perl.org/users/olaf_alders/2011/02/how-to-set-up-your-own-perlmongers-web-service-in-10-minutes-or-less.html" />
+    <id>tag:blogs.perl.org,2011:/users/olaf_alders//280.1457</id>
+
+    <published>2011-02-11T11:11:36Z</published>
+    <updated>2011-02-12T19:44:45Z</updated>
+
+    <summary>I&apos;ve been working with ElasticSearch over the past months as part of the MetaCPAN project. Using ElasticSearch as our back end has worked out really well so far. The reason is that, out of the box, it provides a REST...</summary>
+    <author>
+        <name>Olaf Alders</name>
+        <uri>http://www.wundercounter.com</uri>
+    </author>
+    
+    <category term="api" label="API" scheme="http://www.sixapart.com/ns/types#tag" />
+    <category term="cpan" label="cpan" scheme="http://www.sixapart.com/ns/types#tag" />
+    <category term="elasticsearch" label="elasticsearch" scheme="http://www.sixapart.com/ns/types#tag" />
+    <category term="metacpan" label="metacpan" scheme="http://www.sixapart.com/ns/types#tag" />
+    <category term="perl" label="perl" scheme="http://www.sixapart.com/ns/types#tag" />
+    <category term="perlmongers" label="perlmongers" scheme="http://www.sixapart.com/ns/types#tag" />
+    <category term="rest" label="REST" scheme="http://www.sixapart.com/ns/types#tag" />
+    
+    <content type="html" xml:lang="en" xml:base="http://blogs.perl.org/users/olaf_alders/">
+        <![CDATA[<p>I've been working with ElasticSearch over the past months as part of the <a href="http://search.metacpan.org">MetaCPAN project</a>. Using ElasticSearch as our back end has worked out really well so far. The reason is that, out of the box, it provides a REST API. So, in our case, we've been able to concentrate on writing code and not on designing an API, defining its behaviour, arguing over URL schemes etc.  </p>
+
+<p>To be clear, ES is not written in Perl, but there is <a href="http://search.metacpan.org/#/showpod/ElasticSearch">a handy Perl module</a> you can use to get yourself up and running in *minutes*.  </p>]]>
+        <![CDATA[<p>As my example of how to run our own web service, I've chosen to create a service which hosts info on all of the PerlMongers groups in the comprehensive XML file <a href="http://www.pm.org/groups/perl_mongers.xml">found here</a>. We're going to grab it, parse it and stuff it into ElasticSearch.  Once you have the logic of that part down (and there's not a lot to it), you're basically done. </p>
+
+<p>So, to start, <a href="http://www.elasticsearch.org/download/">just grab yourself a copy of ElasticSearch</a>.  Unzip it and run the following command:</p>
+
+<p><code>bin/elasticsearch -f</code></p>
+
+<p>You know have an ES server running in the foreground on port 9200.  That's it!</p>
+
+<p>Now, for the script:</p>
+
+<pre><code>#!/usr/bin/env perl
+
+<p>use Modern::Perl;<br />
+use ElasticSearch;<br />
+use Encode;<br />
+use Try::Tiny;<br />
+use WWW::Mechanize::Cached;<br />
+use XML::Simple;</p>
+
+<p>my $index_name = 'perlmongers';</p>
+
+<p>my $es = ElasticSearch->new(<br />
+    servers   => 'localhost:9200',<br />
+    transport => 'httplite',<br />
+    timeout   => 30,<br />
+);</p>
+
+<p># if we're running this script the 1st time, there's no index to drop<br />
+try { $es->delete_index( index => $index_name ); };</p>
+
+<p># index doesn't exist until we create it explicitly<br />
+$es->create_index( index => $index_name, );</p>
+
+<p># cache the XML because we may be running the script a lot in dev<br />
+my $mech = WWW::Mechanize::Cached->new;<br />
+$mech->get( 'http://www.pm.org/groups/perl_mongers.xml' );</p>
+
+<p># we don't want empty elements represented as {}<br />
+my $xml    = XMLin( $mech->content, SuppressEmpty => undef );</p>
+
+<p>foreach my $pm_name ( sort keys %{$xml->{group}} ) {</p>
+
+<p>    my $group = $xml->{group}->{$pm_name};</p>
+
+<p>    my %to_insert = (<br />
+        name      => $pm_name,<br />
+        tsar_name => $group->{tsar}->{name} || undef,<br />
+        web       => $group->{web} || undef,<br />
+    );</p>
+
+<p>    foreach my $geo ( keys %{ $group->{location} } ) {<br />
+        $to_insert{$geo} = $group->{location}->{$geo};<br />
+    }</p>
+
+<p>    # fix any encoding problems<br />
+    foreach my $key ( keys %to_insert ) {<br />
+        if ( $to_insert{$key} ) {<br />
+            $to_insert{$key} = encode_utf8( $to_insert{$key} );<br />
+        }<br />
+    }</p>
+
+<p>    my %update = (<br />
+        index => $index_name,<br />
+        type  => 'group',<br />
+        id    => $group->{id},<br />
+        data  => \%to_insert,<br />
+    );</p>
+
+<p>    # you should probably check return values<br />
+    my $result = $es->index( %update );</p>
+
+<p>}</code></pre></p>
+
+<p>There's nothing fancy going on over here.  First, I've created an <strong>index</strong> called <strong>perlmongers</strong>. Then I've just grabbed what I thought were the interesting parts of the XML data and stuffed them into a hash.  I've used this hash to populate a <strong>type</strong> called <strong>group</strong>.  The id I've used for these groups is the internal id already listed in the XML file.  I've made the (hopefully safe) assumption that these ids will not change in future.  </p>
+
+<p>To see what is now in the index, run a query on your local ES server via your web browser:</p>
+
+<p>http://localhost:9200/perlmongers/group/_search?q=*&size=25</p>
+
+<p>This will return the first 25 entries.  You'll see that they look something like this:</p>
+
+<pre>
+      {
+        "_index": "perlmongers",
+        "_type": "group",
+        "_id": "113",
+        "_score": 1,
+        "_source": {
+          "country": "Denmark",
+          "longitude": "10.216",
+          "region": null,
+          "name": "Aarhus.pm",
+          "state": null,
+          "tsar_name": "Lars Balker Rasmussen",
+          "web": "http://aarhus.pm.org/",
+          "city": "Aarhus",
+          "continent": "Europe",
+          "latitude": "56.15"
+        }
+      },
+</pre>
+
+<p>The ES server returns your data in JSON.  Nice! Now, if you want to see just one result, you can search on a name:</p>
+
+<p>http://localhost:9200/perlmongers/group/_search?q=name:toronto.pm</p>
+
+<p>You can also use an id if you happen to know it:</p>
+
+<p>http://localhost:9200/perlmongers/group/103</p>
+
+<p>Maybe you want to search on state:</p>
+
+<p>http://localhost:9200/perlmongers/group/_search?q=state:new york</p>
+
+<p>Anyway, I think you can see where I'm going with this.  How much work did you really have to do here?  You had to munge a bit of data, but that's basically it.  Along with that, you get all the goodness of a rich API which supports some basic queries (which I've shown you here) along with much more complex queries which you can dig into in the ES docs.</p>
+
+<p>If you want to see ES in action, check out some of the sample URLs which are posted on the <a href="https://github.com/CPAN-API/cpan-api/wiki/API-docs">MetaCPAN wiki</a>. If you have any questions, feel free to join us on #metacpan at irc.freenode.net. If you feel like contributing some code, please hit us up on IRC as well.</p>]]>
+    </content>
+</entry>
+
+<entry>
+    <title>My daughter and other stuff</title>
+    <link rel="alternate" type="text/html" href="http://blogs.perl.org/users/ovid/2011/02/my-daughter-and-other-stuff.html" />
+    <id>tag:blogs.perl.org,2011:/users/ovid//11.1456</id>
+
+    <published>2011-02-10T11:24:07Z</published>
+    <updated>2011-02-10T11:35:52Z</updated>
+
+    <summary>On February 5th, my wife and I celebrated the birth of our lovely daughter, Lilly-Rose. Needless to say, this has impacted my posting here :) At one point before the birth when we were both rather bored, I was trying...</summary>
+    <author>
+        <name>Ovid</name>
+        <uri>http://publius-ovidius.livejournal.com/</uri>
+    </author>
+    
+    <category term="personal" label="personal" scheme="http://www.sixapart.com/ns/types#tag" />
+    
+    <content type="html" xml:lang="en" xml:base="http://blogs.perl.org/users/ovid/">
+        <![CDATA[<p>On February 5th, my wife and I celebrated the birth of our lovely daughter, <a href="http://overseas-exile.blogspot.com/2011/02/our-daughter-is-born.html">Lilly-Rose</a>.</p>
+
+<p><center><img border="0" height="237" src="http://2.bp.blogspot.com/_FRJmSLDQrjg/TU7TIGRqifI/AAAAAAAAACc/5ZZSlH7rd1Q/s400/IMAG0059.jpg" width="400" /></center></p>
+
+<p>Needless to say, this has impacted my posting here :)</p>
+
+<p>At one point before the birth when we were both rather bored, I was trying to get some work done, but I had some code which I could not load because I lacked an Internet connection. Not all modules were present on my system, config files were missing, etc. However, I desperately needed to unit test my code and I quickly got fed up with my standard bag of tricks for forcing modules to load. Thus, I wrote a module to handle that bag of tricks for me. Later, after releasing it to github, I thought about dedicating it to my wife and newborn daughter, but I didn't think they'd like <a href="https://github.com/Ovid/Package-Butcher">the Package Butcher</a> dedicated to them.</p>
+]]>
+        <![CDATA[<p>Still, it's handy code and it works like this:</p>
+
+<pre><code>my $butcher = Package::Butcher-&gt;new(
+    {
+        package     =&gt; 'Dummy',
+        do_not_load =&gt; [qw/Cannot::Load Cannot::Load2 NoSuch::List::MoreUtils/],
+        predeclare  =&gt; 'uniq',
+        subs =&gt; {
+            this     =&gt; sub { 7 },
+            that     =&gt; sub { 3 },
+            existing =&gt; sub { 'replaced existing' },
+        },
+        method_chains =&gt; [
+            [
+                'Cannot::Load' =&gt; qw/foo bar baz this that/ =&gt; sub {
+                    my $args = join ', ' =&gt; @_;
+                    return "end chain: $args";
+                },
+            ],
+        ],
+    }
+);
+$butcher-&gt;use(@optional_import_list);
+</code></pre>
+
+<p>In other words, many of the common issues which would prevent a package from loading are dealt with here. You can predeclare subs (with prototypes), prevent naughty packages from loading, handle awful method chains embedded in the code and inject your own code.</p>
+
+<p>It needs a fair bit of TLC (kind of like my daughter), but it helped me to test some code which was otherwise not testable (and yes, the code was broken. Yay for testing!)</p>
+]]>
+    </content>
+</entry>
+
+<entry>
+    <title>App::part released to Github</title>
+    <link rel="alternate" type="text/html" href="http://blogs.perl.org/users/max_maischein/2011/02/apppart-released-to-github.html" />
+    <id>tag:blogs.perl.org,2011:/users/max_maischein//227.1450</id>
+
+    <published>2011-02-10T01:04:37Z</published>
+    <updated>2011-02-10T01:11:40Z</updated>
+
+    <summary>Today, I moved the development place of one of my incredibly simple yet incredibly useful data munging tools from http://perlmonks.org/?node_id=598718 to Github . I hope that by moving it there, it becomes easier for people to submit patches. I haven&apos;t...</summary>
+    <author>
+        <name>Max Maischein</name>
+        <uri>http://corion.net</uri>
+    </author>
+    
+        <category term="programming" scheme="http://www.sixapart.com/ns/types#category" />
+    
+    <category term="apppart" label="App::part" scheme="http://www.sixapart.com/ns/types#tag" />
+    
+    <content type="html" xml:lang="en" xml:base="http://blogs.perl.org/users/max_maischein/">
+        <![CDATA[<p>Today, I moved the development place of one of my incredibly simple yet incredibly useful data munging tools from <a href="http://perlmonks.org/?node_id=598718">http://perlmonks.org/?node_id=598718</a> to <a href="http://github.com/Corion/app-part">Github</a> . I hope that by moving it there, it becomes easier for people to submit patches.</p>
+
+<p>I haven't given much thought about putting the program onto CPAN as well. The packaging is already done, but I'm not sure if I want to split out the meat of the program into a module, or maintain two versions, a module-using version and the stand-alone version that I currently have. App::Ack did maintain a monolithic version for a while, but I'm not sure whether it's worth the effort. There also is a version of this file that reads and produces Excel files, thanks to Spreadsheet::WriteExcel and Spreadsheet::ParseExcel. I haven't decided on whether to import that version into this tree, a different branch or what else to do with it.<br />
+</p>]]>
+        
+    </content>
+</entry>
+
+<entry>
+    <title>Introducing App::Dispatcher</title>
+    <link rel="alternate" type="text/html" href="http://blogs.perl.org/users/mark_lawrence/2011/02/introducing-appdispatcher.html" />
+    <id>tag:blogs.perl.org,2011:/users/mark_lawrence//715.1447</id>
+
+    <published>2011-02-09T14:23:38Z</published>
+    <updated>2011-02-09T13:25:14Z</updated>
+
+    <summary>I have an issue somewhat related to Steven Haryanto&apos;s concern about bloated apps. I can live with a command taking a second longer to run when performing work, but I absolutely detest waiting that long for the usage message to...</summary>
+    <author>
+        <name>Mark Lawrence</name>
+        
+    </author>
+    
+    
+    <content type="html" xml:lang="en" xml:base="http://blogs.perl.org/users/mark_lawrence/">
+        <![CDATA[<p>I have an issue somewhat related to Steven Haryanto's <a href="http://blogs.perl.org/users/steven_haryanto/2011/02/the-coming-bloated-perl-apps.html">concern</a> about bloated apps. I can live with a command taking a second longer to run when performing work, but I absolutely detest waiting that long for the usage message to be generated. I am constantly running commands without arguments (eg Git) to get an overview of sub-commands and/or their options. A slow Perl command line app (eg dzil) is a pain in comparison. It is sometimes quicker to load the manpage.</p>
+
+<p>But it doesn't necessarily have to be that way. <a href="http://search.cpan.org/perldoc?App::Dispatcher">App::Dispatcher</a> is a tool for constructing command line applications
+written in Perl.  It is specifically designed to handle applications
+with multiple sub-commands and will generate code to display usage
+text, validate options and arguments, and dispatch commands. Its main
+strength is that the usage and validation does not load any 
+command classes with their possibly heavy startup dependencies.</p>
+]]>
+        <![CDATA[<p>An application built with App::Dispatcher is composed of three parts:</p>
+
+<ul>
+<li><p>Command Classes</p>
+
+<p>These classes are written by the application author to do the actual
+work. They have special methods which <a href="http://search.cpan.org/perldoc?App::Dispatcher">App::Dispatcher</a> uses to build
+the Dispatcher class.</p></li>
+<li><p>Dispatcher Class</p>
+
+<p>The Dispatcher class is generated when the application author runs the
+app-dispatcher(1) command. The dispatcher class is called by the
+Application Script at runtime.  After performing option and argument
+processing the dispatcher class calls the appropriate Command Class.</p>
+
+<p>The only runtime dependency that the Dispatcher Class needs to run is
+<a href="http://search.cpan.org/perldoc?Getopt::Long::Descriptive">Getopt::Long::Descriptive</a>(3p), which the application author should
+add to their Makefile.PL and/or Build.PL scripts.</p>
+
+<p>Note that <a href="http://search.cpan.org/perldoc?App::Dispatcher">App::Dispatcher</a> is a code generation tool. This means
+that option and argument processing will not change when command
+classes are modified, until app-dispatcher is re-run.</p></li>
+<li><p>Application Script</p>
+
+<p>The application script is what the user runs, and does nothing more
+than call the Dispatcher Class:</p>
+
+<pre><code>#!/usr/bin/perl
+use Your::Command::Dispatcher;
+Your::Command::Dispatcher-&gt;run;
+</code></pre>
+
+<p>All the examples below assume the existence of this application script.</p></li>
+</ul>
+
+<p>The rest of this tutorial is all about how to write Command Classes.
+Let's start with a simple command that has two options, one optional
+argument, and no sub-commands:</p>
+
+<pre><code>package Your::Command;
+
+sub opt_spec {(
+    [ "dry-run|n",     "print out SQL instead of running it" ],
+    [ "drop-tables|D", "DROP TABLEs before deploying" ],
+)};
+
+sub arg_spec {(
+    [ "database=s",   "which database to deploy to",
+        { default =&gt; 'development' } 
+    ],
+)};
+
+sub run {
+    my ($class,$opt) = @_;
+
+    if ( $opt-&gt;dry_run ) {
+        print "Not ";
+    }
+    print "Deploying to ". $opt-&gt;database ."\n";
+}
+
+1;
+</code></pre>
+
+<p>With the above code in 'lib/Your/Command.pm' we can run
+app-dispatcher and then our script:</p>
+
+<pre><code>ex1$ app-dispatcher --add-help Your::Command
+Writing lib/Your/Command/Dispatcher.pm
+
+ex1$ ./ex --help
+usage: ex [options] [&lt;database&gt;]
+    --help             print usage message and exit
+    -n --dry-run       print out SQL instead of running it
+    -D --drop-tables   DROP TABLEs before deploying
+
+ex1$ ./ex
+Deploying to development
+
+ex1$ ./ex -n production
+Not Deploying to production
+</code></pre>
+
+<p>There are several things to note here. The first is the definition of
+the opt_spec() and arg_spec() methods. The values returned from these
+methods are passed more or less untouched to
+<a href="http://search.cpan.org/perldoc?Getopt::Long::Descriptive">Getopt::Long::Descriptive</a>'s describe_options() routine.</p>
+
+<p>Obvious should be the fact that the '-add-help' option to
+app-dispatcher has added a '--help' option to our command.</p>
+
+<p>What is more interesting is that arguments specification has the same
+format as the options specification. An argument could actually be
+considered the same as an un-named option with a fixed position.  So
+<a href="http://search.cpan.org/perldoc?App::Dispatcher">App::Dispatcher</a> actually folds arguments into the option object
+passed to the command class. The added benefit is that the parameter
+validation of <a href="http://search.cpan.org/perldoc?Getopt::Long">Getopt::Long</a> is now also run against arguments.</p>
+
+<p>Let's make the argument mandatory by adding a "required" key to the
+arg_spec definition:</p>
+
+<pre><code>{ default =&gt; 'development', required =&gt; 1 }
+
+ex2$ ./ex
+usage: ex [options] &lt;database&gt;
+    --help             print usage message and exit
+    -n --dry-run       print out SQL instead of running it
+    -D --drop-tables   DROP TABLEs before deploying
+</code></pre>
+
+<p>You can see that the that the argument is now mandatory, and the usage
+message no longer has the '[]' brackets. If the automatically generated
+usage message is not to your liking, you can write a usage_desc()
+method to specify your own, but that is not really recommended as
+you'll have to keep it up to date manually when your code changes:</p>
+
+<pre><code>sub usage_desc {
+    return '%c %o &lt;DATABASE&gt;'
+}
+</code></pre>
+
+<p>Now imagine that the application should have more functions, for
+example 'test', and 'undeploy', and that they should be
+run as sub-commands. We will rewrite 'Your::Command' as follows:</p>
+
+<pre><code>package Your::Command;
+
+
+sub opt_spec {(
+    [ "dry-run|n",     "print out SQL instead of running it" ],
+)};
+
+
+sub arg_spec {(
+    [ "command=s",   "what to do", { required =&gt; 1 } ],
+)};
+</code></pre>
+
+<p>What we now have is a global option 'dry-run', that applies to all
+commands, accessed through the third argument to the run() method (see
+below). Because the 'Your::Command' arg_spec defines a mandatory
+argument, our usage message is still displayed when we run our command
+with no arguments.  If we wanted an action to take place when no
+arguments are given, we would make the Your::Command <command> argument
+optional, and reinstate the run() method in that package.</p>
+
+<p>Now we write a new command class 'Your::Command::deploy' as follows (
+'test' and 'undeploy' are similarly written):</p>
+
+<pre><code>package Your::Command::deploy;
+
+
+sub arg_spec {(
+    [ "database=s",   "production|development",
+        { default =&gt; 'development', required =&gt; 1 } 
+    ],
+)};
+
+
+sub run {
+    my ($self,$opt,$gopt) = @_;
+
+
+    if ( $gopt-&gt;dry_run ) {
+        print "Not ";
+    } 
+    print "Deploying to ". $opt-&gt;database ."\n";
+}
+
+1;
+__END__
+
+
+=head1 NAME
+
+
+Your::Command::deploy - deploy to a database
+</code></pre>
+
+<p>Lets build the dispatcher class again:</p>
+
+<pre><code>ex3$ app-dispatcher --add-help Your::Command
+Found lib/Your/Command/test.pm
+Found lib/Your/Command/undeploy.pm
+Found lib/Your/Command/deploy.pm
+Writing lib/Your/Command/Dispatcher.pm
+</code></pre>
+
+<p>Notice that the dispatcher has found our new command classes, and the
+usage message now shows more information about our subcommands:</p>
+
+<pre><code>ex3$ ./ex
+usage: ex [options] &lt;command&gt;
+    --help         print usage message and exit
+    -n --dry-run   print out SQL instead of running it
+
+Commands:
+    test         test a database
+    deploy       deploy to a database
+    undeploy     undeploy a database
+</code></pre>
+
+<p>The informational text for sub-commands has been taken from the POD
+documentation in the class file. You can override this by specifying an
+'abstract()' method.</p>
+
+<p>Also displayed contextually correctly are usage messages for our sub
+commands:</p>
+
+<pre><code>ex3$ ./ex deploy 
+usage: ex deploy [options] &lt;database&gt;
+    --help    print usage message and exit
+</code></pre>
+
+<p>You can write sub-sub-commands as far down as you want to go. There is
+however only ever one global option as specified in the Your::Command
+class.</p>
+
+<pre><code>ex3$ ./ex -n deploy backup
+Not Deploying to backup
+</code></pre>
+
+<p>By default, commands are listed in a semi-random order. If you want to
+list them in an order that makes more sense (for example in the order
+they would typicaly be run) you can add an order() method to each class
+which returns an integer.</p>
+
+<pre><code>package Your::Command::deploy;
+
+sub order {1};
+
+package Your::Command::test;
+
+sub order {2};
+
+package Your::Command::undeploy;
+
+sub order {3};
+</code></pre>
+
+<p>And now we have:</p>
+
+<pre><code>ex4$ ./ex 
+usage: ex [options] &lt;command&gt;
+    --help         print usage message and exit
+    -n --dry-run   print out SQL instead of running it
+
+Commands:
+    deploy       deploy to a database
+    test         test a database
+    undeploy     undeploy a database
+</code></pre>
+
+<p><a href="http://search.cpan.org/perldoc?App::Dispatcher">App::Dispatcher</a> is brand new and has just been uploaded to CPAN. Feedback, bug reports, patches etc are very welcome.</p>
+
+<h2>Alternatives</h2>
+
+<p>It seems the current state of the art for command line applications is
+<a href="http://search.cpan.org/perldoc?App::Cmd">App::Cmd</a>. I wrote <a href="http://search.cpan.org/perldoc?App::Dispatcher">App::Dispatcher</a> out of the frustration with the
+time that it takes <a href="http://search.cpan.org/perldoc?App::Cmd">App::Cmd</a> to simply generate a usage message,
+since <a href="http://search.cpan.org/perldoc?App::Cmd">App::Cmd</a> loads every command class in an app dynamically.</p>
+]]>
+    </content>
+</entry>
+
+<entry>
+    <title>Into The Labyrinth</title>
+    <link rel="alternate" type="text/html" href="http://blogs.perl.org/users/barbie/2011/02/into-the-labyrinth.html" />
+    <id>tag:blogs.perl.org,2011:/users/barbie//72.1449</id>
+
+    <published>2011-02-09T13:12:28Z</published>
+    <updated>2011-02-09T13:14:07Z</updated>
+
+    <summary>On the 1st January 2011, I released the first Open Source version of Labyrinth, both to CPAN and GitHub. In additon I also released several plugins and a demo site to highlight some of the basic functionality of the system....</summary>
+    <author>
+        <name>Barbie</name>
+        <uri>http://barbie.missbarbell.co.uk</uri>
+    </author>
+    
+    <category term="labyrinthframeworkweb" label="labyrinth framework web" scheme="http://www.sixapart.com/ns/types#tag" />
+    
+    <content type="html" xml:lang="en" xml:base="http://blogs.perl.org/users/barbie/">
+        <![CDATA[<p>On the 1st January 2011, I released the first Open Source version of <a href="http://labyrinth.missbarbell.co.uk">Labyrinth</a>, both to <a href="http://search.cpan.org/perldoc?Labyrinth">CPAN</a> and <a href="http://github.com/barbie/labyrinth">GitHub</a>. In additon I also released several plugins and a <a href="http://demo.missbarbell.co.uk">demo site</a> to highlight some of the basic functionality of the system.</p>
+<p>Labyrinth has been in the making since December 2002, although the true beginnings are from about mid-2001. The codebase has evolved over the years as I've developed more and more websites, and got a better understanding exactly what I would want from a Website Management System. Labyrinth had the intention of being a website in a box, and although it's not quite there yet, hopefully once I've released all the plugin code I can put a proper installation tool in place.</p>
+<p>Labyrinth now is the backend to several Open Source websites, CPAN Testers using it for the <a href="http://www.cpantesters.org/">Reports</a>, <a href="http://blog.cpantesters.org/">Blog</a>, <a href="http://wiki.cpantesters.org/">Wiki</a> and <a href="https://prefs.cpantesters.org/">Preferences</a> sites, as well as some personal, commercial and community projects. As a consequence Labyrinth has become stable enough to look at growing the plugins, rather than the core code. I'm sure there is plenty that could be done with the core code, but for the moment providing a good set of plugins, and some example sites are my next aims.</p>
+<p>As mentioned, I see Labyrinth as a Website Management System. While  many similar applications and frameworks provide the scaffolding for a  Content Management System, Labyrinth extends that by not only providing  the ability to manage your content, but also to provide a degree of  structure around the functionality of the site, so the management of  users and groups, menu options and access, as well as notification  mechanisms, enable you to provide more control dynamically.</p>
+<p>When writing the fore-runner to Labyrinth, one aspect required was  the ability to turn on and off functionality instantly, which meant much  of the logic flow was described in the data, not the code. Labyrinth  has built on this idea, so that the dispatch tables and general  functionality can be controlled by the user via administration screens,  and not by uploading new code. When I started looking at this sort of  application back in 2001, there was nothing available that could do  that. Today there are several frameworks written in Perl that  potentially could be tailored to process a website in this way, but all  require the developer to design and code the functionality. Labyrinth  aims to provide that pre-packaged.</p>
+<p>I'm primarily releasing Labyrinth so that I can release all the code  that drives the CPAN Testers websites. Giving others the ability to  better suggest improvements and contribute. The system allows me the  freedom to build websites quickly and easily, with the hardwork being  put into the design and CSS layouts. With so many other frameworks  available, all of which have bigger development teams and support  mechanisms than I can offer, I'm not intending Labyrinth to be a  competitor. It might interest some, which is great, but if you prefer to  work on other frameworks that's great too. After all it's still Perl ;)</p>
+<p>More news of plugins and sites being released coming soon.</p>            
+]]>
+        
+    </content>
+</entry>
+
+<entry>
+    <title>Testing your Mojo with Test::Mojo</title>
+    <link rel="alternate" type="text/html" href="http://blogs.perl.org/users/tempire/2011/02/testing-your-mojo-with-testmojo.html" />
+    <id>tag:blogs.perl.org,2011:/users/tempire//286.1448</id>
+
+    <published>2011-02-09T10:54:06Z</published>
+    <updated>2011-02-09T12:17:07Z</updated>
+
+    <summary>They say programmers don&apos;t like to test. It seems to me that the folks who say that aren&apos;t programmers. If they are, they&apos;ve never been the sole responsible party for any application. When there&apos;s no one to pass the blame...</summary>
+    <author>
+        <name>tempire</name>
+        <uri>http://empireenterprises.com/</uri>
+    </author>
+    
+    
+    <content type="html" xml:lang="en" xml:base="http://blogs.perl.org/users/tempire/">
+        <![CDATA[<p>They say programmers don't like to test.</p>
+
+<p>It seems to me that the folks who say that aren't programmers.  If they are, they've never been the sole responsible party for any application.  When there's no one to pass the blame to, TDD is no longer just an idea, it's time & money.</p>
+
+<p>Once you get the hang of it, the peace of knowing that your code works has a value beyond measurement. </p>
+
+<p>It's for this reason Mojolicious makes it easy to test your web apps in a clean, simple manner.</p>
+
+<p><script src="https://gist.github.com/817976.js?file=gistfile1.pl"></script></p>
+
+<p>Now that's easy.  But there's more.</p>
+
+<p>Test::Mojo tests are chainable, so you can keep your tests in a clean group:</p>
+
+<p><script src="https://gist.github.com/817981.js?file=gistfile1.pl"></script></p>
+
+<p>Now that's pretty.  But wait, there's more.</p>
+
+<p>Using Mojolicious' built in JSON parser, you can test JSON output using an equivalent decoded Perl structure:</p>
+
+<p><script src="https://gist.github.com/817985.js?file=gistfile1.pl"></script></p>
+
+<p>On a side note, Mojo::JSON is the fastest pure-perl JSON parser available.  Thanks to chansen, it recently became even faster, outperforming JSON::PP by 3x.</p>
+
+<p>But wait, there's more.</p>
+
+<p>Test::Mojo methods have exactly the same syntax as their corresponding Mojo::Client methods, sharing much of the same code.</p>
+
+<p>For example, with Mojo::Client, you would write:</p>
+
+<p><script src="https://gist.github.com/817988.js?file=gistfile1.pl"></script></p>
+
+<p>Testing the route would be nearly the same thing - Just add the _ok suffix, and you're good to go:</p>
+
+<p><script src="https://gist.github.com/817998.js?file=gistfile1.pl"></script></p>
+
+<p>As a matter of fact, testing with all the HTTP methods have the same naming scheme:</p>
+
+<p><script src="https://gist.github.com/818019.js?file=gistfile1.pl"></script></p>
+
+<p>But wait, there's more.</p>
+
+<p>Much like Mojo::Client, Test::Mojo automatically stores cookies for you, so you can test cookie-based web apps without any extra code.</p>
+
+<p>When you need to drop existing cookies, you can reset the session:</p>
+
+<p><script src="https://gist.github.com/818000.js?file=gistfile1.pl"></script></p>
+
+<p>Sometimes, it's necessary to break free and do your own thing.  You can access the most recent transaction using the ->tx accessor:</p>
+
+<p><script src="https://gist.github.com/818001.js?file=gistfile1.pl"></script></p>
+
+<p>Installing is one-step easy, and takes about a minute:<br />
+<code>curl -L cpanmin.us | perl - Mojolicious</code></p>
+
+<p><br />
+One more thing...</p>
+
+<p>Since Test::Mojo is based Mojo::Client, you can debug your tests by printing the HTTP request/response to stderr using an environment variable:</p>
+
+<p><code>MOJO_CLIENT_DEBUG=1 prove t/webapp.t</code></p>
+
+<p>You've got the idea.  Now go test your web apps!</p>
+
+<p><a href="http://mojolicio.us/perldoc?Test/Mojo">Test::Mojo docs</a></p>]]>
+        
+    </content>
+</entry>
+
+<entry>
+    <title>Template::Toolkit META variables and SETs in Dancer</title>
+    <link rel="alternate" type="text/html" href="http://blogs.perl.org/users/sawyer_x/2011/02/templatetoolkit-meta-variables-and-sets-in-dancer.html" />
+    <id>tag:blogs.perl.org,2011:/users/sawyer_x//87.1446</id>
+
+    <published>2011-02-08T20:36:21Z</published>
+    <updated>2011-02-08T22:50:19Z</updated>
+
+    <summary>There is one very advanced feature in Tempate::Toolkit called META variables. META variables are variables that you define in a processed template, that are later available to the WRAPPER template. That means that you can set, for example, the title...</summary>
+    <author>
+        <name>Sawyer X</name>
+        
+    </author>
+    
+        <category term="Dancer" scheme="http://www.sixapart.com/ns/types#category" />
+    
+        <category term="Perl" scheme="http://www.sixapart.com/ns/types#category" />
+    
+    
+    <content type="html" xml:lang="en" xml:base="http://blogs.perl.org/users/sawyer_x/">
+        <![CDATA[<p>There is one very advanced feature in <a href="http://search.cpan.org/perldoc?Template">Tempate::Toolkit</a> called META variables. META variables are variables that you define in a processed template, that are later available to the WRAPPER template. That means that you can set, for example, the title of the page in the main layout from the inner content template. That's also what it's usually useful for.</p>
+
+<p>However, since <a href="http://perldancer.org/">Dancer</a> provides its own "layout" option, it basically separates these two processes (rendering a WRAPPER and rendering an inner template), making Template::Toolkit unable to simply define a WRAPPER. So... how does one get it to work?</p>
+
+<p>Well, it's possible to kindly ask Dancer to step aside for a bit, and give you more control over the templating, which means you can do some more advanced stuff, like using SET to set variables in the WRAPPER, or using META variables. Here's how easy it is:</p>
+
+<p>In your <em>config.yml</em> file, you need to:</p>
+
+<ol>
+	<li>Disable your "layout" configuration (either comment or remove it)</li>
+	<li>Make sure you're using Template::Toolkit:</li>
+<code>
+	    template: "template_toolkit"
+</code>
+	<li>Add the following configuration to enable the main.tt as a WRAPPER:</li>
+<code>
+	    engines:
+	        template_toolkit:
+	            WRAPPER: layout/main.tt
+</code>
+</ol>
+
+<p>There! You now have full and complete control over the template. Dancer's template() DSL will still work, but it will no longer separate the layout processing to a different process, so you have a lot of extra control over it.</p>
+
+<p>Checkout for the <a href="http://perl-ecosystem.org/">PEG (Perl Ecosystem Website)</a> <a href="https://github.com/szabgab/peg/blob/master/config.yml">configuration file</a>, <a href="https://github.com/szabgab/peg/blob/master/views/contact.tt">contact template</a> and <a href="https://github.com/szabgab/peg/blob/master/views/layouts/main.tt">main wrapper</a> (specifically the title) for a live example.</p>
+
+<p>Enjoy! :)</p>]]>
+        
+    </content>
+</entry>
+
+<entry>
+    <title>Looking for a Movable Type hacker</title>
+    <link rel="alternate" type="text/html" href="http://blogs.perl.org/users/gabor_szabo/2011/02/looking-for-a-movable-type-hacker.html" />
+    <id>tag:blogs.perl.org,2011:/users/gabor_szabo//272.1445</id>
+
+    <published>2011-02-08T20:18:08Z</published>
+    <updated>2011-02-08T20:34:05Z</updated>
+
+    <summary>blogs.perl.org is awesome but it has a few issues. Anyone out there to fix them? For example there is no &quot;previous articles&quot; link on the front page but there are 82 other open issues as well. I am sure there...</summary>
+    <author>
+        <name>Gabor Szabo</name>
+        <uri>http://szabgab.com</uri>
+    </author>
+    
+    <category term="blogging" label="blogging" scheme="http://www.sixapart.com/ns/types#tag" />
+    <category term="perl" label="Perl" scheme="http://www.sixapart.com/ns/types#tag" />
+    
+    <content type="html" xml:lang="en" xml:base="http://blogs.perl.org/users/gabor_szabo/">
+        <![CDATA[<p><a href="http://blogs.perl.org/">blogs.perl.org</a> is awesome but it has a few issues. Anyone out there to fix them?</p>
+
+<p>For example there is no "previous articles" link on the front page but there are <br />
+<a href="https://github.com/davorg/blogs.perl.org/issues">82 other open issues</a> as well.</p>
+
+<p>I am sure there are some people in he Perl community who know or want to learn how to fix issues with Movable Type. You can <a href="https://github.com/davorg/blogs.perl.org">fork the code on Github</a> and make many Perl bloggers happy.</p>
+
+<p>I am especially looking at you who endlessly complained about use.perl.org and that you could not fix issues with it.</p>]]>
+        
+    </content>
+</entry>
+
+<entry>
+    <title>WWW::Mechanize::Firefox 0.45 released</title>
+    <link rel="alternate" type="text/html" href="http://blogs.perl.org/users/max_maischein/2011/02/wwwmechanizefirefox-045-released.html" />
+    <id>tag:blogs.perl.org,2011:/users/max_maischein//227.1444</id>
+
+    <published>2011-02-08T23:34:22Z</published>
+    <updated>2011-02-08T23:50:28Z</updated>
+
+    <summary><![CDATA[I've just pushed out a new release of WWW::Mechanize::Firefox , my favourite interactive web scraping module. The changes in this version are: -&gt;eval_in_page() raises errors from perspective of the caller instead of raising errors in Firefox.pm. This was an especially...]]></summary>
+    <author>
+        <name>Max Maischein</name>
+        <uri>http://corion.net</uri>
+    </author>
+    
+    
+    <content type="html" xml:lang="en" xml:base="http://blogs.perl.org/users/max_maischein/">
+        <![CDATA[I've just pushed out a new release of WWW::Mechanize::Firefox , my favourite interactive web scraping module. The changes in this version are:
+
+<ul>
+	<li><code>-&gt;eval_in_page()</code> raises errors from perspective of the caller instead of raising errors in Firefox.pm.<br><p>
+This was an especially annoying error, as it always pointed to somewhere deep within Firefox.pm when I tried to access an non-existing Javascript variable or had Javascript disabled in Firefox.
+</p>
+</li>
+<li>Added <code>-&gt;by_id()</code> method and <code>{ id => $id }</code> option for
+conveniently finding elements with names that ->selector
+interprets as CSS selectors.<br>
+<p>
+As the main application I am automating at $work uses fancy names and ids in forms and values, like <code>_id1:foo</code> , I found myself constantly selecting elements through
+<code>-&gt;click( { xpath => q{//*[@id="_id1:foo"]}</code>, which is not only unsightly but also does not respect the value <code>-&gt;current_form()</code>. This change introduces `id`, which is a shortcut for Just That. I also added more tests testing those names.
+</p>
+</li>
+</ul>
+
+
+
+One 
+
+    . Improved tests checking fields with fancy:names
+      or fancy:ids
+]]>
+        
+    </content>
+</entry>
+
+<entry>
+    <title>FOSDEM, second report - the talks!</title>
+    <link rel="alternate" type="text/html" href="http://blogs.perl.org/users/sawyer_x/2011/02/fosdem-second-report---the-talks.html" />
+    <id>tag:blogs.perl.org,2011:/users/sawyer_x//87.1443</id>
+
+    <published>2011-02-08T09:12:29Z</published>
+    <updated>2011-02-08T09:37:53Z</updated>
+
+    <summary>THIS POST INCLUDES PICTURES! At the second day of FOSDEM, the Dancer core crew pretty time took over the Perl dev room! We are 4 developers, and we gave 5 talks: SPORE (by Franck Cuny), &quot;Code, release, market&quot; (by Alexis...</summary>
+    <author>
+        <name>Sawyer X</name>
+        
+    </author>
+    
+        <category term="Code" scheme="http://www.sixapart.com/ns/types#category" />
+    
+        <category term="Dancer" scheme="http://www.sixapart.com/ns/types#category" />
+    
+        <category term="Design" scheme="http://www.sixapart.com/ns/types#category" />
+    
+        <category term="Perl" scheme="http://www.sixapart.com/ns/types#category" />
+    
+    
+    <content type="html" xml:lang="en" xml:base="http://blogs.perl.org/users/sawyer_x/">
+        <![CDATA[<p><strong>THIS POST INCLUDES PICTURES!</strong></p>
+
+<p>At the second day of FOSDEM, the <a href="http://perldancer.org">Dancer</a> core crew pretty time took over the Perl dev room! We are 4 developers, and we gave 5 talks: SPORE (by Franck Cuny), "Code, release, market" (by Alexis Sukrieh), Curses::Toolkit (by Damien Krotkine), Moose (Sawyer X) and Dancer (Sawyer X). Somehow, all those talks mentioned Dancer, whether it was by the speaker noting the projects he works on, or by using it as an example in the talk (like Alexis did). The amount of noise and buzz we created around Dancer was very positive!</p>
+
+<p>There were a lot of good talks in the Perl dev room (such as DTrace, XML::Compile, Packaging Perl), but I'll try to cover just a few:</p>
+
+<p>Gabor Szabo (szabgab) gave two very good talks, one on Perl 6 and one on <a href="http://padre.perlide.org">Padre, the Perl IDE</a>, ya know. I think they were very well received. Considering the Perl 6 talk was the first talk that day, early morning (I asked Sukria on the way, "when's the last time you had Perl 6 for breakfast?"), a lot of people were there. Perl 6 is not well understood by many people, and the potential (some of which was already reached) is often missed. I think Gabor made it compelling to the audience and they were very tuned and seemed involved.</p>
+
+<p>The Padre talk was a very good example of how humor gets people to listen to you. People care about having a good time, more than learning and people learn better when they have a good time, so try to mix it up! I think it also got me fueled up for my talk. Oh, and I got to meet Zeno Gantner from Padre, very nice guy!</p>
+
+<p>Dams (Damien Krotkine) gave a talk about his <a href="http://search.cpan.org/perldoc?Curses::Toolkit">Curses::Toolkit</a>, which allows you to write visual CLI applications using Curses in a Gtk-like interface, which is pretty nifty. He wrote a few applications to show it off, one of which was a Twitter client he wrote in a few hours ("it took me long because I had a nasty bug", are you kidding me? :) and he actually got people to drop their jaws when he showed them how he's resizing a terminal and the windows automatically resize and titles automatically scroll, if that's what you want. It's really amazing what this guy has done using CLI only. I guess after I found out he was a Gentoo hacker, things made more sense. :)</p>
+
+<p>I gave the Moose talk, and I think it went rather well. I was very hyperactive and paused only for short breaths. People really enjoyed themselves and overall I think it went very well. Got the room of 80 people to fill up. Pretty good, eh?</p>
+
+<p>Later I gave the Dancer talk, and the crowd went nuts. If 80 people filling up the room, taking all seats, is impressive, image what 100 people sitting and standing everywhere looks like! Pretty much all my jokes landed (which is hard because my jokes are lame), and people had a <strong>very</strong> good time! I was really thrilled that I felt comfortable enough to give both talks for such a big crowd, successfully, with a lot of confidence. I think the reason is definitely the company I was with. Being with the Dancer team was tremendous to my self esteem and made me feel very open and relaxed.</p>
+
+<p>Next talk was Franck Cuny's SPORE talk. This guy designed (and wrote!) a framework for creating a client to any REST API with a simple configuration, using the astounding power of Moose's meta-class. He started with the history of SPORE, how he came up with it, and gave examples on how to write your own client using <a href="http://search.cpan.org/perldoc?Net::HTTP::Spore">Net::HTTP::Spore</a>. Seriously kickass! I wish people would understand how incredibly useful it is. No need to write your own code anymore. I'll try it out for MetaCPAN::API (don't worry, a post is still pending).</p>
+
+<p>Last, but definitely not least, was a talk by Alexis Sukrieh (sukria) about how to write and maintain your software, giving lessons he learned from Dancer and other projects. He started by comparing "code" and "software": software is a hell of a lot more than code. Coding is the easy part. He goes on to explain what tools you have, how to treat your users, how to market your software, and giving a lot of interesting advice. I learned quite a lot from Sukria over the time while working with him on Dancer, and this talk was an amalgamation of these lessons.</p>
+
+<p>I've checked twitter for some comments on the talks. I don't have a twitter, but I just went to the site, and gone over some history, so don't consider this as an exhaustive list of all tweets relating to the talks. I do believe there are more that I missed:</p>
+
+<ul>
+	<li>"Attending the first of the modern perl squad talks : SawyerX and #moose ! #fosdem #perl"</li>
+	<li>"#dancer and #spore follow in afternoon :) #fosdem #perl #modernperlsquad"</li>
+	<li>"Config management devroom overflows; Perl/Moose, then. #FOSDEM"</li>
+	<li>"in less than 20 minutes the #modernperlsquad is going to invade the perl devroom! Get ready! #FOSDEM"</li>
+	<li>"Very few people in the perl dev room use catalyst. Interesting. #fosdem"</li>
+	<li>"The best feature of #perl #dancer is @sawyerX =)"</li>
+	<li>"Dancer talk in the perl room has started very well. Very lively speaker."</li>
+	<li>"Less code, more dance #perl #dancer http://bit.ly/hmifHm"</li>
+	<li>"Moose talk now in the perl devroom, by @PerlDancer's core-developer SawyerX. Go Sawyer Go!"</li>
+	<li>"Best speakers so far: Andy Wingo and the #perldancer guy. #fosdem"</li>
+	<li>"@franckcuny presenting SPORE at #fosdem: how lazyness makes better software"</li>
+	<li>"Go @franckcuny ! Go ! #spore #fosdem #modernperlsquad @linkfluence"</li>
+	<li>"Learning about Moose #fosdem"</li>
+	<li>"Interesting talk about Dancer at #fosdem #perl ... early tests failed; time to rtfm"</li>
+        <li>#modernperlsquad on stage ! (moose)</li>
+        <li>19 minutes later, I can now test my script as if the whole shebang was there. <3 you, #Dancer.</li>
+</ul>
+
+<p>You should checkout Sukria's review <a href="http://www.sukria.net/fr/archives/2011/02/06/fosdem-2011-report/">over here</a>!</p>
+
+<p>There is more, but I'll leave that to upcoming posts.<br />
+See you soon!</p>
+
+<p><img alt="dancer-hack-session.jpg" src="http://blogs.perl.org/users/sawyer_x/dancer-hack-session.jpg" width="640" height="480" class="mt-image-none" style="" /></p>
+
+<p><img alt="sawyer_fosdem_moose1.jpg" src="http://blogs.perl.org/users/sawyer_x/sawyer_fosdem_moose1.jpg" width="640" height="480" class="mt-image-none" style="" /></p>
+
+<p><img alt="sawyer_fosdem_moose2.jpg" src="http://blogs.perl.org/users/sawyer_x/sawyer_fosdem_moose2.jpg" width="640" height="480" class="mt-image-none" style="" /></p>]]>
+        
+    </content>
+</entry>
+
+<entry>
+    <title>mod_perl 2.0.5 has arrived!</title>
+    <link rel="alternate" type="text/html" href="http://blogs.perl.org/users/phred/2011/02/mod-perl-205-has-arrived.html" />
+    <id>tag:blogs.perl.org,2011:/users/phred//210.1442</id>
+
+    <published>2011-02-08T17:09:03Z</published>
+    <updated>2011-02-08T17:12:45Z</updated>
+
+    <summary>Here&apos;s the link to the email announcement. Thanks to the many, many contributors to this version. Please see the summary of changes below, along with a special dedication for this release to Randy Kobes. You can get mod_perl 2.0.5 at...</summary>
+    <author>
+        <name>Phred</name>
+        <uri>http://www.redhotpenguin.com</uri>
+    </author>
+    
+    <category term="mod_perl" label="mod_perl" scheme="http://www.sixapart.com/ns/types#tag" />
+    
+    <content type="html" xml:lang="en" xml:base="http://blogs.perl.org/users/phred/">
+        <![CDATA[<p>Here's the <a href="http://bit.ly/fsmsHC">link</a> to the email announcement.</p>
+
+<p>Thanks to the many, many contributors to this version.  Please see the<br />
+summary of changes below, along with a special dedication for this<br />
+release to Randy Kobes.</p>
+
+<p>You can get mod_perl 2.0.5 at one of the following urls, including the CPAN:</p>
+
+<p><a href="http://perl.apache.org/download/index.html">http://perl.apache.org/download/index.html</a></p>
+
+<p><a href="http://apache.org/dist/perl/mod_perl-2.0.5.tar.gz">http://apache.org/dist/perl/mod_perl-2.0.5.tar.gz</a><br />
+<a href="http://apache.org/dist/perl/mod_perl-2.0.5.tar.gz.asc">http://apache.org/dist/perl/mod_perl-2.0.5.tar.gz.asc</a> (pgp sig)</p>
+
+<p>md5: 03d01d135a122bd8cebd0cd5b185d674</p>
+
+<p>---------------------------------------------------</p>
+
+<p>The mod_perl PMC dedicates this release of mod_perl to Randy Kobes, who<br />
+passed away in September 2010.  Randy was a member of the mod_perl project<br />
+management committee and a co-author of the mod_perl Developer's Cookbook.<br />
+His work helped many Windows mod_perl users. His work with ppm files, and<br />
+Win32 perl users will be sorely missed. He was kind, bright, and always<br />
+willing to lend a hand on the mod_perl user's list.</p>
+
+<p>Prepare modperl for the upcoming perl 5.14 [Torsten Foertsch]</p>
+
+<p>Add lib/ModPerl/MethodLookup.pm to MANIFEST via lib/ModPerl/Manifest.pm<br />
+RT #48103 reported by MAR...@cpan.org<br />
+[Fred Moyer]</p>
+
+<p>PerlIOApache_write() now throws an APR::Error object, rather than just a string<br />
+error, if modperl_wbucket_write() fails.<br />
+[Steve Hay]</p>
+
+<p>Authentication tests fail with LWP 5.815 and later<br />
+[Doug Schrag]</p>
+
+<p>Concise test won't perform unless StatusTerse is set to ON<br />
+[Doug Schrag]</p>
+
+<p>Look for a usable apxs in $ENV{PATH} if all other options fail, then<br />
+prompt the user for one.<br />
+[Phred]</p>
+
+<p>Work around bootstrap warnings when Apache2::BuildConfig has not been<br />
+created yet.<br />
+[Phred]</p>
+
+<p>Remove Apache::test compatibility (part of mod_perl 1.2.7), that code<br />
+causes build issues and is 4 versions out of date.<br />
+[Phred]</p>
+
+<p>Make sure perl is built either with multiplicity and ithreads or without<br />
+both [Theory, Torsten]</p>
+
+<p>Support for "install_vendor" and "install_site" make targets [Torsten]</p>
+
+<p>Run tests on bundled pure perl Apache::* modules [Gozer, Phred]</p>
+
+<p>Implement a mini-preprocess language for map-files in xs/maps.<br />
+[Torsten Foertsch]</p>
+
+<p>Implement APR::Socket::fileno [Torsten Foertsch]</p>
+
+<p>Export PROXYREQ_RESPONSE, a missing PROXYREQ_* constant [Gozer]</p>
+
+<p>Make sure standard file descriptors are preserved by the perl-script<br />
+handler [Torsten Foertsch]</p>
+
+<p>Fix the filter init handler attribute check in<br />
+modperl_filter_resolve_init_handler() [Torsten Foertsch]</p>
+
+<p>Make sure buffer is a valid SV in modperl_filter_read() [Torsten Foertsch]</p>
+
+<p>Move modperl_response_finish() out of modperl_response_handler_run in<br />
+mod_perl.c [Torsten Foertsch]</p>
+
+<p>"MODPERL_INC= now correctly supported as an argument to Makefile.PL"<br />
+[Torsten Foertsch]</p>
+
+<p>Fix an XSS issue in Apache2::Status reported by Richard J. Brain<br />
+<rich...@procheckup.com>. [Torsten Foertsch]</p>
+
+<p>Add NOTICE file to the distribution. [Joe Schaefer]</p>
+
+<p>Make sure Apache2::RequestIO::read doesn't clear the buffer on end of<br />
+file and handle negative offsets and offsets that are larger than<br />
+the current string length. [Torsten Foertsch]</p>
+
+<p>Fix a problem that could make APR::XSLoader and Apache2::XSLoader<br />
+load the wrong shared library. [Torsten Foertsch]</p>
+
+<p>Fix compilation when using a non-threaded APR.<br />
+[Gozer, Philip M. Gollucci]</p>
+
+<p>Make sure mod_perl's own ChildInitHandlers are run before user<br />
+supplied ones. This fixes the incorrectly reported value of $$<br />
+at ChildInit time [Gozer]</p>]]>
+        
+    </content>
+</entry>
+
+<entry>
+    <title>Emacs frames are no more evil !</title>
+    <link rel="alternate" type="text/html" href="http://blogs.perl.org/users/erik_colson/2011/02/emacs-frames-are-no-more-evil.html" />
+    <id>tag:blogs.perl.org,2011:/users/erik_colson//531.1441</id>
+
+    <published>2011-02-08T11:53:35Z</published>
+    <updated>2011-02-08T12:03:44Z</updated>
+
+    <summary>I&apos;m an Emacs user for years now. I never used frames because &quot;frames are evil&quot;. Last week I discovered &quot;framemove.el&quot;. Framemove is easy to install. Get it from the emacswiki site and add following lines in .emacs : (require &apos;framemove)...</summary>
+    <author>
+        <name>Erik Colson</name>
+        <uri>http://www.ecocode.net</uri>
+    </author>
+    
+    <category term="emacs" label="emacs" scheme="http://www.sixapart.com/ns/types#tag" />
+    
+    <content type="html" xml:lang="en" xml:base="http://blogs.perl.org/users/erik_colson/">
+        <![CDATA[<p>I'm an Emacs user for years now. I never used frames because "frames are evil".<br />
+Last week I discovered "framemove.el".</p>
+
+<p>Framemove is easy to install. Get it from the emacswiki site and add following lines in .emacs :</p>
+
+<pre>(require 'framemove)
+(framemove-default-keybindings)</pre>
+
+<p><br />
+Now you can switch frames with Meta+arrows. Works like a charm on macosx !</p>
+
+<p>There's another kind of library like this called "windowmove", which does the same to windows as "framemove" does to frames. Both can be integrated (look inside the framemove.el file for configuration).</p>
+
+<p>Today I even have Emacs start with 2 frames by default ! Tell me about changing opinions ;)</p>]]>
+        
+    </content>
+</entry>
+
+<entry>
+    <title>The coming bloated Perl apps?</title>
+    <link rel="alternate" type="text/html" href="http://blogs.perl.org/users/steven_haryanto/2011/02/the-coming-bloated-perl-apps.html" />
+    <id>tag:blogs.perl.org,2011:/users/steven_haryanto//197.1439</id>
+
+    <published>2011-02-07T15:17:00Z</published>
+    <updated>2011-02-07T16:08:01Z</updated>
+
+    <summary>A few weeks ago, I got annoyed by the fact that one of our command line applications was getting slower and slower to start up (the delay was getting more and more noticable), so I thought I&apos;d do some refactoring,...</summary>
+    <author>
+        <name>Steven Haryanto</name>
+        <uri>http://id-perl.blogspot.com/</uri>
+    </author>
+    
+    
+    <content type="html" xml:lang="en" xml:base="http://blogs.perl.org/users/steven_haryanto/">
+        <![CDATA[<p>A few weeks ago, I got annoyed by the fact that one of our command line applications was getting slower and slower to start up (the delay was getting more and more noticable), so I thought I'd do some refactoring, e.g. split large files into smaller ones and delay loading modules until necessary.</p>
+
+<p>Sure enough, one of the main causes of the slow start up was preloading too many modules. Over the years I had been blindly sticking 'use' statements into our kitchen sink $Proj::Utils module, which was used by almost all scripts in the project. Loading $Proj::Utils alone pulled in over 60k lines from around 150 files!</p>
+
+<p>After I split things up, it became clearer which modules are particularly heavy. This one stood out:</p>
+
+<p><code>% time perl -MFile::ChangeNotify -e1<br />
+real   0m0.972s</code></p>
+
+<p><code>% perl -MDevel::EndStats -e1<br />
+# Total number of module files loaded: 129<br />
+# Total number of modules lines loaded: 46385</code></p>
+
+<p>So almost 130 files and a total of 45k+ lines just from loading File::ChangeNotify alone. 130 files just for a filesystem monitoring routine! Who would've thought that a filesystem monitor needs so many lines of program? Compare with, say, a recent HTTP client:</p>
+
+<p><code>% perl -MHTTP::Tiny -e1<br />
+# Total number of module files loaded: 18<br />
+# Total number of modules lines loaded: 6089</code></p>
+
+<p>I quickly switched to Linux::Inotify2 and things are much better now (but I might have to revisit this since we want to give the new Debian/kFreeBSD a Squeeze).</p>
+
+<p>As I suspected (since the module is written by Dave Rolsky also), File::ChangeNotify utilizes Moose, which is not particularly lightweight either:</p>
+
+<p><code>% time perl -MMoose -e1<br />
+real    0m0.712s</code></p>
+
+<p><code>% perl -MDevel::EndStats -MMoose -e1<br />
+# Total number of module files loaded: 100<br />
+# Total number of modules lines loaded: 35760</code></p>
+
+<p>Compare with:</p>
+
+<p><code>% time perl -MMouse -e1<br />
+real    0m0.089s</code></p>
+
+<p><code>% perl -MDevel::EndStats -MMouse -e1<br />
+# Total number of module files loaded: 20<br />
+# Total number of modules lines loaded: 6675</code></p>
+
+<p>Come to think of it, running Dist::Zilla is also quite painfully slow these days. Just running "dzil foo" pulled in around 60k lines and took 1.7s! Of course, dzil is Moose-based.</p>
+
+<p>While it is a good thing that Moose is getting more popular, it's a bit shameful to see that Ruby and Python scripts "get OO for free" while Moose scripts have to endure a 0.7s startup penalty. Mouse, Moo, Role::Basic come to the rescue but I wonder what would Ruby/Python programmers think (you have how many object systems?? Why do you people can never agree on one thing and TIMTOWTDI everything?)</p>
+
+<p>Disclaimer: Number of lines includes all blanks/comment/POD/DATA/etc from all files loaded in %INC, actual SLOC is probably significantly less. Timing is done on a puny HP Mininote netbook (Atom N450 1.66GHz) which I'm currently stuck with in the past few weeks. With all due respects to all authors of modules mentioned. They all write fantastic, working code.</p>]]>
+        
+    </content>
+</entry>
+
+<entry>
+    <title>CPAN Testers Summary - January 2011 - Wish You Were Here</title>
+    <link rel="alternate" type="text/html" href="http://blogs.perl.org/users/cpan_testers/2011/02/cpan-testers-summary---january-2011---wish-you-were-here.html" />
+    <id>tag:blogs.perl.org,2011:/users/cpan_testers//73.1438</id>
+
+    <published>2011-02-07T18:24:03Z</published>
+    <updated>2011-02-07T18:25:28Z</updated>
+
+    <summary>Over the past few of months, various fixes and improvements have been made to the Builder process, which builds the pages and support files on the CPAN Testers Reports website. As mentioned in the last summary, this has made a noticeable improvement in the performance of the server. However, there were further fixes and enhancements planned. Several updates ensued during January, not just for the Builder, but across several parts of the eco-system, both to speed up processing and to reduce the amount of file and database access. Previously several processes recreated their current view by reading the full result set from the database. As we now have over 10 million reports, this can take more time than is reasonable. With the use of the JSON files to record a snapshot, we can now start from a known point, thus meaning we only need to scan a few thousand records. This method has been utlised in other processes, even with smaller database tables and datasets, and the performance improvements have been significant. For the past couple of weeks we have now been able to update pages within 36 hours of a report being submitted, and at times we have even been less than an hour behind. Looking at the graphs the Builder is now consistently processing more pages than reports. Even though January is typically a quieter month for us, it still produced 333,157 reports. We shall see whether the increased submissions in the coming months make a difference in build times. You may already know that the 2011 QA Hackathon is happening in Amsterdam this year, but it warrants promotion. While the focus is typically on traditional aspects of QA and testing, hopefully there will be some CPAN Testers projects featured. The hackathon takes place from Saturday 16th April to Monday 18th April, at the offices of principal sponsors, Booking.com. If you&apos;re interested in attending, please add your name to the Attendees list, and also add what Projects you want to work on. Rounding off this summary, an update of the tester mappings reveals we have gained at least 27 new testers, with a total of 38 new mappings. It&apos;s interesting to note that many of the new testers are not CPAN Authors, which is great. One of the benefits to CPAN Testers is that you can help to contribute to the project without having to be a hardcore Perl dev, and can contribute as little or as much as you are able. We are fast approaching 11 million test reports and I&apos;m pleased to see we are continually encouraging new people to get involve and keep the submissions rising. Long may it continue. Cross-posted from the CPAN Testers Blog...</summary>
+    <author>
+        <name>CPAN Testers</name>
+        <uri>http://blogs.cpantesters.org</uri>
+    </author>
+    
+    <category term="cpancpantestersstatisticsreports" label="cpan cpantesters statistics reports" scheme="http://www.sixapart.com/ns/types#tag" />
+    
+    <content type="html" xml:lang="en" xml:base="http://blogs.perl.org/users/cpan_testers/">
+        <![CDATA[<p>Over the past few of months, various fixes and improvements have been made to the Builder process, which builds the pages and support files on the <a href="http://www.cpantesters.org">CPAN Testers Reports</a> website. As mentioned in <a href="http://blog.cpantesters.org/diary/104">the last summary</a>, this has made a noticeable improvement in the performance of the server. However, there were further fixes and enhancements planned.</p>
+<p>Several updates ensued during January, not just for the Builder, but across several parts of the eco-system, both to speed up processing and to reduce the amount of file and database access. Previously several processes recreated their current view by reading the full result set from the database. As we now have over 10 million reports, this can take more time than is reasonable. With the use of the JSON files to record a snapshot, we can now start from a known point, thus meaning we only need to scan a few thousand records. This method has been utlised in other processes, even with smaller database tables and datasets, and the performance improvements have been significant.</p>
+<p>For the past couple of weeks we have now been able to update pages within 36 hours of a report being submitted, and at times we have even been less than an hour behind. Looking at the graphs the Builder is now consistently processing more pages than reports. Even though January is typically a quieter month for us, it still produced 333,157 reports. We shall see whether the increased submissions in the coming months make a difference in build times.</p>
+<p>You may already know that the <a href="http://2011.qa-hackathon.org">2011 QA Hackathon</a> is happening in Amsterdam this year, but it warrants promotion. While the focus is typically on traditional aspects of QA and testing, hopefully there will be some CPAN Testers projects featured. The hackathon takes place from <strong>Saturday 16th April</strong> to <strong>Monday 18th April</strong>, at the offices of principal sponsors, <em>Booking.com</em>. If you're interested in attending, please add your name to the <a href="http://2011.qa-hackathon.org/qa2011/wiki?node=Attendees">Attendees</a> list, and also add what <a href="http://2011.qa-hackathon.org/qa2011/wiki?node=Agenda">Projects</a> you want to work on.</p>
+<p>Rounding off this summary, an update of the tester mappings reveals we have gained at least 27 new testers, with a total of 38 new mappings. It's interesting to note that many of the new testers are not CPAN Authors, which is great. One of the benefits to CPAN Testers is that you can help to contribute to the project without having to be a hardcore Perl dev, and can contribute as little or as much as you are able. We are fast approaching 11 million test reports and I'm pleased to see we are continually encouraging new people to get involve and keep the submissions rising. Long may it continue.</p>
+Cross-posted from the <a href="http://blog.cpantesters.org/diary/105">CPAN Testers Blog</a>]]>
+        
+    </content>
+</entry>
+
+<entry>
+    <title>Introduction to wirting readable and maintainable Perl</title>
+    <link rel="alternate" type="text/html" href="http://blogs.perl.org/users/alex_balhatchet/2011/02/introduction-to-wirting-readable-and-maintainable-perl.html" />
+    <id>tag:blogs.perl.org,2011:/users/alex_balhatchet//92.1436</id>
+
+    <published>2011-02-07T15:24:07Z</published>
+    <updated>2011-02-11T21:36:36Z</updated>
+
+    <summary>Hey all, I just got back from FOSDEM 2011 last night and had an absolute blast, especially on Sunday when I spent the whole day in the Perl devroom. Thanks to everyone who came! I gave a talk called Introduction...</summary>
+    <author>
+        <name>Alex Balhatchet</name>
+        <uri>http://kaoru.slackwise.net</uri>
+    </author>
+    
+    <category term="fosdem" label="fosdem" scheme="http://www.sixapart.com/ns/types#tag" />
+    <category term="maintainable" label="maintainable" scheme="http://www.sixapart.com/ns/types#tag" />
+    <category term="presentation" label="presentation" scheme="http://www.sixapart.com/ns/types#tag" />
+    <category term="readable" label="readable" scheme="http://www.sixapart.com/ns/types#tag" />
+    <category term="slides" label="slides" scheme="http://www.sixapart.com/ns/types#tag" />
+    
+    <content type="html" xml:lang="en" xml:base="http://blogs.perl.org/users/alex_balhatchet/">
+        <![CDATA[<p>Hey all,</p>
+
+<p>I just got back from FOSDEM 2011 last night and had an absolute blast, especially on Sunday when I spent the whole day in the Perl devroom. Thanks to everyone who came!</p>
+
+<p>I gave a talk called <strong>Introduction to writing readable and maintainable Perl</strong> and I thought I'd share my slides here.</p>
+
+<p><a href="http://www.slideshare.net/kaokun/introduction-to-writing-readable-and-maintainable-perl">http://www.slideshare.net/kaokun/introduction-to-writing-readable-and-maintainable-perl</a></p>
+
+<p>Unfortunately Google Docs => PDF => Slideshare isn't an entirely flawless reproduction, but most of the slides look ok.</p>
+
+<p>I'm considering giving an updated version of the talk at YAPC::EU this year. If you have any feedback please leave a comment or send me an email :)</p>
+
+<p>- Alex</p>]]>
+        
+    </content>
+</entry>
+
+<entry>
+    <title>Frozen Perl 2011: Parse::Stallion/Intro to Dancer/Hallway Track</title>
+    <link rel="alternate" type="text/html" href="http://blogs.perl.org/users/gizmo_mathboy/2011/02/frozen-perl-2011-parsestallionintro-to-dancerhallway-track.html" />
+    <id>tag:blogs.perl.org,2011:/users/gizmo_mathboy//90.1440</id>
+
+    <published>2011-02-07T03:43:36Z</published>
+    <updated>2011-02-08T03:21:53Z</updated>
+
+    <summary>I missed the Parse::Stallion and most of the Intro to Dancer talks because I spent it talking with olegm and perigrin. I really would have liked to catch them but it is always interesting to talk with folks. perigrin is...</summary>
+    <author>
+        <name>gizmo_mathboy</name>
+        
+    </author>
+    
+    
+    <content type="html" xml:lang="en" xml:base="http://blogs.perl.org/users/gizmo_mathboy/">
+        <![CDATA[<p>I missed the Parse::Stallion and most of the Intro to Dancer talks because I spent it talking with olegm and perigrin.</p>
+
+<p>I really would have liked to catch them but it is always interesting to talk with folks.</p>
+
+<p>perigrin is a fellow player of <a href="http://lacunaexpanse.com/">Lacuna Expanse</a> and it was good to meet him.</p>
+
+<p>I then mostly listened to olegm and perigrin compare notes about putting on a workshop, relative costs...generally what perigrin was going to talk about after the Intro to Dancer talk. :-)</p>
+
+<p>The most interesting comment was when perigrin said he would like to see a conference/workshop in each state in the US. It seems like every country in Europe has one so why not each state.</p>
+
+<p>A very compelling idea, especially when you consider that Perl Oasis costs about $2,000 to put on an attracts around 40 attendees.</p>]]>
+        
+    </content>
+</entry>
+
+<entry>
+    <title>Frozen Perl 2011: Parallel::Depend: designing a little language in Perl‎ </title>
+    <link rel="alternate" type="text/html" href="http://blogs.perl.org/users/gizmo_mathboy/2011/02/frozen-perl-2011-paralleldepend-designing-a-little-language-in-perl.html" />
+    <id>tag:blogs.perl.org,2011:/users/gizmo_mathboy//90.1435</id>
+
+    <published>2011-02-07T03:26:39Z</published>
+    <updated>2011-02-07T03:42:26Z</updated>
+
+    <summary>Lembark&apos;s second talk is basically about designing a little language in Perl. This module is a scheduler. When designing a language it should be easy to edit, eyeball and parse. It is a good idea to have line oriented and...</summary>
+    <author>
+        <name>gizmo_mathboy</name>
+        
+    </author>
+    
+    
+    <content type="html" xml:lang="en" xml:base="http://blogs.perl.org/users/gizmo_mathboy/">
+        <![CDATA[<p>Lembark's second talk is basically about designing a little language in Perl.</p>
+
+<p>This module is a scheduler.</p>
+
+<p>When designing a language it should be easy to edit, eyeball and parse.</p>
+
+<p>It is a good idea to have line oriented and whitespace oriented tokens.</p>
+
+<p>One should consider the primitives, basically what are the tasks you want to do.</p>
+
+<p>Taking advantage of the overlooking ability of capturing split for grabbing tokens.</p>
+
+<p>The given/when switch makes writing small languages much easier.</p>
+
+<p>Once again a very good talk about an area that many people wouldn't have to do.</p>]]>
+        
+    </content>
+</entry>
+
+<entry>
+    <title>Frozen Perl 2011: ‎Perl Marketing and Evangelism‎</title>
+    <link rel="alternate" type="text/html" href="http://blogs.perl.org/users/gizmo_mathboy/2011/02/frozen-perl-2011-perl-marketing-and-evangelism.html" />
+    <id>tag:blogs.perl.org,2011:/users/gizmo_mathboy//90.1434</id>
+
+    <published>2011-02-07T03:04:00Z</published>
+    <updated>2011-02-07T03:26:08Z</updated>
+
+    <summary>This is the first of two talks by oZ. He likes Perl a lot, in the last few years there has been a fundamental change in Perl. Things like the modern Perl movement, chromatic&apos;s Modern Perl book, Moose, Catalyst and...</summary>
+    <author>
+        <name>gizmo_mathboy</name>
+        
+    </author>
+    
+    
+    <content type="html" xml:lang="en" xml:base="http://blogs.perl.org/users/gizmo_mathboy/">
+        <![CDATA[<p>This is the first of two talks by oZ.</p>
+
+<p>He likes Perl a lot, in the last few years there has been a fundamental change in Perl. Things like the modern Perl movement, chromatic's Modern Perl book, Moose, Catalyst and DBIx::Class changed how we can use Perl.</p>
+
+<p>Even with all that Perl has an image problem.</p>
+
+<p>What are the Perl companies we trot out: LiveJournal, Ticketmaster, Amazon and SixApart.</p>
+
+<p>He noted that some of them are moving on to other languages for their new development and that some have written Perl in such a way that makes one not want to ever use Perl again.</p>
+
+<p>Nick then presented some of the research he was done. Looking at sites like LangPop, doing searches in sites like Craigslist and sending out a survey to the many people and groups he knows.</p>
+
+<p>He had lots of interesting quotes and such that I didn't put in my notes. I'm hoping he'll put the slides up on the <a href="http://www.frozen-perl.org/mpw2011/wiki?node=PresentationSlides">Frozen Perl site</a>. Looks of data to look at and ponder.</p>
+
+<p>He talked about evangelism and the communication of the Perl community with everyone else. Stuff like the Ironman challenge, how the main Perl web sites compare to Ruby (and I think Python) and some other things I forgot to write down.</p>
+
+<p>There was a brief discussion at the end of his talk and brian d foy made a good point. What geeks think about marketing (and how they do it) is very different from how Marketers do it.</p>
+
+<p>Thought provoking.</p>]]>
+        
+    </content>
+</entry>
+
+<entry>
+    <title>Easy DOM parsing with Mojo::DOM</title>
+    <link rel="alternate" type="text/html" href="http://blogs.perl.org/users/tempire/2011/02/easy-dom-parsing-with-mojodom.html" />
+    <id>tag:blogs.perl.org,2011:/users/tempire//286.1432</id>
+
+    <published>2011-02-06T23:14:40Z</published>
+    <updated>2011-02-07T00:50:40Z</updated>
+
+    <summary>Long ago, I used regex&apos;s to parse HTML. They told me it was evil. They told me it was not maintainable. They were right. But the alternatives were painful. They were clunky. They required me to change the way I...</summary>
+    <author>
+        <name>tempire</name>
+        <uri>http://empireenterprises.com/</uri>
+    </author>
+    
+    
+    <content type="html" xml:lang="en" xml:base="http://blogs.perl.org/users/tempire/">
+        <![CDATA[<p>Long ago, I used regex's to parse HTML.</p>
+
+<p>They told me it was evil. They told me it was not maintainable. They were right.</p>
+
+<p>But the alternatives were painful. They were clunky. They required me to change the way I approached HTML. They required me to abandon the hipness of css selectors I had embraced with javascript libraries, and ignore the many years spent perfecting my css-foo.</p>
+
+<p>HTML::Parser, HTML::TreeBuilder, I'm sure you're brilliant in your own way. I'm sure you have conquered many lands, and for those who wanted to adapt to your mindset, you brought much happiness.</p>
+
+<p>I wanted a simpler way. jQuery taught us that css selectors are that better way.</p>
+
+<p>Fortunately, Mojo::DOM sprouted up out of the land of cookies and rainbows and unicorns.</p>
+
+<p><script src="https://gist.github.com/813613.js?file=gistfile1.pl"></script></p>
+
+<p>Seriously, have you ever seen HTML retrieved, parsed, and processed so nicely in Perl?</p>
+
+<p>Since most of you have used jQuery and/or similiar Javascript libraries, you already know how to use Mojo::Client/DOM. You simply apply your existing Perl & Javascript knowledge, and you're done.</p>
+
+<p>You're not relegated to parsing only web-requested data; you can use Mojo::DOM directly:</p>
+
+<p><script src="https://gist.github.com/813614.js?file=gistfile1.pl"></script></p>
+
+<p>Installing is one-step easy:<br />
+<code>curl -L cpanmin.us | perl - Mojolicious</code></p>
+
+<p>So now you know: you can leave the cruftiness behind, and hang with the hippest of the hip - there's no need to hide your head in shame when talking with hipsters about the latest Ruby shine.  Shine is external; your Mojo runs deep.</p>
+
+<p><a href="http://mojolicio.us/perldoc?Mojo/DOM#NAME">Mojo::DOM docs</a> </p>]]>
+        
+    </content>
+</entry>
+
+<entry>
+    <title>Frozen Perl 2011: Perl and Arduino</title>
+    <link rel="alternate" type="text/html" href="http://blogs.perl.org/users/gizmo_mathboy/2011/02/frozen-perl-2011-perl-and-arduino.html" />
+    <id>tag:blogs.perl.org,2011:/users/gizmo_mathboy//90.1433</id>
+
+    <published>2011-02-06T20:29:34Z</published>
+    <updated>2011-02-06T20:36:19Z</updated>
+
+    <summary>Robert Blackwell gave a good intro to the world of Arduino and Perl. It was mostly how one would work with Arduinos&apos;s and the Perl interface to them. There is a variety of vendors, arduinos and extensions that let you...</summary>
+    <author>
+        <name>gizmo_mathboy</name>
+        
+    </author>
+    
+    
+    <content type="html" xml:lang="en" xml:base="http://blogs.perl.org/users/gizmo_mathboy/">
+        <![CDATA[<p>Robert Blackwell gave a good intro to the world of Arduino and Perl.</p>
+
+<p>It was mostly how one would work with Arduinos's and the Perl interface to them.</p>
+
+<p>There is a variety of vendors, arduinos and extensions that let you do all sorts of fun things.</p>
+
+<p>It's probably the first open source hardware that is widely available and accessible.</p>
+
+<p>Very cool and interesting stuff.</p>]]>
+        
+    </content>
+</entry>
+
+<entry>
+    <title>Bringing Mojolicious to the dancefloor</title>
+    <link rel="alternate" type="text/html" href="http://blogs.perl.org/users/sawyer_x/2011/02/bringing-mojolicious-to-the-dancefloor.html" />
+    <id>tag:blogs.perl.org,2011:/users/sawyer_x//87.1429</id>
+
+    <published>2011-02-06T12:03:17Z</published>
+    <updated>2011-02-06T12:11:50Z</updated>
+
+    <summary>Dancer&apos;s engines is really cool. You wanna know how cool? Here&apos;s an example. If you like Mojolicious&apos; templating system and you want to use it with Dancer, our interchangeable templating engines allow you to use a template engine of Mojolicious,...</summary>
+    <author>
+        <name>Sawyer X</name>
+        
+    </author>
+    
+        <category term="Code" scheme="http://www.sixapart.com/ns/types#category" />
+    
+        <category term="Dancer" scheme="http://www.sixapart.com/ns/types#category" />
+    
+        <category term="Design" scheme="http://www.sixapart.com/ns/types#category" />
+    
+        <category term="Perl" scheme="http://www.sixapart.com/ns/types#category" />
+    
+    
+    <content type="html" xml:lang="en" xml:base="http://blogs.perl.org/users/sawyer_x/">
+        <![CDATA[<p>Dancer's engines is really cool. You wanna know how cool? Here's an example.</p>
+
+<p>If you like Mojolicious' templating system and you want to use it with Dancer, our interchangeable templating engines allow you to use a template engine of Mojolicious, if it exists.</p>
+
+<p>And if it doesn't exist, you can write it. Oh wait, someone already did!</p>
+
+<p>You can find it <a href="http://search.cpan.org/perldoc?Dancer::Template::MojoTemplate">here</a>!</p>
+
+<p>Check out <a href="http://cpansearch.perl.org/src/JAITKEN/Dancer-Template-MojoTemplate-0.1.0/lib/Dancer/Template/MojoTemplate.pm">the source</a> to find out how silly easy this is.</p>
+
+<p>So, if there's another template engine you want with Dancer, try to write it! If you have issues, talk to us on IRC (#dancer on irc.perl.org) and check out other template engines.</p>]]>
+        
+    </content>
+</entry>
+
+<entry>
+    <title>Frozen Perl 2011: ‎Wrapping Installed Subroutines: Wear a Raincoat in Someone Else&apos;s Perl</title>
+    <link rel="alternate" type="text/html" href="http://blogs.perl.org/users/gizmo_mathboy/2011/02/frozen-perl-2011-talks.html" />
+    <id>tag:blogs.perl.org,2011:/users/gizmo_mathboy//90.1431</id>
+
+    <published>2011-02-06T18:59:26Z</published>
+    <updated>2011-02-07T03:03:06Z</updated>
+
+    <summary>Wrapping installed subroutines Steven Lembark gave a talk about wrapping installed subroutines. It was noted on irc that this was the cotinuation/sequal of another talk. The jumping off point is having to work in some code and it has the...</summary>
+    <author>
+        <name>gizmo_mathboy</name>
+        
+    </author>
+    
+    
+    <content type="html" xml:lang="en" xml:base="http://blogs.perl.org/users/gizmo_mathboy/">
+        <![CDATA[<p>Wrapping installed subroutines</p>
+
+<p>Steven Lembark gave a talk about wrapping installed subroutines.</p>
+
+<p>It was noted on irc that this was the cotinuation/sequal of another talk. The jumping off point is having to work in some code and it has the following at the top of every program/module</p>
+
+<p>use warnings;<br />
+$SIG{ WARN } = sub { die };</p>
+
+<p>Now think about what that does...</p>
+
+<p>Yes, you are now screwed.</p>
+
+<p>Especially if you want to do any benchmarking or deal with some other modules.</p>
+
+<p>You can muck about with the symbol table and such but one solution is the Symbol module.</p>
+
+<p>Lembark chose this because it is part of the core/standard libraries (a predication of his talk). It cleans up some of the mess of dealing with globs/symbol table weirdness.</p>
+
+<p>It was noted on irc that Package::Stash is a bit cleaner to use (at least its API is better).</p>
+
+<p>Regardless it was yet more of Lembark showing some of the weird things that you can do (and some times have to do) and why it is better to find a module to give you some distance from that mental mayhem.</p>
+
+<p>As always, he shows off interesting bits of the Perl solution space.</p>]]>
+        
+    </content>
+</entry>
+
+<entry>
+    <title>Frozen Perl 2011: Keynote</title>
+    <link rel="alternate" type="text/html" href="http://blogs.perl.org/users/gizmo_mathboy/2011/02/frozen-perl-2011.html" />
+    <id>tag:blogs.perl.org,2011:/users/gizmo_mathboy//90.1430</id>
+
+    <published>2011-02-06T18:32:35Z</published>
+    <updated>2011-02-06T19:03:51Z</updated>
+
+    <summary>Keynote = 5 things I hate about Perl brian d foy gave the keynote this year. He talked about his talk from two years that was sort of based on Better Off by Eric Bende, his reading of Skeptic magazine...</summary>
+    <author>
+        <name>gizmo_mathboy</name>
+        
+    </author>
+    
+    
+    <content type="html" xml:lang="en" xml:base="http://blogs.perl.org/users/gizmo_mathboy/">
+        <![CDATA[<p>Keynote = 5 things I hate about Perl</p>
+
+<p>  brian d foy gave the keynote this year. He talked about his talk from two years that was sort of based on Better Off by Eric Bende, his reading of Skeptic magazine and what this means regarding Perl.</p>
+
+<p>As part of this he touched on the fashionable memes of why some hates or loves a languages, Perl in particular. Sometimes it's misinformed or ignorant hate or just as a way to validate their choice.</p>
+
+<p>So he was thinking about why there is some much love, or hate, for Perl?</p>
+
+<p>This led into an interview question, "What are 5 things you hate about Perl?"</p>
+
+<p>This shows 3 things: real experience, depth and reach of knowledge, and workarounds used for those things.</p>
+
+<p>This also relaxes the interviewee because it shows it is ok to criticise language being used/talked about.</p>
+
+<p>brian then talked about what he hates about Perl. His list was things like: CPAN, licensing or reusability. He didn't go into any real detail about those.</p>
+
+<p>He focused on 'use'.</p>
+
+<p>What does 'use' actually do? It expands the module into a path, it puts it %INC and imports things.</p>
+
+<p>This does a couple of problematic things.<br />
+<ul><br />
+	<li>It ties the module to the file system.</li><br />
+         <li>First one found in %INC wins.</li><br />
+         <li>How are versions handled?</li><br />
+         <li>What various installations of the module?</li><br />
+         <li>What about private CPANs/darkPans?</li><br />
+</ul></p>
+
+<p>Perl 6 sort of addresses this with something like:<br/><br />
+       use Dog<br/><br />
+       :auth (BDFOY)<br/><br />
+       :ver(v1.2..v1.4)<br/><br />
+       ;<br/></p>
+
+<p>So brian was thinking about how the cpan client/module can be updated to better deal with these problems.</p>
+
+<p>What does this mean? For me, I think it means I need to put more critical thought into some things, especially the tools, languages and assumptions I have been taking for granted for some time now.</p>
+
+<p>For me about the only thing I could think of hating about Perl was some of the OO syntax but I don't do much OO stuff in Perl so I don't have to deal with it too much. Which means I need to think a bit more.</p>]]>
+        
+    </content>
+</entry>
+
+<entry>
+    <title>Dancer FOSDEM fuel, first report</title>
+    <link rel="alternate" type="text/html" href="http://blogs.perl.org/users/sawyer_x/2011/02/dancer-fosdem-fuel-first-report.html" />
+    <id>tag:blogs.perl.org,2011:/users/sawyer_x//87.1428</id>
+
+    <published>2011-02-06T08:04:54Z</published>
+    <updated>2011-02-06T08:54:26Z</updated>
+
+    <summary>Friday and Saturday have been very productive days for Dancer. We wanted to write up this blog post yesterday night but we were waaaaay too tired for that. Instead, you get it this morning while we&apos;re sitting at a great...</summary>
+    <author>
+        <name>Sawyer X</name>
+        
+    </author>
+    
+        <category term="Code" scheme="http://www.sixapart.com/ns/types#category" />
+    
+        <category term="Dancer" scheme="http://www.sixapart.com/ns/types#category" />
+    
+        <category term="Design" scheme="http://www.sixapart.com/ns/types#category" />
+    
+        <category term="Perl" scheme="http://www.sixapart.com/ns/types#category" />
+    
+    
+    <content type="html" xml:lang="en" xml:base="http://blogs.perl.org/users/sawyer_x/">
+        <![CDATA[<p>Friday and Saturday have been very productive days for Dancer. We wanted to write up this blog post yesterday night but we were waaaaay too tired for that. Instead, you get it this morning while we're sitting at a great Perl 6 talk by Gabor Szabo.</p>
+
+<p>Friday we met up. I tried to wait for Franck at the train station and got lost... several times. He found me in the end and we went to our hotel room with his co-workers. Sukria and Dams arrived later. It was very exciting to meet the guys I've been working closely with for a while and haven't even met in person yet. Free software sure is nuts! :)</p>
+
+<p>We couldn't fix the internet at the hotel (one cable, no wireless) so we spent a lot of time on discussions about important things. While we do not like bureaucracy, some things had to be sorted out and talked about. Here is a short list of things we've settled:</p>
+
+<p>* We decided on a pull request processing policy, which allows programmers more power, more independence and allows for much quicker (yet safe!) way to process our pull requests - whether to approve to kindly oppose. When a user presents you with a pull request, it's a gift and we don't want to have users wait for these pull requests for more than a day or two. This actually took the majority of the discussion and we made some very good decisions about that.</p>
+
+<p>* We have a new core developer: Damien (dams) Krotkine! Dams has been working with us on Dancer for a while now and provided pull requests, help, documentation, features, fix ups, and we really wanted to provide him with more control over Dancer. In fact, he was practically a core developer for a while now, but he now finally got an official commit bit. Congratulations, Dams!</p>
+
+<p>Saturday (yesterday) was an even more successful day. We started with a hack session of a few hours. We closed 6 pull requests (all except 1) and all outstanding bugs!! We also had a triage of the issues list and classified them. Some of those were classified as new bugs, while others were classified differently (such as "Change required" which means it's not broken, but there's a recommended behavior change needed). We replied on almost all issues so we know what to fix and when, and raised discussion and changes in other places. We also released a few new versions (from development branch and stable branch) of Dancer that also include a new format of a the changes log, as discussed in previous posts. You can see it <a href="http://cpansearch.perl.org/src/SUKRIA/Dancer-1.3002/CHANGES">here</a>. I think you'll find it quite nifty! :)</p>
+
+<p>Dams has written two plugins (while working on an example application for his talk, it's a command line Curses twitter client, hell yeah!): Dancer::Plugin::FlashMessage and Dancer::Plugin::Captcha::reCaptcha. While the first one existed, he was able to finalize the implementation to match the spec that was previous defined by other frameworks (such as RoR) for this feature. From this point on we'll be able to add nifty features that are missing in others. Flavio Poletti is on the front for new ideas for the flash message feature. Good job! The Captcha plugin is pretty self explanatory. It's funny since it's something Gabor suggested on the plane, not regarding Dancer necessarily. Hey, it's already done and you'll see it on CPAN soon. The myth lives on!</p>
+
+<p>As a very small note, I was able to release a first development release of MetaCPAN::API, which I'll talk more about in another post.</p>
+
+<p>There were further discussions about our release policy. PAUSE has a limitation of not allowing authors to upload older versions of already-existing distributions, so we can no longer support new 1.2xxx releases. That means that we'll have to think of versions in a different way. There was a long discussion, that reached a late hour (while we hacked, actually) and in the end we decided on a release policy which we will later release to the mailing list and in the docs, and perhaps in a blog post for others to learn from (hopefully).</p>
+
+<p>That's it for now. Expect another report soon!</p>]]>
+        
+    </content>
+</entry>
+
+<entry>
+    <title>QueryHunt my little experiment</title>
+    <link rel="alternate" type="text/html" href="http://blogs.perl.org/users/ruben/2011/02/queryhunt-my-little-experiment.html" />
+    <id>tag:blogs.perl.org,2011:/users/ruben//710.1427</id>
+
+    <published>2011-02-06T02:42:37Z</published>
+    <updated>2011-02-06T07:26:42Z</updated>
+
+    <summary>For over a month I have been working on a little project called QueryHunt. it is a questions and answers search engine powered by yahoo BOSS. Why did I decide to use Perl for this project? When I started working...</summary>
+    <author>
+        <name>Ruben</name>
+        <uri>http://queryhunt.com/</uri>
+    </author>
+    
+    <category term="perlsearchenginecrawler" label="perl search engine crawler" scheme="http://www.sixapart.com/ns/types#tag" />
+    
+    <content type="html" xml:lang="en" xml:base="http://blogs.perl.org/users/ruben/">
+        <![CDATA[<p>For over a month I have been working on a little project called <a href="http://queryhunt.com/">QueryHunt</a>.<br />
+it is a questions and answers search engine powered by yahoo BOSS.</p>
+
+<p><strong>Why did I decide to use Perl for this project?</strong></p>
+
+<p>When I started working on this project I had just started to learn Perl, I was planning to write the site in PHP.<br />
+Perl had a lot of promising features that would make the development process easier in the long run<br />
+some of this features are</p>
+
+<ul>
+	<li>Easy XML parsing</li>
+	<li>Regex support (Vital to discard results that were neither a question or an answer.)</li>
+	<li>DBI (in case I decided to give PostgreSQL a try compatibility issues wouldn't be an obstacle)</li>
+</ul>
+
+<p>so for obvious reasons I ended up using Perl, The site has now been running for about 2 months and I'm more than happy with it.</p>
+
+<p>I'm not on vacations anymore so I don't get to work on it so much but I have a lot of ideas and I have started to work on a home-made crawler that I will be more than happy to share with Perl programmers.</p>
+
+<p>I will keep updating this post to write about obstacles I face and other things that might help programmers that are working on similar projects. </p>]]>
+        
+    </content>
+</entry>
+
+<entry>
+    <title>Dist::Zilla::PluginBundle::Author:: namespace</title>
+    <link rel="alternate" type="text/html" href="http://blogs.perl.org/users/oliver_gorwits/2011/02/dist-zilla-pluginbundle-author-namespace.html" />
+    <id>tag:blogs.perl.org,2011:/users/oliver_gorwits//140.1426</id>
+
+    <published>2011-02-06T01:20:16Z</published>
+    <updated>2011-02-06T01:35:11Z</updated>
+
+    <summary>Following the lead of Mike Doherty (DOHERTY) I&apos;ve moved my own Dist::Zilla Author PluginBundle into a new namespace: Dist::Zilla::PluginBundle::Author::OLIVER Having Author PluginBundles is a great system for saving me time and allowing others to build my modules with ease. However I had to agree to Mike&apos;s point that polluting the Dist::Zilla::PluginBundle:: namespace wasn&apos;t so cool. It also makes things more clear in the dist.ini file: [@Author::OLIVER] If you have an Author PluginBundle, please consider moving it into this new namespace. You can of course keep the old one around, in parallel, until code using it has moved off to the backpan....</summary>
+    <author>
+        <name>Oliver Gorwits</name>
+        <uri>http://gorwits.me.uk/</uri>
+    </author>
+    
+    
+    <content type="html" xml:lang="en" xml:base="http://blogs.perl.org/users/oliver_gorwits/">
+        <![CDATA[<p>Following the lead of Mike Doherty (<a href="http://search.cpan.org/~doherty/" target="_blank">DOHERTY</a>) I've moved my own <a href="http://search.cpan.org/perldoc?Dist::Zilla" target="_blank">Dist::Zilla</a> Author PluginBundle into a new namespace:</p>
+
+<pre><code class="prettyprint">Dist::Zilla::PluginBundle::Author::OLIVER
+</code></pre>
+
+<p>Having Author PluginBundles is a great system for saving me time and allowing others to build my modules with ease. However I had to agree to Mike's point that polluting the <code>Dist::Zilla::PluginBundle::</code> namespace wasn't so cool. It also makes things more clear in the <code>dist.ini</code> file:</p>
+
+<pre><code class="prettyprint">[@Author::OLIVER]
+</code></pre>
+
+<p>If you have an Author PluginBundle, please consider moving it into this <a href="http://search.cpan.org/search?query=Dist::Zilla::PluginBundle::Author&mode=all" target="_blank">new namespace</a>. You can of course keep the old one around, in parallel, until code using it has moved off to the backpan.</p>]]>
+        
+    </content>
+</entry>
+
+<entry>
+    <title>Changing the changelog</title>
+    <link rel="alternate" type="text/html" href="http://blogs.perl.org/users/sawyer_x/2011/02/changing-the-changelog.html" />
+    <id>tag:blogs.perl.org,2011:/users/sawyer_x//87.1425</id>
+
+    <published>2011-02-05T10:31:10Z</published>
+    <updated>2011-02-05T10:39:53Z</updated>
+
+    <summary>Dave Rolsky has written a compelling post on how not to write a changes log. It&apos;s ironic (or is it? the meaning of &quot;irony&quot; is illusive) that while I have much criticism for the changes log of others (and have...</summary>
+    <author>
+        <name>Sawyer X</name>
+        
+    </author>
+    
+        <category term="Dancer" scheme="http://www.sixapart.com/ns/types#category" />
+    
+        <category term="Perl" scheme="http://www.sixapart.com/ns/types#category" />
+    
+    
+    <content type="html" xml:lang="en" xml:base="http://blogs.perl.org/users/sawyer_x/">
+        <![CDATA[<p>Dave Rolsky has written a <a href="http://blog.urth.org/2011/01/changes-file-how-and-how-not-to.html">compelling post</a> on how not to write a changes log. It's ironic (or is it? the meaning of "irony" is illusive) that while I have much criticism for the changes log of others (and have commented on them to people in the past), Dancer's changes log is not up to par with what I think it should be, nor what Dave thinks it should be (which is close to what I think).</p>
+
+<p><u>Understanding Dancer's changes log</u></p>
+
+<p>Dancer's changes log has two primary goals: mark down changes for Dancer users, and giving credit to the people who do it.</p>
+
+<p>This means that in each version we have who did what change, and additional credit for whoever helped in any way.</p>
+
+<p>While the current format of the changes log is not optimal, we cared more about maintaining the current state, and did not optimize it. Truth be told, it was a bad habit and none of us advocate the current style be remained.</p>
+
+<p><u>A new path</u></p>
+
+<p>So, agreeing with Dave about the correct format of a changes log, we will be writing the next log entries in a correct form, including dates of releases and an order of what's more crucial or important.</p>
+
+<p>There is a sentence I've learned with time which serves me well, and I do suggest others learn from it as well: "It is only a mistake if you don't learn anything". Once you learn, it can become a lesson. Hence, we welcome any criticism (note "criticism", not "trashing" - which sometimes people confuse with legitimate criticism), in any form (blog post, pull request, commit comment, IRC rant, etc.) by anyone.</p>
+
+<p>Dave, thanks! :)</p>]]>
+        
+    </content>
+</entry>
+
+<entry>
+    <title>The Floods Ate My Car, Literally</title>
+    <link rel="alternate" type="text/html" href="http://blogs.perl.org/users/ron_savage/2011/02/the-floods-ate-my-car-literally.html" />
+    <id>tag:blogs.perl.org,2011:/users/ron_savage//297.1423</id>
+
+    <published>2011-02-05T05:03:55Z</published>
+    <updated>2011-02-05T05:21:31Z</updated>
+
+    <summary>Hi Folks Yes, it&apos;s true. Even though I live on the southern edge of the Australian mainland, the floods have hit here. I&apos;m in Melbourne, the capital city of the state of Victoria. Last night, about 9 pm, the floods...</summary>
+    <author>
+        <name>Ron Savage</name>
+        <uri>http://savage.net.au/</uri>
+    </author>
+    
+    
+    <content type="html" xml:lang="en" xml:base="http://blogs.perl.org/users/ron_savage/">
+        <![CDATA[<p>Hi Folks</p>
+
+<p>Yes, it's true. Even though I live on the southern edge of the Australian mainland, the floods have hit here. I'm in Melbourne, the capital city of the state of Victoria.</p>
+
+<p>Last night, about 9 pm, the floods from other parts of my suburb, Murrumbeena, backed up, and drowned my car to about halfway up the windscreen. The car was parked in the street, in front of the house.</p>
+
+<p>Luckily, the house is on a slight slope down to the street, so the floodwaters stopped about the height of 1 (one!) brick below the floorboards.</p>
+
+<p>This morning I was on the phone for about 10 minutes to roadside assistance (a commercial service) who say that since water got inside the car, it's an insurance matter. So, they transferred me to another department, and after another 25 minute wait I lodged a claim.</p>
+
+<p>Since the car won't start, it's going to be towed to a local crash repair shop. I've been warned by the insurance company that there's no guarantee it'll be salvagable.</p>
+
+<p>It's a 14 year old Subaru, and runs (or did) perfectly, but new it'd now be at least $36,000 to replace, so perhaps I'll be upgrading to a second hand car. I bought it new. Very sad.</p>
+
+<p>At least I am within easy walking distance of a major train line, which I'll need to take a couple of stops to a suburb with a big supermarket. My local one was confiscated recently to pay the debts of the owner, who got caught with gambling and alcohol addications.</p>
+
+<p>Of course, we're safe, which is the main thing.</p>
+
+<p>This comes on top of having to get the house re-wired (it's 80+ years old), since a power point in the kitchen recently started to burn. The switch was 'on', but nothing was plugged in. Scary. Then I'll have to get the roof leak fixed.<br />
+</p>]]>
+        
+    </content>
+</entry>
+
+<entry>
+    <title>What&apos;s New in WebGUI 8.0 #3: Upgrade System</title>
+    <link rel="alternate" type="text/html" href="http://blogs.perl.org/users/preaction/2011/02/whats-new-in-webgui-80-3-upgrade-system.html" />
+    <id>tag:blogs.perl.org,2011:/users/preaction//398.1424</id>
+
+    <published>2011-02-05T00:15:00Z</published>
+    <updated>2011-02-05T06:18:23Z</updated>
+
+    <summary>Following The Path If you installed WebGUI 0.9.0 back in August of 2001 (the first public release), you&apos;ve had a stable upgrade path through WebGUI 7.10.8 (January 2011) and beyond. Plainblack.com has been through every upgrade for the last 10...</summary>
+    <author>
+        <name>preaction</name>
+        
+    </author>
+    
+        <category term="webgui" scheme="http://www.sixapart.com/ns/types#category" />
+    
+    <category term="upgrade" label="upgrade" scheme="http://www.sixapart.com/ns/types#tag" />
+    <category term="webgui" label="webgui" scheme="http://www.sixapart.com/ns/types#tag" />
+    
+    <content type="html" xml:lang="en" xml:base="http://blogs.perl.org/users/preaction/">
+        <![CDATA[<h2>Following The Path</h2>
+
+<p>If you installed WebGUI 0.9.0 back in August of 2001 (the first public 
+release), you've had a stable upgrade path through WebGUI 7.10.8 (January
+2011) and beyond. Plainblack.com has been through every upgrade for the last
+10 years, a shining bastion to our upgradability.</p>
+
+<p>A WebGUI 7.10 user would not even recognize a WebGUI 6.0 database, much less
+the database used by the 1.x series, but slowly, gradually, our upgrade system
+brought new features to every WebGUI site that wanted them.</p>
+
+<h2>The Ancient Way</h2>
+
+<p>Our old upgrade system was quite simple:</p>
+
+<pre><code>docs/upgrade_2.9.0-3.0.0.pl
+docs/upgrade_3.0.0-3.0.1.sql
+docs/upgrade_3.0.0-3.0.1.pl
+</code></pre>
+
+<p>Our upgrade.pl script would check for docs/upgrade_*, compare version numbers,
+and then execute the .sql and .pl scripts in order until there were no more
+upgrades left.</p>
+
+<p>Because each .pl script was executed individually, there was a considerable
+amount of boilerplate in each script (123 lines). Because there was only one script per
+version, some scripts could get quite long. We had conventions to manage these
+limitations, but it was still a bit of a mind-twist to write an upgrade
+routine.</p>
+
+<p>Later, when we moved to simultaneous beta and stable trees, it became even
+more difficult to manage these huge upgrade scripts. Collecting the new
+features from the beta tree to apply to the stable tree was a time-consuming
+manual task that some poor coder had to perform, back hunched over a dimly-lit
+screen in the wee hours of the night, testing and re-testing the upgrade to
+make sure stable lived up to its expectations.</p>
+
+<p>Though our upgrade system had performed admirably, it was time for a fresh
+look at the problem.</p>
+
+<h2>The Modern Vision</h2>
+
+<p>The individual files for upgrades was working quite well, but didn't go far 
+enough. Our new upgrade system has one file per upgrade step. Each sub from an
+old upgrade script would be one file in the new upgrade system. What's more,
+additional file types would be supported:</p>
+
+<pre><code>$ ls share/upgrades/7.10.4-8.0.0/
+addNewAdminConsole.pl
+admin_console.wgpkg
+facebook_auth.sql
+migrateToNewCache.pl
+moveMaintenance.pl
+moveRequiredProfileFields.pl
+</code></pre>
+
+<p>So now, instead of a single file for an upgrade, we have an entire directory.
+In this directory, the .pl files are scripts to be run, the .wgpkg files are
+WebGUI assets to add to the site, the .sql files are SQL commands to run, and
+any .txt files will be shown as a confirmation message to the user for gotchas
+like "All your users have been logged out as a result of this upgrade. Deal
+with it.".</p>
+
+<p>So now, if you want to add your own custom upgrade routine, you just add
+another file to the directory which means less worrying about conflicts. When
+we need to build another new stable version release, we can just move the
+unique upgrade files from beta to the new upgrade.</p>
+
+<p>The best part of the new upgrade system is how the .pl scripts are written.
+When you are in a .pl, you have a bunch of sugar to make the basic tasks much
+easier.</p>
+
+<pre><code># Old upgrade routine. Just another day in a session
+sub migrateToNewCache {
+    my $session = shift;
+    print "\tMigrating to new cache " unless $quiet;
+
+    use File::Path;
+    rmtree "../../lib/WebGUI/Cache";
+    unlink "../../lib/WebGUI/Workflow/Activity/CleanDatabaseCache.pm";
+    unlink "../../lib/WebGUI/Workflow/Activity/CleanFileCache.pm";
+
+    my $config = $session-&gt;config;
+    $config-&gt;set("cache", {
+        driver              =&gt; 'FastMmap',
+        expires_variance   =&gt; '0.10',
+        root_dir            =&gt; '/tmp/WebGUICache',
+    });
+
+    $config-&gt;set("hotSessionFlushToDb", 600);
+    $config-&gt;delete("disableCache");
+    $config-&gt;delete("cacheType");
+    $config-&gt;delete("fileCacheRoot");
+    $config-&gt;deleteFromArray("workflowActivities/None", "WebGUI::Workflow::Activity::CleanDatabaseCache");
+    $config-&gt;deleteFromArray("workflowActivities/None", "WebGUI::Workflow::Activity::CleanFileCache");
+
+    my $db = $session-&gt;db;
+    $db-&gt;write("drop table cache");
+    $db-&gt;write("delete from WorkflowActivity where className in ('WebGUI::Workflow::Activity::CleanDatabaseCache','WebGUI::Workflow::Activity::CleanFileCache')");
+    $db-&gt;write("delete from WorkflowActivityData where activityId in  ('pbwfactivity0000000002','pbwfactivity0000000022')");
+
+    print "DONE!\n" unless $quiet;
+}
+</code></pre>
+
+<p>If you're familiar with WebGUI session, this is pretty standard, but still
+much boilerplate and convention. The new scripts remove boilerplate and
+enforce what was once merely convention.</p>
+
+<pre><code># New upgrade routine. migrateToNewCache.pl
+use WebGUI::Upgrade::Script;
+use Module::Find;
+
+start_step "Migrating to new cache";
+
+rm_lib
+    findallmod('WebGUI::Cache'),
+    'WebGUI::Workflow::Activity::CleanDatabaseCache',
+    'WebGUI::Workflow::Activity::CleanFileCache',
+;
+
+config-&gt;set("cache", {
+    'driver'            =&gt; 'FastMmap',
+    'expires_variance'  =&gt; '0.10',
+    'root_dir'          =&gt; '/tmp/WebGUICache',
+});
+
+config-&gt;set('hotSessionFlushToDb', 600);
+config-&gt;delete('disableCache');
+config-&gt;delete('cacheType');
+config-&gt;delete('fileCacheRoot');
+config-&gt;deleteFromArray('workflowActivities/None', 'WebGUI::Workflow::Activity::CleanDatabaseCache');
+config-&gt;deleteFromArray('workflowActivities/None', 'WebGUI::Workflow::Activity::CleanFileCache');
+
+sql 'DROP TABLE IF EXISTS cache';
+sql 'DELETE FROM WorkflowActivity WHERE className in (?,?)',
+    'WebGUI::Workflow::Activity::CleanDatabaseCache',
+    'WebGUI::Workflow::Activity::CleanFileCache',
+;
+sql 'DELETE FROM WorkflowActivityData WHERE activityId IN (?,?)',
+    'pbwfactivity0000000002',
+    'pbwfactivity0000000022',
+;
+
+done;
+</code></pre>
+
+<p>The first thing we do in our new upgrade script is use
+WebGUI::Upgrade::Script. Now, instead of using the session for everything, we
+have subs imported for various tasks. This means that many times we can run an
+entire upgrade script without opening a WebGUI session, or creating a version
+tag unnecessarily.</p>
+
+<p>If we do need a session, or a version tag, they will be automatically assigned
+relevant information describing what we're doing. When we're done, they will
+be automatically cleaned up and committed. What once was done with
+boilerplate, and subject to random deletion or subversion, is now enforced
+policy.</p>
+
+<p>In all other respects, a WebGUI upgrade script is a Perl script. You can add
+modules, write subroutines, and do anything necessary to move WebGUI into the
+future.</p>
+
+<p>The Internet is always evolving. With the WebGUI 8 upgrade system, we've made 
+it easier to evolve with it.</p>
+
+<p>Stay tuned for next time where I'll show off our CHI-based caching system.</p>
+]]>
+        
+
+    </content>
+</entry>
+
+<entry>
+    <title>Dancer FOSDEM mini-hackathon</title>
+    <link rel="alternate" type="text/html" href="http://blogs.perl.org/users/sawyer_x/2011/02/dancer-fosdem-mini-hackathon.html" />
+    <id>tag:blogs.perl.org,2011:/users/sawyer_x//87.1422</id>
+
+    <published>2011-02-04T09:48:54Z</published>
+    <updated>2011-02-04T09:59:50Z</updated>
+
+    <summary>I am honored to be sponsored by PEG, and I would like to thank them for it. A team of Dancer core developers (Alexis Sukrieh, Franck Cuny, Damien Krotkine and myself) will be having a mini-hackathon this FOSDEM. This is...</summary>
+    <author>
+        <name>Sawyer X</name>
+        
+    </author>
+    
+        <category term="Dancer" scheme="http://www.sixapart.com/ns/types#category" />
+    
+        <category term="Perl" scheme="http://www.sixapart.com/ns/types#category" />
+    
+    
+    <content type="html" xml:lang="en" xml:base="http://blogs.perl.org/users/sawyer_x/">
+        <![CDATA[<p>I am honored to be <a href="http://szabgab.com/blog/2011/01/perl-at-fosdem-2011.html">sponsored</a> by <a href="http://perl-ecosystem.org/">PEG</a>, and I would like to thank them for it.</p>
+
+<p>A team of Dancer core developers (Alexis Sukrieh, Franck Cuny, Damien Krotkine and myself) will be having a mini-hackathon this FOSDEM. This is made possible since we will all be staying together in the same apartment for the duration of the event.</p>
+
+<p>We will focus our efforts on merging Github Pull Requests and closing as many tickets as possible. New features might be worked on, but it is not part of the official plan. We leave room for improvisation. :)</p>
+
+<p>I want to thank everyone who pushed commits and changes into Dancer. I've been very surprised (yet thrilled) at some of the new faces we've been seeing on our IRC channel (#dancer on irc.perl.net) and in our pull requests. While some of these were merged on the spot, others were waiting longer in the queue. This is what we will try to focus on.</p>
+
+<p>The next post will include another issue which will be worked on during the hackathon, which is the Dancer changelog.</p>
+
+<p>If you're arriving at FOSDEM, we have a Perl room and a Perl booth. Feel free to stop by, say hi, catch a few interesting talks and jibber-jabber with us!<br />
+</p>]]>
+        
+    </content>
+</entry>
+
+<entry>
+    <title>Dist::Zilla::Plugin::MetaResourcesFromGit</title>
+    <link rel="alternate" type="text/html" href="http://blogs.perl.org/users/oliver_gorwits/2011/02/dist-zilla-plugin-metaresourcesfromgit.html" />
+    <id>tag:blogs.perl.org,2011:/users/oliver_gorwits//140.1421</id>
+
+    <published>2011-02-04T01:21:17Z</published>
+    <updated>2011-02-04T02:54:34Z</updated>
+
+    <summary><![CDATA[The CPAN META specification includes support for "resource" links to homepage, bug tracker, mail list, source code repository, and so on. These will appear on search.cpan.org if you ship a META.json with your distribution. Dist::Zilla's MetaResources plugin allows you to set these links in the distribution config, but I wanted something a little more automagical. This can be done because I've set up my GitHub repositories with consistent naming and layout. So my new plugin, Dist::Zilla::Plugin::MetaResourcesFromGit, is a drop-in replacement for the standard MetaResources plugin. It automatically generates four resource links based on the name of the distribution and the remote git repository settings. Simply use the plugin in your dist.ini file: [MetaResourcesFromGit] The default links are equivalent to: homepage = https://github.com/&lt;account>/&lt;repo&gt;/wiki bugtracker.web = https://rt.cpan.org/Public/Dist/Display.html?Name=&lt;dist-name&gt; repository.url = git://github.com/&lt;account&gt;/&lt;repo&gt;.git repository.web = https://github.com/&lt;account&gt;/&lt;repo&gt; repository.type = git Any other resources provided to this Plugin are passed through to the MetaResources Plugin as-is. If you wish to override one of the above, some formatting codes are provided (described in the documentation) to assist. If you wish to suppress the appearance of one of the above resources, set an empty value. If you want to know more about my Dist::Zilla and GitHub workflow, I discussed it in an earlier post on this blog. I wrote this plugin to assist me, and it's also shown how great the Moose-based Dist::Zilla architecture is for extending features. The Plugin is GitHub centric at the moment, but I'd be happy to accept a patch to work with other cloud-based Git services (Gitorious, SourceForge, etc)....]]></summary>
+    <author>
+        <name>Oliver Gorwits</name>
+        <uri>http://gorwits.me.uk/</uri>
+    </author>
+    
+    
+    <content type="html" xml:lang="en" xml:base="http://blogs.perl.org/users/oliver_gorwits/">
+        <![CDATA[<p>The <a href="http://search.cpan.org/perldoc?CPAN::Meta::Spec" target="_blank">CPAN META specification</a> includes support for "resource" links to homepage, bug tracker, mail list, source code repository, and so on. These will appear on search.cpan.org if you <a href="http://search.cpan.org/perldoc?Dist::Zilla::Plugin::MetaJSON" target="_blank">ship a META.json</a> with your distribution.</p>
+
+<p>Dist::Zilla's <a href="http://search.cpan.org/perldoc?Dist::Zilla::Plugin::MetaResources" target="_blank">MetaResources</a> plugin allows you to set these links in the distribution config, but I wanted something a little more automagical. This can be done because I've set up my GitHub repositories with consistent naming and layout.</p>
+
+<p>So my new plugin, <a href="http://search.cpan.org/perldoc?Dist::Zilla::Plugin::MetaResourcesFromGit" target="_blank">Dist::Zilla::Plugin::MetaResourcesFromGit</a>, is a drop-in replacement for the standard MetaResources plugin. It automatically generates four resource links based on the name of the distribution and the remote git repository settings. Simply use the plugin in your <code>dist.ini</code> file:</p>
+
+<pre><code class="prettyprint">[MetaResourcesFromGit]
+</code></pre>
+
+<p>The default links are equivalent to:</p>
+
+<pre><code class="prettyprint">homepage        = https://github.com/&lt;account>/&lt;repo&gt;/wiki
+bugtracker.web  = https://rt.cpan.org/Public/Dist/Display.html?Name=&lt;dist-name&gt;
+repository.url  = git://github.com/&lt;account&gt;/&lt;repo&gt;.git
+repository.web  = https://github.com/&lt;account&gt;/&lt;repo&gt;
+repository.type = git
+</code></pre>
+
+<p>Any other resources provided to this Plugin are passed through to the MetaResources Plugin as-is. If you wish to override one of the above, some formatting codes are provided (described in the documentation) to assist. If you wish to suppress the appearance of one of the above resources, set an empty value.</p>
+
+<p>If you want to know more about <a href="http://blogs.perl.org/users/oliver_gorwits/2011/01/my-distzilla-and-gitgithub-workflow.html" target="_blank">my Dist::Zilla and GitHub workflow</a>, I discussed it in an earlier post on this blog. I wrote this plugin to assist me, and it's also shown how great the Moose-based Dist::Zilla architecture is for extending features.</p>
+
+<p>The Plugin is GitHub centric at the moment, but I'd be happy to accept a patch to work with other cloud-based Git services (Gitorious, SourceForge, etc).</p>]]>
+        
+    </content>
+</entry>
+
+<entry>
+    <title>The New #email Epistles</title>
+    <link rel="alternate" type="text/html" href="http://blogs.perl.org/users/aristotle/2011/02/the-new-email-epistles.html" />
+    <id>tag:blogs.perl.org,2011:/users/aristotle//15.1420</id>
+
+    <published>2011-02-03T16:32:53Z</published>
+    <updated>2011-02-03T16:39:59Z</updated>
+
+    <summary><![CDATA[&lt;rjbs&gt;&nbsp;I need to add the _raw and _str variants for everything, so not having them will always be wrong, or at least a mystery &lt;confound&gt;&nbsp;This is a great mystery. But I am speaking of MIME and delimiters. &lt;rjbs&gt;&nbsp;Email: the E...]]></summary>
+    <author>
+        <name>Aristotle</name>
+        <uri>http://plasmasturm.org/</uri>
+    </author>
+    
+    
+    <content type="html" xml:lang="en" xml:base="http://blogs.perl.org/users/aristotle/">
+        <![CDATA[<table><tbody><tr><td>&lt;rjbs&gt;&nbsp;</td><td>I need to add the <tt>_raw</tt> and <tt>_str</tt> variants for everything, so not having them will always be wrong, or at least a mystery</td></tr></tbody></table>
+
+<table><tbody><tr><td>&lt;confound&gt;&nbsp;</td><td>This is a great mystery. But I am speaking of MIME and delimiters.</td></tr></tbody></table>
+
+<table><tbody><tr><td>&lt;rjbs&gt;&nbsp;</td><td>Email: the E is for Ephesians?</td></tr></tbody></table>
+
+<table><tbody><tr><td>&lt;confound&gt;&nbsp;</td><td>Therefore, since we are surrounded by such a great cloud of RFCs, let us throw off every feature that hinders and the proprietary extensions that so easily entangle.</td></tr></tbody></table>
+
+<table><tbody><tr><td>&lt;rjbs&gt;&nbsp;</td><td>confound: Where were you when I divided the tokens from the whitespace?</td></tr></tbody></table>
+
+<table><tbody><tr><td>&lt;aristotle&gt;&nbsp;</td><td>confound++ # ephesians</td></tr></tbody></table>
+
+<table><tbody><tr><td>&lt;rjbs&gt;&nbsp;</td><td>thus marking the first time anyone on IRC was ++'d for Ephesians</td></tr></tbody></table>
+
+<table><tbody><tr><td>&lt;rjbs&gt;&nbsp;</td><td>Encode always; lookahead without ceasing; in everything, be strict, for this is Postel's will for you.</td></tr></tbody></table>
+
+<table><tbody><tr><td>&lt;confound&gt;&nbsp;</td><td>Then he will say to those on his left, "Depart from me, you who are marked as spam, into the limitless bitbucket prepared for penis enhancement and chain forwards. For I was using mutt and you sent me a Word document, I sent you mail and you greylisted me, I wrote to the list and you vacation autoreplied, I made an announcement and you clicked 'reply all'."</td></tr></tbody></table>
+]]>
+        
+
+    </content>
+</entry>
+
+</feed>

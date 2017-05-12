@@ -1,0 +1,3 @@
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <category term="atom10" scheme="http://feedparser.org/tests/" label="Atom 1.0 tests"/>
+</feed>

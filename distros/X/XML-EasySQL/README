@@ -1,0 +1,32 @@
+XML-EasySQL version 1.0
+========================
+
+A two-way SQL/XML base class for Perl. It was written by Curtis Lee Fulton
+(http://fultron.net, curtisf@fultron.net).
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+XML::DOM
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2004 by curtis lee fulton
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+

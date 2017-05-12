@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html xmlns="http://www.w3.org/HTML/1998/html4"
+			xmlns:xmerge="http://www.sergeant.org/xmerge">
+<head>
+<title><xmerge:replace name="/resume/person/persname/forename"/>
+		<xmerge:replace name="/resume/person/persname/surname"/>
+		- CV
+</title>
+</head>
+<body text="#000000" bgcolor="#FFFFFF" link="#0000FF" vlink="#FF0000" alink="#000088">
+
+<h1 align="center">
+	<xmerge:replace name="/resume/person/persname/forename"/>
+	<xmerge:replace name="/resume/person/persname/surname"/>
+</h1>
+
+<center>
+<hr WIDTH="100%">
+<br/>/ <xmerge:repeat><xmerge:replace name="/resume/person/address/line"/> / </xmerge:repeat> / <xmerge:replace name="postcode"/>
+<br/>Tel: <xmerge:repeat><xmerge:replace name="/resume/person/phone"/> (<xmerge:replace name="/resume/person/phone/@Type"/>) </xmerge:repeat> / e-mail: <xmerge:replace name="/resume/person/email"/>
+<p/>DoB: <xmerge:replace name="/resume/person/dob"/></center>
+<b><font size="+1">Education</font></b>
+<center>
+<hr WIDTH="100%"></center>
+
+<blockquote>Durham University&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Graduated: June 1996
+<br>Computer Science</blockquote>
+<b>Key Skills</b>
+<br>
+<hr WIDTH="100%">
+<br>&nbsp;
+<table BORDER CELLSPACING=0 CELLPADDING=3 COLS=3 WIDTH="100%" NOSAVE >
+<tr ALIGN=CENTER NOSAVE>
+<td NOSAVE><b>Web</b></td>
+
+<td><b>Database Skills</b></td>
+
+<td><b>Other Skills</b></td>
+</tr>
+
+<tr>
+<td>Perl 5
+<br>&nbsp;</td>
+
+<td>Sybase Transact SQL&nbsp;and DBA
+<br>Oracle PL/SQL&nbsp;and DB</td>
+
+<td></td>
+</tr>
+</table>
+
+</body>
+</html>

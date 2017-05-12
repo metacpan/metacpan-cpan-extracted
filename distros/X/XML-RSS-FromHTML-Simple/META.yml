@@ -1,0 +1,26 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         XML-RSS-FromHTML-Simple
+version:      0.05
+version_from: lib/XML/RSS/FromHTML/Simple.pm
+installdirs:  site
+requires:
+    Class::Accessor:               0
+    Data::Hexdumper:               0
+    DateTime:                      0
+    Encode:                        0
+    File::Temp:                    0
+    HTML::Entities:                0
+    HTML::Parser:                  3.56
+    HTML::TreeBuilder:             0
+    HTTP::Date:                    0
+    HTTP::Request::Common:         0
+    Log::Log4perl:                 1
+    LWP:                           5.805
+    Test::More:                    0
+    URI::URL:                      0
+    XML::RSS:                      1.22
+    XML::Simple:                   2.16
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30_01

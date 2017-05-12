@@ -1,0 +1,23 @@
+% layout 'default';
+% title 'Search Results';
+% stash active_page => 'search';
+
+% if ( items_in 'products' ) {
+    <ul id="search_results" class="row">
+        % for ( items_in 'products' ) {
+          <li class="col-md-4 prod">
+            <div class="well">
+              <a href="/product/<%= $_->{url} %>" class="h4">
+                <%= $_->{title} %>
+              </a>
+
+              <a href="/product/<%= $_->{url} %>"
+                  class="thumbnail"><img src="/product-pics/<%= $_->{image} %>" alt=""></a>
+            </div>
+          </li>
+        % }
+    </ul>
+% } else {
+    <p class="alert alert-danger">No products were found.
+        Please try a different search query</p>
+% }

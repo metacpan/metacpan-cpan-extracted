@@ -1,0 +1,270 @@
+NAME
+    XML::OverHTTP - A base class for XML over HTTP-styled web service
+    interface
+
+DESCRIPTION
+    This module is not used directly from end-users. As a child class of
+    this, module authors can easily write own interface module for XML over
+    HTTP-styled web service.
+
+METHODS PROVIDED
+    This module provides some methods and requires other methods overridden
+    by child classes. The following methods are to be called in your module
+    or by its users.
+
+  new
+    This constructor method returns a new object for your users. It accepts
+    query parameters by hash.
+
+        my $api = MyAPI->new( %param );
+
+    MyAPI.pm inherits this XML::OverHTTP modules.
+
+  add_param
+    This method adds query parameters for the request.
+
+        $api->add_param( %param );
+
+    It does not validate key names.
+
+  get_param
+    This method returns a current query parameter.
+
+        $api->get_param( 'key' );
+
+  treepp
+    This method returns an XML::TreePP object to make the request.
+
+        $api->treepp->get( 'key' );
+
+    And you can set its object as well.
+
+        my $mytpp = XML::TreePP->new;
+        $api->treepp( $mytpp );
+
+    total_entries, entries_per_page and current_page parameters in $mytpp
+    are updated.
+
+  request
+    This method makes the request for the web service and returns its
+    response tree.
+
+        my $tree = $api->request;
+
+    After calling this method, the following methods are available.
+
+  tree
+    This method returns the whole of the response parsed by XML::TreePP
+    parser.
+
+        my $tree = $api->tree;
+
+    Every element is blessed when "elem_class" is defined.
+
+  root
+    This method returns the root element in the response.
+
+        my $root = $api->root;
+
+  xml
+    This method returns the response context itself.
+
+        print $api->xml, "\n";
+
+  code
+    This method returns the response status code.
+
+        my $code = $api->code; # usually "200" when succeeded
+
+  page
+    This method returns a Data::Page object to create page navigation.
+
+        my $pager = $api->page;
+        print "Last page: ", $pager->last_page, "\n";
+
+    And you can set its object as well.
+
+        my $pager = Data::Page->new;
+        $api->page( $pager );
+
+  pageset
+    This method returns a Data::Pageset object to create page navigation.
+    The paging mode is "fixed" as default.
+
+        my $pager = $api->pageset;
+        $pager->pages_per_set( 10 );
+        print "First page of next page set: ",  $page_info->next_set, "\n";
+
+    Or set it to "slide" mode if you want.
+
+        my $pager = $api->pageset( 'slide' );
+
+  page_param
+    This method returns pair(s) of query key and value to set the page
+    number for the next request.
+
+        my $hash = $api->page_param( $page );
+
+    The optional second argument specifies the number of entries per page.
+
+        my $hash = $api->page_param( $page, $size );
+
+    The optional third argument incluedes some other query parameters.
+
+        my $newhash = $api->page_param( $page, $size, $oldhash );
+
+  page_query
+    This method returns a processed query string which is joined by '&'
+    delimiter.
+
+        my $query = $api->page_query();                         # current page
+        my $query = $api->page_query( $page, $size, $hash );    # specified page
+
+METHOD YOU MUST OVERRIDE
+    You MUST override at least one method below:
+
+  url
+    This is a method to specify the url for the request to the web service.
+    E.g.,
+
+        sub url { 'http://www.example.com/api/V1/' }
+
+METHODS YOU SHOULD OVERRIDE
+    The methods that you SHOULD override in your module are below:
+
+  root_elem
+    This is a method to specify a root element name in the response. E.g.,
+
+        sub root_elem { 'rdf:RDF' }
+
+  is_error
+    This is a method to return "true" value when the response seems to have
+    error. This returns "undef" when it succeeds. E.g.,
+
+        sub is_error { $_[0]->root->{status} != 'OK' }
+
+  total_entries
+    This is a method to return the number of total entries for "Data::Page".
+    E.g.,
+
+        sub total_entries { $_[0]->root->{hits} }
+
+  entries_per_page
+    This is a method to return the number of entries per page for
+    "Data::Page". E.g.,
+
+        sub entries_per_page { $_[0]->root->{-count} }
+
+  current_page
+    This is a method to return the current page number for "Data::Page".
+    E.g.,
+
+        sub current_page { $_[0]->root->{-page} }
+
+  page_param
+    This is a method to return paging parameters for the next request. E.g.,
+
+        sub page_param {
+            my $self = shift;
+            my $page = shift || $self->current_page();
+            my $size = shift || $self->entries_per_page();
+            my $hash = shift || {};
+            $hash->{page}  = $page if defined $page;
+            $hash->{count} = $size if defined $size;
+            $hash;
+        }
+
+    When your API uses SQL-like query parameters, offset and limit:
+
+        sub page_param {
+            my $self = shift;
+            my $page = shift || $self->current_page() or return;
+            my $size = shift || $self->entries_per_page() or return;
+            my $hash = shift || {};
+            $hash->{offset} = ($page-1) * $size;
+            $hash->{limit}  = $size;
+            $hash;
+        }
+
+METHODS YOU CAN OVERRIDE
+    You CAN override the following methods as well.
+
+  http_method
+    This is a method to specify the HTTP method, 'GET' or 'POST', for the
+    request. This returns 'GET' as default. E.g.,
+
+        sub http_method { 'GET' }
+
+  default_param
+    This is a method to specify pairs of default query parameter and its
+    value for the request. E.g.,
+
+        sub default_param { { method => 'search', lang => 'perl' } }
+
+  notnull_param
+    This is a method to specify a list of query parameters which are
+    required by the web service. E.g.,
+
+        sub notnull_param { [qw( api_key secret query )] }
+
+    These keys are checked before makeing a request for safe.
+
+  query_class
+    This is a method to specify a class name for query parameters. E.g.,
+
+        sub elem_class { 'MyAPI::Query' }
+
+    The default value is "undef", it means a normal hash is used instead.
+
+  attr_prefix
+    This is a method to specify a prefix for each attribute in the response
+    tree. XML::TreePP uses it. E.g.,
+
+        sub attr_prefix { '' }
+
+    The default prefix is zero-length string "" which is recommended.
+
+  text_node_key
+    This is a method to specify a hash key for text nodes in the response
+    tree. XML::TreePP uses it. E.g.,
+
+        sub text_node_key { '_text' }
+
+    The default key is "#text".
+
+  elem_class
+    This is a method to specify a base class name for each element in the
+    response tree. XML::TreePP uses it. E.g.,
+
+        sub elem_class { 'MyAPI::Element' }
+
+    The default value is "undef", it means each elements is a just hashref
+    and not bless-ed.
+
+  force_array
+    This is a method to specify a list of element names which should always
+    be forced into an array representation in the response tree. XML::TreePP
+    uses it. E.g.,
+
+        sub force_array { [qw( rdf:li item xmlns )] }
+
+  force_hash
+    This is a method to specify a list of element names which should always
+    be forced into an hash representation in the response tree. XML::TreePP
+    uses it. E.g.,
+
+        sub force_hash { [qw( item image )] }
+
+SEE ALSO
+    XML::TreePP
+
+    <http://www.kawa.net/works/perl/overhttp/overhttp-e.html>
+
+AUTHOR
+    Yusuke Kawasaki <http://www.kawa.net/>
+
+COPYRIGHT AND LICENSE
+    Copyright (c) 2007 Yusuke Kawasaki. All rights reserved. This program is
+    free software; you can redistribute it and/or modify it under the same
+    terms as Perl itself.
+

@@ -1,0 +1,5 @@
+- carp in ::Element.pm print line number in XMLWriter.pm! that's not nice.
+- print for every syntax warning the possibilities the user has
+- implement indent option
+
+If you've more ideas, please mail to moritz@freesources.org, thanks :)

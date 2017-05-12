@@ -1,0 +1,35 @@
+Changes
+lib/XML/Printer/ESCPOS.pm
+lib/XML/Printer/ESCPOS/Tags.pm
+lib/XML/Printer/ESCPOS/Debug.pm
+Makefile.PL
+MANIFEST			This list of files
+README.md
+TODO.md
+t/00-load.t
+t/01-parse.t
+t/02-undefined-tags.t
+t/03-qr-codes.t
+t/04-utf8imagedtext.t
+t/05-barcodes.t
+t/06-linefeed.t
+t/07-images.t
+t/08-print-area-width.t
+t/09-utf8imagedtext-word-wrap.t
+t/10-text-word-wrap.t
+t/11-reset-error-message.t
+t/12-tab-positions.t
+t/13-repeat.t
+t/14-set-unset.t
+t/15-justify.t
+t/16-hr.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+t/lib/Mock/Printer/ESCPOS.pm
+t/images/arrow.png
+t/images/arrow.pdf
+t/images/arrow.gif
+t/images/arrow.jpg
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

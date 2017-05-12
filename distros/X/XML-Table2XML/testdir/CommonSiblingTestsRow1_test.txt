@@ -1,0 +1,11 @@
+root
+/a	/b/#id	/b	/b/@x	/b/@y	/b/c	/b/c/d
+testA	1	testB1	testx1		testc1	
+testA	2	testB2	testx2	testy2	testc2	
+testA	3		testx3	testy3		
+testA	4			testy4		
+testA	5		testx5			
+testA	6	testB6				
+testA	7				testc7	
+testA	7					testd7
+

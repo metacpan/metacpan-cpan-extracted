@@ -1,0 +1,28 @@
+<?xml version='1.0' encoding='utf-8'?>
+<document xmlns="http://web-cpan.berlios.de/modules/XML-Grammar-Fortune/fiction-xml-0.2/" xmlns:xlink="http://www.w3.org/1999/xlink" version="0.2">
+    <head>
+    </head>
+    <body xml:id="index">
+    <title>David vs. Goliath - Part I</title>
+    <section xml:id="top">
+    <title>The Top Section</title>
+    <!-- David has Green hair here -->
+    <p>
+    King <span xml:lang="he-IL">דוד</span> and <span xml:id="foobar">Foobar Anchor</span> and <span xml:id="peter" xml:lang="fr-FR">Pierre</span> and Goliath were standing by each other.
+    </p>
+    <p>
+    David said unto Goliath: "I will shoot you. I <b>swear</b> I will"
+    </p>
+    <section xml:id="goliath">
+    <title>Goliath's Response</title>
+    <!-- Goliath has to reply to that. -->
+    <p>
+    Goliath was not amused.
+    </p>
+    <p>
+    He said to David: "Oh, really. <i>David</i>, the red-headed!".
+    </p>
+    </section>
+    </section>
+</body>
+</document>

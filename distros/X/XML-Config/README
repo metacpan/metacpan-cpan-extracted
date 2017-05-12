@@ -1,0 +1,28 @@
+XML::Config - a simple XML Configuration file reader.
+
+Preface:
+
+This is stupendously simple.  Given a well formed configuration file like this:
+
+<Root>
+ <A_variable>A Key</A_variable>
+</Root>
+
+it returns:
+
+{A_variable => 'A Key'}
+
+I whipped this together for internal use is some of our applications, and it does the trick. 
+It will attempt to parse a .bak file in the same directory as the config file you specify if
+there is an error. See the manpage for details.   
+
+CHANGES:
+
+0.2 -> Two new options in load_conf(), allows you to pass a hash ref to be
+filled by the config reader, instead of the default behaviour of just
+passing back a hash.  As a natural extension to this functionality, you
+may also pass an array ref to load_conf() containing variable names which
+you do not want the config reader to over write if it finds them in the
+config file.  
+
+

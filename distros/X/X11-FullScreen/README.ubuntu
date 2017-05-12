@@ -1,0 +1,6 @@
+To get this running on Ubuntu 13.04, I installed the following packages:
+
+* libimlib2
+* libimlib2-dev
+* xserver-xorg-dev
+

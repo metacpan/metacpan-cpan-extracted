@@ -1,0 +1,37 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.61.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 9d95a0fad9ebf0d142ce19be048a367278149839 MANIFEST
+SHA1 606bd6424682249397d63caf905f651178a4d6cc MANIFEST.SKIP
+SHA1 f4232fc4057deba1c4db7682c56d4410d798c73b META.yml
+SHA1 3ac5e9ad91c4e8aa9387c1c7427cbb9bb7826937 Makefile.PL
+SHA1 7b838e0a8eec2f75ec3e6cd2161087fc63226ab8 bin/xslt_easy.pl
+SHA1 e73001077582bf9aa03a653ca9a91dabacd38dcb bin/xslt_easy_batch.pl
+SHA1 5a9c3dd0c56f475de0d48ba4ba562fa35c15bc6d lib/XML/LibXSLT/Easy.pm
+SHA1 8b4abf24972a1d6de22df433ab8e43a6e1d91935 lib/XML/LibXSLT/Easy/Batch.pm
+SHA1 8b82b546926f8c6cd2cd4394d6bbfecfe057650b lib/XML/LibXSLT/Easy/Batch/CLI.pm
+SHA1 f2a44e7a6038b8a17ab83fc0e7037ab0b4f4d39a lib/XML/LibXSLT/Easy/CLI.pm
+SHA1 cb63459fa7812320828d2ad250b752ac81426404 t/basic.t
+SHA1 5260f2d7432d035c537888007054ee19cda676e3 t/load.t
+SHA1 028ee31c46e87344f69163e3ba8568fabb7328c4 t/xml/foo.xml
+SHA1 a1cfcb44fac837ad68f74066a5efd4d6688aef28 t/xml/foo.xsl
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG/MacGPG2 v2.0.12 (Darwin)
+
+iEYEARECAAYFAktscRwACgkQVCwRwOvSdBj1CQCeMT9QBEpdwOO1qcA8HKdR0PQH
+IPUAnioE/TXoVVutCm2RfmikN+Ihr2wt
+=1L6H
+-----END PGP SIGNATURE-----

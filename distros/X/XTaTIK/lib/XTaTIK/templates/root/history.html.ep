@@ -1,0 +1,8 @@
+% layout 'default';
+% title 'Our History';
+% stash active_page => 'history';
+
+<p>
+  XTaTIK EDIT: Write your history here and style in in global
+  style file
+</p>

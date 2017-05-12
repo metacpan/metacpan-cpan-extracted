@@ -1,0 +1,152 @@
+=head1 CHANGELOG FOR XML::SRS
+
+
+=head2 VERSION 0.09, 14 February 2011
+
+=over
+
+=item *
+
+Removed dependency on Crypt::Password. Passwords are now sent as plain text,
+which is supported by the SRS (and secure, as they're sent via https).
+
+=back
+
+=head2 VERSION 0.07, 9 February 2011
+
+=over
+
+=item *
+
+Removed dependency on MooseX::Method::Signatures
+
+=item *
+
+Added support for DNSSEC files
+
+=item *
+
+Various other changes and tweaks, e.g. adding coercion rules.
+
+=item *
+
+Enhanced documentation
+
+=back
+
+=head2 VERSION 0.06, 12 July 2010
+
+=over
+
+=item *
+
+Broken v0.05 dependencies, reuploading with correct deps.
+
+=back
+
+=head2 VERSION 0.05, 12 July 2010
+
+=over
+
+=item *
+
+Various timestamp fixes including better coercion.
+
+=item *
+
+Various fixed to deCamelCase into nicer_vars.
+
+=item *
+
+Add support for C<AckMessages> and mapping for C<DomainTransfer>.
+
+=item *
+
+Add support for C<GetMessages>, including the new C<QueueMode> and
+C<TypeFilter> attributes/elements.
+
+=item *
+
+Support C<Error> responses with no C<ErrorDetails> elements, as
+required by the RNC.
+
+=item *
+
+Refactoring of C<Handle> and C<Contact> to use inheritance and thereby
+re-use XML attribute/element definitions.
+
+=back
+
+=head2 VERSION 0.04, 25 JUNE 2010
+
+=over
+
+=item *
+
+Add Classes and tests for SRS Handles.
+
+=back
+
+=head2 VERSION 0.03, 12 MAY 2010
+
+=over
+
+=item *
+
+Implement the C<RegistrarUpdate> message
+
+=item *
+
+Mark the C<ActionId> attribute as required on all update actions.
+
+=back
+
+=head2 VERSION 0.02, 7 MAY 2010
+
+=over
+
+=item *
+
+More coerce convenience rules:
+
+=over
+
+=item *
+
+Use the existing convenience coercion rules for L<XML::SRS::Contact>
+fields on L<XML::SRS::Registrar> contact fields.
+
+=item *
+
+Support setting all the date/time XML fields with one Moose attribute,
+and coerce TimeStamp values from L<MooseX::TimestampTZ> types
+(hopefully this will cascade to allow any ISO-8601 form supported by
+that module)
+
+=item *
+
+The C<epp_auth> property of L<XML::SRS::Registrar> can be set to the
+unencrypted or a pre-encrypted string, and it will automatically get
+turned into an encrypted, salted string if required, thanks to the
+magical awesomeness of L<Crypt::Password>.
+
+=back
+
+=item *
+
+A couple of attribute renames; like L<XML::EPP>, any non-perlish
+attribute name is subject to being renamed to be perlish :-)
+
+Added a note to the main L<XML::SRS> man page to make it clear that
+this might happen.
+
+=item *
+
+Add global L<$XML::SRS::PROTOCOL_VERSION>
+
+=item *
+
+=back
+
+=cut
+

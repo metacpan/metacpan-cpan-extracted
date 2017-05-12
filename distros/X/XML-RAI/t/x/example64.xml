@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0">
+  <channel>
+    <title>my little example feed</title>
+    <link>http://www.example.com/</link>
+    <description>example tagline</description>
+    <language>en</language>
+  <item>
+    <title>First post</title>
+    <link>http://www.example.com/archives/1</link>
+    <description>entry summary</description>
+    <div xmlns="http://www.w3.org/1999/xhtml">ENTRY CONTENT WITH <b>INLINE MARKUP</b></div>
+  </item>
+  </channel>
+</rss>

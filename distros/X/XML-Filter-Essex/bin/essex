@@ -1,0 +1,12 @@
+use XML::SAX::Machines qw( Pipeline );
+
+my @files = @ARGV ? @ARGV : "-";
+
+my $p = Pipeline( XML::Filter::Essex::Foo => \*STDOUT );
+
+for ( @files ) {
+    open F, $_ eq "-" ? ">&STDIN" : $_
+        or die "$! opening ", $_ eq "-" ? "stdin" : $_, "\n";
+
+    $p->parse_file( \*F );
+}

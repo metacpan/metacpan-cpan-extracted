@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- an example RSS feed -->
+<!-- XHTML is declared as the default namespace, not RSS -->
+<!-- uses 3 modules that use rdf:resource: admin, annotate, and changed page -->
+
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" 
+         xmlns:dc="http://purl.org/dc/elements/1.1/" 
+         xmlns:admin="http://webns.net/mvcb/"
+		 xmlns:annotate="http://purl.org/rss/1.0/modules/annotate/"
+         xmlns:cp="http://my.theinfo.org/changed/1.0/rss/"
+		 xmlns:rss="http://purl.org/rss/1.0/"
+		 xmlns="http://www.w3.org/1999/xhtml" 
+         >
+
+<rss:channel rdf:about="http://example.org/">
+	<rss:title>Example Site</rss:title>
+	<rss:link>http://example.org/</rss:link>
+	<rss:description>An example site</rss:description>
+	<dc:publisher>admin@example.org</dc:publisher>
+	<dc:language>en-us</dc:language>
+	<dc:date>2002-11-01T07:16:51-08:00</dc:date>
+	<admin:generatorAgent rdf:resource="http://search.cpan.org/dist/XML-RSS-0.98_01/" />
+	<admin:errorReportsTo rdf:resource="mailto:admin@example.org"/>
+	<rss:items>
+	<rdf:Seq>
+		<rdf:li rdf:resource="http://example/archives/000001.html" />
+	</rdf:Seq>
+	</rss:items>
+</rss:channel>
+
+<rss:item rdf:about="http://example/archives/000001.html">
+	<rss:title>A Title &amp; An Ampersand</rss:title>
+	<rss:description>A silly description</rss:description>
+	<rss:link>http://example/archives/000001.html</rss:link>
+	<dc:subject>Personal</dc:subject>
+	<dc:creator>kellan</dc:creator>
+	<dc:date>2002-11-01T07:16:51-08:00</dc:date>
+	<annotate:reference rdf:resource="http://www.monkeyfist.com/discuss/1" />
+	<cp:server rdf:resource="http://example.org/changedPage" />
+</rss:item>
+
+</rdf:RDF>
+

@@ -1,0 +1,109 @@
+=encoding utf8
+
+=head1 NAME
+
+XML::Compile::Translate::Template - create an XML or PERL example
+
+=head1 INHERITANCE
+
+ XML::Compile::Translate::Template
+   is a XML::Compile::Translate
+
+=head1 SYNOPSIS
+
+ my $schema = XML::Compile::Schema->new(...);
+ print $schema->template(XML  => $type, ...);
+ print $schema->template(PERL => $type, ...);
+
+ # script as wrapper for this module
+ schema2example -f XML ...
+
+=head1 DESCRIPTION
+
+The translator understands schemas, but does not encode that into
+actions.  This module interprets the parse results of the translator,
+and creates a kind of abstract syntax tree from it, which can be used
+for documentational purposes.  Then, it implements to ways to represent
+that knowledge: as an XML or a Perl example of the data-structure which
+the schema describes.
+
+Extends L<"DESCRIPTION" in XML::Compile::Translate|XML::Compile::Translate/"DESCRIPTION">.
+ 
+=head1 METHODS
+
+Extends L<"METHODS" in XML::Compile::Translate|XML::Compile::Translate/"METHODS">.
+ 
+=head1 DETAILS
+
+Extends L<"DETAILS" in XML::Compile::Translate|XML::Compile::Translate/"DETAILS">.
+ 
+=head2 Translator options
+
+Extends L<"Translator options" in XML::Compile::Translate|XML::Compile::Translate/"Translator options">.
+ 
+=head2 Processing Wildcards
+
+Wildcards are not (yet) supported.
+
+=head2 Schema hooks
+
+Hooks are implemented since version 0.82.  They can be used to
+improve the template output.
+
+=head3 hooks executed before the template is generated
+
+None defined yet.
+
+=head3 hooks executed as replacement
+
+The predefined hook C<COLLAPSE> can be used to remove the extensive
+listing of some elements.  Usually used with a type of which you
+know the structure or which is repeated often.
+
+=head3 hooks for post-processing, after the data is collected
+
+None defined yet.
+
+=head2 Typemaps
+
+Typemaps are currently only available to improve the PERL output.
+
+=head3 Typemaps for PERL template output
+
+You can pass C<< &function_name >> to indicate that the code reference
+with variable name C<< $function_name >> will be called.  Mind the change
+of C<< & >> into C<< $ >>.
+
+When C<< $object_name >> is provided, then that object is an interface
+object, which will be called for the indicated type.
+
+In case class name (any bareword will do) is specified, it is shown
+as a call to the C<toXML()> instance method call from some data object
+of the specified class.
+
+B<. Example: typemaps with template>
+
+  $schemas->template(PERL => $some_type, typemap =>
+    { $type1 => '&myfunc'   # $myfunc->('WRITER', ...)
+    , $type2 => '$interf'   # $interf->($object, ...)
+    , $type3 => 'My::Class'
+    });
+
+=head1 SEE ALSO
+
+This module is part of XML-Compile distribution version 1.56,
+built on March 30, 2017. Website: F<http://perl.overmeer.net/xml-compile/>
+
+Please post questions or ideas to the mailinglist at
+F<http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/xml-compile> .
+For live contact with other developers, visit the C<#xml-compile> channel
+on C<irc.perl.org>.
+
+=head1 LICENSE
+
+Copyrights 2006-2017 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the Artistic license.
+See F<http://dev.perl.org/licenses/artistic.html>
+

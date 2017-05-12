@@ -1,0 +1,65 @@
+Revision history for XML-MinWriter
+
+0.08 - 2014-12-28T09:24:30+01:00
+
+  [DOCUMENTATION]
+
+  - Migrate to Dist::Zilla
+
+0.07 - 2014-09-20T19:29:17+01:00
+
+  [DOCUMENTATION]
+
+  - Add a .gitignore file
+
+  - Changelog dates are better written as YYYY.MM.DD and probably ordered in
+    the other, descending, direction
+    Remark: I have decided to follow the ISO 8601 standard at
+    http://www.w3.org/TR/NOTE-datetime
+
+  - Just use a Makefile.PL and not a Build.PL the latter does not have any
+    added value any more
+  - In Makefile.PL ==> meta files link to repository
+
+0.06 - 2012-08-04T13:00:00+01:00
+
+  [BUG FIX]
+
+  - Change the obvious error in MinWriter.pm:
+    previously: if ($intro =~ m{\A xml}xmsi and $intro !~ m{/\A xml-stylesheet \z/}xmsi) {
+    now       : if ($intro =~ m{\A xml}xmsi and $intro !~ m{\A xml-stylesheet \z}xmsi) {
+
+0.05 - 2011-12-04T12:00:00+01:00
+
+  [DOCUMENTATION]
+
+  - re-write license text
+
+0.04 - 2011-12-02T12:00:00+01:00
+
+  [REFACTORING]
+
+  - Completeley re-think the purpose and design of XML::MinWriter -->
+    XML::MinWriter inherits from XML::Writer and adds one single method
+    write_pyx.
+
+0.03 - 2011-11-20T12:00:00+01:00
+
+  [ENHANCEMENTS]
+
+  - Adapt the output of NEWLINES => 1 to match XML::Writer
+
+0.02 - 2011-11-19T12:00:00+01:00
+
+  [ENHANCEMENTS]
+
+  - Make XML::MinWriter do the same thing as XML::Writer, that is
+    writing character data on a single line together with the opening
+    and closing tags
+
+0.01 - 2010-10-16T12:00:00+01:00
+
+  [ENHANCEMENTS]
+
+  - First version, released on an unsuspecting world.
+

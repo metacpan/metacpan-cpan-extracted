@@ -1,0 +1,33 @@
+--- #YAML:1.0
+name:               XML-CuteQueries
+version:            0.6614
+abstract:           ~
+author:  []
+license:            LGPL
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Class::Accessor:  0
+    Data::Dumper:     0
+    parent:           0
+    perl:             5.006
+    XML::Twig:        0
+resources:
+    repository:  http://github.com/jettero/xml--cutequeries
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4
+keywords:
+    - xml
+    - twig
+    - cute
+    - simple
+    - easy

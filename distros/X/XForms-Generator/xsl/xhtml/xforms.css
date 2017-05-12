@@ -1,0 +1,46 @@
+/* $Id: xforms.css,v 1.6 2002/10/13 23:14:38 rick Exp $ */
+/* Copyright (c) 2002, cyberCode consulting, inc. All Rights Reserved. */
+form {
+	display:table;
+}
+div.input {
+	display:table-row;
+}
+span.caption {
+	display: table-cell;
+	text-align:right;
+	padding-right: .25em;
+	vertical-align: middle;
+}
+div.required {
+	color: red;
+}
+div.hidden {
+	display: none;
+}
+div.invalid input {
+	color: red;
+}
+span.input,span.output {
+	display: table-cell;
+}
+span.output {
+	/* match default input field text (sort-of)*/
+	font-family: sans-serif;
+}
+div.group {
+	border: thin dotted;
+	display: table-cell;
+}
+div.repeat {
+	border-bottom: thin dotted;
+	padding: .25em;
+}
+button {
+	vertical-align: bottom;
+	display: inline;
+}
+textarea {
+	height: 5em;
+	width: 20em;
+}

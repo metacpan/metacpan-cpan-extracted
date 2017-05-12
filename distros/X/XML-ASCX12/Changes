@@ -1,0 +1,15 @@
+Revision history for Perl extension XML::ASCX12.
+$Id: Changes,v 1.4 2004/09/28 14:59:34 brian.kaney Exp $
+
+0.03  Tue Sep 28 10:54:32 EDT 2004
+    - Properly initialized a variable in the _proc_element() method
+    - POD spelling correction
+
+0.02  Mon Sep 20 15:08:44 EDT 2004 
+    - Fixed a problem with _CANHAVE()
+    - Suppressed an error warning in _execclose()
+
+0.01  Wed Aug 25 16:46:42 2004
+    - original version; created by h2xs 1.23 with options
+        -AX -n XML::ASCX12
+

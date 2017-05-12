@@ -1,0 +1,49 @@
+    <ch byte='xbe' uni='x2010'/>
+    <ch byte='xbf' uni='xff0f'/>
+    <ch byte='xc0' uni='x005c'/>
+    <ch byte='xc1' uni='x301c'/>
+    <ch byte='xc2' uni='x2016'/>
+    <ch byte='xc3' uni='xff5c'/>
+    <ch byte='xc4' uni='x2026'/>
+    <ch byte='xc5' uni='x2025'/>
+    <range byte='xc6' len='2' uni='x2018'/>
+    <range byte='xc8' len='2' uni='x201c'/>
+    <range byte='xca' len='2' uni='xff08'/>
+    <range byte='xcc' len='2' uni='x3014'/>
+    <ch byte='xce' uni='xff3b'/>
+    <ch byte='xcf' uni='xff3d'/>
+    <ch byte='xd0' uni='xff5b'/>
+    <ch byte='xd1' uni='xff5d'/>
+    <range byte='xd2' len='10' uni='x3008'/>
+    <ch byte='xdc' uni='xff0b'/>
+    <ch byte='xdd' uni='x2212'/>
+    <ch byte='xde' uni='x00b1'/>
+    <ch byte='xdf' uni='x00d7'/>
+    <ch byte='xe0' uni='x00f7'/>
+    <ch byte='xe1' uni='xff1d'/>
+    <ch byte='xe2' uni='x2260'/>
+    <ch byte='xe3' uni='xff1c'/>
+    <ch byte='xe4' uni='xff1e'/>
+    <range byte='xe5' len='2' uni='x2266'/>
+    <ch byte='xe7' uni='x221e'/>
+    <ch byte='xe8' uni='x2234'/>
+    <ch byte='xe9' uni='x2642'/>
+    <ch byte='xea' uni='x2640'/>
+    <ch byte='xeb' uni='x00b0'/>
+    <range byte='xec' len='2' uni='x2032'/>
+    <ch byte='xee' uni='x2103'/>
+    <ch byte='xef' uni='xffe5'/>
+    <ch byte='xf0' uni='xff04'/>
+    <range byte='xf1' len='2' uni='x00a2'/>
+    <ch byte='xf3' uni='xff05'/>
+    <ch byte='xf4' uni='xff03'/>
+    <ch byte='xf5' uni='xff06'/>
+    <ch byte='xf6' uni='xff0a'/>
+    <ch byte='xf7' uni='xff20'/>
+    <ch byte='xf8' uni='x00a7'/>
+    <ch byte='xf9' uni='x2606'/>
+    <ch byte='xfa' uni='x2605'/>
+    <ch byte='xfb' uni='x25cb'/>
+    <ch byte='xfc' uni='x25cf'/>
+    <ch byte='xfd' uni='x25ce'/>
+    <ch byte='xfe' uni='x25c7'/>

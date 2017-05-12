@@ -1,0 +1,23 @@
+---
+abstract: 'A smart, easy and powerful way to access or create XML from fiels, data and URLs.'
+author:
+  - 'Graciliano M. P. <gm AT virtuasites.com.br>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.112621'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: XML-Smart
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Object::MultiType: 0.03
+  perl: 5.006
+version: 1.78

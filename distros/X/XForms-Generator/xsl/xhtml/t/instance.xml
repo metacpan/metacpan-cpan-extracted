@@ -1,0 +1,59 @@
+<?xml version="1.0"?>
+<xforms:instance xmlns:xforms="http://www.w3.org/2002/01/xforms">
+  <text>
+	<text-input>mytext</text-input>
+	<secret>mypass</secret>
+  </text>
+  <textarea>1 mutltiline text data
+2 in the textarea</textarea>
+  <output>this is the output</output>
+  <file>testfile</file>
+  <selectOne>2</selectOne>
+  <selectMany>2 3</selectMany>
+  <selectOne-2>2</selectOne-2>
+  <selectMany-2>2 3</selectMany-2>
+  <selectOne-3>2</selectOne-3>
+  <selectMany-3>2 3</selectMany-3>
+  <itemset-value>v2</itemset-value>
+  <itemset-value-1>v2</itemset-value-1>
+  <itemset-value-2>v2</itemset-value-2>
+  <itemset>
+	<item value="v1" caption="value 1"/>
+	<item value="v2" caption="value 2"/>
+	<item value="v3" caption="value 3"/>
+  </itemset>
+  <repeat>
+	<item value="one">
+	  <itemset-value>v1</itemset-value>
+	  <selectMany>1</selectMany>
+	  <selectOne>1</selectOne>
+	</item>
+	<item value="two">
+	  <itemset-value>v2</itemset-value>
+	  <selectMany>1 2</selectMany>
+	  <selectOne>2</selectOne>
+	</item>
+	<item value="three">
+	  <itemset-value>v3</itemset-value>
+	  <selectMany>1 2 3</selectMany>
+	  <selectOne>3</selectOne>
+	</item>
+  </repeat>
+  <bound-repeat>
+	<item value="one">
+	  <itemset-value>v1</itemset-value>
+	  <selectMany>1</selectMany>
+	  <selectOne>1</selectOne>
+	</item>
+	<item value="two">
+	  <itemset-value>v2</itemset-value>
+	  <selectMany>1 2</selectMany>
+	  <selectOne>2</selectOne>
+	</item>
+	<item value="three">
+	  <itemset-value>v3</itemset-value>
+	  <selectMany>1 2 3</selectMany>
+	  <selectOne>3</selectOne>
+	</item>
+  </bound-repeat>
+</xforms:instance>

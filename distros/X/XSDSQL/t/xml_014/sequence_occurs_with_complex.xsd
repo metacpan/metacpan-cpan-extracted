@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+	<xs:element name="sequence_test">
+		<xs:complexType>
+			<xs:sequence maxOccurs="18">
+				<xs:element name="c">
+					<xs:complexType>
+						<xs:sequence>
+              				<xs:element name="el0" type="xs:string"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>
+

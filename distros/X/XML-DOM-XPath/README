@@ -1,0 +1,36 @@
+XML/DOM/XPath
+==========================
+
+# $Id: README,v 1.1.1.1 2003/12/04 20:40:43 mrodrigu Exp $
+
+XML::DOM::XPath is a helper module for XML::DOM that adds XPath support to it.
+It uses XML::XPath to resolve the XPath queries
+
+In truth this should only be used if you have existing code using XML::DOM. 
+If you start a new project and if you can install XML::LibXML (and libxml2 
+on which it is based) then you will get a DOM, XPAth support and a lot more
+power and speed.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  XML::DOM
+  XML::XPath
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 Michel Rodriguez
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

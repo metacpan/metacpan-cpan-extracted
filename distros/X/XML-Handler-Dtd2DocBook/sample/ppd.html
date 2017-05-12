@@ -1,0 +1,327 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>Perl Package Distribution </title><meta name="generator" content="DocBook XSL Stylesheets V1.62.4" /></head><body><div class="book" lang="en" xml:lang="en"><div class="titlepage"><div><div><h1 class="title"><a id="ppd"></a>Perl Package Distribution </h1></div><div><p class="pubdate">Wed Nov 12 11:52:45 2003</p></div></div><div></div><hr /></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="reference"><a href="#index.prolog">I. Prolog</a></span></dt><dd><dl><dt><a href="#prolog">SOFTPKG</a> - </dt></dl></dd><dt><span class="reference"><a href="#index.element">II. Elements</a></span></dt><dd><dl><dt><a href="#elt.ABSTRACT">ABSTRACT</a> - </dt><dt><a href="#elt.AUTHOR">AUTHOR</a> - </dt><dt><a href="#elt.CODEBASE">CODEBASE</a> - </dt><dt><a href="#elt.DEPENDENCY">DEPENDENCY</a> - </dt><dt><a href="#elt.IMPLEMENTATION">IMPLEMENTATION</a> - describe a particular implementation of the Perl Package </dt><dt><a href="#elt.INSTALL">INSTALL</a> - provide either a reference to an installation script </dt><dt><a href="#elt.LANGUAGE">LANGUAGE</a> - </dt><dt><a href="#elt.LICENSE">LICENSE</a> - </dt><dt><a href="#elt.OS">OS</a> - the operating system required for this implementation </dt><dt><a href="#elt.OSVERSION">OSVERSION</a> - the required version of the operating system </dt><dt><a href="#elt.PERLCORE">PERLCORE</a> - the minimum version of the Perl core distribution </dt><dt><a href="#elt.PROCESSOR">PROCESSOR</a> - </dt><dt><a href="#elt.SOFTPKG">SOFTPKG</a> - root element of a description of a software package </dt><dt><a href="#elt.TITLE">TITLE</a> - state the title of the Perl Package </dt><dt><a href="#elt.UNINSTALL">UNINSTALL</a> - provide either a reference to an uninstallation script </dt></dl></dd><dt><span class="reference"><a href="#index.example">III. Examples</a></span></dt><dd><dl><dt><a href="#ex.sample.ppd">Example sample.ppd</a> - </dt></dl></dd></dl></div><div class="reference" lang="en" xml:lang="en"><a id="index.prolog"></a><div class="titlepage"><div><div><h1 class="title"><a id="index.prolog"></a>Prolog</h1></div></div><div></div><hr /></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><a href="#prolog">SOFTPKG</a> - </dt></dl></div><div class="refentry" lang="en" xml:lang="en"><a id="prolog"></a><div class="titlepage"><div></div><div></div></div><div class="refnamediv"><h2>Name</h2><p>SOFTPKG —  — </p></div><div class="refsynopsisdiv"><h2>Synopsis</h2><div class="informaltable"><table border="1"><colgroup><col /><col /><col /></colgroup><tbody><tr><td align="left"><span class="emphasis"><em>Name</em></span></td><td align="left"><span class="emphasis"><em>System</em></span></td><td class="auto-generated"> </td></tr><tr><td align="left">SOFTPKG</td><td align="left">ppd.dtd</td><td class="auto-generated"> </td></tr></tbody></table></div></div><div class="refsect1" lang="en" xml:lang="en"><a id="id335716"></a><h2>Description</h2><p> 
+  The DTD for PPD documents is available from the ActiveState website and 
+  the latest version can be found at http://www.ActiveState.com/PPM/DTD/ppd.dtd
+ 
+</p></div></div></div><div class="reference" lang="en" xml:lang="en"><a id="index.element"></a><div class="titlepage"><div><div><h1 class="title"><a id="index.element"></a>Elements</h1></div></div><div></div><hr /></div><div class="partintro" lang="en" xml:lang="en"><div><div><div><h1 class="title"><a id="id346049"></a>Element tree</h1></div></div><div></div></div><div class="itemizedlist"><ul type="disc" compact="compact"><li><p><a href="#elt.SOFTPKG" title="SOFTPKG"><tt class="sgmltag-element">SOFTPKG</tt></a></p><div class="itemizedlist"><ul type="circle" compact="compact"><li><p><a href="#elt.IMPLEMENTATION" title="IMPLEMENTATION"><tt class="sgmltag-element">IMPLEMENTATION</tt></a></p><div class="itemizedlist"><ul type="disc" compact="compact"><li><p><a href="#elt.INSTALL" title="INSTALL"><tt class="sgmltag-element">INSTALL</tt></a></p></li><li><p><a href="#elt.CODEBASE" title="CODEBASE"><tt class="sgmltag-element">CODEBASE</tt></a></p></li><li><p><a href="#elt.OSVERSION" title="OSVERSION"><tt class="sgmltag-element">OSVERSION</tt></a></p></li><li><p><a href="#elt.LANGUAGE" title="LANGUAGE"><tt class="sgmltag-element">LANGUAGE</tt></a></p></li><li><p><a href="#elt.UNINSTALL" title="UNINSTALL"><tt class="sgmltag-element">UNINSTALL</tt></a></p></li><li><p><a href="#elt.DEPENDENCY" title="DEPENDENCY"><tt class="sgmltag-element">DEPENDENCY</tt></a></p></li><li><p><a href="#elt.OS" title="OS"><tt class="sgmltag-element">OS</tt></a></p></li><li><p><a href="#elt.PROCESSOR" title="PROCESSOR"><tt class="sgmltag-element">PROCESSOR</tt></a></p></li><li><p><a href="#elt.PERLCORE" title="PERLCORE"><tt class="sgmltag-element">PERLCORE</tt></a></p></li></ul></div></li><li><p><a href="#elt.LICENSE" title="LICENSE"><tt class="sgmltag-element">LICENSE</tt></a></p></li><li><p><a href="#elt.ABSTRACT" title="ABSTRACT"><tt class="sgmltag-element">ABSTRACT</tt></a></p></li><li><p><a href="#elt.TITLE" title="TITLE"><tt class="sgmltag-element">TITLE</tt></a></p></li><li><p><a href="#elt.AUTHOR" title="AUTHOR"><tt class="sgmltag-element">AUTHOR</tt></a></p></li></ul></div></li></ul></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><a href="#elt.ABSTRACT">ABSTRACT</a> - </dt><dt><a href="#elt.AUTHOR">AUTHOR</a> - </dt><dt><a href="#elt.CODEBASE">CODEBASE</a> - </dt><dt><a href="#elt.DEPENDENCY">DEPENDENCY</a> - </dt><dt><a href="#elt.IMPLEMENTATION">IMPLEMENTATION</a> - describe a particular implementation of the Perl Package </dt><dt><a href="#elt.INSTALL">INSTALL</a> - provide either a reference to an installation script </dt><dt><a href="#elt.LANGUAGE">LANGUAGE</a> - </dt><dt><a href="#elt.LICENSE">LICENSE</a> - </dt><dt><a href="#elt.OS">OS</a> - the operating system required for this implementation </dt><dt><a href="#elt.OSVERSION">OSVERSION</a> - the required version of the operating system </dt><dt><a href="#elt.PERLCORE">PERLCORE</a> - the minimum version of the Perl core distribution </dt><dt><a href="#elt.PROCESSOR">PROCESSOR</a> - </dt><dt><a href="#elt.SOFTPKG">SOFTPKG</a> - root element of a description of a software package </dt><dt><a href="#elt.TITLE">TITLE</a> - state the title of the Perl Package </dt><dt><a href="#elt.UNINSTALL">UNINSTALL</a> - provide either a reference to an uninstallation script </dt></dl></div></div><div class="refentry" lang="en" xml:lang="en"><a id="elt.ABSTRACT"></a><div class="titlepage"><div></div><div></div></div><div class="refnamediv"><h2>Name</h2><p>ABSTRACT —  — </p></div><div class="refsynopsisdiv"><h2>Synopsis</h2><div class="informaltable"><table border="1"><colgroup><col /><col /><col /></colgroup><tbody><tr><td colspan="3" align="left"><span class="emphasis"><em>
+
+                Mixed Content Model
+
+              </em></span></td></tr><tr><td colspan="3" align="left"><pre class="synopsis">ABSTRACT ::=
+( #PCDATA )</pre></td></tr><tr><td colspan="3" align="left"><span class="emphasis"><em>Attributes</em></span></td></tr><tr><td colspan="3" align="left"><span class="emphasis"><em>None</em></span></td></tr></tbody></table></div></div><div class="refsect1" lang="en" xml:lang="en"><a id="id346770"></a><h2>Description</h2><p> Used to provide a short description outlining the nature and purpose of
+  the Perl Package. Only one instance should be present. 
+</p></div><div class="refsect1" lang="en" xml:lang="en"><a id="id346819"></a><h2>Parents</h2><p>These elements contain ABSTRACT:
+      <span class="simplelist"><a href="#elt.SOFTPKG" title="SOFTPKG"><tt class="sgmltag-element">SOFTPKG</tt></a></span>.
+    </p></div></div><div class="refentry" lang="en" xml:lang="en"><div class="refentry.separator"><hr /></div><a id="elt.AUTHOR"></a><div class="titlepage"><div></div><div></div></div><div class="refnamediv"><h2>Name</h2><p>AUTHOR —  — </p></div><div class="refsynopsisdiv"><h2>Synopsis</h2><div class="informaltable"><table border="1"><colgroup><col /><col /><col /></colgroup><tbody><tr><td colspan="3" align="left"><span class="emphasis"><em>
+
+                Mixed Content Model
+
+              </em></span></td></tr><tr><td colspan="3" align="left"><pre class="synopsis">AUTHOR ::=
+( #PCDATA )</pre></td></tr><tr><td colspan="3" align="left"><span class="emphasis"><em>Attributes</em></span></td></tr><tr><td colspan="3" align="left"><span class="emphasis"><em>None</em></span></td></tr></tbody></table></div></div><div class="refsect1" lang="en" xml:lang="en"><a id="id347665"></a><h2>Description</h2><p> Used to provide information about the author(s) of the Perl Package.
+  Multiple instances are valid. 
+</p></div><div class="refsect1" lang="en" xml:lang="en"><a id="id347674"></a><h2>Parents</h2><p>These elements contain AUTHOR:
+      <span class="simplelist"><a href="#elt.SOFTPKG" title="SOFTPKG"><tt class="sgmltag-element">SOFTPKG</tt></a></span>.
+    </p></div></div><div class="refentry" lang="en" xml:lang="en"><div class="refentry.separator"><hr /></div><a id="elt.CODEBASE"></a><div class="titlepage"><div></div><div></div></div><div class="refnamediv"><h2>Name</h2><p>CODEBASE —  — </p></div><div class="refsynopsisdiv"><h2>Synopsis</h2><div class="informaltable"><table border="1"><colgroup><col /><col /><col /></colgroup><tbody><tr><td colspan="3" align="left"><span class="emphasis"><em>
+
+  
+                Content Model
+  
+
+              </em></span></td></tr><tr><td colspan="3" align="left"><pre class="synopsis">CODEBASE ::=
+EMPTY</pre></td></tr><tr><td colspan="3" align="left"><span class="emphasis"><em>Attributes</em></span></td></tr><tr><td align="left"><p><span class="emphasis"><em>Name</em></span></p></td><td align="left"><p><span class="emphasis"><em>Type</em></span></p></td><td align="left"><p><span class="emphasis"><em>Default</em></span></p></td></tr><tr><td align="left" valign="top">FILENAME</td><td align="left" valign="top">
+
+  
+              CDATA
+  
+
+            </td><td align="left" valign="top">#IMPLIED</td></tr><tr><td align="left" valign="top">HREF</td><td align="left" valign="top">
+
+  
+              CDATA
+  
+
+            </td><td align="left" valign="top">#REQUIRED</td></tr></tbody></table></div></div><div class="refsect1" lang="en" xml:lang="en"><a id="id348287"></a><h2>Description</h2><p> Indicating a location where an archive of the Perl Package can be retrieved.
+  Multiple instances are valid, and can be used to indicate multiple possible
+  locations where the same version of the Perl Package can be retrieved. 
+</p><div class="refsect2" lang="en" xml:lang="en"><a id="id348651"></a><h3>FILENAME</h3><p> ??? 
+</p></div><div class="refsect2" lang="en" xml:lang="en"><a id="id348635"></a><h3>HREF</h3><p> A reference to the location of the Perl Package distribution. 
+</p></div></div><div class="refsect1" lang="en" xml:lang="en"><a id="id348633"></a><h2>Parents</h2><p>These elements contain CODEBASE:
+      <span class="simplelist"><a href="#elt.IMPLEMENTATION" title="IMPLEMENTATION"><tt class="sgmltag-element">IMPLEMENTATION</tt></a></span>.
+    </p></div></div><div class="refentry" lang="en" xml:lang="en"><div class="refentry.separator"><hr /></div><a id="elt.DEPENDENCY"></a><div class="titlepage"><div></div><div></div></div><div class="refnamediv"><h2>Name</h2><p>DEPENDENCY —  — </p></div><div class="refsynopsisdiv"><h2>Synopsis</h2><div class="informaltable"><table border="1"><colgroup><col /><col /><col /></colgroup><tbody><tr><td colspan="3" align="left"><span class="emphasis"><em>
+
+  
+                Content Model
+  
+
+              </em></span></td></tr><tr><td colspan="3" align="left"><pre class="synopsis">DEPENDENCY ::=
+EMPTY</pre></td></tr><tr><td colspan="3" align="left"><span class="emphasis"><em>Attributes</em></span></td></tr><tr><td align="left"><p><span class="emphasis"><em>Name</em></span></p></td><td align="left"><p><span class="emphasis"><em>Type</em></span></p></td><td align="left"><p><span class="emphasis"><em>Default</em></span></p></td></tr><tr><td align="left" valign="top">VERSION</td><td align="left" valign="top">
+
+  
+              CDATA
+  
+
+            </td><td align="left" valign="top">#IMPLIED</td></tr><tr><td align="left" valign="top">NAME</td><td align="left" valign="top">
+
+  
+              CDATA
+  
+
+            </td><td align="left" valign="top">#REQUIRED</td></tr></tbody></table></div></div><div class="refsect1" lang="en" xml:lang="en"><a id="id349106"></a><h2>Description</h2><p> Used to indicate a dependency this Perl Package has on another Perl Package.
+  Multiple instances are valid. 
+</p><div class="refsect2" lang="en" xml:lang="en"><a id="id349535"></a><h3>VERSION</h3><p> Version number of the dependency, in comma-delimited format (e.g. ``1,0,0,0''). 
+</p></div><div class="refsect2" lang="en" xml:lang="en"><a id="id349501"></a><h3>NAME</h3><p> Name of the package that this implementation is dependant upon. 
+</p></div></div><div class="refsect1" lang="en" xml:lang="en"><a id="id349500"></a><h2>Parents</h2><p>These elements contain DEPENDENCY:
+      <span class="simplelist"><a href="#elt.IMPLEMENTATION" title="IMPLEMENTATION"><tt class="sgmltag-element">IMPLEMENTATION</tt></a></span>.
+    </p></div></div><div class="refentry" lang="en" xml:lang="en"><div class="refentry.separator"><hr /></div><a id="elt.IMPLEMENTATION"></a><div class="titlepage"><div></div><div></div></div><div class="refnamediv"><h2>Name</h2><p>IMPLEMENTATION —  — describe a particular implementation of the Perl Package </p></div><div class="refsynopsisdiv"><h2>Synopsis</h2><div class="informaltable"><table border="1"><colgroup><col /><col /><col /></colgroup><tbody><tr><td colspan="3" align="left"><span class="emphasis"><em>
+
+  
+                Element Content Model
+  
+
+              </em></span></td></tr><tr><td colspan="3" align="left"><pre class="synopsis">IMPLEMENTATION ::=
+( <a href="#elt.CODEBASE" title="CODEBASE"><tt class="sgmltag-element">CODEBASE</tt></a> | <a href="#elt.DEPENDENCY" title="DEPENDENCY"><tt class="sgmltag-element">DEPENDENCY</tt></a> | <a href="#elt.LANGUAGE" title="LANGUAGE"><tt class="sgmltag-element">LANGUAGE</tt></a> | <a href="#elt.OS" title="OS"><tt class="sgmltag-element">OS</tt></a> | <a href="#elt.OSVERSION" title="OSVERSION"><tt class="sgmltag-element">OSVERSION</tt></a> | <a href="#elt.PERLCORE" title="PERLCORE"><tt class="sgmltag-element">PERLCORE</tt></a> | 
+  <a href="#elt.PROCESSOR" title="PROCESSOR"><tt class="sgmltag-element">PROCESSOR</tt></a> | <a href="#elt.INSTALL" title="INSTALL"><tt class="sgmltag-element">INSTALL</tt></a> | <a href="#elt.UNINSTALL" title="UNINSTALL"><tt class="sgmltag-element">UNINSTALL</tt></a> )*</pre></td></tr><tr><td colspan="3" align="left"><span class="emphasis"><em>Attributes</em></span></td></tr><tr><td colspan="3" align="left"><span class="emphasis"><em>None</em></span></td></tr></tbody></table></div></div><div class="refsect1" lang="en" xml:lang="en"><a id="id349424"></a><h2>Description</h2><p> Used to describe a particular implementation of the Perl Package. Multiple
+  instances are valid, and should be used to describe different implementations/ports
+  for different operating systems or architectures. 
+</p></div><div class="refsect1" lang="en" xml:lang="en"><a id="id349491"></a><h2>Parents</h2><p>These elements contain IMPLEMENTATION:
+      <span class="simplelist"><a href="#elt.SOFTPKG" title="SOFTPKG"><tt class="sgmltag-element">SOFTPKG</tt></a></span>.
+    </p></div><div class="refsect1" lang="en" xml:lang="en"><a id="id349458"></a><h2>Children</h2><p>The following elements occur in IMPLEMENTATION:
+      <span class="simplelist"><a href="#elt.CODEBASE" title="CODEBASE"><tt class="sgmltag-element">CODEBASE</tt></a>, <a href="#elt.DEPENDENCY" title="DEPENDENCY"><tt class="sgmltag-element">DEPENDENCY</tt></a>, <a href="#elt.INSTALL" title="INSTALL"><tt class="sgmltag-element">INSTALL</tt></a>, <a href="#elt.LANGUAGE" title="LANGUAGE"><tt class="sgmltag-element">LANGUAGE</tt></a>, <a href="#elt.OS" title="OS"><tt class="sgmltag-element">OS</tt></a>, <a href="#elt.OSVERSION" title="OSVERSION"><tt class="sgmltag-element">OSVERSION</tt></a>, <a href="#elt.PERLCORE" title="PERLCORE"><tt class="sgmltag-element">PERLCORE</tt></a>, <a href="#elt.PROCESSOR" title="PROCESSOR"><tt class="sgmltag-element">PROCESSOR</tt></a>, <a href="#elt.UNINSTALL" title="UNINSTALL"><tt class="sgmltag-element">UNINSTALL</tt></a></span>.
+    </p></div></div><div class="refentry" lang="en" xml:lang="en"><div class="refentry.separator"><hr /></div><a id="elt.INSTALL"></a><div class="titlepage"><div></div><div></div></div><div class="refnamediv"><h2>Name</h2><p>INSTALL —  — provide either a reference to an installation script </p></div><div class="refsynopsisdiv"><h2>Synopsis</h2><div class="informaltable"><table border="1"><colgroup><col /><col /><col /></colgroup><tbody><tr><td colspan="3" align="left"><span class="emphasis"><em>
+
+                Mixed Content Model
+
+              </em></span></td></tr><tr><td colspan="3" align="left"><pre class="synopsis">INSTALL ::=
+( #PCDATA )</pre></td></tr><tr><td colspan="3" align="left"><span class="emphasis"><em>Attributes</em></span></td></tr><tr><td align="left"><p><span class="emphasis"><em>Name</em></span></p></td><td align="left"><p><span class="emphasis"><em>Type</em></span></p></td><td align="left"><p><span class="emphasis"><em>Default</em></span></p></td></tr><tr><td align="left" valign="top">HREF</td><td align="left" valign="top">
+
+  
+              CDATA
+  
+
+            </td><td align="left" valign="top">#IMPLIED</td></tr><tr><td align="left" valign="top">EXEC</td><td align="left" valign="top">
+
+  
+              CDATA
+  
+
+            </td><td align="left" valign="top">#IMPLIED</td></tr></tbody></table></div></div><div class="refsect1" lang="en" xml:lang="en"><a id="id351062"></a><h2>Description</h2><p> Used to provide either a reference to an installation script or a series
+  of commands which can be used to install the Perl Package once it has been
+  retrieved. If the EXEC attribute is not specified, the value is assumed to be
+  one or more commands, separated by `;;'. Each such command will be executed
+  by the Perl `system()'function. Only one instance should be present. 
+</p><div class="refsect2" lang="en" xml:lang="en"><a id="id351656"></a><h3>HREF</h3><p> Reference to an external script which should be retrieved and run as part of
+  the installation process. Both filenames and URLs should be considered valid. 
+</p></div><div class="refsect2" lang="en" xml:lang="en"><a id="id351628"></a><h3>EXEC</h3><p> Name of interpreter/shell used to execute the installation script. If the
+  value of EXEC is `PPM_PERL', the copy of Perl that is executing PPM itself ($^X)
+  is used to execute the install script. 
+</p></div></div><div class="refsect1" lang="en" xml:lang="en"><a id="id351626"></a><h2>Parents</h2><p>These elements contain INSTALL:
+      <span class="simplelist"><a href="#elt.IMPLEMENTATION" title="IMPLEMENTATION"><tt class="sgmltag-element">IMPLEMENTATION</tt></a></span>.
+    </p></div></div><div class="refentry" lang="en" xml:lang="en"><div class="refentry.separator"><hr /></div><a id="elt.LANGUAGE"></a><div class="titlepage"><div></div><div></div></div><div class="refnamediv"><h2>Name</h2><p>LANGUAGE —  — </p></div><div class="refsynopsisdiv"><h2>Synopsis</h2><div class="informaltable"><table border="1"><colgroup><col /><col /><col /></colgroup><tbody><tr><td colspan="3" align="left"><span class="emphasis"><em>
+
+  
+                Content Model
+  
+
+              </em></span></td></tr><tr><td colspan="3" align="left"><pre class="synopsis">LANGUAGE ::=
+EMPTY</pre></td></tr><tr><td colspan="3" align="left"><span class="emphasis"><em>Attributes</em></span></td></tr><tr><td align="left"><p><span class="emphasis"><em>Name</em></span></p></td><td align="left"><p><span class="emphasis"><em>Type</em></span></p></td><td align="left"><p><span class="emphasis"><em>Default</em></span></p></td></tr><tr><td align="left" valign="top">VALUE</td><td align="left" valign="top">
+
+  
+              CDATA
+  
+
+            </td><td align="left" valign="top">#REQUIRED</td></tr></tbody></table></div></div><div class="refsect1" lang="en" xml:lang="en"><a id="id351360"></a><h2>Description</h2><p> Used to specify the language used within the given implementation of the
+  Perl Package. Only one instance should be present. 
+</p><div class="refsect2" lang="en" xml:lang="en"><a id="id351590"></a><h3>VALUE</h3></div></div><div class="refsect1" lang="en" xml:lang="en"><a id="id351588"></a><h2>Parents</h2><p>These elements contain LANGUAGE:
+      <span class="simplelist"><a href="#elt.IMPLEMENTATION" title="IMPLEMENTATION"><tt class="sgmltag-element">IMPLEMENTATION</tt></a></span>.
+    </p></div></div><div class="refentry" lang="en" xml:lang="en"><div class="refentry.separator"><hr /></div><a id="elt.LICENSE"></a><div class="titlepage"><div></div><div></div></div><div class="refnamediv"><h2>Name</h2><p>LICENSE —  — </p></div><div class="refsynopsisdiv"><h2>Synopsis</h2><div class="informaltable"><table border="1"><colgroup><col /><col /><col /></colgroup><tbody><tr><td colspan="3" align="left"><span class="emphasis"><em>
+
+  
+                Content Model
+  
+
+              </em></span></td></tr><tr><td colspan="3" align="left"><pre class="synopsis">LICENSE ::=
+EMPTY</pre></td></tr><tr><td colspan="3" align="left"><span class="emphasis"><em>Attributes</em></span></td></tr><tr><td align="left"><p><span class="emphasis"><em>Name</em></span></p></td><td align="left"><p><span class="emphasis"><em>Type</em></span></p></td><td align="left"><p><span class="emphasis"><em>Default</em></span></p></td></tr><tr><td align="left" valign="top">HREF</td><td align="left" valign="top">
+
+  
+              CDATA
+  
+
+            </td><td align="left" valign="top">#REQUIRED</td></tr></tbody></table></div></div><div class="refsect1" lang="en" xml:lang="en"><a id="id352973"></a><h2>Description</h2><p> Indicating the location of the appropriate license agreement or copyright
+  notice for the Perl Package. Only one instance should be present. 
+</p><div class="refsect2" lang="en" xml:lang="en"><a id="id353406"></a><h3>HREF</h3><p> Required attribute. A reference to the location of the license agreement
+  or copyright notice for this package. 
+</p></div></div><div class="refsect1" lang="en" xml:lang="en"><a id="id353403"></a><h2>Parents</h2><p>These elements contain LICENSE:
+      <span class="simplelist"><a href="#elt.SOFTPKG" title="SOFTPKG"><tt class="sgmltag-element">SOFTPKG</tt></a></span>.
+    </p></div></div><div class="refentry" lang="en" xml:lang="en"><div class="refentry.separator"><hr /></div><a id="elt.OS"></a><div class="titlepage"><div></div><div></div></div><div class="refnamediv"><h2>Name</h2><p>OS —  — the operating system required for this implementation </p></div><div class="refsynopsisdiv"><h2>Synopsis</h2><div class="informaltable"><table border="1"><colgroup><col /><col /><col /></colgroup><tbody><tr><td colspan="3" align="left"><span class="emphasis"><em>
+
+  
+                Content Model
+  
+
+              </em></span></td></tr><tr><td colspan="3" align="left"><pre class="synopsis">OS ::=
+EMPTY</pre></td></tr><tr><td colspan="3" align="left"><span class="emphasis"><em>Attributes</em></span></td></tr><tr><td align="left"><p><span class="emphasis"><em>Name</em></span></p></td><td align="left"><p><span class="emphasis"><em>Type</em></span></p></td><td align="left"><p><span class="emphasis"><em>Default</em></span></p></td></tr><tr><td align="left" valign="top">VALUE</td><td align="left" valign="top">
+
+  
+              CDATA
+  
+
+            </td><td align="left" valign="top">#REQUIRED</td></tr></tbody></table></div></div><div class="refsect1" lang="en" xml:lang="en"><a id="id353816"></a><h2>Description</h2><p> Used to outline the operating system required for this implementation of
+  the Perl Package. Multiple instances are valid. Valid values can be taken
+  from the OSD Specification and it's OS element. 
+</p><div class="refsect2" lang="en" xml:lang="en"><a id="id354251"></a><h3>VALUE</h3><p> The name of the operating system required for this implementation of the
+  Perl Package. This value should be obtained from Config.pm as 'osname'. 
+</p></div></div><div class="refsect1" lang="en" xml:lang="en"><a id="id354248"></a><h2>Parents</h2><p>These elements contain OS:
+      <span class="simplelist"><a href="#elt.IMPLEMENTATION" title="IMPLEMENTATION"><tt class="sgmltag-element">IMPLEMENTATION</tt></a></span>.
+    </p></div></div><div class="refentry" lang="en" xml:lang="en"><div class="refentry.separator"><hr /></div><a id="elt.OSVERSION"></a><div class="titlepage"><div></div><div></div></div><div class="refnamediv"><h2>Name</h2><p>OSVERSION —  — the required version of the operating system </p></div><div class="refsynopsisdiv"><h2>Synopsis</h2><div class="informaltable"><table border="1"><colgroup><col /><col /><col /></colgroup><tbody><tr><td colspan="3" align="left"><span class="emphasis"><em>
+
+  
+                Content Model
+  
+
+              </em></span></td></tr><tr><td colspan="3" align="left"><pre class="synopsis">OSVERSION ::=
+EMPTY</pre></td></tr><tr><td colspan="3" align="left"><span class="emphasis"><em>Attributes</em></span></td></tr><tr><td align="left"><p><span class="emphasis"><em>Name</em></span></p></td><td align="left"><p><span class="emphasis"><em>Type</em></span></p></td><td align="left"><p><span class="emphasis"><em>Default</em></span></p></td></tr><tr><td align="left" valign="top">VALUE</td><td align="left" valign="top">
+
+  
+              CDATA
+  
+
+            </td><td align="left" valign="top">#REQUIRED</td></tr></tbody></table></div></div><div class="refsect1" lang="en" xml:lang="en"><a id="id354670"></a><h2>Description</h2><p> Used to outline the required version of the operating system required for
+  this implementation of the Perl Package. Only one instance should be present. 
+</p><div class="refsect2" lang="en" xml:lang="en"><a id="id355102"></a><h3>VALUE</h3><p> The version of the operating system required for installation of this
+  implementation of the package, in a comma-delimited format (e.g. ``3,1,0,0''). 
+</p></div></div><div class="refsect1" lang="en" xml:lang="en"><a id="id355099"></a><h2>Parents</h2><p>These elements contain OSVERSION:
+      <span class="simplelist"><a href="#elt.IMPLEMENTATION" title="IMPLEMENTATION"><tt class="sgmltag-element">IMPLEMENTATION</tt></a></span>.
+    </p></div></div><div class="refentry" lang="en" xml:lang="en"><div class="refentry.separator"><hr /></div><a id="elt.PERLCORE"></a><div class="titlepage"><div></div><div></div></div><div class="refnamediv"><h2>Name</h2><p>PERLCORE —  — the minimum version of the Perl core distribution </p></div><div class="refsynopsisdiv"><h2>Synopsis</h2><div class="informaltable"><table border="1"><colgroup><col /><col /><col /></colgroup><tbody><tr><td colspan="3" align="left"><span class="emphasis"><em>
+
+  
+                Content Model
+  
+
+              </em></span></td></tr><tr><td colspan="3" align="left"><pre class="synopsis">PERLCORE ::=
+EMPTY</pre></td></tr><tr><td colspan="3" align="left"><span class="emphasis"><em>Attributes</em></span></td></tr><tr><td align="left"><p><span class="emphasis"><em>Name</em></span></p></td><td align="left"><p><span class="emphasis"><em>Type</em></span></p></td><td align="left"><p><span class="emphasis"><em>Default</em></span></p></td></tr><tr><td align="left" valign="top">VERSION</td><td align="left" valign="top">
+
+  
+              CDATA
+  
+
+            </td><td align="left" valign="top">#REQUIRED</td></tr></tbody></table></div></div><div class="refsect1" lang="en" xml:lang="en"><a id="id355519"></a><h2>Description</h2><p> Used to specify the minimum version of the Perl core distribution that
+  this Perl Package is to be used with. Only one instance should be present. 
+</p><div class="refsect2" lang="en" xml:lang="en"><a id="id355951"></a><h3>VERSION</h3><p> Version of the Perl core that is required for this implementation of the
+  Perl Package. 
+</p></div></div><div class="refsect1" lang="en" xml:lang="en"><a id="id355949"></a><h2>Parents</h2><p>These elements contain PERLCORE:
+      <span class="simplelist"><a href="#elt.IMPLEMENTATION" title="IMPLEMENTATION"><tt class="sgmltag-element">IMPLEMENTATION</tt></a></span>.
+    </p></div></div><div class="refentry" lang="en" xml:lang="en"><div class="refentry.separator"><hr /></div><a id="elt.PROCESSOR"></a><div class="titlepage"><div></div><div></div></div><div class="refnamediv"><h2>Name</h2><p>PROCESSOR —  — </p></div><div class="refsynopsisdiv"><h2>Synopsis</h2><div class="informaltable"><table border="1"><colgroup><col /><col /><col /></colgroup><tbody><tr><td colspan="3" align="left"><span class="emphasis"><em>
+
+  
+                Content Model
+  
+
+              </em></span></td></tr><tr><td colspan="3" align="left"><pre class="synopsis">PROCESSOR ::=
+EMPTY</pre></td></tr><tr><td colspan="3" align="left"><span class="emphasis"><em>Attributes</em></span></td></tr><tr><td align="left"><p><span class="emphasis"><em>Name</em></span></p></td><td align="left"><p><span class="emphasis"><em>Type</em></span></p></td><td align="left"><p><span class="emphasis"><em>Default</em></span></p></td></tr><tr><td align="left" valign="top">VALUE</td><td align="left" valign="top">
+
+  
+              CDATA
+  
+
+            </td><td align="left" valign="top">#REQUIRED</td></tr></tbody></table></div></div><div class="refsect1" lang="en" xml:lang="en"><a id="id356363"></a><h2>Description</h2><p> Outlining the cpu required for this implementation of the Perl Package.
+  Only one instance should be present. 
+</p><div class="refsect2" lang="en" xml:lang="en"><a id="id356794"></a><h3>VALUE</h3><p> CPU required for the installation of this implementation of the Perl Package.
+  The following values are all valid according to the OSD Specification:
+   x86 alpha mips sparc 680x0 
+</p></div></div><div class="refsect1" lang="en" xml:lang="en"><a id="id356791"></a><h2>Parents</h2><p>These elements contain PROCESSOR:
+      <span class="simplelist"><a href="#elt.IMPLEMENTATION" title="IMPLEMENTATION"><tt class="sgmltag-element">IMPLEMENTATION</tt></a></span>.
+    </p></div></div><div class="refentry" lang="en" xml:lang="en"><div class="refentry.separator"><hr /></div><a id="elt.SOFTPKG"></a><div class="titlepage"><div></div><div></div></div><div class="refnamediv"><h2>Name</h2><p>SOFTPKG —  — root element of a description of a software package </p></div><div class="refsynopsisdiv"><h2>Synopsis</h2><div class="informaltable"><table border="1"><colgroup><col /><col /><col /></colgroup><tbody><tr><td colspan="3" align="left"><span class="emphasis"><em>
+
+  
+                Element Content Model
+  
+
+              </em></span></td></tr><tr><td colspan="3" align="left"><pre class="synopsis">SOFTPKG ::=
+( <a href="#elt.ABSTRACT" title="ABSTRACT"><tt class="sgmltag-element">ABSTRACT</tt></a> | <a href="#elt.AUTHOR" title="AUTHOR"><tt class="sgmltag-element">AUTHOR</tt></a> | <a href="#elt.IMPLEMENTATION" title="IMPLEMENTATION"><tt class="sgmltag-element">IMPLEMENTATION</tt></a> | <a href="#elt.LICENSE" title="LICENSE"><tt class="sgmltag-element">LICENSE</tt></a> | <a href="#elt.TITLE" title="TITLE"><tt class="sgmltag-element">TITLE</tt></a> )*</pre></td></tr><tr><td colspan="3" align="left"><span class="emphasis"><em>Attributes</em></span></td></tr><tr><td align="left"><p><span class="emphasis"><em>Name</em></span></p></td><td align="left"><p><span class="emphasis"><em>Type</em></span></p></td><td align="left"><p><span class="emphasis"><em>Default</em></span></p></td></tr><tr><td align="left" valign="top">NAME</td><td align="left" valign="top">
+
+  
+              CDATA
+  
+
+            </td><td align="left" valign="top">#REQUIRED</td></tr><tr><td align="left" valign="top">VERSION</td><td align="left" valign="top">
+
+  
+              CDATA
+  
+
+            </td><td align="left" valign="top">#IMPLIED</td></tr></tbody></table></div></div><div class="refsect1" lang="en" xml:lang="en"><a id="id357311"></a><h2>Description</h2><p> It's the root element of a description of a software package, in Perl
+   Package Distribution (PPD) format which is an XML application. 
+</p><p>HISTORY : v0.1 - Initial release </p><p>SEE ALSO : OSD Specification http://www.microsoft.com/standards/osd/ </p><div class="refsect2" lang="en" xml:lang="en"><a id="id357759"></a><h3>NAME</h3><p> Name of the package (e.g. ``Foobar''). 
+</p></div><div class="refsect2" lang="en" xml:lang="en"><a id="id357599"></a><h3>VERSION</h3><p> Version number of the package, in comma-delimited format (e.g. ``1,0,0,0'').  
+</p></div></div><div class="refsect1" lang="en" xml:lang="en"><a id="id357598"></a><h2>Children</h2><p>The following elements occur in SOFTPKG:
+      <span class="simplelist"><a href="#elt.ABSTRACT" title="ABSTRACT"><tt class="sgmltag-element">ABSTRACT</tt></a>, <a href="#elt.AUTHOR" title="AUTHOR"><tt class="sgmltag-element">AUTHOR</tt></a>, <a href="#elt.IMPLEMENTATION" title="IMPLEMENTATION"><tt class="sgmltag-element">IMPLEMENTATION</tt></a>, <a href="#elt.LICENSE" title="LICENSE"><tt class="sgmltag-element">LICENSE</tt></a>, <a href="#elt.TITLE" title="TITLE"><tt class="sgmltag-element">TITLE</tt></a></span>.
+    </p></div></div><div class="refentry" lang="en" xml:lang="en"><div class="refentry.separator"><hr /></div><a id="elt.TITLE"></a><div class="titlepage"><div></div><div></div></div><div class="refnamediv"><h2>Name</h2><p>TITLE —  — state the title of the Perl Package </p></div><div class="refsynopsisdiv"><h2>Synopsis</h2><div class="informaltable"><table border="1"><colgroup><col /><col /><col /></colgroup><tbody><tr><td colspan="3" align="left"><span class="emphasis"><em>
+
+                Mixed Content Model
+
+              </em></span></td></tr><tr><td colspan="3" align="left"><pre class="synopsis">TITLE ::=
+( #PCDATA )</pre></td></tr><tr><td colspan="3" align="left"><span class="emphasis"><em>Attributes</em></span></td></tr><tr><td colspan="3" align="left"><span class="emphasis"><em>None</em></span></td></tr></tbody></table></div></div><div class="refsect1" lang="en" xml:lang="en"><a id="id358419"></a><h2>Description</h2><p> Used to state the title of the Perl Package. Only one instance should be present. 
+</p></div><div class="refsect1" lang="en" xml:lang="en"><a id="id358466"></a><h2>Parents</h2><p>These elements contain TITLE:
+      <span class="simplelist"><a href="#elt.SOFTPKG" title="SOFTPKG"><tt class="sgmltag-element">SOFTPKG</tt></a></span>.
+    </p></div></div><div class="refentry" lang="en" xml:lang="en"><div class="refentry.separator"><hr /></div><a id="elt.UNINSTALL"></a><div class="titlepage"><div></div><div></div></div><div class="refnamediv"><h2>Name</h2><p>UNINSTALL —  — provide either a reference to an uninstallation script </p></div><div class="refsynopsisdiv"><h2>Synopsis</h2><div class="informaltable"><table border="1"><colgroup><col /><col /><col /></colgroup><tbody><tr><td colspan="3" align="left"><span class="emphasis"><em>
+
+                Mixed Content Model
+
+              </em></span></td></tr><tr><td colspan="3" align="left"><pre class="synopsis">UNINSTALL ::=
+( #PCDATA )</pre></td></tr><tr><td colspan="3" align="left"><span class="emphasis"><em>Attributes</em></span></td></tr><tr><td align="left"><p><span class="emphasis"><em>Name</em></span></p></td><td align="left"><p><span class="emphasis"><em>Type</em></span></p></td><td align="left"><p><span class="emphasis"><em>Default</em></span></p></td></tr><tr><td align="left" valign="top">HREF</td><td align="left" valign="top">
+
+  
+              CDATA
+  
+
+            </td><td align="left" valign="top">#IMPLIED</td></tr><tr><td align="left" valign="top">EXEC</td><td align="left" valign="top">
+
+  
+              CDATA
+  
+
+            </td><td align="left" valign="top">#IMPLIED</td></tr></tbody></table></div></div><div class="refsect1" lang="en" xml:lang="en"><a id="id358256"></a><h2>Description</h2><p> Used to provide either a reference to an uninstallation script or a raw
+  Perl script which can be used to uninstall the Perl Package at a later point.
+  Only one instance should be present. 
+</p><div class="refsect2" lang="en" xml:lang="en"><a id="id359714"></a><h3>HREF</h3><p> Reference to an external script which should be retrieved and run as part
+  of the removal process. Both filenames and URLs should be considered valid. 
+</p></div><div class="refsect2" lang="en" xml:lang="en"><a id="id359554"></a><h3>EXEC</h3><p> Name of interpreter/shell used to execute the uninstallation script. If the
+  value of EXEC is `PPM_PERL', the copy of Perl that is executing PPM itself ($^X)
+  is used to execute the install script. 
+</p></div></div><div class="refsect1" lang="en" xml:lang="en"><a id="id359553"></a><h2>Parents</h2><p>These elements contain UNINSTALL:
+      <span class="simplelist"><a href="#elt.IMPLEMENTATION" title="IMPLEMENTATION"><tt class="sgmltag-element">IMPLEMENTATION</tt></a></span>.
+    </p></div></div></div><div class="reference" lang="en" xml:lang="en"><a id="index.example"></a><div class="titlepage"><div><div><h1 class="title"><a id="index.example"></a>Examples</h1></div></div><div></div><hr /></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><a href="#ex.sample.ppd">Example sample.ppd</a> - </dt></dl></div><div class="refentry" lang="en" xml:lang="en"><a id="ex.sample.ppd"></a><div class="titlepage"><div></div><div></div></div><div class="refnamediv"><h2>Name</h2><p>Example sample.ppd — </p></div><div class="refsect1" lang="en" xml:lang="en"><a id="id366741"></a><h2>Example sample.ppd</h2><pre class="programlisting">&lt;?xml version=&quot;1.0&quot;?&gt;
+&lt;!DOCTYPE SOFTPKG SYSTEM &quot;ppd.dtd&quot;&gt;
+<span class="emphasis"><em>&lt;!-- The following is a sample PPD file describing the Math-MatrixBool module. 
+     Note that this may not be a current/proper description of this module 
+     and is for sample purposes only.
+--&gt;</em></span>
+ &lt;<a href="#elt.SOFTPKG" title="SOFTPKG"><tt class="sgmltag-element">SOFTPKG</tt></a> NAME=&quot;Math-MatrixBool&quot; VERSION=&quot;4,2,0,0&quot;&gt;
+     &lt;<a href="#elt.TITLE" title="TITLE"><tt class="sgmltag-element">TITLE</tt></a>&gt;Math-MatrixBool&lt;/TITLE&gt;
+     &lt;<a href="#elt.ABSTRACT" title="ABSTRACT"><tt class="sgmltag-element">ABSTRACT</tt></a>&gt;Easy manipulation of matrices of booleans (Boolean Algebra)&lt;/ABSTRACT&gt;
+     &lt;<a href="#elt.AUTHOR" title="AUTHOR"><tt class="sgmltag-element">AUTHOR</tt></a>&gt;Steffen Beyer (sb@sdm.de)&lt;/AUTHOR&gt;
+     &lt;<a href="#elt.LICENSE" title="LICENSE"><tt class="sgmltag-element">LICENSE</tt></a> HREF=&quot;http://www.ActiveState.com/packages/Math-MatrixBool/license.html&quot; /&gt;
+     &lt;<a href="#elt.IMPLEMENTATION" title="IMPLEMENTATION"><tt class="sgmltag-element">IMPLEMENTATION</tt></a>&gt;
+         &lt;<a href="#elt.OS" title="OS"><tt class="sgmltag-element">OS</tt></a> VALUE=&quot;WinNT&quot; /&gt;
+         &lt;<a href="#elt.OS" title="OS"><tt class="sgmltag-element">OS</tt></a> VALUE=&quot;Win95&quot; /&gt;
+         &lt;<a href="#elt.PROCESSOR" title="PROCESSOR"><tt class="sgmltag-element">PROCESSOR</tt></a> VALUE=&quot;x86&quot; /&gt;
+         &lt;<a href="#elt.CODEBASE" title="CODEBASE"><tt class="sgmltag-element">CODEBASE</tt></a> HREF=&quot;http://www.ActiveState.com/packages/Math-MatrixBool/Math-MatrixBool-4.2-bin-1-Win32.tar.gz&quot; /&gt;
+         &lt;<a href="#elt.DEPENDENCY" title="DEPENDENCY"><tt class="sgmltag-element">DEPENDENCY</tt></a> NAME=&quot;Bit-Vector&quot; /&gt;
+         &lt;<a href="#elt.INSTALL" title="INSTALL"><tt class="sgmltag-element">INSTALL</tt></a>&gt;
+         &lt;/INSTALL&gt;
+         &lt;<a href="#elt.UNINSTALL" title="UNINSTALL"><tt class="sgmltag-element">UNINSTALL</tt></a>&gt;
+         &lt;/UNINSTALL&gt;
+     &lt;/IMPLEMENTATION&gt;
+
+     &lt;<a href="#elt.IMPLEMENTATION" title="IMPLEMENTATION"><tt class="sgmltag-element">IMPLEMENTATION</tt></a>&gt;
+         &lt;<a href="#elt.DEPENDENCY" title="DEPENDENCY"><tt class="sgmltag-element">DEPENDENCY</tt></a> NAME=&quot;Bit-Vector&quot; /&gt;
+         &lt;<a href="#elt.CODEBASE" title="CODEBASE"><tt class="sgmltag-element">CODEBASE</tt></a> HREF=&quot;&amp;amp;CPAN;/CPAN/modules/by-module/Math/Math-MatrixBool-4.2.tar.gz&quot; /&gt;
+         &lt;<a href="#elt.INSTALL" title="INSTALL"><tt class="sgmltag-element">INSTALL</tt></a>&gt;
+             system(&quot;make&quot;); ;;
+             system(&quot;make test&quot;); ;;
+             system(&quot;make install&quot;); ;;
+         &lt;/INSTALL&gt;
+     &lt;/IMPLEMENTATION&gt;
+ &lt;/SOFTPKG&gt;
+</pre></div></div></div></div></body></html>

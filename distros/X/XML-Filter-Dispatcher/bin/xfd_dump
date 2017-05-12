@@ -1,0 +1,154 @@
+#!/usr/local/bin/perl -w
+
+$VERSION = 0.000_1;
+
+=head1 NAME
+
+xfd_dump - Process an XML document using an EventPath expression and dump the results.
+
+=head1 SYNOPSIS
+
+    $ cat xml_file | xfd_dump $event_path_expr
+    $ cat xml_file | xfd_dump $expr -
+    $ xfd_dump $expr xml_file
+
+=head1 DESCRIPTION
+
+ALPHA CODE ALERT: The output format will change as I get time.  The name
+might change to xfdgrep too, or that may be something else.
+
+Runs the input file(s) through XML::Filter::Dispatcher using the
+provided EventPath expression and dumps the results as Perl data structures.
+
+=cut
+
+use strict;
+use Getopt::Long;
+
+sub _program_name {
+    require File::Basename;
+    File::Basename::basename( $0 );
+}
+
+sub _usage {
+    my ( $message ) = @_;
+    ## Don't slow execution by always loading a rarely needed module.
+    ## At least, we hope it's rarely needed.
+    require Pod::Usage;
+
+    $message = "Unkown error (message not provided)"
+        if defined $message && ! length $message;
+
+    my $help_mode = ! defined $message;
+
+    my $exitval = $help_mode ? 0 : do {
+        # The "message" may be a simple number, in which case it's an
+        # exit value.
+        $message =~ s/\A(\d+)\z// ? $1 : 1
+    };
+
+    Pod::Usage::pod2usage(
+        -verbose => $help_mode ? 2 : 1,
+        defined $message && length $message
+            ? ( -message => $message )
+            : (),
+        -exitval => $exitval,
+    );
+}
+
+=head1 OPTIONS
+
+=over
+
+=item --help, -h, -?
+
+Print out full help text.
+
+=back
+
+=cut
+
+GetOptions(
+    "help|h|?" => sub { _usage },
+) or _usage 1;
+
+_usage "Missing parameter: EventPath expression required" unless @ARGV;
+my $expr = shift @ARGV;
+
+use XML::SAX::ParserFactory;
+use XML::Filter::Dispatcher qw( :general );
+use Data::Dumper;
+
+unshift @ARGV, "-" unless @ARGV;
+
+my $name;
+
+my $d = XML::Filter::Dispatcher->new(
+    Rules => [
+        $expr => sub {
+            my $v = xvalue;
+            my $t = xvaluetype;
+            my $output;
+            if ( $t eq "attribute" ) {
+                ## TODO: escape this!  Perhaps use XML::Writer's innards.
+                $output = "@" . $v->{Name} . '="' . $v->{Value} . '"';
+            }
+            elsif ( $t eq "start_element" ) {
+                ## TODO: escape this!  Perhaps use XML::Writer's innards.
+                $output = "<" . $v->{Name} . join( "",
+                    map
+                        qq{ $_->{Name}="$_->{Value}"},
+                        values %{$v->{Attributes}}
+                ) . ">";
+            }
+            elsif ( $t eq "end_element" ) {
+                ## TODO: escape this!  Perhaps use XML::Writer's innards.
+                $output = "</" . $v->{Name} . ">"
+            }
+            else {
+                my $dumper = Data::Dumper->new( [ $v ] );
+                $dumper->Indent( 1 );
+                $dumper->Quotekeys( 0 );
+                $dumper->Useqq( 1 );
+                $dumper->Terse( 1 );
+                $output = $dumper->Dump( [ xvalue ] );
+            }
+            chomp $output;
+            print $name, ":", $output =~ tr/\n// ? "\n" : (), $output, "\n";
+        },
+
+    ],
+);
+
+my $p = XML::SAX::ParserFactory->parser( Handler => $d );
+
+for ( @ARGV ) {
+    my $f = $_ eq "-" ? \*STDIN : $_;
+
+    $name = ref $f ? "stdin" : $f;
+
+    ref $f ? $p->parse_file( $f ) : $p->parse_uri( $f );
+}
+
+=head1 LIMITATIONS
+
+=head1 SEE ALSO
+
+L<xfd_as_hash>.
+
+=head1 COPYRIGHT
+
+    Copyright 2002, R. Barrie Slaymaker, Jr., All Rights Reserved
+
+=head1 LICENSE
+
+You may use this module under the terms of the BSD, Artistic, or GPL licenses,
+any version.
+
+=head1 AUTHOR
+
+Barrie Slaymaker <barries@slaysys.com>
+
+=cut
+
+1;

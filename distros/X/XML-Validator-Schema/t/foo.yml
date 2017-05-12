@@ -1,0 +1,27 @@
+# foo.yml - test a simple schema that allows only a single root
+#           element called foo
+
+--- |
+  <?xml version="1.0" encoding="UTF-8"?>
+  <schema xmlns="http://www.w3.org/2001/XMLSchema">
+    <element name="foo" />
+  </schema>
+
+--- |
+  <?xml version="1.0" encoding="UTF-8"?>
+  <foo />
+--- >
+PASS
+
+--- |
+  <?xml version="1.0" encoding="UTF-8"?>
+  <fooz />
+--- >
+FAIL /unexpected <fooz>/
+
+--- |
+  <fooz />
+--- >
+FAIL /unexpected <fooz>/
+
+

@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<rdf:RDF
+  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns:dc="http://purl.org/dc/elements/1.1/"
+  xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+  xmlns:admin="http://webns.net/mvcb/"
+  xmlns:cc="http://web.resource.org/cc/"
+  xmlns="http://purl.org/rss/1.0/">
+
+<channel rdf:about="http://itre.cis.upenn.edu/~myl/languagelog/">
+<title>Language Log</title>
+<link>http://itre.cis.upenn.edu/~myl/languagelog/</link>
+<description></description>
+<dc:language>en-us</dc:language>
+<dc:creator></dc:creator>
+<dc:date>2004-03-09T01:32:26-05:00</dc:date>
+<admin:generatorAgent rdf:resource="http://www.movabletype.org/?v=2.64" />
+<cc:license rdf:resource="http://creativecommons.org/licenses/by-sa/1.0/" />
+
+
+<items>
+<rdf:Seq><rdf:li rdf:resource="http://itre.cis.upenn.edu/~myl/languagelog/archives/000559.html" />
+<rdf:li rdf:resource="http://itre.cis.upenn.edu/~myl/languagelog/archives/000558.html" />
+<rdf:li rdf:resource="http://itre.cis.upenn.edu/~myl/languagelog/archives/000556.html" />
+<rdf:li rdf:resource="http://itre.cis.upenn.edu/~myl/languagelog/archives/000555.html" />
+<rdf:li rdf:resource="http://itre.cis.upenn.edu/~myl/languagelog/archives/000554.html" />
+<rdf:li rdf:resource="http://itre.cis.upenn.edu/~myl/languagelog/archives/000553.html" />
+<rdf:li rdf:resource="http://itre.cis.upenn.edu/~myl/languagelog/archives/000552.html" />
+<rdf:li rdf:resource="http://itre.cis.upenn.edu/~myl/languagelog/archives/000551.html" />
+<rdf:li rdf:resource="http://itre.cis.upenn.edu/~myl/languagelog/archives/000550.html" />
+<rdf:li rdf:resource="http://itre.cis.upenn.edu/~myl/languagelog/archives/000549.html" />
+<rdf:li rdf:resource="http://itre.cis.upenn.edu/~myl/languagelog/archives/000548.html" />
+<rdf:li rdf:resource="http://itre.cis.upenn.edu/~myl/languagelog/archives/000547.html" />
+<rdf:li rdf:resource="http://itre.cis.upenn.edu/~myl/languagelog/archives/000546.html" />
+<rdf:li rdf:resource="http://itre.cis.upenn.edu/~myl/languagelog/archives/000545.html" />
+<rdf:li rdf:resource="http://itre.cis.upenn.edu/~myl/languagelog/archives/000544.html" />
+</rdf:Seq>
+</items>
+
+</channel>
+
+<item rdf:about="http://itre.cis.upenn.edu/~myl/languagelog/archives/000559.html">
+<title>Dialog trajectories</title>
+<link>http://itre.cis.upenn.edu/~myl/languagelog/archives/000559.html</link>
+<description><![CDATA[One of the most interesting things here at LKR2004 was a talk by Jerry Wright, Alicia Abella and Al Gorin, from AT&amp;T Labs, on the topic of &quot;Speech and Dialog Mining.&quot; Jerry (who gave the talk) surveyed a range of...]]></description>
+<dc:subject></dc:subject>
+<dc:creator>Mark Liberman</dc:creator>
+<dc:date>2004-03-09T01:32:26-05:00</dc:date>
+</item>
+<item rdf:about="http://itre.cis.upenn.edu/~myl/languagelog/archives/000558.html">
+<title>Texting</title>
+<link>http://itre.cis.upenn.edu/~myl/languagelog/archives/000558.html</link>
+<description>I&apos;ve visited Japan a couple of times before, most recently about a decade ago. One thing that&apos;s changed since my last visit is texting. Most younger people in Japan now seem to spend a lot of time sending and reading...</description>
+<dc:subject></dc:subject>
+<dc:creator>Mark Liberman</dc:creator>
+<dc:date>2004-03-08T23:47:10-05:00</dc:date>
+</item>
+<item rdf:about="http://itre.cis.upenn.edu/~myl/languagelog/archives/000556.html">
+<title>Dr. Tufts and the Marthambles</title>
+<link>http://itre.cis.upenn.edu/~myl/languagelog/archives/000556.html</link>
+<description>I wrote earlier about the use of the word Marthambles in novels by Dorothy Dunnett and Patrick O&apos;Brian. Lisa Grossman, co-author of Lobscouse and Spotted Dog, sent an informative note in response, which she has kindly given me permission to...</description>
+<dc:subject></dc:subject>
+<dc:creator>Mark Liberman</dc:creator>
+<dc:date>2004-03-08T23:40:35-05:00</dc:date>
+</item>
+<item rdf:about="http://itre.cis.upenn.edu/~myl/languagelog/archives/000555.html">
+<title>Suppose generative syntax was born in Nigeria?</title>
+<link>http://itre.cis.upenn.edu/~myl/languagelog/archives/000555.html</link>
+<description>English: JOHN OFTEN KISSES MARY. French: JEAN EMBRASSE SOUVENT MARIE. (&quot;John kisses often Mary.&quot;) Generative syntacticians have told us that the reason for the difference in the order between verb and adverb here is that in languages with what the...</description>
+<dc:subject></dc:subject>
+<dc:creator>John McWhorter</dc:creator>
+<dc:date>2004-03-08T21:59:40-05:00</dc:date>
+</item>
+<item rdf:about="http://itre.cis.upenn.edu/~myl/languagelog/archives/000554.html">
+<title>Linguist jokes (1)</title>
+<link>http://itre.cis.upenn.edu/~myl/languagelog/archives/000554.html</link>
+<description> Q: Two linguists were walking down the street. Which one was the specialist in contextually indicated deixis and anaphoric reference resolution strategies?...</description>
+<dc:subject></dc:subject>
+<dc:creator>Geoffrey K. Pullum</dc:creator>
+<dc:date>2004-03-08T19:12:06-05:00</dc:date>
+</item>
+<item rdf:about="http://itre.cis.upenn.edu/~myl/languagelog/archives/000553.html">
+<title>Multilingual Instant Messaging in Iraq</title>
+<link>http://itre.cis.upenn.edu/~myl/languagelog/archives/000553.html</link>
+<description> According to this press release from the Office of Naval Research, a recently deployed communications system combining Instant Messaging with machine translation is receiving rave reviews from soldiers in Iraq. It is said to allow speakers of English, Arabic,...</description>
+<dc:subject></dc:subject>
+<dc:creator>Bill Poser</dc:creator>
+<dc:date>2004-03-08T14:38:42-05:00</dc:date>
+</item>
+<item rdf:about="http://itre.cis.upenn.edu/~myl/languagelog/archives/000552.html">
+<title>Chinese Characters Don&apos;t All Come From China</title>
+<link>http://itre.cis.upenn.edu/~myl/languagelog/archives/000552.html</link>
+<description> Since Mark is off fishing in Japan, I thought I&apos;d mention a bit more about Japanese writing. A little known fact is that not all Chinese characters come from China. The Japanese created a few characters themselves. An example...</description>
+<dc:subject></dc:subject>
+<dc:creator>Bill Poser</dc:creator>
+<dc:date>2004-03-07T20:57:41-05:00</dc:date>
+</item>
+<item rdf:about="http://itre.cis.upenn.edu/~myl/languagelog/archives/000551.html">
+<title>Careless talk spreads viruses</title>
+<link>http://itre.cis.upenn.edu/~myl/languagelog/archives/000551.html</link>
+<description>One morning this week I heard an NPR newsreader say (trying to be helpful to us all) that there is a new computer virus on the loose and you are warned &quot;not to open an attachment unless it is from...</description>
+<dc:subject></dc:subject>
+<dc:creator>Geoffrey K. Pullum</dc:creator>
+<dc:date>2004-03-07T18:36:14-05:00</dc:date>
+</item>
+<item rdf:about="http://itre.cis.upenn.edu/~myl/languagelog/archives/000550.html">
+<title>Say No More - Once More</title>
+<link>http://itre.cis.upenn.edu/~myl/languagelog/archives/000550.html</link>
+<description> Jack Hitt&apos;s New York Times Magazine article Say No More about the impending death of the Qawasqar language in Chile has evoked much criticism. Mark Liberman has criticized Hitt&apos;s apparent lack of interest in the language itself as well...</description>
+<dc:subject></dc:subject>
+<dc:creator>Bill Poser</dc:creator>
+<dc:date>2004-03-07T16:53:56-05:00</dc:date>
+</item>
+<item rdf:about="http://itre.cis.upenn.edu/~myl/languagelog/archives/000549.html">
+<title>Reverse Domain Name Hijacking</title>
+<link>http://itre.cis.upenn.edu/~myl/languagelog/archives/000549.html</link>
+<description> There&apos;s an interesting article by Stacey Knapp on Internet domain names in the Oklahoma Journal of Law and Technology. In general, domain names belong to the first person or organization to register them. However, there is a provision by...</description>
+<dc:subject></dc:subject>
+<dc:creator>Bill Poser</dc:creator>
+<dc:date>2004-03-07T16:08:51-05:00</dc:date>
+</item>
+<item rdf:about="http://itre.cis.upenn.edu/~myl/languagelog/archives/000548.html">
+<title>What gets taught; what gets learned</title>
+<link>http://itre.cis.upenn.edu/~myl/languagelog/archives/000548.html</link>
+<description>John McWhorter remarks at the end of this post, about silly statements about language by Jack Hitt and sundry others: &quot;We have to learn to expect articles like Hitt&apos;s until basic linguistics is taught in middle or high school.&quot; He&apos;s...</description>
+<dc:subject></dc:subject>
+<dc:creator>Geoffrey K. Pullum</dc:creator>
+<dc:date>2004-03-06T19:06:50-05:00</dc:date>
+</item>
+<item rdf:about="http://itre.cis.upenn.edu/~myl/languagelog/archives/000547.html">
+<title>Plum Poison</title>
+<link>http://itre.cis.upenn.edu/~myl/languagelog/archives/000547.html</link>
+<description> With Mark Liberman gone fishin&apos; to Japan, and knowing the trouble LanguageLoggers are likely to get into in exotic foreign places (see Geoff Pullum&apos;s postcard from Vegas), my thoughts naturally turned to venereal disease. The Japanese word for &quot;syphillis&quot;...</description>
+<dc:subject></dc:subject>
+<dc:creator>Bill Poser</dc:creator>
+<dc:date>2004-03-06T12:14:37-05:00</dc:date>
+</item>
+<item rdf:about="http://itre.cis.upenn.edu/~myl/languagelog/archives/000546.html">
+<title>Gone fishin&apos;</title>
+<link>http://itre.cis.upenn.edu/~myl/languagelog/archives/000546.html</link>
+<description><![CDATA[I'm on my way to Tokyo for LKR2004, an &quot;International Symposium on Large-scale Knowledge Resources.&quot; The background is the &quot; 21st Century COE (Center of Excellence) Program&quot; of the Japanese Ministry of Education, Culture, Science and Technology (MEXT), which provides...]]></description>
+<dc:subject></dc:subject>
+<dc:creator>Mark Liberman</dc:creator>
+<dc:date>2004-03-05T18:41:36-05:00</dc:date>
+</item>
+<item rdf:about="http://itre.cis.upenn.edu/~myl/languagelog/archives/000545.html">
+<title>Fine writing at 40% adjective rate</title>
+<link>http://itre.cis.upenn.edu/~myl/languagelog/archives/000545.html</link>
+<description><![CDATA[Claudia Roth Pierpoint has a fascinating article (under the generic header "Annals of Culture") in The New Yorker (March 4th, 2004) about the great anti-racist anthropologist and linguist Franz Boas. At one point (p.&nbsp;63) she sums up in a single...]]></description>
+<dc:subject></dc:subject>
+<dc:creator>Geoffrey K. Pullum</dc:creator>
+<dc:date>2004-03-05T15:58:48-05:00</dc:date>
+</item>
+<item rdf:about="http://itre.cis.upenn.edu/~myl/languagelog/archives/000544.html">
+<title>Page rank puzzles</title>
+<link>http://itre.cis.upenn.edu/~myl/languagelog/archives/000544.html</link>
+<description>Prompted by Semantic Compositions&apos; recent self-evaluation, I finally decided to explore the page rank numbers available on the Google toolbar for Internet Explorer. I don&apos;t usually use IE, but for the occasion I cranked it up and gave the thing...</description>
+<dc:subject></dc:subject>
+<dc:creator>Mark Liberman</dc:creator>
+<dc:date>2004-03-05T05:40:27-05:00</dc:date>
+</item>
+
+
+</rdf:RDF>

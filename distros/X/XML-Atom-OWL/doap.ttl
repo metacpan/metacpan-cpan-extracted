@@ -1,0 +1,184 @@
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://purl.org/NET/cpan-uri/dist/XML-Atom-OWL/project>
+	a                    doap:Project;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap-deps:runtime-requirement [ doap-deps:on "Carp 1.00"^^doap-deps:CpanId ], [ doap-deps:on "common::sense 0"^^doap-deps:CpanId ], [ doap-deps:on "URI::URL 0"^^doap-deps:CpanId ], [ doap-deps:on "XML::LibXML 1.70"^^doap-deps:CpanId ], [ doap-deps:on "DateTime 0"^^doap-deps:CpanId ], [ doap-deps:on "Encode 0"^^doap-deps:CpanId ], [
+		doap-deps:on "HTTP::Link::Parser 0.100"^^doap-deps:CpanId;
+	], [ doap-deps:on "LWP::UserAgent 0"^^doap-deps:CpanId ], [ doap-deps:on "MIME::Base64 0"^^doap-deps:CpanId ], [ doap-deps:on "RDF::Trine 0.135"^^doap-deps:CpanId ], [ doap-deps:on "Scalar::Util 0"^^doap-deps:CpanId ], [ doap-deps:on "URI 1.30"^^doap-deps:CpanId ];
+	doap-deps:test-requirement [ doap-deps:on "Test::More 0.61"^^doap-deps:CpanId ];
+	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=XML-Atom-OWL>;
+	doap:category        [ rdfs:label "Atom"@en ], [ rdfs:label "AtomOWL"@en ], [ rdfs:label "RDF"@en ], [ rdfs:label "Feed"@en ], [ rdfs:label "Syndication"@en ], [ rdfs:label "OWL"@en ], [ rdfs:label "ActivityStrea.ms" ];
+	doap:created         "2010-01-15"^^xsd:date;
+	doap:developer       <http://tobyinkster.co.uk/#i>;
+	doap:documenter      <http://tobyinkster.co.uk/#i>;
+	doap:download-page   <https://metacpan.org/release/XML-Atom-OWL>;
+	doap:homepage        <https://metacpan.org/release/XML-Atom-OWL>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      <http://tobyinkster.co.uk/#i>;
+	doap:name            "XML-Atom-OWL";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/XML-Atom-OWL/v_0-01>, <http://purl.org/NET/cpan-uri/dist/XML-Atom-OWL/v_0-02>, <http://purl.org/NET/cpan-uri/dist/XML-Atom-OWL/v_0-03>, <http://purl.org/NET/cpan-uri/dist/XML-Atom-OWL/v_0-04>, <http://purl.org/NET/cpan-uri/dist/XML-Atom-OWL/v_0-100>, <http://purl.org/NET/cpan-uri/dist/XML-Atom-OWL/v_0-101>, <http://purl.org/NET/cpan-uri/dist/XML-Atom-OWL/v_0-102>, <http://purl.org/NET/cpan-uri/dist/XML-Atom-OWL/v_0-103>, <http://purl.org/NET/cpan-uri/dist/XML-Atom-OWL/v_0-104>;
+	doap:repository      [
+		a doap:SVNRepository;
+		doap:browse <http://goddamn.co.uk/svn-web/perlmods/browse/XML-Atom-OWL/>;
+	];
+	doap:shortdesc       "parse an Atom file into RDF"@en;
+	doap:tester          <http://tobyinkster.co.uk/#i>.
+
+<http://purl.org/NET/cpan-uri/dist/XML-Atom-OWL/v_0-01>
+	a                    doap:Version;
+	rdfs:label           "First release"@en;
+	dc:issued            "2010-01-18"^^xsd:date;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/XML-Atom-OWL-0.01.tar.gz>;
+	doap:revision        "0.01"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/XML-Atom-OWL/v_0-02>
+	a                    doap:Version;
+	dc:issued            "2010-01-23"^^xsd:date;
+	doap-changeset:changeset [
+		a doap-changeset:ChangeSet;
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Support for Atom Threading Extension"@en;
+			rdfs:seeAlso <http://www.ietf.org/rfc/rfc4685.txt>;
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Support for Feed Paging and Archiving"@en;
+			rdfs:seeAlso <http://www.ietf.org/rfc/rfc5005.txt>;
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Support for Atom License Extension"@en;
+			rdfs:seeAlso <http://www.ietf.org/rfc/rfc4946.txt>;
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Support arbitrary other extensions using XML literals."@en;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/XML-Atom-OWL/v_0-01>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/XML-Atom-OWL-0.02.tar.gz>;
+	doap:revision        "0.02"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/XML-Atom-OWL/v_0-03>
+	a                    doap:Version;
+	dc:issued            "2010-04-28"^^xsd:date;
+	doap-changeset:changeset [
+		a doap-changeset:ChangeSet;
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Ability to automatically fetch <content src> links and include the content as if it had been inline."@en;
+		], [
+			rdfs:label "Compliance improvements for <content> element."@en;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/XML-Atom-OWL/v_0-02>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/XML-Atom-OWL-0.03.tar.gz>;
+	doap:revision        "0.03"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/XML-Atom-OWL/v_0-04>
+	a                    doap:Version;
+	dc:issued            "2010-04-29"^^xsd:date;
+	doap-changeset:changeset [
+		a doap-changeset:ChangeSet;
+		doap-changeset:item [
+			rdfs:label "Keep base URI and lang information for <content> element."@en;
+			rdfs:comment "Useful for XML-Atom-Microformats."@en;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/XML-Atom-OWL/v_0-03>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/XML-Atom-OWL-0.04.tar.gz>;
+	doap:revision        "0.04"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/XML-Atom-OWL/v_0-100>
+	a                    doap:Version;
+	dc:issued            "2010-07-19"^^xsd:date;
+	doap-changeset:changeset [
+		a doap-changeset:ChangeSet;
+		doap-changeset:item [
+			rdfs:label "Automatically call 'consume' as required."@en;
+		], [
+			a doap-changeset:Regression;
+			rdfs:label "Switched to using common::sense instead of strict, but didn't note change in Makefile.PL/META.yml"@en;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/XML-Atom-OWL/v_0-04>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/XML-Atom-OWL-0.100.tar.gz>;
+	doap:revision        "0.100"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/XML-Atom-OWL/v_0-101>
+	a                    doap:Version;
+	dc:issued            "2010-07-19"^^xsd:date;
+	doap-changeset:changeset [
+		a doap-changeset:ChangeSet;
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix packaging error; Makefile.PL and META.yml didn't note dependency on common::sense."@en;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/XML-Atom-OWL/v_0-100>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/XML-Atom-OWL-0.101.tar.gz>;
+	doap:revision        "0.101"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/XML-Atom-OWL/v_0-102>
+	a                    doap:Version;
+	dc:issued            "2011-03-05"^^xsd:date;
+	doap-changeset:changeset [
+		a doap-changeset:ChangeSet;
+		doap-changeset:item [
+			a doap-changeset:Documentation;
+			rdfs:label "Various formatting fixes and other minor improvements to documentation."@en;
+		], [ rdfs:label "use Scalar::Util qw(blessed)."@en ];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/XML-Atom-OWL/v_0-101>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/XML-Atom-OWL-0.102.tar.gz>;
+	doap:revision        "0.102"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/XML-Atom-OWL/v_0-103>
+	a                    doap:Version;
+	dc:issued            "2011-10-27"^^xsd:date;
+	doap-changeset:changeset [
+		a doap-changeset:ChangeSet;
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "ActivityStrea.ms support."@en;
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "Module::Package::RDF"@en;
+		], [
+			a doap-changeset:Update;
+			rdfs:label "use 5.010"@en;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/XML-Atom-OWL/v_0-102>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/XML-Atom-OWL-0.103.tar.gz>;
+	doap:revision        "0.103"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/XML-Atom-OWL/v_0-104>
+	a                    doap:Version;
+	dc:identifier        "XML-Atom-OWL-0.104"^^xsd:string;
+	dc:issued            "2014-09-11"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Switch to Dist::Inkt.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/XML-Atom-OWL-0.104.tar.gz>;
+	doap:revision        "0.104"^^xsd:string.
+
+<http://tobyinkster.co.uk/#i>
+	a                    foaf:Person;
+	foaf:homepage        <http://tobyinkster.co.uk/>;
+	foaf:mbox            <mailto:tobyink@cpan.org>;
+	foaf:name            "Toby Inkster";
+	foaf:page            <https://metacpan.org/author/TOBYINK>;
+	owl:sameAs           <http://purl.org/NET/cpan-uri/person/tobyink>.
+

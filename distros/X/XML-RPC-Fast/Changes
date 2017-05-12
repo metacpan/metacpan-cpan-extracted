@@ -1,0 +1,36 @@
+# XML::RPC::Fast history
+
+0.8   2012-01-25
+      * fix Curl
+      * fix encoding of large integers
+      * customtype generator
+
+0.7   2011-02-10
+      * Add WWW::Curl useragent (faster than LWP)
+      * Add ability to redefine call url via encoder
+      * Fix encoding of large integers
+
+0.6   2009-09-04
+      * Fixes (thanks to Marko Nordberg for reports)
+      * Added internal_encoding to Enc::LibXML
+
+0.5   2009-09-03
+      * Fixes to tests
+      * Added req method (more universal than call)
+      * Make accessors with set ability
+      * Add UA::AnyEvent
+
+0.4   2009-08-28
+      * Make modular encoder and useragent
+      * Use XML::LibXML instead of XML::Parser
+
+0.3   2009-02-01
+      * Fix broken dependency on XML::Parser
+
+0.2   2009-01-29
+      * add lwp_options, fix requests_redirectable by default
+      * minor fixes of parsing/deparsing
+      * fix dependency on Encode
+
+0.1   2008-10-24
+      * First release

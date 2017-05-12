@@ -1,0 +1,23 @@
+---
+abstract: 'PRANG implementation of the XML SRS protocol'
+author:
+  - 'Catalyst SRS Team <team-srs@catalyst.net.nz>'
+build_requires:
+  XML::Compare: 0.04
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200003, CPAN::Meta::Converter version 2.110390'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: XML-SRS
+requires:
+  Moose: 1.21
+  MooseX::Aliases: 0.08
+  MooseX::Params::Validate: 0.15
+  MooseX::Timestamp: 0.06
+  PRANG: 0.14
+  Regexp::Common: 0
+version: 0.09

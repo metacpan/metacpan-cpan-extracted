@@ -1,0 +1,43 @@
+=head1 NAME
+
+  XML::GDOME::Entity - Interface Entity implementation.
+
+=head1 SYNOPSIS
+
+  $str = $ent->getPublicId();
+  $str = $ent->getSystemId();
+  $str = $ent->getNotationName();
+
+=head1 CLASS INHERITANCE
+
+L<XML::GDOME::Node> > XML::GDOME::Entity
+
+
+=head1 METHODS
+
+=over 4
+
+
+=item $str = $ent->getPublicId();
+
+
+
+I<Returns>: the public identifier associated with the entity, if specified. If the public identifier was not specified, this is undef.
+
+
+=item $str = $ent->getSystemId();
+
+
+
+I<Returns>: the system identifier associated with the entity, if specified. If the system identifier was not specified, this is undef.
+
+
+=item $str = $ent->getNotationName();
+
+
+
+I<Returns>: for unparsed entities, the name of the notation for the entity. For parsed entities, this is undef.
+
+
+=back
+

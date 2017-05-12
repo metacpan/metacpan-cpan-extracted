@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE plants SYSTEM "../test.dtd">
+<plants>
+	<plant>
+		<flower colour="green"></flower>
+		<name>Arum apulum</name>
+	</plant>
+	<plant>
+		<flower colour="green,brown"></flower>
+		<name>Arum discoridis</name>
+	</plant>
+</plants>

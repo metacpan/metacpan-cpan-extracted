@@ -1,0 +1,8 @@
+Revision history for Perl extension XML::Filter::ExceptionLocator.
+
+1.00  Sun Sep 28 18:23:55 2003
+      - original release
+
+1.01  Fri Jan 24 12:16:26 EST 2014
+      - fixed deprecation warning for qw() - thanks J. David Lewis!
+

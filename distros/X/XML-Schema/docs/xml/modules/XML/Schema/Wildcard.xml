@@ -1,0 +1,148 @@
+<module name="XML::Schema::Wildcard">
+
+  <about>
+    The module implements a wildcard to select or reject an XML
+    element based on its namespace.
+  </about>
+
+  <synopsis>
+<perl>
+use XML::Schema::Wildcard;
+
+my $wildcard;
+
+$wildcard = XML::Schema::Wildcard->new( namespace => 'any' );
+$wildcard = XML::Schema::Wildcard->new( namespace => 'not' );
+
+# shorter form of above
+$wildcard = XML::Schema::Wildcard->new( any => 1 );
+$wildcard = XML::Schema::Wildcard->new( not => 1 );
+
+$wildcard = XML::Schema::Wildcard->new( {
+    namespace => 'http://tt2.org/XML/Example.xml',
+} );
+
+$wildcard = XML::Schema::Wildcard->new( {
+    namespace => [
+        'http://tt2.org/XML/Example1.xml',
+        'http://tt2.org/XML/Example2.xml',
+    ],
+} );
+
+$wildcard = XML::Schema::Wildcard->new( {
+    namespace => [ not => 'http://tt2.org/XML/Example.xml' ],
+} );
+</perl>
+  </synopsis>
+
+  <description>
+    <p>
+    This module implements an object class for representing XML
+    Schema wildcards.  This provides for validation of elements 
+    based on their XML namespace component.
+    </p>
+  </description>
+
+  <methods>
+    <method id="new" args="\%config">
+      <p>
+        Constructor method called to create a new wildcard object.  A
+        list of '<perlcode>key =&gt; value</perlcode>' pairs can be
+        specified as command line arguments, or alternately, a hash
+        reference can be passed which contains these configuration
+        values.  The method returns a newly instantiated object on
+        success.  On error it returns undef and sets an internal error
+        message which can be retrieved by calling <method
+        class="XML::Schema::Base">error()</method> as a class method.
+
+<perl>
+# list of options
+my $card = XML::Schema::Wildcard->new( namespace => 'any' )
+    || die XML::Schema::Wildcard->error();
+
+# hash ref of options
+my $card = XML::Schema::Wildcard->new( {
+    namespace => 'any',
+} ) || die XML::Schema::Wildcard->error();
+</perl>
+      </p>
+
+      <p>
+        The following configuration options may be specifed:
+      </p>
+
+      <config>
+        <item key="namespace">
+            <value>'any'</value>
+            <value>'not'</value>
+            <value>'http://tt2.org/XML/...'</value>
+            <value>[ not => 'http://tt2.org/XML/...' ]</value>
+
+	  <p>
+	    This option is used to specify which XML namespaces should
+            be included or excluded by the wildcard.  The value of
+            '<perlcode>any</perlcode>' indicates that any namespaces
+            should be accepted along with elements that are not
+            namespace qualified.  The value of
+            '<perlcode>not</perlcode>' indicates that only those
+            elements that are <i>not</i> namespace qualified should be
+            accepted.  Any other single value is treated as a namespace
+            to which the element should be qualified.
+          </p>
+
+	  <p>
+            The option can also be specified as a reference to an 
+            array of namespaces.  The first element in the list can
+            be '<perlcode>not</perlcode>' to indicate that it contains
+            namespaces that the element should <i>not</i> match.  Otherwise
+            it is taken to be a list of namespaces, one of which the 
+            element <i>must</i> match.
+	  </p>
+        </item>
+
+        <item key="any">
+            <value>1</value>
+            Alternate way of specifying <perlcode>namespace => 'any'</perlcode>.
+        </item>
+
+        <item key="not">
+            <value>1</value>
+            Alternate way of specifying <perlcode>namespace => 'not'</perlcode>.
+        </item>
+
+        <item key="process">
+            <value>'skip'</value>
+            <value>'lax'</value>
+            <value>'strict'</value>
+
+	    This value controls the impact on assessment of the items allowed
+            by wildcards.  At present, this has no effect.
+	</item>
+
+      </config>
+    </method>
+
+    <method id="select">
+	Return the current selection criteria as one of the strings
+        '<perlcode>any</perlcode>', '<perlcode>not</perlcode>' or
+        '<perlcode>one</perlcode>'.
+    </method>
+
+    <method id="process">
+	Return the current assessment process as one of the strings
+        '<perlcode>skip</perlcode>', '<perlcode>lax</perlcode>' or
+        '<perlcode>strict</perlcode>'.
+    </method>
+
+    <method id="namespace">
+	Return a reference to a hash array of namespace that are accepted
+        or rejected according to the selection criteria.
+    </method>
+
+    <method id="accept" args="$value">
+	Returns true (1) if the value is namespace qualified according to the
+        wildcard selection criteria or false (0) if not.
+    </method>
+
+  </methods>
+</module>

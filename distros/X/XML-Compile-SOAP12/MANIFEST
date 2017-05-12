@@ -1,0 +1,22 @@
+ChangeLog
+MANIFEST
+Makefile.PL
+README
+lib/XML/Compile/SOAP12.pm
+lib/XML/Compile/SOAP12.pod
+lib/XML/Compile/SOAP12/Client.pm
+lib/XML/Compile/SOAP12/Client.pod
+lib/XML/Compile/SOAP12/Operation.pm
+lib/XML/Compile/SOAP12/Operation.pod
+lib/XML/Compile/SOAP12/Server.pm
+lib/XML/Compile/SOAP12/Server.pod
+lib/XML/Compile/SOAP12/Util.pm
+lib/XML/Compile/SOAP12/Util.pod
+lib/XML/Compile/SOAP12/xsd/2003-soap-encoding.xsd
+lib/XML/Compile/SOAP12/xsd/2003-soap-envelope.xsd
+lib/XML/Compile/SOAP12/xsd/2003-soap-rpc.xsd
+lib/XML/Compile/WSDL11/xsd/wsdl-soap12.xsd
+t/01use.t
+xt/99pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

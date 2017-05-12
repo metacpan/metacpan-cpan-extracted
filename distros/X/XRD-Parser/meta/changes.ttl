@@ -1,0 +1,173 @@
+@prefix :        <http://usefulinc.com/ns/doap#> .
+@prefix dcs:     <http://ontologi.es/doap-changeset#> .
+@prefix dc:      <http://purl.org/dc/terms/> .
+@prefix foaf:    <http://xmlns.com/foaf/0.1/> .
+@prefix my:      <http://purl.org/NET/cpan-uri/dist/XRD-Parser/> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix toby:    <http://tobyinkster.co.uk/#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+
+my:project :release my:v_0-01 .
+my:v_0-01
+	a               :Version ;
+	dc:issued       "2009-12-05"^^xsd:date ;
+	:revision       "0.01"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/XRD-Parser-0.01.tar.gz> ;
+	rdfs:label      "First release"@en .
+
+my:project :release my:v_0-02 .
+my:v_0-02
+	a               :Version ;
+	dc:issued       "2009-12-09"^^xsd:date ;
+	:revision       "0.02"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/XRD-Parser-0.02.tar.gz> ;
+	dcs:changeset [
+		dcs:versus my:v_0-01 ;
+		dcs:item
+			[ rdfs:label "Support for host-meta's <hm:Host/> element as a way to set subjects."@en ; a dcs:Addition ] ,
+			[ rdfs:label "Implement <Alias/> element as an owl:sameAs-like predicate rather than simply duplicating data."@en ] ,
+			[ rdfs:label "Support <Link template/> attribute via a special datatype and special predicate URI scheme."@en ; a dcs:Addition ] ,
+			[ rdfs:label "Support for IANA keywords in <Link rel/> attribute."@en ; a dcs:Addition ] ,
+			[ rdfs:label "Map XRD <Expires/> element to the RDF URI <http://ontologi.es/xrd#expires>."@en ]
+		] .
+
+my:project :release my:v_0-03 .
+my:v_0-03
+	a               :Version ;
+	dc:issued       "2009-12-14"^^xsd:date ;
+	:revision       "0.03"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/XRD-Parser-0.03.tar.gz> ;
+	dcs:changeset [
+		dcs:versus my:v_0-02 ;
+		dcs:item
+			[ rdfs:label "Provide an XRD::Parser->hostmeta($uri) shortcut constructor."@en ; a dcs:Addition ] ,
+			[ rdfs:label "Send proper HTTP Accept header when requesting XRD files."@en ] ,
+			[ rdfs:label "Prefer namespace-aware DOM functions."@en ]
+		] .
+		
+my:project :release my:v_0-04 .
+my:v_0-04
+	a               :Version ;
+	dc:issued       "2009-12-16"^^xsd:date ;
+	:revision       "0.04"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/XRD-Parser-0.04.tar.gz> ;
+	dcs:changeset [
+		dcs:versus my:v_0-03 ;
+		dcs:item 
+			[ rdfs:label "Support http://host-meta.net/xrd/1.0 and http://host-meta.net/ns/1.0 as alternatives."@en ] ,
+			[ rdfs:label "Don't reify <Link> elements multiple times for multiple <Property> children."@en ] ,
+			[ rdfs:label "Parse <Property> children of <Link template> elements."@en ] ;
+		rdfs:comment "And other minor bugfixes."@en 
+		] .
+		
+my:project :release my:v_0-05 .
+my:v_0-05
+	a               :Version ;
+	dc:issued       "2010-02-02"^^xsd:date ;
+	:revision       "0.05"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/XRD-Parser-0.05.tar.gz> ;
+	dcs:changeset [
+		dcs:versus my:v_0-04 ;
+		dcs:item
+			[ rdfs:label "Provide an alternative method of handling <Property> within <Link>: RDFS subproperties."@en ] ,
+			[ rdfs:label "Allow both methods of handling <Property> within <Link> to be toggled independently."@en ] ,
+			[ rdfs:label "host_uri and template_uri utility functions."@en ; a dcs:Addition ] ,
+			[ rdfs:label "Switch to my new build system."@en ; a dcs:Update ] ,
+			[ rdfs:label "Synchronise callback functionality with RDF::RDFa::Parser 0.30."@en ; a dcs:Update ] ,
+			[ rdfs:label "Copyright 2010."@en ; a dcs:Update ]
+		] .
+
+my:project :release my:v_0-06 .
+my:v_0-06
+	a               :Version ;
+	dc:issued       "2010-04-26"^^xsd:date ;
+	:revision       "0.06"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/XRD-Parser-0.06.tar.gz> ;
+	dcs:changeset [
+		dcs:versus my:v_0-05 ;
+		dcs:item   [ rdfs:label "Add reasonable timeouts for hostmeta constructor."@en ];
+		] .
+
+my:project :release my:v_0-100 .
+my:v_0-100
+	a               :Version ;
+	dc:issued       "2010-06-30"^^xsd:date ;
+	:revision       "0.100"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/XRD-Parser-0.100.tar.gz> ;
+	dcs:changeset [
+		dcs:versus my:v_0-06 ;
+		dcs:item   [ rdfs:label "Improvements to method for extracting host names from URIs."@en ];
+		dcs:item   [ rdfs:label "Tracked changes to host-meta spec."@en ; a dcs:Update ];
+		] .
+
+my:project :release my:v_0-101 .
+my:v_0-101
+	a               :Version ;
+	dc:issued       "2010-07-07"^^xsd:date ;
+	:revision       "0.101"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/XRD-Parser-0.101.tar.gz> ;
+	dcs:changeset [
+		dcs:versus my:v_0-100 ;
+		dcs:item   [ rdfs:label "Split hostmeta_location function out from hostmeta construtor."@en ; rdfs:comment "The hostmeta_location function is useful in its own right to modules like HTTP::LRDD."@en ];
+	] .
+
+my:project :release my:v_0-102 .
+my:v_0-102
+	a               :Version ;
+	dc:issued       "2010-08-11"^^xsd:date ;
+	:revision       "0.102"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/XRD-Parser-0.102.tar.gz> ;
+	dcs:changeset [
+		dcs:versus my:v_0-101 ;
+		dcs:item   [ rdfs:label "new() constructor no longer accepts undef content - use new_from_url() instead."@en ; a dcs:Removal ];
+		dcs:item   [ rdfs:label "new_from_url() constructor."@en ; a dcs:Addition ];
+	] .
+
+my:project :release my:v_0-103 .
+my:v_0-103
+	a               :Version ;
+	dc:issued       "2011-11-27"^^xsd:date ;
+	:revision       "0.103"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/XRD-Parser-0.103.tar.gz> ;
+	dcs:changeset [
+		dcs:versus my:v_0-102 ;
+		dcs:item   [ rdfs:label "use 5.010"@en ; a dcs:Update ] ;
+		dcs:item   [ rdfs:label "Minor tidy"@en ] ;
+		dcs:item   [ rdfs:label "Module::Package::RDF"@en ; a dcs:Packaging ] ;
+		dcs:item   [ rdfs:label "Generate more randomised bnode identifiers." ; a dcs:Bugfix ];
+	] .
+
+my:project :release my:v_0-104 .
+my:v_0-104
+	a               :Version ;
+	dc:issued       "2011-12-04"^^xsd:date ;
+	:revision       "0.104"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/XRD-Parser-0.104.tar.gz> ;
+	dcs:changeset [
+		dcs:versus my:v_0-103 ;
+		dcs:item   [ rdfs:label "Replace UNIVERSAL::AUTHORITY with Object::AUTHORITY."@en ];
+		dcs:item   [ rdfs:label "Newer version of Module::Package::RDF."@en ; a dcs:Packaging, dcs:Bugfix ];
+	] .
+
+my:project :release my:v_0-200 .
+my:v_0-200
+	a               :Version ;
+	dc:issued       "2012-09-11"^^xsd:date ;
+	:revision       "0.200"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/XRD-Parser-0.200.tar.gz> ;
+	dcs:changeset [
+		dcs:versus my:v_0-104 ;
+		dcs:item   [ rdfs:label "Use Digest::SHA instead of Digest::SHA1 as the former is part of the Perl core set of modules."@en ; a dcs:Update];
+		dcs:item   [ rdfs:label "Fix confused version numbers."@en ; a dcs:Packaging];
+	] .
+
+my:project :release my:v_0-201.
+my:v_0-201
+	a               :Version;
+	dc:issued       "2012-09-11"^^xsd:date;
+	:revision       "0.201"^^xsd:string;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/XRD-Parser-0.201.tar.gz>;
+	dcs:changeset [
+		dcs:versus my:v_0-200;
+		dcs:item   [ rdfs:label "Improve CPAN::Changes compliance."@en ; a dcs:Packaging];
+	] .

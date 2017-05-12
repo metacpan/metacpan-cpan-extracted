@@ -1,0 +1,74 @@
+{
+   "abstract" : "simple implementation of a WSDL server within Dancer2",
+   "author" : [
+      "Pierre VIGIER <pierre.vigier@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.047, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "XML-Compile-SOAP-Daemon-Dancer2",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "share",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.034"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Milla" : "v1.0.15",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dancer2" : "0",
+            "XML::Compile::SOAP" : "0",
+            "XML::Compile::SOAP12" : "0",
+            "XML::Compile::SOAP::Daemon" : "0",
+            "XML::Compile::WSDL11" : "0",
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "HTTP::Request" : "0",
+            "Plack::Test" : "0",
+            "Test::More" : "0.96"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/pierre-vigier/XML-Compile-SOAP-Daemon-Dancer2/issues"
+      },
+      "homepage" : "https://github.com/pierre-vigier/XML-Compile-SOAP-Daemon-Dancer2",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/pierre-vigier/XML-Compile-SOAP-Daemon-Dancer2.git",
+         "web" : "https://github.com/pierre-vigier/XML-Compile-SOAP-Daemon-Dancer2"
+      }
+   },
+   "version" : "0.07",
+   "x_contributors" : [
+      "Mohamad Hallal <mohamad.hallal@transfer-to.com>",
+      "Steve Guo <steve.guo@transfer-to.com>"
+   ]
+}
+

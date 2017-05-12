@@ -1,0 +1,102 @@
+Xmms::Streamcast - extention of Xmms::Perl to control one or more
+		streamcast servers.
+
+You need to have Xmms::Perl installed on your machine first.
+
+Add '+require Xmms::Streamcast;' to your .xmms/.perlrc file.
+
+Add the following lines to your .xmms/config.perl file
+
+[streamcast]
+streamhost=YOUR_STREAMCAST_HOST
+streamport=YOUR_STREAMCAST_PORT
+
+Here is a list of the commands:
+
+skip
+
+Summary:	Skips the current song playing
+Arguments:	none
+Example:	xmms> skip
+
+
+request [args]
+
+Summary:	Request a song to be played
+Arguments:	Space seperated list of NUMs	
+Example:	xmms> request 456 444 666
+		song 456 requested
+		song 444 requested
+		song 666 requested
+
+		This requests songs 456, 444, and 666 in the playlist
+
+requests/requested
+
+Summary:	Returns a list of the current requested song
+Arguments:	none
+Example:	xmms> requests
+		465 10_forgotten.mp3
+		466 11_cure_for_the_itch.mp3
+		467 12_pushing_me_away.mp3
+		468 01_papercut.mp3
+		469 02_one_step_colser.mp3
+
+stream
+
+Summary:	Display the current streaming song
+Arguments:	none
+Example:	xmms> stream
+		464 09_a_place_for_my_head.mp3 (3:04)
+
+songs
+
+Summary:	Returns a list of all the songs in the playlist
+Arguments:	none
+Example:	xmms> songs
+		...
+		646 /mp3/metal/a_perfect_circle/mer_de_noms/brena.mp3
+		647 /mp3/metal/a_perfect_circle/mer_de_noms/judith.mp3
+		648 /mp3/metal/a_perfect_circle/mer_de_noms/magdalena.mp3
+		649 /mp3//metal/a_perfect_circle/mer_de_noms/orestes.mp3
+
+dug [arg]
+
+Summary:	Its like 'dig' in perl-xmms.
+Arguments:	STRING
+Example:	xmms> dug liberate
+		66 /mp3/metal/slipknot/slipknot/liberate.mp3 (y/n/a/b)? y
+		song 66 requested
+Notes:		y = yes, n = no, a = all, b = break
+
+search [arg]
+
+Summary:	Search playlist for string
+Arguments:	STRING
+Example:	xmms> search eyeless
+		65 /mp3/metal/slipknot/slipknot/eyeless.mp3
+
+shost [arg]
+
+Summary:	sets the hostname for streamcast server
+Arguments:	STRING
+Example:	xmms> shost YOUR_STREAMCAST_HOST 
+
+sport [arg]
+
+Summary:	sets the post for the streamcast server
+Arguments:	NUM
+Example:	xmms> sport YOUR_STREAMCAST_PORT 
+
+sserver
+
+Summary:	Display the streamcast server we are connected to
+Arguments:	none
+Example:	xmms> sserver
+		YOUR_STREAMCAST_HOST:YOUR_STREAMCAST_PORT
+	
+
+Much thanks to dougm, sax, and mark for their help.
+
+-Cutter
+cutter@nonstopparty.com

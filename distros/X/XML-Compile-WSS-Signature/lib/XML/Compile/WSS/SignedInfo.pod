@@ -1,0 +1,124 @@
+=encoding utf8
+
+=head1 NAME
+
+XML::Compile::WSS::SignedInfo - administrating a SignedInfo block
+
+=head1 SYNOPSIS
+
+  # Not for end-users
+  my $sig = XML::Compile::WSS::Signature->new(signedinfo => HASH);
+  my $si  = $sig->signedinfo;
+
+=head1 DESCRIPTION
+
+The administration and reading/writing for the SignedInfo structure.
+
+=head1 METHODS
+
+=head2 Constructors
+
+=over 4
+
+=item XML::Compile::WSS::SignedInfo-E<gt>B<fromConfig>(HASH|PAIRS)
+
+All OPTIONS for L<new()|XML::Compile::WSS::SignedInfo/"Constructors">
+
+=item XML::Compile::WSS::SignedInfo-E<gt>B<new>($wss, %options)
+
+ -Option       --Default
+  c14n           <created internally>
+  canon_method   C14N_EXC_NO_COMM
+  digest_method  DSIG_SHA1
+  prefix_list    [ds wsu xenc SOAP-ENV]
+  wss            <required>
+
+=over 2
+
+=item c14n => L<XML::Compile::C14N|XML::Compile::C14N> object
+
+=item canon_method => CANON
+
+The algorithm to be used for canonicalization of some component.
+These constants are pre-defined with nice C<C14N_*> names in
+L<XML::Compile::C14N::Util|XML::Compile::C14N::Util>.
+
+=item digest_method => DIGEST
+
+The algorithm used to sign the body digest, when sending.
+
+The digest name is an ugly constant which has a nice C<DSIG_*> alias
+defined in L<XML::Compile::WSS::Util|XML::Compile::WSS::Util>.
+The digest is implemented via the Digest module, and its plugins.
+
+=item prefix_list => ARRAY
+
+Used for canonicalization.
+
+=item wss => L<XML::Compile::WSS|XML::Compile::WSS> object
+
+Optional when a c14n is provided.
+
+=back
+
+=back
+
+=head2 Attributes
+
+=over 4
+
+=item $obj-E<gt>B<c14n>()
+
+=item $obj-E<gt>B<defaultCanonMethod>()
+
+=item $obj-E<gt>B<defaultDigestMethod>()
+
+=item $obj-E<gt>B<defaultPrefixList>()
+
+=back
+
+=head2 Handlers
+
+=over 4
+
+=item $obj-E<gt>B<builder>($wss, %options)
+
+Not for end-users.  Returns a CODE which will be called to produce the
+data for a ds_SignedInfo block.  The %options can overrule the defaults
+set by L<new()|XML::Compile::WSS::SignedInfo/"Constructors">
+
+=back
+
+=head3 Digest
+
+=head3 Canonicalization
+
+With "canonicalization" you apply a set of rules to translate an XML
+structure into a standardized ("canonical") format.
+
+XML offers freedom on where to put namespace declarations, blanks between
+elements, order of attributes, and so on.  However, when you want to
+sign an element, meaningless changes do change the result.  Canonical
+format enforces a set of rules, and produces bytes.
+
+The "Digital Signature v1" supports c14n.  DSIG version 2 uses c14n2...
+which is not yet supported.
+
+=head1 SEE ALSO
+
+This module is part of XML-Compile-WSS-Signature distribution version 2.02,
+built on July 16, 2016. Website: F<http://perl.overmeer.net/xml-compile/>
+
+Please post questions or ideas to the mailinglist at
+F<http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/xml-compile> .
+For live contact with other developers, visit the C<#xml-compile> channel
+on C<irc.perl.org>.
+
+=head1 LICENSE
+
+Copyrights 2012-2016 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

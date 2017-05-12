@@ -1,0 +1,82 @@
+Revision history for X11-Muralis
+================================
+
+0.10 Sun  6 December 2009
+-------------------------
+  * Revamp; displayng is done with backends.
+
+0.03 Tue 28 August 2007
+-----------------------
+
+  * (28 Aug 2007) feh
+  	Re-added in the options for feh.
+
+  * (25 Aug 2007) hsetroot not feh
+  	Removed the custom stuff for feh and put in hsetroot stuff instead.
+  I didn't like feh, it didn't scale properly.
+
+  * (21 Aug 2007) enable use of feh
+  	Because xloadimage doesn't work well with XRender, I added some
+  code to enable feh as an alternative displayer.
+
+  * (5 Apr 2007) no todo
+  	Removed the TODO file since I am using a different system
+  for TODO stuff.
+
+0.02 Sat 11 March 2006
+----------------------
+
+  * (11 Mar 2006) unseen option
+  	* (11 Mar 2006) the 'unseen' option enables files to be displayed without
+  repeat, as it maintains a list of files that have not yet been seen,
+  in the ~/.muralis/unseen file.
+
+  * (11 Mar 2006) exclude option
+  	* (11 Mar 2006) added 'exclude' option, for excluding matches
+  	* (11 Mar 2006) changed 'image_match" to 'is_image' because it was confusing.
+
+  * (11 Mar 2006) match options
+  	Replaced the 'dir_match' option with 'match' which will match
+  anything; there's now a different way of gettting the list of files.
+  Also if you give a filename it will display the first file matching
+  that filename string.
+  	Added the 'nth' option, which will display the nth matching image.
+
+  * (11 Mar 2006) new list options
+  	* (11 Mar 2006) listformat allows the default directories + files listing,
+  or if 'fullname' will give just a list of the full names of the image
+  files.
+  	* (11 Mar 2006) outfile gives the name of an output file for the image listing.
+  If none is given, will print the list to STDOUT as usual.
+
+  * (11 Mar 2006) tweaking arguments
+  	Moved stuff around so that only global things are set in the "new"
+  method, and everything else is properly passed around.
+  	Also enabled the muralis script to override the config_dir
+  and the regular expression used to decide what is an image file.
+
+  * (11 Mar 2006) removed dependency on ls
+  	Used opendir/readdir/closedir instead, keeping this more perl.
+
+  * (11 Mar 2006) improved documentation
+  	I'd forgotten how woeful it was.  Now all the options are
+  actually described.
+
+0.01 Sun 04 September 2005
+--------------------------
+
+  * (4 Sep 2005) tweaking documentation
+
+  * (12 Jul 2005) renamed the module X11:Muralis
+
+  * (12 Jul 2005) workaround Image::Info bug
+  	It seems that with some JPEG files, the Image::Info module
+  can't cope with them, even though xloadimage can display them
+  perfectly well.  So, if Image::Info crashes, this now simply goes
+  on to the display part.  This means that for those particular files,
+  no smart guessing of the appropriate options will happen, but the
+  user can still set their wanted options from the command line.
+
+  * (9 May 2005) fixed tiling options
+
+  * (9 May 2005) initial checkin

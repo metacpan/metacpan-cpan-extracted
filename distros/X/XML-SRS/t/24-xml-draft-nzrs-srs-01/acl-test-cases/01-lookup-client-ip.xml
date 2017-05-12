@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<NZSRSRequest VerMinor="11" VerMajor="3" RegistrarId="100">
+  <AccessControlListQry List="allow" Type="registrar_ip" Resource="epp_connect">
+    <RegistrarIdFilter>101</RegistrarIdFilter>
+    <AddressFilter>101.1.5.0/24</AddressFilter>
+  </AccessControlListQry>
+</NZSRSRequest>

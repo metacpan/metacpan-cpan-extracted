@@ -1,0 +1,6 @@
+Revision history for Perl extension XML::Parser::Style::RDF.
+
+0.01  Sun Nov  9 11:27:20 2003
+	- original version; created by h2xs 1.22 with options
+		-X -n XML::Parser::Style::RDF
+

@@ -1,0 +1,52 @@
+#!/usr/bin/make -f
+#
+# File: rules
+# Date: 07-Jul-2013
+# By  : Kevin Esteb
+#
+# rules file to build XAS for debian
+#
+# Variables
+#
+PERL ?= /usr/bin/perl
+PACKAGE = $(shell dh_listpackages)
+TMP = $(CURDIR)/debian/$(PACKAGE)
+DEBUILD=/usr/bin/debuild
+#
+# Targets
+#
+Build:
+	$(PERL) Build.PL installdirs=vendor
+
+build-indep: Build
+	$(PERL) Build
+	$(PERL) Build test
+	$(PERL) Build install destdir=$(TMP) create_packlist=0
+
+build: build-indep
+	dh_testdir
+	dh_testroot
+	dh_installdocs #DOCS#
+	dh_installexamples #EXAMPLES#
+	dh_installchangelogs #CHANGES#
+	dh_perl
+	dh_compress
+	dh_fixperms
+	dh_installdeb
+	dh_gencontrol
+	dh_md5sums
+	dh_builddeb
+
+clean:
+	dh_clean
+
+deb: debian/rules
+	$(DEBUILD) -rfakeroot -uc -us -sa 2>&1 | tee debuild.log
+
+# required stuff that we don't need.
+
+binary: binary-arch binary-indep
+binary-arch:
+binary-indep:
+build-arch:
+

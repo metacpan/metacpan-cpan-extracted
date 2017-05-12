@@ -1,0 +1,13 @@
+<% 
+    $template->set( '*' => { testcode => \&uppercase_tag } );
+
+    sub uppercase_tag {
+        my( $n, $tag ) = @_;
+        if( my $name = uc $n->getName ) {
+            $tag->set({ pre => "<$name>",
+                        post => "</$name>", });
+        }
+
+        return DO_SELF_AND_KIDS;
+    }
+%><%= apply_templates() %>

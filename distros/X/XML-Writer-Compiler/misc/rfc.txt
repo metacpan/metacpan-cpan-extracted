@@ -1,0 +1,101 @@
+This node is dual purpose. The primary purpose is to request some
+functionality in [mod://Data::Diver] but do so publicly so we can all
+feedback on its usefulness, or whether some other module handles this
+already.
+<P>
+A secondary purpose relates to [id://787605|An earlier node] in
+which [jrey] suggested the <CODE>new_from_lol</CODE> function of
+[mod://HTML::Element].
+
+<h2>Data::Diver::DivePrintable</h2>
+
+I have developed a small piece of code which traverses a sample XML
+document and produces an arrayref or arrayrefs (aka lol) that can
+build the XML document when the arrayref is passed to 
+<a
+href=http://search.cpan.org/~jfearn/HTML-Tree-4.2/lib/HTML/Element.pm#$h_=_HTML::Element-%3Enew_from_lol%28ARRAYREF%29>new_from_lol</a>
+. The actual values are filled in by diving through a nested hash
+reference. 
+
+<h3>example</h3>
+
+<h4>XML</h4>
+
+<CODE>
+<ItemInventoryAddRq> 
+  <ItemInventoryAdd> 
+    <Name >STRTYPE</Name> 
+    <IsActive >BOOLTYPE</IsActive>
+    <ParentRef>
+      <ListID >IDTYPE</ListID>
+      <FullName >STRTYPE</FullName>
+    </ParentRef>
+...
+</CODE>
+
+<h4>lolcode</h4>
+
+<CODE>
+sub mktree {
+  my($root)=@_;
+
+  XML::Element->new_from_lol([
+    "ItemInventoryAddRq",
+    Dive( $root, qw() ),
+    [
+        "ItemInventoryAdd",
+        Dive( $root, qw() ),
+        [ "Name",     Dive( $root, qw(Name) ) ],
+        [ "IsActive", Dive( $root, qw(IsActive) ) ],
+        [
+            "ParentRef",
+            Dive( $root, qw(ParentRef) ),
+            [ "ListID",   Dive( $root, qw(ParentRef ListID) ) ],
+            [ "FullName", Dive( $root, qw(ParentRef FullName) ) ]
+        ],
+...
+
+</CODE>
+
+<h4>sample data</h4>
+
+<CODE>
+my $hashref = {
+   Name => 'Bob',
+   IsActive => 'hell yeah',
+   ParentRef => {
+     ListID => 'afsd-dfsa-dgsd-w2ws',
+     FullName => 'Bob Cat'
+   ...
+</CODE>
+
+<h4>needed functionality</h4>
+
+Because the Dive expression is auto-generated, in certain places it
+does not make sense for the hash-reference to render its value. For
+instance <CODE>Parent</CODE> is just a container node that will never
+have data. So, it would be nice if the <CODE>Dive</CODE> function only
+printed data that was not a reference.
+<P>
+Alternatively, I suppose, I could modify the autogenerator to only
+generate Dive expressions for nodes whose children was text and not
+other nodes.
+
+<h3>XML::Simple::Ordered</h3>
+
+[mod://XML::Simple] converts hash references to XML, with two
+limitations:
+<OL>
+<LI>No ability to sequence elements in the XML
+<LI>No ability to create mixed content
+<OL>
+
+
+HTML::Elements new_from_lol does not have these limitations. And the
+autogenerator I've written converts a hash reference to XML. But what
+it currently does not do is handle attribute rendering. It also does
+not handle repeated  So, in a
+sense, this code is a version of XML Simple for ordered elements. 
+So the
+question is, should a separate hash reference have the attributes for
+each element? No, I think if the data element is a 

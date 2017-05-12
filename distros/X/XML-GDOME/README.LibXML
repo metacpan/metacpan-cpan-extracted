@@ -1,0 +1,70 @@
+Notes on LibXML/GDOME compatability:
+
+LibXML differences
+==================
+
+LibXML non-conformance (to be confirmed)
+========================================
+    The following methods have different behaviour in LibXML and
+    GDOME. I think these are non-conformances in LibXML.
+
+    Node::getAttribute
+      LibXML returns undef when the attribute has not been set
+      GDOME returns empty string
+
+    Node::getLocalName
+      LibXML returns node name for DOM Level 1 documents
+      GDOME returns undef
+
+    Document->getNodeName
+      LibXML returns 'text' for text node
+      GDOME returns '#text' for text node
+
+    Document->importNode
+      LibXML if set 2nd argument allows moves (not copies) nodes
+      GDOME if set 2nd argument specifies a deep copy
+
+    Node->getElementsByTagName
+    Node->getElementsByLocalName
+      LibXML getElementsByTagName ignores namespaces
+      LibXML getElementsByLocalName returns results of getElementsByTagName?
+
+
+Methods with api differences
+============================
+    The following methods work differently between LibXML and GDOME.
+
+    XML::GDOME->parse_string
+      LibXML throws an exception with an empty document
+      GDOME returns ''
+
+    Document->toString
+      LibXML includes 'encoding="UTF-8"' in xml tag
+      GDOME does not include encoding (UTF-8 implied by default)
+
+    Node->find
+      LibXML returns typed objects
+      GDOME returns the string
+
+    Node->findnodes
+      LibXML returns NodeList object in scalar context
+      GDOME only works in array context
+
+
+Methods not implemented in GDOME
+================================
+    The following methods are not part of the W3C DOM and have not
+    been implemented in GDOME.
+
+      XML::LibXML->parse_html_*
+      XML::LibXML->parse_xml_chunk
+      XML::LibXML::Document->new
+      XML::LibXML::Document->URI
+      XML::LibXML::Document->setDocumentElement
+      XML::LibXML::Node->isEqual
+      XML::LibXML::Element->new
+      XML::LibXML::Text->new
+      XML::LibXML::Attr->new
+      XML::LibXML::Comment->new
+      XML::LibXML::DocumentFragment->new
+

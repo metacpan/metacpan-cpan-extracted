@@ -1,0 +1,24 @@
+<NZSRSRequest VerMinor="11" VerMajor="3">
+  <DomainCreate Delegate="1" ActionId="xx101" DomainName="example.org.nz" RegistrantRef="RS1001" Term="1" DomainNameUnicode="example.org.nz" >
+    <RegistrantContact Name="John Smith" Email="j.smith@mydomain.example.org.nz">
+      <PostalAddress Address2="Suburbia" PostalCode="6135" Address1="14 Rural Street" City="Wellington" CountryCode="NZ"/>
+      <Phone LocalNumber="111234" AreaCode="4" CountryCode="64"/>
+      <Fax LocalNumber="111235" AreaCode="4" CountryCode="64"/>
+    </RegistrantContact>
+    <AdminContact Name="ISP Administrator" Email="admin@myisp.example.org.nz">
+      <PostalAddress Address2="Central" PostalCode="6001" Address1="1 Main Road" City="Wellington" CountryCode="NZ"/>
+      <Phone LocalNumber="111123" AreaCode="4" CountryCode="64"/>
+      <Fax LocalNumber="111124" AreaCode="4" CountryCode="64"/>
+    </AdminContact>
+    <TechnicalContact Name="ISP Technician" Email="tech@myisp.example.org.nz">
+      <PostalAddress Address2="Central" PostalCode="6001" Address1="1 Main Road" City="Wellington" CountryCode="NZ"/>
+      <Phone LocalNumber="111125" AreaCode="4" CountryCode="64"/>
+      <Fax LocalNumber="111126" AreaCode="4" CountryCode="64"/>
+    </TechnicalContact>
+    <NameServers>
+      <Server FQDN="ns1.example.com"/>
+      <Server FQDN="ns2.example.com"/>
+    </NameServers>
+    <AuditText>Domain created for John Smith, RS8974</AuditText>
+  </DomainCreate>
+</NZSRSRequest>

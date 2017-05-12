@@ -1,0 +1,45 @@
+0.216     2014-12-15 05:58:39+00:00 UTC
+    #1 fix POD encoding to use UTF-8 (SROMANOV++)
+0.215     2011-05-23 14:53:01 America/New_York
+    More complete file portability tests
+0.214     2011-04-20 16:46:41 America/New_York
+    MS Windows portability fixes in the tests
+0.213     2011-04-20 15:32:55 America/New_York
+    more support documentation
+0.212     2011-04-20 13:27:45 America/New_York
+    only require perl 5.10 instead of 5.12
+0.211     2011-04-19 18:20:21 America/New_York
+    added TaskContainer::find_task and ResourceContainer::map_resources
+    delegated methods
+    support <copy todir=""/> attribute
+0.210     2011-04-19 15:02:08 America/New_York
+    support <concat/> tasks and refid attributes in resources
+    fix bug when default Ant properties are overridden with subsequent
+    references to the main project
+0.209     2011-04-19 11:33:22 America/New_York
+    handle <arg pathref="foo"/> elements in <java/> tasks
+0.208     2011-04-19 10:15:02 America/New_York
+    require MooseX::Singleton 0.26 for compatibility with Moose >1.9900
+0.207     2011-04-18 17:13:37 America/New_York
+    fix fatal bug if a property value is undefined
+0.206     2011-04-18 12:47:30 America/New_York
+    better property and resource name substitution
+    processing <java/> task arguments and <path/> structures
+    new plugin system for XML::Ant::BuildFile::Resource and ::Task
+0.205     2011-03-25 17:00:33 America/New_York
+    new public apply_properties method on projects
+    property substution is recursive
+    rename Target and FileList classes up a level to XML::Ant::BuildFile::
+    added XML::Ant::BuildFile::Task::Java and limited argument parsing
+    lots of new helper methods for files, filelists, properties, targets, tasks
+    targets, filelists, files automatically dereference
+0.204     2011-03-24 16:16:11 America/New_York
+    add some spiffy delegates and attributes for targets
+0.203     2011-03-24 15:00:31 America/New_York
+    turn targets into a hashref of objects so we can query their contents
+0.202     2011-03-23 14:58:44 America/New_York
+    require XML::Rabbit 0.0.4 explicitly so the FileList module will compile
+0.201     2011-03-22 21:44:49 America/New_York
+    remove dependency test on ant executable
+0.200     2011-03-22 13:57:16 America/New_York
+    extract from internal GSI project

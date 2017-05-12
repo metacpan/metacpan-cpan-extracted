@@ -1,0 +1,778 @@
+=encoding utf8
+
+=head1 NAME
+
+XML::LibXML::Simple - XML::LibXML clone of XML::Simple::XMLin()
+
+=head1 INHERITANCE
+
+ XML::LibXML::Simple
+   is a Exporter
+
+=head1 SYNOPSIS
+
+  my $xml  = ...;  # filename, fh, string, or XML::LibXML-node
+
+Imperative:
+
+  use XML::LibXML::Simple   qw(XMLin);
+  my $data = XMLin $xml, %options;
+
+Or the Object Oriented way:
+
+  use XML::LibXML::Simple   ();
+  my $xs   = XML::LibXML::Simple->new(%options);
+  my $data = $xs->XMLin($xml, %options);
+
+=head1 DESCRIPTION
+
+This module is a blunt rewrite of XML::Simple (by Grant McLean) to
+use the XML::LibXML parser for XML structures, where the original
+uses plain Perl or SAX parsers.
+
+=head1 METHODS
+
+=head2 Constructors
+
+=over 4
+
+=item XML::LibXML::Simple-E<gt>B<new>(%options)
+
+Instantiate an object, which can be used to call L<XMLin()|XML::LibXML::Simple/"Translators"> on.  You can
+provide %options to this constructor (to be reused for each call to XMLin)
+and with each call of XMLin (to be used once)
+
+For descriptions of the %options see the L</DETAILS>
+section of this manual page.
+
+=back
+
+=head2 Translators
+
+=over 4
+
+=item $obj-E<gt>B<XMLin>($xmldata, %options)
+
+For $xmldata and descriptions of the %options see the L</DETAILS>
+section of this manual page.
+
+=back
+
+=head1 FUNCTIONS
+
+The functions C<XMLin> (exported implictly) and C<xml_in>
+(exported on request) simply call C<<XML::LibXML::Simple->new->XMLin() >>
+with the provided parameters.
+
+=head1 DETAILS
+
+=head2 Parameter $xmldata
+
+As first parameter to L<XMLin()|XML::LibXML::Simple/"Translators"> must provide the XML message to be
+translated into a Perl structure.  Choose one of the following:
+
+=over 4
+
+=item A filename
+
+If the filename contains no directory components, C<XMLin()> will look for the
+file in each directory in the SearchPath (see OPTIONS below) and in the
+current directory.  eg:
+
+  $data = XMLin('/etc/params.xml', %options);
+
+=item A dash  (-)
+
+Parse from STDIN.
+
+  $data = XMLin('-', %options);
+
+=item undef
+
+[deprecated]
+If there is no XML specifier, C<XMLin()> will check the script directory and
+each of the SearchPath directories for a file with the same name as the script
+but with the extension '.xml'.  Note: if you wish to specify options, you
+must specify the value 'undef'.  eg:
+
+  $data = XMLin(undef, ForceArray => 1);
+
+This feature is available for backwards compatibility with XML::Simple,
+but quite sensitive.  You can easily hit the wrong xml file as input.
+Please do not use it: always use an explicit filename.
+
+=item A string of XML
+
+A string containing XML (recognised by the presence of '<' and '>' characters)
+will be parsed directly.  eg:
+
+  $data = XMLin('<opt username="bob" password="flurp" />', %options);
+
+=item An IO::Handle object
+
+In this case, XML::LibXML::Parser will read the XML data directly from
+the provided file.
+
+  # $fh = IO::File->new('/etc/params.xml') or die;
+  open my $fh, '<:encoding(utf8)', '/etc/params.xml' or die;
+
+  $data = XMLin($fh, %options);
+
+=item An XML::LibXML::Document or ::Element
+
+[Not available in XML::Simple] When you have a pre-parsed XML::LibXML
+node, you can pass that.
+
+=back
+
+=head2 Parameter %options
+
+L<XML::LibXML::Simple|XML::LibXML::Simple> supports most options defined by XML::Simple, so
+the interface is quite compatible.  Minor changes apply.  This explanation
+is extracted from the XML::Simple manual-page.
+
+=over 4
+
+=item *
+
+check out C<ForceArray> because you'll almost certainly want to turn it on
+
+=item *
+
+make sure you know what the C<KeyAttr> option does and what its default
+value is because it may surprise you otherwise.
+
+=item *
+
+Option names are case in-sensitive so you can use the mixed case versions
+shown here; you can add underscores between the words (eg: key_attr)
+if you like.
+
+=back
+
+In alphabetic order:
+
+=over 4
+
+=item ContentKey => 'keyname' I<# seldom used>
+
+When text content is parsed to a hash value, this option let's you specify a
+name for the hash key to override the default 'content'.  So for example:
+
+  XMLin('<opt one="1">Two</opt>', ContentKey => 'text')
+
+will parse to:
+
+  { one => 1, text => 'Two' }
+
+instead of:
+
+  { one => 1, content => 'Two' }
+
+You can also prefix your selected key name with a '-' character to have 
+C<XMLin()> try a little harder to eliminate unnecessary 'content' keys after
+array folding.  For example:
+
+  XMLin(
+    '<opt><item name="one">First</item><item name="two">Second</item></opt>', 
+    KeyAttr => {item => 'name'}, 
+    ForceArray => [ 'item' ],
+    ContentKey => '-content'
+  )
+
+will parse to:
+
+  {
+     item => {
+      one =>  'First'
+      two =>  'Second'
+    }
+  }
+
+rather than this (without the '-'):
+
+  {
+    item => {
+      one => { content => 'First' }
+      two => { content => 'Second' }
+    }
+  }
+
+=item ForceArray => 1 I<# important>
+
+This option should be set to '1' to force nested elements to be represented
+as arrays even when there is only one.  Eg, with ForceArray enabled, this
+XML:
+
+    <opt>
+      <name>value</name>
+    </opt>
+
+would parse to this:
+
+    { name => [ 'value' ] }
+
+instead of this (the default):
+
+    { name => 'value' }
+
+This option is especially useful if the data structure is likely to be written
+back out as XML and the default behaviour of rolling single nested elements up
+into attributes is not desirable. 
+
+If you are using the array folding feature, you should almost certainly
+enable this option.  If you do not, single nested elements will not be
+parsed to arrays and therefore will not be candidates for folding to a
+hash.  (Given that the default value of 'KeyAttr' enables array folding,
+the default value of this option should probably also have been enabled
+as well).
+
+=item ForceArray => [ names ] I<# important>
+
+This alternative (and preferred) form of the 'ForceArray' option allows you to
+specify a list of element names which should always be forced into an array
+representation, rather than the 'all or nothing' approach above.
+
+It is also possible to include compiled regular
+expressions in the list --any element names which match the pattern
+will be forced to arrays.  If the list contains only a single regex,
+then it is not necessary to enclose it in an arrayref.  Eg:
+
+  ForceArray => qr/_list$/
+
+=item ForceContent => 1 I<# seldom used>
+
+When C<XMLin()> parses elements which have text content as well as attributes,
+the text content must be represented as a hash value rather than a simple
+scalar.  This option allows you to force text content to always parse to
+a hash value even when there are no attributes.  So for example:
+
+  XMLin('<opt><x>text1</x><y a="2">text2</y></opt>', ForceContent => 1)
+
+will parse to:
+
+  {
+    x => {         content => 'text1' },
+    y => { a => 2, content => 'text2' }
+  }
+
+instead of:
+
+  {
+    x => 'text1',
+    y => { 'a' => 2, 'content' => 'text2' }
+  }
+
+=item GroupTags => { grouping tag => grouped tag } I<# handy>
+
+You can use this option to eliminate extra levels of indirection in your Perl
+data structure.  For example this XML:
+
+  <opt>
+   <searchpath>
+     <dir>/usr/bin</dir>
+     <dir>/usr/local/bin</dir>
+     <dir>/usr/X11/bin</dir>
+   </searchpath>
+ </opt>
+
+Would normally be read into a structure like this:
+
+  {
+    searchpath => {
+       dir => [ '/usr/bin', '/usr/local/bin', '/usr/X11/bin' ]
+    }
+  }
+
+But when read in with the appropriate value for 'GroupTags':
+
+  my $opt = XMLin($xml, GroupTags => { searchpath => 'dir' });
+
+It will return this simpler structure:
+
+  {
+    searchpath => [ '/usr/bin', '/usr/local/bin', '/usr/X11/bin' ]
+  }
+
+The grouping element (C<< <searchpath> >> in the example) must not contain any
+attributes or elements other than the grouped element.
+
+You can specify multiple 'grouping element' to 'grouped element' mappings in
+the same hashref.  If this option is combined with C<KeyAttr>, the array
+folding will occur first and then the grouped element names will be eliminated.
+
+=item HookNodes => CODE
+
+Select document nodes to apply special tricks.
+Introduced in [0.96], not available in XML::Simple.
+
+When this option is provided, the CODE will be called once the XML DOM
+tree is ready to get transformed into Perl.  Your CODE should return
+either C<undef> (nothing to do) or a HASH which maps values of
+unique_key (see XML::LibXML::Node method C<unique_key> onto CODE
+references to be called.
+
+Once the translater from XML into Perl reaches a selected node, it will
+call your routine specific for that node.  That triggering node found
+is the only parameter.  When you return C<undef>, the node will not be
+found in the final result.  You may return any data (even the node itself)
+which will be included in the final result as is, under the name of the
+original node.
+
+Example:
+
+   my $out = XMLin $file, HookNodes => \&protect_html;
+
+   sub protect_html($$)
+   {   # $obj is the instantated XML::Compile::Simple object
+       # $xml is a XML::LibXML::Element to get transformed
+       my ($obj, $xml) = @_;
+
+       my %hooks;    # collects the table of hooks
+
+       # do an xpath search for HTML
+       my $xpc   = XML::LibXML::XPathContext->new($xml);
+       my @nodes = $xpc->findNodes(...); #XXX
+       @nodes or return undef;
+
+       my $as_text = sub { $_[0]->toString(0) };  # as text
+       #  $as_node = sub { $_[0] };               # as node
+       #  $skip    = sub { undef };               # not at all
+
+       # the same behavior for all xpath nodes, in this example
+       $hook{$_->unique_key} = $as_text
+           for @nodes;
+ 
+       \%hook;
+   }
+
+=item KeepRoot => 1 I<# handy>
+
+In its attempt to return a data structure free of superfluous detail and
+unnecessary levels of indirection, C<XMLin()> normally discards the root
+element name.  Setting the 'KeepRoot' option to '1' will cause the root element
+name to be retained.  So after executing this code:
+
+  $config = XMLin('<config tempdir="/tmp" />', KeepRoot => 1)
+
+You'll be able to reference the tempdir as
+C<$config-E<gt>{config}-E<gt>{tempdir}> instead of the default
+C<$config-E<gt>{tempdir}>.
+
+=item KeyAttr => [ list ] I<# important>
+
+This option controls the 'array folding' feature which translates nested
+elements from an array to a hash.  It also controls the 'unfolding' of hashes
+to arrays.
+
+For example, this XML:
+
+    <opt>
+      <user login="grep" fullname="Gary R Epstein" />
+      <user login="stty" fullname="Simon T Tyson" />
+    </opt>
+
+would, by default, parse to this:
+
+    {
+      user => [
+         { login    => 'grep',
+           fullname => 'Gary R Epstein'
+         },
+         { login    => 'stty',
+           fullname => 'Simon T Tyson'
+         }
+      ]
+    }
+
+If the option 'KeyAttr => "login"' were used to specify that the 'login'
+attribute is a key, the same XML would parse to:
+
+    {
+      user => {
+         stty => { fullname => 'Simon T Tyson' },
+         grep => { fullname => 'Gary R Epstein' }
+      }
+    }
+
+The key attribute names should be supplied in an arrayref if there is more
+than one.  C<XMLin()> will attempt to match attribute names in the order
+supplied.
+
+Note 1: The default value for 'KeyAttr' is C<< ['name', 'key', 'id'] >>.
+If you do not want folding on input or unfolding on output you must
+setting this option to an empty list to disable the feature.
+
+Note 2: If you wish to use this option, you should also enable the
+C<ForceArray> option.  Without 'ForceArray', a single nested element will be
+rolled up into a scalar rather than an array and therefore will not be folded
+(since only arrays get folded).
+
+=item KeyAttr => { list } I<# important>
+
+This alternative (and preferred) method of specifiying the key attributes
+allows more fine grained control over which elements are folded and on which
+attributes.  For example the option 'KeyAttr => { package => 'id' } will cause
+any package elements to be folded on the 'id' attribute.  No other elements
+which have an 'id' attribute will be folded at all. 
+
+Two further variations are made possible by prefixing a '+' or a '-' character
+to the attribute name:
+
+The option 'KeyAttr => { user => "+login" }' will cause this XML:
+
+    <opt>
+      <user login="grep" fullname="Gary R Epstein" />
+      <user login="stty" fullname="Simon T Tyson" />
+    </opt>
+
+to parse to this data structure:
+
+    {
+      user => {
+         stty => {
+            fullname => 'Simon T Tyson',
+            login    => 'stty'
+         },
+         grep => {
+            fullname => 'Gary R Epstein',
+            login    => 'grep'
+         }
+      }
+    }
+
+The '+' indicates that the value of the key attribute should be copied
+rather than moved to the folded hash key.
+
+A '-' prefix would produce this result:
+
+    {
+      user => {
+         stty => {
+            fullname => 'Simon T Tyson',
+            -login   => 'stty'
+         },
+         grep => {
+            fullname => 'Gary R Epstein',
+            -login    => 'grep'
+         }
+      }
+    }
+
+=item NoAttr => 1 I<# handy>
+
+When used with C<XMLin()>, any attributes in the XML will be ignored.
+
+=item NormaliseSpace => 0 | 1 | 2 I<# handy>
+
+This option controls how whitespace in text content is handled.  Recognised
+values for the option are:
+
+=over 4
+
+=item "0"
+
+(default) whitespace is passed through unaltered (except of course for the
+normalisation of whitespace in attribute values which is mandated by the XML
+recommendation)
+
+=item "1"
+
+whitespace is normalised in any value used as a hash key (normalising means
+removing leading and trailing whitespace and collapsing sequences of whitespace
+characters to a single space)
+
+=item "2"
+
+whitespace is normalised in all text content
+
+=back
+
+Note: you can spell this option with a 'z' if that is more natural for you.
+
+=item Parser => OBJECT
+
+You may pass your own XML::LibXML object, in stead of having one
+created for you. This is useful when you need specific configuration
+on that object (See XML::LibXML::Parser) or have implemented your
+own extension to that object.
+
+The internally created parser object is configured in safe mode.
+Read the XML::LibXML::Parser manual about security issues with
+certain parameter settings.  The default is unsafe!
+
+=item ParserOpts => HASH|ARRAY
+
+Pass parameters to the creation of a new internal parser object. You
+can overrule the options which will create a safe parser. It may be more
+readible to use the C<Parser> parameter.
+
+=item SearchPath => [ list ] I<# handy>
+
+If you pass C<XMLin()> a filename, but the filename include no directory
+component, you can use this option to specify which directories should be
+searched to locate the file.  You might use this option to search first in the
+user's home directory, then in a global directory such as /etc.
+
+If a filename is provided to C<XMLin()> but SearchPath is not defined, the
+file is assumed to be in the current directory.
+
+If the first parameter to C<XMLin()> is undefined, the default SearchPath
+will contain only the directory in which the script itself is located.
+Otherwise the default SearchPath will be empty.  
+
+=item ValueAttr => [ names ] I<# handy>
+
+Use this option to deal elements which always have a single attribute and no
+content.  Eg:
+
+  <opt>
+    <colour value="red" />
+    <size   value="XXL" />
+  </opt>
+
+Setting C<< ValueAttr => [ 'value' ] >> will cause the above XML to parse to:
+
+  {
+    colour => 'red',
+    size   => 'XXL'
+  }
+
+instead of this (the default):
+
+  {
+    colour => { value => 'red' },
+    size   => { value => 'XXL' }
+  }
+
+=item NsExpand => 0  I<advised>
+
+When name-spaces are used, the default behavior is to include the
+prefix in the key name.  However, this is very dangerous: the prefixes
+can be changed without a change of the XML message meaning.  Therefore,
+you can better use this C<NsExpand> option.  The downside, however, is
+that the labels get very long.
+
+Without this option:
+
+  <record xmlns:x="http://xyz">
+    <x:field1>42</x:field1>
+  </record>
+  <record xmlns:y="http://xyz">
+    <y:field1>42</y:field1>
+  </record>
+
+translates into
+
+  { 'x:field1' => 42 }
+  { 'y:field1' => 42 }
+
+but both source component have exactly the same meaning.  When C<NsExpand>
+is used, the result is:
+
+  { '{http://xyz}field1' => 42 }
+  { '{http://xyz}field1' => 42 }
+
+Of course, addressing these fields is more work.  It is advised to implement
+it like this:
+
+  my $ns = 'http://xyz';
+  $data->{"{$ns}field1"};
+
+=item NsStrip => 0 I<sloppy coding>
+
+[not available in XML::Simple]
+Namespaces are really important to avoid name collissions, but they are
+a bit of a hassle.  To do it correctly, use option C<NsExpand>.  To do
+it sloppy, use C<NsStrip>.  With this option set, the above example will
+return
+
+  { field1 => 42 }
+  { field1 => 42 }
+
+=back
+
+=head1 EXAMPLES
+
+When C<XMLin()> reads the following very simple piece of XML:
+
+    <opt username="testuser" password="frodo"></opt>
+
+it returns the following data structure:
+
+    {
+      username => 'testuser',
+      password => 'frodo'
+    }
+
+The identical result could have been produced with this alternative XML:
+
+    <opt username="testuser" password="frodo" />
+
+Or this (although see 'ForceArray' option for variations):
+
+    <opt>
+      <username>testuser</username>
+      <password>frodo</password>
+    </opt>
+
+Repeated nested elements are represented as anonymous arrays:
+
+    <opt>
+      <person firstname="Joe" lastname="Smith">
+        <email>joe@smith.com</email>
+        <email>jsmith@yahoo.com</email>
+      </person>
+      <person firstname="Bob" lastname="Smith">
+        <email>bob@smith.com</email>
+      </person>
+    </opt>
+
+    {
+      person => [
+        { email     => [ 'joe@smith.com', 'jsmith@yahoo.com' ],
+          firstname => 'Joe',
+          lastname  => 'Smith'
+        },
+        { email     => 'bob@smith.com',
+          firstname => 'Bob',
+          lastname  => 'Smith'
+        }
+      ]
+    }
+
+Nested elements with a recognised key attribute are transformed (folded) from
+an array into a hash keyed on the value of that attribute (see the C<KeyAttr>
+option):
+
+    <opt>
+      <person key="jsmith" firstname="Joe" lastname="Smith" />
+      <person key="tsmith" firstname="Tom" lastname="Smith" />
+      <person key="jbloggs" firstname="Joe" lastname="Bloggs" />
+    </opt>
+
+    {
+      person => {
+         jbloggs => {
+            firstname => 'Joe',
+            lastname  => 'Bloggs'
+         },
+         tsmith  => {
+            firstname => 'Tom',
+            lastname  => 'Smith'
+         },
+         jsmith => {
+            firstname => 'Joe',
+            lastname => 'Smith'
+         }
+      }
+    }
+
+The <anon> tag can be used to form anonymous arrays:
+
+    <opt>
+      <head><anon>Col 1</anon><anon>Col 2</anon><anon>Col 3</anon></head>
+      <data><anon>R1C1</anon><anon>R1C2</anon><anon>R1C3</anon></data>
+      <data><anon>R2C1</anon><anon>R2C2</anon><anon>R2C3</anon></data>
+      <data><anon>R3C1</anon><anon>R3C2</anon><anon>R3C3</anon></data>
+    </opt>
+
+    {
+      head => [ [ 'Col 1', 'Col 2', 'Col 3' ] ],
+      data => [ [ 'R1C1', 'R1C2', 'R1C3' ],
+                [ 'R2C1', 'R2C2', 'R2C3' ],
+                [ 'R3C1', 'R3C2', 'R3C3' ]
+              ]
+    }
+
+Anonymous arrays can be nested to arbirtrary levels and as a special case, if
+the surrounding tags for an XML document contain only an anonymous array the
+arrayref will be returned directly rather than the usual hashref:
+
+    <opt>
+      <anon><anon>Col 1</anon><anon>Col 2</anon></anon>
+      <anon><anon>R1C1</anon><anon>R1C2</anon></anon>
+      <anon><anon>R2C1</anon><anon>R2C2</anon></anon>
+    </opt>
+
+    [
+      [ 'Col 1', 'Col 2' ],
+      [ 'R1C1', 'R1C2' ],
+      [ 'R2C1', 'R2C2' ]
+    ]
+
+Elements which only contain text content will simply be represented as a
+scalar.  Where an element has both attributes and text content, the element
+will be represented as a hashref with the text content in the 'content' key
+(see the C<ContentKey> option):
+
+  <opt>
+    <one>first</one>
+    <two attr="value">second</two>
+  </opt>
+
+  {
+    one => 'first',
+    two => { attr => 'value', content => 'second' }
+  }
+
+Mixed content (elements which contain both text content and nested elements)
+will be not be represented in a useful way - element order and significant
+whitespace will be lost.  If you need to work with mixed content, then
+XML::Simple is not the right tool for your job - check out the next section.
+
+=head2 Differences to XML::Simple
+
+In general, the output and the options are equivalent, although this
+module has some differences with XML::Simple to be aware of.
+
+=over 4
+
+=item only L<XMLin()|XML::LibXML::Simple/"Translators"> is supported
+
+If you want to write XML then use a schema (for instance with
+XML::Compile). Do not attempt to create XML by hand!  If you still
+think you need it, then have a look at XMLout() as implemented by
+XML::Simple or any of a zillion template systems.
+
+=item no "variables" option
+
+IMO, you should use a templating system if you want variables filled-in
+in the input: it is not a task for this module.
+
+=item empty elements are not removed
+
+Being empty has a meaning which should not be ignored.
+
+=item ForceArray options
+
+There are a few small differences in the result of the C<forcearray> option,
+because XML::Simple seems to behave inconsequently.
+
+=item hooks
+
+XML::Simple does not support hooks.
+
+=back
+
+=head1 SEE ALSO
+
+L<XML::Compile> for processing XML when a schema is available.  When you
+have a schema, the data and structure of your message get validated.
+
+L<XML::Simple>, the original implementation which interface is followed
+as closely as possible.
+
+=head1 COPYRIGHTS
+
+The interface design and large parts of the documentation were taken
+from the L<XML::Simple> module, written by
+Grant McLean E<lt>grantm@cpan.orgE<gt>
+
+Copyrights of the perl code and the related documentation by
+2008-2016 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

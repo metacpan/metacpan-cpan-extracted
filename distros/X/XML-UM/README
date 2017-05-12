@@ -1,0 +1,25 @@
+XML::UM version 0.01
+====================
+
+DESCRIPTION
+
+This module provides methods to convert UTF-8 strings to any XML encoding that XML::Encoding supports. It creates
+mapping routines from the .xml files that can be found in the maps/ directory in the XML::Encoding distribution. Note that
+the XML::Encoding distribution does install the .enc files in your perl directory, but not the.xml files they were created
+from. That's why you have to specify $ENCDIR as in the SYNOPSIS. 
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 1999,2000 Enno Derksen
+All rights reserved.
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

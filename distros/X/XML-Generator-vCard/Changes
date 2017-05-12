@@ -1,0 +1,46 @@
+Revision history for Perl extension XML::Generator::vCard
+
+1.3	 Tue Dec 28 2004
+
+	 - CHANGED to inherit from XML::Generator::vCard::Base
+
+	 - CHANGED to use Module::Build
+
+	 - UPDATED t/20-write.t to not fail most of the time
+
+	 - DEPRECATED '_namespaces' method; use 'namespaces'
+	   instead
+
+1.2	 Tue Nov 16 2004
+
+	 - ADDED note re: binary PHOTO elements and segfaults
+	   on OSX
+
+1.1	 Sun Oct 17 2004
+
+	 - UPDATED to reflect changes in Text::vCard
+	   1.9
+
+1.0	 Fri Oct 15 2004
+
+	 - updated default xmlns to 'x-urn:cpan:ascope:xml-generator-vcard#'
+	 - updated to generate proper NS events
+	 - updated to use Memoize where applicable
+	 - updated to place nicely with T:vC 1.3
+	 - updated Makefile.PL to require T:vC 1.8
+	 - updated POD
+
+	 - added t/10-parse.t
+	 - added t/20-write.t
+	 - added t/Senzala.vcf
+
+1.0_02	 Wed Oct 06 2004
+
+	 - make to place nicely with Text::vCard 1.1
+
+	 - bless
+
+1.0_01	 Sat Sep 25 2004
+
+	 - initial release; port of XML::SAXDriver::vCard
+	   made to play nicely with Text::vCard

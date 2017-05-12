@@ -1,0 +1,29 @@
+<!-- Schema defined in the SOAP Version 1.2 Part 2 specification
+     Recommendation
+     http://www.w3.org/TR/2003/REC-soap12-part2-20030624/
+     $Id: soap-rpc.xsd,v 1.2 2006/12/20 20:45:52 ylafon Exp $
+
+     Copyright (C)2003 W3C(R) (MIT, ERCIM, Keio), All Rights Reserved.
+     W3C viability, trademark, document use and software licensing rules
+     apply.
+     http://www.w3.org/Consortium/Legal/
+
+     This document is governed by the W3C Software License [1] as
+     described in the FAQ [2].
+
+     [1] http://www.w3.org/Consortium/Legal/copyright-software-19980720
+     [2] http://www.w3.org/Consortium/Legal/IPR-FAQ-20000620.html#DTD
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://www.w3.org/2003/05/soap-rpc" targetNamespace="http://www.w3.org/2003/05/soap-rpc">
+        
+ <xs:element name="result" type="xs:QName"/>
+
+ <xs:simpleType name="faultcodeEnum">
+    <xs:restriction base="xs:QName">
+      <xs:enumeration value="tns:ProcedureNotPresent"/>
+	  <xs:enumeration value="tns:BadArguments"/>
+    </xs:restriction>
+ </xs:simpleType>
+
+
+</xs:schema>

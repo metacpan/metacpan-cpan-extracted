@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns="http://www.example.com/country" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.example.com/country" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:complexType name="City">
+		<xs:sequence minOccurs="0">
+			<xs:element name="name" type="xs:string" minOccurs="0"/>
+			<xs:element ref="population" minOccurs="0"/>
+		</xs:sequence>
+		<xs:attribute name="code" type="xs:string"/>
+	</xs:complexType>
+	<xs:complexType name="Country">
+		<xs:sequence minOccurs="0">
+			<xs:element name="name" type="xs:string" minOccurs="0"/>
+			<xs:element ref="population" minOccurs="0"/>
+			<xs:element name="currency" minOccurs="0">
+				<xs:complexType>
+					<xs:attribute name="code" type="xs:string"/>
+					<xs:attribute name="name" type="xs:string"/>
+				</xs:complexType>
+			</xs:element>
+			<xs:element ref="city" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+		<xs:attribute name="code" type="xs:string"/>
+	</xs:complexType>
+	<xs:complexType name="Population">
+		<xs:attribute name="date" type="xs:date"/>
+		<xs:attribute name="figure" type="xs:nonNegativeInteger"/>
+	</xs:complexType>
+	<xs:element name="city" type="City"/>
+	<xs:element name="country" type="Country"/>
+	<xs:element name="population" type="Population"/>
+</xs:schema>

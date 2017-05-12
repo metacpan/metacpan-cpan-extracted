@@ -1,0 +1,66 @@
+#!/bin/bash
+
+PATH="../../bin:$PATH"
+
+# my home development versions, please ignore
+PERLDEV=$HOME/shared/perl
+PERL5LIB=$PERLDEV/XMLCompile/lib:$PERLDEV/XMLCache/lib:$PERLDEV/LogReport/lib:../../lib
+export PERL5LIB
+
+DIMAP_NS=http://www.spotimage.fr/Dimap
+SCHEMA_NS=http://www.w3.org/2001/XMLSchema
+
+[ -d horrible ] || unzip horrible.zip
+
+#
+## first repair the broken schemas
+#
+
+#: <<DISABLED
+rm -rf repaired
+mkdir repaired
+
+for SCHEMA in $(cd horrible; ls *.xsd)
+do  echo "Repairing $SCHEMA"
+
+    xmlrewrite -p schema2001 --repair		\
+      --element-form qualified			\
+      --target-ns    $DIMAP_NS			\
+      --xmlns        dim=$DIMAP_NS		\
+      --output       repaired/$SCHEMA		\
+      --no-comments				\
+      horrible/$SCHEMA				\
+      2>repaired/$SCHEMA.errors
+#     --no-elements dim:version \  # not yet implemented
+
+    if [ $? -ne 0 ]
+    then echo "Production failed"
+         exit 1;
+    fi
+
+done
+
+#DISABLED
+
+#
+## Now reconstruct the schemas
+#
+
+rm -rf final
+mkdir final
+
+for SCHEMA in $(cd repaired; ls Di*.xsd)
+do  echo "Reconstructing $SCHEMA"
+
+    xmlrewrite -p schema2001			\
+      --output       final/$SCHEMA		\
+      --no-annotations				\
+      --no-id-constraints			\
+      --expand-includes				\
+      --xmlns dim=$DIMAP_NS,=$SCHEMA_NS		\
+      repaired/$SCHEMA				\
+      2>final/$SCHEMA.errors
+
+done
+
+exit 0

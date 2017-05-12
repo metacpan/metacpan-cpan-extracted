@@ -1,0 +1,328 @@
+<module name="XML::Schema::Attribute">
+
+  <about>
+    The XML::Schema::Attribute module implements a class of objects
+    that represent XML Schema attributes.
+  </about>
+
+  <synopsis>
+<perl>
+use XML::Schema::Attribute;
+
+# list of arguments
+my $attr = XML::Schema::Attribute->new( name => 'foo', type => 'string' )
+    || die XML::Schema::Attribute->error();
+
+# hash ref of arguments
+my $attr = XML::Schema::Attribute->new( {
+    name      => 'bar', 
+    type      => XML::Schema::Type::string->new(),
+    scope     => $complex_type,
+    default   => 20,
+    namespace => 'http://tt2.org/XML/Example.xml',
+} ) || die XML::Schema::Attribute->error();
+</perl>
+  </synopsis>
+
+  <description>
+    <p>
+    This module implements an object class for representing XML
+    attributes with XML Schema.  An attribute is, of course, a
+    '<xcode>name="value"</xcode>' pair within the starting tag of an
+    XML element.  In the following example, the attributes are named
+    '<xcode>id</xcode>' and '<xcode>name</xcode>'.
+    </p>
+
+<markup>
+<user id="lwall" name="Larry Wall">
+    ...
+</user>
+</markup>
+  
+    <p>
+    Attribute are defined as having a specific type which determines
+    what the acceptable values can be.  These types are implemented by
+    various objects derived from the
+    <module>XML::Schema::Type::Simple</module> module.  There are over
+    30 inbuilt simple type, defined in the
+    <module>XML::Schema::Type::Builtin</module> module, and which
+    include things like string, integer, float, time, date, and so on.
+    Furthermore, you can extend these basic types to create your own
+    custom simple types by applying additional <module
+    class="XML::Schema::Facet">validation facets</module>. 
+    </p>
+
+    <p>
+    An attribute can also define default and fixed values for itself.
+    A fixed constraint specifies a value that the attribute must have,
+    if present in a particular instance document.  A default value can 
+    be specified for attributes that are missing.
+    </p>
+
+    <p>
+    An attribute can be defined within a particular scope.  Usually,
+    it is within the definition of a <module
+    class="XML::Schema::Type::Complex">complex type</module>, but can 
+    also exist within an <module
+    class="XML::Schema::Attribute::Group">attribute group</module>.
+    The attribute communicates with its enclosing scope to resolve
+    its type name (e.g. 'string') with a type object.  This allows 
+    types to effectively be used before they are defined, and also 
+    for attributes to be relocated for use in different scope (e.g.
+    as part of an attribute group) and to resolve the correct type
+    in each location.
+    </p>
+    
+  </description>
+
+  <methods>
+    <method id="new">
+      <p>
+        Constructor method called to create a new attribute object.  A
+        list of '<perlcode>key =&gt; value</perlcode>' pairs can be
+        specified as command line arguments, or alternately, a hash
+        reference can be passed which contains these configuration
+        values.  The method returns a newly instantiated object on
+        success.  On error it returns undef and sets an internal error
+        message which can be retrieved by calling <method
+        class="XML::Schema::Base">error()</method> as a class method.
+
+<perl>
+# list of options
+my $attr = XML::Schema::Attribute->new( name => 'foo', type => 'string' )
+    || die XML::Schema::Attribute->error();
+
+# hash ref of options
+my $attr = XML::Schema::Attribute->new( {
+    name => 'foo', 
+    type => 'string',
+} ) || die XML::Schema::Attribute->error();
+</perl>
+      </p>
+
+      <p>
+        The following configuration options may be specifed:
+      </p>
+
+      <config>
+        <item key="name" value="'myattr'">
+	    The name of the attribute.  In the XML fragment <xcode><foo bar="baz"/></xcode>
+            the attribute name is '<xcode>bar</xcode>'.  This item is mandatory.
+        </item>
+
+        <item key="type">
+            <value>'typename'</value>
+            <value><module class="XML::Schema::Type::Simple">$type</module></value>
+	    The simple type for this attribute specified either by name or as 
+	    as reference to an <module>XML::Schema::Type::Simple</module> object
+	    or subclass thereof.  This item is also mandatory.  The remaining items
+	    are optional.
+        </item>
+
+        <item key="constraint">
+            <value>[ fixed => 3.14 ]</value> 
+            <value>[ default => 43 ]</value>
+            This option can be used to specify a fixed
+            constraint for the attribute, asserting that any specified
+            instance value matches the fixed value.  The second use
+            shows how a default value can be specified which is used
+            when no specific instance value is provided.  Note that
+            '<perlcode>constrain</perlcode>' is a valid alias for
+            '<perlcode>constraint</perlcode>'.
+        </item>
+
+        <item key="fixed" value="3.14">
+	    An alternate way to specify a fixed constraint for an attribute.
+	</item>
+
+        <item key="default" value="42">
+	    An alternate way to specify a default value for an attribute.
+	</item>
+
+        <item key="scope">
+	    <value><module class="XML::Schema::Scope">$scope</module></value>
+	    This configuration item can be used to bind the attribute to a 
+            particular lexical scope.  The attribute <method>type()</method>
+            method is then able to retrieve type objects from type names via
+            the scope reference.
+	</item>
+
+        <item key="namespace" value="'http://tt2.org/XML/xyz.xml'">
+	    The optional XML namespace for the attribute.
+        </item>
+
+        <item key="annotation" value="'...interesting note...'">
+	    An optional annotation for the attribute.  This is not yet
+	    fully supported.
+        </item>
+
+      </config>
+    </method>
+
+    <method id="name">
+      Returns the attribute name.
+<perl>
+my $name = $attribute->name();
+</perl>
+
+    </method>
+
+    <method id="type">
+      Returns the attribute type, as a reference to an object derived
+      from <module>XML::Schema::Type::Simple</module>.  If the
+      attribute type was specified as a name rather than a direct
+      reference to a type then the method will first attempt to 
+      fetch the type object matching that name.  It does this by
+      delegation to its enclosing lexical scope which can be specified
+      by the <cfgvar>scope</cfgvar> configuration item.
+<perl>
+my $typeobj = $attribute->type();
+</perl>
+    </method>
+
+    <method id="namespace">
+      <args></args>
+      <args>$new_namespace</args>
+      Returns the attribute namespace as optionally specified by the
+      <cfgvar>namespace</cfgvar> configuration item.  Can also be 
+      called with a single argument to set a new namespace value.
+<perl>
+my $ns = $attribute->namespace();
+
+$attribute->namespace('http://tt2.org/XML/Example.xml');
+</perl>
+    </method>
+
+
+    <method id="scope">
+      <args></args>
+      <args>$new_scope</args>
+
+      Returns the current scope as specified in the
+      <cfgvar>scope</cfgvar> configuation item.  Can also be called
+      with a single argument to define a new scope for the attribute.
+      This should be a reference to an object which inherits from the
+      <class>XML::Schema::Scope</class> class.
+
+<perl>
+my $scope = $attribute->scope();
+
+$attribute->scope($new_scope);
+</perl>
+    </method>
+
+    <method id="constraint">
+      <args></args>
+      <args>default => $value</args>
+      <args>fixed => $value</args>
+      <p>
+        Accessor method which can be used to get or set the current
+        value constraints.  The value constraint is a pair consisting
+        of a constraint type, which must be one of
+        '<perlcode>fixed</perlcode>' or '<perlcode>default</perlcode>',
+        and a value.  Returns the pair <perlcode>($type, $value)</perlcode>
+        when called without any arguments.
+      </p>
+<perl>
+my ($type, $value) = $attribute->constraint();
+</perl>
+      <p>
+	When called with appropriate <perlcode>($type, $value)</perlcode>
+        arguments, the method sets the current
+	constraint by calling either the default() or fixed() methods.
+      </p>
+<perl>
+$attribute->constraint( default => 42 );
+$attribute->constraint( fixed   => 84 );
+
+# equivalent to
+$attribute->default(42);
+$attribute->fixed(84);
+</perl>
+
+      <p>
+      Note that <perlcode>constrain()</perlcode> is a valid alias for
+      <perlcode>constraint()</perlcode>.
+      </p>
+
+<perl>
+# equivalent
+$attribute->constrain( fixed => 42 );
+$attribute->constraint( fixed => 42 );
+</perl>
+
+    </method>
+
+    <method id="default">
+      <args></args>
+      <args>$value</args>
+      <p>
+        Accessor method which can be used to get or set the current
+        default value constraint.  When called with an argument, the
+        method will force the current value constraint to be 'default'
+        and set the value internally.
+      </p>
+<perl>
+$attribute->default(42);
+</perl>
+      <p>
+	Returns the current default value when called without any
+	arguments.
+      </p>
+<perl>
+my $default = $attribute->default();
+</perl>
+      <p>
+	If the current value constraint is not defined or is set to a
+	type other than 'default' (e.g. if a 'fixed' constraint has
+	been specified) then the method returns undef and sets an
+	internal error value which can be retrieved via the 
+	<method class="XML::Schema::Base">error()</method>
+	method.
+      </p>
+<perl>
+my $default = $attribute->default();
+die $attribute->error() unless defined $default;
+</perl>
+    </method>
+
+    <method id="fixed">
+      <args></args>
+      <args>$value</args>
+      <p>
+	Accessor method which can be used to get or set the current
+	fixed value constraint.  As per <method>default()</method>,
+	this method can be called with or without an argument and in
+	the latter case may return undef if a fixed constraint type
+	isn't defined.
+      </p>
+<perl>
+$attribute->fixed(84);
+my $fixed = $attribute->fixed();
+die $attribute->error() unless defined $fixed;
+</perl>
+    </method>
+
+
+    <method id="instance">
+      <args>$value</args>
+      <p>
+	This method attempts to create an instance of the attribute.
+        The text value parsed from an instance document attribute is
+        passed to the method as an argument, <perlcode>$value</perlcode>.
+	This is then validated according to the underlying type of the 
+        attribute and checked against any <cfgvar>default</cfgvar> or 
+        <cfgvar>fixed</cfgvar> constraints.  If all is well then the 
+        attribute is "activated", by calling any actions scheduled 
+        against the type or attribute.  The method returns the result
+	after activation or the regular post-validation result if no
+	callbacks are scheduled.
+      </p>
+<perl>
+my $val = $attribute->instance('hello world')
+    || die $attribute->error();
+</perl>
+    </method>
+  </methods>
+</module>
+

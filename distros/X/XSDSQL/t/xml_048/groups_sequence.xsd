@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+ 	<xs:group name="g1">
+		<xs:sequence>
+			<xs:element name="g11" type="xs:string"/>
+			<xs:element name="g12" type="xs:string"/>
+		</xs:sequence>
+	</xs:group>
+
+	<xs:group name="g2">
+		<xs:sequence>
+			<xs:element name="g21" type="xs:string"/>
+			<xs:element name="g22" type="xs:string" minOccurs="0"/>
+		</xs:sequence>
+	</xs:group>
+
+	<xs:complexType name="c0">
+		<xs:sequence>
+			<xs:choice>
+				<xs:group ref="g1"/>
+				<xs:element name="el1" type="xs:string" maxOccurs="2"/>
+			</xs:choice>
+			<xs:choice>
+				<xs:element name="el2" type="xs:string"/>
+				<xs:group ref="g2"/>
+			</xs:choice>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:element name="el0" type="c0" />
+
+</xs:schema>
+
+

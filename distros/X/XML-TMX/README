@@ -1,0 +1,17 @@
+XML::TMX
+========
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+Note that some installed scripts require modules that are not required
+for XML::TMX installation. This gives you the possibility to install
+quickly XML::TMX for your use, but probably installs some commands
+that will not work out-of-the-box.
+

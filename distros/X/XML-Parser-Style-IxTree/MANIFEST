@@ -1,0 +1,8 @@
+MANIFEST
+README
+Changes
+Build.PL
+lib/XML/Parser/Style/IxTree.pm
+Makefile.PL
+META.yml
+META.json

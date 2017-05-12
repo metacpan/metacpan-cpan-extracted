@@ -1,0 +1,5 @@
+Revision history for Perl extension XML::RPC::CustomUA.
+
+0.9  Mon Aug  6 13:12:56 2012
+	- override call method to allow custom user agent string
+

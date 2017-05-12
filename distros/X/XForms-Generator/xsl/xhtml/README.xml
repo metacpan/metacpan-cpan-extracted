@@ -1,0 +1,564 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN" 
+"http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd">
+<!-- process with (debian linux):
+ xsltproc \
+ /usr/share/sgml/docbook/stylesheet/xsl/nwalsh/html/docbook.xsl README.xml
+-->
+<article>
+  <articleinfo>
+  <title>XForms to XHTML Stylesheet</title>
+	<pubdate>Tue Aug 20 03:15:27 EDT 2002</pubdate>
+	<releaseinfo role='cvs'>$Id: README.xml,v 1.2 2002/08/27 18:56:08 rick Exp $</releaseinfo>
+	<author>
+	  <firstname>rick</firstname>
+	  <surname>frankel</surname>
+	  <affiliation>
+		<orgname>cyberCode consulting inc</orgname>
+		<address>
+		  <email>rick@rickster.com</email>
+		</address>
+	  </affiliation>
+	</author>
+	<address>
+	</address>
+  </articleinfo>
+
+  <sect1>
+	<title>Contents</title>
+	<para>
+	  <itemizedlist>
+		<listitem>
+		  <para>
+			<filename>xforms.xsl</filename> 
+			xforms to html template</para>
+		</listitem>
+		<listitem>
+		  <para>
+			<filename>xforms.css</filename>
+			Example	CSS styles for above output</para>
+		</listitem>
+		<listitem>
+		  <para>
+			<filename>test.xml</filename>
+			Test input</para>
+		</listitem>
+		<listitem>
+		  <para>
+			<filename>PostFilter.pm</filename>
+			Apply posted data to embedded instance data 
+			(see <xref linkend="inst-encode"/> below)
+		  </para>
+		</listitem>
+		<listitem>
+		  <para><filename>README.xml</filename>
+			source to this document</para>
+		</listitem>
+	  </itemizedlist>
+	</para>
+  </sect1>
+
+  <sect1>
+	<title>Sample Usage</title>
+	<programlisting>
+	  xsltproc --param list-size 3 xforms.xsl test.xml
+	</programlisting>
+  </sect1>
+  
+  <sect1>
+	<title>Optional Parameters</title>
+	<para>
+	  There are 2 default (<sgmltag>xsl:param</sgmltag>s) in the
+	  template. One controls the formatting of lists. The other
+	  controls the encoding of the instance data into the hidden form
+	  field <sgmltag>_instance</sgmltag> (see <xref
+	  linkend="inst-encode"/> below).  Their defaults are:
+	  <itemizedlist>
+		<listitem>
+		  <para><firstterm>list-size</firstterm> 5</para>
+		</listitem>
+		<listitem>
+		  <para><firstterm>encode-instance-data</firstterm>
+			0 (<sgmltag>false()</sgmltag>
+		  </para> 
+		</listitem>
+	  </itemizedlist>
+	</para>
+  </sect1>
+
+  <sect1>
+	<title>Requirements</title>
+	<para>
+	  The stylesheet has been tested with the xsltproc
+	  command-line processor.
+	</para>
+	<para>
+	  The template requires an xslt processor which supports the
+	  following exst extensions:	  
+	  <itemizedlist>
+		<listitem>
+		  <para><firstterm>str:tokenize</firstterm>	
+			for handling multi-valued select instance data</para>
+		</listitem>
+		<listitem>
+		  <para><firstterm>dyn:evaluate</firstterm>	
+			for instance data</para>
+		</listitem>
+		<listitem>
+		  <para><firstterm>func:function</firstterm>
+			for accessing model nodes and more.</para>
+		</listitem>
+	  </itemizedlist>
+	  Note that the dyn prefix is mapped to the http://icl.com/saxon
+	  namespace, which is available in the current release version of
+	  libXML. When the cvs version is released, the evaluate function will
+	  also be mapped into the http://exslt.org/dynamic namespace and the
+	  template can be changed. However, it seems that at least for the
+	  moment, the cvs version of libXML is also backwards compatible
+	  w/ the saxon namespace.
+	</para>
+  </sect1>
+
+  <sect1>
+	<title>Overview</title>
+	<para>
+	  The template attempts to handle as much of the Xforms RFC as possible
+	  w/o client side procesing or multi-pass transformations. Obviously,
+	  w/o client side processing things such as  events, actions,
+	  control flow and interleaved model specific controls cannot be
+	  handled.
+	</para>
+	<para>
+	  This version operates in xslt push mode. Any text or nodes
+	  (w/attributes) not in the xforms namespace are copied to the output as
+	  is. It handles multiple forms, but assumes that ALL the controls for
+	  each form are wrapped in an outermost xforms:group, in the same sense
+	  as binding elements are considered outermost in in section 7.3 of the
+	  xforms spec (that is, the xpath expression 
+	  <sgmltag>ancestor::xforms:group</sgmltag>
+	  returns the null set).
+	</para>
+	<para>
+	  It also assumes that the input contains all non xforms  tags (e.g., html,
+	  head, body) required to generate a valid output document.
+	</para>
+	<para>
+	  selectMany bindings are handled (I think) per the spec. That is, the
+	  instance data is assumed to be a space separated list of data.
+	</para>
+	<para>
+	  Currently, nodeset attributes are assumed to be relative to
+	  xforms:instance (the root of the pseudo document as defined in the
+	  spec), as I cannot deduce from the spec whether they inherit outer
+	  context. If you want to bind a itemset to a relative reference, you
+	  can use a bind attribute. The bind element will be parsed as a
+	  relative path.
+	</para>
+	<para>
+	  An <sgmltag>xforms::group</sgmltag> with the 
+	  class attribute <sgmltag>no-display</sgmltag> can be used for
+	  context grouping and will not generate a 'div' element in the
+	  output. This is useful for generating instance context per section 7.3
+	  of the spec without breaking e.g, a css table model. The template
+	  also ignores any caption, hint or common-attributes 
+	  (<sgmltag>class</sgmltag>, <sgmltag>accessKey</sgmltag>)
+	  associated with the group.
+	</para>
+	<para>
+	  Name attributes on the html form elements are generated according to
+	  the spec. That is, if the encoding is 
+	  <sgmltag>application/x-www-urlencoded</sgmltag>,
+	  the name will be the <sgmltag>local-name()</sgmltag>
+	  of the data node. Any other
+	  encoding (default <sgmltag>multipart-form-data</sgmltag>) 
+	  will be the xpath to the data.
+	</para>
+  </sect1>
+
+  <sect1 id="inst-encode">
+	<title>Instance Encoding</title>
+	<para>Since this implementation does not allow in-place editing of
+	the instance data on the client, the OO perl library
+	<filename>PostFilter.pm</filename> has been provided to perform
+	this function on the backend. If value of the stylesheet parameter
+	<parameter>encode-instance-data</parameter> is true (1), the instance
+	data for the submitted form will be html-encoded into the hidden
+	form parameter <sgmltag>_instance</sgmltag>. The PostFilter
+	package provides one method (other than <function>new</function>),
+	<function>parse</function>, which takes a single argument, a hash of
+	the cgi parameters and returns a libXML document containing the
+	updated instance data. A sample cgi script using
+	<function>PostFilter</function> is provided in
+	<filename>t/filter_test.cgi</filename>.</para>
+	<sect2>
+	  <title>PostFilter.pm</title>
+	  <sect3>
+		<title>Functions</title>
+		<sect4>
+		  <title>new([parser=>parser,debug=>int])</title>
+		  <para>If an instance of <varname>XML::libXML</varname> is not passed in as the
+			named param <sgmltag>parser</sgmltag>, it will be instantiated
+			in the new function.</para>
+		</sect4>
+		<sect4>
+		  <title>parse(%cgi_params)</title>
+		  <para>The <function>parse</function> function takes a single
+		  argument, a reference to hash as returned by
+		  <function>CGI::Vars</function>. It returns an
+		  <varname>XML::LibXML::Document</varname>, with an
+		  <sgmltag>xforms:instance</sgmltag> root element.</para>
+		</sect4>
+	  </sect3>
+	</sect2>
+  </sect1>
+
+  <sect1>
+	<title>Support for the XForms Spec, section-by-section</title>
+	<sect2>
+	  <title>2 Introduction to XForms</title>
+	  
+	  <sect3>
+		<title>2.6 Multiple Forms per Document</title>
+		<para>supported</para>
+	  </sect3>
+	</sect2>
+	<sect2>
+	  <title>3 Document Structure</title>
+	  <sect3>
+		<title>3.1 The XForms Namespace</title>
+		<para>template uses prefix <sgmltag>xf:</sgmltag></para>
+	  </sect3>
+	  <sect3>
+		<title>3.2 Horizontally Applicable Markup</title>
+		<para>elements and attributes in other namespaces copied
+		  verbatim</para>
+	  </sect3>
+	  <sect3>
+		<title>3.3 Model</title>
+		<para>mutiple models allowed. controls for each form must be contained
+		  in an outer group element. The model used will be either the
+		  first model in the document, or the model specified by the
+		  first element found via the xpath expression
+		  <sgmltag>ancestor:xf:*[@model]</sgmltag>. 
+		  extensionFunctions are not supported.</para>
+	  </sect3>
+	  <sect3>
+		<title>3.4 instance</title>
+		<para>Supported for inline content, xlinks not supported</para>
+	  </sect3>
+	  <sect3>
+		<title>3.5 schema</title>
+		<para>not supported</para>
+	  </sect3>
+	  <sect3>
+		<title>3.6 submitInfo</title>
+		<para>supported
+		  <itemizedlist>
+			<listitem><para><firstterm>action </firstterm> 	supported</para></listitem>
+			<listitem><para><firstterm>mediaTypeExtension </firstterm> supported</para></listitem>
+			<listitem><para><firstterm>method </firstterm> supported</para></listitem>
+			<listitem><para><firstterm>version </firstterm> not-supported</para></listitem>
+			<listitem><para><firstterm>indent </firstterm> not-supported</para></listitem>
+			<listitem><para><firstterm>encoding </firstterm> supported</para></listitem>
+			<listitem><para><firstterm>mediaType </firstterm> not-supported</para></listitem>
+			<listitem><para><firstterm>omitXMLDeclaration </firstterm> not-supported</para></listitem>
+			<listitem><para><firstterm>standalone </firstterm> not-supported</para></listitem>
+			<listitem><para><firstterm>CDATASectionElements </firstterm> not-supported</para></listitem>
+			<listitem><para><firstterm>replace </firstterm> not-supported</para></listitem>
+		  </itemizedlist>
+		</para>
+	  </sect3>
+	  <sect3>
+		<title>3.7 privacy</title>
+		<para>not supported</para>
+	  </sect3>
+	  <sect3>
+		<title>3.8 XForms and XLink</title>
+		<para>xlink not supported</para>
+	  </sect3>
+	</sect2>
+	<sect2>
+	  <title>4 Processing Model</title>
+	  <sect3>
+		<title>4.1 Events Overview</title>
+		<para/>
+	  </sect3>
+	  <sect3>
+		<title>4.2 Initialization Events</title>
+		<para>not supported</para>
+	  </sect3>
+	  <sect3>
+		<title>4.3 Interaction Events</title>
+		<para>not supported</para>
+	  </sect3>
+	  <sect3>
+		<title>4.4 XForms Submit</title>
+
+		<sect4>
+		  <title>4.4.1 xforms:submit</title>
+		  <para>supported</para>
+		</sect4>
+		<sect4>
+		  <title>4.4.2 application/x-www-form-urlencoded</title>
+		  <para>supported</para>
+		</sect4>
+		<sect4>
+		  <title>4.4.3 multipart/form-data</title>
+		  <para>supported, default</para>
+		</sect4>
+		<sect4>
+		  <title>4.4.4 text/xml</title>
+		  <para>not supported</para>
+		</sect4>
+	  </sect3>
+	  <sect3>
+		<title>4.5 Error Indications</title>
+		<para>not supported</para>
+	  </sect3>
+	</sect2>
+	<sect2>
+	  <title>5 Datatypes</title>
+	  <para>schemas not supported</para>
+	</sect2>
+	<sect2>
+	  <title>6 Constraints</title>
+	  <sect3>
+		<title>6.1 XForms Constraints</title>
+		<sect4>
+		  <title>6.1.1 type</title>
+		  <para>not currently used.</para>
+		</sect4>
+		<sect4>
+		  <title>6.1.2 readOnly</title>
+		  <para>not currently used</para>
+		</sect4>
+		<sect4>
+		  <title>6.1.3 required</title>
+		  <para>supported, class="required"</para>
+		</sect4>
+		<sect4>
+		  <title>6.1.4 relevant</title>
+		  <para>supported, does not render control</para>
+		</sect4>
+		<sect4>
+		  <title>6.1.5 calculate</title>
+		  <para>not supported</para>
+		</sect4>
+		<sect4>
+		  <title>6.1.6 isValid</title>
+		  <para>supported, sets class="invalid" if false</para>
+		</sect4>
+
+		<sect4>
+		  <title>6.1.7 maxOccurs</title>
+		  <para>supported, used for rendering repeats</para>
+		</sect4>
+		<sect4>
+		  <title>6.1.8 minOccurs</title>
+		  <para>supported, used for rendering repeats</para>
+		</sect4>
+	  </sect3>
+	  <sect3>
+		<title>6.2 Schema Constraints</title>
+		<para>not supported</para>
+	  </sect3>
+	  <sect3>
+		<title>6.3 Additional Schema Examples</title>
+		<para>not supported</para>
+	  </sect3>
+	  <sect3>
+		<title>6.4 Binding</title>
+		<para>supported</para>
+	  </sect3>
+	</sect2>
+	<sect2>
+	  <title>7 XPath Expressions in XForms</title>
+	  <sect3>
+		<title>7.1 XPath Datatypes</title>
+		<para>not supported</para>
+	  </sect3>
+	  <sect3>
+		<title>7.2 Instance Data</title>
+		<para>dom no supported, no client side processing</para>
+	  </sect3>
+	  <sect3>
+		<title>7.3 Evaluation Context</title>
+		<para>properly implemented, i think</para>
+	  </sect3>
+	  <sect3>
+		<title>7.4 XForms Core Function Library</title>
+		<para>only those functions supported by libXML's xpath implementation</para>
+	  </sect3>
+	</sect2>
+	<sect2>
+	  <title>8 Form Controls</title>
+	  <sect3>
+		<title>8.1 input</title>
+		<para>supported</para>
+	  </sect3>
+	  <sect3>
+		<title>8.2 secret</title>
+		<para>supported</para>
+	  </sect3>
+	  <sect3>
+		<title>8.3 textarea</title>
+		<para>supported</para>
+	  </sect3>
+	  <sect3>
+		<title>8.4 output</title>
+		<para>supported</para>
+	  </sect3>
+	  <sect3>
+		<title>8.5 upload</title>
+		<para>supported</para>
+	  </sect3>
+	  <sect3>
+		<title>8.6 range</title>
+		<para>not supported</para>
+	  </sect3>
+	  <sect3>
+		<title>8.7 button</title>
+		<para>supported</para>
+	  </sect3>
+	  <sect3>
+		<title>8.8 submit</title>
+		<para>supported</para>
+	  </sect3>
+	  <sect3>
+		<title>8.9 selectOne</title>
+		<para>supported</para>
+	  </sect3>
+	  <sect3>
+		<title>8.10 selectMany</title>
+		<para>supported</para>
+	  </sect3>
+	  <sect3>
+		<title>8.11 Common Markup for selection controls</title>
+		<sect4>
+		  <title>8.11.1 choices</title>
+		  <para>supported</para>
+		</sect4>
+		<sect4>
+		  <title>8.11.2 item</title>
+		  <para>supported</para>
+		</sect4>
+		<sect4>
+		  <title>8.11.3 itemset</title>
+		  <para>supported</para>
+		</sect4>
+		<sect4>
+		  <title>8.11.4 value</title>
+		  <para>supported</para>
+		</sect4>
+	  </sect3>
+	  <sect3>
+		<title>8.12 Common Markup</title>
+		<sect4>
+		  <title>8.12.1 Common Attributes</title>
+		  <itemizedlist>
+			<listitem><para><firstterm>xml:lang </firstterm> not supported</para></listitem>
+			<listitem><para><firstterm>class </firstterm> supported</para></listitem>
+			<listitem><para><firstterm>navIndex </firstterm> not supported</para></listitem>
+			<listitem><para><firstterm>accessKey </firstterm> supported</para></listitem>
+		  </itemizedlist>
+		</sect4>
+		<sect4>
+		  <title>8.12.2 Single Node Binding Attributes</title>
+		  <para>supported</para>
+		</sect4>
+		<sect4>
+		  <title>8.12.3 Nodeset Binding Attributes</title>
+		  <para>supported</para>
+		</sect4>
+		<sect4>
+		  <title>8.12.4 Common Child Elements</title>
+		  <sect5>
+			<title>8.12.4.1 caption</title>
+			<para>supported, creates field label</para>
+		  </sect5>
+		  <sect5>
+			<title>8.12.4.2 help</title>
+			<para>not supported</para>
+		  </sect5>
+		  <sect5>
+			<title>8.12.4.3 hint</title>
+			<para>supported, creates "title" (rollover)</para>
+		  </sect5>
+		  
+		  <sect5>
+			<title>8.12.4.4 alert</title>
+			<para>not supported</para>
+		  </sect5>
+		  
+		  <sect5>
+			<title>8.12.4.5 extension</title>
+			<para>not supported</para>
+		  </sect5>
+		</sect4>
+	  </sect3>
+	</sect2>
+	<sect2>
+	  <title>9 XForms User Interface</title>
+	  <sect3>
+		<title>9.1 group</title>
+		<para>supported</para>
+	  </sect3>
+	  <sect3>
+		<title>9.2 switch</title>
+		<para>not supported</para>
+	  </sect3>
+	  <sect3>
+		<title>9.3 repeat</title>
+		<para>supported, startIndex and number attributes not supported</para>
+		<sect4>
+		  <title>9.3.1 Repeat Processing</title>
+		  <para>no cursors</para>
+		</sect4>
+		<sect4>
+		  <title>9.3.2 Nested Repeats</title>
+		  <para>supported</para>
+		</sect4>
+		
+		<sect4>
+		  <title>9.3.3 User Interface Interaction</title>
+		  <para>not supported</para>
+		</sect4>
+	  </sect3>
+	</sect2>
+	
+	<sect2>
+	  <title>10 XForms Actions</title>
+	  <para>not supported</para>
+	</sect2>
+	
+	<sect2>
+	  <title>11 Submit</title>
+	  <sect3>
+		<title>11.1 xforms-submit Event</title>
+		<para>not supported</para>
+	  </sect3>
+	  <sect3>
+		<title>11.2 Submission Options</title>
+		<para>For obvious reasons, the options supported are
+		limited due to browser limitations.</para>
+		<itemizedlist>
+		  <title>URI scheme</title>
+		  <listitem><para><firstterm>http</firstterm> supported</para>
+		  </listitem>
+		  <listitem><para><firstterm>https</firstterm> supported</para>
+		  <listitem><para><firstterm>mailto</firstterm> not supported</para>
+		  <listitem><para><firstterm>file</firstterm> not supported</para>
+		  </listitem>
+		</itemizedlist>
+		<itemizedlist>
+		  <title>method</title>
+		  <listitem><para><firstterm>post</firstterm> not supported</para>
+		  <listitem><para><firstterm>get</firstterm> supported</para>
+		  <listitem><para><firstterm>put</firstterm> not supported</para>
+		  <listitem><para><firstterm>form-data-post</firstterm> supported</para>
+		  <listitem><para><firstterm>urlencoded-post</firstterm> supported</para>
+		  </listitem>
+		</itemizedlist>
+	</sect2>
+  </sect1>
+</article>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<root>
+	<c1 attr_c="myattr_c"></c1>
+	<d1 attr_d="myattr_d">
+		<el1>el1</el1>
+	</d1>
+	<d2 attr_d="myattr_d2">
+		<el1>el1_1</el1>
+	</d2>
+	<d2 attr_d="myattr_d2_1">
+		<el1>el1_1_1</el1>
+	</d2>
+	<d2 attr_d="myattr_d2_2" attr_inctype="attr_inctype">
+		<el1>el1_1_2</el1>
+	</d2>
+</root>

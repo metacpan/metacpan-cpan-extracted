@@ -1,0 +1,52 @@
+X11-FullScreen version 0.01
+===========================
+
+Provides a very simple Xlib interface capable of creating borderless
+windows taking up an entire screen of an X windows display.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Build.PL
+   ./Build
+   ./Build test
+   ./Build install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  X11 (www.x.org)
+  Imlib2 (http://docs.enlightenment.org/api/imlib2/html/)
+  
+Building it requires the following Perl modules, available from CPAN:
+  Devel::CheckLib
+  Module::Build
+  ExtUtils::PkgConfig
+
+Testing it requires the following Perl modules, also available from CPAN:
+  Test::More
+  Test::Kwalitee
+  
+COPYRIGHT AND LICENCE
+
+Copyright 2005-2013 by Stephen Nelson
+
+Portions of this code copied from "muxine" (C) 2003 Daniel
+Caujolle-Bert <segfault@club-internet.fr>.
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+  
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+ 
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
+

@@ -1,0 +1,24 @@
+
+==== history of XML::Compile::SOAP::AnyEvent
+
+version 0.90: Mon Feb 15 21:24:45 CET 2016
+
+	Fixes:
+	- AnyEvent::HTTP does not understand HTTP::Headers, so we need
+	  to repack the headers [Heiko Jansen]
+	- mimetype fields [Heiko Jansen]
+
+	Improvements:
+	- change documentation style
+	- up with dependencies
+
+version 0.02: Tue Nov  9 13:20:40 CET 2010
+
+	Fixes:
+	- oops, path of module ::Transfer:: -> ::Transport::
+	  [Aleksey Mashanov]
+
+version 0.01: Mon Nov  1 17:24:27 CET 2010
+
+	- implemented XML::Compile::Transfer::SOAPHTTP_AnyEvent.
+	  Rewrite of code contributed by [Aleksey Mashanov]

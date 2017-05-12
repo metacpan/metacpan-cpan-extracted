@@ -1,0 +1,28 @@
+Revision history for Perl extension XS::TCC.
+
+0.05  Mon Jan  1 08:00:00 2017
+  - Recommending C::Blocks as a good alternative.
+  - Workaround for -DDEBUGGING troubles.
+  - Much more documentation.
+  - pTHX-using tests
+  - Alien::TinyCC compatibility fixes.
+  - Windows fixes (though that might not be perfect still)
+
+0.04  Tue Mar 18 08:00:00 2014
+  - Build/test fixes on recent Perls: Were accidentally seeing
+    gcc branch prediction hints.
+
+0.03  Thu Aug 29 19:18:00 2013
+  - OSX build fixes (Tokuhiro Matsuno)
+  - Use Alien::TinyCC for a tcc copy instead of shipping sources!
+    (With much help from David Mertens)
+  - Better warnings/error handling (distinguishing the two)
+    (Tokuhiro Matsuno)
+  - Fix XS::TCC when under -e (also indirectly)
+
+0.02  Thu Aug 22 07:23:00 2013
+  - Fixed dependencies in Makefile.PL (Tokuhiro Matsuno)
+
+0.01  Mon Apr  8 19:09:00 2013
+  - original version
+

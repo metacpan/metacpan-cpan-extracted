@@ -1,0 +1,2 @@
+0.3	25 January 2009
+	reader_error() method added to follow File::Cache::Persistent error reports

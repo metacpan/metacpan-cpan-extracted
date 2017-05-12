@@ -1,0 +1,20 @@
+    <range byte='xa1' len='3' uni='x3000'/>
+    <ch byte='xa4' uni='xff0c'/>
+    <ch byte='xa5' uni='xff0e'/>
+    <ch byte='xa6' uni='x30fb'/>
+    <range byte='xa7' len='2' uni='xff1a'/>
+    <ch byte='xa9' uni='xff1f'/>
+    <ch byte='xaa' uni='xff01'/>
+    <range byte='xab' len='2' uni='x309b'/>
+    <ch byte='xad' uni='x00b4'/>
+    <ch byte='xae' uni='xff40'/>
+    <ch byte='xaf' uni='x00a8'/>
+    <ch byte='xb0' uni='xff3e'/>
+    <ch byte='xb1' uni='xffe3'/>
+    <ch byte='xb2' uni='xff3f'/>
+    <range byte='xb3' len='2' uni='x30fd'/>
+    <range byte='xb5' len='2' uni='x309d'/>
+    <ch byte='xb7' uni='x3003'/>
+    <ch byte='xb8' uni='x4edd'/>
+    <range byte='xb9' len='3' uni='x3005'/>
+    <ch byte='xbc' uni='x30fc'/>

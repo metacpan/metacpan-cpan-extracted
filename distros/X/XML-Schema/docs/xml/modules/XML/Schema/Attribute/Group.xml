@@ -1,0 +1,630 @@
+<module name="XML::Schema::Attribute::Group">
+
+  <about>
+    This module implements a class of objects to represent XML Schema
+    attribute groups.
+  </about>
+
+  <synopsis>
+<perl>
+use XML::Schema::Attribute::Group;
+
+# create an attribute group
+my $group = XML::Schema::Attribute::Group->new({
+    attributes => {
+	# various ways to define attributes
+        foo => 'string',	
+        bar => XML::Schema::Attribute->new( {
+	    name => 'bar, 
+	    type => 'string'
+	} ),
+        baz => { 
+	    name => 'baz', 
+	    type => 'string',
+	},
+        boz => { 
+	    # name => 'boz' implied
+	    type => 'string',
+        },
+        wiz => { 
+	    type => 'string', 
+	    use  => 'required',
+        },
+        waz => { 
+	    type => 'string', 
+	    required => 1,	# alternate way to specify use
+        },
+     },
+}) || die XML::Schema::Attribute::Group->error();
+
+# another way (of several) to specify usage
+my $group = XML::Schema::Attribute::Group->new({
+    attributes  => { ... },
+    default_use => 'required',
+    optional    => [ qw( foo bar ) ],
+}) || die XML::Schema::Attribute::Group->error();
+
+# fetch existing and add new attributes
+my foo = $group->attribute('foo');
+$group->attribute( XML::Schema::Attribute->new( ... ) );
+$group->attribute( name => 'flic', type => 'string', use => REQUIRED );
+
+</perl>
+  </synopsis>
+
+  <description>
+    <p>
+    This module implements an object class for representing XML
+    attribute groups within XML Schema.  An attribute group defines a
+    collection of attributes and their usage constraints (e.g
+    OPTIONAL, REQUIRED or PROHIBITED).  A <module
+    class="XML::Schema::Type::Complex">complex type</module> definition
+    uses an attribute group to define the acceptable attributes for
+    elements of that type.  Attribute groups can also be defined as
+    independant entities to represent a relocatable collection of 
+    attributes that can be reused in different complex type definitions
+    as required.
+    </p>
+    <p>
+    For further information on attribute groups, please consult the
+    W3C XML Schema specification.
+    </p>
+  </description>
+
+
+
+  <methods>
+
+    <!-- METHOD: name -->
+
+    <method id="new">
+      <p>
+        Constructor method called to create a new attribute group.  A
+        list of '<perlcode>key =&gt; value</perlcode>' pairs can be
+        specified as command line arguments, or alternately, a hash
+        reference can be passed which contains these configuration
+        values.  The method returns a newly instantiated object on
+        success.  On error it returns undef and sets an internal error
+        message which can be retrieved by calling <method
+        class="XML::Schema::Base">error()</method> as a class method.
+<perl>
+# list of options
+my $group = XML::Schema::Attribute::Group->new( name => 'myGroup' )
+     || die XML::Schema::Attribute::Group->error();
+
+# hash ref of options
+my $group = XML::Schema::Attribute::Group->new( { name => 'myGroup' } ) 
+     || die XML::Schema::Attribute::Group->error();
+</perl>
+      </p>
+
+      <p>
+        The following configuration options may be specifed:
+      </p>
+
+      <config>
+        <item key="name" value="'myGroup'">
+	    The name of the attribute group.
+        </item>
+
+        <item key="attributes" value="\%attributes">
+	  <p>
+	    This item can be used to specify a reference to a hash
+            which defines an initial set of attributes for the group.
+            Each key in the hash reference denotes the name of an 
+	    attribute and each value, the corresponding attribute 
+	    definition.  This can be specifed as a reference to an
+            <module>XML::Schema::Attribute</module> object, as a 
+            simple string denoting the attribute type, e.g. 
+	    <perlcode>'integer'</perlcode> or as a reference to 
+            a hash array of configuration options from which an
+            attribute object will be created.
+<perl>
+my $group = XML::Schema::Attribute::Group->new({
+    attributes => {
+        foo => 'string',	
+        bar => XML::Schema::Attribute->new( {
+	    name => 'bar, 
+	    type => 'string'
+	} ),
+        baz => { 
+	    name => 'baz', 
+	    type => 'string',
+	},
+        boz => { 
+	    # name => 'boz' implied
+	    type => 'string',
+        },
+     },
+}) || die XML::Schema::Attribute::Group->error();
+</perl>
+	  </p>
+          <p>
+            In additional to all the arguments accepted by the
+            <class>XML::Schema::Attribute</class> <method
+            class="XML::Schema::Attribute">new()</method> method, the
+            hash array may also contain a '<perlcode>use</perlcode>'
+            key set to a value of <perlcode>'optional'</perlcode>,
+            <perlcode>'required'</perlcode> or
+            <perlcode>'prohibited'</perlcode> to indicate the 
+	    designated usage constraints on the attribute.  
+	  </p>
+<perl>
+my $group = XML::Schema::Attribute::Group->new({
+    attributes => {
+        flic => { 
+	    type => 'string',
+	    use  => 'optional',
+	},
+        flac => { 
+	    type => 'integer',
+	    use  => 'required',
+        },
+     },
+}) || die XML::Schema::Attribute::Group->error();
+</perl>
+
+	  <p>
+	    Alternately, the hash may contains one of the keys
+	    '<perlcode>optional</perlcode>',
+            '<perlcode>required</perlcode>' or
+            '<perlcode>prohibited</perlcode>' with a true corresponding
+	    value to achieve the same effect.
+	  </p>
+<perl>
+my $group = XML::Schema::Attribute::Group->new({
+    attributes => {
+        flic => { 
+	    type => 'string',
+	    optional => 1,
+	},
+        flac => { 
+	    type => 'integer',
+	    required => 1,
+        },
+     },
+}) || die XML::Schema::Attribute::Group->error();
+</perl>
+
+	</item>
+
+        <item key="use" value="\%usage">
+	  <p>
+	    The '<perlcode>use</perlcode>' item can be used to specify 
+            a reference to a hash array which maps attribute names to
+            their usage constraints, for those that don't explicitly 
+            specify their own '<perlcode>use</perlcode>' option in the
+	    <cfgvar>attributes</cfgvar> hash as described above.
+<perl>
+my $group = XML::Schema::Attribute::Group->new({
+    attributes => { ... },
+    use => {
+	foo => 'required',
+	bar => 'optional',
+    },
+}) || die XML::Schema::Attribute::Group->error();
+</perl>
+	  </p>
+          <p>
+            The <class>XML::Schema::Constants</class> module defines a
+            set of constants to represent these values.
+	  </p>
+
+<perl>
+use XML::Schema::Constants qw( :attribs );
+
+my $group = XML::Schema::Attribute::Group->new({
+    attributes => { ... },
+    use => {
+	foo => REQUIRED,
+	bar => OPTIONAL,
+    },
+}) || die XML::Schema::Attribute::Group->error();
+</perl>
+          <p>
+            Note that while the 
+            above constants are represented in UPPER CASE,  e.g.
+            <perlcode>REQUIRED</perlcode>, the actual values that 
+            they represent, and the ones that you should use if you
+            don't opt for the constants, are all in lower case, e.g.
+            <perlcode>'required'</perlcode>.
+	  </p>
+	</item>
+
+        <item key="default_use" value="$use">
+	  <p>
+	    The '<perlcode>default_use</perlcode>' item can be used 
+            to specify the default usage for attributes that don't
+            define it in any other way.  The default value for this
+            is '<perlcode>optional</perlcode>'.
+<perl>
+my $group = XML::Schema::Attribute::Group->new({
+    attributes  => { ... },
+    default_use => 'required',
+}) || die XML::Schema::Attribute::Group->error();
+</perl>
+	  </p>
+	</item>
+
+        <item key="required" value="\@names">
+	  <p>
+	    This option provides an alternate way of specifying that
+	    certain attributes are <perlcode>REQUIRED</perlcode>.  It
+	    should contain a reference to a list which names all
+	    required attributes.
+<perl>
+my $group = XML::Schema::Attribute::Group->new({
+    attributes  => { ... },
+    required    => [ qw( foo bar ) ],
+}) || die XML::Schema::Attribute::Group->error();
+</perl>
+	  </p>
+	</item>
+
+        <item key="optional" value="\@names">
+	  <p>
+	    Like <cfgvar>required</cfgvar> above, option provides an 
+            alternate way of specifying <perlcode>OPTIONAL</perlcode> attributes.
+<perl>
+my $group = XML::Schema::Attribute::Group->new({
+    attributes  => { ... },
+    default_use => 'required',
+    optional    => [ qw( baz boz ) ],
+}) || die XML::Schema::Attribute::Group->error();
+</perl>
+	  </p>
+	</item>
+
+        <item key="prohibited" value="\@names">
+	  <p>
+	    To complete the trilogy, this option allows <perlcode>PROHIBITED</perlcode>
+            attributes to be declared.
+<perl>
+my $group = XML::Schema::Attribute::Group->new({
+    attributes  => { ... },
+    prohibited  => [ qw( baz boz ) ],
+}) || die XML::Schema::Attribute::Group->error();
+</perl>
+	  </p>
+	</item>
+
+        <item key="group">
+	    <value><module class="XML::Schema::Attribute::Group">$group</module></value> 
+	    <value>$group_name</value> 
+	    <value>\%group_config</value> 
+
+	    This configuration item can be used to specify a sub-group that 
+	    the attribute group should adopt.  All attributes and any wildcard 
+	    defined in the sub-group will then become part of the validation
+	    set for the current attribute group.  The value can be specified
+            as a reference to an existing <module>XML::Schema::Attribute::Group</module>
+	    object, as a hash reference of configuration options from which such
+            an object can be created, or as a name by which the attribute group 
+            can be fetched from the current scope.
+	</item>
+
+        <item key="groups">
+	    <value>[ <module class="XML::Schema::Attribute::Group">$group</module>, $group_name, \%group_config, ... ]</value> 
+	      This option is like <cfgvar>group</cfgvar> described above but 
+	      accepts a reference to a list of multiple groups, each item of which 
+	      should be one of the acceptable parameters as for <cfgvar>group</cfgvar>.
+	</item>
+
+        <item key="scope">
+	    <value><module class="XML::Schema::Scope">$scope</module></value> 
+
+            This configuration item can be used to bind the attribute
+	    group to a particular lexical scope.  See the <cfgvar
+	    class="XML::Schema::Attribute" var="$scope">corresponding
+	    entry</cfgvar> in the <module>XML::Schema::Attribute</module>
+            documentation for further details.
+	</item>
+
+        <item key="namespace" value="'http://tt2.org/XML/xyz.xml'">
+	    The optional XML namespace for the attribute group.
+        </item>
+
+        <item key="annotation" value="'...interesting note...'">
+	    An optional annotation for the attribute group.  This is not yet
+	    fully supported.
+        </item>
+
+      </config>
+    </method>
+
+
+
+    <!-- METHOD: name -->
+
+    <method id="name">
+      Returns the attribute group name.
+<perl>
+my $name = $group->name();
+</perl>
+
+    </method>
+
+
+
+    <!-- METHOD: namespace -->
+
+    <method id="namespace">
+      <args></args>
+      <args>$new_namespace</args>
+      Returns the namespace of the attribute group as optionally
+      specified by the <cfgvar>namespace</cfgvar> configuration item.
+      Can also be called with a single argument to set a new namespace
+      value.
+<perl>
+my $ns = $group->namespace();
+
+$group->namespace('http://tt2.org/XML/Example.xml');
+</perl>
+    </method>
+
+
+
+    <!-- METHOD: scope -->
+
+    <method id="scope">
+      <args></args>
+      <args>$new_scope</args>
+
+      Returns the current scope as specified in the
+      <cfgvar>scope</cfgvar> configuation item.  Can also be called
+      with a single argument to define a new scope for the attribute
+      group.  This should be a reference to an object which inherits
+      from the <class>XML::Schema::Scope</class> class.
+
+<perl>
+my $scope = $group->scope();
+
+$group->scope($new_scope);
+</perl>
+    </method>
+
+
+
+    <!-- METHOD: attribute -->
+
+    <method id="attribute">
+      <args>$name</args>
+      <args><module class="XML::Schema::Attribute">$attribute</module></args>
+      <args>name => $name, type => $type, ...</args>
+
+      <p>
+        This method provides a way to retrieve existing attribute
+        definitions and also provide new ones.  When called with a
+        single non-reference argument, <perlcode>$name</perlcode>, the
+        method returns the <module class="XML::Schema::Attribute">attribute</module>
+        object indicated by that name.  If the attribute is not defined
+        then <perlcode>undef</perlcode> is returned and an appropriate
+        error is set.
+<perl>
+my $attr = $group->attribute('foo')
+    || die $group->error();
+</perl>
+      </p>
+      <p>
+        When called with a single argument, <module
+        class="XML::Schema::Attribute">$attribute</module>, which is
+        a reference to an <module>XML::Schema::Attribute</module> object,
+        then the attribute is added to the group.
+<perl>
+$group->attribute( XML::Schema::Attribute->new( ... ) )
+    || die $group->error();
+</perl>
+      </p>
+      <p>
+	Finally, the method can be called with a list of configuration
+        values or a reference to a hash containing those values from which
+        a new <module class="XML::Schema::Attribute">attribute object</module>
+        can be instantiated and added to the group.  The method returns a 
+        reference to the new object created.
+<perl>
+my $flic = $group->attribute( name => 'flic', type => 'string' )
+    || die $group->error();
+
+my $flac = $group->attribute( { name => 'flac', type => 'string', use => 'required' } )
+    || die $group->error();
+</perl>
+      </p>
+    </method>
+
+
+
+    <!-- METHOD: attributes -->
+
+    <method id="attributes">
+	This method returns a reference to the hash array containing all 
+	attribute definitions within the group.  Modifying entries in this 
+        hash will have direct effect upon the group.  Use carefully.
+    </method>
+
+
+
+    <!-- METHOD: default_use -->
+
+    <method id="default_use">
+      <args></args>
+      <args>$new_use</args>
+      Returns the current default usage value for attributes when 
+      called without any arguments.  This will be one of the strings
+      '<perlcode>optional</perlcode>',
+      '<perlcode>required</perlcode>' or
+      '<perlcode>prohibited</perlcode>'.  Can also be called with an
+      argument, one of those same strings, to set the new default usage
+      policy.   Note that this only affects new attributes created via
+      the <method>attribute()</method> method after the call and does
+      not affect any attributes already defined within the group.
+<perl>
+my $use = $group->default_use();
+
+$group->default_use('required');
+</perl>
+    </method>
+
+
+
+    <!-- METHOD: use -->
+
+    <method id="use">
+      <args>$name</args>
+      <args>$name, $use</args>
+      When called with a single argument, <perlcode>$name</perlcode>, this
+      method returns the usage string (as above) for the named attribute.
+      Can also be called with a second argument to set a new usage for the
+      attribute.
+<perl>
+my $foo_use = $group->use('foo');
+
+$group->use( foo => 'required' );
+</perl>
+    </method>
+
+
+
+    <!-- METHOD: required -->
+
+    <method id="required">
+      <args></args>
+      <args>$name</args>
+      <args>$name, $use</args>
+
+      When called without any arguments, this method retursn a
+      reference to a list containing the names of all
+      <perlcode>REQUIRED</perlcode> attributes in the group.  When
+      called with a single argument, <perlcode>$name</perlcode>, it
+      returns true (1) if the named attribute is
+      <perlcode>REQUIRED</perlcode> or false (0) if not.  It can also
+      be called with a third argument which is a flag used to set 
+      the attribute's usage to <perlcode>REQUIRED</perlcode> when
+      true or <perlcode>OPTIONAL</perlcode> otherwise.
+<perl>
+my $req_hash = $group->required();
+
+my $foo_req  = $group->required('foo');
+
+$group->required( foo => 1 );
+</perl>
+    </method>
+
+
+
+    <!-- METHOD: optional -->
+
+    <method id="optional">
+      <args></args>
+      <args>$name</args>
+      <args>$name, $use</args>
+
+      As per <method>required()</method> above, this method provides
+      a way to fetch and set <perlcode>OPTIONAL</perlcode> attribute
+      usage.
+<perl>
+my $opt_hash = $group->optional();
+
+my $foo_opt  = $group->optional('foo');
+
+$group->optional( foo => 1 );
+</perl>
+    </method>
+
+
+
+    <!-- METHOD: prohibited -->
+
+    <method id="prohibited">
+      <args></args>
+      <args>$name</args>
+      <args>$name, $use</args>
+
+      As per <method>required()</method> and
+      <method>optional()</method> above, this method provides a way to
+      fetch and set <perlcode>PROHIBITED</perlcode> attribute usage.
+<perl>
+my $not_hash = $group->prohibited();
+
+my $foo_not  = $group->prohibited('foo');
+
+$group->prohibited( foo => 1 );
+</perl>
+    </method>
+
+
+
+    <!-- METHOD: group -->
+
+    <method id="group">
+      <args>$name</args>
+      <args><module class="XML::Schema::Attribute::Group">$group</module></args>
+      <args>name => $name, attributes => { ... }, ...</args>
+
+      <p>
+        This method provides a way to define a new attribute group
+        that should be added as a sub-group of the current group.  All
+        attributes, wildcards and further sub-groups of the new group
+        will become valid for the current group and all its validation
+        rules will apply.  For example, if a sub-group defines a
+        <cfgvar>required</cfgvar> attribute then the current attribute
+	group will then also require it.
+      </p>
+      <p>
+	The new group can either be specified as a reference to an 
+        existing <module>XML::Schema::Attribute::Group</module> object,
+	a reference to a hash array of configuration parameters that
+	can be used to instantiate an object of that class, or a simple
+	string indicating a name by which the attribute group can be
+        accessed from the enclosing scope.
+<perl>
+$group->group( XML::Schema::Attribute::Group->new(...) )
+    || die $group->error();
+
+$group->group( {
+    name => 'my_new_group', 
+    attributes => { ... },
+} ) || die $group->error();
+
+$group->group('my_other_group')
+    || die $group->error();
+</perl>
+      </p>
+
+      <p>
+	Note the important distinction between this method and the
+	<method class="XML::Schema::Scope">attribute_group()</method>
+	method inherited from <class>XML::Schema::Scope</class>.  The
+	latter creates (if necessary) an attribute group object and
+	defines it by name in the internal scope lookup table.
+	However, it does not bind it to the current attribute group to
+	contribute to the validation of instance document attributes.
+	The <method>group()</method> method delegates to <method
+	class="XML::Schema::Scope">attribute_group()</method> to
+	create and register the new group and then then adds the name of
+	the group to the internal table which binds it into the current 
+        group.
+      </p>
+    </method>
+
+
+
+    <!-- METHOD: groups -->
+
+    <method id="groups">
+	This method returns a reference to a list of the names of
+        other attribute groups that are bound to the current group to
+        contribute to validation.  The actual group references
+        themselves can be fetch via the <method
+        class="XML::Schema::Scope">attribute_group()</method> method.
+<perl>
+my $groups = $group->groups();
+
+print $group->name, " has sub-groups: ", join(', ', @$groups), "\n";
+</perl>
+
+    </method>
+  </methods>
+</module>
+    
+
+

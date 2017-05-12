@@ -1,0 +1,846 @@
+$VAR1 = [
+          {
+            'content' => [
+                           {
+                             'content' => [
+                                            {
+                                              'content' => [
+                                                             {
+                                                               'content' => 'Dave\'s Free Press',
+                                                               'type' => 't'
+                                                             }
+                                                           ],
+                                              'name' => 'title',
+                                              'attrib' => {},
+                                              'type' => 'e'
+                                            },
+                                            {
+                                              'content' => [
+                                                             {
+                                                               'content' => 'http://www.cantrell.org.uk/david/journal/index.pl',
+                                                               'type' => 't'
+                                                             }
+                                                           ],
+                                              'name' => 'link',
+                                              'attrib' => {},
+                                              'type' => 'e'
+                                            },
+                                            {
+                                              'content' => [
+                                                             {
+                                                               'content' => 'the Slightly Less Bad And Wrong Blog Edition',
+                                                               'type' => 't'
+                                                             }
+                                                           ],
+                                              'name' => 'description',
+                                              'attrib' => {},
+                                              'type' => 'e'
+                                            },
+                                            {
+                                              'content' => [
+                                                             {
+                                                               'content' => 'en-us',
+                                                               'type' => 't'
+                                                             }
+                                                           ],
+                                              'name' => 'dc:language',
+                                              'attrib' => {},
+                                              'type' => 'e'
+                                            },
+                                            {
+                                              'content' => [
+                                                             {
+                                                               'content' => '2007-01-20T22:02:42Z',
+                                                               'type' => 't'
+                                                             }
+                                                           ],
+                                              'name' => 'dc:date',
+                                              'attrib' => {},
+                                              'type' => 'e'
+                                            },
+                                            {
+                                              'content' => [
+                                                             {
+                                                               'content' => [
+                                                                              {
+                                                                                'content' => [],
+                                                                                'name' => 'rdf:li',
+                                                                                'attrib' => {
+                                                                                              'rdf:resource' => 'http://www.cantrell.org.uk/david/journal/index.pl/id_bryar-software-release'
+                                                                                            },
+                                                                                'type' => 'e'
+                                                                              },
+                                                                              {
+                                                                                'content' => [],
+                                                                                'name' => 'rdf:li',
+                                                                                'attrib' => {
+                                                                                              'rdf:resource' => 'http://www.cantrell.org.uk/david/journal/index.pl/id_big-brother-racism'
+                                                                                            },
+                                                                                'type' => 'e'
+                                                                              },
+                                                                              {
+                                                                                'content' => [],
+                                                                                'name' => 'rdf:li',
+                                                                                'attrib' => {
+                                                                                              'rdf:resource' => 'http://www.cantrell.org.uk/david/journal/index.pl/id_idiot-recruiters'
+                                                                                            },
+                                                                                'type' => 'e'
+                                                                              },
+                                                                              {
+                                                                                'content' => [],
+                                                                                'name' => 'rdf:li',
+                                                                                'attrib' => {
+                                                                                              'rdf:resource' => 'http://www.cantrell.org.uk/david/journal/index.pl/id_measurement-in-the-digital-age'
+                                                                                            },
+                                                                                'type' => 'e'
+                                                                              },
+                                                                              {
+                                                                                'content' => [],
+                                                                                'name' => 'rdf:li',
+                                                                                'attrib' => {
+                                                                                              'rdf:resource' => 'http://www.cantrell.org.uk/david/journal/index.pl/id_dear-amazon'
+                                                                                            },
+                                                                                'type' => 'e'
+                                                                              },
+                                                                              {
+                                                                                'content' => [],
+                                                                                'name' => 'rdf:li',
+                                                                                'attrib' => {
+                                                                                              'rdf:resource' => 'http://www.cantrell.org.uk/david/journal/index.pl/id_new-weblog'
+                                                                                            },
+                                                                                'type' => 'e'
+                                                                              },
+                                                                              {
+                                                                                'content' => [],
+                                                                                'name' => 'rdf:li',
+                                                                                'attrib' => {
+                                                                                              'rdf:resource' => 'http://www.cantrell.org.uk/david/journal/index.pl/id_customer-service-BA-style'
+                                                                                            },
+                                                                                'type' => 'e'
+                                                                              },
+                                                                              {
+                                                                                'content' => [],
+                                                                                'name' => 'rdf:li',
+                                                                                'attrib' => {
+                                                                                              'rdf:resource' => 'http://www.cantrell.org.uk/david/journal/index.pl/id_amazon-recommendations'
+                                                                                            },
+                                                                                'type' => 'e'
+                                                                              },
+                                                                              {
+                                                                                'content' => [],
+                                                                                'name' => 'rdf:li',
+                                                                                'attrib' => {
+                                                                                              'rdf:resource' => 'http://www.cantrell.org.uk/david/journal/index.pl/id_this-week-in-whisky-news'
+                                                                                            },
+                                                                                'type' => 'e'
+                                                                              },
+                                                                              {
+                                                                                'content' => [],
+                                                                                'name' => 'rdf:li',
+                                                                                'attrib' => {
+                                                                                              'rdf:resource' => 'http://www.cantrell.org.uk/david/journal/index.pl/id_bastard-fairies'
+                                                                                            },
+                                                                                'type' => 'e'
+                                                                              }
+                                                                            ],
+                                                               'name' => 'rdf:Seq',
+                                                               'attrib' => {},
+                                                               'type' => 'e'
+                                                             }
+                                                           ],
+                                              'name' => 'items',
+                                              'attrib' => {},
+                                              'type' => 'e'
+                                            }
+                                          ],
+                             'name' => 'channel',
+                             'attrib' => {
+                                           'rdf:about' => 'http://www.cantrell.org.uk/david/journal/index.pl'
+                                         },
+                             'type' => 'e'
+                           },
+                           {
+                             'content' => [
+                                            {
+                                              'content' => [
+                                                             {
+                                                               'content' => ' New Bryar release ',
+                                                               'type' => 't'
+                                                             }
+                                                           ],
+                                              'name' => 'title',
+                                              'attrib' => {},
+                                              'type' => 'e'
+                                            },
+                                            {
+                                              'content' => [
+                                                             {
+                                                               'content' => ' http://www.cantrell.org.uk/david/journal/index.pl/id_bryar-software-release',
+                                                               'type' => 't'
+                                                             }
+                                                           ],
+                                              'name' => 'link',
+                                              'attrib' => {},
+                                              'type' => 'e'
+                                            },
+                                            {
+                                              'content' => [
+                                                             {
+                                                               'content' => '
+Warning: geeky content ahead<p>As I\'ve been promising to do for ages (it\'s over a year since Simon said I could take over maintenance of it, and several months since I promised <a href=http://randomness.org.uk/>Bob</a> that he could have all the <a href=http://search.cpan.org/src/DCANTRELL/Bryar-3.0/Changes>shiny new features</a> I had planned) I\'ve finally got round to releasing a <a href=http://search.cpan.org/~dcantrell/Bryar-3.0/>new version of Bryar</a>, the software what provides the brains behind this \'ere august journal.<p>The most important change is that I released the stuff for filtering out comment spam.
+',
+                                                               'type' => 't'
+                                                             }
+                                                           ],
+                                              'name' => 'description',
+                                              'attrib' => {},
+                                              'type' => 'e'
+                                            },
+                                            {
+                                              'content' => [
+                                                             {
+                                                               'content' => ' 2007-01-20T22:02:42Z ',
+                                                               'type' => 't'
+                                                             }
+                                                           ],
+                                              'name' => 'dc:date',
+                                              'attrib' => {},
+                                              'type' => 'e'
+                                            },
+                                            {
+                                              'content' => [
+                                                             {
+                                                               'content' => ' david ',
+                                                               'type' => 't'
+                                                             }
+                                                           ],
+                                              'name' => 'dc:creator',
+                                              'attrib' => {},
+                                              'type' => 'e'
+                                            }
+                                          ],
+                             'name' => 'item',
+                             'attrib' => {
+                                           'rdf:about' => 'http://www.cantrell.org.uk/david/journal/index.pl/id_bryar-software-release'
+                                         },
+                             'type' => 'e'
+                           },
+                           {
+                             'content' => [
+                                            {
+                                              'content' => [
+                                                             {
+                                                               'content' => ' Racism on the telly ',
+                                                               'type' => 't'
+                                                             }
+                                                           ],
+                                              'name' => 'title',
+                                              'attrib' => {},
+                                              'type' => 'e'
+                                            },
+                                            {
+                                              'content' => [
+                                                             {
+                                                               'content' => ' http://www.cantrell.org.uk/david/journal/index.pl/id_big-brother-racism',
+                                                               'type' => 't'
+                                                             }
+                                                           ],
+                                              'name' => 'link',
+                                              'attrib' => {},
+                                              'type' => 'e'
+                                            },
+                                            {
+                                              'content' => [
+                                                             {
+                                                               'content' => '
+<table border=1 align=right><tr><td align=center><font size=-2><img src=/david/journal/images/sherpa-shitty.jpg><br>Sherpa Shitty, famous for<br>being a piece of plastic</font></td></tr></table>Apparently there is a television programme called "Big Brother", one of the requirements for appearing on which is being exceedingly stupid.  There\'s a furore because one of the stupid people is supposed to have made some nasty racist comments about another of the stupid people.  Not entirely unexpected, when you consider that the programme has the same requirements as being a racist does.  Anyway, the victim is pictured here.  I hope you don\'t think I\'m racist for pointing out that she looks like a plastic doll.
+',
+                                                               'type' => 't'
+                                                             }
+                                                           ],
+                                              'name' => 'description',
+                                              'attrib' => {},
+                                              'type' => 'e'
+                                            },
+                                            {
+                                              'content' => [
+                                                             {
+                                                               'content' => ' 2007-01-19T22:44:38Z ',
+                                                               'type' => 't'
+                                                             }
+                                                           ],
+                                              'name' => 'dc:date',
+                                              'attrib' => {},
+                                              'type' => 'e'
+                                            },
+                                            {
+                                              'content' => [
+                                                             {
+                                                               'content' => ' david ',
+                                                               'type' => 't'
+                                                             }
+                                                           ],
+                                              'name' => 'dc:creator',
+                                              'attrib' => {},
+                                              'type' => 'e'
+                                            }
+                                          ],
+                             'name' => 'item',
+                             'attrib' => {
+                                           'rdf:about' => 'http://www.cantrell.org.uk/david/journal/index.pl/id_big-brother-racism'
+                                         },
+                             'type' => 'e'
+                           },
+                           {
+                             'content' => [
+                                            {
+                                              'content' => [
+                                                             {
+                                                               'content' => ' An Idiot ',
+                                                               'type' => 't'
+                                                             }
+                                                           ],
+                                              'name' => 'title',
+                                              'attrib' => {},
+                                              'type' => 'e'
+                                            },
+                                            {
+                                              'content' => [
+                                                             {
+                                                               'content' => ' http://www.cantrell.org.uk/david/journal/index.pl/id_idiot-recruiters',
+                                                               'type' => 't'
+                                                             }
+                                                           ],
+                                              'name' => 'link',
+                                              'attrib' => {},
+                                              'type' => 'e'
+                                            },
+                                            {
+                                              'content' => [
+                                                             {
+                                                               'content' => '
+[originally posted on 2006-01-12]<p>I got an email today from a recruiter.  Not to see if I was available for work, but trying to push someone on to me.  The email read:<p><blockquote>
+Please find attached the CV of an extremely talented web developer who specialises in PHP and front end web development technologies including HTML, CSS and JavaScript.<p>This candidate is actively seeking work in your area at the moment. He does have several other interviews arranged therefore if you are interested in seeing him for a role you are currently recruiting for please give me a call today.<p>If you are not recruiting, please keep my details on record for future reference.
+</blockquote><p>and was sent to my personal address, not to work.  Neither I nor my lovely employer have told this girl that we are looking for anyone technical and if we had we\'d not have asked for someone who knew PHP.  So yes, I most certainly will "keep her details on record for future reference".  Being a gentleman, I informed her of this fact and that I was keeping them because I would otherwise not remember that she is clearly far too stupid for me to do business with.<p><strong>Update 2006-01-19:</strong> she dunnit again.  This time I phoned her, and she admitted sending unsolicited, untargetted mailshots - that is, spam.  She, of course, thinks it was targetted, but I\'m afraid that\'s just not true as is obvious from what I wrote above.  And, of course, there\'s the issue that the address she sent her spam to is one that I created only because one person (one!) continually mis-spelt my real one.  I\'ve never sent email from the address in question, nor have I ever given that address to anyone apart from that one person.  Consequently, the idiot spammer Claire O\'Keeffe of Huxley Associates obviously either guessed it or acquired it by some other nefarious means.
+',
+                                                               'type' => 't'
+                                                             }
+                                                           ],
+                                              'name' => 'description',
+                                              'attrib' => {},
+                                              'type' => 'e'
+                                            },
+                                            {
+                                              'content' => [
+                                                             {
+                                                               'content' => ' 2007-01-19T17:43:46Z ',
+                                                               'type' => 't'
+                                                             }
+                                                           ],
+                                              'name' => 'dc:date',
+                                              'attrib' => {},
+                                              'type' => 'e'
+                                            },
+                                            {
+                                              'content' => [
+                                                             {
+                                                               'content' => ' david ',
+                                                               'type' => 't'
+                                                             }
+                                                           ],
+                                              'name' => 'dc:creator',
+                                              'attrib' => {},
+                                              'type' => 'e'
+                                            }
+                                          ],
+                             'name' => 'item',
+                             'attrib' => {
+                                           'rdf:about' => 'http://www.cantrell.org.uk/david/journal/index.pl/id_idiot-recruiters'
+                                         },
+                             'type' => 'e'
+                           },
+                           {
+                             'content' => [
+                                            {
+                                              'content' => [
+                                                             {
+                                                               'content' => ' Measuring speed in the digital age ',
+                                                               'type' => 't'
+                                                             }
+                                                           ],
+                                              'name' => 'title',
+                                              'attrib' => {},
+                                              'type' => 'e'
+                                            },
+                                            {
+                                              'content' => [
+                                                             {
+                                                               'content' => ' http://www.cantrell.org.uk/david/journal/index.pl/id_measurement-in-the-digital-age',
+                                                               'type' => 't'
+                                                             }
+                                                           ],
+                                              'name' => 'link',
+                                              'attrib' => {},
+                                              'type' => 'e'
+                                            },
+                                            {
+                                              'content' => [
+                                                             {
+                                                               'content' => '
+Warning: geeky content ahead<p>In the digital age, accuracy and speedy calculations come from using powers of two.  You also want to stick with integers to avoid rounding error.  Therefore I propose that we measure speed in nano-furlongs per mega-fortnight.  The conversion from metres per second is fairly simple - 1&nbsp;m/s is approximately 2<sup>64</sup>&nbsp;nFurlong/Mfortnight.<p>This means that we can measure incredibly slow speeds with great precision - down to of the order of 10<sup>-19</sup> m/s without having to enter the dangerous world of floating point.  And of course we can easily measure all the way up to the fastest possible speed, that of light, which is only about 2<sup>92</sup> nF/MF.  This provides ample room for further expansion of the measuring stick if Mr. Einstein turns out to have been wrong.  A 128-bit value would let us measure speeds up to 10<sup>10</sup> times that of light, in extremely small increments.
+',
+                                                               'type' => 't'
+                                                             }
+                                                           ],
+                                              'name' => 'description',
+                                              'attrib' => {},
+                                              'type' => 'e'
+                                            },
+                                            {
+                                              'content' => [
+                                                             {
+                                                               'content' => ' 2007-01-16T21:10:18Z ',
+                                                               'type' => 't'
+                                                             }
+                                                           ],
+                                              'name' => 'dc:date',
+                                              'attrib' => {},
+                                              'type' => 'e'
+                                            },
+                                            {
+                                              'content' => [
+                                                             {
+                                                               'content' => ' david ',
+                                                               'type' => 't'
+                                                             }
+                                                           ],
+                                              'name' => 'dc:creator',
+                                              'attrib' => {},
+                                              'type' => 'e'
+                                            }
+                                          ],
+                             'name' => 'item',
+                             'attrib' => {
+                                           'rdf:about' => 'http://www.cantrell.org.uk/david/journal/index.pl/id_measurement-in-the-digital-age'
+                                         },
+                             'type' => 'e'
+                           },
+                           {
+                             'content' => [
+                                            {
+                                              'content' => [
+                                                             {
+                                                               'content' => ' Dear Amazon ',
+                                                               'type' => 't'
+                                                             }
+                                                           ],
+                                              'name' => 'title',
+                                              'attrib' => {},
+                                              'type' => 'e'
+                                            },
+                                            {
+                                              'content' => [
+                                                             {
+                                                               'content' => ' http://www.cantrell.org.uk/david/journal/index.pl/id_dear-amazon',
+                                                               'type' => 't'
+                                                             }
+                                                           ],
+                                              'name' => 'link',
+                                              'attrib' => {},
+                                              'type' => 'e'
+                                            },
+                                            {
+                                              'content' => [
+                                                             {
+                                                               'content' => '
+You\'re a bunch of cunts.  Not only do you provide no way for me to export my wishlist to XML or CSV or anything useful like that, you manage to break all the third-party applications that do it as well.  I hate you and hope you die.<p><strong>update:</strong> they had for no apparent reason disabled my account, although they were still sending me information about how to use it.  It would have been nice if they\'d told me.  It would have been nice if I got helpful error messages back from the Net::Amazon module too.
+',
+                                                               'type' => 't'
+                                                             }
+                                                           ],
+                                              'name' => 'description',
+                                              'attrib' => {},
+                                              'type' => 'e'
+                                            },
+                                            {
+                                              'content' => [
+                                                             {
+                                                               'content' => ' 2007-01-14T17:30:49Z ',
+                                                               'type' => 't'
+                                                             }
+                                                           ],
+                                              'name' => 'dc:date',
+                                              'attrib' => {},
+                                              'type' => 'e'
+                                            },
+                                            {
+                                              'content' => [
+                                                             {
+                                                               'content' => ' david ',
+                                                               'type' => 't'
+                                                             }
+                                                           ],
+                                              'name' => 'dc:creator',
+                                              'attrib' => {},
+                                              'type' => 'e'
+                                            }
+                                          ],
+                             'name' => 'item',
+                             'attrib' => {
+                                           'rdf:about' => 'http://www.cantrell.org.uk/david/journal/index.pl/id_dear-amazon'
+                                         },
+                             'type' => 'e'
+                           },
+                           {
+                             'content' => [
+                                            {
+                                              'content' => [
+                                                             {
+                                                               'content' => ' New weblog ',
+                                                               'type' => 't'
+                                                             }
+                                                           ],
+                                              'name' => 'title',
+                                              'attrib' => {},
+                                              'type' => 'e'
+                                            },
+                                            {
+                                              'content' => [
+                                                             {
+                                                               'content' => ' http://www.cantrell.org.uk/david/journal/index.pl/id_new-weblog',
+                                                               'type' => 't'
+                                                             }
+                                                           ],
+                                              'name' => 'link',
+                                              'attrib' => {},
+                                              'type' => 'e'
+                                            },
+                                            {
+                                              'content' => [
+                                                             {
+                                                               'content' => '
+I\'ve got a new weblog <a href=http://www.cantrell.org.uk/david/journal/weblog.tt2>here</a>.
+',
+                                                               'type' => 't'
+                                                             }
+                                                           ],
+                                              'name' => 'description',
+                                              'attrib' => {},
+                                              'type' => 'e'
+                                            },
+                                            {
+                                              'content' => [
+                                                             {
+                                                               'content' => ' 2007-01-05T22:09:45Z ',
+                                                               'type' => 't'
+                                                             }
+                                                           ],
+                                              'name' => 'dc:date',
+                                              'attrib' => {},
+                                              'type' => 'e'
+                                            },
+                                            {
+                                              'content' => [
+                                                             {
+                                                               'content' => ' david ',
+                                                               'type' => 't'
+                                                             }
+                                                           ],
+                                              'name' => 'dc:creator',
+                                              'attrib' => {},
+                                              'type' => 'e'
+                                            }
+                                          ],
+                             'name' => 'item',
+                             'attrib' => {
+                                           'rdf:about' => 'http://www.cantrell.org.uk/david/journal/index.pl/id_new-weblog'
+                                         },
+                             'type' => 'e'
+                           },
+                           {
+                             'content' => [
+                                            {
+                                              'content' => [
+                                                             {
+                                                               'content' => ' Customer Service, BA-style ',
+                                                               'type' => 't'
+                                                             }
+                                                           ],
+                                              'name' => 'title',
+                                              'attrib' => {},
+                                              'type' => 'e'
+                                            },
+                                            {
+                                              'content' => [
+                                                             {
+                                                               'content' => ' http://www.cantrell.org.uk/david/journal/index.pl/id_customer-service-BA-style',
+                                                               'type' => 't'
+                                                             }
+                                                           ],
+                                              'name' => 'link',
+                                              'attrib' => {},
+                                              'type' => 'e'
+                                            },
+                                            {
+                                              'content' => [
+                                                             {
+                                                               'content' => '
+British Airways\' "vision" is to "create the best possible airport experience before you fly", according to some <a href=/david/journal/images/ba-bumph.txt>bumph</a> they sent me.  To do this they have a "new simpler checked and excess baggage policy".  I wonder what that new policy is, so reading on a bit ... "the maximum weight per bag will be reduced".  The overall effect is that ordinary people will be able to take less luggage.<p>Obviously, that makes flying so much nicer!<p>Now I\'ve known for some time that the government basically doesn\'t want people to fly, and that the method they\'ve chosen to implement this part of their <strike>giving in to terrorists</strike> errm, I mean security agenda is to make it as inconvenient as possible.  I\'d already stopped flying because I quite literally can\'t take all my valuable items in hand luggage like I used to and I don\'t trust the baggage monkeys to not steal them&nbsp;/ use them as footballs&nbsp;/ run them over with trucks&nbsp;/ send them to Ulaan Bator.  I use Eurostar and other trains, which for the vast majority of my journeys is not significantly more time-consuming, as well as being cheaper and a great deal less unpleasant.<p>What I can\'t understand is why an <em>airline</em> would want to collaborate with the enemy in this way and drive even more of its customers away.  Although I do note that BA own 10% of the shares in the company that runs Eurostar ...
+',
+                                                               'type' => 't'
+                                                             }
+                                                           ],
+                                              'name' => 'description',
+                                              'attrib' => {},
+                                              'type' => 'e'
+                                            },
+                                            {
+                                              'content' => [
+                                                             {
+                                                               'content' => ' 2006-12-29T20:02:44Z ',
+                                                               'type' => 't'
+                                                             }
+                                                           ],
+                                              'name' => 'dc:date',
+                                              'attrib' => {},
+                                              'type' => 'e'
+                                            },
+                                            {
+                                              'content' => [
+                                                             {
+                                                               'content' => ' david ',
+                                                               'type' => 't'
+                                                             }
+                                                           ],
+                                              'name' => 'dc:creator',
+                                              'attrib' => {},
+                                              'type' => 'e'
+                                            }
+                                          ],
+                             'name' => 'item',
+                             'attrib' => {
+                                           'rdf:about' => 'http://www.cantrell.org.uk/david/journal/index.pl/id_customer-service-BA-style'
+                                         },
+                             'type' => 'e'
+                           },
+                           {
+                             'content' => [
+                                            {
+                                              'content' => [
+                                                             {
+                                                               'content' => ' Amazon recommendations ',
+                                                               'type' => 't'
+                                                             }
+                                                           ],
+                                              'name' => 'title',
+                                              'attrib' => {},
+                                              'type' => 'e'
+                                            },
+                                            {
+                                              'content' => [
+                                                             {
+                                                               'content' => ' http://www.cantrell.org.uk/david/journal/index.pl/id_amazon-recommendations',
+                                                               'type' => 't'
+                                                             }
+                                                           ],
+                                              'name' => 'link',
+                                              'attrib' => {},
+                                              'type' => 'e'
+                                            },
+                                            {
+                                              'content' => [
+                                                             {
+                                                               'content' => '
+Today I ordered a spoon from Amazon.  This seems to have screwed up its recommendations system so now it seems to be ignoring the zillion bits of sci-fi, the zombie flicks and the metal CDs I\'ve bought and thinks that I want:<p><ul><li>a slotted spoon
+<li>a ladle
+<li>a spaghetti server
+<li>an omelette turner
+<li>some tongs
+</ul><p>mixed in with:<p><ul><li>"selected works" of Cicero (no thanks, I\'ll select my own)
+<li>"Iron Sunrise" by Charlie Stross
+<li>"Adventures of a bacon curer"
+<li>a DVD of The Da Vinci Code
+<li>Now 65
+</ul><p>Well done Amazon, you score two out of ten.<p>And what the FUCK is an omelette turner?
+',
+                                                               'type' => 't'
+                                                             }
+                                                           ],
+                                              'name' => 'description',
+                                              'attrib' => {},
+                                              'type' => 'e'
+                                            },
+                                            {
+                                              'content' => [
+                                                             {
+                                                               'content' => ' 2006-12-28T14:07:23Z ',
+                                                               'type' => 't'
+                                                             }
+                                                           ],
+                                              'name' => 'dc:date',
+                                              'attrib' => {},
+                                              'type' => 'e'
+                                            },
+                                            {
+                                              'content' => [
+                                                             {
+                                                               'content' => ' david ',
+                                                               'type' => 't'
+                                                             }
+                                                           ],
+                                              'name' => 'dc:creator',
+                                              'attrib' => {},
+                                              'type' => 'e'
+                                            }
+                                          ],
+                             'name' => 'item',
+                             'attrib' => {
+                                           'rdf:about' => 'http://www.cantrell.org.uk/david/journal/index.pl/id_amazon-recommendations'
+                                         },
+                             'type' => 'e'
+                           },
+                           {
+                             'content' => [
+                                            {
+                                              'content' => [
+                                                             {
+                                                               'content' => ' This week in Whisky news ',
+                                                               'type' => 't'
+                                                             }
+                                                           ],
+                                              'name' => 'title',
+                                              'attrib' => {},
+                                              'type' => 'e'
+                                            },
+                                            {
+                                              'content' => [
+                                                             {
+                                                               'content' => ' http://www.cantrell.org.uk/david/journal/index.pl/id_this-week-in-whisky-news',
+                                                               'type' => 't'
+                                                             }
+                                                           ],
+                                              'name' => 'link',
+                                              'attrib' => {},
+                                              'type' => 'e'
+                                            },
+                                            {
+                                              'content' => [
+                                                             {
+                                                               'content' => '
+Having come back from Edinburgh after the weekend with a splendid bottle of <a href=http://www.smws.com>the society</a>\'s <a href=https://www.smws.co.uk/shop/whisky_details.php?id_bottlings=1837>Laphroaig</a>, I was pleased to discover a whisky shop in Vinopolis near London Bridge.  At which there was a bottle of <a href=http://www.royalmilewhiskies.com/product.asp?pf_id=0040000007487>50 year old Talisker</a>, which I persuaded to come home with me.<p>I\'m doomed, and not just when the credit card bill arrives.
+',
+                                                               'type' => 't'
+                                                             }
+                                                           ],
+                                              'name' => 'description',
+                                              'attrib' => {},
+                                              'type' => 'e'
+                                            },
+                                            {
+                                              'content' => [
+                                                             {
+                                                               'content' => ' 2006-12-19T15:08:04Z ',
+                                                               'type' => 't'
+                                                             }
+                                                           ],
+                                              'name' => 'dc:date',
+                                              'attrib' => {},
+                                              'type' => 'e'
+                                            },
+                                            {
+                                              'content' => [
+                                                             {
+                                                               'content' => ' david ',
+                                                               'type' => 't'
+                                                             }
+                                                           ],
+                                              'name' => 'dc:creator',
+                                              'attrib' => {},
+                                              'type' => 'e'
+                                            }
+                                          ],
+                             'name' => 'item',
+                             'attrib' => {
+                                           'rdf:about' => 'http://www.cantrell.org.uk/david/journal/index.pl/id_this-week-in-whisky-news'
+                                         },
+                             'type' => 'e'
+                           },
+                           {
+                             'content' => [
+                                            {
+                                              'content' => [
+                                                             {
+                                                               'content' => ' Bastard Fairies ',
+                                                               'type' => 't'
+                                                             }
+                                                           ],
+                                              'name' => 'title',
+                                              'attrib' => {},
+                                              'type' => 'e'
+                                            },
+                                            {
+                                              'content' => [
+                                                             {
+                                                               'content' => ' http://www.cantrell.org.uk/david/journal/index.pl/id_bastard-fairies',
+                                                               'type' => 't'
+                                                             }
+                                                           ],
+                                              'name' => 'link',
+                                              'attrib' => {},
+                                              'type' => 'e'
+                                            },
+                                            {
+                                              'content' => [
+                                                             {
+                                                               'content' => '
+You! Yes, you behind the bikesheds! Listen to <a href=http://www.thebastardfairies.com/>The Bastard Fairies</a> now.<p>Even if you don\'t like the music, the name rules.
+',
+                                                               'type' => 't'
+                                                             }
+                                                           ],
+                                              'name' => 'description',
+                                              'attrib' => {},
+                                              'type' => 'e'
+                                            },
+                                            {
+                                              'content' => [
+                                                             {
+                                                               'content' => ' 2006-12-18T00:10:46Z ',
+                                                               'type' => 't'
+                                                             }
+                                                           ],
+                                              'name' => 'dc:date',
+                                              'attrib' => {},
+                                              'type' => 'e'
+                                            },
+                                            {
+                                              'content' => [
+                                                             {
+                                                               'content' => ' david ',
+                                                               'type' => 't'
+                                                             }
+                                                           ],
+                                              'name' => 'dc:creator',
+                                              'attrib' => {},
+                                              'type' => 'e'
+                                            }
+                                          ],
+                             'name' => 'item',
+                             'attrib' => {
+                                           'rdf:about' => 'http://www.cantrell.org.uk/david/journal/index.pl/id_bastard-fairies'
+                                         },
+                             'type' => 'e'
+                           }
+                         ],
+            'name' => 'rdf:RDF',
+            'attrib' => {
+                          'xmlns' => 'http://purl.org/rss/1.0/',
+                          'xmlns:content' => 'http://purl.org/rss/1.0/modules/content/',
+                          'xmlns:admin' => 'http://webns.net/mvcb/',
+                          'xmlns:rdf' => 'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
+                          'xmlns:sy' => 'http://purl.org/rss/1.0/modules/syndication/',
+                          'xmlns:dc' => 'http://purl.org/dc/elements/1.1/'
+                        },
+            'type' => 'e'
+          }
+        ];

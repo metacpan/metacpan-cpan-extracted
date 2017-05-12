@@ -1,0 +1,28 @@
+Revision history for Perl extension XML::Canonical.
+
+0.10  Apr 21 2002
+	- Rewrote to use new XML Canonical code in libxml2.
+
+0.06  Jan 19 2002
+	- Removed hardcoded INPUT_DIR dir that cased t/spec.t
+	    to fail.
+
+0.05  Jan 14 2002
+	- Now uses XML::GDOME instead of XML::LibXML
+	- Fixed bugs related to setting namespaces from invisible
+	    parent nodes.
+	- other bug fixes
+
+0.04  Nov 28 2001
+	- Cleaned up some warning messages
+
+0.03  Nov 26 2001
+        - Updated dependency on XML::LibXML to 1.30
+
+0.02  Oct 02 2001
+	- Checks for relative namespaces.
+	- Processes xml attributes.
+
+0.01  Sep 28 2001
+	- original version; created by h2xs 1.21 with options
+		-X -n XML::Canonical

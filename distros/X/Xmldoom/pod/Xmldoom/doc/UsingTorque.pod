@@ -1,0 +1,94 @@
+
+=head1 NAME
+
+Xmldoom::doc::UsingTorque -- How to use the Torque generator to work with your database.xml.
+
+=head1 DESCRIPTION
+
+Because the format used in the database definition (commonly named I<database.xml>) is the
+same as Apache Torque, we can use their tools to automatically generate I<database.xml> from
+the database, or automatically create the database from a I<database.xml>.
+
+Basically, the Torque Generator is a set of Ant scripts that call into the Torque engine.  So, you
+need to install Ant as well.
+
+=head1 SETTING UP THE TORQUE GENERATOR
+
+First, you must download the Torque Generator from their project page:
+
+L<http://db.apache.org/torque/download.html>
+
+Make sure you are downloading the Generator (the page is a little confusing).  You'll see that
+there is a table there with versions going down the Y-axis and product names going across the 
+X-axis.  If the page hasn't since this writing, you want the top-cell over to the right one.
+
+Once you've got it:
+
+=over 4
+
+=item 1
+
+Extract the archive somewhere.  You'll end up with directory named like I<torque-gen-3.2>.  Go there.
+
+=item 2
+
+Edit a file named I<build.properties>.  Most of the setting don't matter for us, so you can skip
+down to the section labeled "DATABASE SETTINGS" (with a space between each letter).  Configuring 
+this section should be pretty self explanitory if you have ever used JDBC in Java before.  In
+case you haven't you can check out the explanation at the end of this document named "BUILD PROPERTIES".
+
+=item 3
+
+You need to find and copy the JDBC drivers for your database into the lib/ directory.  More on this 
+in the "BUILD PROPERTIES" section.
+
+=back
+
+Now you are ready to give it a go.
+
+=head1 ANT TARGETS
+
+To generate an XML schema from your database, run:
+
+  ant -f build-torque.xml jdbc
+
+Most likely you won't want to use the generated file directly, because it lacks foreign-keys
+and any of the groovy Xmldoom special features.  But it does provide a quick spring-board to
+allow to copy-paste and modify to get started quickly.
+
+To create your database based on the XML description, run:
+
+  # to initially create the databas
+  ant -f build-torque.xml create-db
+
+  # will drop and re-create all tables in the database
+  ant -f build-torque.xml insert-sql
+
+=head1 BUILD PROPERTIES
+
+Three of the properties are JDBC dsn strings.  Basically, these just pack the driver name,
+server host, and database name into a URI like descriptor.
+
+  # The database DSN *without* the database name.
+  torque.database.createUrl = jdbc:mysql://localhost:3306/
+
+  # Now, with the database name.
+  torque.database.buildUrl = jdbc:mysql://localhost:3306/dbname
+  torque.database.url      = jdbc:mysql://localhost:3306/dbname
+
+You have to tell it where to find the JDBC driver.  You will have to download the actual JAR file
+for this and put into the lib/ directory under your I<torque-gen-*> directory.  You can find
+the MySQL driver here:
+
+L<http://www.mysql.com/products/connector/j/>
+
+  # Describe the path inside of the JAR where the driver class is
+  torque.database.driver = com.mysql.jdbc.Driver
+
+And, of course, you need to provide the appropriate credentials.
+
+  torque.database.user = myuser
+  torque.database.password = mypassword
+
+=cut
+

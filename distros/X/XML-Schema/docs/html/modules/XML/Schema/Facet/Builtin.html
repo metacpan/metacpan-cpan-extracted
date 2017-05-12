@@ -1,0 +1,227 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+<head>
+<title>Modules Index</title>
+</head>
+
+<body bgcolor="#ffffff">
+<table border="0" width="100%">
+<tr>
+<td align="left"><a href="../../../../index.html"><img src="../../../../images/canon.gif" border="0"></a></td>
+<td align="right"><img src="../../../../images/canre.gif"></td>
+</tr>
+</table>
+<div align="right">
+<small><a href="../../../../index.html">XML Schema Home</a></small>
+</div>
+
+<h1>XML::Schema::Facet::Builtin</h1>
+
+<ul>
+
+    The XML::Schema::Facet::Builtin module defines facets which are
+    built in to XML Schema.
+  </ul>
+
+<h2>Table of Contents</h2>
+<ul>
+<table border="0" cellpadding="2" cellspacing="0">
+<tr valign="top">
+<td>
+  <li><b><a href="#section_Synopsis">Synopsis</a></b>
+</td>
+
+<td>
+</td>
+
+<td>
+<td>
+
+</tr>
+<tr valign="top">
+<td>
+  <li><b><a href="#section_Facet_Modules">Facet Modules</a></b>
+</td>
+
+<td>
+</td>
+
+<td>
+<td>
+
+</tr>
+</table>
+</ul>
+
+
+
+
+<hr width="100%" size="1" noshade="1"><a name="section_Synopsis"><h2>Synopsis</h2></a>
+<ul><pre><p>use XML::Schema::Facet::Builtin;
+
+my $facet = XML::Schema::Facet::length-&gt;new(value =&gt; 22);</b></pre></ul>
+
+  
+
+
+
+<hr width="100%" size="1" noshade="1"><a name="section_Facet_Modules"><h2>Facet Modules</h2></a>
+    The <a href="../../../../modules/XML/Schema/Facet/Builtin.html">XML::Schema::Facet::Builtin</a> module defines
+    the following facets:
+
+    <p>
+<ul>
+
+      <li><b>XML::Schema::Facet::Fixable</b><br>
+
+	Adds the optional '<code><b>fixed</b></code>
+' attribute
+        to facets derived from it and the <code><b>fixed()</b></code>
+
+        method to return a flag indicating if the object is fixed
+        (e.g. immutable).
+      
+<br>
+<br>
+
+      <li><b>XML::Schema::Facet::length</b><br>
+
+	This facet uses <a href="../../../../modules/XML/Schema/Facet.html#config_value"><code><b>value</b></code></a>
+	to specify a particular length of a list (in elements) or string
+        (in characters).
+      
+<br>
+<br>
+
+      <li><b>XML::Schema::Facet::minLength</b><br>
+
+	This facet uses <a href="../../../../modules/XML/Schema/Facet.html#config_value"><code><b>value</b></code></a>
+	to specify the minimum length of a list (in elements) or string
+        (in characters).
+      
+<br>
+<br>
+
+      <li><b>XML::Schema::Facet::maxLength</b><br>
+
+	This facet uses <a href="../../../../modules/XML/Schema/Facet.html#config_value"><code><b>value</b></code></a>
+	to specify the maximum length of a list (in elements) or string
+        (in characters).
+      
+<br>
+<br>
+
+      <li><b>XML::Schema::Facet::pattern</b><br>
+
+	This facet uses <a href="../../../../modules/XML/Schema/Facet.html#config_value"><code><b>value</b></code></a>
+	to specify a regular expression which a string should match.
+      
+<br>
+<br>
+
+      <li><b>XML::Schema::Facet::enumeration</b><br>
+
+	This facet uses <a href="../../../../modules/XML/Schema/Facet.html#config_value"><code><b>value</b></code></a>
+	to specify a reference to list of permitted values.
+      
+<br>
+<br>
+
+      <li><b>XML::Schema::Facet::whitespace</b><br>
+
+	This facet uses <a href="../../../../modules/XML/Schema/Facet.html#config_value"><code><b>value</b></code></a> to specify if and
+	what whitespace should be performed on the string.  A value of
+	'preserve' leaves all whitespace intact.  A value of 'replace'
+	replaces newlines, carriage returns and tabs with spaces.  A
+	value of 'collapse' additionally collapses sequences of
+	multiple whitespace into a single space and strips any leading
+        or trailing whitespace.
+      
+<br>
+<br>
+
+      <li><b>XML::Schema::Facet::maxInclusive</b><br>
+
+	This facet uses <a href="../../../../modules/XML/Schema/Facet.html#config_value"><code><b>value</b></code></a>
+	to constrain a numerical value to an inclusive upper bound.
+      
+<br>
+<br>
+
+      <li><b>XML::Schema::Facet::maxExclusive</b><br>
+
+	This facet uses <a href="../../../../modules/XML/Schema/Facet.html#config_value"><code><b>value</b></code></a>
+	to constrain a numerical value to an exclusive upper bound.
+      
+<br>
+<br>
+
+      <li><b>XML::Schema::Facet::minInclusive</b><br>
+
+	This facet uses <a href="../../../../modules/XML/Schema/Facet.html#config_value"><code><b>value</b></code></a>
+	to constrain a numerical value to an inclusive lower bound.
+      
+<br>
+<br>
+
+      <li><b>XML::Schema::Facet::minExclusive</b><br>
+
+	This facet uses <a href="../../../../modules/XML/Schema/Facet.html#config_value"><code><b>value</b></code></a>
+	to constrain a numerical value to an exclusive lower bound.
+      
+<br>
+<br>
+
+      <li><b>XML::Schema::Facet::precision</b><br>
+
+	This facet uses <a href="../../../../modules/XML/Schema/Facet.html#config_value"><code><b>value</b></code></a>
+	to constrain the precision of a floating point number to a particular
+        limit.
+      
+<br>
+<br>
+
+      <li><b>XML::Schema::Facet::scale</b><br>
+
+	This facet uses <a href="../../../../modules/XML/Schema/Facet.html#config_value"><code><b>value</b></code></a>
+	to constrain the scale of a floating point number to a particular
+        limit.
+      
+<br>
+<br>
+
+      <li><b>XML::Schema::Facet::encoding</b><br>
+
+	This facet uses <a href="../../../../modules/XML/Schema/Facet.html#config_value"><code><b>value</b></code></a>
+	to specify a particular encoding for binary data, one of the values
+        '<code><b>hex</b></code>
+' or '<code><b>base64</b></code>
+'.
+        limit.
+      
+<br>
+<br>
+
+      <li><b>XML::Schema::Facet::duration</b><br>
+
+	This facet uses <a href="../../../../modules/XML/Schema/Facet.html#config_value"><code><b>value</b></code></a>
+	to specify a particular fixed time duration.
+      
+<br>
+<br>
+
+      <li><b>XML::Schema::Facet::period</b><br>
+
+	This facet uses <a href="../../../../modules/XML/Schema/Facet.html#config_value"><code><b>value</b></code></a>
+	to specify a particular fixed time period.
+      
+<br>
+<br>
+    </ul>
+</p>
+  
+<div align="center">
+<small><b>Perl XML::Schema Documentation</b></small>
+</div>
+</body>
+</html>

@@ -1,0 +1,3 @@
+[% FOREACH attr = item.attributes.keys -%]
+[% view.print(attr) | indent -%]
+[% END -%]

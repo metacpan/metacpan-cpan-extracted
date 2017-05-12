@@ -1,0 +1,11 @@
+XML::Filter::Cache Changes
+
+0.03
+    - Shallow copy document locator into cache
+
+0.02
+    - Oops, forgot docs :-)
+    - Added auto-Key use from SystemId
+
+0.01
+    - Initial release

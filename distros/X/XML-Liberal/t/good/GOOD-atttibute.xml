@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<xhtml>
+  <hr noshade="noshade"/>
+  <hr noshade="noshade"/>
+  <hr noshade="noshade"/>
+  <hr noshade="noshade" id="foo"/>
+</xhtml>

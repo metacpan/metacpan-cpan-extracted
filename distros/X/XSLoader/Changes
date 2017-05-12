@@ -1,0 +1,212 @@
+History for XSLoader
+
+0.24 - 2016-09-01 - SAPER
+
+  [Distribution]
+  - fixed the way the module's version is detected in order to correctly
+    generate META.* files
+
+0.23 - 2016-08-31 - SAPER
+
+  [Makefile.PL updated from perl blead 9e9fbcaf153d3c9eb897b5cab54a102632df4c78]
+  - 2016-08-05 note a possible pitfall
+  - 2016-08-05 add "provides" metadata for XSLoader (RT#138836)
+
+0.22 - 2016-07-05 - SAPER
+
+  [Code updated from perl blead a651dcdf6a9151150dcf0fb6b18849d3e39b0811]
+  - 2016-07-04 Fix XSLoader to recognize drive letters
+  - 2016-07-03 Don’t let XSLoader load relative paths
+
+  [Code updated from perl 5.24.0]
+  - 2015-11-10 use dl_find_symbol 3rd optional argument
+  - 2015-11-02 remove XSLoader and DynaLoader OS specific code on NA OSes
+
+  [Distribution]
+  - Converted the Changes file to CPAN::Changes::Spec format.
+
+
+0.20 - 2016-05-05 - SAPER
+
+  [Code updated from perl 5.22.1]
+  - 2014-12-06 0.20 Don't test for bootstrap file twice
+  - 2014-10-31 0.19 Amend the mod2fname generation to detect more cases
+  - 2014-10-03 0.18 Allow XSLoader to load modules from a different namespace
+  - 2014-01-03 0.17 DynaLoader: Introduce d_libname_unique for Android
+
+  [Distribution]
+  - Fixed a stupid mistake in Makefile.PL
+
+
+0.16 - 2012-09-03 - SAPER
+
+  [Code updated from bleadperl]
+  - ...
+
+  [Documentation]
+  - CPAN-RT #77294: Fixed some spelling and grammer errors.
+
+  [Tests]
+  - CPAN-RT #77557: Tests started to fail with Perl 5.15.5
+
+  [Distribution]
+  - Perl-RT #114050: Added meta-information in Makefile.PL to reflect
+    that the module is maintained by P5P.
+
+
+0.15 - 2011-04-17 - SAPER #PerlQA2011
+
+  [Documentation]
+  - Document a known bug under Perl 5.8.4 and 5.8.5.
+
+  [Tests]
+  - Fixed tests to pass under Perl 5.8.4 and 5.8.5.
+
+  [Distribution]
+  - CPAN-RT#54456: Set INSTALLDIRS to "site" when installed on Perl 5.11+
+    (thanks to Todd Rinaldo).
+
+
+0.14 - 2011-04-16 - SAPER #PerlQA2011
+
+  [Code updated from bleadperl]
+  - XSLoader::load() with no arguments can use caller to find a default
+    package (Nicholas Clark).
+  - Avoid defining a full XSLoader::bootstrap_inherit post 5.6, as it's
+    not needed (Nicholas Clark).
+  - Small optimisation: for the generated XSLoader.pm, avoid a runtime
+    lexical which is constant (Nicholas Clark).
+
+  [Tests]
+  - Updated from bleadperl, solving RT-CPAN #54132, #61332.
+  - Fixed tests for old Perls.
+  - Added t/00-load.t and t/01-api.t, to provide basic tests
+    when the main ones are skipped.
+
+
+0.10 - 2008-09-23 - SAPER
+
+  [Code]
+  - Commented a debug statement which seems to confuse some Perl builts
+    with -DDEBUGGING (Rafael Garcia-Suarez).
+
+  [Tests]
+  - RT-Perl#59208: Adjusted t/XSLoader.t for builds without dynamic
+    loading (Andy Dougherty).
+  - RT-CPAN#39520: Fixed t/podcover.t (Jerry D. Hedden).
+
+
+0.09 - 2008-09-21 - SAPER
+
+  [Code]
+  - Execute bootstrap files if present, thanks to Vadim Konovalov.
+  - Small optimisation: avoid to calculate "${module}::bootstrap" more
+    than needed, thanks to Vadim Konovalov.
+
+  [Documentation]
+  - The copyright section is also the license.
+
+  [Tests]
+  - Normalised tests headings.
+  - t/pod.t now also uses Pod::Checker.
+  - Added a test in t/XSLoader.t to avoid warnings from Perl 5.10
+
+
+0.08 - 2007-04-29 - SAPER
+
+  [Bufixes]
+  - Fixed installation target.
+
+  [Code]
+  - Merged bleadperl@29580: OS/2-specific change by Ilya Zakharevich: static
+    build can load generic DLLs, but cannot load Perl extensions with DLLs.
+  - Merged bleadperl@29188: Factor out $^O eq 'darwin' from XSLoader.pm
+
+  [Tests]
+  - Fixed t/podcover.t
+  - Merged bleadperl@30852: Allow any *DBM_File to work by Jerry D. Hedden.
+  - Merged bleadperl@31005: Compatibility with version.pm
+
+
+0.07 - 2006-10-13 - SAPER
+
+  [Documentation]
+  - Small Pod changes.
+
+  [Tests]
+  - Removed cargo-cult BEGIN blocs.
+  - Detect if Test::More is available.
+  - Reworked the way modules are tested to improve the TAP output.
+  - Added more tests, mainly error messages checking.
+
+  [Distribution]
+  - Added examples.
+
+
+0.06 - 2005-10-16 - SAPER
+
+  [Documentation]
+  - Merged bleadperl@25666: documentation typos.
+
+  [Distribution]
+  - Now includes a transient XSLoader.pm for PAUSE. Thanks to Andreas Koening
+    for the explanation.
+
+
+0.05 - 2005-09-29 - SAPER
+
+  [Code]
+  - Small optimisation for calling bootstrap_inherit() by Michael Schwern.
+
+  [Tests]
+  - Ported t/XSLoader.t to Test::More
+  - Added t/distchk.t, t/pod.t, t/podcover.t, t/portfs.t
+
+  [Distribution]
+  - Got rid of lib/ directory for easier integration with CORE.
+
+
+0.04 - 2005-09-25 - SAPER
+
+  [Code]
+  - use strict;
+
+  [Documentation]
+  - Updated documentation: pod formatting, diagnostics & bugs sections
+
+  [Tests]
+  - Rewrote t/XSLoader.t
+
+  [Distribution]
+  - Bumped up the version.
+
+
+0.03_01  Mon Dec  6 19:28:57 EST 2004 - MSCHWERN
+
+  [Distribution]
+  - Incrementing version as several versions called themselves 0.03.
+
+
+0.03  *UNRELEASED* - MSCHWERN
+
+  [Code]
+  - Make XSLoader update @DynaLoader::dl_shared_objects [bleadperl@22816]
+
+  [Documentation]
+  - Minor doc style nits [bleadperl@21060]
+
+  [Tests]
+  - Clean up tests for core [bleadperl@20945, 20952, 20961]
+
+
+0.02  Fri Aug 29 21:59:33 PDT 2003 - MSCHWERN
+
+  [Code]
+  - Adapted from bleadperl@20940
+  - Backported to 5.004_05
+  - load() now gives a proper error when given no arguments
+  - Removed copy of DynaLoader's Tolkien quote
+
+  [Tests]
+  - Added basic tests
+

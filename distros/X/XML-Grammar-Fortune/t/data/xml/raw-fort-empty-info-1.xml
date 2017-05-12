@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<collection>
+    <head />
+    <list>
+        <fortune id="the-american-lottery">
+            <meta>
+                <title>The American Lottery</title>
+            </meta>
+            <raw>
+                <body><text><![CDATA[The American Lottery - all you need is a dollar and a dream. We will
+take the dollar, but you can keep the dream.
+
+    Shlomi Fish
+]]></text>
+            </body>
+            <info/>
+            </raw>
+        </fortune>
+    </list>
+</collection>

@@ -1,0 +1,9 @@
+Revision history for Perl extension XML::Generator::RSS10::gcl.
+
+0.02  Monday, 6 December 2004 13:44:25
+   - Minor change to the way the XML local-name is created for tags in the GCL namespace, to account for category names with punctuation marks.
+
+0.01  Wed Sep  8 12:02:06 2004
+	- original version; created by h2xs 1.22 with options
+		-X -n XML::Generator::RSS10::gcl
+

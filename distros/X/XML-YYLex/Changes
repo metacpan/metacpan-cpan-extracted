@@ -1,0 +1,17 @@
+Revision history for Perl extension XML::YYLex.
+
+0.03  Mon Jan 13 20:25:34 CET 2003
+	- changed Makefile.PL to require XML::DOM if no other DOM-module
+	  is installed (thanx to Jeroen Latour)
+
+0.03  Fri Jan 10 23:28:09 CET 2003
+	- made it run on debian woody (with perl 5.6 and an older Sablotron)
+
+0.02  Fri Nov 29 21:58:19 2002
+	- removed a print in the constructor (oops)
+
+0.01  Thu Nov 21 22:39:28 2002
+	- original version; created by h2xs 1.22 with options
+		-AX -n XML::YYLex
+
+$Id: Changes,v 1.2 2003/01/10 22:30:50 daniel Exp $

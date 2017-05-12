@@ -1,0 +1,29 @@
+<refentry id='ex.<TMPL_VAR NAME=name>'>
+  <?dbhtml filename='ex.<TMPL_VAR NAME=fname>.html' ?>
+
+  <refentryinfo>
+    <!-- TMPL_IF NAME="date" --><pubdate><!-- TMPL_VAR NAME="date" --></pubdate><!-- /TMPL_IF -->
+    <bibliomisc>Page g&eacute;n&eacute;r&eacute;e par dtd2db</bibliomisc>
+  </refentryinfo>
+
+  <refmeta>
+    <indexterm>
+      <primary>examples</primary>
+      <secondary><!-- TMPL_VAR NAME=page_title --></secondary>
+    </indexterm>
+    <refentrytitle><!-- TMPL_VAR NAME=page_title --></refentrytitle>
+    <refmiscinfo><!-- TMPL_VAR NAME="generator" --></refmiscinfo>
+  </refmeta>
+
+  <refnamediv>
+    <refname><!-- TMPL_VAR NAME=page_title --></refname>
+    <refpurpose/>
+  </refnamediv>
+
+  <refsect1>
+    <title><!-- TMPL_VAR NAME=page_title --></title>
+    <programlisting><!-- TMPL_VAR NAME="example" --></programlisting>
+  </refsect1>
+
+</refentry>
+

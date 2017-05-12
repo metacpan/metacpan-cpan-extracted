@@ -1,0 +1,12 @@
+
+==== history of XML::Compile::SOAP::Mojolicious
+
+version 0.02: Thu 17 Mar 10:21:32 CET 2016
+	- fix first year of release
+	- fix dependency to Mojo
+	- add XML::Compile::SOAP::Mojolicious to please pause
+
+version 0.01: Tue 15 Mar 08:34:53 CET 2016
+
+	- started with XML::Compile::Transfer::SOAPHTTP_MojoUA.
+	  code contributed by [Heiko Jansen]

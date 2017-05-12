@@ -1,0 +1,13 @@
+<DocumentDefinition>
+  <name>_test_doc_read_blob_validation</name>
+  
+  <blob_element><name>data_blob</name></blob_element>
+  <required>'data_blob'</required>
+
+  <store>
+    <name>main</name>
+    <base>test/blob_read_validation</base>
+    <location>Sequential_file:'extension','.doctest'</location>
+  </store>
+</DocumentDefinition>
+

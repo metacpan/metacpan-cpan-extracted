@@ -1,0 +1,34 @@
+---
+abstract: 'Atom feed and API implementation'
+author:
+  - 'Benjamin Trott, Tatsuhiko Miyagawa'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.01'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: XML-Atom
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Class::Data::Inheritable: 0
+  DateTime: 0
+  DateTime::TimeZone: 0
+  Digest::SHA1: 0
+  LWP::UserAgent: 0
+  MIME::Base64: 0
+  URI: 0
+  XML::LibXML: 1.69
+  XML::XPath: 0
+  perl: 5.8.1
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/miyagawa/xml-atom.git
+version: 0.41

@@ -1,0 +1,35 @@
+---
+abstract: 'Resolve public identifiers and remap system identifiers'
+author:
+  - 'Jeff Fearn <jfearn@cpan.org>'
+build_requires:
+  Cwd: 0
+  LWP::Simple: 0
+  Test::More: 0
+  Text::ParseWords: 0
+  URI::URL: 0
+  XML::Parser: 0
+configure_requires:
+  Module::Build: 0
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4004, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: XML-Catalog
+provides:
+  XML::Catalog:
+    file: lib/XML/Catalog.pm
+    version: 1.03
+  XML::Catalog::XML:
+    file: lib/XML/Catalog.pm
+    version: 1.02
+requires:
+  LWP::Simple: 0
+  Text::ParseWords: 0
+  URI::URL: 0
+  XML::Parser: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 1.03

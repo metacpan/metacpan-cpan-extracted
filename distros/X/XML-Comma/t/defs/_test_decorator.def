@@ -1,0 +1,41 @@
+<DocumentDefinition>
+  <name>_test_decorator</name>
+
+  <class><module>XML::Comma::Pkg::DecoratorTest::Talker</module></class>
+
+  <element>
+    <name>el_plain</name>
+    <class><module>XML::Comma::Pkg::DecoratorTest::Shouter</module></class>
+  </element>
+
+  <nested_element>
+    <name>el_nested</name>
+    <class><module>XML::Comma::Pkg::DecoratorTest::Talker</module></class>
+    <element>
+      <name>el_plain</name>
+      <class><module>XML::Comma::Pkg::DecoratorTest::Whisperer</module></class>
+    </element>
+  </nested_element>
+
+  <blob_element>
+    <name>el_blob</name>
+    <class><module>XML::Comma::Pkg::DecoratorTest::Whisperer</module></class>
+  </blob_element>
+
+  <element>
+    <name>multi</name>
+    <class><module>XML::Comma::Pkg::DecoratorTest::Whisperer</module></class>
+    <class><module>XML::Comma::Pkg::DecoratorTest::OverTalker</module></class>
+  </element>
+
+  <element>
+    <name>configurable</name>
+    <class><module>XML::Comma::Pkg::DecoratorTest::ConfigTalker</module>
+           <config>marhaban</config></class>
+  </element>
+
+  <index>
+    <name>main</name>
+    <field><name>el_plain</name></field>
+  </index>
+</DocumentDefinition>

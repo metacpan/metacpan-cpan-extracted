@@ -1,0 +1,36 @@
+<pdb type="DATA" name="PerlDatabase" creator="Perl">
+
+	<record category="0">
+		<field type="int" value="1" />
+		<field type="date" value="2003-03-27" />
+		<field type="time" value="23:47:00" />
+		<field type="byte" value="1" />
+		<field type="float" value="3.14" />
+		<field type="double" value="2.7" />
+		<field type="short" value="1" />
+		<field type="text">Hello World!</field>
+	</record>
+
+	<record category="0">
+		<field type="int" value="2" />
+		<field type="date" value="2003-03-28" />
+		<field type="time" value="11:12:01" />
+		<field type="byte" value="2" />
+		<field type="float" value="3.15" />
+		<field type="double" value="2.8" />
+		<field type="short" value="2" />
+		<field type="text">Dag Wereld!</field>
+	</record>
+
+	<record category="0">
+		<field type="int" value="3" />
+		<field type="date" value="2003-03-29" />
+		<field type="time" value="23:47:02" />
+		<field type="byte" value="3" />
+		<field type="float" value="3.16" />
+		<field type="double" value="2.9" />
+		<field type="short" value="3" />
+		<field type="text">I'll be back.</field>
+	</record>
+
+</pdb>

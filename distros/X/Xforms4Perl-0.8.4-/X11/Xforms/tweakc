@@ -1,0 +1,19 @@
+#!/usr/bin/perl -n
+if (/by xsubpp version (\d\d*)\.(\d\d*)/) {
+	$my_ver = $1 * 1000 + $2;
+	$my_version = "#define XSUBPP_VERSION $my_ver\n";
+	print;
+} elsif (/^\#include "XSUB.h"/) {
+	print;
+	print $my_version;
+} elsif (/^(.*croak\("Usage: )(\w\w*::)*(\w*\(.*)/) {
+	($pf, $sf) = ($1, $3);
+	print "$pf$sf\n";
+} elsif (/^(.*newXS.*)"(.*)::(\w*)"(.*)/) {
+	($pf, $pk, $xs, $sf) = ($1, $2, $3, $4);
+	$pk =~ s/:://g;
+	print "$pf", "make_xsub_name($pk,\"$xs\")$sf\n";
+} else {
+	print;
+}
+

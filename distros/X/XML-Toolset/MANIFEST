@@ -1,0 +1,27 @@
+CHANGES
+COPYING
+lib/XML/Toolset.pm
+lib/XML/Toolset/BestAvailable.pm
+lib/XML/Toolset/Document.pm
+lib/XML/Toolset/DOM.pm
+lib/XML/Toolset/LibXML.pm
+lib/XML/Toolset/MSXML.pm
+lib/XML/Toolset/Xerces.pm
+lib/XML/Toolset/XMLDOM.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+META.yml			Module meta-data (added by MakeMaker)
+README
+t/base-uri.xml
+t/invalid-ext-dtd.xml
+t/invalid-schema.xml
+t/invalid.xml
+t/main.t
+t/malformed.xml
+t/plants.xsd
+t/test.dtd
+t/valid-ext-dtd.xml
+t/valid-schema.xml
+t/valid.xml
+t/well-formed.xml

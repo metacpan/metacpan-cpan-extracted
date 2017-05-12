@@ -1,0 +1,27 @@
+<DocumentDefinition>
+  <name>_test_collection</name>
+
+  <element><name>name</name></element>
+  <element><name>free_tag_a</name></element>
+  <element><name>free_tag_b</name></element>
+  <element><name>text</name></element>
+
+  <plural>'free_tag_a'</plural>
+  <plural>'free_tag_b'</plural>
+
+   <store>
+    <name>main</name>
+    <base>test</base>
+    <location>Sequential_file:'extension','.doctest'</location>
+    <index_on_store>main</index_on_store>
+  </store>
+ 
+  <index>
+    <name>main</name>
+      <field><name>name</name></field>
+      <collection><name>free_tag_a</name></collection>
+      <collection><name>free_tag_b</name></collection>
+      <textsearch><name>text</name></textsearch>
+  </index>
+
+</DocumentDefinition>

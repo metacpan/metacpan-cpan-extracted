@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<complexType>
+	<c>
+		<el0>EL0c_0</el0>
+		<el0>EL0c_1</el0>
+		<el0>EL0c_2</el0>
+	</c>
+	<d>
+		<el0>EL0d_0</el0>
+		<el0>EL0d_1</el0>
+		<el0>EL0d_2</el0>
+	</d>
+</complexType>

@@ -1,0 +1,29 @@
+<opt>
+  <dir>
+    <name>a</name>
+    <dir>
+      <name>b</name>
+	<dir>
+	  <name>c</name>
+	</dir>
+    </dir>
+    <dir>
+      <name>d</name>
+	<dir>
+	  <name>e</name>
+	  <dir>
+	    <name>f</name>
+	  </dir>
+	  <dir>
+	    <name>g</name>
+	  </dir>
+	</dir>
+	<dir>
+	  <name>h</name>
+	  <dir>
+	    <name>i</name>
+	  </dir>
+	</dir>
+    </dir>
+  </dir>
+</opt>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Schema definition for the recommended product list -->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+   <xsd:include schemaLocation="productDepItem.xsd"/>
+   <xsd:element name="productDepList" type="productDepList"/>
+   <xsd:complexType name="productDepList">
+      <xsd:sequence>
+         <xsd:element name="productDep" type="productDepItem" maxOccurs="unbounded"/>
+      </xsd:sequence>
+   </xsd:complexType>
+</xsd:schema>

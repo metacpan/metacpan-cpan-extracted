@@ -1,0 +1,103 @@
+If transactions are supported - reverse the order of action in creating
+placeholder - create a record in Global_Fields first, then add fields
+and roll-back if unsuccessful.
+
+===============
+
+BUG (am, 3/31/2003): If we're searching on:
+
+ [ 'Sub/name','cs','test' ],
+ 'or',
+ [ 'title','cs','test' ]
+
+and there are no entries at all in Sub for some element where 'title'
+matches 'test' that element won't be shown. We need outer join or
+something similar to deal with it. We need to track if a specific
+sub-table is required or not and join accordingly. Looks damn
+complicated if I'm right.
+
+===============
+
+Multiple read-servers, read_pool argument to odb. For better chance
+of returning in-sync data it is probably worth keeping track of last
+update issued to the main server and querying the main server for a
+couple of seconds after each update before switching to normal read_pool
+selection.
+
+Also, it is probably better to only keep two connections -- to master
+server and to a random read_pool server. If read server goes away -
+reconnect to another read_pool server. It has no merit to keep cycling
+through all read pool servers continuously. Or may-be we should have a
+limit on how many connections to read servers to keep/cycle through.
+
+===============
+
+(DONE) Multivalue put.
+
+===============
+
+Make sure that there is a glue() method available on both Lists and
+Hashes and that fetch() also works on all of them.
+
+===============
+
+Polymorphism. See letter from Jean-Michel Hiver for details and ideas.
+
+===============
+
+Optimization for keys() and values() called in scalar context to issue
+count(*) instead of returning actual array. Probably a special method
+like count(search_args) too for more complex conditions.
+
+===============
+
+(!) Locking and/or transactions support. Safe adding of a new item with
+pre-defined ID using checks that no such item already exists. Somehow
+must deal with race condition if two attempts to add the same item are
+made at the same time.
+
+===============
+
+Fix destroy() on hash objects. It currently does not remove the object,
+but empties it incorrectly.
+
+===============
+
+Make it possible to search on the same deep object or on any. Syntax is
+similar to:
+ [ [ 'Interests/1/interest_id', 'eq', 'qwerty' ], 'and',
+   [ 'Interests/1/level', 'eq', 123 ],
+ ], 'and',
+ [ 'Interests/2/interest_id', 'eq', 'asdf' ]
+
+Meaning: look for all interests where interest_id is 'qwerty' and level
+is 123 on the same object and where there is also an interest with
+interest_id equal to 'asdf' in the same base object.
+
+Also:
+ [ 'Interests/*/interest_id', 'eq', 'asdf' ], 'and',
+ [ 'Interests/*/interest_id', 'eq', 'qwerty' ]
+to denote matching on any object. The difference is merely to add the
+same sub-table again as another letter or not. Probably change query
+syntax to use 'left join' instead of explicit index comparisions.
+
+===============
+
+Negation of 'wq' and 'ws' in search() (Marcos' idea)
+
+===============
+
+fill() method or rather extended put().
+
+===============
+
+temporary_data() method to get per-object space to store something
+temporary that would not be stored in the object on disk. Some cached
+values or something like that. Just a hash or SimpleHash reference in
+fact.
+
+===============
+
+(DONE) Transactions, InnoDB support. trans_begin(), trans_rollback() and
+trans_commit().
+

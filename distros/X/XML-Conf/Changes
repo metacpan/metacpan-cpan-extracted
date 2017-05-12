@@ -1,0 +1,87 @@
+Revision history for Perl extension XML::Conf.
+
+0.07 2015-08-21 Maintenance release, update not required
+
+- Updated Dist::Zilla configuration file to contemporary version from gist
+
+- Updated Travis configuration file to contemporary version from gist
+
+- Moved github badges into core module
+
+- Cleaned the Changes file, for conformity
+
+
+0.06 2014-08-20 bug fix release, update not required
+
+- Addressed issue with XML::Simple (dependency) [RT:62836]
+
+  http://www.cpantesters.org/cpan/report/4dba5ca2-e3fc-11df-b117-fd5467a42f83
+
+  The report had the following error:
+
+    XMLin() requires either XML::SAX or XML::Parser at lib/XML/Conf.pm line 30
+
+  The report was based on use of XML::Simple 2.18. I found this is the Changes file for XML::Simple:
+
+    2.19_02   2012-06-19 20:33:53 Pacific/Auckland
+      - Reinstate XML::SAX::Expat dependency
+
+  I have not been able to replicate the error using XML::Simple 2.20 and
+  I do not want to dig into XML::Simple history so I am specifying a dependency to 2.20 (from 1.04)
+
+Closing the issue
+
+
+0.05 2014-08-16 Maintenance release, update not required
+
+- Ported build system to Dist::Zilla
+
+- Addressed issues with failing tests under this build system
+  the use of 'use lib', is b0rken, see my Perl::Critic policy on the matter
+
+- Added use of warnings
+
+
+0.04 2003-12-11 Bug fix release, update not required
+
+- Added Tie::DeepTied to Makefile.PL, should address failling test from CPAN testers
+
+
+0.03 2003-01-18 Maintenance release, update not required
+
+- Development taken over by jonasbn
+  Nothing known about release 0.02
+
+- Everything put under revision control
+
+- Added README file
+- Added TODO file
+- Added INSTALL file
+- Added AUTHOR file
+- Added LICENSE file
+- Added CVS tags to everything
+- Restructured distribution structure
+- Added t dir
+- Added lib dir
+- Added lib/XML dir
+- Rewrote test.pl
+- Added use of Test::More
+- Added t/basic.t
+- Added prototypes to all methods
+- Added NAME, DESCRIPTION, TODO, AUTHOR and COPYRIGHT paragraphs
+- Privatized the subs: val, setval, newval, delval and trans
+- Added t/private.t
+- Added t/populated.xml
+- Documented _val, _setval, _newval, _delval and _trans
+- Documented FIRSTKEY, NEXTKEY, EXISTS, CLEAR, STORE and TIEHASH 
+- Documented WriteConfig, ReadConfig and RewriteConfig
+- Added SYNOPSIS with examples from the tests (basic.t)
+- Added t/advanced.t
+- Removed test.pl
+- Added use of Carp (croak instead of die)
+- Added Tie::Tools to the Makefile.PL, Tie::DeepTied is a part of this module
+- Added a dummy sub for case
+
+0.01 2000-07-10  Initial release
+
+	- original version; created by h2xs 1.19

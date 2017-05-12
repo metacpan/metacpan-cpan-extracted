@@ -1,0 +1,58 @@
+# test the first group example from the XML Schema tutorial
+
+--- |
+ <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+ <xsd:complexType name="PurchaseOrderType">
+ <xsd:sequence>
+  <xsd:choice>
+   <xsd:group   ref="shipAndBill"/>
+   <xsd:element name="singleUSAddress" type="xsd:string"/>
+  </xsd:choice>
+  <xsd:element name="items"  type="xsd:string"/>
+ </xsd:sequence>
+ <xsd:attribute name="orderDate" type="xsd:string"/>
+ </xsd:complexType>
+
+ <xsd:group name="shipAndBill">
+  <xsd:sequence>
+    <xsd:element name="shipTo" type="xsd:string"/>
+    <xsd:element name="billTo" type="xsd:string"/>
+  </xsd:sequence>
+ </xsd:group>
+ <xsd:element name="po" type="PurchaseOrderType"/>
+ </xsd:schema>
+
+--- |
+<po>
+  <singleUSAddress>foo</singleUSAddress>
+  <items>1,2,3</items>
+</po>
+--- >
+PASS
+
+--- |
+<po>
+  <shipTo>foo</shipTo>
+  <billTo>foo</billTo>
+  <items>1,2,3</items>
+</po>
+--- >
+PASS
+
+--- |
+<po>
+  <singleUSAddress>foo</singleUSAddress>
+  <shipTo>foo</shipTo>
+  <billTo>foo</billTo>
+  <items>1,2,3</items>
+</po>
+--- >
+FAIL
+
+--- |
+<po>
+  <items>1,2,3</items>
+</po>
+--- >
+FAIL
+

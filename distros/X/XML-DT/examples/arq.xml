@@ -1,0 +1,260 @@
+<?xml version='1.0' encoding='ISO-8859-1'?>
+<arq>
+
+<!--
+<foto>
+<url><resol></resol></url>
+<title> </title>
+<author> </author>
+<where> </where>
+<isa> </isa>
+</foto> -->
+
+<foto>
+<url>9809/P0000146.JPG<resol>1536 1024</resol> </url>
+<title>Arcada </title>
+<author>Augustsson </author>
+<where>Braga </where>
+<isa>Praça </isa>
+</foto>
+
+<foto>
+<url>9809/P0000151.JPG <resol>1536 1024</resol></url>
+<desc>Prédio da Brasileira </desc>
+<title aea="1">café Brasileira (Braga)</title>
+<author>Augustsson </author>
+<where>Braga </where>
+<isa>café </isa>
+</foto>
+
+<foto>
+<url>9809/P0000153.JPG<resol>1536 1024</resol> </url>
+<title>Jardins de S.Bárbara, flores </title>
+<author>Augustsson </author>
+<where>Braga </where>
+<isa>Jardim </isa>
+</foto>
+
+<foto>
+<url>9809/P0000154.JPG<resol>1536 1024</resol> </url>
+<title>flores (não sei o nome)</title>
+<author>Augustsson </author>
+<where>Braga/Jardim S.Bárbara </where>
+<isa>flor </isa>
+</foto>
+
+<foto>
+<url>9809/P0000156.JPG<resol>1536 1024</resol> </url>
+<title>flores (não sei o nome)</title>
+<author>Augustsson </author>
+<where>Braga/Jardim S.Bárbara </where>
+<isa>flor </isa>
+</foto>
+
+<foto>
+<url>9809/P0000157.JPG<resol>1536 1024</resol> </url>
+<title>Biblioteca: edifício medieval, visto de jardim de S. Bárbara </title>
+<author>Augustsson </author>
+<where>Braga </where>
+<isa>monumento </isa>
+<isa>jardim </isa>
+</foto>
+
+<foto>
+<url>9809/P0000158.JPG<resol>1536 1024</resol> </url>
+<title aea="1">Câmara Municipal de Braga</title>
+<author>Augustsson </author>
+<where>Braga </where>
+<isa>convento </isa>
+<isa>praça </isa>
+</foto>
+
+<foto>
+<url>9809/P0000160.JPG<resol>1536 1024</resol> </url>
+<title aea="1">Biblioteca Pública de Braga</title>
+<desc>entrada barroca </desc>
+<author>Augustsson </author>
+<where>Braga/Praça do Município </where>
+<isa>monumento </isa>
+<isa>biblioteca </isa>
+</foto>
+
+<foto>
+<url>9809/P0000161.JPG<resol>1536 1024</resol> </url>
+<title aea="1">Sé de Braga:Estátua da Senhora do Leite </title>
+<author>Augustsson </author>
+<where>Braga/Sé </where>
+<isa>estátua </isa>
+</foto>
+
+<foto>
+<url>9809/P0000163.JPG<resol>1536 1024</resol> </url>
+<title>Igreja de S.Marcos </title>
+<author>Augustsson </author>
+<where>Braga </where>
+<isa>igreja </isa>
+</foto>
+
+<foto>
+<url>9809/P0000164.JPG<resol>1536 1024</resol> </url>
+<title>Igreja de St. Cruz </title>
+<author>Augustsson </author>
+<where>Braga </where>
+<isa>igreja </isa>
+</foto>
+
+<foto>
+<url>9809/P0000240.JPG<resol>1536 1024</resol> </url>
+<title>Estátua de D.Afonso Henriques </title>
+<author>Augustsson </author>
+<where>Guimarães </where>
+<isa>estátua </isa>
+</foto>
+
+<foto>
+<url>9809/P0000254.JPG<resol>1536 1024</resol> </url>
+<title>Rua estreita em Guimarães </title>
+<author>Augustsson </author>
+<where>Guimarães </where>
+<isa>rua </isa>
+</foto>
+
+<foto>
+<url>9809/P0000256.JPG<resol>1536 1024</resol> </url>
+<title>Biblioteca antiga de Guimarães, junto à Oliveira </title>
+<author>Augustsson </author>
+<where>Guimarães </where>
+<isa>monumento </isa>
+</foto>
+
+<foto>
+<url>9809/P0000257.JPG<resol>1536 1024</resol> </url>
+<title>Cruzeiro junto à Oliveira </title>
+<author>Augustsson </author>
+<where>Guimarães </where>
+<isa>monumento </isa>
+</foto>
+
+<foto>
+<url>9809/P0000241.JPG<resol>1536 1024</resol> </url>
+<title>Paço dos Duques de Bragança </title>
+<author>Augustsson </author>
+<where>Guimarães </where>
+<isa>Paço </isa>
+</foto>
+
+
+<foto>
+<url>9811/brasileira.jpg <resol>1300 1000</resol></url>
+<desc>Esplanada do café Brasileira </desc>
+<author>jj </author>
+<title aea="1">café Brasileira (Braga)</title>
+<where>Braga </where>
+<isa>café</isa>
+<isa>esplanada</isa>
+<data>1989</data>
+</foto>
+
+<foto>
+<url>9811/castelo.jpg<resol>1300 1000</resol></url>
+<title>Rua do Castelo, torre da igreja dos Terceiros</title>
+<author>jj </author>
+<where>Braga </where>
+<isa>rua</isa>
+<isa>igreja_po</isa>
+</foto>
+
+<foto>
+<url>9811/claraboi.jpg<resol>1300 1000</resol></url>
+<title>Pópulo: torreão visto pelas traseiras</title>
+<author>jj </author>
+<where>Braga </where>
+<isa>promenor arq.</isa>
+<isa>igreja_po</isa>
+<data>1997</data>
+</foto>
+
+<foto>
+<url>9811/janela.jpg<resol>1300 1000</resol></url>
+<title>Largo de S.Victor: Janelas de rótulo e nicho</title>
+<author>jj </author>
+<where>Braga </where>
+<isa>janela</isa>
+<isa>casa</isa>
+<data>1989</data>
+</foto>
+
+<foto>
+<url>9811/mosteiro.jpg<resol>1300 1000</resol></url>
+<title>Mosteiro de Rendufe</title>
+<author>jj </author>
+<where>Braga </where>
+<isa>igreja</isa>
+<isa>monumento</isa>
+</foto>
+
+<foto>
+<url>9811/ruina.jpg<resol>1300 1000</resol></url>
+<title>R. D. Pedro V: Casa arruinada; janela guilhotina/3</title>
+<author>jj </author>
+<where>Braga </where>
+<isa>casa</isa>
+<isa>janela</isa>
+<data>1989</data>
+</foto>
+
+<foto>
+<url>9811/tabique.jpg<resol>1300 1000</resol></url>
+<title>R. ?: Casa arruinada com grade do tabique e janelas de rótula</title>
+<author>jj </author>
+<where>Braga </where>
+<isa>casa</isa>
+<isa>janela</isa>
+<isa>promenor arq.</isa>
+<data>1989</data>
+</foto>
+
+<foto>
+<url>9812/santo.jpg<resol>1036 690</resol></url>
+<title>Cara de um santo, Bom Jesus</title>
+<desc>Cara de um santo numa das capelinhas da via-sacra do Bom Jesus</desc>
+<author>jbb </author>
+<where>Braga/Bom Jesus </where>
+<isa>estátua</isa>
+<isa>santo</isa>
+<data>1998</data>
+</foto>
+
+<aguarela>
+<url>9902/cabreira.jpg<resol>1024 728</resol></url>
+<title>Paisagem da Cabreira</title>
+<desc>paisagem da serra da Cabreira junto `a casa abrigo da Serradela</desc>
+<author>jj </author>
+<where>Minho/Serra da Cabreira/serradela</where>
+<isa>aguarela</isa>
+<isa>paisagem</isa>
+<isa>etnografia</isa>
+<data>1998</data>
+</aguarela>
+
+<desenho>
+<url>9902/flautista.jpg<resol>840 680</resol></url>
+<title>flautista</title>
+<desc>velho a tocar flauta (desenho a caneta, preto e branco)</desc>
+<author>jj </author>
+<isa>desenho</isa>
+<isa>música</isa>
+<isa>etnografia</isa>
+<data>1998</data>
+</desenho>
+
+<desenho>
+<url>9902/mariana1.jpg<resol>340 680</resol></url>
+<title>Marina a desenhar</title>
+<desc>Marina a desenhar (desenho a grafite)</desc>
+<author>jj</author>
+<isa>desenho</isa>
+<data>1998</data>
+</desenho>
+
+</arq>

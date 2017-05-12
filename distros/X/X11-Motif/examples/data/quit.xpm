@@ -1,0 +1,42 @@
+/* XPM */
+static char *stopsign_xpm[] = {
+/* stopsign pixmap
+ * width height ncolors chars_per_pixel */
+"32 32 3 1 ",
+"  c white",
+". c black",
+"X c red",
+/* pixels */
+"          ............          ",
+"         .            .         ",
+"        . XXXXXXXXXXXX .        ",
+"       . XXXXXXXXXXXXXX .       ",
+"      . XXXXXXXXXXXXXXXX .      ",
+"     . XXXXXXXXXXXXXXXXXX .     ",
+"    . XXXXXXXXXXXXXXXXXXXX .    ",
+"   . XXXXXXXXXXXXXXXXXXXXXX .   ",
+"  . XXXXXXXXXXXXXXXXXXXXXXXX .  ",
+" . XXXXXXXXXXXXXXXXXXXXXXXXXX . ",
+". XXX   XX     XX   XX    XXXX .",
+". XX XXX XXX XXX XXX X XXX XXX .",
+". XX XXXXXXX XXX XXX X XXX XXX .",
+". XX XXXXXXX XXX XXX X XXX XXX .",
+". XXX XXXXXX XXX XXX X XXX XXX .",
+". XXXX XXXXX XXX XXX X    XXXX .",
+". XXXXX XXXX XXX XXX X XXXXXXX .",
+". XXXXXX XXX XXX XXX X XXXXXXX .",
+". XXXXXX XXX XXX XXX X XXXXXXX .",
+". XXXXXX XXX XXX XXX X XXXXXXX .",
+". XX XXX XXX XXX XXX X XXXXXXX .",
+". XXX   XXXX XXXX   XX XXXXXXX .",
+" . XXXXXXXXXXXXXXXXXXXXXXXXXX . ",
+"  . XXXXXXXXXXXXXXXXXXXXXXXX .  ",
+"   . XXXXXXXXXXXXXXXXXXXXXX .   ",
+"    . XXXXXXXXXXXXXXXXXXXX .    ",
+"     . XXXXXXXXXXXXXXXXXX .     ",
+"      . XXXXXXXXXXXXXXXX .      ",
+"       . XXXXXXXXXXXXXX .       ",
+"        . XXXXXXXXXXXX .        ",
+"         .            .         ",
+"          ............          "
+} ;

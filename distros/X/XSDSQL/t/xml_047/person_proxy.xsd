@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<xs:schema 
+	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	targetNamespace="http://www.site.org/person"
+	xmlns="http://www.site.org/person"
+>
+
+<xs:include schemaLocation="person.xsd"/>
+
+</xs:schema>
+

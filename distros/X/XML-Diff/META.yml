@@ -1,0 +1,12 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         XML-Diff
+version:      0.05
+version_from: Diff.pm
+installdirs:  site
+requires:
+    Algorithm::Diff:               1.15
+    XML::LibXML:                   1.56
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

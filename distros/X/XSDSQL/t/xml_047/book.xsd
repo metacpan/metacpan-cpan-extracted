@@ -1,0 +1,22 @@
+<?xml version="1.0"?> 
+<xs:schema 
+	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+>
+	<xs:include schemaLocation="types.xsd"/>
+
+	<xs:complexType name="book">
+		<xs:complexContent>
+			<xs:extension base="elementWithID">
+				<xs:sequence>
+					<xs:element ref="isbn"/>
+					<xs:element ref="title"/> 
+					<xs:element ref="author" minOccurs="0"  maxOccurs="unbounded"/> 
+					<xs:element ref="character" minOccurs="0" maxOccurs="unbounded"/>
+				</xs:sequence>
+				<xs:attribute ref="available"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+</xs:schema>
+

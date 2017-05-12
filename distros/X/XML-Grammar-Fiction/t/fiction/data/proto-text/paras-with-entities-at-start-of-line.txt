@@ -1,0 +1,25 @@
+<body id="index">
+
+<title>David vs. Goliath - Part I</title>
+
+<s id="top">
+
+<title>The Top Section</title>
+
+&amp;&#32;David and Goliath were standing by each other.
+&lt;foo&gt;
+
+<s id="goliath">
+
+<title>Goliath's Response</title>
+
+Goliath was not amused.
+
+He said to David: "Oh, really".
+
+</s>
+
+</s>
+
+</body>
+

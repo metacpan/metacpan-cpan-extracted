@@ -1,0 +1,114 @@
+Revision history for Perl extension XML::Directory
+==================================================
+
+1.00  Jan 26, 2004
+        - added alphabetical descending sorting
+          $dir->order_by('z');
+        - fixed a bug of setting with order_by
+
+0.99  Oct 7, 2002
+	- warning caused by order_by() function fixed
+          [patch by Gerhard Wannemacher]
+	- minor optimizations
+
+0.98  Sep 24, 2002
+	- fix in regexp to get the parent directory
+          [patch by Gerhard Wannemacher]
+
+0.97  Jun 21, 2002
+	- minor fix in X:D:SAX constructor (depth => 0)
+
+0.96  May 17, 2002
+        - added orderby to head element
+        - updated SAX::doElement to create a singleton if
+	  necessary
+	- updated DTD to version 1.01 [Aaron Straup Cope]
+	- fixed test.pl
+
+0.95  May 2, 2002
+	- added order_by method [Aaron Straup Cope]
+	- package downgraded for Perl 5.005_03
+	- repeated attempts to open N3 files
+
+0.94  Apr 3, 2002
+	- added missing quotes in String.pm
+
+0.93  Mar 28, 2002
+	- added parameter entities based DTD
+	  [provided by Aaron Straup Cope]
+	- optional DOCTYPE declaration 
+	  (added enable_doctype/disable_doctype methods,
+	   reported via the start_dtd lexical event in SAX)
+
+0.92  Mar 13, 2002
+	- DTD added to docs
+	- minor portability issues on Solaris 7
+	  [reported by Dustin Cavanaugh]
+
+0.91  Feb 5, 2002
+	- relative paths work
+	- updated 'make test'
+
+0.90  Feb 4, 2002
+	- support for symbolic links [suggested by Chris Snyder]
+	- fixes for RDF meta-data stuff (namespaces, position)
+	- SAX driver makes use of XML::SAX::Base
+
+0.85  Jan 17, 2002
+	- XML error messages are escaped to be well-formed
+	- RDF meta-data are escaped to be well-formed
+	- RDF meta-data are read also for the uppermost directory
+
+0.84  Nov 19, 2001
+	- minor bugs fixed
+	- fixed RDF/N3 error handling
+
+0.83  Oct 25, 2001
+	- added a way to stop recursion by meta-data
+	  (doc:Type = 'document')
+
+0.82  Oct 23, 2001
+	- doc:Position added to RDF/N3 support
+
+0.81  Oct 17, 2001
+	- interface to RDF::Notation3 adapted for v0.30 API
+
+0.80  Oct 9, 2001
+	- support for RDF meta-data in RDF/Notation3 files
+	- SAX driver uses the latest PerlSAX2 notation
+	  ({ns}local attributes keys)
+	- XML encoding can be changed for String
+	- minor bug fixes
+
+0.70  Sep 24, 2001
+	- redesigned using a template by Duncan Cameron
+	- escaping & in dir and file names
+	- improved error handling
+
+0.60  Sep 7, 2001
+	- mod_perl interface added
+	- support for namespaces (optional)
+	- parameters stored in XML header
+
+0.51  Aug 30, 2001
+	- fixed a SAX return value error
+	- last level directories added
+
+0.50  Aug 29, 2001
+	- SAX generator added (parse_SAX, set_content_handler and
+	  set_error_handler methods)
+
+0.41  Aug 24, 2001
+	- get_string method added
+	- error handling
+	- fixed a maxdepth defaulting bug
+
+0.40  Aug 21, 2001
+	- object interface (XML::Directory class)
+	- maximal number of nested sub-directories can be limited
+	  (maximal depth)
+	- number of details is controlled (brief, normal, verbose)
+
+0.30  Aug 7, 2001
+	- original version; created by h2xs 1.20
+	- based on a utility script dir2xml.pl, v0.2

@@ -1,0 +1,48 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<cp:ruleset xmlns:pr="urn:ietf:params:xml:ns:pres-rules" xmlns:cp="urn:ietf:params:xml:ns:common-policy">
+	<cp:rule id="pres_whitelist">
+		<cp:conditions>
+			<cp:identity>
+				<cp:one id="sip:thiago@example.org"/>
+				<cp:one id="sip:karen@example.org"/>
+			</cp:identity>
+		</cp:conditions>
+		<cp:actions>
+			<pr:sub-handling>allow</pr:sub-handling>
+		</cp:actions>
+		<cp:transformations>
+			<pr:provide-services>
+				<pr:all-services/>
+			</pr:provide-services>
+			<pr:provide-persons>
+				<pr:all-persons/>
+			</pr:provide-persons>
+			<pr:provide-devices>
+				<pr:all-devices/>
+			</pr:provide-devices>
+			<pr:provide-all-attributes/>
+		</cp:transformations>
+	</cp:rule>
+	<cp:rule id="pres_blacklist">
+		<cp:conditions>
+			<cp:identity>
+				<cp:one id="sip:bill@microsoft.com"/>
+			</cp:identity>
+		</cp:conditions>
+		<cp:actions>
+			<pr:sub-handling>block</pr:sub-handling>
+		</cp:actions>
+		<cp:transformations/>
+	</cp:rule>
+	<cp:rule id="pres_polite_blacklist">
+		<cp:conditions>
+			<cp:identity>
+				<cp:one id="sip:steve@apple.com"/>
+			</cp:identity>
+		</cp:conditions>
+		<cp:actions>
+			<pr:sub-handling>polite-block</pr:sub-handling>
+		</cp:actions>
+		<cp:transformations/>
+	</cp:rule>
+</cp:ruleset>

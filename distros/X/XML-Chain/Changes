@@ -1,0 +1,20 @@
+0.03  2017-03-04
+    - s/append_and_current/append_and_select/
+    - add append() method
+    - add name() method
+    - add rename() method
+    - add each() method
+    - add remap() method
+    - add rm() / remove_and_parent() method
+
+0.02  2017-02-21
+    - namespaces support
+    - chained methods reworked into selectors (XML::Chain::Selector)
+    - add find($xpath) method
+    - first version of auto_indent(1) using XML::Tidy (don't use in persistent env [rt.cpan.org #120296])
+    - single() method (XML::Chain::Element)
+    - empty() method to remove all child elements
+    - loading & storing of xml files / xml strings using IO::Any
+
+0.01  2017-01-18
+    - initial prototype version

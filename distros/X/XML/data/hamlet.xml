@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<PLAY>
+<TITLE>The Tragedy of Hamlet, Prince of Denmark</TITLE>
+
+<PERSONAE>
+<TITLE>Dramatis Personae</TITLE>
+
+<PERSONA>CLAUDIUS, king of Denmark. </PERSONA>
+<PERSONA>HAMLET, son to the late, and nephew to the present king.</PERSONA>
+<PERSONA>POLONIUS, lord chamberlain. </PERSONA>
+<PERSONA>HORATIO, friend to Hamlet.</PERSONA>
+<PERSONA>LAERTES, son to Polonius.</PERSONA>
+<PERSONA>LUCIANUS, nephew to the king.</PERSONA>
+
+<PGROUP>
+<PERSONA>VOLTIMAND</PERSONA>
+<PERSONA>CORNELIUS</PERSONA>
+<PERSONA>ROSENCRANTZ</PERSONA>
+<PERSONA>GUILDENSTERN</PERSONA>
+<PERSONA>OSRIC</PERSONA>
+<GRPDESCR>courtiers.</GRPDESCR>
+</PGROUP>
+
+<PERSONA>A Gentleman</PERSONA>
+<PERSONA>A Priest. </PERSONA>
+
+<PGROUP>
+<PERSONA>MARCELLUS</PERSONA>
+<PERSONA>BERNARDO</PERSONA>
+<GRPDESCR>officers.</GRPDESCR>
+</PGROUP>
+
+<PERSONA>FRANCISCO, a soldier.</PERSONA>
+<PERSONA>REYNALDO, servant to Polonius.</PERSONA>
+<PERSONA>Players.</PERSONA>
+<PERSONA>Two Clowns, grave-diggers.</PERSONA>
+<PERSONA>FORTINBRAS, prince of Norway. </PERSONA>
+<PERSONA>A Captain.</PERSONA>
+<PERSONA>English Ambassadors. </PERSONA>
+<PERSONA>GERTRUDE, queen of Denmark, and mother to Hamlet. </PERSONA>
+<PERSONA>OPHELIA, daughter to Polonius.</PERSONA>
+<PERSONA>Lords, Ladies, Officers, Soldiers, Sailors, Messengers, and other Attendants.</PERSONA>
+<PERSONA>Ghost of Hamlet's Father. </PERSONA>
+</PERSONAE>
+
+<SCNDESCR>SCENE  Denmark.</SCNDESCR>
+
+<PLAYSUBT>HAMLET</PLAYSUBT>
+
+<ACT><TITLE>ACT I</TITLE>
+
+<SCENE><TITLE>SCENE I.  Elsinore. A platform before the castle.</TITLE>
+
+<SPEECH>
+<SPEAKER>HAMLET</SPEAKER>
+<LINE>Now might I do it pat, now he is praying;</LINE>
+<LINE>And now I'll do't. And so he goes to heaven;</LINE>
+<LINE>And so am I revenged. That would be scann'd:</LINE>
+<LINE>A villain kills my father; and for that,</LINE>
+<LINE>I, his sole son, do this same villain send</LINE>
+<LINE>To heaven.</LINE>
+</SPEECH>
+
+<SPEECH>
+<SPEAKER>POLONIUS</SPEAKER>
+<LINE>O, this is hire and salary, not revenge.</LINE>
+<LINE>He took my father grossly, full of bread;</LINE>
+<LINE>With all his crimes broad blown, as flush as May;</LINE>
+<LINE>And how his audit stands who knows save heaven?</LINE>
+<LINE>But in our circumstance and course of thought,</LINE>
+<LINE>'Tis heavy with him: and am I then revenged,</LINE>
+<LINE>To take him in the purging of his soul,</LINE>
+<LINE>When he is fit and season'd for his passage?</LINE>
+<LINE>No!</LINE>
+</SPEECH>
+
+<SPEECH>
+<SPEAKER>HAMLET</SPEAKER>
+<LINE>Up, sword; and know thou a more horrid hent:</LINE>
+<LINE>When he is drunk asleep, or in his rage,</LINE>
+<LINE>Or in the incestuous pleasure of his bed;</LINE>
+<LINE>At gaming, swearing, or about some act</LINE>
+<LINE>That has no relish of salvation in't;</LINE>
+<LINE>Then trip him, that his heels may kick at heaven,</LINE>
+<LINE>And that his soul may be as damn'd and black</LINE>
+<LINE>As hell, whereto it goes. My mother stays:</LINE>
+<LINE>This physic but prolongs thy sickly days.</LINE>
+</SPEECH>
+</SCENE>
+</ACT>
+</PLAY>

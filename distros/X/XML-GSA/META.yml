@@ -1,0 +1,27 @@
+---
+abstract: 'Creates xml in google search appliance (GSA) format'
+author:
+  - 'Shemahmforash <shemahmforash@gmail.com>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.72, CPAN::Meta::Converter version 2.132830'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: XML-GSA
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Date::Parse: 0
+  DateTime: 0
+  XML::Writer: 0.623
+  perl: 0
+resources:
+  repository: https://github.com/Shemahmforash/xml-gsa
+version: 0.07

@@ -1,0 +1,25 @@
+--- #YAML:1.0
+name: XML-Generator-RFC822-RDF
+version: 1.1
+author:
+  - Aaron Straup Cope E<lt>ascope@cpan.orgE<gt>
+abstract: generate RDF/XML SAX2 events for RFC822 messages
+license: perl
+requires:
+  Date::Format: '>= 2.20'
+  Date::Parse: '>= 2.27'
+  Digest::SHA1: '>= 2.10'
+  Email::Address: '>= 1.80'
+  Email::MIME: '>= 1.82'
+  Email::Simple: '>= 1.92'
+  Encode: '>= 1.09'
+  MIME::Words: '>= 3.03'
+  Memoize: ''
+  XML::SAX::Base: '>= 1.04'
+build_requires:
+  Test::Simple: '>= 0.47'
+provides:
+  XML::Generator::RFC822::RDF:
+    file: lib/XML/Generator/RFC822/RDF.pm
+    version: 1.1
+generated_by: Module::Build version 0.2604

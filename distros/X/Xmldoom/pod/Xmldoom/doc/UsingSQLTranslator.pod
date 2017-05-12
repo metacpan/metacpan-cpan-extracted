@@ -1,0 +1,109 @@
+
+=head1 NAME
+
+Xmldoom::doc::UsingSQLTranslator -- How to use the SQL::Translator to work with your database.xml.
+
+=head1 DESCRIPTION
+
+Xmldoom now comes with some add-ons to SQL::Translator that allow you to convert between your
+database.xml and many other formats.
+
+=head1 Using sqlt, sqlt-diff, sqlt-graph, etc..
+
+Installing Xmldoom will also install some additional modules under SQL::Translator, which *should*
+allow you to simply use the command lines tools provided by SQL::Translator to read/write files
+in the database.xml format.  Unfortunately, there is a bug in SQL::Translator where it won't find
+a Parser or Producer module automatically unless it is in the same directory on disk.  This isn't
+a problem if you install both Xmldoom and SQL::Translator from CPAN at the same time.  However it 
+can be a problem if both are installed from different sources (ie. vendor packages and CPAN) or 
+on opposite sides of Perl version updates.
+
+To check what Parsers and Producers are available to SQL::Translator run:
+
+  drs@mork ~ $ sqlt -l
+  
+  Parsers:
+          Access
+          DB2
+          DB2-Grammar
+          DBI
+          DBI-DB2
+          DBI-MySQL
+          DBI-PostgreSQL
+          DBI-SQLite
+          DBI-Sybase
+          Excel
+          MySQL
+          Oracle
+          PostgreSQL
+          SQLite
+          Storable
+          Sybase
+          XML
+          XML-SQLFairy
+          XML-Xmldoom
+          YAML
+          xSV
+  
+  Producers:
+          ClassDBI
+          Diagram
+          Dumper
+          GraphViz
+          HTML
+          MySQL
+          Oracle
+          POD
+          PostgreSQL
+          SQLServer
+          SQLite
+          Storable
+          Sybase
+          TT-Base
+          TT-Table
+          TTSchema
+          XML
+          XML-SQLFairy
+          XML-Xmldoom
+          YAML
+
+Look for the XML-Xmldoom in the list.  This means that everything is good!
+
+To generate a database.xml from your MySQL database, you can do for example:
+
+  sqlt --parser DBI --dsn dbi:mysql:dbname --db-user username --db-password secret --producer XML-Xmldoom >database.xml
+
+To generate MySQL create script from your database.xml, do:
+
+  sqlt --parser XML-Xmldoom --producer MySQL database.xml >schema.sql
+
+See the SQL::Translator documentation for more information on how to use this and the other
+command lines tools.
+
+=head1 Using xmldoom-schema
+
+Xmldoom also ships with its own custom command line tool which basically uses SQL::Translator
+under the hood but provides alot less features than any of its command lines tools.  Its purpose
+is simply to do the common tasks with a much simplified and Xmldoom-specific interface.  It also
+adds the ability to filter out all but a select number of tables and to ignore foreign-key
+declarations.
+
+To generate a database.xml from your MySQL database for a specific list of tables, you can do for example:
+
+  xmldoom-schema create --parser DBI --dsn dbi:mysql:dbname -u username -p secret -t table1 -t table2 >database.xml
+
+To generate MySQL create script from your database.xml for a specific list of tables without any FOREIGN KEY declarations, do:
+
+  xmldoom-schema convert --producer MySQL -t table1 -t table2 --drop-foreign-keys -D database.xml >schema.sql
+
+=head1 Beautifying the XML
+
+The generated XML is admittedly pretty horrendous but I didn't want to add needless dependancies and
+complexity to what is an otherwise very simple tool.  But if this to ever edited and read by humans
+you should probably use an XML beautifier.  I suggest 'xmlpretty' which comes with the 
+XML::Handler::YAWriter CPAN distribution.  These are the options that we use:
+
+  xmlpretty --PrettyWhiteIndent --CatchEmptyElement --NoProlog
+
+=cut
+

@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                XML-Bare-SAX-Parser
+version:             0.01
+abstract:            A minimal XML SAX parser.
+license:             perl
+author:              
+    - David Helkowski <cpan@codechild.com>
+generated_by:        ExtUtils::MakeMaker version 6.44
+distribution_type:   module
+requires:     
+    Carp:                          0
+    DynaLoader:                    0
+    Exporter:                      0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

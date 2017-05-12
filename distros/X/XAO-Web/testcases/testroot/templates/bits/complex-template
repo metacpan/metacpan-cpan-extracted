@@ -1,0 +1,86 @@
+<%SetArg
+  name='FOO'
+  value={<%Page/f template={foo-value}%>}
+%>
+
+<%SetArg
+  name='VAR1'
+  value={<%Condition/f
+           a.arg='FOO'
+           a.pass
+           a.template='foo-is-set-<$FOO$>'
+           default.template='foo-is-not-set'
+         %>}
+%>
+
+<%SetArg
+  name='VAR2'
+  value={v2:<%Condition/f
+           a.arg='FOO'
+           a.pass
+           a.template='foo-is-set-<$FOO$>'
+           default.template='foo-is-not-set'
+         %>}
+%>
+
+<%SetArg
+  name='VAR3'
+  value={v3:<$VAR2/f$>:<%Condition/f
+           a.arg='FOO'
+           a.pass
+           a.template='foo-is-set-<$FOO$>'
+           default.template='foo-is-not-set'
+         %>}
+%>
+
+<%SetArg
+  name='VAR4'
+  value={v4:<%Condition/f
+           a.arg='FOO'
+           a.pass
+           a.template='foo-is-set-<$FOO$>'
+           default.template='foo-is-not-set'
+         %>}
+%>
+
+Some text
+
+<%Condition
+  a.arg='FOO'
+  a.template="Another text"
+%>
+
+And finally more text <!-- with a comment -->
+
+A bunch of variables:
+
+<$VAR1/f$> <$VAR2/h$> <$VAR3/q$> <$VAR4$>
+<$VAR1/f$> <$VAR2/h$> <$VAR3/q$> <$VAR4$>
+<$VAR1/f$> <$VAR2/h$> <$VAR3/q$> <$VAR4$>
+<$VAR1/f$> <$VAR2/h$> <$VAR3/q$> <$VAR4$>
+<$VAR1/f$> <$VAR2/h$> <$VAR3/q$> <$VAR4$>
+<$VAR1/f$> <$VAR2/h$> <$VAR3/q$> <$VAR4$>
+<$VAR1/f$> <$VAR2/h$> <$VAR3/q$> <$VAR4$>
+<$VAR1/f$> <$VAR2/h$> <$VAR3/q$> <$VAR4$>
+<$VAR1/f$> <$VAR2/h$> <$VAR3/q$> <$VAR4$>
+<$VAR1/f$> <$VAR2/h$> <$VAR3/q$> <$VAR4$>
+<$VAR1/f$> <$VAR2/h$> <$VAR3/q$> <$VAR4$>
+<$VAR1/f$> <$VAR2/h$> <$VAR3/q$> <$VAR4$>
+<$VAR1/f$> <$VAR2/h$> <$VAR3/q$> <$VAR4$>
+<$VAR1/f$> <$VAR2/h$> <$VAR3/q$> <$VAR4$>
+<$VAR1/f$> <$VAR2/h$> <$VAR3/q$> <$VAR4$>
+
+And a bunch of objects
+
+<%Date format='%Y-%m-%d' gmtime='1'%> - Date - <%Date format='%Y-%m-%d' gmtime='2'%> - Date -
+<%Date format='%Y-%m-%d' gmtime='1'%> - Date - <%Date format='%Y-%m-%d' gmtime='2'%> - Date -
+<%Date format='%Y-%m-%d' gmtime='1'%> - Date - <%Date format='%Y-%m-%d' gmtime='2'%> - Date -
+<%Date format='%Y-%m-%d' gmtime='1'%> - Date - <%Date format='%Y-%m-%d' gmtime='2'%> - Date -
+<%Date format='%Y-%m-%d' gmtime='1'%> - Date - <%Date format='%Y-%m-%d' gmtime='2'%> - Date -
+<%Date format='%Y-%m-%d' gmtime='1'%> - Date - <%Date format='%Y-%m-%d' gmtime='2'%> - Date -
+<%Date format='%Y-%m-%d' gmtime='1'%> - Date - <%Date format='%Y-%m-%d' gmtime='2'%> - Date -
+<%Date format='%Y-%m-%d' gmtime='1'%> - Date - <%Date format='%Y-%m-%d' gmtime='2'%> - Date -
+<%Date format='%Y-%m-%d' gmtime='1'%> - Date - <%Date format='%Y-%m-%d' gmtime='2'%> - Date -
+<%Date format='%Y-%m-%d' gmtime='1'%> - Date - <%Date format='%Y-%m-%d' gmtime='2'%> - Date -
+
+That's it.

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<NZSRSRequest VerMinor="11" VerMajor="3">
+  <DomainCreate Term="1" DomainName="wotcha.geek.nz" Delegate="1" ActionId="srsstage-90_717" DomainNameUnicode="wotcha.geek.nz">
+    <RegistrantContact Name="Test" Email="test@example.com">
+      <PostalAddress Address1="Street" Address2="Suburb" City="City" CountryCode="NZ"/>
+      <Phone AreaCode="21" CountryCode="64" LocalNumber="0000000"/>
+    </RegistrantContact>
+    <AuditText><![CDATA[Jan 11 11:31:49 srsoapp1 SrsBackend-srsstage[18261]: exeReg=90;actionId=(4,411478)-User Id: andy]]>
+    </AuditText>
+  </DomainCreate>
+</NZSRSRequest>

@@ -1,0 +1,149 @@
+{
+   "abstract" : "XPath (XML Path Language) visualizer.",
+   "author" : [
+      "Emmanuel Rodriguez <potyl@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.110440",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Xacobeo",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::CBuilder" : 0,
+            "ExtUtils::Depends" : 0,
+            "ExtUtils::ParseXS" : 0,
+            "ExtUtils::PkgConfig" : 0,
+            "File::Path" : 0,
+            "File::Slurp" : 0,
+            "File::Spec::Functions" : 0,
+            "Gtk2" : 0,
+            "Test::Exception" : 0,
+            "Test::More" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::Depends" : 0,
+            "ExtUtils::ParseXS" : 0,
+            "ExtUtils::PkgConfig" : 0,
+            "File::Path" : 0,
+            "File::Spec::Functions" : 0,
+            "Gtk2" : 0,
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : 0,
+            "Data::Dumper" : 0,
+            "DynaLoader" : 0,
+            "Exporter" : 0,
+            "File::BaseDir" : 0,
+            "File::Spec::Functions" : 0,
+            "FindBin" : 0,
+            "Getopt::Long" : 0,
+            "Glib" : 0,
+            "Gtk2" : "1.100",
+            "Gtk2::Ex::Entry::Pango" : "0.07",
+            "Gtk2::SourceView2" : 0,
+            "Locale::TextDomain" : 0,
+            "Pod::Usage" : 0,
+            "Time::HiRes" : 0,
+            "XML::LibXML" : 0,
+            "parent" : 0,
+            "perl" : "v5.6.1"
+         }
+      }
+   },
+   "provides" : {
+      "Xacobeo" : {
+         "file" : "lib/Xacobeo.pm",
+         "version" : "0.15"
+      },
+      "Xacobeo::Accessors" : {
+         "file" : "lib/Xacobeo/Accessors.pm",
+         "version" : 0
+      },
+      "Xacobeo::App" : {
+         "file" : "lib/Xacobeo/App.pm",
+         "version" : 0
+      },
+      "Xacobeo::Conf" : {
+         "file" : "lib/Xacobeo/Conf.pm",
+         "version" : 0
+      },
+      "Xacobeo::Document" : {
+         "file" : "lib/Xacobeo/Document.pm",
+         "version" : 0
+      },
+      "Xacobeo::Error" : {
+         "file" : "lib/Xacobeo/Error.pm",
+         "version" : 0
+      },
+      "Xacobeo::GObject" : {
+         "file" : "lib/Xacobeo/GObject.pm",
+         "version" : 0
+      },
+      "Xacobeo::I18n" : {
+         "file" : "lib/Xacobeo/I18n.pm",
+         "version" : 0
+      },
+      "Xacobeo::Plugin" : {
+         "file" : "lib/Xacobeo/Plugin.pm",
+         "version" : 0
+      },
+      "Xacobeo::Timer" : {
+         "file" : "lib/Xacobeo/Timer.pm",
+         "version" : 0
+      },
+      "Xacobeo::UI::DomView" : {
+         "file" : "lib/Xacobeo/UI/DomView.pm",
+         "version" : 0
+      },
+      "Xacobeo::UI::SourceView" : {
+         "file" : "lib/Xacobeo/UI/SourceView.pm",
+         "version" : 0
+      },
+      "Xacobeo::UI::Statusbar" : {
+         "file" : "lib/Xacobeo/UI/Statusbar.pm",
+         "version" : 0
+      },
+      "Xacobeo::UI::Window" : {
+         "file" : "lib/Xacobeo/UI/Window.pm",
+         "version" : 0
+      },
+      "Xacobeo::UI::XPathEntry" : {
+         "file" : "lib/Xacobeo/UI/XPathEntry.pm",
+         "version" : 0
+      },
+      "Xacobeo::Utils" : {
+         "file" : "lib/Xacobeo/Utils.pm",
+         "version" : 0
+      },
+      "Xacobeo::XS" : {
+         "file" : "lib/Xacobeo/XS.pm",
+         "version" : 0
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://code.google.com/p/xacobeo/issues/list"
+      },
+      "homepage" : "http://code.google.com/p/xacobeo/",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/potyl/xacobeo"
+      }
+   },
+   "version" : "0.15"
+}

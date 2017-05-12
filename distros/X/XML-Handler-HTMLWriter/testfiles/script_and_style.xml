@@ -1,0 +1,13 @@
+<html>
+<head>
+<script>
+script here &lt; 4
+</script>
+<style>
+style here { foo &amp; 4 }
+</style>
+</head>
+<body>
+Foo
+</body>
+</html>

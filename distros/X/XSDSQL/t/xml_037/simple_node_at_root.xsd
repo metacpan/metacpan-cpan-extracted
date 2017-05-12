@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<xs:schema 
+	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+ 	targetNamespace="http://www.camera.org" 
+	xmlns="http://www.camera.org"
+>
+
+	<xs:simpleType name="DressSizeType">
+		<xs:restriction base="xs:integer">
+			<xs:minInclusive value="2"/>
+			<xs:maxInclusive value="15"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:complexType name="ct0">
+		<xs:sequence minOccurs="1" maxOccurs="1">
+			<xs:element name="el0" type="xs:string"/>
+		</xs:sequence>
+	</xs:complexType>
+
+
+	<xs:element name="size" type="DressSizeType"/>
+
+	<xs:element name="newSize" type="DressSizeType"/>
+
+	<xs:element name="cmplx" type="ct0"/>
+
+</xs:schema>

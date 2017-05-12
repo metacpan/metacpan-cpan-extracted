@@ -1,0 +1,81 @@
+Thu May 29 2014  Jeff Fearn <Jeff.Fearn@gmail.com>
+   Release 5.4
+   Do not escape CDATA content.
+
+Tue May 27 2014  Jeff Fearn <Jeff.Fearn@gmail.com>
+   Release 5.3
+   Fix CDATA not being printed properly by as_XML. RT #95970
+   Fix Devel::Cover declared as build_requires but not used RT #93155
+   Fix XML::Catalog version number mismatch. RT #93154
+
+Mon Dec 9 2013 Jeff Fearn <Jeff.Fearn@gmail.com>
+   Release 5.2
+
+   Fix local path resolution. RT #90464
+
+Mon Oct 28 2013 Jeff Fearn <Jeff.Fearn@gmail.com>
+   Release 5.1
+
+   Fix entities in attributes only working for root node. RT #89402
+
+Thu Oct 03 2013 Jeff Fearn <Jeff.Fearn@gmail.com>
+   Release 5.0
+
+   Add support for using XML Catalogs. (related to RT #87010)
+   Add support for expanding entities.
+   perl tidy FTW
+   Remove xt/ deps from Build.PL. RT #78039
+   Doc typo fixes. RT #66404
+   Error out if args to new are not in a hash. RT #70654
+   Add logic to keep entities in attributes when NoExpand is set. RT #88973
+
+Jul 17 2013  Jeff Fearn <Jeff.Fearn@gmail.com>
+   Release 4.3
+
+   Hard code VERSION in TreeBuilder.pm for PAUSE. RT #86964
+
+Jul 15 2013  Jeff Fearn <Jeff.Fearn@gmail.com>
+   Release 4.2
+
+   Added store_cdata to handle CDATA.
+   More test coverage.
+
+Mar 13 2011 Jeff Fearn <Jeff.Fearn@gmail.com>
+   Release 4.1
+
+   Doc typo fixes. (Ansgar Burchardt) RT #66404
+   Use same version in all packages for CPAN indexing. RT #66111
+   Moved perlcritic tests to xt/author
+   Fix Authors in all PM files
+
+Nov 24 2010  Jeff Fearn <Jeff.Fearn@gmail.com>
+
+   Release 4.0
+
+   Added NoExpand option to allow entities to be left untouched in xml.
+   Added ErrorContext option to allow better reporting of error locations.
+   Expanded tests to test these options.
+   Added EncodeAmp option to encode unencoded ampersans on parsing.
+   Switched to Module::Build
+   Added Perl::Critic tests
+   Fixed Perl::Critic complaints
+   Switched t/10main.t to Test::More
+   Added create_makefile_pl to Build.pl
+   Bumped HTML::Element req to 4.1 for proper entity handling
+
+
+2004-06-10   Sean M. Burke <sburke@cpan.org>
+
+   Release 3.09 -- maintenance release.
+
+   Just making the dist and the docs a bit tidier -- no actual code changes.
+   Also modernized the tests just a bit.
+
+
+2000-11-03   Sean M. Burke <sburke@cpan.org>
+
+   Release 3.08
+
+   First release version.
+
+

@@ -1,0 +1,30 @@
+---
+abstract: 'TMX interface with Open Corpus Workbench'
+author:
+  - 'Alberto Simões <ambs@cpan.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.035, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: XML-TMX-CWB
+requires:
+  CWB::CL::Strict: '0'
+  Encode: '0'
+  File::Spec::Functions: '0'
+  Lingua::PT::PLNbase: '0'
+  POSIX: '0'
+  XML::TMX: '0.26'
+  XML::TMX::Reader: '0'
+  XML::TMX::Writer: '0'
+  locale: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  repository: https://natura.di.uminho.pt/svn/main/xml/XML-TMX-CWB/
+version: '0.10'

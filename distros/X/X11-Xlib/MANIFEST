@@ -1,0 +1,44 @@
+Changes
+Makefile.PL
+MANIFEST			This list of files
+README
+ppport.h
+typemap
+Xlib.xs
+PerlXlib.h
+PerlXlib.c
+keysym_to_codepoint.c
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+lib/X11/Xlib.pm
+lib/X11/Xlib/Colormap.pm
+lib/X11/Xlib/Display.pm
+lib/X11/Xlib/Keymap.pm
+lib/X11/Xlib/Pixmap.pm
+lib/X11/Xlib/Screen.pm
+lib/X11/Xlib/Struct.pm
+lib/X11/Xlib/Visual.pm
+lib/X11/Xlib/Window.pm
+lib/X11/Xlib/XEvent.pm
+lib/X11/Xlib/XID.pm
+lib/X11/Xlib/XRectangle.pm
+lib/X11/Xlib/XSetWindowAttributes.pm
+lib/X11/Xlib/XSizeHints.pm
+lib/X11/Xlib/XVisualInfo.pm
+lib/X11/Xlib/XWindowAttributes.pm
+lib/X11/Xlib/XWindowChanges.pm
+t/0-Pod-Coverage.t
+t/0-Pod.t
+t/1-X11-Xlib.t
+t/20-xevent.t
+t/21-xvisualinfo.t
+t/22-xrectangle.t
+t/30-connection.t
+t/31-xlib-fatal.t
+t/35-event-queue.t
+t/37-input-kb.t
+t/40-screen-attrs.t
+t/42-window.t
+t/43-pixmap.t
+t/70-xcomposite.t
+t/lib/X11/SandboxServer.pm

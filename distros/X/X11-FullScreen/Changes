@@ -1,0 +1,42 @@
+0.994 2013-08-23
+ - Reformatted Changes file
+ - Moved CheckLib and PkgConfig to ConfigRequires
+ - Switched to OurPkgVersion
+
+0.993 2013-08-22
+ - Moved to Dist::Zilla
+ - Documentation fixes
+
+0.992 2013-08-20
+ - Updated Build.PL to use ExtUtils::PkgConfig
+ - README update
+ - Added github to meta information
+ - Stopped bundling Devel::CheckLib
+ - Removed Xext from dependencies list
+
+0.991 2013-08-19
+ - Fixed tests so that they will work properly on non-X machines
+ - Relaxed requirement on Module::Build version
+ - Added dependencies to Build.PL
+
+0.99 2013-08-18
+ - COMPATIBILITY BREAKING CHANGES!
+ - Rewrote X11::FullScreen as a proper object, instead of a conspiracy of
+   subroutines. All method names changed. Contact me if you're using the
+   original and need a compatibility layer.
+ - Switched to Module::Build
+ - Preserve image aspect ratio when displaying stills that don't take up
+   the full screen
+ - Added clear() method that clears the screen
+
+0.03 2007-12-26
+ - Now getting Imlib2 library info from imlib2-config
+ - Renamed 'Changes' to 'ChangeLog' 
+
+0.02 2007-12-26
+ - Skip tests if we're not running X
+ - Default tests to display :0.0 if not supplied in environment
+
+0.01 2005-04-01
+ - original version; created by h2xs 1.23 with options -A -n
+   X11::FullScreen

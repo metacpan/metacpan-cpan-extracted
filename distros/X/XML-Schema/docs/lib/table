@@ -1,0 +1,7 @@
+<!-- table -->
+<table border="0" cellpadding="4" cellspacing="1" 
+       bgcolor="[% col.table.border %]">
+<!-- table content -->
+[% content %]
+<!-- end of table content -->
+</table>

@@ -1,0 +1,14 @@
+ChangeLog
+MANIFEST
+Makefile.PL
+README
+lib/XML/Compile/Licensed.pm
+lib/XML/Compile/Licensed.pod
+lib/XML/Compile/SOAP/xsd/bea/README
+lib/XML/Compile/SOAP/xsd/bea/bea_wli_sb_context-fix.xsd
+lib/XML/Compile/SOAP/xsd/bea/bea_wli_sb_context.xsd
+lib/XML/Compile/SOAP/xsd/sharepoint/README
+lib/XML/Compile/SOAP/xsd/sharepoint/sharepoint-serial.xsd
+lib/XML/Compile/SOAP/xsd/sharepoint/sharepoint-soap.xsd
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,16 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         XRI
+version:      0.2.4
+version_from: XRI.pm
+installdirs:  site
+requires:
+    Getopt::Std:                   0
+    Log::Agent:                    0
+    LWP::Simple:                   0
+    Text::Balanced:                0
+    URI::Escape:                   0
+    XML::Smart:                    0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

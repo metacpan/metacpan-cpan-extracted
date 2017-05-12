@@ -1,0 +1,164 @@
+<?xml version="1.0" standalone="no"?>
+
+<database
+xmlns="http://gna.org/projects/xmldoom/database"
+xmlns:perl="http://gna.org/projects/xmldoom/database-perl">
+	<table name="book" description="Book Table">
+		<column
+			name="book_id"
+			required="true"
+			primaryKey="true"
+			type="INTEGER"
+			description="Book Id"
+			auto_increment="true"
+		/>
+		<column
+			name="title"
+			required="true"
+			type="VARCHAR"
+			size="255"
+			description="Book Title"
+		/>
+		<column
+			name="isbn"
+			required="true"
+			type="VARCHAR"
+			size="24"
+			phpName="ISBN"
+			description="ISBN Number"
+		/>
+		<column
+			name="publisher_id"
+			required="true"
+			type="INTEGER"
+			description="Foreign Key Publisher"
+		/>
+		<column
+			name="author_id"
+			required="true"
+			type="INTEGER"
+			description="Foreign Key Author"
+		/>
+		<column
+			name="created"
+			type="DATETIME"
+			timestamp="create"
+		/>
+		<column
+			name="last_changed"
+			type="TIMESTAMP"
+			timestamp="current"
+		/>
+
+		<foreign-key foreignTable="publisher">
+			<reference
+				local="publisher_id"
+				foreign="publisher_id"
+			/>
+		</foreign-key>
+
+		<foreign-key foreignTable="author">
+			<reference
+				local="author_id"
+				foreign="author_id"
+			/>
+		</foreign-key>
+	</table>
+
+	<table name="publisher" description="Publisher Table">
+		<column
+			name="publisher_id"
+			required="true"
+			primaryKey="true"
+			type="INTEGER"
+			description="Publisher Id"
+			perl:idGenerator="example::BookStore::PublisherIdGenerator"
+		/>
+		<column
+			name="name"
+			required="true"
+			type="VARCHAR"
+			size="128"
+			description="Publisher Name"
+		/>
+	</table>
+
+	<table name="author" description="Author Table">
+		<column
+			name="author_id"
+			required="true"
+			primaryKey="true"
+			type="INTEGER"
+			auto_increment="true"
+			description="Author Id"
+		/>
+		<column
+			name="first_name"
+			required="true"
+			type="VARCHAR"
+			size="128"
+			description="First Name"
+		/>
+		<column
+			name="last_name"
+			required="true"
+			type="VARCHAR"
+			size="128"
+			description="Last Name"
+		/>
+	</table>
+
+	<table name="orders">
+		<column
+			name="order_id"
+			type="INTEGER"
+			required="true"
+			primaryKey="true"
+		/>
+		<column
+			name="date_opened"
+			type="DATETIME"
+			timestamp="created"
+			required="true"
+		/>
+		<column
+			name="date_shipped"
+			type="DATETIME"
+			required="false"
+		/>
+
+		<foreign-key foreignTable="books_ordered">
+			<reference
+				local="order_id"
+				foreign="order_id"
+			/>
+		</foreign-key>
+	</table>
+
+	<table name="books_ordered">
+		<column
+			name="order_id"
+			type="INTEGER"
+			primaryKey="true"
+		/>
+		<column
+			name="book_id"
+			type="INTEGER"
+			primaryKey="true"
+		/>
+		<column
+			name="quantity"
+			type="INTEGER"
+			required="true"
+			default="1"
+		/>
+
+		<foreign-key foreignTable="book">
+			<reference
+				local="book_id"
+				foreign="book_id"
+			/>
+		</foreign-key>
+	</table>
+</database>
+

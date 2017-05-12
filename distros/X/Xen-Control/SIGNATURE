@@ -1,0 +1,38 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 bee02c637ece7a355eef1109f57989fd77a51bfe Build.PL
+SHA1 14f3b40393e9e2948215008b9d9725692d3ebcf2 Changes
+SHA1 dc197d1c1177920f4b38da2c8c4030cb47d82d57 MANIFEST
+SHA1 b31f35a5ee2f45b98a4146125051f6227c1c8cb8 META.yml
+SHA1 f2d13010d73d0f77d054da5c2e9a4c62f7fd5174 Makefile.PL
+SHA1 30a0ebb11d6e9120642153ca6e5fc3ecdf270e2c README
+SHA1 4c8c486b336220b54f8666f8e7ecb47d423451f9 lib/Xen/Control.pm
+SHA1 636e5b5dff824d7e23ae16095eec669351d3357c lib/Xen/Domain.pm
+SHA1 f4773cd745b4f2b062b9ef6f8bb604ead81622f4 script/xmc
+SHA1 be5029a69c7566237c19c1db7326446ad25e6dcf t/01_Xen-Domain.t
+SHA1 fa2bf1816f1bf1eb2cfd15abc2a140f71e983ed0 t/02_Xen-Control.t
+SHA1 417d369e51042374c5160852c716fde3627bba1d t/dumps/01_xm-ls.txt
+SHA1 20e1271a2a7fadd184e96e4df857370b80be50a4 t/dumps/01_xm-ls_2.txt
+SHA1 0b1c5a2d59be6bfa7d60c64cd964fea6a0331705 t/pod-coverage.t
+SHA1 640935336dc1123c0069bcf5432bcaedc2cf22d3 t/pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.6 (GNU/Linux)
+
+iD8DBQFIYz15uzJBASXpqvsRAt6KAJ95Dmpx2yTbo0Uk9RSn3k5pRJeDngCdEjo9
+qD+ZJcXDpsMmWwHU/Gvnjo4=
+=Jg0I
+-----END PGP SIGNATURE-----

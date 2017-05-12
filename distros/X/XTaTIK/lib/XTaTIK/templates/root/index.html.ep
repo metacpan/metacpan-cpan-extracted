@@ -1,0 +1,49 @@
+% layout 'default';
+% stash active_page => 'home';
+
+<div id="index_shoutout">
+  <h2 class="row">
+    <span class="col-xs-12">
+      <a href="/products" class="thumbnail">
+        % my $has_art = app->static->file('/content-pics/shoutout-art.jpg');
+        % if ( $has_art ) {
+          <img src="/content-pics/shoutout-art.jpg" alt=""
+            class="shout_art block-center">
+        % }
+        <img src="/content-pics/index-logo.png" alt="<%= xtext 'market' %>"
+          class="shout_logo <%= $has_art ? 'art_hidden' : '' %>">
+      </a>
+    </span>
+    <span class="col-xs-12 market_tag">
+      <%= xtext 'market_tag' %>
+
+      % if ( xtext 'market_sub_tag' ) {
+        <small><%= xtext 'market_sub_tag' %></small>
+      % }
+    </span>
+  </h2>
+</div>
+
+%= include 'fragments/index-after-shoutout-site'
+
+% if ( items_in 'hot_products' ) {
+  <div class="hot_products_container">
+    <hr>
+
+    <h3>Hot Products</h3>
+    <ul id="hot_products" class="row">
+      % for ( items_in 'hot_products' ) {
+          <li class="col-md-3 col-xs-6">
+            <div class="well">
+              <a href="/product/<%= $_->{url} %>" class="h4">
+                <%= $_->{title} %>
+              </a>
+
+              <a href="/product/<%= $_->{url} %>"
+                  class="thumbnail"><img src="/product-pics/<%= $_->{image} %>" alt=""></a>
+            </div>
+          </li>
+      % }
+    </ul>
+  </div>
+% }

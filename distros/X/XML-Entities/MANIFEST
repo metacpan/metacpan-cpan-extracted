@@ -1,0 +1,14 @@
+Build.PL
+Changes
+MANIFEST
+Makefile.PL
+META.yml
+README
+ignore.txt
+lib/XML/Entities.pm
+lib/XML/Entities/Data.pm
+lib/XML/Entities/Data.pod
+bin/download-entities.pl
+t/00-xml-entities-data.t
+t/01-xml-entities.t
+t/02-unicode.t

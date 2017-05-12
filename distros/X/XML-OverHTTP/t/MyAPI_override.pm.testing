@@ -1,0 +1,26 @@
+# ----------------------------------------------------------------
+    package MyAPI_override;
+    use strict;
+    use base qw( XML::OverHTTP );
+# ----------------------------------------------------------------
+sub url              { 'MyAPI_override::url' }
+sub http_method      { 'MyAPI_override::http_method' }
+sub root_elem        { 'MyAPI_override::root_elem' }
+sub is_error         { 'MyAPI_override::is_error' }
+sub total_entries    { 'MyAPI_override::total_entries' }
+sub entries_per_page { 'MyAPI_override::entries_per_page' }
+sub current_page     { 'MyAPI_override::current_page' }
+sub default_param    { {'MyAPI_override::default_param'=>1} }
+sub treepp_config    { ['MyAPI_override::treepp_config'] }
+sub attr_prefix      { 'MyAPI_override::attr_prefix' }
+sub elem_class       { 'MyAPI_override::elem_class' }
+sub query_class      { 'MyAPI_override::query_class' }
+sub force_array      { ['MyAPI_override::force_array'] }
+# ----------------------------------------------------------------
+    package MyAPI_override::query_class;
+    use strict;
+    use base qw( Class::Accessor::Fast );
+__PACKAGE__->mk_accessors(qw( one two three four five six ));
+# ----------------------------------------------------------------
+;1;
+# ----------------------------------------------------------------

@@ -1,0 +1,19 @@
+=head1 NAME
+
+XML::Beautify - Beautifies XML output from XML::Writer.
+
+=head1 SYNOPSIS
+
+	B<WARNING:> This is Alpha Software. Plenty is subject to change.
+	use XML::Beautify;
+	$obj_ref = XML::Beautify->new();
+	$cleanXML = $obj_ref->beautify(\$XMLstr);
+
+=head1 DESCRIPTION
+
+Beautifies XML output from XML::Writer and formats any old XML to be human readable.
+
+
+=head1 COPYRIGHT
+
+Copyright (c) 2001 Thomas Bolioli. All rights reserved. This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself. 

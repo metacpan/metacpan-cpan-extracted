@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<?xml-stylesheet href="http://www.w3.org/2000/08/w3c-synd/style.css" type="text/css"?>
+<rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:h="http://www.w3.org/1999/xhtml" xmlns:hr="http://www.w3.org/2000/08/w3c-synd/#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://purl.org/rss/1.0/">
+<channel rdf:about="http://www.w3.org/2000/08/w3c-synd/home.rss">
+<title>World Wide Web Consortium</title>
+<description>Leading the Web to Its Full Potential...</description>
+<link>http://www.w3.org/</link>
+<dc:date>2004-03-08</dc:date>
+<items>
+<rdf:Seq>
+<rdf:li rdf:resource="http://www.w3.org/News/2004#item32"/>
+<rdf:li rdf:resource="http://www.w3.org/News/2004#item34"/>
+<rdf:li rdf:resource="http://www.w3.org/News/2004#item33"/>
+<rdf:li rdf:resource="http://www.w3.org/News/2004#item31"/>
+<rdf:li rdf:resource="http://www.w3.org/News/2004#item30"/>
+<rdf:li rdf:resource="http://www.w3.org/News/2004#item29"/>
+<rdf:li rdf:resource="http://www.w3.org/News/2004#item28"/>
+<rdf:li rdf:resource="http://www.w3.org/News/2004#item27"/>
+</rdf:Seq>
+</items>
+</channel>
+<item rdf:about="http://www.w3.org/News/2004#item32">
+<title>W3C Hosts 4th Annual Technical Plenary Week</title>
+<description>2004-03-01: W3C holds its Technical Plenary Week from 1-5 March in Cannes-Mandelieu, France where 30 W3C Working Groups and Interest Groups hold face-to-face meetings. Participants and invited guests attend the plenary mid-week where there will be 3-minute lightning talks and presentations on Web architecture, mixed markup, quality assurance, new Web devices and searching the Web. W3C thanks sponsors IBM and Sun Microsystems for their generous support. (News archive)</description>
+<link>http://www.w3.org/News/2004#item32</link>
+<dc:date>2004-03-01</dc:date>
+</item>
+<item rdf:about="http://www.w3.org/News/2004#item34">
+<title>Call for Participation: SVG Open 2004, Tokyo, Japan</title>
+<description>2004-03-08: The third annual SVG Open Conference and Exhibition will be held 7-10 September in Tokyo, Japan. Co-sponsored by W3C and hosted by Keio University, the SVG Open conference series is the premier forum for Scalable Vector Graphics (SVG) developers to share ideas, examples and implementations. Proposals are welcome through 16 April for course outlines and abstracts for papers. Opportunities are open now for booth exhibits and conference sponsorships. The W3C SVG Working Group and W3C's Chris Lilley will participate. Read about SVG. (News archive)</description>
+<link>http://www.w3.org/News/2004#item34</link>
+<dc:date>2004-03-08</dc:date>
+</item>
+<item rdf:about="http://www.w3.org/News/2004#item33">
+<title>Amaya 8.3 Released</title>
+<description>2004-03-08: Amaya is W3C's Web browser and authoring tool. Version 8.3 includes new features and enhancements for tables, CSS, MathML and images and the Amaya user interface. Download Amaya binaries for Solaris, Linux and Windows, and Debian and RPM packages. Source code is available. Visit the Amaya home page and the Annotea home page. (News archive)</description>
+<link>http://www.w3.org/News/2004#item33</link>
+<dc:date>2004-03-08</dc:date>
+</item>
+<item rdf:about="http://www.w3.org/News/2004#item31">
+<title>CSS 2.1, CSS Print Profile and CSS3 Paged Media Are W3C Candidate Recommendations</title>
+<description>2004-02-26: W3C is pleased to announce the advancement of three Candidate Recommendations for the Cascading Style Sheets (CSS) language. A snapshot of CSS usage, CSS 2.1 adds a few highly requested features, fixes errata and brings CSS2 in line with implementations. CSS Print Profile works with XHTML-Print for printing to low-cost devices. CSS3 Paged Media Module adds pagination, page margins, headers and footers, footnotes and endnotes, and cross-references with page numbers. Comments are welcome through 25 August. Visit the CSS home page. (News archive)</description>
+<link>http://www.w3.org/News/2004#item31</link>
+<dc:date>2004-02-26</dc:date>
+</item>
+<item rdf:about="http://www.w3.org/News/2004#item30">
+<title>Working Draft: Scalable Vector Graphics (SVG) 1.2</title>
+<description>2004-02-26: The SVG Working Group has released its fifth public Working Draft of Scalable Vector Graphics (SVG) 1.2. SVG delivers accessible, dynamic, and reusable vector graphics, text, and images to the Web in XML. The Working Group invites feedback on this draft. Visit the SVG home page. (News archive)</description>
+<link>http://www.w3.org/News/2004#item30</link>
+<dc:date>2004-02-26</dc:date>
+</item>
+<item rdf:about="http://www.w3.org/News/2004#item29">
+<title>Last Call: Character Model for the World Wide Web</title>
+<description>2004-02-25: The Internationalization Working Group has published the Character Model for the World Wide Web 1.0 in two parts: Fundamentals in Last Call through 19 March, and Normalization. The documents address character encoding identification, early uniform normalization, string identity matching, string indexing, and URI conventions. They build on the Universal Character Set defined by Unicode and ISO/IEC 10646. Visit the Internationalization home page. (News archive)</description>
+<link>http://www.w3.org/News/2004#item29</link>
+<dc:date>2004-02-25</dc:date>
+</item>
+<item rdf:about="http://www.w3.org/News/2004#item28">
+<title>CSS Working Drafts: 'Reader' Media Type, Hyperlink Presentation</title>
+<description>2004-02-25: The CSS Working Group has released two First Public Working Drafts, parts of the Cascading Style Sheets (CSS) language. The CSS 'Reader' Media Type instructs devices to display and speak a document or display and render it in braille. The CSS3 Hyperlink Presentation Module describes the presentation of links and their activation. Comments on both drafts are invited. Visit the CSS home page. (News archive)</description>
+<link>http://www.w3.org/News/2004#item28</link>
+<dc:date>2004-02-25</dc:date>
+</item>
+<item rdf:about="http://www.w3.org/News/2004#item27">
+<title>QA Framework: Test Guidelines Updated</title>
+<description>2004-02-25: The Quality Assurance (QA) Working Group has released an updated Working Draft of the QA Framework: Test Guidelines. One in a family of QA Framework documents, the draft defines a set of common guidelines for conformance test materials for W3C specifications. The group welcomes comments. Visit the QA home page. (News archive)</description>
+<link>http://www.w3.org/News/2004#item27</link>
+<dc:date>2004-02-25</dc:date>
+</item>
+</rdf:RDF>

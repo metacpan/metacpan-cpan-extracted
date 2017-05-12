@@ -1,0 +1,9 @@
+Changes
+Registry.pm
+MANIFEST
+Makefile.PL
+examples/REC-xml-19980210.xml
+examples/reg1.perl
+examples/xml2perl.pl
+examples/perl2xml.pl
+examples/reg1.xml

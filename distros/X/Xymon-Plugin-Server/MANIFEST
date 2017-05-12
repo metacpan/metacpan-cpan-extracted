@@ -1,0 +1,30 @@
+Changes
+example/add-graph.cfg
+example/simple.pl
+example/test.pl
+lib/Xymon/Plugin/Server.pm
+lib/Xymon/Plugin/Server/Devmon.pm
+lib/Xymon/Plugin/Server/Dispatch.pm
+lib/Xymon/Plugin/Server/Hosts.pm
+lib/Xymon/Plugin/Server/Status.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+README.md
+t/00-load.t
+t/04-version.t
+t/05-devmon.t
+t/06-dispatch.t
+t/07-status.t
+t/07-status42.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+t/testhome/bin/bb
+t/testhome/etc/hosts.cfg
+t/testhome/etc/xymonserver.cfg
+t/testhome42/bin/bb
+t/testhome42/etc/bb-hosts
+t/testhome42/etc/hobbitserver.cfg
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

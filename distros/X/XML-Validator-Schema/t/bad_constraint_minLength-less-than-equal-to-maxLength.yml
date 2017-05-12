@@ -1,0 +1,19 @@
+# test invalid Schema Component Constraints
+# only 1 test per file, as first test will always fail the whole file when the schema is parsed
+
+--- |
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="bad_minLength-less-than-equal-to-maxLength" type="bad_minLength-less-than-equal-to-maxLength"/>
+  <xs:simpleType name="bad_minLength-less-than-equal-to-maxLength">
+    <xs:restriction base="xs:string">
+      <xs:minLength value="3"/>
+      <xs:maxLength value="2"/>
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>
+
+--- |
+  <bad_minLength-less-than-equal-to-maxLength>ab</bad_minLength-less-than-equal-to-maxLength>
+--- >
+FAIL /is greater than than facet <maxLength>/
+

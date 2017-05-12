@@ -1,0 +1,141 @@
+<module name="XML::Schema::Facet">
+
+  <about>
+    The module implements XML Schema facets for constraining
+    values of simple types.
+  </about>
+
+  <synopsis>
+<perl>
+package XML::Schema::Facet::MyFacet;
+use base qw( XML::Schema::Facet );
+
+sub valid {
+    my ($self, $instance, $type) = @_;
+    my $value = $instance->{ value };
+
+    # ..more code here...
+
+    return $some_condition ? 1 : 0;
+}
+
+package main;
+my $facet = XML::Schema::Facet::MyFacet->new(...);
+my $instance = {
+    value => 'some data value',
+};
+
+print $facet->valid($instance) ? "valid" : "invalid";
+</perl>
+  </synopsis>
+
+  <description>
+    This modules implements a base class for objects representing XML
+    Schema facets.  A facet is a constraint which can be applied to a
+    simple type to ensure that its values match some criteria,
+    e.g. conform to a regular expression pattern, fall within a
+    particular numerical range, do not exceed a particular string
+    length, etc.
+  </description>
+
+  <methods>
+    <method id="new">
+      <p>
+        Base class constructor method used to create a new facet
+        object or subclass thereof.  A list of 
+        '<perlcode>key =&gt; value</perlcode>' pairs can be
+        specified as command line arguments, or alternately, a hash
+        reference can be passed which contains these configuration
+        values.  The method returns a newly instantiated facet object on
+        success.  On error it returns undef and sets an internal error
+        message which can be retrieved by calling <method
+        class="XML::Schema::Base">error()</method> as a class method.
+<perl>
+# list of options
+my $facet = XML::Schema::Facet::MyFacet->new( value => 10 )
+     || die XML::Schema::Facet::MyFacet->error();
+
+# hash ref of options
+my $facet = XML::Schema::Facet::MyFacet->new( { value => 10 } )
+     || die XML::Schema::Facet::MyFacet->error();
+</perl>
+      </p>
+      <p>
+        The following configuration options may be specifed:
+      </p>
+      <config>
+        <item key="value" value="$value">
+	    The constraining value for the facet.  This item is mandatory
+            as all facets require at least one configuring value.  However,
+            subclassed facets may expect and interpet this value differently.
+        </item>
+        <item key="name" value="'myfacet'">
+	    The name of the facet.  This item is optional and if not 
+            specified, will be taken as the last element of the package
+            name (e.g. <perlcode>XML::Schema::Facet::minLength</perlcode>
+            = '<perlcode>minLength</perlcode>'.
+        </item>
+        <item key="errmsg" value="'failed to match my criteria'">
+	    An optional error message to report when an instance of a
+            simple type constrained by this facet fails to meet the
+            required criteria.
+        </item>
+        <item key="annotation" value="'...something interesting...">
+	    An optional annotation.  Feel free to add something useful
+            or just your favourite quote from Homer Simpson.
+        </item>
+      </config>
+    </method>
+
+    <method id="init" args="\%config">
+	Initialisation method called by <method>new()</method> passing 
+        a reference to a hash array of configuration arguments.  May be
+        redefined by subclasses to perform more specific per-object
+        initialisation.
+    </method>
+
+    <method id="valid">
+      <args>$instance, <module class="XML::Schema::Type::Simple">$type</module></args>
+      <p>
+      This method is used to validate a potential instance of a type against
+      the facet.  A reference to a hash array is passed as the first argument.
+      This contains the candidate value defined as the <perlcode>value</perlcode> 
+      item and may also contain any other data contributed by other validation 
+      facets.  This can effectively be considered as a working scratchpad for
+      facets to share.
+      </p>
+      <p>
+      The second argument passed is a reference to the <module
+      class="XML::Schema::Type::Simple">simple type object</module> which
+      is instantiating this value.
+      </p>
+      <p>
+      Subclassed facets are expected to redefine this method to perform
+      their own validation.
+      </p>
+    </method>
+
+    <method id="invalid" args="$msg">
+      This method can be called to indicate a validation failure and to 
+      generate an appropriate error message based on the custom 
+      <cfgvar>errmsg</cfgvar> value or a constructed message based on the
+      <perlcode>$msg</perlcode> argument passed and the facet's name and
+      value (e.g. <perlcode>"error message (required minLength: 10)"</perlcode>).
+    </method>
+  
+    <method id="name">
+	Returns the name of the facet as (optionally) supplied by the
+	<cfgvar>name</cfgvar> configuration item.
+    </method>
+
+    <method id="value">
+	Returns the facet value as supplied by the
+	<cfgvar>value</cfgvar> configuration item.
+    </method>
+
+    <method id="annotation">
+	Returns the annotation value as supplied by the
+	<cfgvar>annotation</cfgvar> configuration item.
+    </method>
+  </methods>
+</module>

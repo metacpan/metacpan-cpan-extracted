@@ -1,0 +1,522 @@
+<module name="XML::Schema::Base">
+
+  <about>
+    This module implements a base class from which all other
+    XML::Schema::* modules are subclassed.
+  </about>
+
+  <synopsis>
+<perl>
+package XML::Schema::MyModule;
+
+use base qw( XML::Schema::Base );
+use vars qw( $ERROR @MANDATORY %OPTIONAL );
+
+@MANDATORY = qw( id );
+%OPTIONAL  =   ( msg => 'Hello World' );
+
+sub init {
+    my ($self, $config) = @_;
+
+    # search inheritance tree for mandatory/optional params
+    $self->init_mandopt($config)
+	|| return;
+
+    return $self;
+}
+
+package main;
+
+my $module = XML::Schema::MyModule->new( id => 12345 )
+     || die $XML::Schema::MyModule::ERROR;
+</perl>
+  </synopsis>
+
+  <description>
+    <p>
+    This module implements a base class from which all other
+    XML::Schema::* modules are subclassed.  Unless you're
+    hacking on the internals of the XML::Schema::* modules
+    then you probably don't need to worry too much about what's
+    going on in here.
+    </p>
+
+    <p>
+    It implements a <method>new()</method> constructor method for
+    instantiating objects which works in conjunction with an
+    <method>init()</method> which performs per-object initialisation.
+    Splitting this object creation process into two methods makes
+    subclassing much easier.
+    </p>
+
+    <p>
+    It also implements a general purpose <method>error()</method>
+    method which objects can use to report error conditions and
+    callers can use to query those errors.
+    </p>
+
+    <p>
+    Various other useful "private" methods are defined for the
+    base class and in some cases, subclasses to use for debugging,
+    examining package variables, and other miscellaneous tasks.
+    </p>
+  </description>
+
+
+  <pkgvars>
+    <pkgvar id="$ETYPE">
+      <p>
+	The <method>throw()</method> method, when called by an object
+	without specifying an exception type, e.g.
+<perl>
+$myobject->throw('attempt to fit round peg in square hole');
+</perl>
+	will look for the <code>$ETYPE</code> package variable
+	in the object's package and if defined, will use that
+	value as the default error type.  
+      </p>
+    </pkgvar>
+
+    <pkgvar id="$SNIPPET">
+      <p>
+	Internal value used by the <method>_text_snippet()</method>
+	method to define the default length to truncate text to.  Set
+	to 16 by default.
+      </p>
+    </pkgvar>
+
+    <pkgvar id="$INSPECT_LEVEL">
+      <p>
+	Controls the depth to which the <method>_inspect()</method>
+	debugging method recurses into the depths of nested data
+	structures.  Set to 3 by default.
+      </p>
+    </pkgvar>
+
+  </pkgvars>
+
+
+  <methods>
+
+    <method id="new">
+    <args>\%config</args>
+    <args>key => value, key => value, ...</args>
+      <p>
+	General purpose constructor method which can be used to
+	instantiate new objects of classes derived from
+	XML::Schema::Base.
+      </p>
+
+      <p>
+	The method expects a hash array of configuration items either
+	passed directly by reference or as list of <code>key =>
+	value</code> pairs which are automatically folded into a hash
+	reference.  A new object is constructed from a blessed hash
+	and the <method>init()</method> method is called, passing the
+	configuration hash as an argument.
+      </p>
+
+<perl>
+package XML::Schema::MyModule;
+
+use base qw( XML::Schema::Base );
+use vars qw( $ERROR );
+
+package main;
+
+my $obj1 = XML::Schema::MyModule->new({ pi => 3.14, e => 2.718 });
+my $obj2 = XML::Schema::MyModule->new(  pi => 3.14, e => 2.718  );
+</perl>
+    </method>
+
+
+    <method id="init" args="\%config">
+      <p>
+	Called by the <method>new()</method> constructor to perform
+	any per-object initialisation.  A reference to a hash array of
+	configuration parameters is passed as an argument.  The method
+	should return $self on success or undef on failure (e.g. by
+	calling <code>$self->error()</code>).
+      </p>
+<perl>
+sub init {
+    my ($self, $config) = @_;
+	
+    $self->{ _LIKES } = $config->{ likes }
+        || return $self->error("no 'likes' parameter specified") 
+
+    return $self;
+}
+</perl>
+    </method>
+
+    <method id="init_mandopt" args="\%config">
+      <p>
+	Optional initialisation method utilised by some derived
+        modules which examines the <perlcode>@MANDATOY</perlcode> and
+        <perlcode>@OPTIONAL</perlcode> or
+        <perlcode>%OPTIONAL</perlcode> package variables in all of the
+        object's superclasses to construct a full list of mandatory
+        and optional arguments for the object.
+     </p>
+     <p>
+        The method then examines both lists copying corresponding 
+        values from the <perlcode>$config</perlcode> into 
+        <perlcode>$self</perlcode>.  Any variables named in the
+	mandatory list must be defined or an error will be raised
+        and undef returned.
+    </p>
+<perl>
+sub init {
+    my ($self, $config) = @_;
+
+    # search inheritance tree for mandatory/optional params
+    $self->init_mandopt($config)
+	|| return;
+
+    return $self;
+}
+</perl>
+    </method>
+
+
+    <method id="error" args="$msg, $msg, ...">
+      <p>
+	Can be called as a class or object method to get or set the
+	relevant error variable.  Returns the current value of the
+	error variables when called without arguments, or undef when
+	called with argument(s) which are used to set the error
+	variable (multiple arguments are concatenated).
+      </p>
+<perl>
+# class method to set $XML::Schema::MyModule::ERROR
+XML::Schema::MyModule->error('Failed to have cake and eat it');
+
+# class method to retrieve $XML::Schema::MyModule::ERROR
+warn XML::Schema::MyModule->error();
+
+# object method to set $myobj->{ _ERROR }
+$myobj->error('Stone throwing detected in glass house');
+
+# object method to get $myobj->{ _ERROR }
+warn $myobj->error();
+</perl>
+    </method>
+
+    <method id="error_value" args="$item, $got, @legal">
+      <p>
+	Generates a formatted error message and passes it to the
+	<method>error()</method> method.  This method is used to
+	report an illegal value specified for a parameter.  The first
+	argument indicates the name of the item, the second specifies
+	the illegal value received and the remaining arguments give
+	legal alternatives.  A call such as:
+<perl>
+$myobj->error_value('doodah', 'badval', 'foo', 'bar', 'baz');
+</perl>
+	is then equivalent to:
+<perl>
+$myobj->error("doodah must be 'foo', 'bar' or 'baz' (not: 'badval')");
+</perl>
+      </p>
+    </method>
+
+    <method id="throw">
+      <args><module refid="XML::Schema::Exception">$exception</module></args>
+      <args>$error</args>
+      <args>$type, $info</args>
+      <p>
+	Called to throw an error as an
+	<module>XML::Schema::Exception</module> object using the error
+	message passed as the first argument as the information field
+	for the exception.  The error type is defined in the
+	<pkgvar>$ETYPE</pkgvar> package variable in the derived class
+	or defaults to the value of <pkgvar>$ETYPE</pkgvar> in this
+	base class package (the string 'undef', by default). 
+      </p>
+
+<perl>
+package XML::Schema::MyModule;
+
+use base qw( XML::Schema::Base );
+use vars qw( $ETYPE );
+$ETYPE = 'MyModule';
+
+package main;
+
+$myobj = XML::Schema::MyModule->new();
+$myobj->throw('An error');	    # throws "[MyModule] An error"
+</perl>
+
+      <p>
+	Alternately, the method can be called with two explicit
+	arguments to denote the type and info fields.
+      </p>
+
+<perl>
+$myobj->throw('Cake', 'Let them eat it!');  # throws "[Cake] Let them eat it!"
+</perl>
+    </method>
+
+    <method id="factory">
+      <args>$factory</args>
+      <args></args>
+	<p>
+	Various objects need to create instances of other objects at
+	various time.  To avoid hard-coding loads of package names
+	across numerous different files, the objects instead delegate
+	to a factory object to perform this task in a well-defined and
+	extensible manner.  Objects can be passed a
+	<code>factory</code> argument with their constructor which can
+	contain the name of an object class or reference to an object
+	which should be used as a factory by that object.  This method
+	can also be called on a previously instantiated object to set
+	or update the value for its factory.
+	</p>
+	<p>
+	When called without arguments, the method returns the current
+	internal _FACTORY value or if undefined, the class or
+	object reference defined in the <pkgvar class="XML::Schema"
+	var="$FACTORY">$XML::Schema::FACTORY</pkgvar>.
+	</p>
+    </method>
+  </methods>
+
+
+  <section id="private_methods" title="Private Methods">
+    <p>
+      These methods are deemed "private" (or more accurately,
+      "protected") and are intended for the use of classes derived
+      from XML::Schema::Base.
+    </p>
+
+    <methods notitle="1" subtitle="Private Methods:"> >
+      <method id="_baseargs" args="$name, $name, ...">
+	<p>
+	  This method walks up the inheritance tree collecting various
+	  package variables along the way and collating them for the
+	  derived object class.  Variable names in which the caller is
+	  interested should be passed as arguments.  A reference to a
+	  list is returned which contains further references to lists
+	  and/or hash arrays, depending on the variable type.
+	</p>
+<perl>
+sub init {
+    my ($self, $config) = @_;
+
+    my $baseargs = $self->_baseargs(qw( @MANDATORY %OPTIONAL ));
+    my ($mandatory, $optional) = @$baseargs;
+
+    ...
+
+    return $self;
+}
+</perl>
+
+	<p>
+	  For example, consider the following inheritance tree:
+	</p>
+<perl>
+package XML::Schema::Test::Foo;
+use base qw( XML::Schema::Base );
+use vars qw( @MANDATORY %OPTIONAL );
+
+@MANDATORY = qw( one two );
+%OPTIONAL  = ( foo => 'default foo' );
+
+package XML::Schema::Test::Bar;
+use base qw( XML::Schema::Base );
+use vars qw( @MANDATORY %OPTIONAL );
+
+@MANDATORY = qw( three four );
+%OPTIONAL  = ( bar => 'default bar' );
+
+package XML::Schema::Test::Baz;
+use base qw( XML::Schema::Test::Foo
+             XML::Schema::Test::Bar );
+use vars qw( @MANDATORY %OPTIONAL );
+
+@MANDATORY = qw( five six );
+%OPTIONAL  = ( baz => 'default baz' );
+</perl>
+
+	<p>
+	  Now let's call the _baseargs() method against these
+	  different packages and see what they return.
+	</p>
+<perl>
+my @names = qw( @MANDATORY %OPTIONAL );
+
+XML::Schema::Test::Foo->_baseargs(@names);
+
+# returns:
+# [	
+#     [ 'one', 'two' ] 
+#     { foo => 'default foo' }
+# ]
+
+XML::Schema::Test::Bar->_baseargs(@names);
+
+# returns:
+# [	
+#     [ 'three', 'four' ] 
+#     { bar => 'default bar' }
+# ]
+
+XML::Schema::Test::Baz->_baseargs(@names);
+
+# returns:
+# [	
+#     [ 'one', 'two', 'three', 'four' ] 
+#     { foo => 'default foo'
+#       bar => 'default bar'
+#       baz => 'default baz' 
+#     }
+# ]
+</perl>
+
+	<p>
+	  Note that package variables specified as hash arrays can
+	  also be specified as lists.  In this case, the list is
+	  assumed to represent the hash keys which all have empty (but
+	  defined) values.
+	</p>
+<perl>
+@OPTIONAL = qw( foo bar );
+
+# equivalent to:
+%OPTIONAL = ( foo => '', bar => '' );
+</perl>
+      </method>
+
+      <method id="_mandatory" args="\@names, \%config">
+	<p>
+	  This method examines the $config hash array for values
+	  specified by name in the $names list and copies them to the
+	  $self object.  All items are deemed mandatory and the method
+	  will raise an error and return undef if any item is not
+	  defined.
+	</p>
+<perl>
+sub init {
+    my ($self, $config) = @_;
+
+    my $baseargs = $self->_baseargs(qw( @MANDATORY ));
+
+    return $self->_mandatory($baseargs->[0], $config);
+}
+</perl>
+      </method>
+
+      <method id="_optional" args="\%names, \%config">
+	<p>
+	  Like <method>_mandatory()</method>, this method examines the
+	  $config hash array for values specified as keys in the
+	  $names hash and copies them to the $self object.  The values
+	  in the $names hash are used as defaults for items which are
+	  not defined in $config.  If the default value contains a
+	  CODE reference then the subroutine will be called.  The
+	  $names item may also be specified as a reference to a list
+	  in which case all default values are set to the empty
+	  string, ''.
+        </p>
+<perl>
+sub init {
+    my ($self, $config) = @_;
+
+    my $baseargs = $self->_baseargs(qw( %OPTIONAL ));
+
+    return $self->_optional($baseargs->[0], $config);
+}
+</perl>
+      </method>
+
+      <method id="_arguments" args="\@names, \@args">
+	<p>
+	  Similar to <method>_mandatory()</method> and
+	  <method>_optional()</method> above, this method sets named
+	  values but in this case from positional arguments.  The
+	  expected names of values are specified by reference to a
+	  list as the first argument and the list of candidate values
+	  is passed by reference as the second.  An error is raised
+	  and undef returned if any value is undefined.
+	</p>
+<perl>
+sub new {
+    my ($class, @args) = @_;
+
+    my $baseargs = $class->_baseargs('@ARGUMENTS');
+
+    my $self = bless {
+        _ERROR  => '',
+    }, $class;
+
+    return $self->_arguments($baseargs->[0], \@args)
+        || $class->error($self->error());
+}
+</perl>
+      </method>
+    </methods>
+
+    <methods notitle="1" subtitle="Debug Methods:"> >
+
+      <method id="DEBUG" args="$msg, $msg, ...">
+	Simple debugging method which prints all arguments to 
+	STDERR.
+<perl>
+$myobj->DEBUG("The cat sat on the mat\n");
+</perl>
+      </method>
+
+      <method id="TRACE" args="@args">
+	More funky debugging method which generates a trace message
+	showing various potentially useful items, depending on the
+	value defined in the objects <code>_DEBUG</code> value or the
+	<code>$DEBUG</code> package variables in the object's class.
+	The higher the value (currently 0-4) the more detail is
+	generated.
+<perl>
+$myobj->TRACE("The ", $cat, " sat on the ", $mat);
+</perl>
+      </method>
+
+      <method id="ID">
+	Returns a string representing an identifier for the object
+	for debugging purposes.  By default, the value of the 
+	<pkgvar>$ETYPE</pkgvar> variable in the object's package
+	is return.   Subclasses will most likely redefine this 
+	method to return some more meaningful value.
+      </method>
+
+      <method id="_inspect">
+        <args>$something</args>
+        <args>$something, $level</args>
+
+	Attempts to Do The Right Thing to print a meaningful
+	representation of the <code>$something</code> passed as an
+	argument.  Will recurse into <code>$something</code>'s
+	structure while <code>$level</code> is less than 
+	<pkgvar>$INSPECT_LEVEL</pkgvar>.
+      </method>
+
+      <method id="_text_snippet">
+        <args>$text</args>
+        <args>$text, $length</args>
+
+	Returns <code>$text</code> truncated to (at most)
+	<code>$length</code> characters, or the current value
+	of <pkgvar>$SNIPPET</pkgvar> if <code>$length</code>
+	is unspecified.  Strings that are truncated are returned
+	with '...' appended.
+      </method>
+
+    </methods>
+  </section>
+
+</module>
+
+
+
+
+
+

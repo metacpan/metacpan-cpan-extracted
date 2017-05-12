@@ -1,0 +1,9 @@
+CASE:
+
+-  ALIAS should be allowed before CASE, and only before CASE.
+-  same for PROTOTYPE--maybe?
+-  same for INIT--maybe?  no.
+-  CLEANUP goes inside the case -- should it?
+-  PROTOTYPE can be specified for each case--uses the last one
+
+Can't use aliases and prototypes in the same function -- Inc6.xsh

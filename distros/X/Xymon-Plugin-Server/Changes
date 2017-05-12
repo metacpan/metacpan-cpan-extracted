@@ -1,0 +1,21 @@
+Revision history for Xymon-Plugin-Server
+
+0.03    18/Nov/2016
+        Pod is changed to avoid Test::Pod error.
+
+0.02    26/May/2013
+        Makefile.PL
+          perl5.6 is not suppoted.
+        Xymon::Plugin::Server::Status
+          optional hashref parameter is added to constructor.
+          ('EscapeMessage' is recognized.)
+
+0.02    11/May/2013
+        Xymon::Plugin::Server
+          "version" method now returns ARRAYREF correctly.
+
+        Xymon::Plugin::Server::Devmon
+          "format" method rename DS name for compatibilty. (for only Xymon 4.2)
+
+0.01    06/May/2013
+        First version.

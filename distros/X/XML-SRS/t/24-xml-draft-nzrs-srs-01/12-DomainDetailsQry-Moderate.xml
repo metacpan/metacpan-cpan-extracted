@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<NZSRSRequest VerMinor="11" VerMajor="3">
+
+  <DomainDetailsQry QryId="Query-023" Status="Active" MaxResults="100">
+    <ResultDateRange>
+      <From
+         Year="2008"
+         Month="01"
+         Day="01"
+         Hour="00"
+         Minute="00"
+         Second="00"
+         TimeZoneOffset="+13:00"
+         />
+      <To Year="2008"
+          Month="01"
+          Day="31"
+          Hour="23"
+          Minute="59"
+          Second="59"
+          TimeZoneOffset="+13:00"
+          />
+    </ResultDateRange>
+    <FieldList
+       Status="1"
+       RegistrantContact="1"
+       AdminContact="1"
+       TechnicalContact="1"
+       />
+  </DomainDetailsQry>
+
+</NZSRSRequest>

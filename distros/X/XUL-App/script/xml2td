@@ -1,0 +1,92 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+#use Smart::Comments;
+
+local $| = 1;
+local $/;
+my $xml = <>;
+$xml =~ s/^\s+|\s+$//g;
+my $level = 1;
+my $ident;
+while (1) {
+    ### POS XML: pos $xml
+    $ident = '    ' x $level;
+    if ($xml =~ /\G\s*<\?xml[^>]+\?>/gcs) {
+        next;
+    }
+    elsif ($xml =~ /\G\s*<!DOCTYPE.*?\s*]>/gcs) {
+        next;
+    }
+    elsif ($xml =~ /\G\s*<\s*(\w+)\s*(\/\s*)?>/gcs) {
+        my ($tag, $closing) = ($1, $2);
+        if ($closing) { print $ident, "$tag {};\n"; }
+        else  { print $ident, "$tag {\n"; $level++; }
+    }
+    elsif ($xml =~ /\G\s*<\s*(\w+)\s+([^>]+)>/gcs) {
+        my ($tag, $attrs) = ($1, $2);
+        print $ident, "$tag {\n";
+        #print $ident, "    attr {\n",
+        print_attrs($attrs);
+        $level++;
+    }
+    elsif ($xml =~ /\G\s*<\s*\/\s*(\w+)\s*>/gcs) {
+        $level--;
+        print "    " x $level, "}\n";
+    }
+    elsif ($xml =~ /\G\s*<!-- .*? -->/gcs) {
+        next;
+    }
+    elsif ($xml =~ /\G\s*$/gcs) {
+        last;
+    }
+    elsif ($xml =~ /\G\s*([^<]+)/gcs) {
+        my $text = $1;
+        $text = quote($text);
+        print $ident, "outs_raw $text\n";
+    }
+    else {
+        ### HERE!
+        die "Unexpected input: ", substr($xml, pos $xml, 10);
+    }
+}
+while (--$level > 1) {
+    print '    ' x $level, "}\n";
+}
+
+sub quote {
+    my $s = shift;
+    $s =~ s/\{/\\{/g;
+    $s =~ s/\}/\\}/g;
+    "q{$s}";
+}
+
+sub print_attrs {
+    my ($attrs) = @_;
+    print $ident, "    attr {\n";
+    while (1) {
+        if ($attrs =~ s/^\s*(\w+)\s*=\s*("[^"]*")//s) {
+            my ($attr, $val) = ($1, $2);
+            print $ident, ("    " x 2), "$attr => $val,\n";
+        }
+        elsif ($attrs =~ s/^\s*("[^"]+")\s*=\s*("[^"]*")//s) {
+            print $ident, ("    " x 2), "$1 => $2,\n";
+        }
+        elsif ($attrs =~ s/^\s*\/\s*$//s) {
+            print $ident, "    }\n";
+            print $ident, "}\n";
+            $level--;
+            return;
+        }
+        elsif ($attrs =~ s/^\s*$//s) {
+            last;
+        }
+        else {
+            die "Syntax error in tag option list: $attrs\n";
+        }
+    }
+    print $ident, "    }\n";
+}
+

@@ -1,0 +1,13 @@
+[%- IF view.data.navigation %]
+    <nav id="nav">
+      <div class="ym-wrapper">
+        <div class="ym-hlist">
+          <ul>
+[% FOREACH item IN view.data.navigation -%]
+            <li><a href="[% item.link %]">[% item.text %]</a></li>
+[% END -%]
+          </ul>
+        </div>
+      </div>
+    </nav>
+[%- END %]

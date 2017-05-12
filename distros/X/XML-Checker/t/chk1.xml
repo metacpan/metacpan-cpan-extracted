@@ -1,0 +1,15 @@
+<!DOCTYPE root [
+ <!ELEMENT root (a|b|c)*>
+ <!ELEMENT a (b|c)*>
+ <!ELEMENT c (a|b)*>
+ <!ELEMENT b EMPTY>
+]>
+
+<root>
+ <a>
+  <b/>
+  <c>
+   <d/>
+  </c>
+ </a>
+</root>

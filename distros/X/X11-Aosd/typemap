@@ -1,0 +1,21 @@
+Aosd *              T_AOSD_OBJECT
+AosdMouseEvent *    T_PTROBJ
+AosdTransparency    T_IV
+AosdCoordinate      T_IV
+Bool                T_IV
+XClassHint *        T_PTROBJ
+
+INPUT
+
+T_AOSD_OBJECT
+	if (sv_derived_from ($arg, \"X11::Aosd\")) {
+		IV tmp = SvIV ((SV *) SvRV ($arg));
+		$var = INT2PTR ($type, tmp);
+	} else {
+		Perl_croak(aTHX_ \"$var is not of type X11::Aosd\");
+	}
+
+OUTPUT
+
+T_AOSD_OBJECT
+	sv_setref_pv ($arg, \"X11::Aosd\", (void *) $var);

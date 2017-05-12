@@ -1,0 +1,32 @@
+MANIFEST
+README
+Changes
+examples/example-1.pl
+lib/XML/RSS/Feed.pm
+lib/XML/RSS/Headline.pm
+lib/XML/RSS/Headline/PerlJobs.pm
+lib/XML/RSS/Headline/Fark.pm
+lib/XML/RSS/Headline/UsePerlJournals.pm
+t/001_load.t
+t/002_parse.t
+t/003_process.t
+t/004_process_items.t
+t/005_create_headline.t
+t/006_first_seen.t
+t/007_fetch_feed.t
+t/008_store_retrieve.t
+t/009_max_headlines.t
+t/010_deprecated_methods.t
+t/011_pod.t
+t/012_pod_coverage.t
+t/013_legacy.t
+t/014_last_updated.t
+t/015_feed_exceptions.t
+t/016_title_from_description.t
+t/017_perljobs.t
+t/018_debug.t
+t/019_fark.t
+t/020_useperljournals.t
+Makefile.PL
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

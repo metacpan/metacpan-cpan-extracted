@@ -1,0 +1,138 @@
+This file describes the installation procedure of Sablotron. To know
+more on Sablotron, please read the README file in the same directory 
+as this file.
+
+
+1. Intro
+2. Prerequesties
+3. Building
+4. Environment
+5. More info
+
+
+1. Intro
+========================================
+
+XML::Sablotron is a simple Perl package, which encapsulates the C API
+of Sablotron XSLT processor. The only important fact is, that this
+package uses the dynamic linking of Sablotron.
+
+If you need use this module on platforms, which do not allow dynamic
+linking, please contact us.
+
+2. Prerequesties
+========================================
+
+You need the Sablotron package to be correctly installed on you machine. 
+If you don't have it, download it from http://www.gingerall.com.
+
+Unix: 
+----- 
+
+If you've installed Sablotron package in the standard way, all should
+be OK with no additional tweaking. If you've installed Sablotron in
+some non-system directory, you may need
+
+a) run perl Makefile.PL with -d switch, which allows to specify
+directory, where Sablotron is installed (supposes lib and include
+subdirs)
+
+b) set LD_LIBRARY_PATH environment variable to point to directory
+containing library files.
+
+NT:
+---
+
+a) Check, if Sablotron and Expat includes and *.lib files are placed
+in directories pointed by LIB and INCLUDE variables. Otherwise you have to use -d switch for 'perl Makefile.PL' (see Unix comment above).
+
+b) Check, if Sablotron dll files are placed in directories listed in
+PATH environment variable.
+
+3. Building
+========================================
+
+Here is what you need:
+	a Linux box (tested on RH 6.1) with GNU C++ compiler
+  or
+	a NT box (testes on Win NT 4.0) with VC++ 4.2 (and later)
+
+If you need any other port, please contact us.
+
+Unpack the tar-ball file into a directory of your choice.
+
+Change into the XML-Sablotron* directory and type
+
+  perl Makefile.PL
+  make
+  make test
+  make install (if you want; may require the root privileges)
+
+Running a Win32 box you have to type:
+
+  perl Makefile.PL
+  nmake
+  nmake test
+  nmake install (if you want)
+
+!! NT problem !!
+The Perl Makemaker finds Sablotron libraries only in some special
+locations. You can make the Makefile.PL to use files in any other 
+directory using the `-d' switch.
+
+The first line of previous example may look like this:
+perl Makefile.PL -d c:\great-tools\Sablot-x.xx
+
+If the test process fails, there may be something wrong with your 
+environment. Please, check the following "Environment" section.
+
+If you see any errors, you may try to fix it or just contact us.
+Any help or feedback from users is highly appreciated.
+
+------------------------------------------------------------
+JS EXTENSIONS NOTE:
+
+If you have installed Sablotron with JS extensions support,
+XML::Sablotron must link JavaScript shared library. To link a JS 
+library named libjs.so, issue:
+
+  perl Makefile.PL JSLIBPATH=<path_to_jslib.so>
+
+To link a library with a different name, type:
+
+  perl Makefile.PL JSLIBNAME=<lib_name> JSLIBPATH=<path_to_jslib.so>
+------------------------------------------------------------
+
+------------------------------------------------------------
+Debugger and readline
+
+The Sablotron processor supports a command-line debugging. By default
+it doesn't require any special libraries, but it may be
+compiled/linked with a GNU readline support. in such a case you need
+to link a readline library to the perl extension too.
+
+To do it, add LIBS='-lreadline -lncurses' to Makefile.PL (this sample
+is valid for most Linuxes).
+
+
+4. Environment
+========================================
+
+Unix boxes may need add lib directory with Sablotron and Expat files
+to LD_LIBRARY_PATH.
+
+NT boxes need set the PATH variable to the Sablotron bin/ directory.
+
+
+5. More info
+========================================
+
+We suppose you have read the README file. If you haven't, read it now.
+If it is not enough, take a look at our website
+
+http://www.gingerall.com
+
+
+Enjoy Sablotron!!
+
+GA

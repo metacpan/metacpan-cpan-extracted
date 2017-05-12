@@ -1,0 +1,23 @@
+<stx:transform version="1.0" 
+  xmlns:stx="http://stx.sourceforge.net/2002/ns"
+  strip-space="yes">
+
+  <stx:template match="/root">
+    <stx:value-of select="name()"/>
+    <stx:text>.</stx:text>
+    <stx:value-of select="position()"/>
+    <stx:process-children/>
+  </stx:template>
+
+  <stx:group>
+
+    <stx:template match="node" public="yes">
+      <stx:text> </stx:text>
+      <stx:value-of select="name()"/>
+      <stx:text>.</stx:text>
+      <stx:value-of select="position()"/>
+    </stx:template>
+
+  </stx:group>
+  
+</stx:transform>

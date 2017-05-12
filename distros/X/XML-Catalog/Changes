@@ -1,0 +1,25 @@
+Revision history for Perl extension XML::Catalog.
+
+1.03 Wed May 28 2014
+- Add test DTDs to MANIFEST
+
+1.02 Tue May 27 2014
+- Fix missing DTDs causing build fail on Windows.
+- Fix non-portable version declaration.
+
+1.0.1 Mon Oct 28 2013
+- Fix test harness failing on some  machines. RT #89415
+- Add Oasis support for nextCatalog.
+
+1.0.0 Wed Oct 02 2013
+- Support Oasis Catalogs. RT #87010
+- Fix requires. RT #46047
+
+0.02  Thu Sep 21 09:00:00 2000
+- Fixed problem disallowing backslashes in identifiers in SOCAT format
+- Added get_handler() method
+
+0.01  Fri Jun 11 00:00:00 1999
+- original version; created by h2xs 1.18
+
+

@@ -1,0 +1,6 @@
+CHANGES
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+lib/XML/Filter/Mode.pm
+t/XML-Filter-Mode.t

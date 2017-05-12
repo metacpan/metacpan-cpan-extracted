@@ -1,0 +1,9 @@
+% layout 'email';
+% title 'Site Feedback';
+
+<div class="unsemantic-list">
+  <p><strong>Sent on:</strong> <%= scalar(localtime) %></p>
+  <p><strong>Host:</strong> <%= stash 'visitor_ip' %></p>
+  <p><strong>Email:</strong> <%= param 'email' %></p>
+  <p><strong>Feedback:</strong><br><%== stash 'feedback' %></p>
+</div>

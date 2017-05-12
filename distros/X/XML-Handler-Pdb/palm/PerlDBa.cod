@@ -1,0 +1,27 @@
+"Sub Show(index as Integer)
+    Dim inta as Integer
+    Dim intb as Short
+    Dim datt as Date
+    Dim tim as Time
+    Dim bytt as Byte
+    Dim c as String
+    Dim flt as Float
+    Dim dbl as Double
+    Dim srt as Short
+    Dim txt as String
+    Dim result as Integer
+
+    lblNav.Text = Str(dbidx) + ~/~ + Str(Nrec)
+
+    result = dbposition(Db, index, 0)
+    result = dbget(Db, inta, datt, tim, bytt, flt, dbl, srt, txt)
+
+    fldInt.Text = str(inta)
+    fldDate.Text = datemmddyy(datt)
+    fldTime.Text = hourminampm(tim)
+    fldByte.Text =  ~howto display a byte?~
+    fldFloat.Text = Str(flt)
+    fldDouble.Text = Str(dbl)
+    fldShort.Text = Str(srt)
+    fldText.Text = txt
+End Sub"

@@ -1,0 +1,63 @@
+XML-Genx
+========
+
+Genx is a software library written in the C programming language. You
+can use it to generate XML output, suitable for saving into a file or
+sending in a message to another computer program. Genx does several
+things at once:
+
+    * Takes care of escaping XML's special characters for you.
+    * Keeps you from generating text which isn't well-formed.
+    * Generates namespace prefixes so you don't have to.
+    * Produces documents which are Canonical XML, suitable for use
+      with digital-signature technology.
+    * Tries to do all this efficiently.
+
+XML::Genx is a wrapper around Genx to let it be used from Perl.
+
+More on Genx at: http://www.tbray.org/ongoing/When/200x/2004/02/20/GenxStatus
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Build.PL
+   ./Build
+   ./Build test
+   ./Build install
+
+NB: If you are building under MS Windows, you *must* ensure that you use
+the same compiler as you built Perl with.  Otherwise you will see
+mysterious failures when you try to actually use XML::Genx.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 by Dominic Mitchell. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions
+are met:
+1. Redistributions of source code must retain the above copyright
+   notice, this list of conditions and the following disclaimer.
+2. Redistributions in binary form must reproduce the above copyright
+   notice, this list of conditions and the following disclaimer in the
+   documentation and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY AUTHOR AND CONTRIBUTORS ``AS IS'' AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED.  IN NO EVENT SHALL AUTHOR OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+SUCH DAMAGE.
+
+The genx library is:
+
+Copyright (c) 2004 by Tim Bray and Sun Microsystems.  For copying
+permission, see http://www.tbray.org/ongoing/genx/COPYING.
+
+# @(#) $Id: README 1117 2006-02-03 21:16:01Z dom $

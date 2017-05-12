@@ -1,0 +1,9 @@
+BUGS file for XML::Conf
+
+$Id: BUGS,v 1.1 2003/07/22 07:06:59 jonasbn Exp $
+
+- I have experienced with some problems when doing rewrite, I have to
+  narrow the problem down a bit, it might be a possible bug
+
+- When 'case' is not given as a parameter the module can react in a weird
+  way? (please see the TODO)

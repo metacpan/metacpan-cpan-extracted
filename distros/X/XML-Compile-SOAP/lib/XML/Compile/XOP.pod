@@ -1,0 +1,126 @@
+=encoding utf8
+
+=head1 NAME
+
+XML::Compile::XOP - MTOM and XOP handler
+
+=head1 SYNOPSIS
+
+  # by default, XML::Compile encodes binary data
+  my $answer    = $call->(image => $binary_image);
+
+  # to enable use of MTOM
+  use XML::Compile::XOP;
+  my $xop       = XML::Compile::XOP->new;
+  my $xop_image = $xop->bytes($binary_image);
+  my $answer    = $call->(image => $xop_image);
+
+  # returned XOPs in SOAP
+  my ($answer, $trace, $xop) = $wsdl->call($operation)->(%data);
+  print $_->string for @$xop;   # See XML::Compile::XOP::Include
+
+=head1 DESCRIPTION
+
+The SOAP Message Transmission Optimization Mechanism (MTOM) is designed
+for SOAP1.2, but also usable for SOAP1.1.  It optimizes the transport of
+binary information (like images) which are part of the XML message: in
+stead of base64 encoding them adding 25% to the size of the data, these
+binaries are added as pure binary attachment to the SOAP message.
+
+In the official specification, the XML message will be created first
+with the base64 representation of the data in it. Only at transmission,
+a preprocessor XOP (XML-binary Optimized Packaging) extracts those
+components to be send separately.  In Perl, we have to be more careful
+about performance.  Therefore, the path via encoding to base64 and then
+decoding it back to binary in the sender (and the reverse process for
+the receiver) is avoided.
+
+=head1 METHODS
+
+=head2 Constructors
+
+=over 4
+
+=item $obj-E<gt>B<bytes>( <STRING|SCALAR>, %options )
+
+Create a L<XML::Compile::XOP::Include|XML::Compile::XOP::Include> object which sources from a
+STRING (representing bytes) or a SCALAR reference to such a string.
+With the %options, you can overrule defaults generated for the "Include"
+object.
+
+example: use of bytes()
+
+  my $data = $xop->bytes($string, type => 'text/html');
+  # $data is a XML::Compile::XOP::Include
+
+=item $obj-E<gt>B<file>( <$filename|$fh>, %options )
+
+Create a L<XML::Compile::XOP::Include|XML::Compile::XOP::Include> object which sources from a
+FILE specified by NAME or HANDLE.  With the %options, you can overrule
+defaults generated for the "Include" object.
+
+example: use of file()
+
+  use MIME::Types;
+  my $mimetypes = MIME::Types->new;
+
+  my $type = $mimetypes->mimeTypeOf($fn);
+  my $data = $xop->file($fn, type => $fn);
+  # $data is a XML::Compile::XOP::Include
+
+=item XML::Compile::XOP-E<gt>B<new>(%options)
+
+ -Option         --Default
+  hostname         'localhost'
+  xmlmime_version  XMIME11
+  xop_version      XOP10
+
+=over 2
+
+=item hostname => STRING
+
+This is used as part of generated Content-IDs, which have the form of
+a email address.
+
+=item xmlmime_version => URI
+
+=item xop_version => URI
+
+=back
+
+=back
+
+=head1 DETAILS
+
+=head1 SEE ALSO
+
+=over 4
+
+=item MTOM SOAP1.2: F<http://www.w3.org/TR/soap12-mtom/>
+
+=item MTOM SOAP1.1: F<http://schemas.xmlsoap.org/soap/mtom/SOAP11MTOM10.pdf>
+
+=item XOP: F<http://www.w3.org/TR/xop10/>
+
+=item XMLMIME: F<http://www.w3.org/TR/xml-media-types>
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of XML-Compile-SOAP distribution version 3.21,
+built on January 11, 2017. Website: F<http://perl.overmeer.net/xml-compile/>
+
+Please post questions or ideas to the mailinglist at
+F<http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/xml-compile> .
+For live contact with other developers, visit the C<#xml-compile> channel
+on C<irc.perl.org>.
+
+=head1 LICENSE
+
+Copyrights 2007-2017 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

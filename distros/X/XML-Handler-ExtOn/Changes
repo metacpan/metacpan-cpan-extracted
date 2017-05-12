@@ -1,0 +1,18 @@
+Revision history for Perl extension XML::PSAX.
+#$Id: Changes 368 2008-11-24 09:55:03Z zag $
+
+0.06 
+    - create_pipe() use already created filter
+0.05 
+    - add_namespace to ExtOn
+    - add delete alias
+    
+0.04
+    - add SAX1 to ExtOn converter 
+0.03
+    - add tests
+    - documenting
+    - get attrs by name ( by_name )
+0.02 
+    - add mk_characters and mk_cdata
+    - add on_cdata

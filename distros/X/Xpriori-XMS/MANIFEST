@@ -1,0 +1,25 @@
+Changes
+lib/Xpriori/XMS/Config.pm
+lib/Xpriori/XMS/Http.pm
+lib/Xpriori/XMS/NeoCoreSvc.cfg
+lib/Xpriori/XMS/ServerUtil.pm
+lib/Xpriori/XMS/ServerUtil/Solaris.pm
+lib/Xpriori/XMS/ServerUtil/Win32.pm
+lib/Xpriori/XMS/Soap.pm
+lib/Xpriori/XMS/Svc.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+sample/sampleXML/blog.xml
+sample/sampleXML/blog2.xml
+sample/sampleXML/insFile.xml
+sample/sampleXML/modFile.xml
+sample/server1.pl
+sample/test1.pl
+sample/test2.pl
+sample/test3.pl
+sample/test4.pl
+sample/test5.pl
+sample/test6.pl
+t/Xpriori-XMS.t

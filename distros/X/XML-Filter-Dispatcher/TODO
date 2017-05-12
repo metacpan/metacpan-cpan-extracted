@@ -1,0 +1,59 @@
+- test "as_hash( /a/[b] )"
+
+- get a[b[c[d]]] working
+
+- optimize the event queueing; we're keeping more events than we need to.
+
+- There's a cheat in self_node::immed_code_template that returns the
+  \$ctx from the first expression in things like:
+
+      '@*' => [ 'string()' => sub { ... } ]
+
+  .  That's now been copied in to a couple of other places and it's likely
+  that it needs to go everywhere.
+
+- allow alternate grammars
+
+- Don't pass or require $postponement unless one is needed.
+
+- Move parsing code out of new in to compile() and have compile_to_Perl
+  return the source code of a subclass.  Document this, and offer an
+  option to set the class name, both for user self-determination and for
+  the ability to prevent leaking when the application wants to do lots
+  and lots of different rule sets.  Try to support this approach for
+  stylesheet language implementors.
+  - new() should return a subclass
+
+- Detect expressions that will require precursors at fixup time so
+  that we can tell what optimizations are safe (there's an IgnoreDelayToEnd
+  hack, for instance) before compiling.  This will also allow the
+  predicates in //a[b]/c, //a[b]/d, etc. to be combined.
+
+- See if we can avoid conflicts in the precursorization code; a quick
+  glance shows that //text[self::text()] seems to be reusing the
+  Precursors positions. (check this: the precursorization code has
+  since been rewritten).
+
+- Reverse action execution order: top down would be more clear.
+
+- Don't loop through attributes if there's either a node_name op
+  or a (namespace_test + node_local_name) combo; we should just
+  look to see if the desired attribute is present.
+
+- Extract more helper subs in to a runtime to reduce the amount of
+  generated code.
+
+- Carve up AsHashHandler in to code templates and use them "bare" in
+  X::F::D's code generator to save the extra sub call.
+
+- Event queuing.
+  - Needed when xcut() or any precursors found
+  - Offer an option to disable queuing and allow unordered matches
+    - speed enhancer for XML->PerlDataStructure conversions
+  - Offer an option to limit queue length
+      undef => unlimited (default)
+      0     => none allowed, compile time errors
+      N     => limit to N events
+      -N    => error
+
+- add an AllPathsAbsolute option to force "foo" to behave like "/foo".

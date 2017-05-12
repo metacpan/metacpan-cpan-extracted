@@ -1,0 +1,26 @@
+---
+abstract: 'SOAP with Mojolicious'
+author:
+  - 'Heiko Jansen/Mark Overmeer'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120630'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: XML-Compile-SOAP-Mojolicious
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  HTTP::Message: 6.06
+  Log::Report: 1.05
+  Mojolicious: 6.00
+  Time::HiRes: 0
+  XML::Compile::SOAP: 3.16
+version: 0.02

@@ -1,0 +1,302 @@
+NAME
+    XML::Hash::XS - Simple and fast hash to XML and XML to hash conversion
+    written in C
+
+SYNOPSIS
+        use XML::Hash::XS;
+
+        my $xmlstr = hash2xml \%hash;
+        hash2xml \%hash, output => $fh;
+
+        my $hash = xml2hash $xmlstr;
+        my $hash = xml2hash \$xmlstr;
+        my $hash = xml2hash 'test.xml', encoding => 'cp1251';
+        my $hash = xml2hash $fh;
+        my $hash = xml2hash *STDIN;
+
+    Or OOP way:
+
+        use XML::Hash::XS qw();
+
+        my $conv   = XML::Hash::XS->new(utf8 => 0, encoding => 'utf-8')
+        my $xmlstr = $conv->hash2xml(\%hash, utf8 => 1);
+        my $hash   = $conv->xml2hash($xmlstr, encoding => 'cp1251');
+
+DESCRIPTION
+    This module implements simple hash to XML and XML to hash conversion
+    written in C.
+
+    During conversion uses minimum of memory, XML or hash is written
+    directly without building DOM.
+
+    Some features are optional and are available with appropriate libraries:
+
+    * XML::LibXML library is required in order to build DOM
+
+    * ICU or iconv library is required in order to perform charset
+      conversions
+
+FUNCTIONS
+  hash2xml $hash, [ %options ]
+    $hash is reference to hash
+
+        hash2xml
+            {
+                node1 => 'value1',
+                node2 => [ 'value21', { node22 => 'value22' } ],
+                node3 => \'value3',
+                node4 => sub { return 'value4' },
+                node5 => sub { return { node51 => 'value51' } },
+            },
+            canonical => 1,
+            indent    => 2,
+        ;
+
+    will convert to:
+
+        <?xml version="1.0" encoding="utf-8"?>
+        <root>
+          <node1>value1</node1>
+          <node2>value21</node2>
+          <node2>
+            <node22>value22</node22>
+          </node2>
+          <node3>value3</node3>
+          <node4>value4</node4>
+          <node5>
+            <node51>value51</node51>
+          </node5>
+        </root>
+
+    and (use_attr=1):
+
+        hash2xml
+            {
+                node1 => 'value1',
+                node2 => [ 'value21', { node22 => 'value22' } ],
+                node3 => \'value3',
+                node4 => sub { return 'value4' },
+                node5 => sub { return { node51 => 'value51' } },
+            },
+            use_attr  => 1,
+            canonical => 1,
+            indent    => 2,
+        ;
+
+    will convert to:
+
+        <?xml version="1.0" encoding="utf-8"?>
+        <root node1="value1" node3="value3" node4="value4">
+          <node2>value21</node2>
+          <node2 node22="value22"/>
+          <node5 node51="value51"/>
+        </root>
+
+  xml2hash $xml, [ %options ]
+    $xml may be string, reference to string, file handle or tied file
+    handle:
+
+        xml2hash '<root>text</root>';
+        # output: 'text'
+
+        xml2hash '<root a="1" b="2">text</root>';
+        # output: { a => '1', b => '2', content => 'text' }
+
+        open(my $fh, '<', 'test.xml');
+        xml2hash $fh;
+
+        xml2hash *STDIN;
+
+OPTIONS
+    doc [ => 0 ] *# hash2xml*
+        if doc is '1', then returned value is XML::LibXML::Document.
+
+    root [ = 'root' ] *# hash2xml*
+        Root node name.
+
+    version [ = '1.0' ] *# hash2xml*
+        XML document version
+
+    encoding [ = 'utf-8' ] *# hash2xml+xml2hash*
+        XML input/output encoding
+
+    indent [ = 0 ] *# hash2xml*
+        if indent great than "0", XML output should be indented according to
+        its hierarchic structure. This value determines the number of
+        spaces.
+
+        if indent is "0", XML output will all be on one line.
+
+    output [ = undef ] *# hash2xml*
+        XML output method
+
+        if output is undefined, XML document dumped into string.
+
+        if output is FH, XML document writes directly to a filehandle or a
+        stream.
+
+    canonical [ = 0 ] *# hash2xml*
+        if canonical is "1", converter will be write hashes sorted by key.
+
+        if canonical is "0", order of the element will be pseudo-randomly.
+
+    use_attr [ = 0 ] *# hash2xml*
+        if use_attr is "1", converter will be use the attributes.
+
+        if use_attr is "0", converter will be use tags only.
+
+    content [ = undef ] *# hash2xml+xml2hash*
+        if defined that the key name for the text content(used only if
+        use_attr=1).
+
+    force_array => [ = undef ] *# xml2hash*
+        This option is similar to "ForceArray" from XMl::Simple module:
+        <https://metacpan.org/pod/XML::Simple#ForceArray-1-in---important>.
+
+    force_content => [ = 0 ] *# xml2hash*
+        This option is similar to "ForceContent" from XMl::Simple module:
+        <https://metacpan.org/pod/XML::Simple#ForceContent-1-in---seldom-use
+        d>.
+
+    merge_text [ = 0 ] *# xml2hash*
+        Setting this option to "1" will cause merge adjacent text nodes.
+
+    xml_decl [ = 1 ] *# hash2xml*
+        if xml_decl is "1", output will start with the XML declaration
+        '<?xml version="1.0" encoding="utf-8"?>'.
+
+        if xml_decl is "0", XML declaration will not be output.
+
+    trim [ = 0 ] *# hash2xml+xml2hash*
+        Trim leading and trailing whitespace from text nodes.
+
+    utf8 [ = 1 ] *# hash2xml+xml2hash*
+        Turn on utf8 flag for strings if enabled.
+
+    max_depth [ = 1024 ] *# xml2hash*
+        Maximum recursion depth.
+
+    buf_size [ = 4096 ] *# hash2xml+xml2hash*
+        Buffer size for reading end encoding data.
+
+    keep_root [ = 0 ] *# xml2hash*
+        Keep root element.
+
+    filter [ = undef ] *# xml2hash*
+        Filter nodes matched by pattern and return reference to array of
+        nodes.
+
+        Sample:
+
+            my $xml = <<'XML';
+                <root>
+                   <item1>111</item1>
+                   <item2>222</item2>
+                   <item3>333</item3>
+                </root>
+            XML
+
+            my $nodes = xml2hash($xml, filter => '/root/item1');
+            # $nodes = [ 111 ]
+
+            my $nodes = xml2hash($xml, filter => ['/root/item1', '/root/item2']);
+            # $nodes = [ 111, 222 ]
+
+            my $nodes = xml2hash($xml, filter => qr[/root/item\d$]);
+            # $nodes = [ 111, 222, 333 ]
+
+        It may be used to parse large XML because does not require a lot of
+        memory.
+
+    cb [ = undef ] *# xml2hash*
+        This option is used in conjunction with "filter" option and defines
+        callback that will called for each matched node.
+
+        Sample:
+
+            xml2hash($xml, filter => qr[/root/item\d$], cb => sub {
+                print $_[0], "\n";
+            });
+            # 111
+            # 222
+            # 333
+
+    method [ = 'NATIVE' ] *# hash2xml*
+        experimental support the conversion methods other libraries
+
+        if method is 'LX' then conversion result is the same as using
+        XML::Hash::LX library
+
+        Note: for 'LX' method following additional options are available:
+        attr cdata text comm
+
+OBJECT_SERIALISATION(hash2xml)
+    1. When object has a "toString" method
+      In this case, the <toString> method of object is invoked in scalar
+      context. It must return a single scalar that can be directly encoded
+      into XML.
+
+      Example:
+
+          use XML::LibXML;
+          local $XML::LibXML::skipXMLDeclaration = 1;
+          my $doc = XML::LibXML->new->parse_string('<foo bar="1"/>');
+          print hash2xml({ doc => $doc }, indent => 2, xml_decl => 0);
+          =>
+          <root>
+            <doc><foo bar="1"/></doc>
+          </root>
+
+    2. When object has a "iternext" method ("NATIVE" method only)
+      In this case, the <iternext> method method will invoke a few times
+      until the return value is not undefined.
+
+      Example:
+
+          my $count = 0;
+          my $o = bless {}, 'Iterator';
+          *Iterator::iternext = sub { $count++ < 3 ? { count => $count } : undef };
+          print hash2xml({ item => $o }, use_attr => 1, indent => 2, xml_decl => 0);
+          =>
+          <root>
+            <item count="1"/>
+            <item count="2"/>
+            <item count="3"/>
+          </root>
+
+      This can be used to generate a large XML using minimum memory, example
+      with DBI:
+
+          my $sth = $dbh->prepare('SELECT * FROM foo WHERE bar=?');
+          $sth->execute(...);
+          my $o = bless {}, 'Iterator';
+          *Iterator::iternext = sub { $sth->fetchrow_hashref() };
+          open(my $fh, '>', 'data.xml');
+          hash2xml({ row => $o }, use_attr => 1, indent => 2, xml_decl => 0, output => $fh);
+          =>
+          <root>
+            <row bar="..." ... />
+            <row bar="..." ... />
+            ...
+          </root>
+
+BENCHMARK
+    Performance benchmark in comparison with some popular modules(hash2xml):
+
+                        Rate     XML::Hash XML::Hash::LX   XML::Simple XML::Hash::XS
+        XML::Hash     65.0/s            --           -6%          -37%          -99%
+        XML::Hash::LX 68.8/s            6%            --          -33%          -99%
+        XML::Simple    103/s           58%           49%            --          -98%
+        XML::Hash::XS 4879/s         7404%         6988%         4658%            --
+
+    Benchmark was done on <http://search.cpan.org/uploads.rdf>
+
+AUTHOR
+    Yuriy Ustushenko, <yoreek@yahoo.com>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2012-2017 Yuriy Ustushenko
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

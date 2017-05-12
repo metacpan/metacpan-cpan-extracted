@@ -1,0 +1,8 @@
+# X11::GUITest ($Id: typemap 209 2011-05-16 01:09:04Z ctrondlp $)
+BOOL			T_IV
+Window			T_UV
+Cursor			T_UV
+UINT			T_UV
+ULONG			T_UV
+KeySym			T_UV
+

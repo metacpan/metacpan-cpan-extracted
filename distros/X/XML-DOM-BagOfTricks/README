@@ -1,0 +1,34 @@
+XML-DOM-BagOfTricks version 0.01
+================================
+
+XML::DOM::BagOfTricks provides a bundle, or bag, of functions that make 
+dealing with and creating DOM objects easier.
+
+getTextContents() from 'Effective XML processing with DOM and XPath in Perl'
+by Parand Tony Darugar, IBM Developerworks Oct 1st 2001
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+XML::DOM
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 by Aaron Trevena
+Copyright (c) 2001 Parand Tony Darugar, where applicable
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+

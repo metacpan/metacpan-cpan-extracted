@@ -1,0 +1,68 @@
+
+The basic approach I've been following is to implement the C interfaces
+to the various libraries as faithfully as possible while avoiding some
+of the traps that the original designers were forced to live with
+because of C's limitations.  The argument lists used to pass resources
+to many Xt and Xm functions are a good example.  In the C libraries, a
+programmer has to carefully set up some rather cumbersome data
+structures before calling these functions.  The Perl module eliminates
+the need to do this and accepts the resources in normal Perl "list"
+context.  This gives the interface the flavor of the variable length
+argument version of the C routines, but with complete safety, i.e. there
+is no need to provide a terminating NULL and the argument types are
+checked before use.
+
+In addition to the standard C-like interface, I've added a more
+object-oriented syntax.  Currently, only the Toolkit module (i.e. widget
+oriented functions) has this alternate syntax.  The OO syntax permits a
+much simpler, more concise programming style.  It is quite similar to
+Tk.  Compare the two approaches with a Motif PushButton example:
+
+  # ---------------------------------------------------------------------------
+  # This is fairly standard Motif.  The Perl interface is much easier
+  # to use than the C interface because XmStrings are automatically
+  # created and destroyed and callbacks can be anonymous subroutines.
+
+    my $button = XtCreateManagedWidget("button", xmPushButtonWidgetClass, $parent,
+					XmNlabelString, 'OK',
+					XmNlabelType, XmSTRING);
+
+    XtAddCallback($button, XmNactivateCallback, sub { exit }, 0);
+
+    ...
+
+    if (XtIsManaged($button)) {
+       XtSetValues($button, XmNbackground, 'yellow');
+    }
+
+  # However, Motif is still cumbersome because there are lots of
+  # functions and resource names.  The OO Widget interface improves this
+  # by providing fewer, more powerful functions and short alias names
+  # for common resources.  In this example, by setting the text alias
+  # the widget's XmNlabelString and XmNlabelType attributes are both changed.
+  # The callback is also registered at widget creation time instead of in
+  # a separate command.
+
+    my $button = give $parent -button, -text => 'OK', -command => sub { exit };
+
+    ...
+
+    if (query $button -managed) {
+       change $button -bg => 'yellow';
+    }
+
+  # The "query $button" statement above might be more readable if this coding
+  # style is used:
+
+    if ($button->IsManaged) {
+       change $button -bg => 'yellow';
+    }
+
+  # Well, at least C++ programmers might find it more readible...
+
+  # ---------------------------------------------------------------------------
+
+I'd like to do something similar for the basic X interface as well.  X
+programmers desperately need a higher level drawing interface to
+automatically manage graphic contexts and exposures.  There are many freely
+available libraries that this work could be based on.

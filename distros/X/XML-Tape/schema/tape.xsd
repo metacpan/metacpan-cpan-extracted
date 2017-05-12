@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsi:schema targetNamespace="http://library.lanl.gov/2005-01/STB-RL/tape/" elementFormDefault="qualified" attributeFormDefault="unqualified" xmlns:xsi="http://www.w3.org/2001/XMLSchema" xmlns:ta="http://library.lanl.gov/2005-01/STB-RL/tape/">
+	<xsi:annotation>
+		<xsi:documentation>
+	XML Schema defining XML-formatted document-structure for tape containing XML records.
+	Herbert Van de Sompel. January 7th 2005.      
+	Validated with XML Spy 2004 release 4 on January 7th 2005.      
+* add maxOccurs="unbounded" to children of tape-admin.  - Xiaoming, Jan 21th 2005 
+* change processingContent to "strict" of record. -Xiaoming, Jan 21th 2005
+</xsi:documentation>
+	</xsi:annotation>
+	<xsi:element name="tape">
+		<xsi:complexType>
+			<xsi:sequence>
+				<xsi:element ref="ta:tape-admin" minOccurs="0" maxOccurs="unbounded"/>
+				<xsi:element ref="ta:tape-record" maxOccurs="unbounded"/>
+			</xsi:sequence>
+		</xsi:complexType>
+	</xsi:element>
+	<xsi:element name="tape-admin">
+		<xsi:complexType>
+			<xsi:sequence>
+				<xsi:any namespace="##other" maxOccurs="unbounded"  processContents="lax"/>
+			</xsi:sequence>
+		</xsi:complexType>
+	</xsi:element>
+	<xsi:element name="tape-record">
+		<xsi:complexType>
+			<xsi:sequence>
+				<xsi:element ref="ta:tape-record-admin"/>
+				<xsi:element ref="ta:record"/>
+			</xsi:sequence>
+		</xsi:complexType>
+	</xsi:element>
+	<xsi:element name="tape-record-admin">
+		<xsi:complexType>
+			<xsi:sequence>
+				<xsi:element name="identifier" type="xsi:anyURI"/>
+				<xsi:element name="date" type="ta:UTCdatetimeType"/>
+				<xsi:element name="record-admin" minOccurs="0" maxOccurs="unbounded">
+					<xsi:complexType>
+						<xsi:sequence>
+							<xsi:any namespace="##other" processContents="lax"/>
+						</xsi:sequence>
+					</xsi:complexType>
+				</xsi:element>
+			</xsi:sequence>
+		</xsi:complexType>
+	</xsi:element>
+	<xsi:element name="record">
+		<xsi:complexType>
+			<xsi:sequence>
+				<xsi:any namespace="##any" processContents="strict"/>
+			</xsi:sequence>
+		</xsi:complexType>
+	</xsi:element>
+	<xsi:simpleType name="UTCdatetimeType">
+		<xsi:union memberTypes="xsi:date xsi:dateTime"/>
+	</xsi:simpleType>
+</xsi:schema>

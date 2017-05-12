@@ -1,0 +1,43 @@
+Revision history for Perl extension XML::OPML.
+
+0.26   Thu Mar 25 10:20:00 2004
+        - changed the development site email to opml-dev@blogenstein.com
+        - added keywords as an attribute
+0.25   Wed Mar 24 10:39:00 2004
+        - changed the development site to http://opml.blogenstein.com
+0.24   Mon Mar 15 10:38:00 2004
+        - fixed bug regarding -e test on non-files
+0.23   Sat Mar 06 09:53:00 2004
+        - added examples to the tarball
+        - added method insert_outline to modify outlines in any particular embedded group
+        - added support for certain alternate spellings of attributes
+0.22   Sat Mar 06 08:24:00 2004
+        - fixed bug in Makefile
+0.21   Fri Mar 05 13:28:00 2004
+        - managed to find the key to parsing OPML files successfully even with embedded outlines
+        - XML::Simple requirement was removed
+        - XML::Parser and XML::SimpleObject requirements were added
+        - removed prepare_blogroll method since parsing is now possible
+        - added parse method to parse files and string content for updating OPML files
+0.20   Wed Mar 03 10:32:00 2004
+        - now a beta release
+        - contemplating what steps need to be taken to parse and prepare embedded outlines
+        - cleaned up the code a great deal
+        - added support for common blogroll / subscription attributes that AmphetaDesk uses
+        - changed the version numbering to reflect a more perlish system
+0.1.9  Thu Feb 26 14:56:00 2004
+        - added prepare_blogroll method as a new direction in updating OPML files specifically for blogrolls and subscriptions
+        - removed parse and parsefile methods
+        - abandoned hope of being able to update any OPML file due to the lack of a quality standard for OPML
+0.1.8  Wed Feb 25 11:45:00 2004
+        - support for attributes in embedded outline tags in now possible and I really hope this is the last time I have to format the POD
+0.1.7  Fri Feb 20 11:10:00 2004
+        - support for an unlimited number of embedded outlines is now possible and hopefully the POD is finally formatted the right way
+0.1.6  Thu Feb 19 13:37:00 2004
+        - added support for one hierarchy of embedded outlines and reformated the POD
+0.1.5  Tue Feb 17 12:03:00 2004
+        - very, very minor change to fix POD
+0.1.4  Tue Feb 17 11:56:02 2004
+	- original version; created by h2xs 1.22 with options
+		-X XML::OPML
+

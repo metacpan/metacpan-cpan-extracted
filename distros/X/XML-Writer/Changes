@@ -1,0 +1,171 @@
+Revision history for Perl extension XML::Writer.
+
+0.625 Thu 05 Jun 2014 23:55:42 +1000    <joe@kafsemo.org>
+        - Allow xml-model processing instructions (#94078).
+        - Don't warn when undef is passed to setOutput (#94369).
+
+0.624 Wed Feb 12 23:28:39 2014 +1100    <joe@kafsemo.org>
+        - Allow an empty system ID in a doctype declaration.
+
+0.623 Thu Jun 13 23:29:52 2013 +1000    <joe@kafsemo.org>
+        - Fix a memory leak introduced in 0.620.
+        - Avoid issue with implicit stringification.
+
+0.622 Tue May 28 23:02:56 2013 +1000    <joe@kafsemo.org>
+        - Fix bug where output is an IO::Scalar.
+
+0.621 Sun Apr 14 22:42:38 2013 +1000    <joe@kafsemo.org>
+        - Include selfcontained_output.t in the distribution.
+
+0.620 Sun Apr 14 22:20:33 2013 +1000    <joe@kafsemo.org>
+        - Allow OUTPUT => 'self' (#81327).
+
+0.615 Tue Jan 17 01:32:07 2012 +1100    <joe@kafsemo.org>
+        - Fix test skipping when Unicode is unsupported.
+
+0.614 Mon Jan  9 00:24:10 2012 +1100    <joe@kafsemo.org>
+        - Fix regression in 0.613 and set encoding on GLOBs.
+
+0.613 Sat Jan  7 22:51:26 2012 +1100    <joe@kafsemo.org>
+        - Use 'Object->new()' syntax throughout (#65840).
+        - Support passing in any arbitrary object that has a print()
+           method (from Jason Rodrigues).
+
+0.612 Mon Aug 16 00:10:16 2010 +1000    <joe@kafsemo.org>
+        - Allow DATA_INDENT to specify arbitrary white space for
+           indentation. If it is numeric then use that many space
+           characters.
+
+0.611 Thu Apr 22 13:09:12 BST 2010    <joe@kafsemo.org>
+        - Adopt rewritten license text to explicitly allow modification.
+
+0.610 Mon Mar 29 02:29:32 BST 2010    <joe@kafsemo.org>
+        - Add a CHECK_PRINT constructor parameter to check the output print
+           success (#50465). It will croak when printing to output fails.
+
+0.607 Mon Mar 22 14:46:26 GMT 2010    <joe@kafsemo.org>
+        - Address license confusion by reverting to the original
+           license, with contributor permission, and removing
+           unintentional references to the (more restrictive)
+           GPL/Artistic.
+
+0.606 Wed Dec  3 00:09:34 GMT 2008    <joe@kafsemo.org>
+        - Ensure META.yml spec version matches URL.
+
+0.605 Mon Dec  1 23:01:21 GMT 2008    <joe@kafsemo.org>
+        - Use MIT license, formalising David Megginson's original
+           ("No warranty. Commercial and non-commercial use freely
+           permitted.").
+        - Fix from Yanick Champoux for dataElements namespaces (#41359).
+
+0.604 Thu Feb 21 00:42:06 GMT 2008    <joe@kafsemo.org>
+        - Patch from Andreas Koenig for lc(undef) warning in 5.11 (#32874).
+        - Include example code.
+
+0.603 Mon Jun 25 22:31:40 BST 2007    <joe@kafsemo.org>
+        - Escape all necessary white space in attributes (#25499).
+
+0.602 Sat Nov 11 16:54:22 GMT 2006    <joe@kafsemo.org>
+        - Fix bugs in test case to avoid breaking with new Perls.
+        - Make test case work with older Perls, tested against 5.004 (#17288).
+        - Include pod syntax and coverage tests.
+
+0.601 Fri Sep  1 15:01:45 BST 2006    <joe@kafsemo.org>
+        - Don't modify list references passed as tag or attribute names
+           (cpan #14854).
+
+0.600 Thu Jun 30 23:17:00 BST 2005    <joe@kafsemo.org>
+        - Don't include an encoding in the XML declaration unless one
+           is specified.
+        - Check for, and croak on, invalid characters (including ASCII NUL).
+        - Fixed 'ancestor' with out-of-bounds indexes.
+
+0.545 Mon May 16 08:11:17 BST 2005    <joe@kafsemo.org>
+        - Format comments like elements when in data mode.
+        - Only attempt Unicode tests for Perl >= 5.8.1.
+
+0.540 Tue May 10 18:18:58 BST 2005    <joe@kafsemo.org>
+        - Don't die when ENCODING is specified with a scalar OUTPUT.
+        - Add support for US-ASCII encoding.
+
+0.531 Mon Mar 14 22:11:33 GMT 2005    <joe@kafsemo.org>
+        - Rename internal String package to avoid clash with external modules.
+        - Fix Unicode test skipping for Perls before 5.8.
+
+0.530 Tue Feb  1 13:09:31 GMT 2005    <joe@kafsemo.org>
+        - Allow scalar references for the OUTPUT parameter, inspired by
+           Simon Oliver's XML::Writer::String (patch from Yanick Champoux)
+        - Added ENCODING parameter; currently only UTF-8 is supported
+        - Escape newlines in attribute values
+
+0.520 Wed Sep  1 16:18:46 BST 2004    <joe@kafsemo.org>
+        - Fixed bug with forced declaration of the default namespace (#7266)
+        - Removed dead code. Added copyright notices to pod.
+        - Improved test coverage
+
+0.510 Tue May 25 19:46:04 BST 2004    <joe@kafsemo.org>
+        - Permitted in-document namespace prefix control
+        - Don't reopen STDOUT for output (closes #6232)
+        - Moved tests into t/. Added tests for mid-document namespace changes.
+          Show diffs when comparison tests fail
+
+0.500 Sat Mar  6 22:45:54 GMT 2004    <joe@kafsemo.org>
+        - Prepared metadata for a consistent, CPAN-friendly 0.500 release
+        - Added a META.yml to prevent XML::Writer::Namespaces from
+          being indexed
+        - Writer.pm: Removed a duplicate check for valid attribute names
+        - test.pl: Added more tests for full coverage of the cdata method
+
+0.4.6 Tue Mar  2 16:54:04 GMT 2004    <joe@kafsemo.org>
+        - test.pl: Revert to using a temporary file, rather than an
+          IO::String, for compatibility with older Perls
+
+0.4.5 Mon Mar  1 14:46:47 GMT 2004    <joe@kafsemo.org>
+        - added FORCED_NS_DECLS parameter, to declare namespaces ahead of use
+        - fixed check for duplicate attributes
+        - correctly take the default namespace from the supplied prefix map
+        - no longer produce namespace declarations for the 'xml:' prefix
+        - allow xml-stylesheet PIs
+        - fixed warnings about uninitialised values
+        - added a comprehensive suite of tests, using Test::More
+
+0.4.2 Sun Feb 22 15:33:44 GMT 2004    ed@membled.com
+        - added raw() to print raw, unescaped text
+        - patch from srinithan adding cdata() and cdataElement() to
+          write CDATA sections
+
+0.4.1 Sat Oct 18 19:51:51 BST 2003    ed@membled.com
+        - fixed deprecation warning from 'use IO'
+
+0.4 Tue Apr  4 21:59:51 EDT 2000
+        - added support for a simple data mode (off by default), with
+          no mixed content and automatic whitespace and indenting
+        - added get/setDataMode and get/setDataIndent methods
+        - added DATA_MODE and DATA_INDENT parameters to constructor
+        - added dataElement method for simple case (character data
+          content only)
+
+0.3 Thu Dec  9 12:49:28 EST 1999
+        - fixed frequently-reported attribute-list bug
+        - changed xmlDecl() so that first argument is the encoding
+        - added 'use IO;' to avoid errors
+        - documented the doctype() method
+
+0.2
+        - added Namespace support (XML::Writer::Namespaces subclass
+          and NAMESPACES constructor parameter)
+        - added PREFIX_MAP constructor parameter, and
+          add/removePrefix() methods for Namespace support
+        - added getOutput() and setOutput() methods
+        - added new query methods in_element(), within_element(),
+          current_element(), and ancestor()
+        - changed constructor to use parameterized arguments
+        - added constructor option to insert newlines in tags
+        - element name is now optional in endTag() method
+        - fixed test.pl to work on Mac, and added new test
+        - added more examples in documentation
+        - require at least Perl 5.004
+
+0.1  Mon Apr 19 12:27:36 1999
+        - original version; created by h2xs 1.19
+

@@ -1,0 +1,13 @@
+c
+/a/#id	/a/@c	/a/@n	/a/l/@c	/a/l/p/@n	//a/l/p/@v	/a/f/@c	/a/f/p/@n	//a/f/p/@v	/a/p/@n	/a/p/@v	/r/pr/@v	/r/ar/@r
+1	oalca	CONSOLE-WARN	oalp	cp	A1	oalvl	LevelMin	WARN	target	System.err		
+2	oalca	CONSOLE-DEBUG	oalp	cp	A1	oalvl	LevelMax	DEBUG				
+3	oalca	CONSOLE-ALL	oalp	cp	A1	oalvl	LevelMin	WARN				
+4	cidd	DIALOG										
+5	oalr	FILE	oalp	cp	A2	oalvl	LevelMin	WARN	MaxFileSize	1Mb		
+5	oalr	FILE	oalp	cp	A2	oalvl	LevelMin	WARN	MaxBackupIndex	3		
+5	oalr	FILE	oalp	cp	A2	oalvl	LevelMin	WARN	file	dea.log		
+											INFO	DIALOG
+											INFO	CONSOLE-WARN
+											INFO	FILE
+

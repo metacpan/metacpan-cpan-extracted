@@ -1,0 +1,12 @@
+- Clean up Machines.pm POD
+- Clean up Manifolds.pm POD
+
+- Dynamic machines
+- Allow Manifold and ByRecord to not use a merger if there is no handler
+  set, so that you can use ByRecord( My::Filter, XML::SAX::Writer ) to
+  write out multiple file instances.
+- Get DocSplitter to be able to notify a 3rd party or run a closure when
+  starting / stopping each split doc, to make renaming an output file easier
+
+- Allow Manifold to be used to merge documents:
+    Manifold( Parser, Parser, Parser )->parse;

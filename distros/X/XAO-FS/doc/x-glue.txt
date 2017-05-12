@@ -1,0 +1,350 @@
+NAME
+    XAO::DO::FS::Glue - glue that connects database with classes in XAO::FS
+
+SYNOPSIS
+     my $odb=XAO::Objects->new(objname => 'FS::Glue',
+                               dbh => $dbh);
+     my $global=$odb->fetch('/');
+
+DESCRIPTION
+    A reference to the Glue object is what holds together all List and Hash
+    objects in your objects database. This is the only place in API where
+    you pass database handler.
+
+    It is quite possible that if XAO::OS would ever be implemented on top of
+    some non-relational database layer the syntax of Glue's new() methow
+    would change too.
+
+    In current implementation Glue also serves as a base class for both List
+    and Hash classes and it provides some common methods. You should avoid
+    calling them on Glue object (think of them as pure virtual methods in OO
+    sense) and in fact you should avoid using glue object for anything but
+    connecting to a database and retrieveing root node reference.
+
+    For XAO::Web case initialization of Glue and retrieveing of Global
+    object is hidden from developer.
+
+    In theory Glue object should be split into ListGlue and HashGlue because
+    now it mixes methods that know data structure inside List and Glue and
+    this is not a Right Thing. But on the other side it is easier to keep
+    everything that knows about SQL in just one place instead of spreading
+    it over a couple of classes. So, do not ever rely on the fact that let's
+    say _list_store_object is in Glue - it might move to some class of its
+    own later.
+
+PUBLIC METHODS
+    new ($%)
+        Creates new Glue object and connects it to a database. There should
+        be exactly one Glue object per process/per database.
+
+        It is highly recommended that you create a Glue object once
+        somewhere at the top of your script, then retrieve root node object
+        from it and keep reference for the lifetime of your script. The same
+        applies for web scripts, especially under mod_perl - it is
+        recommended to keep root node reference between sessions.
+
+        The only required argument is dsn (database source name). It has
+        special format - first part is `OS', then driver name, then database
+        name and optionally port number, hostname and so on. It is
+        recommended to pass user name and password too. Example:
+
+         my $odb=XAO::Objects->new(objname => 'FS::Glue',
+                                   dsn => 'OS:MySQL:ostest;hostname=dbserver'
+                                   user => 'user',
+                                   password => 'pAsSwOrD');
+
+        In order to get objects connected to that database you should call
+        new on $odb with the following syntax:
+
+         my $neworder=$odb->new(objname => 'Data::Order');
+
+    collection (%)
+        Creates a collection object based on parameters given. Collection is
+        similar to List object -- it contains a list of objects having
+        something in common. Collection is a read-only object, you can use
+        it only to retrieve objects, not to store objects in it.
+
+        Currently the only type of collection supported is the list of all
+        objects of the same class. This can be very useful for searching and
+        analyzing tasks.
+
+        Example:
+
+         my $orders=$odb->collection(class => 'Data::Order');
+
+         my $sr=$orders->search('date_placed', ge, 12345678);
+
+         my $sum=0;
+         foreach my $id (@$sr) {
+             $sum+=$orders->get($id)->get('order_total');
+         }
+
+    container_key ()
+        Works for Hash'es and List's -- returns the name of current object
+        in upper level container.
+
+    contents ()
+        Alias for values() method.
+
+    destroy ()
+        Rough equivalent of:
+
+         foreach my $key ($object->keys()) {
+             $object->delete($key);
+         }
+
+    disconnect ()
+        If you need to explicitly disconnect from the database and you do
+        not want to trust perl's garbage collector to do that call this
+        method.
+
+        After you call disconnect() nearly all methods on $odb handler will
+        throw errors and there is currently no way to re-connect existing
+        handler to the database.
+
+    fetch ($)
+        Returns an object or a property referred to by the given URI. A URI
+        must always start from / currently, relative URIs are not supported.
+
+        This method is in fact the only way to get a reference to the root
+        object (formerly /Global):
+
+         my $global=$odb->fetch('/');
+
+        Experimental extension: The following full forms can also be used:
+
+         xaofs://uri/Pages/P123/Hits/H234/name
+         xaofs://collection/class/Data::Page/5678/Hits/H234/name
+
+        Both should yield the same result providing that 5678 is a
+        Collection (see XAO::DS::FS::Collection) code for P123.
+
+    glue ()
+        Returns reference to the Glue object the current object is received
+        from.
+
+    objname ()
+        Returns relative object name that XAO::Objects would accept.
+
+    objtype ()
+        Always returns 'Glue' string for object database handler object.
+
+    reset ()
+        Useful to bring glue to a usable state after some unknown software
+        used it. If the connection went down it is reconnected. If there is
+        an active transaction -- it will be rolled back, if there are locked
+        tables -- they will be unlocked.
+
+    scan (@)
+        A wrapper for search() method that makes it easier to search in
+        large collections of data.
+
+        See XAO::DO::FS::List for details.
+
+    transact_active ()
+        Checks if a there is an active transaction at the moment. Can be
+        used to avoid starting another one as transactions can't be nested.
+
+        Example:
+
+          $odb->transact_begin unless $odb->transact_active;
+
+    transact_begin ()
+        Begins new transaction. If transactions are not supported by the
+        underlying driver it does nothing, see transact_can() method.
+
+        If there is already an active transaction an error will be thrown
+        and no new transaction will be started. Transactions can't be nested
+        and each transact_begin() must be matched by a transact_commit() or
+        transact_rollback().
+
+        Automatic transact_rollback() is performed on destroying Glue or
+        disconnecting. It is not done automatically on thrown errors, but if
+        an error is never caught the transaction will be rolled back
+        automatically at the program termination stage when Glue is
+        destroyed. Beware of global error catching blocks and do proper
+        cleanup if you use them.
+
+        Example:
+
+          $odb->transact_begin;
+          try {
+              $order->put(order_total => 123.45);
+              $order->get('Products')->put($product_obj);
+              $odb->transact_commit;
+          }
+          otherwise {
+              my $e=shift;
+              $odb->transact_rollback;
+              $e->throw;
+          };
+
+    transact_can ()
+        Returns boolean true if underlying driver supports transactions of
+        false otherwise.
+
+        Example:
+
+          $odb->transact_can ||
+              throw XAO::E::Sample "Transactions are not supported";
+
+    transact_commit ()
+        Commits changes made during the current transaction. If there is no
+        current transaction it will throw an error assuming that there was
+        an out-of-sync transact_commit() or transact_rollback() somewhere
+        before.
+
+        If transactions are not supported the method will do nothing.
+
+    transact_rollback ()
+        Rolls back (cancels) changes made during the current transaction. If
+        there is no current transaction it will throw an error assuming that
+        there was an out-of-sync transact_commit() or transact_rollback()
+        somewhere before.
+
+        If transactions are not supported the method will do nothing.
+
+    unlink ($)
+        Alias to delete(), which is defined in derived classes - List and
+        Hash.
+
+    upper_class ($)
+        Returns the upper class name for the given class or undef for
+        FS::Global. Will skip lists and return class name of hashes only.
+
+        Will throw an error if there is no description for the given class
+        name.
+
+        Example:
+
+            my $base=$odb->upper_class('Data::Order');
+
+    values ()
+        Returns list of values for either Hash or List.
+
+    uri ()
+        Returns complete URI to either the object itself (if no argument is
+        given) or to a property with the given name.
+
+        That URI can then be used to retrieve a property or object using
+        $odb->fetch($uri). Be aware, that fetch() is relatively slow method
+        and should not be abused.
+
+        Works for both List and Hash objects. For just created object will
+        return `undef'.
+
+
+    Most of the methods of Glue would be considered "protected" in more
+    restrictive OO languages. Perl does not impose such limitations and it
+    is up to a developer's conscience to avoid using them.
+
+    The following list is here only for reference. Names, arguments and
+    functions performed may change from version to version. You should never
+    use the following methods in your applications.
+
+    _charset_change (%)
+        Upgrades charset information for the given text fields both in
+        memory structures AND in the database tables.
+
+    _scale_change (%)
+        Changes 'scale' on 'real' type fields. Can go from unscaled REAL to
+        a scaled DECIMAL.
+
+    _class_description ()
+        Returns hash reference describing fields of the class name given.
+
+    _collection_setup ()
+        Sets up collection - base class name, key name and
+        class_description.
+
+    _driver ()
+        Returns a reference to the driver for both Glue and derived objects.
+
+    _field_description ($)
+        Returns the description of the given field.
+
+    _field_default ($;$) {
+        Returns default value for the given field for a hash object. Also
+        sets 'default' in class description if it is not there -- this might
+        happen when old database is used with new FS.
+
+        Optional second argument is for optimization. It should hold field
+        description hash reference if it is available in calling context.
+
+    _glue ()
+        Returns glue object reference. Makes sense only in derived objects!
+        For GLue object itself would throw an error, this is expected
+        behavior!
+
+    _hash_list_base_id ()
+        Returns unique_id of the hash that contains the list that contains
+        the current hash. Used in container_object() method of Hash.
+
+    _hash_list_key_value ()
+        Returns what would be returned by container_key() of upper level
+        List. Used in container_object().
+
+    _list_search (%)
+        Searches for elements in the list and returns a reference to the
+        array with object IDs. See search() method in XAO::DO::FS::List for
+        more details.
+
+        Works on Collections too.
+
+    _build_search_query (%)
+        Builds SQL search query according to search parameters given. See
+        List manpage for description. Returns a reference to a hash of the
+        following structure, not a string:
+
+         sql          => complete SQL statement
+         values       => array of values to be substituted into the SQL query
+         classes      => hash with all classes and their aliases
+         fields_list  => list of all fiels names
+         fields_map   => hash with the map of 'condition field name' => 'sql name'
+         distinct     => list of fields to be unique
+         order_by     => list of fields to sort on
+         post_process => is non-zero if there could be extra rows in the search
+                         results because of some condition that could not be
+                         expressed adequately in SQL.
+         options      => original options from the FS query
+
+    _build_search_field ($$)
+        Builds SQL field name including table alias from field path like
+        'Specification/value'.
+
+        XXX - Returns array consisting of translated field name, final class
+        name, class description and field description.
+
+    _build_search_clause ($$$$$)
+        Builds a list of classes used and WHERE clause for the given search
+        conditions.
+
+    _list_setup ()
+        Sets up list reference fields - relation to upper hash. Makes sense
+        only in derived objects.
+
+    check_name ($)
+        Checks if the given name is a valid field name to be used in put()
+        or get(). Should not be overriden unless you fully understand
+        potential effects.
+
+        Valid name must start from a letter and may consist from letters,
+        digits and underscore symbol. Length is limited to 30 characters.
+
+        Returns boolean value.
+
+BUGS
+    MySQL chops off spaces at the end of text strings and Glue currently
+    does not compensate for that.
+
+AUTHORS
+    Copyright (c) 2005 Andrew Maltsev
+
+    Copyright (c) 2001-2004 Andrew Maltsev, XAO Inc.
+
+    <am@ejelta.com> -- http://ejelta.com/xao/
+
+SEE ALSO
+    Further reading: XAO::FS, XAO::DO::FS::Hash (aka FS::Hash),
+    XAO::DO::FS::List (aka FS::List).
+

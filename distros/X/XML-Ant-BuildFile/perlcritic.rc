@@ -1,0 +1,38 @@
+severity = brutal
+verbose = 8
+exclude = BuiltinFunctions::ProhibitStringyEval CodeLayout::ProhibitHashBarewords Documentation::RequirePodAtEnd Documentation::RequirePODUseEncodingUTF8 Editor::RequireEmacsFileVariables Miscellanea::RequireRcsKeywords Modules::RequireExplicitInclusion Modules::RequireExplicitPackage Modules::RequirePerlVersion Moose::RequireMakeImmutable Tics::ProhibitLongLines
+
+[Lax::RequireExplicitPackage::ExceptForPragmata]
+allowed_pragmata = diagnostics feature perlversion strict warnings utf8
+
+[CodeLayout::RequireTidyCode]
+perltidyrc = xt/author/perltidy.rc
+
+[ControlStructures::ProhibitPostfixControls]
+flowcontrol = carp cluck confess croak die exit goto warn exit
+
+# using Modern::Perl
+[Compatibility::PerlMinimumVersionAndWhy]
+above_version = 5.010
+[Compatibility::PodMinimumVersion]
+above_version = 5.010
+
+[Documentation::PodSpelling]
+stop_words = filelists os basedir bugtracker classname filelist args arg dir plugins prepended pathref concat destfile kv Perldoc perldoc CPAN's annonations PASSed
+
+[Documentation::RequirePodSections]
+lib_sections = NAME | VERSION | SYNOPSIS | DESCRIPTION | SUPPORT | AUTHOR | COPYRIGHT AND LICENSE
+script_sections = NAME | USAGE | DESCRIPTION | CONFIGURATION | SUPPORT | AUTHOR | COPYRIGHT AND LICENSE
+
+[InputOutput::RequireCheckedSyscalls]
+functions = :builtins
+exclude_functions = print say
+
+[Subroutines::ProhibitCallsToUndeclaredSubs]
+exempt_subs = Carp::carp Carp::croak Moose::around Moose::extends Moose::has Moose::with Moose::Role::around Moose::Role::has Moose::Role::requires Moose::Role::with Moose::Util::TypeConstraints::as Moose::Util::TypeConstraints::coerce Moose::Util::TypeConstraints::from Moose::Util::TypeConstraints::subtype Moose::Util::TypeConstraints::via MooseX::Has::Sugar::auto_deref MooseX::Has::Sugar::coerce MooseX::Has::Sugar::lazy MooseX::Has::Sugar::lazy_build MooseX::Has::Sugar::required MooseX::Has::Sugar::ro MooseX::Has::Sugar::rw MooseX::Has::Sugar::Minimal::ro MooseX::Singleton::around MooseX::Singleton::has Path::Class::dir Path::Class::file Try::Tiny::catch Try::Tiny::try
+
+[TestingAndDebugging::RequireUseStrict]
+equivalent_modules = Modern::Perl
+
+[TestingAndDebugging::RequireUseWarnings]
+equivalent_modules = Modern::Perl

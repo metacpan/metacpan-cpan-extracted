@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<xml>
+  <team>
+      <person id="1">
+        <name>Monk</name>
+        <info>Known for his...</info>
+      </person>
+      <person id="2">
+        <name>Emmy</name>
+        <info>what ever</info>
+      </person>
+  </team>
+  <person id="3">
+    <name>John Doe</name>
+  </person>
+  <actions>
+    <scene>Once upon a time</scene>
+    <intro idref="2"/>
+    <intro idref="1" info="true"/>
+    <talk  from="1" to="3"/>
+    <go idref="3" to="right"/>
+    <talk from="2" to="1"/>
+    <go idref="2" to="left"/>
+    <go idref="1" to="left"/>
+ </actions>
+</xml>
+

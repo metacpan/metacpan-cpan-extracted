@@ -1,0 +1,85 @@
+DESCRIPTION
+
+  XML::IDMEF - A perl module for easily creating/parsing IDMEF messages
+
+  IDMEF module is a wrapper around XML::DOM and XML::Parser, providing an 
+  interface designed to simplify the parsing and creation of IDMEF messages. 
+  IDMEF is an XML based standard for representing Intrusion Detection alert
+  messages (http://www.silicondefense.com/idwg/).
+
+  The interface provided by XML::IDMEF is designed to make it very simple
+  to build an IDMEF message while parsing a log file with a key-value 
+  structure, which is the most common situation when writing a log export
+  module for a given software.
+
+
+  ******* WARNING ******* WARNING ******* WARNING ******* WARNING *******
+
+   This release (>0.11) introduces major internal changes compared
+   with the previous versions. Furthermore, it implements the most
+   *final* version of IDMEF. 
+
+   You'd hence better check that using this version of the module
+   does not break anything in your code (it should not, but, well...
+   you know...)
+
+   And of course: this is a beta release and has not been thoroughly
+   tested. Please try it out if you can and report success/failure to
+   the author (erwan@cpan.org).
+
+   Use in production systems is at your own risks.
+
+  ******* WARNING ******* WARNING ******* WARNING ******* WARNING *******
+
+
+PREREQUISITES
+
+  Requires XML::DOM and a XML::Parser.
+
+
+BUILDING/INSTALLING
+
+  Once the archive is unpacked, use these commands:
+
+      perl Makefile.PL
+      make
+      make test
+      make install
+
+  If for some reason, you can't run these commands, you can simple copy 
+  the IDMEF.pm file to your lib/XML directory. To find out which paths
+  perl uses to locate modules, do 
+  'perl -e "print join(\"\n\", @INC), \"\n\";"'
+
+
+STATUS
+
+  This version is a beta release, and has not yet been thoroughly
+  tested in production environment. It has been succesfully run on both
+  linux and openbsd. 
+  If you encounter any problems installing or running this release, please
+  email the author and provide him as much information as possible on the
+  bug and its context.
+
+  Please send any feedback to the author: erwan@cpan.org
+
+
+NEW IN THIS RELEASE
+
+  The IDMEF DTD is compliant with the IDMEF rfc draft 12. 
+  Improved test sequences.
+  See 'Changes' for a detailed historic.
+
+BUGS
+  
+  XML::IDMEF uses internally a simplified version of the IDMEF DTD, which makes
+  that this module will fail to create some very specific IDMEF messages. 
+  In particular, recursive File tags are not accepted.
+
+
+COPYRIGHT
+
+  Copyright 2002 Erwan Lemonnier.
+
+  This module is free software under BSD license.
+

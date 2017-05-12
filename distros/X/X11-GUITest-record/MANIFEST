@@ -1,0 +1,16 @@
+Changes
+Makefile.PL
+MANIFEST
+ppport.h
+README
+record.xs
+record.h
+datastructure.h
+datastructure.c
+t/X11-GUITest-record.t
+test.pl
+fallback/const-c.inc
+fallback/const-xs.inc
+lib/X11/GUITest/record.pm
+
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,114 @@
+#c
+Native Perl Tree Parsers
+
+#0
+require XML::Bare;
+my $ob = new XML::Bare( file => $file, unsafe => 1 );
+$root = $ob->simple();
+
+#- XML::Bare (simple)
+require XML::Bare;
+my $ob = new XML::Bare( file => $file );
+my $root = $ob->simple();
+
+#- XML::Fast
+require XML::Fast;
+$/ = undef;
+open( FILE, $file );
+my $text = <FILE>;
+close( FILE );
+my $hash = XML::Fast::xml2hash( $text );
+
+#-
+require XML::TreePP;
+my $tpp = XML::TreePP->new();
+my $tree = $tpp->parsefile( $file );
+
+#- XML::Parser::EasyTree
+require XML::Parser;
+require XML::Parser::EasyTree;
+my $p1 = new XML::Parser(Style=>'EasyTree');
+$root = $p1->parsefile($file);
+
+#-
+require XML::Handler::Trees;
+require XML::Parser::PerlSAX;
+my $p=XML::Parser::PerlSAX->new();
+my $h=XML::Handler::EasyTree->new();
+$root=$p->parse(Handler=>$h,Source=>{SystemId=>$file});
+
+#-
+require XML::Trivial;
+my $xml = XML::Trivial::parseFile($file);
+
+#-
+require XML::Smart;
+my $XML = XML::Smart->new($file);
+
+#- XML::Simple (XML::Parser)
+require XML::Simple;
+$XML::Simple::PREFERRED_PARSER = 'XML::Parser';
+my $ref = XML::Simple::XMLin($file);
+
+#- XML::Simple (PurePerl)
+require XML::Simple;
+$XML::Simple::PREFERRED_PARSER = 'XML::SAX::PurePerl';
+my $ref = XML::Simple::XMLin($file);
+
+#- XML::Simple (LibXML)
+require XML::Simple;
+$XML::Simple::PREFERRED_PARSER = 'XML::LibXML::SAX::Parser';
+my $ref = XML::Simple::XMLin($file);
+
+#- XML::Simple (XML Bare)
+require XML::Simple;
+$XML::Simple::PREFERRED_PARSER = 'XML::Bare::SAX::Parser';
+my $ref = XML::Simple::XMLin($file);
+
+#-
+require XML::Bare::Simple;
+my $ref = XML::Bare::Simple::XMLin($file);
+
+#-
+require XML::SAX::Simple;
+my $ref = XML::SAX::Simple::XMLin($file);
+
+#-
+require XML::Twig;
+my $t = XML::Twig->new->parsefile( $file );
+$root = $t->root->simplify;
+
+#-
+require XML::Grove::Builder;
+require XML::Parser::PerlSAX;
+my $grove_builder = XML::Grove::Builder->new;
+my $parser = XML::Parser::PerlSAX->new ( Handler => $grove_builder );
+my $document = $parser->parse ( Source => { SystemId => $file } );
+
+#- XML::XPath::XMLParser
+require XML::XPath::XMLParser;
+my $parser = XML::XPath::XMLParser->new;
+my $tree = $parser->parsefile( $file );
+
+#-
+require XML::DOM::Lite;
+my $doc = XML::DOM::Lite::Parser->parseFile( $file );
+
+#-
+require XML::Tiny;
+my $xmlfile;
+open( $xmlfile, $file );
+my $doc = XML::Tiny::parsefile( $xmlfile );
+
+#-
+require XML::MyXML;
+my $ob = XML::MyXML::xml_to_object( $file, { file => 1 } );
+
+#-
+require XML::TinyXML;
+my $ob = XML::TinyXML->new();
+$ob->loadFile( $file );
+
+#-
+require XML::LibXML::Simple;
+my $ref = XML::LibXML::Simple::XMLin($file);

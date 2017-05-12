@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<A>
+ <b title="zbr">
+  <c>aeiou</c>
+  <c>aeiou</c>
+ </b>
+ <b>
+  <C>aeiou</C>
+  <c>aeiou</c>
+ </b>
+ <b>
+  <c TITLE="zbr">aeiou</c>
+  <c>aeiou</c>
+ </b>
+</A>

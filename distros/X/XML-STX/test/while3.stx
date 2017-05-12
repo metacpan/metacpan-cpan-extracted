@@ -1,0 +1,20 @@
+<stx:transform version="1.0" 
+	       xmlns:stx="http://stx.sourceforge.net/2002/ns"
+	       strip-space="yes">
+
+  <stx:template match="/root">
+    <stx:variable name="n" select="0"/>
+    <root>
+      <stx:while test="$n &lt; 6">
+	<stx:variable name="m"/>
+	<w>
+	  <stx:value-of select="concat($n,$m)"/>
+	  <stx:assign name="n" select="$n+1"/>
+	  <stx:assign name="m" select="'M'"/>
+	  <stx:value-of select="concat('-',$n,$m)"/>
+	</w>
+      </stx:while>
+    </root>
+  </stx:template>
+
+</stx:transform>

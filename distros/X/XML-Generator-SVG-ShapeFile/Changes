@@ -1,0 +1,11 @@
+# Changes for XML::Generator::SVG::ShapeFile
+
+0.2	  Sat Aug 21 2004
+
+	  - Updated POD
+
+	  - Added XLink namespace, by default
+
+0.1	  Thu Aug 19 2004
+
+	  - initial public release

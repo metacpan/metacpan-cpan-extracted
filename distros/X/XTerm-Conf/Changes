@@ -1,0 +1,68 @@
+Revision history for XTerm-Conf
+
+0.11	2017-04-06
+	Pod typos and test fixes (mainly timeout issues)
+
+0.10
+	Stable release with all changes in 0.09_50..0.09_51.
+
+0.09_51
+	Internal improvement: no more END{} block resetting
+	the terminal mode.
+
+0.09_50
+	New function terminal_is_supported.
+	New xterm-conf option --is-supported.
+	Improved Pod, added EXAMPLES section.
+	Option check is done also for unsupported terminals.
+	More tests.
+
+0.09
+	Addressed a test problem with rxvt on Ubuntu.
+	Some Pod improvements.
+
+0.08
+	No change to 0.07_50
+
+0.07_50
+	Works without -f on rxvt and urxvt.
+	Fixed minor Pod nit.
+	Live tests also with rxvt and urxvt.
+
+0.07
+	Addressed RT #46829 (syntax error in xterm-conf)
+
+0.06
+	increased perl prerequisite to 5.006
+
+0.05
+	fix: report may hang if xterm is setup with
+	allowWindowOps:false
+
+0.04
+	test fix: check if xterm can be started at all
+
+0.03
+	Pod for the script xterm-conf
+
+0.02
+	introduced some xterm-like short option variants
+
+	better usage
+
+	more options documented in Pod
+
+0.01
+	public release
+
+
+0.00_51
+	xterm-conf has now a -f (force) option.
+
+	xterm_conf() checks for TERM=xterm.
+
+	More live tests.
+
+0.00_50
+        First version, released on an unsuspecting world.
+

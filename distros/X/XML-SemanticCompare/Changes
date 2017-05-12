@@ -1,0 +1,10 @@
+Revision history for XML-SemanticCompare
+
+0.92
+        1 Dec 2009
+        * implemented diff to extract the differences in XML documents
+          -> the implementation is quick and not too efficient. feel
+             free to send me a more efficient implementation
+0.91    26 Nov 2008
+        XML::SemanticCompare released to CPAN
+

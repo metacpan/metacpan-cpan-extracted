@@ -1,0 +1,15 @@
+- enforce using utf-8 internally 
+  (which means: force conversion to utf-8 when loading existing documents)
+- complete documentation
+- write a more exhaustive example.pl
+- in TinyXML::getNode() return an array of nodes instead of the first one when
+  multiple nodes match a given 'path'
+- handle doctype and let user define it at object construction
+- handle nested arrayrefs in the hashref <-> xml conversion
+- optionally use attributes in hashref <-> xml conversion (as in XML::Simple)
+- make wiping of whitespaces an optional feature
+- add the possibility to output a raw xml which doesn't include extra \t and \n
+  actually used to preserve readability of the created xml document
+- handle !ENTITY and !ATTLIST 
+- expose a event-based api since it could be easily implemented using 
+  the cnode member in the TXml struct

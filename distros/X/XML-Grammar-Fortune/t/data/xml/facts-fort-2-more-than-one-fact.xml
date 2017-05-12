@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<facts>
+    <head />
+    <list xml:id="chuck" title="Chuck Norris">
+        <f xml:id="fact1">
+            <l xml:lang="en-US">
+                <body>
+                    <p>Chuck Norris helps the Gods that help themselves.</p>
+                </body>
+                <info>
+                    <author>Shlomi Fish</author>
+                    <work href="http://www.shlomifish.org/humour/bits/facts/Chuck-Norris/">Chuck Norris
+                        facts by Shlomi Fish and friends</work>
+                </info>
+            </l>
+        </f>
+        <f xml:id="fact2">
+            <l xml:lang="en-US">
+                <body>
+                    <p>Chuck Norris read the entire English Wikipedia in
+                        24 hours. Twice.</p>
+                </body>
+                <info>
+                    <author>Shlomi Fish</author>
+                    <work href="http://www.shlomifish.org/humour/bits/facts/Chuck-Norris/">Chuck Norris
+                        facts by Shlomi Fish and friends</work>
+                </info>
+            </l>
+        </f>
+        <f xml:id="fact3">
+            <l xml:lang="en-US">
+                <body>
+                    <p>Chuck Norris does not celebrate Holidays.
+                    Holidays celebrate Chuck Norris.</p>
+                </body>
+                <info>
+                    <author>Shlomi Fish</author>
+                    <work href="http://www.shlomifish.org/humour/bits/facts/Chuck-Norris/">Chuck Norris
+                        facts by Shlomi Fish and friends</work>
+                </info>
+            </l>
+        </f>
+    </list>
+</facts>

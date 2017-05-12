@@ -1,0 +1,237 @@
+# NAME
+
+XML::Simple::Sugar - Sugar sprinkled on XML::Simple
+
+# VERSION
+
+version v1.1.1
+
+# SYNOPSIS
+
+    use Modern::Perl;
+    use XML::Simple::Sugar;
+    
+    my $xs = XML::Simple::Sugar->new;
+    
+    # Autovivify some XML elements
+    my $person = $xs->company->departments->department->person;
+    
+    # Set some content and attributes
+    $person->first_name('John')
+           ->last_name('Smith')
+           ->email('jsmith@example.com')
+           ->salary(60000);
+    
+    $person->xml_attr( { position => 'Engineer' } );
+    
+    say $xs->xml_write; 
+    
+    # <?xml version="1.0"?>
+    # <company>
+    #   <departments>
+    #     <department>
+    #       <person position="Engineer">
+    #         <email>jsmith@example.com</email>
+    #         <first_name>John</first_name>
+    #         <last_name>Smith</last_name>
+    #         <salary>60000</salary>
+    #       </person>
+    #     </department>
+    #   </departments>
+    # </company>
+
+# DESCRIPTION
+
+This module is a wrapper around [XML::Simple](https://metacpan.org/pod/XML::Simple) to provide AUTOLOADed accessors to XML nodes in a given XML document.  All nodes of the XML document are XML::Simple::Sugar objects having the following attributes and methods.
+
+# ATTRIBUTES
+
+## xml (XML Str)
+
+This readonly attribute is for use during instantiation (XML::Simple::Sugar->new({ xml => $xml\_string })).  See also ["xml\_read"](#xml_read).
+
+## xml\_autovivify (Bool DEFAULT true)
+
+This attribute determines on a per element basis whether new attributes or elements may be introduced.  Child elements inherit this setting from their parent.  Setting autovivify to false is useful when working with templates with a strict predefined XML structure. This attribute is true by default.
+
+    my $xs = XML::Simple::Sugar->new(
+      {
+        xml => qq(
+            <strict_document>
+              <foo>bar</foo>
+            </strict_document>
+        ),
+        xml_autovivify => 0,
+      }
+    );
+
+    $xs->strict_document->foo('baz'); # Changes bar to baz.  Ok!
+    $xs->strict_document->biz('a new element'); # Error!  Biz doesn't exist!
+
+## xml\_data (XML::Simple compliant Perl representation of an XML document)
+
+This is the Perl representation of the XML.  This is ugly to work with directly (hence this module), but in lieu of methods yet unwritten there may be a use case for having direct access to this structure.
+
+## xml\_index
+
+The index number of an element in a collection
+
+## xml\_node
+
+The name of the current node
+
+## xml\_parent
+
+The parent XML::Simple::Sugar object to the current element
+
+## xml\_xs
+
+This is underlying XML::Simple object.  If you need to adjust the XML declaration, you can do that by passing an an XML::Simple object with your preferred options to the `new` constructor.  Be wary of setting other XML::Simple options as this module will happily overwrite anything that conflicts with its assumptions.
+
+## xml\_root
+
+Returns the root element XML::Simple::Sugar object
+
+# METHODS
+
+## xml\_read (XML Str)
+
+Parses an XML string and sets the data attribute
+
+## xml\_write
+
+Writes out an XML string
+
+## xml\_content (Str)
+
+Gets or sets the content of the element
+
+    $xs->person->first_name->xml_content('Bob');
+
+    # Which can be implicitly written
+    $xs->person->first_name('Bob');
+
+    # Or using [ index, content, attributes ] notation
+    $xs->person->first_name([ 0, 'Bob', undef ]);
+
+    say $xs->person->first_name->xml_content;
+    # Bob
+
+## xml\_attr (HashRef)
+
+Gets or sets the attributes of the element.
+
+    $xs->person->xml_attr( { position => 'Accountant' } );
+
+    # Which can be implicitly written as...
+    $xs->person( { position => 'Accountant' } );
+
+    # Or using [ index, content, attributes ] notation
+    $xs->person([ 0, undef, { position => 'Accountant' } ]);
+
+    my $attributes = $xs->person->xml_attr;
+    say $attributes->{'position'};
+    # Accountant
+
+## xml\_rmattr (Str)
+
+This method removes the passed scalar argument from the element's list of attributes.
+
+## xml\_nest (XML::Simple::Sugar)
+
+Merges another XML::Simple::Sugar object as a child of the current node.
+
+    my $first_name = XML::Simple::Sugar->new({ xml => '<first_name>Bob</first_name>' });
+    $xs->person->xml_nest( $first_name );
+
+    # Or using [ index, content, attributes ] notation
+    $xs->person( [ 0, $first_name, undef ] );
+
+# Collections
+
+When working with a collection of same-named elements, you can access a specific element by index by passing the collection's name an ArrayRef with the index number.  For example:
+
+    my $person2 = $xs->people->person([1]); # Returns the second person element (index 1)
+
+You can also work with the entire collection of individual elements by passing an ArrayRef with the string 'all'.
+
+    my @people = $xs->people->person(['all']); # Returns an array of XML::Simple::Sugar objects
+
+# Using \[ index, content, attributes \] Notation
+
+When authoring even simple XML documents, using \[ index, content, attributes \] notation allows you to implicitly invoke ["xml\_content"](#xml_content), ["xml\_attr"](#xml_attr), and ["xml\_nest"](#xml_nest) methods on nodes deep within a collection.  For example:
+
+    # Sets the position attribute of the second person
+    $xs->people->person([ 1, undef, { position => 'Engineer' } ]);
+
+    # Sets the third person's second favorite color to orange
+    # with a neon attribute
+    $xs->people->person([ 2 ])->favorite_colors->color([ 1, 'orange', { neon => 1 } ]);
+
+    # Composing large documents from smaller ones
+    my $xs  = XML::Simple::Sugar->new( {
+        xml_xs => XML::Simple->new( XMLDecl => '<!DOCTYPE html>' )
+    } );
+    my $xs2 = XML::Simple::Sugar->new;
+
+    $xs2->table->tr->th([ 0, 'First Name', { style => 'text-align:left' } ]);
+    $xs2->table->tr->th([ 1, 'Last Name' ]);
+
+    $xs->html->body->div([0])->h1('Page Title');
+    $xs->html->body->div([ 1, $xs2 ]);
+
+    say $xs->xml_write;
+
+    # <!DOCTYPE html>
+    # <html>
+    #   <body>
+    #     <div>
+    #       <h1>Page Title</h1>
+    #     </div>
+    #     <div>
+    #       <table>
+    #         <tr>
+    #           <th style="text-align:left">First Name</th>
+    #           <th>Last Name</th>
+    #         </tr>
+    #       </table>
+    #     </div>
+    #   </body>
+    # </html>
+
+# PLEASE BE ADVISED
+
+Most of the automagic happens with AUTOLOAD.  Accessors/mutators and method names in this package cannot be used as element names in the XML document.  XML naming rules prohibit the use of elements starting with the string "xml", so "xml\_" is used as a prefix for all accessors/mutators/methods to avoid potential document conflicts.
+
+# REPOSITORY
+
+[https://github.com/Camspi/XML-Simple-Sugar](https://github.com/Camspi/XML-Simple-Sugar)
+
+# MINIMUM PERL VERSION SUPPORTED
+
+Perl 5.18.2 or later is required by this module.  Lesser Perl versions struggle with deep recursion.  Patches welcome.
+
+# VERSIONING
+
+Semantic versioning is adopted by this module. See [http://semver.org/](http://semver.org/).
+
+# SEE ALSO
+
+- [XML::Simple](https://metacpan.org/pod/XML::Simple)
+
+# CREDITS
+
+- Jonathan Cast for excellent critique.
+- Kyle Bolton for peeking over my shoulder and giving me pro tips.
+- eMortgage Logic, LLC., for allowing me to publish this module to CPAN
+
+# AUTHOR
+
+Chris Tijerina
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by eMortgage Logic LLC.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

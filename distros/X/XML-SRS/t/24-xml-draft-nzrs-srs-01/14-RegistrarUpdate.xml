@@ -1,0 +1,13 @@
+<NZSRSRequest VerMinor="0" VerMajor="5">
+  <RegistrarUpdate ActionId="sep.4be7c311.11ff.001">
+    <RegistrarPublicContact Name="PublicName" Email="PublicEmail@srs.net.nz">
+      <PostalAddress Address1="PublicAddress1" City="PublicCity" CountryCode="NZ" />
+      <Phone AreaCode="4" CountryCode="64" LocalNumber="PublicPhone" />
+    </RegistrarPublicContact>
+    <RegistrarSRSContact Name="SRSName" Email="SRSEmail@srs.net.nz">
+      <PostalAddress Address1="SRSAddress1" City="SRSCity" CountryCode="NZ" />
+      <Phone AreaCode="4" CountryCode="64" LocalNumber="SRSPhone" />
+    </RegistrarSRSContact>
+    <EPPAuth Password="$5$wa3nKVwN$lCaHIahSoOIIum6wpO4B7qvRDbWtNUxfiXJiaXXTjwA"/>
+  </RegistrarUpdate>
+</NZSRSRequest>

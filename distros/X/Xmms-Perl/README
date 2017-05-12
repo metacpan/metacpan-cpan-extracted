@@ -1,0 +1,32 @@
+
+	The source files in this distribution are 
+	Copyright (C) 1999-2000, Doug MacEachern, and are licensed for
+	use under the same terms as Perl itself.
+
+You need xmms installed to use this package: http://www.xmms.org/
+
+This package provides the following modules:
+
+ Xmms::Remote - Perl interface to the xmms_remote API
+
+ Xmms::Config - Perl interface to the xmms_cfg API
+
+ Xmms - Exports the remote control shell routine
+
+ Xmms::Plugin - Embeds a Perl interpreter inside xmms and provides
+                Input/Output/Effect/General plugin interfaces for
+                Perl (not yet released, may never be)
+
+Jean-Baptiste Nivoit has written an emacs mode to interact with
+Xmms::shell, which you can find here:
+
+ http://www.multimania.com/jbn/software/xmms-mode.el
+
+For best results, install the bundle via:
+
+ perl -MCPAN -e 'install Bundle::Xmms'
+
+Enjoy,
+-Doug
+
+dougm@pobox.com

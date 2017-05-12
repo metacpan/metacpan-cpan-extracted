@@ -1,0 +1,96 @@
+Revision history for Perl module XML::SemanticDiff
+
+1.0005 2017-02-06
+    - Convert the distribution to use git, GitHub, and Dist-Zilla.
+    - Correct some spelling errors and add more tests.
+    - Remove trailing whitespace.
+
+1.0004 2014-02-04
+    - Update the contact info for Shlomi Fish from the old one.
+
+1.0003 2014-02-01
+    - Add separate LICENSE file (CPANTS).
+    - Add inc/Test/Run/Builder.pm .
+
+1.0002 2013-08-17
+    - Convert "Changes" (this file) to CPAN::Changes.
+    - Thanks to https://bitbucket.org/sromanov .
+
+1.0001 2013-08-17
+    - Fix https://rt.cpan.org/Ticket/Display.html?id=87903
+        - Case problem with "repository" in "Build.PL".
+    - Remove trailing space.
+
+1.0000 2009-07-28
+    - Fixed the POD displaying:
+        - https://rt.cpan.org/Ticket/Display.html?id=48259
+
+0.99 2008-10-03
+    - Now can exclude some paths from the comparison:
+        - http://rt.cpan.org/Ticket/Display.html?id=39705
+
+0.98 2008-09-13
+    - Added the LICENSE section to the POD (Kwalitee).
+    - Added the "use warnings" (Kwalitee).
+    - Added the "Repository URL" on the resources page.
+
+0.97 2007-08-08
+    - Added the README (Kwalitee)
+    - Specified the LICENSE (as "perl") explicitly in the Makefile.PL.
+      (Kwalitee)
+    - Added t/pod.t. (Kwalitee).
+        - fixed the POD in the process.
+    - Created a Build.PL script based on the Makefile.PL in order to
+      make sure the META.yml is according to the SPEC. (Kwalitee).
+    - Added the t/pod-coverage.t file and made sure the files have
+      full POD coverage. (Kwalitee)
+    - Made sure the second argument in compare can accept a processed
+      XML result, and refactored the code in the process. Added the
+      t/13to-doc-read.t test file.
+    - Converted the "PathFinder" package in lib/XML/SemanticDiff.pm
+      to "XML::SemanticDiff::PathFinder" to maintain namespace
+      purity.
+    - Converted the Pkg to use an object using Non-Expat-Options. Made the
+      global variables as class members using accessors.
+
+0.96 2007-07-03
+    - Fixed the warning emitted with the namespaces being undefined.
+      (t/8nonexist_ns.t)
+        - fixes http://rt.cpan.org/Public/Bug/Display.html?id=1379
+    - Fixed the search algorithm so it will identify the location of the
+      XML tags properly. (t/09two-tags.t)
+    - Applied a modified version of:
+        http://rt.cpan.org/Ticket/Display.html?id=24715
+        - Fixes an exception when comparing XML with multi-byte
+          characters.
+        - Thanks to RMBARKER
+        - t/10wide-chars.t
+    - Applied a modified version of:
+        http://rt.cpan.org/Ticket/Display.html?id=18491
+        - Fixes a case where the same tags in different places with
+        identical contents, are not considered semantically identical.
+        - Thanks to CLOTHO for reporting it and suggesting a
+        fix.
+        - t/11tag-in-different-locations.t
+    - Added a regression test against bug:
+        http://rt.cpan.org/Ticket/Display.html?id=2322
+        - Seems to already have been fixed.
+        - t/12missing-element-has-o-as-cdata.t
+
+0.95 2002-04-09
+    [ Undocumented changelog. ]
+
+0.93 2001-06-14
+    - third (hopefully final) BETA
+    - more doc fixes.
+
+0.91 2001-06-12
+    - second BETA release.
+    - code cleanup.
+    - major doc fixes.
+
+0.50 2001-05-25
+    - initial public BETA release.
+
+0.01 2001-05-24
+    - original version; created by h2xs 1.19

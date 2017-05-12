@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Schema definition for a path -->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+   <xsd:simpleType name="path">
+      <xsd:restriction base="xsd:string"></xsd:restriction>
+      <!-- need to set some kind of pattern here -->
+   </xsd:simpleType>
+</xsd:schema>

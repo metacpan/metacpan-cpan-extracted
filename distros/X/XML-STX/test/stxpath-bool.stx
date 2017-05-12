@@ -1,0 +1,20 @@
+<stx:transform version="1.0" 
+  xmlns:stx="http://stx.sourceforge.net/2002/ns"
+  stxpath-default-namespace="http://test_ns"
+  strip-space="yes">
+
+  <stx:template match="node">
+    <node>
+      <stx:value-of select="true() and false()"/>
+      <stx:text>-</stx:text>
+      <stx:value-of select="true() and not(false())"/>
+      <stx:text>-</stx:text>
+      <stx:value-of select="not(true() and not(false()))"/>
+      <stx:text>-</stx:text>
+      <stx:value-of select="boolean(..)"/>
+      <stx:text>-</stx:text>
+      <stx:value-of select="not(boolean(.))"/>
+    </node>
+  </stx:template>
+
+</stx:transform>

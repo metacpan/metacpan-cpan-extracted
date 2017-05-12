@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/XML-DOM-XML_Base.t
+lib/XML/DOM/XML_Base.pm
+META.yml                                 Module meta-data (added by MakeMaker)

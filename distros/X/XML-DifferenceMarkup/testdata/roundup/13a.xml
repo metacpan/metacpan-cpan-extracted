@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<top xmlns:x="some-url">
+  <a1/>
+  <a2/>
+  <a3/>
+  <a4/>
+  <a5/>
+  <a6>
+    <b>
+      <x:c/>
+    </b>
+  </a6>
+</top>

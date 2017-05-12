@@ -1,0 +1,14 @@
+<DocumentDefinition>
+
+  <name>HTTP_Upload_Config</name>
+
+  <element><name>target</name></element>  
+  <element><name>from</name></element>  
+
+  <store>
+    <name>main</name>    
+    <base>config</base>
+    <location>Read_only_file:'extension','.config'</location>
+  </store>
+
+</DocumentDefinition>

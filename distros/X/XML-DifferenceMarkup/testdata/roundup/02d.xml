@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<dm:diff xmlns:dm="http://www.locus.cz/diffmark">
+  <top>
+    <dm:delete>
+      <a/>
+      <a/>
+    </dm:delete>
+    <dm:copy count="2"/>
+    <dm:insert>
+      <a>
+        <with>
+a tree it would be nice to keep in the common subset
+</with>
+      </a>
+      <a/>
+    </dm:insert>
+  </top>
+</dm:diff>

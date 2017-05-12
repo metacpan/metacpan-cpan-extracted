@@ -1,0 +1,17 @@
+Build.PL
+Changes
+lib/XML/Filter/Conditional.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/01use.t
+t/02passthrough.t
+t/03cond-simple-switch.t
+t/10cond-renamed-switch.t
+t/11cond-namespace-switch.t
+t/12cond-matchall.t
+t/20cond-exceptions.t
+t/99pod.t
+t/MockXMLSAXConsumer.pm

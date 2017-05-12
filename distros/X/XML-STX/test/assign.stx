@@ -1,0 +1,37 @@
+<stx:transform version="1.0" 
+  xmlns:stx="http://stx.sourceforge.net/2002/ns"
+  strip-space="yes">
+
+  <stx:variable name="g1" select="1"/>
+
+  <stx:template match="/root">
+    <stx:copy>
+      <stx:value-of select="$g1"/>
+      <stx:text>:</stx:text>
+
+      <stx:assign name="g1" select="2"/>
+      <stx:value-of select="$g1"/>
+      <stx:text>:</stx:text>
+
+      <stx:assign name="g1">
+	<stx:value-of select="'O'"/>
+	<stx:text>K</stx:text>
+      </stx:assign>
+
+      <stx:value-of select="$g1"/>
+
+      <inner>
+	<stx:variable name="g1" select="'a'"/>
+	<stx:value-of select="$g1"/>
+	<stx:text>:</stx:text>
+
+	<stx:assign name="g1" select="'b'"/>
+	<stx:value-of select="$g1"/>
+      </inner>
+
+      <stx:value-of select="$g1"/>
+
+    </stx:copy>
+  </stx:template>
+  
+</stx:transform>

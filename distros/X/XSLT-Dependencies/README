@@ -1,0 +1,31 @@
+XSLT::Dependencies - Finds all the files included or imported by particular XSLT
+
+/*
+	Description
+*/
+
+XSLT::Dependencies builds a list of all the files included or imported by a given XSTL one.
+
+/*
+	Installation
+*/
+
+perl Makefile.PL
+make
+make test
+make install
+
+/*
+	Author
+*/
+
+Andrew Shitov <andy@shitov.ru>
+
+Please feel free to contact me via e-mail.
+
+/*
+	Copyright
+*/
+
+XSLT::Dependencies module is a free software. 
+You may redistribute and (or) modify it under the same terms as Perl, which ever version it is.

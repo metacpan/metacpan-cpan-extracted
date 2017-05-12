@@ -1,0 +1,12 @@
+Changes
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+README
+lib/XML/Filter/Cache.pm
+lib/XML/Filter/Cache/File.pm
+t/00basic.t
+t/01record.t
+t/02playback.t
+t/03speed.t
+testfiles/large.xml

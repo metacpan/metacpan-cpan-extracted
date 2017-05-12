@@ -1,0 +1,86 @@
+#!/usr/bin/perl -s
+
+use strict;
+use warnings;
+
+use XML::TMX::CWB;
+
+our ($slang,  # source language
+     $tlang,  # target language
+     $h,      # help
+     $v,      # verbose
+     $o);     # output filename
+
+if ($h) {
+    print "cwb2tmx [-slang=EN] [-tlang=PT] [-o=foo.tmx] <source corpus ID> <target corpus ID>\n";
+    exit 1;
+}
+
+my $source = shift or die "Source corpus name is required\n";
+my $target = shift or die "Target corpus name is required\n";
+
+my %ops;
+$ops{source_lang} = $slang || "LANG1";
+$ops{target_lang} = $tlang || "LANG2";
+$ops{output}      = $o     || undef;
+$ops{verbose}     = $v     || 0;
+
+XML::TMX::CWB->toTMX(source => $source,
+                     target => $target,
+                     %ops);
+
+=encoding UTF-8
+
+=head1 NAME
+
+cwb2tmx - convert an aligned CWB corpus to TMX format
+
+=head1 SYNOPSIS
+
+  cwb2tmx [-slang=Lang1] [-slang=Lang2] [-o=output.tmx]
+          <source corpus ID> <target corpus ID>
+
+=head1 DESCRIPTION
+
+This command retrieves a CWB aligned corpus (given the pair of corpora
+identifiers) and exports it on TMX format.
+
+The following optinal parameters can be used:
+
+=over 4
+
+=item C<-o>
+
+Used to specify output filename.
+
+=item C<-slang1>
+
+Name for the source language. C<LANG1> is used if none is supplied.
+
+=item C<-slang2>
+
+Name for the target language. C<LANG2> is used if none is supplied.
+
+=item C<-v>
+
+Verbose mode
+
+=item C<-h>
+
+Prints basic help information.
+
+=back
+
+=head1 SEE ALSO
+
+XML::TMX::CWB (3)
+
+=head1 AUTHOR
+
+Alberto Manuel Brandão Simões, E<lt>ambs@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2010-2011 by Alberto Manuel Brandão Simões
+
+=cut

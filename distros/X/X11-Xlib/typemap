@@ -1,0 +1,101 @@
+TYPEMAP
+Display *             O_X11_Xlib
+DisplayOrNull         O_X11_XlibOrNull
+ScreenNumber          O_X11_Xlib_ScreenNumber
+Visual *              O_X11_Xlib_Opaque
+VisualOrNull          O_X11_Xlib_OpaqueOrNull
+GC                    O_X11_Xlib_Opaque
+XEvent *              O_X11_Xlib_Struct
+XVisualInfo *         O_X11_Xlib_Struct
+XWindowChanges *      O_X11_Xlib_Struct
+XWindowAttributes *   O_X11_Xlib_Struct
+XSetWindowAttributes* O_X11_Xlib_Struct
+XSizeHints *          O_X11_Xlib_Struct
+XRectangle *          O_X11_Xlib_Struct
+Window                O_X11_Xlib_XID
+Pixmap                O_X11_Xlib_XID
+Cursor                O_X11_Xlib_XID
+Colormap              O_X11_Xlib_XID
+Drawable              O_X11_Xlib_XID
+VisualID              O_X11_Xlib_XID
+XserverRegion         O_X11_Xlib_XID
+Atom                  T_UV
+Time                  T_UV
+Bool                  T_BOOL
+KeyCode               T_IV
+KeySym                T_IV
+
+INPUT
+O_X11_Xlib
+    $var = PerlXlib_get_magic_dpy($arg, 1);
+
+OUTPUT
+O_X11_Xlib
+    $arg = PerlXlib_obj_for_display($var, 0);
+
+INPUT
+O_X11_XlibOrNull
+    $var = PerlXlib_get_magic_dpy($arg, 0);
+
+OUTPUT
+O_X11_XlibOrNull
+    $arg = PerlXlib_obj_for_display($var, 0);
+
+INPUT
+O_X11_Xlib_ScreenNumber
+	if (!SvOK($arg))
+		$var = DefaultScreen(dpy);
+	else if (SvROK($arg)) {
+		SV **fp;
+		if (SvTYPE(SvRV($arg)) == SVt_PVHV && (fp= hv_fetch((HV*)SvRV($arg), \"screen_number\", 13, 0)) && *fp) {
+			$var= SvIV(*fp);
+		}
+		else croak(\"Invalid object passed as Screen number\");
+	}
+	else
+		$var= SvIV($arg);
+
+INPUT
+O_X11_Xlib_XID
+    $var = PerlXlib_sv_to_xid($arg);
+
+OUTPUT
+O_X11_Xlib_XID
+    // Always return unsigned integer.  X11::Xlib::* can override this as needed.
+    sv_setuv( $arg, $var );
+
+INPUT
+O_X11_Xlib_Struct
+    $var= ( $type ) PerlXlib_get_struct_ptr(
+        $arg, 0, \"X11::Xlib::@{[ $type =~ /(\w+)/ ]}\", sizeof(@{[ $type =~ /(\w+)/ ]}),
+        (PerlXlib_struct_pack_fn*) &PerlXlib_@{[ $type =~ /(\w+)/ ]}_pack
+    );
+
+INPUT
+O_X11_Xlib_Opaque
+    if (sv_isa($arg, \"X11::Xlib::@{[ $type =~ /(\w+)/ ]}\")) {
+        $var= ($type) SvIV((SV*)SvRV($arg));
+    } else {
+        croak( \"%s is not a %s\", \"$var\", \"X11::Xlib::@{[ $type =~ /(\w+)/ ]}\" );
+    }
+
+OUTPUT
+O_X11_Xlib_Opaque
+    sv_setref_pv($arg, \"X11::Xlib::@{[ $type =~ /(\w+)/ ]}\", (void*) $var);
+
+INPUT
+O_X11_Xlib_OpaqueOrNull
+    if (!SvOK($arg) || (SvIOK($arg) && !SvIV($arg)))
+        $var= NULL;
+    else if (sv_isa($arg, \"X11::Xlib::@{[ $type =~ /(\w+?)OrNull/ ]}\")) {
+        $var= ($type) SvIV((SV*)SvRV($arg));
+    } else {
+        croak( \"%s is not a %s\", \"$var\", \"X11::Xlib::@{[ $type =~ /(\w+)/ ]}\" );
+    }
+
+OUTPUT
+O_X11_Xlib_OpaqueOrNull
+    if ($var)
+        sv_setref_pv($arg, \"X11::Xlib::@{[ $type =~ /(\w+?)OrNull/ ]}\", (void*) $var);
+    else
+        sv_setsv($arg, &PL_sv_undef);

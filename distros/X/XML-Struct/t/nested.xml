@@ -1,0 +1,10 @@
+<nested>
+  <items>
+    <a>X</a>
+  </items>
+  <foo><bar/></foo>
+  <items>
+    <b x="42"/>
+    <a>Y</a>
+  </items>
+</nested>

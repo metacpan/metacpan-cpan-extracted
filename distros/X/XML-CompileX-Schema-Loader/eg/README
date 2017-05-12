@@ -1,0 +1,17 @@
+The examples in this directory demonstrate how to use
+XML::CompileX::Schema::Loader to save WSDL and schema documents from the
+network onto the local file system, and then use XML::Compile::WSDL11 to load
+them without having to retrieve them again.
+
+USAGE:
+
+    $ perl save_wsdl_schema.pl <URLs of WSDL and XSD files...>
+    
+    $ perl load_wsdl_schema.pl <list of saved WSDL and XSD files...>
+
+save_wsdl_schema.pl will save its results into the current directory, with
+subdirectories created for the protocol (http or https), host name(s), and
+paths to the loaded documents.
+
+load_wsdl_schema.pl will load all WSDL and XSD files you specify, compile them,
+and then report on the available SOAP operations and schema elements.

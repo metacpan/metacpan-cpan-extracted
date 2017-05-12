@@ -1,0 +1,208 @@
+=encoding utf8
+
+=head1 NAME
+
+XML::Compile::WSS::KeyInfo - handling WSS key info structures
+
+=head1 SYNOPSIS
+
+  # Not for end-users
+  my $sig = XML::Compile::WSS::Signature->new(key_info => $config);
+  my $ki  = $sig->keyInfo;
+
+=head1 DESCRIPTION
+
+The specifications define at least 10 different ways to provide security
+keys to the messages.  This module implements the logic to read and write
+tokens and keyinfo references to these tokens in the XML message.
+
+=head1 METHODS
+
+=head2 Constructors
+
+=over 4
+
+=item XML::Compile::WSS::KeyInfo-E<gt>B<fromConfig>(HASH|PAIRS)
+
+Take default values to be used with the readers and writers, which
+are created by this object.  So, the configuration contains all parameters
+to L<builder()|XML::Compile::WSS::KeyInfo/"Handlers">
+
+=item XML::Compile::WSS::KeyInfo-E<gt>B<new>(%options)
+
+End-user should use L<XML::Compile::WSS::Signature::new(key_info)|XML::Compile::WSS::Signature/"Constructors"> to pass
+a HASH of %options.  These options do not have accessors (yet).
+
+=back
+
+=head2 Attributes
+
+=over 4
+
+=item $obj-E<gt>B<config>()
+
+=back
+
+=head2 Token administration
+
+=over 4
+
+=item $obj-E<gt>B<addToken>( $token, [$token...] )
+
+=item $obj-E<gt>B<findToken>(%options)
+
+ -Option     --Default
+  fingerprint  undef
+  name         undef
+  uri          undef
+
+=over 2
+
+=item fingerprint => BINARY
+
+=item name => STRING
+
+=item uri => URI
+
+=back
+
+=item $obj-E<gt>B<tokens>()
+
+=back
+
+=head2 Handlers
+
+=over 4
+
+=item $obj-E<gt>B<builder>($wss, %options)
+
+Not for end-users.  Returns a CODE which will be called to produce the
+token representation in some output message.
+
+ -Option       --Default
+  publish_token  'SECTOKREF_URI'
+
+=over 2
+
+=item publish_token => 'NO'|CONSTANTS|CODE
+
+How to publish the security token.  The C<INCLUDE_BY_REF> constant will
+add the token as BinarySecurityToken in the message, plus a keyinfo
+structure with a reference to that token.  See L</DETAILS> about the
+various choices and additional options they imply.
+
+=back
+
+=item $obj-E<gt>B<getTokens>($wss, %options)
+
+Not for end-users.  Returns a CODE which needs to be called with a parsed
+incoming message.
+
+=back
+
+=head1 DETAILS
+
+=head2 Supported KeyInfo types
+
+=head3 KeyInfo
+
+On the top level, we have the following options:
+
+  keyinfo_id STRING       an xsd:ID value for the Id attribute (namespaceless)
+
+=head3 KEYNAME
+
+=head3 X509DATA
+
+This key-info type inlines one or more X509 certificates, in base64
+encoding.
+
+Additional options:
+
+  x509data_type TYPE      read below, default ASN1DER
+
+When you use the C<X509DATA> method to publish your key, you can specify
+the C<x509data_type>
+
+  SERIAL                  issuer name and cert serial number
+  SKI                     subject key identifier (subject hash)
+  SUBJECT                 subject name
+  ASN1DER                  base64 encoded full public certificate
+  CRL                     certification revocation list not supported (yet)
+
+As example, you may look at Net::Domain::SMD::Schema, which uses this
+key storage model for an enveloped signature.
+
+=head3 SecurityTokenReference
+
+The C<wsse:SecurityTokenReference> structure contains various other
+constructs.  They share the following options:
+
+   sectokref_id      the wsu:Id of the SecurityTokenReference
+   usage             list of URIs
+
+=head3 SECTOKREF_KEYID
+
+(At least) used in EncryptedKeys structures.  The "ThumbprintSHA1" is the
+SHA1 of the fingerprint of an key.
+
+Example:
+
+ <wsse:SecurityTokenReference>
+   <wsse:KeyIdentifier
+      EncodingType="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#Base64Binary"
+      ValueType="http://docs.oasis-open.org/wss/oasis-wss-soap-message-security-1.1#ThumbprintSHA1">+tkVcx0cyPfbKrQtVePbC98Kjc0=</wsse:KeyIdentifier>
+   </wsse:SecurityTokenReference>
+ </ds:KeyInfo>
+
+Options and defaults:
+
+   keyid_value       WSM11_PRINT_SHA1
+   keyid_encoding    WSM10_BASE64
+   keyident_id       the wsu:Id of the KeyIdentifier
+
+=head3 SECTOKREF_URI
+
+Creates a KeyInfo structure which refers to the key via an URI.  But, this
+will also add the BinarySecurityToken to the Security header, if not yet
+present.
+
+Example:
+
+ <ds:KeyInfo Id="KI-1">
+   <wsse:SecurityTokenReference wsu:Id="STR-2">
+     <wsse:Reference URI="#X509-3"
+        ValueType="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0#X509v3"/>
+   </wsse:SecurityTokenReference>
+ </ds:KeyInfo>
+
+ <wsse:Security
+   <wsse:BinarySecurityToken wsu:Id="X509-3"
+      EncodingType="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#Base64Binary"
+      ValueType="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0#X509v3">
+        MIIB..akDNgQ==
+   </wsse:BinarySecurityToken>
+ </wsse:Security>
+
+Options and defaults:
+
+  sectokref_uri    Relative or absolute URI
+
+=head1 SEE ALSO
+
+This module is part of XML-Compile-WSS-Signature distribution version 2.02,
+built on July 16, 2016. Website: F<http://perl.overmeer.net/xml-compile/>
+
+Please post questions or ideas to the mailinglist at
+F<http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/xml-compile> .
+For live contact with other developers, visit the C<#xml-compile> channel
+on C<irc.perl.org>.
+
+=head1 LICENSE
+
+Copyrights 2012-2016 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

@@ -1,0 +1,27 @@
+=head1 NAME
+
+  XML::GDOME::XPath::Namespace - Interface XPathNamespace implementation.
+
+=head1 SYNOPSIS
+
+  $elem = $xpns->getOwnerElement();
+
+=head1 CLASS INHERITANCE
+
+L<XML::GDOME::Node> > XML::GDOME::XPath::Namespace
+
+
+=head1 METHODS
+
+=over 4
+
+
+=item $elem = $xpns->getOwnerElement();
+
+NOT IMPLEMENTED
+
+I<Returns>: undef
+
+
+=back
+

@@ -1,0 +1,6 @@
+<p>
+[%  INCLUDE html/list 
+	title   = item.title 
+	content = item.content(view) 
+-%]
+</p>

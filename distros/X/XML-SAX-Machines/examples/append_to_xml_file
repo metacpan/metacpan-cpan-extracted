@@ -1,0 +1,40 @@
+package My::Appender;
+
+use XML::Filter::Merger;
+
+@ISA = qw( XML::Filter::Merger );
+
+use strict;
+
+sub end_element {
+    my $self = shift;
+
+    if ( $self->in_master_document && ! $self->element_depth ) {
+        XML::SAX::ParserFactory->parser(
+            Handler => $self
+        )->parse_string( <<'END_DOC' );
+<!-- note that this comment and the root elt get discarded.
+     The root elt may be kept by calling $self->set_keep_all_roots( 1 );
+-->
+<more-greetings>
+  <hi />
+  <howdy />
+</more-greetings>
+END_DOC
+    }
+
+    $self->SUPER::end_element( @_ );
+}
+
+package main;
+
+use XML::SAX::Machines qw( Pipeline );
+
+Pipeline( My::Appender => \*STDOUT )->parse_string( <<'END_DOC' );
+<greetings>
+  <hello />
+  <bonjour />
+</greetings>
+END_DOC
+
+

@@ -1,0 +1,73 @@
+
+==== version history of XML::Compile:WSS::Signature
+
+version 2.02: Sat 16 Jul 01:29:54 CEST 2016
+
+	Fixes:
+	- do not die on unused header elements.
+
+	Improvements:
+	- change documentation style.
+	- change signature hook from replace into after.
+
+version 2.01: Fri Oct 11 15:53:23 CEST 2013
+
+	Fixes:
+	- calling signature checker more than once.
+	- follow changes in XML::Compile::WSS 1.09
+
+	Improvements:
+	- tests: move template generation from t/31keyinfo.t into t/02templs.t
+	- support key-info type X509Data
+	- too many to mention!  Close to full rework.
+
+version 1.09:
+
+	Fixes:
+	- receive messages without PrefixList  [Karen Etheridge]
+	- token and private_key configuration is optional: report errors
+	  lazy.
+
+	Improvements:
+	- use ::Cache::addPrefixes()
+
+version 1.08: Fri Jan 18 13:37:45 CET 2013
+
+	Changes:
+	- elementsToSign() -> takeElementsToSign()
+
+	Fixes:
+	- second message had two Referer blocks to TheBody.
+	  reported and debugged by [Karen Etheridge]
+	- support filenames as objects in ::Sign::RSA.
+
+version 1.07: Mon Jan 14 12:53:38 CET 2013
+
+	Changes:
+	- removed ::SecToken::RSA::new() option cert_file, in favor of
+	  new ::fromFile()
+
+	Fixes:
+	- a few important fixes by [Karen Etheridge]
+	- add dependency to Digest::SHA1 to pass regression test 1/20sig*
+	  [cpantesters]
+
+version 1.06: Thu Jan 10 09:02:20 CET 2013
+
+	Fixes:
+	- bumped version number to be able to force upgrade when
+	  XML::Compile::WSS was already installed.
+	  Flagged by [Karen Etheridge]
+
+version 0.91: Mon Nov 19 17:17:14 CET 2012
+
+	- canonicalization check fixed.
+
+	- remove .Signature.pm.swp from MANIFEST
+	  rt.cpan.org#81065 [Chernomyrdin]
+
+version 0.90: Mon Nov  5 14:33:32 CET 2012
+
+	- split-off from XML::Compile::WSS v1.03
+
+	- major rewrite, using many more modules.

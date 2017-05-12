@@ -1,0 +1,183 @@
+<a
+    href=https://github.com/metaperl/xml-writer-compiler>XML::Writer::Compiler</a> 
+is a tool for compiling XML into a series of methods which generate XML using
+[mod://XML::Writer]. In a sense, it is similar to [mod://XML::Generator] because 
+methods are creating XML, however, it only generates methods based on
+sample XML instead of the free-form approach of XML::Generator. Thus,
+there is no need for the AUTOLOAD
+<CODE>(wizardry|games|hackery)</CODE> that Generator employs. It is
+also similar to [mod://XML::Toolkit] because it generates classes
+for XML. However, one XML file generates one class with
+XML::Writer::Compiler. XML::Toolkit generates one class per tag within
+a file. Also XML::Toolkit is class-based and refinement would be done
+via numerous subclasses of each XML element. In XML::Compiler::Writer,
+one subclass with several methods for various parts of the XML are all
+that is needed.
+
+<OL>
+<LI>To create Perl classes for XML generation, thereby allowing the
+particular XML for various cases to use all possible means of
+extension and refinement available in Perl - sublcassing, method calls
+and data structures. (also see [id://910617|earlier node]</LI>
+<LI> to build XML from a hashref for simple cases. yet still maintain
+XML order. The difficulties with
+more complex cases <a href="future">are also discussed</a></LI>
+</OL>
+
+
+<h2>Related things</h2>
+
+There are many complete formats for XML generation from data
+structures [id://787605|as seen here]. In reflecting on that thread, I
+decided to work with the [mod://HTML::Element] approach since I'm very
+familiar with it, it is robust, and has been in development for a long
+time.
+
+<h3>XML::Simple</h3>
+There are a few reasons not
+to use [mod://XML::Simple] 
+
+<OL>
+<LI>No support for XML generation requiring specific element
+sequencing</LI>
+<LI>No ability to generate mixed content</LI>
+<LI>The author himself says XML::Simple is only for certain cases of
+XML generation in [mod://XML::Simple::FAQ]
+</LI>
+</OL>
+
+<h3>XML::Toolkit</h3>
+
+<P>
+Another similar module is [mod://XML::Toolkit] by [perigrin]. This
+compiles a single XML file to a series of [mod://Moose] classes. I
+experimented with this module early on. Personally I think a series of
+methods in a single class might be more appropriate for programmatic
+control of a single XML file. [perigrin] somewhat agrees with me
+because we have both compared
+[mod://DBIx::Class], which is object-based, with all other ORMS which
+are limited by being class-based. (The ORM-talk is relevant because me
+and [perigrin] both agree that XML::Toolkit is the
+[mod://DBIx::Class::Loader] of XML).
+Also, I found it to be quite verbose for
+even a simple XML example. Perhaps a compiler-compiler could have
+allowed for simpler usage. For instance to generate this XML:
+
+<CODE>
+ <note>
+     <to>Bob</to>
+     <from>Alice</from>
+     <heading>Secret</heading>
+     <body>Shhh!</body>
+ </note>
+</CODE>
+
+you need this XML::Toolkit:
+
+<CODE>
+  my $document = MyApp::Note->new(
+        to_collection => [MyApp::To->new(text => 'Bob')],
+        from_collection => [MyApp::From->new(text => 'Alice')],
+        headings => [MyApp::Heading->new(text => 'Secret' )],
+        body_collection => [MyApp::Body->new(text=>'Shh!')],
+    )
+</CODE>
+
+but only this much XML::Element::Tolol
+
+<CODE>
+my %data = ( to => 'Bob', 
+  from => 'Alice',
+  heading => 'Secret',
+  Body => 'Shhh!'
+);
+MyApp::Note->new(data => \%data)->tree->as_XML;
+
+</CODE>
+
+In other words, one data definition, one constructor call and one
+method class versus no data definition, 5 constructor calls.
+
+</P>
+
+<h2 id="future">limitations / the future<h2>
+
+<h3>attributes</h3>
+
+The current compiler does have any support for regenerating XML attributes
+from the supplied hashref of data
+- only elements and content can be regenerated. This is unacceptable
+in general, but perfectly fine for my immediate need, which was to
+<a
+    href=https://github.com/metaperl/XML--Quickbooks/blob/master/lib/XML/Quickbooks/Tolol/InvoiceAdd.pm>simplify
+XML generation for calling quickbooks</a>. I've thought of a few ways
+of representing attributes, but am not sure which is best:
+
+<h4> arrayref </h4>
+One possibility is when the key of a hash entry is an arrayref, to use
+the first element as attributes and the second element and the
+content:
+
+<CODE>
+my %data = ( george => [ { age => 45} , 'some content' ] );
+</CODE>
+
+<h4> separate hashref for attributes</h4>
+
+This is just brainstorming, so here's another idea. One hash for
+content another for attributes of the content:
+
+<CODE>
+my %data = ( george => 'some content' ] );
+my %attr = ( george => {age 45 });
+</CODE>
+
+I think I like the former approach better.
+
+<h3>iterated data</h3>
+
+There is no support for automatically "unrolling" a section of XML
+which needs to be repeated. Right now, I'm using splice, [mod://Data::Rmap]
+and [mod://List::MoreUtils] to do arrayref mangling:
+
+<CODE>
+
+    # call the superclass to render the simple data in the hashref
+    my $lol = do {
+      local $self->{data} = \%tmpdata;
+      super();
+    };
+
+    # now rewrite part of the loltree with repetition
+    my @newlol;
+    for my $invoice_line ( @{$array_rows_for_single_invoice} ) {
+        my $aref = [
+            InvoiceLineAdd =>
+              [ ItemRef => [ ListID => $invoice_line->{product_listid} ] ],
+            [ Amount => $invoice_line->{amount} ],
+        ];
+        push @newlol, $aref;
+    }
+
+    my ($dump) = rmap_array {
+        if ( $_->[0] eq 'InvoiceAdd' ) {
+            use List::MoreUtils qw(first_index);
+            my $i = first_index { ref $_ and $_->[0] eq 'SetCredit' } @$_;
+            splice @$_, ++$i, 1, @newlol;
+
+            # No need to drill down any further
+            cut($_);
+        }
+        else {
+            $_;
+        }
+
+    }
+    $lol;
+
+</CODE>
+
+<h3>schema by sample</h3>
+Just like [mod://XML::Toolkit] a complete sample XML file is required
+for compiling into a XML generator class. This is in contrast to
+[mod://XML::Compile] by Mark Overmeer which uses XML schemas. 

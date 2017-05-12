@@ -1,0 +1,128 @@
+XML::Comma INSTALL
+
+XML::Comma is an XML information management framework.  For an example of
+this code "in the wild," check out http://allafrica.com.  Over 500 articles
+per day are added to the site from over 70 sources, and it is all managed
+with HTML::Mason and XML::Comma.
+
+XML::Comma is generally used in conjunction with the Apache web server
+and the HTML::Mason web development system. XML::Comma requires a
+database: either MySQL or PostgresSQL.
+
+XML::Comma has been tested with Apache 1.3.x, mod_perl 1.2.x, HTML::Mason
+1.0+ (0.86 and 1.0 are the same codebase), PERL 5.005_03+ (including 5.6.0),
+MySQL 3.23+, and PostgresSQL.  
+
+For more information about XML::Comma, point a web browser at
+http://xml-comma.org, or read the tutorial included with
+the XML::Comma distribution at docs/guide.html
+
+
+-----------------------------------------------------------------------
+
+Notes on Apache/mod_perl installation:
+
+One ABSOLUTELY MUST install Apache with the built-in Expat stuff disabled.
+Accomplish this by adding '--disable-rule=expat' to the APACI Apache
+configure...  in some cases, mod_perl may add this automatically when the
+configuration for mod_perl is executed.
+
+When you install perl (via Makefile.PL), it's probably best to add
+EVERYTHING=1 in order to ensure that all the callbacks are installed.  This
+may not be necessary, but it's the only way we've tested it up to this
+writing.
+
+Lastly, DO NOT install mod_perl as a DSO.  If you don't know what this
+means, just ignore it and follow the instructions in the mod_perl
+distribution for the statically linked module (this is the default, I
+believe).
+
+URLS: http://perl.apache.org, http://httpd.apache.org
+
+-----------------------------------------------------------------------
+
+Notes on HTML::Mason installation:
+
+Just a couple notes.  First off, make sure your DefaultType in httpd.conf is
+set to text/html.  This is important, and if you email any of the mailing
+lists without having done this, you are probably an idiot ;)
+
+URLS: http://www.masonhq.com
+
+-----------------------------------------------------------------------
+
+Notes on PERL installation:
+
+As mentioned previously, we have tested this with PERL 5.005_03 and 5.6.0.
+Other versions may work as well.  The DBI modules for your database of
+choice will need to be installed (via CPAN is fine - 'perl -MCPAN -e
+shell').  There are a few other PERL modules that are needed to get things
+smoking, including Apache::Util and Net::SMTP.  I'll try to compile a
+complete list of necessary modules some time soon.
+
+-----------------------------------------------------------------------
+
+Notes on database installation:
+
+MySQL and Postgres work fine.  You will need to have one database dedicated
+to the XML::Comma indexing.  You won't need to create any tables-- Comma
+takes care of that all for you!  All you'll need is the username and
+password for the database.
+
+-----------------------------------------------------------------------
+
+Okay.  Now you're probably ready for the XML::Comma installation.  Simply
+enter the XML directory, and execute:
+
+  perl Makefile.PL (doesn't take any args right now)
+  make
+  make install (you need to be root for this step).
+
+The easiest way to test the installation is to now run the command 'perl
+manual-test.pl' (after installation).  If any of the tests fail, there
+*should* be meaningful error messages that suggest installation of
+additional modules, etc.
+
+You DO need to configure XML::Comma and make some directories.  The
+following configurations are found in the file Comma.pm.  In my
+installation, this file is found in /usr/lib/perl5/site_perl/5.6.0/XML/.
+Where it installs on your machine will depend upon how you have perl
+configured.
+
+1) comma_root -
+     This is the base directory for XML::Comma.  I use the directory
+     /usr/local/comma (parallel to my htdocs directory).  You can use
+     anything, but make sure it's a valid directory.  Any application that
+     uses Comma will need to have read and write access to this directory.
+2) document_root -
+     The document root directory is where Comma will store documents.  Comma
+     will create subdirectories in this directory and populate them with XML
+     documents, so make sure there is a) enough space and b) read/write
+     access for the appropriate applications.
+3) defs_directories -
+     XML::Comma's basic architecture relies on XML definitions which reside
+     in any of these directories.  I use $base_directory/defs in my
+     installation, plus $base_directory/macros (for the macros, obviously)
+     and subdirectories of $base_directory/defs for application-specific
+     functions.  You can have as many of these as necessary, but you should
+     probably avoid having defs of the same name in different directories.
+4) defs_extention - (yes, it is spelled "wrong")
+     If you want, you can change this from the default .def.  One reason you
+     might want to change this is if you are using emacs or vim, and want to
+     specify an extension that will make a syntax file or emacs mode load
+     automatically.
+5) macro_extention -
+     See #4.  These files are PERL code, not XML.
+6) hash_module -
+     Any of the Digest:: modules from CPAN should work here.  We use
+     Digest::MD5, which, of course, requires this module to be installed.
+7) index_sql_syntax -
+     Right now, this is either Pg for Postgres or mysql for MySQL.  Just
+     pick whichever one you are using.
+8) index_dbi_connect_info -
+     This string is of the form 'DBI:mysql:database=______:host=______',
+     followed by the database username, then the password.  Just fill in
+     the blanks.
+
+These are the basic configurations.  If you run into any problems, just drop
+an email to comma@allafrica.com, and we'll try to be helpful.

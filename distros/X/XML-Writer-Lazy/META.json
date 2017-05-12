@@ -1,0 +1,55 @@
+{
+   "abstract" : "Pass stringified XML to XML::Writer",
+   "author" : [
+      "['Peter Sergeant <pete@clueball.com>']"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "XML-Writer-Lazy",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Find" : "0",
+            "Test::Differences" : "0",
+            "XML::LibXML::SAX::ChunkParser" : "0",
+            "XML::SAX" : "0",
+            "XML::SAX::Base" : "0",
+            "XML::SemanticDiff" : "0",
+            "XML::Writer" : "0",
+            "perl" : "5.008"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/pjlsergeant/p5-xml-writer-lazy/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/pjlsergeant/p5-xml-writer-lazy.git",
+         "web" : "https://github.com/pjlsergeant/p5-xml-writer-lazy"
+      }
+   },
+   "version" : "0.04"
+}
+

@@ -1,0 +1,91 @@
+{
+   "abstract" : "Load a web service and its dependencies for XML::Compile::WSDL11",
+   "author" : [
+      "Mark Gardner <mjgardner@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "XML-CompileX-Schema-Loader",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Changes" : "0.19",
+            "Test::CPAN::Meta" : "0",
+            "Test::EOL" : "0",
+            "Test::Kwalitee" : "1.21",
+            "Test::More" : "0",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Synopsis" : "0",
+            "Test::Version" : "1"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTTP::Exception" : "0",
+            "LWP::UserAgent" : "0",
+            "List::MoreUtils" : "0",
+            "Modern::Perl" : "0",
+            "Moo" : "0",
+            "MooX::Types::MooseLike::Base" : "0",
+            "URI" : "0",
+            "XML::Compile::SOAP::Util" : "0",
+            "XML::Compile::Util" : "0",
+            "XML::Compile::WSDL11" : "0",
+            "XML::LibXML" : "0",
+            "perl" : "5.010",
+            "utf8" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Carp" : "0",
+            "Const::Fast" : "0",
+            "File::Spec" : "0",
+            "HTTP::Response" : "0",
+            "HTTP::Status" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Path::Tiny" : "0",
+            "Scalar::Util" : "0",
+            "Test::LWP::UserAgent" : "0",
+            "Test::More" : "0.94",
+            "Test::Most" : "0",
+            "URI::file" : "0",
+            "XML::Compile::SOAP11" : "0",
+            "XML::Compile::Transport::SOAPHTTP" : "0",
+            "perl" : "5.010",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mjgardner/xml-compilex-schema-loader/issues"
+      },
+      "homepage" : "http://metacpan.org/release/XML-CompileX-Schema-Loader/",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/mjgardner/xml-compilex-schema-loader.git",
+         "web" : "https://github.com/mjgardner/xml-compilex-schema-loader"
+      }
+   },
+   "version" : "0.006"
+}
+

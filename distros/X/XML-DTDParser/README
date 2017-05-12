@@ -1,0 +1,25 @@
+XML/DTDParser version 1.0
+===============================
+
+Quick and dirty DTD parser.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+None
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2002 Jan Krynicky <Jenda@Krynicky.cz>. All rights reserved.
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+

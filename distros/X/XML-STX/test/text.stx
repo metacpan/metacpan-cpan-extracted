@@ -1,0 +1,11 @@
+<stx:transform version="1.0" 
+  xmlns:stx="http://stx.sourceforge.net/2002/ns"
+  strip-space="yes" 
+  recognize-cdata="yes">
+
+  <stx:template match="node[@id=2]">
+    <stx:text>A  B  C</stx:text>
+    <stx:text> D</stx:text>
+  </stx:template>
+  
+</stx:transform>

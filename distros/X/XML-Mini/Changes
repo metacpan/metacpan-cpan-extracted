@@ -1,0 +1,66 @@
+Revision history for Perl extension XML::Mini
+XML-Mini-1.38, 2008.02.04
+- Fixed <!DOCTYPE ...> bug
+- Can now handle empty attributes="" 
+- Fix for annoying deep recursion warnings
+- <?xml ?> header putting version attribute first, as prefered by xmllint etc.
+
+XML-Mini-1.34, 2008.02.03
+-------------------------
+- Added a preliminary check to XML::Mini::Document::fromString so we don't even try to parse XML that's clearly bad (uneven number of <tag>...</tag> because of mistake of bad <unary> (without closing /).
+
+XML-Mini-1.28, 2003.03.31
+-------------------------
+- New XML::Mini::Document methods, toHash() and fromHash(), allow for wickedly easy XML generation and manipulation.  
+See the XML::Mini::Document::fromHash() and XML::Mini::Document::toHash() pod for details.
+
+- Bug in the parsing algorithm when dealing with multiple elements of the same name, some of which have sub-elements, eg
+
+ <a />
+ <a />
+ <a> <b>...</b> </a>
+ <a />
+
+ Now fixed.
+
+XML-Mini-1.27, 2003.02.01
+-------------------------
+- Problem for users of Perl < 5.8.0 - The module was coded as if Text::Balanced was optional but was 'use'ing it and failing the make test.
+- Made some changes to the parameters for getElement() and getElementByPath(), adding optional positions in order to allow extraction of the nth matching element instead of only the 1st.
+
+
+XML-Mini-1.26, 2003.01.27
+-------------------------
+- Big bug found when using Text::Balanced (problem in parsing <tag>...</tag> whenever ... contains
+something like <unary /> tags or anything but <tag>..</tag> and text).  Fixed and tests adjusted.
+
+XML-Mini-1.25, 2003.01.26
+-------------------------
+- Major changes to the parsing algorithm which, if Text::Balanced is available, allow "cross-nested" tags
+  (such as <a><b><a>..</a></b></a>) to be parsed successfully.
+- <? tags ?> are now represented as XML::Mini::Element::Header elements
+- Added the XML::Mini::Document::header() method to create the new XML::Mini::Element::Header elements 
+  which represent <? tags ?>.
+- Added the XML::Mini::Document::parse() method which accepts strings, filenames, open file handles and
+  opened FileHandle objects
+- Currently beta-testing an XML::Mini replacement parser for the RPC::XML package
+
+XML-Mini-1.24, 2002.12.16
+-------------------------
+- Included Nigel Wetters (rivalsdm.com) changes/bug fixes to XML::Mini 
+  in order to make it more compatible with older Perl installs
+- Fixes to getElement (inability to fetch nested tags of same name)
+- Added the ability to removeChild() and removeAllChildren() for Element objects
+- Added the ability to prependChild() and insertChild(CHILD, INDEX)
+
+XML-Mini-1.24, 2002.11.25
+-------------------------
+- Made compatible with early Perls.
+- test added to check whether modules parse correctly
+- some rearrangement of PODs
+
+
+XML-Mini-1.2,  2002.09.15
+-------------------------
+- Perl implementation of MiniXML API finalised and Makefile.PL created
+

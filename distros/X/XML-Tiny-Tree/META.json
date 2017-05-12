@@ -1,0 +1,52 @@
+{
+   "abstract" : "Convert XML::Tiny output into a Tree",
+   "author" : [
+      "Ron Savage <ron@savage.net.au>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4211",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "XML-Tiny-Tree",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "1.001014"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4211"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "Moo" : "1.007",
+            "Tree" : "1.07",
+            "Types::Standard" : "1.000005",
+            "XML::Tiny" : "2.06",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "XML::Tiny::Tree" : {
+         "file" : "lib/XML/Tiny/Tree.pm",
+         "version" : "1.00"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.perlfoundation.org/artistic_license_2_0"
+      ]
+   },
+   "version" : "1.00"
+}

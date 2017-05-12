@@ -1,0 +1,10 @@
+[Changes for 0.02 - 2006-08-01]
+
+* Callback handlers with ->(key => sub{...}) now works.
+* Setting children using array dereferncing now works.
+* Removing children with "-" now works.
+* Much more comprehensive tests.
+
+[Changes for 0.01 - 2006-07-29]
+
+* Initial CPAN release.

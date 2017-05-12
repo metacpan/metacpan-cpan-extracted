@@ -1,0 +1,32 @@
+=head1 NAME
+
+  XML::GDOME::NodeList - Interface NodeList implementation.
+
+=head1 SYNOPSIS
+
+  $int  = $nl->getLength();
+  $node = $nl->item($index);
+
+=head1 METHODS
+
+=over 4
+
+
+=item $int = $nl->getLength();
+
+
+
+I<Returns>: the number of nodes in the list. The range of valid child node indices is 0 to length-1 inclusive.
+
+
+=item $node = $nl->item($index);
+
+
+
+I<C<index>>: Index into the collection
+
+I<Returns>: the indexth item in the collection. If I<index> is greater than or equal to the number of nodes in the list, this returns undef.
+
+
+=back
+

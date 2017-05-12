@@ -1,0 +1,28 @@
+--- 
+abstract: ~
+author: 
+  - Kan Fushihara <kan at mobilefactory do jp>
+build_requires: 
+  Test::More: 0
+distribution_type: module
+generated_by: Module::Install version 0.680
+license: perl
+meta-spec: 
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+name: XIRCD
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  Devel::Caller: 0
+  Moose: 0.5
+  MooseX::AttributeHelpers: 0.09
+  MooseX::Daemonize: 0.07
+  MooseX::POE: 0.07
+  POE: 0
+  Sub::Exporter: 0
+  UNIVERSAL::require: 0
+  self: 0
+version: 0.0.1

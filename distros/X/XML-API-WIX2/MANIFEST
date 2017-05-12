@@ -1,0 +1,8 @@
+LICENSE
+Changes
+Makefile.PL
+README
+MANIFEST
+lib/XML/API/WIX2.pm
+t/01_initialise.t
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,25 @@
+<h2>Description</h2>
+<!-- TMPL_LOOP NAME="doc" -->
+  <p><!-- TMPL_VAR NAME="data" --></p>
+<!-- /TMPL_LOOP -->
+<!-- TMPL_LOOP NAME="tag" -->
+  <h3><!-- TMPL_VAR NAME="entry" --></h3>
+  <p><!-- TMPL_VAR NAME="data" --></p>
+<!-- /TMPL_LOOP -->
+<!-- TMPL_IF NAME="doc_attrs" -->
+  <ul>
+  <!-- TMPL_LOOP NAME="doc_attrs" -->
+    <li><h4><!-- TMPL_VAR NAME="name" --></h4>
+    <!-- TMPL_LOOP NAME="doc" -->
+      <p><!-- TMPL_VAR NAME="data" --></p>
+    <!-- /TMPL_LOOP -->
+    <!-- TMPL_LOOP NAME="tag" -->
+      <h3><!-- TMPL_VAR NAME="entry" --></h3>
+      <p><!-- TMPL_VAR NAME="data" --></p>
+    <!-- /TMPL_LOOP -->
+    </li>
+  <!-- /TMPL_LOOP -->
+  </ul>
+<!-- /TMPL_IF -->
+<!-- HERE, insert extra data -->
+

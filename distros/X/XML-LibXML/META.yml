@@ -1,0 +1,51 @@
+---
+abstract: 'Interface to Gnome libxml2 xml parsing and DOM library'
+author:
+  - 'Petr Pajas'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0402, CPAN::Meta::Converter version 2.150001'
+keywords:
+  - dom
+  - html
+  - libxml
+  - 'object oriented'
+  - oop
+  - parse
+  - parser
+  - parsing
+  - pullparser
+  - sax
+  - sgml
+  - xml
+  - xpath
+  - XPath
+  - xs
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: XML-LibXML
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Test::More: '0'
+  XML::NamespaceSupport: '1.07'
+  XML::SAX: '0.11'
+  XML::SAX::Base: '0'
+  XML::SAX::Exception: '0'
+  base: '0'
+  parent: '0'
+  perl: '5.008'
+  strict: '0'
+  vars: '0'
+  warnings: '0'
+resources:
+  homepage: https://github.com/shlomif/perl-XML-LibXML
+  repository: https://github.com/shlomif/perl-XML-LibXML
+version: '2.0129'

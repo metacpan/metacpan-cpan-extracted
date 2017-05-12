@@ -1,0 +1,68 @@
+{
+   "abstract" : "Atom Service Document object",
+   "author" : [
+      "Takeru INOUE <takeru.inoue _ gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.112621",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "XML-Atom-Service",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : 0,
+            "Test::NoWarnings" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "XML::Atom" : "0.27",
+            "version" : 0
+         }
+      }
+   },
+   "provides" : {
+      "XML::Atom::Atompub" : {
+         "file" : "lib/XML/Atom/Atompub.pm",
+         "version" : 0
+      },
+      "XML::Atom::Categories" : {
+         "file" : "lib/XML/Atom/Categories.pm",
+         "version" : 0
+      },
+      "XML::Atom::Collection" : {
+         "file" : "lib/XML/Atom/Collection.pm",
+         "version" : 0
+      },
+      "XML::Atom::Control" : {
+         "file" : "lib/XML/Atom/Atompub.pm",
+         "version" : 0
+      },
+      "XML::Atom::Service" : {
+         "file" : "lib/XML/Atom/Service.pm",
+         "version" : "v0.16.2"
+      },
+      "XML::Atom::Workspace" : {
+         "file" : "lib/XML/Atom/Workspace.pm",
+         "version" : 0
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "v0.16.2"
+}

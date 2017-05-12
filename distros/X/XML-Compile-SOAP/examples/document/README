@@ -1,0 +1,39 @@
+
+==== README to examples/document/
+
+Thomas Bayer granted use of his example under the ASF2 License.
+
+This directory contains four examples based on the same existing remote
+server.  Sorry, the server thomas-bayer.com is not available anymore:
+the examples with the remote service will not work!
+
+The server published a nice WSDL file, and a separate schema, which
+have been beautified a bit but nothing more.
+
+ . namesservice.wsdl
+   The WSDL file, describing the service.
+
+ . namesservice.xsd
+   The Schema file, describing the data types transmitted.
+
+The examples explain how to communicate to the server using certain
+conditions:
+
+ . has_wsdl.pl
+   Shows how to use the WSDL file to access the server.  Of course, this
+   is by far the preferred way.
+
+ . has_schema.pl
+   Do not use the WSDL file, but only use the type definitions as found in
+   the schema.  Basically, a manual translation is made from the knowledge
+   about the protocol (often found in some textual specification, when
+   there is no WSDL) into the same structures as the WSDL produces.
+
+Besides the above intensively documented implementations, there are also
+two simplified implementations included in the package.  Those may shape
+your own code, after you understand the structure.
+
+  . has_wsdl2.pl is a simplification of has_wsdl.pl
+  . has_schema2.pl is a simplification of has_schema.pl
+
+Please contribute.

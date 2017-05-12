@@ -1,0 +1,267 @@
+NAME
+    XML::LibXML::Tools - An API for easy XML::LibXML DOM manipulation
+
+SYNOPSIS
+      use XML::LibXML::Tools;
+
+      my $lxt = XML::LibXML::Tools->new();
+
+      # set croakOnError => 0 for all new objects.
+      $XML::LibXML::Tools::croak = 0;
+
+      my $dom = $lxt->complex2Dom( data =>
+                                   [ document =>
+                                     [ node =>
+                                       [ deeper_content =>
+                                         [ $tools->attribute("attribute",
+                                                             "value"),
+                                           "deep content" ],
+                                       ],
+                                       node => [ "content" ]
+                                     ]
+                                   ] );
+
+      # change content
+      $tools->domUpdate( xpath => "/document/node",
+                         data => [ deeper_content => "Other content" ]);
+
+      # add comment
+      $tools->domAdd( xpath => "/document",
+                      data => [ $tools->comment("blaaa") ]);
+
+      # add a nodeset.
+      $tools->domAdd( xpath => "/document/node[2]",
+                      location => AFTER,
+                      data => [ $dom->findnodes("/document/node[1]") ]);
+
+      # add a DOM
+      $tools->domAdd ( xpath => "/document/node[1]",
+                       location => BEFORE,
+                       data => [ node => [ $otherDom ] ] );
+
+      # delete some nodes
+      $tools->domDelete( xpath => "/document",
+                         deleteXPath => "./node[1]" );
+
+DESCRIPTION
+    Hands an interface for merging, updating, adding and deleting a
+    XML::LibXML::Document in an easy fashion.
+
+    Takes care of encoding, etc.
+
+CONSTANTS
+    Constants are exported for your ease.
+
+      BEFORE => "before";
+      AFTER  => "after";
+      TO     => "to";
+
+    All these constants can be used for the location parameter
+
+METHODS
+    Methods are all accessors, they are show with their default value.
+
+  encoding ( "ISO-8859-1" )
+      Default input encoding.
+      Overwritten by the encoding parameter for each function.
+
+  toEncoding ( "UTF-8" )
+      Default to-encoding
+      Never overwritten.
+
+  defaultLocation ( TO )
+      Default adding location.
+
+  objectIconv ( bless({},"Text::Iconv") )
+      Not really relevant, but availabe:
+
+      Text::Iconv->new(encoding, toEncoding)
+
+  objectDom ( "" )
+      Filled by complex2Dom if not yet defined, or you.
+
+      Used so that you can skip the dom-parameter for each function which
+      is meant to work at this DOM.
+
+  storeDom( 1 )
+      If set to 0 complex2Dom doesn't fill the objectDom so you can
+      manipulate 'externals' DOMs without to much overhead.
+
+  error ( undef )
+      Set to 1 by addError
+
+  errorMsg ( undef )
+      Holds the message stack
+
+  croakOnError ( 1 )
+      If an error occurs, croak (errorMsg)
+
+  showPath ( 0 )
+      warns the names of the functions called.
+      Not very usefull unless you are an expert
+
+FUNCTION PARAMETERS
+    Most of these functions operate parameter based,
+
+      eg: $lxt->domAdd(node => $node, dom => $dom, data => $ref )
+
+    Most of these functions call upon each other. They always pass their
+    parameters.
+
+  dom => $dom
+      The L<XML::LibXML::Document> you want to perform your operation
+      on. If ommited objectDom is tried.
+
+  node => $dom->node
+      The node on which you wish to perform your operation.
+
+  xpath => "/path/to/node"
+      If the node is ommited, uses this xpath-statement to get to a node.
+
+  data => $ref
+      [ element => "of surprise" ]
+
+      OR
+
+      [ $dom ]
+
+      OR
+
+      [ $nodelist ]
+
+      OR
+
+      [ [ element => [ $nodelist ],
+          element => [ $dom      ],
+          element => [ attribute( "name", "value" ), "content" ] ]
+
+      The data for the operation. Can be an intrigate combination of
+      arrays DOMs and NodeLists
+
+  encoding => "UTF-7"
+      The from-encoding the be used in this operation
+
+  noConvert => 0, 1
+      Do not convert the data from one encoding to the other for this
+      operation.
+
+      !! USE AT OWN RISK !!
+
+  location => TO
+  location => BEFORE
+  location => AFTER
+      The location for adding.
+
+      TO     : Add to the selected node
+      BEFORE : insert before the selected node
+      AFTER  : insert after the selected node
+
+  deleteXPath, delete
+      Used in domDelete. Delete everything that complies to deleteXPath
+      from the selected node.
+
+      delete is shorthand
+
+  showpath
+    Set the showpath for this operation.
+
+  depth
+    Used internally for showPath. Please do not meddle with it unless your
+    an expert.
+
+FUNCTIONS
+    For the sake of easy reading '*name' is a parameter.
+
+    All these functions return undef once an error has been raised.
+
+  $dom = complex2Dom ( data => $ref )
+      DESCRIPTION
+        Turns an array reference into a L<XML::LibXML::Document>, taking
+        array->[0] as the rootname. calls array2Dom for this purpose.
+
+  array2Dom ( %params )
+      DESCRIPTION
+        Turns *data into a L<XML::LibXML::DocumentFragment> (or alike) so
+        that it can be attached to the *dom or *node at a later point in
+        time. Expert use only.
+
+      REQUIRED PARAMETERS
+        dom, node, data
+
+      NOTE
+        *xpath is ignored here
+        *node is intrepreted as a parentNode.
+
+  domUpdate ( %params )
+      DESCRIPTION
+        Update the selected *node with *data by replacing or adding nodes
+        along the way.
+
+      REQUIRED PARAMETERS
+        dom, node OR xpath, data
+
+  domAdd ( %params )
+      DESCRIPTION
+        Add *data to *node at *location
+
+      REQUIRED PARAMETERS
+        dom, node OR xpath, data
+
+  domDelete ( %params )
+      DESCRIPTION
+        Delete everything from *deleteXPath from *node. Because this is
+        XPath driven there is no way to remove comments - still looking
+        into a solution for that.
+
+      REQUIRED PARAMETERS
+        dom, node OR xpath, data, deleteXPath
+
+  analyseXpath ( "/newlsetter[1]/section[2]/parot[2]" )
+      returns 'parot', 2, '/newlsetter[1]/section[2]'
+
+  convert ( %params )
+      DESCRIPTION
+        converts *data using L<Text::Iconv>. Is influenced by *encoding and *noConvert
+
+  attribute ( "name", "value" )
+      returns the special attribute notation for arrays which need to be
+      transformed to DOMs
+
+  comment ( "comment" )
+      returns the special comment notation for arrays which need to be
+      transformed to DOMs
+
+      Puts a space before and after the comment it is not there, since
+      yours truly beliefs that is more beatifull.
+
+  addError ( $message )
+      Adds $message to the message stack.
+      Sets error() to 1
+
+  resetError ()
+      Resets the error stack and flag.
+
+CHANGES
+      0.71 - released
+      0.72 - minor documentation changes. (it broke on CPAN ... :( )
+
+      0.80 - made sure this also works with a 'broken' Text::Iconv
+
+SEE ALSO
+    XML::LibXML
+
+KNOWN ISSUES
+      - Unfixed checking problem.
+        You might see something like: complex2Dom: To complex! ...
+
+        FIX : Surround the stuff in *data with extra [ ].
+
+AUTHOR INFORMATION
+    Originally Written by Robert Bakker as an Exporter.
+
+    Then re-written by Hartog de Mik to: beautify code. chop up into
+    functions.
+
+    Then finaly re-written by Hartog de Mik into the current OO
+    implementation
+

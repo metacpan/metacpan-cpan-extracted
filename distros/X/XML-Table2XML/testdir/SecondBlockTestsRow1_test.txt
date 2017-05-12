@@ -1,0 +1,60 @@
+root
+/y	/x	/o/#id	/o/@id	/o/@n	/o/p/#id	/o/p/@n	/o/p/@u	/o/p/r/@id	/o/p/r/@n	/o/p/r/@t	/o/v/@id
+testY	testX	1	{28EA7E1C-2FDA-11d3-A200-00C04FA3B60C}	Genre	1	GenreProperties		1	Name	1	
+testY	testX	1	{28EA7E1C-2FDA-11d3-A200-00C04FA3B60C}	Genre	1	GenreProperties		2	NumMediaChildren	0	
+testY	testX	1	{28EA7E1C-2FDA-11d3-A200-00C04FA3B60C}	Genre	1	GenreProperties		3	NumAudioMediaChildren	0	
+testY	testX	1	{28EA7E1C-2FDA-11d3-A200-00C04FA3B60C}	Genre	1	GenreProperties		4	NumVideoMediaChildren	0	
+testY	testX	1	{28EA7E1C-2FDA-11d3-A200-00C04FA3B60C}	Genre	2	GenreUserProperties	1				
+testY	testX	1	{28EA7E1C-2FDA-11d3-A200-00C04FA3B60C}	Genre							{4CC5C8BB-2FDA-11d3-A200-00C04FA3B60C}
+testY	testX	1	{28EA7E1C-2FDA-11d3-A200-00C04FA3B60C}	Genre							{3FB37412-2FDC-11d3-A200-00C04FA3B60C}
+testY	testX	1	{28EA7E1C-2FDA-11d3-A200-00C04FA3B60C}	Genre							{5C07A8AF-2FDD-11d3-A200-00C04FA3B60C}
+testY	testX	2	{05c57c28-e43a-40b5-86c7-616fdc831308}	CDGenre	3	CDGenreProperties		1	Name	1	
+testY	testX	2	{05c57c28-e43a-40b5-86c7-616fdc831308}	CDGenre	4	CDGenreUserProperties	1				
+testY	testX	2	{05c57c28-e43a-40b5-86c7-616fdc831308}	CDGenre							{a43bf63c-ee8d-4e05-a08a-31c7c360848b}
+testY	testX	2	{05c57c28-e43a-40b5-86c7-616fdc831308}	CDGenre							{f6302fe1-e2fd-42c4-9ebe-77552c6d89e0}
+testY	testX	2	{05c57c28-e43a-40b5-86c7-616fdc831308}	CDGenre							{20E88E93-2FDD-11d3-A200-00C04FA3B60C}
+testY	testX	3	{a43bf63c-ee8d-4e05-a08a-31c7c360848b}	CDArtist	5	CDArtistProperties		1	Name	1	
+testY	testX	3	{a43bf63c-ee8d-4e05-a08a-31c7c360848b}	CDArtist	5	CDArtistProperties		2	Role	1	
+testY	testX	3	{a43bf63c-ee8d-4e05-a08a-31c7c360848b}	CDArtist	6	CDArtistUserProperties	1				
+testY	testX	3	{a43bf63c-ee8d-4e05-a08a-31c7c360848b}	CDArtist							{f6302fe1-e2fd-42c4-9ebe-77552c6d89e0}
+testY	testX	3	{a43bf63c-ee8d-4e05-a08a-31c7c360848b}	CDArtist							{E398889B-2FDD-11d3-A200-00C04FA3B60C}
+testY	testX	3	{a43bf63c-ee8d-4e05-a08a-31c7c360848b}	CDArtist							{7B2D2D4E-453B-11d3-A208-00C04FA3B60C}
+testY	testX	3	{a43bf63c-ee8d-4e05-a08a-31c7c360848b}	CDArtist							{20E88E93-2FDD-11d3-A200-00C04FA3B60C}
+testY	testX	4	{f6302fe1-e2fd-42c4-9ebe-77552c6d89e0}	CDAlbum	7	CDAlbumProperties		1	Title	1	
+testY	testX	4	{f6302fe1-e2fd-42c4-9ebe-77552c6d89e0}	CDAlbum	7	CDAlbumProperties		2	Copyright	1	
+testY	testX	4	{f6302fe1-e2fd-42c4-9ebe-77552c6d89e0}	CDAlbum	7	CDAlbumProperties		3	Label	1	
+testY	testX	4	{f6302fe1-e2fd-42c4-9ebe-77552c6d89e0}	CDAlbum	7	CDAlbumProperties		4	ReleaseDate	2	
+testY	testX	4	{f6302fe1-e2fd-42c4-9ebe-77552c6d89e0}	CDAlbum	7	CDAlbumProperties		5	Rating	1	
+testY	testX	4	{f6302fe1-e2fd-42c4-9ebe-77552c6d89e0}	CDAlbum	8	CDAlbumUserProperties	1				
+testY	testX	4	{f6302fe1-e2fd-42c4-9ebe-77552c6d89e0}	CDAlbum							{33DC77DA-2FDD-11d3-A200-00C04FA3B60C}
+testY	testX	4	{f6302fe1-e2fd-42c4-9ebe-77552c6d89e0}	CDAlbum							{20E88E93-2FDD-11d3-A200-00C04FA3B60C}
+testY	testX	4	{f6302fe1-e2fd-42c4-9ebe-77552c6d89e0}	CDAlbum							{a43bf63c-ee8d-4e05-a08a-31c7c360848b}
+testY	testX	4	{f6302fe1-e2fd-42c4-9ebe-77552c6d89e0}	CDAlbum							{E398889B-2FDD-11d3-A200-00C04FA3B60C}
+testY	testX	4	{f6302fe1-e2fd-42c4-9ebe-77552c6d89e0}	CDAlbum							{7B2D2D4E-453B-11d3-A208-00C04FA3B60C}
+testY	testX	5	{4CC5C8BB-2FDA-11d3-A200-00C04FA3B60C}	Artist	9	ArtistProperties		1	Name	1	
+testY	testX	5	{4CC5C8BB-2FDA-11d3-A200-00C04FA3B60C}	Artist	9	ArtistProperties		2	Role	1	
+testY	testX	5	{4CC5C8BB-2FDA-11d3-A200-00C04FA3B60C}	Artist	9	ArtistProperties		3	NumMediaChildren	0	
+testY	testX	5	{4CC5C8BB-2FDA-11d3-A200-00C04FA3B60C}	Artist	9	ArtistProperties		4	NumAudioMediaChildren	0	
+testY	testX	5	{4CC5C8BB-2FDA-11d3-A200-00C04FA3B60C}	Artist	9	ArtistProperties		5	NumVideoMediaChildren	0	
+testY	testX	5	{4CC5C8BB-2FDA-11d3-A200-00C04FA3B60C}	Artist	10	ArtistUserProperties	1				
+testY	testX	5	{4CC5C8BB-2FDA-11d3-A200-00C04FA3B60C}	Artist							{3FB37412-2FDC-11d3-A200-00C04FA3B60C}
+testY	testX	5	{4CC5C8BB-2FDA-11d3-A200-00C04FA3B60C}	Artist							{5C07A8AF-2FDD-11d3-A200-00C04FA3B60C}
+testY	testX	5	{4CC5C8BB-2FDA-11d3-A200-00C04FA3B60C}	Artist							{E398889B-2FDD-11d3-A200-00C04FA3B60C}
+testY	testX	5	{4CC5C8BB-2FDA-11d3-A200-00C04FA3B60C}	Artist							{7B2D2D4E-453B-11d3-A208-00C04FA3B60C}
+testY	testX	6	{C576D561-38B1-11d3-A204-00C04FA3B60C}	UserCollection	11	UserCollection		1	Name	1	
+testY	testX	6	{C576D561-38B1-11d3-A204-00C04FA3B60C}	UserCollection	12	UserCollectionUserProperties	1				
+testY	testX	6	{C576D561-38B1-11d3-A204-00C04FA3B60C}	UserCollection							{3FB37412-2FDC-11d3-A200-00C04FA3B60C}
+testY	testX	6	{C576D561-38B1-11d3-A204-00C04FA3B60C}	UserCollection							{20E88E93-2FDD-11d3-A200-00C04FA3B60C}
+testY	testX	6	{C576D561-38B1-11d3-A204-00C04FA3B60C}	UserCollection							{5C07A8AF-2FDD-11d3-A200-00C04FA3B60C}
+testY	testX	6	{C576D561-38B1-11d3-A204-00C04FA3B60C}	UserCollection							{C23C63E7-3573-11d3-A201-00C04FA3B60C}
+testY	testX	7	{3FB37412-2FDC-11d3-A200-00C04FA3B60C}	Album	13	AlbumProperties		1	Title	1	
+testY	testX	7	{3FB37412-2FDC-11d3-A200-00C04FA3B60C}	Album	13	AlbumProperties		2	Copyright	1	
+testY	testX	7	{3FB37412-2FDC-11d3-A200-00C04FA3B60C}	Album	13	AlbumProperties		3	Label	1	
+testY	testX	7	{3FB37412-2FDC-11d3-A200-00C04FA3B60C}	Album	13	AlbumProperties		4	ReleaseDate	2	
+testY	testX	7	{3FB37412-2FDC-11d3-A200-00C04FA3B60C}	Album	14	AlbumUserProperties	1				
+testY	testX	7	{3FB37412-2FDC-11d3-A200-00C04FA3B60C}	Album							{4CC5C8BB-2FDA-11d3-A200-00C04FA3B60C}
+testY	testX	7	{3FB37412-2FDC-11d3-A200-00C04FA3B60C}	Album							{E398889B-2FDD-11d3-A200-00C04FA3B60C}
+testY	testX	7	{3FB37412-2FDC-11d3-A200-00C04FA3B60C}	Album							{7B2D2D4E-453B-11d3-A208-00C04FA3B60C}
+testY	testX	7	{3FB37412-2FDC-11d3-A200-00C04FA3B60C}	Album							{5C07A8AF-2FDD-11d3-A200-00C04FA3B60C}
+testY	testX	8	{20E88E93-2FDD-11d3-A200-00C04FA3B60C}	AlbumTrack	15	AlbumTrackProperties		1	Title	1	
+

@@ -1,0 +1,16 @@
+Revision history for Perl extension XML::Handler::HTMLWriter.
+
+2.01
+    - Updated to new XML::SAX::Writer API
+
+2.00
+    - Re written to be a subclass of XML::SAX::Writer, and to
+      use it's output functionality and API.
+    - Now SAX2 only.
+
+1.00
+    - Initial CPAN release.
+
+0.01
+    - First release. Most functionality in place, except
+      whitespace handling.

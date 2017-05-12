@@ -1,0 +1,1454 @@
+#    Xforms.functions - An extension to Perl to access Xforms functions.
+#    Copyright (C) 1996-1997  Martin Bartlett
+#
+#    This program is free software; you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation; either version 2 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program; if not, write to the Free Software
+#    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+(Note: the general  notes from this file have been moved to the X11:Xforms
+ man page. After installation, enter 'man X11::Xforms' to read that page)
+
+These are the functions that the Xforms extension to PERL implements. 
+They are grouped by general functionality. Use this file to verify a function's
+call protocol, especially if get you a message:
+
+    'Usage: <function name>. See Xforms4Perl documentation.'
+
+at execution time.
+
+Where the protocol is the same from PERL as from C there is no comment. This
+is the case with a majority of the functions. Where there are differences I
+have indicated the PERL protocol to use. Almost all parameters are PERL scalars
+set to their intuitive values, and all return values (except where indicated)
+are also scalars, set in such a way that, if they are used in further Xforms
+functions they behave as expected. The only routine that accepts something
+other than a direct scalar is the fl_set_xyplot_symbol callback routine,
+which accepts a reference to a Perl array as one of its arguments.
+
+Some functions can accept variable length parameter lists (generally where
+the corresponding C function accepts a pointer to a list of values). These
+functions are indicated below with the optional parts of the parameter lists
+enclosed in square brackets. The square brackets themselves are NOT required
+as part of the call protocol, they are only there to distinguish between
+the required and optional portions of those lists.
+
+Functions marked with '##' at the beginning of the line are not part of the 
+Xforms C library - they have been added to make life a little easier and 
+generally provide X library functions required to make the DEMOS work!! 
+
+-------------------------------------------------------------------------------
+
+GENERAL FUNCTIONS
+
+    fl_add_io_callback
+        fl_add_io_callback(*FILEHANDLE, 
+            $condition, $callback, $user_parm);
+
+        NOTE: It is a reference to a Perl filehandle that is passed, not 
+              the C file descriptor. Note also that the callback is also
+              passed Perl filehandle and not the C file descriptor.
+
+              The following statement parses the arguments in the callback:
+
+                  my($filehandle, $my_data) = @_;
+
+              $filehandle can then be used in any of Perl's io routines in
+              place of a direct file handle.
+
+              See the testiocb.pl DEMO for an example of this.
+
+    fl_add_signal_callback
+    fl_add_timeout
+    fl_app_signal_direct
+##  fl_current_form        
+        $form = fl_current_form(); 
+        NOTE: This function returns an FL_FORM object representing
+              the contents of the fl_current_form field
+
+    fl_default_win
+    fl_default_window
+##  fl_display        
+        $display = fl_display()
+        NOTE: This function returns a Display pointer representing
+              contents of the fl_display field
+
+    fl_finish
+    fl_get_app_resources
+        ($res_val_1 [, $res_val_2 [,...]]) = fl_get_app_resources(
+            $res_name_1, $res_class_1, $default_value_string_1
+            [,$res_name_2, $res_class_2, $default_value_string_2
+            [, ...]]);
+        NOTE: All values are returned as strings.
+
+    fl_get_border_width
+    fl_get_coordunit
+    fl_get_display
+
+    NOTE: The XFontStruct structure used in the C interface to the 
+          following three functions has been defined as a Perl 
+          blessed object. See the X11::Xforms man page for details 
+          of how to use this object with these functions. 
+
+    fl_get_fntstruct    (See NOTE above)
+    fl_get_fontstruct   (See NOTE above)
+    fl_get_font_struct  (See NOTE above)
+
+    fl_get_form_vclass
+    fl_get_resource
+        $res_val = 
+            fl_get_resource($res_name, $res_class, $default_value);
+        NOTE: The resource is always returned as a string, 
+              therefore, none of the type arguments are required.
+
+    fl_gettime        
+        ($sec, $usec) = fl_gettime();
+
+    fl_get_vclass
+    fl_get_vmode
+    fl_get_visual_depth
+    fl_initialize     
+        fl_initialize("X_class_name"[,opt1,spec1,Xkind,val[...]]) 
+
+        NOTE: The processing of @ARGV takes place as described in 
+              the Xforms doc, but it does so under the covers.
+
+              Xrm Option specifications can be added to the parm 
+              list. Basically each quartet of values represents 
+              an FL_CMD_OPT structure. The 'Xkind' variable is of 
+              type XrmOptionKind BUT I have been nice: I have added
+              constants that give these X values FL_ style names. 
+
+              Just take the Xrmoption... name and replace the 
+              'Xrmo' with 'FL_O' for the new constant name. The
+              value parameter MUST be provided on ALL options, but 
+              is ignored as a value except for FL_OptionNoArg 
+              'Xkinds' (ie its a placeholder for all other kinds to
+              make the option processing easier!!). Again, see the 
+              Xforms doc for details of how to use this facility, 
+              then make the logical transforms to Perl.
+
+        The Global Initialization Script
+
+              If a script named .X4Pinit.pl exists in the user's 
+              home directory then it must contain a subroutine 
+              named fl_pre_init and another named fl_post_init. It 
+              can, ofcourse, contain other subroutines invoked by 
+              these two.
+
+              fl_pre_init is invoked immediately before the Xforms 
+              fl_initialize function is called.
+
+              fl_post_init is invoked immediately after the Xforms 
+              fl_initialize function returns.
+
+              See the X11:Xforms man page and the X4Pinit.pl DEMO 
+              for more details on the use of these the Global 
+              Initialization Script.
+
+    fl_keypressed
+    fl_keysym_pressed
+    fl_library_version
+        ($ver_rel, $ver, $rel) = fl_library_version();
+
+    fl_msleep
+    fl_now
+    fl_register_callback
+    fl_remove_io_callback    
+        fl_remove_io_callback(*FILEHANDLE, condition);
+        NOTE: It is a reference to a Perl filehandle that is passed, not the 
+              file descriptor as in C.
+
+    fl_remove_signal_callback
+    fl_remove_timeout
+    fl_ringbell
+##  fl_root
+        $root = fl_root();
+        NOTE: This function returns an X window id representing the 
+              contents of the fl_root field.
+
+##  fl_screen
+        $screen = fl_screen();
+        NOTE: This function returns an integer representing the 
+              contents of the fl_screen field.
+
+##  fl_scrh
+        $scrh = fl_scrh();
+        NOTE: This function returns an integer representing the 
+              contents of the fl_scrh field.
+
+##  fl_scrw
+        $scrw = fl_scrw();
+        NOTE: This function returns an integer representing the 
+              contents of the fl_scrw field.
+
+    fl_set_atclose
+    fl_set_border_width
+##  fl_set_class_callback
+        fl_set_class_callback($object_type_number, $callback);
+
+        NOTE: This 'Value Added Feature' registers a function that
+              is called whenever an object of the specified class 
+              is created using the fl_add_[object_type] or 
+              fl_create_[object_type] functions. The callback is 
+              invoked after the object has been created but before
+              the control is returned to the creating script. It is 
+              passed one argument, the object that was created. 
+
+              The intention is for this callback to provide 
+              automatic initialization or customization of the 
+              object.
+
+              If this function is called from the Global
+              Initialization Script, system wide color and font 
+              schemes can be imposed upon Xforms objects without 
+              application scripts having to perform the 
+              customization of each created object.
+
+              See the DEMO X4Pinit.pl for examples of how these 
+              facilities can be put to good use.
+
+    fl_set_clipping
+    fl_set_clippings
+    fl_set_coordunit
+    fl_set_error_handler
+    fl_set_error_logfp
+        fl_set_error_logfp(*FILEHANDLE);
+        NOTE: It is a reference to a Perl filehandle that is passed, not a 
+              C file descriptor.
+
+    fl_set_font
+    fl_set_font_name
+    fl_set_gc_clipping
+    fl_set_graphics_mode
+    fl_set_idle_callback
+    fl_set_idle_delta
+    fl_set_resource
+    fl_set_scrollbar_type
+    fl_set_tabstop
+    fl_set_text_clipping
+    fl_set_ul_property
+    fl_set_visualID
+    fl_show_errors
+    fl_signal_caught
+##  fl_textgc
+        $textgc = fl_textgc();
+        NOTE: This function returns a value representing the 
+              contents of the fl_textgc field.
+
+##  fl_ul_magic_char
+        $magic_char = fl_ul_magic_char();
+        NOTE: This function returns a character representing the 
+              contents of the fl_ul_magic_char field.
+
+    fl_unset_clipping
+    fl_unset_gc_clipping
+    fl_unset_text_clipping
+    fl_vclass_name
+    fl_vclass_val
+##  fl_vmode
+        $vmode = fl_vmode();
+        NOTE: This function returns an integer representing the 
+              contents of the fl_vmode field.
+
+##  fl_vroot
+        $vroot = fl_vroot(); 
+        NOTE: This function returns an X window id representing the 
+              contents of the fl_vroot field.
+
+    fl_whoami
+
+DEFAULT PROCESSING
+
+    NOTE: The C FL_IOPT structure used in these two functions is 
+          defined as a Perl blessed object. See the X11::Xforms 
+          man page for details on how to create and use this 
+          object with these functions.
+
+    fl_get_defaults         
+        $iopt = fl_get_defaults();
+
+    fl_set_defaults
+
+DIRECT WINDOW MANIPULATION AND OTHER X FACILITIES
+
+##  fl_create_GC            
+        $GC = fl_create_GC();
+        NOTE: Creates a graphics context on the default display
+              for the default window
+
+##  fl_fill_rectangle       
+        fl_fill_rectangle($win, $gc, $x, $y, $width, $height);
+        NOTE: Implements XFillRectangle for Xforms.
+
+    fl_get_gc
+    fl_get_win_geometry
+    fl_get_win_origin
+        ($x, $y) = fl_get_win_origin($window);
+
+    fl_get_win_size
+        ($width, $height) = fl_get_win_size($window);
+
+    fl_get_wingeometry
+        ($x, $y, $width, $height) = fl_get_wingeometry($window);
+
+    fl_get_winorigin
+        ($x, $y) = fl_get_winorigin($window);
+
+    fl_get_winsize
+        ($width, $height) = fl_get_winsize($window);
+
+    fl_initial_wingeometry
+        ($x, $y, $width, $height) = fl_get_win_geometry($window);
+
+    fl_initial_winposition
+    fl_initial_winsize
+    fl_initial_winstate
+    fl_noborder
+    fl_pref_wingeometry
+    fl_pref_winposition
+    fl_pref_winsize
+    fl_reset_winconstraints
+    fl_set_background
+    fl_set_foreground
+    fl_set_winstepunit
+    fl_transient
+    fl_win_background
+    fl_win_to_form
+    fl_winaspect
+    fl_winbackground
+    fl_winclose
+    fl_wincreate
+    fl_winfocus
+    fl_wingeometry
+    fl_winget
+    fl_winhide
+    fl_winisvalid
+    fl_winicon
+    fl_winmaxsize
+    fl_winminsize
+    fl_winmove
+    fl_winopen
+    fl_winposition
+    fl_winreparent
+    fl_winresize
+    fl_winreshape
+    fl_winset
+    fl_winshow
+    fl_winsize
+    fl_winstepunit
+    fl_wintitle
+
+MOUSE-RELATED FUNCTIONS
+
+    fl_get_form_mouse        
+        ($win, $x, $y, $keymask) = fl_get_form_mouse($form);
+
+    fl_get_win_mouse         
+        ($win, $x, $y, $keymask) = fl_get_win_mouse($window);
+
+    fl_get_mouse             
+        ($win, $x, $y, $keymask) = fl_get_mouse();
+
+    fl_mouse_button
+    fl_mousebutton
+    fl_set_mouse
+
+XEVENT FUNCTIONS
+
+    NOTE: The XEvent structures used by these functions are 
+          Perl blessed objects that can be accessed by methods 
+          defined in the co-delivered Perl package X11::XEvent.
+
+          See the X11::XEvent man page and the canvas.pl DEMO
+          for more information on how to do this. 
+
+    fl_XEventsQueued
+    fl_XNextEvent
+        ($status, $xevent) = fl_XNextEvent();
+
+    fl_XPeekEvent
+        ($status, $xevent) = fl_XPeekEvent();
+
+    fl_XPutBackEvent
+    fl_activate_event_callbacks
+    fl_add_event_callback
+    fl_add_selected_xevent
+    fl_addto_selected_xevent
+    fl_last_event
+    fl_print_xevent_name
+    fl_remove_event_callback
+    fl_remove_selected_xevent
+    fl_set_event_callback
+
+CLIPBOARD
+
+    fl_request_clipboard
+        fl_request_clipboard($object, $callback);
+        NOTE: No type argument is passed - the type is always 
+              FL_STRING.
+
+    fl_stuff_clipboard
+        fl_stuff_clipboard($object, $data_string, $callback)
+        NOTE: No type argument is passed - the type is always 
+              FL_STRING. Similarly no length argument is passed. 
+              The length of the string is determined automatically.
+
+DRAWING
+
+    fl_add_float_vertex
+    fl_add_vertex
+    fl_arc
+    fl_arcf
+    fl_bgnclosedline
+    fl_bgnline
+    fl_bgnpolygon
+    fl_circ
+    fl_circf
+    fl_dashedlinestyle
+    fl_diagline
+    fl_drawmode
+    fl_draw_text
+    fl_drw_box
+    fl_drw_checkbox
+    fl_drw_frame
+    fl_drw_text
+    fl_drw_text_beside
+    fl_drw_text_cursor
+    fl_endclosedline
+    fl_endline
+    fl_endpolygon
+    fl_get_drawmode
+    fl_get_linestyle
+    fl_get_linewidth
+    fl_line
+    fl_lines
+        fl_lines($x1, $y1 [,$x2, $y2 [,...]], $color);
+
+    fl_linestyle
+    fl_linewidth
+    fl_oval
+    fl_ovalarc
+    fl_oval_bound
+    fl_ovalbound
+    fl_ovalf
+    fl_ovall
+    fl_pieslice
+    fl_point
+    fl_points
+        fl_points($x1, $y1 [,$x2, $y2 [,...]], $color);
+
+    fl_polybound
+        fl_polybound($x1, $y1 [,$x2, $y2 [,...]], $color);
+
+    fl_polyf
+        fl_polyf($x1, $y1 [,$x2, $y2 [,...]], $color);
+
+    fl_polygon
+        fl_polygon($type, $x1, $y1 [,$x2, $y2 [,...]], $color);
+
+    fl_polyl
+        fl_polyl($x1, $y1 [,$x2, $y2 [,...]], $color);
+
+    fl_rect
+    fl_rectangle
+    fl_rectbound
+    fl_rectf
+    fl_reset_vertex
+    fl_roundrect
+    fl_roundrectangle
+    fl_roundrectf
+    fl_set_drawmode
+    fl_set_linestyle
+    fl_set_linewidth
+    fl_simple_line
+
+CHARACTERS, STRINGS, COLORS
+
+    fl_bk_color
+    fl_bk_textcolor
+    fl_color
+    fl_free_colors
+        fl_free_colors($color1[, $color2[,...]]);
+
+    fl_free_pixels
+        fl_free_pixels($pixel1[, $pixel2[,...]]);
+
+    fl_get_align_xy
+        ($x, $y) = fl_get_align_xy($align, $x, $y, $w, $h, 
+                   $obj_xsize, $obj_ysize, $xmargin, $ymargin); 
+
+    fl_get_char_height 
+        ($return, $ascend, $descend) = 
+            fl_get_char_height($font_style, $font_size);
+
+    fl_get_char_width
+    fl_get_flcolor
+    fl_get_icm_color
+        ($r, $g, $b) = fl_get_icm_color($color);
+
+    fl_get_pixel
+    fl_get_string_dimension
+        ($ascend, $descend) =  
+            fl_get_string_dimension($font_style, $font_size, 
+                                    $string, $string_length);
+
+    fl_get_string_height 
+        ($return, $ascend, $descend) = 
+            fl_get_string_height($font_style, $font_size, 
+                                    $string, $string_length);
+
+    fl_get_string_size
+        ($return, $ascend, $descend) = 
+            fl_get_string_size($font_style, $font_size, 
+                               $string, $string_length);
+
+    fl_get_string_width
+    fl_get_string_widthTAB
+    fl_getmcolor
+        ($result, $r, $g, $b) = fl_getmcolor($color);
+
+    fl_mapcolor
+    fl_mapcolor_name
+    fl_mapcolorname
+    fl_set_color_leak
+    fl_set_gamma
+    fl_set_icm_color
+    fl_textcolor
+
+FORMS
+
+    fl_activate_all_forms
+    fl_activate_form
+    fl_addto_form
+    fl_addto_group
+    fl_adjust_form_size
+    fl_bgn_form
+    fl_bgn_group
+    fl_check_forms
+    fl_check_only_forms
+    fl_deactivate_all_forms
+    fl_deactivate_form
+    fl_do_forms
+    fl_do_only_forms
+    fl_end_form
+    fl_end_group
+    fl_form_is_visible
+    fl_free_form
+    fl_freeze_all_forms
+    fl_freeze_form
+    fl_get_app_mainform
+    fl_get_form_event_cmask
+    fl_hide_form
+    fl_lower_form
+    fl_mode_capable
+    fl_prepare_form_window
+    fl_raise_form
+    fl_redraw_form
+    fl_register_callback
+    fl_register_raw_callback
+        NOTE: Unlike in the C interface where up to 5 raw callback can be 
+              registered at one time, in X11::Xforms, only ONE raw callback 
+              handler can be registered per form.
+
+    fl_scale_form
+    fl_set_app_mainform
+    fl_set_app_nomainform
+    fl_set_font
+    fl_set_font_name
+    fl_set_form_atactivate
+    fl_set_form_atclose
+    fl_set_form_atdeactivate
+    fl_set_form_call_back
+    fl_set_form_callback
+    fl_set_form_dblbuffer
+    fl_set_form_event_cmask
+    fl_set_form_geometry
+    fl_set_form_hotobject
+    fl_set_form_hotspot
+    fl_set_form_icon
+    fl_set_form_maxsize
+    fl_set_form_minsize
+    fl_set_form_position
+    fl_set_form_property
+    fl_set_form_property
+    fl_set_form_size
+    fl_set_form_title
+    fl_set_initial_placement
+    fl_show_form
+    fl_show_form_window
+    fl_unfreeze_all_forms
+    fl_unfreeze_form
+
+GENERAL OBJECT FUNCTIONS
+
+    fl_activate_object
+    fl_add_object
+    fl_call_object_callback
+    fl_compute_object_geometry
+        ($x, $y, $width, $height) = 
+            fl_compute_object_geometry($object);
+
+    fl_deactivate_object
+    fl_delete_object
+    fl_draw_object_label
+    fl_draw_object_label_outside
+    fl_draw_object_outside_label
+    fl_drw_slider
+    fl_fit_object_label
+    fl_free_object
+    fl_get_focus_object 
+    fl_get_object_bbox
+        ($x, $y, $width, $height) = fl_get_object_bbox($object);
+
+    fl_get_object_component
+    fl_get_object_geometry
+        ($x, $y, $width, $height) = fl_get_object_geometry($object);
+
+    fl_get_object_position
+        ($x, $y) = fl_get_object_position($object);
+
+    fl_hide_object
+    fl_make_object
+        $object = 
+            fl_make_object($class, $x, $y, $width, $height, $label,
+                           $handler_callback, $type);
+
+    fl_get_real_object_window
+    fl_redraw_object
+    fl_reset_focus_object
+    fl_scale_object
+    fl_set_call_back
+    fl_set_focus_object
+    fl_set_object_align
+    fl_set_object_automatic
+    fl_set_object_boxtype
+    fl_set_object_bw
+    fl_set_object_callback
+    fl_set_object_color
+    fl_set_object_dblbuffer
+    fl_set_object_dblclick
+    fl_set_object_focus
+    fl_set_object_geometry
+    fl_set_object_gravity
+    fl_set_object_label
+    fl_set_object_lalign
+    fl_set_object_lcol
+    fl_set_object_lcolor
+    fl_set_object_lsize
+    fl_set_object_lstyle
+    fl_set_object_position
+    fl_set_object_posthandler
+    fl_set_object_prehandler
+    fl_set_object_resize
+    fl_set_object_return
+    fl_set_object_shortcut
+    fl_set_object_shortcutkey
+    fl_set_object_size
+    fl_show_object
+    fl_trigger_object
+
+SPECIFIC OBJECT FUNCTIONS
+
+    BITMAPS
+
+        fl_add_bitmap
+        fl_create_bitmap
+        fl_create_from_bitmapdata
+        fl_read_bitmapfile
+            ($pixmap, $width, $height, $hotx, $hoty) =
+                fl_read_bitmapfile($window, $file_name); 
+
+        fl_set_bitmap_data
+        fl_set_bitmap_datafile
+        fl_set_bitmap_file
+
+    PIXMAPS
+
+        fl_add_pixmap
+        fl_create_pixmap
+        fl_create_from_pixmapdata
+            ($pixmap, $width, $height, $shapemask, $hotx, $hoty) =
+                fl_create_from_pixmapdata($win, $tran, 
+                    $pixmapdatastr1 [,$pixmapdatastr2 [,...]]);
+
+            NOTE: The idea here is to have the strings that
+                  make up the pixmap in an array named, perhaps,
+                  @pixmapdatastr and to call the function like 
+                  this:
+
+                  ($pmap, $w, $h, $shapemask, $hotx, $hoty) =
+                    fl_create_from_pixmapdata($win, $tran, 
+                                              @pixmapdatastr);
+
+        fl_free_pixmap
+        fl_free_pixmap_pixmap
+        fl_get_pixmap_pixmap
+            ($pixmap1, $pixmap2, $pixmap3) = 
+                fl_get_pixmap_pixmap($object);
+
+        fl_read_pixmapfile
+            ($pixmap, $width, $height, $shapemask, $hotx, $hoty) =
+                fl_read_pixmapfile($window, $file_name, $tran);
+
+        fl_set_pixmap_align
+        fl_set_pixmap_colorcloseness
+        fl_set_pixmap_data
+            fl_set_pixmap_data($object, $pixmapdatastr1, 
+                [,$pixmapdatastr2 [,...]]);
+
+            NOTE: The idea here is to have the strings that
+                  make up the pixmap in an array named, perhaps,
+                  @pixmapdatastr and to call the function like 
+                  this:
+
+                      fl_set_pixmap_data($object,@pixmapdatastr);
+
+        fl_set_pixmap_file
+        fl_set_pixmap_pixmap
+
+    BOXES
+
+        fl_add_box
+        fl_create_box
+
+    BROWSERS
+
+        fl_add_browser
+        fl_add_browser_line
+        fl_addto_browser
+        fl_addto_browser_chars
+        fl_append_browser
+        fl_clear_browser
+        fl_create_browser
+        fl_delete_browser_line
+        fl_deselect_browser
+        fl_deselect_browser_line
+        fl_get_browser
+        fl_get_browser_dimension    
+            ($x, $y, $width, $height) = 
+                fl_get_browser_dimension($object);
+
+        fl_get_browser_line
+        fl_get_browser_maxline
+        fl_get_browser_screenlines
+        fl_get_browser_topline
+        fl_get_browser_xoffset
+        fl_insert_browser_line
+        fl_isselected_browser_line
+        fl_load_browser
+        fl_replace_browser_line
+        fl_select_browser_line
+        fl_set_browser_dblclick_callback
+        fl_set_browser_fontsize
+        fl_set_browser_fontstyle
+        fl_set_browser_hscrollbar
+        fl_set_browser_scrollbarsize
+        fl_set_browser_line_selectable
+        fl_set_browser_specialkey
+        fl_set_browser_topline
+        fl_set_browser_vscrollbar
+        fl_set_browser_xoffset
+        fl_show_browser_line
+
+    BUTTONS
+
+        fl_add_bitmapbutton
+        fl_add_button
+        fl_add_checkbutton
+        fl_add_lightbutton
+        fl_add_pixmapbutton
+        fl_add_roundbutton
+        fl_add_round3dbutton
+        fl_create_bitmapbutton
+        fl_create_button
+        fl_create_checkbutton
+        fl_create_generic_button
+            $object = fl_create_generic_button($class, $x, $y, 
+                $width, $height, $label, $type);
+
+        fl_create_lightbutton
+        fl_create_pixmapbutton
+        fl_create_roundbutton
+        fl_create_round3dbutton
+        fl_free_pixmapbutton_pixmap
+        fl_get_button
+        fl_get_button_numb
+        fl_get_pixmapbutton_pixmap
+            ($result, $pixmap_id, $mask_id) = 
+                fl_get_pixmapbutton_pixmap($object);
+
+        fl_set_bitmapbutton_data
+        fl_set_bitmapbutton_datafile
+        fl_set_bitmapbutton_file
+        fl_set_button
+        fl_set_button_shortcut
+        fl_set_pixmapbutton_align
+        fl_set_pixmapbutton_data
+            fl_set_pixmapbutton_data($obj, $pixmapdatastr1, 
+                [,$pixmapdatastr2 [,...]]);
+
+            NOTE: The idea here is to have the strings that
+                  make up the pixmap in an array named, perhaps,
+                  @pixmapdatastr and to call the function like 
+                  this:
+
+                      fl_set_pixmapbutton_data($obj,@pixmapdatastr);
+
+        fl_set_pixmapbutton_datafile
+        fl_set_pixmapbutton_file
+        fl_set_pixmapbutton_focus_outline
+        fl_set_pixmapbutton_pixmap
+
+    CANVASES
+
+        fl_add_canvas
+        fl_add_canvas_handler
+        fl_canvas_yield_to_shortcut
+        fl_create_canvas
+        fl_create_generic_canvas
+            $object = 
+                fl_create_generic_canvas($class, $x, $y, $w, $h, 
+                                         $label, $type);
+
+        fl_get_canvas_colormap
+        fl_get_canvas_depth
+        fl_get_canvas_id
+        fl_hide_canvas
+        fl_modify_canvas_prop
+        fl_remove_canvas_handler
+             fl_remove_canvas_handler($canvas_object, $event);
+
+        fl_set_canvas_attributes
+        fl_set_canvas_colormap
+        fl_set_canvas_decoration
+        fl_set_canvas_depth
+        fl_set_canvas_visual
+        fl_share_canvas_colormap
+
+    OPEN_GL CANVASES
+
+        fl_activate_glcanvas
+        fl_add_glcanvas
+        fl_create_glcanvas
+        fl_get_glcanvas_attributes
+            @attributes = fl_get_glcanvas_attributes($object);
+
+        fl_get_glcanvas_context
+        fl_get_glcanvas_defaults
+            @defaults = fl_get_glcanvas_defaults();
+
+        fl_get_glcanvas_xvisualinfo
+        fl_glwincreate
+            ($window, $out_int, $glxcontext) = 
+                fl_glwincreate($in_int1, $in_int2);
+
+        fl_glwinopen
+            ($window, $out_int, $glxcontext) =
+                fl_glwinopen($in_int1, $in_int2);
+
+        fl_set_glcanvas_attributes
+            fl_set_glcanvas_attributes($object, 
+                $attr1 [, $attr2 [,...]]);
+
+        fl_set_glcanvas_defaults
+            fl_set_glcanvas_defaults($dflt1 [, $dflt2 [,...]]);
+
+        fl_set_glcanvas_direct
+
+    CHARTS
+
+        fl_add_chart
+        fl_add_chart_value
+        fl_clear_chart
+        fl_create_chart
+        fl_insert_chart_value
+        fl_replace_chart_value
+        fl_set_chart_autosize
+        fl_set_chart_bounds
+        fl_set_chart_lcol
+        fl_set_chart_lcolor
+        fl_set_chart_lsize
+        fl_set_chart_lstyle
+        fl_set_chart_maxnumb
+
+    CHOICES
+
+        fl_add_choice
+        fl_addto_choice
+        fl_clear_choice
+        fl_create_choice
+        fl_delete_choice
+        fl_get_choice
+        fl_get_choice_item_text
+        fl_get_choice_maxitems
+        fl_get_choice_text
+        fl_replace_choice
+        fl_set_choice
+        fl_set_choice_entries
+            fl_set_choice_entries($object, 
+                $ent_1_text, $ent_1_callback, $ent_1_shortcut, $ent_1_mode
+                [, $ent_2_text, $ent_2_callback, $ent_2_shortcut, $ent_2_mode
+                [, ...]])
+
+            NOTE: This call is basically equivalent to the C 
+                  version except that instead of using an 
+                  FL_PUP_ENTRY structure, the elements of that 
+                  structure are provided in a list. Note that to 
+                  delimit sub-menus just provide a NULL string for 
+                  the $ent_text and DO NOT PROVIDE THE OTHER THREE 
+                  ITEMS FOR THE ENTRY.
+
+                  Useful help can be derived from the popup.pl DEMO.
+
+        fl_set_choice_shortcut
+        fl_set_choice_align
+        fl_set_choice_fontsize
+        fl_set_choice_fontstyle
+        fl_set_choice_item_mode
+        fl_set_choice_item_shortcut
+        fl_set_choice_text
+
+    CLOCKS
+
+        fl_add_clock
+        fl_create_clock
+        fl_get_clock
+            ($hrs, $mins, $secs) = fl_get_clock($object);
+
+        fl_set_clock_adjustment
+        fl_set_clock_ampm
+
+    COUNTERS
+
+        fl_add_counter
+        fl_create_counter
+        fl_get_counter_bounds
+            ($lower, $upper) = fl_get_counter_bounds($object);
+
+        fl_get_counter_step
+            ($lower, $upper) = fl_get_counter_step($object);
+
+        fl_get_counter_value
+        fl_set_counter_bounds
+        fl_set_counter_filter
+        fl_set_counter_precision
+        fl_set_counter_return
+        fl_set_counter_step
+        fl_set_counter_value
+
+    CURSORS
+
+        fl_create_animated_cursor
+            $return = 
+                fl_create_animated_cursor($cursor1 [, $cursor2,
+                                          [,...]], $interval)
+
+            NOTE: In Xforms, the last cursor id passed must be -1. 
+                  This is not necessary in Perl - X11::Xforms adds 
+                  the -1 cursor id itself.
+
+        fl_create_bitmap_cursor
+        fl_get_cursor_byname
+        fl_reset_cursor
+        fl_set_cursor
+        fl_set_cursor_color
+
+    DIALS
+
+        fl_add_dial
+        fl_create_dial
+        fl_get_dial_bounds
+            ($lower, $upper) = fl_get_dial_bounds($object);
+
+        fl_set_dial_direction
+        fl_get_dial_value
+        fl_set_dial_angles    
+        fl_set_dial_bounds    
+        fl_set_dial_cross    
+        fl_set_dial_return
+        fl_set_dial_step
+        fl_set_dial_value
+
+    FRAMES
+
+        fl_add_frame
+        fl_add_labelframe
+        fl_create_frame
+        fl_create_labelframe
+
+    FREE OBJECTS
+
+        fl_add_free
+            $object = fl_add_free($type, $x, $y, $width, 
+                $height, $label, $callback)
+
+        fl_create_free
+            $object = fl_create_free($type, $x, $y, $width, 
+                $height, $label, $callback)
+
+    GOODIES
+
+        fl_add_fselector_appbutton
+        fl_addto_command_log
+        fl_check_command
+        fl_clear_command_log
+        fl_close_command
+        fl_disable_fselector_cache
+        fl_end_all_command
+        fl_end_command
+        fl_exe_command
+        fl_get_command_log_fdstruct
+            NOTE: The FD_CMDLOG structure used in the C interface 
+                  to this function has been defined as a Perl 
+                  blessed object. See the X11::Xforms man page for
+                  details of how to use this object with this 
+                  function. 
+
+        fl_get_directory
+        fl_get_filename
+        fl_get_fselector_fdstruct
+            NOTE: The FD_CMDLOG structure used in the C interface 
+                  to this function has been defined as a Perl 
+                  blessed object. See the X11::Xforms man page for
+                  details of how to use this object with this 
+                  function. 
+
+        fl_get_fselector_form
+        fl_get_pattern
+        fl_hide_alert
+        fl_hide_choice
+        fl_hide_command_log
+        fl_hide_fselector
+        fl_hide_input
+        fl_hide_message
+        fl_hide_oneliner
+        fl_hide_question
+        fl_invalidate_fselector_cache
+        fl_open_command
+        fl_refresh_fselector
+        fl_remove_fselector_appbutton
+        fl_set_choices_shortcut
+        fl_set_command_log_position
+        fl_set_directory
+        fl_set_dirlist_sort
+        fl_set_fselector_border
+        fl_set_fselector_callback
+        fl_set_fselector_cb
+        fl_set_fselector_filetype_marker
+        fl_set_fselector_fontsize
+        fl_set_fselector_fontstyle
+        fl_set_fselector_placement
+        fl_set_fselector_title
+        fl_set_fselector_transient
+        fl_set_goodies_font
+        fl_set_oneliner_color
+        fl_set_oneliner_font
+        fl_set_pattern
+        fl_show_alert
+        fl_show_choice
+        fl_show_choices
+        fl_show_colormap
+        fl_show_command_log
+        fl_show_file_selector
+        fl_show_fselector
+        fl_show_input
+        fl_show_menu_symbol
+        fl_show_message
+        fl_show_messages
+        fl_show_oneliner
+        fl_show_question
+        fl_show_simple_input
+        fl_use_fselector
+
+    INPUTS
+
+        fl_add_input
+        fl_create_input
+        fl_get_input
+        fl_get_input_cursorpos
+            ($return, $x, $y) = fl_get_input_cursorpos($object);
+
+        fl_get_input_format
+            ($attrib_1, $attrib_2) = fl_get_input_format($object);
+
+        fl_get_input_numberoflines
+        fl_get_input_screenlines
+        fl_get_input_selected_range
+            ($string, $start, $end) = 
+                fl_get_input_selected_range($object);
+
+        fl_get_input_topline
+        fl_get_input_xoffset
+        fl_set_input
+        fl_set_input_color
+        fl_set_input_cursorpos
+        fl_set_input_editkeymap
+            NOTE: The FL_EditKeymap structure used in the C 
+                  interface to this function has been defined as 
+                  a Perl blessed object. See the X11::Xforms man 
+                  page for details of how to use this object with 
+                  this function. 
+
+        fl_set_input_filter
+        fl_set_input_format
+        fl_set_input_hscrollbar
+        fl_set_input_maxchars
+        fl_set_input_return
+        fl_set_input_scroll
+        fl_set_input_scrollbarsize
+        fl_set_input_selected
+        fl_set_input_selected_range
+        fl_set_input_shortcut
+        fl_set_input_topline
+        fl_set_input_vscrollbar
+        fl_set_input_xoffset
+
+
+    MENUBARS 
+
+        NOTE: Menubars are currently unimplemented in Xforms.
+              DO NOT USE THESE FUNCTIONS: they will cause your 
+              script to die.
+
+        fl_add_menubar
+        fl_clear_menubar
+        fl_create_menubar
+        fl_set_menubar
+        fl_set_menubar_entries
+
+
+    MENUS
+
+        fl_add_menu
+        fl_addto_menu
+        fl_clear_menu
+        fl_create_menu
+        fl_delete_menu_item
+        fl_get_menu
+        fl_get_menu_item_mode
+        fl_get_menu_item_text
+        fl_get_menu_maxitems
+        fl_get_menu_popup
+        fl_get_menu_text
+        fl_replace_menu_item
+        fl_set_menu
+        fl_set_menu_entries
+            fl_set_menu_entries($object, 
+                $ent_1_text, $ent_1_callback, $ent_1_shortcut, $ent_1_mode
+                [, $ent_2_text, $ent_2_callback, $ent_2_shortcut, $ent_2_mode
+                [, ...]])
+
+            NOTE: This call is basically equivalent to the C 
+                  version except that instead of using an 
+                  FL_PUP_ENTRY structure, the elements of that 
+                  structure are provided in a list. Note that to 
+                  delimit sub-menus just provide a NULL string for 
+                  the $ent_text and DO NOT PROVIDE THE OTHER THREE 
+                  ITEMS FOR THE ENTRY.
+
+                  Useful help can be derived from the popup.pl DEMO.
+
+        fl_set_menu_item_mode
+        fl_set_menu_item_shortcut
+        fl_set_menu_popup
+        fl_setpup_fontsize
+        fl_setpup_fontstyle
+        fl_show_menu_symbol
+
+    POPUPS
+
+        NOTE: You cannot implicitly add pup callbacks via the 
+              %f and %F strings in the fl_addtopup and fl_defpup 
+              calls. You must either use fl_setpup_{item/menu}cb or
+              (0.87 and above) the new fl_setpup_entries calls. 
+              Using %f and %F will not only not work, they will 
+              also almost certainly cause some horrible death to 
+              your application. All other menu types are, however, 
+              supported.
+
+        fl_addtopup
+            $pup_id = fl_addtopup($entry, $entry_string);
+
+        fl_current_pup
+        fl_defpup
+            $pup_id = fl_defpup($entry, $entry_string);
+
+        fl_dopup
+        fl_freepup
+        fl_getpup_items
+        fl_getpup_mode
+        fl_getpup_text
+        fl_hidepup
+        fl_newpup
+        fl_setpup
+        fl_setpup_bw
+        fl_setpup_checkcolor
+        fl_setpup_color
+        fl_setpup_cursor
+        fl_setpup_default_bw
+        fl_setpup_default_checkcolor
+        fl_setpup_default_color
+        fl_setpup_default_cursor
+        fl_setpup_default_fontsize
+        fl_setpup_default_fontstyle
+        fl_setpup_entercb
+        fl_setpup_entries
+            fl_setpup_entries($pup_id, 
+                $ent_1_text, $ent_1_callback, $ent_1_shortcut, $ent_1_mode
+                [, $ent_2_text, $ent_2_callback, $ent_2_shortcut, $ent_2_mode
+                [, ...]])
+
+            NOTE: This call is basically equivalent to the C 
+                  version except that instead of using an 
+                  FL_PUP_ENTRY structure, the elements of that 
+                  structure are provided in a list. Note that to 
+                  delimit sub-menus just provide a NULL string for 
+                  the $ent_text and DO NOT PROVIDE THE OTHER THREE 
+                  ITEMS FOR THE ENTRY.
+
+                  Useful help can be derived from the popup.pl DEMO.
+
+        fl_setpup_hotkey
+        fl_setpup_itemcb
+        fl_setpup_leavecb 
+        fl_setpup_maxpup
+        fl_setpup_menucb
+        fl_setpup_mode
+        fl_setpup_pad
+        fl_setpup_position
+        fl_setpup_selection
+        fl_setpup_shadow
+        fl_setpup_shortcut
+        fl_setpup_softedge
+        fl_setpup_submenu
+        fl_setpup_title
+        fl_showpup
+
+    POSITIONERS
+
+        fl_add_positioner
+        fl_create_positioner
+        fl_get_positioner_xbounds
+            ($lower, $upper) = fl_get_positioner_xbounds($object);
+
+        fl_get_positioner_xvalue
+        fl_get_positioner_ybounds
+            ($lower, $upper) = fl_get_positioner_ybounds($object);
+
+        fl_get_positioner_yvalue
+        fl_set_positioner_return
+        fl_set_positioner_xbounds
+        fl_set_positioner_xstep
+        fl_set_positioner_xvalue
+        fl_set_positioner_ybounds
+        fl_set_positioner_ystep
+        fl_set_positioner_yvalue
+
+    SCROLLBARS
+
+        fl_add_scrollbar
+        fl_create_scrollbar
+        fl_get_scrollbar_bounds
+        fl_get_scrollbar_increment
+            ($lower, $upper) = fl_get_scrollbar_increment($object);
+
+        fl_get_scrollbar_value 
+        fl_set_scrollbar_bounds
+            ($lower, $upper) = fl_get_scrollbar_bounds($object);
+
+        fl_set_scrollbar_increment
+        fl_set_scrollbar_return
+        fl_set_scrollbar_size
+        fl_set_scrollbar_step
+        fl_set_scrollbar_value 
+        fl_set_thinscrollbar
+
+    SCROLLBUTTON
+
+        fl_add_scrollbutton
+        fl_create_scrollbutton
+
+    SLIDERS
+
+        fl_add_slider
+        fl_add_valslider
+        fl_create_slider
+        fl_create_valslider
+        fl_get_slider_bounds
+            ($lower, $upper) = fl_get_slider_bounds($object);
+
+        fl_get_slider_increment
+            ($lower, $upper) = fl_get_slider_increment($object);
+
+        fl_get_slider_value
+        fl_set_slider_bounds
+        fl_set_slider_filter
+        fl_set_slider_increment
+        fl_set_slider_precision
+        fl_set_slider_return
+        fl_set_slider_size
+        fl_set_slider_step
+        fl_set_slider_value
+
+    TABFOLDERS
+
+        fl_add_tabfolder
+        fl_addto_tabfolder
+        fl_create_tabfolder
+        fl_delete_folder
+        fl_delete_folder_byname
+        fl_delete_folder_bynumber
+        fl_get_active_folder
+        fl_get_active_folder_name
+        fl_get_active_folder_number
+        fl_get_folder
+        fl_get_folder_area
+            ($x, $y, $w, $h) = fl_get_folder_area($object);
+
+        fl_get_folder_name
+        fl_get_folder_number 
+        fl_replace_folder_bynumber
+        fl_set_folder
+        fl_set_folder_byname
+        fl_set_folder_bynumber
+
+    TEXT
+
+        fl_add_text
+        fl_create_text
+
+
+    TIMERS
+
+        fl_add_timer
+        fl_create_timer
+        fl_get_timer
+        fl_resume_timer
+        fl_set_timer
+        fl_set_timer_countup
+        fl_set_timer_filter
+        fl_suspend_timer
+
+    XYPLOTS
+
+        fl_add_xyplot
+        fl_add_xyplot_overlay_file
+        fl_add_xyplot_overlay 
+            fl_add_xyplot_overlay($object, $overlayid, $x1, $y1 
+                                  [,$x2, $y2 [,...]], $color);
+
+        fl_add_xyplot_text
+        fl_clear_xyplot
+        fl_create_xyplot
+        fl_delete_xyplot_overlay
+        fl_delete_xyplot_text
+        fl_get_xyplot 
+            ($x, $y, $dataindex) = fl_get_xyplot($object);
+
+        fl_get_xyplot_data 
+            (@xyplot_data) = fl_get_xyplot_data($object);
+            NOTE: The returned data is in the form:
+                  ($x1, $y1 [, $x2, $y2 [,...]])
+
+        fl_get_xyplot_numdata
+        fl_get_xyplot_overlay_data
+            (@xyplot_data) = 
+                fl_get_xyplot_data($object, $overlay_id);
+            NOTE: The returned data is in the form:
+                  ($x1, $y1 [, $x2, $y2 [,...]])
+
+        fl_get_xyplot_xbounds
+            ($lower, $upper) = fl_get_xyplot_xbounds($object);
+
+        fl_get_xyplot_xmapping
+            ($fl1, $fl2) = fl_get_xyplot_xmapping($object);
+
+        fl_get_xyplot_ybounds
+            ($lower, $upper) = fl_get_xyplot_ybounds($object);
+
+        fl_get_xyplot_ymapping
+            ($fl1, $fl2) = fl_get_xyplot_ymapping($object);
+
+        fl_interpolate
+            ($rc, @data) = fl_interpolate($x1, $y2,
+                       [,$x2, $y2 [,...]], grid, ndeg);
+            NOTE: The returned data is in the form:
+                  ($x1, $y1 [, $x2, $y2 [,...]])
+
+        fl_replace_xyplot_point
+        fl_set_xyplot_alphaxtics
+        fl_set_xyplot_alphaytics
+        fl_set_xyplot_data 
+            fl_set_xyplot_data($object, 
+                               $x1, $y1 [,$x2, $y2 [,...]],
+                               $title, $xlabel, $ylabel);
+
+        fl_set_xyplot_datafile
+        fl_set_xyplot_file
+        fl_set_xyplot_fixed_xaxis
+        fl_set_xyplot_fixed_yaxis
+        fl_set_xyplot_fontsize
+        fl_set_xyplot_fontstyle
+        fl_set_xyplot_inspect
+        fl_set_xyplot_interpolate
+        fl_set_xyplot_key
+        fl_set_xyplot_key_font
+        fl_set_xyplot_key_position
+        fl_set_xyplot_keys
+            fl_set_xyplot_keys($object, $x, $y, $align,
+                               $key_str_1 [,$key_str_2 [,...]]);
+
+        fl_set_xyplot_linewidth
+        fl_set_xyplot_maxoverlays
+        fl_set_xyplot_overlay_type
+        fl_set_xyplot_return
+        fl_set_xyplot_symbol
+            NOTE: fl_set_xyplot_symbol has the same protocol as 
+                  its 'C' counterpart,
+
+                  BUT the xyplot symbol drawer callback routine has
+                  a slightly different call protocol to its 
+                  counterpart: The point data is returned as a list
+                  rather than in an array (as in C). 
+
+                  The following statement at the beginning of the 
+                  callback subroutine will assign the correct value
+                  to relevant variables:
+
+                      my($object, $wdth, $hght, @points) = @_;
+
+                  @points will then contain data in the form 
+
+                      ($x1, $y1 [, $x2, $y2 [...]]) 
+
+                  that is, the point co-ordinates for which 
+                  symbol drawing is required.
+
+                  See the xyplotsymb.pl DEMO for an example of
+                  the use of this function.
+
+        fl_set_xyplot_symbolsize
+        fl_set_xyplot_xbounds
+        fl_set_xyplot_xgrid
+        fl_set_xyplot_xscale
+        fl_set_xyplot_xtics
+        fl_set_xyplot_ybounds
+        fl_set_xyplot_ygrid
+        fl_set_xyplot_yscale
+        fl_set_xyplot_ytics
+        fl_xyplot_s2w  
+            ($wx, $wy) = fl_xyplot_w2s($object, $sx, $sy);
+
+        fl_xyplot_w2s  
+            ($sx, $sy) = fl_xyplot_w2s($object, $wx, $wy);
+

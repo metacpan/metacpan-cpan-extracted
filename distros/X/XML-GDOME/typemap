@@ -1,0 +1,117 @@
+TYPEMAP
+char *			G_CHAR
+const char *		T_PV
+const gchar *		T_PV
+gchar *			T_PV
+gulong                  T_IV
+GdomeNode *		G_NODE
+GdomeNamedNodeMap *	G_OBJECT
+GdomeNodeList *		G_OBJECT
+GdomeDOMString *	G_STRING
+GdomeDocument *		G_OBJECT
+GdomeDocumentType *	G_OBJECT
+GdomeElement *		G_OBJECT
+GdomeDOMImplementation* G_OBJECT
+GdomeCharacterData *	G_OBJECT
+GdomeAttr *		G_OBJECT
+GdomeBoolean		T_IV
+GdomeNotation *         G_OBJECT
+GdomeEntity *           G_OBJECT
+GdomeProcessingInstruction * G_OBJECT
+GdomeText *		G_OBJECT
+GdomeEvent *		G_OBJECT
+GdomeEntityReference *  G_OBJECT
+GdomeDocumentFragment * G_OBJECT
+GdomeComment *          G_OBJECT
+GdomeCDATASection *     G_OBJECT
+GdomeEventListener *    G_OBJECT
+GdomeSavingCode         T_IV
+GdomeXPathEvaluator *   G_OBJECT
+GdomeXPathNamespace *   G_OBJECT
+GdomeXPathNSResolver *  G_OBJECT
+GdomeXPathResult *      G_OBJECT
+GdomeXPathSetIterator * G_OBJECT
+GdomeNodeIterator *     G_OBJECT
+GdomeNodeFilter *       G_OBJECT
+GdomeEventListener *    G_OBJECT
+GdomeEvent *            G_OBJECT
+GdomeMutationEvent *    G_OBJECT
+
+INPUT
+G_NODELIST
+G_OBJECT
+    if( sv_isobject($arg) && (SvTYPE(SvRV($arg)) == SVt_PVMG) )
+            $var = ($type)SvIV((SV*)SvRV( $arg ));
+    else{
+            $var = NULL;
+    }
+
+G_NODE
+    if( sv_isobject($arg) && (SvTYPE(SvRV($arg)) == SVt_PVMG) )
+            $var = ($type)SvIV((SV*)SvRV( $arg ));
+    else{
+            $var = NULL;
+    }
+
+G_STRING
+    if( SvOK($arg) )
+       $var = gdome_str_mkref_dup((gchar *) SvPV($arg, PL_na));
+    else {
+       $var = NULL;
+    }
+
+G_CHAR
+    if( SvOK($arg) )
+       $var = (char *) SvPV($arg, PL_na);
+    else {
+       $var = NULL;
+    }
+
+OUTPUT
+G_OBJECT
+    sv_setref_pv( $arg, (char *)CLASS, (void*)$var );
+
+G_NODE
+    switch (gdome_n_nodeType($var, &exc)) {
+    case GDOME_ELEMENT_NODE:
+      CLASS = "XML::GDOME::Element"; break;
+    case GDOME_ATTRIBUTE_NODE:
+      CLASS = "XML::GDOME::Attr"; break;
+    case GDOME_TEXT_NODE:
+      CLASS = "XML::GDOME::Text"; break;
+    case GDOME_CDATA_SECTION_NODE:
+      CLASS = "XML::GDOME::CDATASection"; break;
+    case GDOME_ENTITY_REFERENCE_NODE:
+      CLASS = "XML::GDOME::EntityReference"; break;
+    case GDOME_ENTITY_NODE:
+      CLASS = "XML::GDOME::Entity"; break;
+    case GDOME_PROCESSING_INSTRUCTION_NODE:
+      CLASS = "XML::GDOME::ProcessingInstruction"; break;
+    case GDOME_COMMENT_NODE:
+      CLASS = "XML::GDOME::Comment"; break;
+    case GDOME_DOCUMENT_TYPE_NODE:
+      CLASS = "XML::GDOME::DocumentType"; break;
+    case GDOME_DOCUMENT_FRAGMENT_NODE:
+      CLASS = "XML::GDOME::DocumentFragment"; break;
+    case GDOME_NOTATION_NODE:
+      CLASS = "XML::GDOME::Notation"; break;
+    case GDOME_DOCUMENT_NODE:
+      CLASS = "XML::GDOME::Document"; break;
+    default:
+      break;
+  }
+    sv_setref_pv( $arg, (char *)CLASS, (void*)$var );
+
+G_STRING
+    if($var != NULL) {
+        $arg = newSVpv($var->str, xmlStrlen($var->str));
+        gdome_str_unref($var);
+	sv_2mortal($arg);
+    }
+
+G_CHAR
+    if($var != NULL) {
+        $arg = newSVpv($var, xmlStrlen($var));
+        free($var);
+	sv_2mortal($arg);
+    }

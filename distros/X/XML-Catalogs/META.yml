@@ -1,0 +1,27 @@
+---
+abstract: 'Basic framework to provide DTD catalogs'
+author:
+  - 'Eric Brine, C<< <ikegami@adaelis.com> >>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.110580'
+license: unrestricted
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: XML-Catalogs
+provides:
+  XML::Catalogs:
+    file: lib/XML/Catalogs.pm
+    version: v1.0.3
+requires:
+  Carp: 0
+  File::ShareDir: 0
+  URI::file: 0
+  version: 0
+resources:
+  license: http://creativecommons.org/publicdomain/zero/1.0/
+version: v1.0.3

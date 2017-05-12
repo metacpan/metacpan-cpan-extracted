@@ -1,0 +1,101 @@
+CHANGES
+    Revision history for Perl extension XML::Merge:
+
+    - 1.4 G7NMEdxm Sat Jul 23 14:39:59:48 -0500 2016
+      * inverted conflict resolution 'test' value since true 1 for conflict
+      makes more sense
+
+      * renumbered t/*.t
+
+      * updated Makefile.PL and Build.PL to hopefully fix issue
+      <HTTPS://RT.CPAN.Org/Public/Bug/Display.html?id=29898> (Thanks Kevin.)
+
+      * removed DBUG printing
+
+      * removed PT from VERSION to fix issue
+      <HTTPS://RT.CPAN.Org/Public/Bug/Display.html?id=106873> (Thanks
+      ppisar.)
+
+      * updated license to GPLv3
+
+    - 1.2.75BAJNl Fri May 11 10:19:23:47 2007
+      * added default id @s: idx, ndx, and index
+
+    - 1.2.565EgGd Sun Jun 5 14:42:16:39 2005
+      * added use XML::Tidy to make sure exports are available
+
+      * removed 02prune.t and moved 03keep.t to 02keep.t ... passing tests
+      is good
+
+    - 1.2.4CCJWiB Sun Dec 12 19:32:44:11 2004
+      * guessing how to fix Darwin test failure @ t/02prune.t first prune()
+      call
+
+    - 1.0.4CAL5IS Fri Dec 10 21:05:18:28 2004
+      * fixed buggy _recmerge
+
+    - 1.0.4CAEU0I Fri Dec 10 14:30:00:18 2004
+      * made accessors for _id_xpath_list
+
+      * made _id_xpath_list take XPath locations instead of elem names (old
+      _idea)
+
+      * made test _cres (at Marc's request)
+
+      * made warn _cres croak
+
+      * made Merge inherit from Tidy (which inherits from XPath)
+
+      * separated reload(), strip(), tidy(), prune(), and write() into own
+      XML::Tidy module
+
+    - 1.0.4C2Nf0R Thu Dec 2 23:41:00:27 2004
+      * updated license and prep'd for release
+
+    - 1.0.4C2BcI2 Thu Dec 2 11:38:18:02 2004
+      * updated reload(), strip(), and tidy() to verify _xpob exists
+
+    - 1.0.4C1JHOl Wed Dec 1 19:17:24:47 2004
+      * commented out override stuff since it's probably bad form and dumps
+      crap warnings all over tests and causes them to fail... so I guess
+      just uncomment that stuff if you care to preserve PI's and escapes
+
+    - 1.0.4C1J7gt Wed Dec 1 19:07:42:55 2004
+      * made merge() accept merge_source_xpath and merge_destination_xpath
+      params
+
+      * made merge() accept other Merge objects
+
+      * made reload() not clobber basic escapes (by overriding Text
+      toString())
+
+      * made tidy() not kill processing-instructions (by overriding
+      node_test())
+
+      * made tidy() not kill comments
+
+    - 1.0.4BOHGjm Wed Nov 24 17:16:45:48 2004
+      * fixed merge() same elems with diff ids bug
+
+    - 1.0.4BNBCZL Tue Nov 23 11:12:35:21 2004
+      * rewrote both merge() and _recmerge() _cres stuff since it was buggy
+      before... so hopefully consistently good now
+
+    - 1.0.4BMJCPm Mon Nov 22 19:12:25:48 2004
+      * fixed merge() for empty elem matching and _cres on text kids
+
+    - 1.0.4BMGTLF Mon Nov 22 16:29:21:15 2004
+      * separated reload() from strip() so that prune() can call it too
+
+    - 1.0.4BM0B3x Mon Nov 22 00:11:03:59 2004
+      * fixed tidy() empty elem bug and implemented prune() and unmerge()
+
+    - 1.0.4BJAZpM Fri Nov 19 10:35:51:22 2004
+      * fixing e() ABSTRACT gen bug
+
+    - 1.0.4BJAMR6 Fri Nov 19 10:22:27:06 2004
+      * fleshed out POD and members
+
+    - 1.0.4AIDqmR Mon Oct 18 13:52:48:27 2004
+      * original version
+

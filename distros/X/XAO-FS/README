@@ -1,0 +1,13 @@
+This package contains XAO::FS -- XAO Foundation Server
+
+Normal perl installation should do, providing you already have MySQL
+installed and have a database that you can spare for testing.
+
+   perl Makefile.PL
+   make
+   make test
+   sudo make install
+
+Should you have any additional questions please consult documentation,
+source code or write to am@ejelta.com. Commercial support and custom
+development is also available.

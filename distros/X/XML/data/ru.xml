@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://opencollector.org/opencollector.xsd">
+  <textbody charset="KOI8-R" textCategory="description">
+   <title>Библиотека контактных площадок MSL</title>
+   <version/>
+      <translation>
+        <translator>Andrew</translator>
+      <translatorMail>agf@computerra.ru</translatorMail>
+      <translationDate>2001-08-26T00:00:00:000</translationDate>
+     </translation>
+     <summary>Эта библиотека содержит контактные площадки (для программы) MAGIC используемые в заказных чипах проекта PixelFlow.</summary>
+    <htmlText>
+Эта библиотека содержит контактные площадки (для программы) MAGIC используемые в заказных чипах проекта PixelFlow.
+Площадки намечено изготавливать с помощью технологического процесса CMOS14 (0.5мкм при 3-уровнях металла) от Hewlett-Packard.
+Без особых трудностей многие библиотечные элементы могут портироваться для других похожих технологических процессов. Существенно то,
+что все блоки этой библиотеки были изготовлены и протестированы в 1996-1997 годах, когда HP пыталась (попытка не удалась) выйти на
+рынок графических систем с PixelFlow от UNC. Эту систему и ее пять заказных кристаллов можно рассаматривать как рабочие прототипы,
+однако большинство элементов библиотеки применялось и в других чипах.
+   </htmlText>
+  </textbody>
+</document>

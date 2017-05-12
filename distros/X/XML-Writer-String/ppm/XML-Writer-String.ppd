@@ -1,0 +1,11 @@
+<SOFTPKG NAME="XML-Writer-String" VERSION="0,1,0,0">
+	<TITLE>XML-Writer-String</TITLE>
+	<ABSTRACT>Capture output from XML::Writer.</ABSTRACT>
+	<AUTHOR>S. Oliver &lt;simon.oliver@umist.ac.uk&gt;</AUTHOR>
+	<IMPLEMENTATION>
+		<DEPENDENCY NAME="XML-Writer" VERSION="0,0,0,0" />
+		<OS NAME="MSWin32" />
+		<ARCHITECTURE NAME="MSWin32-x86-multi-thread" />
+		<CODEBASE HREF="XML-Writer-String.tar.gz" />
+	</IMPLEMENTATION>
+</SOFTPKG>

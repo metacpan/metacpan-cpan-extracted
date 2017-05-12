@@ -1,0 +1,38 @@
+<!-- TMPL_INCLUDE NAME='_header.tmpl' -->
+<h1>Entity <!-- TMPL_VAR NAME="name" --></h1>
+<h2>Name</h2>
+<p>
+<!-- TMPL_VAR NAME="name" -->
+<!-- TMPL_IF NAME="brief" -->
+ -- <!-- TMPL_VAR NAME="brief" -->
+<!-- /TMPL_IF -->
+</p>
+<h2>Synopsis</h2>
+<table class='synopsis' border='1' cellspacing='0' cellpadding='4'>
+  <colgroup><col width='50%'/><col width='50%'/></colgroup>
+  <tr>
+    <td class='title'>Name</td>
+  <!-- TMPL_IF NAME="value" -->
+    <td class='title'>Value</td>
+  <!-- TMPL_ELSE -->
+    <!-- TMPL_IF NAME="publicId" -->
+    <td class='title'>Public</td>
+    <!-- /TMPL_IF -->
+    <td class='title'>System</td>
+  <!-- /TMPL_IF -->
+  </tr>
+  <tr>
+    <td><!-- TMPL_VAR NAME="name" --></td>
+  <!-- TMPL_IF NAME="value" -->
+    <td class='title'>&#<!-- TMPL_VAR NAME="value" -->;</td>
+  <!-- TMPL_ELSE -->
+    <!-- TMPL_IF NAME="publicId" -->
+    <td class='title'><!-- TMPL_VAR NAME="publicId" --></td>
+    <!-- /TMPL_IF -->
+    <td class='title'><!-- TMPL_VAR NAME="systemId" --></td>
+  <!-- /TMPL_IF -->
+  </tr>
+</table>
+<!-- TMPL_INCLUDE NAME='_desc.tmpl' -->
+<!-- TMPL_INCLUDE NAME='_footer.tmpl' -->
+

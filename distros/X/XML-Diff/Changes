@@ -1,0 +1,37 @@
+Revision history for Perl extension XML-Diff.
+
+
+0.01  Fri Apr 30 17:12:19 2004
+	- original version; created by h2xs 1.22 with options
+		-X XML-Diff
+
+0.02  Tue May  4 23:05:55 2004
+ - handle namespaced nodes in diffgram (i.e. xsl:template doesn't turn
+   into template anymore)
+ - handle namespaced attributes in diffgram (i.e. <foo bar:baz="1"/>
+   doesn't turn into <foo baz="1"/> anymore)
+ - added to Known Problems that Node Types other than Element, Attribute
+   and Text will likely crash the module. I.e. No Comments, PIs, etc.
+   with this revision (fix in the works)
+
+0.03  Mon May 24 07:28:15 2004
+ - fixed bug with handling blank or 0 valued attributes
+ - fixed bug with nodePaths of inserts
+ - sped up node matching (still pending complete rewrite)
+ - basic handling of comment nodes, processing instructions and
+   CDATA sections. Does not version them, but at least they don't
+   break the diffgram now
+
+
+0.04   Sat May 29 15:12:20 PDT 2004
+ - new matching algorithm reigns in exponential growth of match time on
+   large sets of similar nodes, and speeds up matching about 30% overall
+ - added hard matching of nodes, attributes and content to get better 
+   diffgrams on XML with many nodes of similar structure
+ - fixed bug with inserts of subtrees that were targets of node moves
+ - added more tests to harness
+
+0.05   Tue Jul 10 09:11:04 2007
+ - fixed bug with matching attributes (now sorted on names)
+
+

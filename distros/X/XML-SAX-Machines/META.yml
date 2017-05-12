@@ -1,0 +1,28 @@
+---
+abstract: 'manage collections of SAX processors'
+author:
+  - 'Barry Slaymaker'
+  - 'Chris Prather <chris@prather.org>'
+build_requires:
+  Capture::Tiny: 0
+  Test::More: 0.88
+  blib: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.131560'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: XML-SAX-Machines
+requires:
+  Capture::Tiny: 0
+  XML::SAX: 0
+  XML::SAX::Base: 0
+  XML::SAX::Expat: 0
+  XML::SAX::Writer: 0
+resources:
+  homepage: https://github.com/perigrin/xml-sax-machines
+  repository: https://github.com/perigrin/xml-sax-machines.git
+version: 0.46

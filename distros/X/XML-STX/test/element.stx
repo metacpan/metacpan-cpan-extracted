@@ -1,0 +1,13 @@
+<stx:transform version="1.0" 
+  xmlns:stx="http://stx.sourceforge.net/2002/ns"
+  strip-space="yes">
+
+  <stx:template match="node[@id=2]">
+    <stx:element name="{name()}">
+      <stx:element name="p:el" namespace="NS1">
+	<stx:element name="el" namespace="NS2"/>
+      </stx:element>
+    </stx:element>
+  </stx:template>
+  
+</stx:transform>

@@ -1,0 +1,479 @@
+$VAR1 = [
+          {
+            'content' => [
+                           {
+                             'content' => [
+                                            {
+                                              'content' => [
+                                                             {
+                                                               'content' => [],
+                                                               'name' => 'Header',
+                                                               'attrib' => {
+                                                                             'Value' => 'Wget/1.9.1',
+                                                                             'Name' => 'UserAgent'
+                                                                           },
+                                                               'type' => 'e'
+                                                             }
+                                                           ],
+                                              'name' => 'HTTPHeaders',
+                                              'attrib' => {},
+                                              'type' => 'e'
+                                            },
+                                            {
+                                              'content' => [
+                                                             {
+                                                               'content' => '1ZASHFPN5QS4GBP2D47W',
+                                                               'type' => 't'
+                                                             }
+                                                           ],
+                                              'name' => 'RequestId',
+                                              'attrib' => {},
+                                              'type' => 'e'
+                                            },
+                                            {
+                                              'content' => [
+                                                             {
+                                                               'content' => [],
+                                                               'name' => 'Argument',
+                                                               'attrib' => {
+                                                                             'Value' => '1I8T10N3E4BIE',
+                                                                             'Name' => 'ListId'
+                                                                           },
+                                                               'type' => 'e'
+                                                             },
+                                                             {
+                                                               'content' => [],
+                                                               'name' => 'Argument',
+                                                               'attrib' => {
+                                                                             'Value' => 'DateAdded',
+                                                                             'Name' => 'Sort'
+                                                                           },
+                                                               'type' => 'e'
+                                                             },
+                                                             {
+                                                               'content' => [],
+                                                               'name' => 'Argument',
+                                                               'attrib' => {
+                                                                             'Value' => 'AWSECommerceService',
+                                                                             'Name' => 'Service'
+                                                                           },
+                                                               'type' => 'e'
+                                                             },
+                                                             {
+                                                               'content' => [],
+                                                               'name' => 'Argument',
+                                                               'attrib' => {
+                                                                             'Value' => '1',
+                                                                             'Name' => 'ProductPage'
+                                                                           },
+                                                               'type' => 'e'
+                                                             },
+                                                             {
+                                                               'content' => [],
+                                                               'name' => 'Argument',
+                                                               'attrib' => {
+                                                                             'Value' => 'xxx',
+                                                                             'Name' => 'AWSAccessKeyId'
+                                                                           },
+                                                               'type' => 'e'
+                                                             },
+                                                             {
+                                                               'content' => [],
+                                                               'name' => 'Argument',
+                                                               'attrib' => {
+                                                                             'Value' => 'ItemIds',
+                                                                             'Name' => 'ResponseGroup'
+                                                                           },
+                                                               'type' => 'e'
+                                                             },
+                                                             {
+                                                               'content' => [],
+                                                               'name' => 'Argument',
+                                                               'attrib' => {
+                                                                             'Value' => 'WishList',
+                                                                             'Name' => 'ListType'
+                                                                           },
+                                                               'type' => 'e'
+                                                             },
+                                                             {
+                                                               'content' => [],
+                                                               'name' => 'Argument',
+                                                               'attrib' => {
+                                                                             'Value' => 'ListLookup',
+                                                                             'Name' => 'Operation'
+                                                                           },
+                                                               'type' => 'e'
+                                                             }
+                                                           ],
+                                              'name' => 'Arguments',
+                                              'attrib' => {},
+                                              'type' => 'e'
+                                            },
+                                            {
+                                              'content' => [
+                                                             {
+                                                               'content' => '0.153314113616943',
+                                                               'type' => 't'
+                                                             }
+                                                           ],
+                                              'name' => 'RequestProcessingTime',
+                                              'attrib' => {},
+                                              'type' => 'e'
+                                            }
+                                          ],
+                             'name' => 'OperationRequest',
+                             'attrib' => {},
+                             'type' => 'e'
+                           },
+                           {
+                             'content' => [
+                                            {
+                                              'content' => [
+                                                             {
+                                                               'content' => [
+                                                                              {
+                                                                                'content' => 'True',
+                                                                                'type' => 't'
+                                                                              }
+                                                                            ],
+                                                               'name' => 'IsValid',
+                                                               'attrib' => {},
+                                                               'type' => 'e'
+                                                             },
+                                                             {
+                                                               'content' => [
+                                                                              {
+                                                                                'content' => [
+                                                                                               {
+                                                                                                 'content' => '1I8T10N3E4BIE',
+                                                                                                 'type' => 't'
+                                                                                               }
+                                                                                             ],
+                                                                                'name' => 'ListId',
+                                                                                'attrib' => {},
+                                                                                'type' => 'e'
+                                                                              },
+                                                                              {
+                                                                                'content' => [
+                                                                                               {
+                                                                                                 'content' => 'WishList',
+                                                                                                 'type' => 't'
+                                                                                               }
+                                                                                             ],
+                                                                                'name' => 'ListType',
+                                                                                'attrib' => {},
+                                                                                'type' => 'e'
+                                                                              },
+                                                                              {
+                                                                                'content' => [
+                                                                                               {
+                                                                                                 'content' => '1',
+                                                                                                 'type' => 't'
+                                                                                               }
+                                                                                             ],
+                                                                                'name' => 'ProductPage',
+                                                                                'attrib' => {},
+                                                                                'type' => 'e'
+                                                                              },
+                                                                              {
+                                                                                'content' => [
+                                                                                               {
+                                                                                                 'content' => 'ItemIds',
+                                                                                                 'type' => 't'
+                                                                                               }
+                                                                                             ],
+                                                                                'name' => 'ResponseGroup',
+                                                                                'attrib' => {},
+                                                                                'type' => 'e'
+                                                                              },
+                                                                              {
+                                                                                'content' => [
+                                                                                               {
+                                                                                                 'content' => 'DateAdded',
+                                                                                                 'type' => 't'
+                                                                                               }
+                                                                                             ],
+                                                                                'name' => 'Sort',
+                                                                                'attrib' => {},
+                                                                                'type' => 'e'
+                                                                              }
+                                                                            ],
+                                                               'name' => 'ListLookupRequest',
+                                                               'attrib' => {},
+                                                               'type' => 'e'
+                                                             }
+                                                           ],
+                                              'name' => 'Request',
+                                              'attrib' => {},
+                                              'type' => 'e'
+                                            },
+                                            {
+                                              'content' => [
+                                                             {
+                                                               'content' => [
+                                                                              {
+                                                                                'content' => [
+                                                                                               {
+                                                                                                 'content' => [
+                                                                                                                {
+                                                                                                                  'content' => 'B00009R5ZM',
+                                                                                                                  'type' => 't'
+                                                                                                                }
+                                                                                                              ],
+                                                                                                 'name' => 'ASIN',
+                                                                                                 'attrib' => {},
+                                                                                                 'type' => 'e'
+                                                                                               }
+                                                                                             ],
+                                                                                'name' => 'Item',
+                                                                                'attrib' => {},
+                                                                                'type' => 'e'
+                                                                              }
+                                                                            ],
+                                                               'name' => 'ListItem',
+                                                               'attrib' => {},
+                                                               'type' => 'e'
+                                                             },
+                                                             {
+                                                               'content' => [
+                                                                              {
+                                                                                'content' => [
+                                                                                               {
+                                                                                                 'content' => [
+                                                                                                                {
+                                                                                                                  'content' => 'B00004Y3OS',
+                                                                                                                  'type' => 't'
+                                                                                                                }
+                                                                                                              ],
+                                                                                                 'name' => 'ASIN',
+                                                                                                 'attrib' => {},
+                                                                                                 'type' => 'e'
+                                                                                               }
+                                                                                             ],
+                                                                                'name' => 'Item',
+                                                                                'attrib' => {},
+                                                                                'type' => 'e'
+                                                                              }
+                                                                            ],
+                                                               'name' => 'ListItem',
+                                                               'attrib' => {},
+                                                               'type' => 'e'
+                                                             },
+                                                             {
+                                                               'content' => [
+                                                                              {
+                                                                                'content' => [
+                                                                                               {
+                                                                                                 'content' => [
+                                                                                                                {
+                                                                                                                  'content' => 'B00004R84D',
+                                                                                                                  'type' => 't'
+                                                                                                                }
+                                                                                                              ],
+                                                                                                 'name' => 'ASIN',
+                                                                                                 'attrib' => {},
+                                                                                                 'type' => 'e'
+                                                                                               }
+                                                                                             ],
+                                                                                'name' => 'Item',
+                                                                                'attrib' => {},
+                                                                                'type' => 'e'
+                                                                              }
+                                                                            ],
+                                                               'name' => 'ListItem',
+                                                               'attrib' => {},
+                                                               'type' => 'e'
+                                                             },
+                                                             {
+                                                               'content' => [
+                                                                              {
+                                                                                'content' => [
+                                                                                               {
+                                                                                                 'content' => [
+                                                                                                                {
+                                                                                                                  'content' => 'B00006JY1J',
+                                                                                                                  'type' => 't'
+                                                                                                                }
+                                                                                                              ],
+                                                                                                 'name' => 'ASIN',
+                                                                                                 'attrib' => {},
+                                                                                                 'type' => 'e'
+                                                                                               }
+                                                                                             ],
+                                                                                'name' => 'Item',
+                                                                                'attrib' => {},
+                                                                                'type' => 'e'
+                                                                              }
+                                                                            ],
+                                                               'name' => 'ListItem',
+                                                               'attrib' => {},
+                                                               'type' => 'e'
+                                                             },
+                                                             {
+                                                               'content' => [
+                                                                              {
+                                                                                'content' => [
+                                                                                               {
+                                                                                                 'content' => [
+                                                                                                                {
+                                                                                                                  'content' => 'B0002OHZP2',
+                                                                                                                  'type' => 't'
+                                                                                                                }
+                                                                                                              ],
+                                                                                                 'name' => 'ASIN',
+                                                                                                 'attrib' => {},
+                                                                                                 'type' => 'e'
+                                                                                               }
+                                                                                             ],
+                                                                                'name' => 'Item',
+                                                                                'attrib' => {},
+                                                                                'type' => 'e'
+                                                                              }
+                                                                            ],
+                                                               'name' => 'ListItem',
+                                                               'attrib' => {},
+                                                               'type' => 'e'
+                                                             },
+                                                             {
+                                                               'content' => [
+                                                                              {
+                                                                                'content' => [
+                                                                                               {
+                                                                                                 'content' => [
+                                                                                                                {
+                                                                                                                  'content' => '0131177052',
+                                                                                                                  'type' => 't'
+                                                                                                                }
+                                                                                                              ],
+                                                                                                 'name' => 'ASIN',
+                                                                                                 'attrib' => {},
+                                                                                                 'type' => 'e'
+                                                                                               }
+                                                                                             ],
+                                                                                'name' => 'Item',
+                                                                                'attrib' => {},
+                                                                                'type' => 'e'
+                                                                              }
+                                                                            ],
+                                                               'name' => 'ListItem',
+                                                               'attrib' => {},
+                                                               'type' => 'e'
+                                                             },
+                                                             {
+                                                               'content' => [
+                                                                              {
+                                                                                'content' => [
+                                                                                               {
+                                                                                                 'content' => [
+                                                                                                                {
+                                                                                                                  'content' => 'B00007CVRX',
+                                                                                                                  'type' => 't'
+                                                                                                                }
+                                                                                                              ],
+                                                                                                 'name' => 'ASIN',
+                                                                                                 'attrib' => {},
+                                                                                                 'type' => 'e'
+                                                                                               }
+                                                                                             ],
+                                                                                'name' => 'Item',
+                                                                                'attrib' => {},
+                                                                                'type' => 'e'
+                                                                              }
+                                                                            ],
+                                                               'name' => 'ListItem',
+                                                               'attrib' => {},
+                                                               'type' => 'e'
+                                                             },
+                                                             {
+                                                               'content' => [
+                                                                              {
+                                                                                'content' => [
+                                                                                               {
+                                                                                                 'content' => [
+                                                                                                                {
+                                                                                                                  'content' => '0006547486',
+                                                                                                                  'type' => 't'
+                                                                                                                }
+                                                                                                              ],
+                                                                                                 'name' => 'ASIN',
+                                                                                                 'attrib' => {},
+                                                                                                 'type' => 'e'
+                                                                                               }
+                                                                                             ],
+                                                                                'name' => 'Item',
+                                                                                'attrib' => {},
+                                                                                'type' => 'e'
+                                                                              }
+                                                                            ],
+                                                               'name' => 'ListItem',
+                                                               'attrib' => {},
+                                                               'type' => 'e'
+                                                             },
+                                                             {
+                                                               'content' => [
+                                                                              {
+                                                                                'content' => [
+                                                                                               {
+                                                                                                 'content' => [
+                                                                                                                {
+                                                                                                                  'content' => '0671319779',
+                                                                                                                  'type' => 't'
+                                                                                                                }
+                                                                                                              ],
+                                                                                                 'name' => 'ASIN',
+                                                                                                 'attrib' => {},
+                                                                                                 'type' => 'e'
+                                                                                               }
+                                                                                             ],
+                                                                                'name' => 'Item',
+                                                                                'attrib' => {},
+                                                                                'type' => 'e'
+                                                                              }
+                                                                            ],
+                                                               'name' => 'ListItem',
+                                                               'attrib' => {},
+                                                               'type' => 'e'
+                                                             },
+                                                             {
+                                                               'content' => [
+                                                                              {
+                                                                                'content' => [
+                                                                                               {
+                                                                                                 'content' => [
+                                                                                                                {
+                                                                                                                  'content' => '0743435710',
+                                                                                                                  'type' => 't'
+                                                                                                                }
+                                                                                                              ],
+                                                                                                 'name' => 'ASIN',
+                                                                                                 'attrib' => {},
+                                                                                                 'type' => 'e'
+                                                                                               }
+                                                                                             ],
+                                                                                'name' => 'Item',
+                                                                                'attrib' => {},
+                                                                                'type' => 'e'
+                                                                              }
+                                                                            ],
+                                                               'name' => 'ListItem',
+                                                               'attrib' => {},
+                                                               'type' => 'e'
+                                                             }
+                                                           ],
+                                              'name' => 'List',
+                                              'attrib' => {},
+                                              'type' => 'e'
+                                            }
+                                          ],
+                             'name' => 'Lists',
+                             'attrib' => {},
+                             'type' => 'e'
+                           }
+                         ],
+            'name' => 'ListLookupResponse',
+            'attrib' => {
+                          'xmlns' => 'http://webservices.amazon.com/AWSECommerceService/2005-10-05'
+                        },
+            'type' => 'e'
+          }
+        ];

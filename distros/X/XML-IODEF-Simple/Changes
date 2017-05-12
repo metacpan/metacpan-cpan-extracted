@@ -1,0 +1,24 @@
+Revision history for Perl extension XML::IODEF::Simple.
+
+0.02 2012-01-05
+        - misc bugfixes
+
+0.01 2011-10-28
+        - added IncidentID advanced functionality
+        - added detecttime magic
+        - added some reporttime magic
+        - misc bugfixes
+
+0.00_03 2011-10-27
+        - added History support
+        - misc bugfixes
+
+0.00_02 2011-09-15
+        - added plugin support
+        - cleaned up doc
+        - updated makefile
+
+0.00_01 Tue Aug 30 18:29:50 2011
+	    - original version; created by h2xs 1.23 with options
+		-ABXb 5.8.8 XML::IODEF::Simple
+

@@ -1,0 +1,68 @@
+{
+   "abstract" : "X11 OpenGL API, and DWIM utility object",
+   "author" : [
+      "Michael Conrad <mike@nrdvana.net>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "X11-GLX",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Devel::CheckLib" : "1.03",
+            "ExtUtils::Depends" : "0.405",
+            "ExtUtils::MakeMaker" : "0",
+            "X11::Xlib" : "0.12"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Exporter" : "0",
+            "Log::Any" : "0",
+            "Moo" : "0",
+            "OpenGL" : "0",
+            "X11::Xlib" : "0.11",
+            "X11::Xlib::Pixmap" : "0",
+            "XSLoader" : "0",
+            "parent" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Log::Any::Adapter" : "0",
+            "Log::Any::Adapter::TAP" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/nrdvana/perl-X11-GLX/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/nrdvana/perl-X11-GLX.git",
+         "web" : "https://github.com/nrdvana/perl-X11-GLX"
+      }
+   },
+   "version" : "0.02"
+}
+

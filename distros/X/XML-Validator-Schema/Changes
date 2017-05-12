@@ -1,0 +1,120 @@
+Revision history for XML::Validator::Schema
+
+1.10 2008-01-31
+   - Added a check in Makefile.PL for a broken XML::SAX install.
+     Hopefully this will convince the legions of CPAN testers with
+     broken XML::SAX installs to leave me alone.
+
+1.09 2008-01-29
+   - Fixed a bug which broke date type checking in Perl v5.10.
+
+   - Added support for unions. (John Hollingum)
+
+   - Fixed decimal type to allow values like ".45". (Michael Fox)
+
+   - Added support for line and column numbers in errors in the schema
+     file using XML::Filter::ExceptionLocator and XML::SAX::ExpatXS.
+
+   - Fixed bug where attributes couldn't have anonymous simple-type
+     definitions.  (reported by Jeremy Osborn)
+
+1.08 2004-11-04
+   - Added optional support for line and column numbers using
+     XML::Filter::ExceptionLocator and XML::SAX::ExpatXS.
+
+   - Added support for totalDigits and fractionDigits facets of
+     decimal types, excluding double and float. (Toby Long-Leather)
+
+   - Improved content-model validation failure message to include the
+     name of the enclosing element. (Suggested by Jean Flouret)
+
+1.07 2004-09-22
+   - New 'debug' option aids in tracking down the source of validation
+     failures. (Mathieu)
+
+   - Fixed bug which prevented minExclusive from working. 
+     (h.bridge@fasol.fujitsu.com)
+
+   - Fixed bug which prevented attribute types from working in some
+     cases.
+
+   - Fixed bug which prevented complex types from adding new
+     attributes to existing complex types. (michael.jacob@schering.de)
+
+1.06 2004-04-21
+   - Fixed bug in <all> support with minOccurs="0" contents. 
+     (josef@clubphoto.com)
+
+   - Fixed bug where minOccurs of 2 or greater wouldn't work
+     correctly.
+
+   - Added support for positiveInteger, negativeInteger,
+     nonPositiveInteger and nonNegativeInteger.  (adamk@ali.as)
+
+   - Fixed bug where references to elements inside complex types
+     wouldn't get resolved.
+
+1.05 2003-11-13 
+   - Added support for more simple types (Russell B Cecala) :
+         float
+         duration
+         time
+         date
+         gYearMonth
+         gYear
+         gMonthDay
+         gDay
+         gMonth
+         hexBinary
+         base64Binary
+         anyURI
+         QName
+         NOTATION
+
+1.04  2003-10-06
+   - Added support for minOccurs and maxOccurs with <sequence>,
+     <choice> and <all>.
+
+   - Fixed bug in cache implementation that allowed some state from a
+     failed validation run to leak into subsequent runs.
+
+   - Added support for use as a SAX filter anywhere in a SAX pipeline.
+
+1.03  2003-10-03
+   - Added cache mode to reuse schema objects between calls.
+
+   - Added support for more builtin simpleTypes: normalizedString,
+     token, short, byte, unsignedInt, unsignedShort, unsignedByte
+
+   - Added support for element and attribute refs.
+
+   - Added support for simpleContent.
+
+   - Fixed bug preventing <simpleType> within <sequence> or <choice>
+     from working.
+
+   - Fixed NMTOKEN implementation to derive from token instead of string.
+
+   - Fixed bug where test suite would fail if XML::SAX::RTF was
+     installed.
+
+1.02  2003-10-01
+   - Added support for composition of <sequence> and <choice> groups.
+
+   - Added support for <simpleType>, both named and anonymous, with
+     mostly complete <restriction> support.
+
+   - Added automated test to run test suite against Xerces/C++ if
+     available.  This should keep our tests in line with expected
+     reality.
+
+1.01  2003-09-26
+   - Fixed compatibility with XML::LibXML.
+
+   - Modified test suite to run tests against all available SAX parsers.
+
+   - Added support for simple <choice> and <all> content modules (no
+     combinations yet).
+
+1.00  2003-09-25
+   - First Release.

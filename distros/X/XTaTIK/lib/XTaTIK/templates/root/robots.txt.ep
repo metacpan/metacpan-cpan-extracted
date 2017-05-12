@@ -1,0 +1,1 @@
+Sitemap: <%= $c->url_for('/sitemap.xml')->to_abs %>

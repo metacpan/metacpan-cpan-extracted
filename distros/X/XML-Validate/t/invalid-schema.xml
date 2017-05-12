@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<plants
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="plants.xsd">
+	<plant>
+		<flower colour="green"></flower>
+		<name>Arum apulum</name>
+	</plant>
+	<plant>
+		<flower colour="green,brown"></flower>
+		<name>Arum discoridis</name>
+	</plant>
+	<fish>Wrasse</fish>
+</plants>

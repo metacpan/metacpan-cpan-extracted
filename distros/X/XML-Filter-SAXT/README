@@ -1,0 +1,28 @@
+XML::Filter::SAXT version 0.01
+==============================
+
+DESCRIPTION
+
+SAXT is like the Unix 'tee' command in that it multiplexes the input stream to several output streams. In this case, the
+input stream is a PerlSAX event producer (like XML::Parser::PerlSAX) and the output streams are PerlSAX handlers or
+filters. 
+
+The SAXT constructor takes a list of hash references. Each hash specifies an output handler. The hash keys can be:
+DocumentHandler, DTDHandler, EntityResolver or Handler, where Handler is a combination of the previous three and
+acts as the default handler. E.g. if DocumentHandler is not specified, it will try to use Handler. 
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 1999,2000 Enno Derksen
+All rights reserved.
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

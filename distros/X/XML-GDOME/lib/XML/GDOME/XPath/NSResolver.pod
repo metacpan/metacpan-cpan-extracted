@@ -1,0 +1,24 @@
+=head1 NAME
+
+  XML::GDOME::XPath::NSResolver - Interface XPathNSResolver implementation.
+
+=head1 SYNOPSIS
+
+  $str = $xpnsresolv->lookupNamespaceURI($prefix);
+
+=head1 METHODS
+
+=over 4
+
+
+=item $str = $xpnsresolv->lookupNamespaceURI($prefix);
+
+Look up the namespace URI associated to the given namespace prefix. The XPath evaluator must never call this with a null or empty argument, because the result of doing this is undefined.
+
+I<C<prefix>>: The prefix of the namespace to look for
+
+I<Returns>: namespace URI
+
+
+=back
+

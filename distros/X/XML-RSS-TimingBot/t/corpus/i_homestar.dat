@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/css" href="./rss.css"?>
+<rss version="2.0"
+  xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+><channel>
+
+  <title>Homestar Runner</title>
+  <description>The flashy adventures of Homestar Runner, Strongbad, and friends</description>
+  <link>http://www.homestarrunner.com/</link>
+  <language>en-us</language>
+  <webMaster>sburke@cpan.org</webMaster>
+
+  <sy:updatePeriod>daily</sy:updatePeriod>
+  <sy:updateFrequency>1</sy:updateFrequency>
+  <sy:updateBase>2002-01-01T12:15</sy:updateBase>
+
+<skipHours>
+<hour>1</hour><hour>2</hour><hour>3</hour><hour>4</hour><hour>5</hour>
+<hour>6</hour><hour>7</hour><hour>8</hour><hour>9</hour><hour>10</hour>
+<hour>11</hour><hour>12</hour><hour>13</hour><hour>14</hour>
+<hour>17</hour><hour>18</hour><hour>19</hour><hour>20</hour><hour>21</hour>
+<hour>22</hour><hour>23</hour><hour>24</hour>
+</skipHours>
+<ttl>1440</ttl><!-- a whole day -->
+
+<docs>http://www.interglacial.com/rss/about.html</docs>
+
+  <image>
+    <title>Homestar Runner</title>
+    <url>http://interglacial.com/rss/homestar.gif</url>
+    <width>140</width>
+    <height>121</height>
+    <link>http://www.homestarrunner.com/</link>
+  </image>
+
+<item><title>Marzipan's Answering Machine #10</title><link>http://www.homestarrunner.com/answer10.html</link></item>
+<item><title>Quote of the day: oldaboy2_missvg.zip</title><link>http://www.homestarrunner.com/qod/oldaboy2_missvg.zip</link></item>
+<item><title>At the Homestar Runner Store: flpumafema</title><link>http://store.yahoo.com/homestarrunner/flpumafema.html</link></item>
+<item><title>Marzipan's Answering Machine #9</title><link>http://www.homestarrunner.com/answer9.html</link></item>
+</channel></rss>

@@ -1,0 +1,8 @@
+% layout 'default';
+% title 'About';
+% stash active_page => 'about';
+
+<p>
+  XTaTIK EDIT: Write your about page here and style in in global
+  style file
+</p>

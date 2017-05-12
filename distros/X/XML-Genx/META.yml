@@ -1,0 +1,32 @@
+---
+name: XML-Genx
+version: 0.22
+author:
+  - 'Dominic Mitchell <cpan(at)happygiraffe.net>'
+abstract: 'A simple, correct XML writer'
+license: bsd
+resources:
+  license: http://www.opensource.org/licenses/bsd-license.php
+requires:
+  perl: 5.6.1
+recommends:
+  Test::Pod: 0
+  Test::Pod::Coverage: 0
+  XML::SAX::Base: 0
+provides:
+  XML::Genx:
+    file: lib/XML/Genx.pm
+    version: 0.22
+  XML::Genx::Constants:
+    file: lib/XML/Genx/Constants.pm
+    version: 0.22
+  XML::Genx::SAXWriter:
+    file: lib/XML/Genx/SAXWriter.pm
+    version: 0.22
+  XML::Genx::Simple:
+    file: lib/XML/Genx/Simple.pm
+    version: 0.22
+generated_by: Module::Build version 0.2805
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

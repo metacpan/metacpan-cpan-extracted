@@ -1,0 +1,24 @@
+---
+abstract: 'Document cache for XML::LibXML'
+author:
+  - 'Nick Wellnhofer <wellnhofer@aevum.de>'
+build_requires:
+  File::Touch: 0
+  Test::Deep: 0
+  XML::LibXSLT: 1.59
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300005, CPAN::Meta::Converter version 2.112621'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: XML-LibXML-Cache
+requires:
+  URI: 0
+  XML::LibXML: 1.59
+  perl: 5.008
+resources:
+  repository: http://github.com/nwellnhof/XML-LibXML-Cache
+version: 0.12

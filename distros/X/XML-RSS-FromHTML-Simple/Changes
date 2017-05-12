@@ -1,0 +1,22 @@
+Revision history for Perl extension XML::RSS::Maker.
+
+0.05 11/19/2009
+    (ms) Doc fixes
+    (ms) Added github repository link to Makefile.PL
+
+0.04 03/25/2007
+    (ms) Added the processor object to the argument list for the 
+         link filter and added the <rss_attrs()> method to specify 
+         additional rss item attributes (solving a RFE by J. David
+         Blackstone).
+
+0.03 03/17/2007
+    (ms) Added Hexdumper to debug utf8 problems.
+    (ms) Using XML::Parser as preferred parser to avoid 
+         test problems.
+
+0.02 03/15/2007
+    (ms) Fixed utf8 issues
+
+0.01 03/01/2007
+    (ms) Where it all began

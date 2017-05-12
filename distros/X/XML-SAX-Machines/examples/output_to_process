@@ -1,0 +1,7 @@
+use XML::SAX::Machines qw( Pipeline );
+
+Pipeline(
+    "<$ARGV[0]",
+    ## Put some filter here :)
+    "| xmllint --format -"
+)->parse;

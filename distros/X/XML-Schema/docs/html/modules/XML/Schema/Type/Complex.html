@@ -1,0 +1,201 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+<head>
+<title>Modules Index</title>
+</head>
+
+<body bgcolor="#ffffff">
+<table border="0" width="100%">
+<tr>
+<td align="left"><a href="../../../../index.html"><img src="../../../../images/canon.gif" border="0"></a></td>
+<td align="right"><img src="../../../../images/canre.gif"></td>
+</tr>
+</table>
+<div align="right">
+<small><a href="../../../../index.html">XML Schema Home</a></small>
+</div>
+
+<h1>XML::Schema::Type::Complex</h1>
+
+<ul>
+
+    This module implements an object class for representing XML Schema
+    complex types.  A complex type is one which carries attributes
+    and/or contains other elements.
+  </ul>
+
+<h2>Table of Contents</h2>
+<ul>
+<table border="0" cellpadding="2" cellspacing="0">
+<tr valign="top">
+<td>
+  <li><b><a href="#section_Synopsis">Synopsis</a></b>
+</td>
+
+<td>
+</td>
+
+<td>
+<td>
+
+</tr>
+<tr valign="top">
+<td>
+  <li><b><a href="#section_Methods">Methods</a></b>
+</td>
+
+<td>
+<b>:<b>
+</td>
+
+<td>
+<small><a href="#method_attribute">attribute()</a></small>
+<td>
+
+</tr>
+</table>
+</ul>
+
+
+
+
+<hr width="100%" size="1" noshade="1"><a name="section_Synopsis"><h2>Synopsis</h2></a>
+<ul><pre><p>use XML::Schema::Type::Complex;
+
+my $complex = XML::Schema::Type::Complex-&gt;new(
+    name       =&gt; 'MyComplexType',
+    attributes =&gt; {
+        attr1  =&gt; { 
+	    name    =&gt; 'attr1', 
+	    type    =&gt; $type_obj, 
+	    default =&gt; $value,		  # 'default' or 'fixed' optional
+	},
+        attr2  =&gt; { type =&gt; $type_obj },  # no default, implicit name
+        attr3  =&gt; $type_obj,		  # short form of above
+        attr4  =&gt; $attr_obj,		  # XML::Schema::Attribute object
+    }
+    content    =&gt; [ ... ],
+    # and more...
+);
+
+# add new attribute
+my $string = XML::Schema::Type::string-&gt;new();
+my $attrib = XML::Schema::Attribute-&gt;new( name =&gt; 'foo, type =&gt; $string );
+
+# add attribute object
+$complex-&gt;attribute($attrib);        # calls $attrib-&gt;name() to get 'foo'
+
+# fetch attribute object
+my $acopy = $complex-&gt;attribute('foo');
+
+# add attribute by values
+$complex-&gt;attribute( name =&gt; 'bar', type =&gt; $string );</b></pre></ul>
+
+  
+
+
+<hr width="100%" size="1" noshade="1"><a name="section_Methods"><h2>Methods</h2></a><ul>
+<li><p>
+<a name="method_attribute">
+<b>attribute( $name )</b>
+<br>
+<b>attribute( <a href="../../../../modules/XML/Schema/Attribute.html">$attr_obj</a> )</b>
+<br>
+<b>attribute( name => $name, type => <a href="../../../../modules/XML/Schema/Type/Simple.html">$type</a>, ... )</b>
+<br>
+</a>
+
+
+      <!-- ignore args -->
+      <!-- ignore args -->
+      <!-- ignore args -->
+
+      <p>
+	This method can be used to define and subsequently retrieve
+        attribute definitions for the complex type.
+     </p>
+
+     <p>
+	When called with a single non-reference 
+	argument, <code>$name</code>, the <a href="../../../../modules/XML/Schema/Attribute.html">attribute</a> corresponding to 
+	that name is returned.  If there is no attribute defined with that
+        name then <code>undef</code> is returned and an appropriate error message
+	of the form <code>"no such attribute: $name"</code> is set 
+	internally for subsequent access via the <a href="#method_error"><code><b>error()</b></code></a>
+	method.
+     </p>
+
+<ul><pre><p>my $attr = $complex-&gt;attribute('lang')
+    || die $complex-&gt;error();</b></pre></ul>
+
+    <p>
+	In all other cases, the arguments passed are used to create
+	and/or define a new attribute for the complex type.  If a
+	single argument is passed which is already a reference to an
+	<a href="../../../../modules/XML/Schema/Attribute.html">XML::Schema::Attribute</a> object (or appropriate
+	subclass or substitution class - see
+	<a href="../../../../modules/XML/Schema/Factory.html">XML::Schema::Factory</a>) then its <a href="../../../../modules/XML/Schema/Attribute.html#method_name"><code><b>name()</b></code></a> method is
+	called and a reference to the object is stored internally
+	against that name as an attribute for the complex type.
+    </p>
+
+<ul><pre><p>my $attr = XML::Schema::Attribute-&gt;new( name =&gt; 'lang', type =&gt; 'language' );
+
+$complex-&gt;attribute($attr);</b></pre></ul>
+
+    <p>
+	If a single argument is passed which is a reference to a hash
+	array then the values contained therein will be used to create
+	a new <a href="../../../../modules/XML/Schema/Attribute.html">attribute</a>
+	object which will be assigned to the complex type as above.
+	The hash array should contain <code>name</code> and
+	<code>type</code> elements as a minimum.
+    </p>
+
+<ul><pre><p>$complex-&gt;attribute({ name =&gt; 'lang', type =&gt; 'language' });</b></pre></ul>
+
+    <p>
+	If a list of arguments are passed then they will be automatically
+	folded into a hash reference and treated as above.
+    </p>
+
+<ul><pre><p>$complex-&gt;attribute( name =&gt; 'lang', type =&gt; 'language' );</b></pre></ul>
+
+    <p>
+	Attributes may define their <code>type</code> value in terms
+	of a reference to a <a href="../../../../modules/XML/Schema/Type/Simple.html">type object</a> or a
+	string indicating the name of a <a href="../../../../modules/XML/Schema/Type/Builtin.html">builtin simple type</a>
+	or one previously defined within the scope of the current
+	complex type via the <a href="#method_simpleType"><code><b>simpleType()</b></code></a> method.
+	The <a href="#method_attribute"><code><b>attribute()</b></code></a> method calls the 
+	<a href="../../../../modules/XML/Schema/Attribute.html#method_scope"><code><b>scope()</b></code></a> on 
+	each attribute it adopts or adds the <code>scope</code>
+	item to the hash reference used to create an attribute,
+	as appropriate.  In either case, the effect is to bind the 
+	attribute to the scope of the current complex type (<code>$self</code>)
+	so that it can resolve type names to real type objects when
+	an instance document is parsed.
+    </p>
+
+    <p>
+	The Good Thing about this is that you can generally define
+	types by their names and leave the objects to worry about 
+	resolving them to type objects at the right time.  The Bad
+	Thing about this is that you can't define an attribute once
+	and then use it in a dozen different places because it's 
+	<code>scope</code> item will get overwritten each time
+	you assign it to a complex type.  However, all is not lost
+	because W3C XML Schema defines Attribute Groups which are 
+	"Write Once, Reuse Many" attributes that Do The Right Thing
+	to bind themselves to a scope as necessary.  We'll be 
+	supporting something like that Real Soon Now.
+    </p>
+
+    </p></ul>
+
+
+<div align="center">
+<small><b>Perl XML::Schema Documentation</b></small>
+</div>
+</body>
+</html>

@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<htmlmode>
+<!-- following is a single tag entity: -->
+<img src="bob.jpg"/>
+
+<!-- following is a template that'll get replaced: -->
+<htmlphoto file="bob.jpg">
+<description>Some random picture of some random person</description>
+</htmlphoto>
+
+</htmlmode>

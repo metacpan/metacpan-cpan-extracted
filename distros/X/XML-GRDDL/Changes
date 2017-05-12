@@ -1,0 +1,29 @@
+XML-GRDDL
+=========
+
+Created:      2010-07-14
+Home page:    <https://metacpan.org/release/XML-GRDDL>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=XML-GRDDL>
+Maintainer:   Toby Inkster <mailto:tobyink@cpan.org>
+
+0.004  2012-09-11
+
+ - (Addition) XML::GRDDL can now export a couple of constants.
+ - (Packaging) Drop common::sense dependency.
+ - (Packaging) Modernize.
+ - (Update) Cope with changes to RDF::RDFa::Parser::Config API.
+ - (Update) Copyright 2012.
+
+0.003  2011-02-20
+
+ - (Addition) Hard-code a number of profile URIs.
+ - (Addition) Hard-code the eRDF transformation.
+ - (Update) Copyright 2011.
+
+0.002  2010-07-19
+
+ - (Addition) Optional XSLT 2.0 support via XML::Saxon::XSLT2.
+
+0.001  2010-07-14  # Initial release
+
+

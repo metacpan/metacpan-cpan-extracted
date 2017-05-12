@@ -1,0 +1,59 @@
+---
+abstract: 'Convert MediaWiki text to xhtml'
+author:
+  - "\"G. Allen Morris III\" <gam3@gam3.net>"
+build_requires:
+  Test::XML: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3601'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: XHTML-MediaWiki
+no_index:
+  namespace:
+    - XHTML::MediaWiki
+provides:
+  XHTML::MediaWiki:
+    file: lib/XHTML/MediaWiki.pm
+    version: 0.11
+  XHTML::MediaWiki::Block:
+    file: lib/XHTML/MediaWiki.pm
+  XHTML::MediaWiki::Block::Header:
+    file: lib/XHTML/MediaWiki.pm
+  XHTML::MediaWiki::Block::Nested:
+    file: lib/XHTML/MediaWiki.pm
+  XHTML::MediaWiki::Block::Ordered:
+    file: lib/XHTML/MediaWiki.pm
+  XHTML::MediaWiki::Block::P:
+    file: lib/XHTML/MediaWiki.pm
+  XHTML::MediaWiki::Block::Paragraph:
+    file: lib/XHTML/MediaWiki.pm
+  XHTML::MediaWiki::Block::Pre:
+    file: lib/XHTML/MediaWiki.pm
+  XHTML::MediaWiki::Block::Prewiki:
+    file: lib/XHTML/MediaWiki.pm
+  XHTML::MediaWiki::Block::Ruby:
+    file: lib/XHTML/MediaWiki.pm
+  XHTML::MediaWiki::Block::Special:
+    file: lib/XHTML/MediaWiki.pm
+  XHTML::MediaWiki::Block::Start:
+    file: lib/XHTML/MediaWiki.pm
+  XHTML::MediaWiki::Block::Unordered:
+    file: lib/XHTML/MediaWiki.pm
+  XHTML::MediaWiki::Parser:
+    file: lib/XHTML/MediaWiki.pm
+  XHTML::MediaWiki::Parser::Block:
+    file: lib/XHTML/MediaWiki.pm
+  XHTML::MediaWiki::Parser::Block::Line:
+    file: lib/XHTML/MediaWiki.pm
+requires:
+  HTML::Parser: 0
+  Params::Validate: 0.85
+  URI::Escape: 0
+  perl: 5.006_001
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.11

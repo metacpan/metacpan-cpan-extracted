@@ -1,0 +1,64 @@
+{
+   "abstract" : "add querySelector and querySelectorAll methods to XML::LibXML nodes",
+   "author" : [
+      "Toby Inkster <tobyink@cpan.org>",
+      "TOBYINK <tobyink@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Moose::Meta::Class::__ANON__::SERIAL::9 version , CPAN::Meta::Converter version 2.140640",
+   "keywords" : [],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "XML-LibXML-QuerySelector",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "optional_features" : {},
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTML::Selector::XPath" : "0.13",
+            "XML::LibXML" : "1.70"
+         }
+      }
+   },
+   "provides" : {
+      "XML::LibXML::QuerySelector" : {
+         "file" : "lib/XML/LibXML/QuerySelector.pm",
+         "version" : "0.005"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "X_identifier" : "http://purl.org/NET/cpan-uri/dist/XML-LibXML-QuerySelector/project",
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Dist/Display.html?Queue=XML-LibXML-QuerySelector"
+      },
+      "homepage" : "https://metacpan.org/release/XML-LibXML-QuerySelector",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/tobyink/p5-xml-libxml-queryselector.git",
+         "web" : "https://github.com/tobyink/p5-xml-libxml-queryselector"
+      }
+   },
+   "version" : "0.005"
+}

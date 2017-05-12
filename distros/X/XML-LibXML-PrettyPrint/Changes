@@ -1,0 +1,52 @@
+XML-LibXML-PrettyPrint
+======================
+
+Created:      2011-10-19
+Home page:    <https://metacpan.org/release/XML-LibXML-PrettyPrint>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=XML-LibXML-PrettyPrint>
+Maintainer:   Toby Inkster <tobyink@cpan.org>
+
+0.006	2014-09-07
+
+ [ Test Suite ]
+ - Rewrite test suite to use Test::Warnings instead of Test::Warn.
+
+ [ Other ]
+ - Backport to Perl 5.8.1.
+ - Don't use parent.pm to establish inheritance.
+ - Inherit from Exporter::Tiny instead of Pragmatic.
+
+0.005	2014-09-07
+
+ [ Packaging ]
+ - Add repo link.
+ - use Dist::Inkt.
+
+ [ Other ]
+ - Added: Bundle a command-line script called xml-pretty.
+
+0.004	2013-09-10
+
+ - In HTML, the <dl> element should be block, not compact.
+
+0.003	2012-03-15
+
+ [ Bug Fixes ]
+ - Handle CDATA nodes.
+   Fixes RT#75752.
+   <https://rt.cpan.org/Public/Bug/Display.html?id=75752>
+
+0.002	2011-11-03
+
+ [ Bug Fixes ]
+ - new_from_html constructor was exposing a private lexical variable that I
+   didn't want to expose.
+
+ [ Packaging ]
+ - Declare dependency on 'Pragmatic'.
+
+ [ Other ]
+ - Make elements with @property but no @content preserve whitespace in
+   HTML.
+
+0.001	2011-10-20	Initial release

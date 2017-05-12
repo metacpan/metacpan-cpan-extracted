@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<blog>
+  <entries>
+    <entry>
+      <title>This is title (No1/1) </title>
+      <contents>CONTENTS of (1-1)</contents>
+      <trackback>http://hippo2000.atnifty.com/</trackback>
+      <date>2007-05-22</date>
+    </entry>
+    <entry>
+      <title>This is title (No1/2) </title>
+      <contents>CONTENTS of (1-2)</contents>
+      <trackback></trackback>
+      <date>2007-05-21</date>
+    </entry>
+    <entry>
+      <title>This is title (No1/3) </title>
+      <contents>CONTENTS of (1-3)</contents>
+      <trackback></trackback>
+      <date>2007-05-20</date>
+    </entry>
+  </entries>
+</blog>

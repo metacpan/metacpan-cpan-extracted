@@ -1,0 +1,22 @@
+Revision history for XML::FOAF
+
+0.04  2011.06.16
+    - Turn off expanding external entities in XML::Parser to avoid security
+      risk.
+    - Cleaned up Makefile.PL.
+    - Removed magic svn keywords.
+    - Added author tests (xt/) and modified SYNOPSIS for all modules to
+      make them pass the compilation test.
+
+0.03  2004.12.31
+    - Added XML::FOAF::find_foaf_in_html to auto-discover FOAF content
+      in an HTML page already in memory.
+    - A lower-case "person" is now detected just as well as "Person".
+
+0.02  2003.06.04
+    - Added support for FOAF auto-discovery
+    - Added FOAF::Person::get to retrieve RDF object values given a
+      predicate.
+
+0.01  2003.01.27
+    - Initial distribution.

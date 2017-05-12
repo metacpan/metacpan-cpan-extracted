@@ -1,0 +1,22 @@
+package My::Counter;
+
+use base 'XML::Filter::Essex';
+use XML::Filter::Essex;  ## Import some helpful items.
+
+sub main {
+    my $count = 0;
+
+    on(
+        "start-element::*" => sub { ++$count },
+        "end-document::*"  => sub { put [ "count" => $count ] }
+    );
+
+    get while 1;
+}
+
+1;
+
+
+use XML::SAX::Machines qw( Pipeline );
+
+Pipeline( My::Counter => \*STDOUT )->parse_file( \*STDIN );

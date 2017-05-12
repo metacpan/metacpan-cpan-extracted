@@ -1,0 +1,29 @@
+XAS Logmon is Copyright (c) 2012-2015 Kevin L. Esteb 
+
+XAS is a set of modules, procedures and practices to help write
+consistent Perl5 code for a datacenter operations environment. For the most 
+part, this follows the Unix tradition of small discrete components that
+communicate in well defined ways.
+
+This system is cross platform capable. It will run under Windows as well
+as Unix like environments without a code rewrite. This allows you to
+write your code once and run it where ever.
+
+This package provides the modules and procedures to provide log file
+monitoring. The log files are parsed and the resulting records are
+written to the spool directory, where the spooler forwards them to the
+message queue server. Once queued, the collector can process them
+and store them into the appropriate datastore.
+
+Installation instructions can be found here:
+
+    http://scm.kesteb.us/trac/wiki/XasDocsLogmonInstallation
+
+Extended documentation is available at: http://scm.kesteb.us/trac
+
+LICENSE INFORMATION
+
+This is free software; you can redistribute it and/or modify it under
+the terms of the Artistic License 2.0. For details, see the full text
+of the license at http://www.perlfoundation.org/artistic_license_2_0.
+

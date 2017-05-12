@@ -1,0 +1,1 @@
+cpan2rpm --buildrequires='imlib2-devel, freetype-devel, libXext-devel' --requires='imlib2, freetype, libXext' .

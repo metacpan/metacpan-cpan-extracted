@@ -1,0 +1,25 @@
+my $default = $self->element('default')->get();
+if ( ! $default  or  $default =~ /^false$/i ) {
+  $default = 0;
+} else {
+  $default = 1;
+}
+$self->element('default')->set ( $default );
+
+$self->add_hook ( 'set_hook',
+  sub {
+    if ( ! ${$_[1]}  or  ${$_[1]} =~ /^false$/i ) {
+      ${$_[1]} = 0;
+    } else {
+      ${$_[1]} = 1;
+    }
+  }
+);
+
+$self->add_method ( 'toggle',
+  sub {
+    $_[0]->set( ! $_[0]->get() );
+  }
+);
+
+1;

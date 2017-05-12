@@ -1,0 +1,142 @@
+0.0600  2014-09-24
+        - Implement the <facts> top-level tag with grammar for factoids.
+            - See t/data/xml/facts-fort-4-from-shlomifish.org.xml
+
+0.0513  2014-08-20
+        - Remove an isa => type due to it being a plain class name which
+        does not work in recent versions of Type::Tiny.
+
+0.0512  2013-05-22
+        - Add t/style-trailing-space.t .
+        - Add t/cpan-changes.t .
+            - Convert this file to the CPAN::Changes format.
+
+0.0511  2013-05-09
+        - Convert to XML::GrammarBase::Role::XSLT .
+        - Add scripts/bump-version-number.pl .
+
+0.0510  2013-05-03
+        - Made the minimum version of perl as 5.014 due to test
+        failures:
+            - http://www.cpantesters.org/cpan/report/9be091a6-b278-11e2-97df-5468c1508286
+
+0.0509  2013-05-01
+        - Got rid of trailing space in the output.
+
+0.0508  2013-04-23
+        - Change the repository URL to the new bitbucket one.
+
+0.0507  2013-01-20
+        - Pass the xslt_params to the translation (and require
+        XML::GrammarBase v0.2.0).
+
+0.0506  2013-01-13
+        - Fix the << has '+module_base' >> to be a dist name (with -s)
+        instead of a module name (with ::).
+
+0.0505  2013-01-13
+        - Fix the output_mode parameter and better document it.
+            - Fix some test failures.
+            - Thanks to Anreas Koenig for some debugging assitance.
+
+0.0504  2013-01-06
+        - Fix https://rt.cpan.org/Public/Bug/Display.html?id=82510
+            - Test suite takes forever to run due to loading DTDs from
+            the W3C site, which is throttled.
+            - Thanks to SREZIC for the report and analysis.
+
+0.0503  2013-01-06
+        - Convert lib/XML/Grammar/Fortune/ToText.pm to
+        <<use MooX 'late'>> .
+        - Removed bin/web-feed-synicate.pl - it was superseded by
+        http://metacpan.org/module/XML::Grammar::Fortune::Synd::App .
+
+0.0502  2013-01-06
+        - Add t/00basic.t (for libxml2 diagnosis) and set the minimum
+        XML::LibXML version to 2.0014, to avoid test failures.
+
+0.0501  2013-01-03
+        - Convert lib/XML/Grammar/Fortune.pm to XML::GrammarBase .
+
+0.0500  2011-04-22
+        - Add support for the <italics> tag to the screenplay.
+        - Fix the rendering of <bold> and <italics> inside a <screenplay>
+        fortune as text.
+        - Clarified the license and POD of XML::Grammar::Fortune::ToText .
+        and XML::Grammar::Fortune .
+        - Add a more meaningful synposis to XML::Grammar::Fortune::ToText.
+
+0.0400  2010-10-21
+        - Squash spaces in the text output of the <info /> fields like
+        <work /> , <author />, etc. This was a bug that caused that such tags
+        with newlines would render improperly in fortunes.
+        - Converted to use File::ShareDir for the extradata directory.
+        This was done per the advice given here:
+            - http://www.nntp.perl.org/group/perl.module.build/2010/10/msg2765.html .
+        - Many refactorings in lib/XML/Grammar/Fortune/ToText.pm .
+
+0.0300  2010-09-25
+        - Add support for text-rendering of the Screenplay-XML <inlinedesc>
+        tag, so it will now render as '[' ... ']' inside the paragraphs.
+        - Add the tag-release.pl file to tag a release to the Subversion
+        repository.
+
+0.0200  2010-01-21
+        - Fixed some validation errors in the XSLT stylesheet that caused
+        the Firefox and Opera browser to give up with an error.
+            - <xsl:call-template /> cannot operate on an <xsl:value-of />
+                or have a select="." attribute.
+            - <xsl:apply-templates /> has a mode="..." attribute instead
+            of a name="..." attribute.
+        - Now the conversion-to-text supports more tags and elements
+        that were previously mis-handled (with tests).
+        - Add keywords to the META.yml.
+
+0.0109  2009-10-31
+        - Fixed the tests if XML-LibXSLT generates indented XML.
+            - as is the case on Mandriva Cooker and other systems.
+            - http://nntp.x.perl.org/group/perl.cpan.testers/5800617
+            - was done by removing indentation from both places.
+
+0.0108  2009-03-04
+        - Sorted out the installation of the extradata elements.
+
+0.0107  2009-03-03
+        - converted Build.PL to inc/XML/Grammar/Builder.pm .
+
+0.0106  2009-02-16
+        - set the minimum version of perl that can compile this module,
+        to perl-5.8.x as it requires some ":utf8" stuff, and fails on
+        perl-5.6.x:
+            - http://nntp.x.perl.org/group/perl.cpan.testers/3301395
+
+0.0105  2009-02-14
+        - avoided creating an xmlns="" attribute in the output of several
+        elements which caused the XHTML to be invalid.
+
+0.0104  2008-08-21
+        - Removed a binmode ":utf8" call from t/to-xhtml.t to settle
+        XML-LibXML on Mandriva Cooker and elsewhere.
+            - see https://qa.mandriva.com/show_bug.cgi?id=41993
+
+0.0103  2008-08-02
+        - "documented" open in lib/XML/Grammar/Fortune.pm due to its
+        use Fatal call to settle t/pod-coverage.t.
+
+0.0102  2008-07-31
+        - Converted create_makefile_pl from "traditional" to
+        "passthrough" so it will run Build.PL and avoid the various
+        problems inherent in depending on the Makefile.PL generation.
+        - Hopefully it will silence CPAN Testers warnings such as:
+            - http://www.nntp.perl.org/group/perl.cpan.testers/2008/07/msg1958808.html
+
+0.0101  2008-07-25
+        - Added the _data_dir() to the XSLT - it was an installation
+        copy-and-paste bug.
+
+0.01    2008-07-16
+        - First version - implementing IRC conversations, <quote>,
+        <screenplay> and raw messages.
+        - No "human-friendly" documentation for the XML format, but there's
+        a Relax NG, and comprehensive examples, both for testing
+        and on http://www.shlomifish.org/humour/fortunes/ .

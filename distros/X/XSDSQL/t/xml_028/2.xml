@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<simple_schema xmlns="namespace1" xmlns:xs="http://www.w3.org/2001/XMLSchema-instance" xs:schemaLocation="namespace1 schema.xsd">
+	<el0>el0</el0>
+</simple_schema>
+

@@ -1,0 +1,51 @@
+---
+abstract: 'remove duplicated entries from feed'
+author:
+  - 'Tokuhiro Matsuno <tokuhirom@gmail.com>'
+build_requires:
+  File::Temp: 0
+  Test::More: 0.98
+  URI: 0
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.0.56, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: XML-Feed-Deduper
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+provides:
+  XML::Feed::Deduper:
+    file: lib/XML/Feed/Deduper.pm
+    version: 0.06
+  XML::Feed::Deduper::DB_File:
+    file: lib/XML/Feed/Deduper/DB_File.pm
+    version: 0
+  XML::Feed::Deduper::Role:
+    file: lib/XML/Feed/Deduper/Role.pm
+    version: 0
+requires:
+  DB_File: 0
+  Digest::MD5: 0
+  Mouse: 1.08
+  XML::Feed: 0.41
+  perl: 5.008008
+resources:
+  bugtracker: https://github.com/tokuhirom/p5-xml-feed-deduper/issues
+  homepage: https://github.com/tokuhirom/p5-xml-feed-deduper
+  repository: git://github.com/tokuhirom/p5-xml-feed-deduper.git
+version: 0.06
+x_contributors:
+  - 'mattn <mattn.jp@gmail.com>'

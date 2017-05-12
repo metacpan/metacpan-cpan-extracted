@@ -1,0 +1,7 @@
+CHANGES
+Makefile.PL
+MANIFEST
+README
+runtests
+t/XML-TreePP-XMLPath.t
+lib/XML/TreePP/XMLPath.pm

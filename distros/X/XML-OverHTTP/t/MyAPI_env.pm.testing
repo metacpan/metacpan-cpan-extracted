@@ -1,0 +1,37 @@
+# ----------------------------------------------------------------
+    package MyAPI_env;
+    use strict;
+    use base qw( XML::OverHTTP );
+# ----------------------------------------------------------------
+sub url              { 'http://www.kawa.net/works/perl/treepp/example/envxml.cgi' }
+sub root_elem        { 'env' }
+sub total_entries    { 1 }
+sub entries_per_page { 10 }
+sub current_page     { 1 }
+sub default_param    { {one=>1} }
+sub treepp_config    { [qw( user_agent )] }
+sub elem_class       { 'MyElement' }
+sub force_array      { [qw( SERVER_ADDR )] }
+sub force_hash       { [qw( SERVER_PORT )] }
+# ----------------------------------------------------------------
+    package MyAPI_env::GET;
+    use strict;
+	use vars qw( @ISA );
+	@ISA = qw( MyAPI_env );
+sub http_method { 'GET' }
+# ----------------------------------------------------------------
+    package MyAPI_env::POST;
+    use strict;
+	use vars qw( @ISA );
+	@ISA = qw( MyAPI_env );
+sub http_method { 'POST' }
+# ----------------------------------------------------------------
+    package MyAPI_env::Error;
+    use strict;
+	use vars qw( @ISA );
+	@ISA = qw( MyAPI_env );
+sub default_param { {error=>1} }
+sub is_error { shift->root->{QUERY_STRING} =~ /error=1/i }
+# ----------------------------------------------------------------
+;1;
+# ----------------------------------------------------------------

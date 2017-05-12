@@ -1,0 +1,20 @@
+--- #YAML:1.0
+name: XML-Generator-vCard-RDF
+version: 1.4
+author:
+  - Aaron Straup Cope E<lt>ascope@cpan.orgE<gt>
+abstract: generate RDF/XML SAX2 events for vCard 3.0
+license: perl
+requires:
+  Digest::SHA1: '>= 2.10'
+  Encode: '>= 1.09'
+  Memoize: ''
+  Text::vCard: '>= 1.9'
+  XML::Generator::vCard::Base: '>= 1.0'
+build_requires:
+  Test::Simple: '>= 0.47'
+provides:
+  XML::Generator::vCard::RDF:
+    file: lib/XML/Generator/vCard/RDF.pm
+    version: 1.4
+generated_by: Module::Build version 0.2604

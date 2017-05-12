@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+
+
+<xs:simpleType name="length20">
+	<xs:restriction base="xs:string">
+		<xs:maxLength value="20"/>
+	</xs:restriction>
+</xs:simpleType>
+
+
+<xs:simpleType name="length30">
+	<xs:restriction base="xs:string">
+		<xs:maxLength value="30"/>
+	</xs:restriction>
+</xs:simpleType>
+
+
+<xs:complexType name="c">
+	<xs:simpleContent>
+		<xs:extension base="length20">
+			<xs:attribute name="myattr1">
+				<xs:simpleType>
+					<xs:restriction base="length30">
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:attribute>
+			<xs:attribute name="myattr2" type="length30">
+			</xs:attribute>
+		</xs:extension>
+	</xs:simpleContent>
+</xs:complexType>
+
+
+<xs:element name="root">
+	<xs:complexType>
+		<xs:sequence>
+			<xs:element name="c1" type="c"/>
+		</xs:sequence>
+	</xs:complexType>
+</xs:element>
+
+
+</xs:schema>

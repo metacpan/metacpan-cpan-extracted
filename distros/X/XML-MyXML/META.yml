@@ -1,0 +1,38 @@
+---
+abstract: 'A simple-to-use XML module, for parsing and creating XML documents'
+author:
+  - 'Alexander Karelas <karjala@karjala.org>'
+build_requires:
+  File::Temp: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.006, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: XML-MyXML
+provides:
+  XML::MyXML:
+    file: lib/XML/MyXML.pm
+    version: '0.9407'
+  XML::MyXML::Object:
+    file: lib/XML/MyXML.pm
+    version: '0.9407'
+requires:
+  Carp: '0'
+  Encode: '0'
+  Exporter: '0'
+  Scalar::Util: '0'
+  perl: '5.008'
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/akarelas/xml-myxml/issues
+  homepage: https://github.com/akarelas/xml-myxml
+  repository: https://github.com/akarelas/xml-myxml.git
+version: '0.9407'
+x_serialization_backend: 'YAML::Tiny version 1.69'

@@ -1,0 +1,34 @@
+XML::RAI (RSS Abstraction Interface, said "ray") is an
+object-oriented layer that maps overlapping and alternate tags in
+RSS to one common simplified interface. RAI also includes an
+liberal RSS parser that can be used seperately from the abstraction
+layer.
+
+INSTALLATION
+
+To install this module type the following:
+
+ perl Makefile.PL 
+ make 
+ make test 
+ make install
+ 
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+XML::RSS::Parser 4.0
+Date::Parse 2.26
+Date::Format 2.22
+Test::Weaken
+
+COPYRIGHT AND LICENCE
+
+The software is released under the Artistic License. The terms of
+the Artistic License are described at
+http://www.perl.com/language/misc/Artistic.html.
+
+Except where otherwise noted, XML::RAI is Copyright
+2003-2009, Timothy Appnel, tima@cpan.org. All rights
+reserved.
+
