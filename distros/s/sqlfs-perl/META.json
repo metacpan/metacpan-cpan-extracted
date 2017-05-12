@@ -1,0 +1,55 @@
+{
+   "abstract" : "Store a filesystem in a relational database",
+   "author" : [
+      "Lincoln Stein <lincoln.stein@oicr.on.ca>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4005, CPAN::Meta::Converter version 2.112621",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "sqlfs-perl",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : 0
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBI" : 0,
+            "Fuse" : "0.15",
+            "threads" : 0
+         }
+      }
+   },
+   "provides" : {
+      "DBI::Filesystem" : {
+         "file" : "lib/DBI/Filesystem.pm",
+         "version" : "1.04"
+      },
+      "DBI::Filesystem::DBD::Pg" : {
+         "file" : "lib/DBI/Filesystem/DBD/Pg.pm",
+         "version" : 0
+      },
+      "DBI::Filesystem::DBD::SQLite" : {
+         "file" : "lib/DBI/Filesystem/DBD/SQLite.pm",
+         "version" : 0
+      },
+      "DBI::Filesystem::DBD::mysql" : {
+         "file" : "lib/DBI/Filesystem/DBD/mysql.pm",
+         "version" : 0
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "1.04"
+}

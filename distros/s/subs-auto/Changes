@@ -1,0 +1,41 @@
+Revision history for subs-auto
+
+0.08    2013-09-05 17:50 UTC
+        This is a maintenance release. The code contains no functional change.
+        Satisfied users of version 0.07 can skip this update.
+        + Doc : C++ compilers are officially NOT supported.
+        + Tst : Author tests are no longer bundled with this distribution.
+                They are only made available to authors in the git repository.
+
+0.07    2011-02-27 15:45 UTC
+        + Fix : Compatibility with perl 5.13.10.
+
+0.06    2010-07-25 18:10 UTC
+        + Chg : B::Keywords is now used for its list of core keywords.
+        + Fix : Compatibility with Perl 5.11.2 (and thus 5.12 and later).
+        + Fix : The reset globs now keep their original file name and line
+                number. Symbol is no longer needed.
+        + Fix : The default package on which act the pragma was off by one
+                stack frame.
+        + Fix : Calling a method at compile time on a package on which the
+                pragma acts no longer breaks.
+        + Fix : Work around Kwalitee test misfailures.
+
+0.05    2009-07-01 09:05 UTC
+        + Upd : Resources in META.yml.
+
+0.04    2008-10-02 20:50 UTC
+        + Doc : Nits.
+        + Tst : Yet more of them.
+
+0.03    2008-09-05 20:10 UTC
+        + Chg : The hint hash slot used is now 'subs__auto'.
+        + Tst : More of them.
+
+0.02    2008-08-28 14:50 UTC
+        + Add : The 'in' parameter.
+        + Fix : Add exceptions for __FILE__, __LINE__ and DATA.
+
+0.01    2008-08-27 21:10 UTC
+        First version, released on an unsuspecting world.
+

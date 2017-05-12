@@ -1,0 +1,427 @@
+
+=pod
+
+=head1 NAME
+
+sapnwrfc-cookbook - How to cook with sapnwrfc - SAP Netweaver RFC 
+support for Perl through the SAP NW RFC SDK.
+
+Note: refer to the README (L<http://search.cpan.org/dist/sapnwrfc/README>)
+file in the package archive for build instructions, and that kind of help.
+
+=head1 DESCRIPTION
+
+The sapnwrfc cookbook is a series of recipes showing the basic use
+cases and thus features of sapnwrfc.  These are generally of the 
+form of a piece of code followed by an explanation.
+
+The new SAP NW RFC SDK has two main advantages.  It contains inbuilt
+Unicode support, so as soon as you need to work with wide characters,
+then you must invoke
+
+  use utf8;
+  
+This will ensure that all expected strings passed in are utf8, which is
+the expected input format.
+
+The second main advantage is that there is now support for nested/deep
+structures.  this is where complex parameters or tables, can have
+variable length fields such as STRING/XSTRING, or contain nested 
+complex types ie. other structures or tables.
+
+=head1 RECIPES
+
+The recipes cover the basic concepts of RFC client, and server
+programming.  All of these recipes are covered in the sapnwrfc unit
+tests, found in the source code /t directory.
+
+=head2 RFC client SYNOPSIS
+
+This is the basic formula for creating an RFC client connection,
+looking up a function definition, populating the parameters and
+executing the call.
+
+  SAPNW::Rfc->load_config;
+  my $conn = SAPNW::Rfc->rfc_connect;
+
+  my $rd = $conn->function_lookup("RPY_PROGRAM_READ");
+  my $rc = $rd->create_function_call;
+  $rc->PROGRAM_NAME("SAPLGRFC");
+    eval {
+  $rc->invoke;
+    };
+    if ($@) {
+      die "RFC Error: $@\n";
+    }
+  print "Program name: ".$rc->PROG_INF->{'PROGNAME'}."\n";
+  my $cnt_lines_with_text = scalar grep(/LGRFCUXX/, map { $_->{LINE} } @{$rc->SOURCE_EXTENDED});
+  $conn->disconnect;
+
+Note that you only need to create one connection per system ($conn = SAPNW::Rfc->rfc_connect),
+which should be disconnected when no longer required ($conn->disconnect).
+Additionally, you only need to lookup the function definition once ($rd = $conn->function_lookup('NAME_OF_FUNCTION'))
+- this information is cached internally and is referred to repeatedly when creating each 
+function call (must create a new function call per invocation $rc = $rd->create_function_call).
+
+You can look at the test suites that come with the source code archive to see various
+examples of multiple connections, and RFC invocations ($rc->invoke).
+
+=head2 Creating RFC Connections
+
+Using sapnwrfc, you can create connections in two ways: via a YAML file 
+specified at run time, or default to sap.yml in the current working directory,
+or by supplying parameters at run time.
+
+YAML based connection:
+ 
+  SAPNW::Rfc->load_config('/path/to/yaml/file');
+  my $conn = SAPNW::Rfc->rfc_connect;
+
+Run time parameters:
+
+  my $conn = SAPNW::Rfc->rfc_connect(ashost => 'gecko.local.net',
+                                     sysnr => '01', 
+                                     client => '001',
+                                     user => 'developer', 
+                                     passwd => 'developer');
+
+And you can mix both of the above, to provide defaults from a file, and 
+then override specific values.
+
+B<YAML File Structure>
+
+The YAML file structure is a minimal keyword value arrangement, which can
+take any of the values allowed by the RFC library itself, but must be in lower
+case.  For a full list of parameters, see the sapnwrfc.ini file found with SAP
+NW RFC SDK in the /demo directory. 
+
+A basic example for RFC client connect is:
+
+  ashost: gecko.local.net
+  sysnr: "01"
+  client: "001"
+  user: developer
+  passwd: developer
+  lcheck: 1
+  lang: EN
+  trace: 2
+  debug: 0
+
+The parameter debug is an added one to trigger debugging messages in sapnwrfc.
+
+B<Using SAP SSO>
+
+To connect using SAP SSO, you can specify the ticket in Base64 encoded form, 
+using the the mysapsso2 parameter. So not supply user or passwd.  SNC 
+and SSO over trusted relationships also works, but is beyond the scope of this
+cookbook.  See https://www.sdn.sap.com/irj/scn/weblogs?blog=/pub/wlg/4586, and
+https://www.sdn.sap.com/irj/scn/weblogs?blog=/pub/wlg/1452 for help.
+
+B<Connecting via saprouter>
+
+To connect via saprouter, this is achieved in by constructing the appropriate
+routing string, and using this in place of the ashost parameter eg:
+
+  ashost: /H/my.saprouter.net/H/gecko.local.net/
+
+
+=head2 RFC Connection Attributes
+
+You can obtain basic system details about the associated RFC Client connection.
+$conn->connection_attributes returns a hash ref, with key/value pairs for the 
+connection attributes.
+
+The attributes available are something like:
+
+  {   'rel' => '711',              # client library release
+      'partnerType' => '3',
+      'codepage' => '4103',
+      'isoLanguage' => '',
+      'dest' => '',
+      'trace' => '2',
+      'rfcRole' => 'C',
+      'partnerHost' => 'gecko',    # server host name
+      'sysNumber' => '01',
+      'kernelRel' => '700 ',       # server
+      'user' => 'developer',
+      'sysId' => 'N4S',
+      'cpicConvId' => '43233995',  sub do_global_callback {
+    warn "Running global callback ...\n";
+    return 1;
+  }
+      
+      'progName' => 'SAPLSYST',
+      'language' => 'E',
+      'host' => 'seagull',         # The client host name
+      'client' => '001',
+      'partnerRel' => '700 ',      # server
+      'partnerCodepage' => '4103', # server
+      'type' => 'E'
+  };
+
+B<Example:>
+
+  my $conn = SAPNW::Rfc->rfc_connect;
+  my $attrib = $conn->connection_attributes;
+  warn Dumper($attrib);
+  $conn->disconnect;
+
+
+=head2 Receiving a Table from an RFC call
+
+When invoking an RFC, the parameter values are set or retrieved by name
+on the SAPNW::RFC::FunctionCall object.  eg. RPY_PROGRAM_READ
+has an import parameter PROGRAM_NAME that is the name of the 
+ABAP that you wish to retrieve the source code for.  This is set
+like: $rc->PROGRAM_NAME("SAPLGRFC");
+
+Table type parameters return an Array ref.  Each row of the array
+contains a hash ref of the fields as key/value pairs.
+
+B<Example:>
+
+  my $conn = SAPNW::Rfc->rfc_connect;
+  my $rd = $conn->function_lookup("RPY_PROGRAM_READ");
+  my $rc = $rd->create_function_call;
+  $rc->PROGRAM_NAME("SAPLGRFC");
+  $rc->invoke;
+  foreach my $row (@{$rc->SOURCE_EXTENDED}) {
+    warn Dumper($row);
+    print STDERR $row->{LINE}."\n";
+  }
+  $conn->disconnect;
+
+
+=head2 Sending and Receiving Tables
+
+Next step is to look at sending table entries as well.  In just 
+the same way that received table entries are array refs of hash references,
+so too are the out bound entries.  Notice the table parameter OPTIONS
+below.
+
+B<Example:>
+
+  my $conn = SAPNW::Rfc->rfc_connect;
+  my $rd = $conn->function_lookup("RFC_READ_TABLE");
+  my $rc = $rd->create_function_call;
+  $rc->QUERY_TABLE("T000");
+  $rc->DELIMITER("|");
+  $rc->OPTIONS([{'TEXT' => 'MANDT <> \'000\''}]);  
+  $rc->invoke;
+  warn Dumper($rc->DATA);
+  $conn->disconnect;
+
+=head2 Changing Parameters
+
+Changing parameters combine the characteristics of import and 
+export parameters.  You can set them before the call, and then retrieve 
+a value from them afterwards.  In the example below, COUNTER is set and then
+incremented within the RFC call.
+
+B<Example:>
+
+  my $conn = SAPNW::Rfc->rfc_connect;
+  my $rd = $conn->function_lookup("STFC_CHANGING");
+  my $rc = $rd->create_function_call;
+  $rc->COUNTER(1);
+  $rc->invoke;
+  if ($rc->COUNTER == 1 + 1) {
+    print "Whoopee!\n";
+  }
+  $conn->disconnect;
+
+=head2 Deep Structures
+
+Deep structures, and tables are any complex parameter that contains
+variable length field elements, such as strings/xstrings or contain
+nested structures within.
+
+The guiding principal is that any structure field value of a simple ABAP type 
+will be a Perl scalar value (int, float, string).  Nested tables are array refs
+with rows containing hash refs of the field key/value pairs.  Nested flat structure
+types are hash refs of field key/value pairs.
+
+Unfortunately, there are no common RFC modules guaranteed to be in all SAP systems 
+for me to be able to include a meaningful example here, other than
+STFC_DEEP_STRUCTURE and STFC_DEEP_TABLE, which contain the simplest example of
+structures that contain strings.
+
+B<Example:>
+
+  my $conn = SAPNW::Rfc->rfc_connect;
+  my $fds = $conn->function_lookup("STFC_DEEP_STRUCTURE");
+  my $fs = $fds->create_function_call;
+  $fs->IMPORTSTRUCT({ 'I' => 123, 'C' => 'AbCdEf', 'STR' =>  'The quick brown fox ...', 'XSTR' => pack("H*", "deadbeef")});
+  $fs->invoke;
+  warn Dumper($fs->ECHOSTRUCT);
+  my $fts = $conn->function_lookup("STFC_DEEP_TABLE");
+  my $ft = $fts->create_function_call;
+  $ft->IMPORT_TAB([{ 'I' => 123, 'C' => 'AbCdEf', 'STR' =>  'The quick brown fox ...', 'XSTR' => pack("H*", "deadbeef")}]);
+  $ft->invoke;
+  warn Dumper($ft->EXPORT_TAB);
+  $conn->disconnect;
+
+
+=head2 RFC server SYNOPSIS
+
+This is the basic formula for creating an RFC client connection,
+looking up a function definition, populating the parameters and
+executing the call.  This example is the Perl equivalent to the 
+standard rfcexec demo example that is supplied with the SAP NW 
+RFCSDK written in C++.
+
+B<Example:>
+
+  SAPNW::Rfc->load_config;
+  my $server = SAPNW::Rfc->rfc_register;
+  
+  my $func = new SAPNW::RFC::FunctionDescriptor("RFC_REMOTE_PIPE");
+  my $pipedata = new SAPNW::RFC::Type(name => 'DATA',
+                                      type => RFCTYPE_TABLE,
+                                      fields => [{name => 'LINE',
+                                                  type => RFCTYPE_CHAR,
+                                                  len => 80}]);
+  $func->addParameter(new SAPNW::RFC::Export(name => "COMMAND", 
+                                             len => 80,
+                                             type => RFCTYPE_CHAR));
+  $func->addParameter(new SAPNW::RFC::Table(name => "PIPEDATA",
+                                            len => 80,
+                                            type => $pipedata));
+  $func->callback(\&do_remote_pipe);
+  $server->installFunction($func);
+  $server->accept(5, \&do_global_callback); 
+  $server->disconnect();
+
+  sub do_remote_pipe {
+    my $func = shift;
+    my $ls = $func->COMMAND;
+    $func->PIPEDATA([map {{'LINE' => pack("A80",$_)}} split(/\n/, `$ls`)]);
+    return 1;
+  }
+
+  sub do_global_callback {
+    warn "Running global callback ...\n";
+    return 1;
+  }
+  
+=head2 RFC Server Applications
+
+RFC Server applications are where you can write a client program
+that any ABAP code running on the SAP R/3 server can call as a remote
+RFC.
+
+This is a great mechanism for allowing SAP direct access to any Perl code
+of a 3rd party application.
+
+The basic structure of an RFC server application is setting up the server 
+connection, which registers the application in the SAP RFC gateway:
+
+  my $server = SAPNW::Rfc->rfc_register;
+
+Don't forget that the connection parameters are different for server 
+applications.  The key ones are: tpname  the DESTINATION name referred to
+in the ABAP application, gwhost - the RFC gateway host, gwserv - the service
+number on the gateway to connecto to (eg: 3301).
+
+
+Construct the function definition that SAP can call.  Give the RFC a name:
+
+  my $func = new SAPNW::RFC::FunctionDescriptor("RFC_REMOTE_PIPE");
+
+Build the expected input/output parameters and add them to the function
+definition:
+
+  my $pipedata = new SAPNW::RFC::Type(name => 'DATA',
+                                      type => RFCTYPE_TABLE,
+                                      fields => [{name => 'LINE',
+                                                  type => RFCTYPE_CHAR,
+                                                  len => 80}]);
+  $func->addParameter(new SAPNW::RFC::Export(name => "COMMAND", 
+                                             len => 80,
+                                             type => RFCTYPE_CHAR));
+  $func->addParameter(new SAPNW::RFC::Table(name => "PIPEDATA",
+                                            len => 80,
+                                            type => $pipedata));
+
+Set the callback function in Perl that will be executed.  This receives one 
+parameter - the SAPNW::RFC::FuncitonCall object, that contains the references
+to all the parameters that are passed in and must be passed back:
+
+  $func->callback(\&do_remote_pipe);
+
+  sub do_remote_pipe {
+    my $func = shift;
+    my $ls = $func->COMMAND;
+    $func->PIPEDATA([map {{'LINE' => pack("A80",$_)}} split(/\n/, `$ls`)]);
+    return 1;
+  }
+
+Register the function by installing it:
+
+  $server->installFunction($func);
+
+Now kick off the event loop that will start the RFC server application 
+listening for incoming calls:
+
+  $server->accept(5, \&do_global_callback); 
+
+There are two parameters, the first is the number of seconds for the event loop to
+wait for an incoming call, the second is a callback reference to be executed 
+on each pass of the event loop.
+
+  sub do_global_callback {
+    my $attribs = shift;
+    warn "Running global callback ...\n";
+    return 1;
+  }
+
+The global callback routine gets passed in the connection attributes as a hash ref.
+These are the RFC Server equivalent to that given to the RFC client connection
+from $conn->connection_attributes.
+
+
+=head1 WIN32 Support
+
+When I receive prebuilt PPDs from Olivier (and anyone else who wants to), I make these available at http://www.piersharding.com/download/win32/ .
+
+=cut
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<sapnwrfc>, L<http://search.cpan.org/dist/sapnwrfc/README>, L<SAPNW::Rfc>, perl(1), ABAP(101).
+
+=back
+
+=head1 AUTHOR
+
+Piers Harding E<lt>piers@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2006 - 2010 Piers Harding.
+All rights reserved.
+
+L<http://www.piersharding.com>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 ACKNOWLEDGEMENTS
+
+Many thanks to:
+
+=over 4
+
+=item * Craig Cmehil - for making the connnections
+
+=item * Ulrich Schmidt - for tireless help in development
+
+=item * Olivier Boudry - the build and test meister
+
+=item * Adam Kennedy - for all the improvements
+
+=back
+
+=cut

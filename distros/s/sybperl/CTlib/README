@@ -1,0 +1,12 @@
+	$Id: README,v 1.1 2001/07/05 16:35:46 mpeppler Exp $
+	@(#)README	1.3	12/30/97
+	
+This is the production version of the CTlib module. It is based on the API
+definition that has been developped by Dave Bowen & Amy Lin at
+Sybase, but includes some quite usefull additions (in particular, the
+native handling of datetime and money values).
+
+Of course, comments are welcome!
+
+Michael
+

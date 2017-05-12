@@ -1,0 +1,19 @@
+savevars.pm
+-----------
+
+This module is for lazy people. All you do in your script is
+
+	use savevars qw($bla %blubber @foo);
+
+and you get these variables persistent in a configuration file.
+
+Installation as usual:
+
+	perl Makefile.PL
+	make all test install
+
+NOTE: The test program writes and deletes a configuration file names
+.savevarstestrc in your home directory.
+
+Comments to: Slaven Rezic <slaven.rezic@berlin.de>
+

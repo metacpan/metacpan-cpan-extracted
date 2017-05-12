@@ -1,0 +1,525 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Data::Sofu::Binary - Interface to various binary drivers</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+<link rel="stylesheet" type="text/css" href="/Data/sofupod.css" />
+</head>
+
+<body>
+<div name="index">
+<p><a name="__index__"></a></p>
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#synopsis">Synopsis</a></li>
+	<li><a href="#syntax">SYNTAX</a></li>
+	<li><a href="#binary_drivers">Binary Drivers</a></li>
+	<li><a href="#methods">METHODS</a></li>
+	<ul>
+
+		<li><a href="#new__driver__">new([DRIVER])</a></li>
+		<li><a href="#warn__"><code>warn()</code></a></li>
+		<li><a href="#die__"><code>die()</code></a></li>
+		<li><a href="#open_file_">open(FILE)</a></li>
+		<li><a href="#openout_file_">openout(FILE)</a></li>
+		<li><a href="#get_amount_">get(AMOUNT)</a></li>
+		<li><a href="#unpackheader__"><code>unpackHeader()</code></a></li>
+		<li><a href="#read_file_">read(FILE)</a></li>
+		<li><a href="#load_file_">load(FILE)</a></li>
+		<li><a href="#write_file_tree__comments__encoding__byteorder__sofumark___________"><code>write(FILE,TREE,[COMMENTS,[ENCODING,[BYTEORDER,[SOFUMARK,[...]]]]])</code></a></li>
+		<li><a href="#pack_tree__comments__encoding__byteorder__sofumark___________"><code>pack(TREE,[COMMENTS,[ENCODING,[BYTEORDER,[SOFUMARK,[...]]]]])</code></a></li>
+	</ul>
+
+	<li><a href="#bugs">BUGS</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
+</ul>
+
+<hr name="index" />
+</div>
+<!-- INDEX END -->
+
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>Data::Sofu::Binary - Interface to various binary drivers</p>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>This module can be used to convert complex data structures and SofuObject trees to binary files and streams.</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">Synopsis</a></h1>
+<pre>
+        <span class="keyword">use</span> <span class="variable">Data::Sofu</span> <span class="string">qw/readSofu writeSofuBinary/</span><span class="operator">;</span>
+        <span class="keyword">my</span> <span class="variable">$tree</span> <span class="operator">=</span> <span class="operator">[</span><span class="variable">%ENV</span><span class="operator">]</span><span class="operator">;</span>
+        <span class="variable">$tree</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">Foo</span><span class="operator">}</span><span class="operator">=</span><span class="variable">@INC</span><span class="operator">;</span>
+        <span class="variable">writeSofuBinary</span><span class="operator">(</span><span class="string">"env.sofu"</span><span class="operator">,</span><span class="variable">$tree</span><span class="operator">);</span> <span class="comment">#Write as a binary sofu file</span>
+        <span class="keyword">my</span> <span class="variable">$tree2</span><span class="operator">=</span><span class="variable">readSofu</span><span class="operator">(</span><span class="string">"env.sofu"</span><span class="operator">);</span> <span class="comment">#Reading doesn't care if its binary or normal sofu.</span>
+</pre>
+<pre>
+        <span class="comment">#Or using just this module:</span>
+        <span class="keyword">my</span> <span class="variable">$tree</span> <span class="operator">=</span> <span class="operator">[</span><span class="variable">%ENV</span><span class="operator">]</span><span class="operator">;</span>
+        <span class="variable">$tree</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">Foo</span><span class="operator">}</span><span class="operator">=</span><span class="variable">@INC</span><span class="operator">;</span>
+        <span class="keyword">require</span> <span class="variable">Data::Sofu::Binary</span><span class="operator">;</span>
+        <span class="keyword">my</span> <span class="variable">$bsofu</span><span class="operator">=</span><span class="variable">Data::Sofu::Binary</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">();</span>
+        <span class="keyword">my</span> <span class="variable">$bstream</span> <span class="operator">=</span> <span class="variable">$bsofu</span><span class="operator">-&gt;</span><span class="keyword">pack</span><span class="operator">(</span><span class="variable">$tree</span><span class="operator">);</span>
+        <span class="keyword">my</span> <span class="variable">$tree2</span><span class="operator">=</span><span class="variable">$bsofu</span><span class="operator">-&gt;</span><span class="keyword">read</span><span class="operator">(\</span><span class="variable">$tree</span><span class="operator">);</span> <span class="comment"># This can only read binary data.</span>
+</pre>
+<pre>
+        <span class="comment">#More detailed:</span>
+        <span class="variable">writeSofuBinary</span><span class="operator">(</span><span class="string">"env.sofu"</span><span class="operator">,</span><span class="variable">$tree</span><span class="operator">,</span><span class="variable">$comments</span><span class="operator">,</span><span class="variable">$encoding</span><span class="operator">,</span><span class="variable">$byteorder</span><span class="operator">,</span><span class="variable">$mark</span><span class="operator">);</span> <span class="comment">#For details on these parameters see the pack() Method.</span>
+</pre>
+<p>
+</p>
+<hr />
+<h1><a name="syntax">SYNTAX</a></h1>
+<p>This Module is pure OO, exports nothing</p>
+<p>
+</p>
+<hr />
+<h1><a name="binary_drivers">Binary Drivers</a></h1>
+<p>These are the known binary drivers (for now):</p>
+<dl>
+<dt><strong><a name="000_002_000_000" class="item">&quot;000_002_000_000&quot;</a></strong>
+
+<dd>
+<p><code>Data::Sofu::Binary::Bin0200</code></p>
+</dd>
+<dd>
+<p>Sofu binary version 0.2.0.0 Driver.</p>
+</dd>
+</li>
+</dl>
+<p><strong>Note</strong></p>
+<p>Data::Sofu's writeBinary will always take the latest stable one.</p>
+<p>
+</p>
+<hr />
+<h1><a name="methods">METHODS</a></h1>
+<p>These Methods are also avaiable for the returned binary driver.</p>
+<p>Also see the <code>Data::Sofu::Binary::Bin0200</code> or whatever driver you are using for more methods.</p>
+<p>
+</p>
+<h2><a name="new__driver__">new([DRIVER])</a></h2>
+<p>Creates a new Binary Driver using DRIVER or the latest one available.</p>
+<pre>
+        <span class="keyword">require</span> <span class="variable">Data::Sofu::Binary</span><span class="operator">;</span>
+        <span class="variable">$bsofu</span> <span class="operator">=</span> <span class="variable">Data::Sofu::Binary</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">();</span> <span class="comment">#Using the latest.</span>
+        <span class="variable">$bsofu</span> <span class="operator">=</span> <span class="variable">Data::Sofu::Binary</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="string">"000_002_000_000"</span><span class="operator">);</span> <span class="variable">Taking</span> <span class="variable">a</span> <span class="variable">specific</span> <span class="variable">one</span><span class="operator">.</span>
+        <span class="comment">#You can call it directly:</span>
+        <span class="keyword">require</span> <span class="variable">C</span><span class="operator">&lt;</span><span class="variable">Data::Sofu::Binary::Bin0200</span><span class="operator">&gt;;</span>
+        <span class="variable">$bsofu</span> <span class="operator">=</span> <span class="variable">C</span><span class="operator">&lt;</span><span class="variable">Data::Sofu::Binary::Bin0200</span><span class="operator">&gt;-&gt;</span><span class="variable">new</span><span class="operator">();</span> <span class="comment">#The same</span>
+</pre>
+<p>
+</p>
+<h2><a name="warn__"><code>warn()</code></a></h2>
+<p>Internal method, will throw an exception containing a stacktrace and the offset of the file where it happened.</p>
+<p>
+</p>
+<h2><a name="die__"><code>die()</code></a></h2>
+<p>Internal method, will throw an exception containing a stacktrace and the offset of the file where it happened.</p>
+<p>
+</p>
+<h2><a name="open_file_">open(FILE)</a></h2>
+<p>A helper method to open files</p>
+<p>File can be:</p>
+<p>A filename, (the file will be opened in raw mode)</p>
+<p>a filehandle, (will be set to binmode)</p>
+<p>or a scalarref (data will be written to/form the referenced scalar</p>
+<p>
+</p>
+<h2><a name="openout_file_">openout(FILE)</a></h2>
+<p>Same as <code>open()</code> for output.</p>
+<p>
+</p>
+<h2><a name="get_amount_">get(AMOUNT)</a></h2>
+<p>Internal method, used to read AMOUNT bytes from the filestream.</p>
+<p>
+</p>
+<h2><a name="unpackheader__"><code>unpackHeader()</code></a></h2>
+<p>Internal method, determines endianess and version the binary file was written in.</p>
+<p>Returns ByteOrderMark and Sofu Version.</p>
+<p>
+</p>
+<h2><a name="read_file_">read(FILE)</a></h2>
+<p>Reads FILE in binary mode and returns a perl datastructure (Hashes, Arrays, Scalars)</p>
+<p>See <code>open()</code> for info on the FILE parameter.</p>
+<p>Loads automatically the right driver for FILE, no matter what driver is in use right now. But it will keep the current driver if it can read it.</p>
+<p>Will not change the driver you are currently using!</p>
+<p>
+</p>
+<h2><a name="load_file_">load(FILE)</a></h2>
+<p>Reads FILE in binary mode and returns a Sofu datastructure (Data::Sofu::Object's, Maps, Lists and Values)</p>
+<p>See <code>open()</code> for info on the FILE parameter.</p>
+<p>Loads automatically the right driver for FILE, no matter what driver is in use right now. But it will keep the current driver if it can read it.</p>
+<p>Will not change the driver you are currently using!</p>
+<p>
+</p>
+<h2><a name="write_file_tree__comments__encoding__byteorder__sofumark___________"><code>write(FILE,TREE,[COMMENTS,[ENCODING,[BYTEORDER,[SOFUMARK,[...]]]]])</code></a></h2>
+<p>Writes TREE to FILE.</p>
+<p>See <code>open()</code> for FILE.</p>
+<p>See <code>pack()</code> for COMMENTS,ENCODING,BYTEORDER,SOFUMARK,...</p>
+<p>TREE can be a perl datastructure or a Data::Sofu::Object or derived.</p>
+<p>
+</p>
+<h2><a name="pack_tree__comments__encoding__byteorder__sofumark___________"><code>pack(TREE,[COMMENTS,[ENCODING,[BYTEORDER,[SOFUMARK,[...]]]]])</code></a></h2>
+<p>This method is implemented only in the driver, but it is important to discuss the arguments here.</p>
+<p>Note: These arguments are the ones used in drivers up to the default <code>Data::Sofu::Binary::Bin0200</code>. Later drivers might add more arguments (therefore ...), and earlier drivers might support fewer.</p>
+<pre>
+        <span class="keyword">print</span> <span class="variable">FH</span><span class="operator">,</span> <span class="variable">$bsofu</span><span class="operator">-&gt;</span><span class="keyword">pack</span><span class="operator">(</span><span class="variable">readSofu</span><span class="operator">(</span><span class="string">"something.sofu"</span><span class="operator">),</span><span class="variable">getSofucomments</span><span class="operator">(),</span><span class="string">"UTF-32"</span><span class="operator">,</span><span class="string">"LE"</span><span class="operator">,</span><span class="string">"0.4"</span><span class="operator">);</span>
+</pre>
+<dl>
+<dt><strong><a name="tree" class="item">TREE</a></strong>
+
+<dd>
+<p>First driver to support: <code>Data::Sofu::Binary::Bin0200</code></p>
+</dd>
+<dd>
+<p>Perl datastructure to pack. Can be a hash, array or scalar (or array of hashes of hashes of arrays or whatever). Anything NOT a hash will be converted to TREE={Value=&gt;TREE};</p>
+</dd>
+<dd>
+<p>It can also be a Data::Sofu::Object or derived (Data::Sofu::Map, Data::Sofu::List, Data::Sofu::Value, Data::Sofu::...).
+Anything not a Data::Sofu::Map will be converted to one (A Map with one attribute called &quot;Value&quot; that holds TREE).</p>
+</dd>
+</li>
+<dt><strong><a name="comments" class="item">COMMENTS</a></strong>
+
+<dd>
+<p>First driver to support: <code>Data::Sofu::Binary::Bin0200</code></p>
+</dd>
+<dd>
+<p>Comment hash (as returned by Data::Sofu::getSofucomments() or Data::Sofu-&gt;new()-&gt;<code>comments()</code> after any file was read).</p>
+</dd>
+<dd>
+<p>Can be undef or {}.</p>
+</dd>
+</li>
+<dt><strong><a name="encoding" class="item">ENCODING</a></strong>
+
+<dd>
+<p>First driver to support: <code>Data::Sofu::Binary::Bin0200</code></p>
+</dd>
+<dd>
+<p>Specifies the encoding of the strings in the binary sofu file, which can be:</p>
+</dd>
+<dl>
+<dt><strong><a name="0_or_utf_8" class="item"><code>&quot;0&quot;</code> or <code>&quot;UTF-8&quot;</code></a></strong>
+
+<dd>
+<p>First driver to support: <code>Data::Sofu::Binary::Bin0200</code></p>
+</dd>
+<dd>
+<p>This is default.</p>
+</dd>
+<dd>
+<p>Normal UTF-8 encoding (supports almost all chars)</p>
+</dd>
+</li>
+<dt><strong><a name="1_or_utf_7" class="item"><code>&quot;1&quot;</code> or <code>&quot;UTF-7&quot;</code></a></strong>
+
+<dd>
+<p>First driver to support: <code>Data::Sofu::Binary::Bin0200</code></p>
+</dd>
+<dd>
+<p>This is default for byteorder = 7Bit (See below)</p>
+</dd>
+<dd>
+<p>7Bit encoding (if your transport stream isn't 8-Bit safe</p>
+</dd>
+</li>
+<dt><strong><a name="2_or_utf_16" class="item"><code>&quot;2&quot;</code> or <code>&quot;UTF-16&quot;</code></a></strong>
+
+<dd>
+<p>First driver to support: <code>Data::Sofu::Binary::Bin0200</code></p>
+</dd>
+<dd>
+<p>UTF 16 with byte order mark in EVERY string.</p>
+</dd>
+<dd>
+<p>Byteoder depends on your machine</p>
+</dd>
+</li>
+<dt><strong><a name="3_or_utf_16be" class="item"><code>&quot;3&quot;</code> or <code>&quot;UTF-16BE&quot;</code></a></strong>
+
+<dd>
+<p>First driver to support: <code>Data::Sofu::Binary::Bin0200</code></p>
+</dd>
+<dd>
+<p>No BOM, always BigEndian</p>
+</dd>
+</li>
+<dt><strong><a name="4_or_utf_16le" class="item"><code>&quot;4&quot;</code> or <code>&quot;UTF-16LE&quot;</code></a></strong>
+
+<dd>
+<p>First driver to support: <code>Data::Sofu::Binary::Bin0200</code></p>
+</dd>
+<dd>
+<p>No BOM, always LittleEndian</p>
+</dd>
+</li>
+<dt><strong><a name="5_or_utf_32" class="item"><code>&quot;5&quot;</code> or <code>&quot;UTF-32&quot;</code></a></strong>
+
+<dd>
+<p>First driver to support: <code>Data::Sofu::Binary::Bin0200</code></p>
+</dd>
+<dd>
+<p>UTF-32 with byte order mark in EVERY string.</p>
+</dd>
+<dd>
+<p>Byteoder depends on your machine</p>
+</dd>
+</li>
+<dt><strong><a name="6_or_utf_32be" class="item"><code>&quot;6&quot;</code> or <code>&quot;UTF-32BE&quot;</code></a></strong>
+
+<dd>
+<p>First driver to support: <code>Data::Sofu::Binary::Bin0200</code></p>
+</dd>
+<dd>
+<p>No BOM, always BigEndian</p>
+</dd>
+</li>
+<dt><strong><a name="7_or_utf_32le" class="item"><code>&quot;7&quot;</code> or <code>&quot;UTF-32LE&quot;</code></a></strong>
+
+<dd>
+<p>First driver to support: <code>Data::Sofu::Binary::Bin0200</code></p>
+</dd>
+<dd>
+<p>No BOM, always LittleEndian</p>
+</dd>
+</li>
+<dt><strong><a name="8_9" class="item"><code>&quot;8&quot;,&quot;9&quot;</code></a></strong>
+
+<dd>
+<p>Reserved for future use</p>
+</dd>
+</li>
+<dt><strong><a name="10_or_ascii" class="item"><code>&quot;10&quot;</code> or <code>&quot;ascii&quot;</code></a></strong>
+
+<dd>
+<p>First driver to support: <code>Data::Sofu::Binary::Bin0200</code></p>
+</dd>
+<dd>
+<p>Normal ASCII encoding</p>
+</dd>
+<dd>
+<p>Might not support all characters and will warn about that.</p>
+</dd>
+</li>
+<dt><strong><a name="11_or_cp1252" class="item"><code>&quot;11&quot;</code> or <code>&quot;cp1252&quot;</code></a></strong>
+
+<dd>
+<p>First driver to support: <code>Data::Sofu::Binary::Bin0200</code></p>
+</dd>
+<dd>
+<p>Windows Codepage 1252</p>
+</dd>
+<dd>
+<p>Might not support all characters and will warn about that.</p>
+</dd>
+</li>
+<dt><strong><a name="12_or_latin1" class="item"><code>&quot;12&quot;</code> or <code>&quot;latin1&quot;</code></a></strong>
+
+<dd>
+<p>First driver to support: <code>Data::Sofu::Binary::Bin0200</code></p>
+</dd>
+<dd>
+<p>ISO Latin 1</p>
+</dd>
+<dd>
+<p>Might not support all characters and will warn about that.</p>
+</dd>
+</li>
+<dt><strong><a name="13_or_latin9" class="item"><code>&quot;13&quot;</code> or <code>&quot;latin9&quot;</code></a></strong>
+
+<dd>
+<p>First driver to support: <code>Data::Sofu::Binary::Bin0200</code></p>
+</dd>
+<dd>
+<p>ISO Latin 9</p>
+</dd>
+<dd>
+<p>Might not support all characters and will warn about that.</p>
+</dd>
+</li>
+<dt><strong><a name="14_or_latin10" class="item"><code>&quot;14&quot;</code> or <code>&quot;latin10&quot;</code></a></strong>
+
+<dd>
+<p>First driver to support: <code>Data::Sofu::Binary::Bin0200</code></p>
+</dd>
+<dd>
+<p>ISO Latin 10</p>
+</dd>
+<dd>
+<p>Might not support all characters and will warn about that.</p>
+</dd>
+</li>
+</dl>
+<dt><strong><a name="byteorder" class="item">BYTEORDER</a></strong>
+
+<dd>
+<p>First driver to support: <code>Data::Sofu::Binary::Bin0200</code></p>
+</dd>
+<dd>
+<p>Defines how the integers of the binary file are encoded.</p>
+</dd>
+<dl>
+<dt><strong><a name="undef" class="item"><code>undef</code></a></strong>
+
+<dd>
+<p>First driver to support: <code>Data::Sofu::Binary::Bin0200</code></p>
+</dd>
+<dd>
+<p>Maschine order</p>
+</dd>
+<dd>
+<p>This is Default.</p>
+</dd>
+<dd>
+<p>BOM is placed to detect the order used.</p>
+</dd>
+</li>
+<dt><strong><a name="le" class="item"><code>&quot;LE&quot;</code></a></strong>
+
+<dd>
+<p>First driver to support: <code>Data::Sofu::Binary::Bin0200</code></p>
+</dd>
+<dd>
+<p>Little Endian</p>
+</dd>
+<dd>
+<p>BOM is placed to detect the order used.</p>
+</dd>
+<dd>
+<p>Use this to give it to machines which are using Little Endian and have to read the file alot</p>
+</dd>
+</li>
+<dt><strong><a name="be" class="item"><code>&quot;BE&quot;</code></a></strong>
+
+<dd>
+<p>First driver to support: <code>Data::Sofu::Binary::Bin0200</code></p>
+</dd>
+<dd>
+<p>Big Endian</p>
+</dd>
+<dd>
+<p>BOM is placed to detect the order used.</p>
+</dd>
+<dd>
+<p>Use this to give it to machines which are using Big Endian and have to read the file alot</p>
+</dd>
+</li>
+<dt><strong><a name="7bit" class="item"><code>&quot;7Bit&quot;</code></a></strong>
+
+<dd>
+<p>First driver to support: <code>Data::Sofu::Binary::Bin0200</code></p>
+</dd>
+<dd>
+<p>Use this byteorder if you can't trust your transport stream to be 8-Bit save.</p>
+</dd>
+<dd>
+<p>Encoding is forced to be UTF-7. No byte in the file will be &gt; 127.</p>
+</dd>
+<dd>
+<p>BOM is set to 00 00.</p>
+</dd>
+</li>
+<dt><strong><a name="noforce7bit" class="item"><code>&quot;NOFORCE7Bit&quot;</code></a></strong>
+
+<dd>
+<p>First driver to support: <code>Data::Sofu::Binary::Bin0200</code></p>
+</dd>
+<dd>
+<p>Use this byteorder if you can't trust your transport stream to be 8-Bit save but you want another enconding than UTF-7</p>
+</dd>
+<dd>
+<p>Encoding is NOT forced to be UTF-7.</p>
+</dd>
+<dd>
+<p>BOM is set to 00 00.</p>
+</dd>
+</li>
+</dl>
+<dt><strong><a name="sofumark" class="item">SOFUMARK</a></strong>
+
+<dd>
+<p>First driver to support: <code>Data::Sofu::Binary::Bin0200</code></p>
+</dd>
+<dd>
+<p>Defines how often the string &quot;Sofu&quot; is placed in the file (to tell any user with a text-editor what type of file this one is).</p>
+</dd>
+<dl>
+<dt><strong><code>undef</code></strong>
+
+<dd>
+<p>First driver to support: <code>Data::Sofu::Binary::Bin0200</code></p>
+</dd>
+<dd>
+<p>Only place one &quot;Sofu&quot; at the beginning of the file.</p>
+</dd>
+<dd>
+<p>This is default.</p>
+</dd>
+</li>
+<dt><strong><a name="0_or" class="item"><code>&quot;0&quot; or &quot;&quot;</code></a></strong>
+
+<dd>
+<p>First driver to support: <code>Data::Sofu::Binary::Bin0200</code></p>
+</dd>
+<dd>
+<p>Place no string anywhere.</p>
+</dd>
+</li>
+<dt><strong><a name="1_or_1" class="item"><code>&quot;1&quot; or &gt;1</code></a></strong>
+
+<dd>
+<p>First driver to support: <code>Data::Sofu::Binary::Bin0200</code></p>
+</dd>
+<dd>
+<p>Place a string on every place it is possible</p>
+</dd>
+<dd>
+<p>Warning, the file might get big.</p>
+</dd>
+</li>
+<dt><strong><a name="0_000001_0_99999" class="item"><code>&quot;0.000001&quot; - &quot;0.99999&quot;</code></a></strong>
+
+<dd>
+<p>First driver to support: <code>Data::Sofu::Binary::Bin0200</code></p>
+</dd>
+<dd>
+<p>Place strings randomly.</p>
+</dd>
+</li>
+</dl>
+</dl>
+<p><strong>NOTE:</strong></p>
+<p>Encoding, Byteorder and encoding driver (and Sofumark of course) are saved in the binary file. So you don't need to specify them for reading files, in fact just give them the Data::Sofu's <code>readSofu()</code> and all will be fine.</p>
+<p>
+</p>
+<hr />
+<h1><a name="bugs">BUGS</a></h1>
+<p><code>Data::Sofu::Object-&gt;writeBinary()</code> will only use the Bin0200 driver, no other.</p>
+<pre>
+        <span class="variable">$map</span> <span class="operator">=</span> <span class="variable">new</span> <span class="variable">Data::Sofu::Map</span><span class="operator">;</span>
+        <span class="operator">.....</span>
+        <span class="variable">$map</span><span class="operator">-&gt;</span><span class="variable">writeBinary</span><span class="operator">(</span><span class="variable">$file</span><span class="operator">);</span> <span class="comment">#Bin0200 driver always.</span>
+        <span class="keyword">use</span> <span class="variable">Data::Sofu</span><span class="operator">;</span>
+        <span class="variable">writeSofuBinary</span><span class="operator">(</span><span class="variable">$file</span><span class="operator">,</span><span class="variable">$map</span><span class="operator">);</span> <span class="comment">#Will use the latest driver.</span>
+</pre>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p><code>perl(1)</code>,<a href="http://sofu.sf.net">http://sofu.sf.net</a></p>
+<p><a href="/Data/Sofu/Object.html">the Data::Sofu::Object manpage</a>, <a href="/Data/Sofu.html">the Data::Sofu manpage</a>, <a href="/Data/Sofu/Binary/Bin0200.html">the Data::Sofu::Binary::Bin0200 manpage</a></p>
+
+</body>
+
+</html>

@@ -1,0 +1,465 @@
+#!/usr/local/bin/perl -w
+
+ ###########################################################################
+ #                                                                         #
+ # Simple Tk panel which allows you to synthesise text.                    #
+ #                                                                         #
+ ###########################################################################
+
+sub usage
+  {
+    my ($ret) = @_;
+    print <<EOF;
+Usage: 
+    $0 [-q] [-server HOSTNAME] [-port PORT] [-c COMMAND] [-t TIMEOUT] [TEXT...]
+
+      A simple graphical interface to the festival speech synthesiser.
+
+	-q	Be quieter.
+  
+	-server HOSTNAME
+		The host where festival is running.
+		(default localhost)
+
+	-port PORT
+		Port at which festival is listening.
+		(default 1314)
+
+	-c COMMAND
+		Command to play waveforms.
+		(default 'na_play WAVE')
+
+	-t TIMEOUT
+		Timeout (in senconds) for network connecton attempts.
+		(default 10 seconds)
+
+	TEXT
+		Initial text.
+EOF
+    exit($ret);
+  }
+
+BEGIN {
+unshift @INC, ".";
+}
+
+eval "use Speech::Synthesiser;";
+
+if($@)
+  {
+    print "$@\n";
+    print "You must install the perl Festival module\n";
+    print "from the festival distribution.\n";
+    exit (1);
+  }
+
+use Tk;
+
+$timeout=10;
+$text = "We are perl.\nPrepare for assimilation.";
+$server = 'localhost';
+$port = 1314;
+$command='na_play WAVE';
+$current_voice="no voice";
+$quiet=0;
+
+while ($#ARGV>=0 && $ARGV[0] =~ /^-/)
+  {
+    if ($ARGV[0] =~ /^-+s(erver)?/)
+      {
+	shift @ARGV;
+	$server = shift @ARGV;
+      }
+    elsif ($ARGV[0] =~ /^-+p(ort)?/)
+      {
+	shift @ARGV;
+	$port = shift @ARGV;
+      }   
+    elsif ($ARGV[0] =~ /^-+t(imeout)?/)
+      {
+	shift @ARGV;
+	$timeout = shift @ARGV;
+      }
+    elsif ($ARGV[0] =~ /^-+c(ommand)?/)
+      {
+	shift @ARGV;
+	$command = shift @ARGV;
+      }
+     elsif ($ARGV[0] =~ /^-+q(uiet)?/)
+      {
+	shift @ARGV;
+	$quiet=1;
+      }
+    elsif ($ARGV[0] =~ /^-+[h?](elp)?/)
+      {
+	shift @ARGV;
+	usage(0);
+      }
+    else
+      {
+	usage(1);
+      }
+    
+  }
+
+if ($#ARGV >=0)
+  {
+    $text = join("\n", @ARGV);
+  }
+
+$festival=undef;
+
+$main = new MainWindow;
+
+$icon_im = load_image('Tk/tranicon.gif');
+$powered_im = load_image('Tk/anim.gif');
+
+if (defined($icon_im))
+  {
+    $icon_w=$main->Toplevel(
+			    -background => undef,
+			    -width => $icon_im->width(),
+			    -height => $icon_im->height()
+			   );
+
+    $icon_lab = $icon_w->Label(-image => $icon_im);
+    $icon_lab->pack();
+
+    $icon_lab->bind('<Button-1>' => sub { $main->deiconify;});
+
+    $main->iconwindow($icon_w);
+  }
+
+$main->title('Festival Panel');
+
+$text_field = $main->Text(
+			   -width => 20, -height => 4,
+			   -background => 'antiquewhite'
+			  );
+
+$text_field->insert("0.0", $text);
+
+$fp_frame = $main->Frame();
+
+$festival_frame = $fp_frame->Frame();
+
+$festival_lab = $festival_frame->Label(
+				      -font => '-*-helvetica-bold-r-*-*-*-120-*-*-*-*-*-*',
+				       -background => $main->cget(-background),
+				      -text => 'Server'
+				      );
+
+$festival_field = $festival_frame->Entry(
+				     -width => 15,
+				     -textvariable => \$server,
+				     -background => 'antiquewhite'
+				    );
+
+$festival_field->bind('<Enter>' =>
+		      sub { 
+			$server_last_value = $server;
+		      });
+
+$festival_field->bind('<Leave>' =>
+		      sub { 
+			server_changed()
+			  unless $server_last_value eq $server;
+		      });
+
+$port_frame = $fp_frame->Frame();
+
+$port_lab = $port_frame->Label(
+			       -font => '-*-helvetica-bold-r-*-*-*-120-*-*-*-*-*-*',
+			       -background => $main->cget(-background),
+			       -text => 'Port'
+			      );
+
+$port_field = $port_frame->Entry(
+				 -width => 5,
+				 -textvariable => \$port,
+				 -background => 'antiquewhite'
+				);
+
+$port_field->bind('<Enter>' =>
+		  sub { 
+		    $port_last_value = $port;
+		  });
+
+$port_field->bind('<Leave>' =>
+		  sub { 
+		    server_changed()
+		      unless $port_last_value eq $port;
+		  });
+
+if(defined($powered_im))
+  {
+    $powered_frame=$fp_frame->Frame();
+    $powered_lab=$powered_frame->Label(-image => $powered_im);
+  }
+
+$message_lab = $main->Label(-anchor => 'w', 
+			    -font => '-*-helvetica-bold-r-*-*-*-120-*-*-*-*-*-*',
+			    -background => $main->cget(-background),
+			    -textvariable => \$message,
+			    -relief => 'groove',
+			    -borderwidth => 2,
+			    -width => 40
+			   );
+
+$buttons_frame = $main->Frame(			    
+			     );
+
+$voice_sel = $buttons_frame->Menubutton(-text => 'Voice',
+					-relief => 'raised',
+					-indicatoron => 1,
+					-width => 12
+				       );
+
+$quit_button = $buttons_frame->Button(-text => 'Quit',
+				       -command => sub{exit}
+				      );
+$intro_button = $buttons_frame->Button(-text => 'Intro',
+				       -command => \&intro
+				      );
+$describe_button = $buttons_frame->Button(-text => 'Describe',
+				       -command => \&describe
+				      );
+
+$speak_button = $buttons_frame->Button(-text => 'Speak',
+				       -command => \&speak
+				      );
+
+# $main->pack(-side => 'top', -fill => 'x');
+
+# $title->pack(-side => 'top', -fill => 'x');
+
+$text_field->pack(-side => 'top', -fill => 'x');
+
+$fp_frame->pack(-side => 'top', -fill => 'x');
+  $festival_frame->pack(-side => 'left', -fill => 'x');
+    $festival_lab->pack(-side =>'top');
+    $festival_field->pack(-side =>'bottom');
+
+  $port_frame->pack(-side => 'left', -fill => 'x');
+    $port_lab->pack(-side =>'top');
+    $port_field->pack(-side =>'bottom');
+
+  if(defined($powered_im))
+    {
+      $powered_frame->pack(-side => 'right', -fill => 'x');
+      $powered_lab->pack(-side => 'bottom', -fill => 'x');
+    }
+
+$message_lab->pack(-side => 'top', -fill => 'x');
+
+$buttons_frame->pack(-side => 'top', -fill => 'x');
+  $voice_sel->pack(-side =>'left');
+  $describe_button->pack(-side => 'left');
+  $intro_button->pack(-side => 'left');
+  $quit_button->pack(-side =>'right');
+  $speak_button->pack(-side => 'right');
+
+server_changed();
+
+MainLoop;
+
+exit(0);
+
+sub message
+  {
+    my ($text) = @_;
+
+    if (!defined($text))
+      {
+	$text = '';
+      }
+
+    $message=$text;
+  }
+
+sub server_changed
+  {
+    stop $festival
+      if defined($festival);
+
+    $festival = new Speech::Synthesiser
+      -type => 'Festival',
+      -host => $server, 
+      -port => $port;
+
+    set_play_command Audio::FileWave "riff", $command;
+
+    eval {
+      local $SIG{ALRM} = sub { die "alarm clock restart" };
+      alarm $timeout;
+
+      if (!start $festival)
+	{
+	  die "couldn't connect $synth_error";
+	}
+    };
+    alarm 0;
+
+    if ($@)
+      {
+	if ($@ =~ /alarm clock restart/) 
+	  { 
+	    message("couldn't connect in $timeout seconds"); 
+	    $festival=undef;
+	    festival_ok();
+	    return;
+	  }
+	else
+	  {
+	    message("couldn't connect $synth_error"); 
+	    $festival=undef;
+	    festival_ok();
+	    return;
+	  }
+      }
+
+    my (@voices) = voice_list $festival;
+
+    my ($menu) = $voice_sel->cget(-menu);
+
+    $menu->delete(0,'last')
+      if defined($menu);
+    for $v (@voices)
+      {
+	my ($v) = $v;
+	$voice_sel->command(-label => $v,
+			    -command => sub {set_voice($v);}
+			   );
+      }
+
+    set_voice($voices[0]);
+    festival_ok();
+  }
+
+sub speak
+  {
+    my ($text) = @_;
+    if (defined($festival))
+      {
+	$speak_button->configure(-relief => 'sunken');
+	$speak_button->update();
+
+	my ($n) = $festival->speak(defined($text)?$text:get_text());
+
+	if ($n >= 0)
+	  {
+	    message("$n Chunk".($n==1?"":"s"));
+	  }
+	else
+	  {
+	    message("Festival error");
+	  }
+	$speak_button->configure(-relief => 'raised');
+	$speak_button->update();
+      }
+  }
+
+sub intro
+  {
+    if (defined($festival))
+      {
+	$intro_button->configure(-relief => 'sunken');
+	$intro_button->update();
+	$speak_button->configure(-relief => 'sunken');
+	$speak_button->update();
+	my ($n) = $festival->synth_description();
+
+	message("$n Chunk".($n==1?"":"s"));
+	$speak_button->configure(-relief => 'raised');
+	$speak_button->update();
+	$intro_button->configure(-relief => 'raised');
+	$intro_button->update();
+      }
+  }
+
+sub set_voice
+  {
+    my ($v) = @_;
+
+    if (defined($festival))
+      {
+	$voice_sel->configure(-relief => 'sunken');
+	$voice_sel->update();
+	message("selecting $v");
+	voice $festival $v;
+	$current_voice = $v;
+	$voice_sel->configure(-text => $v);
+
+	my ($vname) = $v;
+
+	$vname =~ s/([^_]*)_(.*)/{my ($a, $b) = ($1, $2); $a =~ s|(.)|$1 |g; "$a _ $b"; }/e;
+
+	speak("voice is $vname")
+	  unless $quiet;
+	$voice_sel->configure(-relief => 'raised');
+	$voice_sel->update();
+
+	describe($v)
+	  unless $quiet;
+      }
+  }
+
+sub festival_ok
+  {
+    if (defined($festival))
+      {
+	$voice_sel->configure(-state => 'normal');
+	$intro_button->configure(-state => 'normal');
+	$speak_button->configure(-state => 'normal');
+      }
+    else
+      {
+	$voice_sel->configure(-state => 'disabled');
+	$intro_button->configure(-state => 'disabled');
+	$speak_button->configure(-state => 'disabled');
+      }
+  }
+
+
+sub get_text
+  {
+    return $text_field->get("0.0", "end");
+  }
+
+
+sub load_image
+  {
+    my ($fn) = @_;
+
+    foreach $d (@INC)
+      {
+	if ( -f "$d/$fn")
+	  {
+	    my ($im) = $main->Photo('-format' => 'GIF', 
+				    -file => "$d/$fn");
+	    return $im;
+	  }
+      }
+    return undef;
+  }
+
+sub describe
+  {
+    my ($voice) = @_;
+
+    $voice = $current_voice
+	unless defined($voice);
+
+    if (defined($festival))
+      {
+	$describe_button->configure(-relief => 'sunken');
+	$describe_button->update();
+	my ($desc) = voice_description $festival $voice;
+
+	my ($d) = $desc->[1]->[3]->[1];
+
+	speak($d);
+	$describe_button->configure(-relief => 'raised');
+	$describe_button->update();
+      }
+  }

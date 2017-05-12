@@ -1,0 +1,108 @@
+README for strict::ModuleName
+                                        Time-stamp: "2003-07-20 06:33:20 ADT"
+
+			  strict::ModuleName
+
+[Partially excerpted from the POD.]
+
+NAME
+    strict::ModuleName -- verify that current package name matches filename
+
+SYNOPSIS
+        # In a file (some @INC dir)/Shazbot.pm:
+        package Shazbot;
+        use strict::ModuleName;
+         # does nothing, because Shazbot.pm matches package name "Shazbot"
+
+    That does nothing, because the package name "Shazbot" is exactly what
+    you'd expect from "Shazbot.pm" in an @INC directory.
+
+    But any of these will throw a fatal error:
+
+        # In a file (some @INC dir)/Shazbot.pm:
+        package ShazBot;
+        use strict::ModuleName;
+         # that's a fatal error, because Shazbot isn't ShazBot
+     
+        # In a file (some @INC dir)/Shazbot.pm:
+        package Shaz::Bot;
+        use strict::ModuleName;
+         # that's a fatal error, because Shazbot isn't Shaz::Bot
+     
+        # In a file (not any @INC dir)/Shazbot.pm:
+        package Shazbot;
+        use strict::ModuleName;
+         # That's a fatal error, because ShazBot wasn't findable
+         #  via any @INC dir.
+
+DESCRIPTION
+    This module stops you from having your module's filename and package
+    name disagree, such as might happen as you're changing the name as
+    you're developing the module; or such as might happen if you are using a
+    case insensitive filesystem, and get the case wrong in the filename.
+
+    A line saying `use strict::ModuleName;' in a module is basically an
+    compile-time assertion that the current package name is compatible with
+    the filename which the current source is being read from.
+
+NOTES
+    Maybe this module should just warn() more instead of die()ing?
+
+COPYRIGHT
+    Copyright (c) 2002,2003 Sean M. Burke. All rights reserved.
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The programs and documentation in this dist are distributed in the hope
+    that they will be useful, but without any warranty; without even the
+    implied warranty of merchantability or fitness for a particular purpose.
+
+AUTHOR
+    Sean M. Burke `sburke@cpan.org'
+
+
+
+PREREQUISITES
+
+This suite requires Perl 5.
+
+
+INSTALLATION
+
+You install strict::ModuleName, as you would install any perl module
+library, by running these commands:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+If you want to install a private copy of strict::ModuleName in your
+home directory, then you should try to produce the initial Makefile
+with something like this command:
+
+  perl Makefile.PL LIB=~/perl
+
+See perldoc perlmodinstall for more information.
+
+
+DOCUMENTATION
+
+POD-format documentation is included in strict::ModuleName.  POD is
+readable with the 'perldoc' utility.  See ChangeLog for recent
+changes.
+
+
+SUPPORT
+
+Questions, bug reports, useful code bits, and suggestions for
+strict::ModuleName should just be sent to me at sburke@cpan.org
+
+
+AVAILABILITY
+
+The latest version of strict::Modulename is available from the
+Comprehensive Perl Archive Network (CPAN).  Visit
+<http://www.perl.com/CPAN/> to find a CPAN site near you.
+

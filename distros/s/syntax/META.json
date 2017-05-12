@@ -1,0 +1,64 @@
+{
+   "abstract" : "Activate syntax extensions",
+   "author" : [
+      "Robert 'phaylon' Sedlacek <rs@474.at>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300016, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "syntax",
+   "no_index" : {
+      "directory" : [
+         "t/"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Data::OptList" : "0.104",
+            "namespace::clean" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "FindBin" : "0",
+            "Test::More" : "0.94"
+         }
+      }
+   },
+   "provides" : {
+      "syntax" : {
+         "file" : "lib/syntax.pm",
+         "version" : "0.004"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=syntax"
+      },
+      "homepage" : "https://github.com/phaylon/syntax/wiki",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/phaylon/syntax.git",
+         "web" : "http://github.com/phaylon/syntax"
+      }
+   },
+   "version" : "0.004",
+   "x_authority" : "cpan:PHAYLON"
+}
+

@@ -1,0 +1,69 @@
+The SWISHED protocol is roughly based on the swish-e command line exe.
+
+The swished server (designed as a mod_perl module) expects a query 
+string with the following contents, and returns data as explained below.
+
+############################################################################
+CLIENT REQUEST: build a query string with the following
+# f=indexname
+# w=search 				query string, if you are doing a search.
+# h=1					request metadata, can be done with or without search
+# b=begin
+# p=prop,prop2,prop3 	these props (default swishdocpath,swishrank,swishtitle)
+# d=1					debug level (not implemented)
+# c=1                   return query and Character information for highlighting 
+						(not implemented-- not in SWISH::API?)
+# M=1					request METANAMES from index
+# P=1					request PROPERTIES from index
+
+
+############################################################################
+HUMAN DESCRIPTION OF SERVER KEYS:
+
+d: lines are purely d:escriptive for d:ebugging
+k: lines are the k:ey of the names and order of the properties returned (for r:)
+m: is m:eta data about the search, w/ hit stats
+q: parsed query string (cut by joshr, this is in header data)
+s: stopwords removed
+r: r:esult, the r:ecords returned
+e: lines are any e:rrors encountered on the server
+h: Name%20Escaped%Header=value%20escaped
+M: metaname,metaname2,...,lastmetainindex
+P: property,property2,...,lastpropsinindex
+
+FOR EXAMPLE, an actual request string received by SWISHED might look like:
+
+ f=DEFAULT&p=swishrank,swishdocpath,swishtitle,swishdocsize&b=0&m=1&w=search+this
+
+
+############################################################################
+EXAMPLE OF A SERVER RESPONSE FOLLOWS:
+Content-type: text/plain
+
+d: pid 17583 opened index /var/lib/sman/sman.index for search 'my search'
+k: 0=swishdocpath&1=swishrank&2=swishtitle
+m: hits=190
+q: search  (if one exists) (cut by joshr, this is in header data)
+r: 0=%2Fusr%2Fshare%2Fman%2Fman3%2FDBI.3pm&1=1000&2=DBI
+r: 0=%2Fusr%2Fshare%2Fman%2Fman3%2FClass%3A%3ADBI.3pm&1=997&2=Class%3A%3ADBI
+r: 0=%2Fusr%2Fshare%2Fman%2Fman3%2FSearch%3A%3AInvertedIndex.3pm&1=964&2=Search%3A%3AInverte...
+h: BeginCharacters: 0123456789abcdefghijklmnopqrstuvwxyz  (uri-escaped, and if headers are requested)
+... (more h: stuff removed) ...
+
+###########################################################################
+If there was an error, we would find a line like this:
+
+e: This is an error string
+
+
+############################################
+# $Log: PROTOCOL,v $
+# Revision 1.11  2006/07/07 02:32:36  joshr
+# no real change
+#
+# Revision 1.10  2006/06/17 17:11:35  joshr
+# most of the protocol changes documented
+#
+# Revision 1.9  2006/06/04 16:58:41  joshr
+# document protocol changes (they're in flux)
+#

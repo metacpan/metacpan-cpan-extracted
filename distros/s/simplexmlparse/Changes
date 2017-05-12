@@ -1,0 +1,41 @@
+Revision history for Perl extension simpleXMLParse.
+
+0.01  Wed May 15 22:11:19 2013
+	- original version; created by h2xs 1.23 with options
+		-AX simpleXMLParse -b 5.5.0
+
+1.9   Fri Jul 26 17:33:00 2013
+        - fixes problem with algorithm dealing with nested same-name tags
+
+2.0  Fri Jul 26 18:54:00 2013
+        - fixes META.yml META.json
+
+2.1  Sun Sep 22 20:31:00 2013
+        - fixes quote parsing, UTF-8, and support for CDATA
+
+2.2  Sun Jan 05 17:00:00 2014
+        - fixes bug in parsing attribute-less <node/>, thread safety, memory leak 
+
+2.3  Sat Mar 22 16:00:00 2014
+        - fixes bug in parsing multiple same-name tags and allows whitespace before and after '=' 
+
+2.4  Sat Mar 22 18:22:00 2014
+        - fixes bug in parsing multiple same-name tags into arrayref 
+
+2.5  Tue Mar 25 18:31:00 2014
+        - fixes bugs in the parsing algorithm 
+
+2.6  Thu Mar 27 18:41:00 2014
+        - fixes Makefile.PL 
+
+2.7  Sun Dec 07 17:18:00 2014
+        - Strips out ENTITY tags within DOCTYPE, as custom ENTITY not supported yet. fixes DOCTYPE tag problem. now handles the 5 predefined entities. Do CDATA scan first (before stripping comments) constructor now does not require { }'s in argument list.  fixes problem with metacharacters in tag names fixes problem with newline stripping.
+
+2.8  Sun Dec 21 15:45:00 2014
+        - Regular expression fixes and Makefile.PL fix
+
+2.9  Tue Feb 17 09:22:00 2015
+        - "Fragile" Regular expression fix and no warnings 
+
+3.0  Mon Apr 06 14:28:00 2015
+        - strip out !ATTLIST and debug statement removal 

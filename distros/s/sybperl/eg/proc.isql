@@ -1,0 +1,29 @@
+/*	@(#)proc.isql	1.3	10/5/95 */
+if exists (select * from sysobjects where name = "t_proc")
+    drop proc t_proc
+go
+create proc t_proc
+	@acc		char(10) = null,
+	@date 		datetime = null out,
+	@open_val	money out,
+	@open_val_t	money out
+as
+  declare @msg varchar(60)
+
+
+  if @acc is null
+     print "@acc is null"
+  else
+     select @msg = "Account = " + @acc
+  if @date is null
+     print "@date is null"
+  else
+     select @msg = @msg + " Date = " + convert(char(12), @date, 12)
+
+  print @msg
+
+/*     select @open_val = null, @open_val_t = null */
+  select @open_val = 1254, @open_val_t = 4521, @date = getdate()
+
+  return 0
+go

@@ -1,0 +1,287 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Data::Sofu::Map - A Sofu Map</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+<link rel="stylesheet" type="text/css" href="/Data/sofupod.css" />
+</head>
+
+<body>
+
+<div name="index">
+<p><a name="__index__"></a></p>
+
+<ul>
+
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#synopsis">Synopsis</a></li>
+	<li><a href="#syntax">SYNTAX</a></li>
+	<li><a href="#methods">METHODS</a></li>
+	<ul>
+
+		<li><a href="#new__data__">new([DATA])</a></li>
+		<li><a href="#set_data_">set(DATA)</a></li>
+		<li><a href="#object_key_">object(KEY)</a></li>
+		<li><a href="#remattribute_key_">remAttribute(KEY)</a></li>
+		<li><a href="#setattribute_key__object_">setAttribute(KEY, OBJECT)</a></li>
+		<li><a href="#hasattribute_key_">hasAttribute(KEY)</a></li>
+		<li><a href="#hasvalue_key_">hasValue(KEY)</a></li>
+		<li><a href="#hasmap_key_">hasMap(KEY)</a></li>
+		<li><a href="#haslist_key_">hasList(KEY)</a></li>
+		<li><a href="#list_key_">list(KEY)</a></li>
+		<li><a href="#map_key_">map(KEY)</a></li>
+		<li><a href="#value_key_">value(KEY)</a></li>
+		<li><a href="#asmap__"><code>asMap()</code></a></li>
+		<li><a href="#ashash__"><code>asHash()</code></a></li>
+		<li><a href="#ismap__"><code>isMap()</code></a></li>
+		<li><a href="#next__"><code>next()</code></a></li>
+		<li><a href="#each__"><code>each()</code></a></li>
+		<li><a href="#length__"><code>length()</code></a></li>
+		<li><a href="#opapply_code_">opApply(CODE)</a></li>
+		<li><a href="#opapplydeluxe_code_">opApplyDeluxe(CODE)</a></li>
+		<li><a href="#storecomment_tree_comment_"><code>storeComment(TREE,COMMENT)</code></a></li>
+		<li><a href="#orderedkeys__"><code>orderedKeys()</code></a></li>
+		<li><a href="#stringify_level__tree_"><code>stringify(LEVEL, TREE)</code></a></li>
+		<li><a href="#binarypack_encoding__byteorder__sofumark_"><code>binaryPack(ENCODING, BYTEORDER, SOFUMARK)</code></a></li>
+		<li><a href="#binarify_tree_binary_driver_"><code>binarify(TREE,BINARY DRIVER)</code></a></li>
+	</ul>
+
+	<li><a href="#bugs">BUGS</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
+</ul>
+
+<hr name="index" />
+</div>
+<!-- INDEX END -->
+
+<p>
+</p>
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>Provides a interface similar to the original SofuD (sofu.sf.net)</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">Synopsis</a></h1>
+<pre>
+        <span class="keyword">require</span> <span class="variable">Data::Sofu::Map</span><span class="operator">;</span>
+        <span class="keyword">my</span> <span class="variable">$map</span> <span class="operator">=</span> <span class="variable">Data::Sofu::Map</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">();</span>
+        <span class="variable">$map</span><span class="operator">-&gt;</span><span class="variable">setAttribute</span><span class="operator">(</span><span class="string">"foo"</span><span class="operator">,</span><span class="string">"bar"</span><span class="operator">);</span>
+        <span class="keyword">print</span> <span class="variable">$map</span><span class="operator">-&gt;</span><span class="variable">value</span><span class="operator">(</span><span class="string">"foo"</span><span class="operator">)-&gt;</span><span class="variable">toString</span><span class="operator">();</span>
+        <span class="variable">$tree</span> <span class="operator">=</span> <span class="variable">Data::Sofu::loadfile</span><span class="operator">(</span><span class="string">"1.sofu"</span><span class="operator">);</span>
+        <span class="variable">$tree</span><span class="operator">-&gt;</span><span class="variable">opApply</span><span class="operator">(</span><span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span><span class="keyword">print</span> <span class="variable">$_</span><span class="operator">[</span><span class="number">0</span><span class="operator">]</span><span class="operator">,</span><span class="string">"\n"</span><span class="operator">});</span> <span class="comment">#Prints all keys</span>
+</pre>
+<p>
+</p>
+<hr />
+<h1><a name="syntax">SYNTAX</a></h1>
+<p>This Module is pure OO, exports nothing</p>
+<p>
+</p>
+<hr />
+<h1><a name="methods">METHODS</a></h1>
+<p>Also look at <code>Data::Sofu::Object</code> for methods, cause Map inherits from it</p>
+<p>
+</p>
+<h2><a name="new__data___creates_a_new_data__sofu__map_and_returns_it">new([DATA])
+Creates a new <code>Data::Sofu::Map</code> and returns it</a></h2>
+<p>Converts DATA to appropriate Objects if DATA is given. DATA has to be a Hash or a hashlike structure.</p>
+<pre>
+        <span class="variable">$env</span> <span class="operator">=</span> <span class="variable">Data::Sofu::Map</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="variable">%ENV</span><span class="operator">);</span>
+</pre>
+<p>
+</p>
+<h2><a name="set_data_">set(DATA)</a></h2>
+<p>Sets the contents of the Map to match a Hash.</p>
+<pre>
+        <span class="variable">$map</span><span class="operator">-&gt;</span><span class="variable">set</span><span class="operator">(</span><span class="variable">%ENV</span><span class="operator">);</span>
+</pre>
+<p>
+</p>
+<h2><a name="object_key_">object(KEY)</a></h2>
+<p>Return an attribute identified by KEY of this Map.</p>
+<pre>
+        <span class="variable">$o</span> <span class="operator">=</span> <span class="variable">$env</span><span class="operator">-&gt;</span><span class="variable">object</span><span class="operator">(</span><span class="string">"PATH"</span><span class="operator">);</span>
+        <span class="keyword">if</span> <span class="operator">(</span><span class="variable">$o</span><span class="operator">-&gt;</span><span class="variable">isList</span><span class="operator">())</span> <span class="operator">{</span>
+                <span class="operator">...</span>
+        <span class="operator">}</span>
+        <span class="keyword">elsif</span> <span class="operator">(</span><span class="variable">$o</span><span class="operator">-&gt;</span><span class="variable">isValue</span><span class="operator">())</span> <span class="operator">{</span>
+        <span class="operator">...</span>
+</pre>
+<p>Note: Changing the returned Object will change the Map as well. (OO 101)</p>
+<p>
+</p>
+<h2><a name="remattribute_key_">remAttribute(KEY)</a></h2>
+<p>Deletes an Attribute from this Map.</p>
+<pre>
+        <span class="variable">$env</span><span class="operator">-&gt;</span><span class="variable">remAttribute</span><span class="operator">(</span><span class="string">"OSTYPE"</span><span class="operator">);</span>
+</pre>
+<p>
+</p>
+<h2><a name="setattribute_key__object_">setAttribute(KEY, OBJECT)</a></h2>
+<p>Replaces/creates an Attribute in this Map identified by KEY and sets it to OBJECT.</p>
+<pre>
+        <span class="variable">$env</span><span class="operator">-&gt;</span><span class="variable">setAttribute</span><span class="operator">(</span><span class="string">"PATH"</span><span class="operator">,</span> <span class="variable">Data::Sofu::List</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="keyword">split</span><span class="regex">/:/</span><span class="operator">,</span><span class="variable">$env</span><span class="operator">-&gt;</span><span class="variable">value</span><span class="operator">(</span><span class="string">"PATH"</span><span class="operator">)-&gt;</span><span class="variable">toString</span><span class="operator">()));</span>
+</pre>
+<p>
+</p>
+<h2><a name="hasattribute_key_">hasAttribute(KEY)</a></h2>
+<p>Return a true value if this Map has an Attribute identified by KEY</p>
+<pre>
+        <span class="keyword">if</span> <span class="operator">(</span><span class="variable">$env</span><span class="operator">-&gt;</span><span class="variable">hasAttribute</span><span class="operator">(</span><span class="string">"Lines"</span><span class="operator">))</span> <span class="operator">{</span>
+                <span class="keyword">print</span> <span class="string">"X"</span> <span class="operator">x</span> <span class="variable">$env</span><span class="operator">-&gt;</span><span class="variable">value</span><span class="operator">(</span><span class="string">"Lines"</span><span class="operator">)-&gt;</span><span class="variable">toInt</span><span class="operator">();</span>
+</pre>
+<p>
+</p>
+<h2><a name="hasvalue_key_">hasValue(KEY)</a></h2>
+<p>Returns 1 if this Map has an Attribute called KEY and this Attribute is a <code>Data::Sofu::Value</code>.</p>
+<pre>
+        <span class="variable">$env</span><span class="operator">-&gt;</span><span class="variable">hasValue</span><span class="operator">(</span><span class="string">"PATH"</span><span class="operator">)</span> <span class="operator">===</span> <span class="variable">$env</span><span class="operator">-&gt;</span><span class="variable">hasAttribute</span><span class="operator">(</span><span class="string">"PATH"</span><span class="operator">)</span> <span class="keyword">and</span> <span class="variable">$env</span><span class="operator">-&gt;</span><span class="variable">object</span><span class="operator">(</span><span class="string">"PATH"</span><span class="operator">)-&gt;</span><span class="variable">isValue</span><span class="operator">();</span>
+</pre>
+<p>Note: Return 0 if the Object is not a Value and under if the Element doesn't exist at all.</p>
+<p>
+</p>
+<h2><a name="hasmap_key_">hasMap(KEY)</a></h2>
+<p>Returns 1 if this Map has an Attribute called KEY and this Attribute is a <code>Data::Sofu::Map</code>.</p>
+<pre>
+        <span class="variable">$env</span><span class="operator">-&gt;</span><span class="variable">hasMap</span><span class="operator">(</span><span class="string">"PATH"</span><span class="operator">)</span> <span class="operator">===</span> <span class="variable">$env</span><span class="operator">-&gt;</span><span class="variable">hasAttribute</span><span class="operator">(</span><span class="string">"PATH"</span><span class="operator">)</span> <span class="keyword">and</span> <span class="variable">$env</span><span class="operator">-&gt;</span><span class="variable">object</span><span class="operator">(</span><span class="string">"PATH"</span><span class="operator">)-&gt;</span><span class="variable">isMap</span><span class="operator">();</span>
+</pre>
+<p>Note: Return 0 if the Object is not a Value and under if the Element doesn't exist at all.</p>
+<p>
+</p>
+<h2><a name="haslist_key_">hasList(KEY)</a></h2>
+<p>Returns 1 if this Map has an Attribute called KEY and this Attribute is a <code>Data::Sofu::List</code>.</p>
+<pre>
+        <span class="variable">$env</span><span class="operator">-&gt;</span><span class="variable">hasList</span><span class="operator">(</span><span class="string">"PATH"</span><span class="operator">)</span> <span class="operator">===</span> <span class="variable">$env</span><span class="operator">-&gt;</span><span class="variable">hasAttribute</span><span class="operator">(</span><span class="string">"PATH"</span><span class="operator">)</span> <span class="keyword">and</span> <span class="variable">$env</span><span class="operator">-&gt;</span><span class="variable">object</span><span class="operator">(</span><span class="string">"PATH"</span><span class="operator">)-&gt;</span><span class="variable">isList</span><span class="operator">();</span>
+</pre>
+<p>Note: Return 0 if the Object is not a Value and under if the Element doesn't exist at all.</p>
+<p>
+</p>
+<h2><a name="list_key_">list(KEY)</a></h2>
+<p>Returns the Object at the key called KEY as a <code>Data::Sofu::List</code>.</p>
+<p>Dies if the Object is not a Data::Sofu::List.</p>
+<pre>
+
+        $env-&gt;list(&quot;PATH&quot;) === $env-&gt;object(&quot;PATH&quot;)-&gt;asList()</pre>
+<p>
+</p>
+<h2><a name="map_key_">map(KEY)</a></h2>
+<p>Returns the Object at the key called KEY as a <code>Data::Sofu::Map</code>.</p>
+<p>Dies if the Object is not a Data::Sofu::Map.</p>
+<pre>
+
+        $env-&gt;map(&quot;PATH&quot;) === $env-&gt;object(&quot;PATH&quot;)-&gt;asMap()</pre>
+<p>
+</p>
+<h2><a name="value_key_">value(KEY)</a></h2>
+<p>Returns the Object at the key called KEY as a <code>Data::Sofu::Value</code>.</p>
+<p>Dies if the Object is not a Data::Sofu::Value.</p>
+<pre>
+
+        $env-&gt;value(&quot;PATH&quot;) === $env-&gt;object(&quot;PATH&quot;)-&gt;asValue()</pre>
+<p>
+</p>
+<h2><a name="asmap__"><code>asMap()</code></a></h2>
+<p>Returns itself, used to make sure this Map is really a Map (<code>Data::Sofu::List</code> and <code>Data::Sofu::Value</code> will die if called with this method)</p>
+<p>
+</p>
+<h2><a name="ashash__"><code>asHash()</code></a></h2>
+<p>Perl only</p>
+<p>Returns this Map as a real perl Hash.</p>
+<p>
+</p>
+<h2><a name="ismap__"><code>isMap()</code></a></h2>
+<p>Returns 1</p>
+<p>
+</p>
+<h2><a name="next__"><code>next()</code></a></h2>
+<p>Returns the next Key, Value pair in no specific order. Used to iterate over the Map.</p>
+<p>If called in list context it returns the (Key, Value) as a list, in scalar context it returns [Key, Value] as an Arrayref and in Void Context it resets the Iterator.</p>
+<pre>
+        <span class="keyword">while</span> <span class="operator">(</span><span class="keyword">my</span> <span class="operator">(</span><span class="variable">$k</span><span class="operator">,</span><span class="variable">$v</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">$env</span><span class="operator">-&gt;</span><span class="keyword">next</span><span class="operator">())</span> <span class="operator">{</span>
+                <span class="keyword">last</span> <span class="keyword">if</span> <span class="variable">$k</span> <span class="keyword">eq</span> <span class="string">"PATH"</span><span class="operator">;</span>
+                <span class="keyword">print</span> <span class="string">"</span><span class="variable">$k</span><span class="string"> = "</span><span class="operator">.</span><span class="variable">$v</span><span class="operator">-&gt;</span><span class="variable">asValue</span><span class="operator">()-&gt;</span><span class="variable">ToString</span><span class="operator">().</span><span class="string">"\n"</span><span class="operator">;</span>
+        <span class="operator">}</span>
+        <span class="variable">$env</span><span class="operator">-&gt;</span><span class="keyword">next</span><span class="operator">()</span> <span class="comment">#Reset Iterator</span>
+</pre>
+<p>
+</p>
+<h2><a name="each__"><code>each()</code></a></h2>
+<p>Returns the next Key, Value pair in no specific order. Used to iterate over the Map.</p>
+<p>If called in list context it returns the (Key, Value) as a list, in scalar context it returns [Key, Value] as an Arrayref and in Void Context it resets the Iterator.</p>
+<pre>
+        <span class="keyword">while</span> <span class="operator">(</span><span class="keyword">my</span> <span class="operator">(</span><span class="variable">$k</span><span class="operator">,</span><span class="variable">$v</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">$env</span><span class="operator">-&gt;</span><span class="keyword">each</span><span class="operator">())</span> <span class="operator">{</span>
+                <span class="keyword">last</span> <span class="keyword">if</span> <span class="variable">$k</span> <span class="keyword">eq</span> <span class="string">"PATH"</span><span class="operator">;</span>
+                <span class="keyword">print</span> <span class="string">"</span><span class="variable">$k</span><span class="string"> = "</span><span class="operator">.</span><span class="variable">$v</span><span class="operator">-&gt;</span><span class="variable">asValue</span><span class="operator">()-&gt;</span><span class="variable">ToString</span><span class="operator">().</span><span class="string">"\n"</span><span class="operator">;</span>
+        <span class="operator">}</span>
+        <span class="variable">$env</span><span class="operator">-&gt;</span><span class="keyword">each</span><span class="operator">()</span> <span class="comment">#Reset Iterator</span>
+</pre>
+<p>
+</p>
+<h2><a name="length__"><code>length()</code></a></h2>
+<p>Returns the length of this Map</p>
+<p>Warning: Resets the Iterator.</p>
+<p>
+</p>
+<h2><a name="opapply_code_">opApply(CODE)</a></h2>
+<p>Takes a Subroutine and iterates with it over the Map. Values and Keys can't be modified.</p>
+<p>The Subroutine takes two Arguments: first is the Key and second is the Value.</p>
+<pre>
+        <span class="variable">$env</span><span class="operator">-&gt;</span><span class="variable">opApply</span><span class="operator">(</span><span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span>
+                <span class="keyword">print</span> <span class="string">"Key = </span><span class="variable">$_</span><span class="string">[0], Value = "</span><span class="operator">,</span><span class="variable">$_</span><span class="operator">[</span><span class="number">1</span><span class="operator">]</span><span class="operator">-&gt;</span><span class="variable">asValue</span><span class="operator">-&gt;</span><span class="variable">toString</span><span class="operator">(),</span><span class="string">"\n"</span><span class="operator">;</span>
+        <span class="operator">});</span>
+</pre>
+<p>Note: The Values are Objects, so they still can be changed, but not replaced.</p>
+<p>
+</p>
+<h2><a name="opapplydeluxe_code_">opApplyDeluxe(CODE)</a></h2>
+<p>Perl only.</p>
+<p>Takes a Subroutine and iterates with it over the Map. Keys can't be modified, but Values can.</p>
+<p>The Subroutine takes two Arguments: first is the Key and second is the Value.</p>
+<pre>
+        <span class="keyword">my</span> <span class="variable">$i</span><span class="operator">=</span><span class="number">0</span><span class="operator">;</span>
+        <span class="variable">$env</span><span class="operator">-&gt;</span><span class="variable">opApplyDeluxe</span><span class="operator">(</span><span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span>
+                <span class="variable">$_</span><span class="operator">[</span><span class="number">1</span><span class="operator">]</span><span class="operator">=</span><span class="variable">new</span> <span class="variable">Data::Sofu::Value</span><span class="operator">(</span><span class="variable">$i</span><span class="operator">++);</span>
+        <span class="operator">});</span>
+</pre>
+<p>Note: Please make sure every replaced Value is a <code>Data::Sofu::Object</code> or inherits from it.</p>
+<p>
+</p>
+<h2><a name="storecomment_tree_comment_"><code>storeComment(TREE,COMMENT)</code></a></h2>
+<p>Stores a comment in the Object if TREE is empty, otherwise it propagades the Comment to all its Values</p>
+<p>Should not be called directly, use <code>importComments()</code> instead.</p>
+<p>
+</p>
+<h2><a name="orderedkeys__"><code>orderedKeys()</code></a></h2>
+<p>Return all Keys of the Map in insertion Order</p>
+<p>
+</p>
+<h2><a name="stringify_level__tree_"><code>stringify(LEVEL, TREE)</code></a></h2>
+<p>Returns a string representing this Map and all its children.</p>
+<p>Runs string(LEVEL+1,TREE+keyname) on all its values.</p>
+<p>
+</p>
+<h2><a name="binarypack_encoding__byteorder__sofumark_"><code>binaryPack(ENCODING, BYTEORDER, SOFUMARK)</code></a></h2>
+<p>Returns a String containing the binary representaion of this Map (according the Sofu Binary File Format)</p>
+<p>Look at <code>Data::Sofu::Binary</code> for the Parameters.</p>
+<p>Note: This uses <code>Data::Sofu::Binary::Bin0200</code> as a only packer.</p>
+<p>
+</p>
+<h2><a name="binarify_tree_binary_driver_"><code>binarify(TREE,BINARY DRIVER)</code></a></h2>
+<p>Returns the binary version of this Map and all its children using the BINARY DRIVER. Don't call this one, use binaryPack instead</p>
+<p>
+</p>
+<hr />
+<h1><a name="bugs">BUGS</a></h1>
+<p>This only supports the 2 Argument version of opApply, I have no idea how to find out if a codereference takes 2 or 1 Arguments.</p>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p><a href="/Data/Sofu.html">the Data::Sofu manpage</a>, <a href="/Data/Sofu/Binary.html">the Data::Sofu::Binary manpage</a>, <a href="/Data/Sofu/Object.html">the Data::Sofu::Object manpage</a>, <a href="/Data/Sofu/List.html">the Data::Sofu::List manpage</a>, <a href="/Data/Sofu/Value.html">the Data::Sofu::Value manpage</a>, <a href="/Data/Sofu/Undefined.html">the Data::Sofu::Undefined manpage</a>, <a href="http://sofu.sf.net">http://sofu.sf.net</a></p>
+
+</body>
+
+</html>
+

@@ -1,0 +1,100 @@
+Release history for strictures
+
+2.000003 - 2016-04-19
+  - update bundled ExtUtils::HasCompiler to 0.013 to fix potential false
+    negative (RT#113637)
+  - list optional XS dependencies as suggests rather than recommends (RT#107393)
+
+2.000002 - 2015-11-04
+  - use ExtUtils::HasCompiler to detect compiler rather than ExtUtils::CBuilder
+  - more comprehensive testing
+
+2.000001 - 2015-06-28
+  - update for perl 5.22 warning categories
+  - avoid using goto &UNIVERSAL::VERSION on perl 5.8, since it segfaults some
+    builds
+  - also detect development directories based on .bzr directory
+  - various test cleanups
+
+2.000000 - 2015-02-26
+  * Incompatible Changes
+    - strictures 2 fatalizes only a subset of warnings.  Some warning
+      categories are not safe to catch, or just inappropriate to have fatal.
+      Existing code looking like 'use strictures 1;' will continue to get the
+      old behavior of fatalizing all errors.  The new behavior will take effect
+      when no version or version 2 is specified.
+
+1.005006 - 2015-01-30
+  - fix extra checks triggering on paths starting with t, xt, lib, or blib,
+    rather than only triggering on those directories.
+  - avoid stat checks for VCS directories until we are in an appropriately
+    named file
+  - various cleanups in test files
+
+1.005005 - 2014-08-16
+  - include minimum perl version in metadata
+
+1.005004 - 2014-03-06
+  - make sure meta files list extra modules as recommendations, not requirements
+
+1.005003 - 2014-02-12
+  - added support for PUREPERL_ONLY (rt#91407)
+  - fixed using strictures->VERSION to query the version (rt#92965)
+
+1.005002 - 2013-12-10
+  - extra prereqs will be listed as hard prerequisites if a compiler is
+    available
+
+1.005001 - 2013-11-07
+  - fix skip on old perl on test script
+
+1.005000 - 2013-11-05
+  - detect mercurial when checking for development trees
+  - avoid using constant.pm to save a bit of memory on older perls
+  - update to v2 metadata
+
+1.004004 - 2012-11-12
+  - fix crash in 1.004003 due to qw() list being readonly
+
+1.004003 - 2012-11-10
+  - check only once for presence of extra testing prereqs
+  - explicitly specify no dynamic_config in META
+
+1.004002 - 2012-09-08
+  - add better rationale for the extra testing heuristic
+
+1.004001 - 2012-07-12
+  - test-specific strictures now enabled during 'dzil test'
+
+1.004000 - 2012-07-12
+  - switch to testing calling file to avoid firing on dependencies
+
+1.003001 - 2012-04-08
+  - fix test to handle defatalization
+
+1.003000 - 2012-04-07
+  - try and run for any checkout t/ now we don't blow up the process
+  - defatalize lack of extra testing modules
+  - disable extra tests on perls <= 5.008003, things do not work there as
+    expected
+
+1.002002 - 2011-02-25
+  - only try and mkdir the .git if it doesn't already exist so repeated
+    test runs don't explode
+
+1.002001 - 2011-02-25
+  - switch .svn to .git in smells-of-vcs test and create it ourselves
+    to ease importing of this dist into subversion repositories
+
+1.002000 - 2011-02-16
+  - add multidimensional and bareword::filehandles in author mode
+
+1.1.1 - 2010-12-05
+  - disable uninitialized warnings before calling ->SUPER::VERSION
+
+1.1.0 - 2010-11-22
+  - enable extra testing only if .git or .svn present to keep requirement
+    for extra modules author-side
+
+1.0.0 - 2010-07-18
+  - initial release

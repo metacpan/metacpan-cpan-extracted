@@ -1,0 +1,21 @@
+Version 1.04
+   - Fix regression test hangs
+
+Version 1.03
+   - Add support for extended attributes.
+
+Version 1.02
+   - Add a "magic directories" feature, which allows you to create
+     directories dynamically populated by the results of running a
+     SQL query.
+   - Rename "length" to "size" in metadata table.
+   - Fix broken rename() method, which previously wasn't able
+     to rename directories.
+   - Add a schema evolution mechanism.
+
+Version 1.01 Fri Jun  7 13:21:43 EDT 2013
+    - Add usage data to README.
+    - Incorporate benchmarking data into README.
+
+Version 1.00 Thu Jun  6 16:22:34 EDT 2013
+    - Initial CPAN release

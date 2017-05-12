@@ -1,0 +1,15 @@
+Changes
+inc/ExtUtils/HasCompiler.pm
+lib/strictures.pm
+lib/strictures/extra.pm
+maint/Makefile.PL.include
+Makefile.PL
+MANIFEST			This list of files
+t/crash.t
+t/extras.t
+t/strictures.t
+xt/all-categories.t
+xt/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+README                                   README file (added by Distar)

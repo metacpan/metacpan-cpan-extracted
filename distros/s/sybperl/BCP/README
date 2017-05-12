@@ -1,0 +1,39 @@
+	$Id: README,v 1.1 1999/05/14 17:22:05 mpeppler Exp $
+	@(#)README	1.3	12/30/97
+
+Copyright (c) 1996-1999  Michael Peppler
+
+   You may copy this under the terms of the GNU General Public License,
+   or the Artistic License, copies of which should have accompanied
+   your Perl kit.
+
+README for Sybase::BCP.
+
+This module is intended to be used on top of the Sybase::DBlib module
+of sybperl 2.04 or later.
+
+INSTALLATION:
+
+If you are installing sybperl 2.04 or later, then this module will get
+automatically installed.
+
+If you are installing a new version of Sybase::BCP on top of an
+existing Sybase::DBlib module, then simply type
+
+	perl Makefile.PL
+	make
+	make install
+
+in this directory.
+
+There are no regression tests defined for this module yet.
+
+The date conversion routines have not been well tested.
+
+Documentation is embedded in the BCP.pm file. Extract with pod2man or
+pod2html, for example.
+
+As always, comments are welcome, either to myself <mpeppler@mbay.net> or
+to the sybperl mailing list <sybperl-l@trln.lib.unc.edu>
+
+Michael

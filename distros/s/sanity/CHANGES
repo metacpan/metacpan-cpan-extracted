@@ -1,0 +1,34 @@
+Revision History for sanity
+===========================
+
+v1.03 2014-10-01
+----------------
+
+[4e20dfe]
+* Author: Brendan Byrd <Perl@ResonatorSoft.org>
+* Date:   2014-10-01 23:44:28 -0400 (64 seconds ago)
+
+Clean up 'features' flags
+
+[8078293]
+* Author: Brendan Byrd <Perl@ResonatorSoft.org>
+* Date:   2014-08-01 21:00:58 -0400 (9 weeks ago)
+
+Add in new Perl 5.20/21 flags
+
+[e6adc1a]
+* Author: Brendan Byrd <Perl@ResonatorSoft.org>
+* Date:   2014-08-01 21:00:07 -0400 (9 weeks ago)
+
+Make warnbits.pl (slightly) more readable
+
+[444fc20]
+* Author: Brendan Byrd <Perl@ResonatorSoft.org>
+* Date:   2014-08-01 20:59:27 -0400 (9 weeks ago)
+
+Distro housekeeping
+
+
+===================================
+End of changes in the last 365 days
+===================================

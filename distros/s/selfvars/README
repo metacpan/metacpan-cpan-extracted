@@ -1,0 +1,133 @@
+NAME
+    selfvars - Provide $self, @args, %opts and %hopts variables for OO
+    programs
+
+SYNOPSIS
+        package MyClass;
+
+        ### Import $self, @args, %opts and %hopts into your package:
+        use selfvars;
+
+        ### Or name the variables explicitly:
+        # use selfvars -self => 'self', -args => 'args', -opts => 'opts', -hopts => 'hopts';
+
+        ### Write the constructor as usual:
+        sub new {
+            return bless({}, shift);
+        }
+
+        ### Use $self in place of $_[0]:
+        sub foo {
+            $self->{foo};
+        }
+
+        ### Use @args in place of @_[1..$#_]:
+        sub bar {
+            my ($foo, $bar) = @args;
+            $self->{foo} = $foo;
+            $self->{bar} = $bar;
+        }
+
+        ### Use %opts in place of %{$_[1]}:
+        sub baz {
+            $self->{x} = $opts{x};
+            $self->{y} = $opts{y};
+        }
+        ### Use %hopts with $obj->yada( x => 1, y => 2 ) call syntax
+        sub yada {
+            $self->{x} = $hopts{x}
+            $self->{y} = $hopts{y}
+        }
+
+DESCRIPTION
+    This moudles exports four special variables: $self, @args, %opts and
+    %hopts.
+
+    They are really just handy helpers to get rid of:
+
+        my $self = shift;
+
+    Behind the scenes, $self is simply tied to $_[0], @args to @_[1..$#_],
+    %opts to "%{$_[1]}", and "%hopts%" to "%{{@_[1..$#_]}}".
+
+    Currently, $self, @args and %hopts are read-only; this means you cannot
+    mutate them:
+
+        $self = 'foo';              # error
+        my $foo = shift @args;      # error
+        $hopts{x} = 'y';            # error
+        delete $hopts{x};           # error
+
+    This restriction may be lifted at a later version of this module, or
+    turned into a configurable option instead.
+
+    However, %opts is not read-only, and can be mutated freely:
+
+        $opts{x} = 'y';             # okay
+        delete $opts{x};            # also okay
+
+INTERFACE
+    $self
+        Returns the current object.
+
+    @args
+        Returns the argument list.
+
+    %opts
+        Returns the first argument, which must be a hash reference, as a
+        hash.
+
+    %hopts
+        Returns the arguments list as a hash.
+
+  Choosing non-default names
+    You can choose alternative variable names with explicit import
+    arguments:
+
+        # Use $this and @vars instead of $self and @args, leaving %opts and %hopts alone:
+        use selfvars -self => 'this', -args => 'vars', -opts, -hopts;
+
+        # Use $this but leave @args, %opts and %hopts alone:
+        use selfvars -self => 'this', -args, -opts, -hopts;
+
+        # Use @vars but leave $self, %opts and %hopts alone:
+        use selfvars -args => 'vars', -self, -opts, -hopts;
+
+    You may also omit one or more variable names from the explicit import
+    arguments:
+
+        # Import $self but not @args, %opts nor %hopts:
+        use selfvars -self => 'self';
+
+        # Same as the above:
+        use selfvars -self;
+
+        # Import $self and %opts but not @args nor %hopts:
+        use selfvars -self, -opts;
+
+DEPENDENCIES
+    None.
+
+ACKNOWLEDGEMENTS
+    This module was inspired and based on Kang-min Liu (gugod)'s "self.pm".
+
+    As seen on #perl:
+
+        <gugod> audreyt: selfvars.pm looks exactly like what I want self.pm to be in the beginning
+        <gugod> audreyt: but I can't sort out the last BEGIN{} block like you did.
+        <gugod> audreyt: that's a great job :D
+
+SEE ALSO
+    self
+
+AUTHORS
+    唐鳳 <cpan@audreyt.org>
+
+CC0 1.0 Universal
+    To the extent possible under law, 唐鳳 has waived all copyright and
+    related or neighboring rights to selfvars.
+
+    This work is published from Taiwan.
+
+    <http://creativecommons.org/publicdomain/zero/1.0>
+

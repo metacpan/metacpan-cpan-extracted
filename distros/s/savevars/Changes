@@ -1,0 +1,28 @@
+Revision history for Perl extension savevars.
+
+0.07
+	- warning fix
+
+0.06  2001-10-11
+	- new section NOTES in POD
+	- Fixed bug in writecfg. Now writecfg() can be called multiple
+	  times per program execution.
+
+0.05  2000-10-10
+	- returned value of cfgfile() is cached, so the same cfgfile is used
+          even if $< is changed during the script
+        - CAVEATS and BUGS sections in POD
+
+0.04  1999-09-07
+	- documented functions
+	- new: dont_write_cfgfile
+
+0.03  1999-05-04
+	- renamed to savevars (former SaveVars)
+
+0.02  1999-05-04
+	- made test suite
+
+0.01  1998-08-25
+	- original version
+

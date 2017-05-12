@@ -1,0 +1,17 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/scriptname.pm
+t/00.load.t
+t/01.use.t
+t/02.use.t
+t/author-critic.t
+t/perlcritic.t
+t/pod-coverage.t
+t/pod.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t

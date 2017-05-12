@@ -1,0 +1,112 @@
+svg2zinc-perl (0.10) unstable; urgency=low
+
+  * thx to tkzinc 3.2.96, SVG skew and matrix properties are now well interpreted 
+
+ --
+
+svg2zinc-perl (0.9) unstable; urgency=low
+
+  * a better loading of Backend (specially if the backend has some errors
+    they are now correctly printed)
+  * compatible with the future Tk::Zinc::Debug new api (to come with TkZinc 3.2.96)
+  * perl classes generated can now define in which group items will be added
+  * a sample script to test generated perl classes (with PerlClass backend): 
+  * make test should test that backend works correctly (after some bug report 
+    from R. Oger) 
+
+ -- Christophe Mertz <mertz@tls.cena.fr>  Wed, 29 Oct 2003 11:06:56 +0100
+
+svg2zinc-perl (0.8) unstable; urgency=low
+
+  * unknown -render options appeared for some backend
+  * -out options was falsely required by Display and Print backend
+  * suppression of some unusefull prints
+  * better testing of the existence of userdefined Backend
+  * svg2zinc.pl now tests if there is an outfile required by some Backend,
+    and warns in the case of user defined Backend
+  * slight doc enhancements
+
+ -- Christophe Mertz <mertz@tls.cena.fr>  Fri, 17 Oct 2003 15:56:48 +0200
+
+svg2zinc-perl (0.7) unstable; urgency=low
+
+  * BEWARE: Tk::Zinc must be 3.295 or higher. but no dependancies
+    because this module can be used without Tk::Zinc installed
+  * Backend can now be easily extended, without modifying SVG::SVG2zinc or
+    even svg2zinc.pl
+  * Provided with two new backends: Image and TclScript (highly experimental) 
+  * enhanced manpages for svg2zinc.pl, SVG::SVG2zinc and SVG::SVG2zinc::Backend
+
+ -- Christophe Mertz <mertz@tls.cena.fr>  Mon,  6 Oct 2003 16:29:43 +0200
+
+svg2zinc-perl (0.6) unstable; urgency=low
+
+  * adding README, cpaniser script, MANIFEST (generated),
+  * update Tk::Zinc dependancy
+  * renaming the ZincExtension sub-module as Tk::Zinc::SVGExtension
+
+ -- Christophe Mertz <mertz@tls.cena.fr>  Wed, 17 Sep 2003 18:27:08 +0200
+
+svg2zinc-perl (0.5) unstable; urgency=low
+
+  * slight evolutions to CPANise this module
+
+ -- Christophe Mertz <mertz@tls.cena.fr>  Wed, 10 Sep 2003 17:57:51 +0200
+
+svg2zinc-perl (0.4) unstable; urgency=low
+
+  * backend classes have been defined. They are currently the following:
+    Exec (for displayng the SVG code with TkZinc)
+    PerlModule (for generating a perl module able to display the SVG file
+    PerlScript (for generating a perl script able to display the SVG file
+    Print (for simply printing on the stdout the perl code)
+  * Some conversion functions have been extracted and put in the
+    Conversions.pm sub-module
+  * addition of approx. 40 tests for the Conversions.pm sub-module
+  * svg path defined as bezier quadratic are converted to bezier cubic
+    (thx lemort@intuilab.com and with the help of Math::Bezier::Convert)
+  * gradient can be defined as other gradient with transparency
+  * we now limit the number of printed lines when a not-implemented
+    attribute is used many many times
+  * uuencoded images included in a SVG file are now correctly displayed
+    (thx lemort@intuilab.com)
+  * some bugs corrections, many detected and/or corrected by lemort@intuilab.com
+
+ -- Christophe Mertz <mertz@tls.cena.fr>  Thu,  4 Sep 2003 08:55:33 +0200
+
+svg2zinc-perl (0.3) unstable; urgency=low
+
+  * now compatible with both zinc-perl 3.2.6h and 3.2.6i (support both gradient syntax)
+    Beware: 3.2.6i should be prefered since it corrects some frequent bugs
+    with curves containing aligned control points
+    There is now an option -version for both the parser and the svg2zinc script.
+  * colors defined in svg/html but not in X defaut rgb.txt have been added
+  * many bugs correction (opacity, svg id cleaning, some parsing errors, ...)
+
+ -- Christophe Mertz <mertz@tls.cena.fr>  Tue,  6 May 2003 09:58:00 +0200
+
+svg2zinc-perl (0.2) unstable; urgency=low
+
+  * fill-rule is now implemented for path (thanks to zinc 3.2.6h and plc work)
+  * SVG tags may be recognized even if they are prefixed with a namespace
+    (-namespace arguments in both parser and svg2zinc script)
+  * not (yet) implemented svg tags are detected and a warning is issued
+  * not implementable tags are identified and their usage is summarized at
+    the end of parsing
+  * shapes with bezier are now fine;
+  * multicontour shapes should be ok
+  * some css are now correctly interpreted
+  * works with zinc-perl 3.2.6h or higher
+  * addition of some samples, either from SVG recommandation, or generated from dia
+  * WARNING: some curves containing bezier segements will make zinc 3.2.6h coredump
+  due to a zinc 3.2.6h bug
+  * This version of svg2zinc-perl will not work any more with the next release of zinc
+  due to incompatible evolution in color and gradient specification of zinc 
+
+ -- Christophe Mertz <mertz@tls.cena.fr>  Thu, 20 Mar 2003 10:42:30 +0100
+
+svg2zinc-perl (0.1) unstable; urgency=low
+
+  * Initial Release. Attention, il y a encore de nombreux défauts
+
+ -- Christophe Mertz <mertz@cena.fr>  Fri, 10 Jan 2003 09:59:55 +0100

@@ -1,0 +1,9 @@
+ashost: /H/nplhost
+sysnr: "42"
+client: "001"
+user: developer
+passwd: developer
+lcheck: 1
+lang: EN
+trace: 0
+debug: 0

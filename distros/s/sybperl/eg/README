@@ -1,0 +1,55 @@
+        @(#)README	1.7     02/13/98
+
+Sybperl 2 examples
+
+This directory contains a couple of example scripts, which I hope will
+prove to be a valid complement to the documentation:
+
+  - bcp.pl    Example on the use of the DBlibrary BCP API. It's a very
+              primitive example.
+  - buffer.pl Perl 5 class inheritance example. This example
+              implements DBlibrary's buffer routines (dbgetrow(),
+              DBFIRSTROW(), DBLASTROW()) in Perl by creating a new
+              package called Sybase::DBlib::Buffer, which inherits the
+              capabilities of Sybase::DBlib, and overrides certain
+              routines (such as dbnextrow() and dbresults()) to add
+              functionality.
+  - ct_sql.pl An example of usage of the ct_sql() call (CTlibrary)
+  - ctlib.pl  A simple CTlibrary example.            
+  - ct_cursor.pl How to use the ct_cursor() call (CTlibrary)
+  - ct_param.pl  How to use the ct_param() call (CTlibrary)
+  - dbcc.pl   Run dbcc checkdb, checkalloc, checktable on a database and
+              get only the errors in the mail...(uses CTlibrary)
+  - rpc-example.pl How to use the dbprc*() calls (DBlibrary)
+  - who.pl    An extended sp_who, in Perl.
+
+  - GenRepDefs.pl
+              Contributed by Ashu Joglekar, this script can be used to
+              generate RepDefs and Subscriptions for a database
+              (Replication Server type info).
+
+  - dbschema.pl, dbschema.old, dbschema.10.pl
+              Three versions of the dbschema.pl script that was
+              originally included with sybperl 1.0xx. See the file
+              README.dbschema for details.
+
+  - Show.cgi
+              Display the text of triggers, stored procs, etc in
+              html format with keywords highlighted.
+
+  - SybWWW.pm
+              Simple error handler for CGI programs.
+
+  - Login.pm  Submitted by Brent B. Powers.
+              Login.pm is a tkPerl widget for loging in to Sybase.
+              It must be placed in $PERL5LIB/Sybase/Login.pm to be
+              used.
+
+  - TABLEop.pm Submitted by Manish I. Shah.
+              This is a module for handling/encapsulating table level
+              operations. It includes its own documentation.
+              
+  - SecureSql.pm
+              Submitted by Olivier Mary.
+              This is a module for batching operations in transactions.
+              Please contact Olivier for details.

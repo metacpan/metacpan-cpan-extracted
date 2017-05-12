@@ -1,0 +1,9 @@
+Makefile.PL
+MANIFEST
+snaked
+Changes
+TODO
+lib/snaked.pm
+HACKING
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

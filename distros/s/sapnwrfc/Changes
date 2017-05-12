@@ -1,0 +1,53 @@
+Fri Jun  1 17:00:23 BST 2007
+  * added in nested table support
+
+Fri Jul 13 06:30:32 BST 2007
+  * added a bit more documentation
+
+Thu Jun 26 18:59:57 NZST 2008
+  * removed connection attributes that are nolonger supported
+
+Tue Oct 14 06:09:26 NZDT 2008
+  * Fixed test plans - thanks Shane Boyce
+
+Mon Dec  8 07:02:31 NZDT 2008
+  * fix compile flags - thanks Jens Rehsack.
+
+Fri Dec 26 10:57:43 NZDT 2008
+  * Fixes for registered RFC work thanks to Matthias Flury
+
+Mon Jun 22 16:51:14 NZST 2009
+  * Fixes on connection parameters
+  * sapnwrfc-cookbook - a comprehensive set of examples, and discussions there in
+  * Better installation instructions
+  * revamped RFC server code
+  * banishment of RFC client memory leaks
+  * thanks to ce.com.au (Adam Kennedy) for all assistance in making these improvements possible.
+  
+ Tue Jun 23 17:00:52 NZST 2009
+   * further banishment of memory leaks when using tables in RFC client calls
+ 
+ Sat Jun 27 17:55:17 NZST 2009
+   * very slow memory leak with respect to referencing table entries on RFC client calls.
+
+Thu Sep 10 07:47:40 NZST 2009
+   * bumped the version and removed the dependency on 5.010
+
+Sat Aug 13 05:23:27 NZST 2011
+   * fixed broken link (wrong format) in cookbook
+
+Fri Jun  1 09:24:06 NZST 2012
+   * fix 4byte chars
+
+Wed Jul 25 09:47:09 NZST 2012
+   * lots of fixes supplied by stefan and Marcus - thanks guys
+
+Sat Aug 18 08:52:28 NZST 2012
+   * more hpux build fixes supplied by stefan
+
+Fri Aug 31 05:42:19 NZST 2012
+   * Fix string length detection - thanks Helmut Schröder
+
+Wed Jan 16 13:06:17 EST 2013
+   * Fix dualvar anomalies - thanks Sven Dowideit
+

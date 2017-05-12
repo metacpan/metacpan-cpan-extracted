@@ -1,0 +1,35 @@
+---
+abstract: 'Activate syntax extensions'
+author:
+  - "Robert 'phaylon' Sedlacek <rs@474.at>"
+build_requires:
+  FindBin: 0
+  Test::More: 0.94
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300016, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: syntax
+no_index:
+  directory:
+    - t/
+provides:
+  syntax:
+    file: lib/syntax.pm
+    version: 0.004
+requires:
+  Carp: 0
+  Data::OptList: 0.104
+  namespace::clean: 0
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=syntax
+  homepage: https://github.com/phaylon/syntax/wiki
+  repository: git://github.com/phaylon/syntax.git
+version: 0.004
+x_authority: cpan:PHAYLON

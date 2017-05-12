@@ -1,0 +1,10 @@
+Revision history for Perl extension sane
+
+0.99    Tue Oct 25 17:42:14 2011
+        - modify Makefile.pl
+
+0.02    Thu Oct 20 20:23:45 2011
+        - initial release
+
+0.01    Thu Oct 20 00:36:09 2011
+        - original version

@@ -1,0 +1,57 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+check_switchman_groups
+
+=head1 DESCRIPTION
+
+Given a path to crontab checks if all groups specified in the crontab are
+described in zookeeper data.
+
+=cut
+
+use strict;
+use warnings;
+
+use App::Switchman;
+use JSON;
+use List::MoreUtils qw/uniq/;
+use Parse::Crontab;
+use Text::ParseWords qw/shellwords/;
+
+my ($CRONTAB) = @ARGV;
+
+my $cron = Parse::Crontab->new(file => $CRONTAB);
+die "invalid crontab $CRONTAB: ".$cron->error_message unless $cron->is_valid;
+
+my @errors = ();
+for my $command (map {$_->command} $cron->jobs) {
+    if ($command =~ m[/usr/local/bin/switchman\s+(.*)$]) {
+        my $app = App::Switchman->new([shellwords $1]);
+        $app->load_prefix_data;
+        my $defined_groups = from_json($app->prefix_data)->{groups};
+        unless ($defined_groups->{$app->group}) {
+            push @errors, $command;
+        }
+    }
+}
+
+if (@errors) {
+    print "$CRONTAB: ".join ', ', @errors;
+    exit 2;
+}
+
+print 'OK';
+
+
+__END__
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2012-2016 by Yandex LLC.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

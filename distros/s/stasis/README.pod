@@ -1,0 +1,103 @@
+=head1 NAME
+
+stasis - an encrypting archive tool using tar, gpg and perl
+
+=head1 SYNOPSIS
+
+  stasis [options]
+
+  Options:
+
+      --destination -de destination directory to save the encrypted archive to
+      --days        -da only create an archive if one doesn't exist within this many days (optional)
+      --files       -f  filepath to a text file of filepaths to backup
+      --ignore      -i  filepath to a text file of glob patterns to ignore (optional)
+      --limit       -l  limit number of stasis backups to keep in destination directory (optional)
+      --passphrase      passphrase to use
+      --passfile        filepath to a textfile containing the password to use
+      --referrer    -r  name of the gpg key to use (instead of a passphrase or passfile)
+      --temp        -t  temp directory path, uses /tmp by default
+      --verbose     -v  verbose, print progress statements (optional)
+      --help        -h  print this documentation (optional)
+
+=head1 OPTIONS
+
+=head2 Examples
+
+Save all the files listed in C<files_to_backup.txt> (one per line) to Dropbox:
+
+  $ stasis --destination ~/Dropbox --files files_to_backup.txt --passphrase mysecretkey
+  $ stasis -de ~/Dropbox -f files_to_backup.txt --passphrase mysecretkey
+
+Use passfile instead of passphrase
+
+  $ stasis -de ~/Dropbox -f files_to_backup.txt --passfile /path/to/passfile
+
+Use referrer GPG key to encrypt
+
+  $ stasis -de ~/Dropbox -f files_to_backup.txt -r keyname@example.com
+
+Ignore the files matching patterns in C<.stasisignore>
+
+  $ stasis -de ~/Dropbox -f files_to_backup.txt -r keyname@example.com -i .stasisignore
+
+Verbose mode
+
+  $ stasis -de ~/Dropbox -f files_to_backup.txt -r mygpgkey@email.com -v
+
+Only keep the last 4 backups
+
+  $ stasis -de ~/Dropbox -f files_to_backup.txt --passphrase mysecretkey -l 4
+
+Only make weekly backups
+
+  $ stasis -de ~/Dropbox -f files_to_backup.txt --passphrase mysecretkey --days 7
+
+=head1 REQUIREMENTS/DEPENDENCIES
+
+=over 4
+
+=item * GnuPG
+
+=item * GNU tar
+
+=item * Perl
+
+=back
+
+C<stasis> has been tested on Linux with GNU tar v 1.28, GnuPG v1.4.19 and Perl 5.20.2. It should work on many earlier versions too.
+
+=head1 BUGS/LIMITATIONS
+
+If C<--files> contains the temp or destination location in it, C<tar> will create an infinite loop.
+
+When a passphrase or file is provided, symmetric GPG encryption is done using AES256 cipher algorithm. At the time of development
+this is considered secure, but only as strong as the passphrase used to encrypt the data.
+
+=head1 INSTALLATION
+
+  $ cpan Stasis
+
+Or
+
+  $ git clone https://github.com/dnmfarrell/Stasis
+  $ cd Stasis
+  $ perl Makefile.PL
+  $ make
+  $ make install
+
+=head1 REPOSITORY
+
+L<https://github.com/dnmfarrell/Stasis>
+
+=head1 AUTHOR
+
+David Farrell E<copy> 2015
+
+=head1 LICENSE
+
+FreeBSD (2 clause BSD license)
+
+
+=cut
+

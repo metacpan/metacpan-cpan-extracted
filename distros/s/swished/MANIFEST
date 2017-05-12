@@ -1,0 +1,12 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+PROTOCOL
+t/swished.t
+lib/SWISHED.pm
+lib/SWISHED/Core.pm                      core functionality
+lib/SWISHED/Handler.pm                   mod_perl 2.0 handler
+lib/startup.pl                           apache&mod_perl 2.0 startup file
+cgi-bin/swished                          for Apache::Registry or basic CGI use
+META.yml                                 Module meta-data (added by MakeMaker)

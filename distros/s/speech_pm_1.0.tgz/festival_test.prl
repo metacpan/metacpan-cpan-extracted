@@ -1,0 +1,85 @@
+#!/usr/local/bin/perl -w
+
+ ###########################################################################
+ #                                                                         #
+ # Simple test of festival interface module.                               #
+ #                                                                         #
+ ###########################################################################
+
+use Speech::Festival;
+
+$f = new Speech::Festival;
+
+if (!conn $f)
+    {
+    die "error connecting - $synth_error";
+    }
+
+$which = $ARGV[0];
+shift @ARGV;
+
+while ($#ARGV>=0)
+    {
+    if ($which eq 'loop')
+	{
+	print "sending $ARGV[0]\n";
+
+	request $f "$ARGV[0]";
+
+	while (1)
+	    {
+	    if (result_waiting $f)
+		{
+		print "result waiting\n";
+		}
+	    else
+		{
+		print "waiting\n";
+		wait_for_result $f;
+		}
+
+	    print "read\n";
+	    my ($type, $data) = get_result $f;
+
+	    die "get error - $!"
+		unless defined($type);
+
+	    print "type=$type data=$data\n";
+
+	    last
+		if $type eq $Speech::Festival::OK || $type eq $Speech::Festival::ERROR;
+	    }
+	}
+    else
+	{
+	print "sending\n";
+
+	my ($nres) = request $f "$ARGV[0]", \&handler;
+
+	print "NRESULTS=$nres\n";
+	}
+    shift @ARGV;
+    }
+
+disconnect $f;
+
+exit(0);
+
+sub handler
+{
+    my ($type, $data) = @_;
+
+    if ($type eq $Speech::Festival::SCHEME)
+	{
+	chomp $data;
+	print "LISP RESULT='$data'\n";
+	}
+    elsif ($type eq $Speech::Festival::OK)
+	{
+	}
+    elsif ($type eq $Speech::Festival::ERROR)
+	{
+	print "ERROR FROM FESTIVAL\n";
+	}
+    return 0;
+}

@@ -1,0 +1,21 @@
+Build.PL
+Changes
+cpanfile
+lib/say.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+META.json
+README.pod
+t/00_compile.t
+t/01_basic.t
+t/02_feature.t
+t/03_feature_all.t
+xt/01_perlcritic.t
+xt/02_pod-coverage.t
+xt/03_pod.t
+xt/04_notabs.t
+xt/05_code_metrics.t
+xt/06_no_use_vars.t
+xt/07_no_conflict.t
+META.yml

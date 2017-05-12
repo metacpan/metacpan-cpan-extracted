@@ -1,0 +1,206 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Data::Sofu::SofuML - Interface to various binary drivers</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+<link rel="stylesheet" type="text/css" href="/Data/sofupod.css" />
+</head>
+
+<body>
+
+
+<!-- INDEX BEGIN -->
+<div name="index">
+<p><a name="__index__"></a></p>
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#synopsis">Synopsis</a></li>
+	<li><a href="#syntax">SYNTAX</a></li>
+	<li><a href="#methods">METHODS</a></li>
+	<ul>
+
+		<li><a href="#new__"><code>new()</code></a></li>
+		<li><a href="#xmlescape_string_level_"><code>XMLescape(STRING,LEVEL)</code></a></li>
+		<li><a href="#xmlkeyescape_key_"><code>XMLKeyescape(KEY)</code></a></li>
+		<li><a href="#genid__"><code>genID()</code></a></li>
+		<li><a href="#indent_level_">indent(LEVEL)</a></li>
+		<li><a href="#packobjectcomment_object_">packObjectComment(OBJECT)</a></li>
+		<li><a href="#packcomment_tree_">packComment(TREE)</a></li>
+		<li><a href="#packelement_element_object_level_id_"><code>packElement(ELEMENT,OBJECT,LEVEL,ID)</code></a></li>
+		<li><a href="#packitem_element_level_id_tree_"><code>packItem(ELEMENT,LEVEL,ID,TREE)</code></a></li>
+		<li><a href="#packobjectdata_object_level_"><code>packObjectData(OBJECT,LEVEL)</code></a></li>
+		<li><a href="#packdata_data_level_tree_"><code>packData(DATA,LEVEL,TREE)</code></a></li>
+		<li><a href="#packobject_object__header__"><code>packObject(OBJECT,[HEADER])</code></a></li>
+		<li><a href="#pack_tree__comments__header___">pack(TREE,[COMMENTS,[HEADER]])</a></li>
+		<li><a href="#load__string_">load (STRING)</a></li>
+		<li><a href="#load__string_">load (STRING)</a></li>
+	</ul>
+
+	<li><a href="#bugs">BUGS</a></li>
+	<li><a href="#see_also">See Also</a></li>
+</ul>
+
+<hr name="index" />
+</div>
+<!-- INDEX END -->
+
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>Data::Sofu::SofuML - Interface to various binary drivers</p>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>This Module is used to convert Sofu Trees to XML Tree.</p>
+<p>This is mostly for convertig Sofu data via XSLT or similar.</p>
+<p>You don't need to use this module directly.</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">Synopsis</a></h1>
+<pre>
+
+        <span class="keyword">use</span> <span class="variable">Data::Sofu</span><span class="operator">;</span>
+        <span class="keyword">my</span> <span class="variable">$sofu</span> <span class="operator">=</span> <span class="variable">readSofu</span><span class="operator">(</span><span class="string">"file.sofu"</span><span class="operator">);</span>
+        <span class="variable">writeSofuML</span><span class="operator">(</span><span class="string">"file.xml"</span><span class="operator">,</span><span class="variable">$sofu</span><span class="operator">,</span><span class="variable">getSofucomments</span><span class="operator">());</span>
+        <span class="comment">#And back</span>
+        <span class="keyword">my</span> <span class="variable">$xml</span> <span class="operator">=</span> <span class="variable">readSofu</span><span class="operator">(</span><span class="string">"file.xml"</span><span class="operator">);</span> <span class="comment">#readSofu can detect SofuML files.</span>
+        <span class="variable">writeSofu</span><span class="operator">(</span><span class="string">"file.sofu"</span><span class="operator">,</span><span class="variable">$xml</span><span class="operator">,</span><span class="variable">getSofucomments</span><span class="operator">());</span>
+</pre>
+<p>Using the Sofu OO syntax:</p>
+<pre>
+        <span class="keyword">require</span> <span class="variable">Data::Sofu</span><span class="operator">;</span>
+        <span class="keyword">my</span> <span class="variable">$s</span> <span class="operator">=</span> <span class="variable">Data::Sofu::new</span><span class="operator">();</span>
+        <span class="keyword">my</span> <span class="variable">$sofu</span> <span class="operator">=</span> <span class="variable">$s</span><span class="operator">-&gt;</span><span class="keyword">read</span><span class="operator">(</span><span class="string">"file.sofu"</span><span class="operator">);</span>
+        <span class="variable">$s</span><span class="operator">-&gt;</span><span class="variable">writeML</span><span class="operator">(</span><span class="string">"file.xml"</span><span class="operator">,</span><span class="variable">$sofu</span><span class="operator">,</span><span class="variable">$s</span><span class="operator">-&gt;</span><span class="variable">comments</span><span class="operator">());</span>
+        <span class="comment">#And back</span>
+        <span class="keyword">my</span> <span class="variable">$xml</span> <span class="operator">=</span> <span class="variable">$s</span><span class="operator">-&gt;</span><span class="keyword">read</span><span class="operator">(</span><span class="string">"file.xml"</span><span class="operator">);</span> <span class="comment">#read also detects SofuML files.</span>
+        <span class="variable">$s</span><span class="operator">-&gt;</span><span class="keyword">write</span><span class="operator">(</span><span class="string">"file.sofu"</span><span class="operator">,</span><span class="variable">$xml</span><span class="operator">,</span><span class="variable">$s</span><span class="operator">-&gt;</span><span class="variable">comments</span><span class="operator">());</span>
+</pre>
+<p>Using scalars instead of files:</p>
+<pre>
+        <span class="keyword">require</span> <span class="variable">Data::Sofu</span><span class="operator">;</span>
+        <span class="keyword">my</span> <span class="variable">$s</span> <span class="operator">=</span> <span class="variable">Data::Sofu::new</span><span class="operator">();</span>
+        <span class="keyword">my</span> <span class="variable">$sofu</span> <span class="operator">=</span> <span class="variable">$s</span><span class="operator">-&gt;</span><span class="keyword">read</span><span class="operator">(</span><span class="string">"file.sofu"</span><span class="operator">);</span>
+        <span class="keyword">my</span> <span class="variable">$xmlstring</span> <span class="operator">=</span> <span class="variable">$s</span><span class="operator">-&gt;</span><span class="variable">packML</span><span class="operator">(</span><span class="variable">$sofu</span><span class="operator">,</span><span class="variable">$s</span><span class="operator">-&gt;</span><span class="variable">comments</span><span class="operator">());</span> <span class="comment">#Contains now the xml files content</span>
+        <span class="keyword">my</span> <span class="variable">$xml</span> <span class="operator">=</span> <span class="variable">$s</span><span class="operator">-&gt;</span><span class="keyword">unpack</span><span class="operator">(</span><span class="variable">$xmlstring</span><span class="operator">);</span>
+        <span class="variable">$s</span><span class="operator">-&gt;</span><span class="keyword">write</span><span class="operator">(</span><span class="variable">$xml</span><span class="operator">,</span><span class="variable">$s</span><span class="operator">-&gt;</span><span class="variable">comments</span><span class="operator">());</span>
+</pre>
+<p>But: $scalar=packML() is not the same as <code>writeML(\$scalar)</code>, packML will not indent the file.</p>
+<p></p>
+<p>
+</p>
+<hr />
+<h1><a name="syntax">SYNTAX</a></h1>
+<p>This Module is pure OO, exports nothing</p>
+<p>
+</p>
+<hr />
+<h1><a name="methods">METHODS</a></h1>
+<p>Most of these Methods (except pack()) are ony for internal use.</p>
+<p>
+</p>
+<h2><a name="new__"><code>new()</code></a></h2>
+<p>Creates a new <code>Data::Sofu::SofuML</code> and returns it.</p>
+<p>
+</p>
+<h2><a name="xmlescape_string_level_"><code>XMLescape(STRING,LEVEL)</code></a></h2>
+<p>Returns the (quite badly) escaped form of STRING</p>
+<p>
+</p>
+<h2><a name="xmlkeyescape_key_"><code>XMLKeyescape(KEY)</code></a></h2>
+<p>Returns the (quite badly) escaped form of KEY</p>
+<p>
+</p>
+<h2><a name="genid__"><code>genID()</code></a></h2>
+<p>Returns a new unqiue ID</p>
+<p>
+</p>
+<h2><a name="indent_level_">indent(LEVEL)</a></h2>
+<p>Returns the indentation for LEVEL</p>
+<p>
+</p>
+<h2><a name="packobjectcomment_object_">packObjectComment(OBJECT)</a></h2>
+<p>Returns the packed comment of OBJECT</p>
+<p>
+</p>
+<h2><a name="packcomment_tree_">packComment(TREE)</a></h2>
+<p>Returns the packed comment of the object reference by TREE</p>
+<p>
+</p>
+<h2><a name="packelement_element_object_level_id_"><code>packElement(ELEMENT,OBJECT,LEVEL,ID)</code></a></h2>
+<p>Returns the ELEMENT for OBJECT</p>
+<p>
+</p>
+<h2><a name="packitem_element_level_id_tree_"><code>packItem(ELEMENT,LEVEL,ID,TREE)</code></a></h2>
+<p>Returns the an XML item</p>
+<p>
+</p>
+<h2><a name="packobjectdata_object_level_"><code>packObjectData(OBJECT,LEVEL)</code></a></h2>
+<p>Converts one Data::Sofu::Object into its XML representation</p>
+<p>
+</p>
+<h2><a name="packdata_data_level_tree_"><code>packData(DATA,LEVEL,TREE)</code></a></h2>
+<p>Converts one perl structure into its XML representation</p>
+<p>
+</p>
+<h2><a name="packobject_object__header__"><code>packObject(OBJECT,[HEADER])</code></a></h2>
+<p>Converts one Data::Sofu::Object into its XML representation</p>
+<p>
+</p>
+<h2><a name="pack_tree__comments__header___">pack(TREE,[COMMENTS,[HEADER]])</a></h2>
+<p>packs TREE to XML using Comments</p>
+<dl>
+<dt><strong><a name="tree" class="item">TREE</a></strong>
+
+<dd>
+<p>Perl datastructure to pack. Can be a hash, array or scalar (or array of hashes of hashes of arrays or whatever). Anything NOT a hash will be converted to TREE={Value=&gt;TREE};</p>
+</dd>
+<dd>
+<p>It can also be a Data::Sofu::Object or derived (Data::Sofu::Map, Data::Sofu::List, Data::Sofu::Value, Data::Sofu::...).
+Anything not a Data::Sofu::Map will be converted to one (A Map with one attribute called &quot;Value&quot; that holds TREE).</p>
+</dd>
+</li>
+<dt><strong><a name="comments" class="item">COMMENTS</a></strong>
+
+<dd>
+<p>Comment hash (as returned by Data::Sofu::getSofucomments() or Data::Sofu-&gt;new()-&gt;<code>comments()</code> after any file was read).</p>
+</dd>
+<dd>
+<p>These are ignored if TREE is a Data::Sofu::Object or derived. Data::Sofu::Object's store their comments in themselves. See Data::Sofu::Object-&gt;<code>importComments()</code> to import them.</p>
+</dd>
+<dd>
+<p>Can be undef or {}.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<h2><a name="load__string_">load (STRING)</a></h2>
+<p>Unpacks a SofuML string to perl datastructures</p>
+<p>Don't use this, use readSofu(&quot;file.xml&quot;) instead.</p>
+<p>
+</p>
+<h2><a name="load__string_">load (STRING)</a></h2>
+<p>Unpacks SofuML string to Data::Sofu::Object's from STRING</p>
+<p>Don't use this, use readSofu(&quot;file.xml&quot;) instead.</p>
+<p>
+</p>
+<hr />
+<h1><a name="bugs">BUGS</a></h1>
+<p>Reading SofuML files need XML::Parser.</p>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">See Also</a></h1>
+<p><a href="/Data/Sofu.html">the Data::Sofu manpage</a>, <a href="/Data/Sofu/Object.html">the Data::Sofu::Object manpage</a>, <a href="http://sofu.sf.net">http://sofu.sf.net</a></p>
+
+</body>
+
+</html>

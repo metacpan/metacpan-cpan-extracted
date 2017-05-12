@@ -1,0 +1,7 @@
+Shishi * T_PTROBJ
+ShishiNode * T_PTROBJ
+ShishiDecision * T_PTROBJ
+ShishiMatch * T_PTROBJ
+shishi_match_t T_IV
+shishi_action_t T_IV
+token_t T_IV

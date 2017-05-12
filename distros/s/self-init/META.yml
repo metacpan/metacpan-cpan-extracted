@@ -1,0 +1,26 @@
+---
+abstract: 'Invoke package init methods at compile time'
+author:
+  - 'Mons Anderson <mons@cpan.org>'
+build_requires:
+  Test::More: 0
+  Test::NoWarnings: 0
+  ex::lib: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.50
+distribution_type: module
+generated_by: 'Module::Install version 0.81'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: self-init
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Carp: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.01

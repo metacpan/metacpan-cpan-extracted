@@ -1,0 +1,9 @@
+ChangeLog	      # empty as this the 0.01 release
+MANIFEST	      # This file
+Makefile.PL	      # MakeMaker file
+README		      # Some notes not covered in the POD doc
+lib/Sql/Simple.pm     # Sql::Simple module
+t/00_insert.t	      # insert tests
+t/10_update.t	      # update tests
+t/20_delete.t	      # delete tests
+t/30_query.t	      # query tests

@@ -1,0 +1,288 @@
+.\".po 4
+.\"	@(#)sybperl.1	1.5	2/22/94
+.TH SYBPERL 1 "31 Aug 1993"
+.ad
+.nh
+.SH NAME
+sybperl \- Perl access to Sybase databases
+.SH SYNOPSIS
+.nf
+$dbproc  = &dblogin([$user[, $pwd[, $server]]])
+$dbproc1 = &dbopen([$server])
+	   &dbclose($dbproc)
+$ret     = &dbcmd($dbproc, $sql_cmd)
+$ret     = &dbsqlexec($dbproc)
+$ret     = &dbresults($dbproc)
+@data    = &dbnextrow($dbproc [, $doAssoc])
+@data    = &dbretdata($dbproc [, $doAssoc])
+$ret     = &dbuse($dbproc, $database)
+$ret     = &dbcancel($dbproc)
+$ret     = &dbcanquery($dbproc)
+$ret     = &dbexit($dbproc)
+$string  = &dbstrcpy($dbproc)
+$string  = &dbsafestr($dbproc,$instring[,$quote_char])
+$status  = &dbwritetext($dbproc_1, $col_name, $dbproc_2, $select_col, $text)
+$count   = &dbnumcols($dbproc)
+$type    = &dbcoltype($dbproc, $colid)
+$name    = &dbcolname($dbproc, $colid)
+$len     = &dbcollen($dbproc, $colid)
+$status  = &dbhasretstat($dbproc)
+$status  = &dbretstatus($dbproc)
+$ret     = &dberrhandle($handler)
+$ret     = &dbmsghandle($handler)
+$ret     = &DBCURCMD($dbproc)
+$status  = &DBMORECMD($dbproc)
+$status  = &DBCMDROW($dbproc)
+$status  = $DBROWS($dbproc)
+$ret     = $DBCOUNT($dbproc)
+($status, $sum)	= &dbmny4add($dbproc,$m1,$m2)
+$status		= &dbmny4cmp($dbproc,$m1,$m2)
+($status, $quotient)	= &dbmny4divide($dbproc,$m1,$m2)
+($status, $dest)	= &dbmny4minus($dbproc,$source)
+($status, $product)	= &dbmny4mul($dbproc,$m1,$m2)
+($status, $difference)	= &dbmny4sub($dbproc,$m1,$m2)
+($status, $ret)	= &dbmny4zero($dbproc)
+($status, $sum)	= &dbmnyadd($dbproc,$m1,$m2)
+$status		= &dbmnycmp($dbproc,$m1,$m2)
+($status, $ret)	= &dbmnydec($dbproc, $m1)
+($status, $quotient)	= &dbmnydivide($dbproc,$m1,$m2)
+($status, $ret, $remainder) = &dbmnydown($dbproc,$m1, $divisor)
+($status, $ret)	= &dbmnyinc($dbproc, $m1)
+($status, $ret, $remain)	= &dbmnyinit($dbproc, $m1,$trim)
+($status, $ret)		= &dbmnymaxneg($dbproc)
+($status, $ret)		= &dbmnymaxpos($dbproc)
+($status, $dest) = &dbmnyminus($dbproc,$source)
+($status, $product)	= &dbmnymul($dbproc,$m1,$m2)
+($status, $m1, $digits, $remain)	= &dbmnyndigit($dbproc,$m1)
+($status, $ret)		= &dbmnyscale($dbproc,$m1,$multiplier,
+				$addend)
+($status, $difference)	= &dbmnysub($dbproc,$m1,$m2)
+($status, $ret)	= &dbmnyzero($dbproc)
+
+$status	= &BCP_SETL($state)
+$status = &bcp_getl;
+$status = &bcp_init($dbproc, $tblname, $hostfile, $errfile, $dir)
+$status = &bcp_meminit($dbproc, $numcols)
+$status = &bcp_sendrow($dbproc, $col1, $col2, ...)
+$status = &bcp_batch($dbproc)
+$status = &bcp_done($dbproc)
+$status = &bcp_control($dbproc, $field, $value)
+$status = &bcp_columns($dbproc, $host_columns)
+$status = &bcp_colfmt($dbproc, $host_column, $host_type,
+		      $host_prefixlen, $host_collen, $host_term,
+		      $host_termlen, $table_colnum)
+($status, $rows_copied) = &bcp_exec($dbproc)
+$status = &bcp_readfmt($dbproc, $filename)
+$status = &bcp_writefmt($dbproc, $filename)
+
+$SUCCEED		$MORE_ROWS			$EXCEPTION	$EXPROGRAM
+$FAIL			$REG_ROW			$EXSIGNAL	$EXSERVER
+$NO_MORE_ROWS	$BUF_FULL			$EXINFO	$EXCOMM
+$NO_MORE_RESULTS	$NO_MORE_PARAMS		$EXDBLIB	$EXTIME
+$ComputeId		$DBSAVE			$EXFORMS	$EXFATAL
+$DBstatus		$DBNOSAVE			$EXUSER
+$SybperlVer		$DBNOERR			$EXLOOKUP
+$STDEXIT		$DB_PASSTHRU_MORE	$EXSCREENIO
+$ERREXIT		$DB_PASSTHRU_EOM		$EXCLIPBOARD
+$INT_EXIT		$DBNOPROC			$EXNONFATAL
+$INT_CONTINUE					$EXCONVERSION
+$INT_CANCEL						$EXRESOURCE
+$INT_TIMEOUT						$EXCONSISTENCY
+$DB_IN		$DB_OUT
+$BCPMAXERRS	$BCPFIRST	$BCPLAST	$BCPBATCH
+$DBTRUE		$DBFALSE
+$SybPackageBug
+$dbNullIsUndef	$dbKeepNumeric	$dbBin0x
+.fi
+.SH DESCRIPTION
+\fBSybperl\fP is a version of \fIPerl\fP which has been extended (via
+the \fIusersubs\fP feature) to allow access to \fISybase\fP databases.
+
+\fBSybperl\fP maps a subset of the \fISybase
+DB-Library\fP API to \fIPerl\fP. The usage of these functions is the same
+as in \fIDB-Library\fP, unless specifically noted.
+
+\fBDifferences with DB-Library:\fP
+
+\fB&dblogin\fP takes 3 optional arguements (the userid, the
+password and the server to connect to). These default to the Unix
+userid, the null password and the default server (from the DSQUERY
+environment variable).
+
+\fB&dblogin\fP returns a \fBDBPROCESS\fP, not a \fBLOGINREC\fP. This
+simplifies the call to open a connection to a Sybase dataserver
+somewhat. If the login fails for any reason \fB&dblogin\fP returns -1.
+\fB&dblogin\fP can be called multiple times to login to different
+servers, or to login as several users simultaneously.
+
+Further \fBDBPROCESSes\fP can be opened using
+\fB&dbopen([$server])\fP, using the login information from the
+last call to \fB&dblogin()\fP. The number of simultaneous DBPROCESSes
+is limited to 25 (This can be changed by altering a #define in sybperl.c).
+
+The \fB$dbproc\fP parameter used by most subroutines is optional,
+and defaults to the DBPROCESS returned
+by the first call to \fB&dblogin\fP (exceptions: \fB&dbsafestr()\fP,
+\fB&dbwritetext()\fP and \fB&bcp_sendrow()\fP require explicit \fB$dbproc\fP parameters.)
+
+\fB&dbnextrow\fP returns an array of formatted data, based on the
+datatype of the corresponding columns. \fB&dbnextrow\fP sets the
+variable \fB$ComputeId\fP when the result row is a computed row (the
+result of a \fIcompute by\fP clause). If the optional \fB$doAssoc\fP
+parameter is non-zero \fB&dbnextrow\fP returns an
+associative array keyed on the column name of each returned field. If
+the column name is null (as for example in the case of an aggregate),
+then \fB&dbnextrow\fP assigns a column name based on the column number.
+
+\fB&dbretdata\fP returns an array of the parameters
+declared as \fBOUTput\fP in an \fBEXEC\fP stored procedure statement.
+If the ooptional \fB$doAssoc\fP parameter is non-zero, then an
+associative array keyed on the name of the parameters is returned
+(again, if the parameters are unnamed, the key is based on the
+paramter number). A single call will
+return all the parameters for the last \fBEXEC\fP statement.
+
+\fB&dbsafestr\fP takes a string literal ' or " as the third [optional] argument
+and means \fBDBSINGLE\fP or \fBDBDOUBLE\fP, respectively.
+Omission of the third argument means \fBDBBOTH\fP.
+
+In order to simplify its use somewhat, the calling sequence of
+\fB&dbwritetext\fP has been changed. \fI$select_proc\fP and
+\fI$select_col\fP are the dbproc and column number of a currently
+active query. Logging is always off.
+
+Note that all DBMONEY routines which in the C version take pointers to
+arguments (in order to return values) return these values in an array
+instead (eg: status = dbmnyadd(dbproc, m1, m2, result) becomes
+($status, $result) = &dbmnyadd($dbproc, $m1, $m2))
+
+Copying data from program variables into a Sybase table using BCP has
+been implemented in a slightly different manner. Instead of using
+bcp_bind(), you need to call &bcp_meminit() to determine the number of
+columns that will be sent to the server, and the call &bcp_sendrow()
+with the data for each row (see \fBEXAMPLES\fP, below). Passing
+\fBundef\fP as one of the data
+values will result in a \fBNULL\fP value being sent to the server for
+that column.
+
+\fBVariables:\fP
+
+\fBSybperl\fP defines a number of Read-Only variables, and three
+Read-Write variables. Most of the variables correspond to #define's in
+the \fIOpenClient\fP include files (see the Sybase documentation for
+more information).
+
+The \fBSybperl\fP specific variables are:
+
+\fB$ComputeId\fP \- Set by \fB&dbnextrow\fP when it processes a
+\fIcompute row\fP as opposed to a normal results row.
+.br
+\fB$DBstatus\fP \- The status returned by the last call to
+\fBdbnextrow()\fP.
+.br
+\fB$SybperlVer\fP \- The Sybperl release version.
+.br
+\fB$SybPackageBug\fP \- Set to TRUE if \fBSybperl\fP was compiled with
+the option to circumvent a bug in \fBPerl's\fP implementation of
+packages. This variable is undefined otherwise.
+.br
+\fB$dbNullIsUndef\fP \- This variable controls whether NULL values
+returned from a query will be returned as the string '\fINULL\fP' (the
+default) or as the \fBPerl\fP \fIundef\fP value.
+.br
+\fB$dbKeepNumeric\fP \- This variable controls whether numeric
+datatypes returned by queries are converted to strings (the default)
+or left in native format.
+.br
+\fB$dbBin0x\fP \- This variable controls whether variables of type
+\fBSYBBINARY\fP are returned with a leading \fB0x\fP or not (the
+default).
+
+These last three variables are all boolean.
+
+.SH "UNIMPLEMENTED FEATURES"
+
+\fB&dbfcmd\fP is not implemented, but can be emulated by using
+\fIsprintf\fP as in \fI&dbcmd($dbproc, sprintf("%d", $num_val))\;\fP
+
+.SH EXAMPLES
+
+Using &dbretdata():
+
+.nf
+	&dbcmd($dbproc, "declare @data int\n");
+	&dbcmd($dbproc, "exec my_stored_proc @data out\n");
+	&dbsqlexec($dbproc);
+	&dbresults($dbproc);
+	while(&dbnextrow($dbproc))
+	{
+		;	# empty loop...
+	}
+	($ret) = &dbretdata($dbproc);
+.fi
+
+Doing a Bulk Copy from program variables into a Sybase table:
+
+.nf
+	&BCP_SETL($DBTRUE);
+	$dbproc = &dblogin;
+	&bcp_init($dbproc, "test.dbo.t2", '', 'bcp.err', $DB_IN);
+	&bcp_meminit($dbproc, 3);   # we wish to copy three columns into
+				    # the 't2' table
+	while(<>)
+	{
+		chop;
+		@dat = split(' ', $_);
+		&bcp_sendrow($dbproc, @dat);
+	}
+	$ret = &bcp_done($dbproc);
+.fi
+
+
+
+.SH OPTIONS
+
+See the \fIPerl(1)\fP manual page.
+
+.SH BUGS
+
+Memory usage can become very large in certain conditions when
+using a version of Perl prior to 4.035. This
+can be circumvented - see the BUGS file in the Sybperl distribution.
+
+If \fB&dbnextrow\fP encounters a datatype that it does not know about,
+it tries to convert it to SYBCHAR, and to store it in a 256 byte
+buffer - without checking for overflow.
+
+The handling of multiple logins isn't really clean. A call to
+\fB&dblogin\fP sets the values for the User name and Password. These
+values are remembered - and used in calls to \fB&dbopen\fP - until
+they are changed in a new call to \fB&dblogin()\fP. It is possible to
+avoid the use of \fB&dbopen\fP alltogether, and simply call
+\fB&dblogin\fP each time a new \fBDBPROCESS\fP is required.
+
+
+.SH FILES
+
+\fI$PERLLIB/sybperl.pl\fP should be called in all \fBsybperl\fP
+scripts to set the correct environment variables used by DB-Library.
+A sample \fI$PERLLIB/sybdb.ph\fP is provided with sybperl. You may
+want to use \fBh2ph\fP to add definitions to this file.
+
+.SH "SEE ALSO"
+
+\fIPerl(1L), Sybase Open Client DB Library Reference Manual, h2ph(1L).\fP
+
+.SH AUTHOR
+
+.nf
+Michael Peppler, ITF Management SA \- mpeppler@itf.ch
+.fi
+Jeffrey Wong (jtw@comdyn.cdsyd.oz.au) contributed the
+OpenClient R4.6.1 DBMONEY routines
+Brent Milnor (brent@oceania.com) contributed &dbwritetext().
+Eric Fifer (egf@sbi.com) contributed corrections to the
+&dblogin()/&dbopen() sequence.
+Mark Lawrence (mark@drd.com) contributed &dbsafestr().
+Michael Bloom (mb@tti.com) contributed code to handle SYBIMAGE data.
+Don Preuss (donp@niaid.nih.gov) contributed the &dbcolXXX() calls.

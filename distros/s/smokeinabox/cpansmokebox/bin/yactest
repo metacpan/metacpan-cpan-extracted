@@ -1,0 +1,2 @@
+use CPANPLUS::YACSmoke;
+test( @ARGV );

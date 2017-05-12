@@ -1,0 +1,66 @@
+NAME
+    App::Smoke::In::A::Box - CPAN Tester smoke environment boxed
+
+SYNOPSIS
+      $ /path/to/perl Makefile.PL 
+      # answer the questions etc
+
+      $ cd ~/cpansmokebox
+
+      $ /path/to/perl bin/yactest-boxed
+
+      # Smoking happens
+
+DESCRIPTION
+    App::Smoke::In::A::Box is a standalone boxed CPAN Tester smoke
+    environment. Built on CPANPLUS and CPANPLUS::YACSmoke it enables an
+    individual to simply download this distribution, extract it somewhere,
+    add their email address and optionally an email gateway to use and start
+    CPAN Testing against an arbitary "perl" executable without worrying
+    about the toolchain dependencies.
+
+    It provides CPANPLUS and bundled modules required to bootstrap the CPAN
+    Testing process.
+
+    Included are:
+
+      CPANPLUS + its prereqs
+
+      CPANPLUS::YACSmoke
+
+      Test::Reporter
+
+      Sort::Versions
+
+      Regexp::Assemble
+
+      Config::IniFiles
+
+MAINTAINER
+    Chris "BinGOs" Williams
+
+KUDOS
+    Gabor Szabo, whose email to the cpan-testers-discuss mailing list
+    inspired this utility.
+
+    Jos Boumans, who did all the real hard work with CPANPLUS and
+    cpanp-boxed.
+
+    Dave Golden, the Test::Reporter guy.
+
+    Adam Kennedy, YAML::Tiny
+
+    Ed Avis et al, Sort::Versions
+
+    David Landgren, Regexp::Assemble
+
+LICENSE
+    Copyright © Chris Williams
+
+    This module may be used, modified, and distributed under the same terms
+    as Perl itself. Please see the license that came with your Perl
+    distribution for details.
+
+SEE ALSO
+    CPANPLUS
+

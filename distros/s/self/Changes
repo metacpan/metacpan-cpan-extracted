@@ -1,0 +1,43 @@
+Revision history for self
+
+0.35 2016-02-01T08:20:44+0100
+- remove self::implicit -- "self" already has the functionality.
+- Fix code injection under perl 5.18, 5.20, and 5.22.
+
+0.34
+- fix deps
+ 
+0.33
+- license changed to MIT.
+- support 'no self'
+
+0.32
+- fix deps
+
+0.31
+- Make it parses sub declaration when '{' is not in the same line as 'sub'
+
+0.30
+- Here comes the B:: -based implementation that gives you $self and @args
+
+0.15
+- More tests to proof.
+- Documentation correction.
+
+0.14
+- Emergency fix for wrong depency. :(
+
+0.13
+- Make it work inside 'eval'.
+
+0.12
+- requires Perl v5.6.0 instead of v5.8.0
+- Use Sub::Exporter instead of Exporter::Lite, this provide
+  a 'renaming' feature, which makes many sense for this module.
+- Using 'self' in eval block or statement is not working, marked as
+  TODO in tests.
+- All these are reported by MARKSTOS++, thanks a lot!.
+
+0.10  Sun Oct 28 19:23:14 2007
+       Initial release.
+

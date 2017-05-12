@@ -1,0 +1,32 @@
+---
+abstract: 'CPAN Tester smoke environment boxed'
+author:
+  - 'Chris Williams <chris@bingosnet.co.uk>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::Install: 1.52
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.99'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: smokeinabox
+no_index:
+  directory:
+    - cpansmokebox
+    - inc
+    - t
+provides:
+  App::Smoke::In::A::Box:
+    file: lib/App/Smoke/In/A/Box.pm
+    version: 0.24
+requires:
+  perl: 5.6.0
+resources:
+  homepage: http://github.com/bingos/smoke-in-a-box/tree
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/bingos/smoke-in-a-box.git
+version: 0.24

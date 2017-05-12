@@ -1,0 +1,47 @@
+Revision history for signatures
+
+0.13      2015-07-28 06:35:39Z
+  - bump minimum version of B::Hooks::Parser for ::Install::Files
+
+0.12      2015-05-13 01:23:05Z
+  - fix parsing of attribute handlers (GH #1)
+
+0.11      2015-01-03 20:35:48Z
+  - re-release to fix problematic $VERSION declaration (RT#101095)
+
+0.10      2014-12-22 08:14:23Z
+  - fix compile errors on perl 5.21.6 (RT#101076, Father Chrysostomos)
+
+0.09      2014-05-25 16:17:38Z
+  - bump required version of B::Hooks::Parser for MSWin32
+
+0.08      2014-05-24 05:07:22Z
+  - Patch for perl > 5.19.2 by Peter Martini (RT#95181)
+
+0.07      2012-05-19 10:46:23Z
+  - Patch for perl > 5.13.7 by Colin Watson
+    See https://rt.cpan.org/Public/Bug/Display.html?id=66997
+
+0.06      2009-07-31 04:34:56Z
+  - Require ExtUtils::Depends 0.302.
+
+0.05      2009-04-19 17:21:35Z
+  - Depend on B::Hooks::EndOfScope 0.08 so exceptions
+    during compile time that trigger a destructor don't
+    cause a panic on 5.10 anymore.
+
+0.04      2009-04-19 10:00:18Z
+  - Skip a test for syntax errors in string evals that
+    sometimes makes perl crash.
+  - Add test case for something that used to blow up.
+  - Depend on latest B::Hooks::OP::Check.
+  - Add repository and bugtracker urls to META.yml.
+
+0.03      2008-12-09 13:35:24Z
+  - Suppress a new prototype warning from blead perl.
+
+0.02      2008-11-11 14:26:33Z
+  - Port to B::Hooks::OP::PPAddr.
+
+0.01      2008-11-05 08:58:17Z
+  - Initial release.

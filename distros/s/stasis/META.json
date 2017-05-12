@@ -1,0 +1,59 @@
+{
+   "abstract" : "an encrypting archive tool using tar, gpg and perl",
+   "author" : [
+      "David Farrell"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "freebsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "stasis",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Getopt::Long" : "0",
+            "Pod::Usage" : "0",
+            "Time::Piece" : "0",
+            "Time::Seconds" : "0",
+            "autodie" : "0"
+         }
+      }
+   },
+   "provides" : {
+     "stasis" : {
+       "file" : "stasis",
+       "version" : "0.05"
+     }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/dnmfarrell/Stasis.git",
+         "web" : "https://github.com/dnmfarrell/Stasis"
+      }
+   },
+   "version" : 0.05,
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

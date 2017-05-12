@@ -1,0 +1,120 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Data::Sofu::Undefined - A Sofu non type</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+<link rel="stylesheet" type="text/css" href="/Data/sofupod.css" />
+</head>
+
+<body>
+
+<!-- INDEX BEGIN -->
+<div name="index">
+<p><a name="__index__"></a></p>
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#synopsis">Synopsis</a></li>
+	<li><a href="#syntax">SYNTAX</a></li>
+	<li><a href="#methods">METHODS</a></li>
+	<ul>
+
+		<li><a href="#new__"><code>new()</code></a></li>
+		<li><a href="#isdefined__"><code>isDefined()</code></a></li>
+		<li><a href="#stringify_level__tree_"><code>stringify(LEVEL, TREE)</code></a></li>
+		<li><a href="#binarify_tree__bdriver_"><code>binarify(TREE, BDRIVER)</code></a></li>
+	</ul>
+
+	<li><a href="#bugs">BUGS</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
+</ul>
+
+<hr name="index" />
+</div>
+<!-- INDEX END -->
+
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>Data::Sofu::Undefined - A Sofu non type</p>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>Provides a interface similar to the original SofuD (sofu.sf.net)</p>
+<p>This Object is similar to Perl's undef .</p>
+<p>It is nothing (not even a <code>Data::Sofu::Value</code>) but it is still there (in Lists or Maps for example)</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">Synopsis</a></h1>
+<pre>
+        <span class="keyword">require</span> <span class="variable">Data::Sofu::Undefined</span><span class="operator">;</span>
+        <span class="keyword">require</span> <span class="variable">Data::Sofu::Map</span><span class="operator">;</span>
+        <span class="keyword">my</span> <span class="variable">$u</span> <span class="operator">=</span> <span class="variable">Data::Sofu::Undefined</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">();</span>
+        <span class="keyword">my</span> <span class="variable">$map</span> <span class="operator">=</span> <span class="variable">Data::Sofu::Map</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">();</span>
+        <span class="variable">$map</span><span class="operator">-&gt;</span><span class="variable">setAttribute</span><span class="operator">(</span><span class="string">"Nx"</span><span class="operator">,</span><span class="variable">$u</span><span class="operator">);</span>
+        <span class="variable">$map</span><span class="operator">-&gt;</span><span class="variable">hasMap</span><span class="operator">(</span><span class="string">"Nx"</span><span class="operator">);</span> <span class="comment"># Returns 0</span>
+        <span class="variable">$map</span><span class="operator">-&gt;</span><span class="variable">hasValue</span><span class="operator">(</span><span class="string">"Nx"</span><span class="operator">);</span> <span class="comment"># Returns 0</span>
+        <span class="variable">$map</span><span class="operator">-&gt;</span><span class="variable">hasAttribute</span><span class="operator">(</span><span class="string">"Nx"</span><span class="operator">);</span> <span class="comment"># Returns 1</span>
+        <span class="comment"># It is also there in $map-&gt;each() and $map-&gt;next();</span>
+</pre>
+<p>
+</p>
+<hr />
+<h1><a name="syntax">SYNTAX</a></h1>
+<p>This Module is pure OO, exports nothing</p>
+<p>
+</p>
+<hr />
+<h1><a name="methods">METHODS</a></h1>
+<p>Also look at <code>Data::Sofu::Object</code> for methods, cause Undefined inherits from it</p>
+<p>
+</p>
+<h2><a name="new__"><code>new()</code></a></h2>
+<p>Creates a new <code>Data::Sofu::Undefined</code> and returns it</p>
+<pre>
+        <span class="variable">$val</span> <span class="operator">=</span> <span class="variable">Data::Sofu::Undefined</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">();</span>
+</pre>
+<p>
+</p>
+<h2><a name="isdefined__"><code>isDefined()</code></a></h2>
+<p>Returns false</p>
+<p>
+</p>
+<h2><a name="stringify_level__tree_"><code>stringify(LEVEL, TREE)</code></a></h2>
+<p>Returns the string representation of this Object.</p>
+<p>Which is the string &quot;UNDEF&quot;</p>
+<p>LEVEL and TREE are ignored.</p>
+<p>
+</p>
+<h2><a name="binarify_tree__bdriver_"><code>binarify(TREE, BDRIVER)</code></a></h2>
+<p>Returns a binary representation of this Object. Don't call this (will be called from <code>packBinary()</code> and writeBinary())</p>
+<p>
+</p>
+<hr />
+<h1><a name="bugs">BUGS</a></h1>
+<p>This still tests true when using:</p>
+<pre>
+        <span class="keyword">my</span> <span class="variable">$u</span><span class="operator">=</span><span class="variable">Data::Sofu::Undefined</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">();</span>
+        <span class="keyword">if</span> <span class="operator">(</span><span class="variable">$u</span><span class="operator">)</span> <span class="operator">{</span> 
+                <span class="comment">#This will happen.</span>
+        <span class="operator">}</span>
+        <span class="keyword">if</span> <span class="operator">(</span><span class="variable">$u</span><span class="operator">-&gt;</span><span class="variable">isDefined</span><span class="operator">())</span> <span class="operator">{</span> 
+                <span class="comment">#This will not happen.</span>
+        <span class="operator">}</span>
+</pre>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p><a href="/Data/Sofu.html">the Data::Sofu manpage</a>, <a href="/Data/Sofu/Value.html">the Data::Sofu::Value manpage</a>, <a href="/Data/Sofu/Object.html">the Data::Sofu::Object manpage</a>, <a href="/Data/Sofu/Map.html">the Data::Sofu::Map manpage</a>, <a href="/Data/Sofu/Value.html">the Data::Sofu::Value manpage</a>, <a href="/Data/Sofu/Reference.html">the Data::Sofu::Reference manpage</a>, <a href="http://sofu.sf.net">http://sofu.sf.net</a></p>
+
+</body>
+
+</html>
+

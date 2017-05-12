@@ -1,0 +1,8 @@
+/* $Id: sqlda.h.min,v 1.1 1999/05/14 17:18:38 mpeppler Exp $ */
+/* dummy sqlda.h file
+ * Rename this file to sqlda.h and place in the include path for the
+ * C compiler to get sybperl to build *if* you have an error
+ * saying sqlda.h not found.
+ */
+
+typedef void SQLDA;

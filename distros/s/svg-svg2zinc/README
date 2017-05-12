@@ -1,0 +1,44 @@
+SVG::SVG2zinc -- a module to display or convert svg files in perl modules or script, assuming you have Tk::Zinc.
+
+This module should work with Perl 5.6.1, Perl/Tk 800
+and Tk::Zinc 3.294 and later.
+If it doesn't, bug reports and patches are welcome.
+
+To install this module, please run:
+
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+For more information on the module, please see the POD documentation
+inside SVG2zinc.pm. ("perldoc SVG::SVG2zinc", once it is installed.)
+
+
+Copyright (C) 2002-2004
+Centre d'Études de la Navigation Aérienne
+IntuiLab
+
+Authors: Christophe Mertz <mertz at intuilab dot com>
+
+with the help or support from
+  S. Chatty <chatty at intuilab dot com>,
+  C. Schlienger <celine at intuilab dot com>
+  A. Lemort <lemort at intuilab dot com>
+  and of course, P. Lecoanet (the author of TkZinc) <lecoanet at cena dot fr>
+
+ This code is free software; you can redistribute it and/or
+ modify it under the terms of the GNU Library General Public
+ License as published by the Free Software Foundation; either
+ version 2 of the License, or (at your option) any later version.
+
+ This code is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ Library General Public License for more details.
+
+ You should have received a copy of the GNU Library General Public
+ License along with this code; if not, write to the Free
+ Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
+ MA 02111-1307, USA.
+

@@ -1,0 +1,7 @@
+#!perl
+
+use strict;
+use warnings;
+use App::SmokeBrew;
+
+my $app = App::SmokeBrew->new_with_options()->run();

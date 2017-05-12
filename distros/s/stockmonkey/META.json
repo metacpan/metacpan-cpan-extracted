@@ -1,0 +1,66 @@
+{
+   "abstract" : "unknown",
+   "author" : [
+      "Paul Miller <jettero@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.143240",
+   "keywords" : [
+      "ATR",
+      "bollinger",
+      "bands",
+      "CCI",
+      "DMI",
+      "EMA",
+      "HMA",
+      "MACD",
+      "RSI",
+      "SMA",
+      "WMU",
+      "ParabolicSAR",
+      "Laguerre",
+      "Stochastic",
+      "ConnorRSI",
+      "CRSI"
+   ],
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "stockmonkey",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Math::Business::Stochastic" : "0",
+            "constant" : "1.05",
+            "perl" : "5.006001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "url" : "http://github.com/jettero/stockmonkey"
+      }
+   },
+   "version" : "2.9407"
+}

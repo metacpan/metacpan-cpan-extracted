@@ -1,0 +1,43 @@
+Site map for http://www.cre.canon.co.uk/
+--------------------------------------------------------------------------------
+http://www.cre.canon.co.uk/::Canon Research Centre Home Page
+  http://www.cre.canon.co.uk/othrsite.htm::Other Canon Sites
+  http://www.cre.canon.co.uk/where/index.htm::Where We Are
+    http://www.cre.canon.co.uk/where/email.htm::Contact E-mail Addresses
+    http://www.cre.canon.co.uk/where/map1.htm::Surrey
+      http://www.cre.canon.co.uk/where/m3.htm::The M3 Motorway
+      http://www.cre.canon.co.uk/where/m4.htm::The M4 Motorway
+      http://www.cre.canon.co.uk/where/heathrow.htm::Heathrow Airport
+      http://www.cre.canon.co.uk/where/london.htm::London
+      http://www.cre.canon.co.uk/where/gatwick.htm::Gatwick Airport
+      http://www.cre.canon.co.uk/where/waterloo.htm::By Train from Waterloo
+      http://www.cre.canon.co.uk/where/map2.htm::Guildford
+        http://www.cre.canon.co.uk/where/map3.htm::University of Surrey Research Park
+      http://www.cre.canon.co.uk/where/m40.htm::The M40 Motorway
+      http://www.cre.canon.co.uk/where/m23.htm::The M23 Motorway
+      http://www.cre.canon.co.uk/where/a3.htm::The A3 Motorway
+      http://www.cre.canon.co.uk/where/m25.htm::The M25 Motorway
+  http://www.cre.canon.co.uk/press/index.htm::Press Releases
+  http://www.cre.canon.co.uk/copy2.htm::Copyright
+  http://www.cre.canon.co.uk/jobs/index.htm::Job Opportunities
+    http://www.cre.canon.co.uk/jobs/softengslt.htm::Software Engineering for Speech and Language Technology
+  http://www.cre.canon.co.uk/overview/index.htm::Overview of CRE
+    http://www.cre.canon.co.uk/overview/past%20achieve.htm::Past Achievements
+    http://www.cre.canon.co.uk/overview/kyosei/kyosei.htm::Kyosei
+      http://www.cre.canon.co.uk/overview/kyosei/commnty.htm::In the Community
+    http://www.cre.canon.co.uk/overview/people/index.htm::Our People
+      http://www.cre.canon.co.uk/overview/people/paulotto.htm::Paul Otto
+      http://www.cre.canon.co.uk/overview/people/allan.htm::Allan Davison
+      http://www.cre.canon.co.uk/overview/people/tim.htm::Tim O'Donoghue
+      http://www.cre.canon.co.uk/overview/people/eli.htm::Eli Tzirkel-Hancock
+    http://www.cre.canon.co.uk/overview/workcre.htm::Working at CRE
+    http://www.cre.canon.co.uk/overview/mission.htm::CRE Mission - Technological Innovation for Cano
+    http://www.cre.canon.co.uk/overview/prncpls.htm::Canon's R&D Principles
+  http://www.cre.canon.co.uk/techover/index.htm::Technology Overview
+    http://www.cre.canon.co.uk/techover/s&lg.htm::Speech and Language Division
+    http://www.cre.canon.co.uk/techover/s&s.htm::Solutions and Systems Division
+      http://www.cre.canon.co.uk/techover/adroit.htm::Adroit
+    http://www.cre.canon.co.uk/techover/cvg.htm::Computer Vision Group
+--------------------------------------------------------------------------------
+Generated on Thursday the 25th of March 1999 at 03:06:30 PM
+sitemapper.pl version 1.007 Ave.Wrigley@itn.co.uk

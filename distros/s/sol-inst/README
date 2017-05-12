@@ -1,0 +1,56 @@
+sol-inst is a collection of Perl modules to access basic installation 
+information on a Solaris system.
+
+Solaris::InstallDB	Manages and searches for packages
+Solaris::Contents	Reads/accesses /var/sadm/install/contents
+Solaris::Package	Reads the pkginfo file for a given package
+Solaris::Patchdiag	Reads a patchdiag.xref file
+
+BACKGROUND
+
+A long time ago, I had a conversation with a fellow engineer about how to 
+properly jumpstart a Solaris server.  He was convinced that the only 
+proper way to bring up a new server was to use the SUNWCall cluster, and 
+then delete the software you didn't need.  For example, if I didn't need 
+X-Windows, I should just "rm -rf /usr/openwin/"
+
+Others argued that SUNWCreq doesn't really install the necessary software 
+needed to maintain a running system, but they never really elaborated on 
+what exactly that missing software was.
+
+So, I took it up as a project to learn more about Solaris packages, the 
+jumpstart process, patching, etc, etc.  I read the Jumpstart book, the 
+Application Packaging Developers Guide, and various man pages.
+
+After awhile I noticed that a lot of the package data files were 
+relatively simple formats, so I wrote some perl scripts to do some 
+simple operations, and ended up creating these modules.
+
+INSTALLATION
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT
+
+This code is considered beta.  My only testing environment is my own 
+network, so there are situations I haven't considered.  I will try to 
+respond to bug reports, but there may be some situations where I can't 
+replicate the environment you are encountering an error in.
+
+FUTURE WORK
+
+If these modules prove to be useful, it would seem logical to create more 
+modules to handle other installation data or installation operations.  For 
+example, modules to read the .clustertoc/.cdtoc files, modules to represent 
+patch distributions, or even modules to access Sun online resources, like 
+SunSolve or the Fingerprint database.
+
+COPYRIGHT
+
+Copyright 2000 Chris Josephes
+
+This library is free software, and you are free to use it under the same 
+terms as Perl itself.

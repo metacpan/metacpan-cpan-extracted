@@ -1,0 +1,77 @@
+	$Id: UPGRADE,v 1.1 1999/05/14 17:15:40 mpeppler Exp $
+
+Upgrading from Sybperl 1.0xx
+----------------------------
+
+Version 2 of Sybperl is a complete re-write, taking advantage of the
+new features of Perl5. Perl has eveloved quite a bit between version 4
+and version 5, and as a consquence, Sybperl has also changed a lot
+between version 1 and 2.
+
+With 1.0xx, there was only one Sybase extension, in 2.0 there are
+three. With 1.0xx you always had to build a new 'sybperl' binary, in
+2.0 this is usually an option (the modules can be 'dynamically loaded'
+on most versions of Unix).
+
+Scripts written for Sybperl 1.0xx will normally work with 2.0,
+provided that 
+
+require 'sybperl.pl';
+
+is included near the top.
+
+The one potential problem lies in Perl 5's more restrictive handling
+of '@' signs in quoted strings. The following code will work in
+Sybperl 1.0xx:
+
+&dbcmd("declare @VAR int\n");
+
+This fails in 2.0, with the following message:
+
+Literal @VAR now requires backslash at /tmp/t.pl line 5, within string
+
+meaning that you now have to write:
+
+&dbcmd("declare \@VAR int\n");
+
+An alternative is to use single quoted strings when no interpolation
+is required.
+
+I mentioned above that there are now three different modules:
+Sybase::DBlib, Sybase::Sybperl and Sybase::CTlib.
+
+- Sybase::Sybperl is the backwards compatibility module. It is
+  implemented on top of Sybase::DBlib, and implements the 1.0xx API.
+  This module is automatically loaded when you require 'sybperl.pl'.
+
+- Sybase::DBlib implements a subset of the Sybase DBlibrary API using
+  a more Perl 5'y syntax:
+
+  $dbh = Sybase::DBlib->dblogin(user, passwd);
+  $dbh->dbcmd("select * from sysprocesses");
+  $dbh->dbsqlexec; $dbh->dbresults;
+  while(@dat = $dbh->dbnextrow) {
+      print "@dat\n";
+  }
+
+  I recommend using this syntax for new programs.
+
+- Sybase::CTlib implements a subset of the Sybase Client Library API,
+  and uses the same basic syntax as above. Client Library is shipped
+  with the System 10 (and later) versions of Sybase Open Client.
+
+  The Sybase::CTlib module makes better use of the new Perl 5
+  features, and includes native datetime, money and numeric datatype
+  handling (ie when retrieving a date from Sybase it is stored in the
+  Sybperl program as a CS_DATETIME variable, not as a string, and is
+  only converted to a string when it is printed). Date comparisons can
+  be written as
+
+  if($date1 < $date2) { ... }
+
+  and the comparison will be done on the actual dates, not on their
+  string representation.
+
+  For money and numeric data items the arithmetic operators have been
+  implemented, so that these data items can be manipulated with no
+  loss of precision.

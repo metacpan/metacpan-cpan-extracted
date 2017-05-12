@@ -1,0 +1,138 @@
+=head1 NAME
+
+Math::Business::StockMonkey::Cookbook - don't reinvent the wheel, start here
+
+=head1 DBI
+
+These modules are all intended to be used with databases.  Here is how you'd
+store their results alongside OHLC data.
+ 
+    use Finance::QuoteHist;
+    my $q = Finance::QuoteHist->new(
+        symbols    => [qw(GOOG)],
+        start_date => '6 months ago',
+        end_date   => 'today',
+    );
+
+    my $rsi = recommended Math::Business::RSI;
+    my $dmi = recommended Math::Business::DMI;
+    my $sar = recommended Math::Business::ParabolicSAR;
+    my $bb  = recommended Math::Business::BollingerBands;
+
+    my $sth = $dbo->prepare("insert into something blah blah blah");
+
+    for my $row ($q->quotes) {
+        my ($symbol, $date, $open, $high, $low, $close, $volume) = @$row;
+
+        $rsi->insert( $close );
+        $dmi->insert( [$high,$low,$close] );
+        $sar->insert( [$open,$high,$low,$close] );
+         $bb->insert( $close );
+
+        $sth->execute(
+            $open, $high, $low, $close,
+
+            # You do not need these lexical variables, there just
+            # here to describe the return values.
+
+            my ($rsi)             = $rsi->query,
+            my ($pdi, $mdi, $adx) = $dmi->query,
+            my ($l,$m,$h)         =  $bb->query,
+
+            $sar->query,
+
+        ) or die $dbo->errstr;
+    }
+
+=head1 AVOID RECALCULATING
+
+I can't stress this strongly enough.  Avoid recalculating lots of data if you
+can.  If you're pulling daily updates to long columns of numbers and you want
+them as accurate as possible -- and noticed that today's value is highly
+dependent on yesterday's value, recursively: then use L<Storable>, L<Data::Dump>
+or L<Data::Dumper>:
+
+    # Pretend we've just calculated 6 months as above under DBI
+    use Storable qw(lock_store lock_retrieve);
+
+    # Store the $bb in a file for later use
+    lock_store($bb, "filename");
+
+You can now resurrect a complete snapshot of the C<$bb> object like this:
+
+    my $resurrected_bb = lock_retrieve("filename");
+       $resurrected_bb->insert($tomorrow_close);
+
+The resurrected C<$bb> will know just as much past history as the original.
+Hurray!  If you have some aversion to L<Storable>, for whatever reason, you can
+do nearly the same thing with the dumper modules like this:
+
+    use Data::Dump qw(dump);
+    open my $save, "filename" or die $!;
+    print $save dump($bb);
+    close $save;
+
+    open my $load, "filename" or die $!;
+    my $code = do { local $/; <$load> };
+    close $load;
+
+    my $resurrected_bb = eval $code; die $@ if $@;
+       $resurrected_bb->insert($tomorrow_close);
+
+=head1 GD::Graph
+
+What good is data without plots?  This is basically how you'd draw a nice
+L<Math::Business::ParabolicSAR> graph.
+
+    use strict;
+    use Math::Business::ParabolicSAR;
+    use GD::Graph::mixed;
+    use List::Util qw(min max);
+
+    my @ohlc = reverse @{$dbo->selectall_arrayref(qq/
+        select day, open,high,low,close
+          from daily
+         where symbol=?
+         order by day desc limit 50
+
+    /, {}, "SYK")};
+
+    my $sar = Math::Business::ParabolicSAR->recommended;
+
+    my @data;
+    for my $p (@ohlc) {
+        my $d = shift @$p;
+
+        $sar->insert($p);
+
+        push @{$data[0]}, $d;      # date
+        push @{$data[1]}, $p->[3]; # close
+        push @{$data[2]}, $p->[1]; # high
+        push @{$data[3]}, $p->[2]; # low
+        push @{$data[4]}, $sar->query;
+    }
+
+    my @all_points = grep {defined $_} map {@$_} @data[1 .. $#data];
+    my $min_point  = min(@all_points);
+    my $max_point  = max(@all_points);
+
+    my $graph = GD::Graph::mixed->new(1000, 500);
+       $graph->set(
+           y_label           => 'dollars',
+           x_label           => 'date',
+           transparent       => 0,
+           markers           => [qw(7 3 9 8)],
+           dclrs             => [qw(black lgreen lred lblue)],
+           y_min_value       => $min_point-0.2,
+           y_max_value       => $max_point+0.2,
+           y_number_format   => '%0.2f',
+           x_labels_vertical => 1,
+           types             => [qw(linespoints points points points)],
+
+       ) or die $graph->error;
+
+    my $gd = $graph->plot(\@data) or die $graph->error;
+    open my $img, '>', "sar.png" or die $!;
+    binmode $img;
+    print $img $gd->png;
+    close $img;

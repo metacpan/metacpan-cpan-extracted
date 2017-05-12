@@ -1,0 +1,9 @@
+$Id: README.dbschema,v 1.1 2000/05/13 22:05:43 mpeppler Exp $
+
+The maintenance of the dbschema.pl script has been taken over by
+David Owen (dowen@midsomer.org). The latest version of the script 
+should be retrieved from his site (www.midsomer.org). I have NOT
+updated the code that is included here with David's latest
+changes.
+
+Michael

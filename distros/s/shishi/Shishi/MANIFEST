@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+Shishi.pm
+Shishi.xs
+test.pl

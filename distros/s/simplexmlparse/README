@@ -1,0 +1,68 @@
+simpleXMLParse version 3.0 
+===========================
+
+simpleXMLParse - Perl extension for pure perl XML parsing 
+
+SYNOPSIS
+
+  use simpleXMLParse;
+  use Data::Dumper;
+  my $parse = new simpleXMLParse(input => $fn, style => $style);
+
+  print Dumper($parse->parse());
+
+DESCRIPTION
+
+  simpleXMLParse currently does not handle DTD's or DTD syntax. 
+
+  style is "1" or "2".
+
+  style "1" will create attribute key-value pairs with an "_attr" suffix convention
+  style "2" will create attribute key-value pairs in same format as nodes while handling collisions
+
+EXPORT
+
+  None by default.  
+
+SEE ALSO
+
+AUTHOR
+
+Daniel Graham, E<lt>dgraham@firstteamsoft.com<gt>
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2008-2015 by Daniel Edward Graham
+
+LGPL 3.0
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.16.3 or,
+at your option, any later version of Perl 5 you may have available.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Test
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2008-2015 by Dan Graham
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.16.3 or,
+at your option, any later version of Perl 5 you may have available.
+
+

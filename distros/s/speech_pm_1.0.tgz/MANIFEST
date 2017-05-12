@@ -1,0 +1,12 @@
+MANIFEST
+README.txt
+Makefile.PL
+Changes
+Speech/Festival.pm
+Speech/Festival/Synthesiser.pm
+Speech/Synthesiser.pm
+Audio/FileWave.pm
+festival_panel.prl
+festival_test.prl
+synthesiser_test.prl
+test.pl

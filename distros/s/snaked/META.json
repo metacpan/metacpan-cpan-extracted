@@ -1,0 +1,47 @@
+{
+   "abstract" : "cron as it should be. Or shouldn't? L<Please vote!|http://www.kohts.com/cron-5/vote/>",
+   "author" : [
+      "Petya Kohts <petya@kohts.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.68, CPAN::Meta::Converter version 2.112621",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "snaked",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : 0
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Cwd" : 0,
+            "Schedule::Cron::Events" : 0,
+            "Set::Crontab" : 0,
+            "Storable" : 0,
+            "Time::HiRes" : 0,
+            "Time::Local" : 0,
+            "Yandex::Tools" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.14"
+}

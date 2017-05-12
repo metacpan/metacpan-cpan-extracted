@@ -1,0 +1,27 @@
+Revision history for swished.
+
+0.10  Thu Jul 07 13:23:00 2006
+	- embellished, updated, and fixed documentation
+	- bugfix to set 'swished_version' of output m: line correctly
+	- added features to return header data, properties, and metas from index
+0.09  Mon May 29 10:05:05 2006
+	- version skipped
+0.08  Tue Jan 04 19:15:12 2005
+	- changed tests to always succeed
+	- documentation updates
+0.07  Mon Aug 09 18:32:34 2004
+	- added server's swished_version to the m:eta output from swished 
+0.06  Thu Jul 29 15:24:30 2004
+	- moved code into SWISHED::Core, 
+	- wrote SWISHED::Handler.pm for apache 2.0 use, and 
+	  cgi-bin/swished for use as an Apache::Registry or CGI
+	- matches SWISH::API::Remote version 0.06
+0.04  Wed Jul 28 15:43:21 2004
+	- first release 
+	- added m: meta-data with data like hits=215&fetched=10
+	- Changed from an Apache::Registry handler to a mod_perl handler
+	  for speed and functionality
+0.01  Wed May 19 06:18:13 2004
+	- original version; created by h2xs 1.23 with options
+		-XA -n swished
+

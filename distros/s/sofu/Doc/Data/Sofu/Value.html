@@ -1,0 +1,166 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Data::Sofu::Value - A Sofu Value</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+<link rel="stylesheet" type="text/css" href="/Data/sofupod.css" />
+</head>
+
+<body>
+
+<!-- INDEX BEGIN -->
+<div name="index">
+<p><a name="__index__"></a></p>
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#synopsis">Synopsis</a></li>
+	<li><a href="#syntax">SYNTAX</a></li>
+	<li><a href="#methods">METHODS</a></li>
+	<ul>
+
+		<li><a href="#new__data__">new([DATA])</a></li>
+		<li><a href="#set_data_">set(DATA)</a></li>
+		<li><a href="#asvalue__"><code>asValue()</code></a></li>
+		<li><a href="#asscalar__"><code>asScalar()</code></a></li>
+		<li><a href="#tostring__"><code>toString()</code></a></li>
+		<li><a href="#toutf16____toutf8____toutf32__"><code>toUTF16()</code>, <code>toUTF8()</code>, toUTF32()</a></li>
+		<li><a href="#toint__"><code>toInt()</code></a></li>
+		<li><a href="#tofloat__"><code>toFloat()</code></a></li>
+		<li><a href="#tolong__"><code>toLong()</code></a></li>
+		<li><a href="#todouble__"><code>toDouble()</code></a></li>
+		<li><a href="#isvalue__"><code>isValue()</code></a></li>
+		<li><a href="#stringify_level_tree_"><code>stringify(LEVEL,TREE)</code></a></li>
+		<li><a href="#binarify_tree_binary_driver_"><code>binarify(TREE,BINARY DRIVER)</code></a></li>
+	</ul>
+
+	<li><a href="#bugs">BUGS</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
+</ul>
+
+<hr name="index" />
+</div>
+<!-- INDEX END -->
+
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>Data::Sofu::Value - A Sofu Value</p>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>Provides a interface similar to the original SofuD (sofu.sf.net)</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">Synopsis</a></h1>
+<pre>
+        <span class="keyword">require</span> <span class="variable">Data::Sofu::Value</span><span class="operator">;</span>
+        <span class="keyword">my</span> <span class="variable">$v</span> <span class="operator">=</span> <span class="variable">Data::Sofu::Value</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">();</span>
+        <span class="variable">$v</span><span class="operator">-&gt;</span><span class="variable">set</span><span class="operator">(</span><span class="string">"Hello World"</span><span class="operator">);</span>
+</pre>
+<p>
+</p>
+<hr />
+<h1><a name="syntax">SYNTAX</a></h1>
+<p>This Module is pure OO, exports nothing</p>
+<p>
+</p>
+<hr />
+<h1><a name="methods">METHODS</a></h1>
+<p>Also look at <code>Data::Sofu::Object</code> for methods, cause Value inherits from it</p>
+<p>
+</p>
+<h2><a name="new__data__">new([DATA])</a></h2>
+<p>Creates a new <code>Data::Sofu::Value</code> and returns it</p>
+<p>Converts DATA to a string if DATA is given.</p>
+<pre>
+        <span class="variable">$val</span> <span class="operator">=</span> <span class="variable">Data::Sofu::Value</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="string">"Hello World"</span><span class="operator">);</span>
+</pre>
+<p>
+</p>
+<h2><a name="set_data_">set(DATA)</a></h2>
+<p>Sets the contents of this Value (replaces the old contents).</p>
+<p>Note: DATA will be converted to a string.</p>
+<pre>
+        <span class="variable">$v</span><span class="operator">-&gt;</span><span class="variable">set</span><span class="operator">(</span><span class="string">"Foobar"</span><span class="operator">);</span>
+</pre>
+<p>
+</p>
+<h2><a name="asvalue__"><code>asValue()</code></a></h2>
+<p>Returns itself, used to make sure this Value is really a Value (Data::Sofu::Map and Data::Sofu::List will die if called with this method)</p>
+<p>
+</p>
+<h2><a name="asscalar__"><code>asScalar()</code></a></h2>
+<p>Perl only</p>
+<p>Returns this Value as a perl Scalar (same as toString)</p>
+<p>
+</p>
+<h2><a name="tostring__"><code>toString()</code></a></h2>
+<p>Returns this as a string</p>
+<p>
+</p>
+<h2><a name="toutf16____toutf8____toutf32__"><code>toUTF16()</code>, <code>toUTF8()</code>, toUTF32()</a></h2>
+<p>Not working in Perl (cause there is no wchar, char, dchar stuff going on, if you need to convert strings use &quot;Encode&quot;)</p>
+<p>They just return the same as <code>toString()</code></p>
+<p>
+</p>
+<h2><a name="toint__"><code>toInt()</code></a></h2>
+<p>Return the Value as an Integer</p>
+<pre>
+        <span class="variable">$v</span><span class="operator">-&gt;</span><span class="variable">toInt</span><span class="operator">()</span> <span class="operator">===</span>  <span class="keyword">int</span> <span class="variable">$v</span><span class="operator">-&gt;</span><span class="variable">toString</span><span class="operator">();</span>
+</pre>
+<p>
+</p>
+<h2><a name="tofloat__"><code>toFloat()</code></a></h2>
+<p>Return the Value as a Float</p>
+<pre>
+        <span class="variable">$v</span><span class="operator">-&gt;</span><span class="variable">toFloat</span><span class="operator">()</span> <span class="operator">===</span>  <span class="variable">$v</span><span class="operator">-&gt;</span><span class="variable">toString</span><span class="operator">()+</span><span class="number">0</span><span class="operator">;</span>
+</pre>
+<p>
+</p>
+<h2><a name="tolong__"><code>toLong()</code></a></h2>
+<p>Return the Value as a Long</p>
+<pre>
+        <span class="variable">$v</span><span class="operator">-&gt;</span><span class="variable">toLong</span><span class="operator">()</span> <span class="operator">===</span>  <span class="keyword">int</span> <span class="variable">$v</span><span class="operator">-&gt;</span><span class="variable">toString</span><span class="operator">();</span>
+</pre>
+<p>
+</p>
+<h2><a name="todouble__"><code>toDouble()</code></a></h2>
+<p>Return the Value as a Double</p>
+<pre>
+        <span class="variable">$v</span><span class="operator">-&gt;</span><span class="variable">toDouble</span><span class="operator">()</span> <span class="operator">===</span>  <span class="variable">$v</span><span class="operator">-&gt;</span><span class="variable">toString</span><span class="operator">()+</span><span class="number">0</span><span class="operator">;</span>
+</pre>
+<p>
+</p>
+<h2><a name="isvalue__"><code>isValue()</code></a></h2>
+<p>Returns 1</p>
+<p>
+</p>
+<h2><a name="stringify_level_tree_"><code>stringify(LEVEL,TREE)</code></a></h2>
+<p>Returns a string representation of this Value.</p>
+<p>LEVEL and TREE are ignored...</p>
+<p>
+</p>
+<h2><a name="binarify_tree_binary_driver_"><code>binarify(TREE,BINARY DRIVER)</code></a></h2>
+<p>Returns the binary version of this Value using the BINARY DRIVER. Don't call this one, use binaryPack instead.</p>
+<p>
+</p>
+<hr />
+<h1><a name="bugs">BUGS</a></h1>
+<p>most of the methods do the same, because perl does the converting for you.</p>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p><a href="/Data/Sofu.html">the Data::Sofu manpage</a>, <a href="/Data/Sofu/Binary.html">the Data::Sofu::Binary manpage</a>, <a href="/Data/Sofu/Object.html">the Data::Sofu::Object manpage</a>, <a href="/Data/Sofu/Map.html">the Data::Sofu::Map manpage</a>, <a href="/Data/Sofu/Value.html">the Data::Sofu::Value manpage</a>, <a href="/Data/Sofu/Undefined.html">the Data::Sofu::Undefined manpage</a>, <a href="http://sofu.sf.net">http://sofu.sf.net</a></p>
+
+</body>
+
+</html>
+

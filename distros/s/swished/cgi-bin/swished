@@ -1,0 +1,33 @@
+#!/usr/bin/perl -w
+
+# this implements the swished daemon
+# as a script suitable for use with Apache::Registry (or as a CGI)
+
+use strict;
+use warnings;
+use lib '/usr/local/swished/lib';
+use SWISHED::Core;
+
+# by default will use the index specified in $ENV{'SWISHED_INDEX_DEFAULT'}
+
+main();
+
+sub main {
+	print CGI::header( -type=>"text/plain" );
+	SWISHED::Core::do_search();
+}
+
+
+1;
+# this can be run straight as a CGI.
+# to enable via Apache::Registry, place lines like the following in your
+# httpd.conf file
+
+#Alias /swished/  /usr/local/swished/cgi-bin/
+#PassEnv SWISHED_INDEX_DEFAULT
+#<Location /swished> 
+#    SetHandler  perl-script
+#    PerlHandler Apache::Registry
+#    Options +ExecCGI
+#	SetEnv SWISHED_INDEX_DEFAULT /var/lib/sman/sman.index
+#</Location>

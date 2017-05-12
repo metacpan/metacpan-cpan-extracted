@@ -1,0 +1,34 @@
+	$Id: README,v 1.2 2001/12/13 00:06:09 mpeppler Exp $
+
+Copyright (c) 2001  Michael Peppler
+
+   You may copy this under the terms of the GNU General Public License,
+   or the Artistic License, copies of which should have accompanied
+   your Perl kit.
+
+README for Sybase::BLK.
+
+This module is intended to be used on top of the Sybase::CTlib module
+of sybperl 2.13_08 or later. It is a direct port of Sybase::BCP, and
+was performed by Scott Zetlan.
+
+INSTALLATION:
+
+If you are installing sybperl 2.13 or later, then this module will get
+automatically installed.
+
+If you are installing a new version of Sybase::BLK on top of an
+existing Sybase::CTlib module, then simply type
+
+	perl Makefile.PL
+	make
+	make install
+
+in this directory.
+
+The date conversion routines have not been well tested.
+
+As always, comments are welcome, either to myself <mpeppler@peppler.org> or
+to the sybperl mailing list <sybperl-l@listproc.net>>
+
+Michael

@@ -1,0 +1,26 @@
+* several different schedules for a job
+separate file? separate directory with schedules?
+
+* schedule type: once, once and delete afterwards, at startup
+execution_interval, execution_schedule, execution_type (once, once && delete, at startup)
+
+* schedule format: configurable time zone for each job
+(makes sense only for execution_schedule/cron type jobs?)
+
+* not schedule jobs on holidays
+definition of holidays -- list of dates? sync with what?
+
+* move holiday jobs to other days
+last_run? (state retention)
+
+* change schedule a bit to not run some jobs in case of emergency
+disabled: disable all, enable all, disable list, enable list?
+(implemented in yandex version, to be pushed to public)
+
+* chain of jobs: if one fails, stop and alert
+each has its own schedule? (state retention)
+
+* error recovery: if job fails do something (depending on the type of error?)
+
+* test run job by name, with snaked environment
+(foreground? logging?)

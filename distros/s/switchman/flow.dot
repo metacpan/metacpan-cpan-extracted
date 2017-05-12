@@ -1,0 +1,41 @@
+// dot % -Tpng -O
+
+digraph flow {
+    compound = true;
+    exists_lock [label="exists(lock, watcher)" shape="diamond"];
+    exit1 [label="exit" shape="oval"];
+    exit2 [label="exit" shape="oval"];
+    exit3 [label="exit" shape="oval"];
+    first_in_r_queue [label="first in r queue" shape="diamond"];
+    fork [shape="oval"];
+    get_lock [label="get lock" shape="diamond"];
+    shift_r_queue [label="shift r queue" shape="box"];
+    push_r_queue [label="push r queue, task" shape="box"];
+    semget [label="semget" shape="diamond"];
+    start [shape="oval"];
+
+    start -> exists_lock;
+    exists_lock -> exit1 [label="+"];
+    exists_lock -> cluster_0 [label="-"];
+    subgraph cluster_0 {
+        label = "for r in resources";
+        is_task_in_r_queue [label="is task in r queue" shape="diamond"];
+        is_task_in_r_queue -> exit2 [label="+"];
+        is_task_in_r_queue -> push_r_queue [label="-"];
+    }
+    cluster_0 -> cluster_1;
+    subgraph cluster_1 {
+        label = "for r in resources";
+        first_in_r_queue -> first_in_r_queue [label="-"];
+        first_in_r_queue -> semget [label="+"];
+        semget -> semget [label="-"];
+    }
+    cluster_1 -> get_lock;
+    get_lock -> exit3 [label="-"];
+    get_lock -> cluster_2 [label="+"];
+    subgraph cluster_2 {
+        label = "for r in resources";
+        shift_r_queue
+    }
+    cluster_2 -> fork;
+}

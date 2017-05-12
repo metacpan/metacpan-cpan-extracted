@@ -1,0 +1,17 @@
+	$Id: README,v 1.1 1999/05/14 17:32:50 mpeppler Exp $
+from
+	@(#)README	1.1	8/7/95
+	
+Two Phase Commit:
+
+This version includes access to the 2PC calls. Usage is as follows:
+
+$dbh = Sybase::DBlib->open_commit([$user, $pwd, $server, $app_name]);
+$id = $dbh->start_xact($app_name, $xact_name, $site_count);
+$name_string = Sybase::DBlib->build_xact_string($xact_name,
+	       $service_name, $commid);
+
+$dbh->commit_xact($id);
+$dbh->close_commit;
+
+I have NOT TESTED THIS!!!

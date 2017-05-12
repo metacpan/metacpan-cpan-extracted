@@ -1,0 +1,27 @@
+self.pm provides $self and @args for your Perl OO modules, so you don't need to
+say:
+
+    my $self = shift;
+
+And this is no source filter.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+DEPENDENCIES
+
+None.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007, Kang-min Liu
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

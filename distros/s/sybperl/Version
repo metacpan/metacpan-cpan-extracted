@@ -1,0 +1,27 @@
+#!/usr/local/bin/perl
+#
+#	$Id: Version,v 1.1 1999/05/14 17:15:59 mpeppler Exp $
+#
+# Execute this script in the Sybperl source directory (after building
+# sybperl...) to find out the exact version that you have
+# This info is very usefull when submitting bugs, problems etc...
+
+require 5.002;
+
+use lib './blib/lib';
+use lib './blib/arch';
+
+
+if( -e "./blib/lib/Sybase/DBlib.pm") {
+    require Sybase::DBlib;
+    print $Sybase::DBlib::Version;
+} else {
+    print "Sybase::DBlib is not available.\n";
+}
+
+if( -e "./blib/lib/Sybase/CTlib.pm") {
+    require Sybase::CTlib;
+    print $Sybase::CTlib::Version;
+} else {
+    print "Sybase::CTlib is not available.\n";
+}

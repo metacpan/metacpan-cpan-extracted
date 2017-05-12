@@ -1,0 +1,17 @@
+README for setenc
+
+This module makes it possible to easily assign %ENV variables at compile
+time, which is usually most handy when debugging code.
+
+Version:
+ 0.04
+
+Required Modules:
+ (none)
+
+The build is standard:
+
+perl Makefile.PL
+make
+make test
+make install

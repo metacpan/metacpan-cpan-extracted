@@ -1,0 +1,69 @@
+=head1 NAME
+
+Math::Business::StockMonkey::FAQ - These are indeed frequent questions
+
+=head1 Your ModuleX is wrong, just look at SiteName!
+
+No it isn't.  Well, probably not.  Most of these technical analysis
+concepts are more ritual than science.  There are many different ways to
+calculate them and each site chooses a way that works best for their own
+database needs.
+
+Compare the Parabolic SAR between two sites (Yahoo!, Bigcharts,
+Stockcharts, Ameritrade, ...) and you're going to see surprisingly
+different results.  Nobody is wrong.  There's just more than one way to do
+it.
+
+The example, P-SAR, is particularly sensitive to starting data.  Depending
+on where you start, the SAR can look wildly different.  That's part of it's
+charm I suppose.
+
+But this phenomenon is not unique to the SAR.  You will find that many of
+these formula are subject to interpretation.  I am most interested in the
+formula as presented by the original Economist.   So you'll see Wells
+Wilder's RSI being calculated.  Although, Cutler had a variation, so that was
+also added...
+
+=head1 I like the Blather variation of PackgeX, it's better ...
+
+Great.  If you can cite an economist who described it, I'm perfectly  willing to
+add that variation as a stetting for the main package.  I'm less interested in
+informal tweaks, but if it'd be a simple option (like a coefficient or
+something), it's a doable thing.
+
+=head1 I'm trying to build an automatic trading system.  Are you interested in something like that?
+
+Not really.  I just want the bare bones functions to be on CPAN.  That is my
+only goal.  Personally, I use them only for things I<not> relating to the stock
+market.
+
+If you are interested in something that automates trading and evaluation of
+stocks, check out Genius Trader:
+
+L<http://www.geniustrader.org/>
+
+=head1 How can I help?
+
+Links and resources.  Really, these modules aren't hard to write... the main
+problem is figuring out where they came from and how they're meant to be
+calculated academically.
+
+Sometimes you have to sift through quite a few approximations intended for
+spreadsheet calculations rather than formally correct computations -- that is,
+if anything can be formally "correct" in technical analysis.
+
+Also, post resources, ideas, and comments to the official mailing list:
+
+L<http://groups.google.com/group/stockmonkey/>
+
+=head1 What is Stock Monkey?
+
+Every time I work on technical analysis I end up bumping into more and more tech
+fans.  In one iteration, I bumped into a group of guys that were trying to use
+genetic computer learning techniques to trade stocks.  The project was called
+stockmonkey (http://stockmonkey.net/) and was hosted on the webservers where I
+work.  As far as I know it's completely abandoned.  The domain name got bought
+up by someone else....
+
+But I resurrected the name.  They used the ::MACD package in their project.
+That's really the only relevance.

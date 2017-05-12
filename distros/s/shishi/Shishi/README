@@ -1,0 +1,149 @@
+NAME
+    Shishi - Perl wrapper for the "shishi" parsing library
+
+SYNOPSIS
+      use Shishi;
+
+      # Create a parser
+      my $parser = new Shishi("some name");
+
+      # Add a basic node
+      my $nodea = Shishi::Node->new("start");
+      $parser->add_node($nodea);
+
+      # Add a node with a simple rule:
+      # State C: match 'c' -> go to ACCEPT state
+      my $nodec = Shishi::Node->new("C")->add_decision(
+            new Shishi::Decision(target => 'c', type => 'char', action => 'finish')
+      );
+
+      # State B: match 'b' -> go to state C
+      my $nodeb = Shishi::Node->new("B")->add_decision(
+            new Shishi::Decision(target => 'b', type => 'char', action => 'continue',
+            next_node=>$nodec));
+
+      # From the first node: match 'a' -> go to state B
+      $parser->start_node->add_decision(
+         new Shishi::Decision(target => 'a', type => 'char', action => 'continue',
+                              next_node => $nodeb)
+      );
+
+      # Tell the parser that these states belong. (Helps with GC)
+      $parser->add_node($nodeb);
+      $parser->add_node($nodec);
+
+      # We now have a state machine which accepts 'abc':
+      ok(!$parser->execute(Shishi->new_match("ab")));
+      ok($parser->execute(Shishi->new_match("abc")));
+
+DESCRIPTION
+    The "shishi" library is a tool for creating state machines for parsing
+    text. Unlike most implementations of finite state automata, it doesn't
+    use a transition table, but more directly implements the structure of a
+    transition network diagram; that's to say, you have nodes which
+    represent states, and decisions which represent the arrows between
+    states. The reason for this rather curious design decision is to allow
+    you to modify the state machine while it's running, something you'll
+    want to do if you're dealing with user-modifiable grammars.
+
+    To do anything with shishi, you need a parser; parsers are labelled for
+    debugging purposes, so create one like this:
+
+        my $parser = new Shishi ("my parser");
+
+    Now your parser needs some states:
+
+        my $node = new Shishi::Node ("first") ;
+        $parser->add_node($node);
+
+        my $node2 = new Shishi::Node ("last") ;
+        $parser->add_node($node2);
+
+    And now you need to have some transitions between those states; these
+    are called "decisions".
+
+        $node->add_decision(
+            target => "abc", 
+            type => "text", 
+            action => "continue",
+            next_node => $node2
+        );
+
+    This moves from the "first" node to the "last" node if it sees the text
+    "abc". Actually, moving to an accept state is also a transition.
+
+        $node2->add_decision(
+            type => "end",
+            action => "finish"
+        );
+
+    This says that we should accept the string if this we're now at the end
+    of the string. Otherwise, we fail.
+
+    As you can see, a decision has both a matching rule ("if you match the
+    text abc", "if you match the end of the string") and an action ("then
+    move to node 2", "then accept the string"). Here are the possible match
+    types:
+
+  MATCH TYPES
+    "text"
+       Matches a string exactly. Pass the string in as "target".
+
+    "char"
+       Matches a single character; equivalent to "text" but more efficient
+       for single-character matching.
+
+    "token"
+       Equivalent to "char" currently; will be used to implement both
+       parsing (passing tokens instead of characters) and Unicode character
+       support (token values outside the range 0-255) in future versions.
+
+    "end"
+       Match only the end of the string. Equivalent to the "$" atom in
+       regular expressions.
+
+    "skip", "any"
+       Matches any character. Equivalent to . in regular expressions.
+
+       Hint
+          This is particularly useful for doing non-anchored matches.
+          Normally, shishi begins matching at the start of a string, as if
+          the "^" RE atom was a default. To "undo" this an allow
+          non-anchored matches, do this:
+
+              $foo->start_node->add_decision(
+               new Shishi::Decision(type => 'skip', next_node => $foo->start_node,
+               action => 'continue')
+              );
+
+    "true"
+       Always matches.
+
+    "code"
+       Executes the supplied comparison function. Pass a subroutine in as
+       "code".
+
+       The subroutine is called with the following parameters: the current
+       "Shishi::Decision" being executed; the text to be parsed; the
+       "Shishi" parser object; the "Shishi::Match" object.
+
+       You're currently not able to modify the text. This will be fixed.
+
+  ACTIONS
+    As for actions, you have the choice of:
+
+    "continue"
+       Transition to another node in the network, specified with
+       "next_node".
+
+    "finish"
+       Accept, return success.
+
+    "fail"
+       Abort the match completely.
+
+    Other actions, such as "shift" and "reduce", may appear in time.
+
+AUTHOR
+    Simon Cozens, "simon@cpan.org"
+

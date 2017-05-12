@@ -1,0 +1,8 @@
+MANIFEST
+Makefile.PL
+lib/Data/Sofu.pm
+lib/Data/Sofu/List.pm
+lib/Data/Sofu/Map.pm
+lib/Data/Sofu/Object.pm
+lib/Data/Sofu/Reference.pm
+lib/Data/Sofu/Value.pm

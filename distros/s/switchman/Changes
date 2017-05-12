@@ -1,0 +1,94 @@
+Revision history for Perl module App::Switchman
+
+1.16 2016-10-26
+    * fixed fqdn determination on ipv6-only hosts
+
+1.15 2016-05-28
+    * https://github.com/komarov/switchman/pull/10 zk_connect as a public method
+
+1.14 2015-09-27
+    * rt.cpan.org #107318: removed File::Slurp dependency
+
+1.13 2015-09-27
+    * fixed failing mock tests
+
+1.12 2015-09-10
+    * changed handling of ALARM - use unsafe signals
+    * improved debug logging
+    * switchman leaves queues before locking
+    * wait_in_queue optimization - watch not for the head of queue, but for the neighbour
+
+1.11 2015-07-01
+    * fix typo in dependencies
+
+1.10 2015-06-22
+    + data_read_len config option
+    * increased default data_read_len from 1Kb to 64Kb
+    * using human-readable version of the error codes
+    * handle Net::ZooKeeper::new initialization fails
+    * fixed possible endless loop during wait in queue
+    * load_prefix_data validates json data and stores decoded result
+    + resources_wait_timeout config option
+
+1.09 2015-06-15
+    + --no-lock option
+
+1.08 2015-03-24
+    + termination_timeout config option
+
+1.07 2014-12-08
+    * specify minimal good version of Net::ZooKeeper in dependencies
+
+1.06 2014-11-24
+    * fixed bug in wait_in_queue for the case when the node was removed during processing
+
+1.05 2013-10-07
+    * increased reconnect tries
+
+1.04 2013-09-25
+    * fixed prepare_zknodes
+
+1.03 2013-09-23
+    * improved error handling
+    * optimistic reconnect
+
+1.02 2013-09-11
+    * implemented nested groups support
+    * removed load_prefix_data from BUILD
+    * reformatted Changes (thanks to Neil Bowers)
+
+1.01 2013-09-09
+    * lockname with '/' is explicitly forbidden
+    * simplified signal handling
+
+1.00 2013-07-15
+    + resource leasing support
+    * OO-interface for App::Switchman
+    * default config at /etc/switchman.conf
+    * group option is no longer required
+
+0.08 2013-02-13
+    + scripts for monitoring
+
+0.07 2013-02-12
+    * improved logging
+
+0.06 2013-02-08
+    + logfile and loglevel in config
+    * Log::Dispatch dependency
+
+0.05 2012-11-19
+    * cache fqdn() result
+
+0.04 2012-11-15
+    * improved cmd arguments handling
+
+0.03 2012-11-15
+    + App::Switchman
+
+0.02 2012-11-05
+    + store hostname and pid in lock znode
+
+0.01 2012-10-24
+    initial release
+

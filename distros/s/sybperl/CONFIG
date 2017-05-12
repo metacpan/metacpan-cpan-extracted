@@ -1,0 +1,70 @@
+#
+# Configuration file for Sybperl
+#
+# DBlibrary version. Set to 1000 (or higher) if you have System 10
+# Set to 0 if you do not want to build DBlib or if DBlib is not available.
+DBLIBVS=1000
+
+
+# CTlib version. Set to 0 if Client Library is not available on your
+# system, or if you don't want to build the CTlib module. The Client
+# Library started shipping with System 10.
+# Set to 100 if you have OpenClient 10.x or later.
+CTLIBVS=100
+
+# Where is the Sybase directory on your system (include files &
+# libraries are expected to be found at SYBASE/include & SYBASE/lib
+SYBASE=/opt/sybase
+
+# If EMBED_SYBASE is TRUE (1), then we add BEGIN { $ENV{SYBASE} = $SYBASE}
+# at the top of both Sybase::DBlib and Sybase::CTlib. This ensures that
+# the correct value for the SYBASE environment variable is always set.
+# The downside is that if you install a new version of Sybase (OpenClient
+# in particular) in a different location (say /opt/sybase/11.9.2 instead of
+# /opt/sybase/11.5.1) then you need to rebuild sybperl with the new value - 
+# setting the SYBASE environment variable will have no effect.
+EMBED_SYBASE = 0
+
+# If EMBED_SYBASE is set, then if EMBED_SYBASE_USE_HOME is also set
+# then, if the SYBASE env. variable is not set at run-time we look
+# for the "sybase" user's home directory first, and then for the 
+# build-time Sybase directory.
+EMBED_SYBASE_USE_HOME = 0
+
+# Additional libraries.
+# Some systems require -lnsl or -lBSD.
+# Solaris 2.x needs -ltli
+# DEC OSF/1 needs -ldnet_stub and may need -lsdna
+#   (Note: Under Dec 3.2 you need to *remove* -lsdna from the DBlib/Makefile
+#    for things to work. *sigh*)
+# SunOS 4.x needs -linsck
+# HP-UX 10.x needs -linsck
+# AIX 3.2.5 needs -linsck
+# Linux needs -linsck
+# See the Sybase OpenClient Supplement for your OS/Hardware
+# combination.
+EXTRA_LIBS=-linsck
+
+# Library directory. Under Windows/NT, if you are using the Borland
+# compilers, then uncomment the line below:
+# BORLAND_LIBS=blib
+
+# Additional #defines.
+# With Perl 5.001m, you will need -DUNDEF_BUG.
+# With Perl 5.002, none are normally needed, but you may wish to
+# use -DDO_TIE to get the benefit of stricter checking on the
+# Sybase::DBlib and Sybase::CTlib attributes.
+# Use -DNCR_BUG if you are on NCR 3.0 and OpenClient 10.0.x
+# Add -DMSSQL if you want to use the Sybase::DBlib portion of sybperl
+# to connect to an MS-SQL 7 server.
+# Add -DTDS_DBOPEN_HACK if you are building with the FreeTDS libraries, and
+# you have configured freetds with --enable-dbm-conflict-fix.
+# Add -DNOBLK if you don't have the libblk.a library available (e.g. FreeTDS)
+EXTRA_DEFS=-DDO_TIE
+
+
+# LINKTYPE
+# If you wish to link Sybase::DBlib and/or Sybase::CTlib statically
+# into perl uncomment the line below and run the make normally. Then,
+# when you run 'make test' a new perl binary will be built.
+#LINKTYPE=static

@@ -1,0 +1,258 @@
+#!/usr/bin/env perl
+package stasis;
+package main;
+use autodie;
+use strict;
+use warnings;
+use Time::Piece;
+use Time::Seconds;
+use Getopt::Long 'GetOptions';
+use Pod::Usage 'pod2usage';
+
+our $VERSION = 0.05;
+
+my $start_time = localtime;
+
+GetOptions(
+  'destination=s' => \ my $destination,
+  'files=s'       => \ my $file_list,
+  'ignore=s'      => \ my $ignore,
+  'days=i'        => \ (my $days = 0),
+  'limit=i'       => \ my $limit,
+  'passphrase=s'  => \ my $passphrase,
+  'passfile=s'    => \ my $passfile,
+  'referrer=s'    => \ my $referrer,
+  'temp=s'        => \(my $tmp = '/tmp'),
+  'verbose'       => \ my $verbose,
+  'help|?'        =>   sub { pod2usage(1) },
+);
+
+die pod2usage() unless $destination
+  && $file_list
+  && ($passphrase || $passfile || $referrer);
+
+# validate mandatory args
+die "--temp $tmp does not exist\n" unless -e $tmp;
+die "--destination $destination does not exist\n" unless -e $destination;
+die "--files $file_list does not exist\n" unless -e $file_list;
+die "--passfile $passfile does not exist\n" if $passfile && ! -e $passfile;
+
+# check if a backup already exists within x days
+unless (need_backup())
+{
+  print "A backup already exists within $days\n";
+  exit 0;
+}
+
+my $archive_name = gen_archive_name();
+my $tmp_destination = join('/', $tmp, $archive_name);
+my $final_destination = join('/', $destination, $archive_name);
+
+# read file list
+print "\nStasis backup started on $start_time\nReading $file_list\n";
+open my $files, '<', $file_list or die $!;
+my @files;
+while (<$files>)
+{
+  chomp;
+  push @files, $_;
+}
+printf "Found %s files/directories to archive\n", scalar @files;
+
+# compress
+my $rv = compress($tmp_destination, \@files, $ignore, $verbose);
+die "Failed to compress files to $tmp_destination $?\n" unless $rv == 0;
+
+# encrypt
+$rv = encrypt($tmp_destination, $passphrase, $referrer, $passfile, $final_destination);
+die "Failed to encrypt $tmp_destination $?\n" unless $rv == 0;
+
+# clean
+$rv = clean($tmp_destination, $destination, $limit, $verbose);
+die "Failed to clean $tmp_destination $?\n" unless $rv;
+
+my $end_time = localtime;
+
+printf "Archiving complete, runtime: %u secs\n", $end_time - $start_time;
+
+sub compress
+{
+  my ($destination, $files, $ignore, $verbose) = @_;
+  my $args = $verbose ? 'cvzf' : 'czf';
+  my $ignore_text = $ignore ? "-X $ignore" : "";
+  my $file_list = join(' ', @$files);
+
+  print "Compressing files:\n";
+  system("tar $args $destination $ignore_text $file_list");
+}
+
+sub gen_archive_name
+{
+  my $dt = localtime;
+  return 'stasis-' . $dt->datetime . '.tar.gz.gpg';
+}
+
+sub encrypt
+{
+  my ($source, $passphrase, $referrer, $passfile, $final_destination) = @_;
+  print "Encrypting archive\n";
+
+  if ($passphrase || $passfile)
+  {
+    my $pass_arg = $passphrase
+      ? "--passphrase $passphrase"
+      : "--passphrase-file $passfile";
+
+    system("gpg --no-tty -c -o $final_destination --cipher-algo AES256 $pass_arg $source");
+  }
+  else
+  {
+    system("gpg --no-tty -e -o $final_destination -R $referrer $source");
+  }
+}
+
+sub clean
+{
+  my ($tmp_file, $destination, $limit, $verbose) = @_;
+
+  print "Cleaning files\n";
+
+  if (defined $limit)
+  {
+    # always keep the latest backup
+    $limit = 1 if $limit == 0;
+
+    print "Cleaning backups, limit $limit\n" if $verbose;
+    my @backups = ();
+    opendir(my $dir, $destination);
+
+    while (readdir $dir)
+    {
+      push @backups, "$destination/$_"
+        if /^stasis-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d\.tar\.gz\.gpg$/;
+    }
+    my @sorted_backups = sort { $b cmp $a } @backups;
+    my @keep_me = splice(@sorted_backups, 0, $limit);
+
+    # delete remaining backups
+    print "Deleting @sorted_backups\n" if $verbose && @sorted_backups;
+    unlink @sorted_backups;
+  }
+  unlink $tmp_file;
+}
+
+sub need_backup
+{
+  my $backup_horizon = $start_time - ONE_DAY * $days;
+  opendir(my $dir, $destination);
+  while (readdir $dir)
+  {
+    next unless /^stasis-.+?\.gpg$/;
+    my @stat = stat "$destination/$_";
+    return 0 if $stat[10] > $backup_horizon->epoch;
+  }
+  return 1;
+}
+1;
+__END__
+=head1 NAME
+
+stasis - an encrypting archive tool using tar, gpg and perl
+
+=head1 SYNOPSIS
+
+  stasis [options]
+
+  Options:
+
+      --destination -de destination directory to save the encrypted archive to
+      --days        -da only create an archive if one doesn't exist within this many days (optional)
+      --files       -f  filepath to a text file of filepaths to backup
+      --ignore      -i  filepath to a text file of glob patterns to ignore (optional)
+      --limit       -l  limit number of stasis backups to keep in destination directory (optional)
+      --passphrase      passphrase to use
+      --passfile        filepath to a textfile containing the password to use
+      --referrer    -r  name of the gpg key to use (instead of a passphrase or passfile)
+      --temp        -t  temp directory path, uses /tmp by default
+      --verbose     -v  verbose, print progress statements (optional)
+      --help        -h  print this documentation (optional)
+
+=head1 OPTIONS
+
+=head2 Examples
+
+Save all the files listed in C<files_to_backup.txt> (one per line) to Dropbox:
+
+  $ stasis --destination ~/Dropbox --files files_to_backup.txt --passphrase mysecretkey
+  $ stasis -de ~/Dropbox -f files_to_backup.txt --passphrase mysecretkey
+
+Use passfile instead of passphrase
+
+  $ stasis -de ~/Dropbox -f files_to_backup.txt --passfile /path/to/passfile
+
+Use referrer GPG key to encrypt
+
+  $ stasis -de ~/Dropbox -f files_to_backup.txt -r keyname@example.com
+
+Ignore the files matching patterns in C<.stasisignore>
+
+  $ stasis -de ~/Dropbox -f files_to_backup.txt -r keyname@example.com -i .stasisignore
+
+Verbose mode
+
+  $ stasis -de ~/Dropbox -f files_to_backup.txt -r mygpgkey@email.com -v
+
+Only keep the last 4 backups
+
+  $ stasis -de ~/Dropbox -f files_to_backup.txt --passphrase mysecretkey -l 4
+
+Only make weekly backups
+
+  $ stasis -de ~/Dropbox -f files_to_backup.txt --passphrase mysecretkey --days 7
+
+=head1 REQUIREMENTS/DEPENDENCIES
+
+=over 4
+
+=item * GnuPG
+
+=item * GNU tar
+
+=item * Perl
+
+=back
+
+C<stasis> has been tested on Linux with GNU tar v 1.28, GnuPG v1.4.19 and Perl 5.20.2. It should work on many earlier versions too.
+
+=head1 BUGS/LIMITATIONS
+
+If C<--files> contains the temp or destination location in it, C<tar> will create an infinite loop.
+
+When a passphrase or file is provided, symmetric GPG encryption is done using AES256 cipher algorithm. At the time of development
+this is considered secure, but only as strong as the passphrase used to encrypt the data.
+
+=head1 INSTALLATION
+
+  $ cpan Stasis
+
+Or
+
+  $ git clone https://github.com/dnmfarrell/Stasis
+  $ cd Stasis
+  $ perl Makefile.PL
+  $ make
+  $ make install
+
+=head1 REPOSITORY
+
+L<https://github.com/dnmfarrell/Stasis>
+
+=head1 AUTHOR
+
+David Farrell E<copy> 2015
+
+=head1 LICENSE
+
+FreeBSD (2 clause BSD license)
+
+=cut

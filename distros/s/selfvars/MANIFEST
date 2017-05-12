@@ -1,0 +1,33 @@
+Changes
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Include.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+inc/parent.pm
+inc/PerlIO.pm
+inc/Test/Builder.pm
+inc/Test/Builder/Module.pm
+inc/Test/More.pm
+lib/selfvars.pm
+lib/selfvars/autoload.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+SIGNATURE			Public-key signature (added by MakeMaker)
+t/00.load.t
+t/02.eval.t
+t/03.interpolation.t
+t/0hopts.t
+t/0simple.t
+t/lib/Counter.pm
+t/lib/EvalTest.pm
+t/lib/HOpts.pm
+t/lib/InterpolationTest.pm
+t/pod-coverage.t
+t/pod.t

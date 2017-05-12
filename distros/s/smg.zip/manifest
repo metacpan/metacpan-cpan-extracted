@@ -1,0 +1,6 @@
+CHANGES
+Makefile.PL
+MANIFEST
+smg.pm
+smg.h
+smg.xs

@@ -1,0 +1,80 @@
+{
+   "abstract" : "Automated Perl building and installation for CPAN Testers",
+   "author" : [
+      "Chris Williams <chris@bingosnet.co.uk>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.013, CPAN::Meta::Converter version 2.133380",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "smokebrew",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Archive::Extract" : "0.40",
+            "CPAN::Perl::Releases" : "0.02",
+            "Config::INI::Reader" : "0.014",
+            "Devel::PatchPerl" : "0.24",
+            "File::Fetch" : "0.24",
+            "File::Path" : "2.08",
+            "File::Spec" : "3.31",
+            "File::pushd" : "1.00",
+            "IPC::Cmd" : "0.58",
+            "List::MoreUtils" : "0.22",
+            "Log::Message::Simple" : "0.06",
+            "Module::CoreList" : "2.49",
+            "Module::Load::Conditional" : "0.38",
+            "Module::Pluggable" : "3.9",
+            "Moose" : "1.03",
+            "Moose::Role" : "1.03",
+            "Moose::Util::TypeConstraints" : "1.03",
+            "MooseX::ConfigFromFile" : "0.02",
+            "MooseX::Getopt" : "0.27",
+            "MooseX::Types::Email" : "0.003",
+            "MooseX::Types::Moose" : "0.21",
+            "MooseX::Types::Path::Class" : "0.05",
+            "MooseX::Types::URI" : "0.03",
+            "Parse::CPAN::Meta" : "1.40",
+            "Perl::Version" : "1.009",
+            "URI" : "1.54",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "3.31",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/bingos/smokebrew",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/bingos/smokebrew.git",
+         "web" : "https://github.com/bingos/smokebrew"
+      }
+   },
+   "version" : "0.48"
+}
+

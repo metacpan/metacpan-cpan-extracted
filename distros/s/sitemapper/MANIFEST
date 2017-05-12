@@ -1,0 +1,12 @@
+lib/WWW/Sitemap.pm
+lib/LWP/AuthenAgent.pm
+Changes
+MANIFEST
+Makefile.PL
+README
+sitemapper.pl
+test.pl
+examples/example.html
+examples/example.js.html
+examples/example.txt
+examples/example.xml

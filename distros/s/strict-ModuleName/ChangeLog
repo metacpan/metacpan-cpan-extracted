@@ -1,0 +1,12 @@
+Revision history for Perl extension strict::ModuleName
+                                        Time-stamp: "2003-07-20 06:34:07 ADT"
+
+2003-07-20  Sean M. Burke  sburke@cpan.org
+
+	* Release 0.04 -- minor doc changes.  No code changes.
+
+
+2002-02-07  Sean M. Burke  sburke@cpan.org
+
+	* Release 0.03 -- first release
+

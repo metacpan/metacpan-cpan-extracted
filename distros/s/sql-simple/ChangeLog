@@ -1,0 +1,11 @@
+0.01 (initial version)
+0.02 (Rewrite of join syntax, cleaned up documentation)
+0.03 (modified documentation, cleaned up minor non-fatal syntax)
+0.04 (added between, fixed query execution logic, adjusted documentation for logical operators)
+0.05 (insert now allows function calls as values, generic cleanup)
+0.06 (error in sort, resulted in failing tests, and an error in clause
+routine)
+0.07 (Altered scalar reference behavior.  Added OO interface.  Added stored
+procedure interface.  Added "asArray" so you can get results as array of
+arrays.  Added "allowNull" to the "op structure" providing an inline "or
+clause", see example in pod.)

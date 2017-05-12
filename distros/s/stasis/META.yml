@@ -1,0 +1,33 @@
+---
+abstract: 'an encrypting archive tool using tar, gpg and perl'
+author:
+  - 'David Farrell'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: stasis
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+ stasis:
+   file: stasis
+   version: 0.05
+requires:
+  Getopt::Long: '0'
+  Pod::Usage: '0'
+  Time::Piece: '0'
+  Time::Seconds: '0'
+  autodie: '0'
+resources:
+  repository: https://github.com/dnmfarrell/Stasis.git
+version: 0.05
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

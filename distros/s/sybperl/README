@@ -1,0 +1,459 @@
+	$Id: README,v 1.6 2003/12/25 18:47:10 mpeppler Exp $
+
+			   sybperl 2.0
+	
+	  This is sybperl, the Sybase extensions for Perl5.
+
+	      Copyright (c) 1991-2001,  Michael Peppler
+			 All rights reserved.
+			 
+  This program is free software; you can redistribute it and/or modify
+  it under the same terms as Perl itself.
+
+  You should have received a copy of the Perl license along with Perl;
+  see the file README in Perl distribution.
+ 
+  You should have received a copy of the GNU General Public License
+  along with Perl; see the file Copying.  If not, write to the Free
+  Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+
+  You should have received a copy of the Artistic License along with
+  Perl; see the file Artistic.
+
+---------------------------------------------------------------------
+
+** NOTE: This version requires Perl 5.002 or later **
+
+
+Please read the UPGRADE file if your previous version of sybperl was
+1.0xx.
+
+Please read the CHANGES file if you are upgrading from a previous
+version of sybperl 2.x.
+
+Please see the README.win32 file if you are trying to build sybperl
+on a Windows 95/NT system.
+
+Perl 5.005 and later can be built with threading enabled. Please read
+README.thread before attempting to use Thread with any Sybase modules.
+
+There are four modules in this distribution: Sybase::DBlib,
+Sybase::BCP, Sybase::Sybperl and Sybase::CTlib.
+
+Sybase::DBlib implements the Perl 5 version of the DB-Library
+API. This differs slightly from the Perl 4 version. Note that this is
+not a full implementation of the DB-Library API.
+Sybase::BCP is a simplified bulk copy API, and requires Sybase::DBlib.
+The Sybase::Sybperl module implements the sybperl 1.0xx API, and is
+built on top of Sybase::DBlib. Use of Sybase::Sybperl is discouraged.
+
+Sybase::CTlib implements a subset of the newer Client Library API.
+Client Ligrary is included with Sybase's OpenClient libraries as of 
+System 10.
+
+---------------------------------------------------------------------
+
+Recent Changes:
+
+2.16    Various bug fixes
+
+        Added DBSETLENCRYPT() to Sybase::DBlib.
+	Added DBDEAD() to Sybase::Sybperl.
+
+	Bug Fixes
+	494   Do not try to use the ocs.cfg file if it exists.
+        499   Change MAXNAME to DBMAXNAME in the DBlib source.
+        500   $date->info return invalid data.
+        511   Change login to syb_login in DBlib.xs (work-around for FreeBSD).
+	516   Money/Numeric values lose precision when not using 
+              UseMoney/UseNumeric.
+	518   looking for non-existent library file (solaris 2.8/ASE 12.5.0.3
+	      perl 5.8)
+	498   Problem compiling sybperl under HP-UX 64-bit mode.
+	488   Sybase::CTlib and DBD::Sybase end up using the same error 
+	      handler
+	470   BLK.pm does not handle empty columns as NULL, and does not 
+              have retry logic of BCP.pm
+	410   BCP.pm has regex bug.
+	379   Sybase::BCP::config() does not correctly handle incremental 
+              changes
+
+2.15    Various bug fixes
+
+        Support for 64bit OpenClient on platforms that support this
+        (Thanks to Pamela Schulz for her help with this)
+        Added CTlib/t/xblk.t and CTlib/t/prepare.t test scripts.
+	CS_BLK_CANCEL was not exported.
+	For building with FreeTDS you can now add -DNOBLK to the 
+	EXTRA_DEFS line in CONFIG.
+
+	Bug Fixes
+	468   Makefile.PL has syntax error when used with perl 5.8.x
+	460   Idem.
+	439   Makefile.PL fails for very old Sybase installation (i.e.
+              installation with no CT-Library)
+	423   Fix Makefile.PL for Win32 builds.
+	422   t/bcp.t fails against 11.0.3.3 linux servers.
+
+
+2.14	And more (minor) bug fixes
+
+	config.pl's getExtraLibs() now tries to determine the Client
+	Library version to avoid linking with -linsck or -ltli for
+	OC 11 or later (as the correct library is loaded dynamically 
+	based on the values defined in $SYBASE/config/libtcl.cfg)
+        Added support for CS_HAFAILOVER connect option (thanks to 
+	Ranko Popovic)
+        Added CTlib version of nsql().
+	Documentation patches from Geoffrey Rommel.
+	Fixed memory leak when using UseDateTime/UseMoney/UseNumeric.
+	Add Async calls for CTlib (ct_poll(), etc).
+	Add CS_DATA_LCHAR connection capability.
+        Add ct_dyn_prepare() and ct_dyn_execute() to handle "dynamic SQL"
+	- thanks to Masatsuyo Takahas for the patch.
+	Add experimental blk_*() calls.
+	Ask for the PWD entries during the perl Makefile.PL phase.
+	Add Sybase::BLK module (based on Sybase::BCP) (*many* thanks to
+        Scott Zetlan for this!)
+	
+	Bug Fixes
+	309   Sybase::BCP fails test if server is set to use 
+	      datarows locking by default.
+
+---------------------------------------------------------------------
+
+Installation:
+
+Before you start, you have to consider the following issues:
+
+a) Is Perl 5.002 (or later) already installed at your site?
+   (For Win32 you *must* have perl 5.004 or later)
+
+   Note: perl 5.004_04 (or later) is highly recommended.
+
+   If Perl 5.002 (or later) is the default production version of Perl
+   at your site, then I recommend that you unpack the sybperl
+   distribution outside of the Perl source tree. The sybperl build
+   process will normally be able to find the pieces it needs if this
+   is the case, and it will be easier for you to manage upgrades to
+   Perl and/or to the add-on extensions that you may have if they are
+   kept separate.
+
+   If 5.002 (or later) is not yet the default version of Perl, or has
+   not been made available via an alternate path, then you should
+   unpack the sybperl distribution in the ext/ directory of the Perl
+   5.002 source tree. NOTE: this method is not well tested, and you
+   may run into problems (unfortunately).
+
+b) Do you want the Sybase modules to be dynamically loadable?
+
+   Most Unix systems come with the capability of loading object code
+   into an already executing program dynamically, usually via some
+   sort of special library (on SunOS, for example, it's libdl.so.1.0).
+
+   The advantage of dynamic loading is that you do not need to install
+   a new Perl binary to provide new functionality, and the size of the
+   binary does not grow as you add this functionality. The cost is a
+   small performance penalty on startup.
+
+   Static loading might be more advantageous to those specific modules
+   which you know you will be using very often (however, I've always
+   used dynamic loading myself - with more than adequate results).
+
+   Note that if you are using HP-UX, you can only use dynamic loading
+   if you have the add-on (extra cost) C compiler (or GNU gcc) and if
+   you have the System 10 (or later)  shared libraries (libsybdb.sl vs 
+   libsybdb.a) as HP-UX can't load an object dynamically which has not 
+   been compiled with the PIC (position independant code) flag. 
+
+c) The DO_TIE compile option
+
+   The Sybase::DBlib and Sybase::CTlib modules define a number of
+   attributes that are accesible via the database handle:
+
+       $dbh = new Sybase::CTlib $user, $passwd...
+       $dbh->{UseDateTime} = CS_TRUE;
+
+   When the DO_TIE compile option is set, these attributes get 'tied'
+   into a special package, thus enabling syntax verification, so that
+   errors like
+
+       $dbh->{UseDateTIme}
+
+   will be caught.
+
+   The downside is that you won't be able to add your own attributes
+   to the $dbh on the fly. You must pre-declare any additional
+   attributes you wish to use by passing them as a hash reference in
+   the new()/dblogin()/ct_connect() calls (see the documentation and
+   the Sybase::BCP module for examples). The DO_TIE option is set via
+   the EXTRA_DEFINES option of the CONFIG file, and is enabled by
+   default.
+   
+d) The -L/usr/local/lib switch and libtcl.{a, so, sl}
+
+   Perl's Configure script adds this switch to the normal link or load
+   line used when building extensions. This is fine, but if you have
+   installed tcl/tk at your site, there is a strong chance that tcl's
+   libtcl.a library has been placed in /usr/local/lib. Sybase's Client
+   Library also includes a library called libtcl.{a,so,sl}. If the
+   -L/usr/local/lib switch is present on the link command line then
+   the wrong version of libtcl will be used, and the Sybase::CTlib
+   module will not work. The solution is to either move or rename
+   tcl/tk's libtcl.a while you build sybperl, or to remove the
+   -L/usr/local/lib flag from Perl's Config.pm file.
+
+e) The LD_LIBRARY_PATH variable and libintl.so
+
+   On Solaris 2.x (and possibly other OSes as well) there is a library
+   in /usr/lib called libintl.so.*, the same name as one of Sybase's
+   ClientLibrary libs. If the LD_LIBRARY_PATH variable includes
+   /usr/lib (or /lib) *before* $SYBASE/lib then the wrong library will
+   be found at run-time, causing 'make test' to fail. The solution is
+   to remove /usr/lib from LD_LIBRARY_PATH (there should be no reason
+   to include it as the system directories [/usr/lib and /lib] are
+   automatically searched for shared libraries when a program starts.)
+
+f) If you are using Win32 (Win NT) please read the README.win32
+   file before proceeding.
+
+g) There is a symbol conflict between Berkeley DB (-ldb) and
+   DB-Library (-lsybdb): both define the dbopen() function. Perl's
+   Configure will include -ldb in the link line of the perl binary if
+   it finds it on the system. This causes Sybase::DBlib to fail.
+
+   This can be resolved by rebuilding perl and excluding -ldb from the 
+   libraries that are included. You can run 
+
+	     perl -V:libs
+
+   to see if -ldb is included in the link line.
+
+   Linux and DEC Unix 4.0 are known to include Berkeley DB by default, 
+   so a normal perl build on those systems will be affected with this
+   problem. 
+
+h) Linux -lndbm and -lgbdm issues.
+
+   In addition to the discussion on -ldb above, it seems that linux's
+   libndbm.a and libgdbm.a libraries also cause problems with
+   DB-Library. I have not identified the exact problem yet, but
+   rebuilding perl without -lndbm and -lgdbm in the extra libraries
+   line (and of course without -ldb) seems to solve the problem.
+
+   Note that recent versions of linux (at least from Red Hat 6.2 onwards)
+   don't seem to have any problem at all. The perl binary that is shipped
+   with these systems can be used directly.
+
+i) Sybase 12.0 or later.
+
+   If you have Sybase 12.0 installed then the build process uses the
+   SYBASE_OCS environment variable to locate the OpenClient files
+   below the directory defined by $SYBASE. The script tests for the
+   existence of the SYBASE_OCS environment variable, and uses it if
+   it exists.
+
+j) 32-bit vs. 64-bit mode
+
+   As of version 12.5 Sybase started shipping 64 bit versions of the
+   OpenClient libraries. If you wish to use these 64 bit libraries
+   you need to have a perl binary that is also built in 64 bit mode.
+   This can be verified via "perl -V" and looking for the "use64bitall"
+   configuration variable. If this is "defined" then you have a 64 bit 
+   binary. The build process detects the use of a 64 bit binary and
+   will attempt to use the appropriate 64 bit Sybase libraries in that
+   case.
+
+k) Threading
+
+   As of perl 5.005 you can build a threaded version of perl. Sybase
+   provides thread-safe libraries on most platforms. These are identified
+   by the _r suffix (i.e. libct_r.so vs. libct.so). If threading is
+   enabled in your perl binary the build will attempt to use the 
+   thread-safe libraries if they exist. See also README.thread in this
+   directory.
+
+   
+Once you have answered these eight questions, you can proceed:
+
+   1) Unpack the package.
+      See comments under a) above.
+      
+      Note that even if you don't want to install Perl 5.002 as a
+      production version right now, you can still install it in some
+      other place, and access that version by setting your PATH
+      variable accordingly (I have a production version Perl5.002
+      under /usr/local/{bin,lib} and a debug version of Perl5.002
+      under /f2/{bin, lib} and change my path when I need to test
+      things with debugging turned on).
+      
+   2) Edit CONFIG
+
+      NOTE: In general, if the SYBASE environment variable (and
+      the SYBASE_OCS for Sybase 12.0 and later) is set correctly then
+      no changes to CONFIG should be needed. The build process will
+      attempt to determine all the necessary information from the 
+      environment.
+      However, if the build fails then you may need to make 
+      changes to this file as described below.
+
+      See comments under b) above regarding dynamic vs static loading.
+      Some systems require extra libraries to build (Solaris 2.x
+      requires -lnsl, for example). You should check your Sybase
+      OpenClient Supplement for your OS and add any special libraries
+      to the EXTRA_LIBS line. The required information can be found on
+      the web at http://sybooks.sybase.com/ (you'll need to need to
+      dig around a bit - look for "Open Client/Server xx.x.x
+      Platforms"), or via AnswerBase. 
+
+      The DBLIBVS and CTLIBVS variables need to be set correctly for
+      the version of OpenClient that is available at your site. Below
+      is a table which lists which versions of Open Client were
+      shipped with the different Sybase Server releases:
+
+      Sybase version		   DBLIBVS   CTLIBVS
+      - 4.0			       400	   0
+      - 4.2 (includes MSSQL 4.2)       420         0
+      - 4.8, 4.9.x                     461         0
+      - 10.0.x                        1000       100
+      - 11.x			      1000	 100
+      - 12.x			      1000	 100
+
+      You can check for the DB-Library version by looking at the top
+      of the sybdb.h include file (it should be located in
+      $SYBASE/include/sybdb.h, where $SYBASE is your Sybase
+      installation directory.)
+
+      Determine if you need any additional #define's for the
+      EXTRA_DEFS line: With Perl 5.001m you needed -DUNDEF_BUG, but
+      this bug has been corrected in 5.002, and you can also add
+      -DDO_TIE to get the stricter attribute checking behavior (see
+      point c. above).
+
+      Uncomment the LINKTYPE line if required (see point b. above).
+
+   3) Type: perl Makefile.PL
+      
+   4) Type: make
+
+      If you get errors (such as undefined variables) it may be
+      because your DBLIBVS or CTLIBVS does not correspond to the Open
+      Client versions that are in fact installed at your site. Check
+      them again. In the case of the Sybase::DBlib module, it doesn't
+      hurt to build with DBLIBVS set to 400 as this is pretty well
+      guaranteed to work (provided you have *some* version of
+      DB-Library!)
+
+   6) Edit PWD
+
+      NOTE: This step is not normally necessary as the build process
+      now asks for this information up front.
+
+      Enter the user id and password that you want to use to run the
+      tests. It's probably a good idea to reset this file to its
+      original state once you're done, unless you really don't have
+      any security concerns!
+
+      Make sure that the SYBASE environment variable is set
+      correctly. You can test this by trying to connect to the server
+      using isql from the same shell.
+
+      The tests are non-destructive (ie only SELECT statements),
+      except for Sybase::BCP which creates a temp table (#bcp) to test
+      the bulk copy features.
+      
+   7) Type: make test
+      If you decided to use static loading then a new perl binary will
+      be generated at this point.
+
+      If you get undefined symbols when testing CTlib (such as _net_*
+      or _intl_getenv not defined), then I'd bet that you have either
+      a libtcl.* in /usr/local/lib, or you have LD_LIBRARY_PATH that
+      includes /usr/lib on Solaris 2.x (which has its own libintl.so
+      just to confuse the issue!).  See points d) and e) above.
+
+      If you get an error message similar to 
+	     "ERROR: Undefined symbol: bsd_tcp"
+      then you are on a system that requires the -linsck library (this 
+      is a Sybase library). Linux, SunOS 4.x, HP-UX and AIX all
+      require this library.
+      Edit the CONFIG file and add -linsck to the EXTRA_LIBS line, and
+      go back to step 3. 
+
+      If you are using perl 5.003 or earlier you will get an error
+      in the dbmoney.t script. This is due to a change in the
+      behaviour of the AutoLoader between perl 5.003 and perl 5.004.
+      The solution is to upgrade to 5.004 (or later), or edit
+      Sybperl/Sybperl.pm and move the __END__ tag to the very end
+      of the file.
+      
+   8) If everything went OK, type: make install
+      This operation probably requires "root" priviledges as this
+      installs the sybperl modules into the perl library tree.
+      Note that the man page does not get installed automatically. To
+      install the documentation, cd to the pod directory, and read the
+      README file there.
+      Also note that even if you've asked for static linking and a
+      perl binary has been built in the sybperl source directory, no
+      perl binary gets installed (see step 9).
+
+   9) If the LINKTYPE is static type:
+
+	 make -f Makefile.aperl inst_perl MAP_TARGET=perl
+
+      to install the new Perl binary. This step is not required when
+      using dynamic linking as the existing Perl binary will load the
+      new code dynamically when required.
+
+  10) Read the manual :-)
+
+      Look for it in the pod/ directory. You can create .man or .html
+      versions from the .pod file by using pod2man or pod2html, both
+      of which come with Perl.
+      The manual may not be perfect yet, but it comes to 16 PostScript
+      pages here, which is "respectable", I guess.
+
+
+In case of problems:
+====================
+
+First, read the FAQ file in the sybperl distribution.
+
+Second, fire off an e-mail to me (mpeppler@peppler.org) or to the Sybperl
+mailing list (sybperl-l@peppler.org) with a *full* description of
+what doesn't work, including version numbers of Perl and sybperl, the
+hardware and OS version, and the Sybase Open Client version you are
+using.
+
+The regression tests don't attempt to test *everything*, but they do
+test all of the basic functions, and should work cleanly.
+
+There are quite a few small example scripts in eg/ which illustrate
+the use of both the DBlib and CTlib modules.
+
+There is a mailing list for discussing sybperl related questions
+(sybperl-l@peppler.org). Send a message to
+sybperl-l-request@peppler.org with 'subscribe' in the body of the message
+to subscribe to the list.
+
+
+
+Reporting Bugs:
+===============
+
+I have set up a (simple) bug tracking database, which can be accessed
+on line at http://www.peppler.org/cgi-bin/bug.cgi. You can submit bugs 
+directly, or send me email using the SPR file in this directory.
+
+When submitting bugs, or any sort of problem report, please make sure
+you include full version information for Sybperl, Perl, Sybase and
+also what hardware/OS configuration you are on. The exact Sybperl
+versions can be extracted by running the 'Version' script in this
+directory. Perl's configuration can be summarized by running 'perl -V'.
+
+
+Comments, criticism, et.al. VERY welcome!
+
+Michael Peppler - mpeppler@peppler.org
+
+

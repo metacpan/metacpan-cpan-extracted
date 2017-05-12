@@ -1,0 +1,37 @@
+--- #YAML:1.0
+
+meta-spec:
+   version: 1.4
+   url: http://module-build.sourceforge.net/META-spec-v1.4.html
+
+name: config-sofu
+version: 0.4
+abstact: Easy interface to sofu files
+author:
+ - Marc Lucksch <perl@maluku.de>
+
+license:
+  perl
+
+distribution_type: module
+
+requires:
+  Data::Sofu: 0
+
+optional_features:
+  comments:
+    description: Provides the ability to read and save comments of the .sofu file.
+    requires:
+      Data::Sofu: "0.23"
+  binary:
+    description: Provides the ability to read and save binary .sofu files.
+    requires:
+      Data::Sofu: "0.29"
+
+provides:
+  Config::Sofu:
+    file: lib/Config/Sofu.pl
+    version: "0.4"
+
+resources:
+  homepage: "http://sofu.sf.net"

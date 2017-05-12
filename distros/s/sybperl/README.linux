@@ -1,0 +1,57 @@
+	$Id: README.linux,v 1.2 2000/11/15 00:41:42 mpeppler Exp $
+
+There are two possible problems with sybperl on linux.
+
+The LANG or LC_ALL environment variable may be set to a value 
+that has not been defined in the $SYBASE/locales/locales.dat file.
+Depending on the situation this can cause sybperl to core dump on
+startup. See http://www.mbay.net/~mpeppler/linux.html#q1.14.
+
+The second problem affects certain versions of perl that have been
+built with the Berkley-DB library linked in: There is a symbol
+conflict between Berkeley DB 1.xx, the ndbm library and Sybase's
+DB-Library. This means that you can't use the default perl version
+that is installed on linux to build the Sybase::DBlib part of sybperl.
+
+The solution is to rebuild perl without -ldb and -lndbm. I've done the 
+following, although there are of course other ways of doing this:
+
+Get the latest perl source from www.perl.com. You might as well
+install the latest stable version of perl if you're going to do this,
+aren't you?
+
+Unpack, and then run (in the perl source directory):
+
+	./Configure -ders -Dlibs="-lnsl -lgdbm -ldl -lm -lc -lposix -lcrypt"
+	make
+	make test
+
+If all is well at this point, su to root, and
+
+	make install
+
+Now go to the sybperl source directory, and do 
+
+	perl -V:libs
+
+to verify that your perl binary is not referencing -ldb or -lndbm any
+more. You can also do
+
+	ldd `which perl`
+
+which should give you something like
+
+troll (6:55AM):456 > ldd `which perl`
+        libnsl.so.1 => /lib/libnsl.so.1 (0x40007000)
+        libgdbm.so.2 => /usr/lib/libgdbm.so.2 (0x4000d000)
+        libdl.so.2 => /lib/libdl.so.2 (0x40013000)
+        libm.so.6 => /lib/libm.so.6 (0x40017000)
+        libc.so.6 => /lib/libc.so.6 (0x40030000)
+        libcrypt.so.1 => /lib/libcrypt.so.1 (0x400d5000)
+        /lib/ld-linux.so.2 => /lib/ld-linux.so.2 (0x2aaaa000)
+
+Now you are ready to build sybperl. Follow the directions in the
+README, and remember to edit CONFIG and set SYBASE and EXTRA_LIBS
+correctly. 
+
+Michael

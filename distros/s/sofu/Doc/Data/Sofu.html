@@ -1,0 +1,414 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Data::Sofu - Perl extension for Sofu data</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+<link rel="stylesheet" type="text/css" href="sofupod.css" />
+</head>
+
+<body>
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">Synopsis</a></li>
+	<li><a href="#synopsis__oostyle">Synopsis - oo-style</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#syntax">SYNTAX</a></li>
+	<li><a href="#functions">FUNCTIONS</a></li>
+	<ul>
+
+		<li><a href="#getsofucomments__"><code>getSofucomments()</code></a></li>
+		<li><a href="#writesofu_file_data__comments__"><code>writeSofu(FILE,DATA,[COMMENTS])</code></a></li>
+		<li><a href="#readsofu_file_"><code>readSofu(FILE)</code></a></li>
+		<li><a href="#loadsofu_file_"><code>loadSofu(FILE)</code></a></li>
+		<li><a href="#packsofu_data__comments__"><code>packSofu(DATA,[COMMENTS])</code></a></li>
+		<li><a href="#unpacksofu_sofu_string_"><code>unpackSofu(SOFU STRING)</code></a></li>
+		<li><a href="#writesofubinary_file__data___comments___encoding___byteorder___sofumark_____"><code>writeSofuBinary(FILE, DATA, [Comments, [Encoding, [ByteOrder, [SofuMark]]]])</code></a></li>
+		<li><a href="#writesofuml_file__data___comments__header___"><code>writeSofuML(FILE, DATA, [COMMENTS,[HEADER]])</code></a></li>
+	</ul>
+
+	<li><a href="#classmethods">CLASS-METHODS</a></li>
+	<ul>
+
+		<li><a href="#loadfile_file_"><code>loadFile(FILE)</code></a></li>
+	</ul>
+
+	<li><a href="#methods__oo_">METHODS (OO)</a></li>
+	<ul>
+
+		<li><a href="#new__"><code>new()</code></a></li>
+		<li><a href="#setindent_indent_"><code>setIndent(INDENT)</code></a></li>
+		<li><a href="#setwarnings__1_0__"><code>setWarnings( 1/0 )</code></a></li>
+		<li><a href="#comments__"><code>comments()</code></a></li>
+		<li><a href="#write_file_data__comments__"><code>write(FILE,DATA,[COMMENTS])</code></a></li>
+		<li><a href="#read_file_"><code>read(FILE)</code></a></li>
+		<li><a href="#pack_data__comments__"><code>pack(DATA,[COMMENTS])</code></a></li>
+		<li><a href="#unpack_sofu_string_"><code>unpack(SOFU STRING)</code></a></li>
+		<li><a href="#load_file_"><code>load(FILE)</code></a></li>
+		<li><a href="#toobjects_data___comments__"><code>toObjects(DATA, [COMMENTS])</code></a></li>
+		<li><a href="#writebinary_file__data___comments___encoding___byteorder___sofumark_____"><code>writeBinary(FILE, DATA, [Comments, [Encoding, [ByteOrder, [SofuMark]]]])</code></a></li>
+		<li><a href="#writeml_file__data___comments__header___"><code>writeML(FILE, DATA, [COMMENTS,[HEADER]])</code></a></li>
+		<li><a href="#packml__data__comments__header__">packML (DATA, COMMENTS,[HEADER])</a></li>
+	</ul>
+
+	<li><a href="#changes">CHANGES</a></li>
+	<li><a href="#bugs">BUGS</a></li>
+	<li><a href="#note_on_unicode">NOTE on Unicode</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>Data::Sofu - Perl extension for Sofu data</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">Synopsis</a></h1>
+<pre>
+        use Data::Sofu;
+        %hash=readSofu(&quot;file.sofu&quot;);
+        ...
+        writeSofu(&quot;file.sofu&quot;,\%hash);
+        
+Or a litte more complex:
+        use Data::Sofu qw/packSofu unpackSofu/;
+        %hash=readSofu(&quot;file.sofu&quot;);
+        $comments=getSofucomments;
+        open fh,&quot;&gt;:UTF16-LE&quot;,&quot;file.sofu&quot;;
+        writeSofu(\*fh,\$hash,$comments);
+        close fh;
+        $texta=packSofu($arrayref);
+        $texth=packSofu($hashref);
+        $arrayref=unpackSofu($texta);
+        $arrayhash=unpackSofu($texth);</pre>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis__oostyle">Synopsis - oo-style</a></h1>
+<pre>
+        require Data::Sofu;
+        my $sofu=new Sofu;
+        %hash=$sofu-&gt;read(&quot;file.sofu&quot;);
+        $comments=$sofu-&gt;comments;
+        $sofu-&gt;write(&quot;file.sofu&quot;,$hashref);
+        open fh,&quot;&gt;:UTF16-LE&quot;,file.sofu&quot;;
+        $sofu-&gt;write(\*fh,$hashref,$comments);
+        close fh;
+        $texta=$sofu-&gt;pack($arrayref);
+        $texth=$sofu-&gt;pack($hashref);
+        $arrayref=$sofu-&gt;unpack($texta);
+        $arrayhash=$sofu-&gt;unpack($texth);</pre>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>This Module provides the ability to read and write sofu files of the versions 0.1 and 0.2. Visit <a href="http://sofu.sf.net">http://sofu.sf.net</a> for a description about sofu.</p>
+<p>It can also read not-so-wellformed sofu files and correct their errors.</p>
+<p>Additionally it provides the ability to pack HASHes and ARRAYs to sofu strings and unpack those.</p>
+<p>The comments in a sofu file can be preserved if they're saved with $sofu-&gt;comment or getSofucomments or if loadFile/load is used.</p>
+<p>It also provides a compatibility layer for sofud via Data::Sofu::Object and Data::Sofu-&gt;loadFile();</p>
+<p>Data::Sofu::Binary provides an experimental interface to Binary Sofu (.bsofu) files and streams.</p>
+<p>
+</p>
+<hr />
+<h1><a name="syntax">SYNTAX</a></h1>
+<p>This module can either be called using object-orientated notation or using the funtional interface.</p>
+<p>Some features are only avaiable when using OO.</p>
+<p>
+</p>
+<hr />
+<h1><a name="functions">FUNCTIONS</a></h1>
+<p>
+</p>
+<h2><a name="getsofucomments__"><code>getSofucomments()</code></a></h2>
+<p>Gets the comments of the last file read</p>
+<p>
+</p>
+<h2><a name="writesofu_file_data__comments__"><code>writeSofu(FILE,DATA,[COMMENTS])</code></a></h2>
+<p>Writes a sofu file with the name FILE.</p>
+<p>FILE can be:</p>
+<p>A reference to a filehandle with the right encoding set or</p>
+<p>a filename or</p>
+<p>a reference to a scalar (Data will be read from a scalar)</p>
+<p>An existing file of this name will be overwritten.</p>
+<p>DATA can be a scalar, a hashref or an arrayref.</p>
+<p>The top element of sofu files must be a hash, so any other datatype is converted to {Value=&gt;DATA}.
+</p>
+<pre>
+
+        @a=(1,2,3);
+        $sofu-&gt;write(&quot;Test.sofu&quot;,\@a);
+        %data=$sofu-&gt;read(&quot;Test.sofu&quot;);
+        @a=@{$data-&gt;{Value}}; # (1,2,3)</pre>
+<p>COMMENTS is a reference to hash with comments like the one retuned by <code>comments()</code></p>
+<p>
+</p>
+<h2><a name="readsofu_file_"><code>readSofu(FILE)</code></a></h2>
+<p>Reads the sofu file FILE and returns a hash with the data.</p>
+<p>FILE can be:</p>
+<p>A reference to a filehandle with the right encoding set or</p>
+<p>a filename or</p>
+<p>a reference to a scalar (Data will be read from a scalar)</p>
+<p>These methods are not exported by default:</p>
+<p>
+</p>
+<h2><a name="loadsofu_file_"><code>loadSofu(FILE)</code></a></h2>
+<p>Reads a .sofu file and converts it to Sofud compatible objects</p>
+<p>FILE can be:</p>
+<p>A reference to a filehandle with the right encoding set or</p>
+<p>a filename or</p>
+<p>a reference to a scalar (Data will be read from a scalar)</p>
+<p>Returns a <code>Data::Sofu::Object</code></p>
+<p>
+</p>
+<h2><a name="packsofu_data__comments__"><code>packSofu(DATA,[COMMENTS])</code></a></h2>
+<p>Packs DATA to a sofu string.</p>
+<p>DATA can be a scalar, a hashref or an arrayref.</p>
+<p>This is different from a normal write(), because the lines are NOT indented and there will be placed brackets around the topmost element. (Which is not Sofu 0.2 conform, please use <code>write(\$scalar,$data)</code> instead).</p>
+<p>COMMENTS is a reference to hash with comments like the one retuned by comments().</p>
+<p>
+</p>
+<h2><a name="unpacksofu_sofu_string_"><code>unpackSofu(SOFU STRING)</code></a></h2>
+<p>This function unpacks SOFU STRING and returns a scalar, which can be either a string or a reference to a hash or a reference to an array.</p>
+<p>Can read Sofu and SofuML files but not binary Sofu files</p>
+<p>Note you can also read packed Data with readSofu(\&lt;packed Data string&gt;):</p>
+<pre>
+        my $packed = packSofu($tree,$comments);
+        my $tree2 = unpackSofu($packed);
+        my $tree3 = readSofu(\$packed); 
+        # $tree2 has the same data as $tree3 (and $tree of course)</pre>
+<p>
+</p>
+<h2><a name="writesofubinary_file__data___comments___encoding___byteorder___sofumark_____"><code>writeSofuBinary(FILE, DATA, [Comments, [Encoding, [ByteOrder, [SofuMark]]]])</code></a></h2>
+<p>Writes the Data as a binary file.</p>
+<p>FILE can be:</p>
+<p>A reference to a filehandle with raw encoding set or</p>
+<p>a filename or</p>
+<p>a reference to a scalar (Data will be read from a scalar)</p>
+<p>DATA has to be a reference to a Hash or Data::Sofu::Object</p>
+<p>COMMENTS is a reference to hash with comments like the one retuned by comments</p>
+<p>More info on the other parameters in Data::Sofu::Binary</p>
+<p>To write other Datastructures use this:</p>
+<pre>
+        writeSofuBinary(&quot;1.sofu&quot;,{Value=&gt;$data});</pre>
+<p>
+</p>
+<h2><a name="writesofuml_file__data___comments__header___"><code>writeSofuML(FILE, DATA, [COMMENTS,[HEADER]])</code></a></h2>
+<p>Writes the Data as an XML file (for postprocessing with XSLT or CSS)</p>
+<p>FILE can be:</p>
+<p>A reference to a filehandle with some encoding set or</p>
+<p>a filename or</p>
+<p>a reference to a scalar (Data will be read from a scalar)</p>
+<p>DATA has to be a reference to a Hash or Data::Sofu::Object</p>
+<p>COMMENTS is a reference to hash with comments like the one retuned by comments, only used when DATA is not a Data::Sofu::Object</p>
+<p>HEADER can be an costum file header, (defaults to <code>qq(&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;\n&lt;!DOCTYPE Sofu SYSTEM &quot;http://sofu.sf.net/Sofu.dtd&quot;&gt;\n)</code> );</p>
+<p>Default output (when given a filename) is UTF-8.</p>
+<p>
+</p>
+<hr />
+<h1><a name="classmethods">CLASS-METHODS</a></h1>
+<p>
+</p>
+<h2><a name="loadfile_file_"><code>loadFile(FILE)</code></a></h2>
+<p>Reads a .sofu file and converts it to Sofud compatible objects.</p>
+<p>FILE can be:</p>
+<p>A reference to a filehandle with the right encoding set or</p>
+<p>a filename or</p>
+<p>a reference to a scalar (Data will be read from a scalar)</p>
+<p>Returns a <code>Data::Sofu::Object</code></p>
+<pre>
+        my $tree=Data::Sofu-&gt;loadFile(&quot;1.sofu&quot;);
+        print $tree-&gt;list(&quot;Foo&quot;)-&gt;value(5);
+        $tree-&gt;list(&quot;Foo&quot;)-&gt;appendElement(new Data::Sofu::Value(8));
+        $tree-&gt;write(&quot;2.sofu&quot;);</pre>
+<p>
+</p>
+<hr />
+<h1><a name="methods__oo_">METHODS (OO)</a></h1>
+<p>
+</p>
+<h2><a name="new__"><code>new()</code></a></h2>
+<p>Creates a new Data::Sofu object.</p>
+<p>
+</p>
+<h2><a name="setindent_indent_"><code>setIndent(INDENT)</code></a></h2>
+<p>Sets the indent to INDENT. Default indent is ``\t''.</p>
+<p>
+</p>
+<h2><a name="setwarnings__1_0__"><code>setWarnings( 1/0 )</code></a></h2>
+<p>Enables/Disables sofu syntax warnings.</p>
+<p>
+</p>
+<h2><a name="comments__"><code>comments()</code></a></h2>
+<p>Gets/sets the comments of the last file read</p>
+<p>
+</p>
+<h2><a name="write_file_data__comments__"><code>write(FILE,DATA,[COMMENTS])</code></a></h2>
+<p>Writes a sofu file with the name FILE.</p>
+<p>FILE can be:</p>
+<p>A reference to a filehandle with the right encoding set or</p>
+<p>a filename or</p>
+<p>a reference to a scalar (Data will be read from a scalar)</p>
+<p>An existing file of this name will be overwritten.</p>
+<p>DATA can be a scalar, a hashref or an arrayref.</p>
+<p>The top element of sofu files must be a hash, so any other datatype is converted to {Value=&gt;DATA}.
+</p>
+<pre>
+
+        @a=(1,2,3);
+        $sofu-&gt;write(&quot;Test.sofu&quot;,\@a);
+        %data=$sofu-&gt;read(&quot;Test.sofu&quot;);
+        @a=@{$data-&gt;{Value}}; # (1,2,3)</pre>
+<p>COMMENTS is a reference to hash with comments like the one retuned by <code>comments()</code></p>
+<p>
+</p>
+<h2><a name="read_file_"><code>read(FILE)</code></a></h2>
+<p>Reads the sofu file FILE and returns a hash with the data.</p>
+<p>FILE can be:</p>
+<p>A reference to a filehandle with the right encoding set or</p>
+<p>a filename or</p>
+<p>a reference to a scalar (Data will be read from a scalar)</p>
+<p>
+</p>
+<h2><a name="pack_data__comments__"><code>pack(DATA,[COMMENTS])</code></a></h2>
+<p>Packs DATA to a sofu string.</p>
+<p>DATA can be a scalar, a hashref or an arrayref.</p>
+<p>COMMENTS is a reference to hash with comments like the one retuned by comments</p>
+<p>This is different from a normal write(), because the lines are NOT indented and there will be placed brackets around the topmost element. (Which is not Sofu 0.2 conform, please use <code>write(\$scalar,$data)</code> instead).</p>
+<p>
+</p>
+<h2><a name="unpack_sofu_string_"><code>unpack(SOFU STRING)</code></a></h2>
+<p>This function unpacks SOFU STRING and returns a scalar, which can be either a string or a reference to a hash or a reference to an array.</p>
+<p>
+</p>
+<h2><a name="load_file_"><code>load(FILE)</code></a></h2>
+<p>Reads a .sofu file and converts it to Sofud compatible objects</p>
+<p>FILE can be:</p>
+<p>A reference to a filehandle with the right encoding set or</p>
+<p>a filename or</p>
+<p>a reference to a scalar (Data will be read from a scalar)</p>
+<p>Returns a <code>Data::Sofu::Object</code></p>
+<p>
+</p>
+<h2><a name="toobjects_data___comments__"><code>toObjects(DATA, [COMMENTS])</code></a></h2>
+<p>Builds a Sofu Object Tree from a perl data structure</p>
+<p>DATA can be a scalar, a hashref or an arrayref.</p>
+<p>COMMENTS is a reference to hash with comments like the one retuned by comments</p>
+<p>Returns a <code>Data::Sofu::Object</code></p>
+<p>
+</p>
+<h2><a name="writebinary_file__data___comments___encoding___byteorder___sofumark_____"><code>writeBinary(FILE, DATA, [Comments, [Encoding, [ByteOrder, [SofuMark]]]])</code></a></h2>
+<p>Writes the Data as a binary file.</p>
+<p>FILE can be:</p>
+<p>A reference to a filehandle with raw encoding set or</p>
+<p>a filename or</p>
+<p>a reference to a scalar (Data will be read from a scalar)</p>
+<p>DATA has to be a reference to a Hash or Data::Sofu::Object</p>
+<p>COMMENTS is a reference to hash with comments like the one retuned by comments</p>
+<p>More info on the other parameters in <code>Data::Sofu::Binary</code></p>
+<p>To write other Datastructures use this:</p>
+<pre>
+        $sofu-&gt;writeBinary(&quot;1.sofu&quot;,{Value=&gt;$data});</pre>
+<p>
+</p>
+<h2><a name="writeml_file__data___comments__header___"><code>writeML(FILE, DATA, [COMMENTS,[HEADER]])</code></a></h2>
+<p>Writes the Data as an XML file (for postprocessing with XSLT or CSS)</p>
+<p>FILE can be:</p>
+<p>A reference to a filehandle with some encoding set or</p>
+<p>a filename or</p>
+<p>a reference to a scalar (Data will be read from a scalar)</p>
+<p>DATA has to be a reference to a Hash or Data::Sofu::Object</p>
+<p>COMMENTS is a reference to hash with comments like the one retuned by comments, only used when DATA is not a Data::Sofu::Object</p>
+<p>HEADER can be an costum file header, (defaults to <code>qq(&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;\n&lt;!DOCTYPE Sofu SYSTEM &quot;http://sofu.sf.net/Sofu.dtd&quot;&gt;\n)</code> );</p>
+<p>Default output (when given a filename) is UTF-8.</p>
+<p>
+</p>
+<h2><a name="packml__data__comments__header__">packML (DATA, COMMENTS,[HEADER])</a></h2>
+<p>Returns DATA as an XML file (for postprocessing with XSLT or CSS) with no Indentation</p>
+<p>DATA has to be a reference to a Hash or Data::Sofu::Object</p>
+<p>COMMENTS is a reference to hash with comments like the one retuned by comments, only used when DATA is not a Data::Sofu::Object</p>
+<p>HEADER can be an costum file header, (defaults to <code>qq(&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;\n&lt;!DOCTYPE Sofu SYSTEM &quot;http://sofu.sf.net/Sofu.dtd&quot;&gt;\n)</code> );</p>
+<p>Those are not (quite) the same:</p>
+<pre>
+        $string = $sofu-&gt;packML($tree,$comments) #Will not indent.
+        $sofu-&gt;writeML(\$string,$tree,$comments)# Will indent.</pre>
+<p>
+</p>
+<hr />
+<h1><a name="changes">CHANGES</a></h1>
+<p>Kyes are now automatically escaped according to the new sofu specification.</p>
+<p>Double used references will now be converted to Sofu-References.</p>
+<p>read, load, readSofu, loadSofu and Data::Sofu::loaFile now detect binary sofu (and load Data::Sofu::Binary)</p>
+<p>read, load, readSofu, loadSofu, Data::Sofu::loaFile, unpackSofu and unpack detect SofuML (and load Data::Sofu::SofuML)</p>
+<p>
+</p>
+<hr />
+<h1><a name="bugs">BUGS</a></h1>
+<p>Comments written after an object will be rewritten at the top of an object:</p>
+<pre>
+        foo = { # Comment1
+                Bar = &quot;Baz&quot;
+        } # Comment2</pre>
+<p>will get to:</p>
+<pre>
+        foo = { # Comment1
+        # Comment 2
+                Bar = &quot;Baz&quot;
+        }</pre>
+<p>
+</p>
+<hr />
+<h1><a name="note_on_unicode">NOTE on Unicode</a></h1>
+<p>Sofu File are normally written in a Unicode format. <code>Data::Sofu</code> is trying to guess which format to read (usually works, thanks to Encode::Guess).</p>
+<p>On the other hand the output defaults to UTF-16 (UNIX) (like SofuD). If you need other encoding you will have to prepare the filehandle yourself and give it to the <code>write()</code> funktions...</p>
+<pre>
+        open my $fh,&quot;&gt;:encoding(latin1)&quot;,&quot;out.sofu&quot;;
+        writeSofu($fh,$data);</pre>
+<p>Warning: UTF32 BE is not supported without BOM (looks too much like Binary);</p>
+<p>Notes:</p>
+<p>As for Encodings under Windows you should always have a :raw a first layer, but to make them compatible with Windows programs you will have to access special tricks:</p>
+<pre>
+        open my $fh,&quot;&gt;:raw:encoding(UTF-16):crlf:utf8&quot;,&quot;out.sofu&quot; #Write Windows UTF-16 Files
+        open my $fh,&quot;&gt;:raw:encoding(UTF-16)&quot;,&quot;out.sofu&quot; #Write Unix UTF-16 Files
+        #Same goes for UTF32
+        
+        #UTF-8: Don't use :utf8 or :raw:utf8 alone here, 
+        #Perl has a different understanding of utf8 and UTF-8 (utf8 allows some errors).
+        open my $fh,&quot;&gt;:raw:encoding(UTF-8)&quot;,&quot;out.sofu&quot; #Unix style UTF-8 
+        open my $fh,&quot;&gt;:raw:encoding(UTF-8):crlf:utf8&quot;,&quot;out.sofu&quot; #Windows style UTF-8</pre>
+<pre>
+        #And right after open():
+        print $fh chr(65279); #Print UTF-8 Byte Order Mark (Some programs want it, some programs die on it...)
+        
+One last thing:</pre>
+<pre>
+        open my $out,&quot;&gt;:raw:encoding(UTF-16BE):crlf:utf8&quot;,&quot;out.sofu&quot;;
+        print $out chr(65279); #Byte Order Mark
+        #Now you can write out UTF16 with BOM in BigEndian (even if you machine in Little Endian)</pre>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p>perl(1),<a href="http://sofu.sf.net">http://sofu.sf.net</a></p>
+<p>For Sofud compatible Object Notation: <a href="/Data/Sofu/Object.html">the Data::Sofu::Object manpage</a>
+
+</p>
+<p>For Sofu Binary: <a href="/Data/Sofu/Binary.html">the Data::Sofu::Binary manpage</a>
+
+</p>
+<p>For SofuML <a href="/Data/Sofu/SofuML.html">the Data::Sofu::SofuML manpage</a>
+
+</p>
+
+</body>
+
+</html>

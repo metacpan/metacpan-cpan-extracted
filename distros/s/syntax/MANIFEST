@@ -1,0 +1,17 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/syntax.pm
+t/basic.t
+t/lib/Syntax/Feature/TestFoo.pm
+t/lib/Syntax/Feature/TestFoo/Bar.pm
+t/release-distmeta.t
+t/release-eol.t
+t/release-no-tabs.t
+t/release-pod-syntax.t
+weaver.ini

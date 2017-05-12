@@ -1,0 +1,93 @@
+[Changes for 0.32 - 2011-05-29]
+
+* Fix a couple typos and making Pod::Coverage tests pass; no functional changes.
+
+[Changes for 0.31 - 2011-05-27]
+
+* Introduce "selfvars::autoload", a helper module that makes it
+  possible to write Mojolicious applications with Dancer syntax.
+
+[Changes for 0.22 - 2010-12-14]
+
+* Add =encoding utf8 to POD; no functional changes.
+
+[Changes for 0.21 - 2010-11-29]
+
+* Improved POD for %hopts; no functional changes.
+
+* Trying to mutate %hopts now fails with this error message:
+    "Modification of a read-only %hopts attempted"
+  which was erroneously listed as "%args" in 0.20.
+
+[Changes for 0.20 - 2010-11-23]
+
+* Added %hopts for ($self, key => value) styled calls:
+
+    package Foo;
+    use selfvars;
+    sub meth {
+        $self->{x} = $hopts{x};
+    }
+
+    # Call it like this:
+    $foo->meth(x => 4);
+
+  Contributed by Roman Galeev.
+
+[Changes for 0.11 - 2010-07-09]
+
+* LICENSING CHANGE: This compilation and all individual files in it
+  are now under the nullary CC0 1.0 Universal terms:
+
+  To the extent possible under law, 唐鳳 has waived all copyright and
+  related or neighboring rights to selfvars.
+
+* Documentation fix: %opt stands for %{$_[1]}, not %{$_[0]}. (Luke Closs)
+
+* Update minimum Perl version from 5.004 to 5.005 as required by Module::Install.
+
+[Changes for 0.10 - 2007-12-29]
+
+* Add support for %opts, an alias for named arguments in %{$_[1]}:
+
+    package Foo;
+    use selfvars;
+    sub meth {
+        $self->{x} = $opts{x};
+    }
+
+    # Call it like this:
+    $foo->meth({x => 4});
+
+* Support for omitting the "undef" part in selective imports:
+
+    # Import $self and %opts but not @args
+    use selfvars -self, -opts;
+
+[Changes for 0.06 - 2007-12-29]
+
+* Minor test suite fixes for Perl 5.004/5.005 compatibility.
+
+[Changes for 0.05 - 2007-12-28]
+
+* You can now choose alternate names for $self and @args:
+
+    use selfvars -self => 'this', -args => 'vars';
+
+[Changes for 0.04 - 2007-12-28]
+
+* Further fixes for supporting Perl 5.005 and 5.004.
+
+[Changes for 0.03 - 2007-12-28]
+
+* Documented that $self and @args are read-only variables for now.
+
+* @args is made truly read-only.
+
+[Changes for 0.02 - 2007-12-28]
+
+* Fix support for Perl 5.005 and 5.004.
+
+[Changes for 0.01 - 2007-12-27]
+
+* Initial release to CPAN of this six-minutes-old hack.

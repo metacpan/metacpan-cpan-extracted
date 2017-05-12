@@ -1,0 +1,105 @@
+NAME
+    subs::auto - Read barewords as subroutine names.
+
+VERSION
+    Version 0.08
+
+SYNOPSIS
+        {
+         use subs::auto;
+         foo;             # Compile to "foo()"     instead of "'foo'"
+                          #                        or croaking on strict subs
+         foo $x;          # Compile to "foo($x)"   instead of "$x->foo"
+         foo 1;           # Compile to "foo(1)"    instead of croaking
+         foo 1, 2;        # Compile to "foo(1, 2)" instead of croaking
+         foo(@a);         # Still ok
+         foo->meth;       # "'foo'->meth" if you have use'd foo somewhere,
+                          #  or "foo()->meth" otherwise
+         print foo 'wut'; # print to the filehandle foo if it's actually one,
+                          #  or "print(foo('wut'))" otherwise
+        } # ... but function calls will fail at run-time if you don't
+          # actually define foo somewhere
+
+        foo; # BANG
+
+DESCRIPTION
+    This pragma lexically enables the parsing of any bareword as a
+    subroutine name, except those which corresponds to an entry in %INC
+    (expected to be class names) or whose symbol table entry has an IO slot
+    (expected to be filehandles).
+
+    You can pass options to "import" as key / value pairs :
+
+    *   "in => $pkg"
+
+        Specifies on which package the pragma should act. Setting $pkg to
+        "Some::Package" allows you to resolve all functions name of the type
+        "Some::Package::func ..." in the current scope. You can use the
+        pragma several times with different package names to allow
+        resolution of all the corresponding barewords.
+
+        Defaults to the current package.
+
+    This module is not a source filter.
+
+EXPORT
+    None.
+
+CAVEATS
+    "*{'::foo'}{CODE}" will appear as defined in a scope where the pragma is
+    enabled, "foo" is used as a bareword, but is never actually defined
+    afterwards. This may or may not be considered as Doing The Right Thing.
+    However, "*{'::foo'}{CODE}" will always return the right value if you
+    fetch it outside the pragma's scope. Actually, you can make it return
+    the right value even in the pragma's scope by reading "*{'::foo'}{CODE}"
+    outside (or by actually defining "foo", which is ultimately why you use
+    this pragma, right ?).
+
+    You have to open global filehandles outside of the scope of this pragma
+    if you want them not to be treated as function calls. Or just use
+    lexical filehandles and default ones as you should be.
+
+    This pragma doesn't propagate into "eval STRING".
+
+DEPENDENCIES
+    perl 5.10.0.
+
+    A C compiler. This module may happen to build with a C++ compiler as
+    well, but don't rely on it, as no guarantee is made in this regard.
+
+    Variable::Magic with "uvar" magic enabled (this should be assured by the
+    required perl version).
+
+    B::Keywords.
+
+    Carp (standard since perl 5), XSLoader (since 5.6.0).
+
+AUTHOR
+    Vincent Pit, "<perl at profvince.com>", <http://www.profvince.com>.
+
+    You can contact me by mail or on "irc.perl.org" (vincent).
+
+BUGS
+    Please report any bugs or feature requests to "bug-subs-auto at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=subs-auto>. I will be
+    notified, and then you'll automatically be notified of progress on your
+    bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc subs::auto
+
+    Tests code coverage report is available at
+    <http://www.profvince.com/perl/cover/subs-auto>.
+
+ACKNOWLEDGEMENTS
+    Thanks to Sebastien Aperghis-Tramoni for helping to name this pragma.
+
+COPYRIGHT & LICENSE
+    Copyright 2008,2009,2010,2011,2013 Vincent Pit, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

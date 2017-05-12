@@ -1,0 +1,53 @@
+Sql::Simple - yet another SQL abstraction layer
+
+Version: 0.06
+
+WHAT IS IT
+
+The Sql::Simple package is a fairly easy way to generate SQL
+statements and execute them.  The structures can represent 
+single statement execution, or mass execution of a single statement.
+
+USING Sql::Simple
+
+This is a simple utility module that rides on top of the DBI/DBD
+architecture.  An instantiated database handle is expected as an
+argument to any of the functions.  Here's an example
+
+use strict;
+use DBI;
+use Sql::Simple;
+
+my $dbh = DBI->connect('dbi:DBTYPE:INSTANCE', 'username', 'password');
+Sql::Simple->insert($dbh, [ qw(column1 column2) ], 'randomtable' [ qw(value1 value2) ]);
+
+KNOWN LIMITATIONS
+
+As this is designed as a generic abstraction layer, anything you attempt to do in
+this module that is not possible under the database you have chosen will continue to
+not work.  (Subqueries on mysql 3.X for example)
+
+BUILDING/INSTALLING
+
+This package is set up to configure and build like a typical perl extension.
+To build:
+
+  perl Makefile.PL
+  make && make test
+
+If Sql::Simple passes all tests, then:
+
+  make install
+
+You mae require super-user access to install.
+
+PROBLEMS/BUG REPORTS
+
+Send all issues found to ryan[at]dietrich.net
+
+THANKS
+
+Kevin Moffatt & Chuck McLean (putting up with me so I could write this [and a lot of good ideas])
+Garth Webb (for giving me such excellent constructive criticism)
+Paul Lindner (the drop of encouragement to release this)
+Randy Ray (used his module as a template for building this thing..)

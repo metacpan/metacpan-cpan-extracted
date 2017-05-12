@@ -1,0 +1,44 @@
+0.14
+  YAPC Europe 2013 release: --sample-config and documentation updated
+
+0.13
+  - got permissions for Schedule::Cron::Events from PKent,
+    removed module from snaked distribution.
+
+0.12
+  - fixed unresolved dependency: moved Schedule::Cron::Events
+    into snaked distribution (it was deleted from CPAN, thanks).
+
+0.11
+  - more accurate timing (using MONOTONIC clock where possible,
+    thanks to tejblum@yandex-team.ru); using "sleep 1" on FreeBSD
+    as Time::HiRes::usleep(1_000_000) block sometimes for several hours :(
+
+  - --detailed-status (similar to that which innodb makes)
+
+  - command-line configuration manipulation (by andozer@yandex-team.ru)
+
+  - eliminated memory leak while rereading configuration
+    (which lead to extensive daemon memory usage over time)
+
+  - lots of small improvements
+
+
+0.06
+  - new scheduling algorithm
+
+0.05
+  - moved library functions into Yandex::Tools
+
+0.04
+  - correct dependency (Schedule::Cron::Events)
+
+0.03
+  - using snaked namespace for module functions
+
+0.02
+  - added documentation
+
+0.01
+  - first release to CPAN
+

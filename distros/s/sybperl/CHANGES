@@ -1,0 +1,508 @@
+	$Id: CHANGES,v 1.23 2010/03/28 11:23:45 mpeppler Exp $
+	
+2.19    Bug Fixes
+
+        Fixed incorrect handling of various "new" datatypes (date,
+        time, bigint, bigdatetime).
+        
+        Other Bug Fixes:
+        
+        640 -   Sybase::BLK fails due to system table ordering issues 
+                consequence of row level locking on system tables in
+                15.0.2 and later.
+
+2.18    Bug Fixes
+
+        Various BLK fixes.
+        Fixed Sybase::BCP and Sybase::BLK tests which failed against
+        12.5.3 servers (changes on the Server side).
+
+	Bugs Fixed:
+
+	577 - perl Makefile.PL fails if umask is 0.
+
+2.17    Kerberos Network login
+
+	Support for CS_SEC_NETWORKAUTH and CS_SEC_SERVERPRINCIPAL
+	connection properties in Sybase::CTlib.
+	Support CS_SERVERADDR connection properties in Sybase::CTlib,
+	and also allow the $server parameter to ct_connect to be
+	specified as "host:port" (requires OpenClient 12.5.1 or later).
+	Some documentation changes/improvements in Sybase::CTlib.
+
+	Bug Fixes
+	546	umask checking doesn't work on Windows.
+	555	blk_rowxfer doesn't handle datatype conversion errors.
+	560	Long binary columns are truncated by ct_fetch.
+	542	Fetch binary in raw format.
+	538     DBlib doesn't export TRACE_xxx symbols.
+
+2.16    Various bug fixes
+
+        Added DBSETLENCRYPT() to Sybase::DBlib.
+	Added DBDEAD() to Sybase::Sybperl.
+	Rearranged the directory structure somewhat so that all the
+	tests are now in one directory and are run as one unit.
+	64-bit builds should now be detected automatically (assuming
+	the perl binary was built in 64-bit mode)
+        Split out the documentation so that there are now pod entries
+	in DBlib.pm and CTlib.pm.
+
+	Bug Fixes
+	494   Do not try to use the ocs.cfg file if it exists.
+        499   Change MAXNAME to DBMAXNAME in the DBlib source.
+        500   $date->info return invalid data.
+        511   Change login to syb_login in DBlib.xs (work-around for FreeBSD).
+	516   Money/Numeric values lose precision when not using 
+              UseMoney/UseNumeric.
+	518   looking for non-existent library file (solaris 2.8/ASE 12.5.0.3
+	      perl 5.8)
+	498   Problem compiling sybperl under HP-UX 64-bit mode.
+	488   Sybase::CTlib and DBD::Sybase end up using the same error 
+	      handler
+	470   BLK.pm does not handle empty columns as NULL, and does not 
+              have retry logic of BCP.pm
+	410   BCP.pm has regex bug.
+	379   Sybase::BCP::config() does not correctly handle incremental 
+              changes
+
+2.15    Various bug fixes
+
+        Support for 64bit OpenClient on platforms that support this
+        (Thanks to Pamela Schulz for her help with this)
+        Added CTlib/t/xblk.t and CTlib/t/prepare.t test scripts.
+	CS_BLK_CANCEL was not exported.
+	For building with FreeTDS you can now add -DNOBLK to the 
+	EXTRA_DEFS line in CONFIG.
+
+	Bug Fixes
+	468   Makefile.PL has syntax error when used with perl 5.8.x
+	460   Idem.
+	439   Makefile.PL fails for very old Sybase installation (i.e.
+              installation with no CT-Library)
+	423   Fix Makefile.PL for Win32 builds.
+	422   t/bcp.t fails against 11.0.3.3 linux servers.
+
+
+2.14	And more (minor) bug fixes
+
+	config.pl's getExtraLibs() now tries to determine the Client
+	Library version to avoid linking with -linsck or -ltli for
+	OC 11 or later (as the correct library is loaded dynamically 
+	based on the values defined in $SYBASE/config/libtcl.cfg)
+        Added support for CS_HAFAILOVER connect option (thanks to 
+	Ranko Popovic)
+        Added CTlib version of nsql().
+	Documentation patches from Geoffrey Rommel.
+	Fixed memory leak when using UseDateTime/UseMoney/UseNumeric.
+	Add Async calls for CTlib (ct_poll(), etc).
+	Add CS_DATA_LCHAR connection capability.
+        Add ct_dyn_prepare() and ct_dyn_execute() to handle "dynamic SQL"
+	- thanks to Masatsuyo Takahas for the patch.
+	Add experimental blk_*() calls.
+	Ask for the PWD entries during the perl Makefile.PL phase.
+	Add Sybase::BLK module (based on Sybase::BCP) (*many* thanks to
+        Scott Zetlan for this!)
+	
+	Bug Fixes
+	309   Sybase::BCP fails test if server is set to use 
+	      datarows locking by default.
+
+2.13    Yet more bug fixes
+
+        Correct EMBED_SYBASE handling (bug in config.pl script).
+	Fix building for Sybase 12.0 (uses SYBASE_OCS environment 
+	variable.)
+	Added dbretlen(), dbretname(), dbrettype() to DBlib.
+        Minor changes to support wide data in Sybase 12.5.
+
+	340: Sybase::BCP fails unless REORDER is defined.
+	342: DateTime calc method microseconds aren't.
+
+2.12    More bug fixes
+
+	Better EMBED_SYBASE, thanks to Mike Hiller.
+	Added UseBix0x mode to CTlib.
+
+	269: dbsqlsend() missing from Sybperl.pm emulation layer.
+	315: -ldnet_stub directive in CONFIG ignored for OSF1/Tru64 Unix.
+	312: DBINTERRUPT misspelled in DBlib.xs.
+
+2.11	Various bug fixes.
+
+	nsql() patch from W. Philipp Moore.
+	Added EMBED_SYBASE configuration variable.
+	dbreadtext() could cause a core dump if the internal call failed.
+	Figured out what was needed to get Sybase::DBlib to talk to an 
+	MS-SQL 7 dataserver. Sybase::CTlib still does not work with the
+	normal, non-patched MS-SQL 7 server.
+	Fixed bug 261: Money/Numeric potentially lose precision in
+		       Sybase::CTlib.
+
+2.10_02
+	Fix incorrect dropping of locale structure in CTlib::DESTROY.
+	Link pod/sybperl.pod to CTlib/CTlib.pod and DBlib/DBlib.pod so 
+	that perldoc Sybase::DBlib now works.
+
+2.10_01
+
+	Added dbbylist().
+	Added DBIORDESC() and DBIOWDESC() (contributed by David Worenklein)
+	Modifications to nsql() contributed by W. Phillip Moore.
+	Added minimal support for languages and charsets to Sybase::CTlib.
+
+2.10    CTlib TEXT/IMAGE handling
+
+	**WARNING**
+
+	Please see the sybperl.pod file for dbpoll() syntax
+	changes.
+
+	Added ct_get_data(), ct_send_data(), ct_data_info().
+	Added some missing documentation.
+	Added Sybase::CTlib::DBDEAD().
+	Added Sybase::DBlib::dbcomputeinfo().
+
+	Changed DBlib::dbpoll() to allow polling on a single handle.
+
+	W. Philipp Moore supplied a patch to CTlib/Makefile.PL to 
+	link with the Sybase _r (re-entrant) libraries if perl
+	was compiled with threading enabled. **THERE IS NO GUARANTEE
+	THAT A THREADED VERSION OF Sybase::CTlib WILL WORK CORRECTLY!!!***
+	Please read README.thread for details.
+
+	Bug Fixes:
+
+	247: Sybase::DBlib::sql() returns invalid results in $doAssoc mode
+	     when multiple result sets are being processed.
+	248: cs_dt_info(CS_DT_CONVFMT) doesn't work.
+	
+2.09_05 DBlib asynch calls
+
+	Added dbpoll(), dbsqlsend() to allow asynchronous calls to Sybase.
+
+	Applied W. Philipp Moore's patch to the nsql() routine.
+
+2.09_04 DBlib dbreg*() calls
+
+	Added dbreg*() calls to allow execution of OpenServer registered
+	procedures.
+
+2.09_03 Bug Fixes
+
+	235: Calling DBlib's dbexit() breaks Sybase::DBlib on Win32
+	236: Sybase::CTlib doesn't work with OC 11.x on Win32.
+
+2.09_02	Bug Fixes
+
+	233: CTlib dumps core in DESTROY.
+
+
+2.09_01 Bug Fixes
+
+	This is a bug fix release. The only functional change is in the
+	handling of attributes in Sybase::CTlib when using the 
+	ct_cmd_alloc() call. If you use that call to open
+	multiple cursors on the same connection then you should
+	be aware that the attributes are shared between the handles
+	opened for this connection (ie the handle created with
+	ct_connect() and the handles created with ct_cmd_alloc().)
+
+	Other fixes:
+
+	218: length($buf) is incorrect after dbreadtext().
+	223: dbreadtext() leaves garbage at the end of $buf
+	224: dbreadtext() missing from Sybase::Sybperl
+	226: Changing $user in dblogin() fails on NCR
+	228: BCP RECORD_SEPARATOR error
+	229: BCP & null_pattern error
+	232: SEGV in ctutils.pl when inserting a duplicate row.
+	
+
+2.09	Performance Enhancements / Win32 portability release:
+
+	Added nsql() routine to Sybase::DBlib (contributed by 
+	W. Phillip Moore).
+
+	Added dbcc.pl (run dbcc's and filter the error messages) and 
+	SecureSql.pm (contributed by Olivier Mary) to the eg/
+	directory.
+
+	Bug fixes:
+
+	216 Sybase::BCP fails under Win32 systems
+	219 Silence some 'variable used only once' warnings.
+
+2.08_52
+
+	Added dbsetdefcharset() and dbsetdeflang() to Sybase::DBlib
+	Added cs_dt_info() to Sybase::CTlib.
+	Added ability to set certain connection properties in
+	Sybase::CTlib.
+
+	Bug Fixes:
+
+	209: CTlib appends trailing \0 byte to string values.
+
+2.08_51
+	Added dbproc and ConInfo attributes back into the handle
+	attributes.
+	Fixed some small-ish bugs introduced by the changes in
+	2.08_50.
+	Merged in porting notes to Win32 from Krzysztof Koczyjan
+	<krzysztofK@worldnet.att.net> (see README.win32 for details).
+
+	Bug Fixes:
+
+	194: CTlib has hard coded warn() calls in ct_connect()
+
+2.08_50
+	Avoids hash for storage of internal attributes data.
+	Can return reference to a pre-allocated array.
+
+	Bug Fixes
+
+	Merged in porting notes for VMS from Charles Bailey 
+	(baily@newman.upenn.edu)
+
+2.08	New Features:
+
+	Added dbpreptext(), dbreadtext(), dbmoretext(), dbsqlok()
+	and force_dbclose() to Sybase::DBlib.
+	Added dbspid() to Sybase::DBlib
+
+	Bug Fixes
+
+	Made some code adjustments to silence some perl 5.004
+	warnings.
+	Finally fixed the "'rpcInfo' is not a valid Sybase::DBlib
+	attribute" bug...
+	Fixed DBSETLPACKET() macro definition (for pre-system 10
+	libraries).
+	Fixed ct_config() so that integer values can be set and
+	retrived. This implied adding a 'type' argument which defaults
+	to CS_CHAR_TYPE, but must be set to CS_INT_TYPE if integer
+	values are passed or retrieved.
+	Fixed dbclose() in Sybperl.pm to *really* close connections.
+	Renamed config to config.pl to avoid problems under Win/NT.
+	ct_fetch() added an extra \0 at the end of TEXT/IMAGE data.
+	Fixed a reorder bug in BCP.pm.
+	Fixed Sybase::CTlib::ct_sql() to set $dbh->{RC} to CS_FAIL 
+	when an error occurs in the processing.
+	Sybase::DBlib::dbrpcxxx() calls where not returning any success
+	or failure information.
+	Sybase::CTlib::ct_col_types() returns CS_INT_TYPE for all integer
+	types.
+
+2.07	Bug Fixes
+
+	Added ct_config() call to CTlib.
+	Fixed memory leak when using TEXT data with the CTlib module.
+	Fixed some data handling and column splitting problems in the
+	BCP module.
+	Improved data handling and data integrity in the bcp_*() calls
+	in DBlib.
+
+2.06	Bug Fixes
+
+	Fixed memory leak when the -DDO_TIE compile time option is
+	turned on.
+	Fixed 32/64 bit pointer problem that caused CTlib to fail on
+	the Dec Alpha.
+	DESTROY function now makes sure that it only closes
+	connections in the process that created them (ie a child
+	process started via fork() would sometimes close the
+	connections of the parent...)
+	New, fully re-written dbschema.pl (thanks to David Whitmarsh)
+
+2.05	Bug Fixes
+
+	BugId	   Description
+
+	165	   Make fails if DBLIBVS < 461.
+	166	   bcp_sendrow() truncates binary (ie TEXT/IMAGE)
+		   fields if they contain NULL bytes.
+	167	   The 5.002 make install places local module in
+		   $PERL5LIB/site_perl, which is searched *after*
+		   $PERL5LIB.
+	169	   -L$SYBASE/lib comes too late in the
+		   $LDFLAGS/$LDDLFLAGS Makefile variables, which can
+		   cause the wrong library to be referenced (tcl/tk's
+		   libtcl.a vs. Sybase's).
+	170	   Retrieving numeric data causes the fields to be
+		   padded with spaces instead of being NULL terminated
+		   after the last digit.
+
+
+2.04	DBlib and CTlib Feature release.
+        New Sybase::BCP module.
+
+	** NOTE **
+
+	This version requires Perl 5.002.
+
+	- Added ct_describe to retrieve the information held in the
+	  CS_DATAFMT structure for each column in the result set.
+	- Added Sybase::{CTlib, DBlib}::debug(level) which enables the
+	  tracing of certain internal states and operations.
+	- Turned Sybase::CTlib and Sybase::DBlib database handle
+	  attributes into a tied hash, so that invalid attribute names
+	  (such as spelling mistakes) can be caught (NOTE: This is a
+	  compile time option that can be turned OFF if you don't like
+	  it). To allow add hoc attributes to be set by the programer
+	  you can pass a hash reference as fifth parameter to the
+	  dblogin/ct_connect calls with the additional attributes that
+	  you want the DBlib or CTlib modules to recognize.
+	- Added Sybase::DBlib::DBSETLPACKET and
+	  Sybase::DBlib::dbgetpacket to allow the use of non-default
+	  network packet sizes (this can increase the performance
+	  tremendously in certain situations).
+	- Sybase::DBlib can now return DATETIME and MONEY values in native
+	  format, with the same functionality as Sybase::CTlib.
+	- Re-wrote and cleaned up some of the logic in
+	  Sybase::DBlib::dbnextrow() and dbretdata().
+	- bcp_sendrow() can now take an array reference as data
+	  parameter instead of a LIST. This is a small performance
+	  improvement when processing wide tables. (Passing a LIST is
+	  still supported).
+	  
+	- Added some additional regression tests.
+
+	- Reviewed the documentation.
+
+	- Sybase::BCP is a new module that attempts to make it easier
+	  to use the bulk copy library. Sybase::BCP includes many
+	  features such as input column re-ordering, failed batch
+	  retries and date/time conversions. It is sub-classed from
+	  the Sybase::DBlib module.
+
+	- Sybase::Login is a tkPerl login widget for sybperl. It
+	  requires the Tk module. You will find it in
+	  eg/Login.pm. Contributed by Brent B. Powers.
+
+	Bug Fixes:
+	
+	BugId	   Description
+
+	158	   Sybase::CTlib dumps core when retrieving "Extended
+		   Error" data in the default Server Message handler.
+	159	   Make DBSETLPACKET() available in DBlib.
+	161	   make test fails for Sybase::DBlib, Sybase::Sybperl
+		   with perl5.002gamma.
+	163	   bcp_batch is not documented.
+			   
+	
+2.03	Bug fixes to Sybase::DBlib.
+
+	- Retrieving large numeric/decimal/identity values caused
+	  floating point values in exponential notation to be
+	  returned. This was due to the default behaviour of DBlibrary
+	  to be compatible with release 4.6.1. This version
+	  AUTOMATICALLY calls dbsetversion() to enable System 10
+	  handling of numeric/decimal/identity data if you build against
+	  a System 10 version of DBlibrary.
+	- Logging for dbwritetext() has been enabled by adding an
+	  additional (optional) $log parameter. I'm not very happy with
+	  the calling sequence (it's getting further and further from
+	  the C version), but that's the cost of not doing it right from
+	  the start, I guess...
+
+	BugId	   Description
+
+	155	   Retrieving large integers (of numeric or decimal
+		   data types) creates floating point data in
+		   exponential notation.
+	156	   dbsetversion() does not work.
+	123	   Allow logging for dbwritetext().
+	
+
+2.02    Updates & Improvements to the CTlib and DBlib modules.
+
+	New Features:
+
+	- Sybase::CTlib::ct_sql() can now return an array of references
+	  to associative arrays (one for each row).
+	- Sybase::CTlib::ct_fetchable() uses a precomputed hash to check
+	  the fetchable status (suggested by Gisle Aas).
+	  Added Sybase::CTlib::ct_cmd_alloc to allow multiple CS_COMMAND
+	  structures with a single connection.
+	- Added Sybase::CTlib::ct_cmd_realloc to drop and realloc the
+	  current CS_COMMAND structure.
+
+	- Added Sybase::DBlib::db*opt() calls. The dbsetopt() call was
+	  implemented in version 1.0xx but somehow did not get recoded
+	  in 2.x.
+	- Sybase::DBlib::sql() can now return an array of references to
+	  associative arrays (one for each row).
+
+	Bug Fixes:
+
+	BugId	   Description
+
+	146	   Need multiple CS_COMMAND structures for ct_cursor
+		   operations.
+	147	   $date->calc() changes both the original $date and
+		   the new date.
+	148	   Sybperl.pm does not export $DB_IN, $DB_OUT.
+	151	   Sybperl.pm does not define &dbwritetext().
+	152	   Sybperl.pm defines $main::ComputeID, sybperl 1.0xx
+		   used $main::ComputeId.
+
+
+2.01	For use with either Perl 5.001m or Perl 5.002.
+
+	New Features:
+
+	- CTlib DateTime, Money and Numeric data handling is now done
+	  either in native mode (ie the data is converted to char
+	  strings or floating precision only when needed which is
+	  sometimes slow) or in 'convert' mode (all data is retrieved in
+	  string or floating point format). The default is to retrieve
+	  data in 'convert' mode. See the 'Attributes' sub-section in
+	  the CTlib section of the manual (pod/sybperl.pod)
+
+	Bug Fixes
+
+	BugId	   Description
+
+	140	   CTlib uses excessive amounts of memory.
+
+	The Makefile.PLs have been updated so that they work both with
+	5.001m (the version I recommend for production use at this
+	point) and 5.002 beta.
+	
+2.0b	Updated to work with Perl 5.002 beta. This version *requires*
+	Perl 5.002beta1f, and MakeMaker.pm 5.14.
+
+	Bug fixes:
+
+	BugId	    Description
+
+	132	    Bizarre copy of CODE in subroutine entry at
+		    t/dblib.t line 93.
+	138	    Problems installing sybperl after upgrading to
+		    5.002 beta 1f.
+
+	In addition, the 'undef' bug that I uncovered in sybperl 2b3
+	has been fixed, so the -DUNDEF_BUG is not necessary anymore.
+
+	The MakeMaker utility has progressed, making the existence of
+	the infamous empty Sybase.xs file unnecessary.
+
+2.0a	Bug fixes:
+
+	BugId	    Description
+
+	130	    CTlib/t/ctlib.t test fails on AIX
+	136	    CTlib fails test on an Onyx running Irix
+	137	    dbnextrow core dumps when retrieve row with binary
+		    length > 140
+	135	    Behaviour change of DBlib::sql not documented in README
+	133	    MakeMaker 5.03 doesn't work with Sybperl.
+
+	Additional functionality:
+
+	DBlib::DBDEAD and DBlib::remove_xact have been added (thanks
+	to Joel Truher).
+
+2.0	Base release.

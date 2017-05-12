@@ -1,0 +1,12 @@
+0.04	1 April 2012
+	Some code esthetics and optimization.  Verified it runs on 5.14.2
+	threaded and unthreaded.
+
+0.03	8 April 2008
+	Minor code cleanup.  Corrected dates in CHANGELOG.
+
+0.02	27 March 2008
+	Added support for "no setenv" (aka "unimport")
+
+0.01	27 March 2008
+	First version of setenv.

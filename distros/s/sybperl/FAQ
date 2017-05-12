@@ -1,0 +1,518 @@
+	$Id: FAQ,v 1.3 2000/11/15 00:35:19 mpeppler Exp $
+
+Index of Sections
+
+       1. Sybperl? What is that? 
+              1.1 What is Sybperl? 
+              1.2 Where can I get Sybperl? 
+              1.3 Can I get Sybperl for Windows/NT? 
+              1.4 Can I get Sybperl for OS foo? 
+              1.5 Is there a version of Sybperl for Perl 5? 
+
+       2. Building and Installing 
+              2.1 Where is uperl.o? 
+              2.1 make test doesn't work 
+              2.2 How to get Dynamic Linking under HP-UX? 
+              2.3 How do I set PERL_SRC? 
+              2.4 I've moved the Sybase libraries, and Sybperl won't run... 
+              2.5 Sybperl won't run as a CGI script 
+              2.6 Sybperl won't build / run on Dec Unix / Alpha 
+              2.7 Sybperl fails on IBM AIX with perl 5.004 
+              2.8 Sybperl fails on Linux RedHat 5.0 
+
+       3. Sybperl 1.x vs Sybperl 2.x 
+              3.1 Are Sybperl 1.x scripts compatible with 2.x? 
+              3.2 Is Sybperl 2.x stable enough to use, or should I use 1.x
+		  for production code? 
+
+       4. Documentation 
+              4.1 Is there any good sybperl documentation? 
+              4.2 Is there a sybperl FAQ? 
+              4.3 Is there a sybperl mailing list? 
+
+       5. Improving sybperl 
+              5.1 Reporting bugs 
+              5.2 Feature requests 
+
+
+1. Sybperl? What is that?
+
+1.1 What is Sybperl?
+
+Matthew Healy wrote this in a recent comp.databases.sybase post: 
+
+       Perl is an interpreted programming language discussed in
+       comp.lang.perl.* newsgroups; though it's interpreted, the
+       interpreter has an internal compiler built-in, so medium-size
+       programs still run quite efficiently.  
+
+       It has become very popular among people who database and/or
+       system administration type work for several reasons:  
+
+              Very powerful and flexible string-manipulation
+	      facilities; anything you can do with awk, grep, sed,
+	      etc. can be done in Perl -- and it even comes with
+	      utilities that convert scripts in those languages into
+	      Perl!  
+              No arbitrary limits on the size of any object; you can
+	      slurp up an entire file into a string variable if you
+	      have enough RAM.  
+              An incredibly useful feature called associative arrays,
+	      which often gives you a quick and easy way of doing
+	      things that would otherwise require going back to your
+	      data structures textbooks. 
+              Versions are available for nearly every platform you've
+	      ever heard of. 
+              It's free! 
+
+       Sybperl is a package of extensions to Perl that basically add
+       the Sybase db_library API calls to the Perl language; the
+       combination is an extremely powerful scripting tool for Sybase
+       DBA's and programmers because it adds the existing strengths of
+       Perl to the Sybase API.  
+
+       So, when would you use it? Anytime the combination of shell
+       scripts with isql is too limited but writing a C program is
+       overkill.
+
+       In particular, since Perl has become the language of choice for
+       many WWW gurus, Sybperl has become the tool of choice for
+       integrating Sybase databases with the Web. And there are now
+       some toolkits written in Sybperl that make it even simpler; my
+       favorite among those is WDB. 
+
+1.2 Where can I get Sybperl?
+
+Sybperl is available from CPAN (the Comprehensive Perl Archive Network.) 
+
+The easiest way to get at CPAN is to go through Tom Christiansen's
+CPAN multiplexer at perl.com. To get the latest Sybperl release you
+can use this URL:
+
+       http://www.perl.com/CPAN/authors/id/MEWP 
+
+Intermediary bug fix releases can also be downloaded from my homepage,
+at http://www.mbay.net/~mpeppler
+
+1.3 Can I get Sybperl for Windows/NT?
+
+The current version of perl and the current version of sybperl can be
+built under Windows NT. The details are available from my homepage. 
+
+There is one known problems: 
+
+       The test input file for the Sybase::BCP module gets mangled by
+       WinZip, and this causes the tests for Sybase::BCP to
+       fail. Daniel Durbin suggests the following fix: 
+
+              Many people will get the archived "sybperl-2.09.tar.gz"
+	      and unpack it with Winzip 6.x. The program has a good
+	      feature of fixing UNIX linefeeds and making them Windows
+	      CR/LF line ends. This breaks the bcp sample data, so you
+	      unzip normally, then change the winzip menu item
+	      "Options/Configuration/TAR File Smart CR/LF Conversion"
+	      and uncheck that option. Then re-extract
+	      "sybperl-2.09\bcp\t\bcp.dat". Fixing the CR/LF is not
+	      necessary to my knowledge, but Windows text editors will
+	      display text files in a better format. 
+
+1.4 Can I get Sybperl for OS foo?
+
+Perl is primarily a Unix tool, and Sybperl was developped under
+SunOS. However, Perl has been ported to numerous other OSes (MS-DOS,
+Windows/NT, OS/2, VMS), and Sybperl should theortically be portable to
+these OSes as well, in particular with Perl 5's better extension
+mechanism.  
+
+I am always ready to provide any help I can to anyone wishing to port
+Sybperl to any particular OS/platform. 
+
+1.5 Is there a version of Sybperl for Perl 5?
+
+Yes. Sybperl 2.x works only with Perl 5. 
+
+Sybperl 1.x does not work with Perl 5, as the Perl extension mechanism
+was changed with Perl 5. 
+
+
+2. Building and Installing
+
+2.1 Where is uperl.o (1.x)?
+
+uperl.o is the object file that sybperl 1.x needs to be linked with to
+give it access to all the Perl routines. uperl.o is normally created
+when you build perl 4.036, but if you have run make clean since
+building, you can recreate it by running make uperl.o.  
+
+If you have Perl 5.x you need sybperl 2.x 
+
+2.2 make test doesn't work
+
+     1.The 'interfaces' file is not visible.
+       The Sybase libraries need access to a file that contain
+       information on how to connect to the server. This file is
+       normally located at the root of the Sybase installation
+       directory, and the Sybase libraries and programs normally use
+       the SYBASE environement variable to find this directory (ie 
+       sybperl will try to find $SYBASE/interfaces in order to run). 
+
+     2.The userid/password combination is invalid.
+       Edit the PWD file to add a valid userid/password combination
+       for accessing your database server. 
+
+     3.The $SYBASE environment variable is incorrectly set.
+       The Sybase::CTlib modules needs access to its locales
+       information in the $SYBASE/locales directory. 
+
+     4.The $LD_LIBRARY_PATH environment variable is incorrectly set. 
+            1. Solaris has libintl.so in /usr/lib Even if you build
+	       sybperl with the correct libraries, because these
+	       libraries are shared, the setting of LD_LIBRARY_PATH
+	       may override the actual library that is used at
+	       run-time. Having /usr/lib in LD_LIBRARY_PATH *before*
+	       $SYBASE/lib will cause any CTlib app to fail on Solaris. 
+
+            2. libtcl.{a,so} from the tcl language Sybase has a
+	       libtcl.so, and tcl has a libtcl.{a,so}, which very often
+	       gets installed in /usr/local/lib. Again, the same
+	       potential problem applies if you have a libtcl.so in
+	       two places, and the wrong one is found at run-time.  
+
+     5.Berkeley DB is installed.
+       Perl will link in libdb.{a, so} from Berkeley DB by default if
+       if finds it on your system. The problem with that is that both
+       Berkeley DB and Sybase DB-library have a function called
+       dbopen(). If Berkeley DB's libdb is linked in to the perl
+       binary then Sybperl will use Berkeley DB's dbopen() 
+       instead of the DBlibrary one, which obviously won't work. 
+
+       Solutions: 
+            1.Berkeley DB (ie the Perl DB_File extension) and Sybperl
+	      dynamically linked: 
+              This works, provided the main perl binary is not linked
+	      with the libdb.so shared library. You can check this
+	      with  
+
+                    perl -V:libs. 
+
+              If it *is* linked with libdb (ie -ldb shows up in the
+	      command above) then you will have to edit perl's
+	      config.sh and rebuild.  
+            2.Either DB_File or Sybperl statically linked: 
+              For this to work you will have to edit the Berkeley DB
+	      source and the DB_File.xs source to change dbopen() to
+	      something different so that the symbols don't clash with
+	      the Sybase symbols. This is messy, I know, but there
+	      isn't really any other way around this.  
+
+     6.t/dbmoney fails with Undefined subroutine error.
+       If you have a version of perl that is older than 5.004 then
+       this error appears. The reason is that perl's AutoLoader module
+       changed between 5.003 and 5.004, and I recoded certain things
+       in the Sybase::Sybperl module to take these changes into
+       account. Unfortunately, this breaks under the older versions of
+       perl.
+       The good solution is of course to upgrade perl to the latest
+       version (5.004_04 as I write this) but that may not be
+       practical - so you can fix Sybase::Sybperl instead: In the
+       sybperl source directory, edit Sybperl/Sybperl.pm and move the
+       __END__ tag to the very end of the file, and all should be
+       well.
+
+2.2 How to get Dynamic Linking under HP-UX?
+
+The bundled C compiler that comes with HP-UX apparently can't produce
+position independant code, which is needed to build a dynamically
+loadable library under HP-UX. The solution there is to use the add-on
+ANSI-C compiler or GCC.
+
+In addition, you can't build a dynamically loadable module of
+DBlibrary v. 4.x, because it is a statically linked library, and was
+not compiled using the position independent code flag. 
+
+So the end result is: to get a dynamically loadable version you need
+the Sybase System 10 OpenClient libraries, and a C compiler that is
+capable of producing position independent code. 
+
+2.3 How do I set PERL_SRC?
+
+This problem sometimes appears when building sybperl with a copy of
+Perl that has not been installed (ie from the source tree): 
+
+You've run: 
+
+       %perl Makefile.PL
+       %make 
+
+and the output looked something like this: 
+
+       % make
+       Rebuilding CTlib/Makefile ...
+       /home/mpeppler/PERL/perl5.001/miniperl -I//home/mpeppler/PERL/perl5.001/lib \
+       -e "use ExtUtils::MakeMaker; MM->runsubdirpl(qw(CTlib))" \
+       INST_LIB=/home/mpeppler/PERL/perl5.001/lib INST_ARCHLIB=/home/mpeppler/PERL/perl5.001/lib \
+       INST_EXE=./blib LINKTYPE=dynamic LIBPERL_A=libperl.a 
+       Unable to locate Perl source. Try setting PERL_SRC in Makefile.PL or on command line.
+       make: *** [CTlib/Makefile] Error 2
+       % 
+
+To do this, you need to add a parameter to the WriteMakefile() call in
+each of the Makefile.PLs (toplevel, DBlib/Makefile.PL,
+CTlib/Makefile.PL and Sybperl/Makefile.PL). The parameter should look
+like this: 
+
+       WriteMakefile(DISTNAME => "sybperl",
+       .... other parameters,
+       PERL_SRC => "/home/mpeppler/src/perl5.001",
+       ...); 
+
+obviously replacing "/home/mpeppler/src/perl5.001" with the
+appropriate directory on your system.  
+
+2.4 I've moved the Sybase libraries, and Sybperl won't run...
+
+The sybperl make process hard-codes the path to the Sybase shared
+libraries (libsybdb.so and friends) into the binaries (either the
+dynamically loadable modules, or the Perl executable). This is done so
+that Perl can find the libraries it needs even if the LD_LIBRARY_PATH
+environment variable which is normally used to specify special library
+directories is not set (as when running a script from cron, for
+example).
+
+This technique obviously fails when the paths to the Sybase libraries
+are changed (through an upgrade, or when moving the binaries to
+another machine with a different configuration). 
+
+The solution is to: 
+
+       Set LD_LIBRARY_PATH to include the Sybase library directories or 
+       Link the Sybase libraries to a standard directory (such as
+       /usr/lib or /usr/local/lib) which will be searched by default.
+       
+
+2.5 Sybperl won't run as a CGI script
+
+Typical symptoms: your script runs from the command line, but fails
+when run as a CGI script.
+
+The first thing is to verify that the SYBASE environment variable is
+set correctly. This *should* really be done at the http server
+configuration level - for example with Apache you can add
+
+	SetEnv SYBASE /opt/sybase
+
+and $ENV{SYBASE} will be set correctly for perl CGI scripts. If you
+need to set $ENV{SYBASE} in the scripts you should do so in a BEGIN
+block:
+
+#!/usr/local/bin/perl -w
+
+BEGIN {
+      $ENV{SYBASE} = '/opt/sybase';
+}
+
+use strict;
+use Sybase::CTlib;
+
+etc...
+
+Another potential problem is an LD_LIBRARY_PATH setting error. The
+HTTP deamon does not normally set this environment variable when
+executing child processes. Again, you may be able to set the
+LD_LIBRARY_PATH environment variable via an http server configuration
+file. Note that it is not possible to set the LD_LIBRARY_PATH
+environment variable in the script itself (the variable needs to be
+set before the execution starts), so you may need to write a small
+shell wrapper that sets this environment variable and then execs your
+script. 
+
+Alternatively, link the Sybase shared libraries to one of the default
+directories (such as /usr/lib). 
+
+2.6 Sybperl won't build / run on Dec Unix / Alpha
+
+Sybperl 2.05 had a bug in the Sybase::CTlib module that caused it to
+fail on the Dec Alpha platform. There is a patch for Sybperl 2.05 that
+corrects this, and Sybperl 2.06 does not have this problem. 
+
+       OpenClient 10.x:
+       Make sure you add -lsdna and -ldnet_stub to the EXTRALIBS line
+       in sybperl's CONFIG file.  
+
+       David Thiede also says that the 10.0.4 version of OpenClient is
+       incorrectly built for the DEC Unix version. The shared
+       libraries can be rebuilt with the following command (make sure
+       you have made backup copies first!!!) 
+
+               cc -o lib$1.so -shared -expect_unresolved "*" -all lib$1.a
+
+       where $1 is each of the libraries you wish to change (ct, cs, etc.). 
+
+       OpenClient 11.x
+       Add -ltli to EXTRA_LIBS. 
+
+As of version 4.0B DEC includes Berkeley DB in its system. This causes
+a conflict with Sybase's DBlibrary, as both DBlibrary and Berkeley DB
+have a function called dbopen(). 
+
+The solution is to make sure that perl itself does not reference -ldb
+when it is being built (the easiest way to check this is with 
+
+        perl -V:libs
+
+If this includes -ldb then you must rebuild perl, making sure that
+-ldb is not included.
+
+It has been repported that sybperl requires LD_LIBRARY_PATH to be set
+under certain versions of DEC Unix. If you get a failure at the make
+test phase you should set LD_LIBRARY_PATH to point to the Sybase
+library directory: 
+
+        setenv LD_LIBRARY_PATH "$SYBASE/lib"
+
+or 
+
+        export LD_LIBRARY_PATH="$SYBASE/lib"
+
+depending on the shell you are using. 
+
+Stuart Garner (stuartmg@newscorp.com) says that one of the problems
+with DEC Unix 4.0A is that it includes libtcl.so in /usr/shlib, which
+causes problems. Here's his solution: 
+
+       It looks like Digital UNIX 4.0a and highter comes with a
+       libtcl.so in /usr/shlib, which is the first directory searched
+       during runtime. What I finally ended up doing was the following: 
+
+               perl Makefile.PL
+               emacs CTlib/Makefile  <<<---- added -exact_version to LDDLFLAGS
+               make
+               make test
+               make install
+
+       Since the Sybase libtcl.so doesn't have a version number and
+       the /usr/shlib/libtcl.so's version number is "osf.1", it finds
+       the correct library at runtime. The "-exact_version" flag
+       doesn't seem to exist in Solaris 2.6, so I'm assuming it's a
+       Digital thing. 
+
+2.7 Sybperl fails on IBM AIX with perl 5.004
+
+There is a strange AutoLoader bug in perl 5.004 on AIX. This can be
+fixed by editing CTlib/CTlib.pm and DBlib/DBlib.pm and moving the
+__END__ tag to the very end of the file, and rebuilding sybperl. 
+
+2.8 Sybperl fails on Linux RedHat 5.x
+
+Linux RedHat 5.x ships with glibc, rather than the libc. This causes
+the original Sybase OpenClient port to Linux to fail miserably. 
+
+The best solution is to get the new Sybase release (see
+http://linux.sybase.com)
+
+
+3. Sybperl 1.x vs Sybperl 2.x
+
+3.1 Are sybperl 1.x scripts compatible with 2.x?
+
+Yes. With these exceptions: 
+
+       @var means different things to Perl and to Transact-SQL. If you
+       use @var as SQL code (typically: "declare @var int exec my_proc
+       @var out") you need to escape the @ (as in \@var). 
+       If you were in the habit of making calls to the sybperl 1.x
+       subs without parens (ie &dbnextrow; instead of &dbnextrow())
+       then there are certain situations where the dbnextrow
+       implementation in sybperl 2.x may try to use an invalid
+       DBPROCESS pointer. This problem does not exist if your scripts
+       always pass explicit DBPROCESS parameters. 
+       The $dbNullIsUndef variable defaults to in sybperl 2.x. It was
+       FALSE in sybperl 1.x. This causes NULL values to be returned as
+       the perl undef value, rather than the string "NULL".
+       You can get the old value by including 
+
+               $dbNullIsUndef = 0;
+
+       in your code. 
+
+Here at ITF I've linked /usr/local/bin/perl to /usr/local/bin/sybperl
+and all my old sybperl scripts work, provided that they had a "require
+'sybperl.pl';" at the top. 
+
+2.2 Is sybperl 2.x stable enough to use, or should I use 1.x for
+    production code? 
+
+Sybperl 2.x is composed of three modules: Sybase::DBlib, Sybase::CTlib
+and Sybase::Sybperl. All three modules are stable, and have been used
+extensively for production code in a large number of organizations. I
+would recommend using the Sybase::CTlib module as this is the way
+Sybase states that the future lies, although the Sybase::DBlib module
+is certainly quite good enough (and maybe a fraction faster).  
+
+I would not use the Sybase::Sybperl module for anything but backwards
+compatibility with existing perl 4.x code. 
+
+If you are still running perl 4.x code I would strongly urge you to
+upgrade, as perl 5.x brings a lot of new tools and methods that make
+programing a lot easier! 
+
+
+4. Documentation
+
+4.1 Is there any good sybperl documentation?
+
+There is a Sybperl man page (available on line at
+http://www.mbay.net/~mpeppler/Sybperl/sybperl.html) 
+
+You need Perl documentation (there are over 370 pages of documentation
+in the standard Perl 5 release...). There are several good Perl books
+(in particular 'Programming Perl', Larry Wall & Randal Schwartz,
+O'Reilly and 'Learning Perl', Randal Schwartz, O'Reilly) 
+
+And you need Sybase documentation, in particular the Sybase
+OpenClient/C manual (I've got mine online via the Sybooks CD-ROM) and
+the Sybase Transact-SQL manual. All the Sybase manuals are available
+on-line at http://sybooks.sybase.com)
+
+4.2 Is there a sybperl FAQ?
+
+Yes - you're reading it :-)
+
+There is also some information on my homepage at 
+
+       http://www.mbay.net/~mpeppler. 
+
+But, more importantly, you should go to 
+
+       http://www.perl.com 
+
+to get access to the latest news and docs, FAQs etc. for perl. And you
+need the Sybase FAQ, too, at 
+
+       http://reality.sgi.com/employees/pablo_corp/Sybase_FAQ 
+
+4.3 Is there a sybperl mailing list?
+
+Yes. The lists address is sybperl-l@list.cren.net 
+
+To subscribe, send a message to listproc@list.cren.net with 
+
+       subscribe Sybperl-L Your Name 
+
+in the body, where "Your Name" is your name :-) 
+
+
+5. Improving sybperl
+
+5.1 Reporting bugs
+
+I no longer work at ITF, so my bug tracking database is not active at
+the moment. However, you can still send me bug reports to
+mpeppler@peppler.org, and I will try to fix them as quickly as possible. 
+
+5.2 Feature requests
+
+If you have any suggestions regarding how sybperl can be improved,
+please send them to me - I am always happy to try to add features :-) 
+
+

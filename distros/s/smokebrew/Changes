@@ -1,0 +1,553 @@
+==================================================
+Changes from 2009-02-19 00:00:00 +0000 to present.
+==================================================
+
+-----------------------------------------
+version 0.48 at 2014-02-18 00:37:05 +0000
+-----------------------------------------
+
+  Change: 62adce1f670e3e15e0f1311fd7b6b81b013cc8b6
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2014-02-18 00:37:05 +0000
+
+    Release engineering for 0.48 
+
+  Change: 6703b92659fabb8d84a8176468ca752f4031a756
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date : 2014-02-18 00:26:13 +0000
+
+    Merge pull request #1 from mephinet/set-make-for-configure-too
+
+    set MAKE in environment for Configure 
+
+  Change: aac4ec8a351bf2da4478d2125bd9aac95d8fa28c
+  Author: mephinet <mephinet@gmx.net>
+  Date : 2014-02-17 20:12:41 +0000
+
+    set MAKE in environment for Configure 
+
+-----------------------------------------
+version 0.46 at 2013-10-03 17:44:42 +0000
+-----------------------------------------
+
+  Change: 51c1bb9a7f10ce845bac4d245c8eed92732cc9d2
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2013-10-03 18:44:42 +0000
+
+    Convert dist to Dist::Zilla 
+
+  Change: 88fe82bc5c48bb79d5d8aa546e6edc43dca82d7a
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2013-10-03 17:48:51 +0000
+
+    Pull the latest CPANPLUS tarball in CPANPLUS::YACSmoke plugin 
+
+  Change: 39d5c30fec03b326926b8bcccca4068ce33a9748
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2013-04-24 21:06:13 +0000
+
+    Generate the README from lib/smokebrew.pm now 
+
+-----------------------------------------
+version 0.44 at 2013-04-13 16:12:21 +0000
+-----------------------------------------
+
+  Change: 30a47479a602e370911f6d12d91d82518279c6f1
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2013-04-13 17:12:21 +0000
+
+    Added smokebrew.pm 
+
+-----------------------------------------
+version 0.42 at 2013-01-07 20:55:04 +0000
+-----------------------------------------
+
+  Change: b2b5063284f5a1cc8b122cc75f1048a6e847995f
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2013-01-07 20:55:04 +0000
+
+    Fix to add missing Changes file 
+
+-----------------------------------------
+version 0.40 at 2013-01-05 22:47:58 +0000
+-----------------------------------------
+
+  Change: 0904e6af7be5faf82f40e9a7206e92ad2111bbb5
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2013-01-05 22:47:58 +0000
+
+    Bump version to 0.40 
+
+  Change: 590dc8f088c04a75ff361bcd538324860d317a64
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2013-01-05 22:46:38 +0000
+
+    Added 'latest' option to only install the most latest perls 
+
+  Change: 8416c9ef41d2e918a2b4bc0d19ff146e36813984
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2013-01-05 22:09:45 +0000
+
+    Add 'modern' option to only install modern perls 
+
+-----------------------------------------
+version 0.38 at 2012-11-26 10:05:57 +0000
+-----------------------------------------
+
+  Change: b62bee96d9e6057375d0289253b59456c14f77c5
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2012-11-26 10:05:57 +0000
+
+    Use Config to find a suitable default for 'make' 
+
+-----------------------------------------
+version 0.36 at 2012-02-28 22:22:31 +0000
+-----------------------------------------
+
+  Change: 6131a9093b7444421885d018d58d0a490655235a
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2012-02-28 22:22:31 +0000
+
+    Rearrange the hard-coded CPAN mirrors 
+
+-----------------------------------------
+version 0.34 at 2011-11-17 21:26:53 +0000
+-----------------------------------------
+
+  Change: 930517add66b304d82df141b1e74b2a67a01ebf5
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2011-11-17 21:26:53 +0000
+
+    Bump required version of MooseX::Types::URI 
+
+-----------------------------------------
+version 0.32 at 2011-05-15 21:28:31 +0000
+-----------------------------------------
+
+  Change: 41d17146ccc245facb0c77df90a6c719b2f73768
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2011-05-15 22:28:31 +0000
+
+    Bump version 
+
+  Change: 1eed2abe3a3bbbaf7c5a780ed49b33f2d9e90711
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2011-05-15 22:27:25 +0000
+
+    Add support for using CPAN::Perl::Releases to find perl tarballs to
+    download 
+
+  Change: a9a66f0ff3b368f4bf36e9fd643dafd7fb37fefb
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2011-03-16 17:12:08 +0000
+
+    Update required version of Devel::PatchPerl 
+
+-----------------------------------------
+version 0.30 at 2011-02-22 14:26:49 +0000
+-----------------------------------------
+
+  Change: f48d631f196909280032a71ab58d66ae8d0e4521
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2011-02-22 14:26:49 +0000
+
+    Bump to version 0.30 
+
+  Change: f97076a53933f5c86a735f69962cf0beae73c3cb
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2011-02-22 13:51:17 +0000
+
+    Resolve bugs regarding perl versions that end in '0' due to floating
+    pointness 
+
+  Change: d0a0324982c15136acef13f60de3d91e70a291e6
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2011-02-21 11:21:48 +0000
+
+    Add .gitignore 
+
+-----------------------------------------
+version 0.28 at 2011-01-14 12:13:54 +0000
+-----------------------------------------
+
+  Change: 30d9fc4b30c3fcf687f608c227071cf3d1a2dfb8
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2011-01-14 12:13:54 +0000
+
+    Bump version to 0.28 
+
+  Change: d312becb27c945624110451bcd8b1394bd4cc068
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2011-01-14 12:12:28 +0000
+
+    Fix issues with passing plugin options to the plugin 
+
+-----------------------------------------
+version 0.26 at 2011-01-09 16:04:25 +0000
+-----------------------------------------
+
+  Change: 2d75b8b1b0ebf6f095430428a1792a9d78fc19a5
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2011-01-09 16:04:25 +0000
+
+    Bump version to 0.26 
+
+  Change: 5c0882056231d997efb1ac3f2bdc46ec1c2fdf6b
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2011-01-09 15:58:16 +0000
+
+    Added plugin options that may be specified in the configuration file 
+
+-----------------------------------------
+version 0.24 at 2010-11-04 15:50:20 +0000
+-----------------------------------------
+
+  Change: c767e3c9f8651e1571422b8df728063eadf2abc5
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2010-11-04 15:50:20 +0000
+
+    Bump version to 0.24 
+
+  Change: 86c2a751d3b787dab7cca0e5162a04392c8a37d5
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2010-11-04 15:49:07 +0000
+
+    Resolve issues with testsuite when there isn't any Internet access to
+    CPAN mirrors 
+
+-----------------------------------------
+version 0.22 at 2010-09-13 15:14:29 +0000
+-----------------------------------------
+
+  Change: 7582214ef802304b68383302090d3fed53e8acd5
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2010-09-13 16:14:29 +0000
+
+    Bump to 0.22 
+
+  Change: 0d5051cc461158888296542eb7d7f71b798ab2f9
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2010-09-13 16:12:57 +0000
+
+    Unfortunate side-effect of removing the man pages is that CPANPLUS
+    will assume that it needs to use sudo. Explicitly tell CPANPLUS to
+    not use sudo. 
+
+-----------------------------------------
+version 0.20 at 2010-09-12 14:36:55 +0000
+-----------------------------------------
+
+  Change: 3ca0f02b2d858cb238a2023732395b4fb78b7b10
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2010-09-12 15:36:55 +0000
+
+    Document the nozapman option and make it actually have an effect.
+    Document the mirrors option to BuildPerl. 
+
+  Change: 05413494d49ed633eb3e8c10404b0036c0f577af
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2010-09-12 13:35:57 +0000
+
+    Add zapping of the man pages that are generated when installing a
+    perl. 
+
+-----------------------------------------
+version 0.18 at 2010-09-10 09:35:43 +0000
+-----------------------------------------
+
+  Change: 6b1f379d74d48ae4f5cc7098f3acc65561d90bd8
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2010-09-10 10:35:43 +0000
+
+    In the CPANPLUS::YACSmoke prefer_makefile explicitly. May resolve
+    issues with v5.10.0 
+
+-----------------------------------------
+version 0.16 at 2010-09-08 18:51:43 +0000
+-----------------------------------------
+
+  Change: be25e4dddbdbf3fb0d51f502c6b4e47d221f76d8
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2010-09-08 19:51:43 +0000
+
+    Mirrors weren't propagating down through BuildPerl to the fetching of
+    the perl source. Fixed. 
+
+-----------------------------------------
+version 0.14 at 2010-09-01 19:50:52 +0000
+-----------------------------------------
+
+  Change: 0993e1b51b83e69817304834f598d7a7e8690c61
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2010-09-01 20:50:52 +0000
+
+    Added setting the PERL_MM_USE_DEFAULT env var in the
+    CPANPLUS::YACSmoke plugin 
+
+-----------------------------------------
+version 0.12 at 2010-09-01 19:12:20 +0000
+-----------------------------------------
+
+  Change: 2218f9d076e7527a8db0000a2a2a4838e1766877
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2010-09-01 20:12:20 +0000
+
+    Make --forcecfg actually work 
+
+-----------------------------------------
+version 0.10 at 2010-09-01 18:34:46 +0000
+-----------------------------------------
+
+  Change: d4b2c9205aa3dc9e41993954a67716a6c2b60a98
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2010-09-01 19:34:46 +0000
+
+    Added --forcecfg option to enable reconfiguration on an existing
+    build 
+
+-----------------------------------------
+version 0.08 at 2010-08-26 15:19:54 +0000
+-----------------------------------------
+
+  Change: ad243e453bbec974c30968570615881ae9f89ac8
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2010-08-26 16:19:54 +0000
+
+    Added the --install switch so we can specify a particular perl
+    version to install 
+
+  Change: e58565406d058b25e949fbaa0e35049eee46fcb6
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2010-06-23 09:18:47 +0000
+
+    Move the installation of Module::Build ahead of selfupdate 
+
+-----------------------------------------
+version 0.06 at 2010-06-02 22:31:28 +0000
+-----------------------------------------
+
+  Change: ff48321fc3f4e372bba7ef3f3830bdd67bacacd5
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2010-06-02 23:31:28 +0000
+
+    Fixed the rather clunky plugin loading code 
+
+-----------------------------------------
+version 0.04 at 2010-05-24 20:42:06 +0000
+-----------------------------------------
+
+  Change: ea6ed7931a76917f112c5c40345b9c6ceaa709f1
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2010-05-24 21:42:06 +0000
+
+    Bump to 0.04 
+
+  Change: a8a0ab112b0e4fb5045d2bad821c0dffcd23b5a8
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2010-05-24 21:40:23 +0000
+
+    Change from using File::chdir to File::pushd, File::chdir looks to be
+    broken with 5.13.1+ 
+
+  Change: 3a5c14c3fb84adb14ab92130084dab5643ef7767
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2010-05-21 16:19:27 +0000
+
+    Added MANIFEST 
+
+-----------------------------------------
+version 0.02 at 2010-05-21 15:15:27 +0000
+-----------------------------------------
+
+  Change: 9221b1e44b8d8b5bfb60aaa4e0ed7a6d34f15385
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2010-05-21 16:15:27 +0000
+
+    Add explicit use statements for the M::I extensions we use in
+    Makefile.PL 
+
+  Change: fa827604834099999129d6191761dd9a64e57a2e
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2010-05-21 15:06:55 +0000
+
+    Bumped version to 0.02 
+
+  Change: 3c9ac78ebf0dc149d523d4efc2278f8d8ecd9c06
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2010-05-21 14:53:34 +0000
+
+    Added Null plugin to the compile tests 
+
+  Change: 5e3891b94b6a6d54b9136ac43be9434dfdd7d6a8
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2010-05-21 14:52:45 +0000
+
+    Added tests for Null plugin 
+
+  Change: a09575f345020953ed2a69678ca718410fb7cdc3
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2010-05-21 14:34:49 +0000
+
+    Added Null plugin 
+
+  Change: 1e0cf5c0873916e7fdb459864c4b0258855f6fb4
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2010-05-20 12:46:14 +0000
+
+    Clarified the syntax for --plugin 
+
+  Change: 6aab42374ae6dc6b1e601ee2e72cdd7eb0cb5465
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2010-05-19 17:08:39 +0000
+
+    Added symlinking to CPANPLUS::YACSmoke plugin. Fixed the logic of
+    'noclean' 
+
+  Change: 4b2cbbb4f1cbbfebf154b7902c651c742a2b279f
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2010-05-19 12:40:52 +0000
+
+    Added the prereqs for MooseX::Getopt and MooseX::ConfigFromFile 
+
+  Change: 1021c49a2be0a91d1094c524598f0ea2bbfcea92
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2010-05-19 10:16:30 +0000
+
+    Plugins can now be specified without the App::SmokeBrew::Plugin
+    prefix. Added force option and skipping previously built perl
+    installations 
+
+  Change: fa5862fbf81106be5a9c80251afd907b73cb3ce7
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2010-05-18 21:28:32 +0000
+
+    Changed clean_up option to noclean and build_dir to builddir 
+
+  Change: 096e1bf8b66f9b9d1fd64b747b4d886afb411dc6
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2010-05-18 16:44:46 +0000
+
+    Finished up documenting and added the standard POD tests. 
+
+  Change: 321675d1832a1da172b03537b89b064b075cd2da
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2010-05-18 15:56:29 +0000
+
+    Added documentation for smokebrew. Updated prereqs 
+
+  Change: b1f63bedf48fbcb4c962ef21d4144a694298888c
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2010-05-18 10:04:06 +0000
+
+    Lots of funky changes. Added Devel::PatchPerl support. 
+
+  Change: eed561a8efe1438b61d7aa14d09f49f08dc32ae1
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2010-05-15 21:56:42 +0000
+
+    Change version number 
+
+  Change: 2172712b30d897c2ec6f4a751e53db337f607dbb
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2010-05-15 15:42:54 +0000
+
+    More documentation. Tweaks to how the configuration file is found. 
+
+  Change: 98e7ab065e0414491fdd98c458c798dac548229a
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2010-05-13 23:01:04 +0000
+
+    Documentation updates 
+
+  Change: 262ac4553b00b6acdbdfc04cbc79c6d034e1eb38
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2010-05-13 16:24:17 +0000
+
+    Added documentation for BuildPerl 
+
+  Change: 1352a165f4828138806104c4c65d1299c61b4fcd
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2010-05-13 15:43:09 +0000
+
+    Changed option name to BuildPerl 
+
+  Change: b7e062ea31265868950b3b5819ab8b0ab3582526
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2010-05-13 15:29:40 +0000
+
+    Moved the smokebrew_dir() function to Tools. Added a new type for
+    ArrayRefStr to Types. 
+
+  Change: 59f465d0ea6dc6cd9528c23af651df5246d40a3c
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2010-05-13 10:29:21 +0000
+
+    Added tests for the inifile reader 
+
+  Change: 2840c366435a62f02d70baa16c8af1a3d77ce2a2
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2010-05-13 09:40:50 +0000
+
+    Wrote tests for App::SmokeBrew::Types and fixed some issues with it. 
+
+  Change: e1740cfb9e850d378d38802dea127d02aa48a654
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2010-05-12 23:32:02 +0000
+
+    A lot of coding, refactoring, coding, refactoring. You get the
+    picture. 
+
+  Change: cdb76120dbadfdc36e521ea7b28a43c88bab9a48
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2010-05-11 13:38:09 +0000
+
+    Thanks to Florian got the URI types working in Plugin::CPYS. Finished
+    that plugin. 
+
+  Change: e0ee6af30e0f7e1ebb2e00479b9a712141364bb6
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2010-05-10 23:54:13 +0000
+
+    Fixed PerlVersion so it deals with older perl versions properly. 
+
+  Change: a10cff8faac6787305a710387147ee319257f92c
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2010-05-10 23:06:03 +0000
+
+    Abstracted the Perlversion code into a role. Moose fucking rocks. 
+
+  Change: 3547690d67bc8ff6106532fb2318d6c512e1d13e
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2010-05-10 22:49:19 +0000
+
+    More funky stuff. Plugins have a role. the CP::YS plugin is most of
+    the way there. 
+
+  Change: 456d628866f6ed556a05dc01311ba2f1474260f5
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2010-05-10 13:18:54 +0000
+
+    Various updates including buildperl actually works. Started on the
+    CPANPLUS::YACSmoke plugin 
+
+  Change: 8e0c89daf65dc7749568c4d089e554c0b8c06447
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2010-05-08 15:43:06 +0000
+
+    Add clean_up code to BuildPerl, to remove perl build dir and tarball. 
+
+  Change: 268d248ca44df1999ff393d6bda3b8bb41de9729
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2010-05-08 13:12:23 +0000
+
+    Update the prereqs list 
+
+  Change: b7678a33417d3a457bed2fa6ec033bb0129a399d
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2010-05-08 01:38:20 +0000
+
+    Smokin' 
+
+================
+End of releases.
+================

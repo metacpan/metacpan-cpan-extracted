@@ -1,0 +1,27 @@
+NAME
+    shit - just use stuff
+
+VERSION
+    version 0.02
+
+SYNOPSIS
+      use shit;
+
+      no shit;
+
+DESCRIPTION
+    Enables strict and warnings without all the typing.
+
+    To enable just "use shit" in your script.
+
+    "no shit" disables strict and warnings.
+
+AUTHOR
+    Chris Williams <chris@bingosnet.co.uk>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2011 by Chris Williams.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

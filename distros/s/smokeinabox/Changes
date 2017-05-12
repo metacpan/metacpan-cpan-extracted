@@ -1,0 +1,43 @@
+Changelog for Smoke-In-A-Box
+============================
+
+0.24  Fri Jul 16 20:37:09 BST 2010
+  - updated CPANPLUS to 0.9007
+  - updated bundled modules
+
+0.22  Tue Mar 16 15:32:38 GMT 2010
+  - updated CPANPLUS to 0.9003
+  - updated bundled modules
+
+0.20  Wed Jan 13 16:04:03 GMT 2010
+  - updated CPANPLUS to 0.9001
+  - updated bundled modules
+
+0.18  Tue Nov 10 12:23:36 GMT 2009
+  - Updated bundled CPANPLUS to 0.89_07
+
+0.16  Mon Jul 27 11:29:47 BST 2009
+  - cpconf wasn't actually setting cpantest, fixed.
+
+0.14  Fri Jul 17 22:26:52 BST 2009
+  - Stripping POD broke CPANPLUS
+
+0.12  Wed Jul  8 22:24:16 BST 2009
+  - Missed one of the bundled files
+
+0.10  Wed Jul  8 22:17:35 BST 2009
+  - Updated CPANPLUS to 0.88
+  - Updated Config::IniFiles to 2.52
+  - Updated CPANPLUS::YACSmoke to 0.42
+
+0.08  Mon Jun 29 06:37:28 BST 2009
+  - Updated CPANPLUS to 0.87_03
+
+0.06	Sun Jun 14 15:35:47 BST 2009
+	- Updated CPANPLUS to 0.87_02
+
+0.04	Tue Jun  2 23:17:29 BST 2009
+	- Updated Test::Reporter to 1.54
+
+0.02	Thu May 21 13:45:21 BST 2009
+	- Initial CPAN release

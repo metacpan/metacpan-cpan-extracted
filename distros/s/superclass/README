@@ -1,0 +1,87 @@
+NAME
+    superclass - Like parent, but with version checks
+
+VERSION
+    version 0.003
+
+SYNOPSIS
+        package Baz;
+        use superclass qw(Foo Bar), 'Baz' => 1.23;
+
+DESCRIPTION
+    Allows you to both load one or more modules, while setting up
+    inheritance from those modules at the same time.
+
+    If a module in the import list is followed by something that doesn't
+    look like a legal module name, the "VERSION" method will be called with
+    it as an argument;
+
+    The synopsis example is mostly similar in effect to
+
+        package Baz;
+        BEGIN {
+            require Foo;
+            require Bar;
+            require Baz;
+            Baz->VERSION(1.23)
+            push @ISA, qw(Foo Bar Baz);
+        }
+
+    Dotted-decimal versions should be given as a string, not a raw v-string,
+    and must include at least one decimal point.
+
+        use superclass 'Bar' => v65.65.65; # BAD: loads AAA.pm
+
+        use superclass 'Bar' => 'v6';      # BAD: loads v6.pm
+
+        use superclass 'Foo' => 'v0.10.0'; # OK
+
+    If the first import argument is "-norequire", no files will be loaded
+    (but any versions given will still be checked).
+
+    This is helpful for the case where a package lives within the current
+    file or a differently named file:
+
+      package MyHash;
+      use Tie::Hash;
+      use superclass -norequire, 'Tie::StdHash';
+
+DIAGNOSTICS
+    Class 'Foo' tried to inherit from itself
+        Attempting to inherit from yourself generates a warning.
+
+            package Foo;
+            use superclass 'Foo';
+
+HISTORY
+    This module was forked from parent to add version checks. The parent
+    module was forked from base to remove the cruft that had accumulated in
+    it.
+
+    Authors of or contributors to predecessor modules include Rafaël
+    Garcia-Suarez, Bart Lateur, Max Maischein, Anno Siegel, and Michael
+    Schwern
+
+SUPPORT
+  Bugs / Feature Requests
+    Please report any bugs or feature requests through the issue tracker at
+    <https://github.com/dagolden/superclass/issues>. You will be notified
+    automatically of any progress on your issue.
+
+  Source Code
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    <https://github.com/dagolden/superclass>
+
+      git clone https://github.com/dagolden/superclass.git
+
+AUTHOR
+    David Golden <dagolden@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by David Golden.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

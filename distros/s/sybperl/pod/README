@@ -1,0 +1,14 @@
+	$Id: README,v 1.1 1999/05/14 18:12:18 mpeppler Exp $
+from
+	@(#)README	1.1	9/20/95
+
+This directory contains the sybperl documentation.
+
+     - sybperl.pod	This is the sybperl 2.x documentation, in
+			'pod' format. The Makefile includes targets
+			for converting this into a .man or a .html
+			file.
+     -sybperl-1.0xx.man This is the man page for sybperl 1.012. It is
+			included as a reference, and to document the
+			behaviour of the Sybase::Sybperl compatibility
+			module.

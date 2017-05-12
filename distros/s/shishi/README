@@ -1,0 +1,31 @@
+Shishi version 0.0.1
+--------------------
+Copyright 2002 Simon Cozens (simon@cpan.org)
+Provided to you under the terms of the Artistic License
+
+Shishi is a dynamic parser and lexer library. Unlike yacc, it doesn't
+provide you with a means of compiling a parser (yet) which you can link
+into your program; instead, it allows you to create a parser "object"
+and add rules to it before throwing text at it to parse. You may add and
+remove rules at parser runtime, and switch between entire parser
+rulesets. You may specify things to be recognised either as single
+characters, strings, designated tokens, or even by passing in a function
+pointer which returns whether or not the rule matched.
+
+There is a small example in the file test.c; the directory Shishi
+contains a Perl wrapper for this library. There's much more
+documentation in there.
+
+For Perl users:
+
+    make
+    cd Shishi
+    perl Makefile.PL
+    make
+    make test
+
+This will create shishi as a static library, and compile it into the
+Shishi XS extension. 
+
+Shishi takes its name from the Shishigami, the mystical deer-god of life
+and death in Hideo Miyazaki's classic anime, Mononokehime.

@@ -1,0 +1,244 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Data::Sofu::Object - Sofud compatibility layer.</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+<link rel="stylesheet" type="text/css" href="/Data/sofupod.css" />
+</head>
+
+<body>
+
+<!-- INDEX BEGIN -->
+<div name="index">
+<p><a name="__index__"></a></p>
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#synopsis">Synopsis</a></li>
+	<li><a href="#syntax">SYNTAX</a></li>
+	<li><a href="#methods">METHODS</a></li>
+	<ul>
+
+		<li><a href="#new_data_">new(DATA)</a></li>
+		<li><a href="#setindent__newindent__">setIndent([NewIndent])</a></li>
+		<li><a href="#clear__"><code>clear()</code></a></li>
+		<li><a href="#asvalue__"><code>asValue()</code></a></li>
+		<li><a href="#aslist__"><code>asList()</code></a></li>
+		<li><a href="#asmap__"><code>asMap()</code></a></li>
+		<li><a href="#asreference__"><code>asReference()</code></a></li>
+		<li><a href="#stringify_level__tree_"><code>stringify(LEVEL, TREE)</code></a></li>
+		<li><a href="#binarify_tree__binary_driver_"><code>binarify(TREE, BINARY DRIVER)</code></a></li>
+		<li><a href="#storecomment_tree__comment_"><code>storeComment(TREE, COMMENT)</code></a></li>
+		<li><a href="#importcomments_comments_">importComments(COMMENTS)</a></li>
+		<li><a href="#isvalue__"><code>isValue()</code></a></li>
+		<li><a href="#islist__"><code>isList()</code></a></li>
+		<li><a href="#ismap__"><code>isMap()</code></a></li>
+		<li><a href="#stringcomment__"><code>stringComment()</code></a></li>
+		<li><a href="#getcomment__"><code>getComment()</code></a></li>
+		<li><a href="#hascomment__"><code>hasComment()</code></a></li>
+		<li><a href="#setcomment_comment_">setComment(COMMENT)</a></li>
+		<li><a href="#appendcomment_comment_">appendComment(COMMENT)</a></li>
+		<li><a href="#isdefined__"><code>isDefined()</code></a></li>
+		<li><a href="#isreference__"><code>isReference()</code></a></li>
+		<li><a href="#pack__"><code>pack()</code></a></li>
+		<li><a href="#binarypack__"><code>binaryPack()</code></a></li>
+		<li><a href="#string_level_tree_"><code>string(LEVEL,TREE)</code></a></li>
+		<li><a href="#packcomment_binary_driver_"><code>packComment(BINARY DRIVER)</code></a></li>
+		<li><a href="#binary_tree__binary_driver_"><code>binary(TREE, BINARY DRIVER)</code></a></li>
+		<li><a href="#write_file_">write(FILE)</a></li>
+	</ul>
+
+	<li><a href="#bugs">BUGS</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
+</ul>
+
+<hr name="index" />
+</div>
+<!-- INDEX END -->
+
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>Data::Sofu::Object - Sofud compatibility layer.</p>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>Provides a interface similar to the original SofuD (sofu.sf.net)</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">Synopsis</a></h1>
+<pre>
+        <span class="keyword">require</span> <span class="variable">Data::Sofu::Object</span><span class="operator">;</span>
+        <span class="keyword">my</span> <span class="variable">$map</span> <span class="operator">=</span> <span class="variable">Data::Sofu::Object</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="operator">{</span><span class="string">Text</span><span class="operator">=&gt;</span><span class="string">"Hello World"</span><span class="operator">}</span><span class="operator">);</span>
+        <span class="keyword">print</span> <span class="keyword">ref</span> <span class="variable">$map</span><span class="operator">;</span> <span class="comment"># Data::Sofu::Map;</span>
+        <span class="variable">$map</span><span class="operator">-&gt;</span><span class="keyword">write</span><span class="operator">(\</span><span class="variable">*STDOUT</span><span class="operator">);</span> <span class="comment"># Text = "Hello World"</span>
+        <span class="variable">$map</span><span class="operator">-&gt;</span><span class="keyword">write</span><span class="operator">(</span><span class="string">"file.sofu"</span><span class="operator">);</span> <span class="comment"># Text = "Hello World"</span>
+        <span class="comment">#You don't need Data::Sofu::Object:</span>
+        <span class="keyword">use</span> <span class="variable">Data::Sofu</span><span class="operator">;</span>
+        <span class="variable">$map</span> <span class="operator">=</span> <span class="variable">loadSofu</span><span class="operator">(</span><span class="string">"file.sofu"</span><span class="operator">);</span>
+        <span class="variable">$map</span><span class="operator">-&gt;</span><span class="keyword">write</span><span class="operator">(\</span><span class="variable">*STDOUT</span><span class="operator">);</span>
+</pre>
+<p>
+</p>
+<hr />
+<h1><a name="syntax">SYNTAX</a></h1>
+<p>This Module is pure OO, exports nothing</p>
+<p>
+</p>
+<hr />
+<h1><a name="methods">METHODS</a></h1>
+<p><code>Data::Sofu::Object</code> is the base class for <code>Map</code>, <code>Value</code>, <code>List</code>, <code>Reference</code> and <code>Undefined</code>.</p>
+<p>All Methods in here might be overwritten, but work the same way</p>
+<p>
+</p>
+<h2><a name="new_data__creates_a_new_data__sofu__object_and_returns_it">new(DATA)
+Creates a new <code>Data::Sofu::Object</code> and returns it</a></h2>
+<p>Converts DATA to appropriate Objects</p>
+<p><strong>Note</strong></p>
+<p>There is no need to call <code>Data::Sofu::Object</code> without DATA.</p>
+<p>
+</p>
+<h2><a name="setindent__newindent__">setIndent([NewIndent])</a></h2>
+<p>Allows different indentations to be used (default is &quot;\t&quot;)</p>
+<p>Returns the current indentation</p>
+<p>
+</p>
+<h2><a name="clear__"><code>clear()</code></a></h2>
+<p>Clears the Buffer of seen Objects only used during the old <code>Data::Sofu::from()</code> and <code>Data::Sofu::toObjects()</code></p>
+<p>
+</p>
+<h2><a name="asvalue__"><code>asValue()</code></a></h2>
+<p>Returns the Object as a C&gt;Data::Sofu::Value&gt; or throws an error if it can't be converted</p>
+<p>
+</p>
+<h2><a name="aslist__"><code>asList()</code></a></h2>
+<p>Returns the Object as a <code>Data::Sofu::List</code> or throws an error if it can't be converted</p>
+<p>
+</p>
+<h2><a name="asmap__"><code>asMap()</code></a></h2>
+<p>Returns the Object as a <code>Data::Sofu::Map</code> or throws an error if it can't be converted</p>
+<p>
+</p>
+<h2><a name="asreference__"><code>asReference()</code></a></h2>
+<p>Returns the Object as a <code>Data::Sofu::Reference</code> or throws an error if it can't be converted</p>
+<p>
+</p>
+<h2><a name="stringify_level__tree_"><code>stringify(LEVEL, TREE)</code></a></h2>
+<p>Returns a string representation of the Object, used during <code>write()</code>, should not be called alone</p>
+<p>LEVEL is the current indentation level.</p>
+<p>TREE is the current position in the TREE (used for Reference building)</p>
+<p>
+</p>
+<h2><a name="binarify_tree__binary_driver_"><code>binarify(TREE, BINARY DRIVER)</code></a></h2>
+<p>Returns a binary representation of the Object, used during <code>writeBinary()</code>, should never be called alone.</p>
+<p>TREE is the current position in the TREE (used for Reference building)</p>
+<p>BINARY DRIVER is a <code>Data::Sofu::Binary</code> instance which is initialized with a Encoding, ByteOrder and Sofumark properties.</p>
+<p>
+</p>
+<h2><a name="storecomment_tree__comment_"><code>storeComment(TREE, COMMENT)</code></a></h2>
+<p>Recursivly stores a comment identified by TREE, is used to store a single comment of the hash returned by <code>Data::Sofu::getSofucomments()</code>;</p>
+<p>
+</p>
+<h2><a name="importcomments_comments_">importComments(COMMENTS)</a></h2>
+<p>Takes a Hashref (as returned by <code>Data::Sofu::getSofucomments())</code> and gives every Object its fitting Comment</p>
+<p>COMMENTS is a reference to a Hash</p>
+<p>Normally Data::Sofu-&gt;new-&gt;<code>toObjects($data,$comments)</code> should have done this.</p>
+<p>
+</p>
+<h2><a name="isvalue__"><code>isValue()</code></a></h2>
+<p>Return 1 if this Object is a <code>Data::Sofu::Value</code> instance, 0 otherwise.</p>
+<p>
+</p>
+<h2><a name="islist__"><code>isList()</code></a></h2>
+<p>Return 1 if this Object is a <code>Data::Sofu::List</code> instance, 0 otherwise.</p>
+<p>
+</p>
+<h2><a name="ismap__"><code>isMap()</code></a></h2>
+<p>Return 1 if this Object is a <code>Data::Sofu::Map</code> instance, 0 otherwise.</p>
+<p>
+</p>
+<h2><a name="stringcomment__"><code>stringComment()</code></a></h2>
+<p>Returns the current Objects comment as a string (inculding the # sign)</p>
+<p>
+</p>
+<h2><a name="getcomment__"><code>getComment()</code></a></h2>
+<p>Returns the current comment as an arrayref (One string for each line)</p>
+<p>
+</p>
+<h2><a name="hascomment__"><code>hasComment()</code></a></h2>
+<p>Returns the amount of comment lines.</p>
+<p>
+</p>
+<h2><a name="setcomment_comment_">setComment(COMMENT)</a></h2>
+<pre>
+
+Sets the comments for this Object.</pre>
+<p>COMMENT should be a reference to an Array</p>
+<p>
+</p>
+<h2><a name="appendcomment_comment_">appendComment(COMMENT)</a></h2>
+<p>Appends to the comments for this Object.</p>
+<p>COMMENT should be a reference to an Array</p>
+<p>
+</p>
+<h2><a name="isdefined__"><code>isDefined()</code></a></h2>
+<p>Returns 1 if the Object is not an instance of <code>Data::Sofu::Undefined</code></p>
+<p>
+</p>
+<h2><a name="isreference__"><code>isReference()</code></a></h2>
+<p>Returns 0 if the Object is not an instance of <code>Data::Sofu::Reference</code></p>
+<p>
+</p>
+<h2><a name="pack__"><code>pack()</code></a></h2>
+<p>Returns a string representation of the current Object and all Objects it might include</p>
+<p>
+</p>
+<h2><a name="binarypack__"><code>binaryPack()</code></a></h2>
+<p>Returns a string of that represents the current Object according the the Binary Sofu specification.</p>
+<p>Only works on <code>Data::Sofu::Map</code>'s other Objects are getting boxed in a Map</p>
+<p>
+</p>
+<h2><a name="string_level_tree_"><code>string(LEVEL,TREE)</code></a></h2>
+<p>A helper function to detect multiple references and convert them to Sofu References, calls stringify with its arguments</p>
+<pre>
+        <span class="variable">$o</span><span class="operator">-&gt;</span><span class="variable">string</span><span class="operator">(-</span><span class="number">1</span><span class="operator">,</span><span class="string">""</span><span class="operator">)</span> <span class="operator">===</span> <span class="variable">$o</span><span class="operator">-&gt;</span><span class="keyword">pack</span><span class="operator">();</span>
+        <span class="keyword">print</span> <span class="variable">$map</span><span class="operator">-&gt;</span><span class="variable">string</span><span class="operator">(</span><span class="number">0</span><span class="operator">,</span><span class="string">""</span><span class="operator">)</span> <span class="operator">===</span> <span class="variable">$o</span><span class="operator">-&gt;</span><span class="keyword">write</span><span class="operator">(\</span><span class="variable">*STDOUT</span><span class="operator">);</span>
+</pre>
+<p>
+</p>
+<h2><a name="packcomment_binary_driver_"><code>packComment(BINARY DRIVER)</code></a></h2>
+<p>Returns the Objects Comments packed by a BINARY DRIVER, used by <code>binaryPack()</code> and <code>writeBinary()</code></p>
+<p>Never call this one alone.</p>
+<p>
+</p>
+<h2><a name="binary_tree__binary_driver_"><code>binary(TREE, BINARY DRIVER)</code></a></h2>
+<p>A helper function to detect multiple references and convert them to Sofu References, calls stringify with its arguments. Should never be called alone, because the result will miss its header.</p>
+<p>
+</p>
+<h2><a name="write_file_">write(FILE)</a></h2>
+<p>Writes the string representation of this Object to a file</p>
+<p>File can be:</p>
+<p>A filename,</p>
+<p>a filehandle or</p>
+<p>a reference to a scalar.</p>
+<p>
+</p>
+<hr />
+<h1><a name="bugs">BUGS</a></h1>
+<p>Comment and Binary Modes are not really sofud complient, might change in the future</p>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p><a href="/Data/Sofu.html">the Data::Sofu manpage</a>, <a href="/Data/Sofu/Binary.html">the Data::Sofu::Binary manpage</a>, <a href="/Data/Sofu/Map.html">the Data::Sofu::Map manpage</a>, <a href="/Data/Sofu/List.html">the Data::Sofu::List manpage</a>, <a href="/Data/Sofu/Value.html">the Data::Sofu::Value manpage</a>, <a href="/Data/Sofu/Undefined.html">the Data::Sofu::Undefined manpage</a>, <a href="http://sofu.sf.net">http://sofu.sf.net</a></p>
+
+</body>
+
+</html>
+

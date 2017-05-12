@@ -1,0 +1,91 @@
+documentation de SVG2zinc
+
+# $Id: doc.txt,v 1.7 2003/09/03 15:59:59 mertz Exp $
+
+limites connues:
+- la valeur currentColor (correspondant à la valeur de l'attribut color) n'est pas implémenté
+cf exemple: W3C_1.1_FullTests/svg/painting-fill-02-t.svg
+- l'héritage des styles est incorrect, cf exemple l'attribut stroke=yellow qui
+n'est pas hérité dans la rangée du bas de
+W3C_1.1_FullTests/svg/painting-fill-04-t.svg
+
+- les items marker ne sont pas implémentés (est-ce faisable, pas sur!)
+
+- les transformations skewX, skewY et matrix de SVG n'existe pas encore dans Zinc
+
+- les ombres apportées par "filtre > special > ombre portée" sont transformées en bitmap png et ceux-ci ne sont pas exactement bien placées dans zinc. Le pb est surement due à ?
+
+- pour les items svg, pattern et marker (nyi), il faudrait gérer la propriété overflow pour gérer un clipping dans le cas où elle vaut "hidden". Si elle vaut scroll que faire?. Sinon ne rien faire.
+- la propriété enable-background n'a d'intérêt que pour des filtres SVG 
+
+- pour les items "container" ('svg', 'g', 'defs' 'symbol', 'clipPath', 'mask', 'pattern', 'marker', 'a' and 'switch'.) il faudrait implémenter la propriété enable-background (??? apparemment pour l'utilisation de filtre...)
+
+- les attributs class utilisées avec des construction text/css comme ceci:
+    <style type="text/css"><![CDATA[
+    .Border { fill:none; stroke:blue; stroke-width:1 }
+    .Connect { fill:none; stroke:#888888; stroke-width:2 }
+    ]]></style>
+  ne sont pas (encore?) implémentés
+  
+
+- les items tref, altglyph, glyph, pattern peuvent contenir des xlink:href Ceux-ci ne sont pas traités
+
+An Error occured: unknown attribute "-joinstyle": (data-svg/intuilabeSamples/april03/ok/divers/voiture2.svg)
+
+  
+Item Text:
+- les items text sont mal traités actuellement. Certaines polices (vectorielles par défintion) sont récupérées et analysées, voir &createNamedFont et la table de hash %fontsMapping. Mais pour l'instant ceci reste encore un peu exploratoire.
+- certains attributs géométriques ne sont pas lus.
+- De plus il existe une limitation entre SVG et Zinc, c'est la possibilité de placer précisement le texte sur plusieurs lignes tout en traitant le texte comme une seule entité. En SVG cela est possible (et semble utilisé pour traiter les espacements non-standard entre caractères sur une même ligne). En zinc le texte peut-être multiligne, mais les positions dépendent de la police (et de l'alignement) et ne peuvent pas être modifiées par l'utilisateur.
+- la notion de tspan pour du texte qui par ex. change de couleur ne peut pas être implémenté (cf remarque précédente). Donc si un texte SVG possède plusieurs couleurs, plusieurs polices... c'est normalement la dernière qui sera prise en compte. Dans le code généré on verra plusieurs fois les attributs -color ou -font... 
+- si une transformation scale (mais aussi rotation) s'applique au texte ou à un groupe père (par exemple le groupe 'svg'), le texte N'AURA PAS la bonne taille.
+- dans zinc le texte ne s'écrit que de gauche à droite, alors que dans SVG toutes les directions sont possibles.
+- l'ancrage du texte (option -anchor de zinc) est approximative actuellement; quelles sont les specif de SVG)
+- la notion de path appliqué à des textes n'est pas réalisable actuellement en zinc
+
+Item PATH:
+
+- il faudrait tester les commandes Q,q S,s A,a (et aussi c,C) quand la commande est omises en cas de répétition multiple (par exemple 2 beziers successives peuvent se décrire par C suivi de 6x2 coordonnées). En effet il y avait des bugs peut-être corrigés (10/11/02)
+
+
+- item rectangle
+Les attributs rx et ry pour des rectangles ne sont pas implémentés. Cela pourra l'être quand on aura des path dans les items curve... 
+ 
+- conversions de distances
+Sont approximatives et ne tiennent pas compte de la défintion de l'écran . Mais faut-il vraiment en tenir compte pour du code généré?!
+
+- les gradients radiaux ne sont pas encore implémentés
+
+- tag DEFS:
+Implémenté un peu n'importe comment! Dans un DEFS on doit pouvoir définir des objets nommés qui seront utilisés ultérieurement via des USE ou par des URI (cas des gradients). Ces objets peuvent aussi être des objets graphiques, mais ceux-ci ne seront pas visualisé dans le DEFS, mais dans le USE.
+
+- tag CLIP: pour l'instant ce tag est ignoré. En fait son contenu est traité, mais le tout est mis dans un groupe invisible. Cela fonctionne à peu près pour l'exemple Fichcrna.svg qui a été fabriqué par l'exportation SVG dans Illustrator d'un fichier .pdf généré par word!
+
+Comment générer des fichiers svg avec Illustrator utilisables?
+
+- il faut illustrator v10
+- positionner "image externe" => non, c'est ok inutile gràace à un patch de Lemort (svg2zinc v0.4, le 3/9/03)
+- attention aux textes. si il y en a peu, il est possible de le vectoriser auparavant
+- eviter les css dans les options avancées
+- attention aux éléments illustrator qui ne peuvent pas être générés en SVG et qui se traduisent par des images png
+  ex: les filets, les ombres vectorielles (menu ....)
+
+  
+Bug éliminés:
+
+- les couleurs "web" de svg ne sont pas encore toutes traitées! voir http://www.w3schools.com/html/html_colornames.asp pour la liste
+=> ok grace au Patch de A. Lemort le 20/4/0O3
+
+- traitement des contour multiples. Avec zinc 3.2.6a, la commande contour multiple xor était assez proche des contours multiples des path de SVG. MAIS AVEC LA NOUVELLE VERSION (> 3.2.6d) la commande xor est supprimée et remplacé par add ou addhole. Il y aura des différences quand le add / addhole concerne des contours non entièrement disjoints.... TBC
+=> pb résolu avec Zinc 3.2.6h ako zinc 3.4
+
+- les items radialgradient et lineargradient doivent hériter des stop définis dans un autre gradient grâce à un lien xlink:href. Ceci doit être fait (cf example: border-collie.svg et win2.svg
+=> implémenté le 7/5/03 23h!
+
+Item Path:
+- la commande A est implémentée de manière légèrement erronée: voir exemple svg/arc01_174.svg
+=> ok le 3/9/03 grace à lemort!
+
+
+
+

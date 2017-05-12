@@ -1,0 +1,16 @@
+use ExtUtils::Constant qw(WriteConstants autoload);
+
+open IN, "../shishi.h" or die $!;
+while (<IN>) { 
+    if (/enum/ .. /}/) {
+        next if /enum/;
+        next if /}/;
+        chomp;
+        s/,//; s/\s+//g;
+        push @enums, { name => $_, type => "IV", macro => 1};
+    }
+}
+
+close IN;
+WriteConstants(NAME => "Shishi", NAMES => \@enums);
+print "\t$_->{name}\n" for @enums;

@@ -1,0 +1,27 @@
+Revision history for scriptname
+
+0.10 Thu May 23 11:59:16 2013
+     Create directories in the tests so CPAN is satisfied :-D
+
+0.9  Wed Dec 19 12:43:22 2012
+     Absent changelog
+
+0.8  Wed Dec 19 12:41:22 2012
+     Using Dist::Zilla and other tweaks
+
+0.7  Fri Oct  3 11:49:18 2008
+     New use of 'lib' flag; some test tweaks
+
+0.6  Mon Sep 29 12:52:11 2008
+     Attempt to silent PAUSE FAIL messages
+
+0.5  Sat Sep 27 15:35:06 2008
+     Lifted requirement for 5.008
+
+0.4  Fri Sep 26 16:13:26 2008
+     Changes in documentation to reflect differences between
+     scriptname and FindBin
+
+0.3  Thu Sep 25 10:55:48 2008
+     Initial release
+

@@ -1,0 +1,414 @@
+<HTML>
+    <HEAD>
+        <TITLE>Site map for http://www.cre.canon.co.uk/</TITLE>
+    </HEAD>
+    <BODY BGCOLOR = "#FFFFFF">
+        <H1>Site map for http://www.cre.canon.co.uk/</H1>
+        <HR NOSHADE>
+
+<SCRIPT LANGUAGE = "JavaScript">
+
+// Tree.js
+//
+// Javascript expandable/collapsable tree class.
+// Written by Jef Pearlman (jef@mit.edu)
+// 
+///////////////////////////////////////////////////////////////////////////////
+
+// class Tree 
+// {
+//   public: 
+//       // These functions can be used to interface with a tree. 
+//     void TreeView(params);
+//       // Constructs a TreeView. Params must be an object containing the
+//       // following properties:
+//       // id: UNIQUE id for the tree
+//       // items: Nested array of strings and arrays determining the tree 
+//       //        structure and content.
+//       // x: Optional x position for tree.
+//       // y: Optional y position for tree.
+//     int getHeight();
+//       // Returns the height of the tree, fully expanded.
+//     int getWidth();
+//       // Returns the width of the widest section of the tree, 
+//       // fully expanded.
+//     int getVisibleHeight();
+//       // Returns the height of the visible tree.
+//     int getVisibleWidth();
+//       // Returns the width of the widest visible section of the tree. 
+//     int getX();
+//       // Returns the x position of the tree. 
+//     int getY();
+//       // Returns the y position of the tree.
+//     Object getLayer();
+//       // Returns the layer object enclosing the entire tree.
+// }
+
+function TreeNode(content, enclosing, id, depth, y)
+     // Constructor for a TreeNode object, creates the appropriate layers
+     // and sets the required properties.
+{
+  this.id = id;
+  this.enclosing = enclosing;
+  this.children = new Array;
+  this.maxChild = 0;
+  this.expanded = false;
+  this.getWidth = TreeNode_getWidth;
+  this.getVisibleWidth = TreeNode_getVisibleWidth;
+  this.getHeight = TreeNode_getHeight;
+  this.getVisibleHeight = TreeNode_getVisibleHeight;
+  this.layout = TreeNode_layout;
+  this.relayout = TreeNode_relayout;
+  this.childLayer = null;
+  this.parent = this.enclosing.node;
+  this.tree = this.parent.tree;
+  this.depth = depth;
+
+  // Write out the content for this item.
+  // Ave - replaced gifs with + / - / o
+  document.write("<LAYER TOP="+y+" LEFT="+(this.depth*10)+" ID=Item"+this.id+">");
+  document.write("<LAYER ID=Buttons WIDTH=9 HEIGHT=9>");
+  document.write("<LAYER ID=Minus VISIBILITY=HIDE WIDTH=9 HEIGHT=9>-</LAYER>");
+  document.write("<LAYER ID=Plus WIDTH=9 VISIBILITY=HIDE HEIGHT=9>+</LAYER>");
+  document.write("<LAYER ID=Disabled VISIBILITY=INHERIT WIDTH=9 HEIGHT=9>o</LAYER>");
+  document.write("</LAYER>"); // Buttons
+  this.layer = this.enclosing.layers['Item'+this.id];
+  this.layers = this.layer.layers;
+  document.write("<LAYER ID=Content LEFT="+(this.layers['Buttons'].x+10)+">"+content+"</LAYER>");
+  document.write("</LAYER>"); // Item
+
+  // Move the buttons to the right position (centered vertically) and
+  // capture the appropriate events.
+  // Ave - now aligned top
+  //this.layers['Buttons'].moveTo(this.layers['Buttons'].x, this.layers['Content'].y+((this.layers['Content'].document.height-9)/2));
+  this.layers['Buttons'].moveTo(this.layers['Buttons'].x, this.layers['Content'].y);
+  this.layers['Buttons'].layers['Plus'].captureEvents(Event.MOUSEDOWN);
+  this.layers['Buttons'].layers['Plus'].onmousedown=TreeNode_onmousedown_Plus;
+  this.layers['Buttons'].layers['Plus'].node=this;
+  this.layers['Buttons'].layers['Minus'].captureEvents(Event.MOUSEDOWN);
+  this.layers['Buttons'].layers['Minus'].onmousedown=TreeNode_onmousedown_Minus;
+  this.layers['Buttons'].layers['Minus'].node=this;
+
+  // Note the height and width;
+  this.height=this.layers['Content'].document.height;
+  this.width=this.layers['Content'].document.width + 10 + (depth*10);
+}
+
+function Tree_build(node, items, depth, nexty)
+     // Recursive function builds a tree, starting at the current node
+     // using the items in items, starting at depth depth, where nexty
+     // is where to locate the new layer to be placed correctly.
+{
+  var i;
+  var nextyChild=0;
+
+  if (node.tree.version >= 4)
+    {
+      // Create the layer for all the children.
+      document.write("<LAYER TOP="+nexty+" VISIBILITY=HIDE ID=Children>");
+      node.childLayer = node.enclosing.layers['Children'];
+      node.childLayer.node = node;
+    }
+  else
+    {
+      // For Navigator 3.0, create a nested unordered list.
+      document.write("<UL>");
+    }
+
+  for (i=0; i<items.length; i++)
+    {
+      if(typeof(items[i]) == "string")
+	{
+	  if (node.tree.version >= 4)
+	    {
+	      // Create a new node as the next child.
+	      node.children[node.maxChild] = new TreeNode(items[i], node.childLayer, node.maxChild, depth, nextyChild);
+	      nextyChild+=node.children[node.maxChild].height;
+	    }
+	  else
+	    {
+	      // Create a new item.
+	      document.write("<LI>"+items[i]);
+	    }
+	  node.maxChild++;
+	}
+      else
+	if (node.maxChild > 0)
+	  {
+	    // Build a new tree using the nested items array, placing it
+	    // under the last child created.
+	    if (node.tree.version >= 4)
+	      {
+		Tree_build(node.children[node.maxChild-1], items[i], depth+1, nextyChild);    
+		nextyChild+=node.children[node.maxChild-1].getHeight()-node.children[node.maxChild-1].height;
+		node.children[node.maxChild-1].layer.layers['Buttons'].layers['Disabled'].visibility="hide";
+		node.children[node.maxChild-1].layer.layers['Buttons'].layers['Plus'].visibility="inherit";
+	      }
+	    else
+	      Tree_build(node, items[i], depth+1, nextyChild);    
+	  }
+    }
+  
+  // End the layer or nested unordered list.
+  if (node.tree.version >= 4)
+    document.write("</LAYER>"); // childLayer
+  else
+    {
+      document.write("</UL>");
+    }
+
+}
+
+function Reposition_footer( )
+{
+    var footer = document.layers[ "Footer" ];
+    if ( footer != null )
+    {
+        footer.moveTo( 5, firstTree.getY() + firstTree.getVisibleHeight() );
+    }
+}
+
+function TreeNode_onmousedown_Plus(e)
+     // Handle a mouse down on a plus (expand).
+{
+  var node=this.node;
+  var oldHeight=node.getVisibleHeight();
+  // Switch the buttons, set the current node expanded, and
+  // relayout everything below it before before displaying the node.
+  node.layers['Buttons'].layers['Minus'].visibility="inherit";
+  node.layers['Buttons'].layers['Plus'].visibility="hide";
+  node.expanded=true;
+  node.parent.relayout(node.id,node.getVisibleHeight()-oldHeight);
+  node.childLayer.visibility='inherit';
+  Reposition_footer();
+  return false;
+}
+
+function TreeNode_onmousedown_Minus(e)
+     // Handle a mouse down on a minus (collapse).
+{
+  var node=this.node;
+  var oldHeight=node.getVisibleHeight();
+  // Switch the buttons, set the current node collapsed, and
+  // hide the node before relaying out everything below it.
+  node.layers['Buttons'].layers['Plus'].visibility="inherit";
+  node.layers['Buttons'].layers['Minus'].visibility="hide";
+  node.expanded=false;
+  node.childLayer.visibility='hide';
+  node.parent.relayout(node.id,node.getVisibleHeight()-oldHeight);  
+  Reposition_footer();
+  return false;
+}
+
+function TreeNode_getHeight()
+     // Get the Height of the current node and it's children.
+{
+  // Recursively add heights.
+  var h=0, i;
+  for (i = 0; i < this.maxChild; i++)
+    h += this.children[i].getHeight();
+  h += this.height;
+  return h;
+}
+
+function TreeNode_getVisibleHeight()
+     // Get the Height of the current node and it's visible children.
+{
+  // Recursively add heights. Only recurse if expanded.
+  var h=0, i;
+  if (this.expanded)
+    for (i = 0; i < this.maxChild; i++)
+      h += this.children[i].getVisibleHeight();
+  h += this.height;
+  return h;
+}
+
+function TreeNode_getWidth()
+     // Get the max Width of the current node and it's children.
+{
+  // Find the max width by recursively comparing.
+  var w=0, i;
+  for (i=0; i<this.maxChild; i++)
+    if (this.children[i].getWidth() > w)
+      w = this.children[i].getWidth();
+  if (this.width > w)
+    return this.width;
+  return w;
+}
+
+function TreeNode_getVisibleWidth()
+     // Get the max Width of the current node and it's visible children.
+{
+  // Find the max width by recursively comparing. Only recurse if expanded.
+  var w=0, i;
+  if (this.expanded)
+    for (i=0; i<this.maxChild; i++)
+      if (this.children[i].getVisibleWidth() > w)
+	w = this.children[i].getVisibleWidth();
+  if (this.width > w)
+    return this.width;
+  return w;
+}
+
+function TreeView_getX()
+     // Get the x location of the main tree layer.
+{
+  // Return the x property of the main layer.
+  return document.layers[this.id+"Tree"].x;
+}
+
+function TreeView_getY()
+     // Get the y location of the main tree layer.
+{
+  // Return the y property of the main layer.
+  return document.layers[this.id+"Tree"].y;
+}
+
+function getLayer()
+     // Get the main layer object.
+{
+  // Returnt he main layer.
+  return document.layers[this.id+"Tree"];
+}
+
+function TreeNode_layout()
+     // Layout the entire tree from scratch, recursively.
+{
+  var nexty=0, i;
+  // Set the layer visible if expanded, hidden if not.
+  if (this.expanded)
+    this.childLayer.visibility="inherit";
+  else
+    if (this.childLayer != null)
+      this.childLayer.visibility="hide";
+  // If there is a child layer, move it to the appropriate position, and
+  // move the children, laying them each out in turn.
+  if (this.childLayer != null)
+    {
+      this.childLayer.moveTo(0, this.layer.y+this.height);
+      for (i=0; i<this.maxChild; i++)
+	{
+	  this.children[i].layer.moveTo((this.depth+1)*10, nexty);
+	  this.children[i].layout();
+	  nexty+=this.children[i].height;
+	}
+    }
+}
+
+function TreeNode_relayout(id, movey)
+{
+  // Move all children physically below the current child number id of
+  // the current node. Much faster than doing a layout() each time.
+
+  // Move all children _after_ this child.
+  for (id++;id<this.maxChild; id++)
+    {
+      this.children[id].layer.moveBy(0, movey);
+      if (this.children[id].childLayer != null)
+	this.children[id].childLayer.moveBy(0, movey);
+    }
+  // If there is a parent, move all of its children below this node,
+  // recursively.
+  if (this.parent != null)
+    this.parent.relayout(this.id, movey);
+}
+
+function Tree(param)
+     // Instantiates a tree and displays it, using the items, id, and optional
+     // x and y in param.
+{
+  // Set up member variables and functions. Also duplicate important TreeNode
+  // member variables so this can serve as a TreeNode (vaguely like 
+  // subclassing)
+  this.version=eval(navigator.appVersion.charAt(0));
+  this.id = param.id;
+  this.children = new Array;
+  this.maxChild = 0;
+  this.expanded = true;
+  this.layout = TreeNode_layout;
+  this.relayout = TreeNode_relayout;
+  this.getX = TreeView_getX;
+  this.getY = TreeView_getY;
+  this.getWidth = TreeNode_getWidth;
+  this.getVisibleWidth = TreeNode_getVisibleWidth;
+  this.getHeight = TreeNode_getHeight;
+  this.getVisibleHeight = TreeNode_getVisibleHeight;
+  this.depth = -1;
+  this.height = 0;
+  this.width = 0;
+  this.tree = this;
+  var items = eval(param.items);
+
+  var left = "";
+  var top = "";
+  if (param.x != null && param.x != "")
+    left += " LEFT="+param.x;
+  if (param.y != null && param.y != "")
+    top += " TOP="+param.y;
+
+
+  if (this.version >= 4)
+    {
+      // Create a surrounding layer to guage size and control the entire tree.
+      // Also create a secondary internal layer so that the code can treat
+      // the tree itself correctly as a node (must have an enclosing layer
+      // and a children layer).
+      document.write("<LAYER VISIBILITY=HIDE ID="+this.id+"Tree"+left+top+">");
+      document.write("<LAYER ID=mainLayer>");
+      this.enclosing = document.layers[this.id+"Tree"].layers['mainLayer'];
+      this.layers = this.enclosing.layers;
+      this.layer = this.enclosing;
+      this.enclosing.node = this;
+    } 
+
+  Tree_build(this, items, 0, 0); // Build the tree.
+  
+  if (this.version >= 4)
+    {
+      // Finish output, record size;
+      document.write("</LAYER></LAYER>");
+      this.layout();
+      document.layers[this.id+"Tree"].visibility="inherit";
+    }
+}
+</SCRIPT>
+<SCRIPT LANGUAGE = "JavaScript">
+    firstTree = new Tree ( 
+        { 
+            id:
+                "sitemap", 
+            items:
+"['<DD><DT><A HREF = \"http://www.cre.canon.co.uk/\">Canon Research Centre Home Page</A></DT><DD>&middot; overview of CRE &middot; technology overview &middot; job opportunities &middot; &middot; where we are &middot; press releases &middot; other canon sites &middot; Canon Research Centre Europe&#44; 1 Occam Court&#44; Occam Road&#44; Surrey Research Park&#44; Guild</DD></DL>',['<DD><DT><A HREF = \"http://www.cre.canon.co.uk/othrsite.htm\">Other Canon Sites</A></DT><DD>Canon Information Systems Research Australia performs a variety of research and development work for Canon and is one of Australia&#39;s leading research and development organisations&#46; Canon Information S</DD></DL>','<DD><DT><A HREF = \"http://www.cre.canon.co.uk/where/index.htm\">Where We Are</A></DT><DD>Canon Research Centre Europe Ltd 1 Occam Court Occam Road Surrey Research Park Guildford&#44; Surrey GU2 5YJ United Kingdom  Tel&#58; &#43;44 1483 448844 Fax&#58; &#43;44 1483 448845 From 9am&#44; there is also h&#43;05 &#40;431&#41;&#46; &copy;</DD></DL>',['<DD><DT><A HREF = \"http://www.cre.canon.co.uk/where/email.htm\">Contact E&#45;mail Addresses</A></DT><DD>We are only able to answer queries relating to this web site and our research&#46;&nbsp; For answers to any technical questions regarding any existing Canon products or printer drivers&#44; please contact your loc</DD></DL>','<DD><DT><A HREF = \"http://www.cre.canon.co.uk/where/map1.htm\">Surrey</A></DT><DD>This is an active map of Guildford and London&#46; Coming from London&#44; take the second exit signposted to Guildford&#46; Zoom In This page was last updated on 25&#47;01&#47;99 &copy;Copyright Canon Research Centre Europe </DD></DL>',['<DD><DT><A HREF = \"http://www.cre.canon.co.uk/where/m3.htm\">The M3 Motorway</A></DT><DD>The M3 Motorway The M3 goes out southwest from London&#44; to Portsmouth&#44; Southampton and the Isle of Wight&#46; Coming from London&#44; turn south onto the M25 and then south onto the A3 to get to CRE&#46; This page</DD></DL>','<DD><DT><A HREF = \"http://www.cre.canon.co.uk/where/m4.htm\">The M4 Motorway</A></DT><DD>The M4 Motorway This page was last updated on 25&#47;01&#47;99 &copy;Copyright Canon Research Centre Europe Ltd 1998</DD></DL>','<DD><DT><A HREF = \"http://www.cre.canon.co.uk/where/heathrow.htm\">Heathrow Airport</A></DT><DD>Take the M4 west away from London&#44; then the M25 south towards Gatwick&#46; General enquiries&#58; &#43;44 181 759 4321 British Airways&#58; &#43;44 181 759 2525 This page was last updated on 25&#47;01&#47;99 &copy;Copyright Canon Res</DD></DL>','<DD><DT><A HREF = \"http://www.cre.canon.co.uk/where/london.htm\">London</A></DT><DD>To get to CRE from London&#44; you can either go by car&#44; taking the M3&#44; M25&#44; and A3&#46; The London Underground system &#40;the Tube&#41; goes all the way out to Heathrow Airport&#46; Both Waterloo and Victoria are on th</DD></DL>','<DD><DT><A HREF = \"http://www.cre.canon.co.uk/where/gatwick.htm\">Gatwick Airport</A></DT><DD>Take the M23 north towards London&#44; then the M25 west towards Heathrow&#46; General enquiries&#58; &#43;44 1293 535353 To confirm which terminal to use&#58; &#43;44 1293 567675 Car park enquiries&#58; &#43;44 1293 567161 British </DD></DL>','<DD><DT><A HREF = \"http://www.cre.canon.co.uk/where/waterloo.htm\">By Train from Waterloo</A></DT><DD>There are normally two fast trains an hour from Waterloo to Guildford&#46; Waterloo is in Central London&#44; just south of the river&#46; Rail Information This page was last updated on 11&#47;03&#47;99 &copy;Copyright Canon </DD></DL>','<DD><DT><A HREF = \"http://www.cre.canon.co.uk/where/map2.htm\">Guildford</A></DT><DD>Guildford This is an active map of Guildford and London&#46; Click on the red spheres for more information on how to get to CRE&#44; or zoom in to see the location of CRE in the Surrey Research Park&#46; Zoom In </DD></DL>',['<DD><DT><A HREF = \"http://www.cre.canon.co.uk/where/map3.htm\">University of Surrey Research Park</A></DT><DD>University of Surrey Research Park The following map shows our location on the Research Park&#46; Zoom Out This page was last updated on 25&#47;01&#47;99 &copy;Copyright Canon Research Centre Europe Ltd 1998</DD></DL>',],'<DD><DT><A HREF = \"http://www.cre.canon.co.uk/where/m40.htm\">The M40 Motorway</A></DT><DD>The M40 Motorway The M40 goes out northwest from London&#44; to Oxford&#46; It is also a good route to Manchester&#46; Whichever direction you are coming from along it&#44; turn south onto the M25 and then south onto</DD></DL>','<DD><DT><A HREF = \"http://www.cre.canon.co.uk/where/m23.htm\">The M23 Motorway</A></DT><DD>The M23 Motorway The M23 goes out south from London&#44; past Gatwick Airport&#44; to Brighton on the south coast&#46; The journey from Gatwick will take about 40 minutes&#46; This page was last updated on 25&#47;01&#47;99 &copy;</DD></DL>','<DD><DT><A HREF = \"http://www.cre.canon.co.uk/where/a3.htm\">The A3 Motorway</A></DT><DD>The A3 is not a motorway&#44; but it is as good as a motorway between the M25 and Guildford&#46; Coming from London&#44; this is not the first exit signposted to Guildford&#46; This page was last updated on 25&#47;01&#47;99 </DD></DL>','<DD><DT><A HREF = \"http://www.cre.canon.co.uk/where/m25.htm\">The M25 Motorway</A></DT><DD>The M25 runs all the way around London&#46; Very congested during the morning and evening rush hour&#46; Furthermore&#44; there are major roadwork&#39;s underway on either side of the junction where you turn off for </DD></DL>',],],'<DD><DT><A HREF = \"http://www.cre.canon.co.uk/press/index.htm\">Press Releases</A></DT><DD>We are planning on updating this page with details of publications and papers that have been produced within CRE&#46;&nbsp; Please return to hear the latest news&#46; This page was last updated on 25&#47;01&#47;99 &copy;Copyri</DD></DL>','<DD><DT><A HREF = \"http://www.cre.canon.co.uk/copy2.htm\">Copyright</A></DT><DD>&copy; Copyright Canon Research Centre Europe Ltd All rights reserved Canon hereby authorizes you to copy documents and information published by Canon on the World Wide Web &#40;henceforth referred to by &quot;docu</DD></DL>','<DD><DT><A HREF = \"http://www.cre.canon.co.uk/jobs/index.htm\">Job Opportunities</A></DT><DD>Software Engineering for Speech and Language Technology&#46; If you have any queries please contact&#58; Tel&#58; &#43;44 1483 448844 Fax&#58; &#43;44 1483 448845 This page was last updated on 11&#47;03&#47;99 &copy;Copyright Canon Resea</DD></DL>',['<DD><DT><A HREF = \"http://www.cre.canon.co.uk/jobs/softengslt.htm\">Software Engineering for Speech and Language Technology</A></DT><DD>The Speech and Language Division at CRE has a new position for a top quality software engineer&#46;&nbsp; Because of British law&#44; preference will be given to applicants who already have the right to work in th</DD></DL>',],'<DD><DT><A HREF = \"http://www.cre.canon.co.uk/overview/index.htm\">Overview of CRE</A></DT><DD>What we want to achieve and how we&#39;ll do it&#46; A summary of the principles CRE work to&#46; Canon&#39;s world&#45;wide corporate philosophy&#46; This page was last updated on 25&#47;01&#47;99 &copy;Copyright Canon Research Centre E</DD></DL>',['<DD><DT><A HREF = \"http://www.cre.canon.co.uk/overview/past%20achieve.htm\">Past Achievements</A></DT><DD>Our work at CRE has already led to the formation of two spin&#45;off Canon businesses to exploit our technologies world&#45;wide&#58;  Canon Audio&#58; A unique new concept in loudspeakers was developed by CRE&#44; calle</DD></DL>','<DD><DT><A HREF = \"http://www.cre.canon.co.uk/overview/kyosei/kyosei.htm\">Kyosei</A></DT><DD>Canon&#39;s Philosophy of kyosei means living and working together for the common good&#46; Addressing Imbalances In today&#39;s world&#44; there are several imbalances that are obstacles to kyosei&#46; Doing this will r</DD></DL>',['<DD><DT><A HREF = \"http://www.cre.canon.co.uk/overview/kyosei/commnty.htm\">In the Community</A></DT><DD>University of Surrey &#45; National Science&#44; Mathematics &amp; Engineering Conference University of Essex &#45; Centre for Audio Research &amp; Engineering Busbridge C of E School&#44; Godalming Boxgrove Primary School&#44; </DD></DL>',],'<DD><DT><A HREF = \"http://www.cre.canon.co.uk/overview/people/index.htm\">Our People</A></DT><DD>Paul Otto&#44; Director of CRE Tim O&#39;Donoghue&#44; Head of Solutions and Systems Eli Tzirkel&#45;Hancock&#44; Head of Speech and Language Allan Davison&#44; Head of Computer Vision This page was last updated on 25&#47;01&#47;99 </DD></DL>',['<DD><DT><A HREF = \"http://www.cre.canon.co.uk/overview/people/paulotto.htm\">Paul Otto</A></DT><DD>When Paul Otto walks into a room&#44; he makes an instant impression&#46; &quot;I like the spirit underlying the company&#44;&quot; he says&#46; Away from work&#44; Paul spends time with his wife and two children&#44; and has recently</DD></DL>','<DD><DT><A HREF = \"http://www.cre.canon.co.uk/overview/people/allan.htm\">Allan Davison</A></DT><DD>Allan joined CRE six&#45;and&#45;a&#45;half years ago&#44; having lectured at London University for the previous ten&#46; &quot; I was looking for a research environment&#44;&quot; he explains&#44; &quot;but one that provided more focused work</DD></DL>','<DD><DT><A HREF = \"http://www.cre.canon.co.uk/overview/people/tim.htm\">Tim O&#39;Donoghue</A></DT><DD>Tim arrived at CRE direct from the University of Leeds seven years ago&#44; where he&#39;d studied computer science and language processing&#46; The nature of Tim&#39;s work means he spends around 30 per cent of his </DD></DL>','<DD><DT><A HREF = \"http://www.cre.canon.co.uk/overview/people/eli.htm\">Eli Tzirkel&#45;Hancock</A></DT><DD>Eli&#39;s story is an interesting one&#46; Eli enjoys swimming&#44; ice&#45;skating&#44; chess&#44; bridge and reading&#44; and he can tell you some good stories about his scuba diving&#46; This page was last updated on 25&#47;01&#47;99 &copy;Co</DD></DL>',],'<DD><DT><A HREF = \"http://www.cre.canon.co.uk/overview/workcre.htm\">Working at CRE</A></DT><DD>There&#39;s more to work than mere work&#46; We will also endeavour &#45; within reason &#45; to supply you with any hardware&#44; software or reference books you may need to facilitate your particular project&#46; Massage a</DD></DL>','<DD><DT><A HREF = \"http://www.cre.canon.co.uk/overview/mission.htm\">CRE Mission &#45; Technological Innovation for Cano</A></DT><DD>To ensure Canon has a technical edge where it matters &#45; by providing world&#45;leading R&amp;D&#44; and world&#45;class development and support&#46; CRE is part of Canon&#39;s commitment to research and development with worl</DD></DL>','<DD><DT><A HREF = \"http://www.cre.canon.co.uk/overview/prncpls.htm\">Canon&#39;s R&amp;D Principles</A></DT><DD>We do not conduct R&amp;D that is not desirable from an ecological point of view&#46;    3&#46; We create previously unexplored technologies and product categories&#46;    4&#46; This page was last updated on 23&#47;02&#47;99 &copy;C</DD></DL>',],'<DD><DT><A HREF = \"http://www.cre.canon.co.uk/techover/index.htm\">Technology Overview</A></DT><DD>Solutions and Systems Speech and Language Computer Vision Each of these working groups shares CRE&#39;s commitment to research and development This page was last updated on 25&#47;01&#47;99 &copy;Copyright Canon Resea</DD></DL>',['<DD><DT><A HREF = \"http://www.cre.canon.co.uk/techover/s&lg.htm\">Speech and Language Division</A></DT><DD>With around 20 members&#44; the Speech and Language Group is the largest research group at CRE&#46; Whilst the main focus of the group is to perform world&#45;class research&#44; we are also engaged in the transfer o</DD></DL>','<DD><DT><A HREF = \"http://www.cre.canon.co.uk/techover/s&s.htm\">Solutions and Systems Division</A></DT><DD>The group&#39;s highest&#45;profile project to date has undoubtedly been the development of Adroit&#44; a memory&#45;based translation system which is used by Canon Europa to assist in the localisation of Canon&#39;s pro</DD></DL>',['<DD><DT><A HREF = \"http://www.cre.canon.co.uk/techover/adroit.htm\">Adroit</A></DT><DD>The Adroit system is used by Canon Europa to assist in the localisation and production of user documentation in Europe&#46; The translation component of Adroit utilises a large database of previously tran</DD></DL>',],'<DD><DT><A HREF = \"http://www.cre.canon.co.uk/techover/cvg.htm\">Computer Vision Group</A></DT><DD>A relaxed and professional atmosphere prevails in the Computer Vision Group&#44; which has members drawn from a variety of backgrounds including university research&#44; consultancy and other commercial resea</DD></DL>',],],]"});
+</SCRIPT>
+<LAYER ID = "Footer">
+    <TABLE BORDER=1>
+        <TR><TD>+</TD>
+        <TD>Click to expand sub-pages</TD>
+        <TR><TD>-</TD>
+        <TD>Click to contract sub-pages</TD>
+        <TR><TD>o</TD>
+        <TD>No sub-pages</TD>
+    </TABLE>
+            <HR NOSHADE>
+        <TABLE WIDTH = "100%">
+            <TR>
+                <TD VALIGN = "TOP" ALIGN = "LEFT">
+                    sitemapper.pl version 1.007
+                </TD>
+                <TD VALIGN = "TOP" ALIGN = "RIGHT">
+                    <A HREF = "mailto:Ave.Wrigley@itn.co.uk">Ave.Wrigley@itn.co.uk</A>
+                </TD>
+            </TR>
+            <TR>
+                <TD COLSPAN = 2 VALIGN = "TOP" ALIGN = "LEFT">
+                    Generated on Thursday the 25th of March 1999 at 03:42:28 PM
+                </TD>
+            </TR>
+        </TABLE>
+
+</LAYER>
+<SCRIPT LANGUAGE = "JavaScript">
+    Reposition_footer();
+</SCRIPT>
+</BODY>
+</HTML>

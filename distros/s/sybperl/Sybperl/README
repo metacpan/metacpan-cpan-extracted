@@ -1,0 +1,25 @@
+	$Id: README,v 1.1 1999/05/14 18:00:45 mpeppler Exp $
+from
+	@(#)README	1.1	8/7/95
+	
+This is the sybperl 1.0xx compatibility package for Perl 5.
+
+This package has been built so that sybperl 1.0xx scripts will
+continue to run with Perl 5 with (hopefully) no modification.
+
+Saying
+
+	require 'sybperl.pl';
+or
+	use Sybperl.pm;
+
+is enough to use the Perl 5 version.
+
+All the sybperl code that I have works with this release, provided I
+change calls taking no parameters from '&foo;' to '&foo();' to avoid
+inheriting a previously defined @_ in sub foo.
+
+I suggest that for future developments you use the Sybase::DBlib
+module directly: this will remove one layer of code (and of possible
+bugs...) from the execution, and future developments may not be back
+ported to Sybase::Sybperl.

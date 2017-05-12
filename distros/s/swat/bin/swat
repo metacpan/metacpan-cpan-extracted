@@ -1,0 +1,343 @@
+#!/bin/bash
+
+swat_ini_file='swat.ini'
+
+cache_dir=~/.swat/.cache/$$
+rm -rf $cache_dir
+mkdir -p $cache_dir
+
+test_root_dir=$cache_dir/prove
+rm -rf $test_root_dir
+mkdir -p $test_root_dir
+
+while [[ $# > 0 ]]
+do
+key="$1"
+
+case $key in
+               # handle -t path1 path2 path3
+    -t|--test) # read until we meet something that is not file or directory
+        shift;
+        while : ; do
+            if  [[ $1 == "-"* ]] ; then
+                break 1
+            fi
+            if  [[ $# -eq 0 ]] ; then
+                break 1
+            fi
+            path="$path $test_root_dir/$1 "
+            shift;
+        done;
+    ;;
+    --prove|--prove-opts)
+    shift;
+    prove_clp="$prove_clp $1"
+    shift
+    ;;
+    --debug|-d)
+    shift;
+    debug_clp=$1
+    shift
+    ;;
+    --ini)
+    shift;
+    suite_ini_file_path="$1"
+    shift;
+    ;;
+    --yaml)
+    shift;
+    suite_yaml_file_path="$1"
+    shift;
+    ;;
+    *)
+    if test -n "${project}"; then
+        host=$1
+        shift;
+    else
+        project=$1
+        shift;
+    fi
+    ;;
+esac
+done
+
+suite_ini_file_path=${suite_ini_file_path:=""}
+suite_yaml_file_path=${suite_yaml_file_path:=""}
+
+project=${project:=$PWD}
+project=`perl -MFile::Spec -e '$i=$ARGV[0]; s{\/$}[], chomp for $i; print File::Spec->rel2abs($i)' $project`
+safe_project=project
+
+if [ -n "${host}" ]; then
+    :
+elif test -f $project/host; then
+    host=`cat $project/host`;
+else
+    echo "usage: swat project HOST:port options";
+    exit 1;
+fi
+
+
+session_file=$cache_dir/session.ini
+bash_hook_lock_file=$cache_dir/bash.hook.lock
+
+# save environment settings to session file
+echo > $session_file
+rm -rf $bash_hook_lock_file
+
+if [ -n "${curl_params}" ]; then
+    echo "curl_params=$curl_params" >> $session_file
+fi
+
+if [ -n "${ignore_http_err}" ]; then
+    echo "ignore_http_err=$ignore_http_err" >> $session_file
+fi
+
+if [ -n "${port}" ]; then
+    echo "port=$port" >> $session_file
+fi
+
+if [ -n "${try_num}" ]; then
+    echo "try_num=$try_num" >> $session_file
+fi
+
+if [ -n "${prove_options}" ]; then
+    echo "prove_options=$prove_options" >> $session_file
+fi
+
+if [ -n "${debug}" ]; then
+    echo "debug=$debug" >> $session_file
+fi
+
+if [ -n "${debug_bytes}" ]; then
+    echo "debug_bytes=$debug_bytes" >> $session_file
+fi
+
+if [ -n "${match_l}" ]; then
+    echo "match_l=$match_l" >> $session_file
+fi
+
+if [ -n "${curl_max_time}" ]; then
+    echo "curl_max_time=$curl_max_time" >> $session_file
+fi
+
+if [ -n "${curl_connect_timeout}" ]; then
+    echo "curl_connect_timeout=$curl_connect_timeout" >> $session_file
+fi
+
+if [ -n "${curl_follow_redirect}" ]; then
+    echo "curl_follow_redirect=$curl_follow_redirect" >> $session_file
+fi
+
+if [ -n "${swat_purge_cache}" ]; then
+    echo "swat_purge_cache=$swat_purge_cache" >> $session_file
+fi
+
+
+
+tt=1
+
+find_cmd="find $project -type f \
+-name get.txt \
+-o -name post.txt \
+-o -name put.txt \
+-o -name delete.txt \
+-o -name meta.txt"
+
+for f in `$find_cmd`; do
+
+    resource_dir=`perl -MFile::Spec -e '$sp=$ARGV[0]; s{\w+\.txt$}[] for $sp; chomp $sp; print File::Spec->rel2abs($sp)' $f`;
+
+    unset try_num
+    unset debug_bytes
+    unset debug
+    unset curl_max_time
+    unset curl_connect_timeout
+    unset curl_follow_redirect
+    unset curl_params
+    unset port
+    unset swat_module
+    unset ignore_http_err
+    unset match_l
+    unset skip_story
+    unset swat_purge_cache
+
+    http_method=`perl -e '$p=$ARGV[0]; $p=~/(\w+)\.txt$/ and print uc($1)' $f`;
+
+    resource=`perl -e '$sp=$ARGV[0]; $p=$ARGV[1]; s{^$sp}[], s{\w+\.txt$}[], s{/$}[] for $p; chomp $p; $p = "/"  unless $p; print $p' $project $f`;
+
+    test -f ~/$swat_ini_file && source ~/$swat_ini_file
+    test -f $project/$swat_ini_file && source $project/$swat_ini_file
+    test -f $resource_dir/$swat_ini_file && source $resource_dir/$swat_ini_file
+
+    source $session_file
+
+    # set defaults
+    try_num=${try_num:=2}
+    debug=${debug:=0}
+    debug_bytes=${debug_bytes:=500}
+    curl_max_time=${curl_max_time:=20}
+    curl_follow_redirect=${curl_follow_redirect:=1}
+    curl_connect_timeout=${curl_connect_timeout:=20}
+    swat_module=${swat_module:=0}
+    ignore_http_err=${ignore_http_err:=0}
+    match_l=${match_l:=40}
+    skip_story=${skip_story:=0}
+    swat_purge_cache=${swat_purge_cache:=0}
+
+    # override parameters via command line args
+    if [ -n "${debug_clp}" ]; then
+        debug=$debug_clp
+    fi
+
+    if test "$skip_story" -eq 1; then
+        continue
+    fi
+
+    if [ -n "${port}" ]; then
+        real_host="$host:$port"
+    else
+        real_host=$host
+    fi
+
+    # execute swat project bash hook
+    if test -f $bash_hook_lock_file; then
+        :
+    else
+        test -f $project/hook.bash && source $project/hook.bash
+        touch $bash_hook_lock_file
+    fi
+
+    curl_cmd="curl -X $http_method"
+
+    curl_cmd="${curl_cmd} -k --connect-timeout $curl_connect_timeout -m $curl_max_time"
+
+    if [ -n "${curl_params}" ]; then
+       curl_cmd="$curl_cmd ${curl_params}"
+    fi
+
+    if [ "$curl_follow_redirect" -ne '0' ]; then
+       curl_cmd="$curl_cmd -L"
+    fi
+
+
+    if test $swat_module -eq 0 ; then
+        mkdir -p "${test_root_dir}/${resource}/${http_method}"
+        tfile="${test_root_dir}/${resource}/${http_method}/request.t"
+    else
+        mkdir -p "${test_root_dir}/${resource}/${http_method}"
+        tfile="${test_root_dir}/${resource}/${http_method}/request.mod"
+    fi
+
+
+    tt=$((tt+1))
+
+    echo > $tfile
+    echo "package main;"  >> $tfile
+    echo >> $tfile
+
+    echo 'BEGIN { push @INC, q{'$project'/lib}; }'  >> $tfile
+
+    echo >> $tfile
+    echo "use strict;"  >> $tfile
+    echo >> $tfile
+
+
+    if test $swat_module -eq 0 ; then
+        echo "use Test::More q{no_plan};"  >> $tfile
+    fi
+
+
+    echo "use swat;"  >> $tfile
+
+    echo >> $tfile
+    echo >> $tfile
+
+    echo "new_story();"  >> $tfile
+    echo >> $tfile
+
+    echo "set_prop( hostname => q{$real_host} );" >> $tfile
+    echo "set_prop( suite_ini_file_path => q{$suite_ini_file_path} );" >> $tfile
+    echo "set_prop( suite_yaml_file_path => q{$suite_yaml_file_path} );" >> $tfile
+    echo "set_prop( resource => q{$resource} );" >> $tfile
+    echo "set_prop( resource_dir => q{$resource_dir} );" >> $tfile
+    echo "set_prop( http_method => q{$http_method} );" >> $tfile
+    echo "set_prop( curl_cmd => q{$curl_cmd} );" >> $tfile
+    echo "set_prop( ignore_http_err => $ignore_http_err );" >> $tfile
+
+    echo "set_prop( project => q{$project} );" >> $tfile
+    echo "set_prop( test_root_dir => q{$test_root_dir} );" >> $tfile
+
+
+    echo "set_prop( debug => $debug );" >> $tfile
+    echo "set_prop( debug_bytes => $debug_bytes );" >> $tfile
+    echo "set_prop( try_num => $try_num );" >> $tfile
+    echo "set_prop( match_l => $match_l );" >> $tfile
+
+    echo "set_prop( swat_module => $swat_module );" >> $tfile
+    echo "set_prop( check_list => q{$f} );" >> $tfile
+
+    if [ "$swat_module" -eq '1' ]; then
+        echo >> $tfile
+        echo "apply_module_variables();"  >> $tfile
+        echo >> $tfile
+    fi
+
+    echo >> $tfile
+    echo >> $tfile
+
+    if test $http_method = "META" ; then
+        echo "print_meta();"  >> $tfile
+    fi
+
+    test -f $resource_dir/hook.pm && echo "do_perl_file('${resource_dir}/hook.pm');"  >> $tfile
+
+    echo >> $tfile
+
+    echo -e "eval { generate_asserts(q{$f}) }; die \$@ if \$@;" >> $tfile;
+    echo >> $tfile
+
+    echo >> $tfile
+    echo >> $tfile
+
+    echo "end_of_story();"  >> $tfile
+    echo >> $tfile
+    echo >> $tfile
+    echo '1;'>> $tfile
+    echo >> $tfile
+
+done;
+
+test -f ~/$swat_ini_file && source ~/$swat_ini_file
+source $session_file
+
+export port
+
+path=${path:=$test_root_dir}
+output_mod=${output_mod:="default"}
+
+
+if [ -z "${prove_clp}" ] && [ -n "${prove_options}" ]; then
+    prove -m -r $path $prove_options;
+    exit_code=$?
+elif [ -n "${prove_clp}"  ]; then
+    prove -m -r $path $prove_clp;
+    exit_code=$?
+else
+    prove -m -r -v $path;
+    exit_code=$?
+fi
+
+swat_purge_cache=${swat_purge_cache:=0}
+
+if test $swat_purge_cache -eq 1; then
+    rm -rf $cache_dir
+fi
+
+exit $exit_code
+
+
+
+
+
+

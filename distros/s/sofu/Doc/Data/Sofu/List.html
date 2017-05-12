@@ -1,0 +1,328 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Data::Sofu::List - A Sofu List</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+<link rel="stylesheet" type="text/css" href="/Data/sofupod.css" />
+</head>
+
+<body>
+
+<div name="index">
+<p><a name="__index__"></a></p>
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#synopsis">Synopsis</a></li>
+	<li><a href="#syntax">SYNTAX</a></li>
+	<li><a href="#methods">METHODS</a></li>
+	<ul>
+
+		<li><a href="#new__data__">new([DATA])</a></li>
+		<li><a href="#set_data_">set(DATA)</a></li>
+		<li><a href="#aslist__"><code>asList()</code></a></li>
+		<li><a href="#asarray__"><code>asArray()</code></a></li>
+		<li><a href="#islist__"><code>isList()</code></a></li>
+		<li><a href="#object_index_">object(INDEX)</a></li>
+		<li><a href="#haselement_index_">hasElement(INDEX)</a></li>
+		<li><a href="#hasobject_index_">hasObject(INDEX)</a></li>
+		<li><a href="#hasvalue_index_">hasValue(INDEX)</a></li>
+		<li><a href="#hasmap_index_">hasMap(INDEX)</a></li>
+		<li><a href="#haslist_index_">hasList(INDEX)</a></li>
+		<li><a href="#list_index_">list(INDEX)</a></li>
+		<li><a href="#map_index_">map(INDEX)</a></li>
+		<li><a href="#value_index_">value(INDEX)</a></li>
+		<li><a href="#setelement_index__value_"><code>setElement(INDEX, VALUE)</code></a></li>
+		<li><a href="#next__"><code>next()</code></a></li>
+		<li><a href="#splice_offset__length__replacement_"><code>splice(OFFSET, LENGTH, REPLACEMENT)</code></a></li>
+		<li><a href="#splicelist_offset__length__replacement_"><code>spliceList(OFFSET, LENGTH, REPLACEMENT)</code></a></li>
+		<li><a href="#appendelement_element_">appendElement(ELEMENT)</a></li>
+		<li><a href="#firstelement__"><code>firstElement()</code></a></li>
+		<li><a href="#lastelement__"><code>lastElement()</code></a></li>
+		<li><a href="#insertelement_element_">insertElement(ELEMENT)</a></li>
+		<li><a href="#appendlist_list_">appendList(LIST)</a></li>
+		<li><a href="#insertlist_list_">insertList(LIST)</a></li>
+		<li><a href="#elementindex_value_">elementIndex(VALUE)</a></li>
+		<li><a href="#clear_value_">clear(VALUE)</a></li>
+		<li><a href="#opapply__"><code>opApply()</code></a></li>
+		<li><a href="#opapplydeluxe__"><code>opApplyDeluxe()</code></a></li>
+		<li><a href="#storecomment_tree_comment_">storeComment(TREE,COMMENT)</a></li>
+		<li><a href="#stringify_level__tree_"><code>stringify(LEVEL, TREE)</code></a></li>
+		<li><a href="#binarify_tree_binary_driver_"><code>binarify(TREE,BINARY DRIVER)</code></a></li>
+	</ul>
+
+	<li><a href="#bugs">BUGS</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
+</ul>
+
+<hr name="index" />
+</div>
+<!-- INDEX END -->
+
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>Data::Sofu::List - A Sofu List</p>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>Provides a interface similar to the original SofuD (sofu.sf.net)</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">Synopsis</a></h1>
+<pre>
+        <span class="keyword">require</span> <span class="variable">Data::Sofu::List</span><span class="operator">;</span>
+        <span class="keyword">my</span> <span class="variable">$list</span> <span class="operator">=</span> <span class="variable">Data::Sofu::List</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">();</span>
+        <span class="variable">$list</span><span class="operator">-&gt;</span><span class="variable">appendElement</span><span class="operator">(</span><span class="variable">Data::Sofu::Value</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="variable">$_</span><span class="operator">))</span> <span class="keyword">foreach</span> <span class="operator">(</span><span class="number">0</span> <span class="operator">..</span> <span class="number">10</span><span class="operator">);;</span>
+</pre>
+<p>
+</p>
+<hr />
+<h1><a name="syntax">SYNTAX</a></h1>
+<p>This Module is pure OO, exports nothing</p>
+<p>
+</p>
+<hr />
+<h1><a name="methods">METHODS</a></h1>
+<p>Also look at <code>Data::Sofu::Object</code> for methods, cause List inherits from it</p>
+<p>
+</p>
+<h2><a name="new__data___creates_a_new_data__sofu__list_and_returns_it">new([DATA])
+Creates a new <code>Data::Sofu::List</code> and returns it</a></h2>
+<p>DATA has to be an Arrayhref</p>
+<pre>
+        <span class="variable">$inc</span> <span class="operator">=</span> <span class="variable">Data::Sofu::List</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(\</span><span class="variable">@INC</span><span class="operator">);</span>
+</pre>
+<p>
+</p>
+<h2><a name="set_data_">set(DATA)</a></h2>
+<p>Sets the contents of this list (replaces the old contents).</p>
+<p>DATA has to be an Arrayhref</p>
+<pre>
+        <span class="variable">$inc</span><span class="operator">-&gt;</span><span class="variable">set</span><span class="operator">(\</span><span class="variable">@INC</span><span class="operator">);</span>
+</pre>
+<p>
+</p>
+<h2><a name="aslist__"><code>asList()</code></a></h2>
+<p>Returns itself, used to make sure this List is really a List (<code>Data::Sofu::Map</code> and <code>Data::Sofu::Value</code> will die if called with this method)</p>
+<p>
+</p>
+<h2><a name="asarray__"><code>asArray()</code></a></h2>
+<p>Perl only</p>
+<p>Returns the list as a perl array.</p>
+<p>
+</p>
+<h2><a name="islist__"><code>isList()</code></a></h2>
+<p>Returns 1</p>
+<p>
+</p>
+<h2><a name="object_index_">object(INDEX)</a></h2>
+<p>Return the object at the position INDEX in the List.</p>
+<p>Dies if the List is shorter than INDEX.</p>
+<p>
+</p>
+<h2><a name="haselement_index_">hasElement(INDEX)</a></h2>
+<p>Deprecated!</p>
+<p>Returns a true value if the List has an Element with the number INDEX</p>
+<p>
+</p>
+<h2><a name="hasobject_index_">hasObject(INDEX)</a></h2>
+<p>Returns a true value if the List has an Element with the number INDEX</p>
+<p>
+</p>
+<h2><a name="hasvalue_index_">hasValue(INDEX)</a></h2>
+<p>Returns 1 if this List has an Element at INDEX and this Element is a <code>Data::Sofu::Value</code>.</p>
+<pre>
+        <span class="variable">$inc</span><span class="operator">-&gt;</span><span class="variable">hasValue</span><span class="operator">(</span><span class="number">2</span><span class="operator">)</span> <span class="operator">===</span> <span class="variable">$inc</span><span class="operator">-&gt;</span><span class="variable">hasElement</span><span class="operator">(</span><span class="number">2</span><span class="operator">)</span> <span class="keyword">and</span> <span class="variable">$inc</span><span class="operator">-&gt;</span><span class="variable">object</span><span class="operator">(</span><span class="number">2</span><span class="operator">)-&gt;</span><span class="variable">isValue</span><span class="operator">();</span>
+</pre>
+<p>Note: Return 0 if the Object is not a Value and under if the Element doesn't exist at all.</p>
+<p>
+</p>
+<h2><a name="hasmap_index_">hasMap(INDEX)</a></h2>
+<p>Returns 1 if this List has an Element at INDEX and this Element is a <code>Data::Sofu::Map</code>.</p>
+<pre>
+        <span class="variable">$inc</span><span class="operator">-&gt;</span><span class="variable">hasMap</span><span class="operator">(</span><span class="number">2</span><span class="operator">)</span> <span class="operator">===</span> <span class="variable">$inc</span><span class="operator">-&gt;</span><span class="variable">hasElement</span><span class="operator">(</span><span class="number">2</span><span class="operator">)</span> <span class="keyword">and</span> <span class="variable">$inc</span><span class="operator">-&gt;</span><span class="variable">object</span><span class="operator">(</span><span class="number">2</span><span class="operator">)-&gt;</span><span class="variable">isMap</span><span class="operator">();</span>
+</pre>
+<p>Note: Return 0 if the Object is not a Map and under if the Element doesn't exist at all.</p>
+<p>
+</p>
+<h2><a name="haslist_index_">hasList(INDEX)</a></h2>
+<p>Returns 1 if this List has an Element at INDEX and this Element is a <code>Data::Sofu::List</code>.</p>
+<pre>
+        <span class="variable">$inc</span><span class="operator">-&gt;</span><span class="variable">hasMap</span><span class="operator">(</span><span class="number">2</span><span class="operator">)</span> <span class="operator">===</span> <span class="variable">$inc</span><span class="operator">-&gt;</span><span class="variable">hasElement</span><span class="operator">(</span><span class="number">2</span><span class="operator">)</span> <span class="keyword">and</span> <span class="variable">$inc</span><span class="operator">-&gt;</span><span class="variable">object</span><span class="operator">(</span><span class="number">2</span><span class="operator">)-&gt;</span><span class="variable">isList</span><span class="operator">();</span>
+</pre>
+<p>Note: Return 0 if the Object is not a List and under if the Element doesn't exist at all.</p>
+<p>
+</p>
+<h2><a name="list_index_">list(INDEX)</a></h2>
+<p>Returns the Object at the postition &quot;INDEX&quot; as a <code>Data::Sofu::List</code>.</p>
+<p>Dies if the Object is not a <code>Data::Sofu::List</code>.</p>
+<pre>
+
+        $inc-&gt;list(2) === $inc-&gt;object(2)-&gt;asList()</pre>
+<p>
+</p>
+<h2><a name="map_index_">map(INDEX)</a></h2>
+<p>Returns the Object at the postition &quot;INDEX&quot; as a <code>Data::Sofu::Map</code>.</p>
+<p>Dies if the Object is not a <code>Data::Sofu::Map</code>.</p>
+<pre>
+
+        $inc-&gt;map(2) === $inc-&gt;object(2)-&gt;asMap()</pre>
+<p>
+</p>
+<h2><a name="value_index_">value(INDEX)</a></h2>
+<p>Returns the Object at the postition &quot;INDEX&quot; as a <code>Data::Sofu::Value</code>.</p>
+<p>Dies if the Object is not a <code>Data::Sofu::Value</code>.</p>
+<pre>
+
+        $inc-&gt;value(2) === $inc-&gt;object(2)-&gt;asValue()</pre>
+<p>
+</p>
+<h2><a name="setelement_index__value_"><code>setElement(INDEX, VALUE)</code></a></h2>
+<p>Perl only (for now)</p>
+<p>Sets the Element at INDEX to VALUE</p>
+<pre>
+        <span class="variable">$inc</span><span class="operator">-&gt;</span><span class="variable">setElement</span><span class="operator">(</span><span class="number">0</span><span class="operator">,</span><span class="variable">Data::Sofu::Value</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="string">"."</span><span class="operator">));</span>
+</pre>
+<p>
+</p>
+<h2><a name="next__"><code>next()</code></a></h2>
+<p>Iterartes over the List, return the next Element on every call and undef at the end of the List.</p>
+<p>When called in void context it just resets the iterator.</p>
+<p>
+</p>
+<h2><a name="splice_offset__length__replacement_"><code>splice(OFFSET, LENGTH, REPLACEMENT)</code></a></h2>
+<p>Perl only (for now)</p>
+<p>Like Perl splice, replaces LENGTH Elements from OFFSET with REPLACEMENT, returns the replaced Elements.</p>
+<pre>
+
+        <span class="keyword">my</span> <span class="variable">$lib</span> <span class="operator">=</span> <span class="variable">new</span> <span class="variable">Data::Sofu::List</span><span class="operator">();</span>
+        <span class="variable">$inc</span><span class="operator">-&gt;</span><span class="keyword">splice</span><span class="operator">(</span><span class="number">2</span><span class="operator">,</span><span class="number">0</span><span class="operator">,</span><span class="variable">Data::Sofu::Value</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="string">"."</span><span class="operator">),</span><span class="variable">Data::Sofu::Value</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="string">".."</span><span class="operator">),</span><span class="variable">Data::Sofu::Value</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="string">"../lib"</span><span class="operator">));</span>
+                <span class="comment"># Inserts 3 new Elements after the second Element</span>
+</pre>
+<p>
+</p>
+<h2><a name="splicelist_offset__length__replacement_"><code>spliceList(OFFSET, LENGTH, REPLACEMENT)</code></a></h2>
+<p>Perl only (for now)</p>
+<p>Like splice, replaces LENGTH Elements from OFFSET with REPLACEMENT, returns the replaced Elements.</p>
+<p>REPLACEMENT is another <code>Data::Sofu::List</code></p>
+<pre>
+
+        <span class="keyword">my</span> <span class="variable">$lib</span> <span class="operator">=</span> <span class="variable">new</span> <span class="variable">Data::Sofu::List</span><span class="operator">(</span><span class="variable">Data::Sofu::Value</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="string">"."</span><span class="operator">),</span><span class="variable">Data::Sofu::Value</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="string">".."</span><span class="operator">),</span><span class="variable">Data::Sofu::Value</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="string">"../lib"</span><span class="operator">));</span>
+        <span class="variable">$inc</span><span class="operator">-&gt;</span><span class="variable">spliceList</span><span class="operator">(</span><span class="number">2</span><span class="operator">,</span><span class="number">0</span><span class="operator">,</span><span class="variable">$lib</span><span class="operator">);</span>
+                <span class="comment"># Inserts the list $lib after the second Element.</span>
+</pre>
+<p>
+</p>
+<h2><a name="appendelement_element_">appendElement(ELEMENT)</a></h2>
+<p>Appends one (or multiple (Perl only)) ELEMENT to the end of this List.</p>
+<pre>
+        <span class="variable">$inc</span><span class="operator">-&gt;</span><span class="variable">appendElement</span><span class="operator">(</span><span class="variable">Data::Sofu::Value</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="string">"lib/"</span><span class="operator">));</span>
+</pre>
+<p>
+</p>
+<h2><a name="firstelement__"><code>firstElement()</code></a></h2>
+<p>Perl only (for now)</p>
+<p>Removes and returns the first Element of this List</p>
+<p>
+</p>
+<h2><a name="lastelement__"><code>lastElement()</code></a></h2>
+<p>Perl only (for now)</p>
+<p>Removes and returns the last Element of this List</p>
+<p>
+</p>
+<h2><a name="insertelement_element_">insertElement(ELEMENT)</a></h2>
+<p>Perl only (for now)</p>
+<p>Appends one (or multiple (Perl only)) ELEMENT to the front of this List.</p>
+<pre>
+        <span class="variable">$inc</span><span class="operator">-&gt;</span><span class="variable">insertElement</span><span class="operator">(</span><span class="variable">Data::Sofu::Value</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="string">"lib/"</span><span class="operator">));</span>
+</pre>
+<p>
+</p>
+<h2><a name="appendlist_list_">appendList(LIST)</a></h2>
+<p>Perl only (for now)</p>
+<p>Appends another LIST to the end of this List.</p>
+<pre>
+        <span class="keyword">my</span> <span class="variable">$lib</span> <span class="operator">=</span> <span class="variable">new</span> <span class="variable">Data::Sofu::List</span><span class="operator">(</span><span class="variable">Data::Sofu::Value</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="string">"."</span><span class="operator">),</span><span class="variable">Data::Sofu::Value</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="string">".."</span><span class="operator">),</span><span class="variable">Data::Sofu::Value</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="string">"../lib"</span><span class="operator">));</span>
+        <span class="variable">$inc</span><span class="operator">-&gt;</span><span class="variable">appendList</span><span class="operator">(</span><span class="variable">$lib</span><span class="operator">);</span>
+</pre>
+<p>
+</p>
+<h2><a name="insertlist_list_">insertList(LIST)</a></h2>
+<p>Perl only (for now)</p>
+<p>Appends another LIST to the front of this List.</p>
+<pre>
+        <span class="keyword">my</span> <span class="variable">$lib</span> <span class="operator">=</span> <span class="variable">new</span> <span class="variable">Data::Sofu::List</span><span class="operator">(</span><span class="variable">Data::Sofu::Value</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="string">"."</span><span class="operator">),</span><span class="variable">Data::Sofu::Value</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="string">".."</span><span class="operator">),</span><span class="variable">Data::Sofu::Value</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="string">"../lib"</span><span class="operator">));</span>
+        <span class="variable">$inc</span><span class="operator">-&gt;</span><span class="variable">insertList</span><span class="operator">(</span><span class="variable">$lib</span><span class="operator">);</span>
+</pre>
+<p>
+</p>
+<h2><a name="elementindex_value_">elementIndex(VALUE)</a></h2>
+<p>Returns the index of the first Element that machtes VALUE</p>
+<p>
+</p>
+<h2><a name="clear_value_">clear(VALUE)</a></h2>
+<p>Perl only (for now)</p>
+<p>Empties this list</p>
+<p>Perl only (for now)</p>
+<p>Returns the length of this List.</p>
+<p>Note: The index of the last element is length-1!</p>
+<p>
+</p>
+<h2><a name="opapply__"><code>opApply()</code></a></h2>
+<p>Takes a Subroutine and iterates with it over this List. Values can't be modified.</p>
+<p>The Subroutine takes one Argument: The Value.</p>
+<pre>
+        <span class="variable">$inc</span><span class="operator">-&gt;</span><span class="variable">opApply</span><span class="operator">(</span><span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span>
+                <span class="keyword">print</span> <span class="string">"Element = </span><span class="variable">$_</span><span class="string">[0]-&gt;asValue-&gt;toString(),"</span><span class="operator">\</span><span class="variable">n</span><span class="string">";
+        });
+        </span>
+</pre>
+<p>Note: The Values are Objects, so they still can be changed, but not replaced.</p>
+<p>
+</p>
+<h2><a name="opapplydeluxe__"><code>opApplyDeluxe()</code></a></h2>
+<p>Perl only.</p>
+<p>Takes a Subroutine and iterates with it over this List. Values can be modified.</p>
+<p>The Subroutine takes one Argument: The Value.</p>
+<pre>
+        <span class="variable">$inc</span><span class="operator">-&gt;</span><span class="variable">opApplyDeluxe</span><span class="operator">(</span><span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span>
+                <span class="variable">$_</span><span class="operator">[</span><span class="number">0</span><span class="operator">]</span><span class="operator">=</span><span class="variable">Data::Sofu::List</span><span class="operator">(</span><span class="keyword">split</span> <span class="regex">/\//</span><span class="operator">,</span><span class="variable">$_</span><span class="operator">[</span><span class="number">0</span><span class="operator">]</span><span class="operator">-&gt;</span><span class="variable">asValue</span><span class="operator">()-&gt;</span><span class="variable">toString</span><span class="operator">());</span>
+        <span class="operator">});</span>
+</pre>
+<p>Note: Please make sure every replaced Value is a <code>Data::Sofu::Object</code> or inherits from it.</p>
+<p>
+</p>
+<h2><a name="storecomment_tree_comment_">storeComment(TREE,COMMENT)</a></h2>
+<p>Stores a comment in the Object if TREE is empty, otherwise it propagades the Comment to all its Elements</p>
+<p>Should not be called directly, use <code>importComments()</code> instead.</p>
+<p>
+</p>
+<h2><a name="stringify_level__tree_"><code>stringify(LEVEL, TREE)</code></a></h2>
+<p>Returns a string representing this List and all its elements.</p>
+<p>Runs string(LEVEL+1,TREE+index) on all its elements.</p>
+<p>
+</p>
+<h2><a name="binarify_tree_binary_driver_"><code>binarify(TREE,BINARY DRIVER)</code></a></h2>
+<p>Returns the binary version of this List and all its elements using the BINARY DRIVER. Don't call this one, use binaryPack instead.</p>
+<p>
+</p>
+<hr />
+<h1><a name="bugs">BUGS</a></h1>
+<p>Some Methods here are not included in Sofud, but they should be so their name might change (Old ones will be preserved)</p>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p><a href="/Data/Sofu.html">the Data::Sofu manpage</a>, <a href="/Data/Sofu/Binary.html">the Data::Sofu::Binary manpage</a>, <a href="/Data/Sofu/Object.html">the Data::Sofu::Object manpage</a>, <a href="/Data/Sofu/Map.html">the Data::Sofu::Map manpage</a>, <a href="/Data/Sofu/Value.html">the Data::Sofu::Value manpage</a>, <a href="/Data/Sofu/Undefined.html">the Data::Sofu::Undefined manpage</a>, <a href="http://sofu.sf.net">http://sofu.sf.net</a></p>
+
+</body>
+
+</html>
+	

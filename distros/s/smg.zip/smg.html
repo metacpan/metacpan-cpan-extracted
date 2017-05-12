@@ -1,0 +1,2189 @@
+<HTML>
+<HEAD>
+<TITLE>smg - Perl extension for screen management</TITLE>
+<LINK REV="made" HREF="mailto:jean_claude@alpha1.cellcom">
+</HEAD>
+
+<BODY>
+
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#NAME">NAME</A>
+	<LI><A HREF="#SYNOPSIS">SYNOPSIS</A>
+	<LI><A HREF="#COPYRIGHTS">COPYRIGHTS</A>
+	<LI><A HREF="#DESCRIPTION">DESCRIPTION</A>
+	<LI><A HREF="#initscr">initscr</A>
+	<LI><A HREF="#changewinattr">changewinattr </A>
+	<LI><A HREF="#changewinsize">changewinsize  </A>
+	<LI><A HREF="#cremenu">cremenu  </A>
+	<LI><A HREF="#cresubwin">cresubwin  </A>
+	<LI><A HREF="#crewin">crewin</A>
+	<LI><A HREF="#curcol">curcol  </A>
+	<LI><A HREF="#curline">curline  </A>
+	<LI><A HREF="#delchars">delchars  </A>
+	<LI><A HREF="#delline">delline  </A>
+	<LI><A HREF="#delmenu">delmenu  </A>
+	<LI><A HREF="#delwin">delwin  </A>
+	<LI><A HREF="#drawline">drawline  </A>
+	<LI><A HREF="#drawbox">drawbox  </A>
+	<LI><A HREF="#erasechars">erasechars  </A>
+	<LI><A HREF="#erasecol">erasecol  </A>
+	<LI><A HREF="#erasewin">erasewin  </A>
+	<LI><A HREF="#eraseline">eraseline  </A>
+	<LI><A HREF="#clearscreen">clearscreen  </A>
+	<LI><A HREF="#insertchars">insertchars  </A>
+	<LI><A HREF="#insertline">insertline  </A>
+	<LI><A HREF="#codetoname">codetoname  </A>
+	<LI><A HREF="#labelwin">labelwin  </A>
+	<LI><A HREF="#loadwin">loadwin </A>
+	<LI><A HREF="#movearea">movearea  </A>
+	<LI><A HREF="#movewin">movewin  </A>
+	<LI><A HREF="#nametocode">nametocode  </A>
+	<LI><A HREF="#putwin">putwin</A>
+	<LI><A HREF="#printscreen">printscreen  </A>
+	<LI><A HREF="#putchars">putchars</A>
+	<LI><A HREF="#puthichars">puthichars</A>
+	<LI><A HREF="#putfatchars">putfatchars</A>
+	<LI><A HREF="#putline">putline  </A>
+	<LI><A HREF="#readkey">readkey  </A>
+	<LI><A HREF="#read_string">read_string  </A>
+	<LI><A HREF="#readkeypt">readkeypt  </A>
+	<LI><A HREF="#refresh">refresh</A>
+	<LI><A HREF="#putwinagain">putwinagain</A>
+	<LI><A HREF="#curpos">curpos  </A>
+	<LI><A HREF="#bell">bell  </A>
+	<LI><A HREF="#savewin">savewin  </A>
+	<LI><A HREF="#scrollsubwin">scrollsubwin  </A>
+	<LI><A HREF="#selmenuopt">selmenuopt  </A>
+	<LI><A HREF="#setcurpos">setcurpos  </A>
+	<LI><A HREF="#setcurmode">setcurmode  </A>
+	<LI><A HREF="#remwin">remwin</A>
+	<LI><A HREF="#AUTHOR">AUTHOR</A>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="NAME">NAME</A></H1>
+<P>
+smg - Perl extension for screen management
+
+<P>
+<HR>
+<H1><A NAME="SYNOPSIS">SYNOPSIS</A></H1>
+<P>
+<PRE>  use smg;
+</PRE>
+<P>
+<HR>
+<H1><A NAME="COPYRIGHTS">COPYRIGHTS</A></H1>
+<P>
+<PRE> This package was released under the terms of the artistic license
+ which terms are in the file copy.art.
+</PRE>
+<P>
+<HR>
+<H1><A NAME="DESCRIPTION">DESCRIPTION</A></H1>
+<P>
+This package uses the OpenVMS screen management utility. Curses work in a
+very poorly way on this system, while the native SMG package takes care of
+all the terminals you defined in the terminal library, of all collating
+tables you might have defined ...
+
+<P>
+It is obvious that this package is not portable on other OSs :-&lt;
+
+<P>
+if you want to be informed of any new release mail to <A
+HREF="mailto:smg@tebbal.demon.co.uk">smg@tebbal.demon.co.uk</A>
+
+<P>
+<HR>
+<H1><A NAME="initscr">initscr</A></H1>
+<P>
+syntax <CODE>initscr(</CODE> $PbId, $KbId);
+
+<P>
+<EM>screen</EM> 4bytes integer is a pointer to the main screen definition.
+<EM>kb</EM> 4bytes integer is a pointer to the keyboard definition.
+
+<P>
+<HR>
+<H1><A NAME="changewinattr">changewinattr</A></H1>
+<P>
+Changes the video attributes for all or part of a window.
+
+<P>
+<STRONG>Syntax:</STRONG>
+
+
+
+<P>
+<PRE>           changewinattr  ($win ,$Y ,$X ,$nb_lines ,$nb_cols ,$attr );
+</PRE>
+<P>
+<STRONG>Parameters:</STRONG>
+
+
+
+<P>
+<EM>$nb_cols:</EM> Horizontal width of the rectangle which attributes are to be modified.
+
+<P>
+<EM>$nb_lines:</EM> Vertical height of the rectangle which attributes are to be modified.
+
+<P>
+<EM>$attr:</EM> A character string with one character/attribute:
+
+<P>
+<EM>I:</EM>  Invisible;
+
+<P>
+<EM>B:</EM>  Bold;
+
+<P>
+<EM>R:</EM>  Reverse;
+
+<P>
+<EM>U:</EM>  Underline;
+
+<P>
+<EM>F:</EM>  Flashing
+
+<P>
+<EM>1:</EM>  terminal user defined feature number 1;
+
+<P>
+<EM>2:</EM>  terminal user defined feature number 2;
+
+<P>
+<EM>4:</EM>  terminal user defined feature number 4;
+
+<P>
+<EM>5:</EM>  terminal user defined feature number 5;
+
+<P>
+<EM>6:</EM>  terminal user defined feature number 6;
+
+<P>
+<EM>7:</EM>  terminal user defined feature number 7;
+
+<P>
+<EM>8:</EM>  terminal user defined feature number 8;
+
+
+<P>
+<PRE>  The user defined features are more often ansi colours and are
+  available on Xterms or on colour terminals and colour terminal emulators
+  VT2XX and over.
+  For a normal rendition just send the string &quot;\0&quot;
+</PRE>
+<P>
+<EM>$X:</EM> Number of the column ( leftmost column is number 1 ) of the upper left
+corner.
+
+<P>
+<EM>$Y:</EM> Number of the line ( top line is number 1 ) of the upper left corner.
+
+<P>
+<EM>$win:</EM> the window you created with crewin or loadwin
+
+
+<P>
+<HR>
+<H1><A NAME="changewinsize">changewinsize</A></H1>
+<P>
+<PRE>         The function lets you change the
+         dimensions of a window.
+</PRE>
+<P>
+<STRONG>Syntax:</STRONG>
+
+
+
+<P>
+<PRE>           changewinsize  ($win ,$nb_lines ,$nb_cols);
+     
+</PRE>
+<P>
+<STRONG>Parameters:</STRONG>
+
+
+
+<P>
+<EM>$nb_cols:</EM> Number of columns of the new window
+
+<P>
+<EM>$nb_lines:</EM> Number of lines of the new window
+
+<P>
+<EM>$win:</EM> the window you created with crewin or loadwin
+
+
+<P>
+<HR>
+<H1><A NAME="cremenu">cremenu</A></H1>
+<P>
+The function displays menu choices in the window indicated, starting at the
+specified line.
+
+<P>
+<STRONG>Syntax:</STRONG>
+
+
+
+<P>
+<PRE>           cremenu  ($win ,$choices ,$option_size ,$flags ,$Y ,$attr);
+</PRE>
+<P>
+<PRE>                            
+       
+</PRE>
+<P>
+<STRONG>Parameters:</STRONG>
+
+
+
+<P>
+<EM>$attr:</EM> A character string with one character/attribute:
+
+<P>
+<EM>I:</EM>  Invisible;
+
+<P>
+<EM>B:</EM>  Bold;
+
+<P>
+<EM>R:</EM>  Reverse;
+
+<P>
+<EM>F:</EM>  Flashing
+
+<P>
+<EM>1:</EM>  terminal user defined feature number 1;
+
+<P>
+<EM>2:</EM>  terminal user defined feature number 2;
+
+<P>
+<EM>3:</EM>  terminal user defined feature number 3;
+
+<P>
+<EM>4:</EM>  terminal user defined feature number 4;
+
+<P>
+<EM>5:</EM>  terminal user defined feature number 5;
+
+<P>
+<EM>6:</EM>  terminal user defined feature number 6;
+
+<P>
+<EM>7:</EM>  terminal user defined feature number 7;
+
+<P>
+<EM>8:</EM>  terminal user defined feature number 8;
+
+
+<P>
+<PRE>  The user defined features are more often ansi colours and are
+  available on Xterms or on colour terminals and colour terminal emulators
+  VT2XX and over.
+  For a normal rendition just send the string &quot;\0&quot;
+</PRE>
+<P>
+<EM>$Y:</EM> Number of the line ( top line is number 1 )
+
+<P>
+<EM>$flags:</EM> A character string with one character/option:
+
+<P>
+<EM>D:</EM> Double-spaced rows of menu items. The default is single spaced.
+
+<P>
+<EM>F:</EM> Each menu item is in a fixed-length field. The is the size of the largest
+menu item. The default is compress.
+
+<P>
+<EM>W:</EM> Wide characters are used in the menu items. The default is normal sized
+characters.
+
+<P>
+<EM>B:</EM> The menu items are displayed in matrix format (default).
+
+<P>
+<EM>V:</EM> Each menu item is displayed on its own line.
+
+<P>
+<EM>H:</EM> The menu items are displayed all on one line.
+
+
+<P>
+<EM>$option_size:</EM> size of every item in <CODE>$choices</CODE> . <CODE>$choices</CODE> will be
+sliced according to this value.
+
+
+<P>
+<HR>
+<H1><A NAME="cresubwin">cresubwin</A></H1>
+<P>
+<PRE>         The function creates a subwindow (called viewport in VMS terminology)
+         and associates it with a window. The location and size of
+         the subwindow are specified by the caller. When the window is sent
+         to screen, only the part mapped by the subwindow will be put on the
+         screen but it will be possible to move the subwindow over the window
+         to browse all the window.
+</PRE>
+<P>
+<STRONG>Syntax:</STRONG>
+
+
+
+<P>
+<PRE>           cresubwin  ($win ,$Y ,$X ,$nb_lines ,$nb_cols);
+       
+</PRE>
+<P>
+<STRONG>Parameters:</STRONG>
+
+
+
+<P>
+<EM>$nb_cols:</EM> Number of columns to show on screen
+
+<P>
+<EM>$nb_lines:</EM> Number of lines to show on screen
+
+<P>
+<EM>$X:</EM> Number of the column where start the subwindow ( leftmost column is number
+1 )
+
+<P>
+<EM>$Y:</EM> Number of the line where start the subwindow ( top line is number 1 )
+
+<P>
+<EM>$win:</EM> the window you created with crewin or loadwin and which visible part will
+be reduced to the subwindow.
+
+
+<P>
+<HR>
+<H1><A NAME="crewin">crewin</A></H1>
+<P>
+The function creates a window and returns its assigned display identifier
+(please note it will not be visible until you use <CODE>putwin()</CODE> ).
+
+<P>
+<STRONG>Syntax:</STRONG>
+	   <CODE>crewin($Y,$X,$winId,$attr)</CODE>
+
+<P>
+<PRE>       
+</PRE>
+<P>
+<STRONG>Parameters:</STRONG>
+
+
+
+<P>
+<EM>$attr:</EM> A character string with one character/attribute:
+
+<P>
+<EM>L:</EM>  A lined border will be drawn around the window.
+
+<P>
+<EM>B:</EM>  A thick block border will be drawn around the window.
+
+
+<P>
+Note that the window needs a border in order to have a title.
+
+<P>
+<PRE>  For a normal rendition just send the string &quot;\0&quot;
+</PRE>
+<P>
+<EM>$X:</EM> Number of columns in the window (excluding the border).
+
+<P>
+<EM>$Y:</EM> Number of lines in the window (excluding the border).
+
+<P>
+<EM>$winId:</EM> the identifier of the window you want to create.
+
+
+<P>
+<HR>
+<H1><A NAME="curcol">curcol</A></H1>
+<P>
+<PRE>         The function returns the virtual
+         cursor's current column position in a specified window.
+</PRE>
+<P>
+<STRONG>Syntax:</STRONG>
+
+
+
+<P>
+<PRE>           curcol  ($win);
+</PRE>
+<P>
+<PRE>       
+</PRE>
+<P>
+<STRONG>Parameters:</STRONG>
+
+
+
+<P>
+<EM>$win:</EM> the window you created with crewin or loadwin
+
+
+<P>
+<HR>
+<H1><A NAME="curline">curline</A></H1>
+<P>
+<PRE>         The function returns the virtual
+         cursor's current line position in a specified window.
+</PRE>
+<P>
+<STRONG>Syntax:</STRONG>
+
+
+
+<P>
+<PRE>           curline  ($win)
+       
+</PRE>
+<P>
+<STRONG>Parameters:</STRONG>
+
+
+
+<P>
+<EM>$win:</EM> the window you created with crewin or loadwin
+
+
+<P>
+<HR>
+<H1><A NAME="delchars">delchars</A></H1>
+<P>
+<PRE>         The function deletes characters in a window.
+</PRE>
+<P>
+<STRONG>Syntax:</STRONG>
+
+
+
+<P>
+<PRE>           delchars  ($win ,$nb_chars ,$Y ,$X);
+       
+</PRE>
+<P>
+<STRONG>Parameters:</STRONG>
+
+
+
+<P>
+<EM>$nb_chars:</EM> Number of characters to delete.
+
+<P>
+<EM>$X:</EM> Number of the column where is starting the deletion ( leftmost column is
+number 1 )
+
+<P>
+<EM>$Y:</EM> Number of the line where is starting the deletion ( top line is number 1 )
+
+<P>
+<EM>$win:</EM> the window you created with crewin or loadwin
+
+
+<P>
+<HR>
+<H1><A NAME="delline">delline</A></H1>
+<P>
+<PRE>         The function deletes lines from a window.
+</PRE>
+<P>
+<STRONG>Syntax:</STRONG>
+
+
+
+<P>
+<PRE>           delline  ($win ,$Y ,$nb_lines);
+       
+</PRE>
+<P>
+<STRONG>Parameters:</STRONG>
+
+
+
+<P>
+<EM>$nb_lines:</EM> Number of lines to delete.
+
+<P>
+<EM>$Y:</EM> Number of the first line to <CODE>delete(</CODE> top line is number 1 )
+
+<P>
+<EM>$win:</EM> the window you created with crewin or loadwin
+
+
+<P>
+<HR>
+<H1><A NAME="delmenu">delmenu</A></H1>
+<P>
+<PRE>         The function ends access to the menu choices in the specified window.
+</PRE>
+<P>
+<STRONG>Syntax:</STRONG>
+
+
+
+<P>
+<PRE>           delmenu  ($win);
+       
+</PRE>
+<P>
+<STRONG>Parameters:</STRONG>
+
+
+
+<P>
+<EM>$win:</EM> the window you created with crewin or loadwin and where you created this
+menu.
+
+
+<P>
+<HR>
+<H1><A NAME="delwin">delwin</A></H1>
+<P>
+<PRE>         The function deletes a window.
+</PRE>
+<P>
+<STRONG>Syntax:</STRONG>
+
+
+
+<P>
+<PRE>           delwin  ($win);
+       
+</PRE>
+<P>
+<STRONG>Parameters:</STRONG>
+
+
+
+<P>
+<EM>$win:</EM> the window you created with crewin or loadwin .
+
+
+<P>
+<HR>
+<H1><A NAME="drawline">drawline</A></H1>
+<P>
+<PRE>         The function draws a horizontal or vertical line.
+</PRE>
+<P>
+<STRONG>Syntax:</STRONG>
+
+
+
+<P>
+<PRE>           drawline  ($win ,$Y0 ,$X0 ,$Y1 ,$X1 ,$attr);
+</PRE>
+<P>
+<PRE>                          
+       
+</PRE>
+<P>
+<STRONG>Parameters:</STRONG>
+
+
+
+<P>
+<EM>$X0:</EM> Number of the column of line start point ( leftmost column is number 1 )
+
+<P>
+<EM>$Y0:</EM> Number of the row of line start point ( top line is number 1 )
+
+<P>
+<EM>$X1:</EM> Number of the column of line end point ( leftmost column is number 1 )
+
+<P>
+<EM>$Y1:</EM> Number of the row of line end point ( top line is number 1 )
+
+<P>
+<EM>$win:</EM> the window you created with crewin or loadwin
+
+<P>
+<EM>$attr:</EM> A character string with one character/attribute:
+
+<P>
+<EM>I:</EM>  Invisible;
+
+<P>
+<EM>B:</EM>  Bold;
+
+<P>
+<EM>R:</EM>  Reverse;
+
+<P>
+<EM>U:</EM>  Underline;
+
+<P>
+<EM>F:</EM>  Flashing
+
+<P>
+<EM>1:</EM>  terminal user defined feature number 1;
+
+<P>
+<EM>2:</EM>  terminal user defined feature number 2;
+
+<P>
+<EM>3:</EM>  terminal user defined feature number 3;
+
+<P>
+<EM>4:</EM>  terminal user defined feature number 4;
+
+<P>
+<EM>5:</EM>  terminal user defined feature number 5;
+
+<P>
+<EM>6:</EM>  terminal user defined feature number 6;
+
+<P>
+<EM>7:</EM>  terminal user defined feature number 7;
+
+<P>
+<EM>8:</EM>  terminal user defined feature number 8;
+
+
+<P>
+<PRE>  The user defined features are more often ansi colours and are
+  available on Xterms or on colour terminals and colour terminal emulators
+  VT2XX and over.
+  For a normal rendition just send the string &quot;\0&quot;
+</PRE>
+
+<P>
+<HR>
+<H1><A NAME="drawbox">drawbox</A></H1>
+<P>
+<PRE>         The function draws a rectangle.
+</PRE>
+<P>
+<STRONG>Syntax:</STRONG>
+
+
+
+<P>
+<PRE>           drawbox  ($win ,$Y0 ,$X0 ,$Y1 ,$X1 ,$attr);
+</PRE>
+<P>
+<PRE>                               
+       
+</PRE>
+<P>
+<STRONG>Parameters:</STRONG>
+
+
+
+<P>
+<EM>$attr:</EM> A character string with one character/attribute:
+
+<P>
+<EM>I:</EM>  Invisible;
+
+<P>
+<EM>B:</EM>  Bold;
+
+<P>
+<EM>R:</EM>  Reverse;
+
+<P>
+<EM>U:</EM>  Underline;
+
+<P>
+<EM>F:</EM>  Flashing
+
+<P>
+<EM>1:</EM>  terminal user defined feature number 1;
+
+<P>
+<EM>2:</EM>  terminal user defined feature number 2;
+
+<P>
+<EM>3:</EM>  terminal user defined feature number 3;
+
+<P>
+<EM>4:</EM>  terminal user defined feature number 4;
+
+<P>
+<EM>5:</EM>  terminal user defined feature number 5;
+
+<P>
+<EM>6:</EM>  terminal user defined feature number 6;
+
+<P>
+<EM>7:</EM>  terminal user defined feature number 7;
+
+<P>
+<EM>8:</EM>  terminal user defined feature number 8;
+
+
+<P>
+<PRE>  The user defined features are more often ansi colours and are
+  available on Xterms or on colour terminals and colour terminal emulators
+  VT2XX and over.
+  For a normal rendition just send the string &quot;\0&quot;
+</PRE>
+<P>
+<EM>($X0,$Y0) and ($X1,$Y1):</EM> are coordinates of one of the box diagonals.
+
+<P>
+<EM>$win:</EM> the window you created with crewin or loadwin
+
+
+<P>
+<HR>
+<H1><A NAME="erasechars">erasechars</A></H1>
+<P>
+<PRE>         The function erases characters in a virtual
+         display by replacing them with blanks.
+</PRE>
+<P>
+<STRONG>Syntax:</STRONG>
+
+
+
+<P>
+<PRE>           erasechars  ($win ,$nb_chars ,$Y, $X);
+       
+</PRE>
+<P>
+<STRONG>Parameters:</STRONG>
+
+
+
+<P>
+<EM>$nb_chars:</EM> Number of characters to erase.
+
+<P>
+<EM>$X:</EM> Number of the column where the erase process starts ( leftmost column is
+number 1 )
+
+<P>
+<EM>$Y:</EM> Number of the line where the erase process starts ( top line is number 1 )
+
+<P>
+<EM>$win:</EM> the window you created with crewin or loadwin
+
+
+<P>
+<HR>
+<H1><A NAME="erasecol">erasecol</A></H1>
+<P>
+<PRE>         The function erases the specified
+         portion of the window from the given position to the
+         end of the column. Erases the column number $X from 
+         line number $Y0 to line number $Y1
+</PRE>
+<P>
+<STRONG>Syntax:</STRONG>
+
+
+
+<P>
+<PRE>           erasecol  ($win ,$Y0 ,$X ,$Y1 );
+           
+</PRE>
+<P>
+<STRONG>Parameters:</STRONG>
+
+
+
+<P>
+<EM>$X:</EM> Number of the column ( leftmost column is number 1 )
+
+<P>
+<EM>$Y0:</EM> Number of the starting line ( top line is number 1 )
+
+<P>
+<EM>$Y1:</EM> Number of the ending line ( top line is number 1 )
+
+<P>
+<EM>$win:</EM> the window you created with crewin or loadwin
+
+
+<P>
+<HR>
+<H1><A NAME="erasewin">erasewin</A></H1>
+<P>
+<PRE>         The function erases all or part of a virtual
+         display by replacing text characters with blanks.
+</PRE>
+<P>
+<STRONG>Syntax:</STRONG>
+
+
+
+<P>
+<PRE>           erasewin  ($win ,$Y0 ,$X0 ,$Y1 ,$X1);
+       
+</PRE>
+<P>
+<STRONG>Parameters:</STRONG>
+
+
+
+<P>
+<EM>($X0,$Y0) and ($X1,$Y1):</EM> are coordinates of one of the diagonals of the rectangular area to erase.
+
+<P>
+<EM>$win:</EM> the window you created with crewin or loadwin
+
+
+<P>
+<HR>
+<H1><A NAME="eraseline">eraseline</A></H1>
+<P>
+<PRE>         The function erases all or part of a line in a virtual
+         display. Erase line number $Y from column $X to the end
+         of line.
+</PRE>
+<P>
+<STRONG>Syntax:</STRONG>
+
+
+
+<P>
+<PRE>           eraseline  ($win ,$Y ,$X);
+       
+</PRE>
+<P>
+<STRONG>Parameters:</STRONG>
+
+
+
+<P>
+<EM>$X:</EM> Number of the column where line erasing starts ( leftmost column is number
+1 )
+
+<P>
+<EM>$Y:</EM> Number of the line to erase ( top line is number 1 )
+
+<P>
+<EM>$win:</EM> the window you created with crewin or loadwin
+
+
+<P>
+<HR>
+<H1><A NAME="clearscreen">clearscreen</A></H1>
+<P>
+<PRE>         The function erases the contents of a physical screen.
+</PRE>
+<P>
+<STRONG>Syntax:</STRONG>
+
+
+
+<P>
+<PRE>           clearscreen  ($PbId);
+       
+</PRE>
+<P>
+<STRONG>Parameters:</STRONG>
+
+
+
+<P>
+<EM>$PbId:</EM> The physical screen you defined in initscr
+
+
+<P>
+<HR>
+<H1><A NAME="insertchars">insertchars</A></H1>
+<P>
+<PRE>         The function inserts characters into a virtual
+         display.
+</PRE>
+<P>
+<STRONG>Syntax:</STRONG>
+
+
+
+<P>
+<PRE>           insertchars  ($win , $string ,$Y ,$X ,$attr);
+       
+</PRE>
+<P>
+<STRONG>Parameters:</STRONG>
+
+
+
+<P>
+<EM>$string:</EM> Character string to insert in window. 
+
+<P>
+<EM>$attr:</EM> A character string with one character/attribute:
+
+<P>
+<EM>I:</EM>  Invisible;
+
+<P>
+<EM>B:</EM>  Bold;
+
+<P>
+<EM>R:</EM>  Reverse;
+
+<P>
+<EM>U:</EM>  Underline;
+
+<P>
+<EM>F:</EM>  Flashing
+
+<P>
+<EM>1:</EM>  terminal user defined feature number 1;
+
+<P>
+<EM>2:</EM>  terminal user defined feature number 2;
+
+<P>
+<EM>3:</EM>  terminal user defined feature number 3;
+
+<P>
+<EM>4:</EM>  terminal user defined feature number 4;
+
+<P>
+<EM>5:</EM>  terminal user defined feature number 5;
+
+<P>
+<EM>6:</EM>  terminal user defined feature number 6;
+
+<P>
+<EM>7:</EM>  terminal user defined feature number 7;
+
+<P>
+<EM>8:</EM>  terminal user defined feature number 8;
+
+
+<P>
+<PRE>  The user defined features are more often ansi colours and are
+  available on Xterms or on colour terminals and colour terminal emulators
+  VT2XX and over.
+  For a normal rendition just send the string &quot;\0&quot;
+</PRE>
+<P>
+<EM>$X:</EM> Number of the column where the insertion starts ( leftmost column is number
+1 )
+
+<P>
+<EM>$Y:</EM> Number of the line where the insertion starts ( top line is number 1 )
+
+<P>
+<EM>$win:</EM> the window you created with crewin or loadwin
+
+
+<P>
+<HR>
+<H1><A NAME="insertline">insertline</A></H1>
+<P>
+<PRE>         The function inserts a line into a window and
+         scrolls the following lines or the previous lines
+         according to $direction.
+</PRE>
+<P>
+<STRONG>Syntax:</STRONG>
+
+
+
+<P>
+<PRE>           insertline  ($win ,$Y , $string ,$direction ,$attr);
+       
+</PRE>
+<P>
+<STRONG>Parameters:</STRONG>
+
+
+
+<P>
+<EM>$string:</EM> Character string containing the line to insert.
+
+<P>
+<EM>$direction:</EM>A one character string:
+
+<P>
+<EM>U:</EM> Preceding will be scrolled up, the first line will be lost.
+
+<P>
+<EM>D:</EM> following will be scrolled down, the last line will be lost.
+
+
+<P>
+<EM>$attr:</EM> A character string with one character/attribute:
+
+<P>
+<EM>I:</EM>  Invisible;
+
+<P>
+<EM>B:</EM>  Bold;
+
+<P>
+<EM>R:</EM>  Reverse;
+
+<P>
+<EM>U:</EM>  Underline;
+
+<P>
+<EM>F:</EM>  Flashing
+
+<P>
+<EM>1:</EM>  terminal user defined feature number 1;
+
+<P>
+<EM>2:</EM>  terminal user defined feature number 2;
+
+<P>
+<EM>3:</EM>  terminal user defined feature number 3;
+
+<P>
+<EM>4:</EM>  terminal user defined feature number 4;
+
+<P>
+<EM>5:</EM>  terminal user defined feature number 5;
+
+<P>
+<EM>6:</EM>  terminal user defined feature number 6;
+
+<P>
+<EM>7:</EM>  terminal user defined feature number 7;
+
+<P>
+<EM>8:</EM>  terminal user defined feature number 8;
+
+
+<P>
+<PRE>  The user defined features are more often ansi colours and are
+  available on Xterms or on colour terminals and colour terminal emulators
+  VT2XX and over.
+  For a normal rendition just send the string &quot;\0&quot;
+</PRE>
+<P>
+<EM>$Y:</EM> Number of the line ( top line is number 1 ) to insert.
+
+<P>
+<EM>$win:</EM> the window you created with crewin or loadwin
+
+
+<P>
+<HR>
+<H1><A NAME="codetoname">codetoname</A></H1>
+<P>
+<PRE>         The function translates the
+         key code of a key on the keyboard into its associated key name.
+</PRE>
+<P>
+<STRONG>Syntax:</STRONG>
+
+
+
+<P>
+<PRE>           codetoname  ($code ,$name);
+       
+</PRE>
+<P>
+<STRONG>Parameters:</STRONG>
+
+
+
+<P>
+<EM>$name:</EM> Ascii String Giving The name of the pressed key.
+
+<P>
+<EM>$code:</EM> A 2byte integer number last pressed code; this code is using 0-255 for
+extended ascii character set, and over for the other keys (ex: F10, PF2,
+SELECT ...)
+
+
+<P>
+<HR>
+<H1><A NAME="labelwin">labelwin</A></H1>
+<P>
+<PRE>         The function supplies a label for a
+         window's border. Note that the window must have created with
+         a border.
+</PRE>
+<P>
+<STRONG>Syntax:</STRONG>
+
+
+
+<P>
+<PRE>           labelwin  ($win ,$text ,$position ,$offset ,$attr );
+</PRE>
+<P>
+<PRE>       
+</PRE>
+<P>
+<STRONG>Parameters:</STRONG>
+
+
+
+<P>
+<EM>$text:</EM> Text of the label.
+
+<P>
+<EM>$position:</EM> a one character string saying on which side is the label:
+
+<P>
+<EM>T:</EM> The label will be on the top side of the border.
+
+<P>
+<EM>B:</EM> The label will be on the bottom side of the border.
+
+<P>
+<EM>L:</EM> The label will be on the left side of the border.
+
+<P>
+<EM>R:</EM> The label will be on the right side of the border.
+
+
+<P>
+<EM>$offset:</EM> Position where start the label.
+
+<P>
+<EM>$attr:</EM> A character string with one character/attribute:
+
+<P>
+<EM>I:</EM>  Invisible;
+
+<P>
+<EM>B:</EM>  Bold;
+
+<P>
+<EM>R:</EM>  Reverse;
+
+<P>
+<EM>U:</EM>  Underline;
+
+<P>
+<EM>F:</EM>  Flashing
+
+<P>
+<EM>1:</EM>  terminal user defined feature number 1;
+
+<P>
+<EM>2:</EM>  terminal user defined feature number 2;
+
+<P>
+<EM>3:</EM>  terminal user defined feature number 3;
+
+<P>
+<EM>4:</EM>  terminal user defined feature number 4;
+
+<P>
+<EM>5:</EM>  terminal user defined feature number 5;
+
+<P>
+<EM>6:</EM>  terminal user defined feature number 6;
+
+<P>
+<EM>7:</EM>  terminal user defined feature number 7;
+
+<P>
+<EM>8:</EM>  terminal user defined feature number 8;
+
+
+<P>
+<PRE>  The user defined features are more often ansi colours and are
+  available on Xterms or on colour terminals and colour terminal emulators
+  VT2XX and over.
+  For a normal rendition just send the string &quot;\0&quot;
+</PRE>
+<P>
+<EM>$win:</EM> the window you created with crewin or loadwin
+
+
+<P>
+<HR>
+<H1><A NAME="loadwin">loadwin</A></H1>
+<P>
+<PRE>         The function creates a new window and loads it with a window 
+         saved with savwin.
+</PRE>
+<P>
+<STRONG>Syntax:</STRONG>
+
+
+
+<P>
+<PRE>           loadwin  ($win ,$filespec);
+       
+</PRE>
+<P>
+<STRONG>Parameters:</STRONG>
+
+
+
+<P>
+<EM>$filespec:</EM> the specification of the file containing the window saved with savewin
+(wild cards are not allowed).
+
+<P>
+<EM>$win:</EM> the window you created with crewin and saved with savwin
+
+
+<P>
+<HR>
+<H1><A NAME="movearea">movearea</A></H1>
+<P>
+<PRE>         The Move function moves a rectangle of text from one window to 
+         another window. Given two points in opposite corners of the rectangle.
+         When $win and $towin are the same windows the intersection between
+         source area and target area may not be what you expect. :-)
+</PRE>
+<P>
+<STRONG>Syntax:</STRONG>
+
+
+
+<P>
+<PRE>           movearea  ($win ,$Y0 ,$X0 ,$Y1 ,$X1, $towin, $toY, $toX, $flags);
+</PRE>
+<P>
+<PRE>       
+</PRE>
+<P>
+<STRONG>Parameters:</STRONG>
+
+
+
+<P>
+<EM>($X0,$Y0) and ($X1,$Y1):</EM> are coordinates of two opposite corners of the rectangle to move.
+
+<P>
+<EM>$toX:</EM> Number of the column where to copy the area
+
+<P>
+<EM>$toY:</EM> Number of the line where to copy the area.
+
+<P>
+<EM>$flags:</EM> A character string with one character/option:
+
+<P>
+<EM>C:</EM> Just copy don't erase text from source window.
+
+<P>
+<EM>T:</EM> Move only the text not the video attributes.
+
+
+<P>
+<EM>$win:</EM> the window you created with crewin or loadwin
+
+<P>
+<EM>$towin:</EM> another window you created with crewin or loadwin
+
+
+<P>
+<HR>
+<H1><A NAME="movewin">movewin</A></H1>
+<P>
+<PRE>         The function relocates a window on a
+         physical screen and preserves the pasting order.
+</PRE>
+<P>
+<STRONG>Syntax:</STRONG>
+
+
+
+<P>
+<PRE>           movewin  ($win ,$PbId, $Y, $X);
+</PRE>
+<P>
+<PRE>       
+</PRE>
+<P>
+<STRONG>Parameters:</STRONG>
+
+
+
+<P>
+<EM>$X,$Y:</EM>  New position of the window on the physical screen.
+
+<P>
+<EM>$PbId:</EM> The physical screen you defined in initscr
+
+<P>
+<EM>$win:</EM> the window you created with crewin or loadwin
+
+
+<P>
+<HR>
+<H1><A NAME="nametocode">nametocode</A></H1>
+<P>
+<PRE>         The function translates the
+         key name of a key on the keyboard into its associated key code.
+</PRE>
+<P>
+<STRONG>Syntax:</STRONG>
+
+
+
+<P>
+<PRE>           nametocode  ($name ,$code);
+       
+</PRE>
+<P>
+<STRONG>Parameters:</STRONG>
+
+
+
+<P>
+<EM>$name:</EM> Ascii String Giving The name of the pressed key.
+
+<P>
+<EM>$code:</EM> A 2byte integer number last pressed code; this code is using 0-255 for
+extended ascii character set, and over for the other keys (ex: F10, PF2,
+SELECT ...)
+
+
+<P>
+<HR>
+<H1><A NAME="putwin">putwin</A></H1>
+<P>
+<PRE>         The function pastes a window to a
+         physical screen.
+</PRE>
+<P>
+<STRONG>Syntax:</STRONG>
+
+
+
+<P>
+<PRE>           putwin($Y,$X,$winId,$PbId);
+</PRE>
+<P>
+<PRE>       
+</PRE>
+<P>
+<STRONG>Parameters:</STRONG>
+
+
+
+<P>
+<EM>$X:</EM> Number of the column on the physical screen where to display this window (
+leftmost column is number 1 ).
+
+<P>
+<EM>$Y:</EM> Number of the line on the physical screen where to display this window (
+top line is number 1 ).
+
+<P>
+<EM>$PbId:</EM> The physical screen you defined in initscr
+
+<P>
+<EM>$winId:</EM> the window you created with crewin or loadwin
+
+
+<P>
+<HR>
+<H1><A NAME="printscreen">printscreen</A></H1>
+<P>
+<PRE>         The function prints the
+         contents of the specified physical screen on a line printer.
+</PRE>
+<P>
+<STRONG>Syntax:</STRONG>
+
+
+
+<P>
+<PRE>           printscreen  ($PbId ,$queue); 
+</PRE>
+<P>
+<PRE>       
+</PRE>
+<P>
+<STRONG>Parameters:</STRONG>
+
+
+
+<P>
+<EM>$PbId:</EM> The physical screen you defined in initscr
+
+<P>
+<EM>$queue:</EM> Name of the printer queue where to submit the print job.
+
+
+<P>
+<HR>
+<H1><A NAME="putchars">putchars</A></H1>
+<P>
+<PRE>         The function writes
+         characters in a window with the text you specify.
+</PRE>
+<P>
+<STRONG>Syntax:</STRONG>
+           <CODE>putchars($winId,$SmgX,$SmgY,$SMGString,$attrib);</CODE>
+
+<P>
+<PRE>       
+</PRE>
+<P>
+<STRONG>Parameters:</STRONG>
+
+
+
+<P>
+<EM>$SmgX:</EM> Number of the starting column of the string ( leftmost column is number 1 )
+
+<P>
+<EM>$SmgY:</EM> Number of the line where to write the string ( top line is number 1 )
+
+<P>
+<EM>$SmgString:</EM> Character string containing the text to write in the window
+
+<P>
+<EM>$attrib:</EM> A character string with one character/attribute:
+
+<P>
+<EM>I:</EM>  Invisible;
+
+<P>
+<EM>B:</EM>  Bold;
+
+<P>
+<EM>R:</EM>  Reverse;
+
+<P>
+<EM>U:</EM>  Underline;
+
+<P>
+<EM>F:</EM>  Flashing
+
+<P>
+<EM>1:</EM>  terminal user defined feature number 1;
+
+<P>
+<EM>2:</EM>  terminal user defined feature number 2;
+
+<P>
+<EM>3:</EM>  terminal user defined feature number 3;
+
+<P>
+<EM>4:</EM>  terminal user defined feature number 4;
+
+<P>
+<EM>5:</EM>  terminal user defined feature number 5;
+
+<P>
+<EM>6:</EM>  terminal user defined feature number 6;
+
+<P>
+<EM>7:</EM>  terminal user defined feature number 7;
+
+<P>
+<EM>8:</EM>  terminal user defined feature number 8;
+
+
+<P>
+<PRE>  The user defined features are more often ansi colours and are
+  available on Xterms or on colour terminals and colour terminal emulators
+  VT2XX and over.
+  For a normal rendition just send the string &quot;\0&quot;
+</PRE>
+<P>
+<EM>$win:</EM> the window you created with crewin or loadwin
+
+
+<P>
+<HR>
+<H1><A NAME="puthichars">puthichars</A></H1>
+<P>
+<PRE>         The function writes
+         double-height, double-width (highwide) characters to a virtual
+         display.
+</PRE>
+<P>
+<STRONG>Syntax:</STRONG>
+
+
+
+<P>
+<PRE>           puthichars($winId,$SmgX,$SmgY,$SMGString,$attrib);
+</PRE>
+<P>
+<STRONG>Parameters:</STRONG>
+
+
+
+<P>
+<EM>$SmgX:</EM> Number of the starting column of the string ( leftmost column is number 1 )
+
+<P>
+<EM>$SmgY:</EM> Number of the line where to write the string ( top line is number 1 )
+
+<P>
+<EM>$SmgString:</EM> Character string containing the text to write in the window
+
+<P>
+<EM>$attrib:</EM> A character string with one character/attribute:
+
+<P>
+<EM>I:</EM>  Invisible;
+
+<P>
+<EM>B:</EM>  Bold;
+
+<P>
+<EM>R:</EM>  Reverse;
+
+<P>
+<EM>U:</EM>  Underline;
+
+<P>
+<EM>F:</EM>  Flashing
+
+<P>
+<EM>1:</EM>  terminal user defined feature number 1;
+
+<P>
+<EM>2:</EM>  terminal user defined feature number 2;
+
+<P>
+<EM>3:</EM>  terminal user defined feature number 3;
+
+<P>
+<EM>4:</EM>  terminal user defined feature number 4;
+
+<P>
+<EM>5:</EM>  terminal user defined feature number 5;
+
+<P>
+<EM>6:</EM>  terminal user defined feature number 6;
+
+<P>
+<EM>7:</EM>  terminal user defined feature number 7;
+
+<P>
+<EM>8:</EM>  terminal user defined feature number 8;
+
+
+<P>
+<PRE>  The user defined features are more often ansi colours and are
+  available on Xterms or on colour terminals and colour terminal emulators
+  VT2XX and over.
+  For a normal rendition just send the string &quot;\0&quot;
+</PRE>
+<P>
+<EM>$win:</EM> the window you created with crewin or loadwin
+
+
+<P>
+<HR>
+<H1><A NAME="putfatchars">putfatchars</A></H1>
+<P>
+<PRE>         The function writes double-width
+         characters to a window.
+</PRE>
+<P>
+<STRONG>Syntax:</STRONG>
+
+
+
+<P>
+<PRE>           putfatchars($winId,$SmgX,$SmgY,$SMGString,$attrib);
+</PRE>
+<P>
+<PRE>       
+</PRE>
+<P>
+<STRONG>Parameters:</STRONG>
+
+
+
+<P>
+<EM>$SmgX:</EM> Number of the starting column of the string ( leftmost column is number 1 )
+
+<P>
+<EM>$SmgY:</EM> Number of the line where to write the string ( top line is number 1 )
+
+<P>
+<EM>$SmgString:</EM> Character string containing the text to write in the window
+
+<P>
+<EM>$attrib:</EM> A character string with one character/attribute:
+
+<P>
+<EM>I:</EM>  Invisible;
+
+<P>
+<EM>B:</EM>  Bold;
+
+<P>
+<EM>R:</EM>  Reverse;
+
+<P>
+<EM>U:</EM>  Underline;
+
+<P>
+<EM>F:</EM>  Flashing
+
+<P>
+<EM>1:</EM>  terminal user defined feature number 1;
+
+<P>
+<EM>2:</EM>  terminal user defined feature number 2;
+
+<P>
+<EM>3:</EM>  terminal user defined feature number 3;
+
+<P>
+<EM>4:</EM>  terminal user defined feature number 4;
+
+<P>
+<EM>5:</EM>  terminal user defined feature number 5;
+
+<P>
+<EM>6:</EM>  terminal user defined feature number 6;
+
+<P>
+<EM>7:</EM>  terminal user defined feature number 7;
+
+<P>
+<EM>8:</EM>  terminal user defined feature number 8;
+
+
+<P>
+<PRE>  The user defined features are more often ansi colours and are
+  available on Xterms or on colour terminals and colour terminal emulators
+  VT2XX and over.
+  For a normal rendition just send the string &quot;\0&quot;
+</PRE>
+<P>
+<EM>$win:</EM> the window you created with crewin or loadwin
+
+
+<P>
+<HR>
+<H1><A NAME="putline">putline</A></H1>
+<P>
+<PRE>         The function writes a line of text
+         to a window, beginning at the current virtual cursor
+         position.
+</PRE>
+<P>
+<STRONG>Syntax:</STRONG>
+
+
+
+<P>
+<PRE>           putline  ($win ,$text ,$advance ,$attr);
+       
+</PRE>
+<P>
+<STRONG>Parameters:</STRONG>
+
+
+
+<P>
+<EM>$text:</EM> Character string containing the text to write in the window
+
+<P>
+<EM>$advance:</EM> Number of line to scroll before writing. If 0 the current line will be
+overwritten with $text.
+
+<P>
+<EM>$attr:</EM> A character string with one character/attribute:
+
+<P>
+<EM>I:</EM>  Invisible;
+
+<P>
+<EM>B:</EM>  Bold;
+
+<P>
+<EM>R:</EM>  Reverse;
+
+<P>
+<EM>U:</EM>  Underline;
+
+<P>
+<EM>F:</EM>  Flashing
+
+<P>
+<EM>1:</EM>  terminal user defined feature number 1;
+
+<P>
+<EM>2:</EM>  terminal user defined feature number 2;
+
+<P>
+<EM>3:</EM>  terminal user defined feature number 3;
+
+<P>
+<EM>4:</EM>  terminal user defined feature number 4;
+
+<P>
+<EM>5:</EM>  terminal user defined feature number 5;
+
+<P>
+<EM>6:</EM>  terminal user defined feature number 6;
+
+<P>
+<EM>7:</EM>  terminal user defined feature number 7;
+
+<P>
+<EM>8:</EM>  terminal user defined feature number 8;
+
+
+<P>
+<PRE>  The user defined features are more often ansi colours and are
+  available on Xterms or on colour terminals and colour terminal emulators
+  VT2XX and over.
+  For a normal rendition just send the string &quot;\0&quot;
+</PRE>
+<P>
+<EM>$win:</EM> the window you created with crewin or loadwin
+
+
+<P>
+<HR>
+<H1><A NAME="readkey">readkey</A></H1>
+<P>
+<PRE>         The function reads a keystroke and returns
+         that keystroke's terminator code.
+</PRE>
+<P>
+<STRONG>Syntax:</STRONG>
+
+
+
+<P>
+<PRE>           readkey  ($KbId ,$code);
+</PRE>
+<P>
+<STRONG>Parameters:</STRONG>
+
+
+
+<P>
+<EM>$KbId:</EM> The Keyboard identifier returned by the function initscr 
+
+<P>
+<EM>$code:</EM> A 2byte integer number last pressed code; this code is using 0-255 for
+extended ascii character set, and over for the other keys (ex: F10, PF2,
+SELECT ...)
+
+
+<P>
+<HR>
+<H1><A NAME="read_string">read_string</A></H1>
+<P>
+<PRE>         The function reads a string off a keyboard with echo in the
+         window and returns the last keystroke's terminator code.
+         any unprintable key other than arrows or delete terminates
+         the program.
+</PRE>
+<P>
+<STRONG>Syntax:</STRONG>
+
+
+
+<P>
+<PRE>           read_string($win,$KbId,$Str,$Size)
+           
+       
+</PRE>
+<P>
+<STRONG>Parameters:</STRONG>
+
+
+
+<P>
+<EM>$KbId:</EM> The Keyboard identifier returned by the function initscr 
+
+<P>
+<EM>$Str:</EM> The returned string.
+
+<P>
+<EM>$Size:</EM> Maximum size of the returned string.
+
+<P>
+<EM>$win:</EM> the window you created with crewin or loadwin
+
+
+<P>
+<HR>
+<H1><A NAME="readkeypt">readkeypt</A></H1>
+<P>
+<PRE>         The function reads a keystroke and returns
+         that keystroke's terminator code.
+</PRE>
+<P>
+<STRONG>Syntax:</STRONG>
+
+
+
+<P>
+<PRE>           readkeypt  ($KbId ,$code ,$prompt ,$timeout ,$win);
+       
+</PRE>
+<P>
+<STRONG>Parameters:</STRONG>
+
+
+
+<P>
+<EM>$prompt:</EM> Ascii String use to prompt the user before waiting for the key stroke.
+
+<P>
+<EM>$timeout:</EM> Number of seconds to wait before returning with ``TIMEOUT'' as key name.
+
+<P>
+<EM>$KbId:</EM> The Keyboard identifier returned by the function initscr 
+
+<P>
+<EM>$code:</EM> A 2byte integer number last pressed code; this code is using 0-255 for
+extended ascii character set, and over for the other keys (ex: F10, PF2,
+SELECT ...)
+
+<P>
+<EM>$win:</EM> the window you created with crewin or loadwin
+
+
+<P>
+<HR>
+<H1><A NAME="refresh">refresh</A></H1>
+<P>
+<PRE>         The function repaints the specified
+         physical screen after non-SMG$ I/O has occurred.
+</PRE>
+<P>
+<STRONG>Syntax:</STRONG>
+
+
+
+<P>
+<PRE>           refresh($PbId);
+       
+</PRE>
+<P>
+<STRONG>Parameters:</STRONG>
+
+
+
+<P>
+<EM>$PbId:</EM> The physical screen you defined in initscr
+
+
+<P>
+<HR>
+<H1><A NAME="putwinagain">putwinagain</A></H1>
+<P>
+<PRE>         The function moves a window
+         to a new position on the physical screen. The pasting order is not
+         preserved. The difference with movewin() is that the window is moved
+         and put over all the other windows.
+</PRE>
+<P>
+<STRONG>Syntax:</STRONG>
+
+
+
+<P>
+<PRE>           putwinagain($win ,$PbId ,$Y ,$X);
+</PRE>
+<P>
+<PRE>       
+</PRE>
+<P>
+<STRONG>Parameters:</STRONG>
+
+
+
+<P>
+<EM>$X:</EM> Number of the physical screen column where to put the window ( leftmost
+column is number 1 )
+
+<P>
+<EM>$Y:</EM> Number of the physical screen line where to put the window ( top line is
+number 1 )
+
+<P>
+<EM>$PbId:</EM> The physical screen you defined in initscr
+
+<P>
+<EM>$win:</EM> the window you created with crewin or loadwin
+
+
+<P>
+<HR>
+<H1><A NAME="curpos">curpos</A></H1>
+<P>
+<PRE>         The function returns the current virtual
+         cursor position in a specified window.
+</PRE>
+<P>
+<STRONG>Syntax:</STRONG>
+
+
+
+<P>
+<PRE>           curpos  ($win ,$Y ,$X);
+       
+</PRE>
+<P>
+<STRONG>Parameters:</STRONG>
+
+
+
+<P>
+<EM>$X:</EM> Number of the cursor current column in window <CODE>$win</CODE> ( leftmost
+column is number 1 )
+
+<P>
+<EM>$Y:</EM> Number of the cursor current line in window <CODE>$win</CODE> ( top line is
+number 1 )
+
+<P>
+<EM>$win:</EM> the window you created with crewin or loadwin
+
+
+<P>
+<HR>
+<H1><A NAME="bell">bell</A></H1>
+<P>
+<PRE>         The Ring the function sounds the terminal
+         bell or buzzer.
+</PRE>
+<P>
+<STRONG>Syntax:</STRONG>
+
+
+
+<P>
+<PRE>           bell  ($win ,$nbtimes);
+       
+</PRE>
+<P>
+<STRONG>Parameters:</STRONG>
+
+
+
+<P>
+<EM>$nbtimes:</EM> Number of times the bell will ring on the terminal.
+
+<P>
+<EM>$win:</EM> the window you created with crewin or loadwin
+
+
+<P>
+<HR>
+<H1><A NAME="savewin">savewin</A></H1>
+<P>
+<PRE>         The Save the function saves the contents
+         of a window and stores it in a file.
+</PRE>
+<P>
+<STRONG>Syntax:</STRONG>
+
+
+
+<P>
+<PRE>           savewin  ($win ,$filespec);
+       
+</PRE>
+<P>
+<STRONG>Parameters:</STRONG>
+
+
+
+<P>
+<EM>$filespec:</EM> the specification of the file that will contain the window (wild cards are
+not allowed).
+
+<P>
+<EM>$win:</EM> the window you created with crewin or loadwin
+
+
+<P>
+<HR>
+<H1><A NAME="scrollsubwin">scrollsubwin</A></H1>
+<P>
+<PRE>         The function scrolls a virtual
+         display under its associated subwindow.
+</PRE>
+<P>
+<STRONG>Syntax:</STRONG>
+
+
+
+<P>
+<PRE>           scrollsubwin  ($win ,$direction ,$count);
+       
+</PRE>
+<P>
+<STRONG>Parameters:</STRONG>
+
+
+
+<P>
+<EM>$direction:</EM> A one character string:
+
+<P>
+<EM>U:</EM> Scrolls the window up <CODE>$count</CODE> lines 
+
+<P>
+<EM>D:</EM> Scrolls the window down <CODE>$count</CODE> lines 
+
+<P>
+<EM>L:</EM> Scrolls the window left <CODE>$count</CODE> lines 
+
+<P>
+<EM>R:</EM> Scrolls the window right <CODE>$count</CODE> lines 
+
+
+<H1><A NAME="selmenuopt">selmenuopt</A></H1>
+<P>
+<PRE>         The Make a Selection from the function lets you move between
+         the menu choices using the arrow keys and lets you make a
+         selection by pressing the Return key.
+</PRE>
+<P>
+<STRONG>Syntax:</STRONG>
+
+
+
+<P>
+<PRE>           selmenuopt  ($KbId ,$win ,$sel_nb ,$def_sel ,$flags ,$hlp); 
+</PRE>
+<P>
+<STRONG>Parameters:</STRONG>
+
+
+
+<P>
+<EM>$KbId:</EM> The Keyboard identifier returned by the function initscr 
+
+<P>
+<EM>$flags:</EM> A character string with one character/option:
+
+<P>
+<EM>I:</EM> Returns immediately whatever is the pressed key. 
+
+<P>
+<EM>R:</EM> Removes the selected option from the list.
+
+
+<P>
+<EM>$win:</EM> the window you created with crewin or loadwin
+
+<P>
+<EM>$sel_nb:</EM> Number of the selected option.
+
+<P>
+<EM>$def_sel:</EM> The option highlighted at start of the function.
+
+<P>
+<EM>$hlp:</EM> Default VMS help library searched for the current option when &lt;help:&gt;
+key is pressed (this parameter is meaningless when flag I is set.
+
+
+<H1><A NAME="setcurpos">setcurpos</A></H1>
+<P>
+<PRE>         The function moves the virtual cursor
+         to the specified position in a window.
+</PRE>
+<P>
+<STRONG>Syntax:</STRONG>
+
+
+
+<P>
+<PRE>           setcurpos  ($win ,$Y ,$X);
+</PRE>
+<P>
+<STRONG>Parameters:</STRONG>
+
+
+
+<P>
+<EM>$X,$Y:</EM> Cursor new position.
+
+<P>
+<EM>$win:</EM> the window you created with crewin or loadwin
+
+
+<H1><A NAME="setcurmode">setcurmode</A></H1>
+<P>
+<PRE>         The function turns the physical cursor on or
+         off and selects jump or smooth scrolling.
+</PRE>
+<P>
+<STRONG>Syntax:</STRONG>
+
+
+
+<P>
+<PRE>           setcurmode  ($PbId ,$flags);
+       
+</PRE>
+<P>
+<STRONG>Parameters:</STRONG>
+
+
+
+<P>
+<EM>$flags:</EM> A character string with one character/option:
+
+<P>
+<EM>0:</EM> The cursor will not be visible.
+
+<P>
+<EM>1:</EM> The cursor will be visible.
+
+<P>
+<EM>J:</EM> The srolling will be on jump mode (faster).
+
+<P>
+<EM>S:</EM> The srolling will be on smooth mode (better for your eyes).
+
+
+<P>
+<EM>$PbId:</EM> The physical screen you defined in initscr
+
+
+<H1><A NAME="remwin">remwin</A></H1>
+<P>
+<PRE>         The function removes a window from
+         a physical screen.
+</PRE>
+<P>
+<STRONG>Syntax:</STRONG>
+
+
+
+<P>
+<PRE>           remwin($win ,$PbId);
+</PRE>
+<P>
+<STRONG>Parameters:</STRONG>
+
+
+
+<P>
+<EM>$PbId:</EM> The physical screen you defined in initscr
+
+<P>
+<EM>$win:</EM> the window you created with crewin or loadwin and you put on the screen
+with putwin. 
+
+
+<H1><A NAME="AUTHOR">AUTHOR</A></H1>
+<P>
+Jean-claude Tebbal
+
+</DL>
+</BODY>
+
+</HTML>

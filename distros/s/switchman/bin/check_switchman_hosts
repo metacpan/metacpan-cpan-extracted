@@ -1,0 +1,56 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+check_switchman_hosts
+
+=head1 DESCRIPTION
+
+Given one command-line argument: path to switchman configuration checks if all
+groups have at least one valid hostname in zookeeper data.
+
+=cut
+
+use strict;
+use warnings;
+
+use App::Switchman;
+use JSON;
+use List::MoreUtils qw/none/;
+use Net::Ping;
+
+my $TIMEOUT = 5;
+
+my ($SWITCHMAN_CONF) = @ARGV;
+$SWITCHMAN_CONF ||= $App::Switchman::DEFAULT_CONFIG_PATH;
+
+my $app = App::Switchman->new(["--config", $SWITCHMAN_CONF, "--lockname", "dummy"]);
+$app->load_prefix_data;
+
+my @problem_groups;
+my $groups = from_json($app->prefix_data)->{groups};
+my $p = Net::Ping->new();
+for my $group (keys %$groups) {
+    my $hosts = $groups->{$group};
+    if (none {$p->ping($_, $TIMEOUT)} (ref $hosts ? @$hosts : $hosts)) {
+        push @problem_groups, $group;
+    }
+}
+
+if (@problem_groups) {
+    print 'groups: '.join ', ', @problem_groups;
+    exit 2;
+}
+print 'OK';
+
+
+__END__
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2012-2016 by Yandex LLC.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

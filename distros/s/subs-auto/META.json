@@ -1,0 +1,62 @@
+{
+   "abstract" : "Read barewords as subroutine names.",
+   "author" : [
+      "Vincent Pit <perl@profvince.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.74, CPAN::Meta::Converter version 2.132140",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "subs-auto",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "B::Keywords" : "0",
+            "Carp" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "Test::More" : "0",
+            "Variable::Magic" : "0.31",
+            "XSLoader" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "B::Keywords" : "0",
+            "Carp" : "0",
+            "Variable::Magic" : "0.31",
+            "XSLoader" : "0",
+            "perl" : "5.010"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Dist/Display.html?Name=subs-auto"
+      },
+      "homepage" : "http://search.cpan.org/dist/subs-auto/",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://git.profvince.com/?p=perl%2Fmodules%2Fsubs-auto.git"
+      }
+   },
+   "version" : "0.08"
+}

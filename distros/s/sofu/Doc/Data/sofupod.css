@@ -1,0 +1,228 @@
+body {
+    background-color:#CECEFF;
+    color:#000000;
+    font-size:13px; font-family:"Bitstream Vera sans",Verdana,sans-serif;
+    margin:0px; border:0px;
+    padding:0px;
+}
+
+p {
+	background-color:white;
+	position:relative;
+	margin-right:20px;
+	margin-left:20px;
+	padding-left:30px;
+	padding-bottom:10px;
+	margin-top:0px;
+	margin-bottom:0px;
+	border-width:0px; border-color:#000000; border-style:solid;
+	border-left-width:1px;
+	border-right-width:1px;
+	vertical-align:left;
+}
+ul {
+	background-color:white;
+	position:relative;
+	margin:0px;
+	margin-right:20px;
+	margin-left:20px;
+	padding-bottom:10px;
+	padding-top:10px;
+	border-width:0px; border-color:#000000; border-style:solid;
+	border-left-width:1px;
+	border-right-width:1px;
+	vertical-align:left;
+}
+ul ul {
+	background-color:white;
+	position:relative;
+	border-width:0px; border-color:#000000; border-style:solid;
+	vertical-align:left;
+}
+dl {
+	background-color:white;
+	position:relative;
+	margin:0px;
+	margin-right:20px;
+	margin-left:20px;
+	padding-bottom:10px;
+	padding-top:10px;
+	border-width:0px; border-color:#000000; border-style:solid;
+	border-left-width:1px;
+	border-right-width:1px;
+	vertical-align:left;
+}
+dt {
+	margin-left:10px;
+	padding:0px;
+}
+dl dl {
+	background-color:white;
+	position:relative;
+	border:0px solid black;
+	border-width:0px; border-color:#000000; border-style:solid;
+	vertical-align:left;
+}
+dd p {
+	border:0px solid black;
+}
+dd {
+	padding:0px;
+	margin:0px;
+	margin-left:20px;
+	border:0px solid black;
+}
+hr {
+	border:1px solid black;
+	border-bottom:0px;
+	margin:0px;
+	margin-left:20px;
+	margin-right:20px;
+	background-color:white;
+	padding-bottom:10px;
+}
+h1 {
+	font-size:19px;
+	border-width:0px; border-color:#000000; border-style:solid;
+	border-left-width:1px;
+	border-right-width:1px;
+	margin:0px;
+	margin-left:20px;
+	margin-right:20px;
+	padding-bottom:10px;
+	padding-left:10px;
+	background-color:white;
+}
+h2 {
+	font-size:16px;
+	border-width:0px; border-color:#000000; border-style:solid;
+	border-left-width:1px;
+	border-right-width:1px;
+	margin:0px;
+	margin-left:20px;
+	margin-right:20px;
+	padding-bottom:10px;
+	padding-left:10px;
+	background-color:white;
+}
+h3 {
+	font-size:14px;
+	border-width:0px; border-color:#000000; border-style:solid;
+	border-left-width:1px;
+	border-right-width:1px;
+	margin:0px;
+	margin-left:20px;
+	margin-right:20px;
+	padding-bottom:10px;
+	padding-left:10px;
+	background-color:white;
+}
+pre {
+	border-width:0px; border-color:#000000; border-style:solid;
+	border-left-width:1px;
+	border-right-width:1px;
+	margin:0px;
+	margin-left:20px;
+	margin-right:20px;
+	padding-bottom:10px;
+	padding-left:20px;
+	background-color:white;
+}
+.content {
+	font-family:monospace;
+	background-color:white;
+	position:relative;
+	margin:5px;
+	padding:5px;
+	margin-top:70px;
+	margin-left:10px;
+	padding-left:10px;
+	border-width:1px; border-color:#000000; border-style:solid;
+	vertical-align:left;
+	list-style: none;
+}
+/* Headlines */
+.headline1 {
+    position:absolute;
+    left:40px;
+    top:0px;
+
+    font-size:20px; font-weight:bold;
+    color:#000000;
+}
+
+#sflogo {
+    position:absolute;
+    right:20px;
+    bottom:13px;
+}
+#impressum {
+    position:absolute;
+    right:150px;
+    bottom:18px;
+}
+
+
+
+.headline2 {
+    position:absolute;
+    left:20px;
+    top:30px;
+    height:20px;
+    width:100px;
+
+    color:#000000;
+
+    font-size:14px; font-weight:bold;
+
+    padding-right:10px;
+    
+    border-top-width:1px; border-top-color:#000000; border-top-style:solid;
+    
+    text-align:right;
+}
+
+#footer {
+	padding:0px;
+	position:absolute;
+	left:200px;
+	right:17px;
+	top:0px;
+	background-color:#CECEFF;
+	border-left:0px;
+	border-right:0px;
+}
+#header {
+	position:absolute;
+	padding:0px;
+	left:200px;
+	bottom:0px;
+	right:17px;
+}
+a {
+    text-decoration:underline;
+}
+
+a.nolink {
+    text-decoration:none;
+}
+
+a.nolink:hover {
+    color:#3F5A7C;
+}
+a:link {
+    color:#004080;
+}
+
+a:visited {
+    color:#002040;
+}
+
+a:hover {
+    color:#0060A0;
+}
+
+a:active {
+    color:#0060A0;
+}
+

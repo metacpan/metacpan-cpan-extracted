@@ -1,0 +1,6 @@
+Revision history for Perl extension Shishi.
+
+0.01  Mon Aug  5 15:32:18 2002
+	- original version; created by h2xs 1.21 with options
+		-n Shishi shishi.h shishi
+

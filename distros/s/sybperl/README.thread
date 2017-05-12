@@ -1,0 +1,70 @@
+	$Id: README.thread,v 1.1 1999/05/14 17:15:21 mpeppler Exp $
+
+Threaded Perl and sybperl
+=========================
+
+Perl 5.005 and later have the ability to run in threaded mode. That
+means that you can have multiple threads of execution in a single
+executable, which is a lot less processor intensive than having to
+fork() to run parallel operations.
+
+However, enabling threading in a program is far from trivial. All the
+code you write (both at the perl level and in the C libraries that are 
+called) must be re-entrant, and thread-safe.
+
+If you have Sybase OpenClient 10.x or earlier you can stop right now - 
+those libraries are NOT thread safe.
+
+Even if you have the 11.x release of OpenClient there are still quite
+a few problems.
+
+First, DB-Library isn't thread-safe in any incarnation. So don't even
+attempt to write programs with the threaded version of perl using
+Sybase::DBlib or Sybase::BCP. It will not work.
+
+Sybase's Client Library on the other hand exists in two versions for
+OpenClient 11.x and later. The normal libraries are not thread-safe
+(and are probably a little bit faster), but there are _r versions of
+the libraries that *are* thread safe. Sybase::CTlib's Makefile.PL will
+attempt to use these libraries if it detects that threading is enabled 
+in the version of perl that is being used to build it.
+
+Unfortunately threaded perl is still quite buggy.
+
+In my (limited) tests I have found that you can run multiple parallel
+queries (as long as you open one connection in each thread!).
+
+But accessing a handle attribute (eg $dbh->{UseDateTime}) causes a
+SIGBUS, at least here on Solaris 2.5.1.
+
+The following little script illustrates the problem:
+
+#!/u4/builds/perl-thread/bin/perl -w
+
+use strict;
+
+use blib;
+
+use Thread;
+use Sybase::CTlib;
+
+for (1..1) {
+    my $thread = new Thread \&runit, $_;
+#    runit($_);
+}
+
+sub runit {
+    my $id = shift;
+    my $dbh = new Sybase::CTlib 'sa';
+    print "$dbh->{UseDateTime}\n";   # dumps core here.
+#    $dbh->{UseDateTime} = 0;
+}
+
+__END__
+
+
+If you have some time and are interested in this issue you are welcome 
+to go spelunking in the perl internals to figure out what the problem
+might be...
+
+Michael

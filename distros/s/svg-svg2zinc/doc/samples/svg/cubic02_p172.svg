@@ -1,0 +1,93 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 20010904//EN" "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
+<svg width="5cm" height="4cm" viewBox="0 0 500 400" xmlns="http://www.w3.org/2000/svg">
+<title>Example cubic02- cubic Bézier commands in path data</title>
+<desc>Picture showing simple examples of path data using
+      both a "C" and an "S" command, along with annotations
+      showing the control points and end points</desc>
+
+<rect style="fill:none; stroke:blue; stroke-width:1" x="1" y="1" width="998" height="998" />
+
+
+<text style="font-size:22; font-family:Verdana" x="25" y="240">M100,200 C100,100 400,100 400,200</text>
+
+<polyline style="fill:none; stroke:#888888; stroke-width:2" points="100,200 100,100" />
+<polyline style="fill:none; stroke:#888888; stroke-width:2" points="400,100 400,200" />
+<path style="fill:none; stroke:red; stroke-width:5" d="M100,200 C100,100 400,100 400,200" />
+
+<circle style="fill:none; stroke:#888888; stroke-width:2" cx="100" cy="200" r="10" />
+<circle style="fill:#888888; stroke:none" cx="100" cy="100" r="10" />
+<circle style="fill:#888888; stroke:none" cx="400" cy="100" r="10" />
+<circle style="fill:none; stroke:#888888; stroke-width:2" cx="400" cy="200" r="10" />
+
+
+
+<text style="font-size:22; font-family:Verdana" x="450" y="270">M600,200 C675,100 975,100 900,200</text>
+
+<polyline style="fill:none; stroke:#888888; stroke-width:2" points="600,200 675,100" />
+<polyline style="fill:none; stroke:#888888; stroke-width:2" points="975,100 900,200" />
+<path style="fill:none; stroke:red; stroke-width:5" d="M600,200 C675,100 975,100 900,200" />
+
+<circle style="fill:none; stroke:#888888; stroke-width:2" cx="600" cy="200" r="10" />
+<circle style="fill:#888888; stroke:none" cx="675" cy="100" r="10" />
+<circle style="fill:#888888; stroke:none" cx="975" cy="100" r="10" />
+<circle style="fill:none; stroke:#888888; stroke-width:2" cx="900" cy="200" r="10" />
+
+
+<text style="font-size:22; font-family:Verdana" x="25" y="540">M100,500 C25,400 475,400 400,500</text>
+
+<polyline style="fill:none; stroke:#888888; stroke-width:2" points="100,500 25,400" />
+<polyline style="fill:none; stroke:#888888; stroke-width:2" points="475,400 400,500" />
+<path style="fill:none; stroke:red; stroke-width:5" d="M100,500 C25,400 475,400 400,500" />
+
+<circle style="fill:none; stroke:#888888; stroke-width:2" cx="100" cy="500" r="10" />
+<circle style="fill:#888888; stroke:none" cx="25" cy="400" r="10" />
+<circle style="fill:#888888; stroke:none" cx="475" cy="400" r="10" />
+<circle style="fill:none; stroke:#888888; stroke-width:2" cx="400" cy="500" r="10" />
+
+
+<text style="font-size:22; font-family:Verdana" x="450" y="570">M600,500 C600,350 900,650 900,500</text>
+
+<polyline style="fill:none; stroke:#888888; stroke-width:2" points="600,500 600,350" />
+<polyline style="fill:none; stroke:#888888; stroke-width:2" points="900,650 900,500" />
+<path style="fill:none; stroke:red; stroke-width:5" d="M600,500 C600,350 900,650 900,500" />
+
+<circle style="fill:none; stroke:#888888; stroke-width:2" cx="600" cy="500" r="10" />
+<circle style="fill:#888888; stroke:none" cx="600" cy="350" r="10" />
+<circle style="fill:#888888; stroke:none" cx="900" cy="650" r="10" />
+<circle style="fill:none; stroke:#888888; stroke-width:2" cx="900" cy="500" r="10" />
+
+
+
+<text style="font-size:22; font-family:Verdana" x="25" y="840">M100,800 C175,700 325,700 400,800</text>
+
+<polyline style="fill:none; stroke:#888888; stroke-width:2" points="100,800 175,700" />
+<polyline style="fill:none; stroke:#888888; stroke-width:2" points="325,700 400,800" />
+<path style="fill:none; stroke:red; stroke-width:5" d="M100,800 C175,700 325,700 400,800" />
+
+<circle style="fill:none; stroke:#888888; stroke-width:2" cx="100" cy="800" r="10" />
+<circle style="fill:#888888; stroke:none" cx="175" cy="700" r="10" />
+<circle style="fill:#888888; stroke:none" cx="325" cy="700" r="10" />
+<circle style="fill:none; stroke:#888888; stroke-width:2" cx="400" cy="800" r="10" />
+
+
+<text style="font-size:22; font-family:Verdana" x="450" y="930">M600,800 C625,700 725,700 750,800</text>
+<text style="font-size:22; font-family:Verdana" x="450" y="970">S875,900 900,800</text>
+
+<polyline style="fill:none; stroke:#888888; stroke-width:2" points="600,800 625,700" />
+<polyline style="fill:none; stroke:#888888; stroke-width:2" points="725,700 750,800" />
+<polyline style="fill:none; stroke:#888888; stroke-width:2" points="750 800 775,900" />
+<polyline style="fill:none; stroke:#888888; stroke-width:2" points="875,900 900,800" />
+<path style="fill:none; stroke:red; stroke-width:5" d="M600,800 C625,700 725,700 750,800 S875,900 900,800" />
+
+<circle style="fill:none; stroke:#888888; stroke-width:2" cx="600" cy="800" r="10" />
+<circle style="fill:#888888; stroke:none" cx="625" cy="700" r="10" />
+<circle style="fill:#888888; stroke:none" cx="725" cy="700" r="10" />
+<circle style="fill:none; stroke:#888888; stroke-width:2" cx="750" cy="800" r="10" />
+<circle style="fill:none; stroke:blue; stroke-width:4" cx="775" cy="900" r="9" />
+<circle style="fill:#888888; stroke:none" cx="875" cy="900" r="10" />
+<circle style="fill:none; stroke:#888888; stroke-width:2" cx="900" cy="800" r="10" />
+
+
+
+</svg>

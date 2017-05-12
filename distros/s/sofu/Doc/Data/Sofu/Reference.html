@@ -1,0 +1,168 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Data::Sofu::Reference - A Sofu Reference</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+<link rel="stylesheet" type="text/css" href="/Data/sofupod.css" />
+</head>
+
+<body>
+
+<!-- INDEX BEGIN -->
+<div name="index">
+<p><a name="__index__"></a></p>
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#synopsis">Synopsis</a></li>
+	<li><a href="#syntax">SYNTAX</a></li>
+	<li><a href="#methods">METHODS</a></li>
+	<ul>
+
+		<li><a href="#new__data__">new([DATA])</a></li>
+		<li><a href="#dangle__data__">dangle([Data])</a></li>
+		<li><a href="#valid__"><code>valid()</code></a></li>
+		<li><a href="#isvalid__"><code>isValid()</code></a></li>
+		<li><a href="#isreference__"><code>isReference()</code></a></li>
+		<li><a href="#follow__"><code>follow()</code></a></li>
+		<li><a href="#asvalue__"><code>asValue()</code></a></li>
+		<li><a href="#asmap__"><code>asMap()</code></a></li>
+		<li><a href="#aslist__"><code>asList()</code></a></li>
+		<li><a href="#islist__"><code>isList()</code></a></li>
+		<li><a href="#isvalue__"><code>isValue()</code></a></li>
+		<li><a href="#ismap__"><code>isMap()</code></a></li>
+		<li><a href="#isdefined__"><code>isDefined()</code></a></li>
+		<li><a href="#asreference__"><code>asReference()</code></a></li>
+	</ul>
+
+	<li><a href="#bugs">BUGS</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
+</ul>
+
+<hr name="index" />
+</div>
+<!-- INDEX END -->
+
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>Data::Sofu::Reference - A Sofu Reference</p>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>Provides a interface similar to the original SofuD (sofu.sf.net).</p>
+<p>References present a transparent interface to the object referenced. Normally they shouldn't even bother you one bit.</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">Synopsis</a></h1>
+<pre>
+        <span class="keyword">require</span> <span class="variable">Data::Sofu::Map</span><span class="operator">;</span>
+        <span class="keyword">require</span> <span class="variable">Data::Sofu::Reference</span><span class="operator">;</span>
+        <span class="keyword">my</span> <span class="variable">$map</span> <span class="operator">=</span> <span class="variable">Data::Sofu::Map</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">();</span>
+        <span class="variable">$map</span><span class="operator">-&gt;</span><span class="variable">setAttribute</span><span class="operator">(</span><span class="string">"myself"</span><span class="operator">,</span><span class="variable">Data::Sofu::Reference</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="variable">$map</span><span class="operator">));</span> <span class="comment">#Reference to itself.</span>
+        <span class="variable">$map</span><span class="operator">-&gt;</span><span class="keyword">map</span><span class="operator">(</span><span class="string">"myself"</span><span class="operator">);</span> <span class="comment">#Will return $map not the Reference.</span>
+        <span class="variable">$map</span><span class="operator">-&gt;</span><span class="variable">object</span><span class="operator">(</span><span class="string">"myself"</span><span class="operator">)-&gt;</span><span class="variable">asReference</span><span class="operator">();</span> <span class="comment">#Will return the Reference.</span>
+        <span class="variable">$map</span><span class="operator">-&gt;</span><span class="variable">object</span><span class="operator">(</span><span class="string">"myself"</span><span class="operator">)-&gt;</span><span class="variable">asMap</span><span class="operator">();</span> <span class="comment">#will return the Map.</span>
+        <span class="variable">$map</span><span class="operator">-&gt;</span><span class="variable">object</span><span class="operator">(</span><span class="string">"myself"</span><span class="operator">)-&gt;</span><span class="variable">isMap</span><span class="operator">();</span> <span class="comment">#True</span>
+        <span class="variable">$map</span><span class="operator">-&gt;</span><span class="keyword">map</span><span class="operator">(</span><span class="string">"myself"</span><span class="operator">)-&gt;</span><span class="variable">isMap</span><span class="operator">();</span> <span class="comment">#Also true</span>
+        <span class="variable">$map</span><span class="operator">-&gt;</span><span class="variable">object</span><span class="operator">(</span><span class="string">"myself"</span><span class="operator">)-&gt;</span><span class="variable">isReference</span><span class="operator">();</span> <span class="comment">#True</span>
+        <span class="variable">$map</span><span class="operator">-&gt;</span><span class="keyword">map</span><span class="operator">(</span><span class="string">"myself"</span><span class="operator">)-&gt;</span><span class="variable">isReference</span><span class="operator">();</span> <span class="comment">#false (you skipped the reference when using map());</span>
+        <span class="comment">#You can also:</span>
+        <span class="keyword">my</span> <span class="variable">$map</span> <span class="operator">=</span> <span class="variable">Data::Sofu::Map</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">();</span>
+        <span class="variable">$map</span><span class="operator">-&gt;</span><span class="variable">setAttribute</span><span class="operator">(</span><span class="string">"myself"</span><span class="operator">,</span><span class="variable">$map</span><span class="operator">);</span> <span class="comment">#Will be converted to Reference as soon as it is written to a file or string.</span>
+</pre>
+<p>
+</p>
+<hr />
+<h1><a name="syntax">SYNTAX</a></h1>
+<p>This Module is pure OO, exports nothing</p>
+<p>
+</p>
+<hr />
+<h1><a name="methods">METHODS</a></h1>
+<p>Also look at <code>Data::Sofu::Object</code> for methods, cause Reference inherits from it</p>
+<p>
+</p>
+<h2><a name="new__data___creates_a_new_data__sofu__reference_and_returns_it">new([DATA])
+Creates a new <code>Data::Sofu::Reference</code> and returns it</a></h2>
+<pre>
+        <span class="variable">$ref</span> <span class="operator">=</span> <span class="variable">Data::Sofu::Reference</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="string">"-&gt;myself"</span><span class="operator">);</span> <span class="comment">#Tree form, not valid (just for saving data)</span>
+        <span class="keyword">my</span> <span class="variable">$map</span> <span class="operator">=</span> <span class="variable">Data::Sofu::Map</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">();</span>
+        <span class="variable">$ref</span> <span class="operator">=</span> <span class="variable">Data::Sofu::Reference</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="variable">$map</span><span class="operator">);</span> <span class="comment">#Valid</span>
+</pre>
+<p>
+</p>
+<h2><a name="dangle__data__">dangle([Data])</a></h2>
+<p>Changes the target of the Reference to Data</p>
+<p>
+</p>
+<h2><a name="valid__"><code>valid()</code></a></h2>
+<p>Return 1 if the Reference is there and points to something that is a Data::Sofu::Object</p>
+<p>
+</p>
+<h2><a name="isvalid__"><code>isValid()</code></a></h2>
+<p>Return 1 if the Reference is there and points to something that is a Data::Sofu::Object</p>
+<p>
+</p>
+<h2><a name="isreference__"><code>isReference()</code></a></h2>
+<p>Returns 1</p>
+<p>
+</p>
+<h2><a name="follow__"><code>follow()</code></a></h2>
+<p>Returns the referenced object, valid or not.</p>
+<p>
+</p>
+<h2><a name="asvalue__"><code>asValue()</code></a></h2>
+<p>Returns the referenced objects <code>asValue()</code> call.</p>
+<p>Which Returns either the referenced object or throws an exception</p>
+<p>
+</p>
+<h2><a name="asmap__"><code>asMap()</code></a></h2>
+<p>Returns the referenced objects <code>asMap()</code> call.</p>
+<p>Which Returns either the referenced object or throws an exception</p>
+<p>
+</p>
+<h2><a name="aslist__"><code>asList()</code></a></h2>
+<p>Returns the referenced objects <code>asList()</code> call.</p>
+<p>Which Returns either the referenced object or throws an exception</p>
+<p>
+</p>
+<h2><a name="islist__"><code>isList()</code></a></h2>
+<p>Returns 1 if the Reference is valid and the referenced Object is a List.</p>
+<p>
+</p>
+<h2><a name="isvalue__"><code>isValue()</code></a></h2>
+<p>Returns 1 if the Reference is valid and the referenced Object is a Value.</p>
+<p>
+</p>
+<h2><a name="ismap__"><code>isMap()</code></a></h2>
+<p>Returns 1 if the Reference is valid and the referenced Object is a Map.</p>
+<p>
+</p>
+<h2><a name="isdefined__"><code>isDefined()</code></a></h2>
+<p>Returns 1 if the Reference is valid and the referenced Object is defined (i.e. not a <code>Data::Sofu::Undefined</code>).</p>
+<p>
+</p>
+<h2><a name="asreference__"><code>asReference()</code></a></h2>
+<p>Returns itself</p>
+<p>
+</p>
+<hr />
+<h1><a name="bugs">BUGS</a></h1>
+<p>Referencing something else than a <code>Data::Sofu::Object</code> or derieved will not convert the referenced thing and it will confuse the <code>write()</code> to produce invalid sofu files.</p>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p><a href="/Data/Sofu.html">the Data::Sofu manpage</a>, <a href="/Data/Sofu/Value.html">the Data::Sofu::Value manpage</a>, <a href="/Data/Sofu/Object.html">the Data::Sofu::Object manpage</a>, <a href="/Data/Sofu/Map.html">the Data::Sofu::Map manpage</a>, <a href="/Data/Sofu/Value.html">the Data::Sofu::Value manpage</a>, <a href="/Data/Sofu/Undefined.html">the Data::Sofu::Undefined manpage</a>, <a href="http://sofu.sf.net">http://sofu.sf.net</a></p>
+
+</body>
+
+</html>
+

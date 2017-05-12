@@ -1,0 +1,25 @@
+#!/usr/bin/perl -w
+use strict;
+use warnings;
+use CPANPLUS::Configure;
+use Getopt::Long;
+my $email;
+my $mx;
+GetOptions ( 'email=s', \$email, 'mx=s', \$mx ) or die "Unknown option\n";
+die "Must supply an --email address\n" unless $email;
+my $conf = CPANPLUS::Configure->new();
+$conf->set_conf( cpantest => 'dont_cc' );
+$conf->set_conf( cpantest_mx => $mx ) if $mx;
+$conf->set_conf( email => $email );
+my $hosts = $conf->get_conf( 'hosts' );
+unless ( scalar grep { $_->{host} eq 'cpan.cpantesters.org' and $_->{scheme} eq 'ftp' } @$hosts ) {
+  my %host = ( scheme => 'ftp', host => 'cpan.cpantesters.org', path => '/CPAN/' );
+  unshift @$hosts, \%host;
+  $conf->set_conf( hosts => $hosts );
+}
+my $file    = join( '/', split( '::', 'CPANPLUS::Config::Boxed' ) ) . '.pm';
+my $file_re = quotemeta($file);
+my $path    = $INC{$file} || '';
+$path       =~ s/$file_re$//;
+$conf->save( 'CPANPLUS::Config::Boxed', $path );
+exit 0;

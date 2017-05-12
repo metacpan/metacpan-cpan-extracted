@@ -1,0 +1,56 @@
+#!/usr/local/bin/perl -w
+
+
+ ###########################################################################
+ #                                                                         #
+ # Simple test of Festival:TTS module.                                     #
+ #                                                                         #
+ ###########################################################################
+
+BEGIN {
+unshift @INC, ".";
+}
+
+use Speech::Synthesiser;
+
+$synth = new Speech::Synthesiser 
+  -type => 'Festival',
+  -host => "localhost"
+  ;
+
+# You will need to replace this with youre preferred play command.
+
+set_play_command Audio::FileWave "riff",    "na_play WAVE ";
+
+if (!start $synth)
+    {
+      die "error starting synthesiser - $synth_error";
+    }
+
+@voices = voice_list $synth;
+
+print "Available Voices: ", join(" ", @voices), "\n";
+
+while ($#ARGV>=0)
+    {
+      print "\n";
+
+      $voice = $voices[rand($#voices+1)];
+
+      print "Selecting $voice\n";
+
+      voice $synth $voice;
+
+      print "Sending: $ARGV[0]\n";
+      
+      my ($nres) = speak $synth $ARGV[0];
+      
+      print "Number of Chunks: $nres\n";
+      
+      shift @ARGV;
+    }
+
+stop $synth;
+
+exit(0);
+

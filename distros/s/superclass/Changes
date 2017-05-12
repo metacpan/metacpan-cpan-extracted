@@ -1,0 +1,20 @@
+Revision history for superclass
+
+0.003     2014-03-11 06:53:57-04:00 America/New_York
+
+    [FIXED]
+
+    - Worked around a test failure due to a bug in the pure-perl version.pm
+
+    [CHANGED]
+
+    - Updated dist.ini and support files
+
+0.002     2013-02-24 21:18:32 America/New_York
+
+    - Renamed from 'inherit' to 'superclass'
+
+0.001     2013-02-08 22:31:22 America/New_York
+
+    - First release
+
