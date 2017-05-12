@@ -1,0 +1,67 @@
+%#============================================================================
+%# ePortal - WEB Based daily organizer
+%# Author - S.Rusakov <rusakov_sa@users.sourceforge.net>
+%#
+%# Copyright (c) 2000-2004 Sergey Rusakov.  All rights reserved.
+%# This program is open source software
+%#
+%#
+%#----------------------------------------------------------------------------
+
+&nbsp;
+<% $dlg->dialog_start(
+            title => pick_lang(rus => "Редактор заданий", eng => "Job editor"),
+            width => "600") %>
+
+<% $dlg->field('title') %>
+<% $dlg->row('<hr>') %>
+<% $dlg->field('period') %>
+<% $dlg->field('jobstatus') %>
+<% $dlg->field('mailresults') %>
+<% $dlg->field('jobserver') %>
+<% $dlg->field('forcerun') %>
+<% $dlg->row('<hr>') %>
+<% $dlg->field('lastrun', RO=>1) %>
+<% $dlg->field('lastresult', RO=>1) %>
+<% $dlg->row('<hr>') %>
+<% $dlg->field('memo') %>
+
+
+<% $dlg->buttons %>
+<% $dlg->dialog_end %>
+&nbsp;
+<% $obj->LastResultHTML %>
+&nbsp;
+
+
+%#=== @METAGS attr =========================================================
+<%attr>
+Title => {rus => "Редактор заданий", eng => "Job editor"}
+</%attr>
+
+
+%#=== @METAGS onStartRequest ====================================================
+<%method onStartRequest><%perl>
+  $obj = new ePortal::CronJob;
+  $dlg = new ePortal::HTML::Dialog( obj => $obj);
+
+  my $location = try {
+    $dlg->handle_request( );
+  } catch ePortal::Exception::DataNotValid with {
+    my $E = shift;
+    $session{ErrorMessage} = $E->text;
+    '';
+  };
+  return $location if $location;
+</%perl></%method>
+
+%#=== @metags once =========================================================
+<%once>
+my ($dlg, $obj);
+</%once>
+
+%#=== @metags cleanup =========================================================
+<%cleanup>
+($dlg, $obj) = ();
+</%cleanup>
+

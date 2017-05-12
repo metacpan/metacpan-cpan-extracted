@@ -1,0 +1,124 @@
+
+  I N S T A L L A T I O N 
+  as an integrated Server-Side-Scripting-Language
+  for the Apache webserver (Version 1.2)
+  ===============================================
+
+  Actually you have two options to install ePerl inside an Apache webserver
+  environment as a Server-Side-Scripting-Language (SSSL):
+
+     a) ePerl as a NPH-CGI/1.1 complaint on-the-fly filter
+
+        This is the preferred standard method of using ePerl as a SSSL. Here
+        the original ePerl interpreter gets used by just installing the
+        stand-alone program "eperl" as a on-the-fly filter for Apache.  Use
+        this when high performance is not the major option to you and when you
+        want to use the Security features of ePerl (Extension-Checks, SetUID).
+        Also notice that only this variant is fully supported by the author.
+
+     b) ePerl as an Apache/mod_perl handler
+
+        This is a special method of using ePerl as a SSSL by making use of the
+        mod_perl package which already integrates a complete Perl 5
+        interpreter into Apache. This method is intended to be used for
+        special purposes and situations where the webmaster really knows what
+        you does. 
+        
+        I RECOMMEND YOU NOT TO USE THIS VARIANT WHEN SECURITY IS AN IMPORTANT
+        POINT TO YOU. Usually this means in practice that this variant is only
+        used _additionally_ to the one in (a) in high-performance situations
+        for scripts provided by the webmaster only. Don't use this variant for
+        providing ePerl to Joe Average.
+
+        So, this variant is not fully supported by the author, because it is
+        (and can) not be a 100% compatible ePerl variant. This is because of
+        principle restrictions, for instance this variant cannot provide the
+        SetUID feature, etc. 
+
+        WHEN USING THIS VARIANT YOU SHOULD REALLY KNOW WHAT YOU ARE DOING!
+        DON'T BLAME THE AUTHOR FOR ANY RISKS OR DAMAGES.
+
+  Ok, here are the installation steps for the two variants. You can also
+  follow both processes to install ePerl as variant (a) for your users and
+  additionally as variant (b) for yourself (the webmaster).
+
+
+  ePerl as a NPH-CGI/1.1 complaint on-the-fly filter
+  --------------------------------------------------
+
+  1. Proceed the standard installation as described in file
+     ``INSTALL'' for the stand-alone program "eperl". In short:
+
+     $ ./configure --prefix=/path/to/eperl/
+     $ make
+     $ make test
+     $ make install
+  
+  2. Now install "eperl" as a special private version
+     for Apache. First copy it to the CGI directory of Apache
+     and use the NPH-CGI/1.1 complaint interface:
+
+     $ cp /path/to/eperl/bin/eperl /path/to/apache/cgi-bin/nph-eperl
+
+  3. Additionally when you also want UID/GID-switching (see eperl(1) for more
+     details), you have to set the Unix setuid bit:
+
+     $ chown root /path/to/apache/cgi-bin/nph-eperl
+     $ chmod u+s  /path/to/apache/cgi-bin/nph-eperl
+     
+  4. Finally configure Apache to process all pages with extension '.phtml' via
+     the ePerl NPH-CGI/1.1 program. To accomplish this you have to add the
+     following to your httpd.conf file of Apache:
+
+     AddType      application/x-httpd-eperl  .phtml .eperl .epl
+     Action       application/x-httpd-eperl  /internal/cgi/nph-eperl
+     ScriptAlias  /internal/cgi              /path/to/apache/cgi-bin
+
+  5. Now test it by coping the files from the eg/ subdirectory of
+     the ePerl distribution to an area which is accessible by Apache and
+     request the ``demo-xx.phtml'' files through your webbrowser.  They should
+     be implicitly pipes on-the-fly through the ePerl interpreter.
+
+
+  ePerl as an Apache/mod_perl handler
+  -----------------------------------
+
+  1. Proceed the standard installation as described in file
+     ``INSTALL'' for the Perl 5 interface modules. In short:
+
+     $ perl Makefile.PL
+     $ make
+     $ make test
+     $ make install
+
+     ATTENTION! For mod_perl to find the modules later you the "perl" in "perl
+     Makefile.PL" should be the one which was also used when you have
+     installed Apache/mod_perl. If not you have to supply paths later of add
+     the paths to @INC inside your mod_perl init script.
+
+  2. Now configure Apache to process all pages with extension '.iphtml' (for
+     internal .phtml) via the mod_perl handler Apache::ePerl.  To accomplish
+     this you have to add the following to your httpd.conf file of Apache:
+
+     PerlModule Apache::ePerl
+     <Files ~ "/root/of/webmaster/area/.+\.iphtml$">
+         SetHandler  perl-script
+         PerlHandler Apache::ePerl
+     </Files>
+
+     This forces all files under /root/of/webmaster/area/ with extension
+     .iphtml to be processed by the Apache::ePerl::handler function which
+     emulates the runtime behavior of the stand-alone "eperl" program (when
+     run as a SSSL) up to 90%.
+     
+     If you're not paranoid about security (for instance driving a stand-alone
+     webserver without user accounts) you can also just use
+
+     PerlModule Apache::ePerl
+     <Files ~ ".+\.iphtml$">
+         SetHandler  perl-script
+         PerlHandler Apache::ePerl
+     </Files>
+
+     which enabled .iphtml files everywhere.
+

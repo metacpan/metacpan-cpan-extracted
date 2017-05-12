@@ -1,0 +1,13 @@
+Changes
+Makefile.PL
+MANIFEST
+t/a/Foo.pm
+t/a/Bar.pm
+t/a/Storable.pm
+t/b/Foo.pm
+t/b/Bar.pm
+t/2unimport.t
+t/1basic.t
+t/3autoload.t
+lib/ex/newest.pm
+README

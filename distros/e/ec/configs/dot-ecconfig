@@ -1,0 +1,311 @@
+#
+# EC SETTINGS AND OPTIONS.
+#
+#
+# Lines that start with '#' are comments and are not 
+# part of the configuration.  
+#
+# Options have the form: 
+#   keyword value
+#
+# If <value> contains spaces, enclose it in quotes; e.g.; 
+#
+#   keyword "value"
+#
+# For most options, if the option is not specified, then a built-in 
+# default value is used. 
+#
+#
+# CONFIGURATION OPTIONS
+#
+# Fonts - X11 fonts to use for message text, message header fields,
+# and menus and widgets.  Each font option should contain enough of 
+# a X Logical Font Descriptor (XLFD) to uniquely identify a font.  
+# The program "xfontsel" can preview fonts on your system, and "xlsfonts"
+# can list the available fonts on the system.  You can also specify 
+# fonts as X system resources.  Refer to the installation instructions
+# in the file, "README," and the, "xfontsel," and, "xlsfonts," man pages.
+# Note that the $headerfont definition, which italicizes header fields, 
+# may only be defined here.
+# 
+# textfont *-courier-medium-r-*-*-12-*
+# listfont *-courier-medium-r-*-*-12-*
+# headerfont *-courier-medium-i-*-*-12-*
+# buttonfont *-helvetica-medium-r-*-*-12-*
+# menufont *-helvetica-medium-r-*-*-12-*
+#
+# Your mail domain at the ISP.  Generally this is the part of 
+# your e-mail address after the '@'.  User name for each server
+# is set in the .servers file.  maildomain defaults to 'localhost'.
+#
+maildomain your-isp.net
+#
+# Port numbers for POP3 and SMTP servers must be set in the 
+# .servers file.  EC uses the SMTP port number here to determine 
+# which is the SMTP server and which are the POP server(s).  POP3 
+# servers generally use port 110. The SMTP port number here
+# should be 25, unless you have a special configuration.  
+#
+smtpport 25
+#
+#
+# SENDMAIL OPTIONS
+#
+# If you want to use a local sendmail as your MTA, set this
+# to non-zero.
+#
+usesendmail 0
+#
+# If 'usesendmail' is set, set 'sendmailprog' to the complete path 
+# of the sendmail program.  If you have a dial-up connection and your 
+# system does not have a name server, you should probably set the mail 
+# domain name (the one in the 'maildomain' option, above) in the 
+# /etc/mail/sendmail.cf file; e.g.,
+#
+#   Djyour-isp.net
+#
+# Also, you'll probably need to set the "smarthost" option 
+# in /etc/mail/sendmail.cf if your local sendmail is not configured 
+# to relay messages (recent versions of sendmail are configured not 
+# to relay by default); e.g:
+#
+#   DSsmtp:mail.your-isp-net
+# 
+# and make sure that your hostname resolves to your mail domain.  For 
+# further details, refer to the Sendmail Installation and Operation 
+# Guide in the Sendmail source code distribution, or one of the 
+# commercial books that describe Sendmail configuration.
+#
+# On Linux systems, "sendmailprog" is usually "/usr/sbin/sendmail."
+# On Solaris systems, "sendmailprog" should usually be "/usr/lib/sendmail."
+#
+sendmailprog /usr/sbin/sendmail
+#
+# If using sendmail, use the -f option to set the sender address
+# to your login@maildomain.  This is sometimes useful on dial-up 
+# connections, if you also use sendmail for local delivery or don't
+# allow masquerading. The -f command line  option also causes 
+# sendmail to place a X-Authentication-Warning: line in the message 
+# header. It's better to use sendmail's 'always_add_domain' option when 
+# you build the sendmail.cf file, if possible.
+#
+sendmailsetfrom 0
+#
+# When using the -f option with sendmail, what domain mailbox
+# name (a complete, valid email address), should be used on
+# the command line.  In many cases this will be your login name
+# to the ISP's SMTP server, if different than your login name
+# on this system.
+#
+sendmailsetfromaddress my_user_name@isp-net
+#
+#
+# QMAIL OPTIONS
+#
+# If you want to use a local qmail as your MTA, set this line
+# to non-zero.
+#
+useqmail 0
+#
+# Set this to the path of qmail-inject.  The default is ''.
+#
+qmailinjectpath /var/qmail/bin/qmail-inject
+#
+#
+# EXIM OPTIONS
+# 
+# Set useexim to non-zero if exim is the MTA.
+#
+useexim 0
+#
+# Pathname of the exim program.
+#
+eximprog /usr/sbin/exim
+#
+# Set to non-zero if you are a trusted exim user (refer to the exim
+# manual page) and want to set the From: address on outgoing
+# messages with the -f option.  (For example, if you have configured
+# exim to use your ISP's SMTP server as a "smart host.")  Administrators 
+# can also set outgoing addresses in the "/etc/email-addresses" file.  
+# If the user address is set there, leave the "eximsetfrom" option set 
+# to 0.
+#
+eximsetfrom 0
+#
+# Set the From: address field if eximsetfrom, above, is non-zero.
+#
+eximsetfromaddress my_user_name@isp-net
+#
+#
+#
+# Name of the .signature file that is appended to outgoing messages.  
+# If not specified, defaults to $HOME/.signature 
+#
+sigfile .signature
+#
+# Attach the sig file defined above.
+#
+usesig 1
+#
+# If you always make Fcc copies of your messages, set the default 
+# value of the Fcc: field here. Defaults to ~/Mail/outgoing .  You
+# can still set a different file name in the Fcc: field of an 
+# outgoing message.
+#
+fccfile Mail/outgoing
+#
+# Name of system mail spool directory.  
+# Your system mailbox name is a concatenation of this directory and 
+# your login name. On Linux machines the directory is usually 
+# /var/spool/mail ; On Solaris machines it is /var/mail.  If 
+# your local MTA is qmail, use your home directory here - either
+# the full path, or ~user format, and also set 'useqmail',
+# above, to non-zero, and 'qmailbox' to the name of
+# your Mailbox.  Defaults to /var/spool/mail/.
+#
+mailspooldir /var/spool/mail
+#
+# Default top-level directory for saved messages. Defaults to ~/Mail .
+#
+maildir ~/Mail
+#
+#
+# Required mail folders, which are subdirectories of 'maildir',
+# above. The directories "incoming" and "trash," are required.
+#
+incomingdir incoming
+trashdir trash
+#
+# List any directories that you want to use for optional mail folders
+# here, each on a separate line. Subdirectories of the directory named 
+# in 'maildir,' above, must exist.  Refer to the file ec.txt or the
+# help menu for details of how folder directories should be organized.  
+# Case sensitivity of directory names depends on the operating system.
+#
+# folder Memos
+# folder E-zines
+# folder Personal
+# folder Important
+#
+# File name of on-line documentation
+#
+helpfile .ec/ec.help
+#
+# How many days to retain messages in trash directory before 
+# permanently deleting them.
+#
+trashdays 2
+#
+# Poll interval--how long EC waits before checking the POP server 
+# for new messages, in milliseconds.  This is not affected by 
+# user-requested checks (using Alt-O). The default is 0.  A value
+# of 60000 means poll every ten minutes.
+#
+pollinterval 0
+#
+# Set your local timezone here, in hours +/- GMT e.g., -0400 is
+# EDT, -0500 is EST and CDT, -0600 is CST and MDT, and so forth.
+#
+timezone -0400
+#
+# Set this to 1 if you want to use GMT for outgoing messages.
+#
+gmtoutgoing 0
+#
+# Initial width in columns of sender's address in mailbox list.
+# The default is 25.
+#
+senderwidth 25
+#
+# Initial width in columns of message date in mailbox list.
+# The default is 21.
+#
+datewidth 21
+#
+# How much of an incoming message header to display.
+# Possible values are: 'full', 'brief', and 'none'.
+# The default is 'brief'.
+#
+headerview brief
+#
+# How long to wait for a server response, in seconds.
+# The default is 10 seconds.
+#
+servertimeout 10
+#
+# Character string to prefix quoted message lines.
+# The default is '> '.
+#
+quotestring '> '
+#
+# Message header sort key: 1 = date, 2 = From, 3 = subject
+# 0 = don't sort messages. The default is 1 (sort by date).
+#
+sortfield 1
+#
+# Sort message headers in descending or ascending order by default
+# The default is 0 (sort in ascending order).
+#
+sortdescending 0
+#
+# If non-zero, show the weekday in message listing.
+# The default is 0.
+#
+weekdayindate 0
+#
+# If non-zero, when From: address and Reply-To: address are different, 
+# Add Cc: to sender in header also when replying to messages.
+# Default is 1.
+#
+ccsender 1
+#
+# Show debugging information if non-zero.  Also keeps messages on
+# server, in trash, and user's system mailbox.
+# The default is 0.
+#
+debug 0
+#
+# Print a transcript of dialogs with the server on the terminal.  
+# -v switch overrides this setting when given on the command line.  
+# The default is 0.
+#
+verbose 0
+#
+# Web browser - Netscape versions 4.x, lynx, and Opera 5.0 are supported.
+# Netscape Version 6 and Mozilla should work but haven't been tested.  
+# Amaya is tested with version 2.4.  The value should be the browser 
+# executable program's name. Make sure the browser program is in one of 
+# the directories in $PATH, or specify the complete path name of the 
+# browser program here, for example, /usr/local/netscape/netscape or 
+# /usr/X11R6/bin/opera.  If the browser is lynx, make sure that the options 
+# for xterm, below, are set correctly.
+#
+browser netscape
+#
+# Xterm options - Define the program name and command line options
+# of the xterm that will run external text-mode programs.  Do not 
+# include the final -e option that starts the external app.
+#
+xterm "/usr/X11R6/bin/xterm -geometry 80x35 -bg black"
+#
+# Mail Filters - Define how to sort incoming messages.  Each
+# line is composed of a text pattern and the folder in which 
+# messages that contain the text pattern should be saved, with 
+# two equals signs "==" separating the two expressions.  If an 
+# incoming message doesn't match any pattern, it is saved in the 
+# default Incoming folder.  Patterns are not passed through the 
+# quotemeta function nor receive any precompiling, which means 
+# that you have to quote any characters with a backslash that have 
+# special meanings in Perl (especially '@'-signs, brackets
+# '<', '>', '[', and ']' ).  Periods as metacharacters match 
+# anything, including themselves.  Matches are case insensitive.
+# Make sure there is a newline after the last filter entry -
+# a nearly unavoidable Unix-ism.
+#
+filter listserv\@ugu.com==unix911
+filter linux\@zdemail.zdlists.com==zines
+filter bulletin\@earthlink.net==zines
+filter Return-Path: \<owner-ptk\@lists.stanford.edu\>==perltk
+filter \<nytdirect\@nytimes.com\>==NY_Times
+filter newsletter\@teamguru.com==zines
+filter wired.com==Wired

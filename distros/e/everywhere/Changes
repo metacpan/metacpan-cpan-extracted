@@ -1,0 +1,58 @@
+#!/usr/bin/perl
+# This is an active-changelog! Run it to update it using Darcs.
+# See below for the actual Changelog stuff!
+
+open my $out,"+<",$0;
+seek $out,0,0;
+seek DATA,0,0;
+print $out ($l = <DATA>) until $l eq "__DATA__\n";
+# Get the Darcs changelog
+$f = `darcs changes`;
+# Chop off the timestamps (but keep the date)
+$f =~ s/\d\d:\d\d:\d\d ... //g;
+# Combine like sections. This might need a bit of work.
+1 while($f =~ s/^(... ...\s+\d+ \d\d\d\d  [\w@\.\-]+)$(.*)^\1$/$1$2/gms);
+# Clear out the extra space we just made
+$f =~ s/\n\n\n/\n/g;
+print $out $f;
+
+# ***************************************
+# *** This is the actual Changelog :) ***
+# ***************************************
+__DATA__
+Sat Jun  4 2011  awwaiid@thelackthereof.org
+  * Update test a bit
+  * Update changelog
+  * Update README and copyright date
+  * Bump version
+  * Add line directive debugging hint (thanks David Leadbeater!)
+
+Thu Sep 10 2009  awwaiid@thelackthereof.org
+  * update manifest more
+  * Add missing test files
+  * Update manifest
+
+Thu Sep  3 2009  awwaiid@thelackthereof.org
+  * update changelog
+  * Fix params and add package_level
+  * Version bump
+  * version bump
+  * shuffle and update
+
+Thu Aug 20 2009  awwaiid@thelackthereof.org
+  * Update changelog
+  * random update to example
+  * version bump
+  * Add use_here flag
+  * er.... I meant qr not qx!
+
+Sun Jul 19 2009  awwaiid@thelackthereof.org
+  * Allow whitelisting with a regex
+
+Sun May  4 2008  awwaiid@thelackthereof.org
+  * Update MANIFEST
+  * Rename from feature::globally to the more general 'everywhere'
+
+Wed Apr 23 2008  awwaiid@thelackthereof.org
+  * Ooops... remove all the blib crap from build
+  * Initial import

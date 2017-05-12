@@ -1,0 +1,76 @@
+%#============================================================================
+%# ePortal - WEB Based daily organizer
+%# Author - S.Rusakov <rusakov_sa@users.sourceforge.net>
+%#
+%# Copyright (c) 2000-2004 Sergey Rusakov.  All rights reserved.
+%# This program is open source software
+%#
+%# Arguments:
+%#  download => 1  - force download dialog on client
+%#
+%#----------------------------------------------------------------------------
+
+
+%#=== @metags onStartRequest ====================================================
+<%method onStartRequest><%perl>
+  my %args = $m->request_args;
+  my $att = new ePortal::Attachment;
+
+  throw ePortal::Exception::FileNotFound( -file => 'attachment')
+    if ! $att->restore($args{id});
+
+  # Check parent object for accessibility
+  # It may be not accessible because of ACL
+  if ( $att->object_id ) {
+    my($ref, $id) = split '=', $att->object_id;
+    my $obj = eval "new $ref;";
+    throw ePortal::Exception::Fatal(-text => "$ref type unknown") if $@;
+    eval { $obj->restore($id) };
+    throw ePortal::Exception::ACL(-operation => 'read') if $@;
+  }
+
+  # Determine mime type
+  my $subr = $r->lookup_uri('/' . escape_uri($att->filename));
+  my $content_type = $subr ? $subr->content_type : undef;
+  $content_type = "application/octet-stream" unless $content_type;
+  logline('debug', "Downloading file ", $att->Filename, " as ", $content_type);
+
+  # Take the file
+  $m->clear_buffer;
+  $r->content_type($content_type);
+  $r->header_out("Content-Disposition" =>
+    ($args{download} ? "attachment" : "inline") .
+    "; filename=".$att->Filename);
+  $r->header_out("Content-Length" => $att->FileSize );
+  $r->send_http_header;
+
+  # read the file from Database or from File
+  if ( $att->storage eq 'db' ) {
+    $m->print($att->Data);
+
+  } elsif ($att->storage eq 'chunk') {
+    $att->get_first_chunk;
+    while(my $buf = $att->get_next_chunk) {
+      last if $r->connection->aborted;
+      $m->print($buf);
+      $m->flush_buffer;
+    }
+      
+  } else {
+    my $fh = $att->fh;
+    throw ePortal::Exception::FileNotFound( -file => $att->filename)
+      if ! $fh;
+
+    my $buffer = undef;
+    while(read($fh, $buffer, 64000)) {
+      $m->print($buffer);
+      $m->flush_buffer;
+    }
+    $fh->close;
+  }
+  $m->flush_buffer;
+  $att = undef;
+  throw ePortal::Exception::Abort;
+</%perl></%method>
+
+

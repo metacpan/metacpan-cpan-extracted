@@ -1,0 +1,59 @@
+%#============================================================================
+%# ePortal - WEB Based daily organizer
+%# Author - S.Rusakov <rusakov_sa@users.sourceforge.net>
+%#
+%# Copyright (c) 2000-2003 Sergey Rusakov.  All rights reserved.
+%# This program is free software; you can redistribute it
+%# and/or modify it under the same terms as Perl itself.
+%#
+%#
+%#----------------------------------------------------------------------------
+&nbsp;
+<% $dlg->dialog_start(title => pick_lang(rus=> "Создание и редактирование заметки", eng => "Edit memo")) %>
+ <% $dlg->field('org_id', RO=>1) %>
+
+%foreach my $field (qw/category_id title memo/) {
+ <% $dlg->field($field) %>
+%}
+
+<% $dlg->buttons %>
+<% $dlg->dialog_end %>
+
+%#=== @METAGS attr =========================================================
+<%attr>
+Title => {rus=> "Создание и редактирование заметки", eng => "Edit memo"}
+Layout => 'Dialog'
+</%attr>
+
+
+%#=== @METAGS onStartRequest ====================================================
+<%method onStartRequest>
+<& PARENT:onStartRequest, %ARGS &>
+<%perl>
+  $obj = new ePortal::App::Organizer::Notepad;
+  $obj->org_id($session{_org_id});
+  $dlg = new ePortal::HTML::Dialog( obj => $obj,
+			width => 480, delete_button => 1, title => "Заметка");
+
+  my $location = try {
+    $dlg->handle_request( );
+  } catch ePortal::Exception::DataNotValid with {
+    my $E = shift;
+    $session{ErrorMessage} = $E->text;
+    '';
+  };
+  return $location if $location;
+</%perl></%method>
+
+
+
+%#=== @metags once =========================================================
+<%once>
+my ($dlg, $obj);
+</%once>
+
+%#=== @metags cleanup =========================================================
+<%cleanup>
+($dlg, $obj) = ();
+</%cleanup>
+

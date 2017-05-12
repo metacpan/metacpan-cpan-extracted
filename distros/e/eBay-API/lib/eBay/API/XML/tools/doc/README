@@ -1,0 +1,54 @@
+################################################################################
+# File: .................... <module_root>/eBay/API/XML/tools/doc/README
+# Original Author: ......... Robert Bradley
+# Last Modified By: ........ Robert Bradley / Jeff Nokes
+# Last Modified: ........... 03/14/2007 @ 19:23
+#
+# Description:  General information about the generation of HTML equivalent
+#               POD documentation, in relevant SDK library order.
+#
+################################################################################
+
+
+
+
+
+DESCRIPTION
+--------------------------------------------------------------------------------
+This directory contains a script used to generate the HTML equivalent of the POD
+documentation that gets auto generated, plus all of the static POD documentation
+in the modules provided in the package.
+
+
+
+
+
+STEPS FOR POD-2-HTML GENERATION:
+--------------------------------------------------------------------------------
+1.   Change working directory to the location of the script.
+
+        cd <module_root>/eBay/API/XML/tools/doc
+
+
+2.   Execute the script.
+
+        perl genhtmldoc.pl
+
+
+3.   Change working directory to the following to view your newly generated
+     HTML POD documentation.
+
+        cd <module_root>/eBay/docs
+
+
+
+
+
+Notes:
+--------------------------------------------------------------------------------
+(1)  This script assumes you are running on a Unix-like system, it will
+     not work on Windows unless you have the Cygwin environment installed, or
+     other Unix mimicking tools like pwd, find, etc.
+
+(2)  This script assumes the version of pod2html is using the same version of
+     Perl as your PERLLIB coincides with.

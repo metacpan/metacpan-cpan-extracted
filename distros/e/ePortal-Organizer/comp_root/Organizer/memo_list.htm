@@ -1,0 +1,152 @@
+%#============================================================================
+%# ePortal - WEB Based daily organizer
+%# Author - S.Rusakov <rusakov_sa@users.sourceforge.net>
+%#
+%# Copyright (c) 2000-2003 Sergey Rusakov.  All rights reserved.
+%# This program is free software; you can redistribute it
+%# and/or modify it under the same terms as Perl itself.
+%#
+%#
+%#----------------------------------------------------------------------------
+%#
+%# Displays list of memos in users notepad
+%#
+%#----------------------------------------------------------------------------
+
+<table width="99%" border="0">
+<tr><td width="50%">
+  <& SELF:intro &>
+</td><td  width="50%" align="right">
+  <& SELF:search_dialog &>
+</td></tr>
+</table>
+
+<% $list->draw_list %>
+<hr>
+
+<span class="memo">
+<li><% pick_lang(rus => q{
+  В записной книжке вы можете хранить свои личные заметки на любую тему.
+  Для удобства поиска заметки могут быть сгруппированы по папкам. Единственное
+	ограничение - максимальный размер текста одной заметки не может превышать 4000
+	символов.
+}, eng => q{
+	This is your personal notepad. Max size of a memo is 4000 characters.
+}) %>
+</span>
+
+
+
+%#=== @METAGS onStartRequest ====================================================
+<%method onStartRequest>
+  <& PARENT:onStartRequest, %ARGS &>
+  <%perl>
+
+  $obj = new ePortal::ThePersistent::Support(
+      DBISource => 'Organizer',
+      Where => "N.org_id=$session{_org_id}",
+      Attributes => {ts => { dtype => 'DateTime'}},
+      SQL => 'SELECT N.id, N.Title, N.ts, N.Memo, C.title as category_title
+        FROM Notepad N
+        LEFT JOIN Category C ON category_id=C.id
+      ');
+
+  $list = new ePortal::HTML::List( obj => $obj, class=>"smallfont",
+      state => {org_id => $session{_org_id}}, after_row => 'row_detail' );
+	$list->add_column_image();
+	$list->add_column( id => "title",
+			title => pick_lang(rus => "Заметка", eng => "Memo"),
+      width => "60%", sorting => 1, url => "memo_edit.htm?objid=#id#");
+  $list->add_column( id => "category_title",
+      title => pick_lang(rus => "Категория", eng => "Category"));
+  $list->add_column( id => "ts",
+      title => pick_lang(rus => "Изменен", eng => "Last modified"),
+      sorting => 1);
+  if ( $session{_organizer}->xacl_check_delete ) {
+    $list->add_column_system( objtype => 'ePortal::App::Organizer::Notepad', delete => 1);
+  }
+
+  my $location = $list->handle_request;
+  return $location if $location;
+
+  # search parameters
+  my (@where, @bind);
+  if ( $ARGS{text} ne '' ) {
+    my $b = '%' . $ARGS{text} . '%';
+    push @where, "(N.title like ? OR N.memo like ?)";
+    push @bind, $b;
+    push @bind, $b;
+  }
+  if ( $ARGS{category_id} > 0 ) {
+    push @where, 'category_id=?';
+    push @bind, $ARGS{category_id};
+  }
+
+  $obj->restore_where($list->restore_parameters, where => \@where, bind => \@bind);
+
+</%perl></%method>
+
+
+
+%#=== @METAGS row_detail ====================================================
+<%method row_detail><%perl>
+  my $list = $ARGS{list};
+  my $obj = $list->{obj};
+  my $t = (split("\r?\n", $obj->Memo))[0];
+</%perl>
+% if ($t) {
+<span class="memo"><% $t |h %>...</span>
+% }
+</%method>
+
+
+
+%#=== @metags once =========================================================
+<%once>
+my ($list, $obj);
+</%once>
+
+%#=== @metags cleanup =========================================================
+<%cleanup>
+($list, $obj ) = ();
+</%cleanup>
+
+
+%#=== @METAGS intro ====================================================
+<%method intro>
+% if ($session{_organizer}->xacl_check_update) {
+  <ul>
+  <li><a href="<% href('memo_edit.htm', org_id => $session{_org_id}, objid => 0) %>"><% img(src=>'/images/icons/memo.gif') %>&nbsp;<%
+      pick_lang(rus => "Новая заметка", eng => "New memo") %></a>
+  </ul>
+% }
+</%method>
+
+
+%#=== @METAGS search_dialog ====================================================
+<%method search_dialog><%perl>
+  my %args = $m->request_args;
+  my $dummy = new ePortal::App::Organizer::Notepad;
+  $dummy->add_attribute( text => {label => pick_lang(rus => "Текст для поиска", eng => "Text to search")} );
+  $dummy->org_id( $session{_org_id} );
+  $dummy->category_id( $args{category_id} );
+  $dummy->text( $args{text} );
+  my $d = new ePortal::HTML::Dialog( obj => $dummy, width => "300", method => 'GET',
+      align => 'right',
+      title => pick_lang(rus => "Поиск", eng => "Search") );
+</%perl>
+
+<%  $d->dialog_start() %>
+  <tr>
+    <% $d->field('org_id', hidden => 1) %>
+    <% $d->field('text') %>
+    <% $d->field('category_id') %>
+
+    <tr><td align="center" colspan="2">
+    <% plink({rus => 'Показать все заметки', eng => 'Show all memos'},
+        href=>href($ENV{SCRIPT_NAME}, org_id => $session{_org_id})) %>
+    </td></tr>
+  </tr>
+<%  $d->buttons(cancel_button => 0, ok_label => pick_lang(rus => "Искать!", eng => "Search!")) %>
+<%  $d->dialog_end() %>
+</%method>

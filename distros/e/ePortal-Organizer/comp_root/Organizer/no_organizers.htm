@@ -1,0 +1,27 @@
+%#============================================================================
+%# ePortal - WEB Based daily organizer
+%# Author - S.Rusakov <rusakov_sa@users.sourceforge.net>
+%#
+%# Copyright (c) 2000-2003 Sergey Rusakov.  All rights reserved.
+%# This program is free software; you can redistribute it
+%# and/or modify it under the same terms as Perl itself.
+%#
+%#
+%#----------------------------------------------------------------------------
+
+<& /message.mc, ErrorMessage => pick_lang(
+    rus => "Нет доступных органайзеров",
+    eng => "No organizers available") &>
+
+<b><% pick_lang(rus => "Возможные причины:", eng => "Possible causes:") %></b>
+<ul>
+  <li><% pick_lang(rus => "Анонимные пользователи не могут иметь своего органайзера",
+      eng => "Anonymous cannot have an organizer") %>
+  <li><% pick_lang(rus => "Нет ни одного общего органайзера",
+      eng => "No public organizers available") %>
+</ul>
+
+%#=== @METAGS attr =========================================================
+<%attr>
+Title => {rus => "Нет Органайзера", eng => "No Organizers"}
+</%attr>

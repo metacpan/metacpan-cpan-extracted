@@ -1,0 +1,14 @@
+%#============================================================================
+%# ePortal - WEB Based daily organizer
+%# Author - S.Rusakov <rusakov_sa@users.sourceforge.net>
+%#
+%# Copyright (c) 2000-2004 Sergey Rusakov.  All rights reserved.
+%# This program is open source software.
+%#
+%#----------------------------------------------------------------------------
+
+%#=== @metags onStartRequest ====================================================
+<%method onStartRequest><%perl>
+  $ePortal->UserConfig('hideinsets', undef);
+  return $m->comp('/dialog.mc:back_url');
+</%perl></%method>

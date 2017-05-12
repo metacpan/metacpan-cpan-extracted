@@ -1,0 +1,8 @@
+* funcall with arbitrary number of parameters (now no more than 10)
+* other way round: call perl from ecl - done - but need test & improvements
+* document/test/use s, _s, create_string (or delete some of these)
+* t_complex and other types
+* spring package to existnce, e.g. like in Tcl::Tk, implement their
+  'stringify' in terms of prin1 method
+* transparent access to perl var from ecl, and for ecl vars from perl
+

@@ -1,0 +1,6 @@
+Revision history for Perl extension encoding::split.
+
+0.01  Wed Jun 20 13:13:34 2007
+	- original version; created by h2xs 1.23 with options
+		-n encoding::split -X -A -P -b 5.8.0
+

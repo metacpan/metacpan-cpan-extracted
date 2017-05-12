@@ -1,0 +1,69 @@
+%#============================================================================
+%# ePortal - WEB Based daily organizer
+%# Author - S.Rusakov <rusakov_sa@users.sourceforge.net>
+%#
+%# Copyright (c) 2000-2004 Sergey Rusakov.  All rights reserved.
+%# This program is open source software
+%#
+%#----------------------------------------------------------------------------
+
+<a href="ps_edit.htm?objid=0">
+<% img(src => '/images/icons/memo.gif') %>
+<% pick_lang(rus => "Добавить новую секцию", eng => "Add new section") %>
+</a>
+<p>
+
+<&| /list.mc, obj => new ePortal::PageSection &>
+ <&| /list.mc:row &>
+  <& /list.mc:column_image &>
+  
+  <& /list.mc:column, id => 'title', 
+          order_by => 'title', 
+          url => href('ps_edit.htm', objid => $_->id) &>
+
+  <&| /list.mc:column, id => 'component', 
+          order_by => 'component' &>
+      <%perl>
+      my $comp = $m->fetch_comp('/pv/sections/'. $_->component);
+      if ( ! $comp ) { # component file does not exists
+        </%perl>
+        <font color="red"><% $_->component %></font>
+        <%perl>
+      } else {
+        </%perl>
+        <% $_->component %>
+        <%perl>
+      }
+      </%perl>
+  </&>
+
+  <& /list.mc:column, id => 'width', 
+          order_by => 'width' &>
+
+  <& /list.mc:column, id => 'xacl_read', 
+          order_by => 'xacl_read' &>
+
+  <& /list.mc:column_delete &>
+
+ </&> <!-- row -->
+
+ <&| /list.mc:extra_row, start_column => 2 &>
+% if ($_->url) {
+  <span class="smallfont" style="color:#336699;">URL: <% $_->url |h %></span>
+% }
+ </&>
+
+</&> <!-- list -->
+
+
+%#=== @METAGS onStartRequest ====================================================
+<%method onStartRequest><%perl>
+
+</%perl></%method>
+
+
+%#=== @METAGS attr =========================================================
+<%attr>
+Title => {rus => "Список секций для дом.страницы", eng => "Sections for home page"}
+require_admin => 1
+</%attr>

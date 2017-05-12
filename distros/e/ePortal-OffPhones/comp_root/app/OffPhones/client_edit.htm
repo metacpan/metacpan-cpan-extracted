@@ -1,0 +1,81 @@
+%#============================================================================
+%# ePortal - WEB Based daily organizer
+%# Author - S.Rusakov <rusakov_sa@users.sourceforge.net>
+%#
+%# Copyright (c) 2000-2003 Sergey Rusakov.  All rights reserved.
+%# This program is free software; you can redistribute it
+%# and/or modify it under the same terms as Perl itself.
+%#
+%#
+%#----------------------------------------------------------------------------
+%#
+%# User editor
+%#
+%#----------------------------------------------------------------------------
+
+&nbsp;
+<% $dlg->dialog_start( title => pick_lang(rus => "Запись в в тел.справочнике", eng => "Phones directory entry"), width => "450") %>
+
+	<% $dlg->field("dept_id", RO => 0) %>
+% foreach my $field (qw/position title rank /) {
+	<% $dlg->field($field) %>
+% }
+
+	<% $dlg->row('<hr>') %>
+
+% foreach my $counter (1.. scalar($dlg->{obj}->Phones) + 5) {
+	<tr>
+		<td><table width="90%">
+			<% $dlg->field("phone_type$counter") %>
+		</table></td>
+		<td><table width="90%">
+			<% $dlg->field("phone_number$counter") %>
+		</table></td>
+	</tr>
+% }
+
+	<% $dlg->row('<hr>') %>
+
+	<% $dlg->field("ts", RO => 1) %>
+
+<% $dlg->buttons %>
+<% $dlg->dialog_end %>
+&nbsp;
+
+% ($dlg, $obj) = ();
+
+%#=== @METAGS attr =========================================================
+<%attr>
+Title => {rus => "Запись в в тел.справочнике", eng => "Phones directory entry"}
+</%attr>
+
+
+%#=== @METAGS onStartRequest ====================================================
+<%method onStartRequest><%perl>
+  my %args = $m->request_args;
+	$dlg = new ePortal::HTML::Dialog( obj => new ePortal::App::OffPhones::Client);
+
+  my $location = try {
+    $dlg->handle_request( );
+  } catch ePortal::Exception::DataNotValid with {
+    my $E = shift;
+    $session{ErrorMessage} = $E->text;
+    '';
+  };
+  return $location if $location;
+
+	$dlg->{obj}->dept_id( $args{dept_id}+0 ) if exists $args{dept_id};
+</%perl></%method>
+
+
+%#=== @metags once =========================================================
+<%once>
+my ($dlg, $obj);
+</%once>
+
+
+%#=== @METAGS HTMLhead ====================================================
+<%method HTMLhead>
+<& PARENT:HTMLhead &>
+<META NAME="Robots" CONTENT="noindex,nofollow">
+</%method>

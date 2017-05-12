@@ -1,0 +1,149 @@
+%#============================================================================
+%# ePortal - WEB Based daily organizer
+%# Author - S.Rusakov <rusakov_sa@users.sourceforge.net>
+%#
+%# Copyright (c) 2000-2003 Sergey Rusakov.  All rights reserved.
+%# This program is free software; you can redistribute it
+%# and/or modify it under the same terms as Perl itself.
+%#
+%#
+%#----------------------------------------------------------------------------
+<%perl>
+  # Prepare Calendar object
+  my $CAL = new ePortal::HTML::Calendar;
+  my @date = $CAL->date;          # get date from calendar
+
+  # Lookup for days
+  my $days = new ePortal::ThePersistent::Support(
+    DBISource => 'Organizer',
+    SQL => "SELECT distinct an_day FROM Anniversary",
+    Where => "org_id=? AND an_month=?",
+    Bind => [$session{_org_id}, $date[1]],
+    OrderBy => "an_day");
+  $days->restore_all;
+  while($days->restore_next) {
+    $CAL->url($days->an_day, 'self');
+  }
+
+</%perl>
+<table width="99%" border="0">
+<tr><td valign="top" align="left">
+  <& SELF:show_dates, date => \@date &>
+</td><td valign="top" align="right" width="150">
+  <% $CAL->draw %>
+% if ($session{_organizer}->xacl_check_update) {
+  <ul><li><a href="<% href('ann_edit.htm', org_id => $session{_org_id}, objid => 0, an_day => $date[2], an_month => $date[1], an_year => $date[0]) %>"><% img(src=>'/images/icons/memo.gif')
+      %>&nbsp;<% pick_lang(rus => "Новое событие", eng => "New anniversary") %></a>
+  </ul>
+% }
+
+</td></tr>
+</table>
+
+
+
+
+
+
+
+%#=== @metags categ_caption ====================================================
+<%method categ_caption>
+% my $categ = $ARGS{categ};
+<tr>
+  <% empty_td(width => 10) %>
+  <td colspan="3">
+    <% $categ->Title %>
+  </td>
+</tr>
+</%method>
+
+
+
+
+%#=== @METAGS item ====================================================
+<%method item>
+% my $ann = $ARGS{ann};
+% my $Y = 1900 + (localtime(time))[5];
+<tr>
+  <% empty_td(width => 10) %>
+  <td align="right" width="25">
+%#    <span style="color:green;">
+%#    <% $ann->an_day %>
+%#    </span>
+    &nbsp;
+  </td>
+  <td>
+    <% $ann->Title %>
+% if ($ann->an_year > 0) {
+    <span class="memo">
+      (<% $Y - $ann->an_year %> <% pick_lang(rus => "годовщина", eng => "anniversary")%>)
+    </span>
+% }
+  </td>
+  <td width="40">
+% if ($ann->xacl_check_update) {
+    <% icon_edit($ann, url => 'ann_edit.htm') %>
+    <% icon_delete($ann) %>
+% }
+  </td>
+</tr>
+</%method>
+
+
+%#=== @METAGS attr =========================================================
+<%attr>
+Title => {rus => "События и годовщины", eng => "Anniversary"}
+</%attr>
+
+%#=== @METAGS month_name ====================================================
+<%method month_name><%perl>
+my $mon = $ARGS{month};
+my @MonthNames = (
+       {rus => "Январь", eng => "January"},
+       {rus => "Февраль", eng => "February"},
+       {rus => "Март", eng => "March"},
+       {rus => "Апрель", eng => "April"},
+       {rus => "Май", eng => "May"},
+       {rus => "Июнь", eng => "June"},
+       {rus => "Июль", eng => "Jule"},
+       {rus => "Август", eng => "August"},
+       {rus => "Сентябрь", eng => "September"},
+       {rus => "Октябрь", eng => "October"},
+       {rus => "Ноябрь", eng => "November"},
+       {rus => "Декабрь", eng => "December"}
+       );
+      return pick_lang($MonthNames[$mon-1]);
+</%perl></%method>
+
+
+
+%#=== @METAGS show_dates ====================================================
+<%method show_dates>
+% my @date = @{ $ARGS{date} };
+
+  <table width="90%" border="0">
+  <tr>
+    <% empty_td(width => 10) %>
+    <td colspan="3">
+    <& /item_caption.mc, title => sprintf("%02d.%02d.%04d", reverse @date) &>
+    </td>
+  </tr>
+
+<%perl>
+
+  my $ann = new ePortal::App::Organizer::Anniversary;
+  $ann->restore_where(org_id => $session{_org_id},
+      an_day => $date[2], an_month => $date[1],
+      order_by=>"category_id, Title");
+
+  my $last_shown_categ = new ePortal::App::Organizer::Category;
+  while ($ann->restore_next) {
+    if ( $last_shown_categ->id != $ann->category_id ) {
+      $last_shown_categ->restore($ann->category_id);
+      $m->comp("SELF:categ_caption", categ => $last_shown_categ);
+    }
+    $m->comp("SELF:item", ann => $ann);
+  }
+</%perl>
+</table>
+</%method>

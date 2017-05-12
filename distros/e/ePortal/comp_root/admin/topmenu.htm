@@ -1,0 +1,80 @@
+%#============================================================================
+%# ePortal - WEB Based daily organizer
+%# Author - S.Rusakov <rusakov_sa@users.sourceforge.net>
+%#
+%# Copyright (c) 2000-2004 Sergey Rusakov.  All rights reserved.
+%# This program is open source software
+%#
+%#
+%#----------------------------------------------------------------------------
+<& /message.mc &>
+
+<form method="GET" action="<% $ENV{SCRIPT_NAME} %>">
+	<input type="hidden" name="savemenu" value="1">
+
+<table width="80%" cellspacing=0 cellpadding=0 border=1>
+	<tr bgcolor="#EEEEEE">
+		<th><% pick_lang(rus => "Наименование", eng => "Name") %></th>
+		<th>URL</th>
+	</tr>
+
+	<tr>
+		<td class="dlglabel"><% pick_lang(rus => "В начало", eng => "Home") %></td>
+		<td class="dlgfield">/index.htm</td>
+	</tr>
+
+	<tr>
+		<td class="dlglabel"><input type="text" class="dlgfield"
+			name="TopMenuItemName1" value="<% $ePortal->Config("TopMenuItemName1") %>"></td>
+		<td class="dlgfield"><input type="text" class="dlgfield"
+			name="TopMenuItemURL1" size=40 value="<% $ePortal->Config("TopMenuItemURL1") %>"></td>
+	</tr>
+
+	<tr>
+		<td class="dlglabel"><input type="text" class="dlgfield"
+			name="TopMenuItemName2" value="<% $ePortal->Config("TopMenuItemName2") %>"></td>
+		<td class="dlgfield"><input type="text" class="dlgfield"
+			name="TopMenuItemURL2" size=40 value="<% $ePortal->Config("TopMenuItemURL2") %>"></td>
+	</tr>
+
+	<tr>
+		<td class="dlglabel"><input type="text" class="dlgfield"
+			name="TopMenuItemName3" value="<% $ePortal->Config("TopMenuItemName3") %>"></td>
+		<td class="dlgfield"><input type="text" class="dlgfield"
+			name="TopMenuItemURL3" size=40 value="<% $ePortal->Config("TopMenuItemURL3") %>"></td>
+	</tr>
+
+	<tr>
+		<td class="dlglabel"><% pick_lang(rus => "Карта сервера", eng => "Server's map") %></td>
+    <td class="dlgfield">/catalog/index.htm</td>
+	</tr>
+
+	<tr>
+		<td class="dlglabel"><% pick_lang(rus => "Регистрация", eng => "Login") %></td>
+		<td class="dlgfield">/login.htm</td>
+	</tr>
+</table>
+
+<Center>
+	<input type="submit" value="<% pick_lang(rus => "Сохранить", eng => "Save") %>">
+</center>
+</form>
+
+
+
+
+%#=== @metags init =========================================================
+<%init>
+	if ($ARGS{savemenu}) {
+		foreach my $arg ( qw/TopMenuItemName1 TopMenuItemURL1
+												TopMenuItemName2 TopMenuItemURL2
+												TopMenuItemName3 TopMenuItemURL3/) {
+			if ( $ARGS{$arg} ) {
+				$ePortal->Config($arg, $ARGS{$arg});
+			} else {
+				$ePortal->Config($arg, undef);
+			}
+		}
+		$session{GoodMessage} = pick_lang(rus => "Настрока сохранена", eng => "Data saved");
+	}
+</%init>

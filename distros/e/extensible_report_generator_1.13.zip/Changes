@@ -1,0 +1,8 @@
+Changes in ERG v1.13
+
+1.  changed specToFormat in erg_report_generator to split spec up to 3
+    sections separated by '|'
+
+2.  fixed dateStr in erg_report_generator for correct month
+
+3.  create distribution file with zip not using 'shrink' method

@@ -1,0 +1,74 @@
+%#============================================================================
+%# ePortal - WEB Based daily organizer
+%# Author - S.Rusakov <rusakov_sa@users.sourceforge.net>
+%#
+%# Copyright (c) 2000-2004 Sergey Rusakov.  All rights reserved.
+%# This program is open source software
+%#
+%#
+%#----------------------------------------------------------------------------
+
+&nbsp;
+<&| /dialog.mc:edit_dialog, title => pick_lang( rus => "Вставка HTML", eng => "HTML inset"),
+                width => 500  &>
+
+<& /dialog.mc:read_only, id => 'page', value => $ARGS{page},
+      label => pick_lang(rus => 'Страница', eng => 'Page') &>
+
+<& /dialog.mc:read_only, id => 'number', value => $ARGS{number},
+      label => pick_lang(rus => 'Номер вставки', eng => 'Insent number') &>
+
+<&| /dialog.mc:cell &><hr></&>
+
+<&| /dialog.mc:label_value_row, label => pick_lang(rus => 'Текст вставки', eng => 'Insent text') &>
+<& /dialog.mc:textarea, id => 'inset', value => $inset, -rows => 10, -columns => 70 &>
+</&>
+
+<&| /dialog.mc:label_value_row, label => pick_lang(rus => 'Скрыть ', eng => 'Hide') .
+    img(src=>"/images/ePortal/html.gif") &>
+<& /dialog.mc:checkbox, id => 'hideinsets' &>
+</&>
+
+<& /dialog.mc:buttons &>
+</&>
+<p>
+
+
+%#=== @METAGS attr =========================================================
+<%attr>
+Title => {rus => "Вставка HTML", eng => "HTML inset"}
+</%attr>
+
+
+%#=== @METAGS onStartRequest ====================================================
+<%method onStartRequest><%perl>
+	$inset_id = "inset$ARGS{number}_$ARGS{page}";
+	$inset = $ePortal->Config($inset_id);
+
+  if ( $m->comp('/dialog.mc:isButtonPressed', button => 'ok') ) {
+    $ePortal->Config($inset_id, $ARGS{inset});
+    $ePortal->UserConfig('hideinsets', $ARGS{hideinsets});
+    throw ePortal::Exception::Abort(-text => $m->comp('/dialog.mc:back_url'));
+
+  } elsif ( $m->comp('/dialog.mc:isButtonPressed', button => 'cancel') ) {
+    throw ePortal::Exception::Abort(-text => $m->comp('/dialog.mc:back_url'));
+  }
+</%perl></%method>
+
+
+
+
+%#=== @metags once =========================================================
+<%once>
+my ($dlg, $obj);
+my $inset_id = undef;
+my $inset = undef;
+</%once>
+
+%#=== @metags cleanup =========================================================
+<%cleanup>
+($dlg, $obj) = ();
+$inset_id = undef;
+$inset = undef;
+</%cleanup>
+

@@ -1,0 +1,250 @@
+EC Installation
+
+
+CAUTIONS
+
+1. As of Version 1.16, ec stores its library modules in the site_perl
+   library directory.  If you try to run an earlier version, you'll
+   likely receive, "module not found," errors, at least, due to version 
+   incompatibilities. The safest course, after installing the new version, 
+   is to remove the library modules of the old version with the commands:
+
+     $ rm -rf ~/.ec/EC
+     $ rm -rf ~/.ec/Tk
+
+2. Remember to make backups of the .ecconfig and .servers files before
+   upgrading.
+
+
+CONTENTS
+
+  SYSTEM REQUIREMENTS
+
+  INSTALLING AND CONFIGURING
+
+    X Fonts
+
+  PRINTING THE DOCUMENTATION
+
+  TROUBLESHOOTING
+
+
+SYSTEM REQUIREMENTS
+
+1. Perl, at least version 5.004.  If the version of Perl that is 
+   installed on the system is earlier than 5.004, you probably 
+   can't run much of anything else, either.
+2. Perl/Tk version 800.022 or later. You can download Perl/Tk
+   from http://www.cpan.org/.  There are also Perl/Tk binary
+   packages for many different systems.
+3. MIME::Base64, if you want to send and receive MIME mail 
+   attachments.  If you have Perl 5.8, it should already be 
+   installed.  Otherwise, you can download MIME::Base64 from 
+   http://www.cpan.org/.
+3. An Internet connection to a POP3 and SMTP server, or 
+   a local Mail Transfer Agent - either sendmail, exim, or 
+   qmail.
+
+
+INSTALLING AND CONFIGURING
+
+1.  Unpack the tar archive, preferably in your home directory 
+    (which you've already done it you're reading this).
+
+      tar zxvf ec-<version>.tar.gz
+
+2.  Install the program, library, and documentation files.  You can 
+    build the files while logged in as a normal user.  The actual 
+    installation requires system administrator privileges.
+
+      $ cd ec-<version>
+      $ perl Makefile.PL
+      $ make
+
+    Then log in as the system administrator and install:
+
+      # make install
+
+3.  Install the configuration files for each user.  They reside in
+    a subdirectory of each user's $HOME directory.  The default 
+    configuration files are located in the configs/ subdirectory: 
+    configs/dot-ecconfig and configs/dot-servers.  
+
+    While logged in as a normal user, install the configuration
+    files with the following commands:
+
+      # mkdir ~/.ec
+      # cp configs/dot-ecconfig ~/.ec/.ecconfig
+      # cp configs/dot-servers ~/.ec/.servers
+      # chmod 0600 ~/.ec/.servers
+
+    If you are upgrading you may not need to re-install the 
+    configuration files, although you should check carefully
+    that the upgrade is compatible with the old configuration
+    files.
+
+    By default, the program looks for the configuration files
+    as $HOME/.ec/.ecconfig and $HOME/.ec/.servers.  The 
+    subdirectory and files are hidden.  Use the -a command
+    line option to ls to view them:
+
+      # ls -la ~/.ec
+
+    For security, the .servers file has limited permissions, so 
+    that only the files owner can view them.  The program prints
+    an error message if the permissions are not correct.
+
+4.  Edit the .ec/.ecconfig file with the program options of 
+    your choice.  You can read and edit the file with a text editor
+    or from the Help -> Sample .ecconfig File... menu option.  
+    The comments in the .ecconfig file explain the function of each 
+    option and the possible values for them.  The help file, the 
+    Help -> Help menu option, provides additional information.
+
+5.  On Solaris systems, make sure that the value of, "mailspooldir,"
+    in the ~/.ec/.ecconfig file is set to the system's mail spool
+    directory, normally /var/mail.
+
+    You may also need to change the value of $SOCK_STREAM line 102 of
+    the ec program to '2' to communicate directly with SMTP and 
+    POP3 servers.  
+
+6.  EC requires, at the very least, a top-level mail subdirectory, 
+    and two sub-sub-directories, one for incoming mail and another 
+    for deleted messages.  Create the directories defined in the
+    configuration file with the following commands:
+
+      $ mkdir ~/Mail
+      $ mkdir ~/Mail/incoming
+      $ mkdir ~/Mail/trash
+
+    These are the path names used in the standard configuration.
+    If you change them. make sure also to edit the options in ec and
+    $HOME/.ec/.ecconfig.
+
+
+X Fonts
+
+    Ec can use fonts specified in ~/.Xresources, ~/.Xdefaults, ~/Ec, 
+    or ~/.ec/.ecconfig.  Ec uses resources of the, "Ec," class.  Here 
+    are some sample font resource entries.
+
+      !! Default font
+      Ec*font: *-helvetica-medium-r-*-*-12-*
+      !! Fonts for widget classes
+      Ec*Dialog*font: *-helvetica-medium-r-*-*-12-*
+      Ec*TextUndo*font: *-courier-medium-r-*-*-12-*
+      Ec*Listbox*font: *-courier-medium-r-*-*-12-*
+      Ec*Menu*font: *-helvetica-medium-r-*-*-12-*
+      Ec*Button*font: *-helvetica-medium-r-*-*-12-*
+
+    Fonts specified in .ecconfig override the X resource settings.
+    Refer to the comments in the .ecconfig file.
+
+
+PRINTING THE DOCUMENTATION
+
+Perl's POD formatting utilities can generate documentation in various
+formats.
+
+  pod2html <ec >doc.html
+  pod2latex <ec >doc.tex
+  pod2man <ec >doc.man
+  pod2text <ec >doc.txt
+  pod2usage <ec >doc.msg
+
+Refer to your system's manual pages for these utilities.
+
+
+TROUBLESHOOTING
+
+1. The installation should copy the executable programs to the same 
+   directory as the perl interpreter.  If the ec program is in your 
+   $HOME directory, typing simply, "ec," should produce a response 
+   like this:
+
+     bash: ec: command not found
+
+   Standard practice on Unix systems is *not* to include the
+   current directory in the search path for programs, as a 
+   security measure.  So, you need to specify the directory
+   explicitly.  Here are two ways to do it:
+
+     # The dot is a synonym for the current directory.
+     $ ./ec   
+     # A tilde is a synonym for your home directory.  
+     $ ~/ec
+
+   Refer to the documentation for the shell (man bash, man csh, man ksh,
+   etc.),  or almost any book about Unix.
+
+
+2. Finding the Perl Interpreter
+
+   Solaris 8
+
+   The standard configuration of Solaris 8 uses Version 5.005 of Perl 
+   and installs the interpreter in /usr/perl5/bin.  The installation 
+   also makes a symlink, /usr/bin/perl.  However, ec still gets installed 
+   in /usr/perl5/bin, which is not listed in the default $PATH.  If you 
+   get an error message like this:
+
+     bash: ec: command not found
+
+   You must:
+
+     1. Make a symlink to ec in /usr/bin (you must have administrator 
+        privileges to do this):
+
+        # ln -s /usr/perl5/bin/ec /usr/bin/ec
+
+     2. Or, add /usr/perl5/bin to your $PATH variable.  How to do
+        that depends on the shell and the desktop environment.  The 
+        command for the Bourne shell sh is:
+
+        $ PATH="/usr/perl5/bin:"$PATH ; export $PATH
+
+     3. If neither of the above are possible, type the full
+        pathname of ec:
+
+        $ /usr/perl5/bin/ec
+
+   Other Operating Systems
+
+   On other systems, if you try to run ec and get an error message like 
+   this:
+
+    bash: ec: No such file or directory
+
+   Then you need to edit the first line of the ec program file to 
+   the path to the system's perl interpreter.  Usually this is 
+   /usr/bin/perl (the default in the distributed program), or 
+   /usr/local/bin/perl.  If neither of these work, try using the 
+   output of the command: "which perl."
+
+3. Diagnosing Server Problems
+
+   The -v command line option prints a transcript of the dialog with 
+   the mail servers:
+
+     $ ec -v &
+
+   If the output scrolls off the screen, you can also redirect
+   the transcript to a file:
+
+     $ ec -v >ec.transcript &
+
+   The transcript should provide enough information to help 
+   pinpoint configuration or authentication errors.
+
+
+If the program doesn't work for some reason that isn't covered in the
+TROUBLESHOOTING section, please let the author know.  Send bug
+reports, suggestions, and other feedback to rkies@cpan.org.
+
+Copyright © 2001-2004 Robert Kiesling, rkies@cpan.org.
+
+Ec is licensed under the same terms as Perl. Please refer to the file,
+"Artistic."
+
+$Id: README,v 1.4 2004/03/03 00:48:19 kiesling Exp $

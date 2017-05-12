@@ -1,0 +1,121 @@
+%#============================================================================
+%# ePortal - WEB Based daily organizer
+%# Author - S.Rusakov <rusakov_sa@users.sourceforge.net>
+%#
+%# Copyright (c) 2000-2003 Sergey Rusakov.  All rights reserved.
+%# This program is free software; you can redistribute it
+%# and/or modify it under the same terms as Perl itself.
+%#
+%#
+%#----------------------------------------------------------------------------
+
+<% empty_table( height => 5 ) %>
+
+<table border="0" cellpadding=0 cellspacing=0 width="100%"
+	style="font-family:MS sans serif;	font-size:8pt;">
+
+	<%perl>
+	my $row_counter = 0;
+	my $client = ePortal::App::OffPhones::stClientsByDept($deptid);
+
+	$client->restore_next;
+	CLIENT: while(1) {
+		my $client_id = $client->id;
+		last CLIENT if ! $client_id;
+
+		my $html_position = $client->Position;
+		my $html_title = $client->Title;
+		my ($html_memo, $html_phone, %have_memo, %have_phone);
+
+		while($client_id == $client->id) {
+			my $memo_id = $client->memo_id;
+			if ($memo_id and ! $have_memo{$memo_id}) {
+				$have_memo{$memo_id} = 1;
+				$html_memo .= '<br>'.plink($client->phone_memo, href=>href("add_memo.htm", objid => $client->memo_id));
+			}
+
+			my $phone_id = $client->phone_id;
+			if ($phone_id and !$have_phone{$phone_id}) {
+				$have_phone{$phone_id} = 1;
+				$html_phone .= '<br>' if $html_phone;
+				my $phone_formatted = ePortal::App::OffPhones::NiceFormat( $client->nNumber, $client->Format);
+				$html_phone .= '<span style="color:#AAAAAA">'.$client->phone_type.'</span>&nbsp;'.
+											'<span style="color:#004400">'.$phone_formatted.'</span>';
+			}
+			$client->restore_next;
+		}
+
+		if ($name) {
+			use locale;
+ 			my $name_formatted = ePortal::App::OffPhones::NiceFormat( $name, length($name)>=6? '##-##-##' : '##-##' );
+			my $found;
+			$found += $html_position =~ s/($name)/<span style="color:red;font-weight:bold;">$1<\/span>/i;
+			$found += $html_title =~ s/($name)/<span style="color:red;font-weight:bold;">$1<\/span>/i;
+			$found += $html_phone =~ s/($name_formatted)/<span style="color:red;font-weight:bold;">$1<\/span>/i;
+			$found += $html_memo =~ s/($name)/<span style="color:red;font-weight:bold;">$1<\/span>/i;
+			next CLIENT if ! $found;
+		}
+
+		$html_phone = "&nbsp;" unless $html_phone;
+		$gdata{OffPhones_found_count} ++;
+
+
+ 		if ( $session{AppOffPhones_EditMode} ) {
+			$html_position = CGI::a({-href=> href("/app/OffPhones/client_edit.htm", objid => $client_id)}, $html_position);
+			$html_title = CGI::a({-href=> href("/app/OffPhones/client_edit.htm", objid => $client_id)}, $html_title);
+		}
+		</%perl>
+
+		<tr bgcolor="<% ++ $row_counter % 2 == 0? '#FFFFFF' : '#eeeeee' %>">
+			<% empty_td(width => 5) %>
+% 	if ($ePortal->username) {
+      <td width="16"><%
+        img( src => "/images/OffPhones/memo.gif",
+				href=> href("add_memo.htm", client_id => $client_id),
+				title => pick_lang(rus => "Добавить личную заметку", eng => "Add personal memo")) %></td>
+			<% empty_td(width => 5) %>
+%		}
+
+		<td width="16">
+      <% img( src=>"/images/OffPhones/adminmemo.gif",
+					href => href("admin_memo.htm", deptid => $deptid, client_id => $client_id),
+					title => pick_lang(
+						rus => "Уведомить администратора о неточностях в справочнике",
+						eng => "Add memo for phones administrator")
+			) %></td>
+
+		<% empty_td(width => 5) %>
+		<td class="s9"><% $html_position %><% $html_memo %></td>
+		<td class="s9"><% $html_title %></td>
+		<td nowrap align="right" class="s9"><% $html_phone %></td>
+
+% 	if ( $session{AppOffPhones_EditMode} ) {
+			<% empty_td(width => 5) %>
+			<td width="16"><% icon_delete($client, objid => $client_id, objtype => 'ePortal::App::OffPhones::Client') %></td>
+%		}
+		<% empty_td(width => 5) %>
+	</tr>
+
+% } # ENF OF CLIENT
+</table>
+
+
+
+
+
+%#=== @METAGS init =========================================================
+<%init>
+	$gdata{OffPhones_found_count} = 0;
+</%init>
+
+
+
+
+
+
+%#============================================================================
+<%args>
+$deptid
+$name => undef			# Поиск по ФИО
+$phone => undef			# Поиск по № телефона
+</%args>

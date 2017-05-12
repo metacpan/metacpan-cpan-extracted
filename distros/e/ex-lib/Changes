@@ -1,0 +1,30 @@
+Revision history for ex-lib
+
+0.90    2009-07-21
+        Make as just a compatibility wrapper for lib::abs
+
+0.07    2009-05-19
+        Added lib::abs initially
+
+0.06    2009-04-20
+        Allow use with empty list
+        Made kwalitee.t to check $ENV{TEST_AUTHOR}
+
+0.05    2009-03-12
+        Lower dependency on Cwd from 3.29 to 3.12
+        Add tests for different versions of Cwd
+        Fix $@ bug
+
+0.04    2009-01-29
+        Fixes for win32
+        Add strict dependency on Cwd
+
+0.03    2009-01-28
+        Fixes for perl < 5.8
+
+0.02    2009-01-23
+        Minor fixes
+
+0.01    2008-09-09
+        First version, released on an unsuspecting world.
+

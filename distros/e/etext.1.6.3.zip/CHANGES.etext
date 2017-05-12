@@ -1,0 +1,70 @@
+Alpha3:
+	Empty blocks implemented, minor bugs and documentation corrections.
+0.4:
+	Too many. (Some of these could be present in ALpha3 too).
+	New style of horizontal offset added. 
+	New interface for layoutCmd added. 3 styles: 1 element, 7
+	elements, 13 elements (last ones recognized, but not supported).
+	New style of addline and deletelines.
+	Works with Perl.
+	First argument to layout callback now contains widget name too. 
+	Used in Equation to get width of the screen.
+	Deletion works better, now deletes as deep a split as needed.
+0.4.1:
+	Now patches one file in Tk only. Now recompile of Tk should be
+	_very_ quick (reinstall can be slow).
+0.4.2:
+	One file was (erroneously) a link outside the tree. The rest
+	of links should be corrected.
+0.4.3:
+	A warning for missing file busted the test on different sites.
+0.4.4:
+	(Under Perl:)  Now the second component of the first argument of
+	layoutCallback is not the name of the widget, but actual reference to
+	the widget. However, a patch to tkGlue.c is needed. Not released
+	because of this.
+0.4.5:
+	One minor bug corrected, updated to sync with Tk-b8 and tk4.0p1.
+	No recompile of Tk is necessary.
+0.4.6:
+	Selection bug corrected, Tab works again (ListFactoryAppendList 
+	added), environment variable `kprefix' denotes prefixes for
+	special keys (default `Control-Meta-').
+0.4.7:
+	Hidden leaves where not hidden from BBox and Measure.
+	Perl demo updated (now only the pedestal is missing).
+	Doc brushed up by Norm Shelley.
+0.5.0:
+	Selection and search work. `txtWgt config -getFlags 1' works.
+0.5.1:
+	Note that case conversion during extraction works with DStrings only. 
+	Verbose mode works, making it possible to have Load/Save in
+		Perl demo.
+	Temporarily verbose output is put on 'block list' subcommand.
+	Menubar added to Perl demo. (TeX from selection is not working so far).
+	Minimal TeX import added.
+0.5.2:
+	Minor documentation fixes. Table block coded in Perl demo.
+	Algorithm of finding @x,y may return start and end of a block now.
+	One could not render a block with data.
+	Block insertion could eat the last fake line into block.
+	Makefile.PL (for Perl build) updated for Tk-b10-tobe.
+0.5.3:
+	Warning from gcc -Wall -Wno-comment -Wno-unused corrected.
+
+MarkFindPrev need additional work: there are two modes for going out
+of tree: when we did not reach the target position, and when we did.
+TkIBTreeLastLine???
+TagRootPtr... TkBTreeStartSearch TkBTreePrevTag
+Methods.def manually created.
+
+0.6.1:
+	Bug with tags togglecount when going out of IBTree corrected.
+	Cleaned up Makefile.PL (might break the install if inside Tk tree).
+
+0.6.2:
+	Should work inside Tk directory too.
+
+1.6.3:
+	Method 'rename' added.
+	Converter to LaTeX handles mathcal, mathfrak and mathbb.

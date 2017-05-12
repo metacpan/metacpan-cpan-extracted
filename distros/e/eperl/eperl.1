@@ -1,0 +1,1077 @@
+.rn '' }`
+''' $RCSfile$$Revision$$Date$
+'''
+''' $Log$
+'''
+.de Sh
+.br
+.if t .Sp
+.ne 5
+.PP
+\fB\\$1\fR
+.PP
+..
+.de Sp
+.if t .sp .5v
+.if n .sp
+..
+.de Ip
+.br
+.ie \\n(.$>=3 .ne \\$3
+.el .ne 3
+.IP "\\$1" \\$2
+..
+.de Vb
+.ft CW
+.nf
+.ne \\$1
+..
+.de Ve
+.ft R
+
+.fi
+..
+'''
+'''
+'''     Set up \*(-- to give an unbreakable dash;
+'''     string Tr holds user defined translation string.
+'''     Bell System Logo is used as a dummy character.
+'''
+.tr \(*W-|\(bv\*(Tr
+.ie n \{\
+.ds -- \(*W-
+.ds PI pi
+.if (\n(.H=4u)&(1m=24u) .ds -- \(*W\h'-12u'\(*W\h'-12u'-\" diablo 10 pitch
+.if (\n(.H=4u)&(1m=20u) .ds -- \(*W\h'-12u'\(*W\h'-8u'-\" diablo 12 pitch
+.ds L" ""
+.ds R" ""
+'''   \*(M", \*(S", \*(N" and \*(T" are the equivalent of
+'''   \*(L" and \*(R", except that they are used on ".xx" lines,
+'''   such as .IP and .SH, which do another additional levels of
+'''   double-quote interpretation
+.ds M" """
+.ds S" """
+.ds N" """""
+.ds T" """""
+.ds L' '
+.ds R' '
+.ds M' '
+.ds S' '
+.ds N' '
+.ds T' '
+'br\}
+.el\{\
+.ds -- \(em\|
+.tr \*(Tr
+.ds L" ``
+.ds R" ''
+.ds M" ``
+.ds S" ''
+.ds N" ``
+.ds T" ''
+.ds L' `
+.ds R' '
+.ds M' `
+.ds S' '
+.ds N' `
+.ds T' '
+.ds PI \(*p
+'br\}
+.\"	If the F register is turned on, we'll generate
+.\"	index entries out stderr for the following things:
+.\"		TH	Title 
+.\"		SH	Header
+.\"		Sh	Subsection 
+.\"		Ip	Item
+.\"		X<>	Xref  (embedded
+.\"	Of course, you have to process the output yourself
+.\"	in some meaninful fashion.
+.if \nF \{
+.de IX
+.tm Index:\\$1\t\\n%\t"\\$2"
+..
+.nr % 0
+.rr F
+.\}
+.TH EPERL 1 "EN" "10/Jul/98" "Ralf S. Engelschall"
+.UC
+.if n .hy 0
+.if n .na
+.ds C+ C\v'-.1v'\h'-1p'\s-2+\h'-1p'+\s0\v'.1v'\h'-1p'
+.de CQ          \" put $1 in typewriter font
+.ft CW
+'if n "\c
+'if t \\&\\$1\c
+'if n \\&\\$1\c
+'if n \&"
+\\&\\$2 \\$3 \\$4 \\$5 \\$6 \\$7
+'.ft R
+..
+.\" @(#)ms.acc 1.5 88/02/08 SMI; from UCB 4.2
+.	\" AM - accent mark definitions
+.bd B 3
+.	\" fudge factors for nroff and troff
+.if n \{\
+.	ds #H 0
+.	ds #V .8m
+.	ds #F .3m
+.	ds #[ \f1
+.	ds #] \fP
+.\}
+.if t \{\
+.	ds #H ((1u-(\\\\n(.fu%2u))*.13m)
+.	ds #V .6m
+.	ds #F 0
+.	ds #[ \&
+.	ds #] \&
+.\}
+.	\" simple accents for nroff and troff
+.if n \{\
+.	ds ' \&
+.	ds ` \&
+.	ds ^ \&
+.	ds , \&
+.	ds ~ ~
+.	ds ? ?
+.	ds ! !
+.	ds /
+.	ds q
+.\}
+.if t \{\
+.	ds ' \\k:\h'-(\\n(.wu*8/10-\*(#H)'\'\h"|\\n:u"
+.	ds ` \\k:\h'-(\\n(.wu*8/10-\*(#H)'\`\h'|\\n:u'
+.	ds ^ \\k:\h'-(\\n(.wu*10/11-\*(#H)'^\h'|\\n:u'
+.	ds , \\k:\h'-(\\n(.wu*8/10)',\h'|\\n:u'
+.	ds ~ \\k:\h'-(\\n(.wu-\*(#H-.1m)'~\h'|\\n:u'
+.	ds ? \s-2c\h'-\w'c'u*7/10'\u\h'\*(#H'\zi\d\s+2\h'\w'c'u*8/10'
+.	ds ! \s-2\(or\s+2\h'-\w'\(or'u'\v'-.8m'.\v'.8m'
+.	ds / \\k:\h'-(\\n(.wu*8/10-\*(#H)'\z\(sl\h'|\\n:u'
+.	ds q o\h'-\w'o'u*8/10'\s-4\v'.4m'\z\(*i\v'-.4m'\s+4\h'\w'o'u*8/10'
+.\}
+.	\" troff and (daisy-wheel) nroff accents
+.ds : \\k:\h'-(\\n(.wu*8/10-\*(#H+.1m+\*(#F)'\v'-\*(#V'\z.\h'.2m+\*(#F'.\h'|\\n:u'\v'\*(#V'
+.ds 8 \h'\*(#H'\(*b\h'-\*(#H'
+.ds v \\k:\h'-(\\n(.wu*9/10-\*(#H)'\v'-\*(#V'\*(#[\s-4v\s0\v'\*(#V'\h'|\\n:u'\*(#]
+.ds _ \\k:\h'-(\\n(.wu*9/10-\*(#H+(\*(#F*2/3))'\v'-.4m'\z\(hy\v'.4m'\h'|\\n:u'
+.ds . \\k:\h'-(\\n(.wu*8/10)'\v'\*(#V*4/10'\z.\v'-\*(#V*4/10'\h'|\\n:u'
+.ds 3 \*(#[\v'.2m'\s-2\&3\s0\v'-.2m'\*(#]
+.ds o \\k:\h'-(\\n(.wu+\w'\(de'u-\*(#H)/2u'\v'-.3n'\*(#[\z\(de\v'.3n'\h'|\\n:u'\*(#]
+.ds d- \h'\*(#H'\(pd\h'-\w'~'u'\v'-.25m'\f2\(hy\fP\v'.25m'\h'-\*(#H'
+.ds D- D\\k:\h'-\w'D'u'\v'-.11m'\z\(hy\v'.11m'\h'|\\n:u'
+.ds th \*(#[\v'.3m'\s+1I\s-1\v'-.3m'\h'-(\w'I'u*2/3)'\s-1o\s+1\*(#]
+.ds Th \*(#[\s+2I\s-2\h'-\w'I'u*3/5'\v'-.3m'o\v'.3m'\*(#]
+.ds ae a\h'-(\w'a'u*4/10)'e
+.ds Ae A\h'-(\w'A'u*4/10)'E
+.ds oe o\h'-(\w'o'u*4/10)'e
+.ds Oe O\h'-(\w'O'u*4/10)'E
+.	\" corrections for vroff
+.if v .ds ~ \\k:\h'-(\\n(.wu*9/10-\*(#H)'\s-2\u~\d\s+2\h'|\\n:u'
+.if v .ds ^ \\k:\h'-(\\n(.wu*10/11-\*(#H)'\v'-.4m'^\v'.4m'\h'|\\n:u'
+.	\" for low resolution devices (crt and lpr)
+.if \n(.H>23 .if \n(.V>19 \
+\{\
+.	ds : e
+.	ds 8 ss
+.	ds v \h'-1'\o'\(aa\(ga'
+.	ds _ \h'-1'^
+.	ds . \h'-1'.
+.	ds 3 3
+.	ds o a
+.	ds d- d\h'-1'\(ga
+.	ds D- D\h'-1'\(hy
+.	ds th \o'bp'
+.	ds Th \o'LP'
+.	ds ae ae
+.	ds Ae AE
+.	ds oe oe
+.	ds Oe OE
+.\}
+.rm #[ #] #H #V #F C
+.SH "NAME"
+ePerl \- Embedded Perl 5 Language
+.SH "VERSION"
+2.2.13 (10-07-1998)
+.SH "SYNOPSIS"
+\fBeperl\fR
+[\fB\-d\fR \fIname\fR=\fIvalue\fR]
+[\fB\-D\fR \fIname\fR=\fIvalue\fR]
+[\fB\-B\fR \fIbegin_delimiter\fR]
+[\fB\-E\fR \fIend_delimiter\fR]
+[\fB\-i\fR]
+[\fB\-m\fR \fImode\fR]
+[\fB\-o\fR \fIoutputfile\fR]
+[\fB\-k\fR]
+[\fB\-I\fR \fIdirectory\fR]
+[\fB\-P\fR]
+[\fB\-C\fR]
+[\fB\-L\fR]
+[\fB\-x\fR]
+[\fB\-T\fR]
+[\fB\-w\fR]
+[\fB\-c\fR]
+[\fIinputfile\fR]
+.PP
+\fBeperl\fR
+[\fB\-r\fR]
+[\fB\-l\fR]
+[\fB\-v\fR]
+[\fB\-V\fR]
+.SH "DESCRIPTION"
+.Sh "Abstract"
+ePerl interprets an \s-1ASCII\s0 file bristled with Perl 5 program statements by
+evaluating the Perl 5 code while passing through the plain \s-1ASCII\s0 data. It can
+operate in various ways: As a stand-alone Unix filter or integrated Perl 5
+module for general file generation tasks and as a powerful Webserver scripting
+language for dynamic \s-1HTML\s0 page programming.
+.Sh "Introduction"
+The \fBeperl\fR program is the \fIEmbedded Perl 5 Language\fR interpreter. This
+really is a full-featured Perl 5 interpreter, but with a different calling
+environment and source file layout than the default Perl interpreter (usually
+the executable \fBperl\fR or \fBperl5\fR on most systems).  It is designed for
+general \s-1ASCII\s0 file generation with the philosophy of \fIembedding\fR the Perl 5
+program code into the \s-1ASCII\s0 data instead of the usual way where you embed the
+\s-1ASCII\s0 data into a Perl 5 program (usually by quoting the data and using them
+via \f(CWprint\fR statements).  So, instead of writing a plain Perl script like
+.PP
+.Vb 6
+\&  #!/path/to/perl
+\&  print "foo bar\en";
+\&  print "baz quux\en";
+\&  for ($i = 0; $i < 10; $i++) { print "foo #${i}\en"; }
+\&  print "foo bar\en";
+\&  print "baz quux\en";
+.Ve
+you can write it now as an ePerl script:
+.PP
+.Vb 6
+\&  #!/path/to/eperl
+\&  foo bar
+\&  baz quux
+\&  <: for ($i = 0; $i < 10; $i++) { print "foo #${i}\en"; } :>
+\&  foo bar
+\&  baz quux
+.Ve
+Although the ePerl variant has a different source file layout, the semantic is
+the same, i.e. both scripts create exactly the same resulting data on
+\f(CWSTDOUT\fR.
+.Sh "Intention"
+ePerl is simply a glue code which combines the programming power of the Perl 5
+interpreter library with a tricky embedding technique.  The embedding trick is
+this: it converts the source file into a valid Perl script which then gets
+\fIentirely\fR evaluated by only one internal instance of the Perl 5 interpreter.
+To achieve this, ePerl translates all plain code into (escaped) Perl 5 strings
+placed into \fIprint\fR constructs while passing through all embedded native Perl
+5 code. As you can see, ePerl itself does exactly the same internally, a silly
+programmer had to do when writing a plain Perl generation script. 
+.PP
+Due to the nature of such bristled code, ePerl is really the better attempt
+when the generated \s-1ASCII\s0 data contains really more static as dynamic data. Or
+in other words: \fIUse ePerl if you want to keep the most of the generated \s-1ASCII\s0
+data in plain format while just programming some bristled stuff.\fR Do not use it
+when generating pure dynamic data. There it brings no advantage to the
+ordinary program code of a plain Perl script. So, the static part should be at
+least 60% or the advantage becomes a disadvantage.
+.PP
+ePerl in its origin was actually designed for an extreme situation: as a
+webserver scripting-language for on-the-fly \s-1HTML\s0 page generation. Here you
+have the typical case that usually 90% of the data consists of pure static
+\s-1HTML\s0 tags and plain \s-1ASCII\s0 while just the remaining 10% are programming
+constructs which dynamically generate more markup code. This is the reason why
+ePerl beside its standard Unix filtering runtime-mode also supports the
+\s-1CGI/1\s0.1 and \s-1NPH\s0\-\s-1CGI/1\s0.1 interfaces.
+.Sh "Embedded Perl Syntax"
+Practically you can put any valid Perl constructs inside the ePerl blocks the
+used Perl 5 interpreter library can evaluate. But there are some important
+points you should always remember and never forget when using ePerl:
+.Ip "\fI1. Delimiters are always discarded.\fR" 4
+Trivially to say, but should be mentioned at least once. The ePerl block
+delimiters are always discarded and are only necessary for ePerl to recognize
+the embedded Perl constructs. They are never passed to the final output.
+.Ip "\fI2. Generated content has to go to \f(CWSTDOUT\fR.\fR" 4
+Although you can define subroutines, calculate some data, etc.  inside ePerl
+blocks only data which is explicitly written to the \f(CWSTDOUT\fR filehandle is
+expanded. In other words: When an ePerl block does not generate content on
+\f(CWSTDOUT\fR, it is entirely replaced by an empty string in the final output.
+But when content is generated it is put at the point of the ePerl block in the
+final output. Usually contents is generated via pure \f(CWprint\fR constructs which
+implicitly use \f(CWSTDOUT\fR when no filehandle is given.
+.Ip "\fI3. Generated content on \f(CWSTDERR\fR always leads to an error.\fR" 4
+Whenever content is generated on the \f(CWSTDERR\fR filehandle, ePerl displays an
+error (including the \s-1STDERR\s0 content). Use this to exit on errors while passing
+errors from ePerl blocks to the calling environment.
+.Ip "\fI4. Last semicolon.\fR" 4
+Because of the following point 6 (see below) and the fact that most of the
+users don't have the internal ePerl block translations in mind, ePerl is smart
+about the last semicolon. Usually every ePerl block has to end with the
+semicolon of the last command.
+.Sp
+.Vb 1
+\&   <: cmd; ...; cmd; :>
+.Ve
+But when the last semicolon is missing it is automatically added
+by ePerl, i.e. 
+.Sp
+.Vb 1
+\&   <: cmd; ...; cmd :>
+.Ve
+is also correct syntax.  But sometimes it is necessary to force ePerl \fInot\fR
+to add the semicolon. Then you can add a ``\f(CW_\fR'\*(R' (underscore) as the last
+non-whitespace character in the block to force ePerl to leave the final
+semicolon. Use this for constructs like the following
+.Sp
+.Vb 5
+\&   <: if (...) { _:>
+\&   foo
+\&   <: } else { _:>
+\&   bar 
+\&   <: } :>
+.Ve
+where you want to spread a Perl directive over more ePerl blocks.
+.Ip "\fI5. Shorthand for \f(CWprint\fR\-only blocks.\fR" 4
+Because most of the time ePerl is used just to interpolate variables, e.g.
+.Sp
+.Vb 1
+\&   <: print $VARIABLE; :>
+.Ve
+it is useful to provide a shortcut for this kind of constructs.  So ePerl
+provides a shortcut via the character \*(L'=\*(R'. When it immediately (no whitespaces
+allowed here) follows the begin delimiter of an ePerl block a \f(CWprint\fR
+statement is implicitly generated, i.e. the above block is equivalent to
+.Sp
+.Vb 1
+\&   <:=$VARIABLE:>
+.Ve
+Notice that the semicolon was also removed here, because it gets automatically
+added (see above).
+.Ip "\fI6. Special EndOfLine discard command for ePerl blocks.\fR" 4
+ePerl provides a special discard command named ``\f(CW//\fR'\*(R' which discards all
+data up-to and including the following newline character when directly
+followed an end block delimiter. Usually when you write
+.Sp
+.Vb 3
+\&  foo
+\&  <: $x = 1; :>
+\&  quux
+.Ve
+the result is
+.Sp
+.Vb 3
+\&  foo
+\&  
+\&  quux
+.Ve
+because ePerl always preserves code around ePerl blocks, even
+just newlines. But when you write
+.Sp
+.Vb 3
+\&  foo
+\&  <: $x = 1; :>//
+\&  quux
+.Ve
+the result is 
+.Sp
+.Vb 2
+\&  foo
+\&  quux
+.Ve
+because the ``\f(CW//\fR'\*(R' deleted all stuff to the end of the line, \fIincluding\fR
+the newline.
+.Ip "\fI7. Restrictions in parsing.\fR" 4
+Every program has its restrictions, ePerl too. Its handicap is that Perl is
+not only a rich language, it is a horrible one according to parsing its
+constructs. Perhaps you know the phrase ,,Only \fIperl\fR can parse \fIPerl\fR'\*(R'.
+Think about it. The implication of this is that ePerl never tries to parse the
+ePerl blocks itself. It entirely relies on the Perl interpreter library,
+because it is the only instance which can do this without errors.  But the
+problem is that ePerl at least has to recognize the begin and end positions of
+those ePerl blocks. 
+.Sp
+There are two ways: It can either look for the end delimiter while parsing but
+at least recognize quoted strings (where the end delimiter gets treated as
+pure data). Or it can just move forward to the next end delimiter and say that
+it have not occur inside Perl constructs. In ePerl 2.0 the second one was
+used, while in ePerl 2.1 the first one was taken because a lot of users wanted
+it this way while using bad end delimiters like ``\f(CW>\fR'\*(R'. But actually the
+author has again revised its opinion and decided to finally use the second
+approach which is used since ePerl 2.2 now. Because while the first one allows
+more trivial delimiters (which itself is not a really good idea), it fails
+when constructs like ``\f(CWm|"[^"]+"|\fR'\*(R' etc.  are used inside ePerl blocks. And
+it is easier to escape end delimiters inside Perl constructs (for instance via
+backslashes in quoted strings) than rewrite complex Perl constructs to use
+even number of quotes.
+.Sp
+So, whenever your end delimiter also occurs inside Perl constructs you have to
+escape it in any way. 
+.Ip "\fI8. \s-1HTML\s0 entity conversion.\fR" 4
+Because one of ePerl's usage is as a server-side scripting-language for \s-1HTML\s0
+pages, there is a common problem in conjunction with \s-1HTML\s0 editors.  They
+cannot know ePerl blocks, so when you enter those blocks inside the editors
+they usually encode some characters with the corresponding \s-1HTML\s0 entities. The
+problem is that this encoding leads to invalid Perl code. ePerl provides the
+option \fB\-C\fR for decoding these entities which is automatically turned on in
+\s-1CGI\s0 modes. See description below under option \fB\-C\fR for more details.
+.Sh "Runtime Modes"
+ePerl can operate in three different runtime modes:
+.Ip "\fIStand-alone Unix filter mode\fR" 4
+This is the default operation mode when used as a generation tool from the
+Unix shell or as a batch-processing tool from within other programs or
+scripts:
+.Sp
+.Vb 4
+\&  $ eperl [options] - < inputfile > outputfile
+\&  $ eperl [options] inputfile > outputfile
+\&  $ eperl [options] -o outputfile - < inputfile
+\&  $ eperl [options] -o outputfile inputfile
+.Ve
+As you can see, ePerl can be used in any combination of \s-1STDIO\s0 and external
+files. Additionally there are two interesting variants of using this mode.
+First you can use ePerl in conjunction with the Unix \fIShebang\fR magic
+technique to implicitly select it as the interpreter for your script similar
+to the way you are used to with the plain Perl interpreter:
+.Sp
+.Vb 4
+\&  #!/path/to/eperl [options]
+\&  foo
+\&  <: print "bar"; :>
+\&  quux
+.Ve
+Second, you can use ePerl in conjunction with the Bourne-Shell \fIHere
+Document\fR technique from within you shell scripts:
+.Sp
+.Vb 8
+\&  #!/bin/sh
+\&  ...
+\&  eperl [options] - <<EOS
+\&  foo
+\&  <: print "quux"; :>
+\&  quux
+\&  EOS
+\&  ...
+.Ve
+And finally you can use ePerl directly from within Perl programs by the use of
+the \fIParse::ePerl\fR\|(3) package (assuming that you have installed this also; see
+file \fI\s-1INSTALL\s0\fR inside the ePerl distribution for more details):
+.Sp
+.Vb 17
+\&  #!/path/to/perl
+\&  ...
+\&  use Parse::ePerl;
+\&  ...
+\&  $script = <<EOT;
+\&  foo
+\&  <: print "quux"; :>
+\&  quux
+\&  EOT
+\&  ...
+\&  $result = Parse::ePerl::Expand({
+\&      Script => $script,
+\&      Result => \e$result,
+\&  });
+\&  ...
+\&  print $result;
+\&  ...
+.Ve
+See \fIParse::ePerl\fR\|(3) for more details.
+.Ip "\fI\s-1CGI/1\s0.1 compliant interface mode\fR" 4
+This is the runtime mode where ePerl uses the \s-1CGI/1\s0.1 interface of a webserver
+when used as a \fIServer-Side Scripting Language\fR on the Web. ePerl enters this
+mode automatically when the \s-1CGI/1\s0.1 environment variable \f(CWPATH_TRANSLATED\fR is
+set and its or the scripts filename does \fInot\fR begin with the \s-1NPH\s0 prefix
+``\fInph-\fR'\*(R'.  In this runtime mode it prefixes the resulting data with
+\s-1HTTP/1\s0.0 (default) or \s-1HTTP/1\s0.1 (if identified by the webserver) compliant
+response header lines.
+.Sp
+ePerl also recognizes \s-1HTTP\s0 header lines at the beginning of the scripts
+generated data, i.e. for instance you can generate your own \s-1HTTP\s0 headers like
+.Sp
+.Vb 5
+\&   <? $url = "..";
+\&      print "Location: $url\en";
+\&      print "URI: $url\en\en"; !>
+\&   <html>
+\&   ...
+.Ve
+But notice that while you can output arbitrary headers, most webservers
+restrict the headers which are accepted via the \s-1CGI/1\s0.1 interface. Usually you
+can provide only a few specific \s-1HTTP\s0 headers like \f(CWLocation\fR or \f(CWStatus\fR.
+If you need more control you have to use the \s-1NPH\s0\-\s-1CGI/1\s0.1 interface mode.
+.Sp
+Additionally ePerl provides a useful feature in this mode: It can switch its
+\s-1UID/GID\s0 to the owner of the script if it runs as a Unix \fISetUID\fR program (see
+below under the \fISecurity\fR manpage and the option ``u+s'\*(R' of \fIchmod\fR\|(1)).
+.Sp
+There are two commonly known ways of using this \s-1CGI/1\s0.1 interface mode on the
+Web. First, you can use it to explicitly transform plain \s-1HTML\s0 files into
+\s-1CGI/1\s0.1 scripts via the \fIShebang\fR technique (see above). For an Apache
+webserver just put the following line as the first line of the file:
+.Sp
+.Vb 1
+\&  #!/path/to/eperl -mc
+.Ve
+Then rename the script from \fIfile.html\fR to \fIfile.cgi\fR and set its execution
+bit via
+.Sp
+.Vb 2
+\&  $ mv file.html file.cgi
+\&  $ chmod a+rx file.cgi
+.Ve
+Now make sure that Apache accepts \fIfile.cgi\fR as a \s-1CGI\s0 program by enabling \s-1CGI\s0
+support for the directory where \fIfile.cgi\fR resides. For this add the line
+.Sp
+.Vb 1
+\&  Options +ExecCGI
+.Ve
+to the \fI.htaccess\fR file in this directory. Finally make sure that Apache
+really recognizes the extension \fI.cgi\fR. Perhaps you additionally have to add
+the following line to your \fIhttpd.conf\fR file:
+.Sp
+.Vb 1
+\&  AddHandler cgi-script .cgi
+.Ve
+Now you can use \fIfile.cgi\fR instead of \fIfile.html\fR and make advantage of the
+achieved programming capability by bristling \fIfile.cgi\fR with your Perl
+blocks (or the transformation into a \s-1CGI\s0 script would be useless).
+.Sp
+Alternatively (or even additionally) a webmaster can enable ePerl support in a
+more seemless way by configuring ePerl as a real implicit server-side
+scripting language. This is done by assigning a \s-1MIME\s0\-type to the various valid
+ePerl file extensions and forcing all files with this \s-1MIME\s0\-type to be
+internally processed via the ePerl interpreter. You can accomplish this for
+Apache by adding the following to your \fIhttpd.conf\fR file
+.Sp
+.Vb 3
+\&  AddType      application/x-httpd-eperl  .phtml .eperl .epl
+\&  Action       application/x-httpd-eperl  /internal/cgi/eperl
+\&  ScriptAlias  /internal/cgi              /path/to/apache/cgi-bin
+.Ve
+and creating a copy of the \fIeperl\fR program in your \s-1CGI\s0\-directory:
+.Sp
+.Vb 1
+\&  $ cp -p /path/to/eperl /path/to/apache/cgi-bin/eperl
+.Ve
+Now all files with the extensions \fI.phtml\fR, \fI.eperl\fR and \fI.epl\fR are
+automatically processed by the ePerl interpreter. There is no need for a
+\fIShebang\fR line or any locally enabled \s-1CGI\s0 mode.
+.Sp
+One final hint: When you want to test your scripts offline, just run them with
+forced \s-1CGI/1\s0.1 mode from your shell. But make sure you prepare all environment
+variables your script depends on, e.g. \f(CWQUERY_STRING\fR or \f(CWPATH_INFO\fR.
+.Sp
+.Vb 2
+\&  $ export QUERY_STRING="key1=value1&key2=value2"
+\&  $ eperl -mc file.phtml
+.Ve
+.Ip "\fI\s-1NPH\s0\-\s-1CGI/1\s0.1 compliant interface mode\fR" 4
+This runtime mode is a special variant of the \s-1CGI/1\s0.1 interface mode, because
+most webservers (e.g. Apache) provide it for special purposes.   It is known
+as \fINon-Parsed-Header\fR (\s-1NPH\s0) \s-1CGI/1\s0.1 mode and is usually used by the
+webserver when the filename of the \s-1CGI\s0 program is prefixed with ``\f(CWnph-\fR'\*(R'.
+In this mode the webserver does no processing on the \s-1HTTP\s0 response headers and
+no buffering of the resulting data, i.e. the \s-1CGI\s0 program actually has to
+provide a complete \s-1HTTP\s0 response itself. The advantage is that the program can
+generate arbitrary \s-1HTTP\s0 headers or \s-1MIME\s0\-encoded multi-block messages.
+.Sp
+So, 
+above we have renamed the file to \fIfile.cgi\fR which restricted us a little
+bit. When we alternatively rename \fIfile.html\fR to \fInph-file.cgi\fR and force
+the \s-1NPH\s0\-\s-1CGI/1\s0.1 interface mode via option \fB\-mn\fR then this file becomes a
+\s-1NPH\s0\-\s-1CGI/1\s0.1 compliant program under Apache and other webservers. Now our
+script can provide its own \s-1HTTP\s0 response (it need not, because when absent
+ePerl provides a default one for it).
+.Sp
+.Vb 6
+\&  #!/path/to/bin/eperl -mn
+\&  <? print "HTTP/1.0 200 Ok\en";
+\&     print "X-MyHeader: Foo Bar Quux\en";
+\&     print "Content-type: text/html\en\en";
+\&  <html>
+\&  ...
+.Ve
+As you expect this can be also used with the implicit Server-Side Scripting
+Language technique. Put  
+.Sp
+.Vb 3
+\&  AddType      application/x-httpd-eperl  .phtml .eperl .epl
+\&  Action       application/x-httpd-eperl  /internal/cgi/nph-eperl
+\&  ScriptAlias  /internal/cgi              /path/to/apache/cgi-bin
+.Ve
+into your \fIhttpd.conf\fR and run the command
+.Sp
+.Vb 1
+\&  $ cp -p /path/to/eperl /path/to/apache/cgi-bin/nph-eperl
+.Ve
+from your shell. \fIThis is the preferred way of using ePerl as a Server-Side
+Scripting Language, because it provides most flexibility\fR.
+.Sh "Security"
+When you are installing ePerl as a \s-1CGI/1\s0.1 or \s-1NPH\s0\-\s-1CGI/1\s0.1 compliant program
+(see above for detailed description of these modes) via
+.PP
+.Vb 3
+\&  $ cp -p /path/to/eperl /path/to/apache/cgi-bin/eperl
+\&  $ chown root /path/to/apache/cgi-bin/eperl
+\&  $ chmod u+s  /path/to/apache/cgi-bin/eperl
+.Ve
+or
+.PP
+.Vb 3
+\&  $ cp -p /path/to/eperl /path/to/apache/cgi-bin/nph-eperl
+\&  $ chown root /path/to/apache/cgi-bin/nph-eperl
+\&  $ chmod u+s  /path/to/apache/cgi-bin/nph-eperl
+.Ve
+i.e. with \fISetUID\fR bit enabled for the \fBroot\fR user, ePerl can switch to the
+\s-1UID/GID\s0 of the \fIscripts owner\fR. Although this is a very useful feature for
+script programmers (because one no longer need to make auxiliary files
+world-readable and temporary files world-writable!), it can be to risky for
+you when you are paranoid about security of SetUID programs. If so just don't
+install ePerl with enabled SetUID bit! This is the reason why ePerl is per
+default only installed as a Stand-Alone Unix filter which never needs this
+feature.
+.PP
+For those of us who decided that this feature is essential for them ePerl
+tries really hard to make it secure. The following steps have to be
+successfully passed before ePerl actually switches its \s-1UID/GID\s0 (in this
+order):
+.PP
+.Vb 11
+\&  1. The script has to match the following extensions:
+\&     .html, .phtml, .ephtml, .epl, .pl, .cgi
+\&  2. The UID of the calling process has to be a valid UID,
+\&     i.e. it has to be found in the systems password file
+\&  3. The UID of the calling process has to match the 
+\&     following users: root, nobody
+\&  4. The UID of the script owner has to be a valid UID,
+\&     i.e. it has to be found in the systems password file
+\&  5. The GID of the script group has to be a valid GID,
+\&     i.e. it has to be found in the systems group file
+\&  6. The script has to stay below or in the owners homedir
+.Ve
+\fI\s-1IF\s0 \s-1ONLY\s0 \s-1ONE\s0 \s-1OF\s0 \s-1THOSE\s0 \s-1STEPS\s0 \s-1FAIL\s0, \s-1NO\s0 \s-1UID\s0/\s-1GID\s0 \s-1SWITCHING\s0 \s-1TAKES\s0 \s-1PLACE\s0!\fR.
+Additionally (if \f(CWDO_ON_FAILED_STEP\fR was defined as \f(CWSTOP_AND_ERROR\fR in
+\fIeperl_security.h\fR \- not per default defined this way!) ePerl can totally stop
+processing and display its error page.  This is for the really paranoid
+webmasters. Per default when any step failed the \s-1UID/GID\s0 switching is just
+disabled, but ePerl goes on with processing. Alternatively you can disable
+some steps at compile time. See \fIeperl_security.h\fR.
+.PP
+\fIAlso remember that ePerl always eliminates the effective \s-1UID/GID\s0,
+independent of the runtime mode and independent if ePerl has switched to the
+\s-1UID/GID\s0 of the owner. For security reasons, the effective \s-1UID/GID\s0 is always
+destroyed before the script is executed.\fR
+.Sh "ePerl Preprocessor"
+ePerl provides an own preprocessor similar to \fI\s-1CPP\s0\fR in style which is either
+enabled manually via option \fB\-P\fR or automatically when ePerl runs in
+(\s-1NPH\s0\-)\s-1CGI\s0 mode.  The following directives are supported:
+.Ip "\f(CW#include path\fR " 4
+This directive is an include directive which can be used to include really any
+stuff, but was actually designed to be used to include other ePerl source
+files. The \fIpath\fR can be either a relative or absolute path for the local
+filesystem or a fully qualified \s-1HTTP\s0 \s-1URL\s0.
+.Sp
+In case of the absolute path the file is directly accessed on the filesystem,
+while the relative path is first searched in the current working directory and
+then in all directories specified via option \fB\-I\fR. In the third case
+(\s-1HTTP\s0 \s-1URL\s0) the file is retrieves via a \s-1HTTP/1\s0.0 request on the network. 
+Here \s-1HTTP\s0 redirects (response codes 301 and 302) are supported, too.
+.Sp
+Notice: While ePerl strictly preserves the line numbers when translating the
+bristled ePerl format to plain Perl format, the ePerl preprocessor can't do
+this (because its a \fBpre\fRprocessor which expands) for this directive.  So,
+whenever you use \f(CW#include\fR, remember that line numbers in error messages are
+wrong.
+.Sp
+Also notice one important security aspect: Because you can include any stuff
+as it is provided with this directive, use it only for stuff which is under
+your direct control. Don't use this directive to include foreign data, at
+least not from external webservers. For instance say you have a ePerl page
+with \f(CW#include http://www.foreigner.com/nice-page.html\fR and at the next
+request of this page your filesystem is lost! Why? Because the foreigner
+recognizes that you include his page and are using ePerl and just put a simple
+``\f(CW<?  \fIsystem\fR\|("rm -rf /"); !>\fR'\*(R' in his page. Think about it.
+\fI\s-1NEVER\s0 \s-1USE\s0 #\s-1INCLUDE\s0 \s-1FOR\s0 \s-1ANY\s0 \s-1DATA\s0 \s-1WHICH\s0 \s-1IS\s0 \s-1NOT\s0 \s-1UNDER\s0 \s-1YOUR\s0 \s-1OWN\s0 \s-1CONTROL\s0\fR.
+Instead always use \f(CW#sinclude\fR for such situations.
+.Ip "\f(CW#sinclude path\fR " 4
+This is the secure variant of \f(CW#include\fR where after reading the data from
+\fIpath\fR all ePerl begin and end delimiters are removed. So risky ePerl blocks
+lost their meaning and are converted to plain text. Always use this directive
+when you want to include data which is not under your own control.
+.Ip "\f(CW#if expr\fR, \f(CW#elsif expr\fR, \f(CW#else\fR, \f(CW#endif\fR" 4
+These implement a \s-1CPP\s0\-style \f(CW#if-[#else-]#endif\fR construct, but with a Perl
+semantic. While the other directives are real preprocessor commands which are
+evaluated at the preprocessing step, this construct is actually just
+transformed into a low-level ePerl construct, so it is \fBnot\fR actually
+evaluated at the preprocessing step. It is just a handy shortcut for the
+following (where \s-1BD\s0 is the currently used begin delimiter and \s-1ED\s0 the end
+delimiter):
+.Sp
+.Vb 4
+\&  ``#if expr''    ->  ``BD if (expr) { _ ED//''
+\&  ``#elsif expr'' ->  ``BD } elsif (expr) { _ ED//''
+\&  ``#else''       ->  ``BD } else { _ ED//''
+\&  ``#endif''      ->  ``BD } _ ED//''
+.Ve
+The advantage of this unusual aproach is that the if-condition really can be
+any valid Perl expression which provides maximum flexibility. The disadvantage
+is that you cannot use the if-construct to make real preprocessing decisions.
+As you can see, the design goal was just to provide a shorthand for the more
+complicated Perl constructs.
+.Ip "\f(CW#c\fR" 4
+This is the comment directive which just discards all data up to and including
+the newline character. Use this one to comment out any stuff, even other
+preprocessor directives.
+.Sh "Provided Functionality"
+Up to know you've understand that ePerl provides a nice facility to embed Perl
+code into any \s-1ASCII\s0 data. But now the typical question is: Which Perl code can
+be put into these ePerl blocks and does ePerl provide any special
+functionality inside these ePerl blocks?
+.PP
+The answers are: First, you can put really \fIany\fR Perl code into the ePerl
+blocks which are valid to the Perl interpreter ePerl was linked with. Second,
+ePerl does \fInot\fR provide any special functionality inside these ePerl blocks,
+because Perl is already sophisticated enough ;\-)
+.PP
+The implication of this is: Because you can use any valid Perl code you can
+make use of all available Perl 5 modules, even those ones which use shared
+objects (because ePerl \fIis\fR a Perl interpreter, including DynaLoader
+support). So, browse to the Comprehensive Perl Archive Network (\s-1CPAN\s0) via
+http://www.perl.com/perl/\s-1CPAN\s0 and grab your favorite packages which can make
+your life easier (both from within plain Perl scripts \fIand\fR ePerl scripts)
+and just use the construct ``\f(CWuse name;\fR'\*(R' in any ePerl block to use them
+from within ePerl. 
+.PP
+When using ePerl as a Server-Side-Scripting-Language I really recommend you to
+install at least the packages \fI\s-1CGI\s0.pm\fR (currently vers.  2.36),
+\fI\s-1HTML\s0\-Stream\fR (1.40), \fIlibnet\fR (1.0505) and \fIlibwww-perl\fR (5.08).  When you
+want to generate on-the-fly images as well, I recommend you to additionally
+install at least \fI\s-1GD\s0\fR (1.14) and \fIImage-Size\fR (2.3). The ePerl interpreter
+in conjunction with these really sophisticated Perl 5 modules will provide you
+with maximum flexibility and functionality. In other words: \fIMake use of
+maximum Software Leverage in the hackers world of Perl as great as possible\fR.
+.SH "OPTIONS"
+.Ip "\fB\-d\fR \fIname\fR=\fIvalue\fR" 4
+Sets a Perl variable in the package \f(CWmain\fR which can be referenced
+via \f(CW$name\fR or more explicitly via \f(CW$main::name\fR. The command
+.Sp
+.Vb 3
+\&  eperl -d name=value ..
+\&  
+\&is actually equivalent to having
+.Ve
+.Vb 1
+\&  <? $name = value; !>
+.Ve
+at the beginning of \fIinputfile\fR. This option can occur more than once.
+.Ip "\fB\-D\fR \fIname\fR=\fIvalue\fR" 4
+Sets a environment variable which can be referenced via \f(CW$ENV{'variable'}\fR
+inside the Perl blocks. The command
+.Sp
+.Vb 3
+\&  eperl -D name=value ..
+\&  
+\&is actually equivalent to 
+.Ve
+.Vb 1
+\&  export name=value; eperl ...
+.Ve
+but the advantage of this option is that it doesn't manipulate the callers
+environment. This option can occur more than once.
+.Ip "\fB\-B\fR \fIbegin_delimiter\fR" 4
+Sets the Perl block begin delimiter string. Use this in conjunction with \f(CW-E\fR
+to set different delimiters when using ePerl as an offline \s-1HTML\s0
+creation-language while still using it as an online \s-1HTML\s0 scripting-language.
+Default delimiters are \f(CW<?\fR and \f(CW!>\fR for \s-1CGI\s0 modes and \f(CW<:\fR and
+\f(CW:>\fR for stand-alone Unix filtering mode.
+.Sp
+There are a lot of possible variations you could choose: \*(L"\f(CW<:\fR\*(R" and
+\*(L"\f(CW:>\fR\*(R" (the default ePerl stand-alone filtering mode delimiters),
+\*(L"\f(CW<?\fR\*(R" and \*(L"\f(CW!>\fR\*(R" (the default ePerl \s-1CGI\s0 interface mode delimiters),
+\*(L"\f(CW<script language='ePerl'>\fR\*(R" and \*(L"\f(CW</script>\fR\*(R" (standard
+\s-1HTML\s0 scripting language style), \*(L"\f(CW<script type="text/eperl">\fR\*(R" and
+\*(L"\f(CW</script>\fR\*(R" (forthcoming \s-1HTML3\s0.2+ aka Cougar style),
+\*(L"\f(CW<eperl>\fR\*(R" and \*(L"\f(CW</eperl>\fR\*(R" (\s-1HTML\s0\-like style),
+\*(L"\f(CW<!--#eperl code='\fR\*(R" and \*(L"\f(CW' -->\fR\*(R" (NeoScript and \s-1SSI\s0 style) or
+even \*(L"\f(CW<?\fR\*(R" and \*(L"\f(CW>\fR\*(R" (\s-1PHP/FI\s0 style; but this no longer recommended
+because it can lead to parsing problems. Should be used only for backward
+compatibility to old ePerl versions 1.x).
+.Sp
+The begin and end delimiters are searched case-insensitive.
+.Ip "\fB\-E\fR \fIend_delimiter\fR" 4
+Sets the Perl block end delimiter string. See also option \fB\-B\fR.
+.Ip "\fB\-i\fR" 4
+Forces the begin and end delimiters to be searched case-insensitive.  Use this
+when you are using delimiters like
+``\f(CW<ePerl>\fR...\f(CW</ePerl>\fR'\*(R' or other more textual ones.
+.Ip "\fB\-m\fR \fImode\fR" 4
+This forces ePerl to act in a specific runtime mode.  See above for a detailed
+description of the three possible modes: Stand-alone filter (\fImode\fR=\f(CWf\fR,
+i.e. option \fB\-mf\fR), \s-1CGI/1\s0.1 interface mode (\fImode\fR=\f(CWc\fR, i.e. option \fB\-mc\fR)
+or the \s-1NPH\s0\-\s-1CGI/1\s0.1 interface mode (\fImode\fR=\f(CWn\fR, i.e. option \fB\-mn\fR).
+.Ip "\fB\-o\fR \fIoutputfile\fR" 4
+Forces the output to be written to \fIoutputfile\fR instead of \fI\s-1STDOUT\s0\fR. Use
+this option when using ePerl as a filter. The outputfile ``\fI\-\fR'\*(R' sets \fI\s-1STDOUT\s0\fR
+as the output handle explicitly. Notice that this file is relative to the
+source file directory when the runtime mode is forced to \s-1CGI\s0 or \s-1NPH\s0\-\s-1CGI\s0.
+.Ip "\fB\-k\fR" 4
+Forces ePerl to keep the current working directory from where it was started.
+Per default ePerl will change to the directory where the file to be executed
+stays. This option is useful if you use ePerl as an offline filter on
+a temporary file.
+.Ip "\fB\-x\fR" 4
+This sets debug mode where ePerl outputs the internally created Perl script to
+the console (\fI/dev/tty\fR) before executing it. Only for debugging problems with
+the inputfile conversion.
+.Ip "\fB\-I\fR \fIdirectory\fR" 4
+Specify a directory which is both used for \f(CW#include\fR and \f(CW#sinclude\fR
+directives of the ePerl preprocessor and added to \f(CW@INC\fR under runtime.  This
+option can occur more than once.
+.Ip "\fB\-P\fR" 4
+Manually enables the special ePerl Preprocessor (see above). This option is
+enabled for all \s-1CGI\s0 modes automatically.
+.Ip "\fB\-C\fR" 4
+This enables the \s-1HTML\s0 entity conversion for ePerl blocks. This option is
+automatically forced in \s-1CGI\s0 modes. 
+.Sp
+The solved problem here is the following: When you use ePerl as a
+Server-Side-Scripting-Language for \s-1HTML\s0 pages and you edit your ePerl source
+files via a \s-1HTML\s0 editor, the chance is high that your editor translates some
+entered characters to \s-1HTML\s0 entities, for instance ``\f(CW<\fR'\*(R' to ``\f(CW&lt;\fR'\*(R'.
+This leads to invalid Perl code inside ePerl blocks, because the \s-1HTML\s0 editor
+has no knowledge about ePerl blocks. Using this option the ePerl parser
+automatically converts all entities found inside ePerl blocks back to plain
+characters, so the Perl interpreter again receives valid code blocks.
+.Ip "\fB\-L\fR" 4
+This enables the line continuation character ``\f(CW\e\fR'\*(R' (backslash) outside
+ePerl blocks. With this option you can spread oneline-data over more lines.
+But use with care: This option changes your data (outside ePerl blocks).
+Usually ePerl really pass through all surrounding data as raw data. With this
+option the newlines become new semantics.
+.Ip "\fB\-T\fR" 4
+This enabled Perl's \fITainting mode\fR where the Perl interpreter takes special
+precautions called taint checks to prevent both obvious and subtle traps.  See
+\fIperlsec\fR\|(1) for more details.
+.Ip "\fB\-w\fR" 4
+This enables Warnings where the Perl interpreter produces some lovely
+diagnostics. See \fIperldiag\fR\|(1) for more details.
+.Ip "\fB\-c\fR" 4
+This runs a pure syntax check which is similar to ``\f(CWperl -c\fR'\*(R'.
+.Ip "\fB\-r\fR" 4
+This prints the internal ePerl \s-1README\s0 file to the console.
+.Ip "\fB\-l\fR" 4
+This prints the internal ePerl \s-1LICENSE\s0 file to the console.
+.Ip "\fB\-v\fR" 4
+This prints ePerl version information to the console.
+.Ip "\fB\-V\fR" 4
+Same as option \fB\-v\fR but additionally shows the Perl compilation parameters.
+.SH "ENVIRONMENT"
+.Sh "Used Variables"
+.Ip "\f(CWPATH_TRANSLATED\fR" 4
+This \s-1CGI/1\s0.1 variable is used to determine the source file when ePerl operates
+as a \s-1NPH\s0\-\s-1CGI/1\s0.1 program under the environment of a webserver.
+.Sh "Provided Variables"
+.Ip "\f(CWSCRIPT_SRC_PATH\fR" 4
+The absolute pathname of the script. Use this when you want to
+directly access the script from within itself, for instance to do
+\f(CWstat()\fR and other calls.
+.Ip "\f(CWSCRIPT_SRC_PATH_DIR\fR" 4
+The directory part of \f(CWSCRIPT_SRC_PATH\fR. Use this one when you want to
+directly access other files residing in the same directory as the script, for
+instance to read config files, etc.
+.Ip "\f(CWSCRIPT_SRC_PATH_FILE\fR" 4
+The filename part of \f(CWSCRIPT_SRC_PATH\fR. Use this one when you need the name
+of the script, for instance for relative self-references through URLs.
+.Ip "\f(CWSCRIPT_SRC_URL\fR" 4
+The fully-qualified \s-1URL\s0 of the script. Use this when you need a \s-1URL\s0 for
+self-reference.
+.Ip "\f(CWSCRIPT_SRC_URL_DIR\fR" 4
+The directory part of \f(CWSCRIPT_SRC_URL\fR. Use this one when you want to
+directly access other files residing in the same directory as the script via
+the Web, for instance to reference images, etc.
+.Ip "\f(CWSCRIPT_SRC_URL_FILE\fR" 4
+The filename part of \f(CWSCRIPT_SRC_URL\fR. Use this one when you need the name of
+the script, for instance for relative self-references through URLs.  Actually
+the same as \f(CWSCRIPT_SRC_PATH_FILE\fR, but provided for consistency. 
+.Ip "\f(CWSCRIPT_SRC_SIZE\fR" 4
+The filesize of the script, in bytes.
+.Ip "\f(CWSCRIPT_SRC_MODIFIED\fR" 4
+The last modification time of the script, in seconds since 0 hours, 0 minutes,
+0 seconds, January 1, 1970, Coordinated Universal Time.
+.Ip "\f(CWSCRIPT_SRC_MODIFIED_CTIME\fR" 4
+The last modification time of the script, in \fIctime\fR\|(3) format (``\s-1WDAY\s0 \s-1MMM\s0 \s-1DD\s0
+\s-1HH:MM:SS\s0 \s-1YYYY\s0\en'').
+.Ip "\f(CWSCRIPT_SRC_MODIFIED_ISOTIME\fR" 4
+The last modification time of the script, in \s-1ISO\s0 format (``\s-1DD\s0\-\s-1MM\s0\-\s-1YYYY\s0
+\s-1HH:MM\s0'').
+.Ip "\f(CWSCRIPT_SRC_OWNER\fR" 4
+The username of the script owner.
+.Ip "\f(CWVERSION_INTERPRETER\fR" 4
+The ePerl identification string.
+.Ip "\f(CWVERSION_LANGUAGE\fR" 4
+The identification string of the used Perl interpreter library.
+.Sh "Provided Built-In Images"
+The following built-in images can be accessed via \s-1URL\s0
+\f(CW/url/to/nph-eperl/\fR\fI\s-1NAME\s0\fR\f(CW.gif\fR:
+.Ip "\f(CWlogo.gif\fR" 4
+The standard ePerl logo. Please do not include this one on your website.
+.Ip "\f(CWpowered.gif\fR" 4
+The ``\fIpowered by ePerl 2.2\fR'\*(R' logo. Feel free to use this on your website.
+.SH "AUTHOR"
+.PP
+.Vb 3
+\&  Ralf S. Engelschall
+\&  rse@engelschall.com
+\&  www.engelschall.com
+.Ve
+.SH "SEEALSO"
+\fIParse::ePerl\fR\|(3), \fIApache::ePerl\fR\|(3).
+.PP
+Web-References:
+.PP
+.Vb 3
+\&  Perl:   perl(1),  http://www.perl.com/
+\&  ePerl:  eperl(1), http://www.engelschall.com/sw/eperl/
+\&  Apache: httpd(8), http://www.apache.org/
+.Ve
+
+.rn }` ''
+.IX Title "EPERL 1"
+.IX Name "ePerl - Embedded Perl 5 Language"
+
+.IX Header "NAME"
+
+.IX Header "VERSION"
+
+.IX Header "SYNOPSIS"
+
+.IX Header "DESCRIPTION"
+
+.IX Subsection "Abstract"
+
+.IX Subsection "Introduction"
+
+.IX Subsection "Intention"
+
+.IX Subsection "Embedded Perl Syntax"
+
+.IX Item "\fI1. Delimiters are always discarded.\fR"
+
+.IX Item "\fI2. Generated content has to go to \f(CWSTDOUT\fR.\fR"
+
+.IX Item "\fI3. Generated content on \f(CWSTDERR\fR always leads to an error.\fR"
+
+.IX Item "\fI4. Last semicolon.\fR"
+
+.IX Item "\fI5. Shorthand for \f(CWprint\fR\-only blocks.\fR"
+
+.IX Item "\fI6. Special EndOfLine discard command for ePerl blocks.\fR"
+
+.IX Item "\fI7. Restrictions in parsing.\fR"
+
+.IX Item "\fI8. \s-1HTML\s0 entity conversion.\fR"
+
+.IX Subsection "Runtime Modes"
+
+.IX Item "\fIStand-alone Unix filter mode\fR"
+
+.IX Item "\fI\s-1CGI/1\s0.1 compliant interface mode\fR"
+
+.IX Item "\fI\s-1NPH\s0\-\s-1CGI/1\s0.1 compliant interface mode\fR"
+
+.IX Subsection "Security"
+
+.IX Subsection "ePerl Preprocessor"
+
+.IX Item "\f(CW#include path\fR "
+
+.IX Item "\f(CW#sinclude path\fR "
+
+.IX Item "\f(CW#if expr\fR, \f(CW#elsif expr\fR, \f(CW#else\fR, \f(CW#endif\fR"
+
+.IX Item "\f(CW#c\fR"
+
+.IX Subsection "Provided Functionality"
+
+.IX Header "OPTIONS"
+
+.IX Item "\fB\-d\fR \fIname\fR=\fIvalue\fR"
+
+.IX Item "\fB\-D\fR \fIname\fR=\fIvalue\fR"
+
+.IX Item "\fB\-B\fR \fIbegin_delimiter\fR"
+
+.IX Item "\fB\-E\fR \fIend_delimiter\fR"
+
+.IX Item "\fB\-i\fR"
+
+.IX Item "\fB\-m\fR \fImode\fR"
+
+.IX Item "\fB\-o\fR \fIoutputfile\fR"
+
+.IX Item "\fB\-k\fR"
+
+.IX Item "\fB\-x\fR"
+
+.IX Item "\fB\-I\fR \fIdirectory\fR"
+
+.IX Item "\fB\-P\fR"
+
+.IX Item "\fB\-C\fR"
+
+.IX Item "\fB\-L\fR"
+
+.IX Item "\fB\-T\fR"
+
+.IX Item "\fB\-w\fR"
+
+.IX Item "\fB\-c\fR"
+
+.IX Item "\fB\-r\fR"
+
+.IX Item "\fB\-l\fR"
+
+.IX Item "\fB\-v\fR"
+
+.IX Item "\fB\-V\fR"
+
+.IX Header "ENVIRONMENT"
+
+.IX Subsection "Used Variables"
+
+.IX Item "\f(CWPATH_TRANSLATED\fR"
+
+.IX Subsection "Provided Variables"
+
+.IX Item "\f(CWSCRIPT_SRC_PATH\fR"
+
+.IX Item "\f(CWSCRIPT_SRC_PATH_DIR\fR"
+
+.IX Item "\f(CWSCRIPT_SRC_PATH_FILE\fR"
+
+.IX Item "\f(CWSCRIPT_SRC_URL\fR"
+
+.IX Item "\f(CWSCRIPT_SRC_URL_DIR\fR"
+
+.IX Item "\f(CWSCRIPT_SRC_URL_FILE\fR"
+
+.IX Item "\f(CWSCRIPT_SRC_SIZE\fR"
+
+.IX Item "\f(CWSCRIPT_SRC_MODIFIED\fR"
+
+.IX Item "\f(CWSCRIPT_SRC_MODIFIED_CTIME\fR"
+
+.IX Item "\f(CWSCRIPT_SRC_MODIFIED_ISOTIME\fR"
+
+.IX Item "\f(CWSCRIPT_SRC_OWNER\fR"
+
+.IX Item "\f(CWVERSION_INTERPRETER\fR"
+
+.IX Item "\f(CWVERSION_LANGUAGE\fR"
+
+.IX Subsection "Provided Built-In Images"
+
+.IX Item "\f(CWlogo.gif\fR"
+
+.IX Item "\f(CWpowered.gif\fR"
+
+.IX Header "AUTHOR"
+
+.IX Header "SEEALSO"
+

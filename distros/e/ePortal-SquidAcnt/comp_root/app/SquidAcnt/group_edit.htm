@@ -1,0 +1,87 @@
+%#============================================================================
+%# ePortal - WEB Based daily organizer
+%# Author - S.Rusakov <rusakov_sa@users.sourceforge.net>
+%#
+%# Copyright (c) 2000-2003 Sergey Rusakov.  All rights reserved.
+%# This program is free software; you can redistribute it
+%# and/or modify it under the same terms as Perl itself.
+%#
+%#
+%#----------------------------------------------------------------------------
+<%perl>  
+  throw ePortal::Exception::ACL( -operation => 'read', -object => $app)
+    unless $app->xacl_check_update;
+</%perl>
+&nbsp;
+<% $dlg->dialog_start(title => pick_lang(rus=> "Ãðóïïà SquidAcnt", eng => "SquidAcnt group")) %>
+
+%foreach my $field (qw/title /) {
+ <% $dlg->field($field) %>
+%}
+
+  <% $dlg->row('<hr>') %>
+
+%foreach my $field (qw/daily_limit_t weekly_limit_t mon_limit_t daily_alert_t /) {
+ <% $dlg->field($field) %>
+%}
+
+<% $dlg->buttons %>
+<% $dlg->dialog_end %>
+
+%#=== @METAGS attr =========================================================
+<%attr>
+Title => {rus=> "Ãðóïïà SquidAcnt", eng => "SquidAcnt group"}
+Layout => 'Dialog'
+</%attr>
+
+
+%#=== @METAGS onStartRequest ====================================================
+<%method onStartRequest><& PARENT:onStartRequest, %ARGS &><%perl>
+  $app = $ePortal->Application('SquidAcnt');
+  $obj = new ePortal::App::SquidAcnt::SAgroup;
+
+  # Add transient attributes for nicely limit input
+  foreach my $a (qw/daily_limit weekly_limit mon_limit daily_alert/) {
+    my %attr = %{ $obj->attribute($a) };
+    $attr{type} = 'Temp';
+    $attr{dtype} = 'Varchar';
+    $obj->add_attribute($a.'_t', \%attr);
+  }
+
+  $dlg = new ePortal::HTML::Dialog( obj => $obj, width => 480);
+
+  my $location = try {
+    $dlg->handle_request( );
+  } catch ePortal::Exception::DataNotValid with {
+    my $E = shift;
+    $session{ErrorMessage} = $E->text;
+    '';
+  };
+
+  # Nicely format/unformat limit values
+  if ( $dlg->isButtonPressed('ok') ) {
+    foreach my $a (qw/daily_limit weekly_limit mon_limit daily_alert/) {
+      $obj->value($a, $app->NiceUnformat( $obj->value($a . '_t')));
+    }
+    $obj->save;
+  } else {
+    foreach my $a (qw/daily_limit weekly_limit mon_limit daily_alert/) {
+      $obj->value($a.'_t', $app->NiceFormat( $obj->value($a)));
+    }
+  }
+
+  return $location if $location;
+</%perl></%method>
+
+
+
+%#=== @metags once =========================================================
+<%once>
+my ($dlg, $obj, $app);
+</%once>
+
+%#=== @metags cleanup =========================================================
+<%cleanup>
+($dlg, $obj, $app) = ();
+</%cleanup>
+

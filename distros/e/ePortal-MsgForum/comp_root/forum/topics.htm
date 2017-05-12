@@ -1,0 +1,130 @@
+%#============================================================================
+%# ePortal - WEB Based daily organizer
+%# Author - S.Rusakov <rusakov_sa@users.sourceforge.net>
+%#
+%# Copyright (c) 2000-2003 Sergey Rusakov.  All rights reserved.
+%# This program is free software; you can redistribute it
+%# and/or modify it under the same terms as Perl itself.
+%#
+%#
+%#----------------------------------------------------------------------------
+%#
+%# View messages in a forum
+%#
+%# Parameters:
+%#  forum_id - view this forum (id or nickname)
+%#
+%#----------------------------------------------------------------------------
+<& /inset.mc, number => 1 &>
+<& navigator.mc,
+    forum => $forum,
+    &>
+
+<table width="100%" border="0">
+<form name="topic" METHOD="GET">
+<tr>
+  <td>
+    <% plink( pick_lang(rus => "Подписаться на форум", eng => "subscribe to forum"), -href => href('subscribe.htm', forum_id => $forum->id )) %>
+  </td>
+<td class="smallfont" align="right">
+ <% CGI::hidden({-name => 'forum_id', -value => $forum->id}) %>
+ <% pick_lang(rus => 'Показать темы за последние', eng => 'Show topics for last') %>
+ <% CGI::textfield({-name => "days", -value => $ARGS{days} || 30, -size => 3}) %>
+ <% pick_lang(rus => 'дней', eng => 'days') %>
+ <% CGI::submit({-value => '>>'}) %>
+</td></tr>
+</form>
+</table>
+
+<% $list->draw_list %>
+
+<& /inset.mc, number => 2 &>
+
+%#=== @metags onStartRequest ====================================================
+<%method onStartRequest><%perl>
+  $app = $ePortal->Application('MsgForum');
+  $forum = new ePortal::App::MsgForum::MsgForum;
+  if ( ! $forum->restore($ARGS{forum_id} )) {
+    return "forum_not_found.htm";
+  }
+
+  my $guestname = pick_lang(rus=>'Гость',eng=>'Guest');
+  $obj = $app->Topics;
+
+  $list = new ePortal::HTML::List(
+    obj => $obj,
+    state => { forum_id => $forum->id },
+		class => "smallfont" );
+
+  $list->add_column_method( id => "message_image", width => '16' );
+  $list->add_column( id => "title",
+        title   => pick_lang(rus => "Тема", eng => "Topic"),
+        url => "view_msg.htm?days=$ARGS{days}&msg_id=#id#",
+        width => '40%',
+        align   => "left");
+  $list->add_column( id => "fullname",
+				title 	=> pick_lang(rus => "Автор", eng => "Author"),
+        width => '25%',
+        align   => "left");
+  $list->add_column( id => "replies",
+        title   => pick_lang(rus => "Ответов", eng => "Replies"),
+        width => '10%',
+        align   => "center");
+  $list->add_column( id => "last_message",
+        title   => pick_lang(rus => "Последний ответ", eng => "Last reply"),
+        width => '15%',
+				align		=> "center");
+  if ( $forum->xacl_check('xacl_delete') ) {
+    $list->add_column_system( delete => 1, objtype => 'ePortal::App::MsgForum::MsgItem');
+  }
+
+  my $location = $list->handle_request;
+  return $location if $location;
+
+  # Get new topics
+  my $days_where;
+  if ( $ARGS{days} > 0) {
+    $ARGS{days} *= 1;
+    $days_where = "(MsgItem.msgdate >= subdate(current_date, interval $ARGS{days} day) OR
+          mi.msgdate >= subdate(current_date, interval $ARGS{days} day))";
+  }
+
+	# Get the messages
+  $obj->restore_where( $list->restore_parameters,
+      where => [$days_where],
+      'MsgItem.forum_id' => $forum->id);
+
+</%perl></%method>
+
+
+
+%#=== @METAGS Title ====================================================
+<%method Title><%perl>
+  return pick_lang(rus => "Дискуссия: ", eng => "Discussion: ") . $forum->Title;
+</%perl></%method>
+
+
+%#=== @metags message_image ====================================================
+<%method message_image><%perl>
+  my $list = $ARGS{list};
+  my $obj = $list->{obj};
+</%perl>
+
+%  if ($obj->picture) {
+    <% img(src=> '/images/MsgForum/msg/'. $obj->picture . '.gif') %>
+%  } else {
+    <% img(src=> "/images/MsgForum/msg.gif") %>
+% }
+</%method>
+
+
+
+%#=== @metags once =========================================================
+<%once>
+my ($list, $obj, $app, $forum, $search_object);
+</%once>
+
+%#=== @metags cleanup =========================================================
+<%cleanup>
+($list, $obj, $app, $forum, $search_object) = ();
+</%cleanup>

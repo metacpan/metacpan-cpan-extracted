@@ -1,0 +1,20 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+lib/ex/monkeypatched.pm
+t/0_compile.t
+t/basic.t
+t/inject.t
+t/lib/Monkey/A.pm
+t/lib/Monkey/B.pm
+t/lib/Monkey/C.pm
+t/lib/Monkey/D.pm
+t/lib/Monkey/False.pm
+t/lib/Monkey/Invalid.pm
+t/lib/Monkey/PatchA.pm
+t/lib/Monkey/PatchB.pm
+t/lib/Monkey/PatchC.pm
+t/lib/Monkey/PatchD.pm
+t/lib/Monkey/Sys.pm
+META.yml                                 Module meta-data (added by MakeMaker)

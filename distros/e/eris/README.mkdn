@@ -1,0 +1,23 @@
+# NAME
+
+eris - Eris is the Greek Goddess of Chaos
+
+# VERSION
+
+version 0.003
+
+# SYNOPSIS
+
+eris exists to transform unstructuted, chaotic log data into structured messages.
+
+# AUTHOR
+
+Brad Lhotsky <brad@divisionbyzero.net>
+
+# COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2015 by Brad Lhotsky.
+
+This is free software, licensed under:
+
+    The (three-clause) BSD License

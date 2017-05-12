@@ -1,0 +1,81 @@
+%#============================================================================
+%# ePortal - WEB Based daily organizer
+%# Author - S.Rusakov <rusakov_sa@users.sourceforge.net>
+%#
+%# Copyright (c) 2000-2003 Sergey Rusakov.  All rights reserved.
+%# This program is free software; you can redistribute it
+%# and/or modify it under the same terms as Perl itself.
+%#
+%#
+%#----------------------------------------------------------------------------
+&nbsp;
+<% $dlg->dialog_start( title => pick_lang(rus => "Личная заметка", eng => "Personal memo"), width => "450") %>
+
+	<% $dlg->row( '<b>' . $client->position . '&nbsp;' . $client->title . '</b>') %>
+	<% $dlg->field("client_id", hidden=>1) %>
+	<% $dlg->field("title") %>
+
+<% $dlg->buttons(delete_button => 1) %>
+<% $dlg->dialog_end %>
+
+<span class="memo">
+<p><% pick_lang(rus => q{
+	Все, что вы напишете в личной заметке будет отображаться в телефонном справочнике
+  только для вас и ни для кого другого. Здесь вы можете указать дополнительную
+	информацию о телефонах человека.
+}, eng => q{
+	This is your personal area to make a note about entry. Nobody can see it except you.
+	}) %>
+
+<p><% pick_lang(rus => qq{
+	В случае, если вы обнаружили неправильно указанный телефонный номер, то сообщите
+  об этом администратору справочника. Для этого нажмите
+	<a href="admin_memo.htm?client_id=$ARGS{client_id}">здесь</a>.
+}, eng => qq{
+  Do not use this form to make a message to administrator. Use
+	<a href="admin_memo.htm?client_id=$ARGS{client_id}">this form</a> to
+	notify administrator about errors in directory.
+}) %>
+</span>
+&nbsp;
+
+% ($dlg, $client) = ();
+
+%#=== @METAGS attr =========================================================
+<%attr>
+Title => {rus => "Личная заметка", eng => "Personal memo"}
+</%attr>
+
+
+%#=== @METAGS onStartRequest ====================================================
+<%method onStartRequest><%perl>
+  my %args = $m->request_args;
+	$dlg = new ePortal::HTML::Dialog( obj => new ePortal::App::OffPhones::PhoneMemo);
+
+  my $location = try {
+    $dlg->handle_request( );
+  } catch ePortal::Exception::DataNotValid with {
+    my $E = shift;
+    $session{ErrorMessage} = $E->text;
+    '';
+  };
+  return $location if $location;
+
+	$dlg->{obj}->client_id( $args{client_id}+0 ) if exists $args{client_id};
+
+	$client = new ePortal::App::OffPhones::Client;
+	$client->restore($args{client_id});
+</%perl></%method>
+
+
+
+%#=== @metags once =========================================================
+<%once>
+my ($dlg, $client);
+</%once>
+
+%#=== @METAGS HTMLhead ====================================================
+<%method HTMLhead>
+<& PARENT:HTMLhead &>
+<META NAME="Robots" CONTENT="noindex,nofollow">
+</%method>

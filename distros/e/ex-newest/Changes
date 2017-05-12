@@ -1,0 +1,9 @@
+Revision history for Perl extension ex::newest.
+
+0.02  Mon Jun 10 13:51:54 2002
+	- Test 3 was giving a false negative with recent bleadperls.
+
+0.01  Wed Oct  3 22:30:24 2001
+	- original version; created by h2xs 1.20 with options
+		-AX -n ex::newest
+

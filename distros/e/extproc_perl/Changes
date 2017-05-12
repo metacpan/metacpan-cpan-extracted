@@ -1,0 +1,136 @@
+$Id: Changes,v 1.29 2006/08/11 13:27:35 jeff Exp $
+
+2.51	Fri Aug 11 09:26:43 EDT 2006
+	* fix for x86_64 (and probably other 64-bit platforms)
+	* fix bug where only one OUT parameter would be populated when passing
+          multiple OUT parameters
+	* use perl's cccdlflags in compilation
+
+2.50	Fri Apr  7 15:51:15 EDT 2006
+	* new spec parser using Parse::RecDescent
+	* relinking is no longer needed for new procedures
+	* "create_wrapper" removed in favor of "create_extproc"
+	* cleaned up source code formatting
+	* new testing infrastructure with better coverage
+	* changed some default configuration options in Makefile.PL
+
+2.01	Thu Sep 16 16:16:18 EDT 2004
+	* New "reparse_subs" option enables reparsing of changed subroutines
+	* Removed distracting debugging output from ora_exception
+	* New upgrade script
+	* The filename argument for import_perl is now optional.  It will
+	  default to the name of the function with a ".pl" extension.
+
+2.00	Tue Apr 20 13:54:35 EDT 2004
+	* Added "new" method for creating new OCIDate objects
+	* Added "setdate_sysdate" method for setting OCIDate objects to current
+	  system date/time
+	* Added "ddl_format" procedure for overriding default ddl_format
+	* Updated bundled documentation
+
+1.99_09	Thu Apr 15 13:26:05 EDT 2004
+	* better runtime error reporting
+	* fixed problem importing source code > 4000 bytes
+	* be more forgiving with whitespace in prototypes
+
+1.99_08 Mon Apr 12 11:57:09 EDT 2004
+	* per-database configuration directives (dbname:config)
+	* increase theoretical max_code_size to 4 GB
+	* increase default max_code_size to 32768
+	* new option to output DDL in package body format
+	* added ddl_format column in perl_config view
+	* fixed prototype parsing to require FUNCTION/PROCEDURE declaration and
+          to allow an empty argument list
+	* prototypes can now be specified in the perl source
+	* removed obsolete columns from code table
+	* autoload some module subroutines to reduce parsing overhead
+
+1.99_07 Wed Feb 25 18:24:39 EST 2004
+	* fixed crash in perl_config and perl_status views
+	* implemented preliminary test suite for "make test"
+	* fixed "always NULL" VARCHAR2 return values in directly executed code
+	* fixed missing null indicators for numeric IN OUT & OUT parameters
+	* removed pending support for opcode security
+	* removed DBD-Oracle 1.14 patch from distribution -- 1.15 includes the
+	  patched code
+
+1.99_06 Sun Feb  1 16:55:17 EST 2004
+	* ExtProc module is now built as a shared object
+	* libperxsi.so no longer retains old version of ExtProc when upgrading
+	* can now run 'perl -cw' to check syntax if you preload extproc_perl.so
+	* create trusted code directory during installation if it doesn't exist
+	* rewrote gen_module_libs so it works more reliably
+	* installation will warn you when shared objects are not found
+	* bootstrap failure errors are now more consistent and verbose
+	* is_null and set_null methods manipulate NULL status of oracle
+	  datatype objects
+
+1.99_05 Sat Jan 17 16:59:49 EST 2004
+	* support for DATE types
+	* methods for manipulating DATE values in Perl
+	* existing libperlxsi is no longer overwritten during installation
+	* set NULL indicators for IN OUT & OUT types
+	* fix inc_path_to_mflag crash on solaris
+
+1.99_04 Sat Dec 27 18:48:07 EST 2003
+	* implement NULL, LENGTH, and MAXLEN indicators for variable length
+          data types like VARCHAR2
+	* allow user-defined attributes in dbi_connect
+	* move put_line into ExtProc and remove from ExtProc::Util
+	* implement filehandle interface to put_line
+	* make ExtProc object-oriented (needed for put_line filehandles)
+	* correctly pass NULL parameters as undefined scalars for directly
+	  executed subroutines
+	* autogenerate external procedure DDL in Perl.create_wrapper
+	* wrote the user's guide (currently only available online)
+
+1.99_03 Sat Dec  6 22:51:11 EST 2003
+	* disallow eval in taint mode
+	* register .fini function (ELF) to call pl_shutdown at library unload
+	  VERY EXPERIMENTAL, but it seems to work well on both linux & solaris
+	* can register user-defined destructors using register_destructor
+	* implement IN OUT and OUT parameters
+	* changed Perl.create_wrapper syntax to better reflect Oracle's syntax
+	* prefix C wrapper function names with EP_ to prevent name clashes
+	* full documentation is now available from the user's guide
+
+1.99_02 Tue Nov 18 11:00:11 EST 2003
+	* can directly call Perl subroutines, bypassing the generic
+	  func & proc wrappers
+	* Perl.create_wrapper creates C wrappers for directly calling subs
+	* beginnings of support for non-VARCHAR2 IN & RETURN values (just
+	  integers for now)
+	* perlxsi.mk and other relinking files are now installed in the
+	  trusted code directory
+
+1.99_01	Sat Nov  8 12:19:19 EST 2003
+	* initial alpha release (pre-2.0)
+	CHANGES BELOW ARE RELATIVE TO the 1.03 codebase:
+	* globals incorporated into single global EP_CONTEXT struct to minimize
+	  use of globals and lay the groundwork for future threading support
+	* gen_module_libs rewritten in perl for portability & accuracy
+	* all oracle functions/procedures now in "Perl" PL/SQL package
+	* perl function is now Perl.func
+	* perl_p procedure is now Perl.proc
+	* former "special subroutines" are their own PL/SQL procedures in the
+	  Perl package
+	* func & proc now take up to 8 arguments by default
+	* debugging and tainting support are always built in
+	* new configuration file with various runtime options
+	* tainting is now a runtime setting
+	* bootstrap file path is a runtime setting
+	* can specify additions to @INC as a runtime setting
+	* can specify debug directory as a runtime setting
+	* simple_query.c and simple_query functions decommissioned
+	* oci.c now contains all significant OCI routines
+	* ExtProc "convenience" routines removed
+	* new fetch_code routine dedicated to fetching code from database
+	* code in database now stored as VARCHAR2 instead of CLOB
+	* support for per-session namespaces (packages)
+	* renamed ExtProc::exception to ExtProc::ora_exception
+	* ExtProc::is_function & ExtProc::is_procedure will tell you the
+	  context of the current call
+	* split module shared objects into their own library, libperlxsi,
+	  so they can be maintained separately from extproc_perl.so
+	* perlxsi.mk Makefile is installed to facilitate linking new modules
+	* perl_config view contains configuration settings

@@ -1,0 +1,90 @@
+%#============================================================================
+%# ePortal - WEB Based daily organizer
+%# Author - S.Rusakov <rusakov_sa@users.sourceforge.net>
+%#
+%# Copyright (c) 2000-2003 Sergey Rusakov.  All rights reserved.
+%# This program is free software; you can redistribute it
+%# and/or modify it under the same terms as Perl itself.
+%#
+%#
+%#----------------------------------------------------------------------------
+%#
+%# Export all user's notepad as HTML file
+%#
+%#----------------------------------------------------------------------------
+
+<h1><% pick_lang(rus => "Записная книжка", eng => "Notepad") %></h1>
+<b><% pick_lang(rus => "Пользователь", eng => "User") %>:</b> <% $ePortal->ShortUserName %><br>
+<b><% pick_lang(rus => "Дата", eng => "Date") %>:</b> <% scalar localtime %>
+
+<a name="#TOC">
+<h1><% pick_lang(rus => "Оглавление", eng => "Table of contents") %></h1>
+
+
+<%perl>
+	my @foldered;
+	$m->flush_buffer;
+
+	#
+	# Show table of contents
+	#
+	my $folder = new ePortal::NotepadFolder;
+	$folder->restore_all;
+	while($folder->restore_next) {
+		$m->out( CGI::b( $folder->title ) . "<ul>");
+		my $ntp = $folder->FolderItems;
+		while($ntp->restore_next) {
+			push @foldered, $ntp->id;
+			$m->out( "<li>" . CGI::a({-href => "#" . $ntp->id}, $ntp->title ));
+		}
+		$m->out("</ul>\n");
+		$m->flush_buffer;
+	}
+
+	#
+	# Show messages not belongs to any folder
+	#
+	my $ntp = new ePortal::Notepad;
+	$ntp->restore_all;
+	my $other;
+	while( $ntp->restore_next ) {
+		next if grep $_ == $ntp->id, @foldered;
+		$m->out("<b>Прочее</b><ul>\n") if $other++ == 0;
+		$m->out( qq{<li><a href="#} . $ntp->id . qq{">} .
+						$ntp->title .
+						"</a>\n");
+	}
+	$m->out("</ul>\n") if $other;
+	$m->flush_buffer;
+
+
+	$m->out("<hr>");
+
+	#
+	# Show memos itself
+	#
+	$ntp = new ePortal::Notepad;
+	$ntp->restore_all;
+	while( $ntp->restore_next ) {
+		my $txt = $ntp->memo;
+		$txt =~ s/\n/<br>\n/go;
+		$m->out("<p><a name=\"#" . $ntp->id . "\"><b>" . $ntp->title . "</b></a><br>\n");
+		$m->out( "$txt\n" );
+		$m->flush_buffer;
+	}
+</%perl>
+
+
+
+%#=== @metags attr =========================================================
+<%attr>
+Title => {rus => "Записная книжка (HTML)", eng => "Notepad export"}
+Layout => 'Empty'
+</%attr>
+
+
+%#=== @METAGS MenuItems ====================================================
+<%method MenuItems><%perl>
+	return [];
+</%perl></%method>
+

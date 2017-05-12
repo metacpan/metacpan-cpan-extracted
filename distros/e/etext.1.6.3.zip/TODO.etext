@@ -1,0 +1,17 @@
+* means done.
+
+A lot of...
+
+See the etext documentation for unimplemented features.
+Plus:
+
+Make selection retrieval and search compatible with "get".
+Make -verbose version of text "get" and friends.
+Make per-instance information.
+Make "block change" subcommand.
+Make "block trim" subcommand.
+Make layout data-driven instead of code-driven.
+Mouse placement of insert could be better: now it is impossible to put
+it before block.
+
+Convert to pTk.

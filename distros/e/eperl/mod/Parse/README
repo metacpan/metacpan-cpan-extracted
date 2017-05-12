@@ -1,0 +1,15 @@
+
+  Parse::ePerl
+  ============
+
+  This module is the Perl 5 glue code which makes the ePerl parser available
+  as an integrated Perl module named Parse::ePerl which can be used to
+  transform a bristled source code buffer into an expanded source code buffer.
+
+  CPAN Module List Entry:
+
+  Name           DSLI  Description                                  Info
+  -------------  ----  -------------------------------------------- -----
+  Parse::
+  ::ePerl        Rdcr  Embedded Perl (ePerl) parser                 RSE
+

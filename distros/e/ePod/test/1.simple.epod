@@ -1,0 +1,36 @@
+=> simple test
+
+bla bla bla bla
+
+=>> sub title
+
+bla bla bla
+
+*> item 1
+
+asads
+
+*>> item 1.1
+
+asads
+
+*>> item 1.2
+
+asads
+
+/*>>
+
+outside text
+
+*> item 2
+
+asads
+
+*/
+
+outside text.
+
+=> end
+
+by
+

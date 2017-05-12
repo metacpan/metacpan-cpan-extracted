@@ -1,0 +1,49 @@
+%#============================================================================
+%# ePortal - WEB Based daily organizer
+%# Author - S.Rusakov <rusakov_sa@users.sourceforge.net>
+%#
+%# Copyright (c) 2000-2003 Sergey Rusakov.  All rights reserved.
+%# This program is free software; you can redistribute it
+%# and/or modify it under the same terms as Perl itself.
+%#
+%#
+%#----------------------------------------------------------------------------
+<%perl>  
+  my $app = $ePortal->Application('SquidAcnt');
+  throw ePortal::Exception::ACL( -operation => 'read', -object => $app)
+    unless $app->xacl_check_read;
+
+  my $obj = new ePortal::App::SquidAcnt::SAurl_group(
+    DBISource => 'SquidAcnt',
+    SQL => "SELECT
+              SAurl_group.*, 
+              count(SAurl.id) as cnt
+            FROM SAurl_group
+            left join SAurl on SAurl_group.id = SAurl.url_group_id
+            ",
+            GroupBy => 'SAurl_group.title',
+  );
+
+</%perl>
+
+% if ($app->xacl_check_update) {
+  <ul>
+  <li><a href="<% href('url_group_edit.htm', objid => 0) %>"><% img(src=>'/images/icons/memo.gif') %>&nbsp;<%
+      pick_lang(rus => "Новая группа блокировок", eng => "New blocking group") %></a>
+  </ul>
+% }
+
+<&| /list.mc, obj => $obj &>
+  <& /list.mc:column_image &>
+  <& /list.mc:column, id => 'title', order_by => 'title',
+                    url => href('url_list.htm', url_group_id => $_->id) &>
+  <& /list.mc:column, id => 'redir_type', order_by => 'redir_type' &>
+  <& /list.mc:column, id => 'cnt', order_by => 'cnt', title => pick_lang({rus=>'Кол-во URL', eng=>'URL count'}) &>
+%  if ( $app->xacl_check_update ) {
+  <& /list.mc:column_edit, url => href('url_group_edit.htm', objid => $_->id) &>
+  <& /list.mc:column_delete &>
+% }
+
+</&> <!-- list -->
+
+

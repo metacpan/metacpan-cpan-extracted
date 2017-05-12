@@ -1,0 +1,96 @@
+%#============================================================================
+%# ePortal - WEB Based daily organizer
+%# Author - S.Rusakov <rusakov_sa@users.sourceforge.net>
+%#
+%# Copyright (c) 2000-2004 Sergey Rusakov.  All rights reserved.
+%# This program is open source software
+%#
+%#
+%#----------------------------------------------------------------------------
+%# Parameters:
+%#     text - text to search in Catalog
+%#----------------------------------------------------------------------------
+
+<& /navigatorbar.mc, bold_last => 1, 
+  items => [
+    { title => pick_lang(rus => "Начало каталога", eng => "Top of Catalogue"), 
+       href => "/catalog/index.htm" },
+    { title => pick_lang(rus => "Поиск в Каталоге", eng => "Search in Catalogue") },
+  ] &>
+<table width="100%" border=0>
+<tr><td>
+  <% pick_lang(
+    rus => "Результат поиска ",
+    eng => "Search result of ") %><b><% $ARGS{sd_text} |h%></b>
+  <& SELF:search, %ARGS &>
+</td><td width="10%">
+  <& /catalog/search_dialog.mc &>
+</td></tr></table>
+
+
+%#=== @metags search ====================================================
+<%method search><%perl>
+  $links_count = 0;
+  my $text = $ARGS{sd_text};
+  my (@sql_where, @sql_bind);
+  foreach my $t (split('\s+', $text)) {
+    my $like = '%'.$t.'%';
+    push @sql_where, "(title like ? OR  memo like ? OR  url like ? OR (recordtype like 'text%' AND text like ?))";
+    push @sql_bind, $like, $like, $like, $like;
+  }
+  if ( ! $ePortal->isAdmin ) {
+    push @sql_where, 'hidden=0';
+  }
+
+  my $catalog = new ePortal::Catalog;
+  </%perl>
+  <&| /list.mc, obj => $catalog, restore_where => {
+    where => join(' AND ', @sql_where),
+    bind => [ @sql_bind ],
+    order_by => "Title",
+    skip_attributes => [qw/text/]} &>
+
+    <& /list.mc:column_image &>
+    <&| /list.mc:column, id => 'title', url => '/catalog/'.$_->id. '/' &>
+      <% $_->title |h %>
+    </&>
+
+    <&| /list.mc:column, id => 'RecordType', -align => 'center' &>
+      <% $_->RecordType eq 'group'
+        ? pick_lang(rus => "Группа ресурсов", eng => "Group")
+        : pick_lang(rus => "Ресурс", eng => "Resource") %>
+    </&>
+
+    <&| /list.mc:nodata &>
+      <& /message.mc, ErrorMessage => pick_lang(
+          rus => "Поиск не принес результатов",
+          eng => 'Nothing found' ) &>
+    </&>
+  </&>
+</%perl></%method>
+
+
+%#=== @METAGS attr =========================================================
+<%attr>
+Title => {rus => "Результат поиска в Каталоге ресурсов", eng => "Search results"}
+</%attr>
+
+
+%#=== @METAGS once =========================================================
+<%once>
+my $links_count = 0;
+</%once>
+
+
+%#=== @METAGS HTMLhead ====================================================
+<%method HTMLhead>
+  <meta name="robots" content="noindex">
+</%method>
+
+
+%#=== @METAGS onStartRequest ====================================================
+<%method onStartRequest><%perl>
+  if ( ! $ARGS{sd_text} ) {  # nothing to search
+    return "index.htm";
+  }
+</%perl></%method>

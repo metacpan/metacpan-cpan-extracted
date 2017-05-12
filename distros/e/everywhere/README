@@ -1,0 +1,54 @@
+NAME
+    everywhere - Use a module (or feature) everywhere
+
+SYNOPSIS
+      #!/usr/bin/perl
+
+      use strict;
+      use everywhere qw/ feature say /;
+      use Greet;
+
+      Greet::hello();
+
+      # in Greet.pm
+      package Greet;
+      use strict;
+      sub hello {
+        say "Helloooooo!!!!";
+      }
+
+DESCRIPTION
+    I got tired of putting "use 5.010" at the top of every module. So now I
+    can throw this in my toplevel program and not have to Repeat Myself
+    elsewhere.
+
+    In theory you should be able to pass it whatever you pass to use.
+
+    Also, I just made it so you can do:
+
+      use everywhere 'MooseX::Declare',
+        matching => '^MyApp',
+        use_here => 0;
+
+    for example and then it will only apply this module to things matching
+    your regex. And not use it here. You can also throw in 'package_level =>
+    1' to use your package after every "package ..." line. All these are
+    experimental :)
+
+BUGS
+    Currently you can only use this once.
+
+SEE ALSO
+    Acme::use::strict::with::pride -- from which most code came!
+
+    Also look at use and feature.
+
+AUTHOR
+      Brock Wilcox <awwaiid@thelackthereof.org> - http://thelackthereof.org/
+      Thanks to mst and #moose ;-)
+
+COPYRIGHT
+      Copyright (c) 2008 Brock Wilcox <awwaiid@thelackthereof.org>. All rights
+      reserved.  This program is free software; you can redistribute it and/or
+      modify it under the same terms as Perl 5.10 or later.
+

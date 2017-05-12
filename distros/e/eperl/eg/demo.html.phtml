@@ -1,0 +1,41 @@
+<!-- 
+##
+##  demo.html -- ePerl demonstration webpage
+##  Copyright (c) 1996,1997 Ralf S. Engelschall, All Rights Reserved. 
+##
+-->
+<html>
+<head>
+<title>demo.html</title>
+</head>
+<body>
+<blockquote>
+<blockquote>
+<h1>demo.html</h1>
+<h2>High-level HTML programming with HTML::Stream</h2>
+<p>
+
+This demonstrates how one can use the HTML-Stream package from
+within ePerl to do high-level HTML programming.
+
+<?
+use HTML::Stream;
+my $HTML = new HTML::Stream \*STDOUT;
+!>
+
+First, a programmed hyperlink to
+<? $HTML->
+   A(HREF=>"http://www.engelschall.com/sw/eperl/")->
+   t("the ePerl webarea")->
+   _A; !> .
+
+<p>
+Second, just 
+<? $HTML->t("plain text with umlaut characters: äöüÄÖÜß\n" ); !>.<br>
+These were automatically converted from ISO-Latin-1 encoding to
+HTML entities.
+
+</blockquote>
+</blockquote>
+</body>
+</html>

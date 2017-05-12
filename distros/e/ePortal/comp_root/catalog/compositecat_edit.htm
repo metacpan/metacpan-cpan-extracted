@@ -1,0 +1,95 @@
+%#============================================================================
+%# ePortal - WEB Based daily organizer
+%# Author - S.Rusakov <rusakov_sa@users.sourceforge.net>
+%#
+%# Copyright (c) 2000-2004 Sergey Rusakov.  All rights reserved.
+%# This program is open source software.
+%#
+%#----------------------------------------------------------------------------
+<%init>
+</%init>
+
+<& /catalog/group_ring.mc, group => $C->id &>
+
+%if ($C->catname_1 eq '') {
+  <& /message.mc, ErrorMessage => pick_lang(
+        rus => "Данный ресурс не использует группировок", 
+        eng => "This is resource does not use groupping") &>
+%return;
+%}
+
+<p style="margin-left: 1 cm;" class="memo">
+<&| /rus.mc &>
+  Ниже приведен список всех категорий (группировок), которые могут быть использованы при
+  добавлении элементов в данный ресурс каталога (<% $C->Title |h %>).
+</&>
+<&| /eng.mc &>
+  Here is the list of all categories of the resource (<% $C->Title |h %>).
+</&>
+<br>
+<% plink({rus => 'Вернуться к ресурсу', eng => 'Back to the resource'},
+    -href => '/catalog/'.$C->id . '/') %>
+</p>
+
+<table width="100%" border="0">
+<tr><td>
+  <& /item_caption.mc, title => pick_lang(rus => "Группировка 1-го уровня: ", eng => "Category 1:"),
+      extra => $C->catname_1 &>
+
+  <&| /list.mc, obj => new ePortal::CtlgCategory, id => 'L1',
+        restore_where => { where => 'parent_id=? AND catnum=1', bind => [$C->id] },
+        &>
+    <& /list.mc:column_image &>
+    <& /list.mc:column, id => 'title' &>
+    <& /list.mc:column_delete &>
+  </&>
+
+  &nbsp;
+  <&| /dialog.mc, width => 300,
+      title => pick_lang(rus => "Добавить группировку", eng => "Add category") &>
+    <form method="POST" action="<% $ENV{SCRIPT_NAME} %>">
+      <input type="hidden" name="objid" value="<% $C->id %>">
+      <input type="hidden" name="catnum" value="1">
+      <% $C->catname_1 |h %><br>
+      <input type="text" name="name" value="" class="dlgfield">
+      <input type="submit" name="submit" value="..." class="button">
+    </form>
+  </&>
+
+</td></tr></table>
+&nbsp;
+
+%#=== @metags onStartRequest ====================================================
+<%method onStartRequest><%perl>
+  $C = new ePortal::Catalog;
+  $C->restore_or_throw($ARGS{objid});
+
+  # Add new category
+  if ( $r->method eq 'POST' ) {
+    if ( $ARGS{name} and $ARGS{catnum}) {
+      my $dummy = new ePortal::CtlgCategory;
+      $dummy->parent_id( $C->id );
+      $dummy->catnum( $ARGS{catnum} );
+      $dummy->Title( $ARGS{name} );
+      $dummy->insert;
+    }
+
+    # redirect to base edit form
+    throw ePortal::Exception::Abort(-text => href('/catalog/compositecat_edit.htm', objid => $C->id));
+  }
+
+</%perl></%method>
+
+%#=== @METAGS attr =========================================================
+<%attr>
+Title => {rus => "Категории ресурса", eng => "Categories of resource"}
+</%attr>
+
+
+%#=== @METAGS once =========================================================
+<%once>
+  my($C);
+</%once>
+<%cleanup>
+  $C = undef;
+</%cleanup>

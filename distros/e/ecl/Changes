@@ -1,0 +1,53 @@
+Revision history for Perl extension ecl (former Language::Lisp::ECLs).
+
+0.62  mar-19 2016
+	- introduced some tests from clisp test suite
+	- complex
+	- more of - eval perl code from lisp - tests and funcs
+
+0.61  mar-12 2016
+	- other way round - eval perl code from lisp
+	- win32 with msvc
+
+0.59  mar-02 2016
+	- stringification
+
+0.58  mar-01 2016
+	- package name now much shorter - just ecl
+	- fix t_string
+
+0.27  Sun Jun 14  2008
+	- ...::Ratio
+	- ...::Bignum
+	- eval_string now eval
+
+0.26  Sun Jun 13  2008
+	- better Makefile.PL
+	- better stringifications
+	- ...::HashTable for (make-hash-table)
+	- ...::Char
+
+0.25  Sun Jun 04  2008
+	- tie-ing of Language::Lisp::ECLs::List
+	- better Makefile.PL
+	- start using cl_dealloc (not work, though)
+
+0.24  Sun May 28  2008
+	- Language::Lisp::ECLs::List
+
+0.23  Sun May 26  2008
+	- interpreter method autoloading
+
+0.21  Sun May 22  2008
+	- most implementation
+
+0.03  Sun May 19 01:05:31 2008
+	- renamed Language::Lisp::ECL to Language::Lisp::ECLs
+
+0.02  Sun May 18 01:05:31 2008
+	- ecl lisp connection added
+
+0.01  Sun May 18 01:05:31 2008
+	- original version; created by h2xs 1.23 with options
+		ecl.h -A -n Language::Lisp::ECL
+

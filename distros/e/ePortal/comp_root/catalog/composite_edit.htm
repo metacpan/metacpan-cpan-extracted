@@ -1,0 +1,202 @@
+%#============================================================================
+%# ePortal - WEB Based daily organizer
+%# Author - S.Rusakov <rusakov_sa@users.sourceforge.net>
+%#
+%# Copyright (c) 2000-2004 Sergey Rusakov.  All rights reserved.
+%# This program is open source software
+%#
+%#
+%#----------------------------------------------------------------------------
+<%once>
+  my ($obj, $att, $C);
+</%once>
+<%cleanup>
+  ($obj, $att, $C) = ();
+</%cleanup>
+&nbsp;
+<&| /dialog.mc:edit_dialog,
+        title => pick_lang(rus => "Ресурс каталога", eng => "Catalogue resource"),
+        width => 550,
+        obj => $obj,
+        multipart => 1,
+        focus => 'title' &>
+
+  <& /dialog.mc:read_only, id => 'parent_id' &>
+  <&| /dialog.mc:cell &><hr></&>
+
+  <& /dialog.mc:field, id => 'title' &>
+  <& /dialog.mc:field, id => 'item_date', label => $C->catname_date &>
+% if ($C->catname_1) {
+  <& /dialog.mc:field, id => 'category1', label => $C->catname_1 &>
+% }
+
+
+%#
+%# Text of resource ============================================================
+%#
+  <&| /dialog.mc:cell, -align => 'center' &>
+  <span class="dlglabel"><% pick_lang(rus => "Текст ресурса", eng => "Text of resource") %></span>
+  <br>
+  <& /dialog.mc:textarea, id => 'text', -class => 's10' &>
+  </&>
+
+
+
+
+%#
+%# New Attachment ============================================================
+%#
+
+  <&| /dialog.mc:collapse, title => pick_lang(rus => "Присоединенные файлы", eng => "Files attached") &>
+
+  <&| /dialog.mc:label_value_row, label => pick_lang(rus => "Файл", eng => "File"), id => "upload_file" &>
+  <% CGI::filefield({-name => 'upload_file', -class => 'dlgfield'}) %>
+  <% CGI::submit({-name => 'dlgb_apply', -class => 'button', -value => pick_lang(rus => "Прикрепить!", eng => "Attach!")}) %>
+  <& /dialog.mc:checkbox, id => 'load_as_text',
+        checkbox_label => pick_lang(rus => "Как текст ресурса", eng => "As resource text"),
+        value => 0 &>
+  </&>
+  <&| /dialog.mc:cell, -align => 'right' &>
+  </&>
+
+
+%#
+%# List Attachments ============================================================
+%#
+
+%  $att = new ePortal::Attachment;
+%  $att->restore_where(obj => $obj);
+%  if ($att->rows) {
+  <&| /dialog.mc:cell, -align => 'center' &>
+    <br>
+   <&| /list.mc, obj => new ePortal::Attachment, no_footer => 2,
+        -width => '80%', rows => 10, restore_where => { obj => $obj } &>
+
+    <& /list.mc:column_image &>
+    <&| /list.mc:column, id => 'filename',
+              -style => 'color: #9966ff;',
+              title => pick_lang(rus => "Имя файла", eng => "File name") &>
+      <b><% $_->filename |h %></b>
+    </&>
+
+    <&| /list.mc:column, id => 'filesize', title => pick_lang(rus => "Размер", eng => "Size"), -align => 'center' &>
+      <% $_->FileSize . '&nbsp;' . pick_lang(rus => "байт", eng => "bytes") %>
+    </&>
+
+    <& /list.mc:column_checkbox &>
+
+    <& /list.mc:action_bar, popup_menu => {
+                        -values => ['delete'],
+                        -labels => { delete => pick_lang(rus => "Удалить", eng => "Delete")}} &>
+   </&><!-- list -->
+  </&><!-- cell -->
+% }
+</&><!-- collapsed section. file attachments -->
+
+
+
+  <&| /dialog.mc:cell &>&nbsp;</&>
+  <& /dialog.mc:buttons, ok_label => pick_lang(rus => "Сохранить ресурс", eng => "Save the resource"),
+      apply_button => 1 &>
+
+
+</&>
+
+<p>
+<div class="memo">
+<&| /rus.mc &>
+  Дополнительную информацию о форматировании текста
+  <a href="/catalog/formatting-rules.htm">смотрите здесь</a>
+</&>
+</div>
+<p>
+
+
+%#=== @METAGS attr =========================================================
+<%attr>
+Title => {rus => "Ресурс каталога", eng => "Catalogue resource"}
+</%attr>
+
+
+%#=== @METAGS onStartRequest ====================================================
+<%method onStartRequest><%perl>
+  $C = new ePortal::Catalog;
+  $obj = new ePortal::CtlgItem;
+
+  # Get arguments from request and prepare objects
+  my $back_url = $m->comp('/dialog.mc:back_url');
+  my $new_att = new ePortal::Attachment;
+  my $updated_successfully = undef;
+
+  # restore object to edit
+  $obj->restore_or_throw($ARGS{objid}) if $ARGS{objid};
+
+  # Get default or new values from URL. Do not save the object !
+  $m->comp('/dialog.mc:htmlSave', obj => $obj);
+  $C->restore_or_throw($obj->parent_id);
+
+  # Upload a file
+  $new_att->upload(r => $r);
+  # Set empty title to uploaded filename
+  if ($new_att->check_id and $obj->Title eq '') {
+    $obj->Title( $new_att->Filename );
+  }
+  # upload the file as text
+  if ($new_att->check_id and $ARGS{load_as_text}) {
+    $obj->Text( $new_att->save_to_string );
+  }
+
+
+  # Save the object
+  if ( $m->comp('/dialog.mc:isButtonPressed', button => 'ok' ) or
+       $m->comp('/dialog.mc:isButtonPressed', button => 'apply' )) {
+
+    $updated_successfully = try {
+      # actually update the object
+      $obj->save();  # 1 on update, 0 on insert, undef on error
+
+      if ( $ARGS{load_as_text} == 0 and $new_att->check_id) {
+        $new_att->link_with_object($obj);
+      }
+      1; # success
+
+    } catch ePortal::Exception::DataNotValid with {
+      my $E = shift;
+      $session{ErrorMessage} = $E->text;
+      undef;
+    };
+  }
+
+  # Clear unsuccessful uploads
+  $new_att->delete if ($new_att->check_id) and ($new_att->state ne 'ok');
+
+  # do redirect
+  if ( $m->comp('/dialog.mc:isButtonPressed', button => 'cancel' )) {
+    throw ePortal::Exception::Abort(-text => $back_url);
+  } elsif ($updated_successfully and $m->comp('/dialog.mc:isButtonPressed', button => 'ok' )) {
+    throw ePortal::Exception::Abort(-text => $back_url);
+  }
+
+  # delete attachment
+  if ( $m->comp('/list.mc:list_action') eq 'delete' ) {
+    my $new_att = new ePortal::Attachment;
+    foreach ($m->comp('/list.mc:checkboxes')) {
+      if ( $new_att->restore($_) ) {
+        $new_att->delete;
+      }
+    }
+  }
+
+  # Redirect to GET after POST
+  if ( $r->method eq 'POST' ) {
+    if ( $obj->check_id ) { # existing object
+      # delete BIG and unwanted arguments from request
+      delete $ARGS{$_} foreach (
+                        qw/text load_as_text uid ts/,
+                        grep { /^xacl_/ } keys %ARGS);
+      $ARGS{objid} = $obj->id;
+      $ARGS{title} ||= $obj->Title;
+    }
+    return href($ENV{SCRIPT_NAME}, %ARGS);
+  }
+</%perl></%method>

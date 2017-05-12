@@ -1,0 +1,290 @@
+%#============================================================================
+%# ePortal - WEB Based daily organizer
+%# Author - S.Rusakov <rusakov_sa@users.sourceforge.net>
+%#
+%# Copyright (c) 2000-2003 Sergey Rusakov.  All rights reserved.
+%# This program is free software; you can redistribute it
+%# and/or modify it under the same terms as Perl itself.
+%#
+%#
+%#----------------------------------------------------------------------------
+%# Parameters:
+%#  msg_id - start of topic or any message inside the topic
+%#  start - [0..xxx] number of first reply to show (pages)
+%#  days - get topics for <days> days on newer
+%#----------------------------------------------------------------------------
+
+<& navigator.mc, forum => $forum, message => $message &>
+
+<b>
+<% pick_lang(rus => "Тема обсуждения", eng => "The subject") %>
+<span style="color:green;"><% $message->Title |h %></span>
+</b>
+
+%#
+%# Форма поиска
+%#
+
+<table width="100%" border="0">
+<form name="topic" METHOD="GET">
+<tr><td class="smallfont" align="right">
+ <% CGI::hidden({-name => 'msg_id', -value => $message->id}) %>
+ <% pick_lang(rus => 'Показать сообщения за последние', eng => 'Show messages for last') %>
+ <% CGI::textfield({-name => "days", -value => $ARGS{days} || 30, -size => 3}) %>
+ <% pick_lang(rus => 'дней', eng => 'days') %>
+ <% CGI::submit({-value => '>>'}) %>
+</td></tr>
+</form>
+</table>
+
+
+%#
+%# Сообщения
+%#
+
+
+<Table border=0 width="99%" cellspacing=0 cellpadding=0>
+<% empty_tr( black=>1, height => 1, colspan => 2) %>
+
+%#
+%# Инициатор топика
+%#
+
+<& SELF:message, topic => 1, message => $message, bgcolor => '#FDEEFF' &>
+
+%#
+%# Если надо, то предыдущие сообщения
+%#
+
+% if ($ARGS{start} > 0) {
+  <& SELF:show_next_prev, prev => 1, start => $ARGS{start} - $messages_per_page &>
+% }
+
+%#
+%# Ответы
+%#
+
+% my $messages=0;
+% while(++$messages <= $messages_per_page and $replies->restore_next) {
+<& SELF:message, message => $replies &>
+% }
+
+%#
+%# Следующие сообщения
+%#
+
+% if ($replies->restore_next) {
+  <& SELF:show_next_prev, next => 1, start => $ARGS{start} + $messages_per_page &>
+% }
+
+</table>
+
+%#
+%# Форма ответа
+%#
+% if ( $forum->xacl_check('xacl_reply') ) {
+  <p>
+  <& /message.mc &>
+  <% $dlg->dialog_start( width => 500,
+      title => pick_lang(
+          rus => "Ответ на сообщение", eng => "Reply to message")) %>
+
+% foreach (qw/msg_id days start/) {
+    <% CGI::hidden({-name => $_, -value => $ARGS{$_}}) %>
+% }
+
+  <% $dlg->field("forum_id", hidden => 1) %>
+  <% $dlg->field("prev_id", hidden => 1) %>
+  <% $dlg->field("title", RO => 1) %>
+
+  <% $dlg->row(pick_lang({rus => 'Иконка', eng => 'Icon'}),
+      $m->scomp('compose.htm:icons', obj => $dlg->{obj})) %>
+  <% $dlg->row('<hr>') %>
+
+  <% $dlg->field("body", vertical => 1) %>
+  <% $dlg->row($m->scomp('compose.htm:smiles')) %>
+
+  <% $dlg->buttons(cancel_button => 0) %>
+%    $dlg->{focus} = undef;
+  <% $dlg->dialog_end %>
+  <& compose.htm:javascript &>
+  <p>
+% }
+
+%#=== @metags init =========================================================
+<%method onStartRequest><%perl>
+  $ARGS{start} = 0 if $ARGS{start} <= 0;
+  $msg_id  = $ARGS{msg_id};
+  $forum   = new ePortal::App::MsgForum::MsgForum;
+	$message = new ePortal::App::MsgForum::MsgItem;
+  $replies = new ePortal::App::MsgForum::MsgItem;
+  $app     = $ePortal->Application('MsgForum');
+
+  while(1) {
+    if (!$message->restore($msg_id)) {   return "message_not_found.htm";  }
+    if ( $message->prev_id) {    $msg_id = $message->prev_id;  next; }
+    last;
+  }
+  if (!$forum->restore( $message->forum_id )) {    return "forum_not_found.htm";  }
+
+  #
+  # Dialog for new reply
+  #
+  if ( $forum->xacl_check('xacl_reply') ) {
+    my $newmessage = new ePortal::App::MsgForum::MsgItem;
+    $newmessage->forum_id( $forum->id );
+    $newmessage->prev_id( $message->id);
+    $newmessage->Title( $message->Title );
+    $dlg = new ePortal::HTML::Dialog( obj => $newmessage, method => 'GET' );
+    my $location = try {
+      $dlg->handle_request( );
+    } catch ePortal::Exception::DataNotValid with {
+      my $E = shift;
+      $session{ErrorMessage} = $E->text;
+      '';
+    };
+  }
+
+
+  # Get new topics
+  my $days_where;
+  if ( $ARGS{days} > 0) {
+    $ARGS{days} *= 1;
+    $days_where = "(msgdate >= subdate(current_date, interval $ARGS{days} day))";
+  }
+
+  #
+  # restore replies
+  #
+  $replies->restore_where(
+      where => $days_where,
+      limit_rows => $messages_per_page +1,
+      limit_offset => $ARGS{start}*1,
+      prev_id => $message->id,
+      order_by => "msgdate desc");
+
+</%perl></%method>
+
+
+
+
+%#=== @METAGS Title ====================================================
+<%method Title><%perl>
+  return $message->Title;
+</%perl></%method>
+
+
+%#=== @metags once =========================================================
+<%once>
+my $messages_per_page = 20;
+my ($app, $list, $obj, $search_object, $dlg);
+my ($forum, $message, $replies, $msg_id);
+</%once>
+
+%#=== @metags cleanup =========================================================
+<%cleanup>
+($app, $list, $obj, $search_object, $dlg) = ();
+($forum, $message, $replies, $msg_id)=();
+</%cleanup>
+
+
+
+%#=== @METAGS message ====================================================
+<%method message><%perl>
+  my $msg = $ARGS{message};
+  my $topic = $ARGS{topic};
+  my $bgcolor = $ARGS{bgcolor} || $topic ? '#FDEEFF' : '#FDFFDD';
+</%perl>
+
+<tr>
+  <td class="smallfont" width="20%">
+%  if ($msg->picture) {
+    <% img(src=> '/images/MsgForum/msg/'. $msg->picture . '.gif') %>
+%  } else {
+    <% img(src=> "/images/MsgForum/msg.gif") %>
+% }
+  Написал:<br>
+  <b><% $msg->htmlValue('FromUser') %></b><br>
+  <span style="color:green;"><% $msg->msgdate %><br></span>
+% if ( $ePortal->isAdmin ) {
+    <span style="color:#CCCCCC;">[<% $msg->useraddress %>]</span><br>
+% }
+</td>
+<td width="80%">
+  <Table border=0 width="99%" cellspacing=0 cellpadding=0>
+  <tr><td class="smallfont" bgcolor="<% $bgcolor %>">
+      <& /htmlify.mc, content => $msg->Body, 
+            highlightreply => 1,
+            allowsmiles => 1, allowphtml => 1, class=> 'smallfont' &>
+  </td></tr>
+% if ($topic and $msg->TitleURL) {
+  <tr><td class="smallfont" bgcolor="<% $bgcolor %>" align="right">
+      <% plink({rus => "Ссылка по теме", eng => "Link"}, -href => $msg->titleurl) %>
+  </td></tr>
+% }
+
+  <tr><td align="right" class="smallfont" bgcolor="#D3FEFA">
+    <%perl>
+    my $att = $msg->Attachment;
+    if ( $att ) {
+      </%perl>
+      <% plink(pick_lang(rus => "Загрузить ", eng => "Download ").$att->filename,
+        -href => $att->download_href(download => 1)) %>
+      <%perl>
+    }
+    </%perl>
+% if ($forum->xacl_check('xacl_reply')) {
+    <% plink(pick_lang(rus => "Ответить", eng => "Reply"),
+      -href => href("compose.htm", prev_id => $message->id, reply_to=> $msg->id)) %>
+% }
+% if ($forum->xacl_check('xacl_edit')) {
+    <% plink(pick_lang(rus => "Правка", eng => "Edit"),
+      -href => href("compose.htm", objid => $msg->id)) %>
+% }
+% if ($forum->xacl_check('xacl_delete')) {
+    <% plink(pick_lang(rus => "Удалить", eng => "Delete"),
+        -href => href("/delete.htm",
+              objid => $msg->id,
+              objtype => ref($msg),
+              done => $msg->prev_id? undef : href("/forum/topics.htm", forum_id => $forum->id))) %>
+% }
+  </td></tr>
+  </table>
+</td>
+</tr>
+
+% if ($topic) {
+  <tr><td class="smallfont" bgcolor="<% $bgcolor %>" align="center" colspan="2">
+      <% pick_lang(rus => "Ответы на данную тему (более свежие ответы идут первыми):",
+        eng => "Replies to this topic (newest are going first):") %>
+  </td></tr>
+% }
+
+<% empty_tr( black=>1, height => 1, colspan => 2) %>
+
+</%method>
+
+
+
+
+%#=== @metags show_next_prev ====================================================
+<%method show_next_prev>
+<tr><td colspan="2" class="g1" align="center">
+% $ARGS{start} = 0 if $ARGS{start} <= 0;
+% if ($ARGS{prev}) {
+  <% '<<<' |h %>
+  <a href="<% href("view_msg.htm", msg_id => $message->id, start => $ARGS{start}) %>">
+  <% pick_lang(rus => 'Показать предыдущие сообщения', eng => 'Show prev messages') %>
+  </a>
+  <% '<<<' |h %>
+% }
+
+% if ($ARGS{next}) {
+  <% '>>>' |h %>
+  <a href="<% href("view_msg.htm", msg_id => $message->id, start => $ARGS{start}) %>">
+  <% pick_lang(rus => 'Показать следующие сообщения', eng => 'Show next messages') %>
+  <% '>>>' |h %>
+% }
+
+</td></tr>
+</%method>

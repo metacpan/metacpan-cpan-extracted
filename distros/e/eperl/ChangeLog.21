@@ -1,0 +1,276 @@
+
+  C h a n g e L o g   o f   e P e r l
+  ___________________________________________________________________________
+
+
+  Changes between 2.1.1 and 2.1.2
+  -------------------------------
+
+  970529 o fixed a typo in eperl_security.h
+           which caused problems for non GCC
+           compilers, e.g. under IRIX.
+           [Thanks to Ewan McPhail 
+            <ewan@epages.iafrica.com> for hint]
+
+  Changes between 2.1.0 and 2.1.1
+  -------------------------------
+   
+  970501 o added -P option to etc/newsvers
+         o removed \n at SCRIPT_.._CTIME
+  970502 o replaced the $| = 1 stuff in eperl_perl5.c to the way
+           mod_perl does it 
+           [Thanks to Doug MacEachern <dougm@osf.org> for patch]
+         o enhanced the SetUID-based UID/GID checking: now in
+           eperl_global.h is an option DO_ON_FAILED_STEP which
+           either forces ePerl to error on any failed checks or go
+           on but finally don't do the UID/GID switching
+         o moved the security definitions from eperl_global.h to
+           a new eperl_security.h and changed the references in
+           eperl.pod
+
+  Changes between 2.1b8 and 2.1.0
+  -------------------------------
+
+  970426 o removed more obsolete @logfile@ stuff
+         o again revised eperl.pod
+         o !! CHANGED LICENSE !!
+           NOW ePerl IS DISTRIBUTED AT THE TERMS
+           OF EITHER THE GPL OR THE ARTISTIC LICENSE
+           LIKE THE Perl 5.0 INTERPRETER ITSELF
+         o fixed /tmp/x usage in configure
+         o created PORTING file
+         o tested ePerl on various platforms
+         o made seteuid/setegid configureable
+           via GNU autoconf for HP/UX and others
+         o made the include files in eperl_globa.h
+           conditional
+         o made the -O2 conditional for GCC only
+
+  Changes between 2.1b7 and 2.1b8
+  -------------------------------
+
+  970425 o fixed installation manpath
+         o fixed a security hole: the
+           effective uid/gid have to be eliminated
+           independend of mode and uid switching
+         o fixed some typos in eperl.pod
+         o rewritten the NEWS file
+         o renamed the options:
+           -D => -d, -E => -D (more intuitive)
+           -b => -B, -e => -E (prevent conflicts)
+         o fixed the order of command line
+           option descriptions
+         o removed the @logfile@ stuff from Makefile
+
+  Changes between 2.1b6 and 2.1b7
+  -------------------------------
+
+  970425 o fixed error page colors
+         o changed some aux files: NEWS, TODO
+         o added .cgi to allowed extensions
+           for using shebang CGI/ePerl scripts 
+         o added more clear info about shebang
+           to eperl.pod
+         o fixed more bugs in eperl.pod
+         o removed the exit on debug
+         o finished the test suite
+         o slightly fixed the usage output
+         o added support for HEAD requests in
+           case the server does not do it for us
+         o documented provided env variables
+         o created new isotime() function
+           for SCRIPT_SRC_MODIFIED_ISOTIME variable
+         o removed eperl_log.c because this 
+           will be used in later versions only
+
+  Changes between 2.1b5 and 2.1b6
+  -------------------------------
+
+  970414 o slightly changed the error message page
+  970418 o created -c for syntax check like "perl -c"
+         o now the default delimiters are
+                <? .. !> for CGI modes
+           and  <: ...:> for Filter mode
+         o removed the delimiters defs in eperl_global.h
+           but added a table to eperl.pod
+         o completely rewritten the setuid security stuff !!
+         o added security information to eperl.pod
+         o now -x does something useful: it outputs
+           the internally generated Perl script to /dev/tty
+           and exits
+
+  Changes between 2.1b4 and 2.1b5
+  -------------------------------
+
+  970404 o now when used as a Unix filter the exit code 
+           is != 0 on error while for CGI scripts it is
+           still 0 (needed to make the webserver happy 
+           and to force him to accept your HTML error page).
+         o now prints the error message on stderr instead
+           of stdout in Unix filter mode
+         o fixed "make distclean", now t/Makefile is 
+           also removed.
+
+  Changes between 2.1b3 and 2.1b4
+  -------------------------------
+
+  970403 o fixed a bug in the b3 distribution:
+           autoheader was not run, so to _compile_
+           ePerl GNU autoconf was needed. :-(
+         o slight adjustments to eperl.pod
+
+  Changes between 2.1b2 and 2.1b3
+  -------------------------------
+
+  970402 o starting with Perl 5.003_96 the dXSUB_SYS define
+           is empty.  Removed the call and the gcc -Wall 
+           kludge from eperl_perl5.c
+         o fixed etc/newvers
+         o add "none" to configure DynaLoader check
+
+  Changes between 2.1b1 and 2.1b2
+  -------------------------------
+  
+  970330 o reduced the logo GIF image in size to fit betteri
+           into the browser window. The reduced one also has 
+           10 KB less bytes.
+         o made the Error HTML page nicer
+         o removed the not used -a (age) option
+
+  Changes between 2.1b0 and 2.1b1
+  -------------------------------
+
+  970326 o added "-o file" to the usage message
+         o when running as a Unix filter the current
+           working directory is restored before the
+           final outputfile (-o) is created.
+         o documented that "-o outputfile" is
+           relative to source file dir when
+           runtime mode is CGI or NPH-CGI
+         o added new-betalevel to Makefile.in
+
+  Changes between 2.0.3 and 2.1b0
+  -------------------------------
+
+  970322 o released as 2.1b0 for first test
+
+  970310 o added --with-perl=/path/to/perl option
+           to ./configure to force a specific perl
+
+  970302 o removed getdate.c stuff :-(
+         o added more tests
+         o changed aux dir to etc for porting to WinNT :-(
+
+  970228 o debugged and cleanup up eperl_parse.c
+         o fixed the core-dump under SunOS which
+           comes from SunOS' non-POSIX vsprintf().
+         o removed the sdbm and md5 stuff because
+           this should be introduced in 3.0 later only.
+         o removed brainfile stuff
+         o fixed another coredump in eperl_parse.c
+         o fixed mode determination and mode-dependend
+           error message
+
+  970227 o debugged and cleanup up eperl_parse.c
+
+  970226 o added dmalloc support for debugging
+
+  970224 o changed sprintf stuff to more portable 
+           variant in eperl_main.c
+         o now autoconf checks for memmove and
+           if not found eperl_parse.c uses bcopy.
+
+  970219 o changed bool checking to Autoconf stuff
+
+  970216 o ported to Linux: now bool is defined,
+           prefix was replaced by AC_prefix to avoid collisions and the
+           ccdlflags from Perl are used which need to be -rdynamic under
+           Linux. Now ePerl compiles out of the box on Linux and runs fine,
+           even with dynamic loading.
+
+  970210 o added getdate() code
+         o added --enable-brainfile=/path/to/brainfile
+           which sets the brain file where timestamps and
+           md5 etc. are stored.
+         o added -a option to set an age
+
+  970209 o added MD5 code
+         o added SDBM code
+
+  970207 o changed -c and -s options to -m c and -m f
+         o adding -m n for NPH/CGI, -m c is no only CGI
+         o added stdin support via "-" and tmpfiles
+         o added automatic tmpfile support with remove
+           on interrupts or errors
+         o now the old tempfiles are also created
+           with new mechanism
+         o added -o option for specifying an
+           explicit outputfile instead of stdout
+         o greatly imporved the manpage and brroght it 
+           to the latest status
+         o created a test suite with Perl Test::Harness
+         o now ePerl also accepts an empty file
+         o added a security logfile which can be optionally
+           enabled via "--enable-logfile=/path/to/logfile"
+           at compile time.
+         o added configure support for debug compilation
+           via --enable-debug. This adds -g -ggdb3 to
+           the CFLAGS and LDFLAGS and prevents the
+           executable from being stripped.
+         o removed the old doc/ subdir with the
+           old FAQ and About file. 
+
+  970206 o removed the generation of libeperl.a
+         o added a real installation target to Makefile
+         o removed eperl_parse.h, because it is still
+           replaced by the generated eperl_proto.h
+         o added -V option which now displays the compile
+           parameters
+         o removed the <tt>..</tt> tags from error output
+           because for the stand-alone version is looks bad.
+         o added experimental TAINT...TAINT_NOT around perl_run.
+         o added -d option to set real Perl variables and
+           not just $ENV{'...'};
+
+  970128 o added support to configure for Perl snapshot
+           releases named 5.003_XX.
+         o added a first security check: If operating in
+           NPH-CGI mode the source file has to be one of
+           the predefined valid file extensions.
+         o now when ePerl runs as a setuid program (seteuid = 0)
+           it switches to the uid/gid of the file owner 
+
+  970127 o added -D option to set environment variables.
+           (this is needed for my WML project where in
+           pass 3 eperl gets called via -D...)
+         o added -k option to keep CWD.
+           (this is needed for my WML project where 
+           ePerl should not chdir to the /tmp/xxx files).
+
+  970118 o make the BEGIN/END_DELIMITER strings variables which
+           now can be set via -b and -e 
+           (this is needed for my WML project where I use
+           two variants of embedded Perl blocks)
+
+  970107 o fixed this changelog file
+         o added test directory
+         o cleanup of Makefile
+         o removed obsolete prototypes in eperl_lib.h
+         o cleaned up eperl_global.h
+         o make eperl_getopt.[ch] gcc -Wall clean
+         o added support for shebang usage, i.e.  you can use #!/path/to/eperl
+           at the top of your pages and use them as a CGI script now. ePerl
+           will ignore the shebang line.
+         o moved the system IO and env functions out to new eperl_sys.c
+         o renamed eperl_lib to eperl_parse
+         o Hups! all references to the CGI/1.0 standard were wrong, it
+           actually is CGI/1.1...
+
+  970106 o added stand-alone interpreter with options
+         o added -x and -v options
+         o added README and LICENSE display
+         o now ePerl reads the file from stdin if
+           the argument is "-"
+         o added a ePerl manual page for the
+           stand-alone interpreter
+

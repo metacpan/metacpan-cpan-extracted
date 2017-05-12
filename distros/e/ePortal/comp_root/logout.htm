@@ -1,0 +1,17 @@
+%#============================================================================
+%# ePortal - WEB Based daily organizer
+%# Author - S.Rusakov <rusakov_sa@users.sourceforge.net>
+%#
+%# Copyright (c) 2000-2004 Sergey Rusakov.  All rights reserved.
+%# This program is open source software
+%#
+%#
+%#----------------------------------------------------------------------------
+%# Description: Here we just clear authentication cookie and redirect to
+%# next page. Actual message about logout process is shown on logout_ok.htm
+%#----------------------------------------------------------------------------
+
+<%method onStartRequest>
+<& /pv/send_auth_cookie.mc &>
+% return "logout_ok.htm";
+</%method>

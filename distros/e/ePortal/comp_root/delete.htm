@@ -1,0 +1,184 @@
+%#============================================================================
+%# ePortal - WEB Based daily organizer
+%# Author - S.Rusakov <rusakov_sa@users.sourceforge.net>
+%#
+%# Copyright (c) 2000-2004 Sergey Rusakov.  All rights reserved.
+%# This program is open source software
+%#
+%#
+%#----------------------------------------------------------------------------
+%# Description:
+%#  Удаление объектов из базы
+%#
+%# Parameters:
+%#	objid => ID of object
+%#  objtype => ref of object
+%#	done|location => URL to redirect after deletion
+%#----------------------------------------------------------------------------
+<& message.mc &>
+
+% if ($html_page eq "object_error") {
+  <& /message.mc,
+			ErrorMessage => pick_lang(
+				rus => "Произошла ошибка при поиске объекта для удаления",
+				eng => "Cannot find the object to delete") &>
+	<center>
+	<% plink(pick_lang(rus => "Вернуться обратно", eng => "Go back"), -href => $return_uri) %>
+	</center>
+
+% } elsif ($html_page eq "delete_error") {
+  <& /message.mc,
+		ErrorMessage => pick_lang(
+			rus => "Произошла ошибка при удалении объекта",
+			eng => "Error occured while deleting the object") &>
+	<% pick_lang(
+			rus => "Количество объектов, которые невозможно удалить:",
+			eng => "Cannot delete objects:") %> <% scalar(@failed_id) %>
+	<center>
+	<% plink(pick_lang(rus => "Вернуться обратно", eng => "Go back"), -href => $return_uri) %>
+	</center>
+
+% } elsif ($html_page eq "no_objects") {
+  <& /message.mc,
+		ErrorMessage => pick_lang(
+			rus => "Не найдено ни одного объекта для удаления",
+			eng => "No objects to delete") &>
+	<center>
+	<% plink(pick_lang(rus => "Вернуться обратно", eng => "Go back"), -href => $return_uri) %>
+	</center>
+
+% } elsif ($html_page eq "one_object") {
+	<center>
+% if ($object_title) {
+	<font color="red"><b><% pick_lang(
+			rus => "Вы действительно хотите удалить?",
+			eng => "Are you shure to delete?") %></b></font><br>
+	<b><% $object_title %></b>
+% } else {
+	<font color="red"><b><% pick_lang(
+		rus => "Вы действительно хотите удалить объект?",
+		eng => "Are you shure to delete an object?") %></b></font><br>
+% }
+	<form method="GET" action="<% $ENV{SCRIPT_NAME} %>">
+			<% CGI::hidden(-name => "done", -value => $return_uri, override => 1) %>
+			<% CGI::hidden(-name => "objid", -value => \@objid, override => 1) %>
+			<% CGI::hidden(-name => "objtype", -value => $objtype, override => 1) %>
+			<% CGI::submit(-name => "confirmed", -value => pick_lang(rus => "ДА", eng => "YES"), -class => "button") %>
+      <% CGI::button(-name => "no", -value => pick_lang(rus => "НЕТ", eng => "NO"), -class => "button",
+      -onClick => "javascript:history.go(-1);") %>
+	</form>
+	</center>
+
+
+% } else {	# confirmation page
+	<center>
+	<font color="red"><b><% pick_lang(
+			rus => "Вы указали к удалению ". scalar(@objid) . " объектов",
+			eng => "Objects to delete " . scalar(@objid)) %></b></font><br>
+	<b><% pick_lang(
+			rus => "Вы действительно хотите их удалить?",
+			eng => "Are you shure to delete them?") %></b><br>
+	<form method="GET" action="<% $ENV{SCRIPT_NAME} %>">
+			<% CGI::hidden(-name => "done", -value => $return_uri, override => 1) %>
+			<% CGI::hidden(-name => "objid", -value => \@objid, override => 1) %>
+			<% CGI::hidden(-name => "objtype", -value => $objtype, override => 1) %>
+      <% CGI::submit(-name => "confirmed", -value => pick_lang(rus => "ДА", eng => "YES"), -class => "button") %>
+      <% CGI::button(-name => "no", -value => pick_lang(rus => "НЕТ", eng => "NO"), -class => "button",
+        -onClick => "javascript:history.go(-1);") %>
+	</form>
+	</center>
+
+% }
+
+%#=== @metags onStartRequest ====================================================
+<%method onStartRequest><%perl>
+	@objid = ref($ARGS{objid}) eq "ARRAY" ? @{$ARGS{objid}} : ($ARGS{objid});
+	$objtype = $ARGS{objtype};
+	my $confirmed = $ARGS{confirmed};
+	my $delete_count = 0;
+  $return_uri = $ARGS{done} || $ARGS{back_url} || $ENV{HTTP_REFERER} || '/index.htm';
+
+	#
+	# Base object creation
+  my ($app) = ($objtype =~ /ePortal::App::([^:]+)::/o);
+  eval { $ePortal->Application($app) if $app };
+	my $object = eval { new $objtype; };
+	if ($@) {
+		logline('crit', $@);
+		$html_page = "object_error";
+		return;
+	}
+
+	#
+	# Rejection of deletion
+	if ($ARGS{no}) {
+		return $return_uri;
+	}
+
+	#
+	# Deletion process
+	#
+	@failed_id = ();
+	if ($confirmed) {
+		foreach my $id (@objid) {
+			if ($object->restore($id)) {
+				my $delete_result = $object->delete;
+				$delete_count += $delete_result;
+
+				if (not $delete_result) {
+					$html_page = "delete_error";
+					push @failed_id, $id;
+				}
+			}
+		}
+		return $return_uri if not @failed_id;
+	}
+
+
+	#
+	# No objects to delete
+	#
+	if (scalar (@objid) == 0) {
+		$html_page = "no_objects";
+		return;
+	}
+
+	#
+	# Special processing if 1 object is to delete
+	#
+	if (scalar (@objid) == 1) {
+		$html_page = "one_object";
+		if ($object->restore($objid[0])) {
+      $object_title = eval { $object->ObjectDescription };
+		} else {
+			$html_page = "no_objects";
+		}
+	}
+
+</%perl></%method>
+
+
+%#=== @METAGS once =========================================================
+<%once>
+my $html_page;
+my @failed_id;
+my $return_uri;
+my $object_title;
+my @objid;
+my $objtype;
+</%once>
+
+
+
+%#=== @METAGS attr =========================================================
+<%attr>
+Title => {rus => "Удаление объектов", eng => "Delete an object"}
+</%attr>
+
+
+
+%#=== @METAGS HTMLhead ====================================================
+<%method HTMLhead>
+<& PARENT:HTMLhead &>
+<META NAME="Robots" CONTENT="noindex,nofollow">
+</%method>

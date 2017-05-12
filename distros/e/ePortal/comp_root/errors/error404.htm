@@ -1,0 +1,54 @@
+%#============================================================================
+%# ePortal - WEB Based daily organizer
+%# Author - S.Rusakov <rusakov_sa@users.sourceforge.net>
+%#
+%# Copyright (c) 2000-2004 Sergey Rusakov.  All rights reserved.
+%# This program is open source software
+%#
+%#
+%#----------------------------------------------------------------------------
+<%perl>
+  $m->clear_buffer;
+  $r->status(404);
+</%perl>
+<html>
+  <head>
+  <title><% pick_lang(rus => "Файл не найден", eng => "File not found") %></title>
+  <meta name="robots" content="noindex">
+  </head>
+<body>
+<center>
+<h1><% pick_lang(rus => "Файл не найден", eng => "File not found") %></h1>
+</center>
+
+<% pick_lang(
+		rus => "Указанный вами ресурс или файл ",
+    eng => "The file requested ") %><br><b><% $ARGS{url} || $ENV{HTTP_REFERER} || $ENV{REQUEST_URI} %></b>
+<br><% pick_lang(
+		rus => "не существует или вы ошиблись при вводе адреса.",
+		eng => "is not exists.") %>
+<p>
+
+%# % foreach (keys %ENV) {
+%#  <% $_ %>: <% $ENV{$_} %><br>
+%# % }
+
+<div align="center"><a href="/"><% pick_lang(
+		rus => "Вернуться к главному меню сервера",
+		eng => "Back to home page") %></a></div>
+<% ' ' x 2048 %>
+
+</body>
+</html>
+
+
+
+%#=== @METAGS attr =========================================================
+<%attr>
+Title => {rus => "Файл не найден", eng => "File not found"}
+</%attr>
+
+%#=== @METAGS flags =========================================================
+<%flags>
+inherit => undef
+</%flags>

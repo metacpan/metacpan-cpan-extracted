@@ -1,0 +1,24 @@
+NAME
+    ex::lib - The same as lib, but makes relative path absolute. (Obsoleted
+    by lib::abs)
+
+VERSION
+    Version 0.90
+
+SYNOPSIS
+    Don't use this module. It's just a compatibility wrapper for "lib::abs"
+
+    But if you want, see the docs for "lib::abs". Interface is the same
+
+BUGS
+    None known
+
+COPYRIGHT & LICENSE
+    Copyright 2007-2009 Mons Anderson.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+AUTHOR
+    Mons Anderson, <mons@cpan.org>
+

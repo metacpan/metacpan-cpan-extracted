@@ -1,0 +1,18 @@
+Changes
+lib/encoding/source.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+META.yml
+README
+t/01name.t
+t/02scoping.t
+t/9002.enc
+t/9103.enc
+t/9144.enc
+t/enc_data.t
+t/enc_eucjp.t
+t/encoding.t
+t/enc_utf8.t
+t/jperl.t
+META.json                                Module JSON meta-data (added by MakeMaker)

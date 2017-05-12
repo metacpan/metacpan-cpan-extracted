@@ -1,0 +1,24 @@
+
+  Known Bugs in ePerl
+  ===================
+
+  o  Under BSD/OS 2.1 and 3.0 there is no real support
+     for dynamic loading of objects. Perl does some tricks
+     to achieve it which ePerl should emulate but still
+     doesn't.
+
+  o  When using
+       - ePerl as a server-side scripting language
+       - running under Apache 1.2
+       - on a FreeBSD 2.1.5 system
+       - ** with SetUID root enabled **
+     then it hangs on any `cmd` or system("cmd") commands.
+
+     => Observation: When removing the SetUID bit on 
+                     nph-eperl all works fine.
+
+     THIS PROBLEM SEEMS TO BE RELATED TO THE SETUID BIT
+     IN CONJUNCTION WITH THE WAY THE PERL LIBRARY IMPLEMENTS
+     THE SHELL ENTRY. I was unable to find the bug inside
+     ePerl. Instead I think it is outside ePerl....
+

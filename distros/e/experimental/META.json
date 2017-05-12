@@ -1,0 +1,77 @@
+{
+   "abstract" : "Experimental features made easy",
+   "author" : [
+      "Leon Timmermans <leont@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.025, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "experimental",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.019"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "feature" : "0",
+            "perl" : "5.010",
+            "strict" : "0",
+            "version" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.89"
+         }
+      }
+   },
+   "provides" : {
+      "experimental" : {
+         "file" : "lib/experimental.pm",
+         "version" : "0.016"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-experimental at rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=experimental"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/Leont/experimental.git",
+         "web" : "https://github.com/Leont/experimental"
+      }
+   },
+   "version" : "0.016",
+   "x_contributors" : [
+      "Father Chrysostomos <sprout@cpan.org>",
+      "Grant McLean <grant@catalyst.net.nz>",
+      "gregor herrmann <gregoa@debian.org>",
+      "Karen Etheridge <ether@cpan.org>",
+      "Leon Timmermans <fawaka@gmail.com>",
+      "Ricardo Signes <rjbs@cpan.org>"
+   ]
+}
+

@@ -1,0 +1,111 @@
+Revision history for Perl module enum
+
+1.11 2015-10-27 NEILB
+    - Updated github repo URL after changing my github username
+
+1.10 2014-08-16 NEILB
+    - Added min perl version (5.006) to enum.pm
+    - Improved DESCRIPTION: reworded first paragraph to be a better summary,
+      fixed formatting, and one typo.
+
+1.09 2014-05-26 NEILB
+    - Added some more modules to the SEE ALSO section
+    - Various documentation improvements
+    - Added github repo to the pod
+
+1.08 2014-05-06 NEILB
+    - Changed how the constants are defined, to deal with a change in 5.19.3
+      "Closures of the form "sub () { $some_variable }" are no longer
+       inlined, causing changes to the variable to be ignored by callers of
+       the subroutine. [perl #79908]"
+      RT#95387 - thanks to Slaven Rezic.
+    - Changed use of \d to [0-9]
+
+1.07 2014-04-10 NEILB
+    - Playing with Devel::Cover, starting to improve coverage of testsuite
+    - Added testsuite for hex and octal index values, and _ in long numbers
+    - Added testsuite for bitmask wrap-around cases
+
+1.06 2014-01-25 NEILB
+    - Specified MIN_PERL_VERSION as 5.006 in Makefile.PL
+    - Changed the COPYRIGHT section to COPYRIGHT AND LICENSE
+      so Kwalitee / CPANTS would see it.
+    - Added 'warnings' to PREREQ_PM
+
+1.05 2013-09-06 NEILB
+    - I'd got two versions wrong when merging the history information
+      from the pod into Changes. As a result the previous release was
+      failing conformance with CPAN::Changes::Spec
+
+1.04 2013-09-05 NEILB
+    - Bumped version so I can release, now the offending CORBA-IDL
+      release has been deleted from CPAN.
+
+1.03 2013-09-02 NEILB
+    - Added links to enumeration modules in SEE ALSO section.
+    - Failed to index, due to clash with Enum module in CORBA-IDL
+
+1.02 2013-09-01 NEILB
+    - Added links to other modules and my review, in SEE ALSO
+    - Failed to index, due to clash with PAUSE permissions for Enum module
+
+1.016_01 2013-08-27 NEILB
+    - Neil Bowers (NEILB) has taken over maintenance from Byron (thanks Byron!)
+    - Reformatted this file (Changes) as per CPAN::Changes::Spec
+    - Some of the revision history was in this file, some was in the pod;
+      I think I've merged them correctly.
+    - Added licence and repository metadata to Makefile.PL
+
+1.016 1999-05-27 ZENIN
+    - Fixed bug that caused bitwise operators to treat enum types as strings
+      instead of numbers.
+    - Last release by ZENIN (Byron Brummer)
+
+1.015 1999-05-22 ZENIN
+    - Add support for negative values.
+    - Added stricter hex value checks.
+
+1.014 1999-05-13 15:58:18 ZENIN
+    - Added support for non-decimal numeric representations
+      ala 0x123, 0644, and 123_456.
+    - First version committed to CVS.
+    - Fixed bug in hex index code that broke on 0xA.
+
+1.013 1999-05-13 10:52:30 ZENIN
+    - Fixed auto-index bugs in new non-decimal numeric support.
+
+1.012 1999-05-13 10:00:45 ZENIN
+    - Added support for non-decimal numeric representations
+      ala 0x123, 0644, and 123_456.
+
+1.011 1998-07-18 ZENIN
+    - Added BITMASK and ENUM directives.
+    - Revamped documentation.
+
+1.010 1998-06-12 ZENIN
+    - Removed test code
+    - Released to CPAN
+
+1.009 1998-06-11 ZENIN
+    - Fixed -w warning when a null tag is used
+
+1.008 1998-06-11 ZENIN
+    - Fixed documentation bugs
+    - Moved A..Z case to last as it's not going to be used
+      as much as the other cases.
+
+1.007 1998-06-10 ZENIN
+    - Changed interface to match original design by Tom Phoenix
+      as implemented in an early version of enum.pm by Benjamin Holzman.
+    - Changed tag syntax to not require the 'PREFIX' string of Tom's
+      interface.
+    - Allow multiple prefix tags to be used at any point.
+    - Allowed index value changes from tags.
+
+1.006 1998-06-10 ZENIN
+    - Fixed superfulous -w warning
+
+1.004 1998-06-10 ZENIN
+    - Changed behaver to closer resemble C enum types
+    - Changed docs to match new behaver
+

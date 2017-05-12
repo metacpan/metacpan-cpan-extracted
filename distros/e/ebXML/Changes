@@ -1,0 +1,8 @@
+Revision history for Perl extension EbXML.
+
+0.01  Thu Nov 20 09:35:52 2003
+	- original version; created by h2xs 1.23 with options
+		-X ebXML
+0.02  Tue Dec 02 16:36:01 2003
+        - added Xerces and ebXML::Message support
+        - added working (?) process_header function

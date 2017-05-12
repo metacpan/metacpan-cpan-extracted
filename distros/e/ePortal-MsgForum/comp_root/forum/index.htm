@@ -1,0 +1,112 @@
+%#============================================================================
+%# ePortal - WEB Based daily organizer
+%# Author - S.Rusakov <rusakov_sa@users.sourceforge.net>
+%#
+%# Copyright (c) 2000-2003 Sergey Rusakov.  All rights reserved.
+%# This program is free software; you can redistribute it
+%# and/or modify it under the same terms as Perl itself.
+%#
+%#
+%#----------------------------------------------------------------------------
+<& /inset.mc, number => 1 &>
+<& navigator.mc &>
+
+<% $list->draw_list %>
+
+% if ($list->{rows_fetched} == 0) {
+	<% pick_lang(rus => q{
+		Администратор пока не создал ни одного дискуссионного форума, который был бы
+		вам доступен.
+	}, eng => q{
+		No forums available. Ask your administrator to create a public forum for you.
+	}) %>
+% }
+
+<& /inset.mc, number => 2 &>
+
+%#=== @METAGS onStartRequest ====================================================
+<%method onStartRequest><%perl>
+  $app = $ePortal->Application('MsgForum');
+  $obj = $app->Forums;
+
+	$list = new ePortal::HTML::List(
+        obj => $obj,
+				after_row => "forum_description",
+				edit_url => "forum_admin.htm");
+	$list->add_column_image( );
+	$list->add_column( id => "title",
+				title 	=> pick_lang(rus => "Название форума", eng => "Forum title"),
+				class 	=> "smallfont",
+        url     => 'topics.htm?page=1&forum_id=#id#');
+  $list->add_column( id => "last_message",
+       title   => pick_lang(rus => "Последнее сообщение", eng => "Last message"),
+       align   => "center",
+       class   => "smallfont",
+       );
+  $list->add_column( id => "topics",
+        title   => pick_lang(rus => "Тем", eng => "Topics"),
+        align   => "center",
+        );
+	$list->add_column( id => "messages",
+				title 	=> pick_lang(rus => "Сообщений", eng => "Messages"),
+				align		=> "center",
+				);
+  $list->add_column_method( id => 'icon_subscribe',
+        align => "center",
+        title   => pick_lang(rus => "Подписка", eng => "Subscr") );
+  $list->add_column_system(
+       objtype => 'ePortal::App::MsgForum::MsgForum',
+       delete  => $ePortal->isAdmin,
+       edit    => $ePortal->isAdmin);
+
+  my $location = $list->handle_request;
+  return $location if $location;
+
+  $obj->restore_where( $list->restore_parameters() );
+</%perl></%method>
+
+
+%#=== @METAGS forum_description ====================================================
+<%method forum_description><%perl>
+	my $list = $ARGS{list};
+	return if not $list->{obj}->memo;
+</%perl>
+	<span style="color:green; font-size:8pt">
+	<% $list->{obj}->memo %>
+	</span>
+</%method>
+
+
+%#=== @metags icon_subscribe ====================================================
+<%method icon_subscribe><%perl>
+  my $list = $ARGS{list};
+  my $obj = $list->{obj};
+</%perl>
+<% img( src => '/images/MsgForum/subscribe.gif',
+      href => href('subscribe.htm', forum_id => $obj->id),
+      title => pick_lang(rus => 'Подписаться для получения новостей форума',
+        eng => 'Subscribe to forum')
+        ) %>
+% if ($ePortal->isAdmin) {
+    <br>
+    <% plink( pick_lang(rus => "Подписчики", eng => "Subscribers"),
+        -href => href('subscribers.htm', forum_id => $obj->id)) %>
+% }
+</%method>
+
+
+
+
+%#=== @metags once =========================================================
+<%once>
+my ($list, $obj, $app, $search_object);
+</%once>
+
+
+
+%#=== @metags cleanup =========================================================
+<%cleanup>
+($list, $obj, $app, $search_object) = ();
+</%cleanup>
+
+

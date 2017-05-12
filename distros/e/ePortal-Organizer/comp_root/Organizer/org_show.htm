@@ -1,0 +1,94 @@
+%#============================================================================
+%# ePortal - WEB Based daily organizer
+%# Author - S.Rusakov <rusakov_sa@users.sourceforge.net>
+%#
+%# Copyright (c) 2000-2003 Sergey Rusakov.  All rights reserved.
+%# This program is free software; you can redistribute it
+%# and/or modify it under the same terms as Perl itself.
+%#
+%#
+%#----------------------------------------------------------------------------
+
+<& /inset.mc, number => 1 &>
+<p>
+<& /item_caption.mc, title => pick_lang(
+    rus => "Список доступных органайзеров",
+    eng => "List of available organizers") &>
+
+<% $list->draw_list %>
+
+<span class="app_description"><% pick_lang(rus => "
+Для каждого зарегистрированного пользователя автоматически создается свой
+личный Органайзер.
+<br>
+Администратор имеет возможность создать для Вас общий Органайзер, который смогут
+просматривать и другие пользователи сервера.
+", eng => "
+Every registered user get private Organizer created automaticaly.
+<br>
+Administrator may create a public Organizer for shared access.
+") %></span>
+
+<p>
+<& /inset.mc, number => 2 &>
+
+%#=== @metags onStartRequest ====================================================
+<%method onStartRequest>
+<& PARENT:onStartRequest, %ARGS &>
+<%perl>
+
+  my @orgs = $session{_app}->AvailableOrganizers();
+
+  if ( @orgs == 1 ) {  # Only one organizer available
+    return href('index.htm', org_id => $orgs[0]);
+
+  } elsif ( @orgs == 0 ) { # No organizers available
+    return "no_organizers.htm";
+  }
+
+  # list of all available organizers
+  $obj = new ePortal::App::Organizer::Organizer;
+
+  $list = new ePortal::HTML::List(obj => $obj, class => "smallfont",
+    edit_url => "org_edit.htm");
+  $list->add_column_image();
+  $list->add_column( id => "title",
+    title => pick_lang(rus => "Название", eng => "Title"),
+    url => "index.htm?org_id=#id#",
+    sorting => 1);
+  $list->add_column_yesno( id => "private",
+      sorting => 1,
+      title => pick_lang(rus => "Личный", eng => "Private"));
+  $list->add_column( id => "writable",
+      align => 'center',
+      title => pick_lang(rus => "Вид доступа", eng => "Access type"),
+      content => sub {
+        my $obj = shift;
+        $obj->xacl_check_update
+          ? pick_lang(rus => "запись", eng => "writable")
+          : pick_lang(rus => "чтение", eng => "read only")
+      });
+  $list->add_column_system(
+    objtype => 'ePortal::App::Organizer::Organizer',
+    edit => sub{ shift->xacl_check_update },
+    delete => sub{ shift->xacl_check_delete });
+
+  my $location = $list->handle_request;
+  return $location if $location;
+
+  my $where = 'id in (' . join(',', @orgs) . ')';
+  $obj->restore_where( $list->restore_parameters, where => $where);
+</%perl></%method>
+
+%#=== @metags once =========================================================
+<%once>
+my ($app, $list, $obj, $search_object);
+</%once>
+
+%#=== @metags cleanup =========================================================
+<%cleanup>
+($app, $list, $obj, $search_object) = ();
+</%cleanup>
+
+
+

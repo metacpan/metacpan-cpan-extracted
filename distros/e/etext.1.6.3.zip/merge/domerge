@@ -1,0 +1,23 @@
+#!/bin/sh 
+srcdir=..
+#oldorig=../../Tk-b11.02/pTk/mTk
+oldorig=../../Tk-b11.02/pTk
+neworig=../../Tk-4.1a0/pTk/mTk/generic
+files=`(cd $srcdir; ls *.[ch])`
+# echo $files
+
+rm -f Fixup 
+for f in $files
+ do 
+  if [ -f $oldorig/$f -a -f $neworig/$f ]
+   then 
+    cp $srcdir/$f .
+    chmod +w $f
+    if merge $f $oldorig/$f $neworig/$f
+     then echo "    $f is okay"
+     else 
+      echo ">>> $f needs fixing"
+      echo $f >> Fixup 
+    fi 
+  fi 
+ done

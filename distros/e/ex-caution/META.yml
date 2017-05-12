@@ -1,0 +1,13 @@
+--- #YAML:1.0
+name:                ex-caution
+version:             0.01
+abstract:            Perl pragma for enabling or disabling strictures and warnings simultaneously 
+license:             ~
+generated_by:        ExtUtils::MakeMaker version 6.36
+distribution_type:   module
+requires:     
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Yves Orton <demerphq@>

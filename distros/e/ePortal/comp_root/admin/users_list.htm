@@ -1,0 +1,75 @@
+%#============================================================================
+%# ePortal - WEB Based daily organizer
+%# Author - S.Rusakov <rusakov_sa@users.sourceforge.net>
+%#
+%# Copyright (c) 2000-2004 Sergey Rusakov.  All rights reserved.
+%# This program is open source software
+%#
+%#
+%#----------------------------------------------------------------------------
+
+<& /search_dialog.mc:dialog, align=> 'right', extra => 
+  img(src=>'/images/icons/memo.gif') . 
+  plink({rus => "Добавить пользователя", eng => "New user"}, href => href('users_edit.htm', objid=>0))
+ &>
+
+<% $list->draw_list %>
+
+%#=== @metags user_info ====================================================
+<%method user_info><%perl>
+	my $list = $ARGS{list};
+	my $obj = $list->{obj};
+</%perl>
+	<span class="smallfont">
+		<font COLOR="green">
+		<% plink(pick_lang(rus => "Членство в группах", eng => "Group membership"),
+				href => href("users_member.htm", objid => $obj->id)) %>
+		</font>
+		<br>
+		<font COLOR="#6CAFB3">
+		<% $obj->department %> <% $obj->title %>
+		</font>
+	</span>
+</%method>
+
+
+
+%#=== @metags onStartRequest ====================================================
+<%method onStartRequest><%perl>
+  $obj = new ePortal::epUser;
+
+  $list = new ePortal::HTML::List(obj => $obj,
+      edit_url => 'users_edit.htm',
+			class => "smallfont", after_row => "user_info" );
+	$list->add_column_image();
+  $list->add_column( id => "username", url => "users_edit.htm?objid=#id#", sorting => 1);
+  $list->add_column( id => "fullname", sorting => 1);
+  $list->add_column( id => "last_login", sorting => 1);
+  $list->add_column_yesno( id => 'enabled');
+  $list->add_column_system(delete  => 1);
+
+  my $location = $list->handle_request;
+  return $location if $location;
+
+  $m->comp('/search_dialog.mc:handle_request');
+  $list->{obj}->restore_where( $list->restore_parameters, text => $session{_text} );
+</%perl></%method>
+
+
+
+%#=== @METAGS attr =========================================================
+<%attr>
+Title => {rus => "Список пользователей ePortal", eng => "ePortal users"}
+</%attr>
+
+
+
+%#=== @metags once =========================================================
+<%once>
+my ($list, $obj);
+</%once>
+
+%#=== @metags cleanup =========================================================
+<%cleanup>
+($list, $obj) = ();
+</%cleanup>

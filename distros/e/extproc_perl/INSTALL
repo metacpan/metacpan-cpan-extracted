@@ -1,0 +1,25 @@
+$Id: INSTALL,v 1.6 2004/04/20 16:09:52 jeff Exp $
+
+PLEASE CONSULT YOUR DBA BEFORE INSTALLING THIS SOFTWARE!!!
+
+ 1) If you are using DBD::Oracle 1.14 or earlier, upgrade to 1.15.
+ 2) Set the ORACLE_HOME environment variable to the proper path.
+ 3) perl Makefile.PL -- follow the instructions
+ 4) make
+ 5) su root
+ 6) make install
+ 7) Configure the listener for external procedures (see the user's guide for
+    details or have a DBA configure this for you)
+ 8) Edit extproc_perl.conf in the installation directory and make any changes
+    you deem necessary.  The defaults should suffice for the first run though.
+    See the user's guide for more details on this file.
+ 9) Connect to your database with sqlplus.  Login with a user/schema that
+    you want to own the Perl package, tables, and views.
+10) Run ep_package.sql by typing @ep_package
+11) Run ep_schema.sql by typing @ep_schema
+12) Restrict delete, truncate, insert, and update privileges on the code table
+    as you (or your DBA) see fit.
+13) Grant select privilege on the code table to all users who will run Perl
+    procedures.  DO NOT assign roles for this privilege (including 'public'),
+    as roles will not be honored if you define a Perl procedure in a PL/SQL
+    package.

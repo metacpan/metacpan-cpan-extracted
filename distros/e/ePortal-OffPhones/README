@@ -1,0 +1,21 @@
+NAME
+    README - all about ePortal
+
+WHAT IS ePortal?
+    ePortal is a set of perl packages and HTML::Mason components to easy
+    implement intranet WEB site for a company. ePortal is writen with a help
+    of Apache, mod_perl, HTML::Mason. The current version of ePortal use
+    MySQL as database backend.
+
+    The ePortal server is distributed under the GPL license for
+    non-commercial use. Contact me if you want do business with ePortal or
+    some of it's part. Send me a postcard if you like it ;-) (Ask for
+    address by e-mail)
+
+    For complete documentation look at
+    http://eportal.sourceforge.net/eng_index.html or download ePortal-docs
+    package
+
+AUTHOR
+    Sergey Rusakov, <rusakov_sa@users.sourceforge.net>. Kemerovo, Russia.
+

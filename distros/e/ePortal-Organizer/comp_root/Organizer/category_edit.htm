@@ -1,0 +1,70 @@
+%#============================================================================
+%# ePortal - WEB Based daily organizer
+%# Author - S.Rusakov <rusakov_sa@users.sourceforge.net>
+%#
+%# Copyright (c) 2000-2003 Sergey Rusakov.  All rights reserved.
+%# This program is free software; you can redistribute it
+%# and/or modify it under the same terms as Perl itself.
+%#
+%#
+%#----------------------------------------------------------------------------
+<& /message.mc &>
+&nbsp;
+<% $dlg->dialog_start( title => pick_lang(rus => "Категория", eng => "Category") ) %>
+
+  <% $dlg->field('org_id', RO=> 1) %>
+  <% $dlg->field('title') %>
+
+<% $dlg->buttons %>
+<% $dlg->dialog_end %>
+<p>
+
+% if ($obj->check_id) { # existing object
+  <div align="center">
+    <% img(src => '/images/icons/warning.gif') %>
+    <% plink({rus => 'Удалить категорию и все данные, которые к ней относятся',
+          eng => 'Delete the category and all associated data'},
+          -href => href('category_delete.htm', org_id => $obj->org_id, objid => $obj->id)) %>
+    <% img(src => '/images/icons/warning.gif') %>
+  </div>
+  <p>
+% }
+
+%#=== @metags once =========================================================
+<%once>
+my ($dlg, $obj);
+</%once>
+
+
+%#=== @METAGS cleanup =========================================================
+<%cleanup>
+($dlg, $obj) = ();
+</%cleanup>
+
+%#=== @METAGS attr =========================================================
+<%attr>
+Title => {rus => "Категория", eng => "Category"}
+Layout => 'Dialog'
+</%attr>
+
+
+%#=== @METAGS onStartRequest ====================================================
+<%method onStartRequest>
+<& PARENT:onStartRequest, %ARGS &>
+<%perl>
+  $obj = new ePortal::App::Organizer::Category;
+  $obj->org_id($session{_org_id});
+
+  # Handle Dialog events
+  $dlg = new ePortal::HTML::Dialog( obj => $obj, width => 450);
+  my $location = try {
+    $dlg->handle_request( );
+  } catch ePortal::Exception::DataNotValid with {
+    my $E = shift;
+    $session{ErrorMessage} = $E->text;
+    '';
+  };
+  return $location if $location;
+
+</%perl></%method>
+

@@ -1,0 +1,174 @@
+%#============================================================================
+%# ePortal - WEB Based daily organizer
+%# Author - S.Rusakov <rusakov_sa@users.sourceforge.net>
+%#
+%# Copyright (c) 2000-2003 Sergey Rusakov.  All rights reserved.
+%# This program is free software; you can redistribute it
+%# and/or modify it under the same terms as Perl itself.
+%#
+%#
+%#----------------------------------------------------------------------------
+% $Calendar = new ePortal::HTML::Calendar;
+% $Calendar->url_all('self');
+% @date = $Calendar->date;
+
+<table width="100%" cellspacing=0 cellpadding=0>
+	<tr>
+		<td width="*">
+			<& SELF:draw_calendar &>
+		</td>
+		<td width="200" align="right">
+      <% $Calendar->draw %>
+			<& SELF:find_next_event &>
+			<br>
+			<& SELF:todo_dialog &>
+		</td>
+	</tr>
+</table>
+% undef $Calendar;
+
+%#=== @METAGS todo_dialog ====================================================
+<%method todo_dialog><%perl>
+  my %args = $m->request_args;
+  my $todo = new ePortal::App::Organizer::ToDo;
+  $todo->org_id($session{_org_id});
+	$dlg = new ePortal::HTML::Dialog();
+  my $location = try {
+    $dlg->handle_request(obj => $todo, objid => 0 );
+  } catch ePortal::Exception::DataNotValid with {
+    my $E = shift;
+    $session{ErrorMessage} = $E->text;
+    '';
+  };
+</%perl>
+		<% $dlg->dialog_start(
+      action => "todo_qadd.htm",
+			formname => "todo_qadd",
+			title => pick_lang(rus => "Мои дела", eng => "My tasks"),
+      title_url => href("todo_list.htm", org_id => $session{_org_id}),
+			title_popup => pick_lang(rus => "Открыть список дел", eng => "Show a list of TODO"),
+			x_button => 0,
+			) %>
+
+		<tr><td colspan=2>
+      <span class="smallfont"><%
+				pick_lang(rus => "Быстро добавить", eng => "Quick add") %>:</span><br>
+      <input type="text" name="title" size=30 class="dlgfield">
+      <input type="submit" name="dlgb_ok" value="+" align="right" class="button">
+      <% CGI::hidden({-name => 'org_id', -value => $session{_org_id} }) %>
+		</td></tr>
+
+% my $counter=1;
+% $todo->restore_where(org_id => $session{_org_id}, undone => 1);
+% while ($todo->restore_next) {
+%		my $bgcolor = $counter++ % 2 == 0? '#FFFFFF' : '#eeeeee';
+
+		<tr><td colspan=2 bgcolor="<% $bgcolor %>" class="smallfont">
+			<A href="<% href("todo_edit.htm", objid => $todo->id) %>" title="<% $todo->memo |h%>">
+			<% $todo->title %></a>
+      <% img( src => "/images/ePortal/ok.gif",
+					title => pick_lang(rus => "Пометить как выполненное", eng => "Mark as completed"),
+					href => href("todo_ok.htm", objid => $todo->id)) %>
+		</td></tr>
+% }
+
+		<% $dlg->dialog_end %>
+</%method>
+
+
+
+
+%#=== @metags draw_calendar ====================================================
+<%method draw_calendar>
+<table border=1 width="99%" cellspacing=0 cellpadding=0 class="g0">
+	<%perl>
+  my %args = $m->request_args;
+  my $events = new ePortal::App::Organizer::Calendar;
+	my $busy_slots = 0;
+	for my $h (8..19) {
+		my @m = qw/00 30 00/;
+		my @align = qw/left right/;
+		foreach my $t (0..1) {
+			my $d1 = sprintf "%04d.%02d.%02d %02d:%s", @date, $h, $m[$t];
+			my $d2 = sprintf "%04d.%02d.%02d %02d:%s", @date, $h+$t, $m[$t+1];
+			my $d1_sql = (($h == 8) and ($t == 0))
+				? sprintf "%04d.%02d.%02d %02d:%s", @date, 0, $m[$t]
+				: $d1;
+			my $d2_sql = (($h == 19) and ($t == 1))
+				? sprintf "%04d.%02d.%02d %02d:%s", @date, 23, 59
+				: $d2;
+	</%perl>
+			<tr>
+				<td width="10%" align="<% $align[$t] %>" valign="top" class="g2">
+          <a href="<% href("cal_edit.htm", objid => 0, dt=>$d1, org_id => $session{_org_id}) %>"
+            title="<% pick_lang(rus => "Назначить встречу на", eng => "Assign appointment at") %> <% $h %>:<% $m[$t] %>">
+					<% $h %>:<% $m[$t] %></a>
+				</td>
+<%perl>
+
+  $events->restore_where(where => "(datestart >= '$d1_sql' and datestart <'$d2_sql')", org_id => $session{_org_id});
+	my ($counter, $content);
+	while($events->restore_next) {
+		my $duration_slots = int($events->duration / 30);
+		$busy_slots = $busy_slots > $duration_slots ? $busy_slots : $duration_slots;
+		$content .= $counter++ ? "<br>": undef;
+		$content .= q{<a class="calendar"} .
+								q{ href="} . href("cal_edit.htm", objid => $events->id) . q{"} .
+								q{ title="} . $events->memo . "\n" . $events->duration . pick_lang(rus=>" мин", eng => " min") . q{">};
+		$content .= $events->title . "</a>";
+		$content .= icon_delete( $events );
+ }
+ $content .= "&nbsp;";
+</%perl>
+				<td width="100%" valign="top" class="<% $busy_slots-- >0? "g3" : "g0" %>">
+					<% $content %>
+				</td>
+			</tr>
+% }}
+				</table>
+</%method>
+
+
+
+%#=== @METAGS find_next_event ====================================================
+<%method find_next_event><%perl>
+  my %args = $m->request_args;
+  my $c = new ePortal::App::Organizer::Calendar;
+  my $next_day = $c->find_next_day_event($session{_org_id}, \@date);
+  my $prev_day = $c->find_prev_day_event($session{_org_id}, \@date);
+
+</%perl>
+<center>
+% if ($prev_day) {
+  <% plink("<<<", -href => $Calendar->self_url(cal_date => $prev_day),
+			title => pick_lang(rus => "Предыдущий день с событием", eng => "Previous day with an event")) %>
+% }
+% if ($prev_day and $next_day) {
+	&nbsp;&middot;&nbsp;&middot;&nbsp;&middot;&nbsp;
+% }
+% if ($next_day) {
+  <% plink(">>>", -href => $Calendar->self_url(cal_date => $next_day),
+			title => pick_lang(rus => "Следующий день с событием", eng => "Next day with an event")) %>
+% }
+</center>
+</%method>
+
+
+%#=== @metags once =========================================================
+<%once>
+my ($dlg, $obj);
+my @date;
+my $Calendar;
+</%once>
+
+%#=== @metags cleanup =========================================================
+<%cleanup>
+($dlg, $obj, @date, $Calendar) = ();
+</%cleanup>
+
+
+%#=== @METAGS Title ====================================================
+<%method Title><%perl>
+  my $c = new ePortal::HTML::Calendar;
+	return pick_lang(rus => "Ежедневник: ", eng => "Daily: ") . sprintf("%02d.%02d.%04d г.", reverse $c->date);
+</%perl></%method>

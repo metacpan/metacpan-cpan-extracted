@@ -1,0 +1,6 @@
+MANIFEST	This file
+README		The readme file for this module
+Changes		File listing changes for this module
+Makefile.pl	File for create the 'makefile' for this module
+test.pl		Test file for this module
+expr_eval.pm	File for expression evaluator module

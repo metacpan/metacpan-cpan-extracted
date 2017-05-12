@@ -1,0 +1,40 @@
+%#============================================================================
+%# ePortal - WEB Based daily organizer
+%# Author - S.Rusakov <rusakov_sa@users.sourceforge.net>
+%#
+%# Copyright (c) 2000-2004 Sergey Rusakov.  All rights reserved.
+%# This program is open source software
+%#
+%#
+%#----------------------------------------------------------------------------
+
+<& /dir.mc,
+    include => [qw/\.html$/],
+    exclude => [qw/CVS ^pod_ ^mc_ ^thep_ ^html_ ^app_ ^dual_/],
+    nobackurl => 1,
+    title => 'ePortal modules',
+    columns => [qw/icon description name size /],
+    description => sub{ ePortal::Utils::filter_html_title(@_) } &>
+
+<& /dir.mc,
+    include => [qw/html_.* mc_.*/],
+    exclude => ['CVS'],
+    nobackurl => 1,
+    title => 'HTML support modules and Mason Components',
+    columns => [qw/icon description name size /],
+    description => sub{ ePortal::Utils::filter_html_title(@_) } &>
+
+<& /dir.mc,
+    include => [qw/thep_.*/],
+    exclude => ['CVS'],
+    nobackurl => 1,
+    title => 'ThePersistent storage modules',
+    columns => [qw/icon description name size /],
+    description => sub{ ePortal::Utils::filter_html_title(@_) } &>
+
+
+
+%#=== @METAGS attr =========================================================
+<%attr>
+Title => { rus => "Руководство программиста", eng => "Programmer's manual" }
+</%attr>

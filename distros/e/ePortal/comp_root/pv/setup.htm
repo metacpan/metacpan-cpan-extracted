@@ -1,0 +1,84 @@
+%#============================================================================
+%# ePortal - WEB Based daily organizer
+%# Author - S.Rusakov <rusakov_sa@users.sourceforge.net>
+%#
+%# Copyright (c) 2000-2004 Sergey Rusakov.  All rights reserved.
+%# This program is open source software
+%#
+%#
+%#----------------------------------------------------------------------------
+<p>
+<&| /dialog.mc:edit_dialog, 
+          title => pick_lang(rus => "Настройка секции", eng => "Section setup"),
+          obj => $obj,    focus => '',    width => 500 &>
+
+%#<& /dialog.mc:read_only, id => 'component' &>
+
+% if (ref($comp) and $comp->method_exists('setup_dialog')) {
+  <% $comp->call_method('setup_dialog', setupinfo => $obj->setupinfo_hash) %>
+% } else {
+  <&| /dialog.mc:cell &>
+    <& /message.mc, ErrorMessage => pick_lang(
+      rus => "Секция ".$obj->title." не имеет настройки",
+      eng => "The section ".$obj->title." does not support setup") &>
+  </&>
+% }
+
+  <& /dialog.mc:buttons &>
+</&>
+<p>
+
+
+
+%#=== @METAGS ControlBar ====================================================
+<%def .ControlBar>
+	<table width="100%" border=0 bgcolor="#EEEEEE">
+		<tr><td align="right">
+			<% plink({rus => "Назад, на главную страницу", eng => "Back to home"}, -href => "/index.htm") %>
+		</td></tr>
+	</table>
+</%def>
+
+%#=== @METAGS onStartRequest ====================================================
+<%method onStartRequest><%perl>
+  $obj = new ePortal::UserSection;
+  $obj->restore_or_throw($ARGS{objid});
+  $comp = $m->fetch_comp('/pv/sections/' . $obj->component);
+
+  try {
+    if ( $m->comp('/dialog.mc:isButtonPressed', button => 'ok') ) {
+      my $hash = $obj->setupinfo_hash;
+      $comp->call_method('setup_save', args => \%ARGS, setupinfo => $hash);
+
+      # Save setupinfo hash to object
+      $obj->setupinfo_hash($hash);
+
+      if ( ref($comp) and $comp->method_exists('setup_validate') ) {
+        $comp->call_method('setup_validate', $obj => $obj, setupinfo => $hash);
+      }
+
+      $obj->update;
+
+      throw ePortal::Exception::Abort( -text => $m->comp('/dialog.mc:back_url'));
+    } elsif ( $m->comp('/dialog.mc:isButtonPressed', button => 'cancel') ) {
+      throw ePortal::Exception::Abort( -text => $m->comp('/dialog.mc:back_url'));
+    }
+
+  } catch ePortal::Exception::DataNotValid with {
+    my $E = shift;
+    $session{ErrorMessage} = $E->text;
+  };
+</%perl></%method>
+
+
+%#=== @metags once =========================================================
+<%once>
+my ($obj, $comp);
+</%once>
+
+%#=== @metags cleanup =========================================================
+<%cleanup>
+($obj, $comp) = ();
+</%cleanup>
+
+

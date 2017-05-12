@@ -1,0 +1,105 @@
+%#============================================================================
+%# ePortal - WEB Based daily organizer
+%# Author - S.Rusakov <rusakov_sa@users.sourceforge.net>
+%#
+%# Copyright (c) 2000-2003 Sergey Rusakov.  All rights reserved.
+%# This program is free software; you can redistribute it
+%# and/or modify it under the same terms as Perl itself.
+%#
+%#
+%#----------------------------------------------------------------------------
+<%perl>  
+  $app = $ePortal->Application('SquidAcnt');
+  throw ePortal::Exception::ACL( -operation => 'read', -object => $app)
+    unless $app->xacl_check_read;
+
+
+  $obj = $app->SAuser_extended;
+
+  $m->comp('/search_dialog.mc:handle_request');
+
+  # search parameters
+  my (@where, @bind);
+  if ( $session{_text} ne '' ) {
+    my $b = '%' . $session{_text} . '%';
+    push @where, "(u.title like ? OR login_name like ? or address like ?)";
+    push @bind, $b, $b, $b;
+  }
+</%perl>
+
+<& /search_dialog.mc:dialog, align => 'right', extra => $m->scomp('SELF:intro') &>
+
+<&| /list.mc, obj => $obj, rows => 10, restore_where => {where => \@where, bind => \@bind} &>
+ <&| /list.mc:row &>
+  <& /list.mc:column_image &> 
+  <& /list.mc:column, id=> 'title', 
+      order_by => 'u.title',
+      url => href('user_edit.htm', objid=> $_->id) &>
+  <& /list.mc:column, id=> 'group_title', order_by => 'group_title' &>
+  <& /list.mc:column, id=> 'address', order_by => 'address', -align=>'center' &>
+  <&| /list.mc:column, id=> 'day', order_by => 'daily_traf', -align=>'center',
+      title => pick_lang(rus => "День", eng => "Day") . '<br>' . CGI::font({-color=>'brown'}, 'limit'),
+      -align=>'center' &>
+        <% CGI::font({-color=>'brown'}, $app->NiceFormat($_->daily_limit)) %>
+        <br>
+        <% CGI::font({-color=>'green'}, $app->NiceFormat($_->daily_traf)) %>
+  </&>  
+  <&| /list.mc:column, id=> 'week', order_by => 'weekly_traf', -align=>'center',
+      title => pick_lang(rus => "Неделя", eng => "Week")  . '<br>' . CGI::font({-color=>'green'}, 'fact'),,
+      -align=>'center' &>
+        <% CGI::font({-color=>'brown'}, $app->NiceFormat($_->weekly_limit)) %>
+        <br>
+        <% CGI::font({-color=>'green'}, $app->NiceFormat($_->weekly_traf)) %>
+  </&>  
+  <&| /list.mc:column, id=> 'month', order_by => 'weekly_traf', -align=>'center',
+      title => pick_lang(rus => "Месяц", eng => "Month"),
+      -align=>'center' &>
+        <% CGI::font({-color=>'brown'}, $app->NiceFormat($_->mon_limit)) %>
+        <br>
+        <% CGI::font({-color=>'green'}, $app->NiceFormat($_->mon_traf)) %>
+  </&>  
+% if ( $app->xacl_check_update ) {
+  <& /list.mc:column_delete &>
+% }
+
+% if ($_->Blocked) {
+    <&| /list.mc:extra_row &>
+      <% CGI::font({-color=>"red"}, pick_lang(rus => "Пользователь блокирован", eng => "The user is blocked")) %>
+    </&>
+% }
+
+% if ($_->end_date) {
+    <&| /list.mc:extra_row &>
+      <% CGI::font({ -color=> $_->account_expired ? 'red' : 'green'}, 
+        pick_lang(rus => "Срок действия пользователя: ", eng => "Account expired on: ") . $_->end_date) %>
+    </&>
+% }
+ 
+ </&> <!-- end of row -->
+</&> <!-- end of list -->
+
+
+
+
+
+%#=== @metags once =========================================================
+<%once>
+my ($list, $obj, $app);
+</%once>
+
+%#=== @metags cleanup =========================================================
+<%cleanup>
+($list, $obj, $app ) = ();
+</%cleanup>
+
+
+%#=== @METAGS intro ====================================================
+<%method intro>
+% if ($ePortal->Application('SquidAcnt')->xacl_check_update) {
+  <ul>
+  <li><a href="<% href('user_edit.htm', objid => 0) %>"><% img(src=>'/images/icons/memo.gif') %>&nbsp;<%
+      pick_lang(rus => "Новый пользователь", eng => "New user") %></a>
+  </ul>
+% }
+</%method>
+

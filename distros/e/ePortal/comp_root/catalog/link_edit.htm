@@ -1,0 +1,88 @@
+%#============================================================================
+%# ePortal - WEB Based daily organizer
+%# Author - S.Rusakov <rusakov_sa@users.sourceforge.net>
+%#
+%# Copyright (c) 2000-2004 Sergey Rusakov.  All rights reserved.
+%# This program is open source software
+%#
+%#
+%#----------------------------------------------------------------------------
+
+&nbsp;
+<&| /dialog.mc:edit_dialog,
+      title => pick_lang(rus => "–есурс каталога", eng => "Catalogue resource"),
+      width => 550,
+      obj => $obj,
+      focus => 'title' &>
+
+  <& /dialog.mc:read_only, id => 'recordtype' &>
+  <&| /dialog.mc:cell &>
+    <hr>
+  </&>
+  <& /dialog.mc:field, id => 'parent_id' &>
+  <& /dialog.mc:field, id => 'title' &>
+  <& /dialog.mc:field, id => 'nickname' &>
+  <& /dialog.mc:field, id => 'priority' &>
+  <&| /dialog.mc:cell &>
+    <hr>
+  </&>
+  <& /dialog.mc:field, id => 'url' &>
+  <& /dialog.mc:field, id => 'memo' &>
+
+% if ($obj->xacl_check_admin) {
+  <&| /dialog.mc:cell &>
+    <hr>
+  </&>
+  <& /dialog.mc:read_only, id => 'uid' &>
+  <& /dialog.mc:field, id => 'xacl_read' &>
+  <& /dialog.mc:field, id => 'xacl_write' &>
+  <& /dialog.mc:field, id => 'xacl_admin' &>
+% }
+
+  <& /dialog.mc:buttons &>
+
+  <&| /dialog.mc:cell &>
+    <hr>
+  </&>
+  <& /dialog.mc:read_only, id => 'ts' &>
+  <& /dialog.mc:read_only, id => 'clicks' &>
+  <& /dialog.mc:read_only, id => 'hits' &>
+
+</&>
+
+<p>
+
+
+%#=== @METAGS attr =========================================================
+<%attr>
+Title => {rus => "—сылка на ресурс", eng => "Link to resource"}
+</%attr>
+
+
+%#=== @METAGS onStartRequest ====================================================
+<%method onStartRequest><%perl>
+  $obj = new ePortal::Catalog;
+
+  $m->comp('/dialog.mc:handle_request', obj => $obj);
+
+  #initialize ACL
+  if ( ! $obj->check_id ) {  # new object
+    my $parent = $obj->parent;
+    $obj->set_acl_from_obj($parent) if $parent;
+  }
+
+</%perl></%method>
+
+
+
+
+%#=== @metags once =========================================================
+<%once>
+my ($dlg, $obj, $att);
+</%once>
+
+%#=== @metags cleanup =========================================================
+<%cleanup>
+($dlg, $obj, $att) = ();
+</%cleanup>
+

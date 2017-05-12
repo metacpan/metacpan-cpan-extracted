@@ -1,0 +1,235 @@
+%#============================================================================
+%# ePortal - WEB Based daily organizer
+%# Author - S.Rusakov <rusakov_sa@users.sourceforge.net>
+%#
+%# Copyright (c) 2000-2003 Sergey Rusakov.  All rights reserved.
+%# This program is free software; you can redistribute it
+%# and/or modify it under the same terms as Perl itself.
+%#
+%#
+%#----------------------------------------------------------------------------
+%#
+%# Compose new message in a forum
+%#----------------------------------------------------------------------------
+<p>
+<% $dlg->dialog_start(
+    width => 500,
+    title => $prev_message
+      ? pick_lang(rus => "Ответ на сообщение", eng => "Reply to message")
+      : pick_lang(rus => "Новое сообщение", eng => "New message")) %>
+
+<% $dlg->field("forum_id", RO => 1) %>
+<% $dlg->field("prev_id", hidden => 1) %>
+
+% if (! $ARGS{prev_id}) {
+ <% $dlg->field("title") %>
+
+% if ($forum->titleurl ) {
+	<% $dlg->field('titleurl') %>
+% }
+
+%} else {
+  <% $dlg->field("title", RO => 1) %>
+
+% }
+
+<% $dlg->row(pick_lang({rus => 'Иконка', eng => 'Icon'}),
+      $m->scomp('compose.htm:icons', obj => $message)) %>
+<% $dlg->row('<hr>') %>
+
+<% $dlg->field("body", vertical => 1) %>
+<% $dlg->row($m->scomp('compose.htm:smiles')) %>
+% if ($forum->xacl_check('xacl_attach')) {
+  <% $dlg->row('<hr>') %>
+  <% $dlg->field("upload_file") %>
+% }
+<% $dlg->row('<hr>') %>
+<% $dlg->buttons %>
+<% $dlg->dialog_end %>
+<p>
+
+<& SELF:javascript &>
+<& /inset.mc &>
+
+<hr width="70%">
+<center>
+<h2><% pick_lang(
+  rus => 'Правила написания сообщений',
+  eng => 'Some guidlines of message writing') %></h2>
+</center>
+
+<blockquote>
+<ul>
+<li><% pick_lang(
+    rus => 'Будьте кратки, ясно излагайте свои мысли',
+    eng => 'Be short and clear') %>
+<li><% pick_lang(
+    rus => 'Не злоупотребляйте спец. значками, используйте их только при необходимости',
+    eng => 'Do not use too many icons') %>
+</ul>
+
+<table width="50%" align="center" border=0>
+<tr>
+  <th colspan=2><% pick_lang(rus => 'Фозможности форматирования текста', eng => 'Formatting the text') %></th>
+</tr>
+
+<tr>
+  <td>[b]bold жирный[/b]</td>
+  <td><b>bold жирный</b></td>
+</tr>
+<tr>
+  <td>[i]italic наклонный[/i]</td>
+  <td><i>italic наклонный</i></td>
+</tr>
+<tr>
+  <td>[u]underline подчерк[/u]</td>
+  <td><u>underline подчерк</u></td>
+</tr>
+
+% if ($ePortal->isAdmin) {
+<tr>
+  <td>[a href="..."]href ссылка[/a]</td>
+  <td><a href="#">href ссылка</a></td>
+</tr>
+<tr>
+  <td>[img src="..."]</td>
+  <td><% pick_lang(rus => "вставка картинки", eng =>"insert an image") %></td>
+</tr>
+<tr>
+  <td>[font color="red"]red font[/font]</td>
+  <td><font color="red">red font</font></td>
+</tr>
+<tr>
+  <td>[span style="color:green;"]green font[/span]</td>
+  <td><span style="color:green;">green font</span></td>
+</tr>
+
+% foreach my $sm (@ePortal::App::MsgForum::Smiles2) {
+<tr>
+  <td>:<% $sm %>:</td>
+  <td><img src="/images/MsgForum/smiles/<% $sm %>.gif" onClick="msmile('<% $sm %>');"></td>
+</tr>
+% }}
+</table>
+</blockquote>
+
+
+%#=== @METAGS onStartRequest ====================================================
+<%method onStartRequest><%perl>
+  $message = new ePortal::App::MsgForum::MsgItem;
+  if ( $ARGS{msgid} ) {
+    if ( !$message->restore($ARGS{msgid}) ) { return "message_not_found.htm"; }
+  }
+  if ( $ARGS{forum_id} ) {
+    $message->forum_id( $ARGS{forum_id});
+  }
+  if ( $ARGS{prev_id} ) {
+    $message->prev_id( $ARGS{prev_id});
+  }
+  if ( $ARGS{reply_to} ) {
+    $prev_message = new ePortal::App::MsgForum::MsgItem;
+    if ( !$prev_message->restore($ARGS{reply_to}) ) { return "message_not_found.htm"; }
+    $message->forum_id( $prev_message->forum_id );
+    if ( $ePortal->isAdmin ) {
+      $message->Body( $prev_message->ReplyTo );
+    }
+    $message->Title( $prev_message->Title );
+  }
+
+  $dlg = new ePortal::HTML::Dialog( obj => $message, multipart_form => 1 );
+
+  my $location = try {
+    $dlg->handle_request( );
+  } catch ePortal::Exception::DataNotValid with {
+    my $E = shift;
+    $session{ErrorMessage} = $E->text;
+    '';
+  };
+  return $location if $location;
+
+  $forum = new ePortal::App::MsgForum::MsgForum;
+  if ( !$forum->restore($message->forum_id)) { return "forum_not_found.htm"; }
+  if ( !$prev_message and !$forum->xacl_check('xacl_post') ) { return "no_rights.htm"; }
+  if ( $prev_message  and !$forum->xacl_check('xacl_reply') ) { return "no_rights.htm"; }
+
+</%perl></%method>
+
+
+%#=== @metags once =========================================================
+<%once>
+my ($dlg, $obj);
+my $forum;
+my ($message, $prev_message);
+</%once>
+
+%#=== @metags cleanup =========================================================
+<%cleanup>
+($dlg, $obj) = ();
+($message, $prev_message) = ();
+undef $forum;
+</%cleanup>
+
+
+
+%#=== @METAGS attr =========================================================
+<%attr>
+Title => {rus => "Новое сообщение", eng => "New message"}
+Layout => 'Dialog'
+</%attr>
+
+
+
+%#=== @METAGS icons ====================================================
+<%method icons>
+% my $obj = $ARGS{obj};
+ <input type="radio" name="picture" value=""<% $obj->Picture? undef: ' checked' %>>
+ <% pick_lang(rus=>'нет', eng =>'no') %>&nbsp;
+
+% foreach my $opt (1..4, 'br', 5..8) {
+% if ($opt eq 'br') {
+ <br>
+% next; }
+
+ <input type="radio" name="picture" value="<% $opt %>"<% $obj->Picture == $opt? ' checked': undef %>>
+ <% img(src => "/images/MsgForum/msg/$opt.gif") %>
+ &nbsp;
+% }
+</%method>
+
+
+
+
+%#=== @metags smiles ====================================================
+<%method smiles>
+<span class="memo">
+<% pick_lang(
+    rus => "Для вставки рисунка щелкните на нем мышкой",
+    eng => "Click a mouse on icon to insert it") %>
+<br>
+
+% foreach (@ePortal::App::MsgForum::Smiles) {
+<img src="/images/MsgForum/smiles/<% $_ %>.gif" onClick="msmile('<% $_ %>');">
+% }
+<%perl>
+
+</%perl></%method>
+
+
+
+
+
+%#=== @METAGS javascript ====================================================
+<%method javascript>
+<script language="JavaScript"><!--
+var number_of_smiles = 0;
+function msmile( sm ) {
+ if ( ++ number_of_smiles > 3) {
+  alert("Не надо злоупотреблять картинками ...");
+  return;
+ }
+ document.dialog.body.value += ':' + sm + ':';
+ document.dialog.body.focus();
+}  // msmile
+-->
+</script>
+</%method>

@@ -1,0 +1,268 @@
+--- eperl-2.2.5.orig/Makefile.in
++++ eperl-2.2.5/Makefile.in
+@@ -43,10 +43,10 @@
+ 
+ #   installation paths
+ prefix          = @prefix@
+-exec_prefix     = @exec_prefix@
+-bindir          = @bindir@
+-libdir          = @libdir@
+-mandir          = @mandir@
++exec_prefix     = ${prefix}
++bindir          = ${prefix}/@bindir@
++libdir          = ${prefix}/@libdir@
++mandir          = ${prefix}/@mandir@
+ 
+ 
+ # ------------------------------------------------
+--- eperl-2.2.5.orig/configure
++++ eperl-2.2.5/configure
+@@ -1745,45 +1745,39 @@
+ EOF
+ 
+ fi
+-bindir="$exec_prefix/bin"
++bindir="bin"
+   if test .$ac_with_uvar = .yes; then
+-    echo 'bindir="$exec_prefix/bin"' >>$ac_uvar_editfile
++    echo 'bindir="bin"' >>$ac_uvar_editfile
+ 
+ fi
+ 
+-libdir="$exec_prefix/lib"
++libdir="lib"
+   if test .$ac_with_uvar = .yes; then
+-    echo 'libdir="$exec_prefix/lib"' >>$ac_uvar_editfile
++    echo 'libdir="lib"' >>$ac_uvar_editfile
+ 
+ fi
+ 
+-datadir="$prefix/var"
++datadir="var"
+   if test .$ac_with_uvar = .yes; then
+-    echo 'datadir="$prefix/var"' >>$ac_uvar_editfile
++    echo 'datadir="var"' >>$ac_uvar_editfile
+ 
+ fi
+ 
+-statdir="$prefix/lib"
++statdir="lib"
+   if test .$ac_with_uvar = .yes; then
+-    echo 'statdir="$prefix/lib"' >>$ac_uvar_editfile
++    echo 'statdir="lib"' >>$ac_uvar_editfile
+ 
+ fi
+ 
+-includedir="$prefix/include"
++includedir="include"
+   if test .$ac_with_uvar = .yes; then
+-    echo 'includedir="$prefix/include"' >>$ac_uvar_editfile
++    echo 'includedir="include"' >>$ac_uvar_editfile
+ 
+ fi
+ 
+-oldincludedir="/usr/include"
++mandir="man/man1"
+   if test .$ac_with_uvar = .yes; then
+-    echo 'oldincludedir="/usr/include"' >>$ac_uvar_editfile
+-
+-fi
+-
+-mandir="$prefix/man/man1"
+-  if test .$ac_with_uvar = .yes; then
+-    echo 'mandir="$prefix/man/man1"' >>$ac_uvar_editfile
++    echo 'mandir="man/man1"' >>$ac_uvar_editfile
+ 
+ fi
+ 
+@@ -1859,7 +1853,7 @@
+ eval libdir=$libdir
+ case $libdir in
+     *eperl* ) ;;
+-          * ) libdir="${exec_prefix}/lib/eperl" ;;
++          * ) libdir="lib/eperl" ;;
+ esac
+ 
+ 
+--- eperl-2.2.5.orig/configure.in
++++ eperl-2.2.5/configure.in
+@@ -249,21 +249,20 @@
+ #                 compliant to the GNU standards.
+ #
+ ])dnl
+-AC_UVAR_SET(bindir,        $exec_prefix/bin)
+-AC_UVAR_SET(libdir,        $exec_prefix/lib)
+-AC_UVAR_SET(datadir,       $prefix/var)
+-AC_UVAR_SET(statdir,       $prefix/lib)
+-AC_UVAR_SET(includedir,    $prefix/include)
+-AC_UVAR_SET(oldincludedir, /usr/include)
+-AC_UVAR_SET(mandir,        $prefix/man/man1)
+-dnl AC_UVAR_SET(man1dir,       $prefix/man/man1)
+-dnl AC_UVAR_SET(man2dir,       $prefix/man/man2)
+-dnl AC_UVAR_SET(man3dir,       $prefix/man/man3)
+-dnl AC_UVAR_SET(man4dir,       $prefix/man/man4)
+-dnl AC_UVAR_SET(man5dir,       $prefix/man/man5)
+-dnl AC_UVAR_SET(man6dir,       $prefix/man/man6)
+-dnl AC_UVAR_SET(man7dir,       $prefix/man/man7)
+-dnl AC_UVAR_SET(man8dir,       $prefix/man/man8)
++AC_UVAR_SET(bindir,        bin)
++AC_UVAR_SET(libdir,        lib)
++AC_UVAR_SET(datadir,       var)
++AC_UVAR_SET(statdir,       lib)
++AC_UVAR_SET(includedir,    include)
++AC_UVAR_SET(mandir,        man/man1)
++dnl AC_UVAR_SET(man1dir,       $mandir/man1)
++dnl AC_UVAR_SET(man2dir,       $mandir/man2)
++dnl AC_UVAR_SET(man3dir,       $mandir/man3)
++dnl AC_UVAR_SET(man4dir,       $mandir/man4)
++dnl AC_UVAR_SET(man5dir,       $mandir/man5)
++dnl AC_UVAR_SET(man6dir,       $mandir/man6)
++dnl AC_UVAR_SET(man7dir,       $mandir/man7)
++dnl AC_UVAR_SET(man8dir,       $mandir/man8)
+ AC_UVAR_SET(manext,        .1)
+ dnl AC_UVAR_SET(man1ext,       .1)
+ dnl AC_UVAR_SET(man2ext,       .2)
+@@ -293,7 +292,7 @@
+ eval libdir=$libdir
+ case $libdir in
+     *eperl* ) ;;
+-          * ) libdir="${exec_prefix}/lib/eperl" ;;
++          * ) libdir="lib/eperl" ;;
+ esac
+ 
+ 
+--- eperl-2.2.5.orig/debian/rules
++++ eperl-2.2.5/debian/rules
+@@ -0,0 +1,87 @@
++#!/usr/bin/make -f
++# Sample debian.rules file - for GNU Hello (1.3).
++# Copyright 1994,1995 by Ian Jackson.
++# I hereby give you perpetual unlimited permission to copy,
++# modify and relicense this file, provided that you do not remove
++# my name from the file itself.  (I assert my moral right of
++# paternity under the Copyright, Designs and Patents Act 1988.)
++# This file may have to be extensively modified
++
++# There used to be `source' and `diff' targets in this file, and many
++# packages also had `changes' and `dist' targets.  These functions
++# have been taken over by dpkg-source, dpkg-genchanges and
++# dpkg-buildpackage in a package-independent way, and so these targets
++# are obsolete.
++
++package=eperl
++r=$(shell pwd)/debian/tmp
++
++build:
++	$(checkdir)
++	./configure --prefix=/usr --exec-prefix=/usr
++	$(MAKE)
++	touch build
++
++clean:
++	$(checkdir)
++	-rm -f build
++	-$(MAKE) -i distclean || $(MAKE) -f Makefile.in distclean
++	-rm -rf *~ $(r) debian/*~ debian/files*
++
++binary-indep:	checkroot build
++	$(checkdir)
++# There are no architecture-independent files to be uploaded
++# generated by this package.  If there were any they would be
++# made here.
++
++binary-arch:	checkroot build
++	$(checkdir)
++	-rm -rf $(r)
++	install -d $(r)/DEBIAN
++	install -d $(r)/usr/doc/$(package)/examples
++	install -d $(r)/usr/doc/examples
++	ln -sf ../$(package)/examples $(r)/usr/doc/examples/$(package)
++	$(MAKE) prefix=$(r)/usr exec_prefix=/usr install
++	#
++	cp debian/copyright $(r)/usr/doc/$(package)/.
++	cp debian/changelog $(r)/usr/doc/$(package)/changelog.Debian
++	cp ChangeLog $(r)/usr/doc/$(package)/changelog
++	gzip -9v $(r)/usr/doc/$(package)/changelog{,.Debian}
++	#
++	cp COPYING $(r)/usr/doc/$(package)/copyright
++	( cd  eg\
++	&& for p in *; do\
++		test -f $$p \
++		&& gzip -v9 <$$p >$(r)/usr/doc/$(package)/examples/$$p.gz;\
++	done; true )
++	p="ANNOUNCE ANNOUNCE.ADDR ARTISTIC COPYING INSTALL INSTALL.APACHE \
++	INSTALL.NSAPI KNOWN.BUGS NEWS PORTING README VERSIONS";\
++	for f in $$p; do gzip -v <$$f >$(r)/usr/doc/$(package)/$$f.gz; done
++	-rm -rf $(r)/usr/man/cat*
++	-rm -rf $(r)/usr/lib/$(package)
++	p=`find $(r)/usr/man -type f -name '*.?'`;\
++		test "$$p" && echo "$$p" | xargs gzip -v9
++	p=`find $(r) -type f|xargs file|grep ELF.*executable|cut -f1 -d:`;\
++		test "$$p" && dpkg-shlibdeps $$p
++	dpkg-gencontrol -P$(r)
++	chown -R root.root $(r)
++	chmod -R g-ws $(r)
++	dpkg --build $(r) ..
++
++define checkdir
++	test -x debian/rules
++	test -f eperl.1
++endef
++
++# Below here is fairly generic really
++
++binary:		binary-indep binary-arch
++
++source diff:
++	@echo >&2 'source and diff are obsolete - use dpkg-source -b'; false
++
++checkroot:
++	$(checkdir)
++	test root = "`whoami`"
++
++.PHONY: binary binary-arch binary-indep clean checkroot
+--- eperl-2.2.5.orig/debian/changelog
++++ eperl-2.2.5/debian/changelog
+@@ -0,0 +1,5 @@
++eperl (2.2.5-1) unstable; urgency=low
++
++  * initial release
++
++ -- Heiko Schlittermann <heiko@lotte.sax.de>  Sat, 6 Sep 1997 11:14:58 +0200
+--- eperl-2.2.5.orig/debian/control
++++ eperl-2.2.5/debian/control
+@@ -0,0 +1,15 @@
++Source: eperl
++Section: dev
++Priority: optional
++Maintainer: Heiko Schlittermann <heiko@lotte.sax.de>
++Standards-Version: 2.1.1.0
++
++Package: eperl
++Architecture: any
++Depends: ${shlibs:Depends}, perl
++Description: ePerl interprets an ASCII file bristled with Perl 5 program statements
++  by evaluating the Perl 5 code while passing through the plain ASCII
++  data. It can operate in various ways: As a stand-alone Unix filter
++  or integrated Perl 5 module for general file generation tasks and
++  as a powerful Webserver scripting language for dynamic HTML page
++  programming.
+--- eperl-2.2.5.orig/debian/copyright
++++ eperl-2.2.5/debian/copyright
+@@ -0,0 +1,12 @@
++This is Debian/GNU Linux's prepackaged version of Ralf Engelschalls
++ePerl package
++
++This package was put together by me, Heiko Schlittermann
++<heiko@lotte.sax.de>, from the sources, which I obtained from
++ftp://ftp.engelschall.com/pub/sw/eperl-*
++The changes were very minimal - merely adding support 
++for the Debian package maintenance scheme, by
++adding various debian/* files.
++
++Ralph Engelschall released wml under the terms and conditions
++of the GNU Public License.  See /usr/doc/eperl/COPRIGHT for more info. 
+--- eperl-2.2.5.orig/debian/substvars
++++ eperl-2.2.5/debian/substvars
+@@ -0,0 +1 @@
++shlibs:Depends=ldso (>= 1.8.0-0), libc5 (>= 5.4.0-0), libdb1, libgdbm1

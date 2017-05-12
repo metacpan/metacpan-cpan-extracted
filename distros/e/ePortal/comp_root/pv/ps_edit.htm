@@ -1,0 +1,118 @@
+%#============================================================================
+%# ePortal - WEB Based daily organizer
+%# Author - S.Rusakov <rusakov_sa@users.sourceforge.net>
+%#
+%# Copyright (c) 2000-2004 Sergey Rusakov.  All rights reserved.
+%# This program is open source software
+%#
+%#
+%#----------------------------------------------------------------------------
+<p>
+<&| /dialog.mc:edit_dialog, title => pick_lang(rus => "Секция", eng => "Section"),
+                obj => $obj,
+                focus => 'title',
+                width => 600 &>
+
+% if ($obj->component eq '') {
+  <& /dialog.mc:field, id => 'component' &>
+  <& /dialog.mc:buttons, more_button => 1, ok_button => 0 &>
+
+% } else {
+
+  <& /dialog.mc:read_only, name => 'component' &>
+  <&| /dialog.mc:cell &><hr></&>
+
+<& /dialog.mc:field, name => 'title' &>
+<& /dialog.mc:field, name => 'width' &>
+<& /dialog.mc:field, name => 'url' &>
+<& /dialog.mc:field, name => 'memo' &>
+<& /dialog.mc:field, name => 'xacl_read', -values => [qw/admin everyone registered uid gid/] &>
+
+% if (ref($comp) and $comp->method_exists('setup_dialog')) {
+  <&| /dialog.mc:collapse, collapse => 0, title => pick_lang(rus => "Настройка секции по умолчанию", eng => "Section setup") &>
+  <% $comp->call_method('setup_dialog', setupinfo => $obj->setupinfo_hash) %>
+  </&>
+% }
+
+  <& /dialog.mc:buttons, apply_button => 1 &>
+% } # if component eq ''
+</&>
+<p>
+
+
+
+%#=== @METAGS attr =========================================================
+<%attr>
+Title => {rus => "Редактирование секции домашней страницы", eng => "Edit section"}
+require_admin => 1
+</%attr>
+
+
+%#=== @METAGS onStartRequest ====================================================
+<%method onStartRequest><%perl>
+  $obj = new ePortal::PageSection;
+  $m->comp('/dialog.mc:handle_request', obj => $obj,
+
+    # Callback to save additional setupinfo 
+    callback_htmlSave => sub {
+        my $obj = shift;
+        my $args = shift;
+        
+        # Automatically save data to existing hash keys
+        my $hash = $obj->setupinfo_hash;
+#        foreach my $k (keys %{$hash}) {
+#          $hash->{$k} = $args->{$k} if exists $args->{$k};
+#        }  
+
+        # optionally call custom section method
+        my $comp = undef;
+        if ( $obj->component ) {
+          $comp = $m->fetch_comp('/pv/sections/' . $obj->component);
+          if ( ref($comp) and $comp->method_exists('setup_save') ) {
+            $comp->call_method('setup_save', $obj => $obj, setupinfo => $hash, args => $args);
+          }
+        } 
+        
+        # Save setupinfo hash to object
+        $obj->setupinfo_hash($hash);
+    },
+
+    # Callback to verify additional setupinfo
+    callback_validate => sub {
+        my $obj = shift;
+        my $comp = undef;
+        if ( $obj->component ) {
+          $comp = $m->fetch_comp('/pv/sections/' . $obj->component);
+          if ( ref($comp) and $comp->method_exists('setup_validate') ) {
+            my $hash = $obj->setupinfo_hash;
+            $comp->call_method('setup_validate', $obj => $obj, setupinfo => $hash);
+          }
+        } 
+    },  
+  );
+
+  # Fill object with default values
+  #
+  $comp = undef;
+  $comp = $m->fetch_comp('/pv/sections/' . $obj->component) if $obj->component;
+  # initially initialize the object from attributes
+  if ( (! $obj->check_id)                      # new object
+        and $obj->component and ref($comp)) {  # component file defined
+    $obj->Width( $comp->attr('def_width') ) if $comp->attr_exists('def_width');
+    $obj->URL( $comp->attr('def_url') )     if $comp->attr_exists('def_url');
+    $obj->Title( pick_lang($comp->attr('def_title')) )        if $comp->attr_exists('def_title');
+    $obj->xacl_read( $comp->attr('def_xacl_read') || 'everyone' ) if $comp->attr_exists('def_xacl_read');
+    $obj->setupinfo_hash( $comp->attr('def_setupinfo_hash') ) if $comp->attr_exists('def_setupinfo_hash');
+  }
+</%perl></%method>
+
+
+%#=== @metags once =========================================================
+<%once>
+my ($obj, $comp);
+</%once>
+
+%#=== @metags cleanup =========================================================
+<%cleanup>
+($obj, $comp) = ();
+</%cleanup>

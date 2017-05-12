@@ -1,0 +1,40 @@
+%#============================================================================
+%# ePortal - WEB Based daily organizer
+%# Author - S.Rusakov <rusakov_sa@users.sourceforge.net>
+%#
+%# Copyright (c) 2000-2004 Sergey Rusakov.  All rights reserved.
+%# This program is open source software
+%#
+%#
+%#----------------------------------------------------------------------------
+%#
+%# Usage:
+%#
+%# 	<form name="theForm">
+%#	<input type="text" name="adate">
+%#	<a href="javascript:DateSelector('adate')"><img border=0
+%# 		src="/images/ePortal/pdate.gif"></a>
+%#	...
+%#  </form>
+%#
+%# or use ePortal::thePersistent::Support::htmlField
+%#
+%##########################################################################
+<%perl>
+  my $C = new ePortal::HTML::Calendar( m => $m );
+	$C->url_all( "javascript:SelectDate('$field','%date%');" );
+	$C->draw;
+	return;
+</%perl>
+
+
+%#=== @metags attr =========================================================
+<%attr>
+Title => {rus => "Календарь", eng => "Calendar"}
+</%attr>
+
+
+%#=== @metags args =========================================================
+<%args>
+$field => undef
+</%args>

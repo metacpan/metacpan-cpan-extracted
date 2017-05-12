@@ -1,0 +1,98 @@
+%#============================================================================
+%# ePortal - WEB Based daily organizer
+%# Author - S.Rusakov <rusakov_sa@users.sourceforge.net>
+%#
+%# Copyright (c) 2000-2003 Sergey Rusakov.  All rights reserved.
+%# This program is free software; you can redistribute it
+%# and/or modify it under the same terms as Perl itself.
+%#
+%#
+%#----------------------------------------------------------------------------
+
+<p>
+% if ($session{_organizer}->xacl_check_update) {
+  <ul>
+  <li><a href="<% href('category_edit.htm', org_id => $session{_org_id}, objid => 0) %>"><% img(src=>'/images/icons/memo.gif') %>&nbsp;<%
+      pick_lang(rus => "Новая категория", eng => "New category") %></a>
+  </ul>
+% }
+<& /item_caption.mc,
+  title => pick_lang(rus => "Категории", eng => "Categories") &>
+
+<% $list->draw_list %>
+
+<div class="app_description">
+Категории используются для группировки информации по различным тематикам.
+Например, можно сгруппировать рабочие контакты, друзей, знакомых и т.д.
+</div>
+
+<& /inset.mc &>
+
+%#=== @metags onStartRequest ====================================================
+<%method onStartRequest>
+<& PARENT:onStartRequest, %ARGS &>
+<%perl>
+  $obj = new ePortal::ThePersistent::Support(
+      DBISource => 'Organizer',
+      Where => "C.org_id=$session{_org_id}",
+      GroupBy => "C.Title, C.id",
+      Attributes => {ts => { dtype => 'DateTime'}},
+      SQL => "SELECT C.*,
+              count(Notepad.id) as notepad_count,
+              count(Anniversary.id) as anniversary_count,
+              count(Contact.id) as contact_count,
+              count(ToDo.id) as todo_count
+        FROM Category C
+        LEFT JOIN Notepad ON Notepad.org_id=$session{_org_id} AND Notepad.category_id=C.id
+        LEFT JOIN Anniversary ON Anniversary.org_id=$session{_org_id} AND Anniversary.category_id=C.id
+        LEFT JOIN ToDo ON ToDo.org_id=$session{_org_id} AND ToDo.category_id=C.id
+        LEFT JOIN Contact ON Contact.org_id=$session{_org_id} AND Contact.category_id=C.id
+      ");
+
+  $list = new ePortal::HTML::List(obj => $obj, class => "smallfont",
+    state => {org_id => $session{_org_id}}, width => '80%');
+  $list->add_column_image();
+  $list->add_column( id => "title",
+    title => pick_lang(rus => "Название", eng => "Title"),
+    url => "category_edit.htm?org_id=$session{_org_id}&objid=#id#", sorting => 1);
+  $list->add_column( id => "todo_count",
+    title => pick_lang(rus => "Дел", eng => "Tasks"),
+    align => "center", sorting => 1);
+  $list->add_column( id => "contact_count",
+    title => pick_lang(rus => "Контактов", eng => "Contacts"),
+    align => "center", sorting => 1);
+  $list->add_column( id => "notepad_count",
+    title => pick_lang(rus => "Заметок", eng => "Memos"),
+    align => "center", sorting => 1);
+  $list->add_column( id => "anniversary_count",
+    title => pick_lang(rus => "Годовщин", eng => "Anniversaries"),
+    align => "center", sorting => 1);
+
+  if ($session{_organizer}->xacl_check_update) {
+    $list->add_column_system(
+      objtype => 'ePortal::App::Organizer::Category',
+      delete => 1);
+  }
+
+  my $location = $list->handle_request;
+  return $location if $location;
+
+  $obj->restore_where( $list->restore_parameters);
+</%perl></%method>
+
+
+
+%#=== @metags once =========================================================
+<%once>
+my ($app, $list, $obj, $search_object);
+</%once>
+
+%#=== @metags cleanup =========================================================
+<%cleanup>
+($app, $list, $obj, $search_object) = ();
+</%cleanup>
+
+%#=== @METAGS attr =========================================================
+<%attr>
+Title => {rus => "Категории", eng => "Categories"}
+</%attr>

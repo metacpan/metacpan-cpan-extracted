@@ -1,0 +1,141 @@
+%#============================================================================
+%# ePortal - WEB Based daily organizer
+%# Author - S.Rusakov <rusakov_sa@users.sourceforge.net>
+%#
+%# Copyright (c) 2000-2004 Sergey Rusakov.  All rights reserved.
+%# This program is open source software
+%#
+%#
+%#----------------------------------------------------------------------------
+<%perl>
+# notepad_users_count => "Notepad users",
+# notepad_count => "Notepad memos total",
+# contact_users_count => "Address users",
+# contact_count => "Address items total",
+# calendar_users_count => "Calendar users",
+# calendar_count => "Calendar items total",
+# todo_users_count => "ToDo users",
+# todo_count => "ToDo items total",
+# msgitem_count => "Messages as forums",
+# msgitem_users_count => "Writing users",
+</%perl>
+
+
+<table align="center" class="smallfont" border="1" width="90%">
+<tr>
+  <th><% pick_lang(rus => "Параметр", eng => "Parameter") %></th>
+  <th><% pick_lang(rus => "Значение", eng => "Value") %></th>
+</tr>
+
+<a name="ePortal"></a>
+<tr>
+  <td colspan="2">
+    <& /item_caption.mc, title => 'ePortal', underline => 0 &>
+  </td>
+</tr>
+
+<& SELF:show_stat,
+  users_registered => {
+    title => pick_lang(rus => "Зарегистрировано пользователей", eng => "Registered users"),
+    sql_1 => 'SELECT count(*) from epUser',
+  } &>
+<& SELF:show_stat,
+  users_active_today => {
+    title => pick_lang(rus => "Активных пользователей сегодня", eng => "Active users today"),
+    sql_1 => 'SELECT count(*) from epUser WHERE last_login >= current_date',
+    sql_2 => 'SELECT username from epUser WHERE last_login >= current_date ORDER BY username',
+  } &>
+<& SELF:show_stat,
+  users_active_now => {
+    title => pick_lang(rus => "Активных пользователей (5 мин)", eng => "Active users (5 min)"),
+    sql_1 => 'SELECT count(*) from epUser WHERE last_login >= date_sub(now(), interval 5 minute)',
+    sql_2 => 'SELECT username, fullname from epUser WHERE last_login >= date_sub(now(), interval 5 minute) ORDER BY username',
+  } &>
+<& SELF:show_stat,
+  sessions_count => {
+    title => pick_lang(rus => "Всего сессий", eng => "Sessions total"),
+    sql_1 => 'SELECT count(*) from sessions',
+  } &>
+<& SELF:show_stat,
+  sessions_active_today => {
+    title => pick_lang(rus => "Сессий активных сегодня", eng => "Active sessions today"),
+    sql_1 => 'SELECT count(*) from sessions WHERE ts >= current_date',
+  } &>
+<& SELF:show_stat,
+  sessions_active_now => {
+    title => pick_lang(rus => "Сессий активных (5 мин)", eng => "Active sessions (5 min)"),
+    sql_1 => 'SELECT count(*) from sessions WHERE ts >= date_sub(now(), interval 5 minute)',
+  } &>
+<& SELF:show_stat,
+  pageview_count => {
+    title => pick_lang(rus => "Персональных домашних страниц", eng => "Personal home pages"),
+    sql_1 => "SELECT count(*) from PageView WHERE pvtype = 'user'",
+    sql_2 => "SELECT uid, Fullname, count(PageView.id) as pv_cnt FROM PageView
+        left join epUser on PageView.uid=epUser.username
+        WHERE pvtype = 'user' group by uid ORDER BY pv_cnt DESC, fullname ",
+  } &>
+<& SELF:show_stat,
+  catalog_count => {
+    title => pick_lang(rus => "Ссылок и групп в Каталоге", eng => "Links and groups in Catalogue"),
+    sql_1 => "SELECT count(*) from Catalog",
+  } &>
+
+
+
+
+% foreach my $app_name ($ePortal->ApplicationsInstalled) {
+%   next if ! $m->comp_exists($app_name.'_statistics.mc');
+    <tr>
+      <td colspan="2">
+        <a name="<% $app_name %>"></a>
+        <& /item_caption.mc, title => $app_name, underline => 0 &>
+      </td>
+    </tr>
+%   $m->comp($app_name.'_statistics.mc');
+% }
+
+</table>
+
+
+
+%#=== @metags attr =========================================================
+<%attr>
+Title => {rus => 'Статистика сервера ePortal', eng => "Statistics page"}
+</%attr>
+
+
+%#=== @METAGS show_stat ====================================================
+<%method show_stat><%perl>
+  my %args = $m->request_args;
+
+  foreach my $key (keys %ARGS) {
+    my $value_1 = $ePortal->dbh->selectrow_array($ARGS{$key}{sql_1});
+    </%perl>
+    <tr>
+      <td>
+        <a name="<% $key %>"></a>
+%       if ($ARGS{$key}{sql_2}) {
+        <a href="<% $ENV{SCRIPT_NAME} %>?verbose=<% $key %>#<% $key %>"><%
+          $ARGS{$key}{title} %></a>
+%       } else {
+          <% $ARGS{$key}{title} %>
+%       }
+      </td>
+      <td align="center">
+        <% $value_1 |h %>
+      </td>
+    </tr>
+    <%perl>
+
+    # --------------------------------------------------------------------
+    # Verbose output if choosen
+    if ( $args{verbose} eq $key ) {
+      my @value_2 = @{ $ePortal->dbh->selectall_arrayref( $ARGS{$key}{sql_2} . ' limit 20' ) };
+      </%perl>
+      <tr><td colspan="2" align="right">
+        <% join('<br>', map {join '&nbsp;-&nbsp;', @$_} @value_2) %>
+      </td></tr>
+      <%perl>
+    }
+  }
+</%perl></%method>

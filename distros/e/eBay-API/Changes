@@ -1,0 +1,22 @@
+Revision history for Perl extension eBay::API.
+
+0.25 Mon Aug 25 18:44:51 PDT 2008
+    - add META.yml file for better no_index support within 
+      CPAN
+    - add eBay::API::Cookbook 
+
+0.24 Mon Aug 25 09:52:27 PDT 2008
+    - cleanup package namespaces for the perl CPAN indexer
+    
+0.23 Sun Aug 24 20:17:17 PDT 2008
+    - add generated code to CPAN distribution
+    - add local xsd file support to Makefile.PL
+      This change allows someone to specify local xsd file 
+      for the class generation.
+      
+      perl Makefile.PL --xsd_file=/tmp/my.xsd
+      
+0.01  Fri May 26 18:58:46 2006
+    - original version; created by h2xs 1.23 with options
+        -XA -n eBay::API
+

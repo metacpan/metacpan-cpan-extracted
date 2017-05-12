@@ -1,0 +1,195 @@
+=> NAME
+
+ePod - Handles easy-POD: write easy and simple, convert to POD, and from there you know the way.
+
+=> DESCRIPTION
+
+This module is used to conver easy-POD files to POD.
+
+easy-POD is a simpler version of POD, and is made to write POD files without worry about:
+
+*> Lines and spaces between commands.
+*> The use of =over and =back for itens.
+*> Case sensitive of X<> formatters.
+
+/*>
+
+Soo, easy-POD let you make some mistakes when writing POD, than it will fixe them for you when converting to POD.
+
+Actually ePod was created to enable non-programmer persons to writed well formated, structured and indexed documentation, and was inspirated in POD.
+
+I<** See .epod files in the "B<./test>" directory of the distribution.>
+
+=> USAGE
+
+  use ePod ;
+
+  my $epod = new ePod( over_size => 10 ) ;
+
+  my $pod = $epod->epod2pod( "Foo.epod" ) ;
+
+  print $pod ;
+
+=> METHODS
+
+==> new ( %OPTIONS )
+
+Create a new I<ePod> object.
+
+B<OPTIONS:>
+
+*> over_size ( N )
+
+Set the size/level of I<"=over N">, where I<N> is a number.
+
+==> epod2pod ( FILE|DATA|FILEHANDLE )
+
+Convert the given ePod FILE|DATA|GLOB to POD.
+
+*> FILE|DATA|FILEHANDLE
+
+Can be a FILE path, DATA (SCALAR) or FILEHANDLE (GLOB)
+
+==> to_pod ( FILE|DATA|FILEHANDLE , NEW_POD_FILE , REPLACE )
+
+Convert the given ePod FILE|DATA|GLOB to a POD file.
+
+*> FILE|DATA|FILEHANDLE
+
+Can be a FILE path, DATA (SCALAR) or FILEHANDLE (GLOB)
+
+*> NEW_POD_FILE
+
+The file path to the new pod file. If not defined will use the same path and name from the ePod file, or I<"unamed.pod">.
+
+*> REPLACE
+
+If I<TRUE> tells to that the file (I<NEW_POD_FILE>) can be replaced.
+
+If I<FALSE|undef> and the file already exists this format will be used: "%name-%x.pod", where I<%name> is the file name and I<%x> is a number free.
+
+==> is_epod (DATA)
+
+Check if a given DATA has ePod syntax.
+
+=> easy-POD Syntax
+
+*> =headx
+
+Use => for the I<head> command, and the level is set with I<"=">.
+
+  =>   same as =head1
+  ==>  same as =head2
+  ===> same as =head3
+
+*> =item
+
+Use *> for the =item command, and the level is set with I<"*">.
+
+Note that you don't need to declare =over and =back to use *>.
+
+Example:
+
+  *> item1
+  item2 text
+  **> item1.1
+
+  *> item2
+  item2 text
+  
+  **> item2.1
+  ***> item2.1.1
+  *> item3
+
+Equivalent POD:
+
+  =over 10
+  
+  =item item1
+  
+  item2 text
+  
+  =over 10
+  
+  =item item1.1
+  
+  =back
+  
+  =item item2
+  
+  item2 text
+  
+  =over 10
+  
+  =item item2.1
+  
+  =over 10
+  
+  =item item2.1.1
+  
+  =back
+  
+  =back
+  
+  =item item3
+  
+  =back
+
+
+*> Explicity end of a item:
+
+To explicity end a item, use I<"/"> before the item level. Soo to end *> will be /*>, and for **> is /**>
+
+You need to explocity end a item only when you want a text after an item outside of it. Example:
+
+  *> item1
+  the item text.
+  *> item2
+  the item text again.
+  
+  and more item text.
+  /*>
+  
+  Text outside of itens.
+
+Equivalent POD:
+
+  =over 10
+  
+  =item item1
+  
+  the item text.
+  
+  =item item2
+  
+  the item text again.
+  
+  and more item text.
+  
+  =back
+  
+  Text outside of itens.
+
+/*>
+
+B<Note that if you want to use POD syntax with easy-POD you won't be able to use =head and =item commands.>
+
+B<All the other POD syntax can be used with easy-POD syntax.>
+
+
+=> SEE ALSO
+
+L<Pod::HtmlEasy>, L<Pod::Parser>, L<Pod::Master>, L<Pod::Master::Html>.
+
+=> AUTHOR
+
+Graciliano M. P. <gm@virtuasites.com.br>
+
+I will appreciate any type of feedback (include your opinions and/or suggestions). ;-P
+
+=> COPYRIGHT
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+

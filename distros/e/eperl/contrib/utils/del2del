@@ -1,0 +1,36 @@
+:
+eval 'exec perl -S $0 ${1+"$@"}'
+    if $running_under_some_shell;
+##
+##  del2del -- Change ePerl block delimiters
+##  Copyright (c) 1997 Ralf S. Engelschall, All Rights Reserved. 
+##
+
+if ($#ARGV < 4) {
+    print STDERR "$0: ERROR: Bad arguments\n";
+    print STDERR "Usage: $0 oldBeginDel oldEndDel newBeginDel newEndDel files ...\n";
+    print STDERR "Example: $0 '<?' '!>' '<%' '%>' *.phtml\n";
+    exit 1
+}
+
+$obd = quotemeta(shift ARGV);
+$oed = quotemeta(shift ARGV);
+$nbd = shift ARGV;
+$ned = shift ARGV;
+
+foreach $file (@ARGV) {
+    print STDERR "Converting $file...";
+    system("cp $file $file.old");
+    open(IN, "<$file.old");
+    open(OUT, ">$file");
+    while (<IN>) {
+        s|$obd|$nbd|go;
+        s|$oed|$ned|go;
+        print OUT $_;
+    }
+    close(OUT);
+    close(IN);
+    print STDERR "Done.\n";
+}
+
+##EOF##

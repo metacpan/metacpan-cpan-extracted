@@ -1,0 +1,11 @@
+##
+##  TEST -- ePerl Test Suite runtime engine
+##  Copyright (c) 1997 Ralf S. Engelschall, All Rights Reserved. 
+##
+
+use Test::Harness;
+@TESTS = split(/[ \n]/, `echo *.t`);
+#$Test::Harness::verbose = 1;
+Test::Harness::runtests(@TESTS);
+
+##EOF##

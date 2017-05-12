@@ -1,0 +1,156 @@
+*************************************************************************
+Release 4.5    Release Date: 23.04.2004
+*************************************************************************
+
+Начиная с версии 4.5 используется новый скрипт установки Build.PL. 
+
+Добавлен новый вид ресурса в Каталоге: возможность добавления большого 
+количества "статей" с группировкой по дате и еще чему-нибудь.
+
+Внимание! Изменился алгоритм "автоформата" для текстовых ресурсов. Изменение 
+может затронуть текстовые ресурсы Каталога и тексты сообщений в приложении 
+MsgForum! 
+
+Обязательно сделайте резервную копию вашей базы ePortal и рабочий вариант 
+ePortal перед обновлением!
+
+ 
+
+ePortal:
++ параметр конфигурации ePortal_dbi_source заменен на ePortal_dbi_host, ePortal_dbi_database
++ все приложения используют одино подключение к MySQL серверу. Если использовались
+  разные источники dbi для приложений - эти базы надо скопировать в основную базу ePortal
+- Новый вид ресурса в Каталоге
+- для наиболее часто используемых типов файлов используется своя таблица MIME типов
+- скрытые группы и ресурсы в каталоге
+- настрока: показывать или нет присоединенные файлы ресурса
+- информация о дате создания, последнем изменении ресурса
+- в диалогах не сохранялись скроки в "кавычках"
+- отпала необходимость в переменной PerlSetVar MasonEscapeFlags в httpd.conf
+- немного расширены возможности автоформатирования ресурсов в Каталоге и сообщений в форумах
+- изменен скрипт установки. Build.PL вместо Makefile.PL
+
+SquidAcnt:
+- не удалялись данные старее 2 месяцев
+
+*************************************************************************
+Release 4.4.1    Release Date: 02.02.2004
+*************************************************************************
+
+Исправлен модуль создания пустой БД
+
+*************************************************************************
+Release 4.4    Release Date: 30.01.2004
+*************************************************************************
+
+Исправлено несколько мелких ошибок.
+
+ePortal:
+- реестр изменений теперь и на русском языке
+- изменилась структура БД. Обновление будет выполнено автоматически.
++ Изменился формат хранения домашних страниц. Надо перепроверить настройку
+  ВСЕХ секций домашней страницы.
+- проверка на существование такого пользователя при ручной регистрации
+- из-за большого объема информации некоторые разделы при редактировании
+  элементов каталога сделаны сворачиваемыми.
+- возможность скрыть изображение <HTM>, обозначающее вставку HTML кода на странице
+- ошибка Cannot open dir /usr/lib/perl5/site_perl/5.8.0/ePortal/ for reading 
+  если установлен "чистый" ePortal без приложений. Исправлено.
+- не работала кнопка "Применить" в некоторых диалогах
+- не работал переход по страницам при большом количестве прикрепленных файлов
+  в ресурсе каталога.
+
+SquidAcnt:
+- если любой из лимитов не определен, то никакой другой не 
+  срабатывает. Исправлено.
+- Недели при учете трафика считались по "американски", т.е. воскресенье-начало недели.
+
+Removed:
+- Удалено приложение compInventory (не закончено и не развивается)
+
+*************************************************************************
+Release 4.3    Release Date: 15.12.2003
+*************************************************************************
+
+This is mainly bugfix release. Many changes in OffPhones application.
+
+WARNING!!! I have no news from English-speaking users of ePortal. 
+If there is no such interest then I will finish that hard dual-language 
+work and will work hardly only on Russian version. Please drop your
+vote to rusakov_sa@users.sourceforge.net to keep ePortal dual-language.
+
+ePortal: 
+- документация по API добавлена в пакет ePortal-docs
+- fixed bug with Catalogue items with nicknames in Russian
+- fixed: it was possible to create a Catalog item with duplicate nickname
+
+OffPhones: 
+- changed limit to display when searching for commonly used phrase
+- once again fixed bug when all subdepartments shown on edit mode turn 
+- removed phone number Format. Any number formatted with ####-###-##-##
+- added health_check procedure for OffPhones.
+- change search algorithm to cost based.
+- Access Control system corrected
+- export a department with subdepartments to text file 
+- print preview for department with subdepartments (export to html)
+- added possibility to add a photo to client
+
+MsgForum:
+- The time of new messages (posted today) is highlighted.
+
+Removed_files:
+lib/ePortal/AuthCookieHandler.pm
+comp_root/login/*
+comp_root/attachment/*
+
+*************************************************************************
+Release 4.2    Release Date: 18.11.2003
+*************************************************************************
+
+Notes: This is mostly bugfix release. 
+User recognition system has been changed. Please review your httpd.conf.
+
++ removed ePortal::AuthCookieHandler. Modify your httpd.conf
++ default installation target changed from /home/ePortal to /opt/ePortal. Be 
+  careful when upgrading old version!
+- fixed: IE4 cannot download any file attachment from Catalogue
+- fixed: "xacl_check ..." when creating new section for home page
+- removed references to ePortal.pl from documentation as expired
+- fixed: /catalog/mostpopular.htm not found
+
+*************************************************************************
+Release 4.1    Release Date: 23.10.2003
+*************************************************************************
+
+Notes: Catalogue system has been rewrited. Added possibility to store 
+large files, HTML & text resources, attach any number of files to resource.
+
++ Attachment storage hash been rewrited. All site specific attachments of
+  unlimited size are stored in database.
+- Extended Catalogue
+- Added more log information about user login process flow
+
+MsgForum: 
+- Fixed bug whean creating new forums.
+- Fixed bug when one try to subscribe already subscribed forum
+
+removed_files:
+/comp_root/catalog/go.htm
+
+*************************************************************************
+Release 4.0    Release Date: 24.09.2003
+*************************************************************************
+
+Notes: This major release should be concerned to development only. Not so many 
+new features, mostly internal code upgrade...
+
+ePortal:
+- fixed bug introduced in 3.91 (Application package not loaded)
+- any periodic job may be forced to run manually
+- added parameter JobServer for periodic jobs. Job execution may be 
+  distributed across many servers.
+- added LDAP synchronization job.
+- ability to merge groups of users
+
+
+

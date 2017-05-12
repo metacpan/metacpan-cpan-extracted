@@ -1,0 +1,139 @@
+%#============================================================================
+%# ePortal - WEB Based daily organizer
+%# Author - S.Rusakov <rusakov_sa@users.sourceforge.net>
+%#
+%# Copyright (c) 2000-2004 Sergey Rusakov.  All rights reserved.
+%# This program is open source software
+%#
+%#
+%#----------------------------------------------------------------------------
+
+<%perl>
+    # Промежуточные данные хранятся в виде
+    # Title | hits/clicks | date1      | date2     | mon1      | mon2     |
+    #                  hits/clicks/visitors
+    # Это массив хэшей
+
+    # Поиск возможных вариантов для даты
+  my @distinct_dates;
+  my $st = new ePortal::ThePersistent::Support(
+    SQL => "SELECT distinct date FROM Statistics",
+    OrderBy => 'date DESC',
+    Attributes => { date => { dtype => 'Date' }  },
+    );
+  $st->restore_where(limit_rows => $ePortal::Catalog::MAX_DATES_SHOW);
+  while($st->restore_next) {
+    push @distinct_dates, $st->date;
+  }
+
+    # Поиск возможных вариантов для месяцев
+  my @distinct_month;
+  $st = new ePortal::ThePersistent::Support(
+    SQL => "SELECT distinct date_format(date,'%m.%Y') as month FROM Statistics",
+    OrderBy => 'date DESC',
+    );
+  $st->restore_where(limit_rows => $ePortal::Catalog::MAX_MONTH_SHOW);
+  while($st->restore_next) {
+    push @distinct_month, $st->month;
+  }
+
+
+  # Сбор статистики по датам
+  $st = new ePortal::ThePersistent::Support(
+    SQL => "SELECT c.Title, c.Clicks, c.Hits,
+          s.date, sum(s.hits) as daily_hits,
+          count(distinct s.visitor) as daily_visitor
+       from Statistics s
+       left join Catalog c on s.catalog_id=c.id",
+    OrderBy => 'c.Title, date',
+    GroupBy => 'catalog_id, date',
+    #Where => 's.date >= date_sub(
+    Attributes => { date => { dtype => 'Date' }  },
+    );
+  $st->restore_where();
+  my %h = ();
+  my @data;
+  while($st->restore_next) {
+    if ( $h{title} ne $st->Title ) {
+      push @data, { %h } if exists $h{title};
+      %h = ();
+      $h{title} = $st->Title;
+      $h{clicks} = $st->Hits . '/' . $st->Clicks;
+    }
+    $h{$st->date} = $st->daily_hits . '/' . $st->daily_visitor;
+  }
+  push @data, { %h } if exists $h{title};
+
+
+  # Сбор статистики по месяцам
+  $st = new ePortal::ThePersistent::Support(
+    SQL => q{SELECT c.Title, c.Clicks, c.Hits,
+          date_format(s.date, '%m.%Y') as month,
+          sum(s.hits) as monthly_hits,
+          count(distinct s.visitor) as monthly_visitor
+       from Statistics s
+       left join Catalog c on s.catalog_id=c.id},
+    OrderBy => 'c.title, month',
+    GroupBy => 'catalog_id, month',
+    );
+  $st->restore_where();
+  while($st->restore_next) {
+    foreach my $d (@data) {
+      if ( $d->{title} eq $st->Title ) {
+        $d->{$st->month} = $st->monthly_hits . '/' . $st->monthly_visitor;
+        last;
+      }
+    }
+  }
+</%perl>
+
+
+<p>
+
+<table border="1" width="99%" cellspacing="0" cellpadding="1">
+<tr>
+  <th width="20%" class="s8"><% pick_lang(rus => "Ресурс", eng => "Resource") %></th>
+  <th bgcolor="#eeeeFF" class="s8">
+    <% pick_lang(rus => "Всего", eng => "Total") %><br>Hits/Clicks
+  </th>
+% foreach (@distinct_dates) {
+  <th bgcolor="#eeFFee" class="s8"><% $_ %><br>Hits/Visitors</th>
+% }
+% foreach (@distinct_month) {
+  <th bgcolor="#FFeeee" class="s8"><% $_ %><br>Hits/Visitors</th>
+% }
+  </tr>
+
+% foreach my $d (@data) {
+ <tr>
+  <td class="s8"><% $d->{title} %></td>
+  <td bgcolor="#eeeeFF" align="center" class="s8"><% $d->{clicks} %></td>
+% foreach (@distinct_dates) {
+  <td bgcolor="#eeFFee" align="center" class="s8"><% $d->{$_} || '-' %></td>
+% }
+% foreach (@distinct_month) {
+  <td bgcolor="#FFeeee" align="center" class="s8"><% $d->{$_} || '-' %></td>
+% }
+ </tr>
+% }
+
+</table>
+
+
+<p>
+<blockquote class="memo">
+<b><% pick_lang(rus => "Примечание:", eng => "Memo:") %></b>
+<br>Hits - <% pick_lang(rus => "Общее кол-во обращений к ресурсу", eng => "Hits to resource's page") %>
+<br>Clicks - <% pick_lang(rus => "Кол-во переходов на ресурс через Каталог", eng => "Clicks on resource in Catalogue") %>
+<br>Visitors - <% pick_lang(rus => "Кол-во посетителей", eng => "Number of visitors") %>
+<p>
+<% pick_lang(rus => "Показаны только те ресурсы, по которым накоплена статистика",
+  eng => "Only resrouces with statistics gathered are shown") %>
+</blockquote>
+
+
+%#=== @METAGS attr =========================================================
+<%attr>
+Title => {rus => "Статистика каталога", eng => "Catalogue statistics"}
+</%attr>
+

@@ -1,0 +1,4 @@
+$Id: TODO,v 1.15 2004/04/12 16:01:54 jeff Exp $
+
+* support for LOB locators as parameters and return values
+* support for arrays as parameters and return values

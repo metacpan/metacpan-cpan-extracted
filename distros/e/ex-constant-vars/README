@@ -1,0 +1,21 @@
+
+    README for Perl module ex::constant::vars
+
+This module is used to create readonly variables to use
+as opaque enumerated constants.
+
+You can read a nicely formatted version of the documentation for
+this module online:
+
+    https://metacpan.org/pod/ex::constant::vars
+
+You should be able to install this using your usual method for installing
+modules from CPAN. If you don't have one, have a look at:
+
+    http://www.cpan.org/modules/INSTALL.html
+
+This module was originally written by Casey Tweten.
+It is currently being maintained by Neil Bowers <neilb@cpan.org>.
+
+Copyright (c) 1995-2000 Casey R. Tweten. All rights reserved.
+Copyright (c) 2012-2015 Neil Bowers. All rights reserved.

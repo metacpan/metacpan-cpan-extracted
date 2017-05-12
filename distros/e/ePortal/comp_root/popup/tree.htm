@@ -1,0 +1,94 @@
+%#============================================================================
+%# ePortal - WEB Based daily organizer
+%# Author - S.Rusakov <rusakov_sa@users.sourceforge.net>
+%#
+%# Copyright (c) 2000-2004 Sergey Rusakov.  All rights reserved.
+%# This program is open source software
+%#
+%#
+%#----------------------------------------------------------------------------
+%#
+%# Usage:
+%#
+%# 	<form name="theForm">
+%#	<input type="text" name="adate">
+%#	<a href="javascript:DateSelector('adate')"><img border=0
+%# 		src="/images/ePortal/pdate.gif"></a>
+%#	...
+%#  </form>
+%#
+%# or use ePortal::thePersistent::Support::htmlField
+%#
+%##########################################################################
+<span id="tree_message"><center>
+<p style="color:red;font-weight:bold;font-size:10pt;text-decoration:blink;">
+	Подождите. Идет загрузка данных.<p>
+</center></span>
+% $m->flush_buffer;
+
+
+%	my $obj;
+% eval { $obj = new $objtype; };
+% if ($@) {
+	<& /message.mc, ErrorMessage => "Не могу создать требуемый объект" &>
+	<!-- objtype: <% $objtype %> -->
+%  return;
+% }
+
+
+%	if (!$obj->restore($objid)) {
+	<& /message.mc, ErrorMessage => "Не могу найти запрошенный объект" &>
+	<!-- objid: <% $objid %> -->
+% return;
+% }
+
+
+%	my $A = $obj->attribute($field);
+% if (! ref($A) or ! ref($A->{tree}) eq 'CODE') {
+	<& /message.mc, ErrorMessage => "Запрошеный атрибут объекта не найден" &>
+	<!-- ref(A): <% ref($A) %> -->
+% return;
+% }
+
+
+%	my $tree = $A->{tree}($obj);
+% if (! $tree) {
+	<& /message.mc, ErrorMessage => "Запрос на получение списка для дерева не выполнен" &>
+	<!-- ref(A): <% ref($A) %> -->
+% }
+% $tree->url("javascript:SelectTreeItem(#id#);");
+% $tree->expand_item($fielddata);
+% $tree->{obj_by_id}{$fielddata}{url}='';
+
+<script language="JavaScript">
+%#--- We have to pass some parameters to SelectTreeItem(). I use global variables ;-)
+	var PopupTree_objid = <% $objid %>;
+	var PopupTree_objtype = '<% $objtype %>';
+	var PopupTree_field = '<% $field %>';
+
+%#--- Hide "wait please. loding" message
+	document.all('tree_message').style.display = "none";
+</script>
+
+<div align="right">
+ <% plink("Закрыть это окно", href => "javascript:window.close();") %>
+</div>
+<h2>Выбор подразделения</h2>
+
+% $m->flush_buffer;
+% $tree->draw;
+
+
+%#=== @metags attr =========================================================
+<%attr>
+Title => {rus => "Выбор из дерева", eng => "Select one from tree"}
+</%attr>
+
+
+%#=== @metags args =========================================================
+<%args>
+$objid
+$objtype
+$fielddata=>undef
+$field
+</%args>

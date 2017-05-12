@@ -1,0 +1,63 @@
+%#============================================================================
+%# ePortal - WEB Based daily organizer
+%# Author - S.Rusakov <rusakov_sa@users.sourceforge.net>
+%#
+%# Copyright (c) 2000-2003 Sergey Rusakov.  All rights reserved.
+%# This program is free software; you can redistribute it
+%# and/or modify it under the same terms as Perl itself.
+%#
+%#
+%#----------------------------------------------------------------------------
+
+%# Процесс загрузки
+% if ($ARGS{file}) {
+  <& ann_load_file.mc &>
+%}
+
+<p>
+<& /item_caption.mc, title =>
+    pick_lang(rus => "Загрузка стандартных событий", eng => "Load standard dates") &>
+
+<%perl>
+  my %Files = (
+    'ann_dates_art.mc' => {
+      title => 'В мире искусства',
+      description => q{Составил на свой вкус Runas (runas@tut.by) на основе рассылки "Памятные даты в истории культуры" (www.subscribe.ru) (более 200)}
+    },
+    'ann_dates_famous.mc' => {
+      title => 'Знаменитости',
+      description => 'Некоторые даты из жизни знаменитостей (более 1000)'
+    },
+    'ann_dates_names.mc' => {
+      title => 'Именины',
+      description => 'Дни ангела (именины) (более 400)'
+    },
+    'ann_dates_church.mc' => {
+      title => 'Православные церковные праздники',
+      description => 'Около 100 дат'
+    },
+    'ann_dates_national.mc' => {
+      title => 'Национальные праздники',
+      description => 'Составитель: Олег Петров [dolphin_e] www.petrov.by.ru (более 160)'
+    },
+    'ann_dates_omens.mc' => {
+      title => 'Народные приметы',
+      description => 'Более 200 народных примет)'
+    },
+    );
+</%perl>
+
+<ul>
+% foreach my $file (keys %Files) {
+  <li><a href="<% href('ann_load.htm', org_id => $session{_org_id},
+      file => $file, category_title => $Files{$file}{title}) %>"><% $Files{$file}{title} %></a>
+      <br><span class="memo"><% $Files{$file}{description} %></span>
+% }
+</ul>
+
+
+
+%#=== @METAGS attr =========================================================
+<%attr>
+Title => {rus => "Загрузка стандартных событий", eng => "Load standard dates"}
+</%attr>

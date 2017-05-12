@@ -1,0 +1,151 @@
+%#============================================================================
+%# ePortal - WEB Based daily organizer
+%# Author - S.Rusakov <rusakov_sa@users.sourceforge.net>
+%#
+%# Copyright (c) 2000-2003 Sergey Rusakov.  All rights reserved.
+%# This program is free software; you can redistribute it
+%# and/or modify it under the same terms as Perl itself.
+%#
+%#
+%#----------------------------------------------------------------------------
+
+<p>
+<table width="90%" border="0">
+
+<tr>
+  <td>
+    <% img(src => '/images/Organizer/dairy.gif', href => href('cal_dairy.htm', org_id=> $session{_org_id})) %>
+    <& /item_caption.mc, title => pick_lang(rus => "Ежедневник", eng => "Dairy") &>
+    <ul>
+    <li><a href="cal_dairy.htm?org_id=<% $session{_org_id} %>"><%
+        pick_lang(rus => "Просмотр ежедневника", eng => "View dairy") %></a>
+        <& SELF:items_count, table => 'Calendar' &>
+    </ul>
+  </td>
+
+  <td>
+    <% img(src => '/images/Organizer/tasks.gif', href => href('todo_list.htm', org_id=> $session{_org_id})) %>
+    <& /item_caption.mc, title => pick_lang(rus => "Дела и задачи", eng => "To do tasks") &>
+    <ul>
+    <li><a href="todo_list.htm?org_id=<% $session{_org_id} %>"><%
+        pick_lang(rus => "Все дела", eng => "All tasks") %></a>
+        <& SELF:items_count, table => 'ToDo' &>
+% if ($session{_organizer}->xacl_check_update) {
+    <li><a href="todo_edit.htm?objid=0&org_id=<% $session{_org_id} %>"><%
+      pick_lang(rus => "Новое дело", eng => "New task") %></a>
+% }
+    </ul>
+  </td>
+</tr>
+
+%#
+%#============================================================================
+%#
+
+<tr>
+  <td>
+    <% img(src => '/images/Organizer/contacts.gif', href => href('cont_list.htm', org_id=> $session{_org_id}) ) %>
+    <& /item_caption.mc, title => pick_lang(rus => "Контакты", eng => "Contacts") &>
+    <ul>
+    <li><a href="cont_list.htm?org_id=<% $session{_org_id} %>"><%
+        pick_lang(rus => "Все контакты", eng => "All contacts") %></a>
+        <& SELF:items_count, table => 'Contact' &>
+% if ($session{_organizer}->xacl_check_update) {
+    <li><a href="cont_edit.htm?objid=0&org_id=<% $session{_org_id} %>"><%
+      pick_lang(rus => "Новый контакт", eng => "New contact") %></a>
+% }
+    </ul>
+  </td>
+
+  <td>
+    <% img(src => '/images/Organizer/draft.gif', href => href('ann_list.htm', org_id=> $session{_org_id})) %>
+    <& /item_caption.mc, title => pick_lang(rus => "Годовщины", eng => "Anniversary") &>
+    <ul>
+    <li><a href="ann_list.htm?org_id=<% $session{_org_id} %>"><%
+        pick_lang(rus => "Список годовщин", eng => "View anniversaries") %></a>
+        <& SELF:items_count, table => 'Anniversary' &>
+% if ($session{_organizer}->xacl_check_update) {
+    <li><a href="ann_edit.htm?objid=0&org_id=<% $session{_org_id} %>"><%
+      pick_lang(rus => "Новая дата", eng => "New anniversary") %></a>
+% }
+% if ($ePortal->isAdmin) {
+    <li><a href="ann_load.htm?org_id=<% $session{_org_id} %>"><% pick_lang(rus => "Загрузить стандартные даты", eng => "Load standard dates") %></a>
+% }
+    </ul>
+  </td>
+</tr>
+
+
+%#
+%#============================================================================
+%#
+
+<tr>
+  <td>
+    <% img(src => '/images/Organizer/memo.gif', href => href('memo_list.htm', org_id=> $session{_org_id}) ) %>
+    <& /item_caption.mc, title => pick_lang(rus => "Заметки", eng => "Notes") &>
+    <ul>
+    <li><a href="memo_list.htm?org_id=<% $session{_org_id} %>"><%
+        pick_lang(rus => "Все заметки", eng => "All memos") %></a>
+        <& SELF:items_count, table => 'Notepad' &>
+% if ($session{_organizer}->xacl_check_update) {
+    <li><a href="memo_edit.htm?objid=0&org_id=<% $session{_org_id} %>"><%
+      pick_lang(rus => "Новая заметка", eng => "New memo") %></a>
+% }
+    </ul>
+  </td>
+
+  <td>
+    <% img(src => '/images/Organizer/computer.gif') %>
+    <& /item_caption.mc, title => pick_lang(rus => "Настройка", eng => "Setup") &>
+    <ul>
+% if ( $session{_app}->AvailableOrganizers() > 1) {
+    <li><a href="org_show.htm"><% pick_lang(rus => "Выбрать другой Органайзер", eng => "Choose another Organizer") %></a>
+% }
+
+% if ($session{_organizer}->xacl_check_update) {
+    <li><a href="org_edit.htm?objid=<% $session{_org_id} %>">Настроить органайзер</a>
+% }
+
+    <li><a href="category_list.htm?org_id=<% $session{_org_id} %>"><%
+        pick_lang(rus => "Категории информации", eng => "Categories") %></a>
+        <& SELF:items_count, table => 'Category' &>
+
+% if ($session{_app}->xacl_check_public_org) {
+    <li><a href="org_edit.htm?objid=0">Добавить органайзер</a>
+% }
+    </ul>
+  </td>
+</tr>
+
+%#
+%#============================================================================
+%#
+
+
+</table>
+
+<p class="app_description">
+  <B>Органайзер</B> - набор полезных программ, облегчающих хранение и поиск
+  личной информации (контакты, дела, заметки). Это то, для чего используют
+  бумажные ежедневники...
+<p class="app_description">
+  Возможен режим работы с несколькими органайзерами одновременно, это необходимо
+  для секретаря, референта, рабочей группы и т.д.
+<p>
+
+
+%#=== @metags Title ====================================================
+<%method Title><%perl>
+  return pick_lang(rus => "Органайзер: ", eng => "Organizer: ") . $session{_organizer}->Title;
+</%perl></%method>
+
+
+%#=== @METAGS items_count ====================================================
+<%method items_count><%perl>
+  my $table = $ARGS{table};
+  my $count = $session{_app}->dbh->selectrow_array("SELECT count(*) FROM $table WHERE org_id=?", undef, $session{_org_id});
+  $count += 0;
+</%perl>
+<span class="memo">(<% $count %>)</span>
+</%method>

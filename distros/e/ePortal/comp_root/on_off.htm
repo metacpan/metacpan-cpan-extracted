@@ -1,0 +1,43 @@
+%#============================================================================
+%# ePortal - WEB Based daily organizer
+%# Author - S.Rusakov <rusakov_sa@users.sourceforge.net>
+%#
+%# Copyright (c) 2000-2004 Sergey Rusakov.  All rights reserved.
+%# This program is open source software
+%#
+%#
+%#----------------------------------------------------------------------------
+%# Description:
+%#  Turns on|off attribute on $object->{enabled}
+%#
+%# Parameters:
+%#	objid => ID of object
+%#  objtype => ref of object
+%#	location => URL to redirect after deletion
+%#----------------------------------------------------------------------------
+
+%#=== @metags onStartRequest ====================================================
+<%method onStartRequest><%perl>
+	my $objid = $ARGS{objid};
+	my $objtype = $ARGS{objtype};
+  my $return_uri = $ARGS{location} || $ENV{HTTP_REFERER} || '/';
+
+	if ($objid > 0 and $objtype =~ /^ePortal::/) {
+		my $object = eval { new $objtype; };
+		if ($@) {
+			logline('crit', $@);
+			$session{ErrorMessage} = pick_lang(rus => "Произошла системная ошибка", eng => "System error");
+		} else {
+			if ($object->restore($objid)) {
+				$object->enabled( $object->enabled ? 0 : 1 );
+				$object->update;
+			} else {
+				$session{ErrorMessage} = pick_lang(rus => "Указанный объект не найден", eng => "Object not found");
+			}
+		}
+	} else {
+		$session{ErrorMessage} = pick_lang(rus => "Не указано ни одного объекта", eng => "No objects to enable");
+	}
+
+	return $return_uri;
+</%perl></%method>

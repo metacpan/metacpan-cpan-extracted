@@ -1,0 +1,48 @@
+<!--
+##
+##  demo.table -- ePerl demonstration webpage
+##  Copyright (c) 1997 Ralf S. Engelschall, All Rights Reserved. 
+##
+-->
+<html>
+<head>
+<title>demo.table</title>
+</head>
+<body>
+<blockquote>
+<blockquote>
+<h1>demo.table</h1>
+<h2>Low-level HTML programming</h2>
+
+Instead of writing down the complex HTML table constructs for the
+1x1 chart we program it with the control structures of Perl
+language.
+
+<p>
+<table border=2>
+<?
+my $end = 12;
+
+# top bar
+print "<tr><th bgcolor=\"#e0e0f0\" align=right>x</th>";
+for (my $i=1; $i <= $end; $i++) {
+    print "<th bgcolor=\"#e0e0f0\" align=right>$i</th>";
+}
+print "</tr>";
+
+# side bar and content
+print"</tr>\n";
+for (my $i=1; $i <= $end; $i++) {
+    print "<tr><th bgcolor=\"#e0e0f0\" align=right>$i</th>";
+    for (my $j=1; $j<= $end; $j++) {
+        print "<td align=right>", $i*$j, "</td>";
+    }
+    print"</tr>\n"; 
+}
+!>
+</table>
+
+</blockquote>
+</blockquote>
+</body>
+</html>

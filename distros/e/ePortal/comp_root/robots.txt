@@ -1,0 +1,7 @@
+User-agent: *
+Disallow: /admin/
+Disallow: /calendar/
+Disallow: /contacts/
+Disallow: /login/
+Disallow: /notepad/
+Disallow: /popup/

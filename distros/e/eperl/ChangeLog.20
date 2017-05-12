@@ -1,0 +1,65 @@
+
+  C h a n g e L o g   o f   e P e r l
+  ___________________________________________________________________________
+
+
+  Changes between 2.0.2 and 2.0.3
+  -------------------------------
+
+  970104 o added some documentation from the webpages to misc/doc/
+         o added a FreeBSD ports area to the webpages
+
+  Changes between 2.0.1 and 2.0.2
+  -------------------------------
+
+  970104 o remove of the temporary files were disabled for
+           debugging purposes. Fixed.
+
+  Changes between 2.0.0 and 2.0.1
+  -------------------------------
+
+  970103 o removed unused variables
+
+  Changes between 1.0 and 2.0.0
+  -----------------------------
+
+  970102 o ePerl now supports the Perl 5 DynaLoader interface for
+           dynamic linking and loading of shared modules. This provides ePerl
+           with the complete power of the underlying Perl 5 installation,
+           including the shared objects.
+
+         o ePerl now runs as NPH-CGI/1.1 script, i.e. as a Non-Parsed-Header
+           CGI-script. This means that it is able to create its own HTTP
+           header.  Implications of this include:
+             - To create HTTP headers just put them on the first
+               lines in your script as plain text or just generate them on the
+               fly by a ePerl block at the beginning of your script. With this
+               feature you can for instance write pages which create images
+               instead of HTML code.
+             - If no headers were created by the script, it
+               outputs it with MIME-type "text/html", including an additional
+               calculated "Content-Length" header.
+             - It automatically adds "Date" and "Server" headers.
+  
+         o ePerl now saves and checks the STDERR output of the script.
+           If this contains data this implies an error and leads to the
+           display of the error HTML page, displaying the STDERR output.
+  
+         o ePerl now saves the STDOUT output of the script (the real
+           contents). This implies that it can calculate the Content-Length or
+           ignore it if STDERR was created and the error page have to be
+           displayed.
+  
+         o Additional environment variables will be set by ePerl
+           prior to the execution of the bristled Perl blocks:
+             SCRIPT_SRC_SIZE ....... the byte size of the original source file
+             SCRIPT_SRC_MTIME ...... the integer value of the last modify time
+             SCRIPT_SRC_MTIME_FMT .. the formatted string of the last modify time
+             SCRIPT_SRC_OWNER ...... the owner of the original source file
+             VERSION_INTERPRETER ... the ePerl version string
+             VERSION_LANGUAGE ...... the Perl version string
+  
+         o The ePerl sources were split into distinct peaces to
+           allow further development, e.g. a standalone program or a Apache
+           API module.
+

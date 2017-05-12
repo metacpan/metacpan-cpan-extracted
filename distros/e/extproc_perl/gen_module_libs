@@ -1,0 +1,39 @@
+#!/usr/local/perl/5.8.1/shared/bin/perl
+
+# $Id: gen_module_libs,v 1.7 2006/04/05 20:42:43 jeff Exp $
+
+# gen_module_libs -- find shared objects for installed perl modules
+
+use Config;
+use strict;
+
+my $dlext = $Config{'dlext'};
+my $warning = 0;
+
+MODULE:
+foreach my $mod (@ARGV) {
+    next if ($mod eq 'ExtProc');
+    my @comp = split(/::/, $mod);
+    my $dir = join('/', @comp);
+    my $base = $comp[$#comp];
+    foreach my $i (@INC) {
+        my $path = "$i/auto/$dir/${base}.$dlext";
+        if (-e $path) {
+            print "$path ";
+            next MODULE;
+        }
+    }
+    # print warning if we fall through
+    print STDERR <<_DONE_;
+*** WARNING: $mod shared object $base.$dlext not found.
+***          $mod will not be available to extproc_perl.
+_DONE_
+    $warning = 1;
+}
+
+print "\n";
+# if there's a warning, beep and sleep so user sees the message
+if ($warning) {
+    print STDERR "\x07\n";
+    sleep 5;
+}

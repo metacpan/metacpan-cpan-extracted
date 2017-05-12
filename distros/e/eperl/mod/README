@@ -1,0 +1,7 @@
+
+  These are the Perl 5 modules which integrate the ePerl parser into Perl
+  (Parse::ePerl) and into the Apache/mod_perl environment (Apache::ePerl).
+
+  DO NOT RUN "perl Makefile.PL" HERE OR IN ANY SUBDIR!
+  INSTEAD USE THE TOP-LEVEL Makefile.PL IN THE ePerl DISTRIBUTION!
+

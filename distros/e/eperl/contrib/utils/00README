@@ -1,0 +1,5 @@
+
+  del2del ............. changes the ePerl block delimiters in a file
+  shtml2phtml ......... converts a (X)SSI file to ePerl format
+  shtml2phtml.test..... testfile for shtml2phtml
+

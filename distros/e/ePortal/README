@@ -1,0 +1,119 @@
+NAME
+    ePortal::Server - The core module of ePortal project.
+
+SYNOPSIS
+    ePortal is a set of perl packages and HTML::Mason components to easy
+    implement intranet WEB site for a company. ePortal is writen with a help
+    of Apache, mod_perl, HTML::Mason. The current version of ePortal uses
+    MySQL as database backend.
+
+    The ePortal project is open source software.
+
+DOCUMENTATION
+    Look at <http://eportal.sourceforge.net/eng_index.html> for complete
+    documentation (Russian and English) and screen shots.
+
+METHODS
+  Application()
+     $app = $ePortal->Application('appname');
+
+    Returns ePortal::Application object or undef if no such object exists.
+
+    Returns $ePortal itself for application called 'ePortal'.
+
+    throws Exception::ApplicationNotInstalled if the application is not
+    installed.
+
+  ApplicationsInstalled()
+    Returns array of installed application names based on modules found in
+    ePortal::App directory
+
+  CheckUserAccount($username,$password)
+    Complete checks for a user account. If it is external user then local
+    copy is created. If local copy is expired, then it is refreshed.
+
+    This function is used during login phase.
+
+    Parameters:
+
+    * username
+        User name to check. It is from login dialog box
+
+    * password
+        A password from login dialog box to verify
+
+    Returns: "(username,reason)" in array context and "username" in scalar
+    context.
+
+    In case of bad login the "username" is undefined and "reason" is the
+    code of denial.
+
+    In case of successful login "username" returned
+
+  cleanup_request()
+    Cleans all internal variables and caches after request is completed.
+
+  isAdmin()
+    Check current for for admin privilegies.
+
+    If the server run under command line then the user always is admin.
+
+    Returns [1|0]
+
+  UserConfig()
+    Retrieve/store configuration parameter for a user. Anonymous users share
+    the same parameters. Use $session hash for session specific parameters.
+
+     UserConfig(parameter, value)
+
+    Optional "value" may be hashref of arrayref
+
+    Returns current or new value of the parameter.
+
+  Config()
+    The same as "UserConfig" but stores server specific parameters.
+
+  dbh()
+    In general "dbh()" is used to get ePortal's database handle.
+
+    This function returns $dbh - database handle or throws
+    ePortal::Exception::DBI.
+
+  send_email($receipient,$subject,$text)
+    Send an e-mail on behalf of ePortal server. send_email() make all
+    character set conversions needed for e-mail.
+
+  onDeleteUser()
+    This is callback function. Do not call it directly. It calls once
+    onDeleteUser(username) for every application installed.
+
+    Parameters:
+
+    * username
+        User name to delete.
+
+  onDeleteGroup()
+    This is callback function. Do not call it directly. It calls once
+    onDeleteGroup(groupname) for every application installed.
+
+    Parameters:
+
+    * groupname
+        Group name to delete.
+
+  max_allowed_packet()
+    Maximum allowed packet size for database. By default MySQL server has
+    limit to 1M packet size but this limit may be changed.
+
+LOGIN PROCESS
+    User authorization and authentication is ticket based. The ticked is
+    created during login process and saved in user's cookie. The ticked is
+    validated on every request.
+
+  External users
+    ePortal may authenticate an user in external directory like LDAP.
+    Currently only Novell Netware LDAP server is tested.
+
+AUTHOR
+    Sergey Rusakov, <rusakov_sa@users.sourceforge.net>
+

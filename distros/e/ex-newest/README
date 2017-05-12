@@ -1,0 +1,27 @@
+ex::newest version 0.02
+=======================
+
+An experimental pragma that modifies the behavior of 'use' and 'require'
+so that they always load the newest version of modules that have been
+installed several times in several places on your system.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires perl 5.7.2 or higher. In fact, it does require an
+higher version to work properly with autoloaded and XS modules.
+
+COPYRIGHT AND LICENCE
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+Copyright (C) 2001 Rafael Garcia-Suarez

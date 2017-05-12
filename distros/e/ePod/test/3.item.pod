@@ -1,0 +1,98 @@
+
+
+=head1 test complex itens
+
+=over 10
+
+=item title
+
+=over 10
+
+=item foo
+
+=over 10
+
+=item foo.1
+
+foo.1 text
+
+=item foo.1.1
+
+foo.1.1 text
+
+=back
+
+=back
+
+=back
+
+outside text
+
+=over 10
+
+=item foo.2
+
+=over 10
+
+=item foo.2.1.1
+
+=back
+
+=item foo.3
+
+foo.3 text
+
+=back
+
+=over 10
+
+=item bar
+
+=over 10
+
+=item bar.1
+
+=over 10
+
+=item bar.1.1
+
+=over 10
+
+=item bar.1.1.1
+
+=back
+
+=back
+
+=item bar.2
+
+=over 10
+
+=item bar.2.1
+
+=over 10
+
+=item bar.2.1.1
+
+=over 10
+
+=item title
+
+txt
+
+=back
+
+=back
+
+=back
+
+=back
+
+=back
+
+=head1 end
+
+by
+
+=cut
+

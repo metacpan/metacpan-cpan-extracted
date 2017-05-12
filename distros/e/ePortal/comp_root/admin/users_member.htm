@@ -1,0 +1,121 @@
+%#============================================================================
+%# ePortal - WEB Based daily organizer
+%# Author - S.Rusakov <rusakov_sa@users.sourceforge.net>
+%#
+%# Copyright (c) 2000-2004 Sergey Rusakov.  All rights reserved.
+%# This program is open source software
+%#
+%#
+%#----------------------------------------------------------------------------
+&nbsp;
+<% $dlg->dialog_start(
+			title => pick_lang(rus => "Членство пользователя в группах", eng => "Group membership"),
+      delete_button => 0,
+			width => 500)	%>
+
+% foreach my $field (qw/username fullname/) {
+	<% $dlg->field($field, RO => 1) %>
+% }
+
+	<tr>
+		<td>&nbsp;</td>
+		<td>&nbsp;</td>
+	</tr>
+
+	<tr>
+		<td align="center">
+			<b><% pick_lang(rus => "Входит в группы", eng => "Member of") %></b>
+			<br>
+			<% CGI::scrolling_list(
+					-name => "member_of",
+					-values => [$dlg->{obj}->member_of()],
+					-size => 5,
+					-multiple => 'true',
+					-class => "dlgfield",
+				) %>
+				<br>
+				<% CGI::submit(
+						-name => "remove",
+						-value => pick_lang(rus => "Убрать", eng => "Remove"),
+						-class => "button"
+					) %>
+
+		</td>
+		<td align="center">
+			<b><% pick_lang(rus => "Не входит в группы", eng => "Not member of") %></b>
+			<br>
+			<% CGI::scrolling_list(
+					-name => "not_member_of",
+					-values => [$dlg->{obj}->not_member_of()],
+					-size => 5,
+					-multiple => 'true',
+					-class => "dlgfield",
+				) %>
+				<br>
+				<% CGI::submit(
+						-name => "add",
+						-value => pick_lang(rus => "Добавить", eng => "Add"),
+						-class => "button"
+					) %>
+
+		</td>
+	</tr>
+
+
+	<tr>
+		<td>&nbsp;</td>
+		<td>&nbsp;</td>
+	</tr>
+
+<% $dlg->buttons(
+    ok_button => 0,
+    cancel_label => pick_lang(rus => "Закрыть", eng => "Cancel")) %>
+<% $dlg->dialog_end %>
+
+%#=== @METAGS attr =========================================================
+<%attr>
+Title => {rus => "Членство пользователя в группах", eng => "Group membership"}
+Layout => 'Dialog'
+</%attr>
+
+
+%#=== @METAGS onStartRequest ====================================================
+<%method onStartRequest><%perl>
+  my $user = new ePortal::epUser;
+	$dlg = new ePortal::HTML::Dialog( obj => $user );
+  my $location = try {
+    $dlg->handle_request( );
+  } catch ePortal::Exception::DataNotValid with {
+    my $E = shift;
+    $session{ErrorMessage} = $E->text;
+    '';
+  };
+
+	my @member_of = ref($ARGS{member_of}) eq "ARRAY" ? @{$ARGS{member_of}} : ($ARGS{member_of});
+	my @not_member_of = ref($ARGS{not_member_of}) eq "ARRAY" ? @{$ARGS{not_member_of}} : ($ARGS{not_member_of});
+
+	if ($ARGS{remove}) {
+		$user->remove_groups(@member_of);
+    return undef;
+
+	} elsif ($ARGS{add}) {
+		$user->add_groups(@not_member_of);
+    return undef;
+	}
+
+  if ( $dlg->isButtonPressed('cancel')) {
+    return $location;
+  }
+</%perl></%method>
+
+%#=== @metags once =========================================================
+<%once>
+my ($dlg, $obj);
+</%once>
+
+%#=== @metags cleanup =========================================================
+<%cleanup>
+($dlg, $obj) = ();
+</%cleanup>
+
+

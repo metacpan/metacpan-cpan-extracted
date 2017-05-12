@@ -1,0 +1,29 @@
+builddir: .
+buildroot: /tmp/eperl
+cpiobin: cpio
+dbpath: /var/local/lib/rpm
+defaultdocdir: /usr/local/doc
+distribution: (not set)
+excludedocs: (not set)
+fixperms: a+rX,g-w,o-w
+ftpport: (not set)
+ftpproxy: (not set)
+gzipbin: /usr/bin/gzip
+messagelevel: (not set)
+netsharedpath: (not set)
+optflags: -O2 -m486 -fno-strength-reduce
+pgp_name: rse
+pgp_path: pgp
+require_distribution: (not set)
+require_icon: (not set)
+require_vendor: (not set)
+root: (not set)
+rpmdir: .
+rpmfilename: %{ARCH}/%{NAME}-%{VERSION}-%{RELEASE}.%{ARCH}.rpm
+signature: none
+sourcedir: .
+specdir: .
+srcrpmdir: .
+tmppath: /var/tmp
+topdir: /usr/local/src/redhat
+vendor: (not set)

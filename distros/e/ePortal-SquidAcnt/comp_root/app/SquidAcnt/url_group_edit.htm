@@ -1,0 +1,56 @@
+%#============================================================================
+%# ePortal - WEB Based daily organizer
+%# Author - S.Rusakov <rusakov_sa@users.sourceforge.net>
+%#
+%# Copyright (c) 2000-2003 Sergey Rusakov.  All rights reserved.
+%# This program is free software; you can redistribute it
+%# and/or modify it under the same terms as Perl itself.
+%#
+%#
+%#----------------------------------------------------------------------------
+<%perl>  
+  throw ePortal::Exception::ACL( -operation => 'read', -object => $app)
+    unless $app->xacl_check_update;
+</%perl>
+<p>
+<&| /dialog.mc:edit_dialog, 
+  obj => $obj, method => 'GET',
+  title => pick_lang(rus=> "Группа блокировок", eng => "Blocking group") 
+  &>
+
+%foreach my $field (qw/title redir_type redir_url/) {
+ <& /dialog.mc:field, obj=>$obj, name => $field &>
+%}
+
+<& /dialog.mc:buttons &>
+</&>
+<p>
+
+%#=== @METAGS attr =========================================================
+<%attr>
+Title => {rus=> "Группа блокировок", eng => "Blocking group"}
+Layout => 'Dialog'
+</%attr>
+
+
+%#=== @METAGS onStartRequest ====================================================
+<%method onStartRequest><& PARENT:onStartRequest, %ARGS &><%perl>
+  $app = $ePortal->Application('SquidAcnt');
+  $obj = new ePortal::App::SquidAcnt::SAurl_group;
+
+</%perl>
+<& /dialog.mc:handle_request, obj => $obj &>
+</%method>
+
+
+
+%#=== @metags once =========================================================
+<%once>
+my ($dlg, $obj, $app);
+</%once>
+
+%#=== @metags cleanup =========================================================
+<%cleanup>
+($dlg, $obj, $app) = ();
+</%cleanup>
+

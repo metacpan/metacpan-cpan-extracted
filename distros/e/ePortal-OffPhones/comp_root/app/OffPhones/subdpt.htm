@@ -1,0 +1,59 @@
+%#============================================================================
+%# ePortal - WEB Based daily organizer
+%# Author - S.Rusakov <rusakov_sa@users.sourceforge.net>
+%#
+%# Copyright (c) 2000-2003 Sergey Rusakov.  All rights reserved.
+%# This program is free software; you can redistribute it
+%# and/or modify it under the same terms as Perl itself.
+%#
+%#
+%#----------------------------------------------------------------------------
+%# List of subdepartments 3 columns wide
+%#
+%#----------------------------------------------------------------------------
+
+<% empty_table( height => 5 ) %>
+<table border="0" cellpadding=0 cellspacing=0 width="100%"
+	style="font-family:MS sans serif;	font-size:10pt;">
+
+%for (my $counter=0; $counter < $rows; $counter++) {
+<tr bgcolor="<% $counter % 2 == 0? '#eeeeee' : '#FFFFFF' %>">
+<% empty_td( width => 5 ) %>
+
+%	for (my $column=0; $column < 3; $column++) {
+%		my $data = $subDepts[$rows*$column + $counter];
+%		$D->data($data);
+    <% CGI::td({}, $data
+			? CGI::a({ -href => href("index.htm", deptid => $D->id)}, $D->Title )
+			: "&nbsp;") %>
+		<% empty_td( width => 5 ) %>
+%	}
+</tr>
+%}
+</table>
+
+
+%#=== @metags init =========================================================
+<%init>
+	my (@subDepts, $rows);
+	my $D = new ePortal::App::OffPhones::Department;
+	$D->restore_where(parent_id => $deptid, order_by => 'title');
+
+	while($D->restore_next) {
+		push @subDepts, $D->data;
+	}
+	$gdata{OffPhones_found_count} = scalar @subDepts;
+	return if ! @subDepts;
+
+	{
+	use integer;
+	$rows = 1+ scalar(@subDepts) / 3;
+	no integer;
+	}
+
+</%init>
+
+<%args>
+$deptid => 0
+</%args>
+

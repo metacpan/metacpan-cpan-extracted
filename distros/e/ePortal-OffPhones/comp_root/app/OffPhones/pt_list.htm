@@ -1,0 +1,65 @@
+%#============================================================================
+%# ePortal - WEB Based daily organizer
+%# Author - S.Rusakov <rusakov_sa@users.sourceforge.net>
+%#
+%# Copyright (c) 2000-2003 Sergey Rusakov.  All rights reserved.
+%# This program is free software; you can redistribute it
+%# and/or modify it under the same terms as Perl itself.
+%#
+%#
+%#----------------------------------------------------------------------------
+<% plink(pick_lang(
+    rus => "Вернуться в телефонный справочник",
+		eng => "Back to phones directory"), href => "index.htm") %>
+
+<% $list->draw_list %>
+<hr>
+
+
+
+%#=== @metags email ====================================================
+<%method phones_count><%perl>
+	my $list = $ARGS{list};
+	my $column = $ARGS{column};
+	my $obj = $list->{obj};
+</%perl>
+<% $obj->phones_count %>
+</%method>
+
+
+
+%#=== @METAGS onStartRequest ====================================================
+<%method onStartRequest><%perl>
+
+	my $types = new ePortal::App::OffPhones::PhoneType;
+
+	$list = new ePortal::HTML::List( obj => $types, class=>"smallfont" );
+	$list->add_column_image();
+	$list->add_column( id => "title", url=>'pt_edit.htm?objid=#id#');
+	$list->add_column( id => "format");
+  $list->add_column_method( id => "phones_count",
+      title => pick_lang(rus => "Кол-во телефонов", eng => "Phones"),
+			align => "center" );
+	$list->add_column_system( delete => 1);
+	$list->add_button_create(url=>"pt_edit.htm");
+
+  my $location = $list->handle_request;
+  return $location if $location;
+
+  $types->restore_where($list->restore_parameters);
+
+</%perl></%method>
+
+
+%#=== @metags once =========================================================
+<%once>
+my ($list, $obj);
+</%once>
+
+%#=== @metags cleanup =========================================================
+<%cleanup>
+($list, $obj) = ();
+</%cleanup>
+
+
+

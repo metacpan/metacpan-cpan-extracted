@@ -1,0 +1,85 @@
+%#============================================================================
+%# ePortal - WEB Based daily organizer
+%# Author - S.Rusakov <rusakov_sa@users.sourceforge.net>
+%#
+%# Copyright (c) 2000-2003 Sergey Rusakov.  All rights reserved.
+%# This program is free software; you can redistribute it
+%# and/or modify it under the same terms as Perl itself.
+%#
+%#----------------------------------------------------------------------------
+%# Short info about user statistics.
+%# 1. Anfo for administrators when the user is blocked
+%# 2. Info for user itself when it is blocked and redirected here
+%#----------------------------------------------------------------------------
+<%perl>  
+  my $app = $ePortal->Application('SquidAcnt');
+  throw ePortal::Exception::ACL( -operation => 'read', -object => $app)
+    unless $app->xacl_check_read;
+  
+  my $user_id = $ARGS{user_id};
+
+  # Lookup user object
+  my $user_obj = $app->SAuser_extended;
+
+  $user_obj->restore_where(where => "u.id=?", bind => [$user_id]);
+  if ( ! $user_obj->restore_next ) {
+    $m->comp('/message.mc', ErrorMessage => pick_lang(rus => "Пользователь не найден", eng => "User not found"));
+    return;
+  }
+
+  # corresponding group object
+  my $group_obj = new ePortal::App::SquidAcnt::SAgroup;
+  $group_obj->restore($user_obj->group_id);
+
+</%perl>
+
+<h1><% $user_obj->Title %></h1>
+
+<br><b><% pick_lang(rus => "Адрес:", eng => "Address:") %></b>
+    <% $user_obj->address %>
+
+<br><b><% pick_lang(rus => "Блокирован:", eng => "Blocked:") %></b>
+    <% $user_obj->Blocked ? 'YES': 'no' %> 
+
+<br><b><% pick_lang(rus => "Срок действия:", eng => "Account expired:") %></b>
+    <% $user_obj->end_date %> 
+
+<table width="90%" border="1">
+  <% CGI::Tr({},
+      CGI::th({}, [ 
+        '&nbsp;',
+        pick_lang(rus => "День", eng => "Day"),
+        pick_lang(rus => "Неделя", eng => "Week"),
+        pick_lang(rus => "Месяц", eng => "Month") ])) %>
+  <% CGI::Tr({},
+      CGI::td({}, pick_lang(rus => "Порог предупреждения", eng => "Warning threshold")),
+      CGI::td({ -align => 'center'}, [
+        $app->NiceFormat($user_obj->daily_alert),
+        '&nbsp;',
+        '&nbsp;' ])) %>
+  <% CGI::Tr({},
+      CGI::td({}, pick_lang(rus => "Лимит", eng => "Limit")),
+      CGI::td({ -align => 'center'}, [
+        $app->NiceFormat($user_obj->daily_limit),
+        $app->NiceFormat($user_obj->weekly_limit),
+        $app->NiceFormat($user_obj->mon_limit) ])) %>
+  <% CGI::Tr({},
+      CGI::td({}, pick_lang(rus => "Фактический трафик", eng => "Traffic")),
+      CGI::td({ -align => 'center'}, [
+        $app->NiceFormat($user_obj->daily_traf),
+        $app->NiceFormat($user_obj->weekly_traf),
+        $app->NiceFormat($user_obj->mon_traf) ])) %>
+</table>
+<p>
+
+  <% plink( pick_lang(rus => "Редактировать пользователя", eng => "Edit the user"),
+    -href => href('user_edit.htm', objid => $user_id) ) %>
+  <% plink( pick_lang(rus => "Статистика", eng => "Statistics"),
+    -href => href('stat_users.htm', ss_period=> 'month', ss_rows => 100, user_id => $user_id) . "#$user_id" ) %>
+<p>
+
+
+%#=== @METAGS attr =========================================================
+<%attr>
+Title => {rus => "Оперативная информация о пользователе", eng => "Operational user info"}
+</%attr>

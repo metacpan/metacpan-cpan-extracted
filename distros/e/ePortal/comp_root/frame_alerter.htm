@@ -1,0 +1,52 @@
+%#============================================================================
+%# ePortal - WEB Based daily organizer
+%# Author - S.Rusakov <rusakov_sa@users.sourceforge.net>
+%#
+%# Copyright (c) 2000-2004 Sergey Rusakov.  All rights reserved.
+%# This program is open source software
+%#
+%#
+%#----------------------------------------------------------------------------
+% $r->header_out("Cache-Control" => "no-cache");
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+  <meta name="Robots" content="noindex,nofollow">
+  <meta name="Pragma" content="no-cache">
+  <meta name="Cache-Control" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <meta http-equiv="Refresh" content="<% $ePortal->refresh_interval %>">
+  <title>Alerter's frame</title>
+</head>
+<body bgcolor="#FFFFFF" leftmargin="0" rightmargin="0" topmargin="0" bottommargin="0" marginwidth="0" marginheight="0">
+<%perl>
+  my $event = new ePortal::PopupEvent;
+  my ($message, $messages);
+  $event->restore_where( username => $ePortal->username, unsent => 1);
+  while($event->restore_next) {
+    $messages ++;
+    if ($messages <= 10) {
+      $message .= $event->memo . '\n';
+    }
+
+    # delete expires PopupEvents anyway
+    my $ev = new ePortal::PopupEvent;
+    $ev->delete if $ev->restore( $event->id );
+  }
+</%perl>
+
+% if ($message) {
+<script language="JavaScript">
+window.alert("<% $message %>");
+</script>
+% }
+<!-- last refresh was at <% scalar localtime %> -->
+<!-- username is <% $ePortal->username %> -->
+</body>
+</html>
+
+
+%#=== @metags attr =========================================================
+<%attr>
+Layout => 'Nothing'
+</%attr>

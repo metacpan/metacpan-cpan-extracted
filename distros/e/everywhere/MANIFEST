@@ -1,0 +1,12 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+eg/Greet.pm
+eg/hi.pl
+lib/everywhere.pm
+t/00_basic.t
+t/01_hello_world.t
+t/Hello.pm
+t/World.pm
+META.yml                                 Module meta-data (added by MakeMaker)

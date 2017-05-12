@@ -1,0 +1,38 @@
+%#============================================================================
+%# ePortal - WEB Based daily organizer
+%# Author - S.Rusakov <rusakov_sa@users.sourceforge.net>
+%#
+%# Copyright (c) 2000-2004 Sergey Rusakov.  All rights reserved.
+%# This program is open source software
+%#
+%#
+%#----------------------------------------------------------------------------
+&nbsp;
+<table width="80%" border="1" align="center" cellpadding=2 cellspacing=0>
+	<tr class="g0">
+		<th>Parameter</th>
+		<th>Default value</th>
+		<th>Actual value</th>
+	</tr>
+
+% foreach my $key (sort $ePortal->{config}->parameters) {
+	<tr>
+		<td><% $key %></td>
+		<td>not implemented</td>
+    <td><%
+        ref($ePortal->{config}->value($key)) eq "ARRAY"
+          ? join( "<br>", @{$ePortal->{config}->value($key)})
+          : $ePortal->{config}->value($key) %></td>
+	</tr>
+%}
+
+</table>
+&nbsp;
+
+
+
+
+%#=== @metags attr =========================================================
+<%attr>
+Title => "List of ePortal::Server's parameters"
+</%attr>

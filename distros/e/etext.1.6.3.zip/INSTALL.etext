@@ -1,0 +1,109 @@
+Under construction.
+
+There are 3 different possibilities: compilation with TCL in tk
+directory, in separate directory and with Perl.
+
+Under TCL in tk directory
+~~~~~~~~~~~~~~~~~~~~~~~~~
+You can just replace the standard tkText* files with the
+supplied, and link wish with one additional file ptclGlue.o.
+
+For this copy all C files (*.c *.h) from the root directory of
+distribution into tk directory and add ptclGlue.o to the list TEXTOBJS
+in the Makefile.
+
+	make 
+	./wish ROOTDIR/demo/etext.tcl
+
+will give you a sample window into which you can type some minimal
+math. See documentation in etext/doc.
+
+Under TCL in separate directory
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+If you want to live in a separate directory, make sure that the links
+tk and tcl in this directory are OK, and essentially do
+
+	cp Makefile.etext Makefile
+	make
+	./wish demo/etext.tcl
+
+(See README.etext for keybindings).
+
+Unfortunately the supplied Makefile is not autoconf'ed, so probably
+you need to 
+
+	cp tk/Makefile Makefile
+	patch <Makefile.diff
+	make
+	./wish demo/etext.tcl
+
+I'm not sure that there is no rejects from patching :-(.
+
+Under Perl
+~~~~~~~~~~
+
+You need a recent Perl (5.003+ ?) and latest Tk/Perl. To install Perl,
+get it from CPAN and
+
+	./Configure -des -D CC=my_compiler -D prefix=/path/to/install/location
+	make
+	make test
+	make install
+
+Install Tk40*.* (or have it installed):
+
+	perl Makefile.PL
+	make
+	perl -Mblib basic_example
+	make install
+
+Now you can compile eText.  There are three variants.  
+If you have Tk build tree:
+
+	cd ROOTDIR/etext/eText
+	perl -Mblib=/path/to/Tk-build-tree Makefile.PL
+	make
+	perl -Mblib=/path/to/Tk-build-tree -Mblib t/eText.t
+	make install
+
+If Tk is installed, then this may work (but probably wont due to dependence
+to some files which are not installed):
+
+	cd ROOTDIR/etext/eText
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+Or you can move etext/eText directory to reside in the main Tk build tree,
+and rebuild Tk:
+
+	mv ROOTDIR/etext/eText ROOT_TK_DIR
+	cd ROOT_TK_DIR
+	perl Makefile.PL
+	make
+
+To test the extension do
+
+	perl -Mblib -I eText/utils eText/t/eText.t
+
+Now, when you install Tk by doing
+
+	make install
+
+eText will be installed as well.
+
+Currently you need to have Tk build tree around to build eText.
+
+make test gives you a window with some example. See README.etext and
+documentation in doc for key bindings.
+
+REMARK
+~~~~~~
+
+If you have an older Tk (before 401.000), you will see a warning like
+this: 
+
+"tkText.c", line 998: warning: argument #2 is incompatible with prototype:
+        prototype: pointer to function(pointer to void) returning void : "unknown", line 0
+        argument : pointer to function(pointer to char) returning void

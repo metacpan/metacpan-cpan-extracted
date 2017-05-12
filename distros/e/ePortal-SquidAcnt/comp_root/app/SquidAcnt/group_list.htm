@@ -1,0 +1,69 @@
+%#============================================================================
+%# ePortal - WEB Based daily organizer
+%# Author - S.Rusakov <rusakov_sa@users.sourceforge.net>
+%#
+%# Copyright (c) 2000-2003 Sergey Rusakov.  All rights reserved.
+%# This program is free software; you can redistribute it
+%# and/or modify it under the same terms as Perl itself.
+%#
+%#
+%#----------------------------------------------------------------------------
+<%perl>  
+  my $app = $ePortal->Application('SquidAcnt');
+  throw ePortal::Exception::ACL( -operation => 'read', -object => $app)
+    unless $app->xacl_check_read;
+
+  $m->comp('/search_dialog.mc:handle_request');
+
+  # search parameters
+  my (@where, @bind);
+  if ( $session{_text} ne '' ) {
+    my $b = '%' . $session{_text} . '%';
+    push @where, "(title like ?)";
+    push @bind, $b;
+  }
+
+  my $obj = new ePortal::App::SquidAcnt::SAgroup(
+    DBISource => 'SquidAcnt',
+    SQL => "SELECT g.*
+                ,ifnull(g.daily_limit, ?) as daily_limit
+                ,ifnull(g.weekly_limit, ?) as weekly_limit
+                ,ifnull(g.mon_limit, ?) as mon_limit
+                ,ifnull(g.daily_alert, ?) as daily_alert
+            FROM SAgroup g
+            ",
+    Bind => [$app->daily_limit, $app->weekly_limit, $app->mon_limit, $app->daily_alert]
+  );
+
+</%perl>
+
+<& /search_dialog.mc:dialog, align => 'right', extra => $m->scomp('SELF:intro') &>
+
+<&| /list.mc, obj => $obj, restore_where => {where=>\@where, bind=>\@bind} &>
+ <&| /list.mc:row &>
+  <& /list.mc:column_image &>
+  <& /list.mc:column, id => 'title', order_by => 'title', 
+      url => href('group_edit.htm', objid => $_->id) &>
+  <&| /list.mc:column, -align => 'center', 
+          title => pick_lang(rus => "Лимиты Дн/Нд/Мс", eng => "Limits Da/We/Mo") &>
+        <% CGI::font({-color=>'red'}, $app->NiceFormat($_->daily_limit)) %> /
+        <% CGI::font({-color=>'brown'}, $app->NiceFormat($_->weekly_limit)) %> /
+        <% CGI::font({-color=>'green'}, $app->NiceFormat($_->mon_limit)) %>
+  </&>
+% if ($app->xacl_check_update ) {
+   <& /list.mc:column_delete &>
+% }
+ </&> <!-- row -->
+</&> <!-- list -->
+
+
+%#=== @METAGS intro ====================================================
+<%method intro>
+% if ($ePortal->Application('SquidAcnt')->xacl_check_update) {
+  <ul>
+  <li><a href="<% href('group_edit.htm', objid => 0) %>"><% img(src=>'/images/icons/memo.gif') %>&nbsp;<%
+      pick_lang(rus => "Новая группа", eng => "New group") %></a>
+  </ul>
+% }
+</%method>
+

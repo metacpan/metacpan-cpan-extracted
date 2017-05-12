@@ -1,0 +1,9 @@
+* means corrected
+
+1) Additional element of a block can hide a cursor.
+2)* If part of long hierarchy of radicals disappears on the right,
+anything disappears. (* Was: wrong interaction of wrapped lines with
+tcl layout. *)
+3) Algorithm for layout can become exponential if it tries to wrap
+around n levels of IBTrees to fit into space.
+4) Change ArgAppendCopy to ArgAppendShadow? (incr refcount instead of copy?)

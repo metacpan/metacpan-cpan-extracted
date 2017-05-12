@@ -1,0 +1,180 @@
+%#============================================================================
+%# ePortal - WEB Based daily organizer
+%# Author - S.Rusakov <rusakov_sa@users.sourceforge.net>
+%#
+%# Copyright (c) 2000-2003 Sergey Rusakov.  All rights reserved.
+%# This program is free software; you can redistribute it
+%# and/or modify it under the same terms as Perl itself.
+%#
+%#
+%#----------------------------------------------------------------------------
+%#
+%# Displays list of contacts
+%#
+%#----------------------------------------------------------------------------
+
+<table width="99%" border="0">
+<tr><td width="30%">
+  <& SELF:intro &>
+</td><td  width="70%" align="right">
+  <& SELF:search_dialog &>
+</td></tr>
+</table>
+
+<% $list->draw_list %>
+<hr>
+
+<span class="memo">
+<li><% pick_lang(rus => q{
+  В адресной книге вы можете хранить свои личные контакты (люди,
+	предприятия и т.д.).
+	}, eng => q{
+	This is place to save your contacts.
+	} ) %>
+</span>
+
+%#=== @metags email ====================================================
+<%method email><%perl>
+	my $list = $ARGS{list};
+	my $column = $ARGS{column};
+	my $obj = $list->{obj};
+	return if ! $obj->email;
+</%perl>
+<a href="mailto:<% $obj->email %>"><% $obj->email %></a>
+</%method>
+
+
+
+%#=== @METAGS onStartRequest ====================================================
+<%method onStartRequest>
+  <& PARENT:onStartRequest, %ARGS &>
+  <%perl>
+
+  my $obj = new ePortal::App::Organizer::Contact(
+      DBISource => 'Organizer',
+      Where => "CN.org_id=$session{_org_id}",
+      SQL => 'SELECT CN.*, C.title as category_title
+        FROM Contact CN
+        LEFT JOIN Category C ON category_id=C.id
+      ');
+
+  $list = new ePortal::HTML::List( obj => $obj, class => "smallfont",
+      state => {org_id => $session{_org_id}}, after_row => 'row_detail' );
+	$list->add_column_image();
+  $list->add_column( id => "title", url => "cont_edit.htm?objid=#id#",
+      sorting => 1,
+      title => pick_lang(rus => "Имя", eng => "Name")  );
+  $list->add_column(id => "category_title",
+      sorting => 1,
+      title => pick_lang(rus => "Категория", eng => "Category") );
+  $list->add_column(id => "company",
+      sorting => 1,
+      title => pick_lang(rus => "Место работы", eng => "Company") );
+  $list->add_column_method( id => "phones",
+      title => pick_lang(rus => "Телефоны", eng => "Phones"));
+  $list->add_column_method( id => "email",
+      sorting => 1,
+      title => 'e-mail');
+  if ( $session{_organizer}->xacl_check_delete ) {
+    $list->add_column_system(delete => 1);
+  }
+
+  my $location = $list->handle_request;
+  return $location if $location;
+
+  # search parameters
+  my (@where, @bind);
+  if ( $ARGS{text} ne '' ) {
+    my $b = '%' . $ARGS{text} . '%';
+    push @where, "(CN.title like ? OR CN.company like ? OR CN.memo like ?)";
+    push @bind, $b;
+    push @bind, $b;
+    push @bind, $b;
+  }
+  if ( $ARGS{category_id} > 0 ) {
+    push @where, 'category_id=?';
+    push @bind, $ARGS{category_id};
+  }
+
+
+  $list->{obj}->restore_where( $list->restore_parameters, where => \@where, bind => \@bind);
+
+</%perl></%method>
+
+%#=== @metags once =========================================================
+<%once>
+my ($list, $obj);
+</%once>
+
+%#=== @metags cleanup =========================================================
+<%cleanup>
+($list, $obj) = ();
+</%cleanup>
+
+
+%#=== @METAGS row_detail ====================================================
+<%method row_detail><%perl>
+  my $list = $ARGS{list};
+  my $obj = $list->{obj};
+  my $t = (split("\r?\n", $obj->Memo))[0];
+</%perl>
+<span class="memo"><% $t |h %></span>
+</%method>
+
+
+%#=== @METAGS search_dialog ====================================================
+<%method search_dialog><%perl>
+  my %args = $m->request_args;
+  my $dummy = new ePortal::App::Organizer::Contact;
+  $dummy->add_attribute( text => {label => pick_lang(rus => "Текст для поиска", eng => "Text to search")} );
+  $dummy->org_id( $session{_org_id} );
+  $dummy->category_id( $args{category_id} );
+  $dummy->text( $args{text} );
+  my $d = new ePortal::HTML::Dialog( obj => $dummy, width => "400", method => 'GET',
+      align => 'right',
+      title => pick_lang(rus => "Поиск", eng => "Search") );
+</%perl>
+
+<%  $d->dialog_start() %>
+  <tr>
+    <% $d->field('org_id', hidden => 1) %>
+    <% $d->field('text') %>
+    <% $d->field('category_id') %>
+
+    <tr><td align="center" colspan="2">
+    <% plink({rus => 'Показать всех', eng => 'Show all'},
+        href=>href($ENV{SCRIPT_NAME}, org_id => $session{_org_id})) %>
+    </td></tr>
+  </tr>
+<%  $d->buttons(cancel_button => 0, ok_label => pick_lang(rus => "Искать!", eng => "Search!")) %>
+<%  $d->dialog_end() %>
+</%method>
+
+
+
+
+%#=== @METAGS intro ====================================================
+<%method intro>
+% if ($session{_organizer}->xacl_check_update) {
+  <ul>
+  <li><a href="<% href('cont_edit.htm', org_id => $session{_org_id}, objid => 0) %>"><% img(src=>'/images/icons/memo.gif') %>&nbsp;<%
+      pick_lang(rus => "Новый контакт", eng => "New contact") %></a>
+  </ul>
+% }
+</%method>
+
+
+%#=== @METAGS phones ====================================================
+<%method phones><%perl>
+  my $list = $ARGS{list};
+  my $obj = $list->{obj};
+  my @html;
+
+  push @html, pick_lang(rus => "р:", eng => "w:") . $obj->phone_w
+    if $obj->phone_w;
+  push @html, pick_lang(rus => "д:", eng => "h:") . $obj->phone_h
+    if $obj->phone_h;
+
+</%perl>
+<span class="memo"><% join('<br>', @html) %></span>
+</%method>

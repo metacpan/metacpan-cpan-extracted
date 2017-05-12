@@ -1,0 +1,26 @@
+%#============================================================================
+%# ePortal - WEB Based daily organizer
+%# Author - S.Rusakov <rusakov_sa@users.sourceforge.net>
+%#
+%# Copyright (c) 2000-2004 Sergey Rusakov.  All rights reserved.
+%# This program is open source software
+%#
+%#
+%#----------------------------------------------------------------------------
+%# Parameters:
+%#    group=<id> display this group
+%#
+%#----------------------------------------------------------------------------
+
+<table width="100%" border=0>
+<tr><td>
+  <& /catalog/group_ring.mc &>
+  <& /catalog/groups.mc &>
+  <& /catalog/links_ring.mc &>
+  <& /catalog/links.mc &>
+</td><td width="10%">
+  <& /catalog/admin.mc &>
+  <& /catalog/search_dialog.mc &>
+  <& /empty_table.mc, height => 5 &>
+  <& /catalog/mostpopular.mc &>
+</td></tr></table>

@@ -1,0 +1,53 @@
+<!-- 
+##
+##  demo.net -- ePerl demonstration webpage
+##  Copyright (c) 1996,1997 Ralf S. Engelschall, All Rights Reserved. 
+##
+-->
+<html>
+<head>
+<title>demo.net</title>
+</head>
+<body>
+<blockquote>
+<blockquote>
+<h1>demo.net</h1>
+<h2>Low-level Network programming with Net::FTP</h1>
+<p>
+
+This demonstrates how one can use the Net::FTP package (from <tt>libnet</tt>)
+from within ePerl to retrieve a file via FTP. As an example the ePerl
+distribution README file is fetched from
+<tt>ftp://ftp.engelschall.com/sw/</tt> while the current filename (ePerl
+version!) is determined on-the-fly.
+
+<p>
+And here comes the file:
+
+<pre>
+<?
+use Net::FTP;
+my $tmpfile = "/tmp/demo.net.tmp.$$";
+
+#   retrieve the file a temporary file
+my $ftp = Net::FTP->new("ftp.engelschall.com");
+$ftp->login("ftp", "demo.ftp\@");
+$ftp->cwd("/sw");
+my ($f) = grep(/^eperl-.*\.readme$/, $ftp->ls("eperl-*.readme"));
+$ftp->get($f, $tmpfile);
+$ftp->quit;
+
+#   read the temporary file into current page
+open(FP, "<$tmpfile");
+while (<FP>) {
+    print $_;
+}
+close(FP);
+unlink($tmpfile);
+!>
+</pre>
+
+</blockquote>
+</blockquote>
+</body>
+</html>  

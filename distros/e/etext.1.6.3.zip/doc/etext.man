@@ -1,0 +1,878 @@
+.rn '' }`
+''' $RCSfile$$Revision$$Date$
+'''
+''' $Log$
+'''
+.de Sh
+.br
+.if t .Sp
+.ne 5
+.PP
+\fB\\$1\fR
+.PP
+..
+.de Sp
+.if t .sp .5v
+.if n .sp
+..
+.de Ip
+.br
+.ie \\n(.$>=3 .ne \\$3
+.el .ne 3
+.IP "\\$1" \\$2
+..
+.de Vb
+.ft CW
+.nf
+.ne \\$1
+..
+.de Ve
+.ft R
+
+.fi
+..
+'''
+'''
+'''     Set up \*(-- to give an unbreakable dash;
+'''     string Tr holds user defined translation string.
+'''     Bell System Logo is used as a dummy character.
+'''
+.tr \(*W-|\(bv\*(Tr
+.ie n \{\
+.ds -- \(*W-
+.ds PI pi
+.if (\n(.H=4u)&(1m=24u) .ds -- \(*W\h'-12u'\(*W\h'-12u'-\" diablo 10 pitch
+.if (\n(.H=4u)&(1m=20u) .ds -- \(*W\h'-12u'\(*W\h'-8u'-\" diablo 12 pitch
+.ds L" ""
+.ds R" ""
+.ds L' '
+.ds R' '
+'br\}
+.el\{\
+.ds -- \(em\|
+.tr \*(Tr
+.ds L" ``
+.ds R" ''
+.ds L' `
+.ds R' '
+.ds PI \(*p
+'br\}
+.\"	If the F register is turned on, we'll generate
+.\"	index entries out stderr for the following things:
+.\"		TH	Title 
+.\"		SH	Header
+.\"		Sh	Subsection 
+.\"		Ip	Item
+.\"		X<>	Xref  (embedded
+.\"	Of course, you have to process the output yourself
+.\"	in some meaninful fashion.
+.if \nF \{
+.de IX
+.tm Index:\\$1\t\\n%\t"\\$2"
+..
+.nr % 0
+.rr F
+.\}
+.TH DOC/ETEXT 1 "perl 5.003, patch 17" "30/Aug/96" "User Contributed Perl Documentation"
+.IX Title "DOC/ETEXT 1"
+.UC
+.IX Name "textblocks - additional text widget subcommand for Tk distribution."
+.if n .hy 0
+.if n .na
+.ds C+ C\v'-.1v'\h'-1p'\s-2+\h'-1p'+\s0\v'.1v'\h'-1p'
+.de CQ          \" put $1 in typewriter font
+.ft CW
+'if n "\c
+'if t \\&\\$1\c
+'if n \\&\\$1\c
+'if n \&"
+\\&\\$2 \\$3 \\$4 \\$5 \\$6 \\$7
+'.ft R
+..
+.\" @(#)ms.acc 1.5 88/02/08 SMI; from UCB 4.2
+.	\" AM - accent mark definitions
+.bd B 3
+.	\" fudge factors for nroff and troff
+.if n \{\
+.	ds #H 0
+.	ds #V .8m
+.	ds #F .3m
+.	ds #[ \f1
+.	ds #] \fP
+.\}
+.if t \{\
+.	ds #H ((1u-(\\\\n(.fu%2u))*.13m)
+.	ds #V .6m
+.	ds #F 0
+.	ds #[ \&
+.	ds #] \&
+.\}
+.	\" simple accents for nroff and troff
+.if n \{\
+.	ds ' \&
+.	ds ` \&
+.	ds ^ \&
+.	ds , \&
+.	ds ~ ~
+.	ds ? ?
+.	ds ! !
+.	ds /
+.	ds q
+.\}
+.if t \{\
+.	ds ' \\k:\h'-(\\n(.wu*8/10-\*(#H)'\'\h"|\\n:u"
+.	ds ` \\k:\h'-(\\n(.wu*8/10-\*(#H)'\`\h'|\\n:u'
+.	ds ^ \\k:\h'-(\\n(.wu*10/11-\*(#H)'^\h'|\\n:u'
+.	ds , \\k:\h'-(\\n(.wu*8/10)',\h'|\\n:u'
+.	ds ~ \\k:\h'-(\\n(.wu-\*(#H-.1m)'~\h'|\\n:u'
+.	ds ? \s-2c\h'-\w'c'u*7/10'\u\h'\*(#H'\zi\d\s+2\h'\w'c'u*8/10'
+.	ds ! \s-2\(or\s+2\h'-\w'\(or'u'\v'-.8m'.\v'.8m'
+.	ds / \\k:\h'-(\\n(.wu*8/10-\*(#H)'\z\(sl\h'|\\n:u'
+.	ds q o\h'-\w'o'u*8/10'\s-4\v'.4m'\z\(*i\v'-.4m'\s+4\h'\w'o'u*8/10'
+.\}
+.	\" troff and (daisy-wheel) nroff accents
+.ds : \\k:\h'-(\\n(.wu*8/10-\*(#H+.1m+\*(#F)'\v'-\*(#V'\z.\h'.2m+\*(#F'.\h'|\\n:u'\v'\*(#V'
+.ds 8 \h'\*(#H'\(*b\h'-\*(#H'
+.ds v \\k:\h'-(\\n(.wu*9/10-\*(#H)'\v'-\*(#V'\*(#[\s-4v\s0\v'\*(#V'\h'|\\n:u'\*(#]
+.ds _ \\k:\h'-(\\n(.wu*9/10-\*(#H+(\*(#F*2/3))'\v'-.4m'\z\(hy\v'.4m'\h'|\\n:u'
+.ds . \\k:\h'-(\\n(.wu*8/10)'\v'\*(#V*4/10'\z.\v'-\*(#V*4/10'\h'|\\n:u'
+.ds 3 \*(#[\v'.2m'\s-2\&3\s0\v'-.2m'\*(#]
+.ds o \\k:\h'-(\\n(.wu+\w'\(de'u-\*(#H)/2u'\v'-.3n'\*(#[\z\(de\v'.3n'\h'|\\n:u'\*(#]
+.ds d- \h'\*(#H'\(pd\h'-\w'~'u'\v'-.25m'\f2\(hy\fP\v'.25m'\h'-\*(#H'
+.ds D- D\\k:\h'-\w'D'u'\v'-.11m'\z\(hy\v'.11m'\h'|\\n:u'
+.ds th \*(#[\v'.3m'\s+1I\s-1\v'-.3m'\h'-(\w'I'u*2/3)'\s-1o\s+1\*(#]
+.ds Th \*(#[\s+2I\s-2\h'-\w'I'u*3/5'\v'-.3m'o\v'.3m'\*(#]
+.ds ae a\h'-(\w'a'u*4/10)'e
+.ds Ae A\h'-(\w'A'u*4/10)'E
+.ds oe o\h'-(\w'o'u*4/10)'e
+.ds Oe O\h'-(\w'O'u*4/10)'E
+.	\" corrections for vroff
+.if v .ds ~ \\k:\h'-(\\n(.wu*9/10-\*(#H)'\s-2\u~\d\s+2\h'|\\n:u'
+.if v .ds ^ \\k:\h'-(\\n(.wu*10/11-\*(#H)'\v'-.4m'^\v'.4m'\h'|\\n:u'
+.	\" for low resolution devices (crt and lpr)
+.if \n(.H>23 .if \n(.V>19 \
+\{\
+.	ds : e
+.	ds 8 ss
+.	ds v \h'-1'\o'\(aa\(ga'
+.	ds _ \h'-1'^
+.	ds . \h'-1'.
+.	ds 3 3
+.	ds o a
+.	ds d- d\h'-1'\(ga
+.	ds D- D\h'-1'\(hy
+.	ds th \o'bp'
+.	ds Th \o'LP'
+.	ds ae ae
+.	ds Ae AE
+.	ds oe oe
+.	ds Oe OE
+.\}
+.rm #[ #] #H #V #F C
+.SH "NAME"
+.IX Header "NAME"
+textblocks \- additional text widget subcommand for Tk distribution.
+.SH "SYNOPSIS"
+.IX Header "SYNOPSIS"
+.PP
+.Vb 2
+\&  .widgetName block subcommand ?opt opt ...?
+\&  .widgetName configure -getFlags integer
+.Ve
+.Sh "What else is in the widget?"
+.IX Subsection "What else is in the widget?"
+The other difference with the stock Text widget is the object oriented
+dump. It dumps a list of objects which represent the contents of the
+widget in the given range. The temporary position for this command is
+.PP
+.Vb 1
+\&   .widget block list from to
+.Ve
+An object is a real object in Perl, and a list with a first element
+being the \fIclass id\fR in \s-1TCL\s0 (the rest being the contests, in what
+follows the first element of the rest is referenced as the first
+element of the object).
+.PP
+The particular elements of the list represent:
+.Ip "String" 7
+.IX Item "String"
+An object with contents being the string. Object class is
+\f(CWTk::Text::String\fR, \fIclass id\fR is \f(CWS\fR.
+.Ip "Marks" 7
+.IX Item "Marks"
+The contents is the name of the mark, the classes are
+\f(CWTk::Text::MarkLeft\fR with \fIid\fR \f(CWL\fR, and \f(CWTk::Text::MarkRight\fR with
+\fIid\fR \f(CWR\fR.
+.Ip "Tags" 7
+.IX Item "Tags"
+The contents is the name of the tag, the classes are
+\f(CWTk::Text::TagOn\fR with \fIid\fR \f(CWT\fR, and \f(CWTk::Text::TagOff\fR with
+\fIid\fR \f(CWt\fR.
+.Ip "Window" 7
+.IX Item "Window"
+The contents is a list of the name of the window and the script to
+create the window, the class is \f(CWTk::Text::EmbWin\fR with \fIid\fR \f(CWW\fR.
+.Ip "block" 7
+.IX Item "block"
+A block is dumped as a list of 
+.Ip "type" 17
+.IX Item "type"
+The first element is a list of \fIblock name\fR, \fIdepth\fR and (optionally)
+\fIinstance data\fR.
+.Ip "contents" 17
+.IX Item "contents"
+The rest of the list represents the contents of the block in the same
+form as the top-level dump, with exception for inter-leaf separators.
+.Sp
+The inter-leaf separators are dumped as on object of class
+\f(CWTk::Text::BlockSeparator\fR, with \fIid\fR \f(CW|\fR, the contents being the
+\*(L"depth\*(R" of the separator. Note that the minimal possible depth is 1
+for separators between leaves of the same parent.
+.Sp
+The object class in Perl is \f(CWTk::Text::Block\fR, the \fIclass id\fR is
+\f(CWB\fR.
+.Ip "Empty" 7
+.IX Item "Empty"
+An empty block is dumped in the same way with the object class being
+\f(CWTk::Text::Empty\fR, the \fIclass id\fR being \f(CWE\fR. The contenst is the
+list of the block name, and (optionally) \fIinstance data\fR.
+.Sh "What is a block?"
+.IX Subsection "What is a block?"
+A Block is an additional editable unit of information for inclusion
+into widget. Block consists of \fIblock type\fR, \fIblock contents\fR, and,
+possibly, \fIblock instance data\fR. \fIBlock contents\fR is a tree whose
+leaves can contain anything that can be in a row in a text widget
+(including other blocks). \fIBlock instance data\fR can be arbitrary data
+as in a language variable.
+.PP
+\fICurrent implementation allows only trees with the distance from root
+to leaves being the same for all the leaves.\fR
+.Sh "Examples of blocks"
+.IX Subsection "Examples of blocks"
+Here we provide several examples on the internal structure of blocks
+that can implement the following objects. To see how the internal
+structure (does not) correlate with the visual appearance, see
+the section on \fIDisplay of blocks\fR.
+.Ip "Button" 12
+.IX Item "Button"
+.Sp
+.Vb 3
+\&    ___ Text to show when released
+\&   /
+\&   \e___ Text to show when pressed
+.Ve
+.Ip "Multilevel sub-super-script" 12
+.IX Item "Multilevel sub-super-script"
+.Sp
+.Vb 9
+\&     __ First superscript
+\&    /
+\&   /\e__ Second superscript
+\&  /
+\&  \e    __ First subscript
+\&   \e  /
+\&    \e/___ Second subscript
+\&     \e
+\&      \e__ Third subscript
+.Ve
+.Ip "Radical" 12
+.IX Item "Radical"
+.Sp
+.Vb 1
+\&  ___ Text to show inside
+.Ve
+.Ip "Tabulation" 12
+.IX Item "Tabulation"
+.Sp
+.Vb 1
+\&  (Empty)
+.Ve
+.Sh "Indices in blocks"
+.IX Subsection "Indices in blocks"
+A block occupies the following place in the index space: 1 index unit
+for the start of the block, then all the leaves separated by 1 index
+separators, and 1 index for the end of the block. Thus a block with
+one empty leaf occupies 2 index units.
+.PP
+An \fIempty\fR block (without leaves) occupies 1 unit of the index space.
+.PP
+Note that a block (however complicated) always fits in one line of the
+index space. In particular, the usual bindings for \f(CWup\fR and \f(CWdown\fR
+will move you out of a block. (You should expect it, since leaves of a
+block \fImay\fR be placed one under another, but may be not.)
+.Sh "String representation of blocks"
+.IX Subsection "String representation of blocks"
+The commands that convert block contents to string (\f(CW.t get\fR,
+selection and search) see the contents of a block as a string of the
+same size as the size of block in the index space. The start of the
+block looks like \f(CW{\fR, end like \f(CW}\fR, interleaf separators like \f(CW|\fR.
+.PP
+An \fIempty\fR block looks like \f(CW.\fR.
+.PP
+Note that a string representation of a block (however complicated)
+always fits in one line.
+.Sh "Insertion in blocks"
+.IX Subsection "Insertion in blocks"
+Insertion changes contents of the block if the insertion point is
+inside the block, i.e.,
+after starting index of the block and before the ending position (and
+not inside some other block contained in the given one). Note that it
+is impossible to be inside an empty block.
+.PP
+If inserted text contains no newlines, it is added to the leaf of tree
+the insertion point is in (i.e., at or after the start of, and before
+the end of). If it contains newlines, then the resulting leaf is split
+into several at the inserted newlines. All the new leaves have the
+same parent node as the initial leaf. Registered callback will be
+called on insertion of newlines \fI(not implemented)\fR.
+.Sh "Destruction of blocks"
+.IX Subsection "Destruction of blocks"
+When the block is destructed, it contents is merged into the
+surrounding environment. Block's head and tail disappear, interleaf
+separators behave like newlines. I.e., if block was contained in
+another block, interleaf separators of deceased block became interleaf
+separators of the parent block, otherwise they became line separators
+in the text widget.
+.Sh "Deletion of text in blocks"
+.IX Subsection "Deletion of text in blocks"
+.Ip "\(bu" 5
+.IX Item "\(bu"
+If the deletion range does not include any index unit occupied by the
+block, the block does not change.
+.Ip "\(bu" 5
+.IX Item "\(bu"
+If a range contains a block as a whole, block is deleted. Registered
+callback will be called \fI(not implemented)\fR. Same happens if the
+range contains all the block except either head or tail index.
+.Ip "\(bu" 5
+.IX Item "\(bu"
+Otherwise, if the range includes head or tail of the block, the block is
+destroyed, and what remains of the contents is merged into enclosing
+structure as is described in the section on \fIDestruction of blocks\fR.
+.Ip "\(bu" 5
+.IX Item "\(bu"
+If a range is completely contained inside some leaf, the inner
+structure of the block does not change (but if a leaf becomes empty,
+registered callback will be called \fI(not implemented)\fR).
+.Ip "\(bu" 5
+.IX Item "\(bu"
+If the range contains leaves separators, two survived leaves are
+merged together. If their parents were different, they are also merged
+together, and the process continues until the common parent is
+met. This is exact opposite to the \f(CWblock split ??\fR subcommand that
+would create this separator. Registered callbacks are called \fI(not
+implemented)\fR.
+.Sh "Tags and blocks"
+.IX Subsection "Tags and blocks"
+Characters inside leaves can be tagged in the usual way. Interleaf
+separators and tail of the block behave like end-of-lines when
+tagged. The behaviour of tags on the start of block is undefined.
+.Sh "Bounding boxes"
+.IX Subsection "Bounding boxes"
+.Ip "\(bu" 5
+.IX Item "\(bu"
+If index in the text corresponds to a character in a leaf of a block,
+it behaves as usual.
+.Ip "\(bu" 5
+.IX Item "\(bu"
+If the index corresponds to the interleaf separator or tail of a
+block, the bounding box of the preceeding leaf is returned.
+.Ip "\(bu" 5
+.IX Item "\(bu"
+If the index corresponds to the head of the block, the bounding box
+for the whole block is returned.
+.PP
+Bounding box for anything \fIinvisible\fR is of size 0 and at the
+upper-left corner of the block.
+.SH "Display of blocks"
+.IX Header "Display of blocks"
+The display of blocks is completely customizable. It is based on the
+current configuration of the \fItype\fR of displayed block.
+.Ip "\(bu" 5
+.IX Item "\(bu"
+If no customization is registered for the block, then the tree
+structure is ignored, all the leaves are drawn on the display one
+under another, left justified, with wrap enabled, and the resulting
+object is vertically centered about the middle of the ascent of the
+default font. In what follows we refer to this behavior as \fIdefault layout\fR.
+.Ip "\(bu" 5
+.IX Item "\(bu"
+If the block registers a layout callback, it will be called when the
+block is about to be drawn. This procedure takes the information on
+the size the leaves take on the display, and returns information on
+what size the block takes on the display and what should be relative
+offsets of leaves in the resulting rectangle. \fIDetails are subject to
+change.\fR No clipping is performed.
+.Ip "\(bu" 5
+.IX Item "\(bu"
+Layout callback can also specify which leaves \fIshould not\fR be shown
+at all, and what additional details to show in the rectangle.
+.Ip "\(bu \fI(Not implemented)\fR" 5
+.IX Item "\(bu \fI(Not implemented)\fR"
+Block can also specify that some leaves have some additional tags.
+.SH "Layout callback"
+.IX Header "Layout callback"
+Layout callback is the main component of the block.
+.PP
+\fIDetails are subject to change.\fR
+.PP
+A layout procedure takes a variable number of \fIinput arguments\fR. The
+\fIfirst element\fR
+is a list containing the block name and widget name, (possibly with an
+addition, say, if \fIinstance data\fR is present in the block, it will be
+the next element). The \fIsecond element\fR gives the horizontal offset of the start
+of the block inside the ambient line (it can be different from the
+absolute horizontal position if the block is inside some other
+block). The \fIremaining elements\fR specify the tree structure of the block and the
+layout details of the leaves. Any child of the root node of the tree
+provides one argument of the function. All the arguments are lists,
+and
+.Ip "\(bu" 5
+.IX Item "\(bu"
+if the child is a leaf, then the list consists of the \fIrepeat count\fR
+(necessarily 1), current \f(CWy\fR offset inside the block, width, \fItotal
+width\fR, height, baseline, and some additional data on the leaf \fI(last
+part is not implemented, but it will contain horizontal stretchability
+of the leaf, vertical one and stretchability of the baseline)\fR.
+.Ip "\(bu" 5
+.IX Item "\(bu"
+If the child is a node, the list elements are themselves lists that
+are obtained using the same rules recursively: if children are leaves,
+the elements are lists of numbers, otherwise lists of lists.
+.Ip "\(bu" 5
+.IX Item "\(bu"
+If block is configured to lie to the layout procedure about its contents, it
+can present several lines or a whole subtree of itself in the same
+form as a single leaf. In this case the \fIrepeat count\fR above can be
+bigger than 1.
+.PP
+\fBSummary:\fR
+.Ip "Input arguments:" 1
+.IX Item "Input arguments:"
+.Sp
+.Vb 1
+\&  {bname wname ...} ho {rc yo w tw h b hs vs bs} ...
+.Ve
+.Ip "Abbreviations:" 1
+.IX Item "Abbreviations:"
+BlockNAME, WidgetNAME, Horizontal Offset, Repeat Count, Y Offset,
+Width, Total Width, Baseline. hs, vs, bs are currently not used.
+.PP
+The return value of the callback must be a list. The length of the
+list (counting multiplicities, see below) must be at least the number of
+leaves plus one. The first element of the list specifies the layout
+information on the block as a whole, the others specify layout
+information for the leaves and (possibly) additional elements to show.
+.PP
+There are three possible formats of the elements in this list. All
+are lists of numbers (and should be of the form \f(CW{dd ... dd}\fR)
+of lengths 1, 7, or 13. The first number is either \fIrepeat count\fR, or
+\fIid\fR of additional line to show (i.e., the same data as returned by
+\f(CWtextWidget block addline index\fR command). Lists of different length have
+the following meaning:
+.Ip "1:" 5
+.IX Item "1:"
+the child is not shown at all. This format is prohibited for the
+layout information of the block as a whole and for additional
+lines. The only element of the list is the \fIrepeat count\fR.
+.Ip "7:" 5
+.IX Item "7:"
+If the block as a whole is not laid out yet, this is the information
+about it, and all the elements but what describe width,
+height and baseline are ignored.  If not all the leaves are laid out
+yet, the first element is the \fIrepeat count\fR, what means the number
+of leaves that are described by this list (it can be 0).
+.Sp
+The remaining elements of the list provide x and y offsets of
+the upper-left corner inside the ambient block, width, \fItotal width\fR,
+height, and baseline of the block as a whole, or of a group of leaves,
+or a leaf. If it describes a group of leaves, the leaves are laid out
+as by default layout procedure. Width, height, and baseline
+information is used for displaying background of the line.
+.Sp
+If all the leaves are laid out, then this list describes an additional
+element to draw if the first element is greater than 0, i.e. it is
+considered a \fIBlock \s-1ID\s0\fR of an additional drawing element, and the
+rest specifies the layout of this element. If it is 0, then this
+element of the list is ignored exactly as in other cases.
+.Ip "13:" 5
+.IX Item "13:"
+\fI(not implemented, but accepted by the widget):\fR the first 7 elements
+have the same meaning as above, the last 6 provide stretchability
+x and y position of upper-left corner, width, \fItotal width\fR, height,
+and baseline.
+.PP
+The \fItotal width\fR above is the width of the leaf including the space
+reserved for showing the background of the leaf terminator.
+.PP
+\fBSummary:\fR
+.Ip "Return list elements:" 1
+.IX Item "Return list elements:"
+.Sp
+.Vb 3
+\&  {Block Layout} {Leaf0 Layout} ...
+\&        {Leafn Layout} {Additional Element0 Layout} ...
+\&        {Additional Elementn Layout}
+.Ve
+.Ip "Layout Styles" 1
+.IX Item "Layout Styles"
+.Ip "" 5
+.IX Item ""
+Block Layout \- \f(CW{ig ig ig w ig h b}\fR
+.Ip "" 5
+.IX Item ""
+Show one or more leaves \- \f(CW{rc xo yo w tw h b}\fR
+.Ip "" 5
+.IX Item ""
+Hide one or more leaves \- \f(CW{rc}\fR
+.Ip "" 5
+.IX Item ""
+Show Additional Elements \- \f(CW{bi xo yo w tw h b}\fR
+.Sp
+(\f(CWw\fR is not very important), put after leaves.
+.Ip "Abbreviations:" 1
+.IX Item "Abbreviations:"
+IGnored, Width, Total Width, Height, Baseline, XOffset, YOffset,
+Repeat Count, Block Id
+.PP
+None of the returned date is used for clipping. However, it is used in
+directing the mouse events and reporting bounding boxes.
+.Sh "Lying to layout callback"
+.IX Subsection "Lying to layout callback"
+It is possible to configure a block to lie about its structure to the
+layout callback. This can greatly simplify writing the callback in
+interpreted languages, if the default layout procedure is satisfactory for
+\fIparts\fR of a block. 
+.PP
+Setting the \f(CW-layoutdepth\fR and/or \f(CW-layoutwidths\fR options for a block
+forces the layout procedure to be called with agruments corresponding
+to modified tree structure. 
+.PP
+If \f(CW-layoutdepth\fR is set, the depth of the tree is modified to be the
+given number. If the true depth of the tree is too small, tree is
+extended from the root side, if it too deep, the subtrees on the
+maximal allowed depth level are mocked as lines with \fIrepeat count\fR.
+.PP
+If \f(CW-layoutwidths\fR is set, this can restrict the number of branches
+going out of any node of the modified tree. The value of this option
+should be a list, elements of this list are either numbers, or lists
+of the form \f(CW{min max}\fR. (A single \f(CWnumber\fR is equivalent to a pair
+\f(CW{number number}\fR). N\-th element of the list controls the number of
+branches going out of nodes on the distance N from the root. If there
+are too few branches, it adds branches that contain simulated groups
+of leaves with \fIrepeat count\fR 0. If there are too many branches, it
+groups several last brunches into one with appropriate \fIrepeat
+count\fR. \fI(Current implementation is buggy in interaction of
+\f(CW-layoutwidths\fR and \f(CW-layoutdepth\fR if the depth of the node is less
+than \f(CW-layoutdepth\fR.)\fR
+.SH "Block subcommands"
+.IX Header "Block subcommands"
+.Ip "\fBconfigure\fR \fIblockName ?option value ... ?\fR" 7
+.IX Item "\fBconfigure\fR \fIblockName ?option value ... ?\fR"
+Standard procedure for creating and configuring block type. Currently
+supported configuration options are
+.Ip "\fB\-layoutcmd\fR" 21
+.IX Item "\fB\-layoutcmd\fR"
+Layout callback.
+.Ip "\fB\-layoutdepth\fR" 21
+.IX Item "\fB\-layoutdepth\fR"
+Depth of simulated tree for layout callback. Default \-1.
+.Ip "\fB\-layoutwidths\fR" 21
+.IX Item "\fB\-layoutwidths\fR"
+List of widths of levels of simulated tree for layout
+callback. Default \f(CW{}\fR.
+.Ip "\fB\-empty\fR" 21
+.IX Item "\fB\-empty\fR"
+Boolean value that specifies that the blocks of this type contain no
+leaves (\fIempty\fR blocks).
+.Ip "\fBcget\fR" 7
+.IX Item "\fBcget\fR"
+Standard configuration get procedure.
+.Ip "\fBat\fR \fIindex\fR" 7
+.IX Item "\fBat\fR \fIindex\fR"
+Returns information in the block that starts at the given index or
+\*(L"nothing\*(R" if there is no such block. Returned information is a list
+consisting of block start index, block length in index space, block
+name, block instance data, structure of the block. The latter is a
+list (possibly of lists) with leaves being lengths of block leaves.
+.Ip "\fBof\fR \fIindex\fR" 7
+.IX Item "\fBof\fR \fIindex\fR"
+Returns information in the innermost block that contains the given index or
+empty list if there is no such block. See \f(CWat\fR subcommand for
+description of return value.
+.Ip "\fBdelete\fR \fIblockName ?blockName ...?\fR" 7
+.IX Item "\fBdelete\fR \fIblockName ?blockName ...?\fR"
+Deletes the information on \fIblock types\fR. Error is returned if the
+are blocks of the given types in the widget.
+.Ip "\fBinsert\fR \fIblockName index1 ?index2?\fR" 7
+.IX Item "\fBinsert\fR \fIblockName index1 ?index2?\fR"
+Inserts block of the given type in the widget. The block contains one
+node, and all the leaves are immediate children of this node. If
+\fIindex2\fR is not specified, creates a block with one empty leaf,
+otherwise moves the contents of the widget between \fIindex1\fR and
+\fIindex2\fR into the tree.
+.Sp
+In the latter case \fIindex1\fR and \fIindex2\fR should be outside of any
+block, or properly inside the same block. The newlines (or,
+correspondingly, interleaf separators of enclosing block) are
+converted into interleaf separators of newly created block.  This is
+prohibited for \fIempty\fR blocks.
+.Ip "\fBnames\fR" 7
+.IX Item "\fBnames\fR"
+Returns list of names of currently defined \fIblock types\fR.
+.Ip "\fBsplit\fR \fIindex ?level?\fR" 7
+.IX Item "\fBsplit\fR \fIindex ?level?\fR"
+.Ip "\(bu" 12
+.IX Item "\(bu"
+If \fIindex\fR is outside of blocks, inserts newline.
+.Ip "\(bu" 12
+.IX Item "\(bu"
+Otherwise, if
+\fIlevel\fR is not specified, or is 0, is equivalent to insertion of
+newline, i.e., splits the leaf into two with the same
+parent.
+.Ip "\(bu" 12
+.IX Item "\(bu"
+If \fIlevel\fR is positive, splits the leaf in two and changes the
+structure of the tree.
+.Ip "\(bu" 17
+.IX Item "\(bu"
+If \fIlevel\fR is less than the distance from the leaf to the root,
+splits the \fIlevel\fRth parent (and all the parents of less order) in
+two. The beginning of the split leaf goes to one node, the rest
+(together with the leafs in the same node after the splitted one) goes
+to another. Example of \fBsplit 1\fR follows (the leaf marked \fBX\fR is
+split into two marked \fBx\fR):
+.Sp
+.Vb 7
+\&      ___                 ___
+\&     / __                /  _
+\&    / /                 /  /
+\& .-------X           .-------x
+\&  \e   \e__             \e \e____x
+\&   \e_____              \e   \e_
+\&                        \e____
+.Ve
+.Ip "\(bu" 17
+.IX Item "\(bu"
+If \fIlevel\fR is too big to proceed with the above procedure, the tree is
+extended to the left first. The added nodes have one child each.
+.Ip "\fBtrim\fR \fIindex\fR" 7
+.IX Item "\fBtrim\fR \fIindex\fR"
+If the block at index has only one edge coming from the root, and this
+edge does not end in a leaf, deletes the root. The resulting tree will
+be 1 level more shallow. Returns error if out of block or the above
+conditions are not met.
+.Ip "\fBdata\fR \fIindex ?data?\fR" 7
+.IX Item "\fBdata\fR \fIindex ?data?\fR"
+Returns or sets \fIinstance data\fR information for the block at \f(CWindex\fR.
+.Ip "\fBaddline\fR \fIindex\fR" 7
+.IX Item "\fBaddline\fR \fIindex\fR"
+\*(L"Steals\*(R" the displayed structure of the line starting at
+\fIindex\fR. Returns the \fIid\fR of the resulting element. This \fIid\fR can
+be used in the return value of the layout callback to specify
+additional elements used in drawing of the block. \fIBeware that the
+behaviour is undefined if the line contains something more complicated
+than tagged characters.\fR
+.Ip "\fBdeletelines\fR" 7
+.IX Item "\fBdeletelines\fR"
+Deletes all the \*(L"stolen\*(R" lines.
+.Ip "\fBlist\fR \fIfrom\fR \fIto\fR" 7
+.IX Item "\fBlist\fR \fIfrom\fR \fIto\fR"
+See the section on \fIWhat else is in the widget?\fR.
+.SH "Additional text widget options"
+.IX Header "Additional text widget options"
+.Ip "\f(CW-getFlags\fR" 10
+.IX Item "\f(CW-getFlags\fR"
+The value is an integer, binary bits of this integer denote current
+\fItext representation\fR options. If no bits are set, the operations
+that consider text contents as a string behave like the standard Tk
+text widget.
+.Sp
+If bit \f(CW1\fR is set, the string representation of a text range
+\fIalways\fR gives a string of the same length as the length of the
+interval in the index space. If some text annotation results in an
+empty string in the standard representation, it is represented as an
+appropriate number of \f(CW*\fRs if this bit is set. Currently this
+concerns embedded windows only, which are represented as \f(CW*\fR.
+.Sp
+All undocumented bits are reserved and should be 0.
+.SH "Minitutorial"
+.IX Header "Minitutorial"
+.Sh "Example of a simple \*(L"pedestal\*(R" block"
+.IX Subsection "Example of a simple \*(L"pedestal\*(R" block"
+Suppose you are satisfied with the standard layout procedure, but want
+to extend the resulting group of lines 10 points to the right (so when
+part of block is selected, selection extends 10 points to the
+right of the rightmost element in leaves), and want to add a blue
+3D background of width 5 with \*(L"height\*(R" 2 around the resulting guy,
+and draw the block on gray 3D background of width 2.
+.PP
+Note that it is not enough to use a tag even for gray background,
+since the border of the tag is inside the rectangle that contains the
+letter, and to get a correct pedestal look we want the border to
+surround the letter, not to be drawn outside of them.
+.PP
+In what follows we use \s-1TCL\s0 as the language for callback. Of course,
+the resulting code will be much simpler in some other languages.
+.PP
+First, we create the 2 new additional elements to display:
+.PP
+.Vb 8
+\&  .t tag configure backgr1 -background blue -border 2 -relief raised
+\&  .t tag configure backgr2 -background gray90 -border 2 -relief raised
+\&  .t insert 1.0 \en backgr1
+\&  set backgrId1 [.t block addline 1.0]
+\&  .t delete 1.0 1.0+1c
+\&  .t insert 1.0 \en backgr2
+\&  set backgrId2 [.t block addline 1.0]
+\&  .t delete 1.0 1.0+1c
+.Ve
+(or we could use existing ones, if possible). The third row creates a
+row in the text widget that is empty, and has tag \*(L"backgr1\*(R". This row
+will show the background only, and we will use it to show the raised
+background behind the block. The fourth row memorizes the \fIid\fR of this
+additional line, and the fifth one returns the text in the widget to
+its initial state. The line is not shown anymore, but the way to show
+it is preserved in a safe place. The second element is created in the
+same way.
+.PP
+Next, since we are satisfied with the way the leaves of the tree are
+places on the screen (i.e., one under another), we do not want to be
+concerned with internal structure of the block tree, so we ask the
+widget to lie about internal structure of the tree:
+.PP
+.Vb 2
+\&  .t block config myBlock -layoutdepth 1 \e
+\&        -layoutwidths 1 -layoutcmd myLayoutCmd
+.Ve
+Now the data given to \f(CWmyLayoutCmd\fR will be always the same, as if
+the block consisted of one leaf only that is the direct child of the
+root. So the arguments the \f(CWmyLayoutCmd\fR receives are the following
+ones:
+.PP
+.Vb 7
+\&  proc myLayoutCmd {block x row} {
+\&    global backgrId1 backgrId2
+\&    set c [lindex $row 0]
+\&    set w [lindex $row 2]
+\&    set tw [lindex $row 3]
+\&    set h [lindex $row 4]
+\&    set b [lindex $row 5]
+.Ve
+Now \f(CW$c\fR, \f(CW$w\fR, \f(CW$tw\fR, \f(CW$h\fR, \f(CW$b\fR contain the count, width,
+\fItotal width\fR, height and baseline of the contents of the block.
+Next we extend the \fItotal width\fR of the row.
+.PP
+.Vb 3
+\&    set tw [expr $tw+10]
+\&    set tw2 [expr $tw+4]
+\&    set tw1 [expr $tw+10]
+.Ve
+We will not replace the width of the row, so mouse events could be
+directed to outside of the block if clicked in the extended area. (In
+fact they won't, since we will extend the size of the ambient block.)
+Next we calculated widths of additonal rows,
+.PP
+.Vb 4
+\&    set h2 [expr $h+4]
+\&    set h1 [expr $h+10]
+\&    set b2 [expr $b+2]
+\&    set b1 [expr $b+5]
+.Ve
+and their height and baselines. All is prepared now to layout the rows:
+.PP
+.Vb 2
+\&    set addrow1 [list $backgrId1 0 0 $tw1 $tw1 $h1 $b1]
+\&    set addrow2 [list $backgrId2 3 3 $tw2 $tw2 $h2 $b2]
+.Ve
+Note that the same list \f(CW$addrow1\fR is good for specifying the size of the
+total block, since the first element of the list (that is \f(CW$backgrId\fR)
+is ignored in the information for the whole block. Now we need to
+move the real contents of the block 5 points to the right and down
+with  respect to the rectangle occupied by the
+block, and return the calculated information:
+.PP
+.Vb 3
+\&    set row [list $c 5 5 $w $tw $h $b]
+\&    return [list $addrow1 $row $addrow1 $addrow2]
+\&  }
+.Ve
+Note that it is vital to put addrow2 after addrow1, since it should be
+drawn after the addrow1 for it to appear to be on top of addrow1.
+.PP
+That's all! Now you can create a binding for insertion of empty block
+into the widget (this binding supposes that \f(CWbindtags\fR are reverted):
+.PP
+.Vb 5
+\&  bind .text <Control-Meta-m> {
+\&    %W block insert myBlock insert
+\&    %W mark set index index-1c
+\&    break
+\&  }
+.Ve
+This binding moves the insertion point inside the block, so you are
+ready to fill block with whatever information you need.
+.PP
+Sample code in the distribution of extended text widget
+provides other examples of blocks: superSub, Fraction, and so on.
+.Sh "Example of a simple \*(L"tabulation\*(R" block"
+.IX Subsection "Example of a simple \*(L"tabulation\*(R" block"
+Here we describe how to code blocks that contain no editable
+information, but provide geometry management. Consider an example of
+tabulation: if we implement tabulation as a block, the size of this
+block should change depending on the position of the start, but the
+only editing operation should be the deletion of the block as a whole.
+.PP
+While it is possible to implement this kind of block using the same
+types of blocks as in the previous section, we will need a lot of code
+change in the bindings if we use this approach: a usual block takes at
+least 2 positions in the index space, so it is possible to make an
+insertion inside this block. Thus we either need correction of
+keybindings that move the insertion point, or should correct the the
+insertion code to check whether the insertion happens inside a block
+of this type. If we do not do this, we need additional decision how to
+handle blocks of this type that have not-empty contents.
+.PP
+The solution is to use \*(L"empty\*(R" blocks that take only 1 position in the
+index space, so it is impossible to insert text inside them. We make
+block type empty by using configuration option \f(CW-empty\fR:
+.PP
+.Vb 1
+\&  .t block configure Tab -empty on -layoutcmd {layoutTab 5 35}
+.Ve
+Note the spaces in the name of layoutcmd: No quoting is performed
+during the call, so \f(CW5\fR and \f(CW35\fR become first two arguments of
+\f(CWlayoutTab\fR procedure. This procedure can be as simple as follows:
+.PP
+.Vb 6
+\&  proc layoutTab {min mult block x} {
+\&    global backgrId2
+\&    set w [expr $min + $mult - ($x + $min - 1) % $mult - 1]
+\&    set totblock [list $backgrId2 0 0 $w $w 5 3]
+\&    return [list $totblock $totblock]
+\&  }
+.Ve
+The only \*(L"working\*(R" row is the \f(CWset w\fR one. It calculates the width
+of the block using the following rule: 
+.Ip "" 5
+.IX Item ""
+the width is at least \f(CW$min\fR, and the right end is on the position that
+is proportional to \f(CW$mult\fR counting from the left of the line.
+.PP
+The last row returns a list of length 2. The first element is the
+description of the block as a whole, the next one is necesssarily the
+description of an additional element (since there are no \*(L"regular\*(R"
+leaves in the tree). This additional element is the same size as the
+block itself, and is used only to provide some visual feedback. We use
+\fIid\fR \f(CW$backgrId2\fR created elsewhere (say, by the code in the previous
+example), and ask for the rectangle to be 3 points above the baseline,
+and 2 points below. 
+.SH "AUTHOR"
+.IX Header "AUTHOR"
+Ilya Zakharevich <ilya@math.ohio-state.edu>
+.SH "AVAILABILITY"
+.IX Header "AVAILABILITY"
+the section on \fI/ftp.math.ohio-state.edu/pub/users/ilya\fR in the \fIftp:\fR manpage.
+
+.rn }` ''

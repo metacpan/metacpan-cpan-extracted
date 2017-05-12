@@ -1,0 +1,26 @@
+%#============================================================================
+%# ePortal - WEB Based daily organizer
+%# Author - S.Rusakov <rusakov_sa@users.sourceforge.net>
+%#
+%# Copyright (c) 2000-2004 Sergey Rusakov.  All rights reserved.
+%# This program is open source software
+%#
+%#----------------------------------------------------------------------------
+
+%#=== @metags onStartRequest ====================================================
+<%method onStartRequest><%perl>
+  my $catalog_id = $ARGS{objid};
+
+  my $C = $ARGS{objtype} eq 'ePortal::CtlgItem'
+      ? new ePortal::CtlgItem
+      : new ePortal::Catalog;
+
+  if ( $C->restore($catalog_id) ) {
+    my $new_att = new ePortal::Attachment;
+    if ( $new_att->upload(r => $r) ) {
+      $new_att->link_with_object($C);
+    }
+  }
+
+  return $m->comp('/dialog.mc:back_url');
+</%perl></%method>

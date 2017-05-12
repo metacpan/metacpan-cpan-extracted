@@ -1,0 +1,43 @@
+:
+eval 'exec ../BnP/BnP.aux.perl -S $0 ${1+"$@"}'
+    if $running_under_some_shell;
+require 5.000;
+BEGIN { push(@INC, "../BnP"); }
+use BnP;
+
+#####################################################################
+##
+##  Build script for ePerl
+##  Copyright (c) 1997 Ralf S. Engelschall, All Rights Reserved. 
+##
+#####################################################################
+
+$bundlename = "eperl";
+$bundlevers = "1.0.0";
+$bundleid   = "$bundlename/$bundlevers";
+
+BnP::init($bundlename, $bundlevers);
+($prefix, $bindir, $libdir, $mandir, $vardir) = BnP::find_dirs($bundlename);
+($gnutriple, $arch, $vendor, $os) = BnP::find_systype; 
+($perl, $cc, $cxx, $cflags) = BnP::find_tools;
+
+BnP::cmd(0, "mkdir $prefix");
+BnP::cmd(0, "mkdir $prefix/bin");
+BnP::cmd(0, "mkdir $prefix/lib");
+BnP::cmd(0, "mkdir $prefix/man");
+BnP::cmd(0, "mkdir $vardir");
+
+BnP::cmd(0, "mkdir work");
+BnP::chdir("work");
+
+BnP::fetch("http://www.engelschall.com/sw/eperl/distrib/",
+           "eperl-2.2.11.tar.gz", "../dist/");
+
+BnP::cmd(0, "gunzip -c ../dist.eperl/eperl-2.2.11.tar.gz | tar xvf -");
+BnP::chdir("eperl-2.2.11");
+BnP::cmd(0, "CC=$cc; export CC; ./configure --prefix=$prefix");
+BnP::cmd(0, "make");
+BnP::cmd(0, "make install");
+BnP::chdir("..");
+
+##EOF##

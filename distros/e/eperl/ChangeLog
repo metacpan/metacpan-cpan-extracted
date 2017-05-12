@@ -1,0 +1,572 @@
+
+  C h a n g e L o g   o f   e P e r l
+  ___________________________________________________________________________
+
+  Changes between 2.2.12 and 2.2.13
+  ---------------------------------
+  [Security and Bug Fixes]
+
+  980120 o Fixed construction of URLs inside Apache::ePerl for
+           cases where the server port is not 80.  [Thanks to Jim
+           O'Quinn <oquinn@fsonline.com> for hint]
+  980202 o Changed .so generation to be more compatible
+  980404 o Made etc/newvers more portable
+  980605 o Fix a minor comparison bug in Apache::ePerl
+           [Thanks to Eric Howe <mu@trends.net> for hint]
+  980705 o Fixed copyright statements by adding 1998 and 
+           removing the "All Rights Reserved" part because
+           this is incompatible with the GPL.
+  980710 o Fix again a non-trivial-to-fix security bug related to the 
+           inconsitency way webservers handle QUERY_STRINGs: this time by
+           making more exact parameter comparison.  Now we check
+           back even the argv[optind] against the provided
+           QUERY_STRING, etc. Now the determination of the three
+           runtime modes (CGI, NPH-CGI, FILTER) should be
+           correct.  [Thanks to Tiago Luz Pinto
+           <tiago@EPS.UFSC.BR> who reported this security hole on
+           bugtraq]
+
+  Changes between 2.2.11 and 2.2.12
+  ---------------------------------
+  [Bugfix only]
+
+  971231 o ARGL! We really need 1998 now: Yesterday
+           I've released 2.2.11 with two nasty syntax errors in
+           the configure script. Hmmmmm... 1998 is now really
+           needed, I think.  [Thanks to Anthony Fok
+           <foka@gpu.srv.ualberta.ca> and ??? <djk@tobit.co.uk>
+           for quick response and patch]
+
+  Changes between 2.2.10 and 2.2.11
+  ---------------------------------
+  [Bugfix only]
+
+  971230 o Activated Perl Locale support for both Perl 5.003 
+           and Perl 5.004 variants.
+         o Fixed owner determination in eperl_main.c: ePerl core
+           dumped when the owner of the script does not exists in
+           the passwd database.
+         o Updated contrib/pkg/ files
+         o Updated VERSIONS file
+
+  Changes between 2.2.9 and 2.2.10
+  --------------------------------
+  [Bugfix only]
+
+  971228 o little distribution bug: the asc2c was not run before
+           the 2.2.9 release, so it has to be run by the builder
+           which is not what was intended.
+
+  Changes between 2.2.8 and 2.2.9
+  -------------------------------
+  [Bugfix only]
+
+  971120 o fixed demo.image.phtml description
+  971221 o fixed a really nasty fclose() bug in eperl_main.c
+           which caused core dumps under Debian GNU/Linux with
+           libc6.  [Thanks to <tv@havoc.fi> and Anthony Fok
+           <foka@gpu.srv.ualberta.ca> for hints]
+
+  Changes between 2.2.7 and 2.2.8
+  -------------------------------
+  [Bugfix and Minor Enhancement]
+
+  971107 o ported to AIX 4.1.x by adding a fix for Perl's ccdlflags
+  971108 o again made Apache::ePerl even more complete: added the
+           following env variables similar to nph-eperl:
+           SCRIPT_SRC_URL, SCRIPT_SRC_URL_DIR,
+           SCRIPT_SRC_URL_FILE, SCRIPT_SRC_PATH,
+           SCRIPT_SRC_PATH_DIR, SCRIPT_SRC_PATH_FILE,
+           SCRIPT_SRC_MODIFIED, SCRIPT_SRC_MODIFIED_CTIME,
+           SCRIPT_SRC_MODIFIED_ISOTIME, SCRIPT_SRC_SIZE,
+           SCRIPT_SRC_OWNER
+         o enhanced the Apache::ePerl status page: now displays
+           also the cache size
+  971116 o fixed shebang mode for webserver environment.  [Thanks
+           to J. Douglas Dunlop <dunlop@ionline.net> for hint]
+         o added hint to INSTALL file that PerlIO+SfIO is currently
+           not supported.
+         o fixed HTTP header parsing: now setting of cookies
+           (e.g.  via Perl's CGI module) work correctly.
+         o fixed HTTP header parsing in Apache::ePerl. Now even
+           the special-case "Content-type: ..." works as expected. 
+  971117 o fixed typos in eperl.pod
+         o fixed preprocessing for Apache::ePerl
+         o overhauled the demo webpages under eg/. Now the
+           CGI::Cookie is used an example for CGI.pm.
+         o adjusted VERSIONS file
+
+  Changes between 2.2.6 and 2.2.7
+  -------------------------------
+  [Bugfix and Minor Enhancement]
+
+  971102 o reduced memory consumption of Apache::ePerl by
+           specificing detailed import flags
+         o fixed prototype bug in Parse::ePerl's XS part
+           [Thanks to Doug MacEachern <dougm@opengroup.org> for patch]
+         o removed the not needed AUTOLOAD facility from
+           Parse::ePerl because this causes problems.
+           [Thanks to Doug MacEachern <dougm@opengroup.org> for hint]
+  971104 o added VERSION_LANGUAGE and VERSION_INTERPRETER
+           environment variables to Apache::ePerl the same way it is provides
+           by the stand-alone program.
+  971105 o adjusted the URL to the Perl homepage in the PODs.
+         o fixed Content-length header generation in Apache::ePerl
+         o minor cleanup to Parse::ePerl
+  971106 o added workarounds to Parse::ePerl for tainted environments 
+           like the "PerlTaintCheck On" under Apache/mod_perl where
+           Parse::ePerl is called from Apache::ePerl.
+         o made the Apache::ePerl error page similar to the one nph-eperl
+           displays.
+
+  Changes between 2.2.5 and 2.2.6
+  -------------------------------
+  [Bugfix and Minor Enhancement]
+
+  970903 o merged ANNOUNCE and ANNOUNCE.ADDR files
+         o slightly fixed comments in eperl_getopt.[ch]
+  970911 o added mod/README with CPAN module snipppet
+         o changed the $VERSION variables to hold a real floating
+           point number like 2.0206 instead of 2.2.6
+         o updated contrib/pkg/fbsdpkg/ stuff
+         o fixed a bug in the preprocessor: filedescriptors were
+           not closed for #include directive [Thanks to
+           mhalperi@bbnplanet.com for patch]
+  971024 o fixed configure's Perl version check because of Perl
+           5.004_04's changed -v output.
+         o added Apache->request($r) to Apache::ePerl for
+           Apache::Registry modules like new CGI.pm under mod_perl-1.02.
+         o updated PORTING file
+         o added GNU long options
+         o changed -i (nocase on delimiters) to -n
+         o cleaned up source by sorted options
+         o now the usage is only displayed on -h/--help
+         o now the copyright and disclaimer is displayed on -V, too.
+         o now configure removes -D_POSIX_SOURCE from Perl's
+           ccflags under IRIX 5.3 because this causes problems with strdup.
+         o now configure explicitly removed newlines at the end
+           of the determined hostname/domainname pair because these
+           would lead to a failure for GNU autoconfs final sed-part.
+           [Thanks to <paul@miraclefish.com> for bug report]
+         o added another -f test inside configure when trying 
+           to find a perl binary because when /tmp/perl is
+           a directory -x alone fails.
+         o added eperl_config.[ch] and moved some code from
+           eperl_global to this file.
+         o added test for strdup() to configure and a private 
+           replacement version to eperl_config.c (from FreeBSD 2.2)
+           because Ultrix is missing strdup().
+           [Thanks to Joerg Lenneis <lenneis@wu-wien.ac.at> for hint]
+         o now the XS-Init function in eperl_perl5.c has a variable
+           list of newXS() calls which come from the new
+           eperl_perl5_sm.h file which itself is generated by
+           eperl_perl5_sm.pl. This way we're now really able to
+           use static module when no DynaLoader is available.
+           [Thanks to Joerg Lenneis <lenneis@wu-wien.ac.at> for hint]
+  971027 o fixed also PORTING.test for new "perl -v" output
+         o changed "prefix" stuff in Makefile.in to make the
+           life of our Debian friends a little bit easier... ;_)
+         o added Debian stuff to contrib/pkg/dpkg/
+         o added workaround in aclocal.m4 for SunOS's braindead "date"
+         o sucessfully run PORTING.test on platforms found in PORTING
+
+  Changes between 2.2.4 and 2.2.5
+  -------------------------------
+  [Bugfix and Minor Enhancement]
+
+  970902 o fixed error catching for Parse::ePerl::Precompile.
+           [Thanks to Joseph W. Norton <norton@alum.mit.edu> for hint]
+  970903 o added better support for PerlIO/StdIO. The combination
+           PerlIO/SfIO is currently untested and may be broken because
+           the I/O redirection for SfIO is very different from StdIO.
+         o added Perl I/O layer info to eperl -V
+         o added built time/user info to configure and eperl -V
+
+  Changes between 2.2.3 and 2.2.4
+  -------------------------------
+  [Bugfix and Major Enhancement]
+
+  970901 o added more hints to PORTING file
+         o fixed a bug in Parse::ePerl for case where $error was undefined
+           [Thanks to Joseph W. Norton <norton@alum.mit.edu> for patch]
+         o fixed -I option: now it works as expected even for
+           cases where you want to add stuff to @INC which is
+           needed at _parse_ time.
+         o now the webmaster can configure the delimiters and other stuff via
+           Apache::ePerl::Config hash from within <Perl>...</Perl> sections in
+           Apache. An example is added to the synopsis of Apache::ePerl
+           manpage.
+
+  Changes between 2.2.2 and 2.2.3
+  -------------------------------
+  [Security Bugfix and Minor Enhancement]
+
+  970821 o fixed installation section in Apache::ePerl manpage
+         o ***** SECURITY BUGFIX *****
+           ePerl versions <= 2.2.2 have a heavy security hole when running
+           under a webserver's CGI/1.1 interface.   Because ePerl assumed here
+           there are not command line arguments. THIS IS WRONG! According to
+           the CGI/1.1 spec when an ISINDEX document is used (QUERY_STRING!)
+           the query is provided on the command line by the webserver.  So,
+           when only one query existed, there was exactly one command line
+           argument and ePerl switched to stand-alone runtime mode and all
+           CGI-mode restrictions are falling down!!
+           ***** SECURITY BUGFIX *****
+           [Thanks to Andrew Pimlott <pimlott@abel.MATH.HARVARD.EDU> for
+           finding this security bug!]
+         o now a chdir is done before the preprocessor is run so relative
+           paths in #include directives work as expected.  [Thanks to Marc
+           Singer <elf@netcom.com> for patch]
+
+  Changes between 2.2.1 and 2.2.2
+  -------------------------------
+  [Bugfix and Porting Enhancement]
+
+  970804 o removed bad demo.errsync.phtml 
+  970806 o fixed a few spaces in Makefile.in
+  970807 o removed wrong $AUTOLOAD from Apache::ePerl 
+         o fixed a few other things in Apache::ePerl and Parse::ePerl
+         o added 2.2.1 to VERSIONS file
+         o moved the place of the release macros in Makefile.in
+           before any targets because some braindead Make variants
+           don't like it in the middle of targets.
+         o added a new test 09-dynaloader.t for testing if
+           dynamic loading works correctly.
+         o added error capturing for Parse::ePerl::Evaluate via __DIE__ hook.
+         o fixed the PODs
+         o moved -lperl at linking after DynaLoader
+  970808 o fixed configure help string for --with-perl=PATH
+         o added missing .eperl extension in eperl_security.h
+           [Thanks to Heiko Schlittermann <heiko@os.inf.tu-dresden.de> for hint]
+         o added more stuff to INSTALL.APACHE
+  970811 o fixed wrong coding in setuid check
+           [Thanks to SONE Takeshi <ts1@tsn.or.jp> for patch]
+
+  Changes between 2.2.0 and 2.2.1
+  -------------------------------
+  [Bugfix and Enhancement]
+
+  970721 o fixed eg/demo.net.phtml
+  970727 o optimized the Perl 5 internal stuff in eperl_eperl5.c 
+           [Thanks to Doug McEachern <dougm@opengroup.org> for patches]
+         o added support for Cwd parameter to Parse::ePerl::Precompile and use
+           this also in Apache::ePerl when precompiling.  
+           [Thanks to Michael Lazar <michael@vertex.worldweb.com> for idea]
+         o added support for quotation marks and angle brackets in #include
+           and #sinclude directives: these are just skipped.
+           [Thanks to Karl Wallner <karl.wallner@x3network.net> for idea]
+         o now DOCUMENT_ROOT is automatically added to @INC in CGI modes.
+           [Thanks to Karl Wallner <karl.wallner@x3network.net> for idea]
+         o now Apache::ePerl always uses option "ConvertEntities=1" when
+           calling Parse::ePerl::Translate.
+           [Thanks to Mike Pheasant <pheasant@gte.net> for hint]
+         o fixed demos for strict variables and added both .phtml
+           and .iphtml files (same contents!) for easier testing
+           with both nph-eperl and Apache::ePerl.
+         o added support for generated custom HTTP headers
+           to Apache::ePerl.
+  970801 o added "/eperl" to $libdir for installation
+         o now "make install" installs the demo pages into $libdir/eg
+         o added PORTING.test script for making porting tests easier
+         o changed test for Perl in configure from "test -f" to "test -x"
+         o fixed the examples again.
+         o fixed a few things in eperl.pod
+  970802 o enhanced the overwriting of the perl and cc programs
+           for the build process. See INSTALL for more details.
+         o enhanced PORTING.test to be able to set perl and cc.
+         o added overview to INSTALL
+
+  Changes between 2.2b9 and 2.2.0
+  -------------------------------
+  [Bugfix only]
+
+  970706 o added missing eperl_getopt.h include
+           for eperl_main.c which caused the compilation
+           at least under SunOS 4.x to fail.
+         o added more descriptive error message
+           to configure when Perl version is to old
+         o added hint to INSTALL that the same
+           environment have to be used for compiling
+           ePerl as for Perl.
+  970709 o added klduge to support Perl+SFIO where
+           fwrite has to be replaced by PerlIO_write
+         o enabled ``CC=/path/to/cc ./configure'' again
+           for cases where one wants to overwrite the
+           used C compiler.
+  970714 o removed some unused defines in eperl_global.h
+           which lead to problems under AIX 4.1.4
+         o removed the P_ macros in eperl_proto.h because
+           AIX 4.1.4 is not happy about it because of
+           PrintError defines which has "...". Should
+           be ok without P_ because we need an ANSI
+           compiler since the first days.
+  970715 o changed Perl requirement from 5.00390 to 5.00325
+  970718 o added ANNOUNCE.ADDR file
+         o updated NEWS file and updated ANNOUNCE file
+         o updated VERSIONS file
+         o slightly adjusted NEWS file
+         o created contrib/utils/00README file
+         o added the package files to contrib/pkg/
+         o updated the demo files
+
+  Changes between 2.2b8 and 2.2b9
+  -------------------------------
+
+  970623 o added docs about #elsif to eperl.pod and NEWS file
+  970628 o added VERSIONS file with ePerl history
+         o shit happens: the preprocessor parsing had
+           nasty bugs where a string "#include" somewhere
+           in the text leads to a total skip of all
+           real "^#include" directives :-(
+
+  Changes between 2.2b7 and 2.2b8
+  -------------------------------
+
+  970615 o added hint about Options +ExecCGI
+           to mod/Apache/ePerl.pm
+         o split the ChangeLog file into seperated files
+         o added old stuff from 2.1.2 to end of NEWS file
+         o created a KNOWN.BUGS file
+         o created a INSTALL.NSAPI
+         o slightly fixed the POD in mod/Apache/ePerl.pm
+         o created a new set of demo files in eg/
+         o fixed some README headers
+  970620 o created a contrib/ dir and initially
+           started to write a shtml2phtml script
+           which converts (X)SSI to ePerl
+         o fixed tabs in top-level Makefile
+  970622 o changed red colors to blue ones in error page
+         o added the new powered-by-ePerl image
+           which can be retrieved via URL nph-eperl/powered.gif
+         o added del2del script to contrib/
+         o added a #elsif to the preprocessor
+
+  Changes between 2.2b6 and 2.2b7
+  -------------------------------
+
+  970602 o now etc/newvers always removes /tmp/genopt 
+           [Thanks to Phil Ritzenthaler <phil@cgrg.ohio-state.edu>
+            for hint]
+         o now configure determines the full 
+           operating system id from Perl's Config.pm
+  970604 o set -Wl,-woff 85 only for IRIX 6.x because
+           IRIX 5.x hates this option..
+           [Thanks to Ewan McPhail <ewan@epages.iafrica.com> and
+            Phil Ritzenthaler <phil@cgrg.ohio-state.edu> for hint]
+         o fixed the preprocessor: the inital searching
+           of the directives was broken, only worked
+           when a specific order was used. So some
+           directives were skipped :-(
+         o added a #sinclude (secure include) directive
+           which is the same as #include but removes
+           all begin and end delimiters, so this one
+           is a secure way of including stuff from 
+           foreign servers.
+         o rewritten the preprocessor part of eperl.pod
+
+  Changes between 2.2b5 and 2.2b6
+  -------------------------------
+
+  970601 o added a #c preprocessor directive
+           to be able to comment out stuff
+           (even to use "#c #include..." to
+           disable an include directive)
+           [Thanks to J. Douglas Dunlop for hint]
+         o now the preprocessor checks the
+           HTTP response code when http://..
+           is uses as the file:
+           - when 301 and 302 are returned
+             it searches for the new URL in the Location-header 
+             and restarts with this one
+           - when a response code other
+             than 200 (OK) is returned it fails the same way 
+             as it fails when a local file it not found: 
+             with an error.
+           [Thanks to J. Douglas Dunlop for hint]
+         o removed the Bash check in configure
+           because this it not used 
+
+  Changes between 2.2b4 and 2.2b5
+  -------------------------------
+
+  970530 o fixed perlvers -> perl_vers stuff
+         o fixed again problem with VERSION stuff:
+           ePerl.pm's were broken (ARGL!)
+
+  Changes between 2.2b3 and 2.2b4
+  -------------------------------
+
+  970529 o fixed preprocessor: #include only
+           valid at column 0, i.e. at start of line
+         o added a test 08 for the preprocessor
+         o now any characters are skipped at end 
+           of #include lines up to the newline
+         o added new parsing feature:
+           "_" as the last non-whitespace command disables the automatic
+           adding of the final semicolon. This is to be able to writeo
+           <: if { :> ... <: } :> etc.
+         o added new optional(!) parsing feature
+           which is per-default disabled(!): "\" directly before a newline
+           character outside ePerl blocks prevent the newline to be printed,
+           i.e. the line is continued in the output
+           This feature can be turned on via new option -L.
+         o added new parsing feature: 
+           when an end delimiter is directly followed by ``//''
+           this discards all data up to and including the following
+           newline.
+         o added three new commands to preprocessor
+           which gets converted to ePerl blocks:
+           ``#if expr'' -> ``<: if (expr) { _:>//'
+           ``#else''    -> ``<: } else { _:>//''
+           ``#endif''   -> ``<: } _:>//''
+         o imported the patch from ePerl 2.1.2 which
+           fixes a problem under non-GCC compilers
+           with a semicolon in eperl_security.h
+         o removed the sin_len stuff
+  970530 o !! Essential Change !!
+           configure now imports all essential compilation
+           flags from Perl's Config.pm, including the compiler.
+           This is necessary to make ePerl work even under
+           HP-UX and IRIX where they need the special compiler
+           and special compiler flags. The point is that
+           Perl already determined the correct flags, so
+           we can use it.
+         o changed C++ style comments in
+           eperl_parse.c to C style
+         o fixed a missing "int" in eperl_sys.c 
+         o renamed eperl_getopt.c to original
+           eperl_egetopt.c and make the namespace
+           clean, i.e. renamed optXXX to egetopt_optXXX.
+           This is needed at least for IRIX
+         o changes egetopt() slightly
+         o replaced the old egetopt() by the GNU getopt()
+           because egetopt() was broken under some
+           systems like IRIX.
+         o option -h now never displays the version
+         o added a missing semicolon in mod/Parse/ePerl.pm
+         o renamed and fixed mod/Parse/t/04_compile.t 
+         o now etc/newvers resets the LANG variable
+           to prevent LOCALE warnings
+         o provided an own copy of perl_eval_pv() which
+           is too new. It was introduced in Perl 5.003_97e.
+           Now plain old Perl 5.003 will work again.
+         o the Perl 5 interface modules can only be
+           used with Perl 5.003_90 or higher because
+           of the TIEHANDLE stuff which is not working
+           in prior releases.
+         o fixed update-version target in Makefile.i
+
+  Changes between 2.2b2 and 2.2b3
+  -------------------------------
+  
+  970521 o fixed NEWS and ANNOUNCE files o spellchecked 
+           INSTALL, INSTALL.APACHE and eperl.pod
+  970522 o fixed eperl.pod =back stuff and added a paragraph 
+           about software leverage.
+  970523 o added reference for Parse::ePerl and Apache::ePerl
+           to eperl.pod
+         o changed abstract in all source files
+  970525 o ** added new option -P for an own #include preprocessor. **
+         o added new option -I: same as for "perl" to
+           add directories to @INC and preprocessor
+  970526 o ** added support for URLs to #include **
+         o added a kludge to etc/newvers for systems
+           like BSDI where no "getopt" program is available
+  970527 o added Parse::ePerl::Preprocess which is the
+           interface to the new preprocessor
+         o added six new environment variables:
+           SCRIPT_SRC_PATH, SCRIPT_SRC_PATH_DIR and SCRIPT_SRC_PATH_FILE
+           SCRIPT_SRC_URL, SCRIPT_SRC_URL_DIR and SCRIPT_SRC_URL_FILE
+         o fixed a long-standing bug: temporary files were 
+           not removed :-(
+         o added new option -C for HTML entity conversions 
+           inside ePerl blocks. This is for people who
+           use HTML editors which have now knowledge of ePerl code.
+  970529 o slightly fixed eperl.pod at some places
+
+  Changes between 2.2b1 and 2.2b2
+  -------------------------------
+
+  970518 o fixed ``make install UNINST=1'' case
+           for Makefile.PL
+  970520 o added more POD to Apache::ePerl
+
+  Changes between 2.2a2 and 2.2b1
+  -------------------------------
+
+  970505 o again reorganized the source
+           code and renamed a lot of
+           functions.
+         o created modules/ with h2xs
+           for a Parse::ePerl module
+         o created generation of libeperl.a
+           containing shared objects for
+           Parse::ePerl
+  970506 o created a top-level Makefile.PL
+           for faking a MakeMaker distribution
+  970509 o created a Apache::ePerl module
+  970510 o added option -i for making the
+           delimiters case-sensitive in more
+           explicit way
+  970511 o added t/05* to Parse::ePerl
+           and made delimiter case variable
+  970513 o enhanced Parse::ePerl and 
+           finished Apache::ePerl
+  970515 o fixed tests 4 and 5 for non-Bash users
+           and fixed a char/int problem in eperl_main.c
+           and eperl_sys.c
+           [Thanks to Jarom Smith <jarom@jarom-indy.prophet.com>]
+  970516 o finished Apache::ePerl and Parse::ePerl
+  970517 o added a INSTALL.APACHE which describes the
+           installation of ePerl as an SSSL under Apache
+
+  Changes between 2.2a1 and 2.2a2
+  -------------------------------
+
+  970504 o removed -s and added -m 755 
+           to install in configure
+         o optimized the parser; no 
+           ``print "";'' constructs are
+           never created which at least slightly 
+           speeds up processing.
+
+  Changes between 2.2a0 and 2.2a1
+  -------------------------------
+
+  970503 o now the begin and end delimiters are searched
+           case-insensitive.
+         o added -h for displaying the usage list.
+           Just to be consequent with options.
+         o added leading and trailing whitespaces
+           for Perl blocks when translating the source file
+           to make the -x display more readable.
+
+  Changes between 2.1.1 and 2.2a0
+  -------------------------------
+
+  970502 o added support for '=' prefix: now <:= ... :>
+           automatically gets converted to "print ...".  Now one
+           can interpolate variables in a more shorter way via
+           <?=$variable!> instead of the long <?  print
+           $variable; !> (in conjunction with the next
+           enhancements)
+         o now ePerl is much smarter when converting the ePerl
+           blocks, i.e. it now recognizes final semicolons and
+           automatically puts one if missing. Now <: cmd;cmd :>
+           is also valid.
+         o Whitespaces are not only stripped
+           from the beginning of a ePerl block. Now
+           they are stripped from the end, too.
+         o !!CHANGED THE PARSING AGAIN!!
+           Now again (as in 2.0.3) ePerl block end delimiters are
+           found via plain forward search. No quoted strings are
+           recognized.  The reason is that constructs with odd
+           number of quoting characters are more often seen than
+           end delimiters in quoted string. And one more fact: It
+           is easier to escape the end delimiter in a quotes
+           string (e.g.  via backslahes) than to rewrite a
+           complex construct (e.g.  m|"[^"]+"| !!).
+         o added -T (Tainting) and -w (Warnings) options
+           which can be used like the same in "perl".
+         o added alpha and snap releases to NEWVERS
+

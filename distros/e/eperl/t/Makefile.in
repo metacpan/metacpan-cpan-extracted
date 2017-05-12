@@ -1,0 +1,11 @@
+##
+##  Makefile -- ePerl Test Suite Makefile
+##
+@SET_MAKE@
+
+perlprog = @perlprog@
+
+test:
+	@$(perlprog) TEST
+
+##EOF##

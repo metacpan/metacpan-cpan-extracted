@@ -1,0 +1,11 @@
+Revision history for Perl module ex::monkeypatched
+
+0.03, 2011-12-22
+  * Fix broken dist (new test files missing)
+
+0.02, 2011-12-22
+  * New `-norequire` feature
+  * Optional new API with more flexibility
+
+0.01, 2011-08-25
+  * Initial release

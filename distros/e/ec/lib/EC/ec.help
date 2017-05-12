@@ -1,0 +1,435 @@
+NAME
+      ec - E-mail reader and composer for Unix and Perl/Tk.
+
+SYNOPSIS
+    ec ["-f" *filename*] ["-hkvdo"]
+
+  Command Line Options
+    "-f" *filename*
+        Use *filename* instead of the default server authentication file.
+
+    "-h"
+        Print help message and exit.
+
+    "-k"
+        Don't delete messages from POP server.
+
+    "-v"
+        Print verbose transcript of dialogs with servers.
+
+    "-d"
+        Print debugging information on the terminal.
+
+    "-o"
+        Offline - don't fetch mail from server.
+
+CONTENTS
+    DESCRIPTION
+    USING EC
+
+        Sorting Messages
+        Entering Messages
+        File Attachments
+
+    CONFIGURATION
+
+        Configuration Files
+        Mail Directories and Folders
+        Filters
+        Mail Transport Agents
+        Editing the Library Path Names in the Source File
+        X Font Resources
+
+    MAINTENANCE
+
+        Folder Indexes
+        PRINTING THE DOCUMENTATION IN DIFFERENT FORMATS
+        LICENSE
+        VERSION INFO
+        CREDITS
+
+DESCRIPTION
+        EC is an Internet email reader and composer that can download
+        incoming messages from one or more POP3 servers, and send mail
+        directly to a SMTP server, or via sendmail or qmail if either is
+        installed.
+
+        EC provides options for configuring user defined mail folders and
+        mail filtering by matching text patterns in incoming messages. The
+        program stores the incoming messages in folders that you configure,
+        or sends them directly to the Trash folder for deletion. With no
+        additional configuration, however, EC displays incoming messages in,
+        naturally, the "Incoming" folder. (EC capitalizes the first letter
+        of directory names when creating folder names.) EC displays the
+        number of unread and total messages in each folder on the "Folder"
+        menu. Messages can be moved from folder to folder, including the
+        Trash folder, so you can retrieve messages that you accidentally
+        delete.
+
+        EC permanently deletes messages stored in the Trash folder after a
+        user-configurable period of time (two days is the default). Refer to
+        the section, "Configuration Files," below.
+
+        EC also supports encoding and decoding of Base64 MIME attachments,
+        using an external filter program included in the distribution
+        package.
+
+USING EC
+        EC uses two windows for email processing: the main window where you
+        can read, sort, save, or delete incoming messages, and a composer
+        window where you can enter new messages and reply to messages in the
+        main window.
+
+        To view a message for reading, replying, or saving to a file, click
+        the left mouse button, button 1, on the message header in the list
+        window.
+
+        Moving and deleting can also operate on multiple messages. Select
+        multiple messages by clicking the left mouse button, button 1, with
+        the Control key down on each message in the list window.
+
+        If EC and its supporting files correctly (as well as Perl and the
+        Perl/Tk library modules), typing at the shell prompt in an xterm:
+
+           # ec
+
+        should start up the program and display the main window with the
+        Incoming mail folder. If you receive an error message that the
+        program cannot connect to the POP mail server, use the "-v" command
+        line option to produce a transcript of the dialog with the server:
+
+          # ec -v
+
+        If EC pops up an error message, or refuses to start at all, or
+        prints a bunch of Perl error messages, consult the *README* file
+        once again. If you need assistance with the installation, please
+        contact the author of the program. The email address is given in the
+        section: "CREDITS," below.
+
+        The functions on the menu bar should be fairly self-explanatory. You
+        can view different mail folders by selecting them from the "Folder"
+        menu, and move messages from one folder to another by selecting the
+        destination folder from the "Message -> Move To" submenu.
+
+        The "File -> Browse URL" function pops up a dialog box with the URL
+        under the text cursor. If you click "OK," EC opens the browser that
+        is named in the .eccconfig file, and loads the URL. If the browser
+        is already open or iconified, EC will use that browser window to
+        view the URL. EC supports Netscape 4.5-4.7, Amaya 2.4, Opera 5.0,
+        and Lynx in an xterm. If you select Lynx, you will probably also
+        need to set the xterm option in the .ecconfig file.
+
+        The "File -> Attachments" function opens a dialog window to save
+        attachments to disk in the main window. When you select "File ->
+        Attachments" in the composer window, the dialog allows you to select
+        files that will be attached to the outgoing message. Refer also to
+        the section, "File Attachments," below.
+
+        There are a number of options for quoting original messages when
+        composing a reply. Refer to the .ecconfig file for information about
+        these options.
+
+        EC also uses the X clipboard, so you can cut and paste between
+        windows in EC as well as other applications. If a program does not
+        have "Cut," "Copy," or "Paste" menu options, you can select text in
+        the original application by holding down the left mouse button and
+        dragging it across the text to highlight it, then changing to the
+        destination text window, and pressing the middle mouse button (or
+        the left and right buttons simultaneously on mice with only two
+        buttons).
+
+  Sorting Messages
+        You can select whether to sort messages by Date (the default), the
+        sender, or the subject, either newest first or oldest first, by
+        selecting the sort field from the "Options -> Sort by" submenu and
+        the "Options -> Sort Order" submenu, or by clicking on the headings
+        of the message listing.
+
+  Entering Messages
+        When you click on the "New" button on the function bar below the
+        incoming message listing, or select "Message -> Compose New Message"
+        from the menu, a window opens with a new message form with header
+        lines for the addressee, the subject, and the name of the FCC (File
+        Carbon Copy) file to save a copy of the message in. If you have a
+        ~/.signature file (refer to the .ecconfig file to configure this
+        option), EC will insert that at the end of the text. You can enter
+        the message below the separator line.
+
+        Clicking on the function bar's "Reply" button, or selecting "Message
+        -> Reply" from the menu bar, opens a compose window with the address
+        and subject of the original message filled in, and the message
+        quoted in the text area. There are several options that determine
+        how EC fills in reply addresses and quotes original messages. Again,
+        refer to the .ecconfig file for information about these options.
+
+        Each message contains header information and body text, separated by
+        a boundary line:
+
+          --- Enter the message text below this line. ---
+
+        This line must exist for EC to process the message, but it is not
+        included in the outgoing message.
+
+        Outgoing messages require at least the valid email address of a
+        recipient to be entered on the "To:" header line.
+
+        You can use the optional fields Cc:, Bcc:, and Reply-To:, either by
+        adding them manually above the separator line, or selecting them
+        from the "Message -> Insert Field" menu selection.
+
+        EC supports a limited form of address "unfolding," so you can enter
+        more than one email address on a To:, Cc:, Reply-To:, or Bcc: line,
+        separated by commas. EC will include the multiple addresses in the
+        outgoing message's header or will process the message to route it to
+        all recipients.
+
+  File Attachments
+        EC supports a subset of the Internet MIME specification which allows
+        files to be sent as attachments to messages.
+
+        To save a file that is attached to an incoming message, select the
+        file from the File -> Attachments menu. Type the name of the file to
+        save the attachment to in the dialog box.
+
+        To attach files to outgoing messages, select the "Attachments ->
+        Attach File..." menu item in the Compose window. Then select the
+        file from the dialog box's list or by entering its name. The file(s)
+        you select are listed on the "Attachments -> Remove Attachment"
+        menu, where you can remove attachments by selecting them. The files
+        are attached to the outgoing message when you click on the "Send"
+        button in the Compose window.
+
+        When a message contains file attachments, EC also encloses the text
+        of the message as a MIME "text/plain" section, and sets the message
+        header's Content-Type: field to "multipart/mixed." All messages
+        contain the required MIME-Version:, Content-Type:, and
+        Content-Transfer-Encoding: headers, whether or not the message
+        contains any attachments.
+
+CONFIGURATION
+        The file, "README," contains installation instructions.
+
+  Configuration Files
+        The program uses two configuration files, .ecconfig and .servers.
+        They reside in the ~/.ec directory by default, although you can
+        change their names and locations by editing their path names in the
+        ec and Config.pm files directly . The files and directory are not
+        visible in normal directory listings. Use the "-a" option to ls to
+        view them:
+
+          # ls -a ~/.ec
+
+        The .ecconfig file contains user-settable defaults for the program's
+        operating parameters using <option> <value> statements on each line.
+        The function of each setting is explained in the .ecconfig file's
+        comments.
+
+        You can also edit the .ecconfig file by selecting 'Sample .ecconfig
+        File...' from the Help menu. Pressing mouse button 3 (the right
+        button on many systems), pops up a menu over the text area. where
+        you can save your changes. You must exit and restart EC for the
+        changes to take effect.
+
+        The .servers file contains the user login name, host name, port, and
+        password for each POP3 and SMTP server. EC allows incoming mail
+        retrieval from multiple POP3 servers, but only allows one SMTP
+        server for sending outgoing mail. The format of each line is:
+
+          <server-name> <port> <user-login-name> <password>
+
+        If there is a hyphen, '"-"', in the password field, EC prompts you
+        for the server's password when the program logs on to the server.
+
+        In standard configurations, POP3 servers use port 110, and the
+        single SMTP server uses port 25.
+
+        The format of the .servers file allows you to retrieve mail from
+        more than one POP3 account, although you can only send mail to on
+        SMTP server.
+
+          mail.isp.net 110 info  password-for-info
+          mail.isp.net 110 sales password-for-sales
+          mail.isp.net 25  info  password-for-info
+
+        If you need to use different addresses for outgoing messages, you
+        can edit the From: or Reply-to: line of message header so that the
+        mail originates from the address you want, or replies get sent to
+        the appropriate address.
+
+        The .servers file must have only user read-write permissions (0600),
+        otherwise the program complains. The correct permissions can be set
+        with the command:
+
+          # chmod 0600 .ec/.servers
+
+        You must be the file's owner, of course, in order to be able to
+        reset the file's permissions.
+
+        The .servers file is not editable from the Help menu.
+
+  Mail Directories and Folders
+        EC saves messages in user-configurable "folders," or directories,
+        and can move messages between folders via the "Message -> Move To"
+        submenu. The mail folders are subdirectories of the <maildir>
+        setting, which is ~/Mail by default.
+
+        Assuming that a user's HOME directory is "/home/bill", the
+        directories that correspond to mail folders are:
+
+          Option     Value      Path
+          ------     -----      ----
+          maildir    ~/Mail     /home/bill/Mail
+          incoming   incoming   /home/bill/Mail/incoming
+          trash      trash      /home/bill/Mail/trash
+
+        The 'Incoming' and 'Trash' folders are required. These directories
+        must exist before using EC. The program will not create them on its
+        own.
+
+        EC makes the first letter of folder names uppercase, regardless of
+        whether the directory name starts with a capital or small letter.
+
+        All other directories can be configured in the .ecconfig file, using
+        the "folder" directive. You must create the directories before EC
+        can move messages into them. If a directory doesn't exist, EC warns
+        you and saves the message in the ~/Mail/incoming directory.
+
+        The e-mail program mutt also uses a directory named "Mail" to store
+        messages. You should change the name of ec's "maildir" so that ec's
+        message storage does not conflict with mutt's mail storage.
+
+  Filters
+        You can sort incoming mail by matching the text in an incoming
+        message with a specified pattern. Each "filter" line in the
+        .ecconfig file is composed of a text pattern, a double equals sign,
+        and the folder the mail is to be saved in. The format of a filter
+        line in the configuration file is:
+
+          filter <text-pattern>==<folder-directory>
+
+        Because the text pattern is used "raw" by Perl, you can use whatever
+        metacharacters Perl recognizes (refer to the "perlre" man page).
+        Pattern matches are not case sensitive, and the folder-directory
+        that the pattern matches must exist.
+
+        Because of Perl's pattern matching, you must quote some characters
+        that are common in email addresses which Perl recognizes as
+        metacharacters, by preceding them with a backslash. These characters
+        include @, [, ], <, and >. Refer to the example filter definitions
+        in the .ecconfig file.
+
+  Mail Transport Agents
+        In additon to an ISP's SMTP server, EC can send outgoing messages
+        via sendmail, qmail, or exim, if any of them are installed. In the
+        .ecconfig file, the "usesendmail", "useqmail", and "useexim" options
+        determine which program, if any, is used. If the value of of any of
+        these options is non-zero, then outgoing mail is routed to the MTA;
+        otherwise, the default is to send mail directly to the ISP's SMTP
+        server, using the information in the ~/.ec/.servers file.
+
+        If no MTA is selected, then ec will send and receive messages
+        directly from a remote mail host, and it will not process messages
+        from a local mail transport agent.
+
+        In most sendmail configurations, either the local sendmail must be
+        configured to relay messages, or have a "smart host" defined. The
+        comments in the .ecconfig file describe only a few of the possible
+        settings. Refer to the sendmail documentation for further
+        information.
+
+        The exim configuration (selected by setting "useexim" to non-zero)
+        is similar to sendmail, but you can use exim with a remote "smart
+        host" without setting a From: domain address in ec, if the system
+        administrator created an entry for your domain email address in
+        "/etc/email-addresses."
+
+        If the "useqmail" option is set, make sure that you can execute the
+        qmail-inject program, which is /var/qmail/bin/qmail-inject in
+        qmail's default configuration. EC still connects directly to an
+        ISP's POP3 server, and uses the system UNIX mailbox, usually
+        /var/spool/mail/<user>, for incoming messages.
+
+        The qmail-inject "-f" option is not implemented. The format of the
+        sender's return address can be set using environment variables.
+        Refer to the qmail-inject manual page for information.
+
+  Editing the Library Path Names in the Source File
+        If you would like to change the path names of library files, use a
+        text editor to edit the values of *$iconpath*, *$cfgfilename*,
+        *$serverfilename*, and *$base64enc* at the beginning of the library
+        modules they appear in.
+
+        The "expand_path" function expands leading tildes ('~') in file and
+        path names to the value of the $HOME environment variable, following
+        the convention of the UNIX Bourne shell. Directory separators are
+        forward slashes ('/'), so compatibility with non-UNIX file systems
+        depends on the Perl environment to perform the path name
+        translation.
+
+  X Fonts
+        Consult the file, "README," for information about setting X Window
+        System font resources, and the comments in the file, ".ecconfig,"
+        for setting fonts with the program's configuration options.
+
+Maintenance
+  Folder Indexes
+        Although EC attempts to maintain an accurate index of read and
+        unread messages in each folder, it is possible, if you upgrade to a
+        later version, or backup and then delete messages manually, that the
+        folder indexes will not match the actual contents of the folder.
+
+        In this case, you must delete the file named .index in each of the
+        folders. For example, to delete the indexes in the Incoming and
+        Trash folders, use these commands:
+
+          # rm Mail/incoming/.index
+          # rm Mail/trash/.index
+
+        If EC does not find the .index file it will, as when you first ran
+        the program, display a message that it is creating a new .index
+        file. The messages themselves are not affected, but you need to
+        select them again to prevent the program from showing their status
+        as *u* for "unread."
+
+PRINTING THE DOCUMENTATION IN DIFFERENT FORMATS
+        It is possible produce this documentation in various formats using
+        Perl's POD formatting utilities:
+
+          pod2html <ec >doc.html
+          pod2latex <ec >doc.tex
+          pod2man <ec >doc.man
+          pod2text <ec >doc.txt
+          pod2usage <ec >doc.hlp
+
+        Refer to your system's manual pages for instructions of how to use
+        these utilities.
+
+LICENSE
+        EC is licensed using the same terms as Perl. Please refer to the
+        file "Artistic" in the distribution archive.
+
+VERSION INFO
+          Version 1.27
+
+CREDITS
+          Written by Robert Allan Kiesling, rkies@cpan.org.
+
+          Windows-specific routines written by Roland Bauer, roland.bauer@fff.at.
+
+          Perl/Tk by Nick Ing-Simmons.
+
+          The POP server interface is based on:
+          POPMail Version 1.6 (RFC1081) Interface for Perl,
+              Written by:
+              Kevin Everets <flynn@engsoc.queensu.ca>
+              Abhijit Kalamkar <abhijitk@india.com>
+              Nathan Mahon <vaevictus@socket.net>
+              Steve McCarthy <sjm@halcyon.com>
+              Sven Neuhaus <sven@ping.de>
+              Bill Reynolds <bill@goshawk.lanl.gov>
+              Hongjiang Wang <whj@cs-air.com>
+
+          The encdec Base64 filter was written by Jörgen Hägg and posted
+          to the comp.mail.mime Usenet News group.  Please refer to the
+          source file, F<encdec.c> for licensing information.
+

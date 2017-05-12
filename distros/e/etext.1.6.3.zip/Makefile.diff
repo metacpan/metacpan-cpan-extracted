@@ -1,0 +1,815 @@
+*** tk/Makefile	Wed Mar 29 22:58:18 1995
+--- Makefile	Wed Mar 20 16:35:18 1996
+***************
+*** 6,12 ****
+  # "autoconf" program (constructs like "@foo@" will get replaced in the
+  # actual Makefile.
+  #
+! # @(#) Makefile.in 1.25 95/03/24 09:38:39
+  
+  #----------------------------------------------------------------
+  # Things you can change to personalize the Makefile for your own
+--- 6,12 ----
+  # "autoconf" program (constructs like "@foo@" will get replaced in the
+  # actual Makefile.
+  #
+! # @(#) Makefile.in 1.14 94/12/23 16:16:57
+  
+  #----------------------------------------------------------------
+  # Things you can change to personalize the Makefile for your own
+***************
+*** 15,84 ****
+  # the configuration script).
+  #----------------------------------------------------------------
+  
+  # Default top-level directories in which to install architecture-
+  # specific files (exec_prefix) and machine-independent files such
+  # as scripts (prefix).  The values specified here may be overridden
+  # at configure-time with the --exec-prefix and --prefix options
+  # to the "configure" script.
+  
+! prefix =		/opt/local
+! exec_prefix =		${prefix}
+! 
+! # The following definition can be set to non-null for special systems
+! # like AFS with replication.  It allows the pathnames used for installation
+! # to be different than those used for actually reference files at
+! # run-time.  INSTALL_ROOT is prepended to $prefix and $exec_prefix
+! # when installing files.
+! INSTALL_ROOT =
+! 
+! # Directory from which applications will reference the library of Tcl
+! # scripts (note: you can set the TK_LIBRARY environment variable at
+! # run-time to override the compiled-in location):
+! TK_LIBRARY =		$(prefix)/lib/tk
+  
+! # Path name to use when installing library scripts:
+! SCRIPT_INSTALL_DIR =	$(INSTALL_ROOT)$(TK_LIBRARY)
+  
+  # Directory in which to install the archive libtk.a:
+! LIB_INSTALL_DIR =	$(INSTALL_ROOT)$(exec_prefix)/lib
+  
+  # Directory in which to install the program wish:
+! BIN_INSTALL_DIR =	$(INSTALL_ROOT)$(exec_prefix)/bin
+! 
+! # Directory from which the program wish should be referenced by scripts:
+! BIN_DIR =		$(exec_prefix)/bin
+  
+  # Directory in which to install the include file tk.h:
+! INCLUDE_INSTALL_DIR =	$(INSTALL_ROOT)$(prefix)/include
+  
+  # Top-level directory for manual entries:
+! MAN_INSTALL_DIR =	$(INSTALL_ROOT)$(prefix)/man
+  
+  # Directory in which to install manual entry for wish:
+! MAN1_INSTALL_DIR =	$(MAN_INSTALL_DIR)/man1
+  
+  # Directory in which to install manual entries for Tk's C library
+  # procedures:
+! MAN3_INSTALL_DIR =	$(MAN_INSTALL_DIR)/man3
+  
+  # Directory in which to install manual entries for the built-in
+  # Tcl commands implemented by Tk:
+! MANN_INSTALL_DIR =	$(MAN_INSTALL_DIR)/mann
+  
+  # The directory containing the Tcl sources and headers appropriate
+  # for this version of Tk ("." will be replaced or has already
+  # been replaced by the configure script):
+! TCL_DIR =		./../tcl7.4b3
+  
+  # The directory containing the Tcl library archive file appropriate
+  # for this version of Tk:
+! TCL_BIN_DIR =		../tcl7.4b3
+  
+  # A "-I" switch that can be used when compiling to make all of the
+  # X11 include files accessible (the configure script will try to
+  # set this value, and will cause it to be an empty string if the
+  # include files are accessible via /usr/include).
+! X11_INCLUDES =		-I/usr/openwin/include
+  
+  # Linker switch(es) to use to link with the X11 library archive (the
+  # configure script will try to set this value automatically, but you
+--- 15,76 ----
+  # the configuration script).
+  #----------------------------------------------------------------
+  
++ DBMALLOC =
++ #DBMALLOC =  -I${HOME}/get/dbmalloc
++ DBMALLOCLIB =
++ #DBMALLOCLIB =  -L${HOME}/get/dbmalloc -ldbmalloc
++ 
+  # Default top-level directories in which to install architecture-
+  # specific files (exec_prefix) and machine-independent files such
+  # as scripts (prefix).  The values specified here may be overridden
+  # at configure-time with the --exec-prefix and --prefix options
+  # to the "configure" script.
+  
+! exec_prefix =	/usr/local
+! prefix =	/usr/local
+  
+! # Directory in which to install the library of Tk scripts and demos
+! # (note: you can set the TK_LIBRARY environment variable at run-time to
+! # override the compiled-in location):
+! TK_LIBRARY =	$(prefix)/lib/tk
+  
+  # Directory in which to install the archive libtk.a:
+! LIB_DIR =	$(exec_prefix)/lib
+  
+  # Directory in which to install the program wish:
+! BIN_DIR =	$(exec_prefix)/bin
+  
+  # Directory in which to install the include file tk.h:
+! INCLUDE_DIR =	$(prefix)/include
+  
+  # Top-level directory for manual entries:
+! MAN_DIR =	$(prefix)/man
+  
+  # Directory in which to install manual entry for wish:
+! MAN1_DIR =	$(MAN_DIR)/man1
+  
+  # Directory in which to install manual entries for Tk's C library
+  # procedures:
+! MAN3_DIR =	$(MAN_DIR)/man3
+  
+  # Directory in which to install manual entries for the built-in
+  # Tcl commands implemented by Tk:
+! MANN_DIR =	$(MAN_DIR)/mann
+  
+  # The directory containing the Tcl sources and headers appropriate
+  # for this version of Tk ("." will be replaced or has already
+  # been replaced by the configure script):
+! TCL_DIR =	./tcl
+  
+  # The directory containing the Tcl library archive file appropriate
+  # for this version of Tk:
+! TCL_BIN_DIR =	./tcl
+  
+  # A "-I" switch that can be used when compiling to make all of the
+  # X11 include files accessible (the configure script will try to
+  # set this value, and will cause it to be an empty string if the
+  # include files are accessible via /usr/include).
+! X11_INCLUDES =	 -I/usr/openwin/include
+  
+  # Linker switch(es) to use to link with the X11 library archive (the
+  # configure script will try to set this value automatically, but you
+***************
+*** 89,99 ****
+  # and the math library (in that order).  The " -lsocket -lnsl" part will be
+  # replaced (or has already been replaced) with relevant libraries as
+  # determined by the configure script.
+! LIBS = libtk.a $(TCL_BIN_DIR)/libtcl.a $(X11_LIB_SWITCHES)  -lsocket -lnsl -lm
+  
+  # To change the compiler switches, for example to change from -O
+  # to -g, change the following line:
+! CFLAGS = -O
+  
+  # To turn off the security checks that disallow incoming sends when
+  # the X server appears to be insecure, reverse the comments on the
+--- 81,91 ----
+  # and the math library (in that order).  The " -lsocket -lnsl" part will be
+  # replaced (or has already been replaced) with relevant libraries as
+  # determined by the configure script.
+! LIBS = ./tk/libtk.a $(TCL_BIN_DIR)/libtcl.a $(X11_LIB_SWITCHES) -lsocket -lnsl -lm $(DBMALLOCLIB)
+  
+  # To change the compiler switches, for example to change from -O
+  # to -g, change the following line:
+! CFLAGS = -g -DPTCL
+  
+  # To turn off the security checks that disallow incoming sends when
+  # the X server appears to be insecure, reverse the comments on the
+***************
+*** 113,147 ****
+  MEM_DEBUG_FLAGS =
+  #MEM_DEBUG_FLAGS = -DTCL_MEM_DEBUG
+  
+- # If your X server is X11R4 or earlier, then you may wish to reverse
+- # the comment characters on the following two lines.  This will enable
+- # extra code to speed up XStringToKeysym.  In X11R5 and later releases
+- # XStringToKeysym is plenty fast, so you needn't define REDO_KEYSYM_LOOKUP.
+- KEYSYM_FLAGS =
+- #KEYSYM_FLAGS = -DREDO_KEYSYM_LOOKUP
+- 
+  # Some versions of make, like SGI's, use the following variable to
+  # determine which shell to use for executing commands:
+  SHELL =		/bin/sh
+  
+- # Tk used to let the configure script choose which program to use
+- # for installing, but there are just too many different versions of
+- # "install" around;  better to use the install-sh script that comes
+- # with the distribution, which is slower but guaranteed to work.
+- 
+- INSTALL = install-sh -c
+- 
+  #----------------------------------------------------------------
+  # The information below is modified by the configure script when
+  # Makefile is generated from Makefile.in.  You shouldn't normally
+  # modify any of this stuff by hand.
+  #----------------------------------------------------------------
+  
+! AC_FLAGS =		 -DHAVE_UNISTD_H=1 -DHAVE_LIMITS_H=1 -DSTDC_HEADERS=1 -DNEED_MATHERR=1 -DTK_FILE_COUNT=_cnt 
+  INSTALL_PROGRAM =	${INSTALL}
+  INSTALL_DATA =		${INSTALL} -m 644
+  RANLIB =		:
+! SRC_DIR =		.
+  
+  #----------------------------------------------------------------
+  # The information below should be usable as is.  The configure
+--- 105,126 ----
+  MEM_DEBUG_FLAGS =
+  #MEM_DEBUG_FLAGS = -DTCL_MEM_DEBUG
+  
+  # Some versions of make, like SGI's, use the following variable to
+  # determine which shell to use for executing commands:
+  SHELL =		/bin/sh
+  
+  #----------------------------------------------------------------
+  # The information below is modified by the configure script when
+  # Makefile is generated from Makefile.in.  You shouldn't normally
+  # modify any of this stuff by hand.
+  #----------------------------------------------------------------
+  
+! AC_FLAGS =		 -DHAVE_UNISTD_H=1 -DHAVE_LIMITS_H=1 -DNEED_MATHERR=1 -DTK_FILE_COUNT=_cnt
+! INSTALL =		/opt/gnu/bin/install -c
+  INSTALL_PROGRAM =	${INSTALL}
+  INSTALL_DATA =		${INSTALL} -m 644
+  RANLIB =		:
+! SRC_DIR =		./tk
+  
+  #----------------------------------------------------------------
+  # The information below should be usable as is.  The configure
+***************
+*** 153,159 ****
+  CC =		cc
+  CC_SWITCHES =	${CFLAGS} -I${SRC_DIR} -I${TCL_DIR} ${X11_INCLUDES} \
+  ${AC_FLAGS} ${PROTO_FLAGS} ${SECURITY_FLAGS} ${MEM_DEBUG_FLAGS} \
+! ${KEYSYM_FLAGS} -DTK_LIBRARY=\"${TK_LIBRARY}\"
+  
+  WIDGOBJS = tkButton.o tkEntry.o tkFrame.o tkListbox.o \
+  	tkMenu.o tkMenubutton.o tkMessage.o tkScale.o \
+--- 132,138 ----
+  CC =		cc
+  CC_SWITCHES =	${CFLAGS} -I${SRC_DIR} -I${TCL_DIR} ${X11_INCLUDES} \
+  ${AC_FLAGS} ${PROTO_FLAGS} ${SECURITY_FLAGS} ${MEM_DEBUG_FLAGS} \
+! -DTK_LIBRARY=\"${TK_LIBRARY}\" ${DBMALLOC}
+  
+  WIDGOBJS = tkButton.o tkEntry.o tkFrame.o tkListbox.o \
+  	tkMenu.o tkMenubutton.o tkMessage.o tkScale.o \
+***************
+*** 166,172 ****
+  IMAGEOBJS = tkImage.o tkImgBmap.o tkImgFmtPPM.o tkImgPhoto.o
+  
+  TEXTOBJS = tkText.o tkTextBTree.o tkTextDisp.o tkTextIndex.o \
+! 	tkTextMark.o tkTextTag.o tkTextWind.o
+  
+  OBJS = tk3d.o tkArgv.o tkAtom.o tkBind.o tkBitmap.o tkClipboard.o tkCmds.o \
+  	tkColor.o tkConfig.o tkCursor.o tkError.o tkEvent.o \
+--- 145,151 ----
+  IMAGEOBJS = tkImage.o tkImgBmap.o tkImgFmtPPM.o tkImgPhoto.o
+  
+  TEXTOBJS = tkText.o tkTextBTree.o tkTextDisp.o tkTextIndex.o \
+! 	tkTextMark.o tkTextTag.o tkTextWind.o ptclGlue.o
+  
+  OBJS = tk3d.o tkArgv.o tkAtom.o tkBind.o tkBitmap.o tkClipboard.o tkCmds.o \
+  	tkColor.o tkConfig.o tkCursor.o tkError.o tkEvent.o \
+***************
+*** 194,210 ****
+  HDRS = default.h ks_names.h patchlevel.h tk.h tkCanvas.h tkInt.h  \
+  	tkPort.h tkText.h
+  
+! DEMOPROGS = browse hello ixset rmt rolodex square tcolor timer widget
+  
+! all: libtk.a wish
+  
+  libtk.a: $(OBJS)
+  	rm -f libtk.a
+  	ar cr libtk.a $(OBJS)
+  	$(RANLIB) libtk.a
+  
+! wish: tkAppInit.o libtk.a $(TCL_BIN_DIR)/libtcl.a
+! 	$(CC) $(CC_SWITCHES) tkAppInit.o $(LIBS) -o wish
+  
+  tktest: tkTest.o tkSquare.o libtk.a $(TCL_BIN_DIR)/libtcl.a
+  	${CC} ${CC_SWITCHES} tkTest.o tkSquare.o $(LIBS) -o tktest
+--- 173,190 ----
+  HDRS = default.h ks_names.h patchlevel.h tk.h tkCanvas.h tkInt.h  \
+  	tkPort.h tkText.h
+  
+! DEMOPROGS = browse color dialog hello ixset rmt rolodex size square \
+! 	tcolor timer widget
+  
+! all: wish
+  
+  libtk.a: $(OBJS)
+  	rm -f libtk.a
+  	ar cr libtk.a $(OBJS)
+  	$(RANLIB) libtk.a
+  
+! wish: ./tk/tkAppInit.o $(TEXTOBJS) ./tk/libtk.a $(TCL_BIN_DIR)/libtcl.a
+! 	$(CC) $(CC_SWITCHES) ./tk/tkAppInit.o $(TEXTOBJS) $(LIBS) -o wish
+  
+  tktest: tkTest.o tkSquare.o libtk.a $(TCL_BIN_DIR)/libtcl.a
+  	${CC} ${CC_SWITCHES} tkTest.o tkSquare.o $(LIBS) -o tktest
+***************
+*** 226,232 ****
+  install: install-binaries install-libraries install-demos install-man
+  
+  install-binaries: libtk.a wish
+! 	@for i in $(LIB_INSTALL_DIR) $(BIN_INSTALL_DIR) ; \
+  	    do \
+  	    if [ ! -d $$i ] ; then \
+  		echo "Making directory $$i"; \
+--- 206,212 ----
+  install: install-binaries install-libraries install-demos install-man
+  
+  install-binaries: libtk.a wish
+! 	@for i in $(LIB_DIR) $(BIN_DIR) ; \
+  	    do \
+  	    if [ ! -d $$i ] ; then \
+  		echo "Making directory $$i"; \
+***************
+*** 236,249 ****
+  		fi; \
+  	    done;
+  	@echo "Installing libtk.a"
+! 	@$(INSTALL_DATA) libtk.a $(LIB_INSTALL_DIR)
+! 	@$(RANLIB) $(LIB_INSTALL_DIR)/libtk.a
+  	@echo "Installing wish"
+! 	@$(INSTALL_PROGRAM) wish $(BIN_INSTALL_DIR)
+  
+  install-libraries:
+! 	@for i in $(INSTALL_ROOT)$(prefix)/lib $(INCLUDE_INSTALL_DIR) \
+! 		$(SCRIPT_INSTALL_DIR) ; \
+  	    do \
+  	    if [ ! -d $$i ] ; then \
+  		echo "Making directory $$i"; \
+--- 216,228 ----
+  		fi; \
+  	    done;
+  	@echo "Installing libtk.a"
+! 	@$(INSTALL_DATA) libtk.a $(LIB_DIR)
+! 	@$(RANLIB) $(LIB_DIR)/libtk.a
+  	@echo "Installing wish"
+! 	@$(INSTALL_PROGRAM) wish $(BIN_DIR)
+  
+  install-libraries:
+! 	@for i in $(prefix)/lib $(INCLUDE_DIR) $(TK_LIBRARY) ; \
+  	    do \
+  	    if [ ! -d $$i ] ; then \
+  		echo "Making directory $$i"; \
+***************
+*** 253,269 ****
+  		fi; \
+  	    done;
+  	@echo "Installing tk.h"
+! 	@$(INSTALL_DATA) $(SRC_DIR)/tk.h $(INCLUDE_INSTALL_DIR)
+! 	for i in $(SRC_DIR)/library/*.tcl $(SRC_DIR)/library/tclIndex $(SRC_DIR)/library/prolog.ps; \
+  	    do \
+! 	    echo "Installing $$i"; \
+! 	    $(INSTALL_DATA) $$i $(SCRIPT_INSTALL_DIR); \
+  	    done;
+  
+  install-demos:
+! 	@for i in $(INSTALL_ROOT)$(prefix)/lib $(SCRIPT_INSTALL_DIR) \
+! 		$(SCRIPT_INSTALL_DIR)/demos \
+! 		$(SCRIPT_INSTALL_DIR)/demos/images ; \
+  	    do \
+  	    if [ ! -d $$i ] ; then \
+  		echo "Making directory $$i"; \
+--- 232,247 ----
+  		fi; \
+  	    done;
+  	@echo "Installing tk.h"
+! 	@$(INSTALL_DATA) $(SRC_DIR)/tk.h $(INCLUDE_DIR)
+! 	@cd $(SRC_DIR)/library; for i in *.tcl tclIndex prolog.ps; \
+  	    do \
+! 	    echo "Installing library/$$i"; \
+! 	    $(INSTALL_DATA) $$i $(TK_LIBRARY); \
+  	    done;
+  
+  install-demos:
+! 	@for i in $(prefix)/lib $(TK_LIBRARY) $(TK_LIBRARY)/demos \
+! 		$(TK_LIBRARY)/demos/images ; \
+  	    do \
+  	    if [ ! -d $$i ] ; then \
+  		echo "Making directory $$i"; \
+***************
+*** 277,299 ****
+  	    if [ -f $$i ] ; then \
+  		echo "Installing library/demos/$$i"; \
+  		sed -e '1 s|/usr/local/bin/wish|$(BIN_DIR)/wish|' \
+! 			$$i > $(SCRIPT_INSTALL_DIR)/demos/$$i; \
+  	    fi; \
+  	    done;
+  	@for i in $(DEMOPROGS); \
+  	    do \
+! 	    chmod 755 $(SCRIPT_INSTALL_DIR)/demos/$$i; \
+  	    done;
+! 	@for i in $(SRC_DIR)/library/demos/images/*; \
+  	    do \
+  	    if [ -f $$i ] ; then \
+! 		echo "Installing $$i"; \
+! 		$(INSTALL_DATA) $$i $(SCRIPT_INSTALL_DIR)/demos/images; \
+  		fi; \
+  	    done;
+  
+  install-man:
+! 	@for i in $(MAN_INSTALL_DIR) $(MAN1_INSTALL_DIR) $(MAN3_INSTALL_DIR) $(MANN_INSTALL_DIR) ; \
+  	    do \
+  	    if [ ! -d $$i ] ; then \
+  		echo "Making directory $$i"; \
+--- 255,277 ----
+  	    if [ -f $$i ] ; then \
+  		echo "Installing library/demos/$$i"; \
+  		sed -e '1 s|/usr/local/bin/wish|$(BIN_DIR)/wish|' \
+! 			$$i > $(TK_LIBRARY)/demos/$$i; \
+  	    fi; \
+  	    done;
+  	@for i in $(DEMOPROGS); \
+  	    do \
+! 	    chmod 755 $(TK_LIBRARY)/demos/$$i; \
+  	    done;
+! 	@cd $(SRC_DIR)/library/demos/images; for i in *; \
+  	    do \
+  	    if [ -f $$i ] ; then \
+! 		echo "Installing library/demos/images/$$i"; \
+! 		$(INSTALL_DATA) $$i $(TK_LIBRARY)/demos/images; \
+  		fi; \
+  	    done;
+  
+  install-man:
+! 	@for i in $(MAN_DIR) $(MAN1_DIR) $(MAN3_DIR) $(MANN_DIR) ; \
+  	    do \
+  	    if [ ! -d $$i ] ; then \
+  		echo "Making directory $$i"; \
+***************
+*** 305,330 ****
+  	@cd $(SRC_DIR)/doc; for i in *.1; \
+  	    do \
+  	    echo "Installing doc/$$i"; \
+! 	    rm -f $(MAN1_INSTALL_DIR)/$$i; \
+  	    sed -e '/man\.macros/r man.macros' -e '/man\.macros/d' \
+! 		    $$i > $(MAN1_INSTALL_DIR)/$$i; \
+! 	    chmod 444 $(MAN1_INSTALL_DIR)/$$i; \
+  	    done;
+  	@cd $(SRC_DIR)/doc; for i in *.3; \
+  	    do \
+  	    echo "Installing doc/$$i"; \
+! 	    rm -f $(MAN3_INSTALL_DIR)/$$i; \
+  	    sed -e '/man\.macros/r man.macros' -e '/man\.macros/d' \
+! 		    $$i > $(MAN3_INSTALL_DIR)/$$i; \
+! 	    chmod 444 $(MAN3_INSTALL_DIR)/$$i; \
+  	    done;
+  	@cd $(SRC_DIR)/doc; for i in *.n; \
+  	    do \
+  	    echo "Installing doc/$$i"; \
+! 	    rm -f $(MANN_INSTALL_DIR)/$$i; \
+  	    sed -e '/man\.macros/r man.macros' -e '/man\.macros/d' \
+! 		    $$i > $(MANN_INSTALL_DIR)/$$i; \
+! 	    chmod 444 $(MANN_INSTALL_DIR)/$$i; \
+  	    done;
+  
+  Makefile: $(SRC_DIR)/Makefile.in
+--- 283,308 ----
+  	@cd $(SRC_DIR)/doc; for i in *.1; \
+  	    do \
+  	    echo "Installing doc/$$i"; \
+! 	    rm -f $(MAN1_DIR)/$$i; \
+  	    sed -e '/man\.macros/r man.macros' -e '/man\.macros/d' \
+! 		    $$i > $(MAN1_DIR)/$$i; \
+! 	    chmod 444 $(MAN1_DIR)/$$i; \
+  	    done;
+  	@cd $(SRC_DIR)/doc; for i in *.3; \
+  	    do \
+  	    echo "Installing doc/$$i"; \
+! 	    rm -f $(MAN3_DIR)/$$i; \
+  	    sed -e '/man\.macros/r man.macros' -e '/man\.macros/d' \
+! 		    $$i > $(MAN3_DIR)/$$i; \
+! 	    chmod 444 $(MAN3_DIR)/$$i; \
+  	    done;
+  	@cd $(SRC_DIR)/doc; for i in *.n; \
+  	    do \
+  	    echo "Installing doc/$$i"; \
+! 	    rm -f $(MANN_DIR)/$$i; \
+  	    sed -e '/man\.macros/r man.macros' -e '/man\.macros/d' \
+! 		    $$i > $(MANN_DIR)/$$i; \
+! 	    chmod 444 $(MANN_DIR)/$$i; \
+  	    done;
+  
+  Makefile: $(SRC_DIR)/Makefile.in
+***************
+*** 351,364 ****
+  	-egrep isalnum\|isalpha\|iscntrl\|isdigit\|islower\|isprint\|ispunct\|isspace\|isupper\|isxdigit $(SRCS) | grep -v UCHAR
+  
+  #
+- # Target to make sure that only symbols with "Tk" prefixes are
+- # exported.
+- #
+- 
+- checkexports: libtk.a
+- 	-nm -p libtk.a | awk '$$2 ~ /[TDB]/ { print $$3 }' | sort -n | grep -v '^[Tt]k'
+- 
+- #
+  # Target to create a proper Tk distribution from information in the
+  # master source directory.  DISTDIR must be defined to indicate where
+  # to put the distribution.
+--- 329,334 ----
+***************
+*** 367,415 ****
+  TCLDIR	  = ../tcl
+  configure: configure.in
+  	autoconf
+! dist:   configure
+! 	rm -rf $(DISTDIR)
+! 	mkdir $(DISTDIR)
+! 	cp license.terms Makefile.in $(DISTDIR)
+! 	chmod 664 $(DISTDIR)/Makefile.in
+! 	cp -p $(SRCS) tkAppInit.c tkSquare.c tkTest.c $(HDRS) $(DISTDIR)
+! 	mkdir $(DISTDIR)/bitmaps
+! 	@for i in bitmaps/* ; do \
+! 	    if [ -f $$i ] ; then \
+! 		sed -e 's/static char/static unsigned char/' \
+! 		       $$i > $(DISTDIR)/$$i; \
+! 	    fi; \
+! 	done;
+! 	mkdir $(DISTDIR)/compat
+! 	cp -p license.terms $(TCLDIR)/compat/unistd.h \
+! 		$(TCLDIR)/compat/stdlib.h $(DISTDIR)/compat
+! 	cp -p README ToDo changes porting.notes porting.old $(DISTDIR)
+! 	cp -p configure configure.in $(TCLDIR)/install-sh $(DISTDIR)
+! 	chmod 775 $(DISTDIR)/configure $(DISTDIR)/configure.in
+! 	chmod +x $(DISTDIR)/install-sh
+! 	mkdir $(DISTDIR)/library
+! 	cp -p license.terms library/*.tcl library/tclIndex $(DISTDIR)/library
+! 	cp -p library/prolog.ps $(DISTDIR)/library
+! 	mkdir $(DISTDIR)/library/demos
+! 	cp -pr library/demos/*.tcl \
+! 		library/demos/tclIndex library/demos/browse \
+! 		library/demos/hello library/demos/ixset \
+! 		library/demos/rmt library/demos/rolodex \
+! 		library/demos/square \
+! 		library/demos/tcolor library/demos/timer \
+! 		library/demos/widget library/demos/README \
+! 		license.terms $(DISTDIR)/library/demos
+! 	mkdir $(DISTDIR)/library/demos/images
+! 	@for i in library/demos/images/* ; do \
+! 	    if [ -f $$i ] ; then \
+! 		cp $$i $(DISTDIR)/$$i; \
+! 	    fi; \
+! 	done;
+! 	mkdir $(DISTDIR)/doc
+! 	cp -p license.terms doc/*.[13n] doc/man.macros $(DISTDIR)/doc
+! 	mkdir $(DISTDIR)/tests
+! 	cp -p license.terms tests/*.test tests/visual tests/*.tcl \
+! 		tests/README tests/all tests/defs tests/option.file* \
+! 		$(DISTDIR)/tests
+  
+  # DO NOT DELETE THIS LINE -- make depend depends on it.
+--- 337,584 ----
+  TCLDIR	  = ../tcl
+  configure: configure.in
+  	autoconf
+! 
+! FTPDIR = $(HOME)/ftp/etext
+! PERLPOD = $(HOME)/get/perl5.002/pod
+! 
+! doc/etext.html: doc/etext.pod
+! 	cd doc; \
+! 	perl $(PERLPOD)/pod2html
+! 
+! $(FTPDIR)/etext.html: doc/etext.html
+! 	cp $? $@
+! 	chmod go+r $@
+! 
+! doc/etext.man: doc/etext.pod
+! 	perl $(PERLPOD)/pod2man $? > $@
+! 
+! doc/etext.txt: doc/etext.man
+! 	groff -man -T ascii $? > $@
+! 
+! $(FTPDIR)/etext.README: README.etext
+! 	cp $? $@
+! 	chmod go+r $@
+! 
+! Makefile.diff: FORCE
+! 	rm -f Makefile.diff
+! 	-diff -c tk/Makefile Makefile > Makefile.diff
+! 
+! diff: FORCE
+! 	rm -f diff 
+! 	-diff -c tk/tkText.h tkText.h > diff 
+! 	-diff -c tk/tkText.c tkText.c >> diff
+! 	-diff -c tk/tkTextIndex.c tkTextIndex.c >> diff
+! 	-diff -c tk/tkTextWind.c tkTextWind.c >> diff
+! 	-diff -c tk/tkTextMark.c tkTextMark.c >> diff
+! 	-diff -c tk/tkTextTag.c tkTextTag.c >> diff
+! 	-diff -c tk/tkTextDisp.c tkTextDisp.c >> diff
+! 	-diff -c tk/tkTextBTree.c tkTextBTree.c >> diff
+! 
+! #DIFFS: diff Makefile.diff FORCE
+! 
+! DIFFS: Makefile.diff FORCE
+! 
+! FORCE:
+! 
+! archive: etext$(VERSION).tar.gz
+! 
+! etext$(VERSION).tar.gz :
+! 	@ if test "X$(VERSION)" = "X"; then echo No VERSION= specified! ;	exit 1;	fi
+! 	cd ..; chmod a+r  `cat etext/MANIFEST.etext`; tar -czvf etext/etext$(VERSION).tar.gz `cat etext/MANIFEST.etext`
+! 
+! $(FTPDIR)/etext$(VERSION).tar.gz : etext$(VERSION).tar.gz
+! 	cp etext$(VERSION).tar.gz $(FTPDIR)
+! 	chmod go+r $(FTPDIR)/etext$(VERSION).tar.gz
+! 
+! dist:   doc/etext.man doc/etext.html $(FTPDIR)/etext.html DIFFS $(FTPDIR)/etext.README $(FTPDIR)/etext$(VERSION).tar.gz
+  
+  # DO NOT DELETE THIS LINE -- make depend depends on it.
++ 
++ tkText.o: ./tk/default.h ./tk/tkPort.h /usr/include/stdio.h
++ tkText.o: /usr/include/sys/feature_tests.h /usr/include/ctype.h
++ tkText.o: /usr/include/fcntl.h /usr/include/sys/types.h
++ tkText.o: /usr/include/sys/machtypes.h /usr/include/sys/isa_defs.h
++ tkText.o: /usr/include/sys/fcntl.h /usr/include/limits.h /usr/include/math.h
++ tkText.o: /usr/include/pwd.h /usr/include/stdlib.h /usr/include/string.h
++ tkText.o: /usr/include/sys/file.h /usr/include/sys/t_lock.h
++ tkText.o: /usr/include/sys/machlock.h /usr/include/sys/dki_lkinfo.h
++ tkText.o: /usr/include/sys/dl.h /usr/include/sys/sleepq.h
++ tkText.o: /usr/include/sys/turnstile.h /usr/include/sys/param.h
++ tkText.o: /usr/include/sys/unistd.h /usr/include/sys/pirec.h
++ tkText.o: /usr/include/sys/mutex.h /usr/include/sys/rwlock.h
++ tkText.o: /usr/include/sys/semaphore.h /usr/include/sys/condvar.h
++ tkText.o: /usr/include/sys/stat.h /usr/include/sys/time.h ./tcl/tcl.h
++ tkText.o: /usr/include/unistd.h /usr/openwin/include/X11/Xlib.h
++ tkText.o: /usr/openwin/include/X11/X.h /usr/openwin/include/X11/Xfuncproto.h
++ tkText.o: /usr/openwin/include/X11/Xosdefs.h /usr/include/stddef.h
++ tkText.o: /usr/openwin/include/X11/cursorfont.h
++ tkText.o: /usr/openwin/include/X11/keysym.h
++ tkText.o: /usr/openwin/include/X11/keysymdef.h
++ tkText.o: /usr/openwin/include/X11/Xatom.h /usr/openwin/include/X11/Xproto.h
++ tkText.o: /usr/openwin/include/X11/Xmd.h /usr/openwin/include/X11/Xprotostr.h
++ tkText.o: /usr/openwin/include/X11/Xresource.h
++ tkText.o: /usr/openwin/include/X11/Xutil.h ./tk/tk.h tkText.h ptcl.h
++ tkTextBTree.o: ./tk/tkInt.h /usr/openwin/include/X11/Xlib.h
++ tkTextBTree.o: /usr/include/sys/types.h /usr/include/sys/feature_tests.h
++ tkTextBTree.o: /usr/include/sys/machtypes.h /usr/include/sys/isa_defs.h
++ tkTextBTree.o: /usr/openwin/include/X11/X.h
++ tkTextBTree.o: /usr/openwin/include/X11/Xfuncproto.h
++ tkTextBTree.o: /usr/openwin/include/X11/Xosdefs.h /usr/include/stddef.h
++ tkTextBTree.o: /usr/openwin/include/X11/Xutil.h ./tk/tk.h ./tcl/tcl.h
++ tkTextBTree.o: ./tk/tkPort.h /usr/include/stdio.h /usr/include/ctype.h
++ tkTextBTree.o: /usr/include/fcntl.h /usr/include/sys/fcntl.h
++ tkTextBTree.o: /usr/include/limits.h /usr/include/math.h /usr/include/pwd.h
++ tkTextBTree.o: /usr/include/stdlib.h /usr/include/string.h
++ tkTextBTree.o: /usr/include/sys/file.h /usr/include/sys/t_lock.h
++ tkTextBTree.o: /usr/include/sys/machlock.h /usr/include/sys/dki_lkinfo.h
++ tkTextBTree.o: /usr/include/sys/dl.h /usr/include/sys/sleepq.h
++ tkTextBTree.o: /usr/include/sys/turnstile.h /usr/include/sys/param.h
++ tkTextBTree.o: /usr/include/sys/unistd.h /usr/include/sys/pirec.h
++ tkTextBTree.o: /usr/include/sys/mutex.h /usr/include/sys/rwlock.h
++ tkTextBTree.o: /usr/include/sys/semaphore.h /usr/include/sys/condvar.h
++ tkTextBTree.o: /usr/include/sys/stat.h /usr/include/sys/time.h
++ tkTextBTree.o: /usr/include/unistd.h /usr/openwin/include/X11/cursorfont.h
++ tkTextBTree.o: /usr/openwin/include/X11/keysym.h
++ tkTextBTree.o: /usr/openwin/include/X11/keysymdef.h
++ tkTextBTree.o: /usr/openwin/include/X11/Xatom.h
++ tkTextBTree.o: /usr/openwin/include/X11/Xproto.h
++ tkTextBTree.o: /usr/openwin/include/X11/Xmd.h
++ tkTextBTree.o: /usr/openwin/include/X11/Xprotostr.h
++ tkTextBTree.o: /usr/openwin/include/X11/Xresource.h tkText.h ptcl.h
++ tkTextDisp.o: ./tk/tkPort.h /usr/include/stdio.h
++ tkTextDisp.o: /usr/include/sys/feature_tests.h /usr/include/ctype.h
++ tkTextDisp.o: /usr/include/fcntl.h /usr/include/sys/types.h
++ tkTextDisp.o: /usr/include/sys/machtypes.h /usr/include/sys/isa_defs.h
++ tkTextDisp.o: /usr/include/sys/fcntl.h /usr/include/limits.h
++ tkTextDisp.o: /usr/include/math.h /usr/include/pwd.h /usr/include/stdlib.h
++ tkTextDisp.o: /usr/include/string.h /usr/include/sys/file.h
++ tkTextDisp.o: /usr/include/sys/t_lock.h /usr/include/sys/machlock.h
++ tkTextDisp.o: /usr/include/sys/dki_lkinfo.h /usr/include/sys/dl.h
++ tkTextDisp.o: /usr/include/sys/sleepq.h /usr/include/sys/turnstile.h
++ tkTextDisp.o: /usr/include/sys/param.h /usr/include/sys/unistd.h
++ tkTextDisp.o: /usr/include/sys/pirec.h /usr/include/sys/mutex.h
++ tkTextDisp.o: /usr/include/sys/rwlock.h /usr/include/sys/semaphore.h
++ tkTextDisp.o: /usr/include/sys/condvar.h /usr/include/sys/stat.h
++ tkTextDisp.o: /usr/include/sys/time.h ./tcl/tcl.h /usr/include/unistd.h
++ tkTextDisp.o: /usr/openwin/include/X11/Xlib.h /usr/openwin/include/X11/X.h
++ tkTextDisp.o: /usr/openwin/include/X11/Xfuncproto.h
++ tkTextDisp.o: /usr/openwin/include/X11/Xosdefs.h /usr/include/stddef.h
++ tkTextDisp.o: /usr/openwin/include/X11/cursorfont.h
++ tkTextDisp.o: /usr/openwin/include/X11/keysym.h
++ tkTextDisp.o: /usr/openwin/include/X11/keysymdef.h
++ tkTextDisp.o: /usr/openwin/include/X11/Xatom.h
++ tkTextDisp.o: /usr/openwin/include/X11/Xproto.h
++ tkTextDisp.o: /usr/openwin/include/X11/Xmd.h
++ tkTextDisp.o: /usr/openwin/include/X11/Xprotostr.h
++ tkTextDisp.o: /usr/openwin/include/X11/Xresource.h
++ tkTextDisp.o: /usr/openwin/include/X11/Xutil.h ./tk/tkInt.h ./tk/tk.h
++ tkTextDisp.o: tkText.h ptcl.h
++ tkTextIndex.o: ./tk/default.h ./tk/tkPort.h /usr/include/stdio.h
++ tkTextIndex.o: /usr/include/sys/feature_tests.h /usr/include/ctype.h
++ tkTextIndex.o: /usr/include/fcntl.h /usr/include/sys/types.h
++ tkTextIndex.o: /usr/include/sys/machtypes.h /usr/include/sys/isa_defs.h
++ tkTextIndex.o: /usr/include/sys/fcntl.h /usr/include/limits.h
++ tkTextIndex.o: /usr/include/math.h /usr/include/pwd.h /usr/include/stdlib.h
++ tkTextIndex.o: /usr/include/string.h /usr/include/sys/file.h
++ tkTextIndex.o: /usr/include/sys/t_lock.h /usr/include/sys/machlock.h
++ tkTextIndex.o: /usr/include/sys/dki_lkinfo.h /usr/include/sys/dl.h
++ tkTextIndex.o: /usr/include/sys/sleepq.h /usr/include/sys/turnstile.h
++ tkTextIndex.o: /usr/include/sys/param.h /usr/include/sys/unistd.h
++ tkTextIndex.o: /usr/include/sys/pirec.h /usr/include/sys/mutex.h
++ tkTextIndex.o: /usr/include/sys/rwlock.h /usr/include/sys/semaphore.h
++ tkTextIndex.o: /usr/include/sys/condvar.h /usr/include/sys/stat.h
++ tkTextIndex.o: /usr/include/sys/time.h ./tcl/tcl.h /usr/include/unistd.h
++ tkTextIndex.o: /usr/openwin/include/X11/Xlib.h /usr/openwin/include/X11/X.h
++ tkTextIndex.o: /usr/openwin/include/X11/Xfuncproto.h
++ tkTextIndex.o: /usr/openwin/include/X11/Xosdefs.h /usr/include/stddef.h
++ tkTextIndex.o: /usr/openwin/include/X11/cursorfont.h
++ tkTextIndex.o: /usr/openwin/include/X11/keysym.h
++ tkTextIndex.o: /usr/openwin/include/X11/keysymdef.h
++ tkTextIndex.o: /usr/openwin/include/X11/Xatom.h
++ tkTextIndex.o: /usr/openwin/include/X11/Xproto.h
++ tkTextIndex.o: /usr/openwin/include/X11/Xmd.h
++ tkTextIndex.o: /usr/openwin/include/X11/Xprotostr.h
++ tkTextIndex.o: /usr/openwin/include/X11/Xresource.h
++ tkTextIndex.o: /usr/openwin/include/X11/Xutil.h ./tk/tkInt.h ./tk/tk.h
++ tkTextIndex.o: tkText.h ptcl.h
++ tkTextMark.o: ./tk/tkInt.h /usr/openwin/include/X11/Xlib.h
++ tkTextMark.o: /usr/include/sys/types.h /usr/include/sys/feature_tests.h
++ tkTextMark.o: /usr/include/sys/machtypes.h /usr/include/sys/isa_defs.h
++ tkTextMark.o: /usr/openwin/include/X11/X.h
++ tkTextMark.o: /usr/openwin/include/X11/Xfuncproto.h
++ tkTextMark.o: /usr/openwin/include/X11/Xosdefs.h /usr/include/stddef.h
++ tkTextMark.o: /usr/openwin/include/X11/Xutil.h ./tk/tk.h ./tcl/tcl.h tkText.h
++ tkTextMark.o: ptcl.h ./tk/tkPort.h /usr/include/stdio.h /usr/include/ctype.h
++ tkTextMark.o: /usr/include/fcntl.h /usr/include/sys/fcntl.h
++ tkTextMark.o: /usr/include/limits.h /usr/include/math.h /usr/include/pwd.h
++ tkTextMark.o: /usr/include/stdlib.h /usr/include/string.h
++ tkTextMark.o: /usr/include/sys/file.h /usr/include/sys/t_lock.h
++ tkTextMark.o: /usr/include/sys/machlock.h /usr/include/sys/dki_lkinfo.h
++ tkTextMark.o: /usr/include/sys/dl.h /usr/include/sys/sleepq.h
++ tkTextMark.o: /usr/include/sys/turnstile.h /usr/include/sys/param.h
++ tkTextMark.o: /usr/include/sys/unistd.h /usr/include/sys/pirec.h
++ tkTextMark.o: /usr/include/sys/mutex.h /usr/include/sys/rwlock.h
++ tkTextMark.o: /usr/include/sys/semaphore.h /usr/include/sys/condvar.h
++ tkTextMark.o: /usr/include/sys/stat.h /usr/include/sys/time.h
++ tkTextMark.o: /usr/include/unistd.h /usr/openwin/include/X11/cursorfont.h
++ tkTextMark.o: /usr/openwin/include/X11/keysym.h
++ tkTextMark.o: /usr/openwin/include/X11/keysymdef.h
++ tkTextMark.o: /usr/openwin/include/X11/Xatom.h
++ tkTextMark.o: /usr/openwin/include/X11/Xproto.h
++ tkTextMark.o: /usr/openwin/include/X11/Xmd.h
++ tkTextMark.o: /usr/openwin/include/X11/Xprotostr.h
++ tkTextMark.o: /usr/openwin/include/X11/Xresource.h
++ tkTextTag.o: ./tk/default.h ./tk/tkPort.h /usr/include/stdio.h
++ tkTextTag.o: /usr/include/sys/feature_tests.h /usr/include/ctype.h
++ tkTextTag.o: /usr/include/fcntl.h /usr/include/sys/types.h
++ tkTextTag.o: /usr/include/sys/machtypes.h /usr/include/sys/isa_defs.h
++ tkTextTag.o: /usr/include/sys/fcntl.h /usr/include/limits.h
++ tkTextTag.o: /usr/include/math.h /usr/include/pwd.h /usr/include/stdlib.h
++ tkTextTag.o: /usr/include/string.h /usr/include/sys/file.h
++ tkTextTag.o: /usr/include/sys/t_lock.h /usr/include/sys/machlock.h
++ tkTextTag.o: /usr/include/sys/dki_lkinfo.h /usr/include/sys/dl.h
++ tkTextTag.o: /usr/include/sys/sleepq.h /usr/include/sys/turnstile.h
++ tkTextTag.o: /usr/include/sys/param.h /usr/include/sys/unistd.h
++ tkTextTag.o: /usr/include/sys/pirec.h /usr/include/sys/mutex.h
++ tkTextTag.o: /usr/include/sys/rwlock.h /usr/include/sys/semaphore.h
++ tkTextTag.o: /usr/include/sys/condvar.h /usr/include/sys/stat.h
++ tkTextTag.o: /usr/include/sys/time.h ./tcl/tcl.h /usr/include/unistd.h
++ tkTextTag.o: /usr/openwin/include/X11/Xlib.h /usr/openwin/include/X11/X.h
++ tkTextTag.o: /usr/openwin/include/X11/Xfuncproto.h
++ tkTextTag.o: /usr/openwin/include/X11/Xosdefs.h /usr/include/stddef.h
++ tkTextTag.o: /usr/openwin/include/X11/cursorfont.h
++ tkTextTag.o: /usr/openwin/include/X11/keysym.h
++ tkTextTag.o: /usr/openwin/include/X11/keysymdef.h
++ tkTextTag.o: /usr/openwin/include/X11/Xatom.h
++ tkTextTag.o: /usr/openwin/include/X11/Xproto.h /usr/openwin/include/X11/Xmd.h
++ tkTextTag.o: /usr/openwin/include/X11/Xprotostr.h
++ tkTextTag.o: /usr/openwin/include/X11/Xresource.h
++ tkTextTag.o: /usr/openwin/include/X11/Xutil.h ./tk/tk.h tkText.h ptcl.h
++ tkTextWind.o: ./tk/tk.h /usr/openwin/include/X11/Xlib.h
++ tkTextWind.o: /usr/include/sys/types.h /usr/include/sys/feature_tests.h
++ tkTextWind.o: /usr/include/sys/machtypes.h /usr/include/sys/isa_defs.h
++ tkTextWind.o: /usr/openwin/include/X11/X.h
++ tkTextWind.o: /usr/openwin/include/X11/Xfuncproto.h
++ tkTextWind.o: /usr/openwin/include/X11/Xosdefs.h /usr/include/stddef.h
++ tkTextWind.o: tkText.h ptcl.h ./tcl/tcl.h ./tk/tkPort.h /usr/include/stdio.h
++ tkTextWind.o: /usr/include/ctype.h /usr/include/fcntl.h
++ tkTextWind.o: /usr/include/sys/fcntl.h /usr/include/limits.h
++ tkTextWind.o: /usr/include/math.h /usr/include/pwd.h /usr/include/stdlib.h
++ tkTextWind.o: /usr/include/string.h /usr/include/sys/file.h
++ tkTextWind.o: /usr/include/sys/t_lock.h /usr/include/sys/machlock.h
++ tkTextWind.o: /usr/include/sys/dki_lkinfo.h /usr/include/sys/dl.h
++ tkTextWind.o: /usr/include/sys/sleepq.h /usr/include/sys/turnstile.h
++ tkTextWind.o: /usr/include/sys/param.h /usr/include/sys/unistd.h
++ tkTextWind.o: /usr/include/sys/pirec.h /usr/include/sys/mutex.h
++ tkTextWind.o: /usr/include/sys/rwlock.h /usr/include/sys/semaphore.h
++ tkTextWind.o: /usr/include/sys/condvar.h /usr/include/sys/stat.h
++ tkTextWind.o: /usr/include/sys/time.h /usr/include/unistd.h
++ tkTextWind.o: /usr/openwin/include/X11/cursorfont.h
++ tkTextWind.o: /usr/openwin/include/X11/keysym.h
++ tkTextWind.o: /usr/openwin/include/X11/keysymdef.h
++ tkTextWind.o: /usr/openwin/include/X11/Xatom.h
++ tkTextWind.o: /usr/openwin/include/X11/Xproto.h
++ tkTextWind.o: /usr/openwin/include/X11/Xmd.h
++ tkTextWind.o: /usr/openwin/include/X11/Xprotostr.h
++ tkTextWind.o: /usr/openwin/include/X11/Xresource.h
++ tkTextWind.o: /usr/openwin/include/X11/Xutil.h

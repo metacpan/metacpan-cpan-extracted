@@ -1,0 +1,18 @@
+#!/usr/bin/perl 
+BEGIN {
+  $subrs = "'block' => [qw(at addline cget configure delete rename
+	                     deletelines insert list names of split trim)],
+                 ";
+  $methods = 'EnterMethods Tk::eText __FILE__, qw(bbox block compare debug delete 
+				dlineinfo get index insert mark scan search
+				see tag window xview yview);
+
+';
+  $v = pop @ARGV;
+}
+
+s/Text/eText/g; 
+s/::text/::etext/g; 
+s/'window'/$subrs$&/;
+s/^(use\s*)?Tk::SubMethods/$methods$&/i;
+s/(bootstrap Tk::eText) \$Tk::VERSION/$1 $v/;

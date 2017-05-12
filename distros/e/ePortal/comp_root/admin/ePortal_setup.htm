@@ -1,0 +1,233 @@
+%#============================================================================
+%# ePortal - WEB Based daily organizer
+%# Author - S.Rusakov <rusakov_sa@users.sourceforge.net>
+%#
+%# Copyright (c) 2000-2004 Sergey Rusakov.  All rights reserved.
+%# This program is open source software
+%#
+%#
+%#----------------------------------------------------------------------------
+<& /message.mc &>
+&nbsp;
+<% $dlg->dialog_start( title => pick_lang(rus => "Настройка ePortal сервера", eng => "ePortal server setup") ) %>
+
+<% $dlg->row('&nbsp;') %>
+<% $dlg->row('<b>Database connection information</b>') %>
+<% $dlg->row('<hr width="50%">') %>
+  <% $dlg->field('dbi_source', RO=>1) %>
+  <% $dlg->field('dbi_host', RO=>1) %>
+  <% $dlg->field('dbi_database', RO=>1) %>
+  <% $dlg->field('dbi_username', RO=>1) %>
+  <% $dlg->field('dbi_password', RO=>1) %>
+
+<% $dlg->row('&nbsp;') %>
+<% $dlg->row('<b>General settings</b>') %>
+<% $dlg->row('<hr width="50%">') %>
+  <% $dlg->field('admin') %>
+  <% $dlg->field('days_keep_sessions') %>
+  <% $dlg->field('refresh_interval') %>
+%#  <% $dlg->field('date_field_style') %>
+  <% $dlg->field('smtp_server') %>
+  <% $dlg->field('www_server') %>
+  <% $dlg->field('mail_domain') %>
+  <% $dlg->field('vhost') %>
+  <% $dlg->field('comp_root', RO=>1) %>
+
+<% $dlg->row('&nbsp;') %>
+<% $dlg->row('<b>Language settings</b>') %>
+<% $dlg->row('<hr width="50%">') %>
+  <% $dlg->field('language') %>
+  <% $dlg->field('disk_charset') %>
+
+<% $dlg->row('&nbsp;') %>
+<% $dlg->row('<b>Debug settings</b>') %>
+<% $dlg->row('<hr width="50%">') %>
+  <% $dlg->field('debug') %>
+  <% $dlg->field('log_filename') %>
+  <% $dlg->field('log_charset') %>
+
+<% $dlg->row('&nbsp;') %>
+<% $dlg->row('<b>LDAP settings</b>') %>
+<% $dlg->row('<hr width="50%">') %>
+  <% $dlg->field('ldap_server') %>
+  <% $dlg->field('ldap_base') %>
+  <% $dlg->field('ldap_binddn') %>
+  <% $dlg->field('ldap_bindpw') %>
+  <% $dlg->field('ldap_charset') %>
+  <% $dlg->field('ldap_uid_attr') %>
+  <% $dlg->field('ldap_fullname_attr') %>
+  <% $dlg->field('ldap_title_attr') %>
+  <% $dlg->field('ldap_ou_attr') %>
+  <% $dlg->field('ldap_group_attr') %>
+  <% $dlg->field('ldap_groupdesc_attr') %>
+
+<% $dlg->row('&nbsp;') %>
+<% $dlg->buttons %>
+<% $dlg->dialog_end %>
+<p>
+
+%#=== @metags once =========================================================
+<%once>
+my ($dlg, $obj);
+</%once>
+
+
+%#=== @METAGS cleanup =========================================================
+<%cleanup>
+($dlg, $obj) = ();
+</%cleanup>
+
+%#=== @METAGS attr =========================================================
+<%attr>
+Title => {rus => "Настройка ePortal", eng => "ePortal setup page"}
+Layout => 'Dialog'
+</%attr>
+
+
+%#=== @METAGS onStartRequest ====================================================
+<%method onStartRequest><%perl>
+    $obj = new ePortal::ThePersistent::Dual(
+      Attributes => {
+        # main_parameters
+        dbi_source   => { default => $ePortal->dbi_source },
+        dbi_host     => { default => $ePortal->dbi_host },
+        dbi_database => { default => $ePortal->dbi_database },
+        dbi_username => { default => $ePortal->dbi_username },
+        dbi_password => {
+            default => $ePortal->dbi_password,
+            fieldtype => 'password',
+        },
+        admin_mode   => { default => $ePortal->admin_mode },
+
+        # configurable parameters
+        admin => {
+            dtype => 'Array',
+        },
+        debug => {
+            dtype => 'VarChar',
+            fieldtype => 'popup_menu',
+            values => [qw/debug info notice warn error crit alert emerg/],
+            labels => {
+                'emerg'  => pick_lang(rus => "emerg - Авария. Система неработоспособна", eng => 'Emergencies - system is unusable'),
+                'alert'  => pick_lang(rus => "alert - Внимание. Серьезные ошибкы", eng => 'Action must be taken immediately'),
+                'crit'   => pick_lang(rus => "crit - Критические ошибки", eng => 'Critical Conditions'),
+                'error'  => pick_lang(rus => "error - Ошибки", eng => 'Error conditions'),
+                'warn'   => pick_lang(rus => "warn - Предупреждения", eng => 'Warning conditions'),
+                'notice' => pick_lang(rus => "notice - Нормальный уровень", eng => 'Normal but significant condition'),
+                'info'   => pick_lang(rus => "info - Информационные", eng => 'Informational'),
+                'debug'  => pick_lang(rus => "debug - отладочные сообщения", eng => 'Debug-level messages')
+            },
+            default => 'warn',
+        },
+        vhost => {},
+        log_filename => {
+            dtype => 'VarChar',
+            default => 'apache',
+        },
+        log_charset => {
+            fieldtype => 'popup_menu',
+            values => [qw/UTF8 DOS WIN KOI8/],
+            default => 'KOI8',
+        },
+        disk_charset => {
+            fieldtype => 'popup_menu',
+            values => [qw/UTF8 DOS WIN KOI8/],
+            default => 'KOI8',
+        },
+        days_keep_sessions => {
+            dtype => 'Number',
+            default => 7,
+        },
+        language => {
+            fieldtype => 'popup_menu',
+            values => [qw/eng rus/],
+            default => 'eng',
+        },
+        refresh_interval => {
+            dtype => 'Number',
+            default => 300,
+        },
+#        date_field_style => {
+#            fieldtype => 'popup_menu',
+#            values => [qw/java nonjava/],
+#            default => 'java',
+#        },
+        smtp_server => {
+            default => $ENV{SERVER_NAME},
+            },
+        www_server  => {
+            default => "http://$ENV{SERVER_NAME}/",
+            },
+        mail_domain => {
+            default => $ENV{SERVER_NAME},
+            },
+        comp_root   => { },
+
+        ldap_server   => { },
+        ldap_base     => { },
+        ldap_binddn   => { },
+        ldap_bindpw   => { },
+        ldap_charset  => {
+            fieldtype => 'popup_menu',
+            values => [qw/UTF8 DOS WIN KOI8/],
+            default => 'UTF8',
+        },
+        ldap_uid_attr => {          default => 'uid' },
+        ldap_fullname_attr => {     default => 'fullName' },
+        ldap_title_attr => {        default => 'title' },
+        ldap_ou_attr => {           default => 'ou'},
+        ldap_group_attr => {        default => 'groupMembership' },
+        ldap_groupdesc_attr => {    default => 'description'},
+
+      },
+    );
+    foreach ($obj->attributes_a) {
+      $obj->value($_, $ePortal->{$_});
+    }
+
+
+  # Handle Dialog events
+  $dlg = new ePortal::HTML::Dialog( obj => $obj, width => 450);
+  my $dialog_done;
+  try {
+    $dlg->handle_request( );
+
+    # Data checking
+    if ( $dlg->isButtonPressed('ok') ) {
+      throw ePortal::Exception::DataNotValid (-text => pick_lang(
+            rus => "Параметр www_server не определен",
+            eng => "www_server parameter is empty"))
+            if ! $obj->www_server;
+      throw ePortal::Exception::DataNotValid (-text => pick_lang(
+            rus => "Параметр www_server не правильный. Должен быть вида http://www.server.com/",
+            eng => "www_server parameter is wrong. Should be like http://www.server.com/"))
+            if $obj->www_server !~ m|^https?://.*/$|;
+
+
+      throw ePortal::Exception::DataNotValid (-text => pick_lang(
+            rus => "Параметр mail_domain не определен",
+            eng => "mail_domain parameter is empty"))
+            if ! $obj->mail_domain;
+
+      foreach ($obj->attributes_a) {
+        $ePortal->{$_} = $obj->value($_);
+        $ePortal->config_save;
+      }
+      $dialog_done = 1;
+    } elsif ( $dlg->isButtonPressed('cancel') ) {
+      $dialog_done = 1;
+    }
+  } catch ePortal::Exception::DataNotValid with {
+    my $E = shift;
+    $session{ErrorMessage} = $E->text;
+  };
+
+  if ($dialog_done) {
+      # clear extra reference to ePortal object or else
+      # disconnect invalidates 1 active statement handle ...
+    $obj->{obj} = undef;
+    return "index.htm"
+  }
+
+</%perl></%method>
+

@@ -1,0 +1,67 @@
+<?
+##
+##  demo.image -- ePerl demonstration webpage
+##  Copyright (c) 1996,1997 Ralf S. Engelschall, All Rights Reserved. 
+##
+
+use GD;
+
+if (not $ENV{'QUERY_STRING'}) { 
+    ##
+    ##  THE PAGE ITSELF
+    ## 
+!>
+<html>
+<head>
+<title>ePerl: demo.env</title>
+</head>
+<body>
+<blockquote>
+<blockquote>
+<h1>demo.image</h1>
+<h2>Graphics programming with GD</h2>
+<p>
+This demonstrates how you can create a webpage with an inlined GIF image which
+itself is generated on-the-fly from within this page. In other words: the
+image is part of the webpage source, too. The trick here is that the complete
+page is surrounded with an ePerl block and according to the QUERY_STRING the
+script either produces the page itself (pure HTML) or the image by programming
+it on-the-fly with the GD module. The link to the image is done via a
+self-referencing URL.
+<p>
+As an example, we present an on-the-fly generared GIF image showing the Web216
+color palette (the ``browser-safe'' colors):
+<p>
+<img src="<?=$ENV{'SCRIPT_SRC_URL'}!>?image=theimage.gif" alt="The Image">
+</blockquote>
+</blockquote>
+</body>
+</html>
+<?
+}
+elsif ($ENV{QUERY_STRING} eq 'image=theimage.gif') {
+    ##
+    ##  THE INLINED IMAGE
+    ##
+    my $im = new GD::Image(200,140);
+    $im->interlaced('true');
+    for (my $b = 0; $b <= 255; $b += 51) {
+        for (my $r = 0; $r <= 255; $r += 51) {
+            for (my $g = 0; $g <= 255; $g += 51) {
+                my $x = (($b / 51) % 3)*60 + (60-($r / 51) * 10);
+                my $y = (($b / 51) < 3 ? 0 : 1)*60 + (60-($g / 51) * 10);
+
+                my $col = $im->colorAllocate($r,$g,$b);
+                $im->rectangle($x, $y, $x+9, $y+9, $col);
+                $im->fill($x+2, $y+2, $col);
+            }
+        }
+    }
+    my $C = $im->gif;
+
+    print  "Content-type: image/gif\n";
+    printf "Content-length: %d\n", length($C);
+    print  "\n";
+    print  $C;
+}
+!>

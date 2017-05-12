@@ -1,0 +1,26 @@
+Changes
+lib/eBay/API/Simple.pm
+lib/eBay/API/Simple/Finding.pm
+lib/eBay/API/Simple/HTML.pm
+lib/eBay/API/Simple/JSON.pm
+lib/eBay/API/Simple/Merchandising.pm
+lib/eBay/API/Simple/Parallel.pm
+lib/eBay/API/Simple/RSS.pm
+lib/eBay/API/Simple/Shopping.pm
+lib/eBay/API/Simple/Trading.pm
+lib/eBay/API/SimpleBase.pm
+docs/ebay.yaml
+Makefile.PL
+MANIFEST			This list of files
+README.rst
+t/01use.t
+ex/01Shopping.t
+ex/02HTML.t
+ex/03Trading.t
+ex/04RSS.t
+ex/05Finding.t
+ex/05Finding_utf8.t
+ex/06Merchandising.t
+ex/09HalfShopping.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

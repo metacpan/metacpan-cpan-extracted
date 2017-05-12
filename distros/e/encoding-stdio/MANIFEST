@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/encoding-stdio.t
+t/encoding-stdio-notsource.t
+lib/encoding/stdio.pm
+META.yml                                 Module meta-data (added by MakeMaker)

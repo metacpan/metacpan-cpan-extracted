@@ -1,0 +1,44 @@
+
+  P O R T I N G
+
+  ePerl was written with portability in mind. Additionally to overcome the
+  system dependend characteristics ePerl uses a GNU autoconf based
+  configuration scheme which tries hard to determine the information both from
+  the installed Perl interpreter and from scratch via own GNU autoconf tests.
+
+  So ePerl already compiles out-of-the-box on a lot of systems. At least the
+  following Unix/Compiler/Perl variants were sucessfully tested by the author
+  in the past:
+
+  System        Platform   Perl     Compiler       Testhost    Time     ePerl
+  ------------- ---------  -------- -------------- ----------- -------- ------
+  FreeBSD 2.2.6 i586/166   5.004_04 GNU cc 2.7.2.1 en1         28.05.98 2.2.13
+  FreeBSD 2.2.1 i586/90    5.004_01 GNU cc 2.7.2p  en3         07.11.97 2.2.7
+  Linux 2.0.29  i586/90    5.004_03 GNU cc 2.7.2.1 gw1         07.11.97 2.2.7
+  AIX 4.1.4     RS6000/42T 5.004_04 AIX cc         rcs7        07.11.97 2.2.7
+  Solaris 2.5.1 SS10/41    5.004_01 GNU cc 2.7.2.1 sunti5      27.10.97 2.2.11
+  SunOS 4.1.3   SS20       5.004_03 GNU cc 2.7.2   sunfi1      27.10.97 2.2.6
+  HP-UX 10.20   A9000/780  5.004    HP cc          hpeickel15  27.10.97 2.2.6
+  IRIX 6.2      IP20       5.004    SGI cc         sgihalle13  27.10.97 2.2.6
+  BSD/OS 2.1    i486       5.004_01 BSDI shlicc2   taz *       01.08.97 2.2.1
+                                               (*)cannot be tested any longer
+
+  If your Unix derivate is not on this list, don't panic. As we said, ePerl
+  tries to determine the information itself, so there is a good chance that
+  ePerl finds alternatives even for your system. At least for the compilation
+  ePerl does a trick: It don't tries to find a reasonable compiler and
+  reasonable flags for it. Instead it uses the one your Perl interpreter was
+  compiled with. Because the Perl 5 Porters already tried hard to determine
+  the best combination, so ePerl can only benefit from it.
+
+  If it still fails to compile or run, first try to see where the problem
+  resides. Usually problems can occur when you are using a brain-dead compiler
+  or a too old Perl version. Try to upgrade or use better variants.  One
+  important case: Because ePerl wants to build itself the same way the Perl
+  interpreter was compiled, this can cause problems on systems which have a
+  binary package of a pre-built Perl system installed.  Here you can only
+  build ePerl without problems when your system has the same compiler, headers
+  and libraries available as the package builder's one had. If this not an
+  option for you try to find a ePerl binary package the same way you found the
+  Perl binary package.
+

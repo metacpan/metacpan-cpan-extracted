@@ -1,0 +1,298 @@
+dnl ##
+dnl ##  configure.in -- GNU autoconf configuration spec
+dnl ##  Copyright (c) Ralf S. Engelschall, <rse@engelschall.com>
+dnl ##
+dnl ##  Process this file with ``autoconf'' to produce a configure script.
+dnl ##
+
+
+dnl #
+dnl #   standard autoconf prolog
+dnl #
+
+AC_PREREQ(2.10)dnl
+AC_REVISION($Revision: 2.0$)
+echo "Configuring for ePerl `./etc/newvers -l c -D eperl_version.c`"
+
+AC_CONFIG_AUX_DIR(etc)
+AC_INIT(README)
+AC_CONFIG_HEADER(config_ac.h)dnl
+AC_PREFIX_DEFAULT(/usr/local)
+
+
+dnl #
+dnl #   libdir adjustment
+dnl #
+
+test "x$prefix" = xNONE && prefix=$ac_default_prefix
+eval "dir=$prefix"
+case $dir in
+    *eperl* ) libsubdir= ;;
+          * ) libsubdir="/eperl" ;;
+esac
+AC_SUBST(libsubdir)
+
+
+dnl #
+dnl #   latest find Perl interpreter
+dnl #
+
+AC_CONFIGURE_PART(CHECK: Configuration of Perl Language)
+AC_MSG_CHECKING([for Perl language])
+AC_ARG_WITH(perl,dnl
+[  --with-perl=PATH        force the usage of a specific installed Perl],
+perlprog=$with_perl
+perlvers=`$perlprog -v | grep version | sed -e 's/.* version //' -e 's/ built.*//' -e 's/ with.*//'`
+,
+TMPFILE=/tmp/x.$$
+rm -f $TMPFILE
+touch $TMPFILE
+c=0
+for dir in `echo $PATH | sed -e 's/:/ /g'` /tmp; do
+    for perl in perl5 perl miniperl; do
+         if test -f "$dir/$perl"; then
+             if test -x "$dir/$perl"; then
+                 perl="$dir/$perl"
+                 version=`$perl -v | grep version | sed -e 's/.* version //' -e 's/ built.*//' -e 's/ with.*//'`
+                 versionnum="`echo $version | sed -e 's/\.//g' -e 's/_//g'`"
+                 versionnum=`expr $versionnum - $c`
+                 echo "$versionnum $version $perl" >>$TMPFILE
+             fi
+         fi
+    done
+    c=`expr $c + 1`
+done
+perlvers="`cat $TMPFILE | sort -u | tail -1 | cut '-d ' -f2`"
+perlprog="`cat $TMPFILE | sort -u | tail -1 | cut '-d ' -f3`"
+rm -f $TMPFILE
+)dnl
+PATH_PERL=$perlprog
+AC_MSG_RESULT([$perlprog v$perlvers])
+case $perlvers in
+    5.003* | 5.004* | 5.005* | 5.006* )
+        ;;
+    * ) echo ""
+        echo "Latest Perl found on your system is $perlvers,"
+        echo "but at least Perl version 5.003 is required."
+        echo "In case the newer one is not in PATH, just use"
+        echo "the option --with-perl=/path/to/bin/perl to"
+        echo "provide the correct executable."
+        echo ""
+        AC_ERROR([Perl version too old]) 
+        ;;
+esac
+case $perlvers in
+    5.00[[3-6]_[0-9][0-9]] ) 
+	    perlvnum=`echo $perlvers | sed -e 's/\.//' -e 's/_//'` ;; 
+    5.00[[3-6]] ) 
+	    perlvnum=`echo $perlvers | sed -e 's/\.//' -e 's/$/00/'` ;; 
+	* ) 
+	    perlvnum=`echo $perlvers | sed -e 's/\.//' -e 's/_//'` ;; 
+esac
+AC_SUBST(PATH_PERL)
+AC_SUBST(perlprog)
+AC_SUBST(perlvers)
+AC_SUBST(perlvnum)
+perl_prog=$perlprog
+perl_vers=$perlvers
+perl_vnum=$perlvnum
+AC_SUBST(perl_prog)
+AC_SUBST(perl_vers)
+AC_SUBST(perl_vnum)
+if test -f $PATH_PERL; then
+    :
+else
+    AC_ERROR([required program ``perl'' not found])
+fi
+
+
+dnl #
+dnl #   determine Perl parameters
+dnl #
+
+AC_MSG_CHECKING([for Perl knowledge of system])
+perl_osname="`$perl_prog -e 'use Config; print $Config{osname}'`";
+perl_osvers="`$perl_prog -e 'use Config; print $Config{osvers}'`";
+perl_os="$perl_osname-$perl_osvers"
+AC_SUBST(perl_osname)
+AC_SUBST(perl_osvers)
+AC_SUBST(perl_os)
+AC_MSG_RESULT([$perl_os])
+
+AC_MSG_CHECKING([for Perl standard compiler])
+perl_cc="`$perl_prog -e 'use Config; print $Config{cc}'`";
+if test ".$CC" = .; then
+    CC=$perl_cc
+    export CC
+    AC_MSG_RESULT([$perl_cc])
+else
+    perl_cc=$CC
+    AC_MSG_RESULT([$perl_cc (OVERWRITTEN)])
+fi
+AC_SUBST(perl_cc)
+
+AC_MSG_CHECKING([for Perl standard optimization flags])
+perl_optimize="`$perl_prog -e 'use Config; print $Config{optimize}'`";
+AC_MSG_RESULT([$perl_optimize])
+AC_SUBST(perl_optimize)
+
+AC_MSG_CHECKING([for Perl standard compilation flags])
+perl_ccflags="`$perl_prog -e 'use Config; print $Config{ccflags}'`";
+case $perl_os in
+    *hpux*    ) perl_ccflags="$perl_ccflags -Wp,-H32768" ;;
+    *irix-5.* ) perl_ccflags="`echo $perl_ccflags | sed -e 's/-D_POSIX_SOURCE//'`" ;;
+esac
+AC_MSG_RESULT([$perl_ccflags])
+AC_SUBST(perl_ccflags)
+
+AC_MSG_CHECKING([for Perl standard link flags])
+perl_ldflags="`$perl_prog -e 'use Config; print $Config{ldflags}'`";
+case $perl_os in
+    *irix-6.* ) perl_ldflags="$perl_ldflags '-Wl,-woff 85'" ;;
+esac
+AC_MSG_RESULT([$perl_ldflags])
+AC_SUBST(perl_ldflags)
+
+AC_MSG_CHECKING([for Perl library files])
+perl_libs="`$perl_prog -e 'use Config; print $Config{libs}'`"
+AC_MSG_RESULT([$perl_libs])
+AC_SUBST(perl_libs)
+
+AC_MSG_CHECKING([for Perl architecture directory])
+perl_archlib="`$perlprog -e 'use Config; print $Config{archlib}'`";
+AC_MSG_RESULT([$perl_archlib])
+AC_SUBST(perl_archlib)
+
+AC_MSG_CHECKING([for Perl dynamic loading support])
+usedl="`$perlprog -e 'use Config; print $Config{usedl}'`";
+case $usedl in
+    define )
+        rc=yes
+        AC_DEFINE(HAVE_PERL_DYNALOADER)
+        perl_dla=$perl_archlib/auto/DynaLoader/DynaLoader.a
+        ;;
+    * )
+        rc=no
+        perl_dla=
+        ;;
+esac
+AC_SUBST(perl_dla)
+AC_MSG_RESULT([$rc])
+
+AC_MSG_CHECKING([for Perl dynamic loading compilation flags])
+perl_cccdlflags="`$perlprog -e 'use Config; print $Config{cccdlflags}'`";
+case $perl_cccdlflags in
+    " " ) x="none" ;;
+    * )   x="$perl_cccdlflags" ;;
+esac
+AC_MSG_RESULT([$x])
+AC_SUBST(perl_cccdlflags)
+
+AC_MSG_CHECKING([for Perl dynamic loading link flags])
+perl_ccdlflags="`$perlprog -e 'use Config; print $Config{ccdlflags}'`";
+case $perl_os in
+    *aix* ) perl_ccdlflags="`echo $perl_ccdlflags | sed -e 's;-bE:perl.exp;-bE:${perl_archlib}/CORE/perl.exp;'`" ;;
+esac
+case $perl_ccdlflags in
+    " " ) x="none" ;;
+    * )   x="$perl_ccdlflags" ;;
+esac
+AC_MSG_RESULT([$x])
+AC_SUBST(perl_ccdlflags)
+
+
+dnl #
+dnl #   determine build tools and parameters
+dnl #
+
+AC_CONFIGURE_PART(CHECK: System Build Environment)
+AC_BUILD_USER
+AC_BUILD_TIME
+AC_PROG_CC
+AC_PROG_RANLIB
+AC_PROGRAM_CHECK(AR, ar, ar,)
+AC_PROGRAM_CHECK(SIZE, size, size,)
+case $perl_os in
+    *irix* ) SIZE="$SIZE -B" ;;
+esac
+
+AC_MSG_CHECKING(for compilation debug mode)
+AC_ARG_ENABLE(debug,dnl
+[  --enable-debug          to enable the debugging options for compilation],
+if test ".$ac_cv_prog_gcc" = ".yes"; then
+    CFLAGS="-Wall -g -ggdb3"
+    LDFLAGS="-g -ggdb3"
+else
+    CFLAGS="-g"
+    LDFLAGS="-g"
+fi
+x="enabled"
+debug=on
+AC_DEFINE(DEBUG_ENABLED)
+,
+CFLAGS=""
+LDFLAGS=""
+x=disabled
+debug=off
+)dnl
+AC_SUBST(debug)
+AC_MSG_RESULT([$x])
+
+if test "$debug" = "on"; then
+    AC_MSG_CHECKING(for dmalloc library)
+    dmalloc=""
+    x=no
+    if test -f /sw/include/dmalloc.h; then
+        if test -f /sw/shlib/libdmalloc.a; then
+            AC_DEFINE(HAVE_DMALLOC)
+            CFLAGS="$CFLAGS -I/sw/include"
+            LDFLAGS="$LDFLAGS -L/sw/shlib"
+            dmalloc="-ldmalloc"
+            x=yes
+        fi
+    fi
+    AC_SUBST(dmalloc)
+    AC_MSG_RESULT([$x])
+fi
+
+AC_SET_MAKE
+AC_PROG_INSTALL
+INSTALL_DATA='${INSTALL} -m 644'
+INSTALL_PROGRAM="${INSTALL_PROGRAM} -m 755"
+
+
+dnl #
+dnl #   determine system parameters
+dnl #
+
+AC_CONFIGURE_PART(CHECK: Characteristic of System Headers and Libraries)
+AC_CONST
+AC_STDC_HEADERS
+AC_HAVE_HEADERS(stdio.h stdarg.h stdlib.h string.h ctype.h dnl
+                unistd.h time.h signal.h pwd.h grp.h dnl
+                sys/types.h sys/stat.h sys/param.h dnl
+                sys/socket.h netinet/in.h netdb.h)
+AC_CHECK_TYPE(bool, char)
+AC_CHECK_FUNCS(memmove)
+AC_CHECK_FUNCS(seteuid)
+AC_CHECK_FUNCS(setegid)
+AC_CHECK_FUNCS(strdup)
+
+
+dnl #
+dnl #   finally: source file substitution...
+dnl #
+
+AC_CONFIGURE_PART(RESULT: Sourcefile Substitution)
+AC_OUTPUT(dnl
+Makefile dnl
+t/Makefile dnl
+config_sc.h dnl
+,dnl
+)dnl
+
+echo ""
+echo "Now please type 'make' to compile. Good luck."
+echo ""
+
+dnl ##EOF##

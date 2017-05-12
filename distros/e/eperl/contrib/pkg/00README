@@ -1,0 +1,21 @@
+
+  This is the collection of package generation files
+  for building ePerl with various packaging/installation systems.
+
+  bnp .......... Files to build with RSE's Build'n'Play mechanism
+                 Put stuff into /sw/BnP/BnP.eperl and run "./Build"
+                 Author: Ralf S. Engelschall
+
+  fbsdpkg ...... Files to build as a FreeBSD package
+                 Put stuff into /usr/ports/lang/ and run "make"
+                 in both subdirs.
+                 Author: Ralf S. Engelschall
+
+  dpkg ......... Files to build a Debian package.
+                 Just copied from ftp.debian.org ;_)
+                 Author: Heiko Schlittermann
+
+  rpm .......... Files to build as a RedHat Package Manager package
+                 !! NOT YET COMPLETE !!
+                 Author: Ralf S. Engelschall
+

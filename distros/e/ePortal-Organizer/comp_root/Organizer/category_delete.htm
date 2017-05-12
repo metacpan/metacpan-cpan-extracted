@@ -1,0 +1,28 @@
+%#============================================================================
+%# ePortal - WEB Based daily organizer
+%# Author - S.Rusakov <rusakov_sa@users.sourceforge.net>
+%#
+%# Copyright (c) 2000-2003 Sergey Rusakov.  All rights reserved.
+%# This program is free software; you can redistribute it
+%# and/or modify it under the same terms as Perl itself.
+%#
+%#
+%#----------------------------------------------------------------------------
+<%method onStartRequest>
+<& PARENT:onStartRequest, %ARGS &>
+<%perl>
+  my $objid = $ARGS{objid};
+  my $C = new ePortal::App::Organizer::Category;
+  $C->restore_or_throw($objid);
+
+  my $category_id = $C->id;
+  $C->delete; # will throw on ACL violation
+
+  foreach my $table (qw/Notepad Contact ToDo Anniversary/) {
+    $C->dbh->do("DELETE FROM $table WHERE org_id=? AND category_id=?", undef,
+      $session{_org_id}, $category_id);
+  }
+
+  return href('category_list.htm', org_id => $session{_org_id});
+</%perl></%method>
+

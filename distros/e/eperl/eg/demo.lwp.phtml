@@ -1,0 +1,37 @@
+<!-- 
+##
+##  demo.lwp -- ePerl demonstration webpage
+##  Copyright (c) 1996,1997 Ralf S. Engelschall, All Rights Reserved. 
+##
+-->
+<html>
+<head>
+<title>demo.lwp</title>
+</head>
+<body>
+<blockquote>
+<blockquote>
+<h1>demo.lwp</h1>
+<h2>High-level Network programming with LWP::Simple</h2>
+
+<p>
+This demonstrates how one can use the LWP::Simple package (from
+<tt>libwww-perl</tt>) from within ePerl to retrieve a file via HTTP. As an
+example the ePerl distribution README file is fetched from
+<tt>http://www.engelschall.com/sw/eperl/distrib/eperl-SNAP/</tt>.
+
+<p>
+And here comes the file:
+
+<pre>
+<?
+use LWP::Simple;
+my $data = get("http://www.engelschall.com/sw/eperl/distrib/eperl-SNAP/README");
+print $data;
+!>
+</pre>
+
+</blockquote>
+</blockquote>
+</body>
+</html>

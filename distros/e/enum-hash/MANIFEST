@@ -1,0 +1,8 @@
+Makefile.PL
+MANIFEST
+Changes
+README
+hash.pm
+t/enum.t
+t/legacy.t
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,128 @@
+%#============================================================================
+%# ePortal - WEB Based daily organizer
+%# Author - S.Rusakov <rusakov_sa@users.sourceforge.net>
+%#
+%# Copyright (c) 2000-2004 Sergey Rusakov.  All rights reserved.
+%# This program is open source software
+%#
+%#
+%#----------------------------------------------------------------------------
+<p>
+<& /item_caption.mc, title => 'ePortal setup step-by-step' &>
+<ul>
+  <li><% img(src=>'/images/icons/warning.gif') %><a href="ePortal_database.htm"><% pick_lang(
+      rus => "Проверка структуры БД. Установка новых приложений",
+      eng => "Check database tables. Dicover newly installed Applications.") %></a>
+  <br><&| SELF:rus &><span class="memo">
+  Проверка и создание таблиц в базе данных, необходимых для работы ePortal.
+  Обнаружение установленных приложений и их настройка по умолчанию.
+  Эта функция выполняется автоматически, но Вы можете повторять этот процесс 
+  многократно в случае необходимости. Данная функция также заполняет таблицы БД
+  данными по умолчанию, создает элементы Каталога и т.п.
+  </span></&>
+  <&| SELF:eng &><span class="memo">
+  Create and upgrade database tables. Discover installed Applications. This 
+  process is done automatically but you may repeat it as many times as you 
+  need. This process fills tables with default values, creates Catalogue 
+  items and much more.
+  </span></&> <p>
+
+
+
+  <li><% img(src=>'/images/icons/warning.gif') %><a href="ePortal_setup.htm"><% pick_lang(
+        rus => "Основная страница настройки ePortal",
+        eng => "ePortal setup page") %></a>
+  <br>
+  <&| SELF:rus &><span class="memo">
+  Диалоговое окно настройки основных параметров работы сервера. 
+  Необходимо закончить эту настроку прежде, чем продолжать работу 
+  с приложениями.
+  </span></&>
+  <&| SELF:eng &><span class="memo">
+  Main configuration dialog. Please complete this setup before continuing 
+  your work with ePortal. 
+  </span></&>
+  <p>
+
+  <li><% img(src=>'/images/icons/warning.gif') %><a href="CronJob_list.htm"><% pick_lang(
+      rus => "Список периодических заданий ePortal",
+      eng => "Periodic job list of ePortal") %></a>
+  <br>
+  <&| SELF:rus &><span class="memo">
+  Для нормальной работы ePortal необходимо организовать периодическое выполнение
+  некоторых заданий. Просмотрите список заданий, задайте периодичность их
+  исполнения и, при необходимости, режим отправки отчета о работе по email.
+  </span></&>
+  <&| SELF:eng &><span class="memo">
+  Check the list of periodic jobs. 
+  </span></&>
+  <p>
+
+</ul>
+
+%#
+%# ===========================================================================
+%#
+
+<p>
+<& /item_caption.mc, title => pick_lang(rus => "Пользователии группы", eng => "Users and groups") &>
+<ul>
+  <li><a HREF="/admin/users_list.htm"><% pick_lang(
+      rus => "Пользователи ePortal",
+      eng => "ePortal users") %></a>
+
+  <li><a HREF="/admin/groups_list.htm"><% pick_lang(
+      rus => "Группы пользователей ePortal",
+      eng => "ePortal groups") %></a>
+</ul>
+
+
+%#
+%# ===========================================================================
+%#
+
+<p>
+<& /item_caption.mc, title => pick_lang(rus => "Приложения", eng => "Applications") &>
+
+<&| /list.mc, list => [$ePortal->ApplicationsInstalled] &>
+  <& /list.mc:column_image &>
+  <&| /list.mc:column, title => pick_lang(rus => "Наименование", eng => "Name") &>
+   <b><% $_ %></b>
+  </&>
+  <&| /list.mc:column, title => pick_lang(rus => "Действия", eng => "Actions")  &>
+    <% plink(pick_lang(rus => "Настройка", eng => "Setup"),
+      -href => $_.'_setup.htm') %>
+    
+    <% $m->comp_exists($_.'_statistics.mc')
+      ? plink(pick_lang(rus => "Статистика", eng => "Statistics"), -href => 'statistics.htm#'.$_)
+      : undef %>
+
+    <% plink(pick_lang(rus => "Вход", eng => "Entrance"),
+      -href => "/app/$_/index.htm") %>
+  </&>
+
+</&> <!-- end of list -->
+
+
+%#
+%# ===========================================================================
+%#
+
+<p>
+<& /item_caption.mc, title => pick_lang(rus => "Прочие ссылки", eng => "Other resources") &>
+
+<ul>
+
+	<li><a href="/manual/index.htm"><% pick_lang(
+			rus => "Руководство по ePortal",
+			eng => "ePortal manual") %></a>
+
+%#<hr>
+%# <li><a HREF="/admin/statistics.htm"><% pick_lang(
+%#     rus => "Статистика работы сервера",
+%#     eng => "Display runtime statistics") %></a>
+
+<hr>
+
+</ul>
+

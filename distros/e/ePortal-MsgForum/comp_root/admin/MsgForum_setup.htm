@@ -1,0 +1,48 @@
+%#============================================================================
+%# ePortal - WEB Based daily organizer
+%# Author - S.Rusakov <rusakov_sa@users.sourceforge.net>
+%#
+%# Copyright (c) 2000-2003 Sergey Rusakov.  All rights reserved.
+%# This program is free software; you can redistribute it
+%# and/or modify it under the same terms as Perl itself.
+%#
+%#
+%#----------------------------------------------------------------------------
+<& /message.mc &>
+<p>
+<&| /dialog.mc:edit_dialog, obj => $obj,
+    title => pick_lang(rus => "Настройка приложения MsgForum", eng => "MsgForum application setup"), &>
+    <& SELF:dialog_dbi_fields &>
+
+  <& /dialog.mc:buttons &>
+</&>
+<p>
+<& SELF:custom_dbi_memo &>
+<p>
+
+%#=== @metags once =========================================================
+<%once>
+my ($dlg, $obj);
+</%once>
+
+
+%#=== @METAGS cleanup =========================================================
+<%cleanup>
+($dlg, $obj) = ();
+</%cleanup>
+
+%#=== @METAGS attr =========================================================
+<%attr>
+Title => {rus => "Настройка приложения MsgForum", eng => "MsgForum application setup"}
+Layout => 'Dialog'
+</%attr>
+
+
+%#=== @METAGS onStartRequest ====================================================
+<%method onStartRequest><%perl>
+  $obj = $ePortal->Application('Organizer', skip_storage_version_check => 1);
+  $m->comp('SELF:setup_onStartRequest', obj => $obj);
+</%perl></%method>
+
+
+

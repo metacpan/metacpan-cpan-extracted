@@ -1,0 +1,58 @@
+$Id: README,v 1.7 2006/04/07 19:56:13 jeff Exp $
+
+extproc_perl enables Oracle stored procedures and functions to be written
+in Perl.  It uses Oracle's external procedure interface to create Perl
+interpreters on the fly to execute Perl subroutines.  These interpreters
+are persistent throughout the life of the database session.
+
+Please send all bug reports, questions and suggestions to jeff@smashing.org,
+or join the mailing list.  More information can be found at
+http://www.smashing.org/extproc_perl.
+
+REQUIREMENTS
+------------
+o A version of Solaris or Linux supported by Oracle
+o Perl 5.6.1 or later
+o shared libperl, threading disabled (threading perl crashes extproc_perl)
+o Oracle 8i (8.1.7 or later) or 9i server with OCI development libraries and
+  headers (problems have been reported with versions earlier than 8.1.7)
+o DBI and DBD::Oracle 1.15
+o Parse::RecDescent
+
+DOCUMENTATION
+-------------
+There is a comprehensive user's guide available on the web at
+http://www.smashing.org/extproc_perl/userguide.html.  This is the official
+documentation for extproc_perl.
+
+TESTING
+-------
+WARNING: The test suite is very immature.  Failures DO NOT indicate that
+extproc_perl will not run on your system, but you should feel free to report
+them.
+
+Before you run 'make test', you need to do several things to set up your
+environment, some of which you may be familiar with from DBD::Oracle:
+
+* Set the ORACLE_SID environment variable to the name of your database.
+* Set the ORACLE_USERID environment variable with your username and password
+  separated by a slash (e.g. user1/foobar).
+* If you are using Oracle 9.2.0 or higher, add the following line to the
+  SID_DESC section of your external procedure listener configuration:
+
+  (ENVS="EXTPROC_DLLS=ANY")
+
+  Your configuration should look something like this:
+
+    (SID_DESC =
+      (SID_NAME = PLSExtProc)
+      (ORACLE_HOME = /u01/app/oracle/product/9.2.0)
+      (PROGRAM = extproc)
+      (ENVS="EXTPROC_DLLS=ANY")
+    )
+
+  Reload the listener with 'lsnrctl reload' and you should be ready to test.
+
+  IMPORTANT!!!  Remove this configuration once you're finished testing.  The
+  test version of extproc_perl enables some testing features that are not
+  suitable for production use.

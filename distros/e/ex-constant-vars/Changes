@@ -1,0 +1,36 @@
+Revision history for Perl module ex::constant::vars
+
+0.06 2015-10-21 NEILB
+    - Switched to Dist::Zilla
+    - Switched URL for repo to reflect my changed github username
+
+0.05 2014-01-25
+    - Switched to metaspec v2 and updated github repo info
+    - Specified MIN_PERL_VERSION as 5.6.0
+    - Added strict and warnings to the list of prereqs
+
+0.04 2013-07-20
+    - Tweaked format of Changes to confirm to CPAN::Changes::Spec
+    - Added repository details to metadata in Makefile.PL
+    - Added repository details to pod documentation
+
+0.03 2012-01-28
+    - Specified license type as 'perl' in Makefile.PL
+    - Added Carp and Exporter as pre-reqs in Makefile.PL
+    - Reworded the one-line description in NAME section in pod.
+    - Other updates to documentation
+
+0.02 2012-01-27
+    - fixed bug where multiple scalar constants would end up
+      with the value of the most recently declared one
+    - fixed warning about prototypes
+    - moved vars.pm to lib/ex/constant/vars.pm
+    - created a t/ test directory, and moved test.pl to t/original.t
+    - added t/tie.t with more tests for the tie interface,
+      including for the multiple scalar bug
+    - added t/const.t with more tests for the const interface
+    - added t/import.t with more tests for the const interface
+
+0.01 2000-11-20
+    - original version uploaded to CPAN
+

@@ -1,0 +1,73 @@
+%#============================================================================
+%# ePortal - WEB Based daily organizer
+%# Author - S.Rusakov <rusakov_sa@users.sourceforge.net>
+%#
+%# Copyright (c) 2000-2003 Sergey Rusakov.  All rights reserved.
+%# This program is free software; you can redistribute it
+%# and/or modify it under the same terms as Perl itself.
+%#
+%#
+%#----------------------------------------------------------------------------
+<% empty_table( height => 10) %>
+<table border="0" cellpadding=0 cellspacing=0 width="100%"
+style="background-color:#FFEEEE; font-family:MS sans serif; font-size:9 pt; ">
+	<tr><td>
+% my ($lastitem, $item);
+% while($item = shift @dptRing) {
+%		$ lastitem = $item;
+	<% CGI::a({-href => href("index.htm", deptid => $item->[0]*1)}, $item->[1]) %>
+	<% scalar @dptRing ? "|" : undef %>
+%}
+	</td></tr>
+
+% if ( $session{AppOffPhones_EditMode} ) {
+	<tr>
+	<td align="right" class="g2">
+		<% img(src => "/images/ePortal/edit.gif") %>
+		<% plink(pick_lang(
+        rus => "Новый телефон в подразделении",
+        eng => "New phone in department"),
+				href => href("client_edit.htm", objid => 0, dept_id => $lastitem->[0])) %>
+
+		<% img(src => "/images/ePortal/edit.gif") %>
+		<% plink(
+        pick_lang(rus => "Новое подразделение", eng => "Add subdepartment"),
+				href => href("dept_edit.htm", objid => 0, parent_id => $lastitem->[0])) %>
+
+% if ($lastitem->[0]) {
+		<% img(src => "/images/ePortal/setup.gif") %>
+    <% plink(pick_lang(rus => "Изменить", eng => "Edit") . " '$lastitem->[1]'",
+			href => href("dept_edit.htm", objid => $lastitem->[0])) %>
+
+		<% img(src => "/images/ePortal/trash.gif") %>
+    <% plink(pick_lang(rus => "Удалить", eng => "Delete")." '$lastitem->[1]'", href => href("/delete.htm", objid => $lastitem->[0],
+			objtype => "ePortal::App::OffPhones::Department",
+			done => href($ENV{SCRIPT_NAME}, deptid => $lastitem->[2]))) %>
+% }
+	</td></tr>
+% }
+</table>
+
+<%init>
+
+my @dptRing = ();		# array of [id, name]
+while ($deptid > 0) {
+	my $D = new ePortal::App::OffPhones::Department;
+	$D->restore($deptid);
+
+	my $dptName = $D->title;
+	if ($name) {
+		use locale;
+		$dptName =~ s/($name)/<span style="color:red;font-weight:bold;">$1<\/span>/i;
+	}
+	unshift @dptRing, [$deptid, $dptName, $D->parent_id];
+	$deptid = $D->Parent_id;
+}
+unshift @dptRing, [undef, pick_lang(rus => "Телефоны", eng => "Phones")];
+
+</%init>
+
+<%args>
+$deptid => 0
+$name => undef	# Поиск по имени
+</%args>

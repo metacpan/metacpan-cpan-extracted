@@ -1,0 +1,35 @@
+ebXML-Message version 0.01
+==========================
+
+ebXML::Message encapsulates ebXML-MS aka ebMS in a class. The class
+provides an interface allowing you to build ebXML messages using
+SOAP::Lite or pure XML.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  SOAP::Lite
+
+  SOAP::Data::Builder
+
+  XML::Xerces
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 by Aaron Trevena, Surrey Technologies, Ltd.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+

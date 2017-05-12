@@ -1,0 +1,24 @@
+%#============================================================================
+%# ePortal - WEB Based daily organizer
+%# Author - S.Rusakov <rusakov_sa@users.sourceforge.net>
+%#
+%# Copyright (c) 2000-2004 Sergey Rusakov.  All rights reserved.
+%# This program is open source software
+%#
+%#
+%#----------------------------------------------------------------------------
+
+<& /message.mc, ErrorMessage => pick_lang(rus => "В доступе отказано", eng => "Access denied") &>
+
+<p>
+<% pick_lang(rus => q{
+	Для доступа к указанному ресурсу необходимы права Администратора.
+}, eng => q{
+	You does not have administrators privilegies.
+}) %>
+<p>
+
+%#=== @metags attr =========================================================
+<%attr>
+Title => {rus => "Ошибка доступа", eng => "Access denied"}
+</%attr>

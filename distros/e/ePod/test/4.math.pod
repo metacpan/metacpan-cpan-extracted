@@ -1,0 +1,39 @@
+
+
+=head1 Break Math
+
+Some simple Math:
+
+  ## A simple definition:
+  A = B
+
+  ## Now multiply both side by A:
+  A**2 = AB
+
+  ## Now add A**2 - 2AB in both sides:
+  A**2 + A**2 - 2AB = AB + A**2 - 2AB
+
+  ## That we can simplify by:
+  2(A**2 -AB) = A**2 - AB
+
+  ## And finally we divide both sides by A**2 - AB:
+  2 = 1
+
+=over 10
+
+=item Soo, 2 is really equal 1?
+
+=item But we didn't anything wrong!
+
+=item Hummm, take a deep look!
+
+Som link sample: L<X|http://somedomain>
+
+=back
+
+=head1 Font
+
+I<"The Last Theorem of Fermat".>
+
+=cut
+

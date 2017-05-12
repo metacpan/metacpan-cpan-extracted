@@ -1,0 +1,55 @@
+<?
+##
+##  demo.cgipm -- ePerl demonstration webpage
+##  Copyright (c) 1996,1997 Ralf S. Engelschall, All Rights Reserved. 
+##
+
+use CGI qw(:standard);
+use CGI::Cookie;
+
+#   the name and initial value of our counter cookie
+my $cnt_name  = 'counter';
+my $cnt_value = 0;
+
+#   fetch possibly existing counter cookie provided by the browser
+my %cookies = fetch CGI::Cookie;
+$cnt_value = $cookies{$cnt_name}->value if ($cookies{$cnt_name});
+
+#   increase the value, because its an access counter
+$cnt_value++;
+
+#   create the new counter cookie and send it back to the browser
+my ($myname, $mypath) = 
+   ($ENV{'SCRIPT_SRC_URL'} =~ m%^http://(.+?)(?:|:\d+)(/.*)$%);
+my $cookie = new CGI::Cookie(
+    -name    => $cnt_name,
+    -value   => sprintf("%d", $cnt_value),
+    -domain  => $myname,
+    -path    => $mypath,
+    -expires => '+24h'
+);
+print "Set-Cookie: $cookie\n";
+!>
+<html>
+<head>
+<title>demo.cgipm</title>
+</head>
+<body>
+<blockquote>
+<blockquote>
+<h1>demo.cgipm</h1>
+<h2>High-level HTTP programming with CGI.pm</h2>
+
+<p>
+This demonstrates how one can create complex HTTP headers like
+Netscape Cookies by programming them via Perl's CGI::Cookie module.
+
+<p>
+You have accessed this demo <font size=+2><b><?=$cnt_value!></b></font> times now.
+This counter is stored in a cookie, so push your RELOAD button a few times
+to see the effect.
+
+</blockquote>
+</blockquote>
+</body>
+</html>

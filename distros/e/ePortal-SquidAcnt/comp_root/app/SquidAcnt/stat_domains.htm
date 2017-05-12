@@ -1,0 +1,127 @@
+%#============================================================================
+%# ePortal - WEB Based daily organizer
+%# Author - S.Rusakov <rusakov_sa@users.sourceforge.net>
+%#
+%# Copyright (c) 2000-2003 Sergey Rusakov.  All rights reserved.
+%# This program is free software; you can redistribute it
+%# and/or modify it under the same terms as Perl itself.
+%#
+%#----------------------------------------------------------------------------
+<& stat_selector.mc &>
+<%perl>  
+  my $app = $ePortal->Application('SquidAcnt');
+  throw ePortal::Exception::ACL( -operation => 'read', -object => $app)
+    unless $app->xacl_check_read;
+  
+  # ----------------------------------------------------------------------
+  # Information about domains
+  my $o = new ePortal::ThePersistent::Support(
+      DBISource => 'SquidAcnt',
+      SQL => "SELECT domain, sum(bytes) as bytes
+        FROM SAtraf",
+      GroupBy => 'domain',
+      #OrderBy => 'bytes DESC',
+      Where => $session{_SquidAcnt_where},
+      Attributes => { domain => {}},
+      );
+
+  my ($bg_values, $bg_labels) = $m->comp('SELF:domain_operations');
+</%perl>
+
+<&| /list.mc, submit => 1, id => 'Ld', obj => $o, rows => 10,
+      order_by => '!bytes' &>
+ <&| /list.mc:row &>
+  <a name="<% $_->domain %>">
+  <& /list.mc:column_number &>
+  <& /list.mc:column_image &>
+  <& /list.mc:column, id => 'domain', 
+                      title => 'Domain', 
+                      self_url => { domain => $_->domain, '#' => $_->domain },
+                      order_by => 'domain', &>
+    <&| /list.mc:column &>&nbsp;</&>
+  <&| /list.mc:column &>
+    <A href="http://<% $_->domain %>" target="_blank">Lookup</a>
+  </&>
+  <&| /list.mc:column, id => 'bytes', 
+                      -width => '10%',
+                      title => 'Bytes', 
+                      order_by => 'bytes',
+                      -align => 'center' &>
+    <% $app->NiceFormat($_->bytes) %>
+  </&>
+  <& /list.mc:column_checkbox, value => $_->domain &>
+ </&> <!-- end of row -->
+      
+<%perl>
+  if ($ARGS{domain} and $ARGS{domain} eq $_->domain) {
+  # ----------------------------------------------------------------------
+  # Information about selected domain
+  my $u = new ePortal::ThePersistent::Support(
+      DBISource => 'SquidAcnt',
+      SQL => "SELECT title, user_id, sum(bytes) as bytes
+        FROM SAtraf
+          LEFT JOIN SAuser on SAtraf.user_id=SAuser.id",
+        GroupBy => 'title, user_id',
+        Where => $session{_SquidAcnt_where},
+        Attributes => { title => {}, user_id => {}},
+        );
+    </%perl>
+  
+  <&| /list.mc:extra_row, start_column => 3 &>
+    <&| /list.mc, id => 'L1', obj => $u, order_by => '!bytes', rows => 10, 
+                restore_where => {where => "domain='$ARGS{domain}'" } &>
+      <& /list.mc:column_number &>
+      <& /list.mc:column, id => 'title', title => 'User', order_by => 'title' &>
+      <&| /list.mc:column &>&nbsp;</&>
+      <&| /list.mc:column,  id => 'bytes', 
+                            title => 'Bytes', 
+                            order_by => 'bytes', 
+                            -width => '10%',
+                            -align => 'center' &>
+        <% $app->NiceFormat($_->bytes) %>
+      </&>
+    </&> <!-- end of list Ld -->
+  </&> <!-- end of extra_row -->
+% }
+
+% if ($app->xacl_check_update) {      
+  <& /list.mc:action_bar, popup_menu => { -values => $bg_values, -labels => $bg_labels} &>
+% }
+</&>
+
+
+%#=== @METAGS attr =========================================================
+<%attr>
+Title => {rus => "Статистика SquidAcnt по доменам", eng => "SquidAcnt statistics by domains"}
+</%attr>
+
+%#=== @metags onStartRequest ====================================================
+<%method onStartRequest><& PARENT:onStartRequest, %ARGS &><%perl>
+  if ( $r->method eq 'POST' ) {
+    return href($ENV{SCRIPT_NAME}, 
+        ss_period => $ARGS{ss_period},
+        user_id   => $ARGS{user_id},
+        domain    => $ARGS{domain},
+        $m->comp('/list.mc:state', id => 'L1'),
+        $m->comp('/list.mc:state', id => 'Ld'),
+      );
+  }
+</%perl></%method>
+
+<%doc>
+  # Information about dates
+  my $d = new ePortal::ThePersistent::Support(
+      DBISource => 'SquidAcnt',
+      SQL => "SELECT log_date, sum(bytes) as bytes
+        FROM SAtraf",
+      GroupBy => 'log_date',
+      OrderBy => 'bytes DESC',
+      Where => $session{_SquidAcnt_where},
+      Attributes => { log_date => { dtype => 'DateTime' } },
+      );
+  $d->restore_where(limit_rows => $session{_SquidAcnt_limit},
+      where => 'user_id=? AND domain=?',
+      bind => [$args{user_id}, $args{domain}])
+    if $args{user_id} and $args{domain};
+
+</%doc>

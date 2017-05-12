@@ -1,0 +1,42 @@
+<!-- 
+##
+##  demo.func -- ePerl demonstration webpage
+##  Copyright (c) 1996,1997 Ralf S. Engelschall, All Rights Reserved. 
+-->
+<html>
+<head>
+<title>demo.func</title>
+</head>
+<body>
+<blockquote>
+<blockquote>
+<h1>demo.func</h1>
+<h2>Perl Programming</h1>
+<p>
+
+<?
+sub ctime {
+    my ($time) = @_;
+    my @dow = ( 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat' );
+    my @moy = ( 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+                'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec' );
+    my ($sec, $min, $hour, $mday, $mon, $year, $wday, $yday, $isdst) = 
+        localtime($time);
+    my ($str) = sprintf("%s %s %2d %02d:%02d:%02d 19%s%s",
+         $dow[$wday], $moy[$mon], $mday, $hour, $min, $sec, $year, 
+         $isdst ?  " DST" : "");
+    return $str;
+}
+!>
+
+This demonstrates the global scoping within a webpage by defining
+a Perl function in a first ePerl block and later calling this
+function in another ePerl block.
+
+<p>
+Local time is <?=&ctime(time())!>.
+
+</blockquote>
+</blockquote>
+</body>
+</html>

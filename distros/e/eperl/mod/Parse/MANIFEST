@@ -1,0 +1,12 @@
+MANIFEST
+Makefile.PL
+README
+ePerl.pm
+ePerl.xs
+t/01_load.t
+t/02_preprocess.t
+t/03_translate.t
+t/04_precompile.t
+t/05_evaluate.t
+t/06_expand.t
+t/07_delimiter.t

@@ -1,0 +1,45 @@
+{
+   "abstract" : "Eirotic - a module to load and use Perl my may ",
+   "author" : [
+      "Marc Chantreux <khatar@phear.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.036, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "eirotic",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Import::Into" : "0",
+            "Path::Tiny" : "0",
+            "Perlude" : "0",
+            "YAML" : "0",
+            "autodie" : "0",
+            "curry" : "0",
+            "perl" : "5.020"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/eiro/p5-eirotic",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/eiro/p5-eirotic.git",
+         "web" : "https://github.com/eiro/p5-eirotic"
+      }
+   },
+   "version" : "0.3"
+}
+

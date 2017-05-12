@@ -1,0 +1,88 @@
+%#============================================================================
+%# ePortal - WEB Based daily organizer
+%# Author - S.Rusakov <rusakov_sa@users.sourceforge.net>
+%#
+%# Copyright (c) 2000-2004 Sergey Rusakov.  All rights reserved.
+%# This program is open source software
+%#
+%#
+%#----------------------------------------------------------------------------
+<& /message.mc &>
+&nbsp;
+<&| /dialog.mc:edit_dialog, width => 300, 
+        focus => 'username',
+        title => pick_lang(rus => "Регистрация в системе",eng => "Login to ePortal") &>
+
+  <&| /dialog.mc:label_value_row, label => pick_lang(rus => 'Ваше имя', eng => 'Login name') &>
+    <& /dialog.mc:textfield, id => 'username', size => 10, value => '' &>
+  </&>
+  <&| /dialog.mc:label_value_row, label => pick_lang(rus => 'Пароль', eng => 'Password') &>
+    <& /dialog.mc:password, id => 'password', size => 10, value => '' &>
+  </&>
+  <&| /dialog.mc:label_value_row, label => pick_lang(rus => "Запомнить пароль", eng => 'Remember me') &>
+    <& /dialog.mc:checkbox, id => 'savepassword', value => 1 &>
+  </&>
+
+  <& /dialog.mc:buttons, ok_label => pick_lang(rus => "Зарегистрироваться!", eng => "Login!") &>
+</&>
+
+&nbsp;
+<hr>
+<p class="s10">
+	<% pick_lang(rus => q{
+		<a href="/login-faq.htm">Здесь</a> находится список часто задаваемых
+		вопросов, касающихся регистрации на информационном сервере.
+	}, eng => q{
+    <a href="/login-faq.htm">Here</a> is Frequently Asked Questions
+		about login process.
+	}) %>
+
+<p>
+<& /inset.mc &>
+
+
+
+
+
+
+
+%#=== @METAGS onStartRequest ====================================================
+<%method onStartRequest><%perl>
+
+	# Handle CANCEL
+  if ($m->comp('/dialog.mc:isButtonPressed', button => 'cancel')) {
+    throw ePortal::Exception::Abort($m->comp('/dialog.mc:back_url'));
+	}
+
+	# Handle OK
+  if ( $ARGS{username} ) {
+    use locale;
+    $ARGS{username} = lc $ARGS{username};
+    
+    try {
+      # will throw on error
+      $ePortal->CheckUserAccount( username => $ARGS{username}, password => $ARGS{password});
+      # send cookie
+      $m->scomp('/pv/send_auth_cookie.mc', username => $ARGS{username}, savepassword => $ARGS{savepassword});
+      
+      # redirect back
+      my $back_url = $m->comp('/dialog.mc:back_url');
+      $back_url = '/index.htm' if $back_url =~ /login\.htm/;
+      throw ePortal::Exception::Abort( -text => $back_url );
+
+      # Login errors handler
+    } catch ePortal::Exception::BadUser with {
+      my $E = shift;
+      $session{ErrorMessage} = $E->text;
+      logline('info', ref($E). ':'. $E->{-reason});
+      $m->scomp('/pv/send_auth_cookie.mc');
+    };
+  }
+
+</%perl></%method>
+
+
+%#=== @METAGS attr ====================================================
+<%attr>
+Title => {rus => "Регистрация на сервере", eng => "Login to server"}
+</%attr>

@@ -1,0 +1,161 @@
+%#============================================================================
+%# ePortal - WEB Based daily organizer
+%# Author - S.Rusakov <rusakov_sa@users.sourceforge.net>
+%#
+%# Copyright (c) 2000-2003 Sergey Rusakov.  All rights reserved.
+%# This program is free software; you can redistribute it
+%# and/or modify it under the same terms as Perl itself.
+%#
+%#
+%#----------------------------------------------------------------------------
+%#
+%# $gdata{OffPhones_found_count} - Number of rows found in subcomponent
+%#----------------------------------------------------------------------------
+<& /message.mc &>
+<% empty_table( height => 10 ) %>
+<!--UdmComment-->
+<table width="90%" align="center" border=0>
+	<tr><td valign="top">
+		<% $sd->draw_dialog %>
+	</td>
+	<% empty_td(width=>5) %>
+	<td class="memo" valign="top">
+
+% if (! $session{AppOffPhones_EditMode}) {
+		<% pick_lang(rus => q{
+    Для поиска введите фамилию, номер телефона или любую часть из
+    наименования подразделения и нажмите кнопку «Искать».
+		}, eng => q{
+		Enter a part of name, department name or phone number to search a man.
+		}) %>
+% }
+
+% if (defined $session{AppOffPhones_EditMode}) {
+		<& SELF:TurnEditMode &>
+% }
+</td></tr></table>
+<!--/UdmComment-->
+
+% foreach my $dpt (@Departments) {
+	<& dring.htm,  deptid => $dpt, name => $name &>
+% $m->flush_buffer;
+	<& person.htm, deptid => $dpt, name => $name &>
+% $m->flush_buffer;
+
+% if ( ! $name)	{
+	<& subdpt.htm, deptid => $dpt, name => $name &>
+% $m->flush_buffer;
+	<& dring.htm,  deptid => $dpt, name => $name &>
+% $m->flush_buffer;
+% }
+
+%}
+
+<!--UdmComment-->
+<p>
+	<ul class="memo">
+
+% if (defined $session{AppOffPhones_EditMode}) {
+	<li><% pick_lang(
+			rus => q{
+        Всего <a href="memo_list.htm">заметок от пользователей:</a>
+        },
+			eng => q{
+				<a href="memo_list.htm">Notes</a> from users:
+				}) %>
+		<% ePortal::App::OffPhones::UserMemoCount() %>.
+% }
+
+	<li><% pick_lang(rus => qq{
+    Если вы увидели какую-либо неточность в телефонном справочнике,
+    не сочтите за труд <a href="admin_memo.htm?deptid=$deptid">} .
+    img(src=> "/images/OffPhones/adminmemo.gif") .
+		"сообщить нам</a> об этом. Спасибо.",
+	eng => qq{
+    Please, <a href="admin_memo.htm?deptid=$deptid">inform} .
+		img(src=> "/images/OffPhones/adminmemo.gif") . "
+		 </a>the administrator about errors in telephone directory.") %>
+
+	<li><% pick_lang(
+		rus => "Нажав на " . img(src=> "/images/OffPhones/memo.gif") ." вы сможете
+			сохранить свою <b>персональную</b>  информацию об указанном человеке.
+      Никто кроме Вас не сможет увидеть эти заметки. Для это необходимо
+			зарегистрироваться!",
+		eng => "Click ".img(src=> "/images/OffPhones/memo.gif") . " to
+			make a personal memo about the entry") %>
+
+	<li><% pick_lang(
+		rus => "Для поиска человека можно ввести любую часть фамилии, должности,
+			номера телефона или названия подразделения.",
+		eng => "Type any part of name or department name to search a man") %>
+</ul>
+<!--/UdmComment-->
+
+
+
+
+%#=== @metags init =========================================================
+<%init>
+  my $sd = new ePortal::App::OffPhones::SearchDialog;
+	my @Departments;
+
+	if ($name =~ /[0123456789\- \.,]+/) {
+		$name =~ tr/-\., //d;
+	}
+
+	if ($name) {
+		$sd->Name($name);
+		my $OffPhones = ePortal::App::OffPhones::stSearchDistinctDepartment($name);
+		while($OffPhones->restore_next) { push @Departments, $OffPhones->id; }
+		$session{ErrorMessage} = pick_lang(
+        rus => "Нет никого такого ...",
+				eng => "No such entry ...") if ! @Departments;
+	}
+
+	push @Departments, $deptid if (! scalar @Departments);
+</%init>
+
+
+
+%#=== @METAGS args =========================================================
+<%args>
+$deptid => 0
+$name => undef
+</%args>
+
+
+
+
+
+%#=== @METAGS TurnEditMode ====================================================
+<%method TurnEditMode>
+% my %args = $m->request_args;
+
+<br><span style="color:#FF5555; font-size:9pt; font-weight:bold;">
+% if ($session{AppOffPhones_EditMode}) {
+  <a href="<%
+      href($ENV{SCRIPT_NAME}, edit_mode => 0, deptid => $args{deptid},
+        name => $args{name})  %>"><% pick_lang(rus => "Выключить", eng => "Turn off") %></a>
+			<% pick_lang(rus => "режим редактирования.", eng => "edit mode") %>
+	<br>
+	<% pick_lang(rus => q{
+		<a href="memo_list.htm">Список</a> замечаний от пользователей.
+		<br>
+		<a href="pt_list.htm">Редактор</a> типов телефонов.
+	}, eng => q{
+		<a href="memo_list.htm">A list</a> of users remarks.
+		<br>
+		<a href="pt_list.htm">Editor</a> of phone types.
+	}) %>
+
+% } else {
+	<% pick_lang(
+    rus => "Вы обладаете правами на изменение данных в телефонном справочнике. Для этого надо",
+		eng => "Your are able to edit phone directory. To do it") %>
+
+  <a href="<%
+    href($ENV{SCRIPT_NAME}, edit_mode => 1, deptid => $args{deptid}, name => $args{name})
+	%>"><% pick_lang(rus => "включить режим редактировани", eng => "click here") %></a>.
+% }
+</span>
+</%method>

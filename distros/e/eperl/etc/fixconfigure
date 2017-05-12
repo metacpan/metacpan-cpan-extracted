@@ -1,0 +1,30 @@
+:
+eval 'exec perl -S $0 ${1+"$@"}'
+    if $running_under_some_shell;
+##
+##  add BASH bootstrap hack to a configure script
+##  Copyright (c) Ralf S. Engelschall, All Rights Reserved.
+##
+
+open(FPI, "<$ARGV[0]");
+open(FPO, ">$ARGV[0].n");
+while (<FPI>) {
+    if (m|#! /bin/sh\n|) {
+        print FPO "#! /bin/sh\n";
+        print FPO <<'EOF'
+# if we can run at the top, why should we stay at the bottom any longer?
+if [ ".$BASH" = . ]; then BASH=`which bash`; if [ ".$BASH" != . ]; then exec $BASH $0 $*; fi; fi
+EOF
+;
+	}
+	else {
+        print FPO $_;
+    }
+}
+close(FPO);
+close(FPI);
+unlink("$ARGV[0]");
+link("$ARGV[0].n", "$ARGV[0]");
+unlink("$ARGV[0].n");
+
+##EOF##

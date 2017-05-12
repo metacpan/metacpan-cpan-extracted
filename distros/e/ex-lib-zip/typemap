@@ -1,0 +1,9 @@
+LIBZIB_OBJ*	T_LIBZIB_OBJ
+
+INPUT
+T_LIBZIB_OBJ
+	if (SvROK($arg) && sv_derived_from($arg, CLASSNAME)) {
+	    $var = (LIBZIB_OBJ*)SvRV($arg);
+	}
+	else
+	    croak(\"$var is not derived from \"CLASSNAME\"\")

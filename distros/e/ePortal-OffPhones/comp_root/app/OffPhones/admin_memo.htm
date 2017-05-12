@@ -1,0 +1,84 @@
+%#============================================================================
+%# ePortal - WEB Based daily organizer
+%# Author - S.Rusakov <rusakov_sa@users.sourceforge.net>
+%#
+%# Copyright (c) 2000-2003 Sergey Rusakov.  All rights reserved.
+%# This program is free software; you can redistribute it
+%# and/or modify it under the same terms as Perl itself.
+%#
+%#
+%#----------------------------------------------------------------------------
+&nbsp;
+<% $dlg->dialog_start( title => pick_lang(rus => "Сообщить администратору", eng => "Notify administrator"), width => "450") %>
+
+	<% $dlg->field("client_id", hidden=>1) %>
+	<% $dlg->field("dept_id", hidden=>1) %>
+	<% $dlg->field("private", hidden=>1) %>
+	<% $dlg->field("title") %>
+
+<% $dlg->buttons(delete_button => 1) %>
+<% $dlg->dialog_end %>
+
+<span class="memo">
+<p>
+	<% pick_lang(
+    rus => "Просим Вас указать фамилию того, у кого обнаружена неточность и название подразделения.",
+		eng => "Please let us know about entry name and department name where inaccuracy exists") %>
+
+% if (!$ePortal->username) {
+	<br><% pick_lang(rus => q{
+    Желательно также указать Вашу фамилию или просто
+		<a href="/login.htm">зарегистрироваться.</a>
+	}, eng => q{
+		Please write your name or just <a href="/login.htm">log in.</a>
+	}) %>
+% }
+</span>
+<p>
+<& /inset.mc &>
+
+% ($dlg)=();
+
+%#=== @METAGS attr =========================================================
+<%attr>
+Title => {rus => "Сообщить о неточности в тел.справочнике", eng => "Notify administrator"}
+</%attr>
+
+
+%#=== @METAGS onStartRequest ====================================================
+<%method onStartRequest><%perl>
+  my %args = $m->request_args;
+	$dlg = new ePortal::HTML::Dialog( obj => new ePortal::App::OffPhones::PhoneMemo);
+
+  my $location = try {
+    $dlg->handle_request( );
+  } catch ePortal::Exception::DataNotValid with {
+    my $E = shift;
+    $session{ErrorMessage} = $E->text;
+    '';
+  };
+  return $location if $location;
+
+	my $dpt = new ePortal::App::OffPhones::Department;
+	if (! $dlg->{obj}->Title and $dpt->restore($args{deptid})) {
+		$dlg->{obj}->Title( "Неточность в подразделении " . $dpt->title);
+	}
+
+	$dlg->{obj}->dept_id( $args{deptid}+0 ) if exists $args{deptid};
+	$dlg->{obj}->client_id( $args{client_id}+0 ) if exists $args{client_id};
+	$dlg->{obj}->private(0);
+
+</%perl></%method>
+
+
+%#=== @metags once =========================================================
+<%once>
+my ($dlg);
+</%once>
+
+
+%#=== @METAGS HTMLhead ====================================================
+<%method HTMLhead>
+<& PARENT:HTMLhead &>
+<META NAME="Robots" CONTENT="noindex,nofollow">
+</%method>

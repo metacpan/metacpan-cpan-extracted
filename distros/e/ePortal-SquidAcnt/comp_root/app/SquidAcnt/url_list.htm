@@ -1,0 +1,126 @@
+%#============================================================================
+%# ePortal - WEB Based daily organizer
+%# Author - S.Rusakov <rusakov_sa@users.sourceforge.net>
+%#
+%# Copyright (c) 2000-2003 Sergey Rusakov.  All rights reserved.
+%# This program is free software; you can redistribute it
+%# and/or modify it under the same terms as Perl itself.
+%#
+%#
+%#----------------------------------------------------------------------------
+<%perl>  
+  throw ePortal::Exception::ACL( -operation => 'read', -object => $app)
+    unless $app->xacl_check_read;
+</%perl>
+
+<&| /dialog.mc:edit_dialog, obj=> $dlgobject, 
+      width => 600,
+      title => pick_lang(rus => "Добавить слово", eng => "Add a word") &>
+ <& /dialog.mc:hidden, name => 'url_group_id', value => $ARGS{url_group_id} &>
+ <& /list.mc:state_as_hidden &>
+
+<&| /dialog.mc:cell &>
+  <b><% pick_lang(rus => "Слово:", eng => "Word:") %></b>
+  <& /dialog.mc:textfield, obj => $dlgobject, name => 'title' &>
+  <b><% pick_lang(rus => "Тип:", eng => "Type:") %></b>
+  <& /dialog.mc:popup_menu, obj => $dlgobject, name => 'url_type' &>
+  <& /dialog.mc:_buttons, ok_label => pick_lang(rus => "Добавить!", eng => "Add!"), cancel_button => 0 &>
+</&>
+</&>
+
+<p>
+<&| /list.mc, submit => 1, obj => $obj, restore_where => {url_group_id => $ARGS{url_group_id}} &>
+<&| /list.mc:row &>
+  <& /list.mc:column_number &>
+  <& /list.mc:column_image &>
+
+  <& /list.mc:column, id=> 'title', order_by => 'title' &>
+  <& /list.mc:column, id=> 'url_type', -align=>'center', order_by => 'url_type' &>
+  <& /list.mc:column, id => 'ts', -align=>'center', order_by => 'ts' &>
+
+  <& /list.mc:column_checkbox &>
+%#   <& /list.mc:column_delete &>
+</&>
+%#<& /list.mc:row_span, height => 4 &>
+<& /list.mc:action_bar,
+  popup_menu => {
+    -values => ['delete'],
+    -labels => {delete => pick_lang(rus => "Удалить", eng => "Delete")}
+    }
+ &>
+</&>
+
+<p>
+<p class="memo">
+  <% pick_lang(rus => "Обычный URL выглядит как http://домен/путь?параметры. 
+    Тип URL задает параметры где искать ключевые слова", 
+      eng => "Common URL looks like http://domain/path?parameters") %> 
+<ul>
+  <li class="memo"><% pick_lang(
+      rus => "<b>домен:строка</b> - название домена оканчивается на слово", 
+      eng => "<b>domain:string</b> - domain name ends with the word") %>
+  <li class="memo"><% pick_lang(
+      rus => "<b>домен:regex</b> - регулярное выражение по домену", 
+      eng => "<b>domain:regex</b> - regular expression on domain name") %>
+  <li class="memo"><% pick_lang(
+      rus => "<b>путь:строка</b> - путь к файлу начинается на слово", 
+      eng => "<b>path:string</b> - path starts with the word") %>
+  <li class="memo"><% pick_lang(
+      rus => "<b>путь:regex</b> - регулярное выражение по пути до файла", 
+      eng => "<b>path:regex</b> - regular expression on file path") %>
+  <li class="memo"><% pick_lang(
+      rus => "<b>regex</b> - регулярное выражение по всему URL", 
+      eng => "<b>regex</b> - regular expression on entire URL") %>
+</ul>
+
+
+
+%#=== @METAGS onStartRequest ====================================================
+<%method onStartRequest><& PARENT:onStartRequest, %ARGS &><%perl>
+  $app = $ePortal->Application('SquidAcnt');
+
+  throw ePortal::Exception::Fatal(-text => 'url_group_id not known')
+    if ( ! $ARGS{url_group_id} );
+
+  # ----------------------------------------------------------------------
+  # Dialog object
+  $dlgobject = new ePortal::App::SquidAcnt::SAurl;
+  $m->comp('/dialog.mc:handle_request', 
+        obj => $dlgobject,
+        back_url => href('/app/SquidAcnt/url_list.htm', 
+            url_group_id => $ARGS{url_group_id}, 
+            $m->comp('/list.mc:state')),
+        );
+
+  # ----------------------------------------------------------------------
+  # List object
+  $obj = new ePortal::App::SquidAcnt::SAurl;
+
+  my @delete_id = $m->comp('/list.mc:checkboxes');
+  if ($m->comp('/list.mc:list_action') eq 'delete') {
+    foreach (@delete_id) {
+      $obj->restore($_) && $obj->delete;
+    }  
+  }  
+  
+  # I do not like POST method because of list.mc
+  if ( $r->method eq 'POST' ) {
+    return href($ENV{SCRIPT_NAME}, 
+              url_group_id => $ARGS{url_group_id}, 
+              $m->comp('/list.mc:state'));
+  }
+
+</%perl></%method>
+
+
+
+%#=== @metags once =========================================================
+<%once>
+my ($obj, $app, $dlgobject);
+</%once>
+
+%#=== @metags cleanup =========================================================
+<%cleanup>
+($obj, $app, $dlgobject ) = ();
+</%cleanup>
+

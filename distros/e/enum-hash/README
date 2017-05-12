@@ -1,0 +1,35 @@
+		enum::hash
+
+DESCRIPTION
+
+Provides the same interface as the L<enum> module, but returns the 
+values as a list, instead of creating symbolic constants.
+
+
+DOCUMENTATION
+
+The documentation is in Template.pm in the form of POD format perldocs.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+COPYRIGHT
+
+Copyright 2004-2005, Carl Franks.  All rights reserved.  
+
+This library is free software; you can redistribute it and/or modify it under 
+the same terms as Perl itself.
+
+Derived from the original enum cpan distribution,
+Copyright 1998 (c) Byron Brummer. Copyright 1998 (c) OMIX, Inc.
+Permission to use, modify, and redistribute this module granted under the 
+same terms as Perl.
+

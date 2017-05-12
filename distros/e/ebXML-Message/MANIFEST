@@ -1,0 +1,12 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/ebXML-Message.t
+lib/ebXML/Message.pm
+lib/ebXML/Message/Service.pm
+lib/ebXML/Message/Reference.pm
+lib/ebXML/Message/DOMWriter.pm
+lib/ebXML/Message/DOMReader.pm
+lib/ebXML/Message/SOAPWriter.pm
+META.yml                                 Module meta-data (added by MakeMaker)

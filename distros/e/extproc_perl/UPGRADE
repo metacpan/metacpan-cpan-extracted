@@ -1,0 +1,10 @@
+$Id: UPGRADE,v 1.7 2004/05/05 17:21:50 jeff Exp $
+
+From 2.00:
+
+Run @ep_upgrade from sqlplus.
+
+From pre-2.00:
+
+You must first upgrade to version 2.0, then you can upgrade to the current
+version.

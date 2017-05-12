@@ -1,0 +1,42 @@
+-- $Id: ep_schema.sql.in,v 1.17 2006/04/05 20:38:58 jeff Exp $
+
+-- create code table
+CREATE TABLE -CODETABLE- (
+    name VARCHAR2(255) primary key,
+    plsql_spec VARCHAR2(255),
+    language VARCHAR2(16),
+    version NUMBER(11),
+    code CLOB
+);
+
+-- create perl_config view
+CREATE OR REPLACE VIEW perl_config AS (
+    select
+        Perl.config('bootstrap_file') as BOOTSTRAP_FILE,
+        Perl.config('code_table') as CODE_TABLE,
+        Perl.config('inc_path') as INC_PATH,
+        Perl.config('debug_directory') as DEBUG_DIRECTORY,
+        Perl.config('max_code_size') as MAX_CODE_SIZE,
+        Perl.config('max_sub_args') as MAX_SUB_ARGS,
+        Perl.config('trusted_code_directory') as TRUSTED_CODE_DIRECTORY,
+        Perl.config('tainting') as TAINTING,
+        Perl.config('session_namespace') as SESSION_NAMESPACE,
+        Perl.config('package_subs') as PACKAGE_SUBS,
+        Perl.config('ddl_format') as DDL_FORMAT,
+        Perl.config('reparse_subs') as REPARSE_SUBS
+    from dual
+);
+
+-- create perl_status view
+CREATE OR REPLACE VIEW perl_status AS (
+    select
+        Perl.version as EXTPROC_PERL_VERSION,
+        Perl.debug_status as DEBUG_STATUS,
+        Perl.debug_file as DEBUG_FILE,
+        Perl.package as PACKAGE,
+        Perl.errno as ERRNO,
+        Perl.errsv as ERRSV
+    from dual
+);
+
+show errors

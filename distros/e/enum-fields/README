@@ -1,0 +1,123 @@
+NAME
+    enum::fields - Perl extension for defining constants for use in
+    Array-based objects
+
+SYNOPSIS
+      package Foo;
+  
+      use enum::fields qw{
+          FIELD_ONE
+          FIELD_TWO
+      };
+  
+      package Bar;
+  
+      use base 'Foo';
+  
+      use enum::fields::extending Foo => qw{
+          BAR_FIELD_ONE
+          BAR_FIELD_TWO
+      };
+
+DESCRIPTION
+    This module allows you to define constants that can be inherited and
+    extended by child classes. It is used much like a simple form of enum to
+    define constants, with the exception that you can inherit a list of
+    constants from a parent class using the "extending" form of the pragma.
+
+    This module was designed to allow an object-oriented programmer to use
+    an array to store instance data for object classes.
+
+    Since I'm a lousy doc writer I'll get right to the examples.
+
+  Example 1 - Parent Class
+      package Employee;
+  
+      use enum::fields qw{NAME PHONE SALARY};
+  
+      sub new {
+          my $class = shift;
+          my $self = bless [], $class;
+
+          $self->[NAME] = shift;
+          $self->[PHONE] = shift;
+          $self->[SALARY] = shift;
+      }
+  
+      sub salary {
+          my $self = shift;
+          $self->[SALARY] = shift if (@_);
+          $self->[SALARY];
+      }
+
+    This example shows a simple employee object. It holds the employee's
+    name, phone, and salary information. The constructor for this class,
+    aptly named 'new', creates a new employee and assigns the three
+    arguments passed in to the NAME, PHONE, and SALARY fields (whose values,
+    not-so-coincidentally, are 0, 1, and 2). Since this is actually an array
+    storage, it is nice and fast.
+
+  Example 2 - Subclassing without adding fields
+      package Employee::CoffeeBoy;
+  
+      use Carp;
+  
+      use base 'Employee';
+      use enum::fields::extending 'Employee';
+
+      sub salary {
+          my $self = shift;
+          if (@_) {
+              $salary = shift;
+              if ($salary > 8_000.00) {
+                  croak "Attept to overpay coffee boy";
+              }
+              $self->[SALARY] = $salary;
+          }
+          $self->[SALARY];
+      }
+
+    This example shows a subclass that inherits from Employee. Using the
+    enum::fields::extending pragma causes the fields from the parent class
+    to be brought into the child class. Therefore we are able to override
+    the *salary* method.
+
+  Example 3 - Subclassing with adding fields
+      package Employee::CEO;
+  
+      use base 'Employee';
+      use enum::fields::extending Employee => qw{
+          NUMBER_OF_BOATS
+      };
+  
+      sub boats {
+          my $self = shift;
+          $self->[NUMBER_OF_BOATS] = shift if (@_);
+          $self->[NUMBER_OF_BOATS];
+      }
+
+    This class shows that we can inherit the fields from a parent, and then
+    add another field onto the end of the list. Behind the scenes, the new
+    field is numbered after those from the parent class, so that the
+    inherited fields and the new fields will not collide.
+
+CAVEATS
+    You cannot add fields to a class after another class has inherited its
+    fields. Attempting to do so will result in a compile-time error.
+
+    Trying to extend fields from more than one class (ala multiple
+    inheritance) will not work. For a different (arguably better) solution,
+    see Class::Delegate.
+
+SEE ALSO
+    enum, fields.
+
+AUTHOR
+    David M. Lloyd <dmlloyd@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2002 by David M. Lloyd
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

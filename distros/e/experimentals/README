@@ -1,0 +1,40 @@
+experimentals version 0.017
+
+This module reduces:
+
+    use experimental qw(
+            fc          postderef     current_sub
+            say         regex_sets    unicode_eval
+            state       array_base    postderef_qq
+            switch      smartmatch    lexical_subs
+            bitwise     signatures    lexical_topic
+            evalbytes   refaliasing   unicode_strings
+            autoderef
+    );
+
+(or any subset of those features) to:
+
+    use experimentals;
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+
+DEPENDENCIES
+
+None.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2015, Damian Conway
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

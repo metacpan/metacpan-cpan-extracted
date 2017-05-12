@@ -1,0 +1,159 @@
+################################################################################
+# File: ....................... README
+# Original Author: ............ Jeff Nokes
+# Last modified by: ........... Jeff Nokes
+# Last modified: .............. 03/15/2007 @ 14:46
+################################################################################
+
+
+
+
+
+DESCRIPTION
+
+eBay Perl SDK
+
+This library is intended to provide a Perl based interface for the public eBay
+web services API (http://developer.ebay.com).  Inside this library are a group
+of modules used to provide eBay API generic and XML interface specific class
+hierarchies, that are extended via the auto-generated API call/data-type
+sub-classes.  The tools provided in this library contain a script used to
+generate these sub-classes on the developer's behalf; please reference
+INSTALL for more information on how to use this tool.
+
+This is a pure-Perl library, that is almost entirely object oriented (OO).  And
+in keeping with traditional Perl philosophies, it was decided to utilize as many
+existing CPAN modules/libraries as possible, to implement it.
+
+eBay Inc. currently supports the following interfaces to its API:
+
+  REST (partially supported as of 12/11/2006)
+  SOAP
+  XML
+
+This library currently supports the following eBay supported interfaces:
+
+  XML
+
+... and was designed so that future support for other protocol
+interfaces could be easily added.
+
+
+This library includes the following features:
+
+  (1)  Ability to make XML API calls to the eBay web services public interface
+       using HTTP/HTTPS.
+
+  (2)  Ability to: execute a single API call in a serial fashion; group multiple
+       API calls to be executed in serial, or asynchronously in parallel via
+       the LWP::Parallel module.
+
+  (3)  Ability to stub out eBay API error responses for error handling testing,
+       simulating a real API error, even though a real request was never sent.
+
+  (4)  Ability to make most global library configurations using ENVironment
+       variables and/or OO methods.
+
+  (5)  Error exception class, extendable to the end-user's Perl application if
+       one so chooses.
+
+  (6)  Tool to auto-generate all specific API call/data-type classes.  As eBay
+       up rev's its API interface version, the end-user can just re-generate
+       all of the call/data-type classes with the new WSDL or Schema (.xsd)
+       published by eBay.  (Reference INSTALL for more information)
+
+
+For more information on how to use eBay's web services API, please visit the
+publicly available web site, http://developer.ebay.com.
+
+
+
+
+
+INSTALLATION
+
+This library can be installed via the traditional Perl process of:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+Users may also use `perl -MCPAN` if the module is available on CPAN mirrors.
+Please reference INSTALL for more information on the recommended full
+intallation process.
+
+
+
+
+
+DEPENDENCIES
+
+This module requires this version (or higher) of Perl:
+
+   5.008001
+
+
+This module requires these versions (or higher) of other modules and libraries:
+
+   Compress::Zlib      v 1.41
+   Crypt::SSLeay       v 0.51
+   Cwd                 v 3.18
+   Data::Dumper        v 2.121
+   Devel::StackTrace   v 1.03
+   Encode              v 1.9801
+   Error               v 0.15
+   Exception::Class    v 1.14
+   Exporter            v 5.567
+   File::Find          v 1.05
+   File::Path          v 1.06
+   File::Spec          v 3.18
+   Getopt::Long        v 2.34
+   HTTP::Headers       v 1.47
+   HTTP::Request       v 1.34
+   HTTP::Status        v 1.28
+   IO::File            v 1.10
+   LWP::Parallel       v 2.57
+   LWP::UserAgent      v 2.023
+   Params::Validate    v 0.74
+   Scalar::Util        v 1.11
+   Time::HiRes         v 1.51
+   Time::localtime     v 1.02
+   XML::Simple         v 2.09
+   XML::Writer         v 0.600
+   XML::Tidy           v 1.2.54HJnFa
+
+Note:  The module versions mentioned above are the versions that this library
+was developed and tested with.  It is assumed that all later versions of
+these same modules will also work, but please reference each module's specific
+documentation for it's functional API preservation, or lack thereof.
+
+
+
+
+
+CREDITS
+
+  Original authors/contributors in alphabetical order:
+
+    Robert Bradley
+    Mike Evans
+    Milenko Milanovic
+    Jeff Nokes
+
+    perl@ebay.com
+
+
+
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 1995-2006 eBay Inc. All Rights Reserved.
+
+This library is licensed under the terms of the Common Development and
+Distribution License ("CDDL").  The full text of this license is available
+with this module distribution in the file named:
+
+COMMON_DEVELOPMENT_AND_DISTRIBUTION_LICENSE.html
+

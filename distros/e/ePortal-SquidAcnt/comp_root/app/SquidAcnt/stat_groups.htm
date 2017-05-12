@@ -1,0 +1,55 @@
+%#============================================================================
+%# ePortal - WEB Based daily organizer
+%# Author - S.Rusakov <rusakov_sa@users.sourceforge.net>
+%#
+%# Copyright (c) 2000-2003 Sergey Rusakov.  All rights reserved.
+%# This program is free software; you can redistribute it
+%# and/or modify it under the same terms as Perl itself.
+%#
+%#----------------------------------------------------------------------------
+<& stat_selector.mc &>
+<%perl>  
+  my $app = $ePortal->Application('SquidAcnt');
+  throw ePortal::Exception::ACL( -operation => 'read', -object => $app)
+    unless $app->xacl_check_read;
+
+
+  # ----------------------------------------------------------------------
+  # Information about groups
+  my $o = new ePortal::ThePersistent::Support(
+      DBISource => 'SquidAcnt',
+      SQL => "SELECT g.title as group_title,
+                      u.title as user_title,
+                      u.id as user_id,
+                      sum(bytes) as bytes
+        FROM SAtraf t
+        LEFT JOIN SAuser u on t.user_id=u.id
+        LEFT JOIN SAgroup g on u.group_id=g.id",
+      GroupBy => 'group_title, user_title, user_id',
+      Where => $session{_SquidAcnt_where},
+      Attributes => { title => {}, user_id => {}},
+      );
+
+</%perl>
+
+<&| /list.mc, id => 'L1', obj => $o, rows => 20, &>
+ <&| /list.mc:row &>
+    <& /list.mc:column_number &>
+    <& /list.mc:column_image &>
+    <& /list.mc:column, id => 'group_title', title => 'Group', order_by => 'group_title' &>
+    <& /list.mc:column, id => 'user_title', title => 'User', order_by => 'user_title',
+      url => href('stat_users.htm', user_id => $_->user_id) . '#' . $_->user_id &>
+    <&| /list.mc:column,  id => 'bytes', 
+                          title => 'Bytes', 
+                          order_by => 'bytes', 
+                          -width => '10%',
+                          -align => 'center' &>
+      <% $app->NiceFormat($_->bytes) %>
+    </&>
+ </&>
+</&>  
+
+%#=== @METAGS attr =========================================================
+<%attr>
+Title => {rus => "Статистика SquidAcnt по группам", eng => "SquidAcnt statistics by groups"}
+</%attr>

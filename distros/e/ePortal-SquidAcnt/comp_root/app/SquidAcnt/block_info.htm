@@ -1,0 +1,72 @@
+%#============================================================================
+%# ePortal - WEB Based daily organizer
+%# Author - S.Rusakov <rusakov_sa@users.sourceforge.net>
+%#
+%# Copyright (c) 2000-2003 Sergey Rusakov.  All rights reserved.
+%# This program is free software; you can redistribute it
+%# and/or modify it under the same terms as Perl itself.
+%#
+%#----------------------------------------------------------------------------
+<%perl>
+  my $app = $ePortal->Application('SquidAcnt');
+
+  # User object
+  my $user_id = $ARGS{user_id};
+  my $user_obj = $app->SAuser_extended;
+  $user_obj->restore_where(where => "u.id=?", bind => [$user_id]);
+  if ( ! $user_obj->restore_next ) {
+    #$m->comp('/message.mc', ErrorMessage => pick_lang(rus => "Пользователь не найден", eng => "User not found"));
+    #return;
+  }
+
+  # Blocking group
+  my $block_group = new ePortal::App::SquidAcnt::SAurl_group;
+  $block_group->restore($ARGS{block_group}) if $ARGS{block_group};
+
+</%perl>
+<h1><% pick_lang(rus => "Доступ запрещен", eng => "Access denied")%></h1>
+
+% if ($block_group->id) {
+  <& /message.mc, ErrorMessage => pick_lang(rus => "Сработала группа блокировок: ", 
+        eng => "Blocking group triggered: ") . $block_group->Title &>
+% }
+
+% if ($ARGS{internal}) {
+  <& /message.mc, ErrorMessage => pick_lang(rus => "Вам не разрешен доступ в Интернет", 
+        eng => "You are not valid user") &>
+% }
+
+% if ($ARGS{blocked} or $user_obj->Blocked) {
+  <& /message.mc, ErrorMessage => pick_lang(rus => "Пользователь заблокирован", 
+        eng => "User is blocked") &>
+
+  <h3><% pick_lang(rus => "Показания счетчиков", eng => "Counters statistics") %></h3>
+  <table width="90%" border="1">
+    <% CGI::Tr({},
+        CGI::th({}, [ 
+          '&nbsp;',
+          pick_lang(rus => "День", eng => "Day"),
+          pick_lang(rus => "Неделя", eng => "Week"),
+          pick_lang(rus => "Месяц", eng => "Month") ])) %>
+    <% CGI::Tr({},
+        CGI::td({}, pick_lang(rus => "Лимит", eng => "Limit")),
+        CGI::td({ -align => 'center'}, [
+          $app->NiceFormat($user_obj->daily_limit),
+          $app->NiceFormat($user_obj->weekly_limit),
+          $app->NiceFormat($user_obj->mon_limit) ])) %>
+    <% CGI::Tr({},
+        CGI::td({}, pick_lang(rus => "Фактический трафик", eng => "Traffic")),
+        CGI::td({ -align => 'center'}, [
+          $app->NiceFormat($user_obj->daily_traf),
+          $app->NiceFormat($user_obj->weekly_traf),
+          $app->NiceFormat($user_obj->mon_traf) ])) %>
+  </table>
+
+% }
+
+<& /inset.mc &>
+
+%#=== @METAGS attr =========================================================
+<%attr>
+Title => {rus => "Доступ запрещен", eng => "Access denied"}
+</%attr>

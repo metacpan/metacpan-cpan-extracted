@@ -1,0 +1,29 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         ePortal-MsgForum
+version:      4.2
+version_from: lib/ePortal/App/MsgForum.pm
+installdirs:  site
+requires:
+    Apache::Request:               0
+    CGI:                           2.81
+    Data::Dumper:                  0
+    Date::Calc:                    5
+    DBD::mysql:                    0
+    DBI:                           1.28
+    Digest::MD5:                   2.13
+    Error:                         0
+    HTML::Mason:                   1.16
+    Image::Size:                   2.99
+    List::Util:                    0
+    Mail::Sendmail:                0.78
+    MIME::Base64:                  0
+    Net::LDAP:                     0
+    Params::Validate:              0.24
+    Storable:                      0
+    Text::Wrap:                    0
+    Unicode::Map8:                 0
+    Unicode::String:               0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.21

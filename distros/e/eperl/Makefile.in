@@ -1,0 +1,383 @@
+##
+##  Makefile -- ePerl Makefile
+##  Copyright (c) 1996,1997 Ralf S. Engelschall, All Rights Reserved. 
+##
+@SET_MAKE@
+
+# ------------------------------------------------
+#   DEFINITIONS
+# ------------------------------------------------
+
+#   imported Perl 5 parameters
+perl_prog       = @perl_prog@
+perl_cc         = @perl_cc@
+perl_optimize   = @perl_optimize@
+perl_ccflags    = @perl_ccflags@
+perl_ldflags    = @perl_ldflags@
+perl_libs       = @perl_libs@
+perl_dla        = @perl_dla@
+perl_ccdlflags  = @perl_ccdlflags@
+perl_cccdlflags = @perl_cccdlflags@
+perl_archlib    = @perl_archlib@
+
+#   compiler tools
+CC       = $(perl_cc)
+CFLAGS   = @CFLAGS@ $(perl_optimize) $(perl_ccflags) -I$(perl_archlib)/CORE -I.
+DLCFLAGS = @CFLAGS@ $(perl_optimize) $(perl_cccdlflags) $(perl_ccflags) -I$(perl_archlib)/CORE -I.
+LDFLAGS  = @LDFLAGS@ $(perl_ccdlflags) $(perl_ldflags) -L$(perl_archlib)/CORE 
+LDLIBS   = $(perl_dla) -lperl $(perl_libs)
+AR       = @AR@
+RANLIB   = @RANLIB@
+SIZE     = @SIZE@
+debug    = @debug@
+dmalloc  = @dmalloc@
+
+#   installation tools
+INSTALL         = @INSTALL@
+INSTALL_PROGRAM = @INSTALL_PROGRAM@
+INSTALL_DATA    = @INSTALL_DATA@
+MKDIR           = ./etc/mkinstalldirs
+CP              = cp
+
+#   installation paths
+prefix          = @prefix@
+exec_prefix     = $(prefix)
+bindir          = $(prefix)/bin
+libsubdir       = @libsubdir@
+libdir          = $(prefix)/lib$(libsubdir)
+mandir          = $(prefix)/man/man1
+
+
+# ------------------------------------------------
+#   THE RELEASE STUFF (MACROS)
+# ------------------------------------------------
+
+_GETDISTINFO = \
+    _version=`./etc/newvers -lc -d eperl_version.c`; \
+    _date=`date '+%y%m%d_%H%M'`
+
+_BUILDDIST = \
+    echo "Creating tarball..."; \
+    gtar --no-recursion -cvf - `find * -depth -print | sort` |\
+    tardy --user_number=1000  --user_name=rse \
+          --group_number=1000 --group_name=en \
+          --prefix=$${_distname} - |\
+    gzip >$${_tarball}; \
+    echo "Done"; \
+    ls -l $${_tarball}
+
+_NEWVERS = \
+	./etc/newvers -lc -p ePerl $$OPT eperl_version.c; \
+	V=`./etc/newvers -lc -D eperl_version.c`;\
+	sed -e "s/Version .*(.*)/Version $$V/g" <README >README.n && mv README.n README; \
+	V=`./etc/newvers -lc -d eperl_version.c`;\
+	sed -e "s/@v=(\"[0-9.]*\"/@v=(\"$$V\"/g" <mod/Parse/ePerl.pm >mod/Parse/ePerl.pm.n && mv mod/Parse/ePerl.pm.n mod/Parse/ePerl.pm; \
+	sed -e "s/@v=(\"[0-9.]*\"/@v=(\"$$V\"/g" <mod/Apache/ePerl.pm >mod/Apache/ePerl.pm.n && mv mod/Apache/ePerl.pm.n mod/Apache/ePerl.pm
+
+_UPDATEVERS = \
+	V=`./etc/newvers -lc -d eperl_version.c`;\
+	./etc/newvers -lc -p ePerl -r $$V eperl_version.c; \
+	V=`./etc/newvers -lc -D eperl_version.c`;\
+	sed -e "s/Version .*(.*)/Version $$V/g" <README >README.n && mv README.n README; \
+	V=`./etc/newvers -lc -d eperl_version.c`;\
+	sed -e "s/@v=(\"[0-9.]*\"/@v=(\"$$V\"/g" <mod/Parse/ePerl.pm >mod/Parse/ePerl.pm.n && mv mod/Parse/ePerl.pm.n mod/Parse/ePerl.pm; \
+	sed -e "s/@v=(\"[0-9.]*\"/@v=(\"$$V\"/g" <mod/Apache/ePerl.pm >mod/Apache/ePerl.pm.n && mv mod/Apache/ePerl.pm.n mod/Apache/ePerl.pm
+
+
+# ------------------------------------------------
+#   THE DEFAULT TARGET
+# ------------------------------------------------
+
+all: config eperl eperl.1
+
+
+# ------------------------------------------------
+#   THE CONFIGURATION SUPPORT
+# ------------------------------------------------
+
+config: configure config_ac.h.in
+
+configure: configure.in aclocal.m4 acconfig.h
+	rm -f configure
+	autoconf configure.in >configure
+	chmod 770 configure
+
+config_ac.h.in: configure.in acconfig.h
+	rm -f config_ac.h.in
+	autoheader configure.in >config_ac.h.in
+
+
+# ------------------------------------------------
+#   THE RELEASE STUFF (TARGETS)
+# ------------------------------------------------
+
+release: distclean fixperm
+	@$(_GETDISTINFO); \
+	_distname="eperl-$${_version}"; \
+	_tarball="/tmp/$${_distname}.tar.gz"; \
+	echo "Release Distribution: ePerl Version $$_version"; \
+	$(_BUILDDIST); \
+	mv /tmp/$${_distname}.tar.gz $${_distname}.tar.gz
+
+snap: distclean fixperm
+	@$(_GETDISTINFO); \
+	_distname="eperl-$${_version}-SNAP-$${_date}"; \
+	_tarball="/tmp/$${_distname}.tar.gz"; \
+	echo "Snap of whole source tree: ePerl Version $$_version as of $${_date}"; \
+	$(_BUILDDIST); \
+	mv /tmp/$${_distname}.tar.gz $${_distname}.tar.gz
+
+new-version:
+	OPT=-iv; $(_NEWVERS)
+
+new-revision:
+	OPT=-ir; $(_NEWVERS)
+
+new-patchlevel:
+	OPT=-iP; $(_NEWVERS)
+
+new-betalevel:
+	OPT=-ib; $(_NEWVERS)
+
+new-alphalevel:
+	OPT=-ia; $(_NEWVERS)
+
+new-snaplevel:
+	OPT=-is; $(_NEWVERS)
+
+new-release:
+	OPT=-r$(R); $(_NEWVERS)
+
+update-version:
+	$(_UPDATEVERS)
+
+
+# ------------------------------------------------
+#   THE PROGRAM
+# ------------------------------------------------
+
+PROTO_SRCS = \
+ eperl_main.c \
+ eperl_perl5.c \
+ eperl_parse.c \
+ eperl_pp.c \
+ eperl_sys.c \
+ eperl_http.c \
+ eperl_debug.c \
+ eperl_config.c \
+ eperl_version.c \
+ eperl_readme.c \
+ eperl_license.c \
+ eperl_logo.c \
+ eperl_powered.c
+
+SRCS = \
+ eperl_main.c \
+ eperl_perl5.c \
+ eperl_parse.c \
+ eperl_pp.o \
+ eperl_sys.c \
+ eperl_http.c \
+ eperl_getopt.c \
+ eperl_debug.c \
+ eperl_config.c \
+ eperl_version.c \
+ eperl_readme.c \
+ eperl_license.c \
+ eperl_logo.c \
+ eperl_powered.c
+
+OBJS = \
+ eperl_main.o \
+ eperl_perl5.o \
+ eperl_parse.o \
+ eperl_pp.o \
+ eperl_sys.o \
+ eperl_http.o \
+ eperl_getopt.o \
+ eperl_debug.o \
+ eperl_config.o \
+ eperl_version.o \
+ eperl_readme.o \
+ eperl_license.o \
+ eperl_logo.o \
+ eperl_powered.o
+
+eperl: $(OBJS)
+	$(CC) $(LDFLAGS) -o eperl $(OBJS) $(LDLIBS) $(dmalloc)
+	@if [ "x$(debug)" = xoff ]; then \
+		strip eperl; \
+	fi
+	@ls -l eperl; @SIZE@ eperl
+
+eperl_main.o: eperl_main.c
+	$(CC) $(CFLAGS) -c eperl_main.c
+
+eperl_perl5.o: eperl_perl5.c eperl_perl5_sm.h
+	$(CC) $(CFLAGS) -c eperl_perl5.c
+
+eperl_perl5_sm.h: eperl_perl5_sm.pl
+	$(perl_prog) eperl_perl5_sm.pl >eperl_perl5_sm.h
+
+eperl_getopt.o: eperl_getopt.c
+	$(CC) $(CFLAGS) -c eperl_getopt.c
+
+eperl_parse.o: eperl_parse.c
+	$(CC) $(CFLAGS) -c eperl_parse.c
+
+eperl_pp.o: eperl_pp.c
+	$(CC) $(CFLAGS) -c eperl_pp.c
+
+eperl_sys.o: eperl_sys.c
+	$(CC) $(CFLAGS) -c eperl_sys.c
+
+eperl_debug.o: eperl_debug.c
+	$(CC) $(CFLAGS) -c eperl_debug.c
+
+eperl_config.o: eperl_config.c
+	$(CC) $(CFLAGS) -c eperl_config.c
+
+eperl_http.o: eperl_http.c
+	$(CC) $(CFLAGS) -c eperl_http.c
+
+eperl_version.o: eperl_version.c
+	$(CC) $(CFLAGS) -c eperl_version.c
+
+eperl_readme.c: README
+	./etc/asc2c README  eperl_readme  ePerl_README
+
+eperl_readme.o: eperl_readme.c
+	$(CC) $(CFLAGS) -c eperl_readme.c
+
+eperl_license.c: ARTISTIC COPYING
+	(\
+	 echo "--File: COPYING-------------------------------------"; \
+	 cat COPYING; \
+	 echo "--File: ARTISTIC------------------------------------"; \
+	 cat ARTISTIC; \
+	) >LICENSE
+	./etc/asc2c LICENSE eperl_license ePerl_LICENSE
+	rm -f LICENSE
+
+eperl_license.o: eperl_license.c
+	$(CC) $(CFLAGS) -c eperl_license.c
+
+eperl_logo.c: eperl_logo.gif
+	./etc/bin2c eperl_logo.gif eperl_logo ePerl_LOGO
+
+eperl_logo.o: eperl_logo.c
+	$(CC) $(CFLAGS) -c eperl_logo.c
+
+eperl_powered.c: eperl_powered.gif
+	./etc/bin2c eperl_powered.gif eperl_powered ePerl_POWERED
+
+eperl_powered.o: eperl_powered.c
+	$(CC) $(CFLAGS) -c eperl_powered.c
+
+
+mkproto:
+	./etc/mkproto eperl_proto.h $(PROTO_SRCS)
+
+fixperm:
+	./etc/fixperm *
+
+
+# ------------------------------------------------
+#   THE DOCUMENTATION
+# ------------------------------------------------
+
+eperl.1: eperl.pod eperl_version.c
+	V=`./etc/newvers -l c -D eperl_version.c`; \
+	sed -e "s|\@V\@|$$V|g" -e "s|\@prefix\@|$(prefix)|" <eperl.pod >/tmp/eperl.pod; \
+	pod2man --section=1 \
+	        --center="Ralf S. Engelschall" \
+			--release="EN" \
+			/tmp/eperl.pod >eperl.1 && \
+	rm -f /tmp/eperl.pod
+
+
+# ------------------------------------------------
+#   THE SHARED LIBRARY
+# ------------------------------------------------
+
+SOBJS = \
+ eperl_parse.so \
+ eperl_pp.so \
+ eperl_http.so \
+ eperl_version.so 
+
+libeperl.a: $(SOBJS)
+	$(AR) r libeperl.a $(SOBJS)
+	$(RANLIB) libeperl.a
+
+eperl_parse.so: eperl_parse.c
+	$(CC) $(DLCFLAGS) -o eperl_parse.o -c eperl_parse.c && mv eperl_parse.o eperl_parse.so
+
+eperl_pp.so: eperl_pp.c
+	$(CC) $(DLCFLAGS) -o eperl_pp.o -c eperl_pp.c && mv eperl_pp.o eperl_pp.so
+
+eperl_http.so: eperl_http.c
+	$(CC) $(DLCFLAGS) -o eperl_http.o -c eperl_http.c && mv eperl_http.o eperl_http.so
+
+eperl_version.so: eperl_version.c
+	$(CC) $(DLCFLAGS) -o eperl_version.o -c eperl_version.c && mv eperl_version.o eperl_version.so
+
+
+# ------------------------------------------------
+#   TEST SUITE
+# ------------------------------------------------
+
+test:
+	@cd t; make test
+
+
+# ------------------------------------------------
+#   INSTALLATION
+# ------------------------------------------------
+
+install: all
+	$(MKDIR) $(bindir)
+	$(MKDIR) $(mandir)
+	$(MKDIR) $(libdir)
+	$(INSTALL_PROGRAM) eperl $(bindir)/eperl
+	$(INSTALL_DATA) eperl.1 $(mandir)/eperl.1
+	$(MKDIR) $(libdir)
+	$(CP) -r eg/* $(libdir)/
+
+
+# ------------------------------------------------
+#   CLEANUP
+# ------------------------------------------------
+
+clean:
+	-rm -f $(OBJS)
+	-rm -f eperl
+	-rm -f $(SOBJS)
+	-rm -f libeperl.a
+	-rm -f core *.core
+
+realclean:
+	-rm -f $(OBJS)
+	-rm -f eperl
+	-rm -f $(SOBJS)
+	-rm -f libeperl.a
+	-rm -f core *.core
+	-rm -f eperl_perl5_sm.h
+	-rm -f eperl.1
+	-rm -f eperl_readme.[ch]
+	-rm -f eperl_license.[ch]
+
+distclean:
+	-rm -f $(OBJS)
+	-rm -f eperl
+	-rm -f $(SOBJS)
+	-rm -f libeperl.a
+	-rm -f core *.core
+	-rm -f eperl_perl5_sm.h
+	-rm -f config_ac.h config_sc.h
+	-rm -f config.status config.cache config.log
+	-rm -f Makefile
+	-rm -f t/Makefile
+
+
+##EOF##

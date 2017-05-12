@@ -1,0 +1,10 @@
+
+  Here you can find some of the demo files from the
+  ePerl webpages. They demonstrate typical situations
+  for which ePerl can be used.
+
+  The ones with extension .phtml can be used for testing with
+  the stand-alone NPH/CGI program nph-eperl.
+  The ones with extension .iphtml can be used for testing with
+  the internal Apache/mod_perl handler Apache::ePerl.
+

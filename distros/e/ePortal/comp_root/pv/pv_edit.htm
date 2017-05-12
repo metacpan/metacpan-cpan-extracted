@@ -1,0 +1,84 @@
+%#============================================================================
+%# ePortal - WEB Based daily organizer
+%# Author - S.Rusakov <rusakov_sa@users.sourceforge.net>
+%#
+%# Copyright (c) 2000-2004 Sergey Rusakov.  All rights reserved.
+%# This program is open source software
+%#
+%#
+%#----------------------------------------------------------------------------
+&nbsp;
+<&| /dialog.mc:edit_dialog,
+      obj => $obj, 
+      title => pick_lang(rus => "Домашняя страница", eng =>"Home page"), 
+      width => 400 &>
+<& /dialog.mc:field, id => 'title' &>
+<& /dialog.mc:field, id => 'columnswidth' &>
+
+% if ($ePortal->isAdmin) {
+% if ($obj->pvtype eq 'default') {
+  <& /dialog.mc:read_only, id => 'pvtype' &>
+% } else {
+  <& /dialog.mc:field, id => 'pvtype' &>
+% }
+
+
+<&| /dialog.mc:cell &>&nbsp;</&>
+<&| /dialog.mc:collapse, collapse => 0, title => pick_lang(rus => "Права доступа", eng => "Access rights") &>
+  <& /dialog.mc:field, id => 'xacl_read' &>
+  <&| /dialog.mc:cell, -class => 'memo' &>
+   <% pick_lang(rus => "Права доступа действительны только для 'Общих' домашних страниц", 
+        eng => "Access rights are valid only for 'Template' home pages") %>
+  </&>
+</&>
+% }
+
+<&| /dialog.mc:cell &>&nbsp;</&>
+<& /dialog.mc:buttons &>
+
+</&>
+<p>
+
+
+%#=== @METAGS attr =========================================================
+<%attr>
+Title => {rus => "Создание домашней страницы", eng => "Personal home page"}
+</%attr>
+
+
+%#=== @METAGS onStartRequest ====================================================
+<%method onStartRequest><%perl>
+  $obj = new ePortal::PageView;
+
+  $m->comp('/dialog.mc:handle_request', obj => $obj, 
+    callback_aftersave => sub {
+      my $obj = shift;
+      my $args = shift;
+
+      # Crear pvtype='default' for non-current PageView's
+      if ( $m->comp('/dialog.mc:isButtonPressed', button => 'ok') and 
+            $ePortal->isAdmin and
+            $obj->check_id and 
+            $obj->pvtype eq 'default') {
+        logline('warn', 'Default home page changed');
+        $obj->dbh->do("
+          UPDATE PageView SET 
+                        pvtype='user', 
+                        uid=? 
+                    WHERE pvtype='default' AND id!=?", 
+          undef, $ePortal->username, $obj->id);
+      }
+    });
+</%perl></%method>
+
+
+%#=== @metags once =========================================================
+<%once>
+my ($obj);
+</%once>
+
+%#=== @metags cleanup =========================================================
+<%cleanup>
+($obj) = ();
+</%cleanup>
+

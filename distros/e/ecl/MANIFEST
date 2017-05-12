@@ -1,0 +1,17 @@
+Changes
+ecl.xs
+Makefile.PL
+MANIFEST
+try.p	
+README
+TODO
+t/Language-Lisp-ECLs.t
+t/clisp-tests.t
+t/tests/tests.lisp
+t/tests/lists151.tst
+t/tests/list-set.tst
+t/tests/symbols.tst
+t/tests/README
+lib/ecl.pm
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

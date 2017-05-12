@@ -1,0 +1,48 @@
+%#============================================================================
+%# ePortal - WEB Based daily organizer
+%# Author - S.Rusakov <rusakov_sa@users.sourceforge.net>
+%#
+%# Copyright (c) 2000-2003 Sergey Rusakov.  All rights reserved.
+%# This program is free software; you can redistribute it
+%# and/or modify it under the same terms as Perl itself.
+%#
+%#
+%#----------------------------------------------------------------------------
+<%perl>  
+  my $app = $ePortal->Application('SquidAcnt');
+  throw ePortal::Exception::ACL( -operation => 'read', -object => $app)
+    unless $app->xacl_check_read;
+</%perl>
+
+<p>
+<table width="90%" border="0">
+
+<tr>
+  <td>
+    <& /item_caption.mc, title => pick_lang(rus => "Статистика", eng => "Staistics") &>
+    <ul>
+    <li><a href="stat_domains.htm"><%
+        pick_lang(rus => "По доменам Интернета", eng => "Top domains") %></a>
+    <li><a href="stat_users.htm"><%
+        pick_lang(rus => "По пользователям", eng => "Top users") %></a>
+    <li><a href="stat_groups.htm"><%
+        pick_lang(rus => "По группам", eng => "Top groups of users") %></a>
+
+    </ul>
+  </td>
+
+  <td>
+    <& /item_caption.mc, title => pick_lang(rus => "Настройка", eng => "Setup") &>
+    <ul>
+    <li><a href="user_list.htm"><%
+        pick_lang(rus => "Список пользователей", eng => "List of users") %></a>
+    <li><a href="group_list.htm"><%
+        pick_lang(rus => "Список групп пользователей", eng => "List of groups of users") %></a>
+    <li><a href="url_group_list.htm"><%
+        pick_lang(rus => "Список групп блокировок", eng => "List blocking groups") %></a>
+    </ul>
+  </td>
+</tr>
+
+</table>
+

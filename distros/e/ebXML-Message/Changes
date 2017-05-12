@@ -1,0 +1,11 @@
+Revision history for Perl extension ebXML::Message.
+
+0.01  Thu Nov 20 09:35:46 2003
+	- original version; created by h2xs 1.23 with options
+		-X ebXML::Message
+0.02  ** dunno **
+
+0.03  Fri Nov 28 12:31:20 2003
+	- merged SV and AJT code
+	- added new modules (DOMWriter, SOAPWriter
+	- lots of new features and code and documentation

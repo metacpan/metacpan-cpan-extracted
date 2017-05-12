@@ -1,0 +1,60 @@
+# $Id: extproc_perl.conf.in,v 1.12 2006/04/06 00:22:02 jeff Exp $
+
+# extproc_perl configuration
+
+# format: [db:]key value
+# directives apply to all database instances in this ORACLE_HOME
+# db is an optional database name for database-specific directives
+# database-specific directives MUST follow global ones if they co-exist
+# database name is case insensitive
+# comment out all empty settings with a hash (#)
+#
+# GLOBAL & DATABASE CONFIGURATION EXAMPLE:
+# bootstrap_file /tmp/boot.pl
+# db1:bootstrap_file /tmp/db1-boot.pl
+
+# path to bootstrap file
+bootstrap_file -BOOTSTRAP-
+
+# name of the code table, including schema if it is not a public synonym
+code_table -CODETABLE-
+
+# additions to perl's include path (@INC) -- colon separated
+#inc_path 
+
+# path to debug output directory
+debug_directory /tmp
+
+# use taint checking -- this applies globally to all subroutines
+# HIGHLY RECOMMENDED!
+enable_tainting yes
+
+# use per-session namespaces
+enable_session_namespace yes
+
+# allow fully-qualified subroutine names in Perl.func & Perl.proc
+# this lets you run any subroutine in any imported package, regardless of
+# its existence as in the code table or bootstrap file.  Very useful for
+# development.  Not recommended for production.
+enable_package_subs no
+
+# path to trusted directory that contains imported code files
+trusted_code_directory -TRUSTEDDIR-
+
+# format for DDL to create directly executed procedures
+# standard: outputs a CREATE statement you can run directly from sqlplus
+# package: outputs DDL for a package body
+ddl_format standard
+
+# maximum code size per subroutine in bytes
+# must be less than or equal to max size of CLOB (4 GB)
+# allocated once per interpreter
+max_code_size 32768
+
+# maximum arguments to a subroutine (<=  system max, which is usually 128)
+# there is currently no benefit to tuning this
+max_sub_args 32
+
+# check code table for changes at each subroutine invocation and reparse
+# any changed subroutines.  adds a bit of overhead, but good for development.
+reparse_subs yes

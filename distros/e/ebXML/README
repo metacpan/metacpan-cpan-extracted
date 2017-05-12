@@ -1,0 +1,94 @@
+EbXML version 0.02
+==================
+
+This module provides some basic ebXML Messaging functionality
+using ebXML::Message objects and XML::Xerces XML parser.
+
+About ebXML Messaging
+---------------------
+
+Header Processing.
+The creation of the ebXML Header elements for the ebXML Message uses input from the application, passed through the Message Service Interface, information from the Collaboration Protocol Agreement governing the message, and generated information such as digital signature, timestamps and unique identifiers.
+
+Header Parsing.
+Extracting or transforming information from a received ebXML Header element into a form suitable for processing by the MSH implementation. 
+
+Security Services.
+Digital signature creation and verification, encryption, authentication and authorization. These services MAY be used by other components of the MSH including the Header Processing and Header Parsing components. 
+
+Reliable Messaging Services.
+Handles the delivery and acknowledgment of ebXML Messages. The service includes handling for persistence, retry, error notification and acknowledgment of messages requiring reliable delivery. 
+
+Message Packaging.
+The final enveloping of an ebXML Message (ebXML header elements and payload) into its SOAP Messages with Attachments container.
+Error Handling.
+This component handles the reporting of errors encountered during MSH or Application processing of a message. 
+
+Message Service Interface.
+An abstract service interface applications use to interact with the MSH to send and receive messages and which the MSH uses to interface with applications handling received messages (Delivery Module).
+
+NOTE: Implementations MUST support non-multipart messages, which may occur when there are no ebXML payloads. An ebXML message with no payload may be sent either as a plain SOAP message or as a [SOAPAttach] multipart message with only one body part.
+
+NOTE: The mandatory SOAPAction HTTP header field must also be included in the HTTP header and MAY have a value 
+of "ebXML" SOAPAction: "ebXML"
+
+Example ebXML Header
+--------------------
+
+<SOAP:Envelope xmlns:SOAP="http://schemas.xmlsoap.org/soap/envelope/" 
+               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+               xsi:schemaLocation="http://schemas.xmlsoap.org/soap/envelope/ 
+                                   http://www.oasis-open.org/committees/ebxml-msg/schema/envelope.xsd">
+  <SOAP:Header xmlns:eb="http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd" 
+               xsi:schemaLocation="http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd 
+                                   http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd">
+     <eb:MessageHeader ...>
+     </eb:MessageHeader> 
+  </SOAP:Header> 
+  <SOAP:Body xmlns:eb="http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd" 
+             xsi:schemaLocation="http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd 
+                                 http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd"> 
+     <eb:Manifest eb:version="2.0"> ... </eb:Manifest> 
+  </SOAP:Body>
+</SOAP:Envelope>
+
+
+
+
+The README is used to introduce the module and provide instructions on
+how to install the module, any machine dependencies it may have (for
+example C compilers and installed libraries) and any other information
+that should be provided before the module is installed.
+
+A README file is required for CPAN modules since CPAN extracts the
+README file from a module distribution so that people browsing the
+archive can use it get an idea of the modules uses. It is usually a
+good idea to provide version information here so that people can
+decide whether fixes for the module are worth downloading.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  blah blah blah
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2003 by aaron trevena
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+

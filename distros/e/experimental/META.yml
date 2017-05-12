@@ -1,0 +1,37 @@
+---
+abstract: 'Experimental features made easy'
+author:
+  - 'Leon Timmermans <leont@cpan.org>'
+build_requires:
+  Test::More: '0.89'
+configure_requires:
+  Module::Build::Tiny: '0.019'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.025, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: experimental
+provides:
+  experimental:
+    file: lib/experimental.pm
+    version: '0.016'
+requires:
+  Carp: '0'
+  feature: '0'
+  perl: '5.010'
+  strict: '0'
+  version: '0'
+  warnings: '0'
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=experimental
+  repository: git://github.com/Leont/experimental.git
+version: '0.016'
+x_contributors:
+  - 'Father Chrysostomos <sprout@cpan.org>'
+  - 'Grant McLean <grant@catalyst.net.nz>'
+  - 'gregor herrmann <gregoa@debian.org>'
+  - 'Karen Etheridge <ether@cpan.org>'
+  - 'Leon Timmermans <fawaka@gmail.com>'
+  - 'Ricardo Signes <rjbs@cpan.org>'

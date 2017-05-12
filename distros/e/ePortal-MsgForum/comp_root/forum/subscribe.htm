@@ -1,0 +1,160 @@
+%#============================================================================
+%# ePortal - WEB Based daily organizer
+%# Author - S.Rusakov <rusakov_sa@users.sourceforge.net>
+%#
+%# Copyright (c) 2000-2003 Sergey Rusakov.  All rights reserved.
+%# This program is free software; you can redistribute it
+%# and/or modify it under the same terms as Perl itself.
+%#
+%#
+%#----------------------------------------------------------------------------
+<& /message.mc &>
+
+<blockquote><span class="memo">
+<% pick_lang(
+  rus => "Подписка на форум даст Вам возможность получать
+    по электронной почте уведомления о новых сообщениях на форуме",
+  eng => "Subscribe to receive by e-mail a notification about
+    new messages on the forum")
+%>
+</span></blockquote>
+
+% if (! $ePortal->username) {
+  <& SELF:not_registered &>
+% } else {
+  <& SELF:currently_subscribed &>
+  <p>
+  <& SELF:subscribe, forum_id => $ARGS{forum_id} &>
+% }
+
+<center>
+<% plink( pick_lang(
+    rus => "Вернуться к списку форумов",
+    eng => "Back to forums"),
+  href => "index.htm") %>
+</center>
+
+
+
+%#=== @metags onStartRequest ====================================================
+<%method onStartRequest><%perl>
+  $app = $ePortal->Application('MsgForum');
+
+  if ( $ePortal->username and $ARGS{subscribe_id} ) {
+    my $f = new ePortal::App::MsgForum::MsgForum;
+    if ( $f->restore($ARGS{subscribe_id}) ) {
+      $app->Subscribe($ePortal->username, $f->id );
+      $session{GoodMessage} = pick_lang(
+          rus => "Вы подписаны на форум: ".$f->Title,
+          eng => "You are subscribed to forum: ".$f->Title);
+    }
+  }
+
+  if ( $ePortal->username and $ARGS{unsubscribe_id} ) {
+    my $f = new ePortal::App::MsgForum::MsgForum;
+    if ( $f->restore($ARGS{unsubscribe_id}) ) {
+      $app->Unsubscribe($ePortal->username, $f->id );
+      $session{GoodMessage} = pick_lang(
+          rus => "Вы отписаны от форума: ".$f->Title,
+          eng => "You are unsubscribed from forum: ".$f->Title);
+    }
+  }
+</%perl></%method>
+
+
+
+%#=== @METAGS attr =========================================================
+<%attr>
+Title => {rus => "Подписка на форум", eng => "Subscribe to forum"}
+</%attr>
+
+
+%#=== @metags once =========================================================
+<%once>
+my ($app);
+</%once>
+
+
+
+%#=== @metags cleanup =========================================================
+<%cleanup>
+($app) = ();
+</%cleanup>
+
+
+%#=== @METAGS not_registered ====================================================
+<%method not_registered>
+   <& /message.mc, ErrorMessage => pick_lang(
+      rus => "Для оформления подписки необходимо зарегистрироваться ...",
+      eng => "Subscription is available only for registered users") &>
+</%method>
+
+
+
+%#=== @METAGS currently_subscribed ====================================================
+<%method currently_subscribed>
+<table width="80%" border="0" align="center">
+  <tr class="g1">
+  <td colspan="2" align="center">
+    <b><% pick_lang(
+          rus => 'Текущее состояние подписки',
+          eng => 'Currently subscribed') %>:</b>
+  </td>
+  </tr>
+
+<%perl>
+  my $st = $app->ForumsSubscribed($ePortal->username);
+  $st->restore_where();
+</%perl>
+% if (! $st->restore_next) {
+    <tr><td align="center">
+      <font color="red">
+      <% pick_lang(rus => "Ничего не подписано", eng => "No subscription") %>
+      </font>
+    </td>
+    </tr>
+% }
+% while( $st->forum_id ) {
+    <tr>
+      <td align="center"><font color="green"><% $st->Title |h %></font>
+      &middot;&nbsp;&middot;&nbsp;&middot;&nbsp;
+      <% plink( pick_lang(rus => "Отписаться", eng => "Unsubscribe"),
+          -href => href('subscribe.htm', unsubscribe_id=> $st->forum_id)) %>
+    </tr>
+% last if ! $st->restore_next; }
+</table>
+</%method>
+
+
+
+%#=== @metags subscribe ====================================================
+<%method subscribe><%perl>
+  my $forum_id = $ARGS{forum_id};
+  my $forum = new ePortal::App::MsgForum::MsgForum;
+  my ($forums_id, $forums_title) = $forum->restore_all_hash('id', 'title');
+</%perl>
+
+<form method="GET">
+<table width="80%" border=0 align="center">
+  <tr class="g1"><td align="center">
+    <b><% pick_lang(
+          rus => 'Подписка на форум',
+          eng => 'Subscribe to forum') %>:</b>
+  </td></tr>
+
+  <tr><td align="center">
+    <% CGI::popup_menu({ -name => 'subscribe_id',
+        -values => $forums_id,
+        -labels => $forums_title,
+        -default => $forum_id,
+        -class => 'gldfield'
+        }) %>
+    <% CGI::submit(
+        -name => 'subscribe',
+        -class => 'dlgbutton',
+        -value => pick_lang(rus => "Подписаться", eng => "Subscribe")) %>
+  </td></tr>
+
+  </table>
+  </form>
+</%method>

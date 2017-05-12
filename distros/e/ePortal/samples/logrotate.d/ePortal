@@ -1,0 +1,10 @@
+# put it in /etc/logrotate.d
+
+/var/log/ePortal.log {
+	daily
+	rotate 3
+	compress
+	missingok
+	create 664 httpd httpd
+}	
+

@@ -1,0 +1,58 @@
+ex::lib::zip version 0.04
+=========================
+
+An extension to let you C<use> things direct from zip files direct.
+No temporary files.  No subprocesses.
+
+For example
+
+  use ex::lib::zip 'library.zip'; # A zip file that contains a file Foo.pm
+  use Foo; # And perl will get Foo.pm from library.zip.
+
+
+Yes, you can use the <DATA> filehandle from modules inside the zip. Your
+data will be uncompressed.
+
+Yes, you can use SelfLoader inside the zip.
+
+Yes, you can use AutoLoader inside the zip, provided you zip up the auto/...
+tree
+
+Yes, you can even put the zip file in your script, to package your modules
+with your script in one file. Like this
+
+  BEGIN {
+    eval "use ex::lib::zip q($0)";
+  }
+  use Foo;
+  __END__
+  ... your zip containing Foo.pm (etc) goes here.
+
+(although, of course, your target perl will need this module installed already)
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  PerlIO::gzip
+  PerlIO::subfile
+  perl 5.7.1
+
+You can rebuild the test zips with the perl script make-zips.pl
+
+COPYRIGHT AND LICENCE
+
+You may distribute this work under the terms of either the GNU General
+Public License or the Artistic License, as specified in perl's README
+file.
+
+Copyright © 2001,2003 Nicholas Clark

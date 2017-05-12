@@ -1,0 +1,12 @@
+Cantonese.pm
+Changes
+Makefile.PL
+MANIFEST
+README
+Cantonese.dict
+Cantonese.txt
+zhy_list
+update_dict.pl
+t/1.t
+t/2.t
+META.yml                                 Module meta-data (added by MakeMaker)

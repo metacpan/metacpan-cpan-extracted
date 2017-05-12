@@ -1,0 +1,77 @@
+#!/bin/sh
+##
+##  PORTING.test -- check if current platform passes the the test suite
+## 
+
+echon () {
+	echo "$*" | awk '{ printf("%s", $0); }'
+}
+
+TMPFILE=/tmp/eperl.$$.tmp
+rm -f $TMPFILE
+touch $TMPFILE
+c=0
+for dir in `echo $PATH | sed -e 's/:/ /g'` /tmp; do
+    for perl in perl5 perl miniperl; do
+         if test -f "$dir/$perl"; then
+             if test -x "$dir/$perl"; then
+                 perl="$dir/$perl"
+                 version=`$perl -v | grep version | sed -e 's/.* version //' -e 's/ built.*//' -e 's/ with.*//'`
+                 versionnum="`echo $version | sed -e 's/\.//g' -e 's/_//g'`"
+                 versionnum=`expr $versionnum - $c`
+                 echo "$versionnum $version $perl" >>$TMPFILE
+             fi
+         fi
+    done
+    c=`expr $c + 1`
+done
+perlvers="`cat $TMPFILE | sort -u | tail -1 | cut '-d ' -f2`"
+perlprog="`cat $TMPFILE | sort -u | tail -1 | cut '-d ' -f3`"
+rm -f $TMPFILE
+echon "Perl Interpreter (v$perlvers) [$perlprog]: "
+read rc
+case $rc in
+    "" ) perl=$perlprog ;;
+    *  ) perl=$rc       ;;
+esac
+
+ccprog="`$perlprog -e 'use Config; print $Config{cc}'`";
+case $ccprog in
+   *gcc* ) ccvers=`gcc -v 2>&1 | grep "version" | awk '{ print $3; }'` ;;
+   *     ) ccvers="??" ;;
+esac
+echon "ANSI C Compiler (v$ccvers) [$ccprog]: "
+read rc
+case $rc in
+    "" ) cc=$ccprog ;;
+    *  ) cc=$rc     ;;
+esac
+
+echo ""
+echo "PART 1: PORTING-TEST OF STAND-ALONE SYSTEM"
+echo ""
+
+echo "$ CC=$cc ./configure --with-perl=$perl"
+CC=$cc ./configure --with-perl=$perl
+echo "$ make"
+make 
+echo "$ make test"
+make test
+echo "$ make distclean"
+make distclean
+
+echo ""
+echo "PART 2: PORTING-TEST OF PERL 5 INTEGRATED MODULE SYSTEM"
+echo ""
+
+echo "$ $perl Makefile.PL CC=$cc"
+$perl Makefile.PL CC=$cc
+echo "$ make"
+make 
+echo "$ make test"
+make test
+echo "$ make distclean"
+make distclean
+
+
+##EOF##

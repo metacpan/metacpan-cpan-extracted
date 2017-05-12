@@ -1,0 +1,203 @@
+--- #YAML:1.0
+name: ePortal
+version: 4.5
+author:
+  - |-
+    Sergey Rusakov, E<lt>rusakov_sa@users.sourceforge.netE<gt>
+abstract: The core module of ePortal project.
+license: open_source
+requires:
+  Apache::Request: 0
+  CGI: 0
+  DBD::mysql: 0
+  DBI: 1.28
+  Data::Dumper: 0
+  Date::Calc: 5
+  Digest::MD5: 2.13
+  Error: 0
+  HTML::Mason: 1.22
+  Image::Size: 2.99
+  List::Util: 0
+  MIME::Base64: 0
+  Mail::Sendmail: 0.78
+  Net::LDAP: 0
+  Params::Validate: 0.24
+  Storable: 0
+  Text::Wrap: 0
+  Unicode::Map8: 0
+  Unicode::String: 0
+recommends:
+  CGI: 3.04
+  HTML::Mason: 1.25
+provides:
+  HTML::Mason::Commands:
+    file: lib/ePortal/Apache.pm
+    version: 4.5
+  ePortal:
+    file: lib/ePortal/Server.pm
+    version: 4.5
+  ePortal::Apache:
+    file: lib/ePortal/Apache.pm
+    version: 4.5
+  ePortal::App::dummy:
+    file: lib/ePortal/App/dummy.pm
+    version: 4.5
+  ePortal::Application:
+    file: lib/ePortal/Application.pm
+    version: 4.5
+  ePortal::ApplicationConfig:
+    file: lib/ePortal/ApplicationConfig.pm
+    version: 4.5
+  ePortal::Attachment:
+    file: lib/ePortal/Attachment.pm
+    version: 4.5
+  ePortal::Auth::Base:
+    file: lib/ePortal/Auth/Base.pm
+    version: 4.5
+  ePortal::Auth::LDAP:
+    file: lib/ePortal/Auth/LDAP.pm
+    version: 4.5
+  ePortal::Catalog:
+    file: lib/ePortal/Catalog.pm
+    version: 4.5
+  ePortal::CronJob:
+    file: lib/ePortal/CronJob.pm
+    version: 4.5
+  ePortal::CtlgCategory:
+    file: lib/ePortal/CtlgCategory.pm
+    version: 4.5
+  ePortal::CtlgItem:
+    file: lib/ePortal/CtlgItem.pm
+    version: 4.5
+  ePortal::Exception:
+    file: lib/ePortal/Exception.pm
+    version: 4.5
+  ePortal::Exception::ACL:
+    file: lib/ePortal/Exception.pm
+    version: 4.5
+  ePortal::Exception::Abort:
+    file: lib/ePortal/Exception.pm
+    version: 4.5
+  ePortal::Exception::ApplicationNotInstalled:
+    file: lib/ePortal/Exception.pm
+    version: 4.5
+  ePortal::Exception::BadUser:
+    file: lib/ePortal/Exception.pm
+    version: 4.5
+  ePortal::Exception::DBI:
+    file: lib/ePortal/Exception.pm
+    version: 4.5
+  ePortal::Exception::DataNotValid:
+    file: lib/ePortal/Exception.pm
+    version: 4.5
+  ePortal::Exception::DatabaseNotConfigured:
+    file: lib/ePortal/Exception.pm
+    version: 4.5
+  ePortal::Exception::Fatal:
+    file: lib/ePortal/Exception.pm
+    version: 4.5
+  ePortal::Exception::FileNotFound:
+    file: lib/ePortal/Exception.pm
+    version: 4.5
+  ePortal::Exception::ObjectNotFound:
+    file: lib/ePortal/Exception.pm
+    version: 4.5
+  ePortal::Global:
+    file: lib/ePortal/Global.pm
+    version: 4.5
+  ePortal::HTML::Calendar:
+    file: lib/ePortal/HTML/Calendar.pm
+    version: 4.5
+  ePortal::HTML::Dialog:
+    file: lib/ePortal/HTML/Dialog.pm
+    version: 4.5
+  ePortal::HTML::List:
+    file: lib/ePortal/HTML/List.pm
+    version: 4.5
+  ePortal::HTML::ListColumn:
+    file: lib/ePortal/HTML/ListColumn.pm
+    version: 4.5
+  ePortal::HTML::Tree:
+    file: lib/ePortal/HTML/Tree.pm
+    version: 4.5
+  ePortal::MethodMaker:
+    file: lib/ePortal/MethodMaker.pm
+  ePortal::PageSection:
+    file: lib/ePortal/PageSection.pm
+    version: 4.5
+  ePortal::PageView:
+    file: lib/ePortal/PageView.pm
+    version: 4.5
+  ePortal::PopupEvent:
+    file: lib/ePortal/PopupEvent.pm
+    version: 4.5
+  ePortal::PopupEvent::CalendarEvent:
+    file: lib/ePortal/PopupEvent.pm
+    version: 4.5
+  ePortal::Server:
+    file: lib/ePortal/Server.pm
+    version: 4.5
+  ePortal::ThePersistent::ACL:
+    file: lib/ePortal/ThePersistent/ACL.pm
+    version: 4.5
+  ePortal::ThePersistent::Base:
+    file: lib/ePortal/ThePersistent/Base.pm
+    version: 4.5
+  ePortal::ThePersistent::Cached:
+    file: lib/ePortal/ThePersistent/Cached.pm
+    version: 4.5
+  ePortal::ThePersistent::DataType::Array:
+    file: lib/ePortal/ThePersistent/DataType/Array.pm
+    version: 4.5
+  ePortal::ThePersistent::DataType::Date:
+    file: lib/ePortal/ThePersistent/DataType/Date.pm
+    version: 4.5
+  ePortal::ThePersistent::DataType::DateTime:
+    file: lib/ePortal/ThePersistent/DataType/DateTime.pm
+    version: 4.5
+  ePortal::ThePersistent::DataType::Number:
+    file: lib/ePortal/ThePersistent/DataType/Number.pm
+    version: 4.5
+  ePortal::ThePersistent::DataType::VarChar:
+    file: lib/ePortal/ThePersistent/DataType/VarChar.pm
+    version: 4.5
+  ePortal::ThePersistent::DataType::YesNo:
+    file: lib/ePortal/ThePersistent/DataType/YesNo.pm
+    version: 4.5
+  ePortal::ThePersistent::Dual:
+    file: lib/ePortal/ThePersistent/Dual.pm
+    version: 4.5
+  ePortal::ThePersistent::ExtendedACL:
+    file: lib/ePortal/ThePersistent/ExtendedACL.pm
+    version: 4.5
+  ePortal::ThePersistent::ParentACL:
+    file: lib/ePortal/ThePersistent/ParentACL.pm
+    version: 4.5
+  ePortal::ThePersistent::Session:
+    file: lib/ePortal/ThePersistent/Session.pm
+    version: 4.5
+  ePortal::ThePersistent::Support:
+    file: lib/ePortal/ThePersistent/Support.pm
+    version: 4.5
+  ePortal::ThePersistent::Tools:
+    file: lib/ePortal/ThePersistent/Tools.pm
+    version: 4.5
+  ePortal::ThePersistent::UserConfig:
+    file: lib/ePortal/ThePersistent/UserConfig.pm
+    version: 4.5
+  ePortal::ThePersistent::Utils:
+    file: lib/ePortal/ThePersistent/Utils.pm
+    version: 4.5
+  ePortal::UserSection:
+    file: lib/ePortal/UserSection.pm
+    version: 4.5
+  ePortal::Utils:
+    file: lib/ePortal/Utils.pm
+    version: 4.5
+  ePortal::epGroup:
+    file: lib/ePortal/epGroup.pm
+    version: 4.5
+  ePortal::epUser:
+    file: lib/ePortal/epUser.pm
+    version: 4.5
+generated_by: Module::Build version 0.24

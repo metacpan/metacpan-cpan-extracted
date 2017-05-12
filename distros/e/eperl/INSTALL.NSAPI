@@ -1,0 +1,203 @@
+
+  I N S T A L L A T I O N 
+  as a Server-Side-Scripting-Language
+  for a Netscape Server via the NSAPI
+  ===================================
+
+  OVERVIEW
+  --------
+
+  This is the documentation and source of a standard NSAPI module written by
+  Rasmus Lerdorf <rasmus@lerdorf.on.ca> which allows you to redirect any
+  request to a given CGI program based on the extension of the requested file.
+  Please note that neither the author of ePerl nor Rasmus Lerdorf use Netscape
+  servers, so they won't be able to answer specific installation questions for
+  you.  You are pretty much on your own here. If you want support from authors
+  writing free software, then you have to use a free webserver as well ;-)
+
+  INSTALLATION
+  ------------
+
+  Your first step is save the two files appended at the end of this document
+  as ``Makefile'' and ``redirect_cgi.c'' to any location. Then compile the
+  module.  The Makefile is configured for Solaris.  You will need to modify it
+  to reflect your local compiler conventions for creating shared libraries.
+  Read the Makefile.  There are some hints for other operating systems.  
+
+  Once you have a redirect_cgi.so shared library, you need to edit three
+  different server configuration files.  These are in your ns-home config
+  directory.
+
+  1. In mime.types, add the following line to the end of the file 
+     to create a new mime type to be used internally by the server.
+
+         type=magnus-internal/eperl exts=phtml
+
+  2. In magnus.conf add the following line to the end of the file
+     to make the link between the Netscape server core and the new module
+     (only one line, backslashes are are written down for readability only):
+
+         Init fn=load-modules \
+              shlib=/www/nsapi/redirect_cgi.so \
+              funcs=redirect-cgi
+
+     Replace the /www/nsapi with the path to your redirect_cgi.so file.
+     It can be anywhere on your system.
+
+  3. In obj.conf insert the following line (only one line,
+     backslashes are are written down for readability only):
+
+         ObjectType fn="redirect-cgi" \
+                    cgi_path="/www/cgi-bin/eperl.cgi" \
+                    type="magnus-internal/eperl"
+
+     Here, replace /www/cgi-bin/eperl.cgi with the path to your ePerl program.
+     The line should be inserted after the "type-by-extension" line, but
+     before the "force-type" line.
+
+  HINTS
+  -----
+
+  Note that if you are running multiple servers, you will need to configure
+  each one individually according to the above instructions.  
+  
+  The most recent version of this module can be found in the file archive at
+  http://www.vex.net/php/.
+
+  FILES
+  -----
+
+--Makefile--------------------------------------
+#
+# Edit the following to reflect the location of your nsapi include directory.
+# 
+INCLUDEDIR=/opt/www/etc/ns-home/nsapi/include
+
+#
+# Now, pick your operating system
+#
+
+
+# For Solaris (using Sun's compiler)
+CC_CMD=cc -DSOLARIS
+SHARED=-G
+
+#
+# I haven't tested on any platform except Solaris.  If you find
+# that some of these work, or if you make it work on any platform
+# except Solaris, please e-mail me at: rasmus@vex.net 
+# so I can update this file.
+#
+# For Irix
+#CC_CMD=cc -DIRIX
+#SHARED=-shared
+
+# For SunOS (using gcc)
+#CC_CMD=gcc -DSUNOS4 -fpic
+#LD_SHAREDCMD=ld -assert pure-text
+
+# For OSF/1
+#CC_CMD=cc -DOSF
+#SHARED=-all -shared -expect_unresolved "*"
+
+# For HP-UX
+#CC_CMD=cc -DHPUX
+#SHARED=-b
+
+# For AIX (good luck)
+#CC_CMD=cc -DAIX
+#SHARED=-bM:SRE -bE:module.exp -bI:module.imp -e _nostart
+##module.exp is a file you create which lists each function in your module
+##module.imp is a function you create which lists each function which
+##           should be exported from the server into the module.
+
+INCLUDE_FLAGS=-I$(INCLUDEDIR)
+COMMON_DEFS=-DMCC_HTTPD -DXP_UNIX
+
+
+#
+# For Solaris, use single-step compile and link with the following
+all: redirect_cgi.so
+
+redirect_cgi.so: redirect_cgi.c
+	$(CC_CMD) $(COMMON_DEFS) $(INCLUDE_FLAGS) $(SHARED) -o redirect_cgi.so redirect_cgi.c
+
+#
+# For SUNOS, use two-step compile and link.  uncomment the following:
+#
+#OBJS=redirect_cgi.o
+#
+#all: redirect_cgi.so
+#
+#redirect_cgi.so: $(OBJS)
+#	$(LD_SHAREDCMD) $(OBJS) -o redirect_cgi.so
+#
+#.c.o:
+#	$(CC_CMD) $(COMMON_DEFS) $(INCLUDE_FLAGS) -c $<
+
+clean:
+	rm redirect_cgi.so
+--Makefile--------------------------------------
+
+--redirect_cgi.c--------------------------------
+/***[redirect_cgi.c]**********************************************[TAB=4]****\
+*                                                                            *
+* NSAPI CGI Redirection Module                                               *
+*                                                                            *
+* Copyright 1995,1996,1997 Rasmus Lerdorf <rasmus@lerdorf.on.ca>             *
+*                                                                            *
+*  This program is free software; you can redistribute it and/or modify      *
+*  it under the terms of the GNU General Public License as published by      *
+*  the Free Software Foundation; either version 2 of the License, or         *
+*  (at your option) any later version.                                       *
+*                                                                            *
+*  This program is distributed in the hope that it will be useful,           *
+*  but WITHOUT ANY WARRANTY; without even the implied warranty of            *
+*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the             *
+*  GNU General Public License for more details.                              *
+*                                                                            *
+*  You should have received a copy of the GNU General Public License         *
+*  along with this program; if not, write to the Free Software               *
+*  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.                 *
+*                                                                            *
+\****************************************************************************/
+#include "base/pblock.h"
+#include "frame/http.h"
+#include "frame/log.h"
+#include <string.h>
+
+int redirect_cgi(pblock *pb, Session *sn, Request *rq) {
+	int l=0, lr=0, lq=0, lc=0;
+	char *rpath, *pi;
+	pb_param *path = pblock_find("path", rq->vars);
+	pb_param *rqpath = pblock_find("uri", rq->reqpb);
+	pb_param *query = pblock_find("query", rq->reqpb);
+	pb_param *ctype = pblock_find("content-type", rq->srvhdrs);
+	char *cgi_path = pblock_findval("cgi_path", pb);
+	char *type = pblock_findval("type", pb);
+
+    if(!cgi_path || !type) {
+        log_error(LOG_MISCONFIG, "redirect-cgi", sn, rq, 
+			"missing parameters (need cgi_path and type)");
+		return REQ_ABORTED;
+	}
+	l = strlen(path->value);
+	lr = strlen(rqpath->value);
+	if(query) lq = strlen(query->value);
+	lc = strlen(cgi_path);
+	if(l && !strcmp(ctype->value,type)) {
+		rpath = (char *)MALLOC(lc + 1);
+		pi = (char *)MALLOC(lr + lq + 2);
+		strcpy(rpath,cgi_path);
+		if(query) sprintf(pi,"%s?%s",rqpath->value,query->value);
+		else strcpy(pi,rqpath->value);
+		FREE(path->value);	
+		path->value = rpath;	
+		FREE(ctype->value);
+		ctype->value = STRDUP("magnus-internal/cgi");
+		pblock_nvinsert("path-info", pi, rq->vars);
+	}
+	return REQ_PROCEED;
+}
+--redirect_cgi.c--------------------------------
+

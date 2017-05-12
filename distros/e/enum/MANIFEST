@@ -1,0 +1,13 @@
+Changes
+README
+INSTALL
+MANIFEST
+Makefile.PL
+lib/enum.pm
+t/dot_dot.t
+t/new_index.t
+t/new_package.t
+t/new_tag.t
+t/simple_tags.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

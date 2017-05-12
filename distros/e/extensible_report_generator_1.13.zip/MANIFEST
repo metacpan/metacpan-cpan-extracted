@@ -1,0 +1,10 @@
+erg_line_formatter.pm    line formatter class
+erg_report_generator.pm  basic report generator class
+erg_report_summary.pm    report summary class
+erg_page_manager.pm      page manager class
+test.pl                  test/demo file
+file_reporter.pm         file reporter class used by test.pl
+Makefile.pl		 Makefile generator
+README			 README file
+MANIFEST		 MANIFEST
+Changes                  list of changes

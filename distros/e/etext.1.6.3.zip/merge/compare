@@ -1,0 +1,8 @@
+#!/bin/sh 
+srcdir=..
+files=`ls *.[ch]`
+
+for f in $files
+ do
+ diff $srcdir/$f $f > /dev/null 2>&1 || echo $f different
+ done

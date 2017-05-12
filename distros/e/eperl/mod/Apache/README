@@ -1,0 +1,15 @@
+
+  Apache::ePerl
+  =============
+
+  This module is the Apache/mod_perl handler which provides a fast
+  webserver-internal ePerl facility by emulating the external ePerl
+  CGI-program by the use of its Parse::ePerl package.
+
+  CPAN Module List Entry:
+
+  Name           DSLI  Description                                  Info
+  -------------  ----  -------------------------------------------- -----
+  Apache::
+  ::ePerl        Rdpr  Fast emulated Embedded Perl (ePerl) facility RSE
+

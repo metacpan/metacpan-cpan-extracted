@@ -1,0 +1,65 @@
+%#============================================================================
+%# ePortal - WEB Based daily organizer
+%# Author - S.Rusakov <rusakov_sa@users.sourceforge.net>
+%#
+%# Copyright (c) 2000-2003 Sergey Rusakov.  All rights reserved.
+%# This program is free software; you can redistribute it
+%# and/or modify it under the same terms as Perl itself.
+%#
+%#
+%#----------------------------------------------------------------------------
+<% plink(pick_lang(
+    rus => "Вернуться в телефонный справочник",
+		eng => "Back to phones directory"), href => "index.htm") %>
+
+
+<% $list->draw_list %>
+<hr>
+
+%#=== @metags once =========================================================
+<%once>
+my ($list, $obj);
+</%once>
+
+%#=== @metags cleanup =========================================================
+<%cleanup>
+($list, $obj) = ();
+</%cleanup>
+
+
+%#=== @METAGS client_info ====================================================
+<%method client_info><%perl>
+	my $list = $ARGS{list};
+	my $obj = $list->{obj};
+</%perl>
+% if ($obj->client_id) {
+<% plink(pick_lang(rus => "Клиент", eng => "Client"), href => href("client_edit.htm", objid => $obj->client_id)) %>
+<br>
+% }
+% if ($obj->dept_id) {
+<% plink(pick_lang(rus => "Подразделение", eng => "Department"), href => href("index.htm", deptid => $obj->dept_id)) %>
+% }
+</%method>
+
+
+%#=== @METAGS onStartRequest ====================================================
+<%method onStartRequest><%perl>
+  my $app = $ePortal->Application('OffPhones');
+	my $memos = new ePortal::App::OffPhones::PhoneMemo;
+
+	$list = new ePortal::HTML::List( obj => $memos, class=>"smallfont" );
+	$list->add_column_image();
+	$list->add_column( id => "ts", title => pick_lang(rus => "Дата", eng => "Date") );
+	$list->add_column( id => "user_name", title => pick_lang(rus => "Пользователь", eng => "User") );
+	$list->add_column_method( id => "client_info", title => pick_lang(rus => "Ссылка на телефон", eng => "Link to entry"));
+	$list->add_column( id => "title", title => pick_lang(rus => "Текст", eng => "Text"));
+	$list->add_column_system( delete => 1);
+
+  my $location = $list->handle_request;
+  return $location if $location;
+
+  $memos->restore_where($list->restore_parameters, private => 0, order_by => "ts desc");
+
+</%perl></%method>
+
+

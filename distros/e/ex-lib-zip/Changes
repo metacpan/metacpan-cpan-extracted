@@ -1,0 +1,35 @@
+Revision history for Perl extension ex::lib::zip.
+
+0.04  Wed Sep 24 18:53:11 BST 2003
+      Reorder this file so that the most recent changes go at the top
+      Mmm. So nobody told me that it didn't build under threads
+      (and it seems that I never tested that)
+      Fixed the perl context bugs. My own fault for PERL_NO_IMPLICIT_CONTEXT
+
+0.03  Sat Dec 15 16:32:46 GMT 2001
+      Oops. Short delay. I've been a fool. Why use PerlIO_apply_layera when
+      all I need to do is push 1 layer PerlIO_push
+      Sun Aug 26 14:52:54 BST 2001
+      So PerlIO_apply_layera() changed in 5.7.2 to use PerlIO_list_t *
+      rather than AV *, and everything was broken.  zip.xs now fixed.
+      (but I'm not sure if this is supposed to be a public API. It's not in
+       the perliol.h, hence warnings from gcc about integer to pointer
+       conversions)
+      Moved all the test modules into t, so that the CPAN scripts don't think
+      I'm providing all the dummy modules in there (Thanks to Andreas König for
+      explaining this one)
+
+0.02  Sat Apr 21 23:22:10 BST 2001
+      Was leaking a scalar for each zip stored file encountered, as the
+      result of newSVpvf never had its refcount decreased.
+      Now re-written this section at the end of findfile() to build an AV
+      and call the new PerlIO_apply_layera() function. The argument to the
+      PerlIO::subfile layer is now a UV, which saves converting a number to and
+      from a string.
+      Added make-zips.pl to the MANIFEST, which had been forgotten.
+      Tweak the Makefile.PL so that make-zips.pl and pushme.pl don't get
+      spotted and hence installed. (They aren't meant to be installed)
+
+0.01  Sat Feb 24 15:11:09 2001
+	- original version; created by h2xs 1.21 with options
+		-A -n ex::lib::zip

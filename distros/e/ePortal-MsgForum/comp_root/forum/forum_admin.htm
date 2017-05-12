@@ -1,0 +1,76 @@
+%#============================================================================
+%# ePortal - WEB Based daily organizer
+%# Author - S.Rusakov <rusakov_sa@users.sourceforge.net>
+%#
+%# Copyright (c) 2000-2003 Sergey Rusakov.  All rights reserved.
+%# This program is free software; you can redistribute it
+%# and/or modify it under the same terms as Perl itself.
+%#
+%#
+%#----------------------------------------------------------------------------
+%#
+%# Administrator's page for a forum
+%#
+%#----------------------------------------------------------------------------
+
+&nbsp;
+<% $dlg->dialog_start( title => pick_lang(rus => "Форум", eng => "Forum"), width => 550) %>
+
+% foreach my $field (qw/title nickname memo titleurl keepdays /) {
+	<% $dlg->field($field) %>
+% }
+
+<tr>
+  <td colspan=2 align="center">
+    <hr>
+    <b><% pick_lang(rus=>'Права доступа', eng => 'Access rights') %></b>
+  </td>
+</tr>
+
+% foreach my $field (qw/xacl_read xacl_post xacl_reply xacl_edit xacl_delete xacl_attach/) {
+  <% $dlg->field($field) %>
+% }
+
+<% $dlg->buttons %>
+<% $dlg->dialog_end %>
+	<p>
+
+%#=== @METAGS attr =========================================================
+<%attr>
+Title => {rus => "Администрирование форума", eng => "Forum administration"}
+Layout => 'Dialog'
+</%attr>
+
+
+%#=== @METAGS onStartRequest ====================================================
+<%method onStartRequest><%perl>
+  $obj = new ePortal::App::MsgForum::MsgForum;
+  $dlg = new ePortal::HTML::Dialog( obj => $obj );
+
+  my $location = try {
+    $dlg->handle_request( );
+  } catch ePortal::Exception::DataNotValid with {
+    my $E = shift;
+    $session{ErrorMessage} = $E->text;
+    '';
+  };
+  return $location if $location;
+</%perl></%method>
+
+
+%#=== @METAGS MenuItems ====================================================
+<%method MenuItems><%perl>
+	return [];
+</%perl></%method>
+
+
+%#=== @metags once =========================================================
+<%once>
+my ($dlg, $obj);
+</%once>
+
+%#=== @metags cleanup =========================================================
+<%cleanup>
+($dlg, $obj) = ();
+</%cleanup>
+

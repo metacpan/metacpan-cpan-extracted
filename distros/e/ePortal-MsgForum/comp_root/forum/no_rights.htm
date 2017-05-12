@@ -1,0 +1,28 @@
+%#============================================================================
+%# ePortal - WEB Based daily organizer
+%# Author - S.Rusakov <rusakov_sa@users.sourceforge.net>
+%#
+%# Copyright (c) 2000-2003 Sergey Rusakov.  All rights reserved.
+%# This program is free software; you can redistribute it
+%# and/or modify it under the same terms as Perl itself.
+%#
+%#
+%#----------------------------------------------------------------------------
+
+<& /message.mc, ErrorMessage => pick_lang(
+    rus => "Недостаточно прав для выполнения действия",
+    eng => "Not enough right to do it") &>
+
+<p><center>
+	<% plink(
+      {rus => "Список форумов", eng => "All forums"},
+			-href => "index.htm")
+	%>
+</center>
+
+
+%#=== @METAGS attr =========================================================
+<%attr>
+Title => {rus => "Недостаточно прав для выполнения действия", eng => "Not enough right to do it"}
+</%attr>
+

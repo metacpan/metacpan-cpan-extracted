@@ -1,0 +1,173 @@
+:
+eval 'exec perl -S $0 ${1+"$@"}'
+    if $running_under_some_shell;
+##
+##  shtml2phtml -- Convert (X)SSI script (.shtml) to ePerl script (.phtml)
+##  Copyright (c) 1997 Ralf S. Engelschall, All Rights Reserved. 
+##
+
+$time = time();
+$deftimefmt = "%A, %d-%b-%y %T %Z";
+$preamble = "";
+$BD = "<?";
+$ED = "!>";
+
+@CGIVARS = (
+    #   standard CGI variables from CGI spec
+    'SERVER_SOFTWARE',
+    'SERVER_NAME',
+    'GATEWAY_INTERFACE',
+    'SERVER_PROTOCOL',
+    'SERVER_PORT',
+    'REQUEST_METHOD',
+    'PATH_INFO',
+    'PATH_TRANSLATED',
+    'SCRIPT_NAME',
+    'QUERY_STRING',
+    'REMOTE_HOST',
+    'REMOTE_ADDR',
+    'AUTH_TYPE',
+    'REMOTE_USER',
+    'REMOTE_IDENT',
+    'CONTENT_TYPE',
+    'CONTENT_LENGTH',
+    'HTTP_ACCEPT',
+    'HTTP_USER_AGENT',
+    #   additional CGI variables from Apache mod_rewrite
+    'SCRIPT_FILENAME',
+    'SCRIPT_URL',
+);
+
+sub add_to_preamble ($) {
+    my ($cmd) = @_;
+
+    $x = quotemeta($cmd);
+    if ($preamble !~ m|$x|s) {
+        $preamble .= $cmd;
+    }
+}
+
+sub interpolate_variable ($) {
+    my ($name) = @_;
+
+    #   standard CGI variable
+    if (grep("$name", @CGIVARS) eq $name) {
+        return "\$ENV{'$name'}";
+    }
+    #   special ones
+    elsif ($name eq 'LAST_MODIFIED') {
+        &add_to_preamble("use POSIX;\n");   
+        &add_to_preamble('$timefmt = "'.$deftimefmt.'";'."\n");     
+        return 'strftime($timefmt, localtime((stat($ENV{"SCRIPT_SRC_FILE"}))[9]))',
+    }
+    elsif ($name eq 'DATE_LOCAL') {
+        &add_to_preamble("use POSIX;\n");   
+        &add_to_preamble('$timefmt = "'.$deftimefmt.'";'."\n");     
+        return 'strftime($timefmt, localtime(time()))',
+    }
+    elsif ($name eq 'DATE_GMT') {
+        &add_to_preamble("use POSIX;\n");   
+        &add_to_preamble('$timefmt = "'.$deftimefmt.'";'."\n");     
+        return 'strftime($timefmt, gmttime(time()))',
+    }
+    elsif ($name eq 'DOCUMENT_NAME') {
+        return '\$ENV{"SCRIPT_SRC_FILE"};',
+    }
+    elsif ($name eq 'DOCUMENT_URI') {
+        return '\$ENV{"SCRIPT_SRC_URL"};',
+    }
+    else {
+        return '$'.$name;
+    }
+}
+
+$in = "";
+while (<STDIN>) {
+    $in .= $_;
+}
+
+$out = "";
+while ($in) {
+    if ($in =~ m|(.*?)<!--#(.+?)\s*-->(.*)|s) {
+        $out .= $1;
+        $cmd = $2;
+        $in = $3;
+    }
+    else {
+        $out .= $in;
+        last;
+    }
+
+    if ($cmd =~ m|config\s+timefmt="?(.+?)"?"\s*$|) {
+        $out .= "$BD \$timefmt = \"$1\"; $ED";
+    }
+    elsif ($cmd =~ m|echo\s+var="?(.+?)"?"\s*$|) {
+        $out .= "$BD print " . &interpolate_variable($1) . "; $ED";
+    }
+    elsif ($cmd =~ m|include\s+file="?(.+?)"?"\s*$|) {
+        $out .= "\n#include \"$1\"\n";
+    }
+    elsif ($cmd =~ m|include\s+virtual="?(.+?)"?"\s*$|) {
+        $out .= "\n#include \"$1\"\n";
+    }
+    elsif ($cmd =~ m|printenv\s*$|) {
+        $out .= "$BD foreach \$k (sort(keys(\%ENV))) { print \"\$k=\$ENV{\$k}\\n\"; } $ED";
+    }
+    elsif ($cmd =~ m|set\s+var="?(.+?)"?\s+value="?(.+?)"?\s*$|) {
+        $out .= "$BD \$$1='$2'; $ED";
+    }
+    elsif ($cmd =~ m|exec\s+cgi="?(.+?)"?\s*$|) {
+        &add_to_preamble("use LWP::Simple;\n");     
+        $out .= "$BD print get('$1'); $ED";
+    }
+    elsif ($cmd =~ m|exec\s+cmd="?(.+?)"?\s*$|) {
+        $out .= "$BD print `$1`; $ED";
+    }
+    elsif ($cmd =~ m|fsize\s+file="?(.+?)"?\s*$|) {
+        $out .= "$BD print (stat(\"$1\"))[7]; $ED";
+    }
+    elsif ($cmd =~ m|fsize\s+virtual="?(.+?)"?\s*$|) {
+        $out .= "$BD print (stat(\"$1\"))[7]; $ED";
+    }
+    elsif ($cmd =~ m|flastmod\s+file="?(.+?)"?\s*$|) {
+        &add_to_preamble("use POSIX;\n");   
+        &add_to_preamble('$timefmt = "'.$deftimefmt.'";'."\n");     
+        $out .= "$BD print strftime(\$timefmt, (stat(\"$1\"))[9]); $ED";
+    }
+    elsif ($cmd =~ m|flastmod\s+virtual="?(.+?)"?\s*$|) {
+        &add_to_preamble("use POSIX;\n");   
+        &add_to_preamble('$timefmt = "'.$deftimefmt.'";'."\n");     
+        $out .= "$BD print strftime(\$timefmt, (stat(\"$1\"))[9]); $ED";
+    }
+    elsif ($cmd =~ m|if\s+expr="?(.+?)"?\s*$|) {
+        $expr = $1;
+        $expr =~ s|=(\s/)|=~$1|g;
+        $expr =~ s|!=(\s/)|!~$1|g;
+        $expr =~ s|=\s|ne |g;
+        $expr =~ s|!=\s|ne |g;
+        $expr =~ s|&&|and|g;
+        $expr =~ s|\|\||or|g;
+        $out .= "\n#if $expr\n";
+    }
+    elsif ($cmd =~ m|elif\s+expr="?(.+?)"?\s*$|) {
+        $expr = $1;
+        $expr =~ s|=(\s/)|=~$1|g;
+        $expr =~ s|!=(\s/)|!~$1|g;
+        $expr =~ s|=\s|ne |g;
+        $expr =~ s|!=\s|ne |g;
+        $expr =~ s|&&|and|g;
+        $expr =~ s|\|\||or|g;
+        $out .= "\n#elsif $expr\n";
+    }
+    elsif ($cmd =~ m|else\s*$|) {
+        $out .= "\n#else\n";
+    }
+    elsif ($cmd =~ m|endif\s*$|) {
+        $out .= "\n#endif\n";
+    }
+}
+
+print "$BD\n$preamble$ED\n";
+print $out;
+
+##EOF##

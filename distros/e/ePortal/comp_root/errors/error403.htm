@@ -1,0 +1,36 @@
+%#============================================================================
+%# ePortal - WEB Based daily organizer
+%# Author - S.Rusakov <rusakov_sa@users.sourceforge.net>
+%#
+%# Copyright (c) 2000-2004 Sergey Rusakov.  All rights reserved.
+%# This program is open source software
+%#
+%#
+%#----------------------------------------------------------------------------
+<& /message.mc, ErrorMessage => pick_lang(rus => "В доступе отказано", eng => "Access denied") &>
+
+<% pick_lang(
+	rus => "Доступ к указанному ресурсу запрещен. Возможные причины этого:",
+	eng => "Access denied. Possible reasons are:") %>
+
+<ul>
+<li><% pick_lang(
+      rus => "Вы не зарегистрированы в системе",
+			eng => "You are not logged in") %>.
+<li><% pick_lang(
+			rus => "Администратор не разрешал Вам доступ к этому ресурсу",
+			eng => "Administrator has denied your access to this resource") %>.
+<li><% pick_lang(
+			rus => "Вы не входите в группу тех, кому разрешен доступ к ресурсу",
+			eng => "Your are not member of group of users who has access to this resource") %>.
+</ul>
+
+
+
+<div align="center"><a href="/"><% pick_lang(
+		rus => "Вернуться к главному меню сервера",
+		eng => "Back to home page") %></a></div>
+
+<%attr>
+Title => {rus => "Доступ запрещен", eng => "Access denied"}
+</%attr>

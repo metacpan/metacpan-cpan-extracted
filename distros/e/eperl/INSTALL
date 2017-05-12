@@ -1,0 +1,131 @@
+
+  I N S T A L L A T I O N
+  =======================
+
+
+  OVERVIEW FOR THE IMPATIENT
+  ==========================
+
+  To install the stand-alone program into /path/to/eperl/root/{bin,man}/:
+      
+      $ ./configure --prefix=/path/to/eperl/root
+      $ make
+      $ make test
+      $ make install
+
+  To install the integrated Perl 5 modules into
+
+    a) your existing Perl system under 
+       /path/to/existing/perl/area/lib/site_perl/{Parse,Apache}/:
+
+      $ perl Makefile.PL
+      $ make
+      $ make test
+      $ make install
+
+    b) a private area of your own under
+       /path/to/your/perl/area/lib/site_perl/{Parse,Apache}/:
+
+      $ perl Makefile.PL PREFIX=/path/to/private/perl/area/
+      $ make
+      $ make test
+      $ make install
+
+
+  DETAILED DESCRIPTION
+  ====================
+
+  1. Requirements
+     ============
+     
+     Make sure you have a up-to-date release of Perl already installed on your
+     system. Perl 5.004 is highly recommended to make use of the complete
+     ePerl functionality.  Previous releases are only supported partially: for
+     the stand-alone program you need at least Perl 5.003 compiled with
+     -DEMBED while for the Perl 5 interface modules you need at least Perl
+     5.003_90. Also make sure (``perl -V | grep sfio'')that your
+     Perl-Interpreter doesn't use PerlIO in combination with SfIO, because
+     this currently is not supported by ePerl.
+
+     As a summary the following table shows the details of support grade:
+
+         Perl               stand-alone        Perl 5
+         version            ePerl program      interface modules
+         ------------------ ------------------ -----------------
+         5.003              no                 no
+         5.003+-DEMBED      yes (minimum)      no
+         5.003_01-5.003_25  yes (minimum)      no
+         5.003_25-5.003_99  yes                yes
+         5.004-...          yes                yes
+     
+  2. Configuring the source
+     ======================
+
+     The ePerl distribution is a hybrid source tree. It can be used to either
+     install the stand-alone program "eperl" or the Perl 5 interface modules
+     "Parse::ePerl" and "Apache::ePerl". Decide which one you want or just
+     install both.
+
+     First make sure that the ``perl'' program is in your path, so
+     ``configure'' can find it. If you have different Perl binaries in your
+     path the one with the latest version number will be used. If you want to
+     force ePerl to be build with a specific Perl on your system (if you have
+     more then one installed), you can also use option
+     ``--with-perl=/path/to/bin/perl'' with ``configure'' or specify this
+     specific one when running "Makefile.PL". 
+     
+     Additionally you need a real ANSI C compiler like GCC to compile ePerl,
+     but most of the vendor compilers also work. Per default the C compiler is
+     used which was used for compiling your Perl itself.  To overwrite this
+     use ``CC=/path/to/bin/cc''.
+
+     Now do _ONLY ONE_ of these steps:
+
+     a) Configure the ePerl source via standard GNU conding style procedure
+        for building the stand-alone program:
+
+        $ [CC=/path/to/bin/cc] ./configure --prefix=/path/to/eperl/root 
+                                           [--with-perl=/path/to/bin/perl]
+
+     b) Configure the ePerl sources via standard MakeMaker procedure 
+        for building the Perl 5 interface modules:
+
+        $ [/path/to/bin/]perl Makefile.PL [PREFIX=/path/to/private/perl/area/]
+                                          [CC=/path/to/bin/cc]
+
+  3. Build the object files
+     ======================
+
+     Now you are ready to run the build process. Start it with a simple
+     ``Make'' call:
+
+        $ make
+
+  4. Run the Test suite
+     ==================
+
+     You can now run a test suite which will check if the programs work
+     correctly before they get finally installed. I highly recommend you to do
+     this step, even it is optional and not really required.
+     
+        $ make test
+
+  5. Installation
+     ============
+     
+     Finally install ePerl into /path/to/eperl/root/{bin,man}/ 
+     (in case of the stand-alone program) or
+     /path/to/private/perl/area/lib/site_perl/{Parse,Apache}/ 
+     (in case of the Perl 5 interface modules). 
+     _NO_ third-party files are changed on your system.
+
+        $ make install
+
+  6. Cleanup
+     =======
+
+     Now cleanup the source tree to make it a vanilla distribution again.
+
+        $ make distclean
+
+

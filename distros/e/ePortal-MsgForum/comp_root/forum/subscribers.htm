@@ -1,0 +1,78 @@
+%#============================================================================
+%# ePortal - WEB Based daily organizer
+%# Author - S.Rusakov <rusakov_sa@users.sourceforge.net>
+%#
+%# Copyright (c) 2000-2003 Sergey Rusakov.  All rights reserved.
+%# This program is free software; you can redistribute it
+%# and/or modify it under the same terms as Perl itself.
+%#
+%#
+%#----------------------------------------------------------------------------
+% if ($ErrorMessage) {
+ <& /message.mc &>
+% return; }
+
+<b><% $forum->Title %></b>
+<p>
+<span class="memo">
+<% pick_lang(
+    rus => "Щелкните на пользователе для принудительной отписки от форума",
+    eng => "Click on user to unsubscribe it from forum") %>
+</span>
+<p>
+
+<blockquote>
+% while($subscribers->restore_next) {
+  <a href="<% href('subscribers.htm', forum_id => $forum->id, unsubscribe_user => $subscribers->username) %>">
+  <% $subscribers->username %> - <% $subscribers->fullname %></a><br>
+%}
+</blockquote>
+
+
+
+<center>
+<% plink( pick_lang(
+    rus => "Вернуться к списку форумов",
+    eng => "Back to forums"),
+  href => "index.htm") %>
+</center>
+
+
+
+%#=== @metags onStartRequest ====================================================
+<%method onStartRequest><%perl>
+  # create application and forum
+  $app = $ePortal->Application('MsgForum');
+  $forum = new ePortal::App::MsgForum::MsgForum;
+  if ( ! $forum->restore($ARGS{forum_id}) ) {
+    $ErrorMessage = pick_lang(rus => "Форум не найден", eng => "Forum not found");
+    return;
+  }
+
+  # process unsubscribe
+  if ( $ARGS{unsubscribe_user} ) {
+    $app->Unsubscribe( $ARGS{unsubscribe_user}, $forum->id );
+  }
+
+  # retrieve a list of subscribers
+  $subscribers = $app->ForumSubscribers($forum->id);
+  $subscribers->restore_all;
+
+</%perl></%method>
+
+%#=== @METAGS once =========================================================
+<%once>
+my ($subscribers, $app, $forum, $ErrorMessage);
+</%once>
+
+
+%#=== @METAGS cleanup =========================================================
+<%cleanup>
+($subscribers, $app, $forum, $ErrorMessage) = ();
+</%cleanup>
+
+%#=== @METAGS attr =========================================================
+<%attr>
+Title => {rus => "Подписчики на форум", eng => "Subscribers to forum"}
+require_admin => 1
+</%attr>

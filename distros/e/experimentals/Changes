@@ -1,0 +1,34 @@
+Revision history for experimentals
+
+0.013  Sun Feb 15 22:07:54 2015
+       Initial release.
+
+
+0.014  Wed Jul 22 10:36:44 2015
+       First public release
+
+
+0.015  Thu Jul 23 07:16:50 2015
+
+       Fixed version number in example, so code will run before 2213.
+       (Thanks, Graham! ;-)
+
+
+0.016  Tue Nov 24 09:57:09 2015
+
+       Pod nit denitted.
+
+       Added 'use strict' (forgot perl doesn't auto-strict under 'use 5.10')
+
+       Removed testing for lexical $_ under 5.23+
+       (thanks Slaven!)
+
+
+
+0.017  Sat Jun 25 09:44:05 2016
+
+       Updated documentation to reflect changes in Perl 5.24
+
+       Removed testing for lexical subs under 5.25+
+       (thanks Slaven!)
+

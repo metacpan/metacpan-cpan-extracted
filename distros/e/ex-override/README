@@ -1,0 +1,121 @@
+override(3)    User Contributed Perl Documentation    override(3)
+
+
+
+NNNNAAAAMMMMEEEE
+       ex::override - Perl pragma to override core functions
+
+SSSSYYYYNNNNOOOOPPPPSSSSIIIISSSS
+         use ex::override ucfirst => sub {
+                                          # make sure only the first
+                                          # letter is uppercased
+                                          ucfirst( lc( shift ) );
+                                         };
+
+         ucfirst( 'MAKE THIS RIGHT' );
+         # Make this right
+
+         no ex::override 'ucfirst';
+
+         ucfirst( 'MAKE THIS RIGHT' );
+         # MAKE THIS RIGHT
+
+
+DDDDEEEESSSSCCCCRRRRIIIIPPPPTTTTIIIIOOOONNNN
+       "ex::override" is an easy way to override core perl func-
+       tions.
+
+       OOOOvvvveeeerrrrrrrriiiiddddiiiinnnngggg aaaa ffffuuuunnnnccccttttiiiioooonnnn
+
+         use ex::override
+           length => \&mylength,
+           open   => \&myopen;
+
+       Overriding a core function happens at compile time.  Argu-
+       ments are passed to "ex::override" in a name based, or
+       hash style.  The key is the name of the core function to
+       override, the value is your subroutine to replace the
+       core's.
+
+       UUUUssssiiiinnnngggg aaaannnn oooovvvveeeerrrrrrrriiiiddddeeeennnn ffffuuuunnnnttttiiiioooonnnn
+
+       Nothing changes on the surface.  If you override "stat",
+       then you still use "stat" the same way.
+
+       NNNNOOOOTTTTEEEE:::: This is only true if you are keeping the same proto-
+       type as the function you've overriden.  To do this, you
+       must define your prototype:
+
+         use ex::override values => sub (\%) { values %{+shift} };
+
+       If you don't use this same prototype or force yourself to
+       use the function the same, you can extend the functional-
+       ity of a core function:
+
+         # length of all arguments passed to length()
+         use ex::override length => sub { length join '', @_ };
+
+
+       OOOOvvvveeeerrrrrrrriiiiddddiiiinnnngggg aaaa ffffuuuunnnnccccttttiiiioooonnnn gggglllloooobbbbaaaallllyyyy
+
+       DDDDoooonnnn''''tttt ddddoooo tttthhhhiiiissss wwwwiiiitttthhhhoooouuuutttt aaaa vvvveeeerrrryyyy ggggoooooooodddd rrrreeeeaaaassssoooonnnn!!!!
+
+       "ex::override" allows you the ability to override core
+       functions globaly.  Any packages that inherit from yours
+       will use your function override.  There are good reasons
+       for doing this, if you think you need to, make sure you
+       have a good reason.
+
+         use ex::override
+           GLOBAL_length => sub {
+                                 # prevent someone from passing a list
+                                 croak "Don't do that!" if @_ > 1;
+                                 length shift
+                                };
+
+       NNNNOOOOTTTTEEEE:::: If you globaly override a function in a package,
+       only that package can remove it.
+
+       RRRReeeemmmmoooovvvviiiinnnngggg yyyyoooouuuurrrr oooovvvveeeerrrrrrrriiiiddddeeee
+
+       This works the same way that "no strict" works.
+
+         no ex::override; # remove _all_ overrides
+
+         no ex::override 'values';
+
+         no ex::override 'GLOABL_length';
+
+
+TTTTIIIIPPPPSSSS
+       Get a list of overrideable function
+           If you have the Perl source laying around, go to it's
+           root dir and try this:
+
+             perl -lne 'print /_(\w+)/ if /return -K/' toke.c
+
+           You'll have to weed out which ones are functions ( vs.
+           operators, etc. ).
+
+       Get a functions prototype
+             perl -lwe 'print prototype "CORE::length"'
+
+           This prints the prototype, or "Use of uninitialized
+           variable..." if there isn't one.
+
+TTTTOOOODDDDOOOO
+       Find a way to preserve prototypes so the user doesn't have
+       to know them.
+
+AAAAUUUUTTTTHHHHOOOORRRR
+       Casey West, <_c_a_s_e_y_@_g_e_e_k_n_e_s_t_._c_o_m>
+
+CCCCOOOOPPPPYYYYRRRRIIIIGGGGHHHHTTTT
+       Copyright (c) 2000 Casey West <casey@geeknest.com>.  All
+       rights reserved.  This program is free software; you can
+       redistribute it and/or modify it under the same terms as
+       Perl itself.
+
+
+
+2003-03-14                 perl v5.6.1                override(3)

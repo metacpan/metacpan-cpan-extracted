@@ -1,0 +1,2 @@
+<pop-mail-server-name> 110 <mailbox-name> <password>
+<smtp-mail-server-name> 25 <mailbox-name> <password>

@@ -1,0 +1,18 @@
+Revision history for Perl extension ePod.
+
+0.04  2004-01-19
+      (Only fixes for bad ePod/POD files)
+      - Fixed null verbatin lines in POD.
+      - Fixed close of inexistent item.
+
+0.03  2004-01-16
+      - Added method is_epod().
+      - Now ePod accept fully POD syntax embedded.
+
+0.02  2004-01-15
+      - Added script epod2pod.pl
+
+
+0.01  2004-01-13 16:16:17
+      - original version;
+

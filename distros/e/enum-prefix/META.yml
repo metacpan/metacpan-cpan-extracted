@@ -1,0 +1,25 @@
+---
+abstract: unknown
+author:
+  - 'electricface <electricface@qq.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0.88'
+  Test::UseAllModules: '0.10'
+configure_requires:
+  ExtUtils::MakeMaker::CPANfile: '0.06'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: enum-prefix
+no_index:
+  directory:
+    - t
+    - inc
+requires: {}
+resources:
+  repository: https://gitcafe.com/electricface/enum-prefix
+version: '0.04'

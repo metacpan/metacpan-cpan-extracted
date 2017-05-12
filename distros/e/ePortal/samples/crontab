@@ -1,0 +1,36 @@
+# ePortal - WEB Based daily organizer
+# Author - S.Rusakov <rusakov_sa@mail.ru>
+#
+# Copyright (c) 2001-2003 Sergey Rusakov.  All rights reserved.
+# This program is free software; you can redistribute it
+# and/or modify it under the same terms as Perl itself.
+#
+#===============================================================
+# This is sample crontab file to use with ePortal.
+#
+
+#
+# crontab file format
+# min hour day_of_month month day_of_week user command
+#
+
+#
+# Define some of environment variables
+#
+MAILTO=root
+PERL5LIB=/opt/ePortal/lib
+
+#
+# Define DBI source
+#
+EPORTAL_DBI_SOURCE=dbi:mysql:host=mysql.domain;database=ePortal;
+EPORTAL_DBI_USERNAME=ePortal
+EPORTAL_DBI_PASSWORD=******
+
+
+#
+# every 5 minutes
+#
+*/5 * * * * root perl /home/ePortal/bin/ePortal-cron.pl
+
+

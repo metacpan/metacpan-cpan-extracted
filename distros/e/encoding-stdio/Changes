@@ -1,0 +1,11 @@
+Revision history for Perl extension encoding::stdio.
+
+0.02  Wed Jun 20 13:02:51 2007
+        - dropped encoding::source in favour of RGARCIA's new lexical
+          encoding::source which is better and mostly drop-in compatible
+        - renamed the distribution to encoding-stdio
+
+0.01  Thu May 25 01:17:01 2006
+	- original version; created by h2xs 1.23 with options
+		-n encoding::split -X -A -P --use-new-tests -b 5.8.0 --overwrite
+

@@ -1,0 +1,139 @@
+%#============================================================================
+%# ePortal - WEB Based daily organizer
+%# Author - S.Rusakov <rusakov_sa@users.sourceforge.net>
+%#
+%# Copyright (c) 2000-2004 Sergey Rusakov.  All rights reserved.
+%# This program is open source software
+%#
+%#
+%#----------------------------------------------------------------------------
+
+<&| /list.mc, obj => new ePortal::CronJob, submit => 1 &>
+  <&| /list.mc:row &>
+  <& /list.mc:column_image &>
+
+  <& /list.mc:column, id => 'title', order_by => 'title',
+                    url => href("CronJob_edit.htm", objid=>$_->id) &>
+
+  <& /list.mc:column, id => 'period', 
+                      order_by => 'period,title', 
+                      order_by_desc => 'period desc,title',
+                      -align => 'center' &>
+
+  <&| /list.mc:column, id => 'JobStatus', 
+                      order_by => 'JobStatus,title', 
+                      order_by_desc => 'JobStatus DESC,title',
+                      -align => 'center' &>
+    <%perl>
+    my $color = '#000000';
+    $color = 'red' if $_->JobStatus eq 'disabled';
+    $color = 'green' if $_->JobStatus eq 'enabled';
+    </%perl>
+    <font color="<% $color %>"><% $_->htmlValue('JobStatus') %></font>
+  </&>
+
+  <&| /list.mc:column, id => 'LastResult', order_by => 'LastResult', -align => 'center' &>
+    <%perl>
+    my $color = '#000000';
+    $color = 'red'    if $_->LastResult eq 'failed';
+    $color = 'green'  if $_->LastResult eq 'done';
+    $color = 'yellow' if $_->LastResult eq 'running';
+    </%perl>
+    <font color="<% $color %>"><% $_->htmlValue('LastResult') %></font>
+  </&>
+
+  <& /list.mc:column, id => 'lastrun', order_by => 'lastrun', -align => 'center' &>
+  <& /list.mc:column_checkbox &>
+  </&><!-- row -->
+
+  <&| /list.mc:extra_row &>
+  <span class="smallfont">
+      <font COLOR="#6CAFB3"><% $_->Memo %></font>
+  </span>
+  </&>
+
+% if ($_->JobServer) {
+  <&| /list.mc:extra_row &>
+  <span class="smallfont">
+      <font COLOR="green"><% pick_lang(rus => "Сервер заданий: ", eng => "Job server: ") %><% $_->JobServer %></font>
+  </span>
+  </&>
+% }
+% if ($_->ForceRun) {
+  <&| /list.mc:extra_row &>
+  <span class="smallfont">
+      <font COLOR="red"><% pick_lang(rus => "Задание будет запущено при первой возможности", eng => "Job is forced to run ") %></font>
+  </span>
+  </&>
+% }
+
+  <& /list.mc:action_bar, popup_menu => {
+        -values => [qw/enable disable forcerun/],
+        -labels => {
+          enable   => pick_lang(rus => "Включить", eng => "Enable"),
+          disable  => pick_lang(rus => "Выключить", eng => "Disable"),
+          forcerun => pick_lang(rus => "Запустить", eng => "Force run"),
+        },
+        }  &>
+</&>
+
+<p>
+<ul class="memo">
+  <li>
+    <&| SELF:rus &>
+    Добавление новых периодических заданий производится автоматически
+    при появлении файла задания в каталоге comp_root/cmdline</&>
+    <&| SELF:eng &>
+    Addition of new periodic job is done automatically when new job
+    script appears in comp_root/cmdline directory</&>
+
+  <li>
+    <&| SELF:rus &>
+    Не надо удалять те задания, для которых существует файл задания.
+    Просто выключите ненужные задания, они не будут исполняться</&>
+    <&| SELF:eng &>
+    Do not delete needless job. Just disable it.</&>
+
+  <li>
+    <&| SELF:rus &>
+    Параметр "Имя сервера задач" используется для запуска заданий на различных 
+    серверах. Для этого надо запускать ePortal-cron.pl с параметром 
+    <code>--jobserver [name]</code>, где [name] совпадает с указанным у задания.
+    </&>
+    <&| SELF:eng &>
+    "Job server name" parameter used to run different jobs on different servers.
+    Run <code>ePortal-cron.pl --jobserver [name]</code> to process only these jobs.
+    </&>
+</ul>
+<p>
+
+
+%#=== @metags onStartRequest ====================================================
+<%method onStartRequest><%perl>
+  my $list_action = $m->comp('/list.mc:list_action');
+  if ( $list_action ) {
+    my $obj = new ePortal::CronJob;
+    my $counter = 0;
+    foreach my $id ($m->comp('/list.mc:checkboxes')) {
+      next if ! $obj->restore($id);
+      $obj->jobstatus('enabled') if $list_action eq 'enable';
+      $obj->jobstatus('disabled') if $list_action eq 'disable';
+      $obj->forcerun(1) if $list_action eq 'forcerun';
+      $obj->update;
+      $counter ++;
+    }
+    
+    $session{GoodMessage} = $counter . pick_lang(rus => " заданий включено", eng => " jobs enabled") if $list_action eq 'enable';
+    $session{GoodMessage} = $counter . pick_lang(rus => " заданий выключено", eng => " jobs disabled") if $list_action eq 'disable';
+    $session{GoodMessage} = $counter . pick_lang(rus => " заданий будут запущены", eng => " forced to run") if $list_action eq 'forcerun';
+    return href($ENV{SCRIPT_NAME}, $m->comp('/list.mc:state'));
+  }
+</%perl></%method>
+
+
+
+%#=== @METAGS attr =========================================================
+<%attr>
+Title => {rus => "Периодические задания ePortal", eng => "Periodic jobs of ePortal"}
+</%attr>
+

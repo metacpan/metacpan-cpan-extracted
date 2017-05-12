@@ -1,0 +1,98 @@
+INTRODUCTION
+
+The Extensible Report Generator (ERG) is a set of perl object modules
+that lets a user quickly develop object classes which can produce
+highly configurable reports with a minimal amount of development
+effort.  The report generator class can easily be extended to produce
+summary information besides just formatting data and field headings.
+
+Here's an example of a very simple report produce by the report
+generators, including the field headings and the summary lines.
+
+----------------------------------------------------------------------
+Directory                       Modify time           Access
+
+docs                            05/27/98 19:03:06     05/27/98
+freezer                         05/27/98 14:33:34     05/27/98
+
+
+File                     Size   Modify time           Access
+
+dirhelp.vtxt            1,383   05/27/98 09:26:42     06/03/98
+file_reporter.pm        6,366   06/03/98 10:38:58     06/03/98
+line_formatter.pm      11,680   06/03/98 10:17:04     06/03/98
+old_test.pl             3,258   05/27/98 19:00:06     06/03/98
+page_manager.pm         9,719   06/03/98 10:33:20     06/03/98
+report_generator.pm    25,540   06/03/98 10:16:42     06/03/98
+report_summary.pm       6,821   06/03/98 10:20:04     06/03/98
+test.pl                 2,468   06/03/98 10:50:18     06/03/98
+zzz                       513   05/27/98 10:31:02     06/03/98
+
+Total                  67,748
+
+Average                 7,528
+----------------------------------------------------------------------
+
+
+STRUCTURE
+
+The ERG consists of 4 class objects.  The line formatter class is used
+by the report generator class to format lines and by the page manager
+class to format headers and trailers for each page.  The report
+generator class can produce three types of output:  lines with field
+data, lines with field headings or lines with summary information.
+The report summary class is used by the report generator class to keep track
+of information for report summaries, e.g. totals, averages.
+The page manage class can be used to break report lines into pages.
+
+
+
+GETTING STARTED
+
+The over-all structure is pretty easy to understand.  The quickest
+way to get started is to look at the file 'test.pl' which is a
+demo of using the report generators and the file 'file_reporter'
+which is an example for extending the basic report generator
+class.  Comments of the beginning of each of the 4 basic class files
+can help explain more about how to extend the classes.
+
+The simplest way to use this module is just to copy the four class files
+into the working directory.  (The standard Makefile.pl is also provided.)
+
+
+LIST OF FILES INCLUDED:
+
+    README	             -  this file
+    MANIFEST                 -  list of files
+    Changes                  -  list of changes
+    Makefile.pl              -  make file generator
+
+    erg_line_formatter.pm    -  line formatter class
+    erg_report_generator.pm  -  basic report generator class
+    erg_report_summary.pm    -  report summary class
+    erg_page_manager.pm      -  page manager class
+
+    test.pl                  -  test/demo file
+    file_reporter.pm         -  file reporter class used by test.pl
+
+
+Version:  1.13
+Date:  7/25/98
+
+s. luebking
+phoenixl@aol.com
+
+
+
+############################# Copyright #######################################
+
+# Copyright (c) 1998 Scott Luebking. All rights reserved.
+# This program is free software; you can redistribute it and/or
+# modify it under the same terms as Perl itself.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+###############################################################################

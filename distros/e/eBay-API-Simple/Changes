@@ -1,0 +1,107 @@
+# Changes for eBay::API::Simple
+
+TODO: add ClientAlerts and BestMatch backend
+
+0.29 Wed Aug  1 17:34:01 PDT 2012
+- add IAF Token support to Trading module
+
+0.28 Mon May  7 16:37:35 PDT 2012
+- add allow_blessed and convert_blessed to json encode call 
+
+0.27
+- add support for basic authorization
+
+0.25
+- add support for parallel requests using LWP::Parallel
+
+0.24
+- fix HTML and RSS test scripts (stale URLs)
+- in build_urls method, use sort for consistent URL output
+- add better error handling for JSON backend
+
+0.23 Fri May 27 17:31:16 PDT 2011
+- add JSON backend
+
+0.22 Fri Apr  1 10:16:30 PDT 2011
+- rework test scripts
+
+0.21 Thu Jan 27 22:08:31 PST 2011
+- build url function now allows for multiple keys in the query string
+  i.e. /uri/?q=foo1&q=foo2&q=foo3
+- fix prereq - dependent on URI::Encode >= 3.30
+
+0.20 Wed Jan 26 21:23:35 PST 2011
+- fix test
+
+0.19 Wed Jan 26 13:35:59 PST 2011
+- check for $ENV{HOME} being defined before using
+- add more utf8 fixes
+- add special fix for unicode in 5.8.1
+
+0.18 Wed Jul 28 13:11:30 GMT+7 2010
+- encode "keywords" field for UTF-8 in Finding module
+- test for UTF-8 compatibility for Finding module
+
+0.17 Thu Jul 15 14:09:57 PDT 2010
+- add YAML support for API configurations 
+- remove worldofgood test
+- add SellerReport.pl script for pulling out the sellers details from 
+  Shopping and Trading api and the usage of ebay.yaml 
+
+0.16 Thu Jul  1 15:00:46 PDT 2010
+- add support for attributes in the request via enable_attributes flag
+
+0.15 Tue Jun 15 15:00:55 PDT 2010
+- add sandbox docs
+- modify Finding backend to support the "X-EBAY-SOA-SERVICE-NAME" 
+  defaults to: FindingService
+  * provides support custom services on the Finding platform
+   
+0.14
+- modify debugging
+- modify Trading backend: calls can now be made without a password 
+  since it's not required for a fetch token call.
+
+0.13 Fri Feb  5 13:28:31 PST 2010
+- add query string arg support for RSS and HTML backends
+- fixed XML namespace stripping (now done in base class with optional override)
+
+0.12 Wed Jan 27 11:32:30 PST 2010
+- add support to the Merchandising services
+
+0.11 Tue Jan 26 18:15:38 PST 2010 
+- add to documentation
+
+0.10 Sat Jan 23 19:44:31 PST 2010
+- fix tests
+
+0.09 Fri Jan 22 11:54:36 PST 2010
+- fix version issue
+
+0.07 Fri Jan 22 11:34:36 PST 2010
+- add support for eBay Finding2.0 services
+  * eBay::API::Simple::Finding
+- add proxy support to base class
+
+0.06 Mon Aug  3 09:06:58 PDT 2009
+- fix fish config routine
+- add Simple.pm subclass
+
+0.05 Mon Jul 20 17:30:43 PDT 2009
+- add default timeout of 20 seconds
+- added support for username/password on Trading API
+
+0.04 Mon Feb 16 15:40:05 PST 2009
+- release to CPAN
+- code cleanup
+- add ebay.ini support
+- fix tests
+- fix xmlout bug in Shopping backend
+
+0.02 Thu Jan  8 13:34:36 PST 2009
+- several doc udpates
+- made some cosmetic changes
+
+0.01 Thu Jan  8 10:03:09 PST 2009
+- alpha release for this eBay::API::Simple library
+

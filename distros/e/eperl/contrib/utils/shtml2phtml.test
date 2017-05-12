@@ -1,0 +1,11 @@
+foo 
+bar1<!--#set var="bar" value="FUCK"-->bar2
+bar1<!--#echo var="bar"-->bar2
+bar1<!--#echo  var="REMOTE_HOST" -->bar2
+bar1<!--#echo  var="LAST_MODIFIED" -->bar2
+bar1<!--#include file="somewhere/file.x" -->bar2
+bar1<!--#include virtual="somewhere/file.x" -->bar2
+bar1<!--#exec cgi="somewhere/file.x" -->bar2
+bar1<!--#exec cmd="somewhere/file.x" -->bar2
+bar1<!--#flastmod file="somewhere/file.x" -->bar2
+bar1<!--#printenv-->bar2

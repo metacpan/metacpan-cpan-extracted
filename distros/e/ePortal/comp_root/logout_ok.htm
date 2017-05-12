@@ -1,0 +1,33 @@
+%#============================================================================
+%# ePortal - WEB Based daily organizer
+%# Author - S.Rusakov <rusakov_sa@users.sourceforge.net>
+%#
+%# Copyright (c) 2000-2004 Sergey Rusakov.  All rights reserved.
+%# This program is open source software
+%#
+%#
+%#----------------------------------------------------------------------------
+<h1><% pick_lang(
+		rus => "–абота с сервером окончена.",
+		eng => "You are logged out.") %></h1>
+
+<% pick_lang( rus => q{
+	“еперь вы сможете получить доступ только к ресурсам общего доступа.
+	ƒл€ доступа к персональной информации и ресурсам с ограниченным доступом вам
+	надо будет оп€ть зарегистрироватьс€.
+}, eng => q{
+  Anonymous users may see only public resources. Please login again to
+	see your personal resources.
+}) %>
+
+%#=============================================================================
+<%attr>
+Title => { rus => "ќкончание работы", eng => "Logout from ePortal"}
+</%attr>
+
+
+
+%#============================================================================
+<%method HTMLhead>
+	<meta http-equiv="Refresh" content="10; URL=http://<% $ENV{HTTP_HOST} %>/">
+</%method>

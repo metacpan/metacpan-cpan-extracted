@@ -1,0 +1,49 @@
+README file  -  Math::ExprEval 1.0
+
+This module is an expression evaluator.  It has three main objectives:
+
+    efficiency
+
+    extensibility
+
+    user-friendly error messages
+
+
+It's features include:
+
+    standard data types, arithmetic and boolean operators, conditionals,
+    pattern matching
+
+    user-defined data types
+
+    user-defined binary operators and prefix unary operators
+
+    over-loaded binary operators and prefix unary operators
+
+    calls to user-provided perl functions
+
+    a mode for syntax checking only
+
+    optimized re-evaluation of expressions
+
+    multiple symbol tables
+
+The documentation for the evalExpression function in eval_expr.pm explains
+how to use the module.  The test.pl file has examples on how to use this module.
+
+18 December 2001
+
+############################# Copyright #######################################
+
+# Copyright (c) 2001 Scott Luebking. All rights reserved.
+# This program is free software; you can redistribute it and/or
+# modify it under the same terms as Perl itself.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+###############################################################################
+
+ 

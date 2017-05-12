@@ -1,0 +1,7 @@
+encoding-split version 0.02
+===========================
+
+This package does not contain any actual implementation, but depends on
+encoding::source and encoding::stdio, to automate upgrades for people who used
+encoding::split 0.01 which contained both.
+

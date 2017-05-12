@@ -1,0 +1,906 @@
+##
+##        ____           _ 
+##    ___|  _ \ ___ _ __| |
+##   / _ \ |_) / _ \ '__| |
+##  |  __/  __/  __/ |  | |
+##   \___|_|   \___|_|  |_|
+## 
+##  ePerl -- Embedded Perl 5 Language
+##
+##  ePerl interprets an ASCII file bristled with Perl 5 program
+##  statements by evaluating the Perl 5 code while passing through
+##  the plain ASCII data. It can operate in various ways: As a
+##  stand-alone Unix filter or integrated Perl 5 module for general
+##  file generation tasks and as a powerful Webserver scripting
+##  language for dynamic HTML page programming.
+##
+##  ======================================================================
+##
+##  Copyright (c) 1996,1997 Ralf S. Engelschall, All rights reserved.
+##
+##  This program is free software; it may be redistributed and/or modified
+##  only under the terms of either the Artistic License or the GNU General
+##  Public License, which may be found in the ePerl source distribution.
+##  Look at the files ARTISTIC and COPYING or run ``eperl -l'' to receive
+##  a built-in copy of both license files.
+##
+##  This program is distributed in the hope that it will be useful, but
+##  WITHOUT ANY WARRANTY; without even the implied warranty of
+##  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See either the
+##  Artistic License or the GNU General Public License for more details.
+##
+##  ======================================================================
+##
+##  eperl.pod -- ePerl Documentation in Plain Old Document (POD) Format
+##
+
+=head1 NAME
+
+ePerl - Embedded Perl 5 Language
+
+=head1 VERSION
+
+@V@
+
+=head1 SYNOPSIS
+
+B<eperl>
+[B<-d> I<name>=I<value>]
+[B<-D> I<name>=I<value>]
+[B<-B> I<begin_delimiter>]
+[B<-E> I<end_delimiter>]
+[B<-i>]
+[B<-m> I<mode>]
+[B<-o> I<outputfile>]
+[B<-k>]
+[B<-I> I<directory>]
+[B<-P>]
+[B<-C>]
+[B<-L>]
+[B<-x>]
+[B<-T>]
+[B<-w>]
+[B<-c>]
+[I<inputfile>]
+
+B<eperl>
+[B<-r>]
+[B<-l>]
+[B<-v>]
+[B<-V>]
+
+=head1 DESCRIPTION
+
+=head2 Abstract
+
+ePerl interprets an ASCII file bristled with Perl 5 program statements by
+evaluating the Perl 5 code while passing through the plain ASCII data. It can
+operate in various ways: As a stand-alone Unix filter or integrated Perl 5
+module for general file generation tasks and as a powerful Webserver scripting
+language for dynamic HTML page programming.
+
+=head2 Introduction
+
+The B<eperl> program is the I<Embedded Perl 5 Language> interpreter. This
+really is a full-featured Perl 5 interpreter, but with a different calling
+environment and source file layout than the default Perl interpreter (usually
+the executable B<perl> or B<perl5> on most systems).  It is designed for
+general ASCII file generation with the philosophy of I<embedding> the Perl 5
+program code into the ASCII data instead of the usual way where you embed the
+ASCII data into a Perl 5 program (usually by quoting the data and using them
+via C<print> statements).  So, instead of writing a plain Perl script like
+
+  #!/path/to/perl
+  print "foo bar\n";
+  print "baz quux\n";
+  for ($i = 0; $i < 10; $i++) { print "foo #${i}\n"; }
+  print "foo bar\n";
+  print "baz quux\n";
+
+you can write it now as an ePerl script:
+
+  #!/path/to/eperl
+  foo bar
+  baz quux
+  <: for ($i = 0; $i < 10; $i++) { print "foo #${i}\n"; } :>
+  foo bar
+  baz quux
+
+Although the ePerl variant has a different source file layout, the semantic is
+the same, i.e. both scripts create exactly the same resulting data on
+C<STDOUT>.
+
+=head2 Intention
+
+ePerl is simply a glue code which combines the programming power of the Perl 5
+interpreter library with a tricky embedding technique.  The embedding trick is
+this: it converts the source file into a valid Perl script which then gets
+I<entirely> evaluated by only one internal instance of the Perl 5 interpreter.
+To achieve this, ePerl translates all plain code into (escaped) Perl 5 strings
+placed into F<print> constructs while passing through all embedded native Perl
+5 code. As you can see, ePerl itself does exactly the same internally, a silly
+programmer had to do when writing a plain Perl generation script. 
+
+Due to the nature of such bristled code, ePerl is really the better attempt
+when the generated ASCII data contains really more static as dynamic data. Or
+in other words: I<Use ePerl if you want to keep the most of the generated ASCII
+data in plain format while just programming some bristled stuff.> Do not use it
+when generating pure dynamic data. There it brings no advantage to the
+ordinary program code of a plain Perl script. So, the static part should be at
+least 60% or the advantage becomes a disadvantage.
+
+ePerl in its origin was actually designed for an extreme situation: as a
+webserver scripting-language for on-the-fly HTML page generation. Here you
+have the typical case that usually 90% of the data consists of pure static
+HTML tags and plain ASCII while just the remaining 10% are programming
+constructs which dynamically generate more markup code. This is the reason why
+ePerl beside its standard Unix filtering runtime-mode also supports the
+CGI/1.1 and NPH-CGI/1.1 interfaces.
+
+=head2 Embedded Perl Syntax
+
+Practically you can put any valid Perl constructs inside the ePerl blocks the
+used Perl 5 interpreter library can evaluate. But there are some important
+points you should always remember and never forget when using ePerl:
+
+=over 4
+
+=item I<1. Delimiters are always discarded.>
+
+Trivially to say, but should be mentioned at least once. The ePerl block
+delimiters are always discarded and are only necessary for ePerl to recognize
+the embedded Perl constructs. They are never passed to the final output.
+
+=item I<2. Generated content has to go to C<STDOUT>.>
+
+Although you can define subroutines, calculate some data, etc.  inside ePerl
+blocks only data which is explicitly written to the C<STDOUT> filehandle is
+expanded. In other words: When an ePerl block does not generate content on
+C<STDOUT>, it is entirely replaced by an empty string in the final output.
+But when content is generated it is put at the point of the ePerl block in the
+final output. Usually contents is generated via pure C<print> constructs which
+implicitly use C<STDOUT> when no filehandle is given.
+
+=item I<3. Generated content on C<STDERR> always leads to an error.>
+
+Whenever content is generated on the C<STDERR> filehandle, ePerl displays an
+error (including the STDERR content). Use this to exit on errors while passing
+errors from ePerl blocks to the calling environment.
+
+=item I<4. Last semicolon.>
+
+Because of the following point 6 (see below) and the fact that most of the
+users don't have the internal ePerl block translations in mind, ePerl is smart
+about the last semicolon. Usually every ePerl block has to end with the
+semicolon of the last command.
+
+   <: cmd; ...; cmd; :>
+
+But when the last semicolon is missing it is automatically added
+by ePerl, i.e. 
+
+   <: cmd; ...; cmd :>
+
+is also correct syntax.  But sometimes it is necessary to force ePerl I<not>
+to add the semicolon. Then you can add a ``C<_>'' (underscore) as the last
+non-whitespace character in the block to force ePerl to leave the final
+semicolon. Use this for constructs like the following
+
+   <: if (...) { _:>
+   foo
+   <: } else { _:>
+   bar 
+   <: } :>
+
+where you want to spread a Perl directive over more ePerl blocks.
+
+=item I<5. Shorthand for C<print>-only blocks.>
+
+Because most of the time ePerl is used just to interpolate variables, e.g.
+
+   <: print $VARIABLE; :>
+
+it is useful to provide a shortcut for this kind of constructs.  So ePerl
+provides a shortcut via the character '='. When it immediately (no whitespaces
+allowed here) follows the begin delimiter of an ePerl block a C<print>
+statement is implicitly generated, i.e. the above block is equivalent to
+
+   <:=$VARIABLE:>
+
+Notice that the semicolon was also removed here, because it gets automatically
+added (see above).
+
+=item I<6. Special EndOfLine discard command for ePerl blocks.>
+
+ePerl provides a special discard command named ``C<//>'' which discards all
+data up-to and including the following newline character when directly
+followed an end block delimiter. Usually when you write
+
+  foo
+  <: $x = 1; :>
+  quux
+
+the result is
+
+  foo
+  
+  quux
+
+because ePerl always preserves code around ePerl blocks, even
+just newlines. But when you write
+
+  foo
+  <: $x = 1; :>//
+  quux
+
+the result is 
+
+  foo
+  quux
+
+because the ``C<//>'' deleted all stuff to the end of the line, I<including>
+the newline.
+
+=item I<7. Restrictions in parsing.>
+
+Every program has its restrictions, ePerl too. Its handicap is that Perl is
+not only a rich language, it is a horrible one according to parsing its
+constructs. Perhaps you know the phrase ,,Only F<perl> can parse I<Perl>''.
+Think about it. The implication of this is that ePerl never tries to parse the
+ePerl blocks itself. It entirely relies on the Perl interpreter library,
+because it is the only instance which can do this without errors.  But the
+problem is that ePerl at least has to recognize the begin and end positions of
+those ePerl blocks. 
+
+There are two ways: It can either look for the end delimiter while parsing but
+at least recognize quoted strings (where the end delimiter gets treated as
+pure data). Or it can just move forward to the next end delimiter and say that
+it have not occur inside Perl constructs. In ePerl 2.0 the second one was
+used, while in ePerl 2.1 the first one was taken because a lot of users wanted
+it this way while using bad end delimiters like ``C<E<gt>>''. But actually the
+author has again revised its opinion and decided to finally use the second
+approach which is used since ePerl 2.2 now. Because while the first one allows
+more trivial delimiters (which itself is not a really good idea), it fails
+when constructs like ``C<m|"[^"]+"|>'' etc.  are used inside ePerl blocks. And
+it is easier to escape end delimiters inside Perl constructs (for instance via
+backslashes in quoted strings) than rewrite complex Perl constructs to use
+even number of quotes.
+
+So, whenever your end delimiter also occurs inside Perl constructs you have to
+escape it in any way. 
+
+=item I<8. HTML entity conversion.>
+
+Because one of ePerl's usage is as a server-side scripting-language for HTML
+pages, there is a common problem in conjunction with HTML editors.  They
+cannot know ePerl blocks, so when you enter those blocks inside the editors
+they usually encode some characters with the corresponding HTML entities. The
+problem is that this encoding leads to invalid Perl code. ePerl provides the
+option B<-C> for decoding these entities which is automatically turned on in
+CGI modes. See description below under option B<-C> for more details.
+
+=back
+
+=head2 Runtime Modes
+
+ePerl can operate in three different runtime modes:
+
+=over 4
+
+=item I<Stand-alone Unix filter mode>
+
+This is the default operation mode when used as a generation tool from the
+Unix shell or as a batch-processing tool from within other programs or
+scripts:
+
+  $ eperl [options] - < inputfile > outputfile
+  $ eperl [options] inputfile > outputfile
+  $ eperl [options] -o outputfile - < inputfile
+  $ eperl [options] -o outputfile inputfile
+
+As you can see, ePerl can be used in any combination of STDIO and external
+files. Additionally there are two interesting variants of using this mode.
+First you can use ePerl in conjunction with the Unix I<Shebang> magic
+technique to implicitly select it as the interpreter for your script similar
+to the way you are used to with the plain Perl interpreter:
+
+  #!/path/to/eperl [options]
+  foo
+  <: print "bar"; :>
+  quux
+
+Second, you can use ePerl in conjunction with the Bourne-Shell I<Here
+Document> technique from within you shell scripts:
+
+  #!/bin/sh
+  ...
+  eperl [options] - <<EOS
+  foo
+  <: print "quux"; :>
+  quux
+  EOS
+  ...
+
+And finally you can use ePerl directly from within Perl programs by the use of
+the Parse::ePerl(3) package (assuming that you have installed this also; see
+file F<INSTALL> inside the ePerl distribution for more details):
+
+  #!/path/to/perl
+  ...
+  use Parse::ePerl;
+  ...
+  $script = <<EOT;
+  foo
+  <: print "quux"; :>
+  quux
+  EOT
+  ...
+  $result = Parse::ePerl::Expand({
+      Script => $script,
+      Result => \$result,
+  });
+  ...
+  print $result;
+  ...
+
+See Parse::ePerl(3) for more details.
+
+=item I<CGI/1.1 compliant interface mode>
+
+This is the runtime mode where ePerl uses the CGI/1.1 interface of a webserver
+when used as a I<Server-Side Scripting Language> on the Web. ePerl enters this
+mode automatically when the CGI/1.1 environment variable C<PATH_TRANSLATED> is
+set and its or the scripts filename does I<not> begin with the NPH prefix
+``F<nph->''.  In this runtime mode it prefixes the resulting data with
+HTTP/1.0 (default) or HTTP/1.1 (if identified by the webserver) compliant
+response header lines.
+
+ePerl also recognizes HTTP header lines at the beginning of the scripts
+generated data, i.e. for instance you can generate your own HTTP headers like
+
+   <? $url = "..";
+      print "Location: $url\n";
+      print "URI: $url\n\n"; !>
+   <html>
+   ...
+
+But notice that while you can output arbitrary headers, most webservers
+restrict the headers which are accepted via the CGI/1.1 interface. Usually you
+can provide only a few specific HTTP headers like C<Location> or C<Status>.
+If you need more control you have to use the NPH-CGI/1.1 interface mode.
+
+Additionally ePerl provides a useful feature in this mode: It can switch its
+UID/GID to the owner of the script if it runs as a Unix I<SetUID> program (see
+below under L<Security> and the option ``u+s'' of chmod(1)).
+
+There are two commonly known ways of using this CGI/1.1 interface mode on the
+Web. First, you can use it to explicitly transform plain HTML files into
+CGI/1.1 scripts via the I<Shebang> technique (see above). For an Apache
+webserver just put the following line as the first line of the file:
+
+  #!/path/to/eperl -mc
+
+Then rename the script from F<file.html> to F<file.cgi> and set its execution
+bit via
+
+  $ mv file.html file.cgi
+  $ chmod a+rx file.cgi
+
+Now make sure that Apache accepts F<file.cgi> as a CGI program by enabling CGI
+support for the directory where F<file.cgi> resides. For this add the line
+
+  Options +ExecCGI
+
+to the F<.htaccess> file in this directory. Finally make sure that Apache
+really recognizes the extension F<.cgi>. Perhaps you additionally have to add
+the following line to your F<httpd.conf> file:
+
+  AddHandler cgi-script .cgi
+
+Now you can use F<file.cgi> instead of F<file.html> and make advantage of the
+achieved programming capability by bristling F<file.cgi> with your Perl
+blocks (or the transformation into a CGI script would be useless).
+
+Alternatively (or even additionally) a webmaster can enable ePerl support in a
+more seemless way by configuring ePerl as a real implicit server-side
+scripting language. This is done by assigning a MIME-type to the various valid
+ePerl file extensions and forcing all files with this MIME-type to be
+internally processed via the ePerl interpreter. You can accomplish this for
+Apache by adding the following to your F<httpd.conf> file
+
+  AddType      application/x-httpd-eperl  .phtml .eperl .epl
+  Action       application/x-httpd-eperl  /internal/cgi/eperl
+  ScriptAlias  /internal/cgi              /path/to/apache/cgi-bin
+
+and creating a copy of the F<eperl> program in your CGI-directory:
+
+  $ cp -p /path/to/eperl /path/to/apache/cgi-bin/eperl
+
+Now all files with the extensions F<.phtml>, F<.eperl> and F<.epl> are
+automatically processed by the ePerl interpreter. There is no need for a
+I<Shebang> line or any locally enabled CGI mode.
+
+One final hint: When you want to test your scripts offline, just run them with
+forced CGI/1.1 mode from your shell. But make sure you prepare all environment
+variables your script depends on, e.g. C<QUERY_STRING> or C<PATH_INFO>.
+
+  $ export QUERY_STRING="key1=value1&key2=value2"
+  $ eperl -mc file.phtml
+
+
+=item I<NPH-CGI/1.1 compliant interface mode>
+
+This runtime mode is a special variant of the CGI/1.1 interface mode, because
+most webservers (e.g. Apache) provide it for special purposes.   It is known
+as I<Non-Parsed-Header> (NPH) CGI/1.1 mode and is usually used by the
+webserver when the filename of the CGI program is prefixed with ``C<nph->''.
+In this mode the webserver does no processing on the HTTP response headers and
+no buffering of the resulting data, i.e. the CGI program actually has to
+provide a complete HTTP response itself. The advantage is that the program can
+generate arbitrary HTTP headers or MIME-encoded multi-block messages.
+
+So, 
+above we have renamed the file to F<file.cgi> which restricted us a little
+bit. When we alternatively rename F<file.html> to F<nph-file.cgi> and force
+the NPH-CGI/1.1 interface mode via option B<-mn> then this file becomes a
+NPH-CGI/1.1 compliant program under Apache and other webservers. Now our
+script can provide its own HTTP response (it need not, because when absent
+ePerl provides a default one for it).
+
+  #!/path/to/bin/eperl -mn
+  <? print "HTTP/1.0 200 Ok\n";
+     print "X-MyHeader: Foo Bar Quux\n";
+     print "Content-type: text/html\n\n";
+  <html>
+  ...
+
+As you expect this can be also used with the implicit Server-Side Scripting
+Language technique. Put  
+
+  AddType      application/x-httpd-eperl  .phtml .eperl .epl
+  Action       application/x-httpd-eperl  /internal/cgi/nph-eperl
+  ScriptAlias  /internal/cgi              /path/to/apache/cgi-bin
+
+into your F<httpd.conf> and run the command
+
+  $ cp -p /path/to/eperl /path/to/apache/cgi-bin/nph-eperl
+
+from your shell. I<This is the preferred way of using ePerl as a Server-Side
+Scripting Language, because it provides most flexibility>.
+
+=back
+
+=head2 Security
+
+When you are installing ePerl as a CGI/1.1 or NPH-CGI/1.1 compliant program
+(see above for detailed description of these modes) via
+
+  $ cp -p /path/to/eperl /path/to/apache/cgi-bin/eperl
+  $ chown root /path/to/apache/cgi-bin/eperl
+  $ chmod u+s  /path/to/apache/cgi-bin/eperl
+
+or
+
+  $ cp -p /path/to/eperl /path/to/apache/cgi-bin/nph-eperl
+  $ chown root /path/to/apache/cgi-bin/nph-eperl
+  $ chmod u+s  /path/to/apache/cgi-bin/nph-eperl
+
+i.e. with I<SetUID> bit enabled for the B<root> user, ePerl can switch to the
+UID/GID of the I<scripts owner>. Although this is a very useful feature for
+script programmers (because one no longer need to make auxiliary files
+world-readable and temporary files world-writable!), it can be to risky for
+you when you are paranoid about security of SetUID programs. If so just don't
+install ePerl with enabled SetUID bit! This is the reason why ePerl is per
+default only installed as a Stand-Alone Unix filter which never needs this
+feature.
+
+For those of us who decided that this feature is essential for them ePerl
+tries really hard to make it secure. The following steps have to be
+successfully passed before ePerl actually switches its UID/GID (in this
+order):
+
+  1. The script has to match the following extensions:
+     .html, .phtml, .ephtml, .epl, .pl, .cgi
+  2. The UID of the calling process has to be a valid UID,
+     i.e. it has to be found in the systems password file
+  3. The UID of the calling process has to match the 
+     following users: root, nobody
+  4. The UID of the script owner has to be a valid UID,
+     i.e. it has to be found in the systems password file
+  5. The GID of the script group has to be a valid GID,
+     i.e. it has to be found in the systems group file
+  6. The script has to stay below or in the owners homedir
+
+I<IF ONLY ONE OF THOSE STEPS FAIL, NO UID/GID SWITCHING TAKES PLACE!>.
+Additionally (if C<DO_ON_FAILED_STEP> was defined as C<STOP_AND_ERROR> in
+F<eperl_security.h> - not per default defined this way!) ePerl can totally stop
+processing and display its error page.  This is for the really paranoid
+webmasters. Per default when any step failed the UID/GID switching is just
+disabled, but ePerl goes on with processing. Alternatively you can disable
+some steps at compile time. See F<eperl_security.h>.
+
+I<Also remember that ePerl always eliminates the effective UID/GID,
+independent of the runtime mode and independent if ePerl has switched to the
+UID/GID of the owner. For security reasons, the effective UID/GID is always
+destroyed before the script is executed.>
+
+=head2 ePerl Preprocessor
+
+ePerl provides an own preprocessor similar to F<CPP> in style which is either
+enabled manually via option B<-P> or automatically when ePerl runs in
+(NPH-)CGI mode.  The following directives are supported:
+
+=over 4
+
+=item C<#include path> 
+
+This directive is an include directive which can be used to include really any
+stuff, but was actually designed to be used to include other ePerl source
+files. The I<path> can be either a relative or absolute path for the local
+filesystem or a fully qualified HTTP URL.
+
+In case of the absolute path the file is directly accessed on the filesystem,
+while the relative path is first searched in the current working directory and
+then in all directories specified via option B<-I>. In the third case
+(HTTP URL) the file is retrieves via a HTTP/1.0 request on the network. 
+Here HTTP redirects (response codes 301 and 302) are supported, too.
+
+Notice: While ePerl strictly preserves the line numbers when translating the
+bristled ePerl format to plain Perl format, the ePerl preprocessor can't do
+this (because its a B<pre>processor which expands) for this directive.  So,
+whenever you use C<#include>, remember that line numbers in error messages are
+wrong.
+
+Also notice one important security aspect: Because you can include any stuff
+as it is provided with this directive, use it only for stuff which is under
+your direct control. Don't use this directive to include foreign data, at
+least not from external webservers. For instance say you have a ePerl page
+with C<#include http://www.foreigner.com/nice-page.html> and at the next
+request of this page your filesystem is lost! Why? Because the foreigner
+recognizes that you include his page and are using ePerl and just put a simple
+``C<E<lt>?  system("rm -rf /"); !E<gt>>'' in his page. Think about it.
+I<NEVER USE #INCLUDE FOR ANY DATA WHICH IS NOT UNDER YOUR OWN CONTROL>.
+Instead always use C<#sinclude> for such situations.
+
+=item C<#sinclude path> 
+
+This is the secure variant of C<#include> where after reading the data from
+I<path> all ePerl begin and end delimiters are removed. So risky ePerl blocks
+lost their meaning and are converted to plain text. Always use this directive
+when you want to include data which is not under your own control.
+
+=item C<#if expr>, C<#elsif expr>, C<#else>, C<#endif>
+
+These implement a CPP-style C<#if-[#else-]#endif> construct, but with a Perl
+semantic. While the other directives are real preprocessor commands which are
+evaluated at the preprocessing step, this construct is actually just
+transformed into a low-level ePerl construct, so it is B<not> actually
+evaluated at the preprocessing step. It is just a handy shortcut for the
+following (where BD is the currently used begin delimiter and ED the end
+delimiter):
+
+  ``#if expr''    ->  ``BD if (expr) { _ ED//''
+  ``#elsif expr'' ->  ``BD } elsif (expr) { _ ED//''
+  ``#else''       ->  ``BD } else { _ ED//''
+  ``#endif''      ->  ``BD } _ ED//''
+
+The advantage of this unusual aproach is that the if-condition really can be
+any valid Perl expression which provides maximum flexibility. The disadvantage
+is that you cannot use the if-construct to make real preprocessing decisions.
+As you can see, the design goal was just to provide a shorthand for the more
+complicated Perl constructs.
+
+=item C<#c>
+
+This is the comment directive which just discards all data up to and including
+the newline character. Use this one to comment out any stuff, even other
+preprocessor directives.
+
+=back
+
+=head2 Provided Functionality
+
+Up to know you've understand that ePerl provides a nice facility to embed Perl
+code into any ASCII data. But now the typical question is: Which Perl code can
+be put into these ePerl blocks and does ePerl provide any special
+functionality inside these ePerl blocks?
+
+The answers are: First, you can put really I<any> Perl code into the ePerl
+blocks which are valid to the Perl interpreter ePerl was linked with. Second,
+ePerl does I<not> provide any special functionality inside these ePerl blocks,
+because Perl is already sophisticated enough ;-)
+
+The implication of this is: Because you can use any valid Perl code you can
+make use of all available Perl 5 modules, even those ones which use shared
+objects (because ePerl I<is> a Perl interpreter, including DynaLoader
+support). So, browse to the Comprehensive Perl Archive Network (CPAN) via
+http://www.perl.com/perl/CPAN and grab your favorite packages which can make
+your life easier (both from within plain Perl scripts I<and> ePerl scripts)
+and just use the construct ``C<use name;>'' in any ePerl block to use them
+from within ePerl. 
+
+When using ePerl as a Server-Side-Scripting-Language I really recommend you to
+install at least the packages F<CGI.pm> (currently vers.  2.36),
+F<HTML-Stream> (1.40), F<libnet> (1.0505) and F<libwww-perl> (5.08).  When you
+want to generate on-the-fly images as well, I recommend you to additionally
+install at least F<GD> (1.14) and F<Image-Size> (2.3). The ePerl interpreter
+in conjunction with these really sophisticated Perl 5 modules will provide you
+with maximum flexibility and functionality. In other words: I<Make use of
+maximum Software Leverage in the hackers world of Perl as great as possible>.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-d> I<name>=I<value>
+
+Sets a Perl variable in the package C<main> which can be referenced
+via C<$name> or more explicitly via C<$main::name>. The command
+
+  eperl -d name=value ..
+  
+is actually equivalent to having
+
+  <? $name = value; !>
+
+at the beginning of I<inputfile>. This option can occur more than once.
+
+=item B<-D> I<name>=I<value>
+
+Sets a environment variable which can be referenced via C<$ENV{'variable'}>
+inside the Perl blocks. The command
+
+  eperl -D name=value ..
+  
+is actually equivalent to 
+
+  export name=value; eperl ...
+
+but the advantage of this option is that it doesn't manipulate the callers
+environment. This option can occur more than once.
+
+=item B<-B> I<begin_delimiter>
+
+Sets the Perl block begin delimiter string. Use this in conjunction with C<-E>
+to set different delimiters when using ePerl as an offline HTML
+creation-language while still using it as an online HTML scripting-language.
+Default delimiters are C<E<lt>?> and C<!E<gt>> for CGI modes and C<E<lt>:> and
+C<:E<gt>> for stand-alone Unix filtering mode.
+
+There are a lot of possible variations you could choose: "C<E<lt>:>" and
+"C<:E<gt>>" (the default ePerl stand-alone filtering mode delimiters),
+"C<E<lt>?>" and "C<!E<gt>>" (the default ePerl CGI interface mode delimiters),
+"C<E<lt>script language='ePerl'E<gt>>" and "C<E<lt>/scriptE<gt>>" (standard
+HTML scripting language style), "C<E<lt>script type="text/eperl"E<gt>>" and
+"C<E<lt>/scriptE<gt>>" (forthcoming HTML3.2+ aka Cougar style),
+"C<E<lt>eperlE<gt>>" and "C<E<lt>/eperlE<gt>>" (HTML-like style),
+"C<E<lt>!--#eperl code='>" and "C<' --E<gt>>" (NeoScript and SSI style) or
+even "C<E<lt>?>" and "C<E<gt>>" (PHP/FI style; but this no longer recommended
+because it can lead to parsing problems. Should be used only for backward
+compatibility to old ePerl versions 1.x).
+
+The begin and end delimiters are searched case-insensitive.
+
+=item B<-E> I<end_delimiter>
+
+Sets the Perl block end delimiter string. See also option B<-B>.
+
+=item B<-i>
+
+Forces the begin and end delimiters to be searched case-insensitive.  Use this
+when you are using delimiters like
+``C<E<lt>ePerlE<gt>>...C<E<lt>/ePerlE<gt>>'' or other more textual ones.
+
+=item B<-m> I<mode>
+
+This forces ePerl to act in a specific runtime mode.  See above for a detailed
+description of the three possible modes: Stand-alone filter (I<mode>=C<f>,
+i.e. option B<-mf>), CGI/1.1 interface mode (I<mode>=C<c>, i.e. option B<-mc>)
+or the NPH-CGI/1.1 interface mode (I<mode>=C<n>, i.e. option B<-mn>).
+
+=item B<-o> I<outputfile>
+
+Forces the output to be written to F<outputfile> instead of F<STDOUT>. Use
+this option when using ePerl as a filter. The outputfile ``F<->'' sets F<STDOUT>
+as the output handle explicitly. Notice that this file is relative to the
+source file directory when the runtime mode is forced to CGI or NPH-CGI.
+
+=item B<-k>
+
+Forces ePerl to keep the current working directory from where it was started.
+Per default ePerl will change to the directory where the file to be executed
+stays. This option is useful if you use ePerl as an offline filter on
+a temporary file.
+
+=item B<-x>
+
+This sets debug mode where ePerl outputs the internally created Perl script to
+the console (F</dev/tty>) before executing it. Only for debugging problems with
+the inputfile conversion.
+
+=item B<-I> I<directory>
+
+Specify a directory which is both used for C<#include> and C<#sinclude>
+directives of the ePerl preprocessor and added to C<@INC> under runtime.  This
+option can occur more than once.
+
+=item B<-P>
+
+Manually enables the special ePerl Preprocessor (see above). This option is
+enabled for all CGI modes automatically.
+
+=item B<-C>
+
+This enables the HTML entity conversion for ePerl blocks. This option is
+automatically forced in CGI modes. 
+
+The solved problem here is the following: When you use ePerl as a
+Server-Side-Scripting-Language for HTML pages and you edit your ePerl source
+files via a HTML editor, the chance is high that your editor translates some
+entered characters to HTML entities, for instance ``C<E<lt>>'' to ``C<&lt;>''.
+This leads to invalid Perl code inside ePerl blocks, because the HTML editor
+has no knowledge about ePerl blocks. Using this option the ePerl parser
+automatically converts all entities found inside ePerl blocks back to plain
+characters, so the Perl interpreter again receives valid code blocks.
+
+=item B<-L>
+
+This enables the line continuation character ``C<\>'' (backslash) outside
+ePerl blocks. With this option you can spread oneline-data over more lines.
+But use with care: This option changes your data (outside ePerl blocks).
+Usually ePerl really pass through all surrounding data as raw data. With this
+option the newlines become new semantics.
+
+=item B<-T>
+
+This enabled Perl's I<Tainting mode> where the Perl interpreter takes special
+precautions called taint checks to prevent both obvious and subtle traps.  See
+perlsec(1) for more details.
+
+=item B<-w>
+
+This enables Warnings where the Perl interpreter produces some lovely
+diagnostics. See perldiag(1) for more details.
+
+=item B<-c>
+
+This runs a pure syntax check which is similar to ``C<perl -c>''.
+
+=item B<-r>
+
+This prints the internal ePerl README file to the console.
+
+=item B<-l>
+
+This prints the internal ePerl LICENSE file to the console.
+
+=item B<-v>
+
+This prints ePerl version information to the console.
+
+=item B<-V>
+
+Same as option B<-v> but additionally shows the Perl compilation parameters.
+
+=back
+
+=head1 ENVIRONMENT
+
+=head2 Used Variables
+
+=over 4
+
+=item C<PATH_TRANSLATED>
+
+This CGI/1.1 variable is used to determine the source file when ePerl operates
+as a NPH-CGI/1.1 program under the environment of a webserver.
+
+=back
+
+=head2 Provided Variables
+
+=over 4
+
+=item C<SCRIPT_SRC_PATH>
+
+The absolute pathname of the script. Use this when you want to
+directly access the script from within itself, for instance to do
+C<stat()> and other calls.
+
+=item C<SCRIPT_SRC_PATH_DIR>
+
+The directory part of C<SCRIPT_SRC_PATH>. Use this one when you want to
+directly access other files residing in the same directory as the script, for
+instance to read config files, etc.
+
+=item C<SCRIPT_SRC_PATH_FILE>
+
+The filename part of C<SCRIPT_SRC_PATH>. Use this one when you need the name
+of the script, for instance for relative self-references through URLs.
+
+=item C<SCRIPT_SRC_URL>
+
+The fully-qualified URL of the script. Use this when you need a URL for
+self-reference.
+
+=item C<SCRIPT_SRC_URL_DIR>
+
+The directory part of C<SCRIPT_SRC_URL>. Use this one when you want to
+directly access other files residing in the same directory as the script via
+the Web, for instance to reference images, etc.
+
+=item C<SCRIPT_SRC_URL_FILE>
+
+The filename part of C<SCRIPT_SRC_URL>. Use this one when you need the name of
+the script, for instance for relative self-references through URLs.  Actually
+the same as C<SCRIPT_SRC_PATH_FILE>, but provided for consistency. 
+
+=item C<SCRIPT_SRC_SIZE>
+
+The filesize of the script, in bytes.
+
+=item C<SCRIPT_SRC_MODIFIED>
+
+The last modification time of the script, in seconds since 0 hours, 0 minutes,
+0 seconds, January 1, 1970, Coordinated Universal Time.
+
+=item C<SCRIPT_SRC_MODIFIED_CTIME>
+
+The last modification time of the script, in ctime(3) format (``WDAY MMM DD
+HH:MM:SS YYYY\n'').
+
+=item C<SCRIPT_SRC_MODIFIED_ISOTIME>
+
+The last modification time of the script, in ISO format (``DD-MM-YYYY
+HH:MM'').
+
+=item C<SCRIPT_SRC_OWNER>
+
+The username of the script owner.
+
+=item C<VERSION_INTERPRETER>
+
+The ePerl identification string.
+
+=item C<VERSION_LANGUAGE>
+
+The identification string of the used Perl interpreter library.
+
+=back
+
+=head2 Provided Built-In Images
+
+The following built-in images can be accessed via URL
+C</url/to/nph-eperl/>I<NAME>C<.gif>:
+
+=over 4
+
+=item C<logo.gif>
+
+The standard ePerl logo. Please do not include this one on your website.
+
+=item C<powered.gif>
+
+The ``I<powered by ePerl 2.2>'' logo. Feel free to use this on your website.
+
+=back
+
+=head1 AUTHOR
+
+  Ralf S. Engelschall
+  rse@engelschall.com
+  www.engelschall.com
+
+=head1 SEEALSO
+
+Parse::ePerl(3), Apache::ePerl(3).
+
+Web-References:
+
+  Perl:   perl(1),  http://www.perl.com/
+  ePerl:  eperl(1), http://www.engelschall.com/sw/eperl/
+  Apache: httpd(8), http://www.apache.org/
+
+=cut
+
+##EOF##

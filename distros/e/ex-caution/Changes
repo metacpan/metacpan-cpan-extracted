@@ -1,0 +1,6 @@
+Revision history for Perl extension ex::caution.
+
+0.01  Thu Dec 27 17:47:06 2007
+	- original version; created by h2xs 1.23 with options
+		-AX -nex::caution
+

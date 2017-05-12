@@ -1,0 +1,167 @@
+%#============================================================================
+%# ePortal - WEB Based daily organizer
+%# Author - S.Rusakov <rusakov_sa@users.sourceforge.net>
+%#
+%# Copyright (c) 2000-2003 Sergey Rusakov.  All rights reserved.
+%# This program is free software; you can redistribute it
+%# and/or modify it under the same terms as Perl itself.
+%#
+%#
+%#----------------------------------------------------------------------------
+
+<table width="99%" border="0">
+<tr><td width="30%">
+  <& SELF:intro &>
+</td><td  width="70%" align="right">
+  <& SELF:search_dialog &>
+</td></tr>
+</table>
+
+<% $list->draw_list %>
+
+%#=== @metags onStartRequest ====================================================
+<%method onStartRequest>
+  <& PARENT:onStartRequest, %ARGS &>
+  <%perl>
+
+  my $obj = new ePortal::App::Organizer::ToDo(
+      DBISource => 'Organizer',
+      Where => "TD.org_id=$session{_org_id}",
+      SQL => 'SELECT TD.*, C.title as category_title
+        FROM ToDo TD
+        LEFT JOIN Category C ON category_id=C.id
+      ');
+
+  $list = new ePortal::HTML::List(obj => $obj, class => "smallfont",
+    state => {org_id => $session{_org_id}}, after_row => 'row_detail' );
+	$list->add_column_image();
+  $list->add_column(id => "title",
+      sorting => 1,
+      title => pick_lang(rus => "Дело", eng => "Task"),
+      url => "todo_edit.htm?objid=#id#&done=todo_list.htm");
+  $list->add_column(id => "category_title",
+      sorting => 1,
+      title => pick_lang(rus => "Категория", eng => "Category") );
+  $list->add_column(id => "status", align => "center",
+      sorting => 1,
+      title => pick_lang(rus => "Состояние", eng => "Status") );
+  $list->add_column(id => "datestart", align => "center",
+      sorting => 1,
+      title => pick_lang(rus => "Начало", eng => "Start"));
+  $list->add_column(id => "dateend", align => "center",
+      sorting => 1,
+      title => pick_lang(rus => "Окончание", eng => "End"));
+  $list->add_column(id => "priority", align => "center",
+      sorting => 1,
+      title => pick_lang(rus => "Приоритет", eng => "Priority"));
+  $list->add_column(id => "q_ok", content => sub {
+                my $todo = shift;
+								if ($todo->status eq "undone") {
+                  return img( src => "/images/ePortal/ok.gif",
+										title => pick_lang(
+                        rus => "Пометить как выполненное",
+												eng => "Mark as completed"),
+										href => href("todo_ok.htm", objid => $todo->id));}
+								},
+							align => "center");
+
+  if ( $session{_organizer}->xacl_check_delete ) {
+    $list->add_column_system( delete => 1);
+  }
+
+  my $location = $list->handle_request;
+  return $location if $location;
+
+  # search parameters
+  my (@where, @bind);
+  if ( $ARGS{text} ne '' ) {
+    my $b = '%' . $ARGS{text} . '%';
+    push @where, "(TD.title like ? OR TD.memo like ?)";
+    push @bind, $b;
+    push @bind, $b;
+  }
+  if ( $ARGS{category_id} > 0 ) {
+    push @where, 'category_id=?';
+    push @bind, $ARGS{category_id};
+  }
+  if ( $ARGS{status} ) {
+    push @where, 'TD.status=?';
+    push @bind, $ARGS{status};
+  }
+
+  $list->{obj}->restore_where($list->restore_parameters, where => \@where, bind => \@bind);
+</%perl></%method>
+
+
+%#=== @METAGS attr =========================================================
+<%attr>
+Title => {rus => "Список дел", eng => "To do list"}
+</%attr>
+
+
+%#=== @METAGS row_detail ====================================================
+<%method row_detail><%perl>
+  my $list = $ARGS{list};
+  my $obj = $list->{obj};
+  my $t = (split("\r?\n", $obj->Memo))[0];
+</%perl>
+<span class="memo"><% $t |h %>...</span>
+</%method>
+
+
+
+%#=== @metags once =========================================================
+<%once>
+my ($list, $obj);
+</%once>
+
+%#=== @metags cleanup =========================================================
+<%cleanup>
+($list, $obj) = ();
+</%cleanup>
+
+%#=== @METAGS search_dialog ====================================================
+<%method search_dialog><%perl>
+  my %args = $m->request_args;
+  my $dummy = new ePortal::App::Organizer::ToDo;
+  $dummy->add_attribute( text => {label => pick_lang(rus => "Текст для поиска", eng => "Text to search")} );
+  $dummy->org_id( $session{_org_id} );
+  $dummy->category_id( $args{category_id} );
+  $dummy->text( $args{text} );
+  $dummy->status( $args{status} );
+  my $d = new ePortal::HTML::Dialog( obj => $dummy, width => "400", method => 'GET',
+      align => 'right',
+      title => pick_lang(rus => "Поиск", eng => "Search") );
+</%perl>
+
+<%  $d->dialog_start() %>
+  <tr>
+    <% $d->field('org_id', hidden => 1) %>
+    <% $d->field('text') %>
+    <% $d->row(
+        $d->field('category_id', horizontal => 1) .
+        $d->field('status', horizontal => 1)) %>
+
+    <tr><td align="center" colspan="2">
+    <% plink({rus => 'Показать все дела', eng => 'Show all tasks'},
+        href=>href($ENV{SCRIPT_NAME}, org_id => $session{_org_id})) %>
+    </td></tr>
+  </tr>
+<%  $d->buttons(cancel_button => 0, ok_label => pick_lang(rus => "Искать!", eng => "Search!")) %>
+<%  $d->dialog_end() %>
+</%method>
+
+
+
+
+%#=== @METAGS intro ====================================================
+<%method intro>
+% if ($session{_organizer}->xacl_check_update) {
+  <ul>
+  <li><a href="<% href('todo_edit.htm', org_id => $session{_org_id}, objid => 0) %>"><% img(src=>'/images/icons/memo.gif') %>&nbsp;<%
+      pick_lang(rus => "Новое дело", eng => "New task") %></a>
+  </ul>
+% }
+</%method>
+
+

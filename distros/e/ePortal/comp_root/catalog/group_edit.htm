@@ -1,0 +1,93 @@
+%#============================================================================
+%# ePortal - WEB Based daily organizer
+%# Author - S.Rusakov <rusakov_sa@users.sourceforge.net>
+%#
+%# Copyright (c) 2000-2004 Sergey Rusakov.  All rights reserved.
+%# This program is open source software
+%#
+%#
+%#----------------------------------------------------------------------------
+
+&nbsp;
+<&| /dialog.mc:edit_dialog,
+      title => pick_lang(rus => "Группа ресурсов", eng => "Group"),
+      obj => $obj,
+      focus => 'title',
+      width => 550 &>
+  <& /dialog.mc:hidden, id => 'recordtype', value => 'group' &>
+  <& /dialog.mc:field, id => 'parent_id' &>
+  <& /dialog.mc:field, id => 'title' &>
+
+%#
+%# OTHER ============================================================
+%#
+<&| /dialog.mc:collapse, collapse => 0, title => pick_lang(rus => "Дополнительные свойства", eng => "More info") &>
+  <& /dialog.mc:field, id => 'nickname' &>
+  <& /dialog.mc:field, id => 'priority' &>
+  <& /dialog.mc:field, id => 'hidden' &>
+  <&| /dialog.mc:cell, -align=>'center' &>
+    <b><% pick_lang({rus => "Краткое описание", eng => "Short description"}) %>:</b><br>
+    <& /dialog.mc:textarea, id => 'memo' &>
+  </&>
+</&>
+
+%#
+%# Access rights ============================================================
+%#
+
+% if ($obj->xacl_check_admin) {
+  <&| /dialog.mc:collapse, title => pick_lang(rus => "Права доступа", eng => "Access rights") &>
+  <& /dialog.mc:read_only, id => 'uid' &>
+  <& /dialog.mc:field, id => 'xacl_read' &>
+  <& /dialog.mc:field, id => 'xacl_write' &>
+  <& /dialog.mc:field, id => 'xacl_admin' &>
+  <& /dialog.mc:field, id => 'including_children' &>
+  </&>
+% }
+
+  <&| /dialog.mc:cell &>&nbsp;</&>
+  <& /dialog.mc:buttons, ok_label => pick_lang(rus => "Сохранить ресурс", eng => "Save the resource"),
+      apply_button => 1 &>
+</&>
+<p>
+
+
+%#=== @METAGS attr =========================================================
+<%attr>
+Title => {rus => "Группа", eng => "Group"}
+</%attr>
+
+
+%#=== @METAGS onStartRequest ====================================================
+<%method onStartRequest><%perl>
+  $obj = new ePortal::Catalog;
+  $obj->add_attribute( including_children => {
+        type => 'Temp',
+        dtype => 'YesNo',
+        label => pick_lang(rus => "Заменить права подчиненных", eng => "Replace rights on children"),
+  });
+
+  $m->comp('/dialog.mc:handle_request',
+    obj => $obj,
+    callback_aftersave => sub {
+      my $obj = shift;
+      $obj->xacl_set_r if $obj-> including_children;
+    });
+
+  #initialize ACL
+  my $parent = $obj->parent;
+  $obj->set_acl_from_obj($parent) if $parent and ! $obj->check_id;
+</%perl></%method>
+
+
+
+%#=== @metags once =========================================================
+<%once>
+my ($obj);
+</%once>
+
+%#=== @metags cleanup =========================================================
+<%cleanup>
+($obj) = ();
+</%cleanup>
+

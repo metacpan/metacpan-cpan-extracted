@@ -1,0 +1,62 @@
+%#============================================================================
+%# ePortal - WEB Based daily organizer
+%# Author - S.Rusakov <rusakov_sa@users.sourceforge.net>
+%#
+%# Copyright (c) 2000-2003 Sergey Rusakov.  All rights reserved.
+%# This program is free software; you can redistribute it
+%# and/or modify it under the same terms as Perl itself.
+%#
+%#
+%#----------------------------------------------------------------------------
+&nbsp;
+<% $dlg->dialog_start( title => pick_lang(rus => "Заметка в календаре", eng => "Calendar note"), width => 450) %>
+
+<% $dlg->field("org_id", RO=>1) %>
+<% $dlg->field("title") %>
+<% $dlg->field("datestart", RO => 0) %>
+<% $dlg->field("duration") %>
+<% $dlg->field("memo") %>
+
+<% $dlg->buttons %>
+<% $dlg->dialog_end %>
+
+
+%#=== @METAGS attr =========================================================
+<%attr>
+Title => {rus => "Заметка в календаре", eng => "Calendar note"}
+</%attr>
+
+
+
+
+%#=== @METAGS onStartRequest ====================================================
+<%method onStartRequest>
+<& PARENT:onStartRequest, %ARGS &>
+<%perl>
+  my %args = $m->request_args;
+  $obj = new ePortal::App::Organizer::Calendar;
+  $obj->org_id( $session{_org_id});
+  $obj->datestart( $args{dt});
+
+  $dlg = new ePortal::HTML::Dialog( obj => $obj);
+  my $location = try {
+    $dlg->handle_request( );
+  } catch ePortal::Exception::DataNotValid with {
+    my $E = shift;
+    $session{ErrorMessage} = $E->text;
+    '';
+  };
+  return $location if $location;
+</%perl></%method>
+
+
+%#=== @metags once =========================================================
+<%once>
+my ($dlg, $obj);
+</%once>
+
+%#=== @metags cleanup =========================================================
+<%cleanup>
+($dlg, $obj) = ();
+</%cleanup>
+

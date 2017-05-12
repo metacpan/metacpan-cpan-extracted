@@ -1,0 +1,24 @@
+%#============================================================================
+%# ePortal - WEB Based daily organizer
+%# Author - S.Rusakov <rusakov_sa@users.sourceforge.net>
+%#
+%# Copyright (c) 2000-2003 Sergey Rusakov.  All rights reserved.
+%# This program is free software; you can redistribute it
+%# and/or modify it under the same terms as Perl itself.
+%#
+%#
+%#----------------------------------------------------------------------------
+
+%#=== @metags onStartRequest ====================================================
+<%method onStartRequest>
+<& PARENT:onStartRequest, %ARGS &>
+<%perl>
+	if ($ARGS{title}) {
+    my $todo = new ePortal::App::Organizer::ToDo;
+    $todo->org_id($ARGS{org_id});
+		$todo->title($ARGS{title});
+		$todo->datestart('now');
+		$todo->insert;
+	}
+  return href("cal_dairy.htm", org_id=> $ARGS{org_id});    # redirect
+</%perl></%method>
